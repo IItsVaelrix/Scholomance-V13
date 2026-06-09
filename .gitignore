@@ -1,0 +1,30 @@
+# Node
+node_modules/
+# Build outputs
+dist/
+output/
+.vite/
+# Test results
+test-results/
+
+# Database files
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# Nested repositories
+Scholomance-V13/
+
+# Editor files
+.vscode/
+.idea/
+.DS_Store
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Cache / temp
+.tmp/
+.cache/
