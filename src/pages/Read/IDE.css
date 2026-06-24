@@ -5669,3 +5669,121 @@
   border-radius: 3px;
   opacity: 0.9;
 }
+
+/* ── Writer focus mode ─────────────────────────────────────────────── */
+/* Class names verified against ReadPage.jsx / IDEChrome.jsx:
+   chrome = .ide-topbar/.ide-statusbar, ambient = .ide-ambient-canvas,
+   left activity bar = .activity-icons-col, left files/tools = .ide-sidebar,
+   right analysis = .ide-right-panel, resize handles = .sidebar-resize-handle,
+   editor wrappers = .codex-workspace > .document-container (center Panel has no class). */
+.ide-layout-wrapper--focus .ide-topbar,
+.ide-layout-wrapper--focus .ide-statusbar,
+.ide-layout-wrapper--focus .ide-ambient-canvas,
+.ide-layout-wrapper--focus .activity-icons-col,
+.ide-layout-wrapper--focus .ide-sidebar,
+.ide-layout-wrapper--focus .ide-right-panel,
+.ide-layout-wrapper--focus .sidebar-resize-handle {
+  display: none !important;
+}
+
+.ide-layout-wrapper--focus .ide-main-content {
+  padding: 0;
+}
+
+/* react-resizable-panels sets inline flex on panels; switching the group to
+   block lets the (now only-visible) center editor panel span full width. */
+.ide-layout-wrapper--focus .ide-panel-group {
+  display: block;
+}
+
+.ide-layout-wrapper--focus .codex-workspace,
+.ide-layout-wrapper--focus .document-container {
+  max-width: 78ch;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Engraved red M button */
+.focus-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 60, 60, 0.55);
+  border-radius: 6px;
+  background: radial-gradient(circle at 50% 30%, #7a1414, #3a0808);
+  color: #ffb3b3;
+  cursor: pointer;
+}
+.focus-mode-btn__glyph {
+  font-weight: 700;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8), 0 -1px 0 rgba(255, 120, 120, 0.4);
+}
+.focus-mode-btn--bar { width: 28px; height: 28px; }
+.focus-mode-btn--floating {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  z-index: 60;
+  box-shadow: 0 0 16px rgba(255, 40, 40, 0.45);
+}
+.focus-mode-btn--active { box-shadow: 0 0 12px rgba(255, 40, 40, 0.7); }
+
+/* Ambience tray */
+.ambience-tray {
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  min-width: 220px;
+  background: rgba(12, 12, 18, 0.86);
+  border: 1px solid var(--ritual-border, rgba(255, 255, 255, 0.12));
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
+  color: var(--ritual-ink, #e8e8f0);
+}
+.ambience-tray__head { display: flex; justify-content: space-between; align-items: center; }
+.ambience-tray__title { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; }
+.ambience-tray__row { display: flex; align-items: center; gap: 10px; }
+.ambience-tray__toggle {
+  flex: 0 0 9.5rem;
+  text-align: left;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.ambience-tray__toggle[aria-pressed='true'] {
+  border-color: var(--active-school-glow, rgba(120, 200, 255, 0.6));
+  background: rgba(255, 255, 255, 0.06);
+}
+.ambience-tray__toggle:disabled { opacity: 0.4; cursor: not-allowed; }
+.ambience-tray__collapse,
+.ambience-tray__fab {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+}
+.ambience-tray__fab {
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  z-index: 60;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(12, 12, 18, 0.86);
+  border: 1px solid var(--ritual-border, rgba(255, 255, 255, 0.12));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .focus-mode-btn { transition: none; }
+}

@@ -47,6 +47,9 @@ import { encodeBytecodeHealth, CELL_IDS } from "../../lib/diagnostic.adapter.js"
 
 const USE_SERVER_ANALYSIS = parseBooleanEnvFlag(import.meta.env.VITE_USE_SERVER_PANEL_ANALYSIS, true);
 import ToolsSidebar from "./ToolsSidebar.jsx";
+import AmbienceTray from './AmbienceTray.jsx';
+import FocusModeButton from './FocusModeButton.jsx';
+import { useFocusMode } from './useFocusMode.js';
 import SearchPanel from "./SearchPanel.jsx";
 import FloatingPanel from "../../components/shared/FloatingPanel.jsx";
 import IDEAmbientCanvas from "./IDEAmbientCanvas.jsx";
@@ -242,6 +245,7 @@ export default function ReadPage() {
   const [mobileActiveTab, setMobileActiveTab] = useState("EDITOR");
   const [showScorePanel, setShowScorePanel] = useState(false);
   const [showOraclePanel, setShowOraclePanel] = useState(true);
+  const [focusMode, setFocusMode] = useState(false);
   const [showSpellcheckPanel, setShowSpellcheckPanel] = useState(false);
   const [oracleWord, setOracleWord] = useState("");
   const [toasts, setToasts] = useState([]);
@@ -254,6 +258,8 @@ export default function ReadPage() {
       setToasts((prev) => prev.filter((t) => t.id !== id));
     }, 3000);
   }, []);
+
+  useFocusMode(focusMode, setFocusMode);
 
   const schoolColorHex = useMemo(() => {
     return SCHOOLS[selectedSchool]?.color || "#d5b34b";
@@ -1193,7 +1199,7 @@ export default function ReadPage() {
   /* ── DESKTOP RENDER ── */
   return (
     <div 
-      className="ide-layout-wrapper"
+      className={`ide-layout-wrapper${focusMode ? ' ide-layout-wrapper--focus' : ''}`}
       style={{
         '--ritual-abyss': ritualPalette.abyss,
         '--ritual-panel': ritualPalette.panel,
@@ -1222,6 +1228,8 @@ export default function ReadPage() {
         auroraLevel={auroraLevel}
         onCycleAuroraLevel={cycleAuroraLevel}
         onSettingsClick={() => setShowSettingsPanel((p) => !p)}
+        focusMode={focusMode}
+        onToggleFocus={() => setFocusMode((v) => !v)}
       />
       <main className="ide-main-content">
         <IDEAmbientCanvas schoolColor={schoolColorHex} />
@@ -1596,7 +1604,14 @@ export default function ReadPage() {
         analysisError={analysisError}
         serverAnalysisActive={USE_SERVER_ANALYSIS}
       />
-      
+
+      {focusMode && (
+        <>
+          <FocusModeButton variant="floating" active onToggle={() => setFocusMode(false)} />
+          <AmbienceTray />
+        </>
+      )}
+
       {isPredictive && tooltipState.token && (
         <AnimatePresence>
           <RitualPredictionTooltip

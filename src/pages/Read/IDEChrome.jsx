@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js';
 import { freshRng } from '../../lib/math/seededRng.js';
 import './IDE.css';
+import FocusModeButton from './FocusModeButton.jsx';
 
 // ─── MatrixTitle ──────────────────────────────────────────────────────────────
 
@@ -235,6 +236,8 @@ export function TopBar({
   auroraLevel = 2,
   onCycleAuroraLevel,
   onSettingsClick,
+  focusMode,
+  onToggleFocus,
   showMinimapControl = true,
   showSettingsControl = true,
 }) {
@@ -302,6 +305,7 @@ export function TopBar({
             {AURORA_LABELS[auroraLevel]}
           </button>
         )}
+        <FocusModeButton variant="bar" active={focusMode} onToggle={onToggleFocus} />
         {showSettingsControl && (
           <button className="ide-icon-btn" title="Settings" aria-label="Settings" onClick={onSettingsClick}>
             <GearIcon />
