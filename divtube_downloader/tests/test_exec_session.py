@@ -90,5 +90,36 @@ class PythonExecTest(unittest.TestCase):
         self.assertIn(str(id(marker)), out)
 
 
+class ToolServiceExecTest(unittest.TestCase):
+    def setUp(self):
+        from tui.services.tool_service import ToolService
+        self.svc = ToolService()
+
+    def tearDown(self):
+        from tui.services.exec_session_service import get_exec_session
+        get_exec_session().reset("all")
+
+    def test_tools_are_registered_in_schema(self):
+        names = {t["function"]["name"] for t in self.svc.tools}
+        self.assertIn("bash_session", names)
+        self.assertIn("python_exec", names)
+        self.assertIn("exec_reset", names)
+
+    def test_bash_session_tool_runs(self):
+        out = self.svc.execute_tool("bash_session", {"command": "echo via-toolservice"})
+        self.assertIn("via-toolservice", out)
+
+    def test_python_exec_tool_runs_and_persists(self):
+        self.svc.execute_tool("python_exec", {"code": "z = 7"})
+        out = self.svc.execute_tool("python_exec", {"code": "z * 6"})
+        self.assertIn("42", out)
+
+    def test_exec_reset_tool_clears_python(self):
+        self.svc.execute_tool("python_exec", {"code": "w = 5"})
+        self.svc.execute_tool("exec_reset", {"target": "python"})
+        out = self.svc.execute_tool("python_exec", {"code": "w"})
+        self.assertIn("NameError", out)
+
+
 if __name__ == "__main__":
     unittest.main()

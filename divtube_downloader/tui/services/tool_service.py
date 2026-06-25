@@ -3,6 +3,8 @@ import json
 import os
 import subprocess
 
+from tui.services.exec_session_service import get_exec_session
+
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 BRIDGE_SCRIPT = os.path.join(PROJECT_ROOT, "divtube_downloader", "scripts", "scholomance-bridge.mjs")
 
@@ -1188,6 +1190,50 @@ class ToolService:
                         "required": ["file_path", "patch"]
                     }
                 }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "bash_session",
+                    "description": "Run a shell command in a PERSISTENT bash session. Unlike run_command, the working directory, exported env vars, and shell state PERSIST across calls. Use for multi-step shell work. Default timeout 30s; on timeout the command is killed and the session restarted.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "command": {"type": "string", "description": "Shell command to run in the persistent session."},
+                            "timeout": {"type": "integer", "description": "Seconds before the command is killed (default 30).", "default": 30}
+                        },
+                        "required": ["command"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "python_exec",
+                    "description": "Execute Python in a PERSISTENT in-process REPL inside the running cockpit. Variables and imports persist across calls. A trailing expression's value is returned (REPL semantics); stdout is captured. The namespace exposes os, sys, json, the live 'tools' (ToolService), and 'app' (the running TUI app) for direct runtime introspection. Default timeout 30s (best-effort interrupt; cannot kill a blocked C call).",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "code": {"type": "string", "description": "Python source to execute in the persistent namespace."},
+                            "timeout": {"type": "integer", "description": "Seconds before a best-effort interrupt (default 30).", "default": 30}
+                        },
+                        "required": ["code"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "exec_reset",
+                    "description": "Reset the persistent execution sessions: restart the bash session and/or clear the python REPL namespace.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "target": {"type": "string", "enum": ["bash", "python", "all"], "description": "Which session to reset (default all).", "default": "all"}
+                        },
+                        "required": []
+                    }
+                }
             }
         ]
  
@@ -1200,8 +1246,10 @@ class ToolService:
 
     def execute_tool(self, tool_name, kwargs, callback=None):
         # ── CLI Gate: cooldown + redundancy check ────────────
-        if not _gate_check(tool_name, kwargs, callback):
-            return f"⛔ Gate blocked '{tool_name}': check your cadence."
+        # exec tools are the intentionally-powerful path; repeated calls are expected.
+        if tool_name not in ("bash_session", "python_exec", "exec_reset"):
+            if not _gate_check(tool_name, kwargs, callback):
+                return f"⛔ Gate blocked '{tool_name}': check your cadence."
         # ──────────────────────────────────────────────────────
         if tool_name == "read_file":
             return self._read_file(kwargs, callback)
@@ -1283,6 +1331,12 @@ class ToolService:
             return self._heal(kwargs, callback)
         elif tool_name == "apply_patch":
             return self._apply_patch(kwargs, callback)
+        elif tool_name == "bash_session":
+            return self._bash_session(kwargs, callback)
+        elif tool_name == "python_exec":
+            return self._python_exec(kwargs, callback)
+        elif tool_name == "exec_reset":
+            return self._exec_reset(kwargs, callback)
         return "Tool not found."
 
     def _read_file(self, kwargs, callback):
@@ -1588,6 +1642,36 @@ class ToolService:
             return "Command timed out after 15s."
         except Exception as e:
             return f"Command error: {e}"
+
+    def _bash_session(self, kwargs, callback):
+        command = kwargs.get("command", "").strip()
+        if not command:
+            return "Error: No command provided."
+        timeout = int(kwargs.get("timeout", 30))
+        out = get_exec_session().run_bash(command, timeout=timeout)
+        if callback:
+            callback(f"  [#7CFF8B]✓[/] bash_session('{command[:60]}')")
+        return out
+
+    def _python_exec(self, kwargs, callback):
+        code = kwargs.get("code", "")
+        if not code.strip():
+            return "Error: No code provided."
+        timeout = int(kwargs.get("timeout", 30))
+        out = get_exec_session().run_python(code, timeout=timeout, host=self)
+        if callback:
+            first = code.strip().splitlines()[0] if code.strip() else ""
+            callback(f"  [#7CFF8B]✓[/] python_exec('{first[:60]}')")
+        return out
+
+    def _exec_reset(self, kwargs, callback):
+        target = kwargs.get("target", "all")
+        if target not in ("bash", "python", "all"):
+            target = "all"
+        msg = get_exec_session().reset(target)
+        if callback:
+            callback(f"  [#7CFF8B]✓[/] exec_reset({target}): {msg}")
+        return msg
 
     def _git_diff(self, kwargs, callback):
         import subprocess
