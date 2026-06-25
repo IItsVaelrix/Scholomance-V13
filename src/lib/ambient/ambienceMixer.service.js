@@ -133,18 +133,24 @@ export function createAmbienceMixerService({ createEngine }) {
   };
 }
 
-function createWebAudioEngine() {
+export function createWebAudioEngine() {
   const Ctx = window.AudioContext || window.webkitAudioContext;
   const ctx = new Ctx();
   const master = ctx.createGain();
   master.gain.value = 0;
   master.connect(ctx.destination);
 
-  const availability = { rain: false, cafe: false, wind: false };
+  const availability = {};
+  const reportedAvailability = {};
   let availabilityCb = null;
   const channels = {};
+  const desiredGain = {};
 
   for (const id of AMBIENCE_CHANNELS) {
+    availability[id] = false;
+    reportedAvailability[id] = null; // unknown — forces first update through
+    desiredGain[id] = 0;
+
     const gain = ctx.createGain();
     gain.gain.value = 0;
     gain.connect(master);
@@ -153,11 +159,15 @@ function createWebAudioEngine() {
     el.preload = 'auto';
     el.crossOrigin = 'anonymous';
     el.addEventListener('canplaythrough', () => {
+      if (reportedAvailability[id] === true) return;
       availability[id] = true;
+      reportedAvailability[id] = true;
       if (availabilityCb) availabilityCb({ ...availability });
     }, { once: true });
     el.addEventListener('error', () => {
+      if (reportedAvailability[id] === false) return;
       availability[id] = false;
+      reportedAvailability[id] = false;
       if (availabilityCb) availabilityCb({ ...availability });
     });
     const src = ctx.createMediaElementSource(el);
@@ -176,12 +186,25 @@ function createWebAudioEngine() {
     setChannelGain(id, value, rampMs) {
       const c = channels[id];
       if (!c) return;
-      if (value > 0) { const p = c.el.play(); if (p && p.catch) p.catch(() => {}); }
+      desiredGain[id] = value;
       ramp(c.gain.gain, value, rampMs);
+      if (value > 0) {
+        if (c.el.paused) c.el.play().catch(() => {});
+      } else {
+        c.el.pause();
+      }
     },
     setMasterGain(value, rampMs) { ramp(master.gain, value, rampMs); },
-    async resume() { if (ctx.state === 'suspended') await ctx.resume(); },
-    async suspend() { if (ctx.state === 'running') await ctx.suspend(); },
+    async resume() {
+      await ctx.resume();
+      for (const id of AMBIENCE_CHANNELS) {
+        if (desiredGain[id] > 0) channels[id].el.play().catch(() => {});
+      }
+    },
+    async suspend() {
+      for (const id of AMBIENCE_CHANNELS) channels[id].el.pause();
+      await ctx.suspend();
+    },
     onAvailabilityChange(cb) { availabilityCb = cb; },
   };
 }
