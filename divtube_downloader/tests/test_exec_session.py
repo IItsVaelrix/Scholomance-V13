@@ -45,5 +45,50 @@ class BashSessionTest(unittest.TestCase):
         self.assertIn("recovered", out2)
 
 
+class PythonExecTest(unittest.TestCase):
+    def setUp(self):
+        self.sess = RuntimeExecSession()
+
+    def tearDown(self):
+        self.sess.reset("all")
+
+    def test_variable_persists_across_calls(self):
+        self.sess.run_python("x = 41")
+        out = self.sess.run_python("x + 1")
+        self.assertIn("42", out)
+
+    def test_import_persists_across_calls(self):
+        self.sess.run_python("import math")
+        out = self.sess.run_python("math.floor(3.9)")
+        self.assertIn("3", out)
+
+    def test_stdout_is_captured(self):
+        out = self.sess.run_python("print('hello-exec')")
+        self.assertIn("hello-exec", out)
+
+    def test_exception_returns_traceback_not_raise(self):
+        out = self.sess.run_python("1/0")
+        self.assertIn("ZeroDivisionError", out)
+
+    def test_reset_python_clears_namespace(self):
+        self.sess.run_python("y = 99")
+        self.sess.reset("python")
+        out = self.sess.run_python("y")
+        self.assertIn("NameError", out)
+
+    def test_python_timeout_interrupts_busy_loop(self):
+        start = time.time()
+        out = self.sess.run_python("while True:\n    pass", timeout=1)
+        elapsed = time.time() - start
+        self.assertLess(elapsed, 10, "python timeout did not fire promptly")
+        self.assertIn("timed out", out.lower())
+
+    def test_bind_app_exposes_app_in_namespace(self):
+        marker = object()
+        self.sess.bind_app(marker)
+        out = self.sess.run_python("id(app)")
+        self.assertIn(str(id(marker)), out)
+
+
 if __name__ == "__main__":
     unittest.main()

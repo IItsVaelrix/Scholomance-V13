@@ -12,7 +12,42 @@ import subprocess
 import threading
 import uuid
 
+import ast
+import ctypes
+import io
+import json
+import sys
+import traceback
+
 _OUT_LIMIT = 4000
+
+
+_NO_VALUE = object()
+
+
+def _async_raise(thread_id, exctype):
+    """Best-effort: inject *exctype* into the thread with id *thread_id*.
+
+    Interrupts pure-Python loops; cannot interrupt a blocked C call.
+    """
+    res = ctypes.pythonapi.PyThreadState_SetAsyncExc(
+        ctypes.c_long(thread_id), ctypes.py_object(exctype)
+    )
+    if res > 1:
+        ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(thread_id), None)
+
+
+def _run_repl(code, ns):
+    """Exec all statements; eval a trailing expression and return its value."""
+    block = ast.parse(code, mode="exec")
+    if block.body and isinstance(block.body[-1], ast.Expr):
+        last = ast.Expression(block.body.pop().value)
+        if block.body:
+            exec(compile(block, "<exec_session>", "exec"), ns)
+        return eval(compile(last, "<exec_session>", "eval"), ns)
+    exec(compile(block, "<exec_session>", "exec"), ns)
+    return _NO_VALUE
+
 
 
 class RuntimeExecSession:
@@ -110,6 +145,61 @@ class RuntimeExecSession:
             tail = "\n(exit %s)" % code
         return (output + tail) if output or tail else "(no output)"
 
+    # ── python ──────────────────────────────────────────────────────
+    def bind_app(self, app):
+        self._app = app
+        if self._py_ns is not None:
+            self._py_ns["app"] = app
+
+    def _ensure_ns(self):
+        if self._py_ns is None:
+            self._py_ns = {
+                "__name__": "__exec_session__",
+                "os": os,
+                "sys": sys,
+                "json": json,
+                "app": self._app,
+                "tools": None,
+            }
+        return self._py_ns
+
+    def run_python(self, code, timeout=30, host=None):
+        with self._lock:
+            ns = self._ensure_ns()
+            ns["app"] = self._app
+            if host is not None:
+                ns["tools"] = host
+
+            buf = io.StringIO()
+            holder = {"value": _NO_VALUE, "exc": None}
+
+            def target():
+                try:
+                    holder["value"] = _run_repl(code, ns)
+                except BaseException:
+                    holder["exc"] = traceback.format_exc()
+
+            old_out, old_err = sys.stdout, sys.stderr
+            sys.stdout = sys.stderr = buf
+            th = threading.Thread(target=target, daemon=True)
+            th.start()
+            th.join(timeout)
+            timed_out = th.is_alive()
+            if timed_out:
+                _async_raise(th.ident, TimeoutError)
+                th.join(2)
+            sys.stdout, sys.stderr = old_out, old_err
+
+            out = buf.getvalue()
+            if timed_out:
+                return (out + "\n(python timed out after %ss; best-effort interrupt sent)" % timeout).strip()
+            if holder["exc"]:
+                return (out + holder["exc"]).strip()
+            val = holder["value"]
+            if val is not _NO_VALUE and val is not None:
+                out += repr(val)
+            return out.strip() if out.strip() else "(no output)"
+
     # ── reset ───────────────────────────────────────────────────────
     def reset(self, target="all"):
         with self._lock:
@@ -117,7 +207,9 @@ class RuntimeExecSession:
             if target in ("bash", "all"):
                 self._kill_bash()
                 msgs.append("bash session reset")
-            # python branch added in Task 2
+            if target in ("python", "all"):
+                self._py_ns = None
+                msgs.append("python namespace cleared")
             return "; ".join(msgs) if msgs else "nothing reset"
 
 
