@@ -7,6 +7,8 @@ from textual.containers import Vertical
 from textual.widgets import Static, Input, TextArea
 from textual import events, on
 from rich.text import Text
+from rich.markup import escape as _escape_markup
+from rich.errors import MarkupError
 import threading
 import os
 import asyncio
@@ -27,8 +29,10 @@ from tui.services.archive_bridge import ArchiveBridge
 from tui.services.prompt_service import PromptService
 from tui.services.scd64_service import scd64_service
 from tui.services.substrate_osmosis_service import SubstrateOsmosisService
-from tui.services.env_config import write_key
+from tui.services.env_config import write_key, set_active_key, set_provider, get_active_provider
 from tui.screens.video_forge_screen import VideoForgeScreen
+from tui.widgets.log_tail_widget import LogTailWidget
+from tui.widgets.registry_inspector_widget import RegistryInspectorWidget
 
 # ── Scholomance palette ──────────────────────────────────────────────
 # Obsidian · Purple · Crimson
@@ -189,8 +193,12 @@ class FileSelectScreen(ModalScreen[str]):
         if self.archive:
             return
         import subprocess
-        import os
-        cwd = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        # Anchor the picker at the real project root (the git repo top), not the
+        # divtube_downloader subfolder — so @ finds files anywhere in the
+        # Scholomance tree, and its paths match how resolve_at_references()
+        # resolves them (both share _get_project_root()).
+        from tui.core.command_parser import _get_project_root
+        cwd = _get_project_root()
         try:
             out = subprocess.check_output(["git", "ls-files"], text=True, cwd=cwd)
             self.files = [f for f in out.splitlines() if f.strip()]
@@ -306,6 +314,52 @@ class FileSelectScreen(ModalScreen[str]):
                 self.query_one("#file-filter").focus()
                 event.prevent_default()
 
+class WidgetModalScreen(ModalScreen):
+    """Host an arbitrary widget inside a dismissable modal.
+
+    LogTailWidget / RegistryInspectorWidget are plain widgets, not Screens, so
+    they cannot be handed straight to push_screen(). This wraps one in a screen
+    so it can be pushed, and dismisses on Escape.
+    """
+
+    CSS = """
+    WidgetModalScreen {
+        align: center middle;
+        background: rgba(13, 13, 13, 0.92);
+    }
+    #widget-modal-container {
+        width: 90%;
+        height: 90%;
+        border: panel #DC143C;
+        background: #1C1C1C;
+        padding: 1 2;
+        box-sizing: border-box;
+    }
+    .modal-title {
+        text-align: center;
+        margin-bottom: 1;
+        color: #B388FF;
+    }
+    """
+
+    def __init__(self, widget, title: str = ""):
+        super().__init__()
+        self._widget = widget
+        self._title = title
+
+    def compose(self):
+        children = []
+        if self._title:
+            children.append(Static(f"[bold #DC143C]{self._title}[/]", classes="modal-title"))
+        children.append(self._widget)
+        yield Vertical(*children, id="widget-modal-container")
+
+    @on(events.Key)
+    def _on_modal_key(self, event):
+        if event.key == "escape":
+            self.dismiss(None)
+
+
 class ModelSelectScreen(ModalScreen[str]):
     def __init__(self, free_models, paid_models):
         super().__init__()
@@ -383,6 +437,15 @@ class DivTubeAgentApp(App):
         border-title-align: center;
         padding: 1 1;
         margin: 1 0 1 1;
+    }
+    #aether-meter {
+        height: 6;
+        background: #1C1C1C;
+        border: panel #B388FF;
+        border-title-color: #F8FAFC;
+        border-title-align: center;
+        padding: 0 1;
+        margin: 1 1 0 0;
     }
     #inspector {
         height: 1fr;
@@ -577,6 +640,11 @@ class DivTubeAgentApp(App):
         self.setup_commands()
 
     async def on_mount(self):
+        try:
+            from tui.services.exec_session_service import get_exec_session
+            get_exec_session().bind_app(self)
+        except Exception:
+            pass
         await scd64_service.start()
         
         # Connect radar widget updates
@@ -1189,8 +1257,10 @@ class DivTubeAgentApp(App):
                             ui.prompt.set_model(model_name)
                             write_key("OPENCODE_MODEL", model_name)
                             ui.log_msg(f"[bold {SUCCESS}]✔ Active default model set to:[/] {model_name}")
-                    # Only show free models to ensure the user can actually use them
-                    ui.push_screen(ModelSelectScreen(free_models, []), on_selected)
+                    # Show both free and paid models so every available model
+                    # is selectable (paid ones only appear when the provider
+                    # reports a positive price).
+                    ui.push_screen(ModelSelectScreen(free_models, paid_models), on_selected)
                 ui.call_from_thread(push_screen)
             ui.critic_service.get_models(ui.log_msg, on_fetched)
 
@@ -1200,54 +1270,50 @@ class DivTubeAgentApp(App):
             if not args:
                 ui.log_msg(f"[{ERROR}]Usage:[/] /apikey <your_api_key>")
                 return
-                
+
             key = args[0]
-            write_key("CUSTOM_API_KEY", key)
-            
-            ui.log_msg(f"[bold {SUCCESS}]✔ API Key securely saved![/] This key will persist across restarts.")
-            
+            provider = set_active_key(key)
+
+            if provider:
+                ui.log_msg(f"[bold {SUCCESS}]✔ API Key saved for [{provider}]![/] It will be restored automatically whenever you switch back to this provider — no need to re-enter it.")
+            else:
+                ui.log_msg(f"[bold {SUCCESS}]✔ API Key securely saved![/] This key will persist across restarts.")
+
         self.registry.register("/apikey", handle_apikey, "Set API Key", "/apikey <key>")
+
+        def handle_budget(ui, args):
+            from tui.services.token_meter import meter
+            if args and args[0].lower() in ("reset", "clear"):
+                meter.reset_spend()
+                ui.log_msg(f"[bold {SUCCESS}]✔ Aether reserve refilled.[/] Spend counter zeroed.")
+                return
+            if args:
+                raw = args[0].lstrip("$")
+                try:
+                    meter.set_budget(float(raw))
+                except ValueError:
+                    ui.log_msg(f"[{ERROR}]Usage:[/] /budget <usd amount>  ·  /budget reset")
+                    return
+            s = meter.snapshot()
+            ui.log_msg(
+                f"[bold {PURPLE_LT}]❖ AETHER RESERVE ❖[/]\n"
+                f"  Budget:    ${s['budget']:.2f}\n"
+                f"  Spent:     ≈${s['cost']:.4f}  ({s['calls']} calls)\n"
+                f"  Remaining: ≈${s['remaining']:.2f}  ({s['ratio'] * 100:.0f}%)\n"
+                f"  Tokens:    {s['tokens']:,}\n"
+                f"[{MUTED}]Cost is an estimate from a tunable price table — tune via AETHER_PRICE_* in .env.[/]"
+            )
+
+        self.registry.register("/budget", handle_budget, "Set/show the aether (credit) reserve", "/budget <usd> | reset")
 
         def handle_provider(ui, args):
             if not args:
-                ui.log_msg(f"[{ERROR}]Usage:[/] /provider <openai|xai|opencode|router|gemini|blackbox|custom_base_url>")
+                ui.log_msg(f"[{ERROR}]Usage:[/] /provider <openai|xai(grok)|opencode|router(openrouter)|gemini|blackbox|groq|custom_base_url>")
                 return
-            provider = args[0].lower()
-            base_url = ""
-            models_url = ""
-            if provider == "openai":
-                base_url = "https://api.openai.com/v1"
-                models_url = "https://api.openai.com/v1"
-                default_model = "gpt-4o"
-            elif provider == "xai":
-                base_url = "https://api.x.ai/v1"
-                models_url = "https://api.x.ai/v1"
-                default_model = "grok-beta"
-            elif provider == "opencode":
-                base_url = "https://opencode.ai/zen/v1"
-                models_url = "https://opencode.ai/zen/v1"
-                default_model = "big-pickle"
-            elif provider == "router":
-                base_url = "https://openrouter.ai/api/v1"
-                models_url = "https://openrouter.ai/api/v1"
-                default_model = "google/gemini-2.5-pro"
-            elif provider == "blackbox":
-                base_url = "https://api.blackbox.ai/v1"
-                models_url = "https://api.blackbox.ai/v1"
-                default_model = "blackboxai"
-            elif provider == "gemini" or provider == "google":
-                base_url = "https://generativelanguage.googleapis.com/v1beta/openai"
-                models_url = "https://generativelanguage.googleapis.com/v1beta/openai"
-                default_model = "gemini-2.5-flash"
-            else:
-                base_url = args[0]
-                models_url = args[0]
-                default_model = ""
 
-            write_key("CUSTOM_API_BASE", base_url)
-            write_key("CUSTOM_MODELS_URL", models_url)
+            provider, base_url, models_url, default_model, key_restored = set_provider(args[0])
+
             if default_model:
-                write_key("OPENCODE_MODEL", default_model)
                 os.environ["OPENCODE_MODEL"] = default_model
                 ui.critic_service.active_model = default_model
                 ui.prompt.set_model(default_model)
@@ -1255,8 +1321,13 @@ class DivTubeAgentApp(App):
             else:
                 model_msg = ""
 
-            ui.log_msg(f"[bold {SUCCESS}]✔ API Provider set to:[/] {base_url}{model_msg}\n[{WARNING}]⚠ Saved API key may not work with this provider.[/] Use /apikey to set a matching key, then /model to see available models.")
-            
+            if key_restored:
+                key_msg = f"\n[bold {SUCCESS}]🔑 Saved API key for [{provider}] restored.[/] You're ready to go."
+            else:
+                key_msg = f"\n[{WARNING}]No API key saved for [{provider}] yet.[/] Set it once with /apikey <key> — it'll be remembered from now on."
+
+            ui.log_msg(f"[bold {SUCCESS}]✔ API Provider set to:[/] {base_url}{model_msg}{key_msg}")
+
         self.registry.register("/provider", handle_provider, "Set API Provider", "/provider <name_or_url>")
 
         def handle_release(ui, args):
@@ -1673,6 +1744,8 @@ class DivTubeAgentApp(App):
         r("/health-emit",     handle_health_emit,      "Emit a BytecodeHealth green signal",    "/health-emit <cell> <check>")
         r("/health-verify",   handle_health_verify,    "Run 100x determinism verification",     "/health-verify [cell] [check]")
         r("/health-status",   handle_health_status,    "Show health signal stats",              "/health-status")
+        r("/log",             self._show_log_tail,     "Live tail of app/error logs",           "/log")
+        r("/registry",        self._show_registry,     "Inspect TurboQuant registry",           "/registry")
 
     def show_help(self):
         gold, muted, purple = GOLD, MUTED, PURPLE_LT
@@ -1802,7 +1875,13 @@ class DivTubeAgentApp(App):
     def log_msg(self, msg):
         def _write():
             chat = self._get_active_chat()
-            chat.write(msg)
+            try:
+                chat.write(msg)
+            except MarkupError:
+                # Malformed Rich markup (stray "[/]"/mismatched tags from raw
+                # user, LLM, file or tool text) must never crash the TUI. Fall
+                # back to writing the text with its markup neutralised.
+                chat.write(_escape_markup(msg) if isinstance(msg, str) else msg)
             # Keep a plain-text mirror for /copy.
             try:
                 if isinstance(msg, str):
@@ -1859,7 +1938,9 @@ class DivTubeAgentApp(App):
         import os
         project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
             
-        self.log_msg(f"\n[bold #FFD700]▸[/] [bold #FFFFFF]{val}[/]")
+        # Escape the raw message: user text may contain Rich markup sequences
+        # (e.g. a stray "[/]") that would otherwise break markup rendering.
+        self.log_msg(f"\n[bold #FFD700]▸[/] [bold #FFFFFF]{_escape_markup(val)}[/]")
 
         # ── bare @file reference (no command) ────────────────────────
         if val.startswith("@") and not val.startswith("/"):
@@ -1920,7 +2001,14 @@ class DivTubeAgentApp(App):
                 inp.text = text
                 inp.focus()
 
-    @on(events.Key)
+    def _show_log_tail(self, args: list[str]) -> None:
+        """Open live log tail widget."""
+        self.push_screen(WidgetModalScreen(LogTailWidget(), "❖ LIVE LOG TAIL ❖"))
+
+    def _show_registry(self, args: list[str]) -> None:
+        """Open TurboQuant registry inspector."""
+        self.push_screen(WidgetModalScreen(RegistryInspectorWidget(), "❖ TURBOQUANT REGISTRY ❖"))
+
     def handle_keys(self, event: events.Key):
         try:
             input_widget = self.query_one("#command-input")
@@ -2016,6 +2104,49 @@ class DivTubeAgentApp(App):
             # show options in chat
             self.log_msg(f"[#6A5A6A]@{prefix} → {', '.join(matches)}[/]")
 
+def _persist_crash(header, exc_text):
+    """Append a crash traceback to error.log + a timestamped crash file.
+
+    Textual restores the terminal on exit, so an unhandled traceback usually
+    scrolls away (or the window closes) before it can be read. Persisting it
+    makes every crash recoverable after the fact — error.log is also tailed
+    live by the in-app /log view.
+    """
+    import datetime
+    now = datetime.datetime.now()
+    banner = f"\n===== {header} {now.isoformat(timespec='seconds')} =====\n{exc_text}"
+    for path in ("error.log", f"crash-{now:%Y%m%d-%H%M%S}.log"):
+        try:
+            with open(path, "a", encoding="utf-8") as fh:
+                fh.write(banner)
+        except OSError:
+            pass
+    try:
+        import sys
+        sys.stderr.write(banner)
+        sys.stderr.flush()
+    except Exception:
+        pass
+
+
 if __name__ == "__main__":
+    import threading as _threading
+    import traceback as _traceback
+
+    # Worker-thread crashes (e.g. the typewriter/agent threads) otherwise die
+    # silently — capture those too.
+    def _thread_excepthook(args):
+        _persist_crash(
+            f"THREAD CRASH ({args.thread.name})",
+            "".join(_traceback.format_exception(
+                args.exc_type, args.exc_value, args.exc_traceback)),
+        )
+    _threading.excepthook = _thread_excepthook
+
     app = DivTubeAgentApp()
-    app.run()
+    try:
+        app.run()
+    except Exception:
+        # Main-thread / message-loop crash surfaced by Textual after exit.
+        _persist_crash("CRASH", _traceback.format_exc())
+        raise
