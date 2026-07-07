@@ -75,6 +75,7 @@ import { rhymeAstrologyRoutes } from './routes/rhymeAstrology.routes.js';
 import { resolveRhymeAstrologyArtifactPaths } from './utils/rhymeAstrologyPaths.js';
 import { imageAnalysisRoutes } from './routes/imageAnalysis.routes.js';
 import { registerSchoolStylesRoutes } from './routes/schoolStyles.routes.js';
+import downloaderRoutes from './routes/downloader.routes.js';
 import { catalogRoutes } from './routes/catalog.routes.js';
 import { studioRoutes } from './routes/studio.routes.js';
 import { createMailQueueWorker, createMailerService } from './services/mailer.service.js';
@@ -1131,6 +1132,7 @@ fastify.register(worldRoutes, { prefix: '/api/world', adapter: lexiconAdapter, p
 fastify.register(corpusRoutes, { prefix: '/api/corpus', adapter: corpusAdapter, lexiconAdapter });
 fastify.register(imageAnalysisRoutes, { prefix: '/api/image' });
 fastify.register(registerSchoolStylesRoutes, { prefix: '/api/styles' });
+fastify.register(downloaderRoutes, { prefix: '/api/downloader' });
 fastify.register(catalogRoutes);
 fastify.register(studioRoutes, { localAudioAdapter });
 if (ENABLE_RHYME_ASTROLOGY) {
