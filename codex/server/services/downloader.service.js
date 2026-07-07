@@ -137,7 +137,7 @@ class DownloaderService extends EventEmitter {
         child.stdout.on('data', (data) => {
           const text = data.toString();
           // Basic progress parsing (e.g., "[download]  15.2% of 50.00MiB at 1.25MiB/s ETA 00:30")
-          const match = text.match(/\[download\]\s+([\d\.]+)%/);
+          const match = text.match(/\[download\]\s+([\d.]+)%/);
           if (match) {
             const percent = parseFloat(match[1]);
             this.updateJobStatus(jobId, 'downloading', { progress_percent: Math.floor(percent) }).catch(()=>{});

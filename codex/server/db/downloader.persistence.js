@@ -30,8 +30,8 @@ const DOWNLOADER_MIGRATIONS = [
   {
     version: 1,
     name: 'create_downloader_tables',
-    up(database) {
-      database.exec(`
+    up(dbLayer) {
+      dbLayer.exec(`
         CREATE TABLE IF NOT EXISTS download_jobs (
           id TEXT PRIMARY KEY,
           url TEXT NOT NULL,
