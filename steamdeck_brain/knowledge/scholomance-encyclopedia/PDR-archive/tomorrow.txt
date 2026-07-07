@@ -1,0 +1,6 @@
+vaelrix-forcefield-session-2026-06-23.
+
+
+     1. Wire brain outputs through the PixelBrain Router into BytecodeHealth.
+     2. Make CODE_BRAIN evidence-based with real file/search calls.
+     3. Add a BrainBridge.ask() integration test.

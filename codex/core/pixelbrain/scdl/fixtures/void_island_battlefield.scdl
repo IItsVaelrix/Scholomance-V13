@@ -1,0 +1,211 @@
+# void_island_battlefield — full AI-traced isometric VOID tutorial island map
+# Using SCDL v1.2 for a cohesive battlefield. Central focus, paths, crystal walls on edges,
+# ice/snow base, decor. Large canvas for map overview.
+
+asset void_island_battlefield canvas 256x256
+
+palette {
+  abyss     = #04060e
+  deep      = #0e1526
+  dark      = #182238
+  base      = #22304f
+  mid       = #2d4066
+  lit       = #3d5480
+  bright    = #52709f
+  sheen     = #7291bd
+  frost     = #a8c3e2
+  spec      = #e3eef9
+  cyanhot   = #67e8f9
+  cyansoft  = #b7f4fd
+  amethdark = #3b2170
+  amethbody = #5b34a8
+  amethlite = #8b5cf6
+  amethhi   = #b794f6
+  snowbase  = #c7d4ea
+  snowlit   = #e6eef8
+}
+
+def ice_floor {
+  part slab material void_ice {
+    polygon 64 -1 129 32 64 65 -1 32 base
+    polygon -1 32 64 -1 64 4 8 32 bright
+    polygon 64 -1 129 32 120 32 64 4 lit
+    polygon -1 32 64 65 64 59 8 32 dark
+    polygon 64 65 129 32 120 32 64 59 deep
+    line 0 32 64 0 sheen
+    line 64 0 127 31 lit
+  }
+}
+
+def snow_floor {
+  part slab material void_ice {
+    polygon 64 -1 129 32 64 65 -1 32 base
+  }
+  part snow material snow {
+    polygon 20 20 60 15 100 25 80 50 30 45 snowbase
+    polygon 30 25 70 20 90 35 60 55 snowlit
+    cell 40 30 spec
+  }
+}
+
+def rune_path {
+  part slab material void_ice {
+    polygon 64 -1 129 32 64 65 -1 32 base
+  }
+  part runes material cyan_glow {
+    glow radius 2
+    line 20 30 110 35 cyanhot
+    line 25 45 105 50 cyansoft
+    cell 50 32 cyanhot
+    cell 80 38 cyanhot
+  }
+}
+
+def crystal_cluster {
+  part mound material void_ice {
+    polygon 18 108 34 98 58 94 84 96 108 104 116 112 96 120 64 124 30 120 12 114 deep
+  }
+  part crystals material amethyst {
+    polygon 70 14 50 92 64 104 68 40 amethlite
+    polygon 70 14 68 40 64 104 86 94 amethdark
+    polygon 70 14 66 44 64 100 70 96 72 44 amethbody
+  }
+  part glow material cyan_glow {
+    glow radius 4
+    cell 67 78 cyansoft
+  }
+}
+
+def crystal_fern {
+  part stem material amethyst {
+    line 48 70 50 40 amethbody
+  }
+  part fronds material crystal {
+    polygon 30 35 48 45 50 30 35 25 amethlite
+    polygon 50 30 65 35 70 25 55 20 amethlite
+  }
+}
+
+def glow_mushroom {
+  part stem material void_ice {
+    rect 46 50 8 30 frost
+  }
+  part cap material amethyst {
+    circle 50 45 radius 18 amethbody
+    circle 50 40 radius 12 amethlite
+  }
+  part gills material cyan_glow {
+    glow radius 3
+    ellipse 42 38 radius 6 ry 3 cyanhot
+  }
+}
+
+def crystal_wall {
+  part base material void_ice {
+    polygon 40 80 90 80 100 110 30 110 base
+  }
+  part crystals material amethyst {
+    polygon 45 20 55 20 50 70 amethlite
+    polygon 55 20 75 25 70 75 amethbody
+    polygon 70 25 85 30 80 80 amethdark
+  }
+  part glow material cyan_glow {
+    glow radius 4
+    cell 55 40 cyanhot
+  }
+}
+
+def central_focus {
+  part basin material void_ice {
+    polygon 64 30 100 64 64 100 28 64 dark
+  }
+  part ring material cyan_glow {
+    glow radius 5
+    ring 64 64 radius 25 width 4 cyanhot
+    ring 64 64 radius 15 width 3 amethhi
+  }
+  part sigil material gold {
+    polygon 50 50 78 50 78 78 50 78 amethhi
+    line 55 55 73 73 cyanhot
+    line 73 55 55 73 cyanhot
+  }
+}
+
+def cliff_section {
+  part icecliff material void_ice {
+    polygon 0 40 128 40 128 112 0 112 dark
+  }
+  part crystals material amethyst {
+    polygon 45 20 55 20 50 70 amethlite
+    polygon 55 20 75 25 70 75 amethbody
+    polygon 70 25 85 30 80 80 amethdark
+  }
+}
+
+# Base layers
+part void_bg material abyss {
+  rect 0 0 256 256 abyss
+  cell 20 30 spec
+  cell 50 80 frost
+  cell 180 40 cyansoft
+  cell 220 150 spec
+  cell 80 200 frost
+}
+
+part island_shape material void_ice {
+  polygon 40 60 80 30 180 35 220 70 230 140 200 200 100 210 50 170 35 110 base
+}
+
+# Battlefield composition
+group battlefield at 20 20 {
+  instance central_focus at 100 80 scale 1.5
+
+  # Paths
+  instance rune_path at 30 80
+  instance rune_path at 60 80
+  instance rune_path at 90 80
+  instance rune_path at 120 80
+  instance rune_path at 150 80
+
+  instance rune_path at 100 30 rotate 90
+  instance rune_path at 100 60 rotate 90
+  instance rune_path at 100 90 rotate 90
+  instance rune_path at 100 120 rotate 90
+
+  # Decor
+  instance crystal_fern at 50 50
+  instance glow_mushroom at 70 60
+  instance crystal_cluster at 130 55
+  instance crystal_fern at 55 110
+  instance glow_mushroom at 120 105
+
+  # Crystal walls left
+  instance crystal_wall at 15 40
+  instance crystal_wall at 15 70
+  instance crystal_wall at 15 100
+  instance crystal_cluster at 10 30 scale 1.1
+
+  # Right
+  instance crystal_wall at 190 40 mirror x
+  instance crystal_wall at 190 70 mirror x
+  instance crystal_wall at 190 100 mirror x
+  instance crystal_cluster at 200 30 mirror x scale 1.1
+
+  # Top
+  instance crystal_wall at 50 15 rotate 90
+  instance crystal_wall at 90 15 rotate 90
+  instance crystal_wall at 130 15 rotate 90
+
+  # Bottom cliff with crystals
+  instance cliff_section at 40 160
+  instance cliff_section at 100 165 scale 0.9
+  instance crystal_wall at 60 155 rotate 90
+  instance crystal_cluster at 70 175
+
+  # Snow
+  instance snow_floor at 30 140
+  instance snow_floor at 150 145
+}
+
+export json png svg phaser
+

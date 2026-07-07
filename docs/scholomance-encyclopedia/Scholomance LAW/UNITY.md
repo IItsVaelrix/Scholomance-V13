@@ -368,7 +368,12 @@ COMMON FIRST TASKS
 - **Shared preamble**: `SHARED_PREAMBLE.md` — the axioms of the living syntax universe
 - **Global law**: `VAELRIX_LAW.md` — the law, the escalation protocol, the domain map
 - **Schema contract**: `SCHEMA_CONTRACT.md` — the canonical data shapes
-- **Agent contexts**: `CLAUDE.md`, `CODEX.md`, `GEMINI.md`, `BLACKBOX.md`, `opencode.md`, `CURSOR.md`
+- **Agent contexts**: `CLAUDE.md`, `CODEX.md`, `GEMINI.md`, `GROK.md`, `BLACKBOX.md`, `opencode.md`, `CURSOR.md`
+
+**SCDNA multi-agent hookup**: All listed agents (Grok, Codex, Gemini, Claude, Cursor, OpenCode) are hooked to SCDNA gene injection via:
+`python -m vaelrix_forcefield.scdna.inject --prompt "..." --agent <grok|codex|gemini|claude|cursor|opencode>`
+or the unified `scripts/scdna-gene-inject.sh`.
+See individual LAW files for agent-specific notes. Genes (e.g. WAND_CHEMICAL_STROKE_PROPAGATION) are automatically relevant for matching tasks.
 - **Architecture**: `AI_ARCHITECTURE_V2.md` — agent coordination patterns
 - **Security**: `ARCH_CONTRACT_SECURITY.md` — security law
 

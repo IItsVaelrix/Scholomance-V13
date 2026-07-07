@@ -1,0 +1,149 @@
+asset barrel canvas 30x31
+
+palette {
+  outline      = #05070f
+  void_cap     = #13203a
+  void_dark    = #1a2b4a
+  void_darkest = #090f1c
+  void_mid     = #2f6076
+  void_light   = #63b8d4
+  void_low     = #1e4258
+  rime_base    = #6d90a6
+  rime_hi      = #c2e8f6
+  frost_glow   = #a8ecff
+}
+
+# VOID ICY barrel — hand-drawn barrel re-skinned to frozen void-corruption.
+# Authored as LEFT HALF only; symmetry x mirrors about canvas center (x14.5).
+
+part staves material voidbark {
+  symmetry x
+  line 9 1 14 1 outline
+  line 7 2 8 2 outline
+  line 9 2 13 2 void_cap
+  line 14 2 14 2 void_dark
+  line 5 3 6 3 outline
+  line 7 3 7 3 void_darkest
+  line 8 3 13 3 void_cap
+  line 14 3 14 3 void_dark
+  line 4 4 4 4 outline
+  line 5 4 5 4 void_cap
+  line 6 4 6 4 void_darkest
+  line 7 4 13 4 void_cap
+  line 14 4 14 4 void_dark
+  line 4 5 4 5 outline
+  line 5 5 14 5 void_darkest
+  line 3 6 3 6 outline
+  line 3 7 3 7 outline
+  line 3 8 3 8 outline
+  line 2 9 2 9 outline
+  line 3 9 4 9 void_dark
+  line 5 9 7 9 void_mid
+  line 8 9 8 9 void_darkest
+  line 9 9 9 9 void_mid
+  line 10 9 13 9 void_light
+  line 14 9 14 9 void_darkest
+  line 2 10 2 10 outline
+  line 3 10 4 10 void_dark
+  line 5 10 7 10 void_mid
+  line 8 10 8 10 void_darkest
+  line 9 10 9 10 void_mid
+  line 10 10 13 10 void_light
+  line 14 10 14 10 void_darkest
+  line 2 11 2 11 outline
+  line 3 11 4 11 void_dark
+  line 5 11 7 11 void_mid
+  line 8 11 8 11 void_darkest
+  line 9 11 9 11 void_mid
+  line 10 11 13 11 void_light
+  line 14 11 14 11 void_darkest
+  line 2 12 2 12 outline
+  line 3 12 4 12 void_dark
+  line 5 12 7 12 void_mid
+  line 8 12 8 12 void_darkest
+  line 9 12 9 12 void_mid
+  line 10 12 13 12 void_light
+  line 14 12 14 12 void_darkest
+  line 2 13 2 13 outline
+  line 3 13 4 13 void_dark
+  line 5 13 7 13 void_mid
+  line 8 13 8 13 void_darkest
+  line 9 13 9 13 void_mid
+  line 10 13 13 13 void_light
+  line 14 13 14 13 void_darkest
+  line 2 14 2 14 outline
+  line 3 14 14 14 void_darkest
+  line 2 15 2 15 outline
+  line 2 16 2 16 outline
+  line 2 17 2 17 outline
+  line 2 18 2 18 outline
+  line 3 18 4 18 void_dark
+  line 5 18 7 18 void_mid
+  line 8 18 8 18 void_darkest
+  line 9 18 9 18 void_mid
+  line 10 18 13 18 void_light
+  line 14 18 14 18 void_darkest
+  line 2 19 2 19 outline
+  line 3 19 4 19 void_dark
+  line 5 19 7 19 void_mid
+  line 8 19 8 19 void_darkest
+  line 9 19 9 19 void_mid
+  line 10 19 13 19 void_light
+  line 14 19 14 19 void_darkest
+  line 2 20 2 20 outline
+  line 3 20 4 20 void_dark
+  line 5 20 7 20 void_mid
+  line 8 20 8 20 void_darkest
+  line 9 20 9 20 void_mid
+  line 10 20 13 20 void_light
+  line 14 20 14 20 void_darkest
+  line 2 21 2 21 outline
+  line 3 21 4 21 void_dark
+  line 5 21 7 21 void_mid
+  line 8 21 8 21 void_darkest
+  line 9 21 9 21 void_mid
+  line 10 21 13 21 void_light
+  line 14 21 14 21 void_darkest
+  line 2 22 2 22 outline
+  line 3 22 14 22 void_darkest
+  line 3 23 3 23 outline
+  line 3 24 3 24 outline
+  line 3 25 3 25 outline
+  line 4 26 4 26 outline
+  line 5 26 13 26 void_low
+  line 14 26 14 26 void_darkest
+  line 5 27 5 27 outline
+  line 6 27 13 27 void_mid
+  line 14 27 14 27 void_low
+  line 7 28 7 28 outline
+  line 8 28 14 28 void_low
+  line 9 29 14 29 outline
+}
+
+part hoops material void_ice {
+  symmetry x
+  line 4 6 14 6 rime_base
+  line 4 7 5 7 rime_base
+  line 6 7 14 7 rime_hi
+  line 4 8 14 8 rime_base
+  line 3 15 14 15 rime_base
+  line 3 16 4 16 rime_base
+  line 5 16 14 16 rime_hi
+  line 3 17 14 17 rime_base
+  line 4 23 14 23 rime_base
+  line 4 24 5 24 rime_base
+  line 6 24 14 24 rime_hi
+  line 4 25 14 25 rime_base
+}
+
+part frost material cyan_glow {
+  symmetry x
+  cell 5 7 frost_glow
+  cell 6 16 frost_glow
+  cell 5 24 frost_glow
+  cell 11 10 frost_glow
+  cell 12 19 frost_glow
+  glow radius 2
+}
+
+export png aseprite

@@ -1,0 +1,76 @@
+asset barrel canvas 64x48
+
+palette {
+  wood_darkest = #3a200d
+  wood_dark    = #5e3313
+  wood_mid     = #985521
+  wood_light   = #ce843e
+  
+  hoop_shadow  = #141419
+  hoop_base    = #696a6a
+  hoop_hi      = #9f9ea1
+  hoop_glint   = #b4b4be
+}
+
+# Barrel with proper bulge. Center ~32x24
+# Top band:    ~Y=6-8,  width ~22px (X=21-43)
+# Bulge:       ~Y=22,   width ~28px (X=18-46)
+# Bottom band: ~Y=38-40, width ~22px (X=21-43)
+
+part body material bark {
+  # Five vertical staves with barrel curve approximation.
+  # Each stave is a thin polygon that follows the bulge.
+
+  # Stave 1 (leftmost, shadowed)
+  polygon 21 8  25 8  24 22  25 40  21 40  18 22  wood_darkest
+
+  # Stave 2 
+  polygon 25 8  30 8  29 22  30 40  25 40  24 22  wood_dark
+
+  # Stave 3 (center, brightest)
+  polygon 30 8  35 8  36 22  35 40  30 40  29 22  wood_light
+
+  # Stave 4
+  polygon 35 8  40 8  41 22  40 40  35 40  36 22  wood_mid
+
+  # Stave 5 (rightmost, shadowed)
+  polygon 40 8  43 8  46 22  43 40  40 40  41 22  wood_dark
+}
+
+part hoops material darksteel {
+  # Top hoop - thick shaded band
+  # Shadow line (bottom of hoop)
+  line 19 17 45 17 hoop_shadow
+  line 19 16 45 16 hoop_shadow
+  
+  # Main hoop body
+  line 19 15 45 15 hoop_base
+  line 19 14 45 14 hoop_base
+  line 19 13 45 13 hoop_base
+  
+  # Highlight on top
+  line 19 12 45 12 hoop_hi
+  line 19 11 45 11 hoop_hi
+  
+  # Left-side glint
+  line 22 11 27 11 hoop_glint
+
+  # Bottom hoop - thick shaded band
+  # Shadow line (bottom of hoop)
+  line 19 35 45 35 hoop_shadow
+  line 19 34 45 34 hoop_shadow
+  
+  # Main hoop body
+  line 19 33 45 33 hoop_base
+  line 19 32 45 32 hoop_base
+  line 19 31 45 31 hoop_base
+  
+  # Highlight on top
+  line 19 30 45 30 hoop_hi
+  line 19 29 45 29 hoop_hi
+  
+  # Left-side glint
+  line 22 29 27 29 hoop_glint
+}
+
+export png aseprite

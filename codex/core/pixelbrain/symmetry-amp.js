@@ -513,6 +513,28 @@ export function applySymmetryToLattice(lattice, symmetry) {
       });
       break;
     }
+    case 'diagonal': {
+      // Main-diagonal reflection (top-left → bottom-right): transpose (col,row) → (row,col),
+      // matching testDiagonalSymmetry's idx1=(y,x) / idx2=(x,y) comparison and the angle-45
+      // axis from calculateSymmetryAxis. Bounds-guarded so a non-square lattice skips cells
+      // whose transpose falls outside the grid instead of emitting out-of-range coordinates.
+      cells.forEach((cell) => {
+        const mirrorCol = Math.floor(cell.row);
+        const mirrorRow = Math.floor(cell.col);
+        if (mirrorCol < 0 || mirrorCol >= cols || mirrorRow < 0 || mirrorRow >= rows) return;
+        const mirrorKey = `${mirrorCol},${mirrorRow}`;
+        if (!newCells.has(mirrorKey)) {
+          newCells.set(mirrorKey, {
+            ...cell,
+            col: mirrorCol,
+            row: mirrorRow,
+            color: cell.color,
+            emphasis: cell.emphasis * 0.9,
+          });
+        }
+      });
+      break;
+    }
   }
 
   return { ...lattice, cells: newCells, symmetry };

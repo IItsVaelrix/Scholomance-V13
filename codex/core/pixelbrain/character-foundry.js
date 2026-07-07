@@ -2,9 +2,12 @@ import { composeCharacterSilhouette } from './character-silhouette-composer.js';
 import { createCharacterSkeleton, hashCharacterSkeleton, validateCharacterSkeleton } from './character-construction-skeleton.js';
 import { normalizeCharacterSpec, validateCharacterSpec, hashCharacterSpec } from './character-spec.js';
 import { MATERIAL_PALETTES, resolveMaterialId } from './material-registry.js';
-import { hashString } from './shared.js';
+import { hashString, roundTo } from './shared.js';
 import { getRenderer } from './renderer-registry.js';
 import { applyXBR2x } from './pixel-scale-amp.js';
+import { evaluateFormula } from './formula-to-coordinates.js';
+import { pointsToSVGPath } from './svg-path-builder.js';
+import { applyChaikin, applyAffine, applyOffsetCurve } from './shared.js';
 
 import './character-body-profiles.js';
 import './character-face-profiles.js';
@@ -12,6 +15,8 @@ import './character-hair-profiles.js';
 import './character-clothing-profiles.js';
 import './character-accessory-profiles.js';
 import './character-detail-profiles.js';
+import './scholo-chibi-face-profiles.js';
+import './scholomance-character-motif-amp.js';
 
 const CHARACTER_DEFAULTS = {
   canvas: { width: 32, height: 48 },
@@ -79,6 +84,7 @@ function applyCharacterFills({ silhouette, spec, direction } = {}) {
 
   const partRamps = {
     'body': getMaterialRamp(mat.skin, '#F5D0A9'),
+    'head': getMaterialRamp(mat.skin, '#F5D0A9'),
     'hair': getMaterialRamp(mat.hair, '#4A3828'),
     'leftEye': getMaterialRamp(mat.eyes, '#3A2010'),
     'rightEye': getMaterialRamp(mat.eyes, '#3A2010'),
@@ -88,6 +94,8 @@ function applyCharacterFills({ silhouette, spec, direction } = {}) {
     'rightEar': getMaterialRamp(mat.skin, '#F5D0A9'),
     'top': getMaterialRamp('cloth_linen', '#C8C0B0'),
     'bottom': getMaterialRamp('cloth_wool', '#807870'),
+    'robe': getMaterialRamp('void_cloth', '#362463'),
+    'boots': getMaterialRamp('leather_brown', '#6A4030'),
     'shoes': getMaterialRamp('leather_brown', '#6A4030'),
   };
 
@@ -439,6 +447,11 @@ export function forgeCharacter(rawSpec, opts = {}) {
   const spec = normalizeCharacterSpec(rawSpec);
   validateCharacterSpec(spec);
 
+  // Route to vectorized Wand path if vectorWand present (high priority for vectorized art)
+  if (spec.vectorWand) {
+    return forgeCharacterFromWandVector(spec.vectorWand, spec, { ...opts, direction: 'south' });
+  }
+
   const pngScale = Math.max(1, Math.round(opts.pngScale || 4));
   const directions = spec.directions || ['south', 'east', 'north', 'west'];
   const canvas = spec.canvas || CHARACTER_DEFAULTS.canvas;
@@ -514,3 +527,282 @@ export function forgeCharacter(rawSpec, opts = {}) {
 export { composeCharacterSilhouette } from './character-silhouette-composer.js';
 export { normalizeCharacterSpec, validateCharacterSpec, hashCharacterSpec } from './character-spec.js';
 export { createCharacterSkeleton } from './character-construction-skeleton.js';
+
+export function exportCharacterToPbrainBlueprint(character) {
+  if (!character) return null;
+  const spec = character.spec || {};
+  const canvas = character.canvas || { width: 64, height: 64 };
+
+  const construction = {
+    boxes: {},
+    anchors: character.construction || {},
+    vectorPaths: character.vectorPaths || null,  // embedded for Wand roundtrip
+  };
+
+  // If we have vectorPaths from Wand, derive simple boxes from bounds for compatibility
+  if (character.vectorPaths && character.vectorPaths.length > 0) {
+    character.vectorPaths.forEach(path => {
+      const xs = path.points.map(p => p.x);
+      const ys = path.points.map(p => p.y);
+      const minX = Math.min(...xs), maxX = Math.max(...xs);
+      const minY = Math.min(...ys), maxY = Math.max(...ys);
+      construction.boxes[path.role] = {
+        x: Math.floor(minX), y: Math.floor(minY),
+        width: Math.ceil(maxX - minX) + 1, height: Math.ceil(maxY - minY) + 1
+      };
+    });
+  }
+
+  const exportObj = {
+    schema: 'pixelbrain.export.v1',
+    schemaVersion: '1.0.0',
+    format: 'json',
+    material: 'source',
+    metadata: {
+      manifest: { width: canvas.width, height: canvas.height, format: 'pixelbrain.export.v1' },
+      construction,
+      source: character.vectorSource === 'wand' ? 'wand-vector' : 'profile',
+      specId: spec.id,
+    },
+    coordinates: (character.fills && Object.values(character.fills)[0]?.coordinates) || [],
+  };
+
+  return exportObj;
+}
+
+/**
+ * Wand → Vectorized Character Model
+ *
+ * This is the bridge that makes Wand the creator of character models with vectorized art.
+ *
+ * - Takes a Wand formula proposal (edge_trace, composite of traces, mathematical_stroke, etc.)
+ * - Evaluates to clean vector coordinates (with optional role/partId for construction).
+ * - Rasterizes the vectors into PixelBrain cells using stroke-aware logic (center + edges + bleed).
+ * - Then feeds into the normal fill + silhouette pipeline for materials, lighting, chibi rules.
+ *
+ * This gives:
+ *   • Pure Wand construction (your 00_Reference layer)
+ *   • Vectorized art output (paths you can export as SVG, animate, or re-sample)
+ *   • Deterministic pixel raster with full PixelBrain treatment
+ *
+ * Example usage:
+ *   const wandProposal = {
+ *     coordinateFormula: {
+ *       type: 'composite',
+ *       children: [
+ *         { role: 'head', formula: { type: 'edge_trace', tracePath: [...] } },
+ *         { role: 'body', formula: { type: 'mathematical_stroke', parameters: {...} } }
+ *       ]
+ *     }
+ *   };
+ *   const character = forgeCharacterFromWandVector(wandProposal, baseSpec, { direction: 'south' });
+ */
+export function forgeCharacterFromWandVector(wandProposal, baseSpec = {}, opts = {}) {
+  if (!wandProposal) throw new Error('forgeCharacterFromWandVector: wandProposal required');
+
+  const canvas = baseSpec.canvas || CHARACTER_DEFAULTS.canvas;
+  const direction = opts.direction || 'south';
+
+  // 1. Evaluate Wand to vector coordinates
+  // Support composite by recursing children and attaching roles
+  function evalWandWithRoles(proposal, canvas) {
+    const formula = proposal.coordinateFormula || proposal.formula || proposal;
+    if (formula.type === 'composite' && Array.isArray(formula.children)) {
+      let all = [];
+      for (const child of formula.children) {
+        const childFormula = child.formula || child;
+        const subWidth = (child.size?.w ?? 1) * canvas.width;
+        const subHeight = (child.size?.h ?? 1) * canvas.height;
+        const childCanvas = { width: subWidth, height: subHeight };
+        const coords = evaluateFormula({ coordinateFormula: childFormula }, childCanvas);
+        const anchor = child.anchor || { x: 0.5, y: 0.5 };
+        const dx = anchor.x * canvas.width - subWidth / 2;
+        const dy = anchor.y * canvas.height - subHeight / 2;
+        const role = child.role || 'body';
+        coords.forEach(c => {
+          c.x += dx;
+          c.y += dy;
+          c.role = role;
+          c.partId = role;
+        });
+        all = all.concat(coords);
+      }
+      return all;
+    }
+    return evaluateFormula(proposal, canvas);
+  }
+
+  const vectorCoords = evalWandWithRoles(wandProposal, canvas);
+
+  if (!vectorCoords || vectorCoords.length === 0) {
+    throw new Error('Wand proposal evaluated to empty coordinates. Provide traces or strokes.');
+  }
+
+  // 2. Convert vector points to PixelBrain cells
+  const cells = [];
+  const seen = new Set();
+
+  const addCell = (x, y, role = 'body', emphasis = 1) => {
+    const rx = Math.round(x);
+    const ry = Math.round(y);
+    const k = `${rx},${ry}`;
+    if (seen.has(k)) return;
+    seen.add(k);
+    cells.push({
+      x: rx,
+      y: ry,
+      partId: role,
+      emphasis: Math.max(0, Math.min(1, emphasis)),
+    });
+  };
+
+  // Group by role
+  const byRole = {};
+  for (const c of vectorCoords) {
+    const role = c.partId || c.role || c.source || 'body';
+    if (!byRole[role]) byRole[role] = [];
+    byRole[role].push(c);
+  }
+
+  const pointInPolygon = (x, y, polygon) => {
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const pi = polygon[i];
+      const pj = polygon[j];
+      const crosses = ((pi.y > y) !== (pj.y > y))
+        && (x < (pj.x - pi.x) * (y - pi.y) / ((pj.y - pi.y) || 1) + pi.x);
+      if (crosses) inside = !inside;
+    }
+    return inside;
+  };
+
+  // Rasterize each role as vector art (thick stroke simulation)
+  // #5: Real bezier/offset-curve math for hair/limbs (dense sampling + parallel offset curves)
+  for (const [role, points] of Object.entries(byRole)) {
+    const shouldFillClosedTrace = /head|body|robe|boot|eye|mouth/.test(role);
+    if (shouldFillClosedTrace && points.length >= 3) {
+      const polygon = points.map(p => ({ x: Number(p.x) || 0, y: Number(p.y) || 0 }));
+      const minX = Math.floor(Math.min(...polygon.map(p => p.x)));
+      const maxX = Math.ceil(Math.max(...polygon.map(p => p.x)));
+      const minY = Math.floor(Math.min(...polygon.map(p => p.y)));
+      const maxY = Math.ceil(Math.max(...polygon.map(p => p.y)));
+      for (let y = minY; y <= maxY; y += 1) {
+        for (let x = minX; x <= maxX; x += 1) {
+          if (pointInPolygon(x + 0.5, y + 0.5, polygon)) {
+            addCell(x, y, role, 0.82);
+          }
+        }
+      }
+    }
+
+    if (points.length < 2) {
+      for (const p of points) addCell(p.x, p.y, role, p.emphasis || 1);
+      continue;
+    }
+
+    const isStroke = points.some(p => p.role && String(p.role).includes('stroke'));
+    const isHairOrLimb = /hair|arm|leg|limb/.test(role);
+
+    for (let i = 0; i < points.length - 1; i++) {
+      const a = points[i];
+      const b = points[i + 1];
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const len = Math.hypot(dx, dy) || 1;
+      const steps = Math.max(1, Math.ceil(len * (isHairOrLimb ? 3 : 2)));
+
+      const pxp = -dy / len;
+      const pyp = dx / len;
+
+      for (let s = 0; s <= steps; s++) {
+        const t = steps === 0 ? 0 : s / steps;
+        const px = a.x + dx * t;
+        const py = a.y + dy * t;
+        const press = (a.emphasis || 0.85) * (1 - Math.abs(t - 0.5) * 0.15);
+
+        addCell(px, py, role, press);
+
+        if (isStroke || isHairOrLimb) {
+          // offset curve (parallel curves)
+          const baseW = isHairOrLimb ? 1.4 : (a.role === 'stroke.edge' ? 1.9 : 1.1);
+          const half = baseW * 0.5 * press;
+
+          addCell(px + pxp * half, py + pyp * half, role, press * 0.75);
+          addCell(px - pxp * half, py - pyp * half, role, press * 0.75);
+
+          if (isHairOrLimb) {
+            addCell(px + pxp * half * 1.35, py + pyp * half * 1.35, role, press * 0.45);
+            addCell(px - pxp * half * 1.35, py - pyp * half * 1.35, role, press * 0.45);
+          }
+
+          if (press < 0.65 || a.role === 'stroke.bleed') {
+            addCell(px + pxp * half * 1.7, py + pyp * half * 1.7, role, press * 0.35);
+          }
+        }
+      }
+    }
+  }
+
+  // 3. Build a minimal silhouette from the vector cells + feed to normal pipeline
+  const silhouette = {
+    cells,
+    partOf: new Map(cells.map(c => [`${c.x},${c.y}`, c.partId || 'body'])),
+    colorOf: new Map(),
+    skeleton: null, // will be inferred or provided via anchors in proposal
+  };
+
+  // Merge with base spec for materials / other parts
+  const mergedSpec = {
+    ...baseSpec,
+    canvas,
+    // If the Wand proposal carried materials or presentation, they win
+  };
+
+  // 4. Run the normal fill + raster pipeline on top of our vector silhouette
+  const fills = applyCharacterFills({ silhouette, spec: mergedSpec, direction });
+
+  // 5. Rasterize using public rasterizeCells (XBR upscale for crisp output)
+  const baseScale = 1;
+  let rgba = rasterizeCells(fills.coordinates, canvas.width, canvas.height, baseScale);
+  rgba = applyXBR2x(rgba, canvas.width, canvas.height);
+  rgba = applyXBR2x(rgba, canvas.width * 2, canvas.height * 2);
+
+  // Vectorized art export (the important part for Wand-driven models)
+  // Enhanced with direct SVG serializer + pure immutable modifiers (Chaikin, offset)
+  const vectorPaths = Object.entries(byRole).map(([role, pts]) => {
+    let processed = pts.map(p => ({ ...p }));
+    if (processed.length > 3) {
+      processed = applyChaikin(processed, 1);
+      processed = applyOffsetCurve(processed, 0.8, 1);
+    }
+    const directSVG = pointsToSVGPath(processed, { smooth: true, scale: 1, precision: 2 });
+    return {
+      role,
+      points: processed.map(p => ({
+        x: roundTo(p.x, 2),
+        y: roundTo(p.y, 2),
+        emphasis: p.emphasis || 1,
+        role: p.role || p.source
+      })),
+      svgPath: directSVG || null,
+    };
+  });
+
+  const pbrainBlueprint = exportCharacterToPbrainBlueprint({ spec: mergedSpec, canvas, vectorPaths, vectorSource: 'wand', fills, construction: {} });
+
+  return Object.freeze({
+    spec: mergedSpec,
+    vectorSource: 'wand',
+    vectorPaths,           // THE vectorized art — clean paths from Wand formulas
+    silhouette: { cells: fills.coordinates },
+    fills,
+    canvas,
+    blueprint: pbrainBlueprint,  // full round-trip .pbrain.json ready
+    diagnostics: {
+      source: 'wand-vector',
+      pointCount: vectorCoords.length,
+      cellCount: fills.coordinates.length,
+      roles: Object.keys(byRole),
+    },
+  });
+}

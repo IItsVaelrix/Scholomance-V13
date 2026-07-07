@@ -27,13 +27,18 @@ export function ChatbotUI({ title = "Oracle Memory Terminal" }) {
     setMessages(prev => [...prev, { sender: 'user', text: userMsg }]);
     setIsLoading(true);
 
+    let speculativeEnvelope = null;
+    if (typeof window !== 'undefined' && window.SpeculativeContextBuffer) {
+      speculativeEnvelope = window.SpeculativeContextBuffer.drainForMessage();
+    }
+
     try {
       const response = await fetch('http://localhost:8000/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ session_id: sessionId, message: userMsg }),
+        body: JSON.stringify({ session_id: sessionId, message: userMsg, speculativeEnvelope }),
       });
 
       if (!response.ok) {

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MudletPackage>
+<MudletPackage version="1.001">
+  <TriggerPackage>
+    <Trigger isActive="yes" isFolder="no">
+      <name>ErHUD Chat Capture</name>
+      <script>erhud.chat.append("general", matches[2] or "Someone", matches[3] or line)</script>
+      <regexCodeList>
+        <string>^(\w+) says</string>
+      </regexCodeList>
+    </Trigger>
+  </TriggerPackage>
+</MudletPackage>

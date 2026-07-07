@@ -1,0 +1,25 @@
+# void_chestplate.scdl
+# SCDL v1 reference fixture — the canonical Void Chestplate asset
+# Used for regression testing and compiler smoke tests.
+
+asset void_chestplate canvas 64x64
+
+palette {
+  void0 = #05060D
+  gold2 = #D8B84C
+  cyan2 = #00E5FF
+}
+
+part torso material voidsteel {
+  symmetry x
+  trace outline from image.region("body")
+  fill void0
+  rim gold2 at north west
+}
+
+part gem material cyan_glow {
+  cell 31 18 cyan2
+  glow radius 2
+}
+
+export json svg phaser

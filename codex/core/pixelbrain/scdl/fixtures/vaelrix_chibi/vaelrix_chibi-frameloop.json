@@ -1,0 +1,37 @@
+{
+  "contract": "SCDL-FRAME-LOOP-v1",
+  "asset": "vaelrix_chibi",
+  "loop": "idle",
+  "canvas": {
+    "width": 32,
+    "height": 48
+  },
+  "defaultDurationMs": 420,
+  "sourceChecksum": "00000000f938ffea",
+  "frames": [
+    {
+      "index": 0,
+      "label": "rest",
+      "durationMs": 420,
+      "packet": "pbasset_351edb83"
+    },
+    {
+      "index": 1,
+      "label": "blink",
+      "durationMs": 420,
+      "packet": "pbasset_65bfed1f"
+    },
+    {
+      "index": 2,
+      "label": "glow",
+      "durationMs": 420,
+      "packet": "pbasset_df7aebed"
+    },
+    {
+      "index": 3,
+      "label": "settle",
+      "durationMs": 420,
+      "packet": "pbasset_351edb83"
+    }
+  ]
+}

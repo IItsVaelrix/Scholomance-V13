@@ -6,9 +6,11 @@ import java.util.regex.Pattern;
 
 public class ProcessEventParser {
     
-    // Example: [download]  15.3% of 10.00MiB at  1.23MiB/s ETA 00:05
+    // Example: [download]   6.1% of  246.27KiB at   14.45MiB/s ETA 00:00
+    // The previous pattern used \\s (literal backslash + s) instead of \s, so it
+    // never matched real yt-dlp output and no progress events were ever emitted.
     private static final Pattern PROGRESS_PATTERN = Pattern.compile(
-        "\\[download\\]\\\\s+([0-9.]+)%\\\\s+of\\\\s+.*?(?:at\\\\s+([0-9a-zA-Z./]+))?\\\\s+(?:ETA\\\\s+([0-9:]+))?"
+        "\\[download\\]\\s+([0-9.]+)%\\s+of\\s+\\S+\\s+at\\s+(.+?)\\s+ETA\\s+(\\S+)"
     );
 
     public static void parseDownloadProgress(String line, DownloadProgressListener listener) {

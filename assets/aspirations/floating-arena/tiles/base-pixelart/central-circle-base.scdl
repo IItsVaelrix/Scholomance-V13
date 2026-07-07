@@ -1,0 +1,58 @@
+# central-circle-base.scdl
+# Large special "tile" / feature for the glowing ritual center.
+# This is a major component from the reference image.
+# Create as pixel art base at higher resolution (128x128 or 160x160) then enhance.
+
+asset central_circle_base canvas 128x128
+
+palette {
+  deep_ice   = #1a253f
+  base_ice   = #2a3a5a
+  glow_blue  = #3db8ff
+  rune_core  = #a0d8ff
+  bright     = #67e8f9
+  frost      = #c8e0f0
+  dark       = #0f1a30
+  ameth      = #8b5cf6
+}
+
+part floor material ice {
+  rect 0 0 128 128 base_ice
+  # radial grooves
+  line 64 10 64 118 dark
+  line 10 64 118 64 dark
+}
+
+part outer_ring material glow {
+  glow radius 3
+  circle 64 64 radius 52 bright
+  circle 64 64 radius 48 glow_blue
+}
+
+part inner_ring material glow {
+  glow radius 2
+  circle 64 64 radius 32 rune_core
+  circle 64 64 radius 28 bright
+}
+
+part core material glow {
+  glow radius 4
+  circle 64 64 radius 12 bright
+  cell 64 64 rune_core
+}
+
+# Inner diagram (stylized multi-point like the ref)
+part sigil material rune {
+  line 64 30 64 50 rune_core
+  line 64 78 64 98 rune_core
+  line 30 64 50 64 rune_core
+  line 78 64 98 64 rune_core
+  # small accents
+  cell 44 44 bright
+  cell 84 44 bright
+  cell 44 84 bright
+  cell 84 84 bright
+  polygon 58 58 70 58 70 70 58 70 ameth
+}
+
+export png json

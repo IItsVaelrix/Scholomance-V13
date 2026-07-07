@@ -44,7 +44,8 @@ export function validateFormula(formula, depth = 0) {
     'fibonacci',
     'template_based',
     'composite',
-    'vectorized_text'
+    'vectorized_text',
+    'mathematical_stroke'
   ];
 
   if (!validTypes.includes(formula.type)) {
@@ -79,6 +80,9 @@ export function validateFormula(formula, depth = 0) {
       break;
     case 'vectorized_text':
       allowedKeys.push('text', 'fontSize', 'cx', 'cy', 'spacing');
+      break;
+    case 'mathematical_stroke':
+      allowedKeys.push('parameters');
       break;
   }
 
@@ -122,6 +126,52 @@ export function validateFormula(formula, depth = 0) {
         errors.push('vectorized_text.spacing must be a number');
       } else if (formula.spacing < 0.1 || formula.spacing > 5) {
         errors.push('vectorized_text.spacing must be in range [0.1, 5]');
+      }
+    }
+  }
+
+  if (formula.type === 'mathematical_stroke') {
+    if (formula.parameters === undefined || typeof formula.parameters !== 'object' || formula.parameters === null) {
+      errors.push('mathematical_stroke.parameters must be an object');
+    } else {
+      const paramKeys = Object.keys(formula.parameters);
+      const allowedParams = [
+        'cx', 'cy', 'length', 'angle', 'baseWidth', 'widthVariation',
+        'frequency', 'density', 'bleed', 'n'
+      ];
+      const unknownParams = paramKeys.filter(k => !allowedParams.includes(k));
+      if (unknownParams.length > 0) {
+        errors.push(`Unknown parameters in mathematical_stroke: ${unknownParams.join(', ')}`);
+      }
+
+      const numericParams = ['cx', 'cy', 'length', 'angle', 'baseWidth', 'widthVariation', 'frequency', 'density', 'bleed'];
+      numericParams.forEach((key) => {
+        if (formula.parameters[key] !== undefined && typeof formula.parameters[key] !== 'number') {
+          errors.push(`mathematical_stroke.parameters.${key} must be a number`);
+        }
+      });
+      if (formula.parameters.length !== undefined && formula.parameters.length <= 0) {
+        errors.push('mathematical_stroke.parameters.length must be > 0');
+      }
+      if (formula.parameters.baseWidth !== undefined && formula.parameters.baseWidth <= 0) {
+        errors.push('mathematical_stroke.parameters.baseWidth must be > 0');
+      }
+      if (formula.parameters.widthVariation !== undefined
+          && (formula.parameters.widthVariation < 0 || formula.parameters.widthVariation > 1)) {
+        errors.push('mathematical_stroke.parameters.widthVariation must be in range [0, 1]');
+      }
+      if (formula.parameters.density !== undefined && formula.parameters.density <= 0) {
+        errors.push('mathematical_stroke.parameters.density must be > 0');
+      }
+      if (formula.parameters.bleed !== undefined
+          && (formula.parameters.bleed < 0 || formula.parameters.bleed > 1)) {
+        errors.push('mathematical_stroke.parameters.bleed must be in range [0, 1]');
+      }
+      if (formula.parameters.n !== undefined) {
+        if (!Number.isInteger(formula.parameters.n)) errors.push('mathematical_stroke.parameters.n must be an integer');
+        else if (formula.parameters.n < 16 || formula.parameters.n > MAX_PARAMETRIC_N) {
+          errors.push(`mathematical_stroke.parameters.n must be in range [16, ${MAX_PARAMETRIC_N}]`);
+        }
       }
     }
   }

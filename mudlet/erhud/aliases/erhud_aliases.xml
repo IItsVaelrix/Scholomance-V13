@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MudletPackage>
+<MudletPackage version="1.001">
+  <AliasPackage>
+    <Alias isActive="yes" isFolder="no">
+      <name>erhud</name>
+      <script>erhud.help()</script>
+      <command></command>
+      <regex>^erhud$</regex>
+    </Alias>
+    <Alias isActive="yes" isFolder="no">
+      <name>erhud on</name>
+      <script>send("erhud on")</script>
+      <regex>^erhud on$</regex>
+    </Alias>
+    <!-- Add the other aliases similarly in Mudlet editor for full persistence -->
+  </AliasPackage>
+</MudletPackage>

@@ -33,7 +33,13 @@ describe('ambienceMixer.service', () => {
     const s = service.getState();
     expect(s.running).toBe(false);
     expect(s.channels.rain.enabled).toBe(false);
-    expect(s.channels.cafe.available).toBe(true);
+    expect(s.channels.rain.available).toBe(true);
+  });
+
+  it('exposes exactly one channel (rain) for now', () => {
+    const { service } = makeService();
+    expect(Object.keys(service.getState().channels)).toEqual(['rain']);
+    expect(AMBIENCE_CHANNELS).toEqual(['rain']);
   });
 
   it('enabling a channel starts the engine and ramps its gain to its volume', async () => {
@@ -47,10 +53,10 @@ describe('ambienceMixer.service', () => {
 
   it('disabling a running channel ramps its gain to 0', async () => {
     const { service, engine } = makeService();
-    await service.setChannelEnabled('cafe', true);
+    await service.setChannelEnabled('rain', true);
     engine.calls.length = 0;
-    await service.setChannelEnabled('cafe', false);
-    expect(engine.calls).toContainEqual(['channel', 'cafe', 0, expect.any(Number)]);
+    await service.setChannelEnabled('rain', false);
+    expect(engine.calls).toContainEqual(['channel', 'rain', 0, expect.any(Number)]);
   });
 
   it('master volume scales independently and notifies subscribers', async () => {
@@ -74,11 +80,11 @@ describe('ambienceMixer.service', () => {
 
   it('marks a channel unavailable and forces its gain to 0', async () => {
     const { service, engine } = makeService();
-    await service.setChannelEnabled('wind', true);
+    await service.setChannelEnabled('rain', true);
     engine.calls.length = 0;
-    engine._fail('wind');
-    expect(service.getState().channels.wind.available).toBe(false);
-    expect(engine.calls).toContainEqual(['channel', 'wind', 0, expect.any(Number)]);
+    engine._fail('rain');
+    expect(service.getState().channels.rain.available).toBe(false);
+    expect(engine.calls).toContainEqual(['channel', 'rain', 0, expect.any(Number)]);
   });
 
   it('loadConfig applies persisted master + channel settings', () => {
@@ -180,27 +186,30 @@ describe('createWebAudioEngine', () => {
   it('suspend() pauses all elements + calls ctx.suspend(); resume() re-plays channels with desired gain > 0', async () => {
     const engine = createWebAudioEngine();
     const rainIdx = AMBIENCE_CHANNELS.indexOf('rain');
-    const cafeIdx = AMBIENCE_CHANNELS.indexOf('cafe');
     const rainEl = audioElements[rainIdx];
-    const cafeEl = audioElements[cafeIdx];
 
-    // Enable rain, leave cafe at 0
+    // Enable rain
     engine.setChannelGain('rain', 0.6, 120);
     expect(rainEl.paused).toBe(false);
 
     // Suspend
     await engine.suspend();
     expect(rainEl.pause).toHaveBeenCalledTimes(1);
-    expect(cafeEl.pause).toHaveBeenCalledTimes(1);
     expect(fakeCtx.suspend).toHaveBeenCalledTimes(1);
 
-    // Resume — only rain should re-play (desired gain > 0)
+    // Resume — rain should re-play (desired gain > 0)
     await engine.resume();
     expect(fakeCtx.resume).toHaveBeenCalledTimes(1);
     // play was called once before suspend, and once again after resume
     expect(rainEl.play).toHaveBeenCalledTimes(2);
-    // cafe desired gain is 0, must not play
-    expect(cafeEl.play).not.toHaveBeenCalled();
+  });
+
+  it('a channel left at gain 0 is not played on resume', async () => {
+    const engine = createWebAudioEngine();
+    const rainEl = audioElements[AMBIENCE_CHANNELS.indexOf('rain')];
+    // never enabled → desired gain stays 0
+    await engine.resume();
+    expect(rainEl.play).not.toHaveBeenCalled();
   });
 
   it('firing the error event twice invokes onAvailabilityChange only once (idempotent)', () => {

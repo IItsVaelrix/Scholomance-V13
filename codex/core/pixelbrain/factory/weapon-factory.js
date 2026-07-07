@@ -1,17 +1,21 @@
 /**
  * Weapon Factory
- * Declares the microprocessor route for weapons (e.g. Holy Fire Paladin
- * Sword), per 2026-06-12-pixelbrain-holy-fire-paladin-sword-pdr.
+ * Declares the seam-checked route for weapons (e.g. Holy Fire Paladin
+ * Sword, pickaxe), per 2026-06-12-pixelbrain-holy-fire-paladin-sword-pdr.
  *
  * Mirrors the seam-checked route pattern used in armor-factory.js, but
  * with weapon-specific required outputs (blade, guard, hilt, pommel,
  * holyFire motif, cross engraving, shader target masks).
+ *
+ * Steps in these routes are contract-only: the foundry (item-foundry.js)
+ * produces the geometry outside the route and the route's `seam`
+ * declarations + `requiredOutputs` are validated against it. No `execute`
+ * body is attached. The one exception is `createVolumeLiftStep` (pickaxe
+ * route), which is a real executor and is routed through `executeRoute`
+ * so its voxel output reaches the foundry.
  */
-import { executeRoute } from '../microprocessor-route.js';
 import { expandShapeGrammar } from '../shape-grammar-engine.js';
 import { HOLYFIRE_MOTIF_AMP_SEAM } from '../holyfire-motif-amp.js';
-import { SDF_SHAPE_AMP_SEAM } from '../sdf-shape-amp.js';
-import { NOISE_FILL_AMP_SEAM } from '../noise-fill-amp.js';
 import { createVolumeLiftStep } from '../volume-lift-amp.js';
 
 const holyPaladinGrammar = {
@@ -112,7 +116,6 @@ export function forgeWeapon(spec, skeleton) {
               ...spec.parts.map((part) => 'part.' + part.id + '.cells'),
             ],
           },
-          execute: () => {},
         },
         {
           name: 'ShapeGrammarExpansion',
@@ -121,7 +124,6 @@ export function forgeWeapon(spec, skeleton) {
             consumes: ['spec.parts', 'silhouette.cells'],
             emits: ['shape.parts', 'shape.requiredOutputs', 'shape.seams'],
           },
-          execute: () => {},
         },
         {
           name: 'RegionFillAMP',
@@ -137,7 +139,6 @@ export function forgeWeapon(spec, skeleton) {
               ]),
             ],
           },
-          execute: () => {},
         },
         {
           name: 'GeometryAMP',
@@ -149,7 +150,6 @@ export function forgeWeapon(spec, skeleton) {
               ...spec.parts.map((part) => 'geometry.mask.' + part.id),
             ],
           },
-          execute: () => {},
         },
         createVolumeLiftStep({
           dims: { width: spec.canvas.width, height: spec.canvas.height },
@@ -210,7 +210,6 @@ export function forgeWeapon(spec, skeleton) {
             ...spec.parts.map((part) => `part.${part.id}.cells`),
           ],
         },
-        execute: () => {},
       },
       {
         name: 'ConstructionAMP',
@@ -219,7 +218,6 @@ export function forgeWeapon(spec, skeleton) {
           consumes: ['spec.construction', 'silhouette.cells'],
           emits: ['construction.skeleton', 'construction.anchors'],
         },
-        execute: () => {},
       },
       // SDFShapeAMP is applied in foundry if spec.parts have 'sdf'; not added here to avoid breaking holy tests that don't declare it.
 
@@ -230,7 +228,6 @@ export function forgeWeapon(spec, skeleton) {
           consumes: ['spec.parts', 'construction.skeleton'],
           emits: ['shape.parts', 'shape.requiredOutputs', 'shape.seams'],
         },
-        execute: () => {},
       },
       {
         name: 'HolyFireMotifAMP',
@@ -238,7 +235,6 @@ export function forgeWeapon(spec, skeleton) {
           ...HOLYFIRE_MOTIF_AMP_SEAM,
           id: 'holyfire-motif-v1',
         },
-        execute: () => {},
       },
       {
         name: 'HeraldryAMP',
@@ -250,7 +246,6 @@ export function forgeWeapon(spec, skeleton) {
           mergeContract: 'heraldry-stamp-after-holyfire-flames-v1',
           validates: ['cross.cells > 0 when required'],
         },
-        execute: () => {},
       },
       {
         name: 'RegionFillAMP',
@@ -266,7 +261,6 @@ export function forgeWeapon(spec, skeleton) {
             ]),
           ],
         },
-        execute: () => {},
       },
       // NoiseFillAMP is applied in foundry if spec.parts have 'noise'; not added to this holy route to preserve existing test expectations for seam/required failures.
 
@@ -281,7 +275,6 @@ export function forgeWeapon(spec, skeleton) {
           ],
           validates: ['shader target masks exist before shader forge'],
         },
-        execute: () => {},
       },
     ],
   };

@@ -22,6 +22,11 @@ jobs:
         node-version: '20'
         cache: npm
 
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
     - name: Install dependencies
       run: npm ci
 
@@ -45,6 +50,15 @@ jobs:
 
     - name: Run Unit Tests
       run: npm run test -- --run
+
+    # ForceField is pure-stdlib Python; pytest is the only dependency. Includes
+    # the latency/structural guards (test_latency_guard.py) that fail CI on
+    # O(repo) file-walk or per-call I/O regressions in BrainBridge.ask().
+    - name: Run ForceField Python tests (incl. latency guards)
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pytest
+        PYTHONPATH=steamdeck_brain python -m pytest steamdeck_brain/vaelrix_forcefield/tests/ -q
 
     - name: Run QA Feature Tests
       run: npm run test:qa:features

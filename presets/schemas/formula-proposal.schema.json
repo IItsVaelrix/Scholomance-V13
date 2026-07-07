@@ -48,6 +48,18 @@
           "type": "integer",
           "description": "Optional color channel override"
         },
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Deterministic seed for PRNG / noise in procedural math (enforces identical output)"
+        },
+        "precision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6,
+          "default": 3,
+          "description": "Fixed decimal places for coordinate rounding (prevents float drift)"
+        },
         "formula": {
           "$ref": "formula.schema.json"
         }

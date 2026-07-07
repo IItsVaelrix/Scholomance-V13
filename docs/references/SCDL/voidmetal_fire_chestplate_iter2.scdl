@@ -1,0 +1,299 @@
+asset voidmetal_fire_chestplate_iter2 canvas 96x112
+
+palette {
+  bgshadow      = #0B0C12
+  blackink      = #080910
+  voidblack     = #151620
+  voiddeep      = #222431
+  steelshadow   = #2B2D38
+  steeldeep     = #373944
+  steelmid      = #4B4E5A
+  steelhi       = #86858F
+  silveredge    = #D3CED7
+  oxblooddeep   = #3E0B16
+  oxblood       = #7E1827
+  crimsonedge   = #D43C47
+  redglint      = #FF6A61
+  purpledeep    = #321344
+  purplemid     = #6D2C8B
+  violetglint   = #C58AF0
+  emberdeep     = #7B1309
+  ember         = #D83212
+  orangehot     = #FF711D
+  goldhot       = #FFC35C
+  whitehot      = #FFF0A6
+  gemdark       = #650A06
+  gemmid        = #C92312
+  gemhot        = #FF5E19
+  gemshine      = #FFF4A8
+}
+
+# Wider reference-faithful silhouette: collar bowl, tusk shoulders, tapering abdomen.
+part silhouette_shadow material source {
+  polygon 48 7 67 9 77 19 87 29 94 43 91 57 82 66 78 82 69 97 58 106 48 111 38 106 27 97 18 82 14 66 5 57 2 43 9 29 19 19 29 9 bgshadow
+}
+
+# Broad cuirass mass, left half mirrored.
+part torso_base material voidsteel {
+  symmetry x
+  polygon 48 13 34 16 25 27 20 42 22 64 28 88 39 105 48 111 voidblack
+  polygon 47 23 33 25 25 39 26 60 32 82 46 99 voiddeep
+  polygon 46 35 31 39 26 51 30 62 45 62 steelshadow
+  polygon 45 64 31 66 33 81 43 91 steeldeep
+  polygon 44 82 35 86 40 101 48 108 steelshadow
+  polygon 44 24 35 30 32 37 45 39 steelmid
+}
+
+# Filled armor plates reduce the "wireframe" look and give the cracks something to burn through.
+part torso_plate_facets material blacksteel {
+  symmetry x
+  polygon 47 31 36 32 31 39 38 47 47 44 steeldeep
+  polygon 47 47 35 49 30 56 35 63 47 61 steelmid
+  polygon 46 66 36 69 35 79 43 87 steeldeep
+  polygon 43 89 36 92 41 101 48 106 steeldeep
+  line 47 31 36 32 steelhi
+  line 36 32 31 39 steelhi
+  line 38 47 47 44 silveredge
+  line 35 49 30 56 steelhi
+  line 35 63 47 61 silveredge
+  line 36 69 35 79 steelhi
+  line 43 87 46 66 silveredge
+}
+
+# Bevel architecture. Stays mostly structural, no glow.
+part torso_edges material silver {
+  symmetry x
+  line 48 13 34 16 silveredge
+  line 34 16 25 27 steelhi
+  line 25 27 20 42 steelhi
+  line 20 42 22 64 steelhi
+  line 22 64 28 88 steelhi
+  line 28 88 39 105 steelhi
+  line 39 105 48 111 silveredge
+  line 48 28 33 36 silveredge
+  line 33 36 27 52 steelhi
+  line 27 52 31 63 steelhi
+  line 31 63 46 62 silveredge
+  line 48 63 37 72 steelhi
+  line 37 72 42 99 steelhi
+  line 48 86 42 99 silveredge
+}
+
+# Bowl collar opened wider, with a darker throat cutout.
+part collar_back material blacksteel {
+  path "M 22 15 Q 48 1 74 15 L 70 30 Q 48 23 26 30 Z" steeldeep
+  path "M 29 15 Q 48 7 67 15 L 63 23 Q 48 19 33 23 Z" voidblack
+  ellipse 48 17 radius 25 ry 10 silveredge
+  ellipse 48 18 radius 18 ry 6 voiddeep
+  polygon 41 25 55 25 51 39 45 39 voidblack
+  line 25 29 39 25 steelhi
+  line 71 29 57 25 steelhi
+}
+
+# Red collar trim now reads closer to the reference's fiery engraved band.
+part collar_trim material ruby {
+  path "M 24 24 L 34 20 L 42 25 L 48 34 L 54 25 L 62 20 L 72 24 L 67 32 L 57 29 L 48 42 L 39 29 L 29 32 Z" oxblooddeep
+  line 27 24 40 27 crimsonedge
+  line 56 27 69 24 crimsonedge
+  line 38 27 48 39 crimsonedge
+  line 58 27 48 39 crimsonedge
+  line 48 34 48 44 orangehot
+  cell 32 24 ember
+  cell 36 25 goldhot
+  cell 60 25 goldhot
+  cell 64 24 ember
+}
+
+# Heavier shoulder pauldrons: more mass, less bat-wing, closer to the reference armor.
+part shoulder_mass material voidsteel {
+  symmetry x
+  polygon 13 25 25 13 38 21 42 38 34 55 17 62 5 52 8 36 voiddeep
+  polygon 11 34 25 21 36 27 38 38 32 49 17 55 8 48 steeldeep
+  polygon 18 28 29 23 35 31 33 41 21 47 12 42 steelmid
+  polygon 6 50 17 62 34 55 31 66 16 71 5 59 voidblack
+  ellipse 23 39 radius 18 ry 12 steelhi
+  line 8 48 17 55 silveredge
+  line 17 55 32 49 steelhi
+}
+
+# Upright red ear-blades widened and sharpened.
+part shoulder_red_blades material ruby {
+  symmetry x
+  polygon 29 7 39 16 38 44 27 43 23 22 oxblooddeep
+  polygon 32 11 37 18 36 39 29 38 27 23 crimsonedge
+  polygon 9 39 24 31 36 40 24 47 9 52 oxblood
+  polygon 8 55 23 59 33 55 29 67 14 72 oxblooddeep
+  line 29 7 39 16 redglint
+  line 23 22 27 43 crimsonedge
+  line 9 39 24 31 redglint
+  line 8 55 23 59 crimsonedge
+  line 14 72 29 67 steelhi
+}
+
+# Purple enamel panels are larger, with actual bevel sparkle.
+part shoulder_enamel material amethyst {
+  symmetry x
+  polygon 13 31 23 23 32 30 30 39 20 42 13 38 purpledeep
+  polygon 15 33 23 27 28 32 27 37 20 39 15 36 purplemid
+  line 16 37 25 30 violetglint
+  line 14 34 21 29 violetglint
+  line 21 40 29 36 purplemid
+  cell 17 33 violetglint
+}
+
+# Square shoulder bosses, slightly lower and chunkier.
+part shoulder_bosses material silver {
+  symmetry x
+  polygon 31 39 38 31 46 39 38 47 steeldeep
+  polygon 34 39 38 35 42 39 38 43 oxblooddeep
+  line 31 39 38 31 silveredge
+  line 38 31 46 39 steelhi
+  line 46 39 38 47 steelhi
+  line 38 47 31 39 silveredge
+  cell 38 35 orangehot
+}
+
+# Extra lower lamellar makes the bottom feel less empty.
+part side_lamellar material blacksteel {
+  symmetry x
+  polygon 18 59 31 63 31 69 18 71 steeldeep
+  polygon 20 71 33 72 35 80 22 83 voiddeep
+  polygon 24 84 38 86 40 96 30 101 voiddeep
+  polygon 13 66 23 69 22 76 12 77 steelshadow
+  line 20 63 31 66 steelhi
+  line 22 75 35 77 steelhi
+  line 30 89 40 93 steelhi
+  line 19 70 31 69 silveredge
+  line 13 66 23 69 steelhi
+}
+
+# Lower belt and central hanging rune plate.
+part belt_and_tasset material blacksteel {
+  symmetry x
+  polygon 28 90 40 88 48 96 48 104 36 102 28 98 voiddeep
+  polygon 17 84 30 86 30 98 20 101 oxblooddeep
+  polygon 20 87 28 89 27 97 21 98 steeldeep
+  line 17 84 30 86 silveredge
+  line 30 86 30 98 steelhi
+  line 28 90 40 88 crimsonedge
+  line 40 88 48 96 silveredge
+  polygon 43 94 53 94 56 104 48 111 40 104 steeldeep
+  polygon 46 98 50 98 50 105 46 105 emberdeep
+  line 44 96 52 96 crimsonedge
+  cell 48 101 orangehot
+}
+
+# Orange underglow under gem and cracks. Painted before metal cradle.
+part fire_underpaint material shadow_fire {
+  polygon 48 39 60 51 58 67 48 82 38 67 36 51 emberdeep
+  polygon 48 45 55 56 53 66 48 75 43 66 41 56 orangehot
+}
+
+# Metal cradle with clearer diamond geometry.
+part gem_cradle material silver {
+  polygon 48 37 64 51 64 67 48 84 32 67 32 51 voidblack
+  polygon 48 42 58 51 58 65 48 76 38 65 38 51 steeldeep
+  line 48 37 64 51 silveredge
+  line 64 51 64 67 steelhi
+  line 64 67 48 84 silveredge
+  line 48 84 32 67 steelhi
+  line 32 67 32 51 silveredge
+  line 32 51 48 37 silveredge
+  line 38 51 58 51 steelhi
+  line 38 65 58 65 steelhi
+  polygon 48 40 57 52 55 65 48 77 41 65 39 52 gemdark
+}
+
+part central_gem material divine_flame_core {
+  sphere 48 58 radius 8 light -1 -1 gemshine whitehot gemhot gemmid gemdark
+  polygon 48 44 56 58 48 75 40 58 gemmid
+  polygon 48 48 53 58 48 70 43 58 orangehot
+  polygon 48 51 51 58 48 65 45 58 whitehot
+  line 48 44 56 58 whitehot
+  line 56 58 48 75 ember
+  line 48 75 40 58 emberdeep
+  line 40 58 48 44 goldhot
+  glow radius 4
+}
+
+# Lava network tightened: fewer giant spokes, more branching plates.
+part fire_cracks material divine_flame_core {
+  symmetry x
+  line 48 52 39 47 orangehot
+  line 39 47 32 43 ember
+  line 32 43 28 35 emberdeep
+  line 39 47 35 55 goldhot
+  line 35 55 28 59 ember
+  line 48 62 40 66 orangehot
+  line 40 66 34 75 ember
+  line 34 75 35 88 emberdeep
+  line 40 66 29 69 ember
+  line 48 47 44 36 orangehot
+  line 44 36 40 27 ember
+  line 48 71 45 85 orangehot
+  line 45 85 43 101 emberdeep
+  line 48 58 31 56 ember
+  glow radius 2
+}
+
+# White-hot cores only on key cracks so the gem stays the focal point.
+part fire_crack_cores material divine_flame_core {
+  symmetry x
+  line 48 52 41 48 whitehot
+  line 48 62 42 66 goldhot
+  line 48 47 45 38 goldhot
+  line 48 71 46 83 goldhot
+  cell 35 55 whitehot
+  cell 40 66 whitehot
+  cell 44 36 goldhot
+  glow radius 1
+}
+
+# Runes: collar/belt/shoulder scratch marks, not readable text, but rune-shaped.
+part ember_runes material void_rune_glow {
+  symmetry x
+  line 32 24 35 23 ember
+  line 35 23 36 26 ember
+  line 39 26 41 24 ember
+  line 41 24 42 28 ember
+  line 29 72 32 72 ember
+  line 32 72 31 76 ember
+  line 36 83 39 84 ember
+  line 39 84 37 88 ember
+  line 20 91 25 91 ember
+  line 25 91 23 96 ember
+  line 17 37 20 35 violetglint
+  line 20 35 21 38 violetglint
+  line 18 45 24 45 purplemid
+  line 13 63 18 64 purplemid
+  cell 31 21 orangehot
+  cell 29 26 ember
+  cell 24 28 violetglint
+  cell 27 31 purplemid
+  cell 41 95 orangehot
+  glow radius 1
+}
+
+# Final contour pass sharpens the miniature read.
+part ink_contour material onyx {
+  symmetry x
+  line 48 7 67 9 blackink
+  line 67 9 77 19 blackink
+  line 77 19 87 29 blackink
+  line 87 29 94 43 blackink
+  line 94 43 91 57 blackink
+  line 91 57 82 66 blackink
+  line 82 66 78 82 blackink
+  line 78 82 69 97 blackink
+  line 69 97 58 106 blackink
+  line 58 106 48 111 blackink
+  line 29 7 39 16 blackink
+  line 5 52 8 36 blackink
+  line 8 36 13 25 blackink
+  line 13 25 25 13 blackink
+  line 25 13 29 7 blackink
+  line 32 51 48 37 blackink
+  line 64 51 48 37 blackink
+}
+
+export json svg png aseprite

@@ -168,7 +168,7 @@ export default function PixelBrainPage() {
   const handleNew = () => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = 'image/*,.json,.aseprite,.ase';
+    input.accept = 'image/*,.json,.aseprite,.ase,.pbrain';
 
     // Cancelling the picker means "blank project". File inputs do not fire
     // `change` on cancel - only the `cancel` event covers this path.
@@ -185,7 +185,7 @@ export default function PixelBrainPage() {
       const lower = file.name.toLowerCase();
 
       try {
-        if (lower.endsWith('.json')) {
+        if (lower.endsWith('.json') || lower.endsWith('.pbrain')) {
           const text = await file.text();
           const pkt = JSON.parse(text);
           // Remount the editor with the new packet; it imports the grid itself

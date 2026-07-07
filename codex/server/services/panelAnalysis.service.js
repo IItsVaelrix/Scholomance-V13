@@ -35,6 +35,10 @@ const DEFAULT_RHYME_ASTROLOGY_BUCKET_CAP = 200;
 const DEFAULT_RHYME_ASTROLOGY_CACHE_SIZE = 500;
 const DEFAULT_RHYME_ASTROLOGY_WINDOW_LIMIT = 12;
 
+function resolveAnalysisProfile(profile) {
+  return profile === 'editor' ? 'editor' : 'full';
+}
+
 // Resolve the dictionary DB path the same way the server boot does. We need
 // it here so the panel analysis can talk to the in-process lexicon adapter
 // and lift authoritative `rhyme_family` values into the rhyme engine.
@@ -816,7 +820,9 @@ export async function createPanelAnalysisService(options = {}) {
       return createEmptyPanelPayload();
     }
 
-    const nluMode = options?.nluMode || 'generate';
+    const analysisProfile = resolveAnalysisProfile(options?.analysisProfile);
+    const isEditorProfile = analysisProfile === 'editor';
+    const nluMode = isEditorProfile ? 'direct' : (options?.nluMode || 'generate');
 
     try {
       const uniqueWords = [...new Set(text.match(WORD_REGEX_GLOBAL) || [])];
@@ -855,10 +861,10 @@ export async function createPanelAnalysisService(options = {}) {
         mode: deepAnalysis?.compiler?.mode || 'balanced',
       }), {
         gutenbergPriors: gutenbergEmotionPriors,
-        pixelBrainEnabled: true,
+        pixelBrainEnabled: !isEditorProfile,
         nluMode,
-        routing: { topK: 4 },
-        wordNetEnabled: true,
+        routing: { topK: isEditorProfile ? 2 : 4 },
+        wordNetEnabled: !isEditorProfile,
       });
       const amplifiedDoc = attachVerseIRAmplifier(analyzedDoc, verseIR?.verseIRAmplifier || null);
       const scoreData = await scoreEngine.calculateScore(amplifiedDoc);
@@ -875,14 +881,16 @@ export async function createPanelAnalysisService(options = {}) {
         hhmTokenStateByIdentity: hhmSignals.tokenStateByIdentity,
         gutenbergPriors: gutenbergEmotionPriors,
       }).emotion;
-      const rhymeAstrology = await buildRhymeAstrologyPayload(wordAnalyses, verseIR);
-      const narrativeAMP = await narrativeAMPService.analyzeVerse({
-        text,
-        verseIR,
-        hhmSummary: hhmSignals.summary,
-        scoreData,
-        verseIRAmplifier: verseIR?.verseIRAmplifier || null,
-      });
+      const rhymeAstrology = isEditorProfile ? null : await buildRhymeAstrologyPayload(wordAnalyses, verseIR);
+      const narrativeAMP = isEditorProfile
+        ? null
+        : await narrativeAMPService.analyzeVerse({
+          text,
+          verseIR,
+          hhmSummary: hhmSignals.summary,
+          scoreData,
+          verseIRAmplifier: verseIR?.verseIRAmplifier || null,
+        });
       const scoreDataWithPlsFeatures = scoreData && rhymeAstrology?.features
         ? {
           ...scoreData,
@@ -928,7 +936,7 @@ export async function createPanelAnalysisService(options = {}) {
         scoreData: scoreDataWithPlsFeatures,
         rhymeAstrology,
         narrativeAMP,
-        oracle: toLegacyOraclePayload(narrativeAMP),
+        oracle: isEditorProfile ? null : toLegacyOraclePayload(narrativeAMP),
         vowelSummary,
       };
     } catch (error) {

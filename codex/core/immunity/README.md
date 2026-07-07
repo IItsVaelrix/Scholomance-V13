@@ -303,15 +303,68 @@ codex/core/immunity/
 ├── protocol.scanner.js       # Layer 3 async surface scanner
 ├── inflammatoryResponse.js # BytecodeError builders
 ├── repair.recommendations.js # Repair guidance lookup
+├── qbit-immune-checkpoint.js        # QBIT immune checkpoint (evidence governor)
+├── qbit-immune-checkpoint.config.js # Checkpoint configuration
 └── README.md                # This file
 
 codex/server/services/
 ├── immunity.service.js      # Server orchestrator
 
-tests/qa/
-├── immunity.stasis.test.js          # Original stasis tests
-├── immunity.glyph-stasis.test.js    # Glyph + determinism + L3 tests
+tests/
+├── core/immunity/qbit-immune-checkpoint.test.js  # Checkpoint QA suite
+├── qa/immunity.stasis.test.js                    # Original stasis tests
+├── qa/immunity.glyph-stasis.test.js              # Glyph + determinism + L3 tests
 ```
+
+### QBIT Immune Checkpoint v1 (integration layer)
+
+**Files:** `codex/core/immunity/qbit-immune-checkpoint.{js,config.js}`  
+**PDR:** [`QBIT-Immune-Checkpoint-PDR.md`](../../docs/scholomance-encyclopedia/PDR-archive/QBIT-Immune-Checkpoint-PDR.md)  
+**PIR:** `docs/scholomance-encyclopedia/post-implementation-reports/PIR-20260703-QBIT-IMMUNE-CHECKPOINT.md`
+
+The checkpoint is the bloodstream between rule detection and violation emission. It does not replace the layers above; it gates them with evidence.
+
+```
+rule fires
+  → G1 signal floor (passesG1SignalFloor)
+  → vaccine match (injected adapter; VIOLATION on hit)
+  → novel antigen check (NEEDS_MERLIN when caller flags suspect novel)
+  → G2/M evaluation (evaluateImmuneCheckpoint)
+      ├─ VIOLATION     (memory confirms past threshold)
+      ├─ HEALTH_SIGNAL (memory refutes past threshold)
+      └─ WARN          (insufficient signal or mixed)
+  → rule reputation check (evaluateRuleReputation → RULE_APOPTOSIS_CANDIDATE)
+  → memory cell update (updateMemoryCellWithObservation; caller persists)
+```
+
+**Invariants enforced by the test suite (34 cases):**
+
+- Same observation → same verdict, key, and memory cell 100x in a row
+- Memory cells are frozen (`Object.freeze`) — mutation throws or no-ops
+- Half-life decay uses `floor` so evidence is monotonically non-increasing
+- Vaccine match always wins over local refute (PDR §"Integration Points")
+- Cold start (no memory) emits `WARN`, not `NEEDS_MERLIN` — the latter is caller-flagged
+- Rule apoptosis is a candidate signal (`PB-ERR-v1-STATE-WARN-IMMUNE-0F0A`),
+  not a silent kill — the PDR requires Merlin review
+
+**Adapters (DI):**
+
+```javascript
+checkpointDiagnosticObservation({
+  observation,         // rule engine observation
+  memory,              // { get(key), upsert(key, cell) }
+  vaccines,            // { match(bytecodeEnvelope) }
+  config,              // optional override
+  runIndex,            // monotonic checkpoint counter
+});
+```
+
+Callers inject the storage and vaccine adapters so the checkpoint itself remains pure. Production wiring should adapt `QbitMemoryPersistence.js` and `BytecodeXPVaccine.js` to the adapter shape; see the PIR for the integration matrix.
+
+**Live wiring status:**
+
+- **Server (landed 2026-07-03):** `codex/server/services/immunity.service.js` routes every innate/adaptive/protocol violation through the checkpoint before emission. `HEALTH_SIGNAL` decisions emit a `BytecodeHealth` (`PB-OK-v1-IMMUNE-PASS-COORD`, cellId `IMMUNITY_SCAN`) on the green-path channel. `RULE_APOPTOSIS_CANDIDATE` signals are persisted to a new `immunity_apoptosis_audit` table and surfaced via `getStatus().checkpoint`. Tests in `tests/qa/backend/immunity.checkpoint.test.js` (10 cases).
+- **CLI (pending):** `codex/core/diagnostic/run-diagnostic.cli.js` still bypasses the checkpoint. Small follow-up that mirrors the server-side change.
 
 ## SISP Compliance
 

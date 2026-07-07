@@ -1,0 +1,48 @@
+[agent]
+id = "grok"
+name = "Grok DivTube"
+scope = "scholomance"
+lawful_collab_role = "backend"
+display_role = "grok"
+grok_role = "divtube_downloader_agent"
+framework_origin = "xai-grok"
+scratch_root = "grok/divtube"
+
+[skills]
+paths = [
+  "divtube_downloader/.grok/skills/grok-divtube-playbook/SKILL.md",
+  "divtube_downloader/.grok/skills/grok-reasoning.skill.js",
+  "divtube_downloader/.grok/skills/grok-xai-hooks.toml",
+]
+
+[mcp_servers.divtube-grok-collab]
+command = "node"
+args = [
+  "--env-file=.env",
+  "divtube_downloader/grok/mcp-bridge-entry.mjs",
+]
+cwd = "/home/deck/Downloads/Scholomance-V12-main"
+enabled = true
+
+[mcp_servers.divtube-grok-collab.registration]
+tool = "mcp_scholomance_collab_agent_register"
+agent_id = "grok"
+name = "Grok DivTube"
+role = "backend"
+display_role = "grok"
+grok_role = "divtube_downloader_agent"
+framework_origin = "xai-grok"
+capabilities = [
+  "divtube",
+  "youtube-intel",
+  "seo-analysis",
+  "xai-reasoning",
+  "memory",
+  "mcp",
+]
+
+[memory]
+agent_id = "grok"
+get_tool = "memory_get"
+set_tool = "memory_set"
+key_prefix = "grok:"

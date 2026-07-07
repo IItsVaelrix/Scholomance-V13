@@ -1,0 +1,79 @@
+{
+  "version": "combat-iso-water-v1",
+  "combatMetrics": {
+    "tw": 80,
+    "th": 40,
+    "depth": 5,
+    "spriteWidth": 80,
+    "spriteHeight": 45
+  },
+  "terrainType": "water",
+  "sceneAlignment": [
+    "CombatArenaScene",
+    "PolarisForestScene"
+  ],
+  "variations": [
+    {
+      "id": "water-plain",
+      "label": "Plain",
+      "file": "Water Tile Plain.png"
+    },
+    {
+      "id": "water-ripples",
+      "label": "Ripples",
+      "file": "Water Tile Ripples.png"
+    },
+    {
+      "id": "water-shallow",
+      "label": "Shallow",
+      "file": "Water Tile Shallow.png"
+    },
+    {
+      "id": "water-deep",
+      "label": "Deep Pool",
+      "file": "Water Tile Deep Pool.png"
+    },
+    {
+      "id": "water-current",
+      "label": "Current",
+      "file": "Water Tile Current.png"
+    },
+    {
+      "id": "water-foam",
+      "label": "Foam Edge",
+      "file": "Water Tile Foam Edge.png"
+    },
+    {
+      "id": "water-lily",
+      "label": "Lily Pads",
+      "file": "Water Tile Lily Pads.png"
+    },
+    {
+      "id": "water-reeds",
+      "label": "Reeds",
+      "file": "Water Tile Reeds.png"
+    },
+    {
+      "id": "water-stones",
+      "label": "Submerged Stones",
+      "file": "Water Tile Submerged Stones.png"
+    },
+    {
+      "id": "water-sonic",
+      "label": "Sonic Glow",
+      "file": "Water Tile Sonic Glow.png"
+    },
+    {
+      "id": "water-murky",
+      "label": "Murky",
+      "file": "Water Tile Murky.png"
+    },
+    {
+      "id": "water-dense",
+      "label": "Dense Detail",
+      "file": "Water Tile Dense Detail.png"
+    }
+  ],
+  "sheet": "Water Tile Sheet.png",
+  "aseprite": "Water Tile Variations.aseprite"
+}

@@ -1,0 +1,109 @@
+# void_glow_mushroom — bioluminescent mushroom cluster, tutorial island prop
+# 96x96, transparent background, bottom-center anchored.
+# Light law: upper-left (-1,-1); the gills are emissive.
+asset void_glow_mushroom canvas 96x96
+
+palette {
+  abyss    = #04060e
+  deep     = #0e1526
+  dark     = #182238
+  base     = #22304f
+  mid      = #2d4066
+  lit      = #3d5480
+  frost    = #a8c3e2
+  spec     = #e3eef9
+  cyanhot  = #67e8f9
+  cyansoft = #b7f4fd
+  cyandeep = #0e7490
+  capdark  = #3b2170
+  capbody  = #5b34a8
+  caplite  = #8b5cf6
+  caphi    = #b794f6
+  capspec  = #e9e2fc
+}
+
+# ── mossy ground clump ───────────────────────────────────────────────────
+part ground material void_ice {
+  polygon 16 84 34 78 60 76 76 80 84 88 70 94 40 94 20 90 deep
+  polygon 28 84 48 80 66 82 74 88 58 92 34 90 dark
+  cell 30 82 frost
+  cell 42 79 frost
+  cell 26 85 base
+}
+
+# ── big mushroom — sphere cap, glowing gill band, sturdy stem ────────────
+part bigstem material void_cloth {
+  # tapered stalk
+  polygon 34 58 44 58 46 84 32 84 base
+  polygon 36 58 40 58 41 84 35 84 mid
+  # stem rings
+  line 34 66 44 66 dark
+  line 33 74 45 74 dark
+  cell 36 62 lit
+  cell 37 70 lit
+}
+
+part bigcap material amethyst {
+  # full lit dome
+  sphere 39 40 radius 20 light -1 -1 capspec caphi capbody capdark abyss
+  # gill underside band overpainting the dome's lower third
+  polygon 19 44 59 44 55 54 45 58 33 58 23 54 dark
+  # glowing gill vanes
+  line 22 48 56 48 cyandeep
+  line 24 51 54 51 cyanhot
+  line 28 54 50 54 cyandeep
+  cell 26 49 cyansoft
+  cell 34 52 cyansoft
+  cell 42 49 cyansoft
+  cell 50 52 cyansoft
+  # cap speckles — frost warts on the lit side
+  cell 30 28 capspec
+  cell 38 24 capspec
+  cell 26 36 caphi
+  cell 46 28 caphi
+  cell 34 33 capspec
+}
+
+# ── mid mushroom — leaning right, smaller ────────────────────────────────
+part midstem material void_cloth {
+  polygon 66 66 74 66 78 86 66 86 base
+  polygon 68 66 71 66 73 86 69 86 mid
+  line 66 74 75 74 dark
+}
+
+part midcap material amethyst {
+  sphere 69 56 radius 13 light -1 -1 capspec caphi capbody capdark abyss
+  polygon 56 59 82 59 79 66 71 69 63 66 dark
+  line 59 62 79 62 cyanhot
+  line 62 65 76 65 cyandeep
+  cell 66 63 cyansoft
+  cell 73 63 cyansoft
+  cell 64 49 capspec
+  cell 71 46 caphi
+}
+
+# ── button mushroom — front left, barely sprouted ────────────────────────
+part button material amethyst {
+  polygon 20 76 26 76 27 86 19 86 mid
+  sphere 23 72 radius 7 light -1 -1 capspec caphi capbody capdark abyss
+  line 18 76 28 76 cyanhot
+  cell 21 68 capspec
+}
+
+# ── spore glow — drifting luminous motes ─────────────────────────────────
+part spores material cyan_glow {
+  glow radius 3
+  cell 50 34 cyansoft
+  cell 58 20 cyansoft
+  cell 30 14 cyansoft
+  cell 44 10 cyanhot
+  cell 76 40 cyansoft
+  cell 84 30 cyansoft
+  cell 14 60 cyansoft
+  cell 60 44 cyanhot
+  # glow pooling on the ground under the gills
+  cell 36 88 cyansoft
+  cell 44 90 cyanhot
+  cell 52 88 cyansoft
+  cell 70 90 cyansoft
+}

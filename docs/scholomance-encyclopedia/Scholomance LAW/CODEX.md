@@ -100,3 +100,15 @@ QA CHECKLIST:
 - [ ] Trace included in output
 - [ ] Schema matches SCHEMA_CONTRACT.md
 ```
+
+## SCDNA Gene Injection
+
+Integrate SCDNA for schema and layer enforcement genes.
+
+Run: `python -m vaelrix_forcefield.scdna.inject --prompt "..." --agent codex`
+
+Prioritize genes in domains: architecture, schema, determinism, code, pixel.
+
+Use injected genes to guide schema design, layer contracts, and to avoid drift. Wire SCDNA into your validation and schema tools where possible.
+
+See `scripts/scdna-gene-inject.sh` and the scdna/ module for the injection pipeline. Genes are canonical directives.

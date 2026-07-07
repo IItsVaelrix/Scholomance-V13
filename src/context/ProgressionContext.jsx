@@ -263,6 +263,17 @@ export function ProgressionProvider({ children, authReady = true, isAuthenticate
     }
   }, []);
 
+  useEffect(() => {
+    const onScholomanceXp = (event) => {
+      const accountXp = Math.max(0, Math.floor(Number(event?.detail?.accountXp) || 0));
+      if (accountXp <= 0) return;
+      const action = event?.detail?.action || 'scholomance_stat';
+      addXP(accountXp, `scholomance:${action}`);
+    };
+    window.addEventListener('scholomance-xp-changed', onScholomanceXp);
+    return () => window.removeEventListener('scholomance-xp-changed', onScholomanceXp);
+  }, [addXP]);
+
   const resetProgression = useCallback(async () => {
     const optimisticReset = {
       ...defaultProgression,

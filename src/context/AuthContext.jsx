@@ -98,8 +98,10 @@ export function AuthProvider({ children }) {
         await new Promise(resolve => setTimeout(resolve, 50));
         if (!mounted) return;
 
-        // 3. Then check if the user is authenticated
-        await checkMe({ force: true });
+        // 3. Check authenticated state only when the client has evidence of a
+        // prior login. Anonymous production visits should not emit a handled
+        // but noisy 401 from /auth/me on every page load.
+        await checkMe();
       } catch (e) {
         if (mounted) {
           const bytecode = emitNetworkBytecodeError('/auth/csrf-token', 0, { error: e.message });
@@ -185,7 +187,8 @@ export function AuthProvider({ children }) {
     } finally {
       clearCsrfToken();
       setSessionHint(false);
-      await checkMe({ force: true });
+      setUser(null);
+      setIsLoading(false);
     }
   };
 

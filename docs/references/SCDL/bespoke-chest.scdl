@@ -1,0 +1,201 @@
+asset scholomance_treasure_chest canvas 80x45
+
+palette {
+  outline       = #180e0a
+
+  wood_deep     = #361b0b
+  wood_shadow   = #4e260f
+  wood_mid      = #8b4d20
+  wood_lit      = #cf8438
+
+  gold_dark     = #7c5a21
+  gold_hi       = #efbc48
+
+  blacksteel    = #1d232a
+  steel_mid     = #5d6570
+  steel_hi      = #b1bbc9
+
+  void_purple   = #5c2a89
+  rune_cyan     = #46e2ff
+  rune_core     = #e8fbff
+}
+
+# Painter order:
+# 1) shadow / silhouette
+# 2) lid + body wood
+# 3) straps / rails / corners
+# 4) lockplate
+# 5) runes / small accents
+
+part shadow material source {
+  line 22 43 57 43 void_purple
+  line 26 44 53 44 void_purple
+}
+
+part silhouette material bark {
+  # Outer chest silhouette
+  polygon 22 6 57 6 64 13 67 37 62 40 17 40 12 37 15 13 outline
+}
+
+part interior material bark {
+  # Exposed interior back wall
+  rect 17 7 46 13 wood_deep
+  # Interior wood grain
+  line 18 8 61 8 wood_shadow
+  line 20 10 58 10 wood_shadow
+  line 17 12 60 12 wood_shadow
+  line 19 14 62 14 wood_shadow
+  line 21 16 57 16 wood_shadow
+  line 18 18 61 18 wood_shadow
+}
+
+part lid material bark {
+  # Arched lid
+  polygon 24 7 55 7 61 13 58 19 21 19 18 13 wood_shadow
+  polygon 26 8 53 8 59 13 56 18 23 18 20 13 wood_mid
+  polygon 31 9 48 9 53 13 50 17 29 17 26 13 wood_lit
+
+  # Lid wood grain
+  line 27 10 52 10 wood_shadow
+  line 22 12 57 12 wood_shadow
+  line 25 15 54 15 wood_shadow
+
+  # Lid underside seam
+  line 18 19 61 19 wood_deep
+
+  # Lid outline emphasis
+  line 24 7 55 7 outline
+  line 20 13 59 13 outline
+}
+
+part body material bark {
+  # Main front body
+  rect 16 20 48 17 wood_mid
+
+  # Side shadows
+  rect 16 20 7 17 wood_shadow
+  rect 57 20 7 17 wood_shadow
+
+  # Deep inner side panels
+  rect 23 20 7 17 wood_deep
+  rect 50 20 7 17 wood_deep
+
+  # Lit central section
+  rect 31 20 18 17 wood_lit
+
+  # Body wood grain
+  line 18 22 61 22 wood_shadow
+  line 24 24 55 24 wood_deep
+  line 17 26 62 26 wood_shadow
+  line 21 28 58 28 wood_shadow
+  line 26 30 53 30 wood_deep
+  line 19 32 60 32 wood_shadow
+  line 17 34 62 34 wood_shadow
+
+  # Front panel seams
+  line 23 20 23 36 outline
+  line 30 20 30 36 wood_shadow
+  line 49 20 49 36 wood_shadow
+  line 56 20 56 36 outline
+
+  # Center highlight ribs
+  line 38 21 38 35 gold_hi
+  line 39 21 39 35 wood_lit
+  line 40 21 40 35 wood_lit
+  line 41 21 41 35 gold_hi
+}
+
+part rails material gold {
+  # Top rail
+  rect 15 18 50 3 gold_dark
+  line 16 19 63 19 gold_hi
+  line 17 20 62 20 gold_dark
+
+  # Bottom rail
+  rect 16 35 48 3 gold_dark
+  line 17 36 62 36 gold_hi
+  line 18 37 61 37 outline
+}
+
+part straps material gold {
+  # Left strap
+  rect 27 18 4 20 gold_dark
+  line 28 19 28 36 gold_hi
+
+  # Right strap
+  rect 49 18 4 20 gold_dark
+  line 51 19 51 36 gold_hi
+}
+
+part corners material darksteel {
+  # Left corner support
+  rect 16 20 4 16 blacksteel
+  line 17 21 17 34 steel_mid
+  cell 17 22 steel_hi
+
+  # Right corner support
+  rect 60 20 4 16 blacksteel
+  line 62 21 62 34 steel_mid
+  cell 62 22 steel_hi
+}
+
+part lockplate material darksteel {
+  rect 35 23 10 9 blacksteel
+  rect 37 24 6 7 gold_dark
+  line 38 24 41 24 gold_hi
+  line 38 30 41 30 outline
+
+  # keyhole / magic core
+  cell 39 26 rune_core
+  cell 40 26 rune_core
+  cell 38 27 rune_cyan
+  cell 39 27 rune_cyan
+  cell 40 27 rune_cyan
+  cell 41 27 rune_cyan
+  cell 39 28 void_purple
+  cell 40 28 void_purple
+}
+
+part runes material cyan_glow {
+  # Left lid rune
+  cell 29 13 rune_cyan
+  cell 30 12 rune_cyan
+  cell 30 13 rune_core
+  cell 30 14 rune_cyan
+  cell 31 13 rune_cyan
+
+  # Center lid sigil
+  cell 39 11 rune_core
+  cell 40 11 rune_core
+  cell 38 12 rune_cyan
+  cell 39 12 rune_cyan
+  cell 40 12 rune_cyan
+  cell 41 12 rune_cyan
+  cell 39 13 void_purple
+  cell 40 13 void_purple
+
+  # Right lid rune
+  cell 48 13 rune_cyan
+  cell 49 12 rune_cyan
+  cell 49 13 rune_core
+  cell 49 14 rune_cyan
+  cell 50 13 rune_cyan
+
+  # Front tiny rune accents
+  cell 28 29 rune_cyan
+  cell 51 29 rune_cyan
+}
+
+part rivets material darksteel {
+  cell 17 19 steel_hi
+  cell 28 19 steel_hi
+  cell 51 19 steel_hi
+  cell 62 19 steel_hi
+
+  cell 17 36 steel_hi
+  cell 28 36 steel_hi
+  cell 51 36 steel_hi
+  cell 62 36 steel_hi
+}
+
+export png aseprite

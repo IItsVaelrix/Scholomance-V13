@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { buildRitualPrediction, posToRole } from '../../src/lib/ritualPredictionTooltip.js';
+import {
+  buildRitualPrediction,
+  posToRole,
+  reconcileWithLexicon,
+} from '../../src/lib/ritualPredictionTooltip.js';
 
 const build = (word, contextLine = '') =>
   buildRitualPrediction({ word, line: 0, column: 0, contextLine, surroundingText: contextLine });
@@ -94,6 +98,89 @@ describe('confidenceFactors (#5 auditable decomposition)', () => {
     const vague = build('xq').prediction.confidence;
     const decisive = build('and').prediction.confidence;
     expect(decisive).toBeGreaterThan(vague);
+  });
+});
+
+describe('reconcileWithLexicon (single prediction authority)', () => {
+  // A synthetic base prediction in the buildRitualPrediction shape, so we can
+  // assert that backend lexicon truth overrides the local heuristic regardless
+  // of what the local pipeline produced.
+  const makeBase = (overrides = {}) => ({
+    word: 'flight',
+    normalizedWord: 'flight',
+    prediction: {
+      ritualName: 'Flight — Trigger Glyph',
+      ritualFamily: 'Invocation Rite',
+      role: 'trigger',
+      roleSignal: 'suffix:-ing',
+      roleAlternatives: [],
+      confidence: 0.6,
+      confidenceFactors: [{ label: 'base prior', delta: 0.4 }, { label: 'morphological signal', delta: 0.2 }],
+      phonology: { vowelFamily: 'i', syllableCount: 1, rhymeKey: 'aɪt' },
+      ...overrides.prediction,
+    },
+    details: {
+      why: 'local',
+      whyFactors: [],
+      nearbySignals: [],
+      resonancePartners: [
+        { word: 'light', type: 'slant', score: 0.5 },
+        { word: 'silent', type: 'perfect', score: 0.4 },
+      ],
+      ...overrides.details,
+    },
+    diagnostics: { warnings: [], debugTrace: [] },
+  });
+
+  it('lets the lexicon part-of-speech override the local role guess', () => {
+    const base = makeBase(); // local says "trigger"
+    const out = reconcileWithLexicon(base, { word: 'flight', pos: ['noun'] });
+    expect(out.prediction.role).toBe('anchor'); // noun -> anchor wins
+    expect(out.prediction.ritualName).toContain('Anchor');
+    expect(out.prediction.authority).toBe('lexicon');
+  });
+
+  it('renders backend-confirmed rhyme tiers, not the local phoneme guess', () => {
+    const base = makeBase();
+    // Backend says "light" is a PERFECT rhyme even though the local engine
+    // scored it slant. This is the COLOR_DRAGON fallback the gene forbids.
+    const out = reconcileWithLexicon(base, {
+      word: 'flight',
+      rhymes: ['light'],
+      slantRhymes: [],
+    });
+    const light = out.details.resonancePartners.find((p) => p.word === 'light');
+    expect(light.type).toBe('perfect');
+    expect(light.confirmed).toBe(true);
+  });
+
+  it('does not let an unconfirmed local "perfect" claim stand as perfect', () => {
+    const base = makeBase();
+    // Backend has rhyme data, but "silent" is in neither list -> the local
+    // "perfect" must not be trusted over backend truth.
+    const out = reconcileWithLexicon(base, {
+      word: 'flight',
+      rhymes: ['light'],
+      slantRhymes: [],
+    });
+    const silent = out.details.resonancePartners.find((p) => p.word === 'silent');
+    expect(silent.confirmed).toBe(false);
+    expect(silent.type).not.toBe('perfect');
+  });
+
+  it('records a lexicon-confirmation factor and does not lower confidence', () => {
+    const base = makeBase();
+    const out = reconcileWithLexicon(base, { word: 'flight', pos: ['noun'] });
+    expect(out.prediction.confidence).toBeGreaterThanOrEqual(base.prediction.confidence);
+    const labels = out.prediction.confidenceFactors.map((f) => f.label).join(' ');
+    expect(labels).toMatch(/lexicon/i);
+  });
+
+  it('keeps the local role when the lexicon offers no usable part-of-speech', () => {
+    const base = makeBase();
+    const out = reconcileWithLexicon(base, { word: 'flight', pos: [] });
+    expect(out.prediction.role).toBe('trigger'); // unchanged
+    expect(out.prediction.authority).toBe('lexicon'); // still backed by a lookup
   });
 });
 

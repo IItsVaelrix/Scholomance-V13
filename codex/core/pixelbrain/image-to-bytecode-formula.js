@@ -26,6 +26,8 @@ export const FORMULA_TYPES = Object.freeze({
   TEMPLATE_BASED: 'template_based',
   FIBONACCI: 'fibonacci',
   VECTORIZED_TEXT: 'vectorized_text',
+  MATHEMATICAL_STROKE: 'mathematical_stroke',  // User's vision: math formula that *simulates* a stroke, not pixel stroking
+  MATH_EXPRESSION: 'math_expression',  // General state-free AST for procedural vector math (sin, cos, noise, mod, etc.)
 });
 
 /**

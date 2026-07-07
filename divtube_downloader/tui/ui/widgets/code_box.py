@@ -61,10 +61,15 @@ class CodeBox(VerticalScroll):
         self._language = language if language != "text" else _guess_language(filename)
         self._container = None
 
+    # Shown when no source is loaded, so the panel invites use instead of
+    # reading as a blank/broken box.
+    _EMPTY = ("[#6A5A6A]no scroll open[/]\n"
+              "[#6A5A6A]code surfaces here when you /analyze or open a file[/]")
+
     def compose(self) -> ComposeResult:
         if self._filename:
             yield Static(f"[#B388FF]📄 {self._filename}[/]", classes="code-title")
-        self._container = Static("", classes="code-content")
+        self._container = Static(self._EMPTY, classes="code-content")
         yield self._container
 
     def set_code(self, code: str, filename: str = "", language: str | None = None):
@@ -80,7 +85,7 @@ class CodeBox(VerticalScroll):
             return
 
         if not code.strip():
-            self._container.update("")
+            self._container.update(self._EMPTY)
             return
 
         try:

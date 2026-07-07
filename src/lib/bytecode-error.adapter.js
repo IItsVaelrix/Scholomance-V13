@@ -14,6 +14,25 @@ import {
   ERROR_CODES 
 } from './pixelbrain.adapter.js';
 
+export {
+  normalizeErrorToBytecode,
+  createEventDiagnostic,
+  assertEventPayload,
+} from '../../codex/core/events/event-diagnostics.js';
+
+export {
+  AMBIENT_EVENTS,
+  COMBAT_BRIDGE_EVENTS,
+  EVENT_DOMAINS,
+  PROGRESSION_EVENTS,
+  RUNTIME_EVENTS,
+  SCHOL_EVENT_MAP,
+  createEventEnvelope,
+  getEventContract,
+  isKnownScholomanceEvent,
+  validateEventPayload,
+} from '../../codex/core/events/scholomance-event-map.js';
+
 /**
  * Wraps a standard frontend error or event into a PB-ERR-v1 bytecode string.
  * 

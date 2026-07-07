@@ -1,0 +1,68 @@
+{
+  "contract": "PB-SCDNA-GENE-v1",
+  "version": "1.0.0",
+  "assetId": "void_forest_grass_tile",
+  "geneId": "gene_grass_001",
+  "geneType": "GRASS_SURFACE",
+  "canvas": {
+    "width": 32,
+    "height": 32
+  },
+  "bounds": {
+    "x": 12,
+    "y": 12,
+    "w": 11,
+    "h": 9
+  },
+  "role": "surface_grass",
+  "materialHint": "pine_needle",
+  "paletteRoles": [
+    "grass_highlight",
+    "grass_mid",
+    "grass_shadow"
+  ],
+  "coordinates": [
+    {
+      "x": 15,
+      "y": 12,
+      "color": "#6B11A4",
+      "role": "surface_grass",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 14,
+      "color": "#60218C",
+      "role": "surface_grass",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 16,
+      "color": "#552480",
+      "role": "surface_grass",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 17,
+      "color": "#9F43C2",
+      "role": "surface_grass",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 20,
+      "color": "#8D1FD8",
+      "role": "surface_grass",
+      "isMotif": false
+    }
+  ],
+  "geometryHints": {
+    "closed": false,
+    "branchLike": false,
+    "preferredPrimitive": "polygon",
+    "preserveAsMotif": false
+  },
+  "checksum": "scd64:EkfwSXpyMHe0Xd8x4p8m72h7WaSzhE4X1O2wZgrj0o0000000000000000000000"
+}

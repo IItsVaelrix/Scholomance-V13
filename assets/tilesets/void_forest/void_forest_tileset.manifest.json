@@ -1,0 +1,275 @@
+{
+  "tileset": "void_forest",
+  "version": "1.0",
+  "gridSize": 32,
+  "atlasWidth": 512,
+  "atlasHeight": 512,
+  "tiles": [
+    {
+      "id": "void_ground_plain",
+      "col": 0,
+      "row": 0,
+      "x": 0,
+      "y": 0,
+      "tags": [
+        "ground"
+      ]
+    },
+    {
+      "id": "void_ground_noise_a",
+      "col": 1,
+      "row": 0,
+      "x": 32,
+      "y": 0,
+      "tags": [
+        "ground"
+      ]
+    },
+    {
+      "id": "void_ground_cracked",
+      "col": 2,
+      "row": 0,
+      "x": 64,
+      "y": 0,
+      "tags": [
+        "ground"
+      ]
+    },
+    {
+      "id": "void_ground_cyan_fleck",
+      "col": 3,
+      "row": 0,
+      "x": 96,
+      "y": 0,
+      "tags": [
+        "ground"
+      ]
+    },
+    {
+      "id": "void_ground_violet_fleck",
+      "col": 4,
+      "row": 0,
+      "x": 128,
+      "y": 0,
+      "tags": [
+        "ground"
+      ]
+    },
+    {
+      "id": "void_ground_to_abyss_n",
+      "col": 0,
+      "row": 1,
+      "x": 0,
+      "y": 32,
+      "tags": [
+        "edge",
+        "abyss_n"
+      ]
+    },
+    {
+      "id": "void_ground_to_abyss_s",
+      "col": 1,
+      "row": 1,
+      "x": 32,
+      "y": 32,
+      "tags": [
+        "edge",
+        "abyss_s"
+      ]
+    },
+    {
+      "id": "root_path_center",
+      "col": 0,
+      "row": 3,
+      "x": 0,
+      "y": 96,
+      "tags": [
+        "path"
+      ]
+    },
+    {
+      "id": "root_path_horizontal",
+      "col": 1,
+      "row": 3,
+      "x": 32,
+      "y": 96,
+      "tags": [
+        "path"
+      ]
+    },
+    {
+      "id": "void_cliff_face",
+      "col": 0,
+      "row": 4,
+      "x": 0,
+      "y": 128,
+      "tags": [
+        "cliff"
+      ]
+    },
+    {
+      "id": "void_cliff_top",
+      "col": 1,
+      "row": 4,
+      "x": 32,
+      "y": 128,
+      "tags": [
+        "cliff_top"
+      ]
+    },
+    {
+      "id": "void_pine_sapling_1x1",
+      "col": 0,
+      "row": 5,
+      "x": 0,
+      "y": 160,
+      "tags": [
+        "tree"
+      ]
+    },
+    {
+      "id": "void_pine_medium_trunk",
+      "col": 2,
+      "row": 5,
+      "x": 64,
+      "y": 160,
+      "tags": [
+        "tree",
+        "trunk"
+      ]
+    },
+    {
+      "id": "void_pine_medium_mid",
+      "col": 2,
+      "row": 6,
+      "x": 64,
+      "y": 192,
+      "tags": [
+        "tree",
+        "branches"
+      ]
+    },
+    {
+      "id": "void_pine_medium_top",
+      "col": 2,
+      "row": 7,
+      "x": 64,
+      "y": 224,
+      "tags": [
+        "tree",
+        "top"
+      ]
+    },
+    {
+      "id": "exposed_roots",
+      "col": 0,
+      "row": 8,
+      "x": 0,
+      "y": 256,
+      "tags": [
+        "debris",
+        "roots"
+      ]
+    },
+    {
+      "id": "rune_stone",
+      "col": 0,
+      "row": 9,
+      "x": 0,
+      "y": 288,
+      "tags": [
+        "prop",
+        "rune"
+      ]
+    },
+    {
+      "id": "cyan_flame_wisp",
+      "col": 1,
+      "row": 9,
+      "x": 32,
+      "y": 288,
+      "tags": [
+        "prop",
+        "wisp"
+      ]
+    },
+    {
+      "id": "cyan_rune_pulse_f0",
+      "col": 0,
+      "row": 10,
+      "x": 0,
+      "y": 320,
+      "tags": [
+        "anim",
+        "rune_pulse_0"
+      ]
+    },
+    {
+      "id": "cyan_rune_pulse_f1",
+      "col": 1,
+      "row": 10,
+      "x": 32,
+      "y": 320,
+      "tags": [
+        "anim",
+        "rune_pulse_1"
+      ]
+    },
+    {
+      "id": "cyan_rune_pulse_f2",
+      "col": 2,
+      "row": 10,
+      "x": 64,
+      "y": 320,
+      "tags": [
+        "anim",
+        "rune_pulse_2"
+      ]
+    },
+    {
+      "id": "cyan_rune_pulse_f3",
+      "col": 3,
+      "row": 10,
+      "x": 96,
+      "y": 320,
+      "tags": [
+        "anim",
+        "rune_pulse_3"
+      ]
+    },
+    {
+      "id": "walkable_marker_hidden",
+      "col": 0,
+      "row": 11,
+      "x": 0,
+      "y": 352,
+      "tags": [
+        "tactical",
+        "walkable"
+      ]
+    },
+    {
+      "id": "blocked_terrain_indicator",
+      "col": 1,
+      "row": 11,
+      "x": 32,
+      "y": 352,
+      "tags": [
+        "tactical",
+        "blocked"
+      ]
+    }
+  ],
+  "animations": [
+    {
+      "id": "cyan_rune_pulse_4f",
+      "frames": [
+        "cyan_rune_pulse_f0",
+        "cyan_rune_pulse_f1",
+        "cyan_rune_pulse_f2",
+        "cyan_rune_pulse_f3"
+      ],
+      "durationMs": 800
+    }
+  ]
+}

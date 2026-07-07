@@ -24,11 +24,19 @@ export function rasterLine(x0, y0, x1, y1, emit) {
 
 export function rasterArc(cx, cy, r, emit, startAngle = 0, endAngle = Math.PI * 2) {
   const steps = Math.max(8, Math.ceil(r * Math.PI * 2 * 2)); 
+  let prevX = null;
+  let prevY = null;
   for (let i = 0; i <= steps; i++) {
     const angle = startAngle + (endAngle - startAngle) * (i / steps);
     const x = Math.round(cx) + Math.round(Math.cos(angle) * r);
     const y = Math.round(cy) + Math.round(Math.sin(angle) * r);
-    emit(x, y);
+    if (prevX !== null) {
+      rasterLine(prevX, prevY, x, y, emit);
+    } else {
+      emit(x, y);
+    }
+    prevX = x;
+    prevY = y;
   }
 }
 
@@ -202,4 +210,94 @@ export function rasterConstructionGuides(spec, emit) {
   }
 
   return allPoints;
+}
+
+/**
+ * Rasterize a precise ellipse perimeter using midpoint algorithm.
+ */
+export function rasterEllipse(cx, cy, rx, ry, emit) {
+  let x = 0;
+  let y = ry;
+  let dx = 2 * ry * ry * x;
+  let dy = 2 * rx * rx * y;
+  let d1 = (ry * ry) - (rx * rx * ry) + (0.25 * rx * rx);
+
+  const plot = (px, py) => {
+    emit(Math.round(cx) + px, Math.round(cy) + py);
+    emit(Math.round(cx) - px, Math.round(cy) + py);
+    emit(Math.round(cx) + px, Math.round(cy) - py);
+    emit(Math.round(cx) - px, Math.round(cy) - py);
+  };
+
+  while (dx < dy) {
+    plot(x, y);
+    if (d1 < 0) {
+      x++;
+      dx = dx + (2 * ry * ry);
+      d1 = d1 + dx + (ry * ry);
+    } else {
+      x++;
+      y--;
+      dx = dx + (2 * ry * ry);
+      dy = dy - (2 * rx * rx);
+      d1 = d1 + dx - dy + (ry * ry);
+    }
+  }
+
+  let d2 = ((ry * ry) * ((x + 0.5) * (x + 0.5))) + ((rx * rx) * ((y - 1) * (y - 1))) - (rx * rx * ry * ry);
+  while (y >= 0) {
+    plot(x, y);
+    if (d2 > 0) {
+      y--;
+      dy = dy - (2 * rx * rx);
+      d2 = d2 + (rx * rx) - dy;
+    } else {
+      y--;
+      x++;
+      dx = dx + (2 * ry * ry);
+      dy = dy - (2 * rx * rx);
+      d2 = d2 + dx - dy + (rx * rx);
+    }
+  }
+}
+
+/**
+ * Rasterize a filled ellipse directly.
+ */
+export function rasterEllipseFilled(cx, cy, rx, ry, emit) {
+  const rxSq = rx * rx;
+  const rySq = ry * ry;
+  for (let y = -ry; y <= ry; y++) {
+    const dySq = y * y;
+    const xDist = Math.round(rx * Math.sqrt(1 - dySq / rySq));
+    for (let x = -xDist; x <= xDist; x++) {
+      emit(Math.round(cx) + x, Math.round(cy) + y);
+    }
+  }
+}
+
+/**
+ * Rasterize an accurate cubic bezier curve with dynamic subdivision.
+ */
+export function rasterBezierCurve(x0, y0, x1, y1, x2, y2, x3, y3, emit) {
+  const dist = Math.hypot(x1 - x0, y1 - y0) + Math.hypot(x2 - x1, y2 - y1) + Math.hypot(x3 - x2, y3 - y2);
+  const steps = Math.max(16, Math.ceil(dist * 2));
+  let prevX = null;
+  let prevY = null;
+  
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const invT = 1 - t;
+    const px = invT * invT * invT * x0 + 3 * invT * invT * t * x1 + 3 * invT * t * t * x2 + t * t * t * x3;
+    const py = invT * invT * invT * y0 + 3 * invT * invT * t * y1 + 3 * invT * t * t * y2 + t * t * t * y3;
+    const currX = Math.round(px);
+    const currY = Math.round(py);
+    if (prevX !== null) {
+      rasterLine(prevX, prevY, currX, currY, emit);
+    } else {
+      emit(currX, currY);
+    }
+    prevX = currX;
+    prevY = currY;
+  }
 }

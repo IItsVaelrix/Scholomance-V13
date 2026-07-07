@@ -1,0 +1,325 @@
+# tutorial-island-scdl-trace-v1
+# SCDL source trace of tutorial-island-ai-upscaled-reference-v1.png.
+# Reference raster is aspiration only; this file is the editable source of truth.
+# Light law: upper-left / NW. Props are authored as bottom-weighted overlays.
+
+asset tutorial_island_scdl_trace_v1 canvas 512x288
+
+palette {
+  abyss      = #030611
+  star       = #dcecff
+  nebula     = #4d2a83
+  aurorac    = #49e7e7
+  aurorav    = #9a5cf5
+  voidrock   = #111a2d
+  rockdeep   = #060914
+  crackblue  = #14c7ff
+  icebase    = #8faad0
+  icemid     = #adc3df
+  icehi      = #d8e7f6
+  icespec    = #f3fbff
+  snow       = #eef7ff
+  runeblack  = #071021
+  runedeep   = #10255a
+  cyanhot    = #64f7ff
+  cyansoft   = #bdfbff
+  cyanmid    = #1baed0
+  violet     = #7c54ff
+  violethi   = #c0a7ff
+  amethdark  = #33135f
+  amethbody  = #6b28bf
+  amethlite  = #a855f7
+  amethspec  = #f0d9ff
+  enemyred   = #a82d32
+  robe       = #1e8ccc
+  gold       = #f6d77c
+}
+
+def starfield {
+  part void material source {
+    rect 0 0 512 288 abyss
+    circle 44 28 radius 1 star
+    circle 116 18 radius 1 star
+    circle 438 22 radius 1 star
+    circle 489 63 radius 1 star
+    circle 38 211 radius 1 star
+    circle 472 232 radius 1 star
+    circle 204 24 radius 1 cyansoft
+    circle 346 42 radius 1 violethi
+    circle 83 249 radius 1 star
+    circle 407 264 radius 1 star
+    sphere 30 72 radius 2 light -1 -1 star cyansoft cyanmid nebula abyss
+    sphere 486 222 radius 2 light -1 -1 star cyansoft cyanmid nebula abyss
+    path "M 0 236 C 48 210 92 214 140 246 L 140 288 L 0 288 Z" nebula
+    path "M 0 22 C 38 8 72 18 105 52 L 77 88 C 42 66 20 58 0 64 Z" nebula
+  }
+}
+
+def aurora {
+  part cyan material cyan_glow {
+    glow radius 18
+    path "M 210 8 C 260 28 314 21 378 6 C 432 -8 475 3 512 26 L 512 58 C 462 38 416 35 363 46 C 306 58 255 48 205 31 Z" aurorac
+    path "M 265 22 C 326 41 383 35 449 18 C 472 13 493 17 512 25 L 512 73 C 452 58 397 65 337 70 C 302 72 270 55 238 41 Z" aurorav
+  }
+}
+
+def island_top {
+  part slab material void_ice {
+    polygon 46 92 132 40 330 35 458 101 460 184 370 245 150 249 42 190 icebase
+    polygon 46 92 132 40 226 46 152 81 icehi
+    polygon 132 40 330 35 395 72 226 46 icemid
+    polygon 395 72 458 101 460 184 395 153 icemid
+    polygon 42 190 150 249 251 228 132 188 icemid
+    polygon 251 228 370 245 460 184 395 153 voidrock
+    polygon 152 81 226 46 310 83 236 112 icehi
+    polygon 236 112 310 83 395 153 286 165 icemid
+    polygon 132 188 236 112 286 165 251 228 icebase
+    line 46 92 132 40 icespec
+    line 132 40 330 35 icehi
+    line 330 35 458 101 icehi
+    line 42 190 150 249 icehi
+    line 150 249 370 245 icemid
+  }
+  part facets material diamond {
+    line 96 116 212 55 icehi
+    line 151 145 273 63 icespec
+    line 210 196 356 91 icemid
+    line 92 164 235 226 icehi
+    line 146 78 394 153 icehi
+    line 116 207 425 104 icemid
+    line 74 136 406 217 icespec
+    cell 135 76 icespec
+    cell 360 74 icespec
+    cell 102 194 icespec
+    cell 397 204 icehi
+  }
+}
+
+def cliff_faces {
+  part cliff material voidsteel {
+    polygon 42 190 150 249 150 288 65 246 voidrock
+    polygon 150 249 370 245 343 288 159 288 rockdeep
+    polygon 370 245 460 184 434 250 343 288 voidrock
+    polygon 42 190 65 246 46 226 rockdeep
+    polygon 458 101 460 184 434 250 418 140 rockdeep
+    line 78 207 70 256 crackblue
+    line 188 253 175 286 crackblue
+    line 326 249 337 286 crackblue
+    line 426 190 438 228 crackblue
+    line 86 218 92 236 cyansoft
+    line 312 258 300 278 cyanmid
+  }
+  part icicles material void_ice {
+    polygon 82 202 92 203 87 235 icehi
+    polygon 111 218 121 218 116 252 snow
+    polygon 202 250 213 250 207 284 icehi
+    polygon 294 249 305 249 298 281 icemid
+    polygon 392 224 402 217 397 258 icehi
+    polygon 438 173 447 165 443 210 snow
+  }
+}
+
+def ritual_circle {
+  part glow material cyan_glow {
+    glow radius 10
+    ring 256 151 radius 54 width 7 cyanhot
+    ring 256 151 radius 43 width 3 violethi
+    ring 256 151 radius 32 width 3 cyansoft
+    ring 256 151 radius 20 width 2 violet
+    sphere 256 151 radius 8 light -1 -1 icespec cyanhot cyansoft cyanmid runeblack
+    line 256 98 256 203 cyansoft
+    line 204 151 308 151 cyansoft
+    line 219 113 293 189 violet
+    line 293 113 219 189 violet
+    circle 256 97 radius 4 cyansoft
+    circle 256 205 radius 4 cyansoft
+    circle 202 151 radius 4 cyansoft
+    circle 310 151 radius 4 cyansoft
+    circle 220 114 radius 3 violethi
+    circle 292 114 radius 3 violethi
+    circle 220 188 radius 3 violethi
+    circle 292 188 radius 3 violethi
+  }
+}
+
+def rune_tile {
+  part inset material voidsteel {
+    polygon -18 -8 18 -8 24 4 0 14 -24 4 runeblack
+    polygon -14 -5 14 -5 18 3 0 10 -18 3 runedeep
+  }
+  part glyph material cyan_glow {
+    glow radius 2
+    line -7 -1 5 -1 cyanhot
+    line -2 -5 4 5 cyansoft
+    cell 8 1 cyanhot
+    cell -10 3 violet
+  }
+}
+
+def snow_glyph {
+  part mark material cyan_glow {
+    glow radius 2
+    line -8 0 8 0 cyansoft
+    line 0 -8 0 8 cyansoft
+    line -6 -6 6 6 cyansoft
+    line 6 -6 -6 6 cyansoft
+  }
+}
+
+def crystal_cluster {
+  part base material void_ice {
+    polygon -28 18 -8 9 22 10 35 21 18 29 -18 28 icebase
+  }
+  part shards material amethyst {
+    polygon 0 -50 -14 15 -3 25 5 -28 amethlite
+    polygon 0 -50 5 -28 -3 25 18 13 amethdark
+    polygon -18 -26 -30 16 -17 24 -10 -10 amethbody
+    polygon 20 -30 10 12 23 20 30 -4 amethlite
+    polygon 35 -14 25 14 39 19 47 2 amethbody
+    polygon -39 -7 -48 17 -35 22 -28 5 amethdark
+    cell 1 -50 amethspec
+    line 0 -49 -9 12 amethspec
+    line -18 -25 -24 14 violethi
+    line 20 -29 14 10 amethspec
+  }
+}
+
+def crystal_pillar {
+  part plinth material void_ice {
+    polygon -14 15 0 8 16 16 2 24 icebase
+    polygon -9 15 0 11 10 16 1 20 icehi
+  }
+  part shard material amethyst {
+    polygon 0 -36 -14 8 -2 18 4 -12 amethlite
+    polygon 0 -36 4 -12 -2 18 16 7 amethdark
+    polygon 0 -36 -3 -9 -2 14 4 -12 amethbody
+    cell 1 -36 amethspec
+    line 0 -35 -7 7 amethspec
+  }
+}
+
+def glow_mushroom {
+  part stems material void_ice {
+    rect -4 2 4 18 icehi
+    rect 7 4 3 14 icemid
+    rect -13 6 3 11 icemid
+  }
+  part caps material cyan_glow {
+    glow radius 4
+    circle -2 0 radius 8 cyanhot
+    circle 8 2 radius 6 cyanmid
+    circle -12 5 radius 5 cyansoft
+    cell -5 -3 icespec
+  }
+}
+
+def frost_fern {
+  part stem material cyan_glow {
+    glow radius 2
+    line 0 20 0 -18 cyanhot
+    polygon 0 -13 -14 -23 -5 -9 cyansoft
+    polygon 0 -8 16 -18 5 -5 cyansoft
+    polygon 0 -2 -18 -9 -5 2 cyanmid
+    polygon 0 4 17 -4 5 7 cyansoft
+  }
+}
+
+def scholar {
+  part cloak material cyan_glow {
+    polygon 0 -32 -13 2 0 12 13 2 robe
+    polygon 0 -32 -5 4 0 12 5 4 cyansoft
+  }
+  part face material gold {
+    circle 0 -21 radius 5 icehi
+    cell -2 -23 runeblack
+    cell 2 -23 runeblack
+  }
+  part staff material gold {
+    line 15 -34 15 9 gold
+    sphere 15 -37 radius 4 light -1 -1 icespec cyanhot cyansoft cyanmid runeblack
+  }
+}
+
+def enemy {
+  part cloak material source {
+    polygon 0 -30 -12 4 0 12 12 4 enemyred
+    polygon 0 -30 0 11 8 3 #6d1519
+  }
+  part hood material source {
+    circle 0 -22 radius 6 #5a1015
+    circle 0 -21 radius 3 icehi
+  }
+  part weapon material gold {
+    line 14 -22 14 8 gold
+    line 10 -20 18 -26 gold
+  }
+}
+
+group scene at 0 0 {
+  instance starfield at 0 0
+  instance aurora at 0 0
+  instance cliff_faces at 0 0
+  instance island_top at 0 0
+
+  instance ritual_circle at 0 0
+
+  # Rune cross and square path
+  instance rune_tile at 162 132 rotate 8 scale 1.05
+  instance rune_tile at 198 132 rotate 8 scale 1.05
+  instance rune_tile at 234 132 rotate 8 scale 1.05
+  instance rune_tile at 278 132 rotate 8 scale 1.05
+  instance rune_tile at 314 132 rotate 8 scale 1.05
+  instance rune_tile at 350 132 rotate 8 scale 1.05
+  instance rune_tile at 256 82 rotate 88 scale 1.05
+  instance rune_tile at 256 111 rotate 88 scale 1.05
+  instance rune_tile at 256 191 rotate 88 scale 1.05
+  instance rune_tile at 256 220 rotate 88 scale 1.05
+
+  instance rune_tile at 183 96 rotate 8
+  instance rune_tile at 329 96 rotate 8
+  instance rune_tile at 183 202 rotate 8
+  instance rune_tile at 329 202 rotate 8
+  instance rune_tile at 145 160 rotate 8
+  instance rune_tile at 367 160 rotate 8
+
+  # Snow sigils
+  instance snow_glyph at 185 82 scale 0.8
+  instance snow_glyph at 327 82 scale 0.8
+  instance snow_glyph at 150 160 scale 0.8
+  instance snow_glyph at 374 160 scale 0.8
+  instance snow_glyph at 212 52 scale 0.7
+  instance snow_glyph at 300 52 scale 0.7
+
+  # Perimeter crystal language
+  instance crystal_cluster at 92 142 scale 1.05
+  instance crystal_cluster at 113 79 scale 0.75
+  instance crystal_cluster at 236 50 scale 1.1
+  instance crystal_cluster at 282 49 scale 1.15
+  instance crystal_cluster at 406 145 scale 1.05 mirror x
+  instance crystal_cluster at 390 84 scale 0.75 mirror x
+  instance crystal_cluster at 255 276 scale 0.56
+  instance crystal_cluster at 172 244 scale 0.52
+  instance crystal_cluster at 345 242 scale 0.52 mirror x
+
+  instance crystal_pillar at 78 116 scale 0.8
+  instance crystal_pillar at 434 116 scale 0.8
+  instance crystal_pillar at 145 238 scale 0.75
+  instance crystal_pillar at 367 238 scale 0.75
+
+  # Bioluminescent foliage
+  instance glow_mushroom at 129 86 scale 0.8
+  instance glow_mushroom at 391 91 scale 0.8
+  instance glow_mushroom at 181 248 scale 0.54
+  instance glow_mushroom at 335 246 scale 0.54
+  instance frost_fern at 119 109 scale 0.9
+  instance frost_fern at 398 110 scale 0.9 mirror x
+  instance frost_fern at 218 252 scale 0.52
+  instance frost_fern at 303 250 scale 0.52 mirror x
+
+  # Tutorial actor anchor stand-ins. Real runtime actors remain separate.
+  instance scholar at 126 157 scale 0.75
+  instance enemy at 378 139 scale 0.72
+  instance enemy at 409 158 scale 0.72
+}
+
+export png json svg phaser

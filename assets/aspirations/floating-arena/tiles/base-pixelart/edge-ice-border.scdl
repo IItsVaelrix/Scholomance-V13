@@ -1,0 +1,31 @@
+# edge-ice-border.scdl
+# Base pixel art for platform edge / border tile with icicle feel.
+asset edge_ice_border canvas 64x64
+
+palette {
+  deep_ice   = #1a253f
+  base_ice   = #2a3a5a
+  lit_ice    = #4a6a9a
+  frost      = #c8e0f0
+  dark_line  = #0f1a30
+  white      = #e8f0f8
+}
+
+part slab material ice {
+  rect 0 8 64 56 base_ice
+  polygon 0 8 32 8 32 30 0 30 lit_ice
+  polygon 32 8 64 8 64 30 32 30 lit_ice
+  line 0 8 64 8 frost
+  line 0 8 0 64 dark_line
+}
+
+part icicles material ice {
+  # hanging icicle details
+  polygon 8 30 12 50 16 30 frost
+  polygon 20 30 24 55 28 30 frost
+  polygon 36 30 40 48 44 30 frost
+  polygon 48 30 52 52 56 30 frost
+  line 10 30 10 50 white
+}
+
+export png json

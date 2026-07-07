@@ -386,12 +386,12 @@ export async function installCombatMocks(page) {
 
   await page.route("**/api/combat/score", (route) =>
     fulfillJson(route, {
-      damage: 2000,
+      damage: 42,
       healing: 6,
       totalScore: 91,
       school: "SONIC",
       arenaSchool: "SONIC",
-      opponentSchool: "VOID",
+      opponentSchool: "SONIC",
       commentary: "A mock resonance tears through the chamber.",
       traces: [
         { heuristic: "rhyme_density", contribution: 46 },
@@ -409,6 +409,16 @@ export async function installCombatMocks(page) {
         failureDisposition: "NEUTRAL",
       },
       failureCast: false,
+      verseIR: {
+        verseIRAmplifier: {
+          dominantTier: "RARE",
+          noveltySignal: 0.62,
+          semanticDepth: 0.48,
+          impactMultiplier: 1.08,
+        },
+        tokens: [],
+        lines: [],
+      },
     })
   );
 }

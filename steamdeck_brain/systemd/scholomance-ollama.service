@@ -16,6 +16,10 @@ Type=simple
 # big drive with:  OLLAMA_MODELS=/run/media/deck/<DRIVE>/ollama/models
 # and/or point at a relocated server with:  OLLAMA_HOST=127.0.0.1:11434
 EnvironmentFile=-%h/.config/scholomance-brain.env
+# Steam Deck's APU (RADV VANGOGH) is an *integrated* GPU. Ollama detects it over
+# Vulkan but skips integrated GPUs unless told otherwise, so without this the model
+# runs 100% on CPU. Enable iGPU offload (override in the EnvironmentFile if needed).
+Environment=OLLAMA_IGPU_ENABLE=1
 # Self-heal: install Ollama (to @OLLAMA_BIN@'s prefix) if the binary is missing.
 ExecStartPre=@ENSURE_OLLAMA@ @OLLAMA_BIN@
 ExecStart=@OLLAMA_BIN@ serve

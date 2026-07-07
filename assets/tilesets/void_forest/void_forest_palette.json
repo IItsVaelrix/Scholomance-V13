@@ -1,0 +1,65 @@
+{
+  "name": "Void Forest Palette",
+  "aliases": {
+    "void_black": "#03040A",
+    "void_navy": "#070B1A",
+    "deep_indigo": "#10163A",
+    "pine_blue": "#17245C",
+    "void_violet": "#32227A",
+    "rim_violet": "#5146C8",
+    "cold_cyan": "#20D8FF",
+    "faint_cyan": "#0C7896",
+    "astral_blue": "#2B6CFF",
+    "shadow_purple": "#190B2E",
+    "snow_ash": "#BBC7E8",
+    "snow_shadow": "#566083",
+    "root_dark": "#090711",
+    "root_rim": "#282060",
+    "rune_glow": "#48F2FF"
+  },
+  "materials": {
+    "voidsoil": {
+      "type": "basic",
+      "base": "void_navy",
+      "shadow": "void_black"
+    },
+    "voidbark": {
+      "type": "basic",
+      "base": "deep_indigo",
+      "shadow": "void_black",
+      "highlight": "pine_blue"
+    },
+    "voidpine": {
+      "type": "basic",
+      "base": "void_navy",
+      "shadow": "void_black",
+      "highlight": "rim_violet"
+    },
+    "astralmoss": {
+      "type": "glow",
+      "base": "astral_blue",
+      "glow": "cold_cyan"
+    },
+    "corrupted_snow": {
+      "type": "basic",
+      "base": "snow_ash",
+      "shadow": "snow_shadow"
+    },
+    "rune_glow": {
+      "type": "glow",
+      "base": "rune_glow",
+      "glow": "cold_cyan",
+      "radius": 2
+    },
+    "abyss": {
+      "type": "basic",
+      "base": "void_black",
+      "shadow": "void_black"
+    },
+    "voidcrystal": {
+      "type": "glow",
+      "base": "rim_violet",
+      "glow": "astral_blue"
+    }
+  }
+}

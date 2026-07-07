@@ -1,0 +1,149 @@
+# void_ice_floor — primary walkable tile, tutorial Void ice island
+# Isometric 2:1 diamond, 128x64. Light law: upper-left (-1,-1).
+# Diamond vertices: N(64,0) E(127,32) S(64,63) W(0,32).
+asset void_ice_floor canvas 128x64
+
+palette {
+  abyss    = #04060e
+  deep     = #0e1526
+  dark     = #182238
+  base     = #22304f
+  mid      = #2d4066
+  lit      = #3d5480
+  bright   = #52709f
+  sheen    = #7291bd
+  frost    = #a8c3e2
+  spec     = #e3eef9
+  cyanhot  = #67e8f9
+  cyansoft = #b7f4fd
+}
+
+# ── ice slab: body + directional edge bands ──────────────────────────────
+part slab material void_ice {
+  # full diamond body
+  polygon 64 -1 129 32 64 65 -1 32 base
+  # NW edge band (lit side, width 4y/8x)
+  polygon -1 32 64 -1 64 4 8 32 bright
+  # NE edge band (half-lit)
+  polygon 64 -1 129 32 120 32 64 4 lit
+  # SW edge band (falloff shadow)
+  polygon -1 32 64 65 64 59 8 32 dark
+  # SE edge band (deepest shadow)
+  polygon 64 65 129 32 120 32 64 59 deep
+  # 1px crest sheen along the two lit edges
+  line 0 32 64 0 sheen
+  line 64 0 127 31 lit
+  # 1px sink line along the two shadow edges
+  line 0 33 63 63 deep
+  line 64 63 127 33 abyss
+}
+
+# ── crystalline facet mosaic (flat plates, tone falls NW → SE) ───────────
+part facets material diamond {
+  # upper band — plates catching the NW light
+  polygon 34 22 48 14 60 20 46 28 lit
+  polygon 48 14 64 8 78 14 60 20 mid
+  polygon 60 20 78 14 94 20 76 26 mid
+  polygon 76 26 94 20 108 28 92 34 base
+  # mid band — body tones
+  polygon 20 30 34 22 46 28 32 36 lit
+  polygon 46 28 60 20 76 26 62 34 mid
+  polygon 32 36 46 28 62 34 48 42 base
+  polygon 62 34 76 26 92 34 78 42 base
+  # lower band — sliding into shadow
+  polygon 48 42 62 34 78 42 64 50 dark
+  polygon 78 42 92 34 104 38 90 44 dark
+  polygon 64 50 78 42 90 44 74 52 dark
+  polygon 36 42 48 42 64 50 50 52 dark
+  # tiny bright slivers where plate lips catch the light
+  polygon 34 22 48 14 50 16 38 23 bright
+  polygon 20 30 34 22 36 24 24 31 bright
+  # E-tip plates so the point isn't bare
+  polygon 92 34 108 28 116 32 104 38 base
+  polygon 90 44 104 38 110 40 98 46 dark
+  # facet seams — hairline fractures following the iso diagonals
+  line 48 14 60 20 deep
+  line 62 34 76 26 deep
+  line 78 42 92 34 dark
+  # dither along tone boundaries so bands melt into each other
+  cell 44 30 mid
+  cell 50 30 mid
+  cell 58 22 lit
+  cell 66 22 mid
+  cell 72 16 mid
+  cell 82 16 base
+  cell 86 22 mid
+  cell 98 24 base
+  cell 40 38 mid
+  cell 54 36 base
+  cell 68 36 base
+  cell 84 36 base
+  cell 96 36 base
+  cell 46 44 base
+  cell 60 44 dark
+  cell 72 44 base
+  cell 86 40 base
+  cell 58 48 dark
+  cell 70 48 base
+  # cracks wandering across the shadowed SE half
+  line 70 44 78 48 deep
+  line 78 48 88 46 deep
+  line 88 46 94 40 dark
+  line 52 46 58 50 deep
+  cell 78 48 abyss
+  cell 88 46 abyss
+}
+
+# ── frost bloom: dither + sparkle along the lit edges ────────────────────
+part frostbloom material diamond {
+  # dither transition off the NW crest
+  cell 10 29 frost
+  cell 14 28 frost
+  cell 18 25 frost
+  cell 22 23 frost
+  cell 26 21 frost
+  cell 30 19 frost
+  cell 34 17 frost
+  cell 38 14 frost
+  cell 42 13 frost
+  cell 46 11 frost
+  cell 50 9 frost
+  cell 54 7 frost
+  cell 58 5 frost
+  cell 12 30 sheen
+  cell 20 26 sheen
+  cell 28 22 sheen
+  cell 36 18 sheen
+  cell 44 14 sheen
+  cell 52 10 sheen
+  cell 60 6 sheen
+  # specular sparkle points (kept upper-left, matching the light law)
+  cell 24 22 spec
+  cell 25 22 spec
+  cell 24 21 spec
+  cell 46 12 spec
+  cell 47 12 spec
+  cell 62 13 spec
+  cell 33 27 spec
+  # faint frost feathering into the body
+  cell 30 28 frost
+  cell 44 20 frost
+  cell 58 18 frost
+  cell 50 26 frost
+  cell 38 30 frost
+}
+
+# ── void micro-crystals: faint cyan energy trapped in the ice ────────────
+part veins material cyan_glow {
+  glow radius 2
+  # W-tip cluster
+  cell 16 33 cyanhot
+  cell 17 33 cyansoft
+  cell 16 34 cyansoft
+  # mid-body fleck
+  cell 72 40 cyanhot
+  cell 73 40 cyansoft
+  # E-side fleck, dimmer (further from light)
+  cell 106 31 cyanhot
+  cell 107 32 cyansoft
+}

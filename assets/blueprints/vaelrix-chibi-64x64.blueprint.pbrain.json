@@ -1,0 +1,9736 @@
+{
+  "schema": "pixelbrain.export.v1",
+  "schemaVersion": "1.0.0",
+  "format": "json",
+  "material": "source",
+  "coordinates": [
+    {
+      "x": 28,
+      "y": 4,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 29,
+      "y": 4,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 30,
+      "y": 4,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 31,
+      "y": 4,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 32,
+      "y": 4,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 33,
+      "y": 4,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 34,
+      "y": 4,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 35,
+      "y": 4,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 24,
+      "y": 5,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 25,
+      "y": 5,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 26,
+      "y": 5,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 27,
+      "y": 5,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 28,
+      "y": 5,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 29,
+      "y": 5,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 30,
+      "y": 5,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 31,
+      "y": 5,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 32,
+      "y": 5,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 33,
+      "y": 5,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 34,
+      "y": 5,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 35,
+      "y": 5,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 36,
+      "y": 5,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 37,
+      "y": 5,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 38,
+      "y": 5,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 39,
+      "y": 5,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 21,
+      "y": 6,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 22,
+      "y": 6,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 23,
+      "y": 6,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 24,
+      "y": 6,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 25,
+      "y": 6,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 26,
+      "y": 6,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 27,
+      "y": 6,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 28,
+      "y": 6,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 29,
+      "y": 6,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 30,
+      "y": 6,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 31,
+      "y": 6,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 32,
+      "y": 6,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 33,
+      "y": 6,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 34,
+      "y": 6,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 35,
+      "y": 6,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 36,
+      "y": 6,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 37,
+      "y": 6,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 38,
+      "y": 6,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 39,
+      "y": 6,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 40,
+      "y": 6,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 41,
+      "y": 6,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 42,
+      "y": 6,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 19,
+      "y": 7,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 20,
+      "y": 7,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 21,
+      "y": 7,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 22,
+      "y": 7,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 23,
+      "y": 7,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 24,
+      "y": 7,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 25,
+      "y": 7,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 26,
+      "y": 7,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 27,
+      "y": 7,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 28,
+      "y": 7,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 29,
+      "y": 7,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 30,
+      "y": 7,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 31,
+      "y": 7,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 32,
+      "y": 7,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 33,
+      "y": 7,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 34,
+      "y": 7,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 35,
+      "y": 7,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 36,
+      "y": 7,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 37,
+      "y": 7,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 38,
+      "y": 7,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 39,
+      "y": 7,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 40,
+      "y": 7,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 41,
+      "y": 7,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 42,
+      "y": 7,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 43,
+      "y": 7,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 44,
+      "y": 7,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 17,
+      "y": 8,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 18,
+      "y": 8,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 19,
+      "y": 8,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 20,
+      "y": 8,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 21,
+      "y": 8,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 22,
+      "y": 8,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 23,
+      "y": 8,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 24,
+      "y": 8,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 25,
+      "y": 8,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 26,
+      "y": 8,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 27,
+      "y": 8,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 28,
+      "y": 8,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 29,
+      "y": 8,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 30,
+      "y": 8,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 31,
+      "y": 8,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 32,
+      "y": 8,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 33,
+      "y": 8,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 34,
+      "y": 8,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 35,
+      "y": 8,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 36,
+      "y": 8,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 37,
+      "y": 8,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 38,
+      "y": 8,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 39,
+      "y": 8,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 40,
+      "y": 8,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 41,
+      "y": 8,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 42,
+      "y": 8,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 43,
+      "y": 8,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 44,
+      "y": 8,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 45,
+      "y": 8,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 46,
+      "y": 8,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 16,
+      "y": 9,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 17,
+      "y": 9,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 18,
+      "y": 9,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 19,
+      "y": 9,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 20,
+      "y": 9,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 21,
+      "y": 9,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 22,
+      "y": 9,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 23,
+      "y": 9,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 24,
+      "y": 9,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 25,
+      "y": 9,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 26,
+      "y": 9,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 27,
+      "y": 9,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 28,
+      "y": 9,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 29,
+      "y": 9,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 30,
+      "y": 9,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 31,
+      "y": 9,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 32,
+      "y": 9,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 33,
+      "y": 9,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 34,
+      "y": 9,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 35,
+      "y": 9,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 36,
+      "y": 9,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 37,
+      "y": 9,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 38,
+      "y": 9,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 39,
+      "y": 9,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 40,
+      "y": 9,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 41,
+      "y": 9,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 42,
+      "y": 9,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 43,
+      "y": 9,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 44,
+      "y": 9,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 45,
+      "y": 9,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 46,
+      "y": 9,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 47,
+      "y": 9,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 15,
+      "y": 10,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 16,
+      "y": 10,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 17,
+      "y": 10,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 18,
+      "y": 10,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 19,
+      "y": 10,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 20,
+      "y": 10,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 21,
+      "y": 10,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 22,
+      "y": 10,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 23,
+      "y": 10,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 24,
+      "y": 10,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 25,
+      "y": 10,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 26,
+      "y": 10,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 27,
+      "y": 10,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 28,
+      "y": 10,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 29,
+      "y": 10,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 30,
+      "y": 10,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 31,
+      "y": 10,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 32,
+      "y": 10,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 33,
+      "y": 10,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 34,
+      "y": 10,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 35,
+      "y": 10,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 36,
+      "y": 10,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 37,
+      "y": 10,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 38,
+      "y": 10,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 39,
+      "y": 10,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 40,
+      "y": 10,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 41,
+      "y": 10,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 42,
+      "y": 10,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 43,
+      "y": 10,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 44,
+      "y": 10,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 45,
+      "y": 10,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 46,
+      "y": 10,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 47,
+      "y": 10,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 48,
+      "y": 10,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 15,
+      "y": 11,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 16,
+      "y": 11,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 17,
+      "y": 11,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 18,
+      "y": 11,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 19,
+      "y": 11,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 20,
+      "y": 11,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 21,
+      "y": 11,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 22,
+      "y": 11,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 23,
+      "y": 11,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 24,
+      "y": 11,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 25,
+      "y": 11,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 26,
+      "y": 11,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 27,
+      "y": 11,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 28,
+      "y": 11,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 29,
+      "y": 11,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 30,
+      "y": 11,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 31,
+      "y": 11,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 32,
+      "y": 11,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 33,
+      "y": 11,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 34,
+      "y": 11,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 35,
+      "y": 11,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 36,
+      "y": 11,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 37,
+      "y": 11,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 38,
+      "y": 11,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 39,
+      "y": 11,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 40,
+      "y": 11,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 41,
+      "y": 11,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 42,
+      "y": 11,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 43,
+      "y": 11,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 44,
+      "y": 11,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 45,
+      "y": 11,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 46,
+      "y": 11,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 47,
+      "y": 11,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 48,
+      "y": 11,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 14,
+      "y": 12,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 15,
+      "y": 12,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 16,
+      "y": 12,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 17,
+      "y": 12,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 18,
+      "y": 12,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 19,
+      "y": 12,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 20,
+      "y": 12,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 21,
+      "y": 12,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 22,
+      "y": 12,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 23,
+      "y": 12,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 24,
+      "y": 12,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 25,
+      "y": 12,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 26,
+      "y": 12,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 27,
+      "y": 12,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 28,
+      "y": 12,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 29,
+      "y": 12,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 30,
+      "y": 12,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 31,
+      "y": 12,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 32,
+      "y": 12,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 33,
+      "y": 12,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 34,
+      "y": 12,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 35,
+      "y": 12,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 36,
+      "y": 12,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 37,
+      "y": 12,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 38,
+      "y": 12,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 39,
+      "y": 12,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 40,
+      "y": 12,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 41,
+      "y": 12,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 42,
+      "y": 12,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 43,
+      "y": 12,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 44,
+      "y": 12,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 45,
+      "y": 12,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 46,
+      "y": 12,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 47,
+      "y": 12,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 48,
+      "y": 12,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 49,
+      "y": 12,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 14,
+      "y": 13,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 15,
+      "y": 13,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 16,
+      "y": 13,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 17,
+      "y": 13,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 18,
+      "y": 13,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 19,
+      "y": 13,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 20,
+      "y": 13,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 21,
+      "y": 13,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 22,
+      "y": 13,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 23,
+      "y": 13,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 24,
+      "y": 13,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 25,
+      "y": 13,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 26,
+      "y": 13,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 27,
+      "y": 13,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 28,
+      "y": 13,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 29,
+      "y": 13,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 30,
+      "y": 13,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 31,
+      "y": 13,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 32,
+      "y": 13,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 33,
+      "y": 13,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 34,
+      "y": 13,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 35,
+      "y": 13,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 36,
+      "y": 13,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 37,
+      "y": 13,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 38,
+      "y": 13,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 39,
+      "y": 13,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 40,
+      "y": 13,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 41,
+      "y": 13,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 42,
+      "y": 13,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 43,
+      "y": 13,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 44,
+      "y": 13,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 45,
+      "y": 13,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 46,
+      "y": 13,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 47,
+      "y": 13,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 48,
+      "y": 13,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 49,
+      "y": 13,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 14,
+      "y": 14,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 15,
+      "y": 14,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 16,
+      "y": 14,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 17,
+      "y": 14,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 18,
+      "y": 14,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 19,
+      "y": 14,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 20,
+      "y": 14,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 21,
+      "y": 14,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 22,
+      "y": 14,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 23,
+      "y": 14,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 24,
+      "y": 14,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 25,
+      "y": 14,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 26,
+      "y": 14,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 27,
+      "y": 14,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 28,
+      "y": 14,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 29,
+      "y": 14,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 30,
+      "y": 14,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 31,
+      "y": 14,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 32,
+      "y": 14,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 33,
+      "y": 14,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 34,
+      "y": 14,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 35,
+      "y": 14,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 36,
+      "y": 14,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 37,
+      "y": 14,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 38,
+      "y": 14,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 39,
+      "y": 14,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 40,
+      "y": 14,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 41,
+      "y": 14,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 42,
+      "y": 14,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 43,
+      "y": 14,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 44,
+      "y": 14,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 45,
+      "y": 14,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 46,
+      "y": 14,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 47,
+      "y": 14,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 48,
+      "y": 14,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 49,
+      "y": 14,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 14,
+      "y": 15,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 15,
+      "y": 15,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 16,
+      "y": 15,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 17,
+      "y": 15,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 18,
+      "y": 15,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 19,
+      "y": 15,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 20,
+      "y": 15,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 21,
+      "y": 15,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 22,
+      "y": 15,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 23,
+      "y": 15,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 24,
+      "y": 15,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 25,
+      "y": 15,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 26,
+      "y": 15,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 27,
+      "y": 15,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 28,
+      "y": 15,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 29,
+      "y": 15,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 30,
+      "y": 15,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 31,
+      "y": 15,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 32,
+      "y": 15,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 33,
+      "y": 15,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 34,
+      "y": 15,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 35,
+      "y": 15,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 36,
+      "y": 15,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 37,
+      "y": 15,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 38,
+      "y": 15,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 39,
+      "y": 15,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 40,
+      "y": 15,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 41,
+      "y": 15,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 42,
+      "y": 15,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 43,
+      "y": 15,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 44,
+      "y": 15,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 45,
+      "y": 15,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 46,
+      "y": 15,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 47,
+      "y": 15,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 48,
+      "y": 15,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 49,
+      "y": 15,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 14,
+      "y": 16,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 15,
+      "y": 16,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 16,
+      "y": 16,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 17,
+      "y": 16,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 18,
+      "y": 16,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 19,
+      "y": 16,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 20,
+      "y": 16,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 21,
+      "y": 16,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 22,
+      "y": 16,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 23,
+      "y": 16,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 24,
+      "y": 16,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 25,
+      "y": 16,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 26,
+      "y": 16,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 27,
+      "y": 16,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 28,
+      "y": 16,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 29,
+      "y": 16,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 30,
+      "y": 16,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 31,
+      "y": 16,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 32,
+      "y": 16,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 33,
+      "y": 16,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 34,
+      "y": 16,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 35,
+      "y": 16,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 36,
+      "y": 16,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 37,
+      "y": 16,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 38,
+      "y": 16,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 39,
+      "y": 16,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 40,
+      "y": 16,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 41,
+      "y": 16,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 42,
+      "y": 16,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 43,
+      "y": 16,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 44,
+      "y": 16,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 45,
+      "y": 16,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 46,
+      "y": 16,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 47,
+      "y": 16,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 48,
+      "y": 16,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 49,
+      "y": 16,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 14,
+      "y": 17,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 15,
+      "y": 17,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 16,
+      "y": 17,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 17,
+      "y": 17,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 18,
+      "y": 17,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 19,
+      "y": 17,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 20,
+      "y": 17,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 21,
+      "y": 17,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 22,
+      "y": 17,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 23,
+      "y": 17,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 24,
+      "y": 17,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 25,
+      "y": 17,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 26,
+      "y": 17,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 27,
+      "y": 17,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 28,
+      "y": 17,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 29,
+      "y": 17,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 30,
+      "y": 17,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 31,
+      "y": 17,
+      "color": "#4A316A",
+      "partId": "highlight.hair"
+    },
+    {
+      "x": 32,
+      "y": 17,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 33,
+      "y": 17,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 34,
+      "y": 17,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 35,
+      "y": 17,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 36,
+      "y": 17,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 37,
+      "y": 17,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 38,
+      "y": 17,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 39,
+      "y": 17,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 40,
+      "y": 17,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 41,
+      "y": 17,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 42,
+      "y": 17,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 43,
+      "y": 17,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 44,
+      "y": 17,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 45,
+      "y": 17,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 46,
+      "y": 17,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 47,
+      "y": 17,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 48,
+      "y": 17,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 49,
+      "y": 17,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 14,
+      "y": 18,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 15,
+      "y": 18,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 16,
+      "y": 18,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 17,
+      "y": 18,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 18,
+      "y": 18,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 19,
+      "y": 18,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 20,
+      "y": 18,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 21,
+      "y": 18,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 22,
+      "y": 18,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 23,
+      "y": 18,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 24,
+      "y": 18,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 25,
+      "y": 18,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 26,
+      "y": 18,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 27,
+      "y": 18,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 28,
+      "y": 18,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 29,
+      "y": 18,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 30,
+      "y": 18,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 31,
+      "y": 18,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 32,
+      "y": 18,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 33,
+      "y": 18,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 34,
+      "y": 18,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 35,
+      "y": 18,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 36,
+      "y": 18,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 37,
+      "y": 18,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 38,
+      "y": 18,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 39,
+      "y": 18,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 40,
+      "y": 18,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 41,
+      "y": 18,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 42,
+      "y": 18,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 43,
+      "y": 18,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 44,
+      "y": 18,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 45,
+      "y": 18,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 46,
+      "y": 18,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 47,
+      "y": 18,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 48,
+      "y": 18,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 49,
+      "y": 18,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 15,
+      "y": 19,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 16,
+      "y": 19,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 17,
+      "y": 19,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 18,
+      "y": 19,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 19,
+      "y": 19,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 20,
+      "y": 19,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 21,
+      "y": 19,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 22,
+      "y": 19,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 23,
+      "y": 19,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 24,
+      "y": 19,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 25,
+      "y": 19,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 26,
+      "y": 19,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 27,
+      "y": 19,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 28,
+      "y": 19,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 29,
+      "y": 19,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 30,
+      "y": 19,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 31,
+      "y": 19,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 32,
+      "y": 19,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 33,
+      "y": 19,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 34,
+      "y": 19,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 35,
+      "y": 19,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 36,
+      "y": 19,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 37,
+      "y": 19,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 38,
+      "y": 19,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 39,
+      "y": 19,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 40,
+      "y": 19,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 41,
+      "y": 19,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 42,
+      "y": 19,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 43,
+      "y": 19,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 44,
+      "y": 19,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 45,
+      "y": 19,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 46,
+      "y": 19,
+      "color": "#28203A",
+      "partId": "shade.hair"
+    },
+    {
+      "x": 47,
+      "y": 19,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 48,
+      "y": 19,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 15,
+      "y": 20,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 16,
+      "y": 20,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 17,
+      "y": 20,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 18,
+      "y": 20,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 19,
+      "y": 20,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 20,
+      "y": 20,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 21,
+      "y": 20,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 22,
+      "y": 20,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 23,
+      "y": 20,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 24,
+      "y": 20,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 25,
+      "y": 20,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 26,
+      "y": 20,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 27,
+      "y": 20,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 28,
+      "y": 20,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 29,
+      "y": 20,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 30,
+      "y": 20,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 31,
+      "y": 20,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 32,
+      "y": 20,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 33,
+      "y": 20,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 34,
+      "y": 20,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 35,
+      "y": 20,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 36,
+      "y": 20,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 37,
+      "y": 20,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 38,
+      "y": 20,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 39,
+      "y": 20,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 40,
+      "y": 20,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 41,
+      "y": 20,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 42,
+      "y": 20,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 43,
+      "y": 20,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 44,
+      "y": 20,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 45,
+      "y": 20,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 46,
+      "y": 20,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 47,
+      "y": 20,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 48,
+      "y": 20,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 16,
+      "y": 21,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 17,
+      "y": 21,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 18,
+      "y": 21,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 19,
+      "y": 21,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 20,
+      "y": 21,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 21,
+      "y": 21,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 22,
+      "y": 21,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 23,
+      "y": 21,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 24,
+      "y": 21,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 25,
+      "y": 21,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 26,
+      "y": 21,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 27,
+      "y": 21,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 28,
+      "y": 21,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 29,
+      "y": 21,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 30,
+      "y": 21,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 31,
+      "y": 21,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 32,
+      "y": 21,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 33,
+      "y": 21,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 34,
+      "y": 21,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 35,
+      "y": 21,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 36,
+      "y": 21,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 37,
+      "y": 21,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 38,
+      "y": 21,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 39,
+      "y": 21,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 40,
+      "y": 21,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 41,
+      "y": 21,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 42,
+      "y": 21,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 43,
+      "y": 21,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 44,
+      "y": 21,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 45,
+      "y": 21,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 46,
+      "y": 21,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 47,
+      "y": 21,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 16,
+      "y": 22,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 17,
+      "y": 22,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 18,
+      "y": 22,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 19,
+      "y": 22,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 20,
+      "y": 22,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 21,
+      "y": 22,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 22,
+      "y": 22,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 23,
+      "y": 22,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 24,
+      "y": 22,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 25,
+      "y": 22,
+      "color": "#FFFFFF",
+      "partId": "face.eye_shine"
+    },
+    {
+      "x": 26,
+      "y": 22,
+      "color": "#21163D",
+      "partId": "face.iris"
+    },
+    {
+      "x": 27,
+      "y": 22,
+      "color": "#21163D",
+      "partId": "face.iris"
+    },
+    {
+      "x": 28,
+      "y": 22,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 29,
+      "y": 22,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 30,
+      "y": 22,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 31,
+      "y": 22,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 32,
+      "y": 22,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 33,
+      "y": 22,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 34,
+      "y": 22,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 35,
+      "y": 22,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 36,
+      "y": 22,
+      "color": "#FFFFFF",
+      "partId": "face.eye_shine"
+    },
+    {
+      "x": 37,
+      "y": 22,
+      "color": "#21163D",
+      "partId": "face.iris"
+    },
+    {
+      "x": 38,
+      "y": 22,
+      "color": "#21163D",
+      "partId": "face.iris"
+    },
+    {
+      "x": 39,
+      "y": 22,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 40,
+      "y": 22,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 41,
+      "y": 22,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 42,
+      "y": 22,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 43,
+      "y": 22,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 44,
+      "y": 22,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 45,
+      "y": 22,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 46,
+      "y": 22,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 47,
+      "y": 22,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 17,
+      "y": 23,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 18,
+      "y": 23,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 19,
+      "y": 23,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 20,
+      "y": 23,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 21,
+      "y": 23,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 22,
+      "y": 23,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 23,
+      "y": 23,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 24,
+      "y": 23,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 25,
+      "y": 23,
+      "color": "#21163D",
+      "partId": "face.iris"
+    },
+    {
+      "x": 26,
+      "y": 23,
+      "color": "#21163D",
+      "partId": "face.iris"
+    },
+    {
+      "x": 27,
+      "y": 23,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 28,
+      "y": 23,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 29,
+      "y": 23,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 30,
+      "y": 23,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 31,
+      "y": 23,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 32,
+      "y": 23,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 33,
+      "y": 23,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 34,
+      "y": 23,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 35,
+      "y": 23,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 36,
+      "y": 23,
+      "color": "#21163D",
+      "partId": "face.iris"
+    },
+    {
+      "x": 37,
+      "y": 23,
+      "color": "#21163D",
+      "partId": "face.iris"
+    },
+    {
+      "x": 38,
+      "y": 23,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 39,
+      "y": 23,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 40,
+      "y": 23,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 41,
+      "y": 23,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 42,
+      "y": 23,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 43,
+      "y": 23,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 44,
+      "y": 23,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 45,
+      "y": 23,
+      "color": "#101018",
+      "partId": "hair.base"
+    },
+    {
+      "x": 46,
+      "y": 23,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 17,
+      "y": 24,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 18,
+      "y": 24,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 19,
+      "y": 24,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 20,
+      "y": 24,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 21,
+      "y": 24,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 22,
+      "y": 24,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 23,
+      "y": 24,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 24,
+      "y": 24,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 25,
+      "y": 24,
+      "color": "#21163D",
+      "partId": "face.iris"
+    },
+    {
+      "x": 26,
+      "y": 24,
+      "color": "#21163D",
+      "partId": "face.iris"
+    },
+    {
+      "x": 27,
+      "y": 24,
+      "color": "#21163D",
+      "partId": "face.iris"
+    },
+    {
+      "x": 28,
+      "y": 24,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 29,
+      "y": 24,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 30,
+      "y": 24,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 31,
+      "y": 24,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 32,
+      "y": 24,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 33,
+      "y": 24,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 34,
+      "y": 24,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 35,
+      "y": 24,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 36,
+      "y": 24,
+      "color": "#21163D",
+      "partId": "face.iris"
+    },
+    {
+      "x": 37,
+      "y": 24,
+      "color": "#21163D",
+      "partId": "face.iris"
+    },
+    {
+      "x": 38,
+      "y": 24,
+      "color": "#21163D",
+      "partId": "face.iris"
+    },
+    {
+      "x": 39,
+      "y": 24,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 40,
+      "y": 24,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 41,
+      "y": 24,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 42,
+      "y": 24,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 43,
+      "y": 24,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 44,
+      "y": 24,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 45,
+      "y": 24,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 46,
+      "y": 24,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 18,
+      "y": 25,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 19,
+      "y": 25,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 20,
+      "y": 25,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 21,
+      "y": 25,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 22,
+      "y": 25,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 23,
+      "y": 25,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 24,
+      "y": 25,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 25,
+      "y": 25,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 26,
+      "y": 25,
+      "color": "#21163D",
+      "partId": "face.iris"
+    },
+    {
+      "x": 27,
+      "y": 25,
+      "color": "#21163D",
+      "partId": "face.iris"
+    },
+    {
+      "x": 28,
+      "y": 25,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 29,
+      "y": 25,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 30,
+      "y": 25,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 31,
+      "y": 25,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 32,
+      "y": 25,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 33,
+      "y": 25,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 34,
+      "y": 25,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 35,
+      "y": 25,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 36,
+      "y": 25,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 37,
+      "y": 25,
+      "color": "#21163D",
+      "partId": "face.iris"
+    },
+    {
+      "x": 38,
+      "y": 25,
+      "color": "#21163D",
+      "partId": "face.iris"
+    },
+    {
+      "x": 39,
+      "y": 25,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 40,
+      "y": 25,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 41,
+      "y": 25,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 42,
+      "y": 25,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 43,
+      "y": 25,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 44,
+      "y": 25,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 45,
+      "y": 25,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 18,
+      "y": 26,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 19,
+      "y": 26,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 20,
+      "y": 26,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 21,
+      "y": 26,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 22,
+      "y": 26,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 23,
+      "y": 26,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 24,
+      "y": 26,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 25,
+      "y": 26,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 26,
+      "y": 26,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 27,
+      "y": 26,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 28,
+      "y": 26,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 29,
+      "y": 26,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 30,
+      "y": 26,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 31,
+      "y": 26,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 32,
+      "y": 26,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 33,
+      "y": 26,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 34,
+      "y": 26,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 35,
+      "y": 26,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 36,
+      "y": 26,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 37,
+      "y": 26,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 38,
+      "y": 26,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 39,
+      "y": 26,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 40,
+      "y": 26,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 41,
+      "y": 26,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 42,
+      "y": 26,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 43,
+      "y": 26,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 44,
+      "y": 26,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 45,
+      "y": 26,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 19,
+      "y": 27,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 20,
+      "y": 27,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 21,
+      "y": 27,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 22,
+      "y": 27,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 23,
+      "y": 27,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 24,
+      "y": 27,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 25,
+      "y": 27,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 26,
+      "y": 27,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 27,
+      "y": 27,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 28,
+      "y": 27,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 29,
+      "y": 27,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 30,
+      "y": 27,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 31,
+      "y": 27,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 32,
+      "y": 27,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 33,
+      "y": 27,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 34,
+      "y": 27,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 35,
+      "y": 27,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 36,
+      "y": 27,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 37,
+      "y": 27,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 38,
+      "y": 27,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 39,
+      "y": 27,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 40,
+      "y": 27,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 41,
+      "y": 27,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 42,
+      "y": 27,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 43,
+      "y": 27,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 44,
+      "y": 27,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 19,
+      "y": 28,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 20,
+      "y": 28,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 21,
+      "y": 28,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 22,
+      "y": 28,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 23,
+      "y": 28,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 24,
+      "y": 28,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 25,
+      "y": 28,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 26,
+      "y": 28,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 27,
+      "y": 28,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 28,
+      "y": 28,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 29,
+      "y": 28,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 30,
+      "y": 28,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 31,
+      "y": 28,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 32,
+      "y": 28,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 33,
+      "y": 28,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 34,
+      "y": 28,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 35,
+      "y": 28,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 36,
+      "y": 28,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 37,
+      "y": 28,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 38,
+      "y": 28,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 39,
+      "y": 28,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 40,
+      "y": 28,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 41,
+      "y": 28,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 42,
+      "y": 28,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 43,
+      "y": 28,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 44,
+      "y": 28,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 20,
+      "y": 29,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 21,
+      "y": 29,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 22,
+      "y": 29,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 23,
+      "y": 29,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 24,
+      "y": 29,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 25,
+      "y": 29,
+      "color": "#FFE0C2",
+      "partId": "highlight.skin"
+    },
+    {
+      "x": 26,
+      "y": 29,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 27,
+      "y": 29,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 28,
+      "y": 29,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 29,
+      "y": 29,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 30,
+      "y": 29,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 31,
+      "y": 29,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 32,
+      "y": 29,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 33,
+      "y": 29,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 34,
+      "y": 29,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 35,
+      "y": 29,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 36,
+      "y": 29,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 37,
+      "y": 29,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 38,
+      "y": 29,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 39,
+      "y": 29,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 40,
+      "y": 29,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 41,
+      "y": 29,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 42,
+      "y": 29,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 43,
+      "y": 29,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 20,
+      "y": 30,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 21,
+      "y": 30,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 22,
+      "y": 30,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 23,
+      "y": 30,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 24,
+      "y": 30,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 25,
+      "y": 30,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 26,
+      "y": 30,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 27,
+      "y": 30,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 28,
+      "y": 30,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 29,
+      "y": 30,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 30,
+      "y": 30,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 31,
+      "y": 30,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 32,
+      "y": 30,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 33,
+      "y": 30,
+      "color": "#0B0B0F",
+      "partId": "face.eye_black"
+    },
+    {
+      "x": 34,
+      "y": 30,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 35,
+      "y": 30,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 36,
+      "y": 30,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 37,
+      "y": 30,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 38,
+      "y": 30,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 39,
+      "y": 30,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 40,
+      "y": 30,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 41,
+      "y": 30,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 42,
+      "y": 30,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 43,
+      "y": 30,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 21,
+      "y": 31,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 22,
+      "y": 31,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 23,
+      "y": 31,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 24,
+      "y": 31,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 25,
+      "y": 31,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 26,
+      "y": 31,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 27,
+      "y": 31,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 28,
+      "y": 31,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 29,
+      "y": 31,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 30,
+      "y": 31,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 31,
+      "y": 31,
+      "color": "#7E1F36",
+      "partId": "face.mouth"
+    },
+    {
+      "x": 32,
+      "y": 31,
+      "color": "#7E1F36",
+      "partId": "face.mouth"
+    },
+    {
+      "x": 33,
+      "y": 31,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 34,
+      "y": 31,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 35,
+      "y": 31,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 36,
+      "y": 31,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 37,
+      "y": 31,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 38,
+      "y": 31,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 39,
+      "y": 31,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 40,
+      "y": 31,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 41,
+      "y": 31,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 42,
+      "y": 31,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 22,
+      "y": 32,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 23,
+      "y": 32,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 24,
+      "y": 32,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 25,
+      "y": 32,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 26,
+      "y": 32,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 27,
+      "y": 32,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 28,
+      "y": 32,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 29,
+      "y": 32,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 30,
+      "y": 32,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 31,
+      "y": 32,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 32,
+      "y": 32,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 33,
+      "y": 32,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 34,
+      "y": 32,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 35,
+      "y": 32,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 36,
+      "y": 32,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 37,
+      "y": 32,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 38,
+      "y": 32,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 39,
+      "y": 32,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 40,
+      "y": 32,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 41,
+      "y": 32,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 23,
+      "y": 33,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 24,
+      "y": 33,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 25,
+      "y": 33,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 26,
+      "y": 33,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 27,
+      "y": 33,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 28,
+      "y": 33,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 29,
+      "y": 33,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 30,
+      "y": 33,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 31,
+      "y": 33,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 32,
+      "y": 33,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 33,
+      "y": 33,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 34,
+      "y": 33,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 35,
+      "y": 33,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 36,
+      "y": 33,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 37,
+      "y": 33,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 38,
+      "y": 33,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 39,
+      "y": 33,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 40,
+      "y": 33,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 25,
+      "y": 34,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 26,
+      "y": 34,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 27,
+      "y": 34,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 28,
+      "y": 34,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 29,
+      "y": 34,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 30,
+      "y": 34,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 31,
+      "y": 34,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 32,
+      "y": 34,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 33,
+      "y": 34,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 34,
+      "y": 34,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 35,
+      "y": 34,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 36,
+      "y": 34,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 37,
+      "y": 34,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 38,
+      "y": 34,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 25,
+      "y": 35,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 26,
+      "y": 35,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 27,
+      "y": 35,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 28,
+      "y": 35,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 29,
+      "y": 35,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 30,
+      "y": 35,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 31,
+      "y": 35,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 32,
+      "y": 35,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 33,
+      "y": 35,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 34,
+      "y": 35,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 35,
+      "y": 35,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 36,
+      "y": 35,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 37,
+      "y": 35,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 38,
+      "y": 35,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 23,
+      "y": 36,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 24,
+      "y": 36,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 25,
+      "y": 36,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 26,
+      "y": 36,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 27,
+      "y": 36,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 28,
+      "y": 36,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 29,
+      "y": 36,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 30,
+      "y": 36,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 31,
+      "y": 36,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 32,
+      "y": 36,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 33,
+      "y": 36,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 34,
+      "y": 36,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 35,
+      "y": 36,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 36,
+      "y": 36,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 37,
+      "y": 36,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 38,
+      "y": 36,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 39,
+      "y": 36,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 40,
+      "y": 36,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 18,
+      "y": 37,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 19,
+      "y": 37,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 20,
+      "y": 37,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 21,
+      "y": 37,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 22,
+      "y": 37,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 23,
+      "y": 37,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 24,
+      "y": 37,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 25,
+      "y": 37,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 26,
+      "y": 37,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 27,
+      "y": 37,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 28,
+      "y": 37,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 29,
+      "y": 37,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 30,
+      "y": 37,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 31,
+      "y": 37,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 32,
+      "y": 37,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 33,
+      "y": 37,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 34,
+      "y": 37,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 35,
+      "y": 37,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 36,
+      "y": 37,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 37,
+      "y": 37,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 38,
+      "y": 37,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 39,
+      "y": 37,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 40,
+      "y": 37,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 41,
+      "y": 37,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 42,
+      "y": 37,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 43,
+      "y": 37,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 44,
+      "y": 37,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 45,
+      "y": 37,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 17,
+      "y": 38,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 18,
+      "y": 38,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 19,
+      "y": 38,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 20,
+      "y": 38,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 21,
+      "y": 38,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 22,
+      "y": 38,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 23,
+      "y": 38,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 24,
+      "y": 38,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 25,
+      "y": 38,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 26,
+      "y": 38,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 27,
+      "y": 38,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 28,
+      "y": 38,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 29,
+      "y": 38,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 30,
+      "y": 38,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 31,
+      "y": 38,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 32,
+      "y": 38,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 33,
+      "y": 38,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 34,
+      "y": 38,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 35,
+      "y": 38,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 36,
+      "y": 38,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 37,
+      "y": 38,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 38,
+      "y": 38,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 39,
+      "y": 38,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 40,
+      "y": 38,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 41,
+      "y": 38,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 42,
+      "y": 38,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 43,
+      "y": 38,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 44,
+      "y": 38,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 45,
+      "y": 38,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 46,
+      "y": 38,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 16,
+      "y": 39,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 17,
+      "y": 39,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 18,
+      "y": 39,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 19,
+      "y": 39,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 20,
+      "y": 39,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 21,
+      "y": 39,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 22,
+      "y": 39,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 23,
+      "y": 39,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 24,
+      "y": 39,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 25,
+      "y": 39,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 26,
+      "y": 39,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 27,
+      "y": 39,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 28,
+      "y": 39,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 29,
+      "y": 39,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 30,
+      "y": 39,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 31,
+      "y": 39,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 32,
+      "y": 39,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 33,
+      "y": 39,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 34,
+      "y": 39,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 35,
+      "y": 39,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 36,
+      "y": 39,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 37,
+      "y": 39,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 38,
+      "y": 39,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 39,
+      "y": 39,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 40,
+      "y": 39,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 41,
+      "y": 39,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 42,
+      "y": 39,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 43,
+      "y": 39,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 44,
+      "y": 39,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 45,
+      "y": 39,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 46,
+      "y": 39,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 47,
+      "y": 39,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 16,
+      "y": 40,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 17,
+      "y": 40,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 18,
+      "y": 40,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 19,
+      "y": 40,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 20,
+      "y": 40,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 21,
+      "y": 40,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 22,
+      "y": 40,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 23,
+      "y": 40,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 24,
+      "y": 40,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 25,
+      "y": 40,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 26,
+      "y": 40,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 27,
+      "y": 40,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 28,
+      "y": 40,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 29,
+      "y": 40,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 30,
+      "y": 40,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 31,
+      "y": 40,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 32,
+      "y": 40,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 33,
+      "y": 40,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 34,
+      "y": 40,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 35,
+      "y": 40,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 36,
+      "y": 40,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 37,
+      "y": 40,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 38,
+      "y": 40,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 39,
+      "y": 40,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 40,
+      "y": 40,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 41,
+      "y": 40,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 42,
+      "y": 40,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 43,
+      "y": 40,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 44,
+      "y": 40,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 45,
+      "y": 40,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 46,
+      "y": 40,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 47,
+      "y": 40,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 16,
+      "y": 41,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 17,
+      "y": 41,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 18,
+      "y": 41,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 19,
+      "y": 41,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 20,
+      "y": 41,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 21,
+      "y": 41,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 22,
+      "y": 41,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 23,
+      "y": 41,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 24,
+      "y": 41,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 25,
+      "y": 41,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 26,
+      "y": 41,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 27,
+      "y": 41,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 28,
+      "y": 41,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 29,
+      "y": 41,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 30,
+      "y": 41,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 31,
+      "y": 41,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 32,
+      "y": 41,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 33,
+      "y": 41,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 34,
+      "y": 41,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 35,
+      "y": 41,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 36,
+      "y": 41,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 37,
+      "y": 41,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 38,
+      "y": 41,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 39,
+      "y": 41,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 40,
+      "y": 41,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 41,
+      "y": 41,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 42,
+      "y": 41,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 43,
+      "y": 41,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 44,
+      "y": 41,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 45,
+      "y": 41,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 46,
+      "y": 41,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 47,
+      "y": 41,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 16,
+      "y": 42,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 17,
+      "y": 42,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 18,
+      "y": 42,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 19,
+      "y": 42,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 20,
+      "y": 42,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 21,
+      "y": 42,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 22,
+      "y": 42,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 23,
+      "y": 42,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 24,
+      "y": 42,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 25,
+      "y": 42,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 26,
+      "y": 42,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 27,
+      "y": 42,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 28,
+      "y": 42,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 29,
+      "y": 42,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 30,
+      "y": 42,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 31,
+      "y": 42,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 32,
+      "y": 42,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 33,
+      "y": 42,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 34,
+      "y": 42,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 35,
+      "y": 42,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 36,
+      "y": 42,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 37,
+      "y": 42,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 38,
+      "y": 42,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 39,
+      "y": 42,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 40,
+      "y": 42,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 41,
+      "y": 42,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 42,
+      "y": 42,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 43,
+      "y": 42,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 44,
+      "y": 42,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 45,
+      "y": 42,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 46,
+      "y": 42,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 47,
+      "y": 42,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 16,
+      "y": 43,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 17,
+      "y": 43,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 18,
+      "y": 43,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 19,
+      "y": 43,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 20,
+      "y": 43,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 21,
+      "y": 43,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 22,
+      "y": 43,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 23,
+      "y": 43,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 24,
+      "y": 43,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 25,
+      "y": 43,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 26,
+      "y": 43,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 27,
+      "y": 43,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 28,
+      "y": 43,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 29,
+      "y": 43,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 30,
+      "y": 43,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 31,
+      "y": 43,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 32,
+      "y": 43,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 33,
+      "y": 43,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 34,
+      "y": 43,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 35,
+      "y": 43,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 36,
+      "y": 43,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 37,
+      "y": 43,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 38,
+      "y": 43,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 39,
+      "y": 43,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 40,
+      "y": 43,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 41,
+      "y": 43,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 42,
+      "y": 43,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 43,
+      "y": 43,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 44,
+      "y": 43,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 45,
+      "y": 43,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 46,
+      "y": 43,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 47,
+      "y": 43,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 16,
+      "y": 44,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 17,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 18,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 19,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 20,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 21,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 22,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 23,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 24,
+      "y": 44,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 25,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 26,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 27,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 28,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 29,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 30,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 31,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 32,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 33,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 34,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 35,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 36,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 37,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 38,
+      "y": 44,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 39,
+      "y": 44,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 40,
+      "y": 44,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 41,
+      "y": 44,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 42,
+      "y": 44,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 43,
+      "y": 44,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 44,
+      "y": 44,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 45,
+      "y": 44,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 46,
+      "y": 44,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 47,
+      "y": 44,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 16,
+      "y": 45,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 17,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 18,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 19,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 20,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 21,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 22,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 23,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 24,
+      "y": 45,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 25,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 26,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 27,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 28,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 29,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 30,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 31,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 32,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 33,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 34,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 35,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 36,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 37,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 38,
+      "y": 45,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 39,
+      "y": 45,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 40,
+      "y": 45,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 41,
+      "y": 45,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 42,
+      "y": 45,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 43,
+      "y": 45,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 44,
+      "y": 45,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 45,
+      "y": 45,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 46,
+      "y": 45,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 47,
+      "y": 45,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 16,
+      "y": 46,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 17,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 18,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 19,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 20,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 21,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 22,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 23,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 24,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 25,
+      "y": 46,
+      "color": "#7C55D9",
+      "partId": "accent.violet"
+    },
+    {
+      "x": 26,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 27,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 28,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 29,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 30,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 31,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 32,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 33,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 34,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 35,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 36,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 37,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 38,
+      "y": 46,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 39,
+      "y": 46,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 40,
+      "y": 46,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 41,
+      "y": 46,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 42,
+      "y": 46,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 43,
+      "y": 46,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 44,
+      "y": 46,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 45,
+      "y": 46,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 46,
+      "y": 46,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 47,
+      "y": 46,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 17,
+      "y": 47,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 18,
+      "y": 47,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 19,
+      "y": 47,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 20,
+      "y": 47,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 21,
+      "y": 47,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 22,
+      "y": 47,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 23,
+      "y": 47,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 24,
+      "y": 47,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 25,
+      "y": 47,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 26,
+      "y": 47,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 27,
+      "y": 47,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 28,
+      "y": 47,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 29,
+      "y": 47,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 30,
+      "y": 47,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 31,
+      "y": 47,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 32,
+      "y": 47,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 33,
+      "y": 47,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 34,
+      "y": 47,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 35,
+      "y": 47,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 36,
+      "y": 47,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 37,
+      "y": 47,
+      "color": "#7E1F36",
+      "partId": "accent.crimson"
+    },
+    {
+      "x": 38,
+      "y": 47,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 39,
+      "y": 47,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 40,
+      "y": 47,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 41,
+      "y": 47,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 42,
+      "y": 47,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 43,
+      "y": 47,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 44,
+      "y": 47,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 45,
+      "y": 47,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 46,
+      "y": 47,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 18,
+      "y": 48,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 19,
+      "y": 48,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 20,
+      "y": 48,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 21,
+      "y": 48,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 22,
+      "y": 48,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 23,
+      "y": 48,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 24,
+      "y": 48,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 25,
+      "y": 48,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 26,
+      "y": 48,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 27,
+      "y": 48,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 28,
+      "y": 48,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 29,
+      "y": 48,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 30,
+      "y": 48,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 31,
+      "y": 48,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 32,
+      "y": 48,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 33,
+      "y": 48,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 34,
+      "y": 48,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 35,
+      "y": 48,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 36,
+      "y": 48,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 37,
+      "y": 48,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 38,
+      "y": 48,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 39,
+      "y": 48,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 40,
+      "y": 48,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 41,
+      "y": 48,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 42,
+      "y": 48,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 43,
+      "y": 48,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 44,
+      "y": 48,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 45,
+      "y": 48,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 19,
+      "y": 49,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 20,
+      "y": 49,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 21,
+      "y": 49,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 22,
+      "y": 49,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 23,
+      "y": 49,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 24,
+      "y": 49,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 25,
+      "y": 49,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 26,
+      "y": 49,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 27,
+      "y": 49,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 28,
+      "y": 49,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 29,
+      "y": 49,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 30,
+      "y": 49,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 31,
+      "y": 49,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 32,
+      "y": 49,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 33,
+      "y": 49,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 34,
+      "y": 49,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 35,
+      "y": 49,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 36,
+      "y": 49,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 37,
+      "y": 49,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 38,
+      "y": 49,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 39,
+      "y": 49,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 40,
+      "y": 49,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 41,
+      "y": 49,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 42,
+      "y": 49,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 43,
+      "y": 49,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 44,
+      "y": 49,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 20,
+      "y": 50,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 21,
+      "y": 50,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 22,
+      "y": 50,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 23,
+      "y": 50,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 24,
+      "y": 50,
+      "color": "#D99B78",
+      "partId": "shade.skin"
+    },
+    {
+      "x": 25,
+      "y": 50,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 26,
+      "y": 50,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 27,
+      "y": 50,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 28,
+      "y": 50,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 29,
+      "y": 50,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 30,
+      "y": 50,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 31,
+      "y": 50,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 32,
+      "y": 50,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 33,
+      "y": 50,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 34,
+      "y": 50,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 35,
+      "y": 50,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 36,
+      "y": 50,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 37,
+      "y": 50,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 38,
+      "y": 50,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 39,
+      "y": 50,
+      "color": "#F2C7A5",
+      "partId": "skin.base"
+    },
+    {
+      "x": 40,
+      "y": 50,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 41,
+      "y": 50,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 42,
+      "y": 50,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 43,
+      "y": 50,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 24,
+      "y": 51,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 25,
+      "y": 51,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 26,
+      "y": 51,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 27,
+      "y": 51,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 28,
+      "y": 51,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 29,
+      "y": 51,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 30,
+      "y": 51,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 31,
+      "y": 51,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 32,
+      "y": 51,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 33,
+      "y": 51,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 34,
+      "y": 51,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 35,
+      "y": 51,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 36,
+      "y": 51,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 37,
+      "y": 51,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 38,
+      "y": 51,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 39,
+      "y": 51,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 24,
+      "y": 52,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 25,
+      "y": 52,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 26,
+      "y": 52,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 27,
+      "y": 52,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 28,
+      "y": 52,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 29,
+      "y": 52,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 30,
+      "y": 52,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 31,
+      "y": 52,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 32,
+      "y": 52,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 33,
+      "y": 52,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 34,
+      "y": 52,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 35,
+      "y": 52,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 36,
+      "y": 52,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 37,
+      "y": 52,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 38,
+      "y": 52,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 39,
+      "y": 52,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 40,
+      "y": 52,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 24,
+      "y": 53,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 25,
+      "y": 53,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 26,
+      "y": 53,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 27,
+      "y": 53,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 28,
+      "y": 53,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 29,
+      "y": 53,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 30,
+      "y": 53,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 31,
+      "y": 53,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 32,
+      "y": 53,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 33,
+      "y": 53,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 34,
+      "y": 53,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 35,
+      "y": 53,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 36,
+      "y": 53,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 37,
+      "y": 53,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 38,
+      "y": 53,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 39,
+      "y": 53,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 40,
+      "y": 53,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 24,
+      "y": 54,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 25,
+      "y": 54,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 26,
+      "y": 54,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 27,
+      "y": 54,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 28,
+      "y": 54,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 29,
+      "y": 54,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 30,
+      "y": 54,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 31,
+      "y": 54,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 32,
+      "y": 54,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 33,
+      "y": 54,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 34,
+      "y": 54,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 35,
+      "y": 54,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 36,
+      "y": 54,
+      "color": "#2A2430",
+      "partId": "highlight.outfit"
+    },
+    {
+      "x": 37,
+      "y": 54,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 38,
+      "y": 54,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 39,
+      "y": 54,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 40,
+      "y": 54,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 24,
+      "y": 55,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 25,
+      "y": 55,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 26,
+      "y": 55,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 27,
+      "y": 55,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 28,
+      "y": 55,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 29,
+      "y": 55,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 30,
+      "y": 55,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 31,
+      "y": 55,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 32,
+      "y": 55,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 33,
+      "y": 55,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 34,
+      "y": 55,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 35,
+      "y": 55,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 36,
+      "y": 55,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 37,
+      "y": 55,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 38,
+      "y": 55,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 39,
+      "y": 55,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 40,
+      "y": 55,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 24,
+      "y": 56,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 25,
+      "y": 56,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 26,
+      "y": 56,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 27,
+      "y": 56,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 28,
+      "y": 56,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 29,
+      "y": 56,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 30,
+      "y": 56,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 31,
+      "y": 56,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 32,
+      "y": 56,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 33,
+      "y": 56,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 34,
+      "y": 56,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 35,
+      "y": 56,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 36,
+      "y": 56,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 37,
+      "y": 56,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 38,
+      "y": 56,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 39,
+      "y": 56,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 40,
+      "y": 56,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 24,
+      "y": 57,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 25,
+      "y": 57,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 26,
+      "y": 57,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 27,
+      "y": 57,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 28,
+      "y": 57,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 29,
+      "y": 57,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 30,
+      "y": 57,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 31,
+      "y": 57,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 32,
+      "y": 57,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 33,
+      "y": 57,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 34,
+      "y": 57,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 35,
+      "y": 57,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 36,
+      "y": 57,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 37,
+      "y": 57,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 38,
+      "y": 57,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 39,
+      "y": 57,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 40,
+      "y": 57,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 22,
+      "y": 58,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 23,
+      "y": 58,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 24,
+      "y": 58,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 25,
+      "y": 58,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 26,
+      "y": 58,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 27,
+      "y": 58,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 28,
+      "y": 58,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 29,
+      "y": 58,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 30,
+      "y": 58,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 31,
+      "y": 58,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 32,
+      "y": 58,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 33,
+      "y": 58,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 34,
+      "y": 58,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 35,
+      "y": 58,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 36,
+      "y": 58,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 37,
+      "y": 58,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 38,
+      "y": 58,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 39,
+      "y": 58,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 40,
+      "y": 58,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 41,
+      "y": 58,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 42,
+      "y": 58,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 21,
+      "y": 59,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 22,
+      "y": 59,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 23,
+      "y": 59,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 24,
+      "y": 59,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 25,
+      "y": 59,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 26,
+      "y": 59,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 27,
+      "y": 59,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 28,
+      "y": 59,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 29,
+      "y": 59,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 30,
+      "y": 59,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 31,
+      "y": 59,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 32,
+      "y": 59,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 33,
+      "y": 59,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 34,
+      "y": 59,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 35,
+      "y": 59,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 36,
+      "y": 59,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 37,
+      "y": 59,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 38,
+      "y": 59,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 39,
+      "y": 59,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 40,
+      "y": 59,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 41,
+      "y": 59,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 42,
+      "y": 59,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 43,
+      "y": 59,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 21,
+      "y": 60,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 22,
+      "y": 60,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 23,
+      "y": 60,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 24,
+      "y": 60,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 25,
+      "y": 60,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 26,
+      "y": 60,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 27,
+      "y": 60,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 28,
+      "y": 60,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 29,
+      "y": 60,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 30,
+      "y": 60,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 31,
+      "y": 60,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 33,
+      "y": 60,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 34,
+      "y": 60,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 35,
+      "y": 60,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 36,
+      "y": 60,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 37,
+      "y": 60,
+      "color": "#24202A",
+      "partId": "outfit.coat.base"
+    },
+    {
+      "x": 38,
+      "y": 60,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 39,
+      "y": 60,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 40,
+      "y": 60,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 41,
+      "y": 60,
+      "color": "#0F0D14",
+      "partId": "shade.coat"
+    },
+    {
+      "x": 42,
+      "y": 60,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 43,
+      "y": 60,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 23,
+      "y": 61,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 24,
+      "y": 61,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 25,
+      "y": 61,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 26,
+      "y": 61,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 27,
+      "y": 61,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 28,
+      "y": 61,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 29,
+      "y": 61,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 30,
+      "y": 61,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 34,
+      "y": 61,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 35,
+      "y": 61,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 36,
+      "y": 61,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 37,
+      "y": 61,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 38,
+      "y": 61,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 39,
+      "y": 61,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 40,
+      "y": 61,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    },
+    {
+      "x": 41,
+      "y": 61,
+      "color": "#15121A",
+      "partId": "outline.ink"
+    }
+  ],
+  "palettes": [
+    {
+      "key": "source",
+      "colors": [
+        "#15121A",
+        "#2A2430",
+        "#F2C7A5",
+        "#D99B78",
+        "#FFE0C2",
+        "#101018",
+        "#28203A",
+        "#4A316A",
+        "#FFFFFF",
+        "#21163D",
+        "#0B0B0F",
+        "#24202A",
+        "#0F0D14",
+        "#7E1F36",
+        "#7C55D9"
+      ]
+    }
+  ],
+  "metadata": {
+    "assetId": "vaelrix.chibi.64x64.v1",
+    "title": "Vaelrix Chibi 64x64",
+    "sourceBytecode": "manual-lattice-vaelrix-chibi-64x64-v1",
+    "fingerprint": "817735f00aeb831e3c80e6f316a3fe0e9a7706ffa5a738d23799879769ca972b",
+    "fingerprintSource": "sha256:c14n:packet_with_metadata_fingerprint_null",
+    "manifest": {
+      "width": 64,
+      "height": 64,
+      "gridSize": 1,
+      "background": "transparent",
+      "origin": "top-left",
+      "coordinateBounds": {
+        "xMin": 0,
+        "xMax": 63,
+        "yMin": 0,
+        "yMax": 63
+      }
+    },
+    "style": {
+      "proportions": "chibi",
+      "lighting": "top-left",
+      "antiAliasing": false,
+      "gradients": false,
+      "semiTransparentPixels": false,
+      "paletteMode": "indexed",
+      "silhouette": "large-head-small-body-readable"
+    },
+    "construction": {
+      "contract": "PB-CONSTRUCTION-SKELETON-v1",
+      "skeletonId": "vaelrix-chibi-64x64-construction-v1",
+      "center": {
+        "x": 32,
+        "y": 32
+      },
+      "bounds": {
+        "width": 64,
+        "height": 64,
+        "gridSize": 1
+      },
+      "axes": true,
+      "anchors": [
+        {
+          "id": "head_center",
+          "x": 32,
+          "y": 21,
+          "role": "head origin"
+        },
+        {
+          "id": "body_center",
+          "x": 32,
+          "y": 44,
+          "role": "body origin"
+        },
+        {
+          "id": "left_eye_center",
+          "x": 26,
+          "y": 23,
+          "role": "eye anchor"
+        },
+        {
+          "id": "right_eye_center",
+          "x": 38,
+          "y": 23,
+          "role": "eye anchor"
+        },
+        {
+          "id": "feet_ground",
+          "x": 32,
+          "y": 61,
+          "role": "ground contact"
+        }
+      ],
+      "boxes": {
+        "head": {
+          "x": 14,
+          "y": 4,
+          "width": 36,
+          "height": 32
+        },
+        "hair": {
+          "x": 14,
+          "y": 4,
+          "width": 36,
+          "height": 20
+        },
+        "face": {
+          "x": 18,
+          "y": 16,
+          "width": 28,
+          "height": 20
+        },
+        "eyesLeft": {
+          "x": 23,
+          "y": 20,
+          "width": 7,
+          "height": 7
+        },
+        "eyesRight": {
+          "x": 34,
+          "y": 20,
+          "width": 8,
+          "height": 7
+        },
+        "body": {
+          "x": 21,
+          "y": 35,
+          "width": 22,
+          "height": 18
+        },
+        "armsLeft": {
+          "x": 16,
+          "y": 37,
+          "width": 10,
+          "height": 14
+        },
+        "armsRight": {
+          "x": 38,
+          "y": 37,
+          "width": 10,
+          "height": 14
+        },
+        "legsLeft": {
+          "x": 24,
+          "y": 52,
+          "width": 8,
+          "height": 9
+        },
+        "legsRight": {
+          "x": 33,
+          "y": 52,
+          "width": 8,
+          "height": 9
+        },
+        "feetLeft": {
+          "x": 21,
+          "y": 58,
+          "width": 11,
+          "height": 4
+        },
+        "feetRight": {
+          "x": 33,
+          "y": 58,
+          "width": 11,
+          "height": 4
+        },
+        "accessories": {
+          "x": 23,
+          "y": 36,
+          "width": 18,
+          "height": 13
+        }
+      },
+      "promotionRule": "construction cells are reference metadata; final art lives in coordinates"
+    },
+    "symmetry": {
+      "type": "none",
+      "dominantAxis": "vertical",
+      "reason": "Chibi construction is centered, but lighting, hair clusters, hands, sash, and coat shadows are intentionally asymmetric."
+    },
+    "aseprite": {
+      "editableLayerStackBottomToTop": [
+        "00_Transparent_BG",
+        "01_Skin_Base",
+        "02_Outfit_Base",
+        "03_Hair_Base",
+        "04_Accent_Details",
+        "05_Shading",
+        "07_Highlights",
+        "06_Face_Eyes",
+        "08_Outline_and_Inner_Lines"
+      ],
+      "originalRequestedLayerStackBottomToTop": [
+        "00_Transparent_BG",
+        "01_Skin_Base",
+        "02_Outfit_Base",
+        "03_Hair_Base",
+        "04_Accent_Details",
+        "05_Shading",
+        "06_Face_Eyes",
+        "07_Highlights",
+        "08_Outline_and_Inner_Lines"
+      ],
+      "compositeOrderPolicy": "Face/Eyes is composited above Highlights in the flat lattice so skin highlights do not overwrite eyes.",
+      "sourceLayerRuns": [
+        {
+          "order": 0,
+          "sectionId": "skin_base",
+          "sourceLayer": "01_Skin_Base",
+          "colorId": "P03",
+          "color": "#F2C7A5",
+          "partId": "skin.base",
+          "cellCountAuthored": 437,
+          "rowRuns": "y=16: x=24-25, x=34-38\ny=17: x=23-26, x=33-40\ny=18: x=23-27, x=32-41\ny=19: x=22-42\ny=20: x=21-43\ny=21: x=20-44\ny=22: x=19-44\ny=23: x=19-44\ny=24: x=18-45\ny=25: x=19-44\ny=26: x=19-44\ny=27: x=20-43\ny=28: x=20-43\ny=29: x=21-42\ny=30: x=21-42\ny=31: x=22-41\ny=32: x=23-40\ny=33: x=25-38\ny=34: x=26-37\ny=35: x=27-36\ny=36: x=29-34\ny=37: x=30-33\ny=38: x=30-33\ny=48: x=19-23, x=40-44\ny=49: x=20-24, x=39-43\ny=50: x=24-24, x=39-39"
+        },
+        {
+          "order": 1,
+          "sectionId": "outfit_base",
+          "sourceLayer": "02_Outfit_Base",
+          "colorId": "P12",
+          "color": "#24202A",
+          "partId": "outfit.coat.base",
+          "cellCountAuthored": 488,
+          "rowRuns": "y=35: x=26-28, x=35-37\ny=36: x=25-28, x=35-38\ny=37: x=23-29, x=34-40\ny=38: x=18-29, x=34-45\ny=39: x=17-46\ny=40: x=17-46\ny=41: x=17-46\ny=42: x=17-46\ny=43: x=17-46\ny=44: x=17-46\ny=45: x=17-46\ny=46: x=17-46\ny=47: x=18-45\ny=48: x=24-39\ny=49: x=25-38\ny=50: x=25-38\ny=51: x=25-38\ny=52: x=25-30, x=34-39\ny=53: x=25-29, x=35-39\ny=54: x=25-29, x=35-39\ny=55: x=25-29, x=35-39\ny=56: x=25-29, x=35-39\ny=57: x=25-29, x=35-39\ny=58: x=24-30, x=34-40\ny=59: x=22-30, x=34-42\ny=60: x=23-30, x=34-41"
+        },
+        {
+          "order": 2,
+          "sectionId": "hair_base",
+          "sourceLayer": "03_Hair_Base",
+          "colorId": "P06",
+          "color": "#101018",
+          "partId": "hair.base",
+          "cellCountAuthored": 401,
+          "rowRuns": "y=05: x=28-35\ny=06: x=24-39\ny=07: x=21-42\ny=08: x=19-44\ny=09: x=17-46\ny=10: x=16-47\ny=11: x=16-47\ny=12: x=15-48\ny=13: x=15-48\ny=14: x=15-48\ny=15: x=15-48\ny=16: x=15-23, x=26-33, x=39-48\ny=17: x=15-22, x=27-32, x=41-48\ny=18: x=15-22, x=28-31, x=42-48\ny=19: x=16-21, x=43-47\ny=20: x=16-20, x=44-47\ny=21: x=17-19, x=45-46\ny=22: x=17-18, x=45-46\ny=23: x=18-18, x=45-45"
+        },
+        {
+          "order": 3,
+          "sectionId": "accent_crimson",
+          "sourceLayer": "04_Accent_Details",
+          "colorId": "P14",
+          "color": "#7E1F36",
+          "partId": "accent.crimson",
+          "cellCountAuthored": 42,
+          "rowRuns": "y=36: x=28-35\ny=37: x=29-34\ny=38: x=30-33\ny=47: x=26-37\ny=48: x=26-37"
+        },
+        {
+          "order": 4,
+          "sectionId": "accent_violet",
+          "sourceLayer": "04_Accent_Details",
+          "colorId": "P15",
+          "color": "#7C55D9",
+          "partId": "accent.violet",
+          "cellCountAuthored": 32,
+          "rowRuns": "y=39: x=23-23, x=40-40\ny=40: x=23-23, x=30-33, x=40-40\ny=41: x=23-23, x=29-34, x=40-40\ny=42: x=23-23, x=30-33, x=40-40\ny=43: x=24-24, x=31-32, x=39-39\ny=44: x=24-24, x=39-39\ny=45: x=24-24, x=39-39\ny=46: x=25-25, x=38-38"
+        },
+        {
+          "order": 5,
+          "sectionId": "skin_shadow",
+          "sourceLayer": "05_Shading",
+          "colorId": "P04",
+          "color": "#D99B78",
+          "partId": "shade.skin",
+          "cellCountAuthored": 82,
+          "rowRuns": "y=24: x=41-44\ny=25: x=39-44\ny=26: x=38-43\ny=27: x=37-43\ny=28: x=35-42\ny=29: x=34-41\ny=30: x=34-41\ny=31: x=33-40\ny=32: x=32-39\ny=33: x=31-38\ny=34: x=31-36\ny=49: x=23-24, x=42-43\ny=50: x=24-24"
+        },
+        {
+          "order": 6,
+          "sectionId": "coat_shadow",
+          "sourceLayer": "05_Shading",
+          "colorId": "P13",
+          "color": "#0F0D14",
+          "partId": "shade.coat",
+          "cellCountAuthored": 130,
+          "rowRuns": "y=39: x=40-46\ny=40: x=40-46\ny=41: x=40-46\ny=42: x=40-46\ny=43: x=40-46\ny=44: x=40-46\ny=45: x=39-46\ny=46: x=38-45\ny=49: x=34-38\ny=50: x=34-38\ny=51: x=34-38\ny=52: x=28-30, x=37-39\ny=53: x=28-29, x=37-39\ny=54: x=28-29, x=37-39\ny=55: x=28-29, x=37-39\ny=56: x=28-29, x=37-39\ny=57: x=28-29, x=37-39\ny=58: x=27-30, x=38-40\ny=59: x=26-30, x=38-42\ny=60: x=26-30, x=38-41"
+        },
+        {
+          "order": 7,
+          "sectionId": "hair_midtone",
+          "sourceLayer": "05_Shading",
+          "colorId": "P07",
+          "color": "#28203A",
+          "partId": "shade.hair",
+          "cellCountAuthored": 176,
+          "rowRuns": "y=08: x=21-29\ny=09: x=19-30\ny=10: x=18-27, x=35-44\ny=11: x=17-26, x=34-45\ny=12: x=16-24, x=34-46\ny=13: x=16-23, x=35-46\ny=14: x=16-22, x=36-46\ny=15: x=16-21, x=37-46\ny=16: x=16-20, x=39-46\ny=17: x=16-19, x=42-46\ny=18: x=17-20, x=43-46\ny=19: x=17-20, x=44-46"
+        },
+        {
+          "order": 8,
+          "sectionId": "skin_highlight",
+          "sourceLayer": "07_Highlights",
+          "colorId": "P05",
+          "color": "#FFE0C2",
+          "partId": "highlight.skin",
+          "cellCountAuthored": 46,
+          "rowRuns": "y=18: x=24-26\ny=19: x=23-28\ny=20: x=22-30\ny=21: x=21-27\ny=22: x=20-25\ny=23: x=20-24\ny=24: x=20-23\ny=28: x=24-27\ny=29: x=24-25"
+        },
+        {
+          "order": 9,
+          "sectionId": "hair_highlight",
+          "sourceLayer": "07_Highlights",
+          "colorId": "P08",
+          "color": "#4A316A",
+          "partId": "highlight.hair",
+          "cellCountAuthored": 75,
+          "rowRuns": "y=06: x=25-33\ny=07: x=22-35\ny=08: x=20-31\ny=09: x=18-26\ny=10: x=17-23\ny=11: x=16-21\ny=12: x=16-20\ny=13: x=17-20\ny=16: x=27-31\ny=17: x=28-31"
+        },
+        {
+          "order": 10,
+          "sectionId": "outfit_highlight",
+          "sourceLayer": "07_Highlights",
+          "colorId": "P02",
+          "color": "#2A2430",
+          "partId": "highlight.outfit",
+          "cellCountAuthored": 57,
+          "rowRuns": "y=37: x=23-28\ny=38: x=22-29\ny=39: x=22-28\ny=40: x=22-27\ny=41: x=22-26\ny=42: x=22-25\ny=43: x=22-25\ny=49: x=25-28\ny=50: x=25-29\ny=53: x=25-26, x=35-36\ny=54: x=25-26, x=35-36"
+        },
+        {
+          "order": 11,
+          "sectionId": "face_eye_black",
+          "sourceLayer": "06_Face_Eyes",
+          "colorId": "P11",
+          "color": "#0B0B0F",
+          "partId": "face.eye_black",
+          "cellCountAuthored": 66,
+          "rowRuns": "y=20: x=23-29, x=35-41\ny=21: x=24-28, x=35-39\ny=22: x=23-24, x=28-29, x=34-35, x=39-40\ny=23: x=23-24, x=27-29, x=34-35, x=38-40\ny=24: x=23-24, x=28-29, x=34-35, x=39-40\ny=25: x=24-25, x=28-28, x=35-36, x=39-39\ny=26: x=25-27, x=36-38\ny=30: x=30-33"
+        },
+        {
+          "order": 12,
+          "sectionId": "face_iris",
+          "sourceLayer": "06_Face_Eyes",
+          "colorId": "P10",
+          "color": "#21163D",
+          "partId": "face.iris",
+          "cellCountAuthored": 18,
+          "rowRuns": "y=22: x=26-27, x=37-38\ny=23: x=25-26, x=36-37\ny=24: x=25-27, x=36-38\ny=25: x=26-27, x=37-38"
+        },
+        {
+          "order": 13,
+          "sectionId": "face_eye_shine",
+          "sourceLayer": "06_Face_Eyes",
+          "colorId": "P09",
+          "color": "#FFFFFF",
+          "partId": "face.eye_shine",
+          "cellCountAuthored": 2,
+          "rowRuns": "y=22: x=25-25, x=36-36"
+        },
+        {
+          "order": 14,
+          "sectionId": "face_mouth",
+          "sourceLayer": "06_Face_Eyes",
+          "colorId": "P14",
+          "color": "#7E1F36",
+          "partId": "face.mouth",
+          "cellCountAuthored": 2,
+          "rowRuns": "y=31: x=31-32"
+        },
+        {
+          "order": 15,
+          "sectionId": "outline",
+          "sourceLayer": "08_Outline_and_Inner_Lines",
+          "colorId": "P01",
+          "color": "#15121A",
+          "partId": "outline.ink",
+          "cellCountAuthored": 283,
+          "rowRuns": "y=04: x=28-35\ny=05: x=24-27, x=36-39\ny=06: x=21-23, x=40-42\ny=07: x=19-20, x=43-44\ny=08: x=17-18, x=45-46\ny=09: x=16-16, x=47-47\ny=10: x=15-15, x=48-48\ny=11: x=15-15, x=48-48\ny=12: x=14-14, x=49-49\ny=13: x=14-14, x=49-49\ny=14: x=14-14, x=49-49\ny=15: x=14-14, x=49-49\ny=16: x=14-14, x=24-25, x=34-38, x=49-49\ny=17: x=14-14, x=23-26, x=33-40, x=49-49\ny=18: x=14-14, x=23-27, x=32-41, x=49-49\ny=19: x=15-15, x=22-22, x=42-42, x=48-48\ny=20: x=15-15, x=48-48\ny=21: x=16-16, x=47-47\ny=22: x=16-16, x=47-47\ny=23: x=17-17, x=46-46\ny=24: x=17-17, x=46-46\ny=25: x=18-18, x=45-45\ny=26: x=18-18, x=45-45\ny=27: x=19-19, x=44-44\ny=28: x=19-19, x=44-44\ny=29: x=20-20, x=43-43\ny=30: x=20-20, x=43-43\ny=31: x=21-21, x=42-42\ny=32: x=22-22, x=41-41\ny=33: x=23-24, x=39-40\ny=34: x=25-38\ny=35: x=25-25, x=38-38\ny=36: x=23-27, x=36-40\ny=37: x=18-22, x=24-26, x=37-39, x=41-45\ny=38: x=17-17, x=46-46\ny=39: x=16-16, x=47-47\ny=40: x=16-16, x=47-47\ny=41: x=16-16, x=47-47\ny=42: x=16-16, x=47-47\ny=43: x=16-16, x=47-47\ny=44: x=16-16, x=47-47\ny=45: x=16-16, x=47-47\ny=46: x=16-16, x=47-47\ny=47: x=17-17, x=46-46\ny=48: x=18-18, x=25-38, x=45-45\ny=49: x=19-19, x=44-44\ny=50: x=20-23, x=40-43\ny=51: x=24-24, x=39-39\ny=52: x=24-24, x=30-33, x=40-40\ny=53: x=24-24, x=30-34, x=40-40\ny=54: x=24-24, x=30-34, x=40-40\ny=55: x=24-24, x=30-34, x=40-40\ny=56: x=24-24, x=30-34, x=40-40\ny=57: x=24-24, x=30-34, x=40-40\ny=58: x=22-23, x=31-33, x=41-42\ny=59: x=21-21, x=31-33, x=43-43\ny=60: x=21-22, x=31-31, x=33-33, x=42-43\ny=61: x=23-30, x=34-41"
+        }
+      ]
+    },
+    "palette": {
+      "countVisible": 15,
+      "transparent": {
+        "id": "P00",
+        "role": "background"
+      },
+      "indexed": [
+        {
+          "id": "P01",
+          "hex": "#15121A",
+          "name": "Ink Outline",
+          "usage": "Main silhouette and hard internal cuts"
+        },
+        {
+          "id": "P02",
+          "hex": "#2A2430",
+          "name": "Soft Inner Rim",
+          "usage": "Coat highlight, secondary dark detail"
+        },
+        {
+          "id": "P03",
+          "hex": "#F2C7A5",
+          "name": "Skin Base",
+          "usage": "Face, neck, hands"
+        },
+        {
+          "id": "P04",
+          "hex": "#D99B78",
+          "name": "Skin Shadow",
+          "usage": "Bottom-right face and hands"
+        },
+        {
+          "id": "P05",
+          "hex": "#FFE0C2",
+          "name": "Skin Highlight",
+          "usage": "Top-left face highlights"
+        },
+        {
+          "id": "P06",
+          "hex": "#101018",
+          "name": "Hair Base",
+          "usage": "Near-black hair mass"
+        },
+        {
+          "id": "P07",
+          "hex": "#28203A",
+          "name": "Hair Midtone",
+          "usage": "Hair depth clusters"
+        },
+        {
+          "id": "P08",
+          "hex": "#4A316A",
+          "name": "Hair Violet Highlight",
+          "usage": "Top-left hair shine"
+        },
+        {
+          "id": "P09",
+          "hex": "#FFFFFF",
+          "name": "Eye Shine",
+          "usage": "Eye sparkle pixels"
+        },
+        {
+          "id": "P10",
+          "hex": "#21163D",
+          "name": "Violet Iris",
+          "usage": "Eye iris"
+        },
+        {
+          "id": "P11",
+          "hex": "#0B0B0F",
+          "name": "Eye Black",
+          "usage": "Pupils, eyelids, mouth line"
+        },
+        {
+          "id": "P12",
+          "hex": "#24202A",
+          "name": "Coat Base",
+          "usage": "Main outfit"
+        },
+        {
+          "id": "P13",
+          "hex": "#0F0D14",
+          "name": "Coat Shadow",
+          "usage": "Right-side coat, boots, underside"
+        },
+        {
+          "id": "P14",
+          "hex": "#7E1F36",
+          "name": "Crimson Accent",
+          "usage": "Collar, sash, mouth"
+        },
+        {
+          "id": "P15",
+          "hex": "#7C55D9",
+          "name": "Violet Accent",
+          "usage": "Chest glyph, trim"
+        }
+      ],
+      "finalColorCounts": {
+        "#0B0B0F": 66,
+        "#0F0D14": 129,
+        "#101018": 187,
+        "#15121A": 283,
+        "#21163D": 18,
+        "#24202A": 241,
+        "#28203A": 139,
+        "#2A2430": 54,
+        "#4A316A": 75,
+        "#7C55D9": 21,
+        "#7E1F36": 32,
+        "#D99B78": 74,
+        "#F2C7A5": 183,
+        "#FFE0C2": 26,
+        "#FFFFFF": 2
+      }
+    },
+    "parts": {
+      "accent.crimson": 30,
+      "accent.violet": 21,
+      "face.eye_black": 66,
+      "face.eye_shine": 2,
+      "face.iris": 18,
+      "face.mouth": 2,
+      "hair.base": 187,
+      "highlight.hair": 75,
+      "highlight.outfit": 54,
+      "highlight.skin": 26,
+      "outfit.coat.base": 241,
+      "outline.ink": 283,
+      "shade.coat": 129,
+      "shade.hair": 139,
+      "shade.skin": 74,
+      "skin.base": 183
+    },
+    "bounds": {
+      "minX": 14,
+      "maxX": 49,
+      "minY": 4,
+      "maxY": 61
+    },
+    "coordinateCount": 1530,
+    "authoredLayerCellCount": 2337,
+    "layerCollisionCountDuringComposite": 807,
+    "qa": {
+      "readableAt64x64": true,
+      "readableAt32x32": true,
+      "paletteUnder16VisibleColors": true,
+      "noAntiAliasing": true,
+      "noGradients": true,
+      "noSemiTransparentPixels": true,
+      "noCoordinatesOutsideCanvas": true,
+      "noDuplicateFinalCoordinates": true,
+      "noOrphanPixels8Neighbor": true,
+      "transparentPixelsOmitted": true
+    },
+    "sourceManuals": [
+      {
+        "name": "PIXELBRAIN_LANGUAGE_WHITE_PAPER.md",
+        "searchCode": "SCHOL-ENC-BYKE-SEARCH-WP-PIXELBRAIN-LANGUAGE"
+      },
+      {
+        "name": "PIXELBRAIN_AGENT_OPERATING_MANUAL.md",
+        "searchCode": "SCHOL-ENC-BYKE-SEARCH-WP-PIXELBRAIN-AGENT-MANUAL"
+      }
+    ],
+    "conversionNotes": [
+      "Converted from Aseprite row-run blueprint into a flat PixelBrain lattice export packet.",
+      "No image or PNG preview was generated.",
+      "Final coordinates are collision-free topmost cells only; original row-runs are retained under metadata.aseprite.sourceLayerRuns.",
+      "The asset declares symmetry as none to avoid a strict-mirror fatal on intentionally asymmetric hair, shadow, and accessories."
+    ]
+  },
+  "diagnostics": [
+    {
+      "severity": "INFO",
+      "source": "aseprite_to_pixelbrain_conversion",
+      "message": "Face/Eyes composited above Highlights to preserve eye readability in flat PixelBrain coordinates."
+    }
+  ]
+}

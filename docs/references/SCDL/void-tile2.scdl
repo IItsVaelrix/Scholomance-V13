@@ -1,0 +1,109 @@
+asset void_grass_tile canvas 32x32
+
+palette {
+  void_black = #070711
+  shadow_blue = #10111f
+  soil_black = #0b0712
+  void_soil_dark = #15091f
+  void_soil_mid = #231033
+  purple_soil_lift = #32144a
+  blade_shadow = #3b0d63
+  blade_mid = #7b1bb8
+  blade_light = #b832f5
+  blade_hot = #ff4dff
+  glow_core = #d936ff
+  obsidian_dark = #11131f
+  obsidian_mid = #242638
+  obsidian_highlight = #454760
+  rim_dark = #181325
+  rim_purple = #5b21b6
+  rim_glow = #c084fc
+}
+
+part side_walls material black_steel {
+  # Left wall
+  polygon 2 16 16 23 16 27 2 20 obsidian_dark
+  # Right wall
+  polygon 16 23 30 16 30 20 16 27 shadow_blue
+  
+  # Edge highlight
+  line 2 16 16 23 obsidian_highlight
+  line 16 23 30 16 obsidian_highlight
+  
+  # Center corner
+  line 16 23 16 27 rim_dark
+}
+
+part top_soil material voidsteel {
+  # Main dirt diamond
+  polygon 2 16 16 9 30 16 16 23 void_soil_dark
+  
+  # Soil texture patches
+  polygon 8 16 16 12 24 16 16 20 void_soil_mid
+  polygon 12 16 16 14 20 16 16 18 purple_soil_lift
+}
+
+part grass material void_rune_glow {
+  cell 10 9 blade_hot
+  cell 10 10 blade_hot
+  cell 20 10 blade_light
+  cell 8 11 blade_light
+  cell 11 11 blade_hot
+  cell 20 11 blade_light
+  cell 8 12 blade_light
+  cell 11 12 blade_mid
+  cell 14 12 blade_shadow
+  cell 19 12 blade_light
+  cell 8 13 blade_light
+  cell 9 13 blade_light
+  cell 12 13 blade_mid
+  cell 13 13 blade_hot
+  cell 14 13 blade_shadow
+  cell 15 13 blade_mid
+  cell 19 13 blade_light
+  cell 23 13 blade_hot
+  cell 10 14 blade_light
+  cell 12 14 blade_mid
+  cell 13 14 blade_hot
+  cell 15 14 blade_shadow
+  cell 16 14 blade_light
+  cell 19 14 blade_mid
+  cell 20 14 blade_light
+  cell 22 14 blade_hot
+  cell 23 14 blade_hot
+  cell 10 15 blade_mid
+  cell 13 15 blade_shadow
+  cell 14 15 blade_hot
+  cell 15 15 blade_shadow
+  cell 16 15 blade_shadow
+  cell 17 15 blade_shadow
+  cell 18 15 blade_mid
+  cell 22 15 blade_hot
+  cell 25 15 blade_mid
+  cell 11 16 blade_light
+  cell 12 16 blade_mid
+  cell 13 16 blade_light
+  cell 14 16 blade_shadow
+  cell 15 16 blade_shadow
+  cell 16 16 blade_light
+  cell 17 16 blade_shadow
+  cell 18 16 blade_mid
+  cell 21 16 blade_hot
+  cell 22 16 blade_hot
+  cell 24 16 blade_mid
+  cell 25 16 blade_mid
+  cell 12 17 blade_mid
+  cell 15 17 blade_shadow
+  cell 16 17 blade_shadow
+  cell 20 17 blade_mid
+  cell 23 17 blade_mid
+  cell 15 18 blade_shadow
+  cell 19 18 blade_mid
+  cell 20 18 blade_mid
+  cell 21 18 blade_mid
+  cell 22 18 blade_mid
+
+  glow radius 2
+}
+
+export json png aseprite

@@ -1,0 +1,257 @@
+.root {
+  --discovery-duration: 3500ms;
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-system) + 1);
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 44%, rgba(61, 95, 170, 0.14) 0%, transparent 68%),
+    rgba(2, 6, 14, 0.52);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+}
+
+.panel {
+  position: relative;
+  width: min(92vw, 440px);
+  border-radius: 10px;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(10px) scale(0.97);
+  background:
+    linear-gradient(165deg, rgba(12, 20, 36, 0.97) 0%, rgba(5, 9, 18, 0.99) 100%);
+  border: 1px solid rgba(100, 200, 255, 0.28);
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.72),
+    0 0 0 1px rgba(255, 211, 90, 0.08) inset,
+    0 0 28px rgba(0, 255, 255, 0.06) inset;
+}
+
+.chromeHeader {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  gap: 0.35rem 0.75rem;
+  align-items: center;
+  padding: 0.85rem 1.25rem 0.7rem;
+  border-bottom: 1px solid rgba(100, 200, 255, 0.14);
+  background: linear-gradient(180deg, rgba(16, 28, 48, 0.55), transparent);
+}
+
+.chromeBadge {
+  grid-row: span 2;
+  padding: 0.28rem 0.55rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 204, 102, 0.35);
+  background: rgba(255, 211, 90, 0.08);
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #ffcc66;
+}
+
+.chromeLabel {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(103, 247, 255, 0.78);
+}
+
+.chromeDivider {
+  grid-column: 2;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(103, 247, 255, 0.45) 0%,
+    rgba(103, 247, 255, 0.08) 72%,
+    transparent 100%
+  );
+}
+
+.panelBody {
+  padding: 1.35rem 1.5rem 1.15rem;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display, 'Cinzel', Georgia, serif);
+  font-size: clamp(1.85rem, 5.5vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #f4f0e6;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
+}
+
+.xp {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  margin: 0.85rem 0 0;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid rgba(103, 247, 255, 0.28);
+  background: rgba(0, 40, 60, 0.35);
+  box-shadow: inset 0 0 12px rgba(103, 247, 255, 0.06);
+}
+
+.xpValue {
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-size: clamp(1.2rem, 3.5vw, 1.55rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #67f7ff;
+}
+
+.xpUnit {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  color: rgba(170, 255, 204, 0.82);
+}
+
+.chromeFooter {
+  padding: 0 1.25rem 0.85rem;
+}
+
+.progressTrack {
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(100, 200, 255, 0.12);
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #67f7ff, #ffcc66);
+  transform-origin: left center;
+}
+
+.corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: rgba(255, 204, 102, 0.55);
+  border-style: solid;
+  pointer-events: none;
+}
+
+.cornerTl {
+  top: 7px;
+  left: 7px;
+  border-width: 2px 0 0 2px;
+}
+
+.cornerTr {
+  top: 7px;
+  right: 7px;
+  border-width: 2px 2px 0 0;
+}
+
+.cornerBl {
+  bottom: 7px;
+  left: 7px;
+  border-width: 0 0 2px 2px;
+}
+
+.cornerBr {
+  right: 7px;
+  bottom: 7px;
+  border-width: 0 2px 2px 0;
+}
+
+.enter .backdrop {
+  animation: discovery-backdrop-in 360ms ease-out forwards;
+}
+
+.enter .panel {
+  animation: discovery-panel-in 480ms cubic-bezier(0.2, 0.9, 0.24, 1) forwards;
+}
+
+.enter .progressBar {
+  animation: discovery-progress var(--discovery-duration) linear forwards;
+}
+
+.exit .backdrop {
+  animation: discovery-backdrop-out 420ms ease-in forwards;
+}
+
+.exit .panel {
+  animation: discovery-panel-out 420ms ease-in forwards;
+}
+
+.visible .backdrop,
+.visible .panel {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes discovery-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes discovery-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes discovery-progress {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+@keyframes discovery-backdrop-out {
+  to { opacity: 0; }
+}
+
+@keyframes discovery-panel-out {
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(1.02);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter .backdrop,
+  .enter .panel,
+  .enter .progressBar,
+  .exit .backdrop,
+  .exit .panel {
+    animation: none;
+  }
+
+  .visible .backdrop,
+  .visible .panel,
+  .enter .backdrop,
+  .enter .panel {
+    opacity: 1;
+    transform: none;
+  }
+
+  .enter .progressBar,
+  .visible .progressBar {
+    transform: scaleX(0);
+  }
+}

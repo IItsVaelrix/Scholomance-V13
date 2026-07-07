@@ -8,6 +8,7 @@ heuristics, and theme consistency — deterministic keyword/pattern analysis.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCortexForceField
@@ -82,24 +83,48 @@ def _project_root() -> Path:
     return Path.cwd()
 
 
+# Vendored / build / VCS directories that never contain the project's own UI
+# source. Pruning them is what keeps the scan bounded by source-tree size
+# instead of walking node_modules / virtualenvs (hundreds of thousands of
+# paths) on every query.
+_IGNORE_DIRS = {
+    "node_modules", "venv", "__pycache__", "dist", "build", "out",
+    "coverage", "test-results", "site-packages", "target", "vendor",
+}
+# Hard ceiling on files examined so a pathological tree can never dominate
+# latency even if a new vendor dir slips past _IGNORE_DIRS.
+_SCAN_FILE_BUDGET = 6000
+
+
 def _scan_ui_files(root: Path) -> tuple[list[str], list[str]]:
     components: list[str] = []
     styles: list[str] = []
     style_exts = {".css", ".scss", ".less"}
     component_dirs = {"components", "pages", "views", "ui", "widgets", "screens"}
-    for candidate in list(root.rglob("*"))[:1500]:
-        if not candidate.is_file():
-            continue
-        suffix = candidate.suffix.lower()
-        if suffix not in _UI_FILE_PATTERNS:
-            continue
-        parent_name = candidate.parent.name.lower()
-        if suffix in style_exts or parent_name in {"styles", "themes", "css"}:
-            styles.append(str(candidate.relative_to(root)))
-        elif parent_name in component_dirs or any(
-            d in str(candidate.parent).lower() for d in component_dirs
-        ):
-            components.append(str(candidate.relative_to(root)))
+    root_str = str(root)
+    examined = 0
+    for dirpath, dirnames, filenames in os.walk(root):
+        # Prune in-place so os.walk never descends vendored/build/dot dirs.
+        dirnames[:] = [
+            d for d in dirnames
+            if d not in _IGNORE_DIRS and not d.startswith(".")
+        ]
+        parent_name = os.path.basename(dirpath).lower()
+        dirpath_lower = dirpath.lower()
+        for name in filenames:
+            examined += 1
+            if examined > _SCAN_FILE_BUDGET:
+                return components, styles
+            suffix = os.path.splitext(name)[1].lower()
+            if suffix not in _UI_FILE_PATTERNS:
+                continue
+            rel = os.path.relpath(os.path.join(dirpath, name), root_str)
+            if suffix in style_exts or parent_name in {"styles", "themes", "css"}:
+                styles.append(rel)
+            elif parent_name in component_dirs or any(
+                d in dirpath_lower for d in component_dirs
+            ):
+                components.append(rel)
     return components, styles
 
 

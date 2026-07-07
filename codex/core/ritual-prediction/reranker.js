@@ -9,6 +9,7 @@
  */
 
 import { initializeTurboQuant, similarity, quantizeVector } from '../quantization/turboquant.js';
+import { generatePhonosemanticVector } from '../semantic/vector.utils.js';
 
 // Configuration
 const RERANK_LIMIT = 200; // Only rerank top N from graph pass
@@ -91,9 +92,12 @@ export async function rerankCandidates(candidates, context, dependencies = {}, o
     const contextText = `${context.prevToken || ''} ${context.prefix || ''}`.trim();
     if (!contextText) return candidates;
     
-    // For baseline verification, we generate a mock vector matching the build script
-    const mockContextVec = generateMockVector(contextText, 256);
-    const qPayload = await quantizeVector(mockContextVec);
+    // Embed the query context with the SAME generator used to build the stored
+    // document embeddings (generatePhonosemanticVector + seed 42). Using a
+    // different generator here puts query and document vectors in incompatible
+    // spaces, making the similarity score noise.
+    const contextVec = generatePhonosemanticVector(contextText, 256);
+    const qPayload = await quantizeVector(contextVec);
 
     // 2. Fetch Embeddings for Top Candidates
     const tokens = candidates.slice(0, RERANK_LIMIT).map(c => c.token);
@@ -124,20 +128,4 @@ export async function rerankCandidates(candidates, context, dependencies = {}, o
 
     // 5. Final Sort
     return reranked.sort((a, b) => b.totalScore - a.totalScore);
-}
-
-/**
- * Placeholder for semantic vector generation (to be replaced by GTE-Small)
- */
-function generateMockVector(text, dim) {
-    const vec = new Float32Array(dim);
-    const words = text.toLowerCase().split(/\s+/);
-    for (const word of words) {
-        for (let i = 0; i < word.length; i++) {
-            const charCode = word.charCodeAt(i);
-            const idx = (charCode * (i + 1)) % dim;
-            vec[idx] += 1.0;
-        }
-    }
-    return vec;
 }

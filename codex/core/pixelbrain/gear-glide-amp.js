@@ -13,6 +13,7 @@
  *   rotation(t) = (degreesPerBeat * (BPM / 60) * t) in radians
  *   where t = time in seconds since animation start
  */
+import { fractionalBeatAt, sampleChannel } from './resonance-grid-bridge.js';
 
 /**
  * Clamp value between min and max
@@ -111,6 +112,20 @@ export function getRotationAtTime(absoluteTimeMs, bpm, degreesPerBeat = 90, conf
 }
 
 /**
+ * Get smooth rotation using a pre-compiled resonance grid
+ * 
+ * @param {Object} grid - Compiled resonance grid from compileGrid()
+ * @param {number} timeMs - Absolute time in milliseconds
+ * @param {number} degreesPerBeat - Rotation per beat (default: 90)
+ * @returns {number} Rotation in radians
+ */
+export function getRotationFromResonance(grid, timeMs, degreesPerBeat = 90) {
+  const radiansPerBeat = degreesPerBeat * Math.PI / 180;
+  const beats = fractionalBeatAt(grid, timeMs);
+  return normalizeRotation(beats * radiansPerBeat);
+}
+
+/**
  * Normalize rotation to 0-2π range
  */
 function normalizeRotation(rotation) {
@@ -164,6 +179,33 @@ export function getBPMRotationWithPulse(bpm, degreesPerBeat = 90, timeMs, config
   return {
     rotation,
     pulse,
+  };
+}
+
+/**
+ * BPM-synced rotation with pulse driven by resonance sidecar
+ * 
+ * @param {Object} grid - Compiled resonance grid
+ * @param {number} timeMs - Absolute time in milliseconds
+ * @param {number} degreesPerBeat - Rotation per beat
+ * @param {Object} config - Config
+ * @returns {Object} { rotation, pulse }
+ */
+export function getRotationWithPulseFromResonance(grid, timeMs, degreesPerBeat = 90, config = {}) {
+  const cfg = { ...GEAR_GLIDE_CONFIG, ...config };
+  
+  const rotation = getRotationFromResonance(grid, timeMs, degreesPerBeat);
+  
+  // Pulse mapped from onset (step) and rms (linear)
+  const onset = sampleChannel(grid, 'spectral.onset', timeMs);
+  const rms = sampleChannel(grid, 'spectral.rms', timeMs);
+  
+  // Gate the pulse with onset, scale with rms
+  const pulseAmplitude = onset > 0 ? (rms * cfg.BEAT_PULSE_AMOUNT) : 0;
+  
+  return {
+    rotation,
+    pulse: 1 + pulseAmplitude
   };
 }
 

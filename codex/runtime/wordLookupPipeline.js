@@ -16,6 +16,7 @@ import { on, emit } from './eventBus.js';
 import { getFromCache, setInCache, clearCache } from './cache.js';
 import { isActionAllowed } from './rateLimit.js';
 import { mergeLexicalEntries } from '../core/schemas.js';
+import { RUNTIME_EVENTS } from '../core/events/scholomance-event-map.js';
 
 // Constants
 const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours (persisted to IndexedDB)
@@ -27,9 +28,9 @@ const CACHE_PREFIX = 'lexical:';
 
 // Event names
 export const EVENTS = {
-  REQUEST: 'ui:word_lookup_requested',
-  RESPONSE: 'runtime:word_lookup_result',
-  ERROR: 'runtime:word_lookup_error',
+  REQUEST: RUNTIME_EVENTS.WORD_LOOKUP_REQUEST,
+  RESPONSE: RUNTIME_EVENTS.WORD_LOOKUP_RESPONSE,
+  ERROR: RUNTIME_EVENTS.WORD_LOOKUP_ERROR,
 };
 
 /**

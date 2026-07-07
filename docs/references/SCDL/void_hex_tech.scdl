@@ -1,0 +1,414 @@
+asset void_hex_tech canvas 32x32
+
+palette {
+  c000 = #460e6b
+  c001 = #2d0e52
+  c002 = #1e0f43
+  c003 = #5e1288
+  c004 = #7812ab
+  c005 = #2a2140
+  c006 = #201833
+  c007 = #b8b5c0
+  c008 = #7e798b
+  c009 = #3f3b58
+  c010 = #0d0423
+  c011 = #14072c
+}
+
+part slab_1 material source {
+  ring 16 16 6 1 c004
+  rect 14 11 1 2 c004
+  rect 17 11 2 1 c004
+  cell 17 12 c004
+  cell 19 12 c004
+  cell 10 13 c004
+  rect 20 13 1 2 c004
+  rect 11 14 2 1 c004
+  cell 19 14 c004
+  rect 21 14 1 5 c004
+  rect 11 17 2 1 c004
+  rect 19 17 2 1 c004
+  cell 11 18 c004
+  rect 20 18 1 2 c004
+  cell 12 19 c004
+  rect 14 19 1 3 c004
+  rect 17 19 1 3 c004
+  rect 19 19 1 2 c004
+  cell 13 20 c004
+  cell 18 20 c004
+  rect 15 21 2 1 c004
+}
+
+part cracks material source {
+  ring 16 16 8 1 c011
+  ring 16 16 9 1 c011
+  ring 16 16 10 1 c011
+  ring 16 16 11 1 c005
+  ring 16 16 12 1 c005
+  ring 16 16 13 1 c005
+  rect 15 0 2 1 c008
+  cell 14 1 c009
+  cell 15 1 c005
+  cell 16 1 c006
+  cell 17 1 c009
+  cell 12 2 c008
+  rect 13 2 2 1 c005
+  cell 15 2 c006
+  cell 16 2 c011
+  rect 17 2 1 2 c006
+  cell 18 2 c005
+  cell 19 2 c008
+  cell 10 3 c008
+  cell 11 3 c001
+  cell 12 3 c002
+  rect 13 3 2 1 c006
+  cell 18 3 c006
+  cell 19 3 c002
+  cell 20 3 c005
+  cell 21 3 c008
+  cell 8 4 c008
+  cell 9 4 c009
+  cell 10 4 c001
+  cell 14 4 c000
+  rect 15 4 2 1 c003
+  cell 17 4 c000
+  cell 21 4 c001
+  cell 22 4 c009
+  cell 23 4 c008
+  cell 7 5 c009
+  cell 8 5 c001
+  cell 11 5 c009
+  cell 12 5 c001
+  cell 13 5 c000
+  cell 14 5 c001
+  rect 15 5 2 1 c011
+  cell 17 5 c001
+  cell 18 5 c000
+  cell 20 5 c009
+  cell 23 5 c001
+  cell 24 5 c009
+  cell 5 6 c008
+  cell 6 6 c005
+  cell 7 6 c002
+  cell 9 6 c009
+  rect 10 6 1 2 c006
+  cell 11 6 c010
+  cell 12 6 c002
+  cell 19 6 c002
+  cell 20 6 c010
+  cell 21 6 c006
+  cell 22 6 c009
+  cell 24 6 c002
+  cell 26 6 c008
+  cell 3 7 c008
+  rect 4 7 2 1 c005
+  rect 9 7 1 2 c011
+  cell 22 7 c011
+  rect 24 7 2 1 c006
+  cell 27 7 c005
+  cell 28 7 c008
+  rect 7 8 2 1 c000
+  cell 10 8 c010
+  rect 11 8 1 2 c001
+  cell 12 8 c002
+  cell 19 8 c002
+  rect 20 8 1 2 c001
+  cell 21 8 c010
+  rect 23 8 2 1 c000
+  cell 5 9 c001
+  cell 6 9 c003
+  cell 7 9 c000
+  rect 8 9 2 1 c010
+  rect 12 9 3 1 c001
+  rect 15 9 2 1 c000
+  rect 17 9 2 1 c001
+  rect 19 9 1 2 c000
+  rect 22 9 2 1 c010
+  cell 24 9 c000
+  cell 25 9 c003
+  cell 26 9 c001
+  rect 5 10 1 3 c003
+  cell 6 10 c002
+  rect 7 10 2 1 c010
+  cell 11 10 c002
+  cell 12 10 c000
+  cell 13 10 c003
+  cell 18 10 c003
+  cell 20 10 c002
+  rect 23 10 2 1 c010
+  cell 25 10 c002
+  rect 26 10 1 3 c003
+  rect 6 11 1 2 c011
+  rect 8 11 2 1 c010
+  cell 10 11 c002
+  cell 11 11 c000
+  cell 20 11 c000
+  cell 21 11 c002
+  rect 22 11 2 1 c010
+  cell 3 12 c005
+  rect 8 12 1 2 c010
+  cell 9 12 c002
+  cell 10 12 c000
+  cell 13 12 c003
+  cell 18 12 c003
+  cell 21 12 c000
+  cell 22 12 c002
+  rect 23 12 1 2 c010
+  cell 3 13 c002
+  cell 5 13 c000
+  cell 9 13 c001
+  cell 12 13 c003
+  cell 13 13 c004
+  cell 14 13 c000
+  cell 17 13 c000
+  cell 18 13 c004
+  cell 19 13 c003
+  rect 22 13 1 2 c001
+  cell 26 13 c000
+  cell 28 13 c002
+  rect 3 14 1 4 c001
+  rect 5 14 1 4 c006
+  cell 6 14 c010
+  rect 9 14 1 4 c000
+  cell 13 14 c000
+  cell 18 14 c000
+  cell 23 14 c011
+  cell 25 14 c010
+  rect 26 14 1 4 c006
+  rect 4 15 1 2 c009
+  rect 7 15 1 2 c001
+  rect 8 15 1 2 c000
+  rect 15 15 2 2 c000
+  rect 22 15 2 2 c000
+  rect 24 15 1 2 c001
+  rect 27 15 1 2 c009
+  rect 28 15 1 3 c001
+  cell 6 17 c010
+  cell 13 17 c000
+  cell 18 17 c000
+  cell 22 17 c000
+  rect 23 17 1 2 c011
+  cell 25 17 c010
+  cell 3 18 c002
+  cell 5 18 c000
+  cell 9 18 c001
+  cell 12 18 c003
+  cell 13 18 c004
+  cell 14 18 c000
+  cell 17 18 c000
+  cell 18 18 c004
+  cell 19 18 c003
+  cell 22 18 c001
+  cell 26 18 c000
+  cell 28 18 c002
+  rect 5 19 1 3 c003
+  rect 8 19 1 4 c010
+  cell 9 19 c002
+  cell 10 19 c000
+  cell 13 19 c003
+  cell 18 19 c003
+  cell 21 19 c000
+  cell 22 19 c002
+  rect 23 19 1 4 c010
+  rect 26 19 1 3 c003
+  cell 6 20 c011
+  cell 9 20 c010
+  cell 10 20 c002
+  cell 11 20 c000
+  cell 20 20 c000
+  cell 21 20 c002
+  cell 22 20 c010
+  cell 6 21 c002
+  cell 7 21 c010
+  rect 11 21 1 3 c001
+  rect 12 21 1 2 c000
+  cell 13 21 c003
+  cell 18 21 c003
+  rect 19 21 1 2 c000
+  rect 20 21 1 3 c001
+  cell 21 21 c011
+  cell 24 21 c010
+  cell 25 21 c002
+  cell 6 22 c003
+  rect 7 22 1 2 c000
+  cell 9 22 c010
+  cell 13 22 c001
+  cell 14 22 c000
+  rect 15 22 2 1 c003
+  cell 17 22 c000
+  cell 18 22 c001
+  cell 22 22 c010
+  rect 24 22 1 2 c000
+  cell 25 22 c003
+  cell 8 23 c000
+  cell 12 23 c002
+  rect 14 23 5 1 c011
+  cell 19 23 c002
+  cell 23 23 c000
+  cell 3 24 c009
+  cell 4 24 c011
+  cell 9 24 c006
+  rect 13 24 1 2 c010
+  rect 15 24 2 1 c010
+  rect 18 24 1 2 c010
+  cell 22 24 c006
+  cell 27 24 c011
+  cell 28 24 c009
+  cell 4 25 c008
+  cell 5 25 c005
+  rect 7 25 2 2 c002
+  cell 12 25 c006
+  cell 14 25 c010
+  cell 17 25 c010
+  cell 19 25 c006
+  cell 21 25 c005
+  rect 23 25 2 2 c002
+  cell 27 25 c008
+  cell 6 26 c008
+  rect 9 26 1 2 c002
+  cell 10 26 c006
+  cell 13 26 c003
+  cell 14 26 c001
+  cell 17 26 c001
+  cell 18 26 c003
+  cell 19 26 c005
+  cell 21 26 c006
+  rect 22 26 1 2 c002
+  cell 25 26 c008
+  cell 8 27 c009
+  rect 10 27 2 1 c002
+  cell 14 27 c000
+  rect 15 27 2 1 c003
+  cell 17 27 c000
+  rect 20 27 2 1 c002
+  cell 23 27 c009
+  cell 9 28 c008
+  cell 11 28 c002
+  cell 20 28 c002
+  cell 22 28 c008
+  cell 11 29 c008
+  cell 12 29 c005
+  cell 20 29 c008
+  cell 13 30 c009
+  cell 14 30 c011
+  cell 15 30 c005
+  cell 17 30 c011
+  cell 18 30 c009
+  rect 15 31 2 1 c009
+}
+
+part slab_0 material source {
+  ring 16 16 14 1 c007
+  ring 16 16 15 1 c007
+  rect 17 0 15 1 c007
+  rect 20 1 12 1 c007
+  rect 23 2 9 1 c007
+  rect 25 3 7 1 c007
+  rect 26 4 6 1 c007
+  rect 27 5 5 1 c007
+  rect 28 6 4 1 c007
+  rect 29 7 3 1 c007
+  rect 30 8 2 2 c007
+  rect 31 10 1 3 c007
+  rect 31 20 1 12 c007
+  rect 30 23 1 9 c007
+  rect 29 25 1 7 c007
+  rect 28 26 1 6 c007
+  rect 27 27 1 5 c007
+  rect 26 28 1 4 c007
+  rect 25 29 1 3 c007
+  rect 23 30 2 2 c007
+  rect 20 31 3 1 c007
+}
+
+part mortar material source {
+  ring 16 16 16 1 c007
+  ring 16 16 17 1 c007
+  ring 16 16 18 1 c007
+  rect 0 0 7 1 c007
+  rect 0 1 6 1 c007
+  cell 13 1 c007
+  rect 0 2 4 1 c007
+  rect 10 2 2 1 c007
+  rect 0 3 3 1 c007
+  rect 8 3 2 1 c007
+  rect 0 4 2 2 c007
+  cell 7 4 c007
+  cell 6 5 c007
+  cell 0 6 c007
+  rect 1 13 1 7 c007
+  rect 0 26 1 6 c007
+  cell 5 26 c007
+  rect 1 27 1 5 c007
+  rect 6 27 2 1 c007
+  rect 7 28 2 1 c007
+  rect 2 29 1 3 c007
+  rect 8 29 3 1 c007
+  rect 3 30 1 2 c007
+  rect 10 30 3 1 c007
+  rect 4 31 2 1 c007
+  rect 13 31 2 1 c007
+}
+
+part slab_2 material source {
+  rect 15 11 2 4 c003
+  rect 14 14 1 4 c003
+  rect 17 14 1 4 c003
+  rect 11 15 3 2 c003
+  rect 18 15 3 2 c003
+  rect 15 17 2 4 c003
+}
+
+part slab_3 material source {
+  rect 2 8 1 16 c008
+}
+
+part slab_4 material source {
+  rect 29 8 1 16 c008
+}
+
+part slab_5 material source {
+  rect 4 19 1 5 c006
+  rect 3 20 1 4 c006
+  rect 5 23 2 2 c006
+  cell 7 24 c006
+  cell 6 25 c006
+}
+
+part slab_6 material source {
+  rect 27 19 1 5 c006
+  rect 28 20 1 4 c006
+  rect 25 23 2 2 c006
+  cell 24 24 c006
+  cell 25 25 c006
+}
+
+part slab_7 material source {
+  rect 12 27 1 2 c006
+  rect 19 27 1 2 c006
+  rect 13 28 2 2 c006
+  rect 17 28 2 2 c006
+  rect 15 29 2 1 c006
+  cell 16 30 c006
+}
+
+part slab_8 material source {
+  rect 13 6 6 2 c010
+  cell 12 7 c010
+  cell 19 7 c010
+}
+
+part slab_9 material source {
+  rect 6 7 2 1 c006
+  rect 3 8 4 1 c006
+  rect 3 9 2 3 c006
+  cell 4 12 c006
+}
+
+part slab_10 material source {
+  rect 26 8 3 1 c006
+  rect 27 9 2 3 c006
+  cell 27 12 c006
+}
+
+export json png aseprite

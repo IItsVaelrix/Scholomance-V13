@@ -427,4 +427,51 @@ export function registerBuiltInDrawers(): void {
       ctx.restore();
     }
   });
+
+  const characterRoleStyles: Record<string, { depth: number; fill: string; stroke: string; glow?: string }> = {
+    robe: { depth: 34, fill: 'rgba(48, 32, 82, 0.82)', stroke: 'rgba(216, 184, 76, 0.55)' },
+    boots: { depth: 36, fill: 'rgba(22, 16, 31, 0.9)', stroke: 'rgba(140, 108, 37, 0.45)' },
+    head: { depth: 38, fill: 'rgba(232, 201, 160, 0.78)', stroke: 'rgba(248, 232, 204, 0.72)' },
+    hair: { depth: 40, fill: 'rgba(74, 53, 133, 0.78)', stroke: 'rgba(140, 108, 255, 0.68)' },
+    leftEye: { depth: 42, fill: 'rgba(0, 229, 255, 0.88)', stroke: 'rgba(168, 244, 255, 0.9)', glow: 'rgba(0, 229, 255, 0.8)' },
+    rightEye: { depth: 42, fill: 'rgba(0, 229, 255, 0.88)', stroke: 'rgba(168, 244, 255, 0.9)', glow: 'rgba(0, 229, 255, 0.8)' },
+    mouth: { depth: 43, fill: 'rgba(58, 29, 42, 0.9)', stroke: 'rgba(248, 232, 204, 0.42)' },
+  };
+
+  Object.entries(characterRoleStyles).forEach(([role, style]) => {
+    roleDispatcher.registerRoleDrawer({
+      role,
+      depth: style.depth,
+      draw: (ctx, coords) => {
+        if (coords.length === 0) return;
+
+        ctx.save();
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.lineWidth = role.includes('Eye') || role === 'mouth' ? 1.2 : 2;
+        ctx.strokeStyle = style.stroke;
+        ctx.fillStyle = style.fill;
+        ctx.shadowBlur = style.glow ? 10 : 3;
+        ctx.shadowColor = style.glow || style.stroke;
+
+        if (coords.length >= 3) {
+          ctx.beginPath();
+          coords.forEach((coord, index) => {
+            if (index === 0) ctx.moveTo(coord.x, coord.y);
+            else ctx.lineTo(coord.x, coord.y);
+          });
+          if (role !== 'mouth') ctx.closePath();
+          if (role !== 'mouth') ctx.fill();
+          ctx.stroke();
+        }
+
+        coords.forEach((coord) => {
+          const size = role.includes('Eye') ? 2.6 : 1.8;
+          ctx.fillRect(coord.x - size / 2, coord.y - size / 2, size, size);
+        });
+
+        ctx.restore();
+      },
+    });
+  });
 }

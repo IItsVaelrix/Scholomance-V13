@@ -134,6 +134,14 @@ If yes: [exact question]
 - **Security**: `ARCH_CONTRACT_SECURITY.md`
 - **Claude / Codex**: `CLAUDE.md`, `CODEX.md`
 
+## SCDNA Gene Injection
+
+Use the SCDNA injector for memory, architecture, pixel, and risk genes during triage.
+
+CLI: python -m vaelrix_forcefield.scdna.inject --prompt "..." --agent cursor
+
+Genes provide injected directives. Wire or manually invoke for relevant sessions (e.g. when debugging Wand or propagation). The hook mechanism (scripts/scdna-gene-inject.sh) can be adapted for Cursor if it supports prompt hooks.
+
 ---
 
 *Persona: Nexus — Madhatter Data. Second debugger in Cursor; Gemini remains the keeper of backend, tests, and CI.*

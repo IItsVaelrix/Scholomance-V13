@@ -91,4 +91,60 @@ describe('[Server] panelAnalysis.service rhyme astrology', () => {
 
     service.close();
   });
+
+  it('skips optional astrology and oracle branches for editor panel analysis', async () => {
+    const queryEngine = {
+      query: vi.fn(async () => ({
+        query: { resolvedNodes: [], compiler: { activeWindowIds: [] } },
+        topMatches: [],
+        constellations: [],
+        diagnostics: { queryTimeMs: 0, cacheHit: false, candidateCount: 0 },
+      })),
+      close: vi.fn(),
+    };
+    const narrativeAMPService = {
+      analyzeVerse: vi.fn(async () => ({
+        version: 'test',
+        narrator: 'test',
+        mood: 'OBSERVANT',
+        summary: 'unused',
+        beats: [],
+        revisions: [],
+      })),
+      close: vi.fn(),
+    };
+
+    const service = await createPanelAnalysisService({
+      enableRhymeAstrology: true,
+      rhymeAstrologyQueryEngine: queryEngine,
+      narrativeAMPService,
+      gutenbergEmotionPriors: {
+        version: 1,
+        generatedAt: '2026-03-28T00:00:00.000Z',
+        emotions: {},
+      },
+      log: {
+        warn: vi.fn(),
+        error: vi.fn(),
+      },
+    });
+
+    const result = await service.analyzePanels([
+      'Flame remembers name',
+      'Same remembers flame',
+    ].join('\n'), {
+      analysisProfile: 'editor',
+      nluMode: 'generate',
+    });
+
+    expect(result.analysis).toBeTruthy();
+    expect(result.scoreData).toBeTruthy();
+    expect(result.rhymeAstrology).toBeNull();
+    expect(result.narrativeAMP).toBeNull();
+    expect(result.oracle).toBeNull();
+    expect(queryEngine.query).not.toHaveBeenCalled();
+    expect(narrativeAMPService.analyzeVerse).not.toHaveBeenCalled();
+
+    service.close();
+  });
 });

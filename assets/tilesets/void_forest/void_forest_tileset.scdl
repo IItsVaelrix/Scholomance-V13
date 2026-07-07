@@ -1,0 +1,234 @@
+asset void_forest_tileset canvas 512x512
+
+palette {
+  void_black      = #03040A
+  void_navy       = #070B1A
+  deep_indigo     = #10163A
+  pine_blue       = #17245C
+  void_violet     = #32227A
+  rim_violet      = #5146C8
+  cold_cyan       = #20D8FF
+  faint_cyan      = #0C7896
+  astral_blue     = #2B6CFF
+  shadow_purple   = #190B2E
+  snow_ash        = #BBC7E8
+  snow_shadow     = #566083
+  root_dark       = #090711
+  root_rim        = #282060
+  rune_glow       = #48F2FF
+}
+
+part void_ground_plain material voidsoil {
+  rect 0 0 32 32 void_navy
+  cell 4 4 void_black
+  cell 15 20 void_black
+  cell 28 8 void_black
+}
+
+part void_ground_noise_a material voidsoil {
+  rect 32 0 32 32 void_navy
+  cell 34 3 void_black
+  cell 42 12 void_black
+  cell 52 5 void_black
+  cell 50 25 void_black
+  cell 62 30 void_black
+}
+
+part void_ground_cracked material voidsoil {
+  rect 64 0 32 32 void_navy
+  line 69 5 79 15 void_black
+  line 79 15 89 10 void_black
+}
+
+part void_ground_cyan_fleck material voidsoil {
+  rect 96 0 32 32 void_navy
+  cell 108 14 faint_cyan
+  cell 109 14 cold_cyan
+  cell 118 28 faint_cyan
+}
+
+part void_ground_violet_fleck material voidsoil {
+  rect 128 0 32 32 void_navy
+  cell 136 8 void_violet
+  cell 144 16 void_violet
+  cell 152 24 void_violet
+}
+
+part void_ground_to_abyss_n material voidsoil {
+  rect 0 32 32 16 void_black
+  rect 0 48 32 16 void_navy
+  line 0 48 32 48 deep_indigo
+}
+
+part void_ground_to_abyss_s material voidsoil {
+  rect 32 32 32 16 void_navy
+  rect 32 48 32 16 void_black
+  line 32 47 64 47 deep_indigo
+}
+
+part root_path_center material voidbark {
+  rect 0 96 32 32 void_navy
+  rect 8 96 16 32 root_dark
+  line 8 96 8 128 root_rim
+  line 23 96 23 128 root_rim
+  cell 12 108 void_violet
+}
+
+part root_path_horizontal material voidbark {
+  rect 32 96 32 32 void_navy
+  rect 32 104 32 16 root_dark
+  line 32 104 64 104 root_rim
+  line 32 119 64 119 root_rim
+}
+
+part void_cliff_face material voidbark {
+  rect 0 128 32 32 root_dark
+  line 4 128 4 160 void_black
+  line 16 128 16 160 void_black
+  line 28 128 28 160 void_black
+}
+
+part void_cliff_top material voidsoil {
+  rect 32 128 32 32 void_navy
+  line 32 159 64 159 deep_indigo
+}
+
+part void_pine_sapling_1x1 material voidpine {
+  rect 14 176 4 16 root_dark
+  line 15 176 15 192 root_rim
+  polygon 16 162 24 178 8 178 void_navy
+  line 10 177 22 177 rim_violet
+  cell 16 164 rim_violet
+}
+
+part void_pine_medium_trunk material voidpine {
+  rect 76 160 8 32 root_dark
+  line 77 160 77 192 void_black
+  line 82 160 82 192 root_rim
+  cell 79 175 void_violet
+}
+
+part void_pine_medium_mid material voidpine {
+  rect 76 192 8 32 root_dark
+  line 77 192 77 224 void_black
+  line 82 192 82 224 root_rim
+  polygon 80 192 94 208 80 212 void_navy
+  polygon 80 200 68 216 80 220 void_navy
+  line 82 207 92 207 rim_violet
+  line 70 215 80 215 rim_violet
+}
+
+part void_pine_medium_top material voidpine {
+  rect 78 240 4 16 root_dark
+  polygon 80 226 90 248 70 248 void_navy
+  line 72 247 88 247 rim_violet
+  cell 80 228 faint_cyan
+}
+
+part exposed_roots material voidbark {
+  rect 0 256 32 32 void_navy
+  line 4 284 28 260 root_dark
+  line 5 284 29 260 root_rim
+  line 12 276 20 284 root_dark
+  line 13 276 21 284 root_rim
+}
+
+part rune_stone material rune_glow {
+  rect 0 288 32 32 void_navy
+  rect 10 298 12 16 root_dark
+  line 10 298 22 298 root_rim
+  cell 16 304 cold_cyan
+  cell 16 306 cold_cyan
+  line 14 308 18 308 rune_glow
+}
+
+part cyan_flame_wisp material rune_glow {
+  rect 32 288 32 32 void_navy
+  circle 48 304 radius 4 cold_cyan
+  circle 48 304 radius 2 faint_cyan
+}
+
+part cyan_rune_pulse_f0 material rune_glow {
+  rect 0 320 32 32 void_navy
+  rect 10 330 12 12 void_black
+  cell 16 336 cold_cyan
+}
+
+part cyan_rune_pulse_f1 material rune_glow {
+  rect 32 320 32 32 void_navy
+  rect 74 330 12 12 void_black
+  circle 80 336 radius 2 cold_cyan
+  cell 80 336 rune_glow
+}
+
+part cyan_rune_pulse_f2 material rune_glow {
+  rect 64 320 32 32 void_navy
+  rect 138 330 12 12 void_black
+  circle 144 336 radius 4 cold_cyan
+  cell 144 336 rune_glow
+}
+
+part cyan_rune_pulse_f3 material rune_glow {
+  rect 96 320 32 32 void_navy
+  rect 202 330 12 12 void_black
+  circle 208 336 radius 2 cold_cyan
+  cell 208 336 rune_glow
+}
+
+part walkable_marker_hidden material voidsoil {
+  rect 0 352 32 32 void_navy
+  polygon 16 356 28 368 16 380 4 368 deep_indigo
+}
+
+part blocked_terrain_indicator material abyss {
+  rect 32 352 32 32 void_navy
+  polygon 48 356 60 368 48 380 36 368 shadow_purple
+  line 40 360 56 376 void_violet
+  line 56 360 40 376 void_violet
+}
+
+part void_fern_small material voidpine {
+  rect 0 384 32 32 void_navy
+  line 16 416 16 392 void_violet
+  line 16 412 8 404 pine_blue
+  line 16 408 24 400 pine_blue
+  line 16 400 12 396 pine_blue
+  line 16 396 20 392 pine_blue
+  cell 8 404 rim_violet
+  cell 24 400 rim_violet
+}
+
+part void_fern_large material voidpine {
+  rect 32 384 32 32 void_navy
+  line 48 416 48 384 void_violet
+  polygon 48 410 38 400 48 396 pine_blue
+  polygon 48 406 58 396 48 392 pine_blue
+  polygon 48 398 40 388 48 386 pine_blue
+  polygon 48 394 56 384 48 384 pine_blue
+  cell 38 400 rim_violet
+  cell 58 396 rim_violet
+  cell 40 388 rim_violet
+  cell 56 384 rim_violet
+}
+
+part void_blossom material rune_glow {
+  rect 64 384 32 32 void_navy
+  line 80 416 80 406 root_rim
+  circle 80 400 radius 6 void_violet
+  circle 80 400 radius 3 rim_violet
+  cell 80 400 cold_cyan
+  cell 76 400 rune_glow
+  cell 84 400 rune_glow
+  cell 80 396 rune_glow
+  cell 80 404 rune_glow
+}
+
+part void_grass_tuft material voidpine {
+  rect 96 384 32 32 void_navy
+  line 112 416 112 404 pine_blue
+  line 112 416 106 408 pine_blue
+  line 112 416 118 408 pine_blue
+  cell 112 404 rim_violet
+}
+
+export json png svg

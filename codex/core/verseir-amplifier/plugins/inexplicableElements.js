@@ -1,6 +1,6 @@
 import { createTierAmplifier } from '../shared.js';
 
-const INEXPLICABLE_ELEMENT_DOMAINS = Object.freeze([
+export const INEXPLICABLE_ELEMENT_DOMAINS = Object.freeze([
   Object.freeze({
     id: 'cosmic',
     label: 'Cosmic',

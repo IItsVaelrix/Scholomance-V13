@@ -121,31 +121,35 @@ export function fuseMotionOutput(
   
   if (activeConfig.enableVectorQuantization) {
     try {
-      const dim = activeConfig.vectorDimension ?? 256;
-      const vector = vectorizeMotion(output, dim);
-      const quantized = quantizeVectorJS(vector);
+      if ((workingState as any).quantizedSignature) {
+        output.quantizedSignature = (workingState as any).quantizedSignature;
+      } else {
+        const dim = activeConfig.vectorDimension ?? 256;
+        const vector = vectorizeMotion(output, dim);
+        const quantized = quantizeVectorJS(vector);
 
-      // Firefox compatibility: quantized.data is expected to be Uint8Array-like.
-      // If something else slips through (e.g. ArrayBuffer/Buffer/string), fall back.
-      const bytes = quantized?.data;
-      if (!bytes || typeof bytes.length !== 'number') {
-        throw new Error(`quantized.data is not a byte array (type=${typeof bytes})`);
+        // Firefox compatibility: quantized.data is expected to be Uint8Array-like.
+        // If something else slips through (e.g. ArrayBuffer/Buffer/string), fall back.
+        const bytes = quantized?.data;
+        if (!bytes || typeof bytes.length !== 'number') {
+          throw new Error(`quantized.data is not a byte array (type=${typeof bytes})`);
+        }
+
+        const hexData = Array.from(bytes)
+          .map((b: number) => b.toString(16).padStart(2, '0'))
+          .join('');
+
+        const backend = activeConfig.vectorBackend === 'wasm' ? 'wasm' : 'js';
+
+        output.quantizedSignature = {
+          data: hexData,
+          norm: quantized.norm,
+          dimension: dim,
+          sampleCount: Math.floor(dim / 4),
+          channels: ['translateX', 'translateY', 'scale', 'opacity'] as const,
+          backend,
+        };
       }
-
-      const hexData = Array.from(bytes)
-        .map((b: number) => b.toString(16).padStart(2, '0'))
-        .join('');
-
-      const backend = activeConfig.vectorBackend === 'wasm' ? 'wasm' : 'js';
-
-      output.quantizedSignature = {
-        data: hexData,
-        norm: quantized.norm,
-        dimension: dim,
-        sampleCount: Math.floor(dim / 4),
-        channels: ['translateX', 'translateY', 'scale', 'opacity'] as const,
-        backend,
-      };
     } catch (err: any) {
       const msg = err instanceof Error ? err.message : String(err);
       output.diagnostics.push(`Vector quantization failed (fallback): ${msg}`);

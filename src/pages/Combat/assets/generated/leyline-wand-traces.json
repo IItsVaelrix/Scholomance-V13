@@ -1,0 +1,178 @@
+{
+  "schema": "wand.formula.v1",
+  "id": "leyline-fissure-traces.v1",
+  "description": "Construction lines for badlands fissure leylines. Primary faults use edge_trace for clean geometry before erosion/rim/ground passes.",
+  "traces": {
+    "main": {
+      "coordinateFormula": {
+        "type": "edge_trace",
+        "tracePath": [
+          {
+            "x": 4,
+            "y": 15.2
+          },
+          {
+            "x": 11,
+            "y": 14.8
+          },
+          {
+            "x": 19,
+            "y": 15.6
+          },
+          {
+            "x": 27,
+            "y": 14.9
+          },
+          {
+            "x": 35,
+            "y": 16.5
+          },
+          {
+            "x": 43,
+            "y": 15.3
+          },
+          {
+            "x": 51,
+            "y": 16.9
+          },
+          {
+            "x": 58,
+            "y": 15.7
+          }
+        ]
+      }
+    },
+    "companion": {
+      "coordinateFormula": {
+        "type": "edge_trace",
+        "tracePath": [
+          {
+            "x": 6,
+            "y": 18.8
+          },
+          {
+            "x": 14,
+            "y": 19.4
+          },
+          {
+            "x": 23,
+            "y": 18.9
+          },
+          {
+            "x": 32,
+            "y": 19.6
+          },
+          {
+            "x": 40,
+            "y": 18.5
+          },
+          {
+            "x": 49,
+            "y": 19.1
+          },
+          {
+            "x": 57,
+            "y": 18.7
+          }
+        ]
+      }
+    },
+    "upperSplay": {
+      "coordinateFormula": {
+        "type": "edge_trace",
+        "tracePath": [
+          {
+            "x": 10,
+            "y": 11
+          },
+          {
+            "x": 18,
+            "y": 11.5
+          },
+          {
+            "x": 27,
+            "y": 10.2
+          },
+          {
+            "x": 35,
+            "y": 11.8
+          },
+          {
+            "x": 44,
+            "y": 10.5
+          },
+          {
+            "x": 53,
+            "y": 11.2
+          }
+        ]
+      }
+    },
+    "lowerSplay": {
+      "coordinateFormula": {
+        "type": "edge_trace",
+        "tracePath": [
+          {
+            "x": 12,
+            "y": 22
+          },
+          {
+            "x": 21,
+            "y": 21.5
+          },
+          {
+            "x": 30,
+            "y": 22.8
+          },
+          {
+            "x": 39,
+            "y": 21.3
+          },
+          {
+            "x": 48,
+            "y": 22.2
+          }
+        ]
+      }
+    },
+    "crossShear": {
+      "coordinateFormula": {
+        "type": "edge_trace",
+        "tracePath": [
+          {
+            "x": 16,
+            "y": 8
+          },
+          {
+            "x": 22,
+            "y": 8.8
+          },
+          {
+            "x": 29,
+            "y": 7.5
+          }
+        ]
+      }
+    },
+    "extraCross": {
+      "coordinateFormula": {
+        "type": "edge_trace",
+        "tracePath": [
+          {
+            "x": 35,
+            "y": 9.5
+          },
+          {
+            "x": 42,
+            "y": 10.2
+          },
+          {
+            "x": 48,
+            "y": 8.8
+          }
+        ]
+      }
+    }
+  },
+  "usage": "Feed each trace into evaluateFormula + raster + erosion/rim/ground passes. Tint result via material fill for any affinity."
+}

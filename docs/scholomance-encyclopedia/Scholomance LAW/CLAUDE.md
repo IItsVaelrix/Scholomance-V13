@@ -184,6 +184,15 @@ REGRESSION RETEST: [specific visual baseline files affected]
 
 ---
 
+## SCDNA Gene Injection
+
+Use the SCDNA gene system for proactive context.
+
+- Invoke via `python -m vaelrix_forcefield.scdna.inject --prompt "<task>" --agent claude`
+- Genes (from steamdeck_brain/vaelrix_forcefield/scdna/) are injected as additional directives for matching intents (e.g. pixel, wand, ui, tactical).
+- In Claude Code hook environments, the scripts/scdna-gene-inject.sh handles automatic injection on UserPromptSubmit.
+- Always respect active genes in your specs, especially for procedural art, themes, and surface consistency (e.g. the WAND_CHEMICAL_STROKE_PROPAGATION gene pushes formula-based chemical propagation over manual stroking).
+
 ## Agent Coordination
 
 | Agent | Domain | Writes To |

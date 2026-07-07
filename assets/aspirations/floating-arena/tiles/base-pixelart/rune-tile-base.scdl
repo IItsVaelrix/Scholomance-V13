@@ -1,0 +1,64 @@
+# rune-tile-base.scdl
+# Base pixel art master for a single floor rune tile.
+# Drawn as clean low-res pixel art (lattice first).
+# Canvas 64x64 for square tile feel in the perspective view.
+# This is the "initial asset" before AI enhancement.
+
+asset rune_tile_base canvas 64x64
+
+palette {
+  deep_ice   = #1a253f
+  base_ice   = #2a3a5a
+  lit_ice    = #4a6a9a
+  glow_blue  = #3db8ff
+  rune_core  = #a0d8ff
+  frost      = #c8e0f0
+  dark_line  = #0f1a30
+}
+
+# Ice slab base (flat tile with subtle facets)
+part slab material ice {
+  rect 2 2 60 60 base_ice
+  # subtle facet shading for 3D pop even at pixel level
+  polygon 2 2 30 2 30 30 2 30 lit_ice
+  polygon 32 2 62 2 62 30 32 30 lit_ice
+  polygon 2 32 30 32 30 62 2 62 deep_ice
+  polygon 32 32 62 32 62 62 32 62 deep_ice
+  # thin frost edges
+  line 2 2 62 2 frost
+  line 2 2 2 62 frost
+  # dark grid lines / cracks for tile separation
+  line 0 0 64 0 dark_line
+  line 0 0 0 64 dark_line
+  line 64 0 64 64 dark_line
+  line 0 64 64 64 dark_line
+}
+
+# Central glowing rune symbol (stylized, readable at small size)
+# This should be varied per unique rune in the source image.
+part rune material glow {
+  glow radius 2
+  # Main rune design - abstract cross + orbit (inspired by the ref's glowing symbols)
+  line 20 20 44 20 rune_core
+  line 20 44 44 44 rune_core
+  line 20 20 20 44 rune_core
+  line 44 20 44 44 rune_core
+  # center diamond
+  polygon 28 28 36 28 36 36 28 36 glow_blue
+  cell 32 32 rune_core
+  # corner accents
+  cell 18 18 glow_blue
+  cell 46 18 glow_blue
+  cell 18 46 glow_blue
+  cell 46 46 glow_blue
+  # small "energy" dots
+  cell 24 32 frost
+  cell 40 32 frost
+  cell 32 24 frost
+  cell 32 40 frost
+}
+
+export png json
+
+# After compile, the -png.png is your clean pixelart base.
+# Then AI enhance that base PNG with upscaling + shaders.

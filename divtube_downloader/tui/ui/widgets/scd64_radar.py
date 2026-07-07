@@ -1,11 +1,17 @@
 from textual.widgets import Static
 from rich.text import Text
 from rich.panel import Panel
+from tui.ui.sigils import title
+
+# Shown before any qbit state arrives (cold boot) or whenever the field is idle,
+# so the panel reads as "waiting", not blank/broken. Centred by #radar CSS.
+_DORMANT = "[#6A5A6A]◦ field dormant[/]\n[#6A5A6A]no qbits in flight[/]"
+
 
 class SCD64Radar(Static):
     def __init__(self, **kwargs):
-        super().__init__("", **kwargs)
-        self.border_title = "✦ QBIT FIELD RADAR ✦"
+        super().__init__(_DORMANT, **kwargs)
+        self.border_title = title("QBIT FIELD RADAR")
         self.agents = []
         self.seeds = []
 
@@ -16,6 +22,10 @@ class SCD64Radar(Static):
         self._refresh_radar()
 
     def _refresh_radar(self):
+        if not self.agents and not self.seeds:
+            self.update(_DORMANT)
+            return
+
         lines = []
         grid_size = 16
         

@@ -1,0 +1,38 @@
+{
+  "mcpServers": {
+    "divtube-grok-collab": {
+      "command": "node",
+      "args": ["--env-file=.env", "divtube_downloader/grok/mcp-bridge-entry.mjs"],
+      "cwd": "/home/deck/Downloads/Scholomance-V12-main",
+      "registration": {
+        "tool": "mcp_scholomance_collab_agent_register",
+        "payload": {
+          "id": "grok",
+          "name": "Grok DivTube",
+          "role": "backend",
+          "framework_origin": "xai-grok",
+          "capabilities": [
+            "divtube",
+            "youtube-intel",
+            "seo-analysis",
+            "xai-reasoning",
+            "memory",
+            "mcp"
+          ],
+          "metadata": {
+            "display_role": "grok",
+            "grok_role": "divtube_downloader_agent",
+            "framework_origin": "xai-grok",
+            "scratch_root": "grok/divtube",
+            "memory_agent_id": "grok"
+          }
+        }
+      },
+      "memory": {
+        "agent_id": "grok",
+        "get_tool": "memory_get",
+        "set_tool": "memory_set"
+      }
+    }
+  }
+}

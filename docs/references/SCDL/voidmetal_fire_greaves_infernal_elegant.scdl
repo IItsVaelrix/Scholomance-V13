@@ -1,0 +1,206 @@
+asset voidmetal_fire_greaves_infernal_elegant canvas 80x112
+
+palette {
+  void0      = #04050A
+  void1      = #090B12
+  chain      = #070910
+  seam       = #10131D
+  steel0     = #151821
+  steel1     = #222733
+  steel2     = #343A47
+  steel3     = #515864
+  edge       = #858C96
+  coldhi     = #C5CAD1
+  leather    = #21100E
+  strap      = #120B10
+  rivet      = #A89570
+  oxblood    = #4B0811
+  ember0     = #C91F06
+  ember1     = #FF4C00
+  ember2     = #FF9426
+  core       = #FFD16A
+  whitecore  = #FFF0B8
+  purple0    = #1B102A
+  purple1    = #56306F
+  purple2    = #A96ED0
+}
+
+# Slender backing form: firm mass, but no infantry-tank block.
+part rear_elegant_silhouette material black_steel {
+  symmetry x
+  polygon 22 12 33 10 37 27 36 48 33 72 31 99 25 111 18 108 16 91 18 63 18 34 steel0
+  polygon 25 27 35 25 35 51 32 73 26 76 21 59 steel1
+  polygon 22 74 32 72 31 99 25 109 20 105 19 91 steel1
+}
+
+# Central negative space stays visible so the legs breathe like wearable armor.
+part inner_void_gap material blacksteel {
+  polygon 35 8 45 8 44 27 41 42 39 42 36 27 chain
+  polygon 33 28 40 25 40 82 36 95 32 66 chain
+  polygon 40 25 47 28 48 66 44 95 40 82 chain
+  rect 37 61 6 46 void0
+}
+
+part cathedral_waist_belt material leather_brown {
+  rect 28 5 24 4 leather
+  rect 34 2 12 4 strap
+  rect 37 3 6 6 steel2
+  rect 38 4 4 3 void1
+  line 29 5 51 5 edge
+  cell 31 7 rivet
+  cell 36 7 rivet
+  cell 43 7 rivet
+  cell 48 7 rivet
+}
+
+# Pointed central plate replaces the militaristic codpiece block.
+part gothic_codpiece material voidsteel {
+  polygon 34 9 46 9 45 22 41 36 40 40 39 36 35 22 steel1
+  polygon 36 11 44 11 43 21 40 31 37 21 steel2
+  polygon 38 14 42 14 41 25 40 30 39 25 steel3
+  line 40 9 40 38 edge
+  line 36 12 39 31 steel3
+  line 44 12 41 31 steel3
+  cell 39 12 coldhi
+}
+
+# Hip plates hang as faulds: ceremonial, blade-like, not bulky shelves.
+part infernal_faulds material voidsteel {
+  symmetry x
+  polygon 20 12 33 9 37 18 34 26 23 27 17 20 steel2
+  polygon 21 24 35 22 33 34 24 41 18 34 steel1
+  polygon 24 35 34 32 32 44 25 51 20 44 steel0
+  line 20 12 33 9 edge
+  line 23 27 34 26 steel3
+  line 24 41 33 34 steel3
+}
+
+part amethyst_noble_sheen material amethyst {
+  symmetry x
+  polygon 24 13 32 12 35 18 31 25 23 23 20 18 purple0
+  polygon 26 15 32 17 29 22 23 20 purple1
+  line 26 15 32 17 purple2
+  line 23 23 29 25 purple2
+}
+
+# Dominant thigh plate: long taper and diagonal sweep instead of repeated bands.
+part sculpted_thigh_plate material voidsteel {
+  symmetry x
+  polygon 21 30 35 26 37 40 34 57 25 62 18 49 18 38 steel1
+  polygon 24 33 35 30 35 42 26 50 20 45 steel2
+  polygon 23 50 34 44 33 57 26 60 steel0
+  line 24 33 35 30 edge
+  line 26 50 35 42 steel3
+  line 23 50 34 44 seam
+}
+
+part inner_thigh_shadow_plate material black_steel {
+  symmetry x
+  polygon 31 29 38 32 37 57 33 68 29 55 steel0
+  polygon 32 33 37 35 36 47 31 44 steel2
+  line 32 33 37 35 edge
+  line 31 48 36 47 steel3
+}
+
+# The knee is the jewel: gothic fang shape, still protective but not tactical.
+part gothic_knee_fang material voidsteel {
+  symmetry x
+  polygon 21 60 35 55 39 65 35 75 27 80 18 73 16 65 steel1
+  polygon 24 61 35 58 36 65 32 72 26 75 20 70 steel2
+  polygon 28 64 35 61 35 67 31 73 27 74 24 69 steel3
+  line 21 60 35 55 edge
+  line 24 61 35 58 coldhi
+  line 18 73 35 75 seam
+}
+
+# Long shin plate gives firmness through vertical flow, not stacked bulk.
+part long_cathedral_shin material voidsteel {
+  symmetry x
+  polygon 22 75 34 72 36 89 32 104 26 111 19 104 18 89 steel1
+  polygon 25 78 34 75 34 88 29 99 23 94 21 88 steel2
+  polygon 23 96 33 91 31 105 26 110 21 104 steel0
+  line 25 78 34 75 edge
+  line 23 94 34 88 steel3
+  line 23 96 33 91 seam
+}
+
+part ankle_relic_sabaton material black_steel {
+  symmetry x
+  polygon 19 102 31 100 38 106 34 111 17 111 12 108 steel0
+  polygon 21 101 31 101 35 105 24 107 15 107 steel2
+  polygon 28 101 36 106 32 109 25 108 steel1
+  line 21 101 31 101 edge
+  line 15 108 34 108 steel3
+  cell 30 103 coldhi
+}
+
+# Selective beveling: enough depth, not a riveted military chassis.
+part selective_plate_highlights material silver {
+  symmetry x
+  line 31 10 35 19 edge
+  line 24 13 23 25 steel3
+  line 24 33 35 30 steel3
+  line 26 50 35 42 steel3
+  line 24 61 35 58 edge
+  line 25 78 34 75 steel3
+  line 29 98 31 107 coldhi
+}
+
+part sparse_ceremonial_rivets material bronze {
+  symmetry x
+  cell 25 13 rivet
+  cell 32 12 rivet
+  cell 21 26 rivet
+  cell 32 35 rivet
+  cell 24 57 rivet
+  cell 31 63 rivet
+  cell 24 80 rivet
+  cell 31 101 rivet
+}
+
+# Restrained molten scars. Hand-placed, not mirrored, so the fire feels alive.
+part ember_undercracks material shadow_fire {
+  line 23 38 20 45 oxblood
+  line 20 45 22 51 oxblood
+  line 20 45 27 47 oxblood
+  line 56 37 60 45 oxblood
+  line 60 45 64 42 oxblood
+  line 60 45 59 52 oxblood
+  line 24 80 20 89 oxblood
+  line 20 89 23 97 oxblood
+  line 20 89 17 94 oxblood
+  line 54 76 61 86 oxblood
+  line 61 86 59 96 oxblood
+  line 61 86 65 92 oxblood
+  glow radius 2
+}
+
+part ember_cracks material divine_flame_core {
+  line 23 38 20 45 ember1
+  line 20 45 22 50 ember2
+  line 20 45 27 47 ember0
+  line 56 37 60 45 ember1
+  line 60 45 64 42 ember2
+  line 60 45 59 51 ember0
+  line 24 80 20 89 ember1
+  line 20 89 23 96 ember2
+  line 20 89 17 93 ember0
+  line 54 76 61 86 ember1
+  line 61 86 59 95 ember2
+  line 61 86 65 91 ember0
+  cell 20 45 core
+  cell 60 45 core
+  cell 20 89 whitecore
+  cell 61 86 whitecore
+  glow radius 3
+}
+
+part infernal_pin_hits material divine_flame_core {
+  polygon 19 44 21 45 20 48 18 47 core
+  polygon 59 44 62 45 61 48 58 47 core
+  polygon 19 88 21 89 20 92 17 92 ember2
+  polygon 60 85 62 86 61 89 58 88 ember2
+  glow radius 2
+}
+
+export json png aseprite

@@ -1,0 +1,96 @@
+asset barrel canvas 64x48
+
+palette {
+  wood_darkest = #3a200d
+  wood_dark    = #5e3313
+  wood_mid     = #985521
+  wood_light   = #ce843e
+  wood_highlight = #e8b36a
+  
+  hoop_shadow  = #141419
+  hoop_base    = #696a6a
+  hoop_hi      = #9f9ea1
+  hoop_glint   = #d0d0d8
+}
+
+# Improved barrel with richer staves, better shading, and stronger bulge
+
+part body material bark {
+  # 7 staves with varying width and stronger cylindrical shading + bulge
+
+  # 1. Far left (deep shadow)
+  polygon 18 8  23 8  21 23  23 39  19 39  17 23  wood_darkest
+
+  # 2. Left shadow
+  polygon 23 8  28 8  27 23  28 39  23 39  21 23  wood_dark
+
+  # 3. Left-mid
+  polygon 28 8  33 8  32 23  33 39  28 39  27 23  wood_mid
+
+  # 4. Center (brightest, slight highlight)
+  polygon 33 8  39 8  38 23  39 39  33 39  32 23  wood_light
+
+  # 5. Right-mid
+  polygon 39 8  44 8  44 23  44 39  39 39  38 23  wood_mid
+
+  # 6. Right shadow
+  polygon 44 8  49 8  49 23  49 39  44 39  44 23  wood_dark
+
+  # 7. Far right (deep shadow)
+  polygon 49 8  53 8  52 23  52 39  49 39  49 23  wood_darkest
+
+  # Extra subtle vertical highlight on center staves (left side of center)
+  line 35 9 35 37 wood_highlight
+  line 36 9 36 37 wood_highlight
+}
+
+part hoops material darksteel {
+  # Top hoop - rich metallic look
+  # Shadow base
+  line 17 16 53 16 hoop_shadow
+  line 17 15 53 15 hoop_shadow
+  
+  # Main body
+  line 17 14 53 14 hoop_base
+  line 17 13 53 13 hoop_base
+  line 17 12 53 12 hoop_base
+  
+  # Strong highlight
+  line 17 11 53 11 hoop_hi
+  line 17 10 53 10 hoop_hi
+  
+  # Glint on left side
+  line 21 10 30 10 hoop_glint
+
+  # Bottom hoop
+  # Shadow base
+  line 17 35 53 35 hoop_shadow
+  line 17 34 53 34 hoop_shadow
+  
+  # Main body
+  line 17 33 53 33 hoop_base
+  line 17 32 53 32 hoop_base
+  line 17 31 53 31 hoop_base
+  
+  # Strong highlight
+  line 17 30 53 30 hoop_hi
+  line 17 29 53 29 hoop_hi
+  
+  # Glint on left side
+  line 21 29 30 29 hoop_glint
+}
+
+# Barrel lid and base rings for better 3D definition
+part lid material bark {
+  # Top lid rim
+  line 20 7 50 7 wood_darkest
+  line 21 6 49 6 wood_dark
+}
+
+part base material bark {
+  # Bottom base rim
+  line 20 41 50 41 wood_darkest
+  line 21 42 49 42 wood_dark
+}
+
+export png aseprite

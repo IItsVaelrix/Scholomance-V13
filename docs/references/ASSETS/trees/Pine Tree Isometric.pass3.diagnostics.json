@@ -1,0 +1,85 @@
+{
+  "pass": 3,
+  "width": 80,
+  "height": 120,
+  "tiers": [
+    {
+      "top": 8,
+      "bottom": 26
+    },
+    {
+      "top": 27,
+      "bottom": 47
+    },
+    {
+      "top": 48,
+      "bottom": 64
+    },
+    {
+      "top": 65,
+      "bottom": 84
+    }
+  ],
+  "frames": [
+    {
+      "index": 0,
+      "name": "Base Pine",
+      "cellsBefore": 3503,
+      "cellsAfter": 3503,
+      "shadow": 1771,
+      "mid": 259,
+      "highlight": 892,
+      "rim": 161,
+      "smooth": 729,
+      "trunk": 315,
+      "star": 6,
+      "snow": 3,
+      "symmetry": 743
+    },
+    {
+      "index": 1,
+      "name": "Snow Cap",
+      "cellsBefore": 3512,
+      "cellsAfter": 3512,
+      "shadow": 1698,
+      "mid": 198,
+      "highlight": 783,
+      "rim": 155,
+      "smooth": 954,
+      "trunk": 315,
+      "star": 0,
+      "snow": 2,
+      "symmetry": 718
+    },
+    {
+      "index": 2,
+      "name": "Ember Autumn",
+      "cellsBefore": 3494,
+      "cellsAfter": 3494,
+      "shadow": 1771,
+      "mid": 261,
+      "highlight": 890,
+      "rim": 161,
+      "smooth": 731,
+      "trunk": 315,
+      "star": 0,
+      "snow": 0,
+      "symmetry": 743
+    },
+    {
+      "index": 3,
+      "name": "Void Corrupted",
+      "cellsBefore": 3494,
+      "cellsAfter": 3494,
+      "shadow": 1742,
+      "mid": 257,
+      "highlight": 875,
+      "rim": 139,
+      "smooth": 858,
+      "trunk": 315,
+      "star": 0,
+      "snow": 0,
+      "symmetry": 730
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "contract": "ITEM-SPEC-v1",
+  "id": "loot.chest.base.v1",
+  "class": "prop",
+  "archetype": "loot_chest",
+  "canvas": { "width": 40, "height": 28, "gridSize": 1 },
+  "seed": 404,
+  "bytecode": "VW-LOOT-CHEST-SEMANTIC-SOURCE",
+  "bands": 6,
+  "parts": [
+    {
+      "id": "glow",
+      "profile": "loot.chest.glow",
+      "params": { "cx": 20, "cy": 10, "rx": 13, "ry": 9 },
+      "fill": { "material": "source", "anchor": "spectral" }
+    },
+    {
+      "id": "body",
+      "profile": "loot.chest.body",
+      "params": { "cx": 20, "half": 11, "top": 14, "bottom": 23 },
+      "attach": { "parent": "glow", "at": "center" },
+      "fill": { "material": "source", "anchor": "body" },
+      "outline": { "material": "source", "anchor": "deep" }
+    },
+    {
+      "id": "lid",
+      "profile": "loot.chest.lid",
+      "params": { "cx": 20, "half": 12, "top": 5, "hinge": 13 },
+      "attach": { "parent": "body", "at": "top" },
+      "fill": { "material": "source", "anchor": "frost" },
+      "outline": { "material": "source", "anchor": "shadow" }
+    },
+    {
+      "id": "band",
+      "profile": "loot.chest.band",
+      "params": { "cx": 20, "half": 10, "y0": 15, "y1": 16 },
+      "attach": { "parent": "body", "at": "center" },
+      "fill": { "material": "source", "anchor": "deep" }
+    },
+    {
+      "id": "lock",
+      "profile": "loot.chest.lock",
+      "params": { "cx": 20, "cy": 12, "half": 2 },
+      "attach": { "parent": "lid", "at": "center" },
+      "fill": { "material": "source", "anchor": "whiteCore" },
+      "outline": { "material": "silver", "anchor": "spectral" }
+    }
+  ]
+}

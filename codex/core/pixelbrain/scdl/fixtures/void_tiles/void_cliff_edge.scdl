@@ -1,0 +1,142 @@
+# void_cliff_edge — island rim tile: floor diamond + sheared ice cliff
+# falling away into the void. 128x112: rows 0-63 = standard floor diamond,
+# rows 64-111 = cliff faces with a ragged floating-island underside.
+# Light law: upper-left (-1,-1). SW face half-lit, SE face in shadow.
+asset void_cliff_edge canvas 128x112
+
+palette {
+  abyss    = #04060e
+  deep     = #0e1526
+  dark     = #182238
+  base     = #22304f
+  mid      = #2d4066
+  lit      = #3d5480
+  bright   = #52709f
+  sheen    = #7291bd
+  frost    = #a8c3e2
+  spec     = #e3eef9
+  cyanhot  = #67e8f9
+  cyansoft = #b7f4fd
+  voidviol = #3b2170
+}
+
+# ── floor diamond (shared set law) ───────────────────────────────────────
+part slab material void_ice {
+  polygon 64 -1 129 32 64 65 -1 32 base
+  polygon -1 32 64 -1 64 4 8 32 bright
+  polygon 64 -1 129 32 120 32 64 4 lit
+  polygon -1 32 64 65 64 59 8 32 dark
+  polygon 64 65 129 32 120 32 64 59 deep
+  line 0 32 64 0 sheen
+  line 64 0 127 31 lit
+}
+
+# ── facet texture on the walkable top ────────────────────────────────────
+part facets material diamond {
+  polygon 30 26 46 17 60 23 44 31 lit
+  polygon 60 23 78 15 94 23 76 29 mid
+  polygon 44 31 60 23 76 29 60 37 mid
+  polygon 76 29 94 23 108 31 92 35 base
+  polygon 34 37 44 31 60 37 48 42 base
+  polygon 60 37 76 29 92 35 76 43 dark
+  cell 52 27 mid
+  cell 70 25 base
+  cell 86 31 base
+  cell 56 39 dark
+}
+
+# ── SW cliff face — sheared ice strata, half-lit ─────────────────────────
+part cliffsw material void_ice {
+  # face body with a ragged torn underside
+  polygon 0 32 64 63 64 104 56 92 48 110 40 88 30 100 24 90 14 94 8 78 0 84 mid
+  # strata bands following the shear plane
+  polygon 0 40 64 71 64 79 0 48 base
+  polygon 0 56 64 87 64 93 0 64 dark
+  # lip crest — bright edge where the floor breaks
+  line 0 32 64 63 sheen
+  line 0 33 63 64 lit
+  # vertical fracture scars
+  line 18 42 16 66 dark
+  line 38 52 36 80 deep
+  line 52 58 50 92 dark
+  line 8 38 7 56 base
+  # underside going void-touched
+  polygon 0 66 64 97 64 104 56 92 48 110 40 88 30 100 24 90 14 94 8 78 0 84 deep
+  cell 30 88 voidviol
+  cell 44 94 voidviol
+  cell 14 80 voidviol
+}
+
+# ── SE cliff face — in shadow, falling to black ──────────────────────────
+part cliffse material void_ice {
+  polygon 64 63 127 32 127 70 120 88 112 74 102 96 94 80 82 90 74 104 64 104 dark
+  # strata, barely lit
+  polygon 64 71 127 40 127 46 64 79 deep
+  polygon 64 87 127 56 127 62 64 93 abyss
+  # lip crest — thin cold edge
+  line 64 63 127 32 mid
+  line 64 64 127 33 deep
+  # fracture scars swallowed by shadow
+  line 84 60 82 82 abyss
+  line 104 50 102 72 deep
+  line 116 44 115 66 abyss
+  # underside dissolving into the void
+  polygon 64 95 127 64 127 70 120 88 112 74 102 96 94 80 82 90 74 104 64 104 abyss
+  cell 90 82 voidviol
+  cell 110 72 voidviol
+}
+
+# ── icicles — frost fangs hanging off the shear lip ──────────────────────
+part icicles material diamond {
+  # SW side (lit tones)
+  polygon 12 39 17 42 14 54 frost
+  cell 14 55 spec
+  polygon 30 48 34 50 32 60 sheen
+  cell 32 61 frost
+  polygon 46 56 51 59 48 72 frost
+  cell 48 73 spec
+  # SE side (shadow tones)
+  polygon 78 57 83 54 81 70 mid
+  cell 81 71 frost
+  polygon 98 47 103 44 101 58 dark
+  cell 101 59 mid
+  polygon 114 39 118 37 116 48 dark
+  cell 116 49 mid
+}
+
+# ── void drift — debris and motes falling away beneath the island ────────
+part voiddrift material cyan_glow {
+  glow radius 2
+  cell 26 104 cyansoft
+  cell 52 108 cyansoft
+  cell 84 102 cyansoft
+  cell 106 92 cyansoft
+  cell 12 94 cyansoft
+  cell 70 108 cyanhot
+}
+
+part debris material void_ice {
+  cell 20 104 deep
+  cell 38 100 dark
+  cell 60 108 deep
+  cell 90 96 deep
+  cell 116 88 dark
+  cell 6 88 deep
+  cell 46 106 abyss
+  cell 100 94 abyss
+}
+
+# ── frost bloom on the lit crest (set law) ───────────────────────────────
+part frostbloom material diamond {
+  cell 12 30 frost
+  cell 22 25 frost
+  cell 32 20 frost
+  cell 42 15 frost
+  cell 52 10 frost
+  cell 60 6 frost
+  cell 17 27 sheen
+  cell 37 17 sheen
+  cell 57 8 sheen
+  cell 27 22 spec
+  cell 47 12 spec
+}

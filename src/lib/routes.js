@@ -13,6 +13,7 @@ export const NexusPage = lazyWithRetry(() => import("../pages/Nexus/NexusPage.js
 export const PixelBrainPage = lazyWithRetry(() => import("../pages/PixelBrain/PixelBrainPage.jsx"), "pixelbrain-page");
 export const CareerPage = lazyWithRetry(() => import("../pages/Career/CareerPage"), "career-page");
 export const WandPage = lazyWithRetry(() => import("../pages/Wand/WandPage.jsx"), "wand-page");
+export const WandGraphPage = lazyWithRetry(() => import("../pages/Wand/WandGraphPage.jsx"), "wand-graph-page");
 export const DivWandPage = lazyWithRetry(() => import("../pages/DivWand/DivWandPage.jsx"), "div-wand-page");
 export const QbitWorldPage = lazyWithRetry(() => import("../pages/QbitWorld/QbitWorldPage.jsx"), "qbit-world-page");
 
@@ -20,6 +21,7 @@ export const PhotonicBridgeLab = lazyWithRetry(() => import("../pages/internal/p
 export const StudioUpload = lazyWithRetry(() => import("../pages/internal/Studio/StudioUpload.jsx"), "studio-upload");
 export const ActorForgeLab = lazyWithRetry(() => import("../pages/internal/pixel-lotus/ActorForgeLab.tsx"), "actor-forge-lab");
 export const IsoMapSandbox = lazyWithRetry(() => import("../pages/internal/pixel-lotus/IsoMapSandbox.tsx"), "iso-map-sandbox");
+export const TileForgeLab = lazyWithRetry(() => import("../pages/internal/pixel-lotus/TileForgeLab.jsx"), "tile-forge-lab");
 export const ScholoTimeLabPage = lazyWithRetry(() => import("../pages/internal/ScholoTimeLab/ScholoTimeLab.jsx"), "scholo-time-lab");
 
 export const BlogIndexPage = lazyWithRetry(() => import("../pages/Blog/BlogIndexPage"), "blog-index-page");
@@ -28,7 +30,7 @@ export const VisualizerReleasePage = lazyWithRetry(() => import("../pages/Visual
 export const OraclePage = lazyWithRetry(() => import("../pages/Oracle/OraclePage.jsx"), "oracle-page");
 
 const IS_PROD = typeof import.meta !== "undefined" && import.meta.env.PROD;
-const INTERNAL_MODULES = ["/collab", "/pixelbrain", "/career", "/wand", "/div-wand", "/qbit-world", "/internal/photonic-bridge", "/internal/studio", "/internal/pixel-lotus/actor-forge", "/internal/pixel-lotus/iso-map-sandbox", "/internal/time-lab"];
+const INTERNAL_MODULES = ["/collab", "/pixelbrain", "/career", "/wand", "/wand/graph", "/div-wand", "/qbit-world", "/internal/photonic-bridge", "/internal/studio", "/internal/pixel-lotus/actor-forge", "/internal/pixel-lotus/iso-map-sandbox", "/internal/pixel-lotus/tile-forge", "/internal/time-lab"];
 
 export const ALL_COMPONENTS = {
   "/watch": WatchPage,
@@ -42,12 +44,14 @@ export const ALL_COMPONENTS = {
   "/pixelbrain": PixelBrainPage,
   "/career": CareerPage,
   "/wand": WandPage,
+  "/wand/graph": WandGraphPage,
   "/div-wand": DivWandPage,
   "/qbit-world": QbitWorldPage,
   "/internal/photonic-bridge": PhotonicBridgeLab,
   "/internal/studio": StudioUpload,
   "/internal/pixel-lotus/actor-forge": ActorForgeLab,
   "/internal/pixel-lotus/iso-map-sandbox": IsoMapSandbox,
+  "/internal/pixel-lotus/tile-forge": TileForgeLab,
   "/internal/time-lab": ScholoTimeLabPage,
   "/blog": BlogIndexPage,
   "/blog/:slug": BlogArticlePage,

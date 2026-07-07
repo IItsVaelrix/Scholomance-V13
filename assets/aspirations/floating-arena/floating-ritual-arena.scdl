@@ -1,0 +1,331 @@
+# floating-ritual-arena.scdl
+# Authoritative SCDL source for the AI-enhanced floating icy ritual arena reference.
+# Image reference: assets/aspirations/floating-arena/full-arena-ref.jpg (1280x720)
+#
+# This follows the established pipeline:
+#   AI raster (aspiration / reference only)
+#   → SCDL vector authoring (source of truth)
+#   → lowered lattice cells
+#   → symmetry / vector passes
+#   → compile + exports (PNG, JSON, Godot/Phaser packets)
+#
+# Design goals:
+# - Dramatic floating ice platform with jagged icicled edges and deep cracks.
+# - Central multi-layered glowing ritual circle (the hero element from the ref).
+# - Grid of rune-etched tiles surrounding the circle.
+# - Perimeter crystal clusters and frost foliage (reuse/enhance VOID tile defs).
+# - Aurora/space atmosphere as bg + emissive glow.
+# - Isometric/angled top-down presentation consistent with void_island_battlefield.
+#
+# Canvas chosen for overview. Light law: upper-left consistent with existing VOID tiles.
+#
+# Usage:
+#   node codex/core/pixelbrain/scdl/scdl.cli.js compile assets/aspirations/floating-arena/floating-ritual-arena.scdl --export png,json,phaser --out-dir assets/aspirations/floating-arena/
+
+asset floating_ritual_arena canvas 320x240
+
+palette {
+  abyss      = #04060e
+  deep       = #0e1526
+  dark       = #182238
+  base       = #22304f
+  mid        = #2d4066
+  lit        = #3d5480
+  bright     = #52709f
+  sheen      = #7291bd
+  frost      = #a8c3e2
+  spec       = #e3eef9
+  cyanhot    = #67e8f9
+  cyansoft   = #b7f4fd
+  cyandeep   = #0e7490
+  amethdark  = #3b2170
+  amethbody  = #5b34a8
+  amethlite  = #8b5cf6
+  amethhi    = #b794f6
+  amethspec  = #e9e2fc
+  runedim    = #4650a8
+  runeviol   = #7c8cff
+  runehi     = #b4bcff
+  gold       = #f4d27a
+  snowbase   = #c7d4ea
+  snowlit    = #e6eef8
+}
+
+# Major reusable scene elements as defs (following void_island_battlefield.scdl exactly)
+def platform {
+  part body material void_ice {
+    polygon 40 40  100 20  220 25  290 55  300 140  270 195  160 210  60 190  30 110  base
+    polygon 40 40  100 20  160 35  120 55  bright
+    polygon 100 20 220 25 180 45 120 55  lit
+    polygon 160 210 270 195 300 140 220 160  deep
+    polygon 120 160 180 170 260 155 200 190  dark
+    line 80 70 140 85 deep
+    line 140 85 200 75 deep
+    line 70 120 130 140 abyss
+    line 180 110 250 130 deep
+    line 50 45 110 28 sheen
+    line 110 28 190 30 lit
+    cell 95 35 spec
+    cell 70 55 sheen
+  }
+}
+
+def ritual_circle {
+  part circle material cyan_glow {
+    ring 160 120 radius 55 width 7 cyanhot
+    ring 160 120 radius 54 width 5 cyansoft
+    ring 160 120 radius 42 width 4 runeviol
+    ring 160 120 radius 41 width 3 runedim
+    ring 160 120 radius 32 width 3 cyanhot
+    ring 160 120 radius 22 width 4 amethhi
+    ring 160 120 radius 21 width 2 cyansoft
+    sphere 160 120 radius 9 light -1 -1 spec cyanhot cyansoft cyandeep abyss
+    line 160 75 160 95 runehi
+    line 160 145 160 165 runehi
+    line 115 120 135 120 runehi
+    line 185 120 205 120 runehi
+    line 125 85 140 100 runeviol
+    line 180 85 195 100 runeviol
+    line 125 155 140 140 runeviol
+    line 180 155 195 140 runeviol
+    cell 160 68 runehi
+    cell 160 172 runehi
+    cell 108 120 runehi
+    cell 212 120 runehi
+    cell 132 82 cyanhot
+    cell 188 82 cyanhot
+    cell 132 158 cyanhot
+    cell 188 158 cyanhot
+    polygon 148 112 172 112 172 128 148 128 deep
+  }
+}
+
+def circle_aura {
+  part aura material cyan_glow {
+    glow radius 12
+    ring 160 120 radius 62 width 9 cyansoft
+    cell 160 120 cyanhot
+  }
+}
+
+def rune_tile {
+  part tile material void_ice {
+    polygon 8 8 24 4 40 8 36 20 24 24 12 20 base
+    polygon 8 8 24 4 20 10 bright
+    polygon 24 4 40 8 36 14 lit
+    polygon 12 20 24 24 36 20 deep
+    cell 20 12 runedim
+    cell 24 12 runeviol
+    cell 20 16 cyanhot
+    line 18 10 26 10 runehi
+    line 22 8 22 18 runehi
+  }
+}
+
+def perimeter_crystal {
+  part base material void_ice {
+    polygon 6 26 14 22 30 24 34 30 26 34 10 32 deep
+  }
+  part shard material amethyst {
+    polygon 22 6 14 28 20 32 24 14 amethlite
+    polygon 22 6 24 14 20 32 28 26 amethdark
+    polygon 22 6 20 12 20 28 23 24 amethbody
+    cell 23 5 amethspec
+    line 22 6 19 18 amethhi
+  }
+}
+
+def icicle_spike {
+  part spike material void_ice {
+    polygon 4 2 8 2 10 18 6 22 2 18 frost
+    line 6 2 6 20 spec
+  }
+}
+
+# =====================================================
+# Background atmosphere (as defs for instancing)
+# =====================================================
+def space_bg {
+  part bg material abyss {
+    rect 0 0 320 240 abyss
+    cell 40 30 spec
+    cell 280 50 frost
+    cell 90 180 cyansoft
+    cell 220 160 spec
+    cell 300 210 cyanhot
+    cell 15 90 frost
+  }
+}
+
+def aurora_layer {
+  part glow material cyan_glow {
+    glow radius 30
+    rect 0 0 320 70 cyansoft
+    cell 100 25 cyanhot
+    cell 200 35 cyansoft
+  }
+}
+
+# =====================================================
+# Major reusable scene elements wrapped as defs (following void_island_battlefield pattern)
+# =====================================================
+def platform {
+  part body material void_ice {
+    polygon 40 40  100 20  220 25  290 55  300 140  270 195  160 210  60 190  30 110  base
+    polygon 40 40  100 20  160 35  120 55  bright
+    polygon 100 20 220 25 180 45 120 55  lit
+    polygon 160 210 270 195 300 140 220 160  deep
+    polygon 120 160 180 170 260 155 200 190  dark
+    line 80 70 140 85 deep
+    line 140 85 200 75 deep
+    line 70 120 130 140 abyss
+    line 180 110 250 130 deep
+    line 50 45 110 28 sheen
+    line 110 28 190 30 lit
+    cell 95 35 spec
+    cell 70 55 sheen
+  }
+}
+
+def ritual_circle {
+  part circle material cyan_glow {
+    ring 160 120 radius 55 width 7 cyanhot
+    ring 160 120 radius 54 width 5 cyansoft
+    ring 160 120 radius 42 width 4 runeviol
+    ring 160 120 radius 41 width 3 runedim
+    ring 160 120 radius 32 width 3 cyanhot
+    ring 160 120 radius 22 width 4 amethhi
+    ring 160 120 radius 21 width 2 cyansoft
+    sphere 160 120 radius 9 light -1 -1 spec cyanhot cyansoft cyandeep abyss
+    line 160 75 160 95 runehi
+    line 160 145 160 165 runehi
+    line 115 120 135 120 runehi
+    line 185 120 205 120 runehi
+    line 125 85 140 100 runeviol
+    line 180 85 195 100 runeviol
+    line 125 155 140 140 runeviol
+    line 180 155 195 140 runeviol
+    cell 160 68 runehi
+    cell 160 172 runehi
+    cell 108 120 runehi
+    cell 212 120 runehi
+    cell 132 82 cyanhot
+    cell 188 82 cyanhot
+    cell 132 158 cyanhot
+    cell 188 158 cyanhot
+    polygon 148 112 172 112 172 128 148 128 deep
+  }
+}
+
+def circle_aura {
+  part aura material cyan_glow {
+    glow radius 12
+    ring 160 120 radius 62 width 9 cyansoft
+    cell 160 120 cyanhot
+  }
+}
+
+def rune_tile {
+  part tile material void_ice {
+    polygon 8 8 24 4 40 8 36 20 24 24 12 20 base
+    polygon 8 8 24 4 20 10 bright
+    polygon 24 4 40 8 36 14 lit
+    polygon 12 20 24 24 36 20 deep
+    cell 20 12 runedim
+    cell 24 12 runeviol
+    cell 20 16 cyanhot
+    line 18 10 26 10 runehi
+    line 22 8 22 18 runehi
+  }
+}
+
+def perimeter_crystal {
+  part base material void_ice {
+    polygon 6 26 14 22 30 24 34 30 26 34 10 32 deep
+  }
+  part shard material amethyst {
+    polygon 22 6 14 28 20 32 24 14 amethlite
+    polygon 22 6 24 14 20 32 28 26 amethdark
+    polygon 22 6 20 12 20 28 23 24 amethbody
+    cell 23 5 amethspec
+    line 22 6 19 18 amethhi
+  }
+}
+
+def icicle_spike {
+  part spike material void_ice {
+    polygon 4 2 8 2 10 18 6 22 2 18 frost
+    line 6 2 6 20 spec
+  }
+}
+
+# =====================================================
+# Full arena composition
+# =====================================================
+group arena at 0 0 {
+
+  # Background first
+  instance space_bg at 0 0
+  instance aurora_layer at 0 0
+
+  # Main floating platform
+  instance platform at 30 35 scale 1.05
+
+  # Central ritual circle (hero element)
+  instance circle_aura at 95 55 scale 0.95
+  instance ritual_circle at 95 55
+
+  # Surrounding rune grid
+  instance rune_tile at 85 70
+  instance rune_tile at 115 70
+  instance rune_tile at 70 85
+  instance rune_tile at 130 85
+  instance rune_tile at 85 100
+  instance rune_tile at 115 100
+
+  instance rune_tile at 60 55
+  instance rune_tile at 140 55
+  instance rune_tile at 55 95
+  instance rune_tile at 145 95
+  instance rune_tile at 75 120
+  instance rune_tile at 125 120
+
+  instance rune_tile at 45 40
+  instance rune_tile at 155 40
+  instance rune_tile at 40 115
+  instance rune_tile at 160 115
+
+  # Perimeter crystals
+  instance perimeter_crystal at 35 22
+  instance perimeter_crystal at 38 12
+  instance perimeter_crystal at 52 8 scale 0.8
+
+  instance perimeter_crystal at 18 60
+  instance perimeter_crystal at 20 50
+  instance perimeter_crystal at 15 75 scale 0.9
+
+  instance perimeter_crystal at 265 55 mirror x
+  instance perimeter_crystal at 268 45 mirror x
+  instance perimeter_crystal at 275 72 mirror x scale 0.85
+
+  instance perimeter_crystal at 80 175
+  instance perimeter_crystal at 85 160
+  instance perimeter_crystal at 200 170 mirror x
+  instance perimeter_crystal at 205 155 mirror x
+
+  # Icicles
+  instance icicle_spike at 55 48
+  instance icicle_spike at 245 52
+  instance icicle_spike at 70 165
+  instance icicle_spike at 210 168
+}
+
+export png json phaser svg
+
+# Notes for pipeline:
+# - This SCDL is the source of truth. The JPEG is reference only.
+# - After compile, run craft-gate / silhouette audit if we produce a sealed .silh for the platform outline.
+# - Next: vary rune glyphs per tile (use different cell patterns or a rune part family).
+# - Character placement: positions are hints for chibi instances (see character-foundry + profiles).
+# - Godot: the phaser/json export + lattice packets feed frame instantiation.
+# - Fidelity: after authoring, the render-fidelity pipeline (AMPs) can be layered on exports.

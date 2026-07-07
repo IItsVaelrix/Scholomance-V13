@@ -71,3 +71,31 @@ export function onOracleMarginalia(result, audioForge) {
 export function onNexusUnlock(result, audioForge) {
   audioForge?.emitSfx('NEXUS_UNLOCK', result);
 }
+
+/**
+ * @param {object} payload
+ * @param {import('../hooks/useAudioForge.js').AudioForgeInstance|import('../lib/audio/gameAudioForge.service.js').GameAudioForgeService} audioForge
+ */
+export function onFootstep(payload, audioForge) {
+  audioForge?.emitSfx('FOOTSTEP', payload);
+}
+
+/**
+ * Obelisk runes swelling with latent discharge.
+ *
+ * @param {object} payload - { intensity?: number, pulseIndex?: number, battleId }
+ * @param {import('../hooks/useAudioForge.js').AudioForgeInstance|import('../lib/audio/gameAudioForge.service.js').GameAudioForgeService} audioForge
+ */
+export function onObeliskCharge(payload, audioForge) {
+  audioForge?.emitSfx('OBELISK_CHARGE', payload);
+}
+
+/**
+ * Obelisk tesla discharge strike.
+ *
+ * @param {object} payload - { intensity?: number, pulseIndex?: number, battleId }
+ * @param {import('../hooks/useAudioForge.js').AudioForgeInstance|import('../lib/audio/gameAudioForge.service.js').GameAudioForgeService} audioForge
+ */
+export function onObeliskDischarge(payload, audioForge) {
+  audioForge?.emitSfx('OBELISK_DISCHARGE', payload);
+}

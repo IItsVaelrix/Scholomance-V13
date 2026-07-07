@@ -1,9 +1,9 @@
-export const AMBIENCE_CHANNELS = ['rain', 'cafe', 'wind'];
+// Pared down to a single soundscape for now — the focus-mode mixer exposes just
+// one knob (Rain + Forest Stream). Re-add 'cafe'/'wind' here to restore them.
+export const AMBIENCE_CHANNELS = ['rain'];
 
 export const AMBIENCE_ASSETS = Object.freeze({
-  rain: '/audio/ambience/rain.mp3',
-  cafe: '/audio/ambience/cafe.mp3',
-  wind: '/audio/ambience/wind.mp3',
+  rain: '/audio/ambience/rain-forest-stream.mp3',
 });
 
 export const AMBIENCE_STORAGE_KEY = 'scholomance.focus.ambience.v1';
@@ -26,8 +26,7 @@ export function createAmbienceMixerService({ createEngine }) {
     master: 0.7,
     channels: {
       rain: { enabled: false, volume: 0.5, available: true },
-      cafe: { enabled: false, volume: 0.5, available: true },
-      wind: { enabled: false, volume: 0.5, available: true },
+
     },
   };
 

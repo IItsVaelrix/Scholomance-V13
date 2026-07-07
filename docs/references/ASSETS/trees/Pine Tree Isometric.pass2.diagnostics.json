@@ -1,0 +1,59 @@
+{
+  "pass": 2,
+  "width": 80,
+  "height": 120,
+  "frames": [
+    {
+      "index": 0,
+      "name": "Base Pine",
+      "cellsBefore": 3267,
+      "cellsAfter": 3411,
+      "stairSteps": 158,
+      "undersides": 136,
+      "rimHighlights": 155,
+      "trunk": 243,
+      "snow": 9,
+      "star": 7,
+      "symmetry": 140
+    },
+    {
+      "index": 1,
+      "name": "Snow Cap",
+      "cellsBefore": 3285,
+      "cellsAfter": 3422,
+      "stairSteps": 158,
+      "undersides": 241,
+      "rimHighlights": 265,
+      "trunk": 243,
+      "snow": 6,
+      "star": 0,
+      "symmetry": 160
+    },
+    {
+      "index": 2,
+      "name": "Ember Autumn",
+      "cellsBefore": 3267,
+      "cellsAfter": 3404,
+      "stairSteps": 158,
+      "undersides": 246,
+      "rimHighlights": 274,
+      "trunk": 243,
+      "snow": 0,
+      "star": 0,
+      "symmetry": 163
+    },
+    {
+      "index": 3,
+      "name": "Void Corrupted",
+      "cellsBefore": 3267,
+      "cellsAfter": 3404,
+      "stairSteps": 158,
+      "undersides": 60,
+      "rimHighlights": 151,
+      "trunk": 243,
+      "snow": 0,
+      "star": 0,
+      "symmetry": 144
+    }
+  ]
+}

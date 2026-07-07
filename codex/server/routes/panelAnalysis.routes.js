@@ -24,10 +24,27 @@ const REDIS_CACHE_PREFIX = 'panel-analysis:';
 const panelAnalysisBodySchema = z.object({
   text: z.string().max(MAX_TEXT_LENGTH),
   nluMode: z.enum(['direct', 'generate']).optional(),
+  analysisProfile: z.enum(['editor', 'full']).optional(),
 });
 
-function getCacheKey(text) {
-  return createHash('sha256').update(String(text || '')).digest('hex');
+function resolveAnalysisProfile(profile) {
+  return profile === 'editor' ? 'editor' : 'full';
+}
+
+function resolveEffectiveNluMode(nluMode, analysisProfile) {
+  if (resolveAnalysisProfile(analysisProfile) === 'editor') {
+    return 'direct';
+  }
+  return nluMode === 'direct' ? 'direct' : 'generate';
+}
+
+function getCacheKey({ text, nluMode, analysisProfile }) {
+  const cacheKeyPayload = {
+    text: String(text || ''),
+    analysisProfile: resolveAnalysisProfile(analysisProfile),
+    nluMode: resolveEffectiveNluMode(nluMode, analysisProfile),
+  };
+  return createHash('sha256').update(JSON.stringify(cacheKeyPayload)).digest('hex');
 }
 
 function getFromMemoryCache(cache, key) {
@@ -103,7 +120,7 @@ export async function panelAnalysisRoutes(fastify, opts = {}) {
         });
       }
 
-      const cacheKey = getCacheKey(parsed.data.text);
+      const cacheKey = getCacheKey(parsed.data);
       const redisClient = fastify.redis;
 
       try {
@@ -149,6 +166,7 @@ export async function panelAnalysisRoutes(fastify, opts = {}) {
         const data = await Promise.race([
           panelAnalysisService.analyzePanels(parsed.data.text, {
             nluMode: parsed.data.nluMode,
+            analysisProfile: parsed.data.analysisProfile,
           }),
           timeoutPromise,
         ]);

@@ -3,7 +3,7 @@
 ## Bytecode Search Code
 `SCHOL-ENC-BYKE-SEARCH-LAW-AGENTS`
 
-> Read first: `SHARED_PREAMBLE.md` → `VAELRIX_LAW.md` → `SCHEMA_CONTRACT.md` → this file.
+> Read first: `SHARED_PREAMBLE.md` (which includes SCDNA genes) → `VAELRIX_LAW.md` → `SCHEMA_CONTRACT.md` → this file.
 
 ## The Soul
 

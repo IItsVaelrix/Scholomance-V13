@@ -1,4 +1,4 @@
-import { createPixelBrainAssetPacket } from './pixelbrain-asset-packet.js';
+import { forgePacket } from './semantic-bridge.js';
 
 function layerCellsToArray(layer) {
   if (!layer?.cells) return [];
@@ -30,7 +30,7 @@ export function templateGridToPixelBrainAssetPacket(grid, options = {}) {
     });
   });
 
-  return createPixelBrainAssetPacket({
+  return forgePacket({
     id: options.id,
     source: {
       kind: 'template-editor',
@@ -64,5 +64,11 @@ export function templateGridToPixelBrainAssetPacket(grid, options = {}) {
       createdBy: 'template-grid-asset-bridge',
       operations: ['template-grid-to-pixelbrain-asset'],
     },
-  });
+  }, {
+    id: options.id || options.sourceId || null,
+    parts: layers.map((layer, index) => ({
+      id: layer?.name || `layer-${index}`,
+      layerName: layer?.name || null,
+    })),
+  }, { sourceKind: 'template-editor' });
 }

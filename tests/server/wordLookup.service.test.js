@@ -61,19 +61,12 @@ describe('[Server] WordLookupService', () => {
     });
 
     const result = await service.lookupWord('Arcana');
-    expect(result.source).toBe('scholomance-local');
+    expect(result.source).toBe('scholomance-merged');
     expect(result.word).toBe('arcana');
     expect(result.data?.definition?.text).toBe('Secret knowledge');
-    // Local dict wins; only the slant-rhyme supplement (Datamuse rel_nry) is
-    // called. The full external-API path (Free Dictionary + Datamuse rel_*
-    // triad) is NOT invoked.
-    expect(fetchMock).toHaveBeenCalledTimes(2);
     const urls = fetchMock.mock.calls.map(([url]) => String(url));
     expect(urls[0]).toContain('/api/lexicon/lookup/arcana');
-    expect(urls[1]).toContain('https://api.datamuse.com/words?rel_nry=arcana');
-    expect(urls.some((url) => url.includes('dictionaryapi.dev'))).toBe(false);
-    expect(urls.some((url) => url.includes('rel_rhy='))).toBe(false);
-    expect(urls.some((url) => url.includes('rel_syn='))).toBe(false);
+    expect(urls.some((url) => url.includes('https://api.datamuse.com/words?rel_nry=arcana'))).toBe(true);
   });
 
   it('falls back to external APIs when local misses', async () => {
@@ -162,7 +155,7 @@ describe('[Server] WordLookupService', () => {
     });
 
     const result = await service.lookupWord('ember');
-    expect(result.source).toBe('scholomance-local');
+    expect(result.source).toBe('scholomance-merged');
     expect(result.data?.synonyms).toHaveLength(15);
     expect(result.data?.antonyms).toHaveLength(15);
     expect(result.data?.rhymes).toHaveLength(15);
@@ -191,11 +184,54 @@ describe('[Server] WordLookupService', () => {
     });
 
     const result = await service.lookupWord('orbit');
-    expect(result.source).toBe('scholomance-local');
+    expect(result.source).toBe('scholomance-merged');
     expect(result.data?.synonyms).toHaveLength(4);
     expect(result.data?.antonyms).toHaveLength(2);
     expect(result.data?.rhymes).toHaveLength(3);
     expect(result.data?.slantRhymes).toHaveLength(1);
+  });
+
+  it('keeps Scholomance lexicon rhymes authoritative when local phoneme keys disagree', async () => {
+    const fetchMock = vi.fn(async (url) => {
+      const href = String(url);
+      if (href === 'http://dict.local/api/lexicon/lookup/perfect') {
+        return jsonResponse({
+          definition: { text: 'Complete or exact', partOfSpeech: 'adjective' },
+          entries: [],
+          synonyms: [],
+          antonyms: [],
+          rhymes: ['act', 'sect'],
+          rhymeFamily: 'AE',
+        });
+      }
+      if (href.startsWith('https://api.datamuse.com/words?rel_nry=perfect')) {
+        return jsonResponse([]);
+      }
+      throw new Error(`Unexpected URL: ${href}`);
+    });
+    const phonemeEngine = {
+      ensureAuthorityBatch: vi.fn(async () => {}),
+      primeG2PBatch: vi.fn(async () => {}),
+      analyzeWord: vi.fn((word) => {
+        const key = String(word || '').trim().toUpperCase();
+        if (key === 'PERFECT') return { rhymeKey: 'EH-KT', phonemes: ['P', 'ER0', 'F', 'EH1', 'K', 'T'] };
+        if (key === 'ACT') return { rhymeKey: 'AE-KT', phonemes: ['AE1', 'K', 'T'] };
+        if (key === 'SECT') return { rhymeKey: 'EH-KT', phonemes: ['S', 'EH1', 'K', 'T'] };
+        return { rhymeKey: 'ZZ-open', phonemes: ['Z'] };
+      }),
+    };
+
+    const service = createWordLookupService({
+      fetchImpl: fetchMock,
+      phonemeEngine,
+      scholomanceDictApiUrl: 'http://dict.local/api/lexicon',
+    });
+
+    const result = await service.lookupWord('perfect');
+    expect(result.source).toBe('scholomance-merged');
+    expect(result.data?.rhymes).toEqual(expect.arrayContaining(['act', 'sect']));
+    expect(result.data?.rhymes).toHaveLength(2);
+    expect(result.data?.slantRhymes ?? []).not.toContain('act');
   });
 
   it('supplements slant rhymes from Datamuse when the local dict omits them', async () => {
@@ -228,7 +264,7 @@ describe('[Server] WordLookupService', () => {
     });
 
     const result = await service.lookupWord('ember');
-    expect(result.source).toBe('scholomance-local');
+    expect(result.source).toBe('scholomance-merged');
     expect(result.data?.rhymes?.length).toBeGreaterThan(0);
     expect(result.data?.slantRhymes).toEqual(expect.arrayContaining(datamuseSlants));
     expect(result.data?.slantRhymes.length).toBeLessThanOrEqual(15);
@@ -263,11 +299,11 @@ describe('[Server] WordLookupService', () => {
     });
 
     const result = await service.lookupWord('zzzqxqv');
-    expect(result.source).toBe('scholomance-local');
+    expect(result.source).toBe('scholomance-merged');
     expect(result.data?.slantRhymes ?? []).toHaveLength(0);
   });
 
-  it('preserves local-dict slantRhymes and does not call Datamuse when present', async () => {
+  it('preserves local-dict slantRhymes when present', async () => {
     const localSlants = ['orchid', 'torrid', 'horrid'];
     const fetchMock = vi.fn(async (url) => {
       const href = String(url);
@@ -290,13 +326,7 @@ describe('[Server] WordLookupService', () => {
     });
 
     const result = await service.lookupWord('orbit');
-    expect(result.source).toBe('scholomance-local');
+    expect(result.source).toBe('scholomance-merged');
     expect(result.data?.slantRhymes).toEqual(expect.arrayContaining(localSlants));
-    const calledDatamuse = fetchMock.mock.calls.some(([url]) =>
-      String(url).startsWith('https://api.datamuse.com/words?rel_nry=orbit')
-    );
-    expect(calledDatamuse).toBe(false);
   });
 });
-
-

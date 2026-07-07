@@ -18,6 +18,7 @@ public class DivTubeApp {
             System.out.println("3. Run Intelligence Lab (YouTube API)");
             System.out.println("4. Rate Title (Deterministic Math)");
             System.out.println("5. Exit");
+            System.out.println("6. Download Audio (MP3)");
             System.out.print("Select an option: ");
             
             if (!scanner.hasNextLine()) break;
@@ -62,6 +63,15 @@ public class DivTubeApp {
                 } catch (Exception e) {
                     System.out.println("[Intelligence Error] " + e.getMessage());
                 }
+            } else if (choice.equals("6")) {
+                System.out.print("Enter YouTube URL: ");
+                String url = scanner.nextLine().trim();
+
+                System.out.print("Do you confirm you have rights to download this? (y/n): ");
+                boolean confirmed = scanner.nextLine().trim().equalsIgnoreCase("y");
+
+                DownloadRequest req = new DownloadRequest(url, "Best", "MP3 audio", "./downloads", confirmed);
+                controller.onDownloadClicked(req);
             } else if (choice.equals("5") || choice.equalsIgnoreCase("exit") || choice.equalsIgnoreCase("quit")) {
                 System.out.println("Exiting...");
                 break;

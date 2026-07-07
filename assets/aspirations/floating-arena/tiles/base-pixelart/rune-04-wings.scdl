@@ -1,0 +1,41 @@
+# rune-04-wings.scdl
+# Base pixel art for rune glyph inspired by ref crop rune-04-wings
+asset rune_04_wings canvas 64x64
+
+palette {
+  deep_ice   = #1a253f
+  base_ice   = #2a3a5a
+  lit_ice    = #4a6a9a
+  glow_blue  = #3db8ff
+  rune_core  = #a0d8ff
+  frost      = #c8e0f0
+  dark_line  = #0f1a30
+}
+
+part slab material ice {
+  rect 2 2 60 60 base_ice
+  polygon 2 2 30 2 30 30 2 30 lit_ice
+  polygon 32 2 62 2 62 30 32 30 lit_ice
+  polygon 2 32 30 32 30 62 2 62 deep_ice
+  polygon 32 32 62 32 62 62 32 62 deep_ice
+  line 2 2 62 2 frost
+  line 2 2 2 62 frost
+  line 0 0 64 0 dark_line
+  line 0 0 0 64 dark_line
+  line 64 0 64 64 dark_line
+  line 0 64 64 64 dark_line
+}
+
+part rune material glow {
+  glow radius 2
+  # Wing / chevron style
+  line 12 24 32 12 rune_core
+  line 32 12 52 24 rune_core
+  line 12 40 32 28 rune_core
+  line 32 28 52 40 rune_core
+  cell 32 32 glow_blue
+  cell 20 28 frost
+  cell 44 28 frost
+}
+
+export png json

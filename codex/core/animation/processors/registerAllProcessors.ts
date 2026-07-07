@@ -4,7 +4,7 @@
  * Collects and registers all available motion microprocessors into the AMP registry.
  */
 
-import { processorRegistry } from '../amp/runAnimationAmp.ts';
+import { processorRegistry } from '../amp/registry.ts';
 import { constraintProcessors } from './constraints/constraintProcessors.ts';
 import { transformProcessors } from './transform/transformProcessors.ts';
 import { timeVisualProcessors } from './time/timeVisualProcessors.ts';

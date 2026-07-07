@@ -1,0 +1,85 @@
+{
+  "version": "combat-iso-grass-v2",
+  "combatMetrics": {
+    "tw": 80,
+    "th": 40,
+    "depth": 5,
+    "spriteWidth": 80,
+    "spriteHeight": 45
+  },
+  "reference": "docs/references/Grass Tile Isometric.aseprite",
+  "referencePaletteSample": [
+    "#457b1f",
+    "#8f563b",
+    "#654231",
+    "#5c8831",
+    "#3f5c23",
+    "#6abe30",
+    "#4c9a1a",
+    "#294615",
+    "#120b06"
+  ],
+  "sceneAlignment": [
+    "CombatArenaScene",
+    "PolarisForestScene"
+  ],
+  "variations": [
+    {
+      "id": "grass-plain",
+      "label": "Plain",
+      "file": "Grass Tile Plain.png"
+    },
+    {
+      "id": "grass-tufts",
+      "label": "Tufts",
+      "file": "Grass Tile Tufts.png"
+    },
+    {
+      "id": "grass-moss",
+      "label": "Moss Patch",
+      "file": "Grass Tile Moss Patch.png"
+    },
+    {
+      "id": "grass-clover",
+      "label": "Clover",
+      "file": "Grass Tile Clover.png"
+    },
+    {
+      "id": "grass-fern",
+      "label": "Fern Sprig",
+      "file": "Grass Tile Fern Sprig.png"
+    },
+    {
+      "id": "grass-wildflower",
+      "label": "Wildflower",
+      "file": "Grass Tile Wildflower.png"
+    },
+    {
+      "id": "grass-litter",
+      "label": "Leaf Litter",
+      "file": "Grass Tile Leaf Litter.png"
+    },
+    {
+      "id": "grass-pebble",
+      "label": "Pebble",
+      "file": "Grass Tile Pebble.png"
+    },
+    {
+      "id": "grass-mushroom",
+      "label": "Mushroom",
+      "file": "Grass Tile Mushroom.png"
+    },
+    {
+      "id": "grass-vines",
+      "label": "Ground Vines",
+      "file": "Grass Tile Ground Vines.png"
+    },
+    {
+      "id": "grass-dense",
+      "label": "Dense Foliage",
+      "file": "Grass Tile Dense Foliage.png"
+    }
+  ],
+  "sheet": "Grass Tile Sheet.png",
+  "aseprite": "Grass Tile Variations.aseprite"
+}

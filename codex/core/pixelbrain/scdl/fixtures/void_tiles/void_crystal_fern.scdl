@@ -1,0 +1,118 @@
+# void_crystal_fern — crystalline void flora, curling frost fern prop
+# 96x112, transparent background, bottom-center anchored.
+# Light law: upper-left (-1,-1).
+asset void_crystal_fern canvas 96x112
+
+palette {
+  deep     = #0e1526
+  dark     = #182238
+  base     = #22304f
+  mid      = #2d4066
+  lit      = #3d5480
+  bright   = #52709f
+  sheen    = #7291bd
+  frost    = #a8c3e2
+  spec     = #e3eef9
+  cyanhot  = #67e8f9
+  cyansoft = #b7f4fd
+  amethlite = #8b5cf6
+  amethhi   = #b794f6
+}
+
+# ── root clump ───────────────────────────────────────────────────────────
+part roots material void_ice {
+  polygon 34 100 48 94 64 98 70 106 54 110 38 108 deep
+  polygon 42 100 54 96 62 102 50 106 dark
+  cell 44 98 frost
+  cell 52 95 frost
+}
+
+# ── main stem — curling crystalline spine ────────────────────────────────
+part stem material amethyst_resonance {
+  # spine segments curving up and left
+  line 52 100 50 84 mid
+  line 51 100 49 84 base
+  line 50 84 46 66 mid
+  line 49 84 45 66 lit
+  line 46 66 44 48 lit
+  line 44 48 46 34 bright
+  line 46 34 52 24 sheen
+  # crozier curl at the crown
+  line 52 24 58 22 sheen
+  line 58 22 60 26 bright
+  line 60 26 56 28 lit
+  # stem glints
+  cell 45 60 sheen
+  cell 44 44 frost
+  cell 49 29 frost
+}
+
+# ── fronds — paired crystal leaflets, drooping with frost ────────────────
+part fronds material amethyst_resonance {
+  # lower pair (longest, heavy droop)
+  line 50 88 34 84 mid
+  line 34 84 22 90 base
+  polygon 22 90 28 86 26 94 dark
+  line 50 88 68 86 base
+  line 68 86 80 94 dark
+  polygon 80 94 76 89 86 96 deep
+  # second pair
+  line 47 72 32 66 lit
+  line 32 66 22 68 mid
+  polygon 22 68 28 64 26 72 base
+  line 47 72 62 70 mid
+  line 62 70 74 76 base
+  polygon 74 76 70 71 80 78 dark
+  # third pair
+  line 45 56 32 48 lit
+  line 32 48 26 48 bright
+  polygon 26 48 31 45 30 52 mid
+  line 45 56 58 52 lit
+  line 58 52 68 56 mid
+  polygon 68 56 64 51 73 57 base
+  # crown pair (small, still unfurling)
+  line 45 40 36 34 bright
+  polygon 36 34 41 31 39 38 lit
+  line 45 40 54 38 bright
+  polygon 54 38 51 34 59 39 lit
+  # leaflet teeth along the big fronds
+  cell 40 85 lit
+  cell 28 87 mid
+  cell 60 85 mid
+  cell 74 90 dark
+  cell 38 66 bright
+  cell 54 70 lit
+}
+
+# ── frost tips — every leaflet ends in bright rime ───────────────────────
+part frosttips material diamond {
+  cell 22 89 frost
+  cell 21 91 spec
+  cell 81 95 frost
+  cell 21 67 frost
+  cell 22 66 spec
+  cell 75 77 frost
+  cell 25 47 spec
+  cell 26 46 frost
+  cell 69 56 frost
+  cell 35 33 spec
+  cell 55 37 spec
+  cell 59 22 spec
+  cell 60 23 frost
+}
+
+# ── void bloom — the fern's faint amethyst luminescence ──────────────────
+part bloom material cyan_glow {
+  glow radius 3
+  cell 58 24 amethhi
+  cell 57 25 amethlite
+  cell 59 26 cyansoft
+  # sap nodes along the spine
+  cell 46 65 cyansoft
+  cell 44 49 amethlite
+  cell 50 86 cyansoft
+  # spore motes drifting off the crown
+  cell 66 18 cyansoft
+  cell 40 16 cyansoft
+  cell 52 12 amethhi
+}

@@ -63,11 +63,28 @@ function ExternalContentSyncPlugin({ content }) {
   return null;
 }
 
-function SpellcheckPlugin({ checkSpelling }) {
+function SpellcheckPlugin({ checkSpelling, enabled }) {
   const [editor] = useLexicalComposerContext();
   const spellCache = useRef(new Map());
 
   useEffect(() => {
+    // When the HEX TOOLS predictive toggle is off, spellcheck is dormant: strip
+    // any misspelled marks already on the document and run nothing further.
+    if (!enabled) {
+      editor.update(() => {
+        const root = $getRoot();
+        const clear = (node) => {
+          if ($isTruesightWordNode(node)) {
+            if (node.__isMisspelled) node.setMisspelled(false);
+          } else if (node.getChildren) {
+            node.getChildren().forEach(clear);
+          }
+        };
+        clear(root);
+      }, { tag: 'spellcheck-update' });
+      return;
+    }
+
     if (!checkSpelling) return;
 
     const performSpellcheck = async () => {
@@ -131,7 +148,7 @@ function SpellcheckPlugin({ checkSpelling }) {
     performSpellcheck();
 
     return unregister;
-  }, [editor, checkSpelling]);
+  }, [editor, checkSpelling, enabled]);
 
   return null;
 }
@@ -215,7 +232,14 @@ function LineHeightPlugin({ onLineHeight }) {
       if (!root) return;
       const para = root.querySelector('p, [class*="paragraph"]');
       if (!para) return;
-      const h = para.offsetHeight;
+      // Report ONE line's height, not the whole paragraph. In plain-text Lexical,
+      // pressing Enter inserts <br> line breaks inside a SINGLE paragraph, so
+      // para.offsetHeight grows with every line -- using it as the per-line height
+      // balloons every gutter row on each keystroke. The resolved line-height is
+      // the true single-line height and stays constant regardless of line count.
+      // (Loaded scrolls split into separate <p> per line, so they never hit this.)
+      const lineHeight = parseFloat(getComputedStyle(para).lineHeight);
+      const h = Number.isFinite(lineHeight) && lineHeight > 0 ? lineHeight : para.offsetHeight;
       if (h > 0) onLineHeight(h);
     };
     // Measure once after first render and again after each update.
@@ -478,9 +502,10 @@ const LexicalScrollEditor = forwardRef(({
 
     let suggestionsList = [];
 
-    // Spelling corrections first - independent of the predictor, so they surface
-    // even when predictive completion is off or not yet ready.
-    if (checkSpelling && getSpellingSuggestions) {
+    // Spelling corrections are part of the ritual-prediction feature: they must
+    // only surface when the HEX TOOLS predictive toggle is on. With it off, the
+    // spellcheck box never appears.
+    if (isPredictive && checkSpelling && getSpellingSuggestions) {
       try {
         const valid = await checkSpelling(prefix);
         if (!valid) {
@@ -695,7 +720,7 @@ const LexicalScrollEditor = forwardRef(({
               />
               <SavePlugin onSave={onSave} title={title} />
               <LexicalRefPlugin editorRef={lexicalEditorRef} />
-              <SpellcheckPlugin checkSpelling={checkSpelling} />
+              <SpellcheckPlugin checkSpelling={checkSpelling} enabled={isPredictive} />
               <LineDecorationPlugin highlightedLines={highlightedLines} pinnedLines={pinnedLines} />
               <TruesightPlugin analyzedDocument={analyzedDocument} isTruesight={isTruesight} isQuarantined={isQuarantined} analyzedWordsByCharStart={analyzedWordsByCharStart} analyzedWordsByIdentity={analyzedWordsByIdentity} theme={theme} resonantCharStarts={resonantCharStarts} />
               <WordClickPlugin onWordActivate={onWordActivate} analyzedDocument={analyzedDocument} />

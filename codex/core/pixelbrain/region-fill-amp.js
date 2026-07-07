@@ -25,6 +25,7 @@ import {
   resolveMaterialId,
 } from './material-registry.js';
 import { computeOutline } from './silhouette-composer.js';
+import { resolveRole, CanonicalRoles } from './semantic-registry.js';
 
 const ANCHOR_ORDER = Object.freeze([
   'void', 'shadow', 'deep', 'body', 'frost', 'spectral', 'whiteCore',
@@ -221,6 +222,12 @@ export function applyRegionFills({ silhouette, template, spec, motifCells = null
     const partId = silhouette.partOf.get(key);
     const part = partId ? partById.get(partId) : null;
     const isRim = outline.has(key);
+
+    // === SemQuant connective tissue: respect semantic role from authoring ===
+    const semanticRole = c.semanticRole || c.role || resolveRole(c);
+    const isSemanticRim = semanticRole === CanonicalRoles.RIM || semanticRole === 'rim';
+    const isSemanticConstruction = semanticRole === CanonicalRoles.CONSTRUCTION_GUIDE;
+
     const isMotif = motifCells && motifCells.has(key);
     let color = null;
     if (isMotif) {
@@ -228,7 +235,7 @@ export function applyRegionFills({ silhouette, template, spec, motifCells = null
       // motif cells take their role's color (core or glow)
       color = motifEntry.color || null;
       motifCellCount += 1;
-    } else if (isRim && part && (trimByPart.get(partId) || outlineByPart.get(partId))) {
+    } else if ((isRim || isSemanticRim) && part && (trimByPart.get(partId) || outlineByPart.get(partId))) {
       color = trimByPart.get(partId) || outlineByPart.get(partId);
       rimCells += 1;
     } else if (part) {
@@ -251,9 +258,10 @@ export function applyRegionFills({ silhouette, template, spec, motifCells = null
       ...c,
       partId,
       color,
-      isRim,
+      isRim: isRim || isSemanticRim,
       isMotif: Boolean(isMotif),
       motifRole: isMotif ? motifCells.get(key).role : null,
+      semanticRole: semanticRole || null,
     });
   }
 

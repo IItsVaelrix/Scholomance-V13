@@ -33,15 +33,99 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from typing import Optional
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from steamdeck_brain import BrainBridge
 
 # ─── Config ──────────────────────────────────────────────────────────────────
 
 DEFAULT_PORT = 9090
 DEFAULT_MODEL = "qwen2.5-coder:7b"
+DEFAULT_NO_LLM = True  # Brain serves ForceField/SCDNA without Ollama by default
 
-# Global bridge (single instance)
-_bridge: Optional[BrainBridge] = None
+# Global bridge (single instance). Either BrainBridge (LLM) or NoLLMBridge (deterministic).
+_bridge: Optional[object] = None
+
+
+class NoLLMBridge:
+    """
+    Model-free brain bridge. Wraps direct_brain.forcefield_ask() so the HTTP
+    daemon can serve brains + SCDNA + routing + arbiter without ever loading
+    or calling Ollama. The full ForceField pipeline runs deterministically;
+    no 7B model is touched, no RAM is pinned for inference, and the daemon
+    never blocks on model cold-loads.
+    """
+
+    MODEL_ID = "no-llm (direct ForceField + SCDNA)"
+
+    def __init__(self):
+        # Lazy import so daemon startup doesn't fail if direct_brain is unavailable.
+        import direct_brain  # noqa: F401
+        self._direct = direct_brain
+        self._queries = 0
+        self._started_at = time.time()
+
+    @property
+    def model(self):
+        # duck-typed for /health endpoint compatibility
+        class _M:
+            model = self.MODEL_ID
+        return _M()
+
+    def ask(self, query: str, show_context: bool = False, **_) -> str:
+        self._queries += 1
+        result = self._direct.forcefield_ask(query, deterministic=True)
+        return self._format(result, show_context=show_context)
+
+    def ask_direct(self, query: str, **_) -> str:
+        self._queries += 1
+        return (
+            f"[no-llm direct] {query}\n"
+            "(ForceField pipeline only; no Ollama model attached. "
+            "Use /ask for full brain arbitration + SCDNA.)"
+        )
+
+    def get_stats(self) -> dict:
+        return {
+            "mode": "no-llm",
+            "model": self.MODEL_ID,
+            "queries_served": self._queries,
+            "uptime_s": round(time.time() - self._started_at, 1),
+            "ollama_used": False,
+        }
+
+    @staticmethod
+    def _format(result: dict, show_context: bool) -> str:
+        if not isinstance(result, dict):
+            return str(result)
+        if result.get("error"):
+            return f"[brain error] {result['error']}"
+        ans = result.get("answer") or {}
+        findings = result.get("findings") or []
+        signals = result.get("scdna_health_signals") or result.get("health_signals") or []
+        genes = result.get("scdna_genes") or []
+        next_action = result.get("next_action")
+        lines = []
+        if isinstance(ans, dict):
+            summary = ans.get("summary") or ans.get("direct") and "Direct ForceField."
+            if summary:
+                lines.append(f"# {summary}")
+            kf = ans.get("key_findings") or []
+            if kf:
+                lines.append("\n## Key findings")
+                for f in kf[:8]:
+                    lines.append(f"- {f}")
+        else:
+            lines.append(str(ans))
+        if findings and show_context:
+            lines.append("\n## Findings (raw)")
+            for f in findings[:12]:
+                lines.append(f"- {f}")
+        if next_action:
+            lines.append(f"\n## Next action\n{next_action}")
+        if genes and show_context:
+            lines.append(f"\n## SCDNA genes applied: {len(genes)}")
+        if signals and show_context:
+            lines.append(f"\n## Health signals: {len(signals)}")
+        lines.append(f"\n[mode: {result.get('mode', 'direct-forcefield')}, ollama_used: {result.get('ollama_used', False)}]")
+        return "\n".join(lines) if lines else json.dumps(result, indent=2, default=str)
 
 # ─── HTTP Handler ────────────────────────────────────────────────────────────
 
@@ -64,12 +148,19 @@ class DaemonHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/health":
-            from vaelrix_tools import TOOL_REGISTRY, _file_cache
+            tools_count = 0
+            file_cache_stats = {"entries": 0, "size_bytes": 0, "size_mb": 0.0}
+            try:
+                from vaelrix_tools import TOOL_REGISTRY, _file_cache
+                tools_count = len(TOOL_REGISTRY)
+                file_cache_stats = _file_cache.stats()
+            except Exception:
+                pass
             self._send_json(200, {
                 "status": "ok",
                 "model": _bridge.model.model if _bridge else "not ready",
-                "tools": len(TOOL_REGISTRY),
-                "file_cache": _file_cache.stats()
+                "tools": tools_count,
+                "file_cache": file_cache_stats
             })
         elif self.path == "/stats":
             if _bridge:
@@ -235,22 +326,29 @@ def run_server(port: int = DEFAULT_PORT, model: str = DEFAULT_MODEL,
                substrate_db: str = "~/.substrate/memory.sqlite",
                top_k: int = 5, multi_hop: bool = True,
                ollama_host: str = "http://localhost:11434",
-               personality: str = None):
+               personality: str = None,
+               no_llm: bool = DEFAULT_NO_LLM):
     """Start the HTTP daemon."""
     global _bridge
 
     if not _refresh_port(port):
         sys.exit(1)
 
-    print("🧠 Initializing BrainBridge (daemon mode)...")
-    _bridge = BrainBridge(
-        model=model,
-        substrate_db=substrate_db,
-        top_k=top_k,
-        multi_hop=multi_hop,
-        ollama_host=ollama_host,
-        personality=personality
-    )
+    if no_llm:
+        print("🧠 Initializing NoLLMBridge (ForceField + SCDNA only, no Ollama)...")
+        _bridge = NoLLMBridge()
+        print(f"   ✓ Model-free mode active. Ollama will not be contacted.")
+    else:
+        print("🧠 Initializing BrainBridge (daemon mode, LLM-backed)...")
+        from steamdeck_brain import BrainBridge
+        _bridge = BrainBridge(
+            model=model,
+            substrate_db=substrate_db,
+            top_k=top_k,
+            multi_hop=multi_hop,
+            ollama_host=ollama_host,
+            personality=personality
+        )
 
     HTTPServer.allow_reuse_address = True
     HTTPServer.allow_reuse_port = True
@@ -301,6 +399,11 @@ def main():
     parser.add_argument("--ollama-host", default="http://localhost:11434")
     parser.add_argument("--personality", "-P", default=None, help="Persona to load (e.g. Vaelrix)")
     parser.add_argument("--no-multi-hop", action="store_true")
+    parser.add_argument("--no-llm", dest="no_llm", action="store_true",
+                        default=DEFAULT_NO_LLM,
+                        help="Run without Ollama (default: ON). ForceField + SCDNA only.")
+    parser.add_argument("--llm", dest="no_llm", action="store_false",
+                        help="Enable Ollama-backed bridge (loads 7B model).")
     args = parser.parse_args()
 
     run_server(
@@ -310,7 +413,8 @@ def main():
         top_k=args.top_k,
         multi_hop=not args.no_multi_hop,
         ollama_host=args.ollama_host,
-        personality=args.personality
+        personality=args.personality,
+        no_llm=args.no_llm
     )
 
 

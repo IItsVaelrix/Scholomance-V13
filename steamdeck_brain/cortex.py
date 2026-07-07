@@ -32,17 +32,39 @@ import os
 import time
 from pathlib import Path
 from typing import List, Optional, Dict, Any, Tuple
+import numpy as np
 
 import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from substrate_engine import Substrate
 from embed_providers import HybridEmbedProvider, NGramEmbeddingProvider
+from turbo_quant import TurboQuantEmbedProvider
 
 # ─── Config ──────────────────────────────────────────────────────────────────
 
-DEFAULT_L1_SIZE = 16      # hot memories kept in RAM
+DEFAULT_L1_SIZE = 16384      # hot memories kept in RAM
 DEFAULT_CONFIDENCE_THRESHOLD = 0.25  # min similarity to consider relevant
-DEFAULT_MAX_HOPS = 3       # max retrieval hops for deep reasoning
+DEFAULT_MAX_HOPS = 15       # max retrieval hops for deep reasoning
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  Speculative Memory Policy
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class SpeculativePolicy:
+    def __init__(self, min_affinity: float = 0.78):
+        self.min_affinity = min_affinity
+
+def verify_speculative_envelope(envelope, substrate, policy):
+    risk = envelope.get("risk", "high") if isinstance(envelope, dict) else getattr(envelope, "risk", "high")
+    tier = envelope.get("tier", "unknown") if isinstance(envelope, dict) else getattr(envelope, "tier", "unknown")
+    
+    if str(risk).lower() == "high":
+        print(f"⚠️  High risk rejected packet logged (Tier: {tier}) but NOT injected.")
+        return None
+        
+    payload = envelope.get("payload", "") if isinstance(envelope, dict) else getattr(envelope, "payload", "")
+    return payload
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -59,49 +81,85 @@ class L1Cache:
       - Eviction: LRU when full
     """
     
-    def __init__(self, max_size: int = DEFAULT_L1_SIZE):
+    def __init__(self, max_size: int = 16384, use_turbo_quant: bool = True, dim: int = 384):
         self.max_size = max_size
+        self.use_turbo_quant = use_turbo_quant
+        self.dim = dim
         self._entries: List[Dict[str, Any]] = []  # {text, vector, metadata, access_count, last_access}
+
+        if self.use_turbo_quant:
+            self.tq = TurboQuantEmbedProvider(embedding_dim=dim, bits_per_coord=2)
     
     def get(self, text: str, vector: List[float]) -> Optional[Dict[str, Any]]:
         """Check if a memory is in L1 cache by vector similarity."""
-        for entry in self._entries:
-            sim = self._cosine_sim(vector, entry["vector"])
-            if sim > 0.95:  # near-identical
-                entry["access_count"] += 1
-                entry["last_access"] = time.time()
-                return entry
+        if self.use_turbo_quant:
+            vec_np = np.array(vector, dtype=np.float32)
+            compressed_vec = self.tq.compress(vec_np)
+            for entry in self._entries:
+                sim = self.tq.bitwise_similarity(compressed_vec, entry["compressed_vector"])
+                if sim > 0.95:  # near-identical
+                    entry["access_count"] += 1
+                    entry["last_access"] = time.time()
+                    return entry
+        else:
+            for entry in self._entries:
+                sim = self._cosine_sim(vector, entry["vector"])
+                if sim > 0.95:  # near-identical
+                    entry["access_count"] += 1
+                    entry["last_access"] = time.time()
+                    return entry
         return None
     
     def put(self, text: str, vector: List[float], metadata: Optional[Dict] = None):
         """Add a memory to L1 cache (hot)."""
         # Check if already present
-        for entry in self._entries:
-            if self._cosine_sim(vector, entry["vector"]) > 0.95:
-                entry["access_count"] += 1
-                entry["last_access"] = time.time()
-                return
+        if self.use_turbo_quant:
+            vec_np = np.array(vector, dtype=np.float32)
+            compressed_vec = self.tq.compress(vec_np)
+            for entry in self._entries:
+                if self.tq.bitwise_similarity(compressed_vec, entry["compressed_vector"]) > 0.95:
+                    entry["access_count"] += 1
+                    entry["last_access"] = time.time()
+                    return
+        else:
+            for entry in self._entries:
+                if self._cosine_sim(vector, entry["vector"]) > 0.95:
+                    entry["access_count"] += 1
+                    entry["last_access"] = time.time()
+                    return
         
         # Evict if full (LRU)
         if len(self._entries) >= self.max_size:
             self._entries.sort(key=lambda x: x["last_access"])
             self._entries.pop(0)
         
-        self._entries.append({
+        entry_data = {
             "text": text,
             "vector": vector,
             "metadata": metadata or {},
             "access_count": 1,
             "last_access": time.time()
-        })
+        }
+        if self.use_turbo_quant:
+            entry_data["compressed_vector"] = compressed_vec
+            
+        self._entries.append(entry_data)
     
     def query(self, query_vector: List[float], top_k: int = 3) -> List[Dict[str, Any]]:
         """Search L1 cache by similarity."""
         scored = []
-        for entry in self._entries:
-            sim = self._cosine_sim(query_vector, entry["vector"])
-            if sim > 0.3:  # minimum relevance
-                scored.append((sim, entry))
+        if self.use_turbo_quant:
+            q_np = np.array(query_vector, dtype=np.float32)
+            compressed_q = self.tq.compress(q_np)
+            for entry in self._entries:
+                sim = self.tq.bitwise_similarity(compressed_q, entry["compressed_vector"])
+                if sim > 0.3:  # minimum relevance
+                    scored.append((sim, entry))
+        else:
+            for entry in self._entries:
+                sim = self._cosine_sim(query_vector, entry["vector"])
+                if sim > 0.3:  # minimum relevance
+                    scored.append((sim, entry))
         scored.sort(key=lambda x: -x[0])
         
         results = []
@@ -110,7 +168,8 @@ class L1Cache:
                 "text": entry["text"],
                 "similarity": round(sim, 4),
                 "metadata": entry["metadata"],
-                "source": "L1"
+                "source": "L1",
+                "vector": entry["vector"]
             })
         return results
     
@@ -178,8 +237,21 @@ class MultiHopRetriever:
         seen_texts = set()
         query_vector = self.substrate.embed.encode(query)
         
-        # Check L1 cache first (fast path)
-        l1_results = self.l1_cache.query(query_vector, top_k=top_k_per_hop)
+        # Dual-pass retrieval: Coarse pass via L1 cache (bitwise)
+        l1_candidates = self.l1_cache.query(query_vector, top_k=top_k_per_hop * 10)
+        
+        # Fine pass: Exact cosine similarity against candidates
+        fine_scored = []
+        for r in l1_candidates:
+            sim = self.l1_cache._cosine_sim(query_vector, r.get("vector", []))
+            fine_scored.append((sim, r))
+            
+        fine_scored.sort(key=lambda x: -x[0])
+        l1_results = []
+        for sim, r in fine_scored[:top_k_per_hop]:
+            r["similarity"] = round(sim, 4)
+            l1_results.append(r)
+            
         for r in l1_results:
             if r["text"] not in seen_texts:
                 seen_texts.add(r["text"])
@@ -442,7 +514,7 @@ class Cortex:
         )
         
         # Initialize L1 cache (hot memory)
-        self.l1 = L1Cache(max_size=l1_size)
+        self.l1 = L1Cache(max_size=l1_size, dim=dim)
         
         # Initialize multi-hop retriever
         self.retriever = MultiHopRetriever(

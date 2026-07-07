@@ -371,10 +371,6 @@
 /* ── PREVIEW ROOT ────────────────────────────────────────────────────────── */
 
 .dw-preview-root {
-  width: 100%;
-  max-width: 800px;
-  min-height: 480px;
-  height: 480px;
   background: #030509;
   border: 1px dashed rgba(201, 162, 39, 0.22);
   border-radius: 6px;

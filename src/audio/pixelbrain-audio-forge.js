@@ -5,17 +5,20 @@
  * worker bridge, packet queue, and the public API.
  *
  * AMENDMENT 2: AudioContext ownership is explicit.
- * dispose({ closeAudioContext }) defaults to false.
- * External contexts (ambience, music) are never closed blindly.
+ * AMENDMENT 4: Worker is optional; synthesis falls back to main thread.
  *
  * LAYER: src/audio (browser adapter) — requires browser APIs.
  */
 
 import { createAudioMixer, AUDIO_BUSES } from './audio-mixer.js';
-import { schedulePacket, handleWorkerMessage, clearAudioBufferCache } from './audio-forge.scheduler.js';
+import {
+  schedulePacket,
+  handleWorkerMessage,
+  clearAudioBufferCache,
+  rejectAllPendingWorkerJobs,
+  resolvePacketAudioBuffer,
+} from './audio-forge.scheduler.js';
 import { resolveIntent } from './sfx-intent-resolver.js';
-
-// ─── Context Creation ─────────────────────────────────────────────────────────
 
 function createOwnedAudioContext() {
   const AudioCtx = window.AudioContext ?? window.webkitAudioContext;
@@ -26,8 +29,6 @@ function createOwnedAudioContext() {
     return null;
   }
 }
-
-// ─── Worker Factory ───────────────────────────────────────────────────────────
 
 function createForgeWorker() {
   try {
@@ -40,11 +41,7 @@ function createForgeWorker() {
   }
 }
 
-// ─── Packet Queue (for pre-gesture buffering) ─────────────────────────────────
-
-const MAX_QUEUE_SIZE = 32;
-
-// ─── Forge Factory ────────────────────────────────────────────────────────────
+const MAX_QUEUE_SIZE = 64;
 
 /**
  * Creates a PixelBrain Audio Forge instance.
@@ -54,28 +51,32 @@ const MAX_QUEUE_SIZE = 32;
  * @returns {AudioForgeInstance}
  */
 export function createPixelBrainAudioForge(options = {}) {
-  // Ownership tracking — critical for AMENDMENT 2
   const externalContext = options.audioContext ?? null;
   let audioContext = externalContext ?? createOwnedAudioContext();
   const ownsContext = externalContext === null;
 
   let worker = createForgeWorker();
+  let workerEnabled = worker != null;
   let mixer = audioContext ? createAudioMixer(audioContext) : null;
   let disposed = false;
   let muted = false;
-
-  // Pre-gesture packet queue
   const pendingQueue = [];
 
-  // Wire worker message handler
+  function disableWorker(reason) {
+    if (!workerEnabled) return;
+    workerEnabled = false;
+    rejectAllPendingWorkerJobs(new Error(reason ?? 'AudioForge worker disabled'));
+    worker?.terminate();
+    worker = null;
+    console.warn('[AudioForge] Worker disabled:', reason);
+  }
+
   if (worker) {
     worker.onmessage = (event) => handleWorkerMessage(event);
     worker.onerror = (err) => {
-      console.warn('[AudioForge] Worker error:', err.message);
+      disableWorker(err?.message ?? 'worker error');
     };
   }
-
-  // ─── Internal Helpers ───────────────────────────────────────────────────────
 
   async function ensureContextRunning() {
     if (!audioContext) return false;
@@ -100,40 +101,30 @@ export function createPixelBrainAudioForge(options = {}) {
   }
 
   async function _playPacketNow(packet) {
-    if (!audioContext || !worker || !mixer || disposed) return;
-    await schedulePacket({ packet, audioContext, worker, mixer });
+    if (!audioContext || !mixer || disposed) return;
+    await schedulePacket({
+      packet,
+      audioContext,
+      worker: workerEnabled ? worker : null,
+      mixer,
+    });
   }
 
-  // ─── Public API ─────────────────────────────────────────────────────────────
-
   return {
-    /** Whether the AudioContext is running. */
     get ready() {
       return !disposed && audioContext?.state === 'running';
     },
 
-    /** Whether globally muted. */
     get muted() {
       return muted;
     },
 
-    /**
-     * Unlocks the AudioContext after a user gesture.
-     * Call from a pointerdown or keydown handler.
-     */
     async unlock() {
       if (disposed || !audioContext) return;
       await ensureContextRunning();
       await flushQueue();
     },
 
-    /**
-     * Plays a pre-built PB-SFX-v1 packet directly.
-     * If context is suspended, queues the packet until unlock().
-     *
-     * @param {object} packet
-     * @returns {Promise<void>}
-     */
     async playPacket(packet) {
       if (disposed || muted) return;
       const running = await ensureContextRunning();
@@ -146,73 +137,63 @@ export function createPixelBrainAudioForge(options = {}) {
       await _playPacketNow(packet);
     },
 
-    /**
-     * Resolves a game event into a packet, then schedules it.
-     * The canonical path for combat and game events.
-     *
-     * @param {string} eventType
-     * @param {object} [eventData]
-     * @returns {Promise<void>}
-     */
     async scheduleSfx(eventType, eventData = {}) {
       if (disposed || muted) return;
       try {
         const { packet } = resolveIntent(eventType, eventData);
         await this.playPacket(packet);
       } catch (err) {
-        // Intent resolution or playback failed — never propagate to combat
         console.warn(`[AudioForge] scheduleSfx failed for "${eventType}":`, err?.message ?? err);
       }
     },
 
-    /**
-     * Alias for scheduleSfx — event-bus compatible.
-     * Combat and Phaser can emitSfx without knowing audio internals.
-     */
     async emitSfx(eventType, eventData = {}) {
       return this.scheduleSfx(eventType, eventData);
     },
 
-    /**
-     * Sets the volume for a named bus.
-     *
-     * @param {string} bus - One of AUDIO_BUSES values
-     * @param {number} value - [0, 1]
-     */
+    setMuted(value) {
+      muted = Boolean(value);
+    },
+
+    async prewarmEventTypes(eventTypes = []) {
+      if (disposed || !audioContext || !Array.isArray(eventTypes)) return;
+      const running = await ensureContextRunning();
+      if (!running) return;
+      for (const eventType of eventTypes) {
+        try {
+          const { packet } = resolveIntent(eventType, { surface: 'stone', stepIndex: 0 });
+          await resolvePacketAudioBuffer({
+            packet,
+            audioContext,
+            worker: workerEnabled ? worker : null,
+          });
+        } catch {
+          // Best-effort cache warm.
+        }
+      }
+    },
+
     setVolume(bus, value) {
       if (disposed || !mixer) return;
       mixer.setVolume(bus, value);
     },
 
-    /**
-     * Disposes the forge.
-     *
-     * AMENDMENT 2: closeAudioContext defaults to false.
-     * Only close the context if this forge created and owns it.
-     *
-     * @param {object} [opts]
-     * @param {boolean} [opts.closeAudioContext=false]
-     */
     dispose({ closeAudioContext = false } = {}) {
       if (disposed) return;
       disposed = true;
 
-      // Always: terminate worker, disconnect mixer, clear pending queue
-      worker?.terminate();
-      worker = null;
+      disableWorker('dispose');
       mixer?.disconnect();
       mixer = null;
       pendingQueue.length = 0;
       clearAudioBufferCache();
 
-      // Close context only if we own it AND caller explicitly opts in
       if (audioContext && ownsContext && closeAudioContext) {
         audioContext.close().catch(() => {});
       }
       audioContext = null;
     },
 
-    // Expose bus names for consumers
     BUSES: AUDIO_BUSES,
   };
 }

@@ -1,0 +1,28 @@
+# crimson-ooze-vector.scdl
+# SCDL v1 vector-ops — same look as fixtures/crimson_ooze/crimson_ooze.scdl
+# but with the new circle/ring vocabulary.
+
+asset crimson_ooze canvas 24x24
+
+palette {
+  core   = #DA1B1B
+  rim    = #651515
+  glow   = #F87272
+  shine  = #F99494
+  shadow = #200909
+}
+
+part body material crimson_ooze_material {
+  circle 12 12 radius 10 core
+  ring   12 12 radius 10 width 2 shadow
+  ring   12 12 radius 8  width 1 rim
+  ring   12 12 radius 7  width 1 glow
+  glow radius 2
+}
+
+part highlight material emissive {
+  circle 7 7 radius 1 shine
+  circle 9 9 radius 1 shine
+}
+
+export json svg phaser png

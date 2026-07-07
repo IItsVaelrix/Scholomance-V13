@@ -167,7 +167,7 @@ export const naturalLanguageAmp = {
     }
 
     const tokenCount = tokenize(rawText).length;
-    const mode = (tokenCount < 10) ? 'generate' : (options.nluMode || 'direct');
+    const mode = options.nluMode || ((tokenCount < 10) ? 'generate' : 'direct');
     
     // Parse the prompt using the microprocessor pipeline. The dictionary
     // adapter (if supplied) enables OOV subject resolution via Datamuse.

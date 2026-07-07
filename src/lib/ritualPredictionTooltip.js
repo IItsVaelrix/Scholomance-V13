@@ -1,47 +1,5 @@
 import { PhonemeEngine } from '../../codex/core/phonology/phoneme.engine.js';
 import { deepRhymeEngine } from '../../codex/core/rhyme-astrology/deepRhyme.engine.js';
-import { ScholomanceDictionaryAPI } from './scholomanceDictionary.api.js';
-
-// Pending prime request keyed by the engine instance, so a second tooltip open
-// in the same tab does not re-issue the same lookup while the first is in
-// flight. Cleared on success/error.
-const pendingPrimeByEngine = new WeakMap();
-
-/**
- * Prime the rhyme engine's authoritative family cache from the live
- * ScholomanceDictionaryAPI. This is the bridge that fixes the local-phoneme
- * slant/perfect misclassification: words that share a `rhyme_family` in the
- * server lexicon are perfect rhymes by contract, regardless of how the local
- * scorer rates their ending signatures.
- *
- * Safe to call repeatedly: the engine's `primeRhymeFamilies` is a no-op for
- * already-cached words, and a single in-flight promise is shared across
- * concurrent callers (de-duped by engine identity).
- */
-export async function primeRitualRhymeFamilies(words, engine = deepRhymeEngine) {
-  const list = Array.from(new Set(
-    (Array.isArray(words) ? words : [])
-      .map((w) => String(w || '').trim())
-      .filter(Boolean),
-  ));
-  if (list.length === 0) return { requested: 0, families: 0 };
-
-  const inFlight = pendingPrimeByEngine.get(engine);
-  if (inFlight) return inFlight;
-
-  const promise = (async () => {
-    if (!ScholomanceDictionaryAPI.isConfigured()) {
-      return { requested: list.length, families: 0, skipped: 'unconfigured' };
-    }
-    return engine.primeRhymeFamilies(list, ScholomanceDictionaryAPI);
-  })();
-  pendingPrimeByEngine.set(engine, promise);
-  try {
-    return await promise;
-  } finally {
-    pendingPrimeByEngine.delete(engine);
-  }
-}
 
 const CONNECTORS = new Set([
   'and', 'or', 'but', 'nor', 'for', 'yet', 'so', 'if', 'then', 'than',
@@ -228,18 +186,15 @@ function buildIntent(role) {
 }
 
 /**
- * Build the resonance picture from the surrounding line using the real rhyme
- * engine: which neighbours this word actually phonetically connects to, the
- * connection type (perfect/near/slant/assonance) and its score. This is the
- * genuinely useful payload that the old tooltip never computed.
+ * Build the resonance picture from the surrounding line using the local rhyme
+ * engine: which neighbours this word phonetically connects to, the connection
+ * type (perfect/near/slant/assonance) and its score.
  *
- * Sync path: `analyzeLine` is synchronous, but the dictionary family cache
- * must be primed asynchronously. If the cache has not been primed yet (e.g.
- * the tooltip opens before the prime promise resolves), the engine still
- * produces a line analysis; the connection types in that pass fall back to
- * local phoneme scoring until the next call after `primeRhymeFamilies`
- * resolves. The `primeResonanceFamilies` helper in this module kicks off
- * the prime in parallel with the analysis so the very first open is correct.
+ * These tiers are a PROVISIONAL local estimate only. `reconcileWithLexicon`
+ * downstream overrides them with backend-confirmed rhyme membership once the
+ * lexicon lookup resolves, so the local phoneme scorer never has the final say
+ * on whether a partner is a perfect rhyme (gene
+ * BUGPATTERN_COLOR_DRAGON_FRONTEND_FALLBACK).
  */
 function buildResonance(contextLine, word, debugTrace) {
   const empty = { partners: [], lineAnalysisOk: false };
@@ -362,6 +317,89 @@ function computeConfidence(roleResult, analysis) {
   const raw = factors.reduce((s, f) => s + f.delta, 0);
   const confidence = Math.min(0.98, Math.max(0.1, raw));
   return { confidence, factors };
+}
+
+// Pull the most authoritative part-of-speech the lexicon payload carries:
+// the ranked `pos` array first, then the primary definition's partOfSpeech.
+function lexiconPartOfSpeech(lex) {
+  if (!lex) return '';
+  const fromArray = Array.isArray(lex.pos)
+    ? lex.pos.find(Boolean)
+    : (typeof lex.pos === 'string' ? lex.pos : '');
+  return fromArray || lex.definition?.partOfSpeech || '';
+}
+
+/**
+ * Collapse the local heuristic prediction and the authoritative lexicon lookup
+ * into ONE prediction model. The lexicon is the single source of truth:
+ *
+ *   - role is taken from the dictionary part-of-speech when available;
+ *   - resonance tiers render BACKEND-confirmed rhyme membership, never the
+ *     local phoneme guess (gene BUGPATTERN_COLOR_DRAGON_FRONTEND_FALLBACK:
+ *     "render confirmed indices only", "do not trust frontend-only phoneme
+ *     analysis over backend truth");
+ *   - confidence gains an auditable factor recording the reconciliation.
+ *
+ * Returns the base prediction untouched when no lexicon entry exists; the
+ * caller marks that case provisional.
+ */
+export function reconcileWithLexicon(basePrediction, lex) {
+  if (!basePrediction || !lex) return basePrediction;
+
+  const base = basePrediction.prediction || {};
+  const baseDetails = basePrediction.details || {};
+
+  // ── Role authority: dictionary POS overrides the local heuristic guess ──
+  const lexRole = posToRole(lexiconPartOfSpeech(lex));
+  const role = lexRole || base.role;
+  const roleChanged = Boolean(lexRole) && lexRole !== base.role;
+
+  // ── Resonance authority: backend rhyme membership defines the tier ──
+  const rhymeSet = new Set((Array.isArray(lex.rhymes) ? lex.rhymes : []).map(normalize));
+  const slantSet = new Set((Array.isArray(lex.slantRhymes) ? lex.slantRhymes : []).map(normalize));
+  const haveRhymeData = rhymeSet.size > 0 || slantSet.size > 0;
+
+  const resonancePartners = (baseDetails.resonancePartners || []).map((p) => {
+    const key = normalize(p.word);
+    if (rhymeSet.has(key)) return { ...p, type: 'perfect', confirmed: true };
+    if (slantSet.has(key)) return { ...p, type: 'slant', confirmed: true };
+    if (!haveRhymeData) return { ...p, confirmed: false };
+    // Backend has authoritative rhyme data and this partner is absent from it:
+    // the local phoneme guess is unconfirmed — never let it assert "perfect".
+    const demoted = (p.type === 'perfect' || p.type === 'identity') ? 'slant' : p.type;
+    return { ...p, type: demoted, confirmed: false };
+  });
+
+  // ── Confidence: reconciling against the lexicon raises certainty ──
+  const confidenceFactors = [...(base.confidenceFactors || [])];
+  let confidence = base.confidence;
+  if (lexRole) {
+    const delta = roleChanged ? 0.1 : 0.15;
+    confidenceFactors.push({
+      label: roleChanged ? `lexicon corrected role to ${lexRole}` : 'lexicon confirmed role',
+      delta,
+    });
+    confidence = Math.min(0.98, Math.max(0.1, (Number(confidence) || 0) + delta));
+  }
+
+  return {
+    ...basePrediction,
+    prediction: {
+      ...base,
+      role,
+      ritualName: roleChanged ? buildRitualName(basePrediction.word, role) : base.ritualName,
+      ritualFamily: RITUAL_FAMILIES[role] || base.ritualFamily,
+      intent: roleChanged ? buildIntent(role) : base.intent,
+      roleSignal: lexRole ? 'lexicon' : base.roleSignal,
+      confidence,
+      confidenceFactors,
+      authority: 'lexicon',
+    },
+    details: {
+      ...baseDetails,
+      resonancePartners,
+    },
+  };
 }
 
 export function buildRitualPrediction(params) {

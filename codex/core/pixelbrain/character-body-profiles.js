@@ -33,12 +33,30 @@ const STARBOUND_CHIBI_MASKS = Object.freeze({
   foot: Object.freeze([1, 2, 2, 2, 1]),
 });
 
+const SCHOLO_CHIBI_MASKS = Object.freeze({
+  // Square Enix–style chibi (≈2.8 heads tall)
+  // Larger head, smaller torso, very short legs
+  headSouth: Object.freeze([4, 6, 8, 9, 10, 10, 10, 9, 8, 7, 5, 3, 1]),
+  headProfile: Object.freeze([3, 5, 7, 8, 9, 9, 8, 7, 5, 3, 1]),
+  torsoSouth: Object.freeze([2, 3, 4, 4, 3, 2]),
+  torsoProfile: Object.freeze([1, 2, 3, 3, 2, 1]),
+  arm: Object.freeze([2, 2, 2, 1, 1]),
+  leg: Object.freeze([2, 2, 1, 1]),
+  foot: Object.freeze([2, 2, 1]),
+});
+
 // Structural guards for the Starbound Esper chibi (and chibi-style bodies).
 // These hard caps + ratios ensure the *base silhouette* (the cells + skeleton anchors
 // exposed to hair, clothing, accessories, details) stays narrow and head-dominant.
 // This prevents every future robe, armor, jacket, pauldron, or accessory from
 // inheriting an overly wide torso/shoulder that turns the chibi into a rectangle or linebacker.
-const CHIBI_SILHOUETTE_GUARDS = Object.freeze({
+//
+// Per PIXELBRAIN_AGENT_OPERATING_MANUAL + PIXELBRAIN_LANGUAGE_WHITE_PAPER:
+// - Lattice is authority (integer cells only).
+// - Determinism is non-negotiable.
+// - Required silhouette invariants must be enforced on the base (loud failure if broken).
+// - These guards are the source of truth for chibi proportion math.
+export const CHIBI_SILHOUETTE_GUARDS = Object.freeze({
   maxShoulderWidthRatio: 0.72,
   maxArmOutsetPx: 2,
   maxHandOutsetPx: 1,
@@ -46,6 +64,91 @@ const CHIBI_SILHOUETTE_GUARDS = Object.freeze({
   maxLegColumnHeightPx: 7,
   footSpacingPx: 1,
 });
+
+/**
+ * Central, deterministic applicator for chibi silhouette guards.
+ * Called after raw cell construction for any direction.
+ * Returns a new array of cells that respects all declared invariants.
+ * This closes the gap between the *declared* guards and executed geometry.
+ */
+function applyChibiSilhouetteGuards(rawCells, cx, direction, headMaxHalf, options = {}) {
+  const g = CHIBI_SILHOUETTE_GUARDS;
+  const isProfile = direction === 'east' || direction === 'west';
+
+  // Group by y (deterministic)
+  const byY = new Map();
+  for (const c of rawCells) {
+    if (!byY.has(c.y)) byY.set(c.y, new Set());
+    byY.get(c.y).add(c.x);
+  }
+
+  const legStartY = options.legTop ?? 28;
+  const maxLegH = g.maxLegColumnHeightPx;
+  const footGap = g.footSpacingPx;
+  const maxShoulder = Math.max(2, Math.round(headMaxHalf * g.maxShoulderWidthRatio));
+
+  // Apply leg height cap first (removes lower rows)
+  const allLegYs = [...byY.keys()].filter(y => y >= legStartY).sort((a, b) => a - b);
+  if (allLegYs.length > maxLegH) {
+    const toRemove = allLegYs.slice(maxLegH);
+    for (const y of toRemove) byY.delete(y);
+  }
+
+  const cleaned = [];
+  const sortedYs = [...byY.keys()].sort((a, b) => a - b);
+
+  for (const y of sortedYs) {
+    let xs = [...byY.get(y)].sort((a, b) => a - b);
+    const mid = cx;
+    const isLegBand = y >= legStartY;
+
+    if (!isLegBand) {
+      // Cap torso/shoulder width toward head dominance
+      let left = xs.filter(x => x < mid);
+      let right = xs.filter(x => x > mid);
+      if (left.length && right.length) {
+        const maxL = Math.max(...left);
+        const minR = Math.min(...right);
+        if ((minR - maxL + 1) > maxShoulder * 2) {
+          const excess = (minR - maxL + 1) - Math.floor(maxShoulder * 2);
+          const trim = Math.ceil(excess / 2);
+          left = left.filter(x => x >= mid - maxShoulder + trim);
+          right = right.filter(x => x <= mid + maxShoulder - trim);
+          xs = [...left, ...right].sort((a, b) => a - b);
+        }
+      }
+    }
+
+    if (isLegBand) {
+      if (!isProfile) {
+        // South: clear exact center + enforce foot gap
+        xs = xs.filter(x => x !== mid);
+        let left = xs.filter(x => x < mid);
+        let right = xs.filter(x => x > mid);
+        if (left.length && right.length) {
+          const maxL = Math.max(...left);
+          const minR = Math.min(...right);
+          const gap = minR - maxL - 1;
+          if (gap < footGap) {
+            const push = Math.ceil((footGap - gap) / 2);
+            left = left.map(x => x - push);
+            right = right.map(x => x + push);
+            xs = [...left, ...right].sort((a, b) => a - b);
+          }
+        }
+      } else {
+        // Profile: keep extremely narrow column only (side view leg)
+        xs = xs.filter(x => Math.abs(x - mid) <= 1);
+      }
+    }
+
+    for (const x of xs) {
+      cleaned.push({ x: Math.round(x), y });
+    }
+  }
+
+  return cleaned;
+}
 
 function pushHalfWidthRows(cells, cx, topY, halfWidths, options = {}) {
   const shiftX = roundInt(options.shiftX ?? 0);
@@ -526,16 +629,20 @@ function makeStarboundEsperChibiBody() {
       }
     }
 
-    // Legs — column height is hard-capped by the guard so long robes/armor don't create tall rectangular lower body.
+    // Legs — column height is hard-capped by the guard (prevents tall rectangular lower body on chibi).
     const baseLeg = STARBOUND_CHIBI_MASKS.leg;
     let legRows = baseLeg.map((w) => Math.max(0, roundInt(w * compact)));
-    legRows = legRows.slice(0, CHIBI_SILHOUETTE_GUARDS.maxLegColumnHeightPx);
+    const maxLegH = CHIBI_SILHOUETTE_GUARDS.maxLegColumnHeightPx;
+    legRows = legRows.slice(0, maxLegH);
 
     const legTop = waistY;
     const legBot = legTop + legRows.length - 1;
 
     if (isProfile) {
-      pushHalfWidthRows(cells, cx, legTop, legRows, { shiftX: profileShift });
+      // Profile view (side): single thin leg column. No "two legs" or collapse.
+      // Use the narrowest possible column for the visible leg silhouette.
+      const profileLegRows = legRows.map((w, i) => (i < 2 ? 1 : 0));
+      pushHalfWidthRows(cells, cx, legTop, profileLegRows, { shiftX: profileShift });
     } else {
       for (const side of [-1, 1]) {
         const lx = cx + side * (legGap + 1);
@@ -543,21 +650,27 @@ function makeStarboundEsperChibiBody() {
       }
     }
 
-    // Feet: enforce footSpacingPx gap at the body center column.
-    // Foot center sits at cx ± (legGap+1). Without clipping, the widest mask row
-    // (halfW=2) reaches cx, shared by both feet. footInnerDxCap is the maximum
-    // inward dx before a cell would cross into the declared gap zone.
+    // Feet
     const footTop = legBot - 1;
     const footBot = footTop + STARBOUND_CHIBI_MASKS.foot.length - 1;
-    const footInnerDxCap = legGap + 1 - CHIBI_SILHOUETTE_GUARDS.footSpacingPx;
-    for (const side of isProfile ? [0] : [-1, 1]) {
-      const fx = cx + side * legGap;
-      const toeShift = isProfile ? facingSign : side;
-      pushHalfWidthRows(cells, fx, footTop, STARBOUND_CHIBI_MASKS.foot, {
-        shiftX: toeShift,
-        clipRight: side < 0 ? footInnerDxCap : undefined,
-        clipLeft: side > 0 ? -footInnerDxCap : undefined,
-      });
+
+    if (isProfile) {
+      // Single narrow foot under the leg column in side view.
+      const profileFoot = [1, 1, 1];
+      const toeShift = facingSign;
+      pushHalfWidthRows(cells, cx + legGap, footTop, profileFoot, { shiftX: toeShift });
+    } else {
+      // South view — enforce footSpacingPx gap + no center overlap
+      const footInnerDxCap = legGap + 1 - CHIBI_SILHOUETTE_GUARDS.footSpacingPx;
+      for (const side of [-1, 1]) {
+        const fx = cx + side * legGap;
+        const toeShift = side;
+        pushHalfWidthRows(cells, fx, footTop, STARBOUND_CHIBI_MASKS.foot, {
+          shiftX: toeShift,
+          clipRight: side < 0 ? footInnerDxCap : undefined,
+          clipLeft: side > 0 ? -footInnerDxCap : undefined,
+        });
+      }
     }
 
     let eyeL = null;
@@ -583,6 +696,16 @@ function makeStarboundEsperChibiBody() {
       }
     }
 
+    // Final lattice enforcement — this is the point where declared guards become executed geometry.
+    // Per PIXELBRAIN_AGENT_OPERATING_MANUAL § Lattice Authority + Loud Failure.
+    const headMaxHalfForGuard = Math.max(...(isProfile ? STARBOUND_CHIBI_MASKS.headProfile : STARBOUND_CHIBI_MASKS.headSouth));
+    const enforcedCells = applyChibiSilhouetteGuards(cells, cx, direction, headMaxHalfForGuard, {
+      legTop,
+    });
+
+    // Rebuild a minimal leg/foot bottom for skeleton if enforcement changed the extent (rare, deterministic)
+    const finalFootBot = Math.max(...enforcedCells.map(c => c.y), footBot);
+
     const skeleton = buildSkeleton(
       { x: cx, y: headTopY },
       { x: cx, y: headMidY },
@@ -594,14 +717,14 @@ function makeStarboundEsperChibiBody() {
       { x: cx + legGap + legHalfW, y: waistY },
       { x: cx - legGap - legHalfW, y: roundInt((waistY + legBot) / 2) },
       { x: cx + legGap + legHalfW, y: roundInt((waistY + legBot) / 2) },
-      { x: cx - legGap - legHalfW, y: footBot - 1 },
-      { x: cx + legGap + legHalfW, y: footBot - 1 },
+      { x: cx - legGap - legHalfW, y: finalFootBot - 1 },
+      { x: cx + legGap + legHalfW, y: finalFootBot - 1 },
     );
 
     return {
-      cells,
+      cells: enforcedCells,
       anchors: {
-        base: { x: cx, y: footBot },
+        base: { x: cx, y: finalFootBot },
         tip: { x: cx, y: headTopY },
         center: { x: cx, y: roundInt(CH / 2) },
         headTop: skeleton.head.top,

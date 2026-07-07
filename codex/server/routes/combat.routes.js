@@ -10,6 +10,12 @@ const combatScoreBodySchema = z.object({
   playerId: z.string().trim().min(1).max(128).optional(),
   arenaSchool: SchoolSchema.optional(),
   opponentSchool: SchoolSchema.optional(),
+  scholomance: z.record(z.string(), z.number()).optional(),
+  compendiumContext: z.object({
+    usedEntryIds: z.array(z.string()).optional(),
+    unlockedEntryIds: z.array(z.string()).optional(),
+    discoveredEntryIds: z.array(z.string()).optional(),
+  }).optional(),
 }).strict();
 
 export async function combatRoutes(fastify, opts = {}) {
@@ -39,6 +45,8 @@ export async function combatRoutes(fastify, opts = {}) {
         playerId: parsed.data.playerId,
         arenaSchool: parsed.data.arenaSchool,
         opponentSchool: parsed.data.opponentSchool,
+        scholomance: parsed.data.scholomance,
+        compendiumContext: parsed.data.compendiumContext,
         session: request.session,
       });
     },

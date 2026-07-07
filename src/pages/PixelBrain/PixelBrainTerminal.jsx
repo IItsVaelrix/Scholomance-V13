@@ -1,8 +1,55 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import { FormulaLibrary } from "./FormulaLibrary";
 import { formulaToBytecode } from "../../lib/pixelbrain.adapter";
 import "./PixelBrainTerminal.css";
+
+/**
+ * Map the /api/pixelbrain/compile response into the analysisResult shape the
+ * terminal already renders. The backend packet is canonical; we only project
+ * it for display (never recompute color/geometry here — COLOR_DRAGON).
+ */
+function mapCompileResultToAnalysis(data) {
+  const packet = data?.packet || {};
+  const digest = data?.digest || {};
+  const canvas = packet.canvas || digest.canvas || { width: 64, height: 64, gridSize: 1 };
+  const sourceColors = Array.isArray(digest.sourcePalette) && digest.sourcePalette.length > 0
+    ? digest.sourcePalette
+    : ["#888888"];
+  const rawCoords = packet.geometry?.coordinates || digest.coordinates || [];
+  const coordinates = rawCoords.map((c) => {
+    const x = Math.round(Number(c?.snappedX ?? c?.x) || 0);
+    const y = Math.round(Number(c?.snappedY ?? c?.y) || 0);
+    return {
+      snappedX: x,
+      snappedY: y,
+      emphasis: Number(c?.emphasis) || 0.6,
+      // Authoritative source-palette color, chosen deterministically by position.
+      color: c?.color || sourceColors[(x + y) % sourceColors.length],
+      paletteKey: "source",
+    };
+  });
+  const palettes = [
+    { key: "source", colors: sourceColors },
+    ...(Array.isArray(digest.semanticPalette) && digest.semanticPalette.length > 0
+      ? [{ key: "mood", colors: digest.semanticPalette }]
+      : []),
+  ];
+  const params = data?.params || {};
+  return {
+    coordinates,
+    canvas,
+    palettes,
+    tokenCount: coordinates.length,
+    activeTokenCount: coordinates.length,
+    paletteCount: palettes.length,
+    dominantAxis: params.form?.dominantAxis,
+    dominantSymmetry: params.form?.symmetry,
+    bytecode: data?.checksum ? `PB-NL-${data.checksum}` : null,
+    intent: data?.intent,
+    checksum: data?.checksum,
+  };
+}
 
 function LatticeCanvas({ coordinates, canvas, palettes, isAnalyzing }) {
   const canvasRef = useRef(null);
@@ -103,12 +150,12 @@ function LatticeCanvas({ coordinates, canvas, palettes, isAnalyzing }) {
         ctx.globalAlpha = 1;
       }
 
-      // Draw token label (only for non-image sources)
-      if (!coord.source || !coord.source.startsWith('image')) {
+      // Draw token label (only for non-image sources that carry a token word).
+      if (coord.token && (!coord.source || !coord.source.startsWith('image'))) {
         ctx.fillStyle = "#888";
         ctx.font = "8px 'JetBrains Mono', monospace";
         ctx.textAlign = "center";
-        ctx.fillText(coord.token.substring(0, 6), x, y + 18);
+        ctx.fillText(String(coord.token).substring(0, 6), x, y + 18);
       }
     });
 
@@ -407,7 +454,41 @@ function AnalyzingState() {
   );
 }
 
-export default function PixelBrainTerminal({ mode, analysisResult, onFormulaSelect, onClose }) {
+export default function PixelBrainTerminal({ mode: propMode, analysisResult: propAnalysisResult, onFormulaSelect, onClose }) {
+  const [prompt, setPrompt] = useState("");
+  const [compiled, setCompiled] = useState(null);
+  const [compileState, setCompileState] = useState("idle"); // idle | compiling | error
+  const [compileError, setCompileError] = useState(null);
+
+  const handleCompile = useCallback(async () => {
+    const text = prompt.trim();
+    if (!text || compileState === "compiling") return;
+    setCompileState("compiling");
+    setCompileError(null);
+    try {
+      const res = await fetch("/api/pixelbrain/compile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ prompt: text }),
+      });
+      if (!res.ok) throw new Error(`Compile failed (${res.status})`);
+      const data = await res.json();
+      setCompiled(mapCompileResultToAnalysis(data));
+      setCompileState("idle");
+    } catch (err) {
+      setCompileError(err?.message || "Compilation failed");
+      setCompileState("error");
+    }
+  }, [prompt, compileState]);
+
+  // An internally compiled prompt takes precedence over the prop-driven flow,
+  // so the existing result JSX below renders it without further changes.
+  const analysisResult = compiled || propAnalysisResult;
+  const mode = compileState === "compiling"
+    ? "analyzing"
+    : (compiled ? "result" : propMode);
+
   const handleExport = () => {
     if (!analysisResult) return;
     
@@ -466,7 +547,57 @@ export default function PixelBrainTerminal({ mode, analysisResult, onFormulaSele
 
       {/* Terminal Content */}
       <div className="terminal-screen">
-        {mode === "input" && <IdleState />}
+        {mode === "input" && (
+          <div
+            className="terminal-input-state"
+            style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px", padding: "24px" }}
+          >
+            <div className="idle-message" style={{ textAlign: "center", color: "#7affa0", letterSpacing: "2px" }}>
+              PHONETIC LATTICE SYNTHESIS
+            </div>
+            <form
+              onSubmit={(e) => { e.preventDefault(); handleCompile(); }}
+              style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%", maxWidth: "440px" }}
+            >
+              <textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Describe the sigil — e.g. a heroic golden sword"
+                rows={2}
+                aria-label="PixelBrain compile prompt"
+                style={{
+                  resize: "vertical",
+                  background: "rgba(0,0,0,0.4)",
+                  color: "#d8ffe0",
+                  border: "1px solid rgba(120,255,160,0.3)",
+                  borderRadius: "4px",
+                  padding: "8px",
+                  fontFamily: "monospace",
+                }}
+              />
+              <button
+                type="submit"
+                disabled={!prompt.trim() || compileState === "compiling"}
+                style={{
+                  background: "rgba(120,255,160,0.12)",
+                  color: "#d8ffe0",
+                  border: "1px solid rgba(120,255,160,0.4)",
+                  borderRadius: "4px",
+                  padding: "8px",
+                  cursor: prompt.trim() ? "pointer" : "not-allowed",
+                  fontFamily: "monospace",
+                  letterSpacing: "2px",
+                }}
+              >
+                {compileState === "compiling" ? "FORGING…" : "FORGE"}
+              </button>
+              {compileError && (
+                <div style={{ color: "#ff8080", fontFamily: "monospace", fontSize: "12px" }}>{compileError}</div>
+              )}
+            </form>
+            <IdleState />
+          </div>
+        )}
         {mode === "analyzing" && <AnalyzingState />}
         {mode === "result" && analysisResult && (
           <motion.div

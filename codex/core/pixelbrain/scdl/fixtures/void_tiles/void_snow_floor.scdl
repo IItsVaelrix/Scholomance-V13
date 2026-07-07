@@ -1,0 +1,105 @@
+# void_snow_floor — snow-drifted ice, tutorial Void ice island
+# Isometric 2:1 diamond, 128x64. Light law: upper-left (-1,-1).
+asset void_snow_floor canvas 128x64
+
+palette {
+  abyss    = #04060e
+  deep     = #0e1526
+  dark     = #182238
+  base     = #22304f
+  mid      = #2d4066
+  lit      = #3d5480
+  bright   = #52709f
+  sheen    = #7291bd
+  frost    = #a8c3e2
+  spec     = #e3eef9
+  cyanhot  = #67e8f9
+  cyansoft = #b7f4fd
+  snowshad = #8fa3c4
+  snowbase = #c7d4ea
+  snowlit  = #e6eef8
+}
+
+# ── ice slab underneath (shared set law) ─────────────────────────────────
+part slab material void_ice {
+  polygon 64 -1 129 32 64 65 -1 32 base
+  polygon -1 32 64 -1 64 4 8 32 bright
+  polygon 64 -1 129 32 120 32 64 4 lit
+  polygon -1 32 64 65 64 59 8 32 dark
+  polygon 64 65 129 32 120 32 64 59 deep
+  line 0 32 64 0 sheen
+  line 64 0 127 31 lit
+  line 0 33 63 63 deep
+  line 64 63 127 33 abyss
+}
+
+# ── snow blanket — ragged cover, receding toward the SE melt edge ───────
+part snow material snow {
+  # blanket body with a torn, drifted outline
+  polygon 64 6 84 16 104 28 94 36 78 40 64 48 46 44 30 40 12 32 30 22 46 14 snowbase
+  # wind-packed shadow ripples across the body (iso-diagonal)
+  polygon 40 26 58 17 70 23 52 32 snowlit
+  polygon 70 23 88 25 96 30 76 32 52 32 snowlit
+  polygon 30 34 44 34 60 40 44 42 snowshad
+  polygon 60 40 78 36 88 34 74 42 snowshad
+  # drift mounds — lit crown, shadow crescent on the SE side
+  circle 44 22 radius 6 snowlit
+  circle 47 24 radius 4 snowbase
+  circle 42 20 radius 3 spec
+  circle 82 28 radius 5 snowlit
+  circle 84 30 radius 3 snowshad
+  circle 60 36 radius 5 snowbase
+  circle 62 38 radius 3 snowshad
+  # ragged melt fingers reaching toward the exposed ice
+  polygon 94 36 104 28 110 32 100 38 snowshad
+  polygon 64 48 78 40 84 42 70 50 snowshad
+  cell 106 34 snowbase
+  cell 102 38 snowshad
+  cell 88 40 snowbase
+  cell 74 46 snowshad
+  cell 56 46 snowbase
+  cell 40 44 snowshad
+  cell 22 36 snowbase
+  cell 16 33 snowshad
+  # wind scuffs
+  line 52 28 62 32 snowshad
+  line 72 26 80 29 snowshad
+}
+
+# ── exposed ice where the blanket has melted back (SE third) ─────────────
+part meltice material void_ice {
+  polygon 104 28 116 32 100 42 94 36 mid
+  polygon 70 50 84 42 100 42 88 50 74 54 dark
+  polygon 100 42 110 38 104 44 dark
+  cell 108 36 lit
+  cell 92 46 base
+  cell 80 50 base
+  cell 98 42 mid
+  # slick highlight on the wet melt line
+  line 94 36 104 28 sheen
+  line 70 50 84 42 mid
+}
+
+# ── sparkle — sunlit snow glitter, pinned to the light side ──────────────
+part sparkle material diamond {
+  cell 36 20 spec
+  cell 37 20 spec
+  cell 52 14 spec
+  cell 66 18 spec
+  cell 67 18 spec
+  cell 46 28 spec
+  cell 78 22 spec
+  cell 58 24 spec
+  cell 30 30 spec
+  cell 88 26 frost
+  cell 72 34 frost
+  cell 44 40 frost
+}
+
+# ── faint void shimmer trapped under the snow ────────────────────────────
+part shimmer material cyan_glow {
+  glow radius 2
+  cell 94 36 cyansoft
+  cell 55 46 cyansoft
+  cell 26 33 cyansoft
+}

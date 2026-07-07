@@ -1,0 +1,471 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Tactical Lattice Battle Board — Styles
+   Follows existing CombatPage.css patterns: glassmorphism, dark bg,
+   cyan/violet accents, --z-system stacking, --font-sans typography.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Tile Tooltip ────────────────────────────────────────────────────────── */
+
+.tactical-tile-tooltip {
+  min-width: 190px;
+  max-width: 280px;
+  padding: 10px 14px;
+  color: #f6fbff;
+  pointer-events: none;
+  z-index: var(--z-system, 9000);
+  background:
+    linear-gradient(180deg, rgba(9, 17, 28, 0.96), rgba(3, 7, 13, 0.98));
+  border: 1px solid rgba(100, 200, 255, 0.42);
+  border-radius: 8px;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.8),
+    inset 0 0 10px rgba(0, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  animation: tactical-tooltip-fade-in 0.15s ease-out;
+}
+
+@keyframes tactical-tooltip-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.tactical-tile-tooltip__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tactical-tile-tooltip__glyph {
+  font-size: 1.125rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 4px currentColor);
+}
+
+.tactical-tile-tooltip__name {
+  color: #65f4ff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.tactical-tile-tooltip__modifiers {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.tactical-tile-tooltip__modifier-line {
+  color: #b8e6ff;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.tactical-tile-tooltip__info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.tactical-tile-tooltip__label {
+  color: rgba(230, 242, 248, 0.56);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tactical-tile-tooltip__value {
+  color: rgba(230, 242, 248, 0.88);
+  font-size: 0.75rem;
+}
+
+.tactical-tile-tooltip__warning {
+  margin-top: 4px;
+  padding: 3px 6px;
+  color: #ff8866;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  background: rgba(234, 67, 53, 0.12);
+  border-radius: 3px;
+}
+
+.tactical-tile-tooltip__threat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.tactical-tile-tooltip__threat-name {
+  color: #ff6644;
+  font-size: 0.6875rem;
+  font-style: italic;
+}
+
+.tactical-tile-tooltip__control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.tactical-tile-tooltip__control-value {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tactical-tile-tooltip__control-value--player {
+  color: #4488ff;
+}
+
+.tactical-tile-tooltip__control-value--enemy {
+  color: #ff4444;
+}
+
+.tactical-tile-tooltip__control-value--neutral {
+  color: #888888;
+}
+
+/* ─── Overlay Controls ────────────────────────────────────────────────────── */
+
+.tactical-overlay-controls {
+  position: absolute;
+  bottom: 80px;
+  right: 12px;
+  z-index: var(--z-overlay, 100);
+  pointer-events: auto;
+}
+
+.tactical-overlay-controls--compact {
+  bottom: 60px;
+  right: 8px;
+}
+
+.tactical-overlay-controls__expand-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  color: rgba(230, 242, 248, 0.72);
+  font-size: 0.6875rem;
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  background:
+    linear-gradient(180deg, rgba(9, 17, 28, 0.88), rgba(3, 7, 13, 0.92));
+  border: 1px solid rgba(100, 200, 255, 0.28);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.tactical-overlay-controls__expand-btn:hover {
+  color: #65f4ff;
+  border-color: rgba(100, 200, 255, 0.56);
+}
+
+.tactical-overlay-controls__expand-icon {
+  font-size: 0.625rem;
+}
+
+.tactical-overlay-controls__expand-label {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tactical-overlay-controls__grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 8px;
+  background:
+    linear-gradient(180deg, rgba(9, 17, 28, 0.92), rgba(3, 7, 13, 0.96));
+  border: 1px solid rgba(100, 200, 255, 0.22);
+  border-radius: 8px;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.6),
+    inset 0 0 8px rgba(0, 255, 255, 0.04);
+  backdrop-filter: blur(6px);
+  animation: overlay-controls-slide-in 0.2s ease-out;
+}
+
+@keyframes overlay-controls-slide-in {
+  from { opacity: 0; transform: translateX(8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.tactical-overlay-controls__btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  color: rgba(230, 242, 248, 0.64);
+  font-size: 0.6875rem;
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  text-align: left;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tactical-overlay-controls__btn:hover:not(:disabled) {
+  color: rgba(230, 242, 248, 0.92);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.tactical-overlay-controls__btn--active {
+  color: #f6fbff;
+  background: rgba(100, 200, 255, 0.08);
+  border-color: rgba(100, 200, 255, 0.32);
+}
+
+.tactical-overlay-controls__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.tactical-overlay-controls__btn-indicator {
+  width: 8px;
+  height: 8px;
+  border: 1px solid;
+  border-radius: 2px;
+  flex-shrink: 0;
+  transition: background-color 0.15s;
+}
+
+.tactical-overlay-controls__btn-icon {
+  font-size: 0.875rem;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 16px;
+  text-align: center;
+}
+
+.tactical-overlay-controls__btn-label {
+  flex: 1;
+  white-space: nowrap;
+}
+
+.tactical-overlay-controls__btn-hotkey {
+  flex-shrink: 0;
+  padding: 1px 4px;
+  color: rgba(230, 242, 248, 0.36);
+  font-size: 0.5625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 3px;
+}
+
+/* ─── Spell Preview Panel (PDR §18.2) ─────────────────────────────────────── */
+
+.tactical-spell-preview {
+  position: absolute;
+  bottom: 140px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-overlay, 100);
+  min-width: 260px;
+  max-width: 380px;
+  padding: 12px 16px;
+  color: #f6fbff;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(9, 17, 28, 0.94), rgba(3, 7, 13, 0.97));
+  border: 1px solid rgba(200, 160, 255, 0.38);
+  border-radius: 8px;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.7),
+    inset 0 0 12px rgba(200, 160, 255, 0.06);
+  backdrop-filter: blur(8px);
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  animation: tactical-tooltip-fade-in 0.2s ease-out;
+}
+
+.tactical-spell-preview__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(200, 160, 255, 0.18);
+}
+
+.tactical-spell-preview__weave {
+  color: #c8a0ff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tactical-spell-preview__target {
+  color: rgba(230, 242, 248, 0.72);
+  font-size: 0.75rem;
+}
+
+.tactical-spell-preview__modifiers {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 8px;
+}
+
+.tactical-spell-preview__modifier {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.6875rem;
+}
+
+.tactical-spell-preview__modifier-label {
+  color: rgba(230, 242, 248, 0.56);
+}
+
+.tactical-spell-preview__modifier-value {
+  color: #b8e6ff;
+  font-weight: 500;
+}
+
+.tactical-spell-preview__modifier-value--positive {
+  color: #66ff88;
+}
+
+.tactical-spell-preview__modifier-value--negative {
+  color: #ff6644;
+}
+
+.tactical-spell-preview__result {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 6px;
+  border-top: 1px solid rgba(200, 160, 255, 0.12);
+}
+
+.tactical-spell-preview__damage {
+  color: #ff8866;
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.tactical-spell-preview__effect {
+  color: rgba(230, 242, 248, 0.72);
+  font-size: 0.6875rem;
+}
+
+.tactical-spell-preview__warning {
+  margin-top: 6px;
+  padding: 3px 6px;
+  color: #ffaa44;
+  font-size: 0.625rem;
+  font-weight: 500;
+  background: rgba(255, 170, 68, 0.08);
+  border-radius: 3px;
+}
+
+/* ─── Tile School Highlight Animations ────────────────────────────────────── */
+
+@keyframes tile-pulse-fire {
+  0%, 100% { box-shadow: inset 0 0 8px rgba(204, 68, 17, 0.3); }
+  50%      { box-shadow: inset 0 0 16px rgba(204, 68, 17, 0.6); }
+}
+
+@keyframes tile-pulse-void {
+  0%, 100% { box-shadow: inset 0 0 8px rgba(102, 34, 170, 0.3); }
+  50%      { box-shadow: inset 0 0 16px rgba(102, 34, 170, 0.6); }
+}
+
+@keyframes tile-pulse-sonic {
+  0%, 100% { box-shadow: inset 0 0 8px rgba(34, 170, 204, 0.3); }
+  50%      { box-shadow: inset 0 0 16px rgba(34, 170, 204, 0.6); }
+}
+
+@keyframes tile-pulse-ice {
+  0%, 100% { box-shadow: inset 0 0 8px rgba(136, 204, 238, 0.3); }
+  50%      { box-shadow: inset 0 0 16px rgba(136, 204, 238, 0.6); }
+}
+
+@keyframes tile-pulse-holy {
+  0%, 100% { box-shadow: inset 0 0 8px rgba(238, 221, 102, 0.3); }
+  50%      { box-shadow: inset 0 0 16px rgba(238, 221, 102, 0.6); }
+}
+
+@keyframes tile-pulse-rune {
+  0%, 100% { box-shadow: inset 0 0 10px rgba(204, 136, 255, 0.3); }
+  50%      { box-shadow: inset 0 0 20px rgba(204, 136, 255, 0.7); }
+}
+
+@keyframes tile-pulse-null {
+  0%, 100% { box-shadow: inset 0 0 6px rgba(85, 85, 85, 0.2); }
+  50%      { box-shadow: inset 0 0 12px rgba(85, 85, 85, 0.4); }
+}
+
+@keyframes tile-pulse-anchor {
+  0%, 100% { box-shadow: inset 0 0 10px rgba(170, 102, 204, 0.3); }
+  50%      { box-shadow: inset 0 0 18px rgba(170, 102, 204, 0.6); }
+}
+
+.tile-fire   { animation: tile-pulse-fire   3s ease-in-out infinite; }
+.tile-void   { animation: tile-pulse-void   3s ease-in-out infinite; }
+.tile-sonic  { animation: tile-pulse-sonic  3s ease-in-out infinite; }
+.tile-ice    { animation: tile-pulse-ice    3s ease-in-out infinite; }
+.tile-holy   { animation: tile-pulse-holy   3s ease-in-out infinite; }
+.tile-rune   { animation: tile-pulse-rune   2.5s ease-in-out infinite; }
+.tile-null   { animation: tile-pulse-null   4s ease-in-out infinite; }
+.tile-anchor { animation: tile-pulse-anchor 3s ease-in-out infinite; }
+
+/* ─── Matrix Transition Overlay ───────────────────────────────────────────── */
+
+.battle-transition-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-system, 9000);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.battle-transition-overlay__code-flood {
+  position: absolute;
+  inset: 0;
+  color: #00ff41;
+  font-family: 'Courier New', monospace;
+  font-size: 0.625rem;
+  line-height: 1;
+  opacity: 0;
+  mix-blend-mode: screen;
+  animation: code-flood-in 0.4s 0.2s ease-out forwards;
+}
+
+@keyframes code-flood-in {
+  from { opacity: 0; }
+  to   { opacity: 0.6; }
+}
+
+.battle-transition-overlay__grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  animation: grid-reveal 0.4s 2.2s ease-out forwards;
+}
+
+@keyframes grid-reveal {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

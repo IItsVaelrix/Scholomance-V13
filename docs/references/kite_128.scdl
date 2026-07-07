@@ -1,0 +1,4737 @@
+asset kite_128 canvas 128x128
+
+palette {
+  c000 = #838281
+  c001 = #041e39
+  c002 = #000318
+  c003 = #9f9b96
+  c004 = #d9d1c6
+  c005 = #6b6968
+  c006 = #7f7e7c
+  c007 = #beb7b0
+  c008 = #fefed6
+  c009 = #405f83
+  c010 = #162536
+  c011 = #514f4f
+  c012 = #625f60
+  c013 = #f7d783
+  c014 = #13273e
+  c015 = #282728
+  c016 = #8c8a83
+  c017 = #2c4869
+  c018 = #162f4c
+  c019 = #182d45
+  c020 = #494847
+  c021 = #5b5755
+  c022 = #220500
+  c023 = #0c1927
+  c024 = #22374f
+  c025 = #193452
+  c026 = #8a8784
+  c027 = #0c2744
+  c028 = #ada8a2
+  c029 = #132a45
+  c030 = #486991
+  c031 = #333334
+  c032 = #684a18
+  c033 = #1d3248
+  c034 = #5679a1
+  c035 = #224266
+  c036 = #34475e
+  c037 = #0b1d30
+  c038 = #7d7978
+  c039 = #948f8c
+  c040 = #777574
+  c041 = #3d2201
+  c042 = #9e7634
+  c043 = #403f40
+  c044 = #030105
+  c045 = #54390e
+  c046 = #c59b4e
+  c047 = #716e6e
+  c048 = #36506f
+  c049 = #1e3a5a
+  c050 = #0e233a
+  c051 = #322e2b
+  c052 = #668ab3
+  c053 = #1a2b3e
+  c054 = #36557b
+  c055 = #28415f
+  c056 = #263d57
+  c057 = #835f25
+  c058 = #7c6e63
+  c059 = #19191b
+  c060 = #021429
+  c061 = #102133
+  c062 = #2a4c74
+  c063 = #3a393a
+}
+
+part mortar material source {
+  ring 64 64 52 1 c044
+  ring 64 64 54 1 c044
+  ring 64 64 55 1 c044
+  ring 64 64 56 1 c044
+  ring 64 64 57 1 c044
+  ring 64 64 58 1 c044
+  ring 64 64 59 1 c044
+  ring 64 64 60 1 c044
+  ring 64 64 61 1 c044
+  ring 64 64 62 1 c044
+  ring 64 64 63 1 c044
+  ring 64 64 64 1 c044
+  rect 0 0 56 1 c044
+  rect 73 0 55 1 c044
+  rect 0 1 51 1 c044
+  rect 78 1 50 1 c044
+  rect 0 2 47 1 c044
+  rect 82 2 46 1 c044
+  rect 0 3 44 1 c044
+  rect 85 3 43 1 c044
+  rect 0 4 41 1 c044
+  rect 88 4 40 1 c044
+  rect 0 5 38 1 c044
+  rect 91 5 37 1 c044
+  rect 0 6 36 1 c044
+  rect 93 6 35 1 c044
+  rect 0 7 34 1 c044
+  rect 95 7 33 1 c044
+  rect 0 8 32 1 c044
+  rect 97 8 31 1 c044
+  rect 0 9 31 1 c044
+  rect 98 9 30 1 c044
+  rect 0 10 29 1 c044
+  rect 100 10 28 1 c044
+  rect 0 11 28 1 c044
+  rect 101 11 27 1 c044
+  rect 0 12 26 1 c044
+  rect 103 12 25 1 c044
+  rect 0 13 25 1 c044
+  rect 104 13 24 1 c044
+  rect 0 14 24 1 c044
+  rect 105 14 23 1 c044
+  rect 0 15 23 1 c044
+  rect 106 15 22 1 c044
+  rect 0 16 21 1 c044
+  rect 108 16 20 1 c044
+  rect 0 17 20 1 c044
+  rect 109 17 19 1 c044
+  rect 0 18 19 1 c044
+  rect 110 18 18 1 c044
+  rect 0 19 18 1 c044
+  rect 111 19 17 1 c044
+  rect 0 20 17 1 c044
+  rect 112 20 16 1 c044
+  rect 0 21 16 2 c044
+  rect 113 21 15 2 c044
+  rect 0 23 15 1 c044
+  rect 114 23 14 1 c044
+  rect 0 24 14 1 c044
+  rect 115 24 13 1 c044
+  rect 0 25 13 1 c044
+  cell 100 25 c044
+  rect 116 25 12 1 c044
+  rect 0 26 12 2 c044
+  cell 101 26 c044
+  rect 117 26 11 2 c044
+  cell 26 27 c044
+  cell 102 27 c044
+  rect 0 28 11 1 c044
+  cell 25 28 c044
+  rect 100 28 1 4 c044
+  cell 103 28 c044
+  rect 118 28 10 1 c044
+  rect 0 29 10 2 c044
+  cell 24 29 c044
+  rect 101 29 1 71 c044
+  cell 104 29 c044
+  rect 119 29 9 2 c044
+  rect 23 30 1 2 c044
+  rect 26 30 1 69 c044
+  rect 102 30 1 69 c044
+  rect 105 30 1 2 c044
+  rect 0 31 9 1 c044
+  rect 22 31 1 2 c044
+  rect 25 31 1 67 c044
+  rect 103 31 1 67 c044
+  rect 106 31 1 2 c044
+  rect 120 31 8 1 c044
+  rect 0 32 8 2 c044
+  rect 24 32 1 65 c044
+  rect 104 32 1 65 c044
+  rect 121 32 7 2 c044
+  cell 21 33 c044
+  rect 23 33 1 63 c044
+  rect 100 33 1 3 c044
+  rect 105 33 1 63 c044
+  cell 107 33 c044
+  rect 0 34 7 2 c044
+  rect 20 34 1 2 c044
+  rect 108 34 1 2 c044
+  rect 122 34 6 2 c044
+  rect 22 35 1 59 c044
+  rect 106 35 1 59 c044
+  rect 0 36 6 2 c044
+  cell 19 36 c044
+  rect 21 36 1 57 c044
+  rect 107 36 1 57 c044
+  cell 109 36 c044
+  rect 123 36 5 2 c044
+  rect 18 37 1 2 c044
+  rect 100 37 1 64 c044
+  rect 110 37 1 2 c044
+  rect 0 38 5 3 c044
+  rect 20 38 1 53 c044
+  rect 27 38 1 62 c044
+  rect 108 38 1 53 c044
+  rect 124 38 4 3 c044
+  rect 17 39 1 2 c044
+  rect 19 39 1 51 c044
+  rect 109 39 1 51 c044
+  rect 111 39 1 2 c044
+  rect 0 41 4 3 c044
+  rect 16 41 1 2 c044
+  rect 18 41 1 47 c044
+  rect 110 41 1 47 c044
+  rect 112 41 1 2 c044
+  rect 125 41 3 3 c044
+  rect 15 43 1 3 c044
+  rect 17 43 1 43 c044
+  rect 111 43 1 43 c044
+  rect 113 43 1 3 c044
+  rect 0 44 3 3 c044
+  rect 28 44 1 2 c044
+  rect 99 44 1 58 c044
+  rect 126 44 2 3 c044
+  rect 14 45 1 3 c044
+  cell 29 45 c044
+  rect 98 45 1 2 c044
+  rect 114 45 1 3 c044
+  rect 16 46 1 37 c044
+  cell 97 46 c044
+  rect 112 46 1 37 c044
+  rect 0 47 2 4 c044
+  rect 28 47 1 54 c044
+  rect 127 47 1 4 c044
+  rect 13 48 1 4 c044
+  rect 115 48 1 4 c044
+  rect 15 49 1 31 c044
+  rect 113 49 1 31 c044
+  rect 0 51 1 5 c044
+  rect 12 52 1 5 c044
+  rect 14 52 1 25 c044
+  rect 98 52 1 51 c044
+  rect 114 52 1 25 c044
+  rect 116 52 1 5 c044
+  rect 29 53 1 49 c044
+  rect 11 57 1 15 c044
+  rect 13 57 1 15 c044
+  rect 115 57 1 15 c044
+  rect 117 57 1 15 c044
+  rect 97 58 1 46 c044
+  rect 30 62 1 41 c044
+  rect 96 62 1 43 c044
+  rect 31 65 1 39 c044
+  rect 90 67 1 4 c044
+  rect 95 67 1 39 c044
+  rect 32 68 1 37 c044
+  rect 33 70 1 36 c044
+  rect 91 70 1 2 c044
+  rect 92 71 1 2 c044
+  rect 94 71 1 35 c044
+  rect 12 72 1 5 c044
+  rect 34 72 2 1 c044
+  cell 93 72 c044
+  rect 116 72 1 5 c044
+  rect 0 73 1 55 c044
+  rect 34 75 1 31 c044
+  rect 93 75 1 32 c044
+  rect 13 77 1 4 c044
+  rect 92 77 1 31 c044
+  rect 115 77 1 4 c044
+  rect 1 78 1 50 c044
+  rect 35 78 1 29 c044
+  rect 127 78 1 50 c044
+  rect 14 81 1 3 c044
+  rect 36 81 1 27 c044
+  rect 91 81 1 27 c044
+  rect 114 81 1 3 c044
+  rect 2 82 1 46 c044
+  rect 126 82 1 46 c044
+  rect 15 83 1 3 c044
+  rect 37 83 1 25 c044
+  rect 90 83 1 26 c044
+  rect 113 83 1 3 c044
+  rect 3 85 1 43 c044
+  rect 125 85 1 43 c044
+  rect 16 86 1 2 c044
+  rect 38 86 1 23 c044
+  rect 89 86 1 24 c044
+  rect 112 86 1 2 c044
+  rect 4 88 1 40 c044
+  rect 17 88 1 2 c044
+  rect 39 88 1 22 c044
+  rect 88 88 1 22 c044
+  rect 111 88 1 2 c044
+  rect 124 88 1 40 c044
+  rect 18 90 1 2 c044
+  rect 40 90 1 20 c044
+  rect 87 90 1 21 c044
+  rect 110 90 1 2 c044
+  rect 5 91 1 37 c044
+  rect 123 91 1 37 c044
+  cell 19 92 c044
+  rect 41 92 1 19 c044
+  rect 86 92 1 19 c044
+  cell 109 92 c044
+  rect 6 93 1 35 c044
+  rect 20 93 1 2 c044
+  rect 108 93 1 2 c044
+  rect 122 93 1 35 c044
+  rect 42 94 1 17 c044
+  rect 85 94 1 18 c044
+  rect 7 95 1 33 c044
+  cell 21 95 c044
+  cell 107 95 c044
+  rect 121 95 1 33 c044
+  rect 22 96 1 2 c044
+  rect 43 96 1 16 c044
+  rect 84 96 1 16 c044
+  rect 106 96 1 2 c044
+  rect 8 97 1 31 c044
+  rect 23 97 1 2 c044
+  rect 83 97 1 15 c044
+  rect 105 97 1 2 c044
+  rect 120 97 1 31 c044
+  rect 9 98 1 30 c044
+  rect 44 98 1 14 c044
+  rect 119 98 1 30 c044
+  cell 24 99 c044
+  rect 45 99 1 13 c044
+  rect 82 99 1 14 c044
+  cell 104 99 c044
+  rect 10 100 1 28 c044
+  cell 25 100 c044
+  cell 103 100 c044
+  rect 118 100 1 28 c044
+  rect 11 101 1 27 c044
+  cell 26 101 c044
+  rect 46 101 1 12 c044
+  rect 81 101 1 12 c044
+  cell 102 101 c044
+  rect 117 101 1 27 c044
+  cell 27 102 c044
+  rect 80 102 1 11 c044
+  cell 101 102 c044
+  rect 12 103 1 25 c044
+  cell 28 103 c044
+  rect 47 103 1 10 c044
+  cell 100 103 c044
+  rect 116 103 1 25 c044
+  rect 13 104 1 24 c044
+  cell 29 104 c044
+  rect 48 104 1 9 c044
+  rect 79 104 1 10 c044
+  cell 99 104 c044
+  rect 115 104 1 24 c044
+  rect 14 105 1 23 c044
+  rect 30 105 2 1 c044
+  rect 97 105 2 1 c044
+  rect 114 105 1 23 c044
+  rect 15 106 1 22 c044
+  rect 31 106 2 1 c044
+  rect 49 106 1 8 c044
+  rect 78 106 1 8 c044
+  rect 96 106 2 1 c044
+  rect 113 106 1 22 c044
+  cell 33 107 c044
+  rect 50 107 1 7 c044
+  rect 77 107 1 7 c044
+  cell 95 107 c044
+  rect 16 108 1 20 c044
+  rect 34 108 2 1 c044
+  rect 76 108 1 7 c044
+  rect 93 108 2 1 c044
+  rect 112 108 1 20 c044
+  rect 17 109 1 19 c044
+  cell 36 109 c044
+  rect 51 109 1 5 c044
+  cell 92 109 c044
+  rect 111 109 1 19 c044
+  rect 18 110 1 18 c044
+  rect 37 110 2 1 c044
+  rect 52 110 1 5 c044
+  rect 75 110 1 5 c044
+  rect 90 110 2 1 c044
+  rect 110 110 1 18 c044
+  rect 19 111 1 17 c044
+  rect 39 111 2 1 c044
+  rect 53 111 1 4 c044
+  rect 74 111 1 4 c044
+  rect 88 111 2 1 c044
+  rect 109 111 1 17 c044
+  rect 20 112 1 16 c044
+  rect 41 112 2 1 c044
+  rect 54 112 1 3 c044
+  rect 73 112 1 3 c044
+  rect 86 112 2 1 c044
+  rect 108 112 1 16 c044
+  rect 21 113 2 15 c044
+  rect 43 113 3 1 c044
+  rect 72 113 1 2 c044
+  rect 83 113 3 1 c044
+  rect 106 113 2 15 c044
+  rect 23 114 1 14 c044
+  rect 45 114 3 1 c044
+  cell 55 114 c044
+  rect 71 114 1 2 c044
+  rect 81 114 3 1 c044
+  rect 105 114 1 14 c044
+  rect 24 115 1 13 c044
+  rect 48 115 4 1 c044
+  cell 70 115 c044
+  rect 77 115 4 1 c044
+  rect 104 115 1 13 c044
+  rect 25 116 1 12 c044
+  rect 52 116 5 1 c044
+  rect 72 116 5 1 c044
+  rect 103 116 1 12 c044
+  rect 26 117 2 11 c044
+  rect 57 117 2 1 c044
+  rect 68 117 4 1 c044
+  rect 101 117 2 11 c044
+  rect 28 118 1 10 c044
+  rect 100 118 1 10 c044
+  rect 29 119 2 9 c044
+  rect 98 119 2 9 c044
+  rect 31 120 1 8 c044
+  rect 97 120 1 8 c044
+  rect 32 121 2 7 c044
+  rect 95 121 2 7 c044
+  rect 34 122 2 6 c044
+  rect 93 122 2 6 c044
+  rect 36 123 2 5 c044
+  rect 91 123 2 5 c044
+  rect 38 124 3 4 c044
+  rect 88 124 3 4 c044
+  rect 41 125 3 3 c044
+  rect 85 125 3 3 c044
+  rect 44 126 3 2 c044
+  rect 82 126 3 2 c044
+  rect 47 127 4 1 c044
+  rect 78 127 4 1 c044
+}
+
+part slab_0 material source {
+  rect 63 8 2 1 c044
+  rect 63 9 1 2 c044
+  rect 61 10 2 2 c044
+  rect 64 10 2 1 c044
+  rect 59 11 2 2 c044
+  rect 65 11 3 1 c044
+  rect 57 12 2 2 c044
+  rect 67 12 3 1 c044
+  rect 55 13 2 2 c044
+  cell 59 13 c044
+  rect 69 13 3 1 c044
+  rect 54 14 1 2 c044
+  rect 71 14 5 1 c044
+  rect 51 15 3 1 c044
+  rect 73 15 4 1 c044
+  rect 48 16 4 1 c044
+  rect 76 16 3 1 c044
+  rect 45 17 5 1 c044
+  rect 31 18 1 6 c044
+  rect 41 18 6 1 c044
+  rect 29 19 2 1 c044
+  rect 32 19 10 1 c044
+  rect 32 20 6 1 c044
+  rect 32 21 1 30 c044
+  cell 35 21 c044
+  rect 31 25 1 2 c044
+  cell 31 32 c044
+  rect 31 39 1 2 c044
+  rect 31 44 1 2 c044
+  rect 33 44 1 9 c044
+}
+
+part slab_1 material source {
+  rect 34 53 1 7 c044
+  rect 33 54 1 4 c044
+  rect 35 58 1 7 c044
+  rect 34 61 1 2 c044
+  rect 36 64 1 8 c044
+  cell 35 66 c044
+  rect 37 68 1 6 c044
+  rect 34 69 2 1 c044
+  cell 35 70 c044
+  rect 38 71 1 5 c044
+  rect 39 75 1 3 c044
+  rect 40 77 1 4 c044
+  rect 41 80 1 3 c044
+  rect 42 82 1 4 c044
+  rect 43 85 1 3 c044
+  rect 44 87 1 2 c044
+}
+
+part slab_2 material source {
+  rect 79 17 7 1 c044
+  rect 82 18 8 1 c044
+  rect 86 19 9 1 c044
+  rect 89 20 8 1 c044
+  rect 95 21 1 20 c044
+  rect 96 22 1 2 c044
+  cell 96 25 c044
+}
+
+part slab_3 material source {
+  rect 63 42 1 8 c008
+  rect 48 45 4 1 c008
+  rect 50 46 2 2 c008
+  rect 55 46 2 2 c008
+  rect 39 47 11 1 c008
+  rect 52 47 3 1 c008
+  rect 57 47 6 1 c008
+  rect 64 47 12 1 c008
+}
+
+part slab_4 material source {
+  rect 27 15 7 1 c008
+  rect 27 16 1 22 c008
+}
+
+part slab_5 material source {
+  rect 49 96 1 4 c044
+  cell 48 97 c044
+  rect 50 98 1 4 c044
+  rect 51 100 1 3 c044
+  rect 52 101 1 3 c044
+  rect 53 103 1 3 c044
+  rect 54 104 1 3 c044
+  rect 55 106 1 2 c044
+  cell 56 107 c044
+}
+
+part slab_6 material source {
+  rect 63 16 2 1 c008
+  rect 63 17 1 14 c008
+  rect 62 18 1 4 c008
+  rect 61 20 1 3 c008
+}
+
+part slab_7 material source {
+  rect 47 11 3 1 c008
+  rect 43 12 6 1 c008
+  rect 39 13 5 1 c008
+  cell 46 13 c008
+  rect 34 14 6 1 c008
+}
+
+part slab_8 material source {
+  rect 66 69 1 19 c044
+}
+
+part slab_9 material source {
+  rect 94 42 1 10 c044
+  rect 96 43 3 1 c044
+  rect 95 44 2 1 c044
+  cell 96 45 c044
+  rect 95 48 1 2 c044
+}
+
+part slab_10 material source {
+  rect 60 23 3 1 c013
+  rect 59 24 3 2 c013
+  rect 61 26 2 1 c013
+  rect 62 27 1 4 c013
+}
+
+part slab_11 material source {
+  rect 64 87 2 1 c045
+  rect 65 88 1 7 c045
+  rect 66 91 3 1 c045
+  cell 64 92 c045
+  cell 66 92 c045
+  cell 64 94 c045
+}
+
+part slab_12 material source {
+  rect 44 44 1 3 c013
+  rect 41 45 3 1 c013
+  rect 46 45 2 2 c013
+  rect 42 46 2 1 c013
+  cell 45 46 c013
+  cell 48 46 c013
+}
+
+part slab_13 material source {
+  rect 73 33 1 7 c062
+  cell 72 34 c062
+  cell 74 34 c062
+  cell 72 36 c062
+  rect 74 37 2 1 c062
+  cell 74 38 c062
+}
+
+part slab_14 material source {
+  rect 72 66 2 1 c049
+  rect 69 67 4 1 c049
+  rect 70 68 3 1 c049
+  rect 69 69 3 1 c049
+  cell 70 70 c049
+}
+
+part slab_15 material source {
+  rect 49 31 1 3 c030
+  rect 50 33 2 1 c030
+  rect 50 34 1 4 c030
+  rect 51 35 2 1 c030
+  cell 49 36 c030
+}
+
+part slab_16 material source {
+  rect 49 37 1 2 c009
+  cell 48 38 c009
+  rect 50 38 5 1 c009
+  rect 51 39 2 1 c009
+  rect 54 39 2 1 c009
+}
+
+part slab_17 material source {
+  rect 61 58 1 12 c044
+}
+
+part slab_18 material source {
+  rect 93 63 2 1 c063
+  rect 94 64 1 5 c063
+  cell 95 65 c063
+  rect 93 66 1 4 c063
+}
+
+part slab_19 material source {
+  rect 87 70 1 2 c050
+  rect 86 71 1 3 c050
+  rect 84 72 2 2 c050
+  rect 85 74 1 2 c050
+  cell 86 75 c050
+}
+
+part slab_20 material source {
+  rect 69 14 2 1 c002
+  rect 69 15 1 3 c002
+  cell 68 16 c002
+  rect 70 16 1 4 c002
+  cell 69 19 c002
+}
+
+part slab_21 material source {
+  rect 90 15 1 4 c043
+  rect 93 15 1 4 c043
+  rect 91 16 2 1 c043
+  cell 94 17 c043
+}
+
+part slab_22 material source {
+  rect 78 48 6 1 c032
+  rect 81 49 4 1 c032
+  cell 83 50 c032
+}
+
+part slab_23 material source {
+  rect 96 31 1 10 c008
+}
+
+part slab_24 material source {
+  rect 57 108 1 3 c044
+  rect 58 109 1 3 c044
+  rect 59 110 1 2 c044
+  rect 60 111 1 2 c044
+}
+
+part slab_25 material source {
+  rect 52 109 3 1 c063
+  rect 53 110 4 1 c063
+  rect 56 111 1 2 c063
+  cell 55 112 c063
+}
+
+part slab_26 material source {
+  rect 61 113 1 2 c044
+  rect 62 114 2 2 c044
+  cell 64 115 c044
+  rect 63 116 1 2 c044
+  cell 64 117 c044
+}
+
+part cracks material source {
+  rect 62 4 3 1 c008
+  rect 61 5 2 1 c008
+  cell 63 5 c000
+  cell 64 5 c038
+  rect 65 5 2 1 c008
+  rect 59 6 2 1 c008
+  cell 61 6 c021
+  rect 62 6 1 2 c044
+  rect 63 6 1 2 c008
+  rect 64 6 2 1 c044
+  cell 66 6 c021
+  rect 67 6 2 1 c008
+  rect 57 7 2 1 c008
+  rect 59 7 1 2 c028
+  cell 60 7 c003
+  cell 61 7 c012
+  cell 64 7 c015
+  cell 65 7 c044
+  rect 66 7 1 3 c005
+  cell 67 7 c047
+  cell 68 7 c040
+  rect 69 7 2 1 c008
+  rect 55 8 3 1 c008
+  rect 58 8 1 2 c000
+  cell 60 8 c006
+  cell 61 8 c043
+  cell 62 8 c000
+  cell 65 8 c005
+  rect 67 8 1 2 c012
+  cell 68 8 c011
+  cell 69 8 c047
+  cell 70 8 c003
+  rect 71 8 2 1 c008
+  rect 53 9 2 1 c008
+  cell 55 9 c000
+  cell 56 9 c006
+  cell 57 9 c028
+  cell 59 9 c040
+  cell 60 9 c011
+  cell 61 9 c038
+  cell 62 9 c008
+  cell 64 9 c008
+  cell 65 9 c047
+  cell 68 9 c005
+  rect 69 9 2 1 c012
+  cell 71 9 c005
+  cell 72 9 c040
+  rect 73 9 2 1 c008
+  rect 50 10 3 1 c008
+  cell 53 10 c011
+  cell 54 10 c038
+  cell 55 10 c006
+  cell 56 10 c016
+  cell 57 10 c051
+  cell 58 10 c038
+  cell 59 10 c000
+  cell 60 10 c038
+  cell 66 10 c008
+  cell 67 10 c006
+  cell 68 10 c021
+  cell 69 10 c005
+  cell 70 10 c040
+  cell 71 10 c021
+  cell 72 10 c012
+  cell 73 10 c026
+  cell 74 10 c047
+  rect 75 10 3 1 c008
+  cell 50 11 c058
+  rect 51 11 1 2 c007
+  cell 52 11 c003
+  cell 53 11 c028
+  cell 54 11 c039
+  rect 55 11 2 1 c000
+  cell 57 11 c028
+  cell 58 11 c008
+  rect 63 11 1 3 c002
+  cell 64 11 c056
+  cell 68 11 c008
+  cell 69 11 c003
+  cell 70 11 c006
+  cell 71 11 c000
+  cell 72 11 c047
+  cell 73 11 c038
+  cell 74 11 c020
+  cell 75 11 c040
+  rect 76 11 1 2 c012
+  cell 77 11 c003
+  rect 78 11 3 1 c008
+  rect 49 12 2 1 c007
+  rect 52 12 2 1 c039
+  cell 54 12 c012
+  cell 55 12 c028
+  cell 56 12 c003
+  cell 61 12 c053
+  cell 62 12 c034
+  cell 64 12 c034
+  cell 65 12 c024
+  cell 66 12 c036
+  cell 70 12 c008
+  rect 71 12 2 1 c012
+  cell 73 12 c028
+  cell 74 12 c005
+  cell 75 12 c039
+  cell 77 12 c047
+  cell 78 12 c026
+  rect 79 12 2 1 c028
+  rect 81 12 3 1 c008
+  cell 44 13 c003
+  cell 45 13 c004
+  cell 47 13 c005
+  cell 48 13 c004
+  cell 49 13 c008
+  rect 50 13 1 2 c028
+  rect 51 13 2 1 c004
+  rect 53 13 2 1 c008
+  cell 60 13 c036
+  cell 61 13 c009
+  cell 62 13 c054
+  cell 64 13 c029
+  rect 65 13 1 2 c054
+  rect 66 13 1 2 c009
+  cell 67 13 c048
+  cell 68 13 c036
+  rect 72 13 2 1 c008
+  cell 74 13 c040
+  rect 75 13 2 1 c047
+  cell 77 13 c003
+  cell 78 13 c047
+  rect 79 13 1 2 c004
+  cell 80 13 c039
+  cell 81 13 c016
+  cell 82 13 c007
+  cell 83 13 c021
+  rect 84 13 4 1 c008
+  cell 40 14 c005
+  cell 41 14 c039
+  cell 42 14 c007
+  rect 43 14 3 1 c028
+  cell 46 14 c004
+  cell 47 14 c021
+  rect 48 14 1 2 c007
+  cell 49 14 c004
+  rect 51 14 3 1 c008
+  cell 57 14 c002
+  cell 58 14 c009
+  cell 59 14 c053
+  cell 60 14 c023
+  cell 61 14 c029
+  cell 62 14 c017
+  cell 63 14 c034
+  cell 64 14 c017
+  cell 67 14 c034
+  cell 68 14 c055
+  cell 76 14 c028
+  cell 77 14 c026
+  cell 78 14 c038
+  cell 80 14 c004
+  cell 81 14 c021
+  cell 82 14 c026
+  cell 83 14 c038
+  cell 84 14 c012
+  cell 85 14 c006
+  cell 86 14 c021
+  cell 87 14 c012
+  cell 88 14 c020
+  rect 89 14 5 1 c008
+  cell 34 15 c039
+  rect 35 15 2 1 c005
+  cell 37 15 c028
+  cell 38 15 c006
+  cell 39 15 c040
+  cell 40 15 c007
+  rect 41 15 2 1 c003
+  cell 43 15 c028
+  rect 44 15 1 2 c004
+  cell 45 15 c011
+  rect 46 15 2 1 c007
+  rect 49 15 2 1 c008
+  cell 55 15 c059
+  cell 56 15 c009
+  rect 57 15 1 2 c017
+  rect 58 15 1 2 c054
+  cell 59 15 c030
+  cell 60 15 c017
+  cell 61 15 c049
+  cell 62 15 c054
+  cell 63 15 c044
+  cell 64 15 c054
+  cell 65 15 c034
+  cell 66 15 c055
+  cell 67 15 c017
+  cell 68 15 c029
+  cell 70 15 c034
+  rect 71 15 2 1 c024
+  rect 77 15 3 1 c008
+  cell 80 15 c028
+  cell 81 15 c003
+  cell 82 15 c007
+  cell 83 15 c000
+  rect 84 15 2 1 c005
+  rect 86 15 2 1 c020
+  cell 88 15 c043
+  cell 89 15 c011
+  cell 91 15 c020
+  cell 92 15 c059
+  rect 94 15 7 1 c008
+  cell 28 16 c021
+  cell 29 16 c005
+  cell 30 16 c012
+  cell 31 16 c005
+  rect 32 16 2 1 c011
+  cell 34 16 c047
+  cell 35 16 c005
+  cell 36 16 c038
+  cell 37 16 c026
+  cell 38 16 c005
+  cell 39 16 c003
+  cell 40 16 c000
+  cell 41 16 c003
+  rect 42 16 2 1 c004
+  rect 45 16 3 1 c008
+  cell 52 16 c059
+  cell 53 16 c002
+  cell 54 16 c024
+  cell 55 16 c052
+  cell 56 16 c035
+  rect 59 16 1 2 c034
+  cell 60 16 c030
+  cell 61 16 c024
+  cell 62 16 c055
+  cell 65 16 c055
+  rect 66 16 1 2 c056
+  cell 67 16 c009
+  cell 71 16 c017
+  cell 72 16 c029
+  cell 73 16 c025
+  cell 74 16 c056
+  cell 75 16 c059
+  rect 79 16 4 1 c008
+  cell 83 16 c011
+  cell 84 16 c005
+  cell 85 16 c012
+  rect 86 16 1 2 c021
+  rect 87 16 2 1 c011
+  rect 89 16 1 2 c020
+  cell 94 16 c063
+  cell 95 16 c020
+  cell 96 16 c063
+  cell 97 16 c044
+  cell 98 16 c063
+  cell 99 16 c031
+  rect 28 17 1 2 c044
+  rect 29 17 2 1 c008
+  cell 31 17 c011
+  cell 32 17 c012
+  rect 33 17 1 2 c021
+  rect 34 17 1 2 c012
+  cell 35 17 c040
+  cell 36 17 c021
+  cell 37 17 c043
+  cell 38 17 c026
+  cell 39 17 c040
+  rect 40 17 2 1 c007
+  rect 42 17 3 1 c008
+  cell 50 17 c009
+  rect 51 17 1 2 c055
+  cell 52 17 c030
+  cell 53 17 c009
+  cell 54 17 c030
+  cell 55 17 c001
+  cell 56 17 c052
+  cell 57 17 c048
+  cell 58 17 c030
+  cell 60 17 c052
+  cell 61 17 c034
+  cell 62 17 c002
+  cell 64 17 c045
+  cell 65 17 c056
+  cell 67 17 c050
+  cell 68 17 c062
+  cell 71 17 c056
+  cell 72 17 c017
+  rect 73 17 1 2 c035
+  cell 74 17 c025
+  cell 75 17 c048
+  cell 76 17 c056
+  rect 77 17 1 3 c002
+  cell 78 17 c024
+  cell 87 17 c021
+  cell 88 17 c011
+  rect 91 17 1 2 c063
+  cell 92 17 c020
+  cell 95 17 c059
+  rect 96 17 1 2 c044
+  cell 97 17 c008
+  cell 29 18 c021
+  cell 30 18 c043
+  cell 32 18 c038
+  cell 35 18 c047
+  rect 36 18 2 1 c011
+  rect 38 18 3 1 c008
+  cell 47 18 c023
+  cell 48 18 c052
+  cell 49 18 c034
+  cell 50 18 c030
+  cell 52 18 c035
+  cell 53 18 c050
+  cell 54 18 c009
+  rect 55 18 1 2 c052
+  cell 56 18 c030
+  cell 57 18 c009
+  cell 58 18 c062
+  cell 59 18 c009
+  cell 60 18 c025
+  cell 61 18 c048
+  cell 64 18 c042
+  rect 65 18 1 2 c008
+  cell 66 18 c024
+  cell 67 18 c062
+  cell 68 18 c009
+  cell 69 18 c054
+  cell 71 18 c054
+  cell 72 18 c030
+  rect 74 18 1 2 c062
+  rect 75 18 2 1 c055
+  cell 78 18 c000
+  cell 79 18 c033
+  cell 80 18 c055
+  cell 81 18 c053
+  cell 92 18 c063
+  rect 94 18 2 1 c063
+  cell 97 18 c021
+  cell 98 18 c015
+  cell 28 19 c026
+  cell 42 19 c002
+  cell 43 19 c036
+  rect 44 19 1 2 c030
+  cell 45 19 c052
+  cell 46 19 c034
+  cell 47 19 c052
+  rect 48 19 2 1 c030
+  cell 50 19 c048
+  cell 51 19 c034
+  cell 52 19 c009
+  rect 53 19 1 2 c030
+  cell 54 19 c054
+  cell 56 19 c054
+  cell 57 19 c052
+  cell 58 19 c054
+  rect 59 19 2 1 c055
+  cell 61 19 c024
+  cell 64 19 c045
+  cell 66 19 c030
+  cell 67 19 c054
+  cell 68 19 c049
+  cell 71 19 c062
+  cell 72 19 c029
+  cell 73 19 c009
+  rect 75 19 1 2 c017
+  rect 76 19 1 2 c054
+  cell 78 19 c017
+  cell 79 19 c055
+  cell 80 19 c056
+  cell 81 19 c025
+  cell 82 19 c024
+  cell 83 19 c033
+  cell 84 19 c014
+  cell 85 19 c033
+  cell 95 19 c043
+  cell 96 19 c031
+  rect 97 19 2 1 c044
+  cell 99 19 c043
+  cell 28 20 c005
+  cell 29 20 c012
+  cell 30 20 c038
+  cell 38 20 c023
+  rect 39 20 1 3 c002
+  cell 40 20 c009
+  cell 41 20 c024
+  rect 42 20 2 1 c030
+  cell 45 20 c062
+  cell 46 20 c052
+  rect 47 20 2 1 c034
+  rect 49 20 2 1 c009
+  cell 51 20 c017
+  cell 52 20 c001
+  cell 54 20 c002
+  cell 55 20 c030
+  cell 56 20 c034
+  cell 57 20 c054
+  cell 58 20 c030
+  cell 59 20 c009
+  cell 60 20 c036
+  cell 64 20 c046
+  cell 65 20 c045
+  cell 66 20 c044
+  rect 67 20 1 2 c055
+  rect 68 20 2 1 c017
+  cell 70 20 c048
+  rect 71 20 1 2 c054
+  rect 72 20 2 1 c062
+  cell 74 20 c001
+  cell 77 20 c055
+  cell 78 20 c060
+  cell 79 20 c049
+  cell 80 20 c017
+  cell 81 20 c027
+  rect 82 20 2 1 c055
+  cell 84 20 c024
+  cell 85 20 c025
+  rect 86 20 1 2 c002
+  cell 87 20 c014
+  cell 88 20 c019
+  cell 97 20 c051
+  rect 98 20 1 5 c063
+  cell 99 20 c015
+  cell 28 21 c012
+  rect 29 21 2 1 c040
+  cell 33 21 c002
+  cell 34 21 c023
+  cell 36 21 c036
+  rect 37 21 1 2 c002
+  cell 38 21 c048
+  cell 40 21 c001
+  cell 41 21 c052
+  cell 42 21 c009
+  cell 43 21 c001
+  cell 44 21 c009
+  cell 45 21 c052
+  cell 46 21 c034
+  rect 47 21 2 2 c052
+  cell 49 21 c030
+  cell 50 21 c054
+  cell 51 21 c048
+  cell 52 21 c030
+  cell 53 21 c001
+  cell 54 21 c062
+  rect 55 21 2 1 c009
+  cell 57 21 c018
+  rect 58 21 1 2 c054
+  cell 59 21 c030
+  cell 60 21 c048
+  cell 64 21 c045
+  cell 65 21 c042
+  cell 66 21 c008
+  cell 68 21 c056
+  cell 69 21 c048
+  rect 70 21 1 2 c002
+  rect 72 21 1 2 c035
+  cell 73 21 c017
+  rect 74 21 1 2 c062
+  cell 75 21 c054
+  cell 76 21 c033
+  cell 77 21 c002
+  cell 78 21 c017
+  cell 79 21 c034
+  cell 80 21 c049
+  cell 81 21 c025
+  cell 82 21 c029
+  rect 83 21 1 3 c049
+  cell 84 21 c025
+  cell 85 21 c014
+  cell 87 21 c033
+  cell 88 21 c014
+  rect 89 21 1 2 c002
+  cell 90 21 c053
+  cell 91 21 c033
+  rect 92 21 2 1 c010
+  cell 94 21 c061
+  cell 96 21 c043
+  cell 97 21 c063
+  cell 99 21 c043
+  cell 100 21 c063
+  cell 28 22 c040
+  cell 29 22 c012
+  cell 30 22 c039
+  cell 33 22 c056
+  cell 34 22 c014
+  cell 35 22 c059
+  cell 36 22 c001
+  cell 38 22 c034
+  rect 40 22 2 1 c060
+  cell 42 22 c034
+  cell 43 22 c054
+  cell 44 22 c052
+  cell 45 22 c054
+  cell 46 22 c009
+  rect 49 22 1 3 c034
+  cell 50 22 c052
+  cell 51 22 c034
+  cell 52 22 c017
+  cell 53 22 c049
+  cell 54 22 c009
+  cell 55 22 c030
+  cell 56 22 c009
+  rect 57 22 1 2 c054
+  cell 59 22 c053
+  cell 60 22 c022
+  cell 62 22 c046
+  rect 64 22 2 1 c032
+  cell 66 22 c057
+  cell 67 22 c044
+  cell 68 22 c036
+  cell 69 22 c055
+  cell 71 22 c035
+  cell 73 22 c054
+  cell 75 22 c062
+  cell 76 22 c025
+  cell 77 22 c035
+  cell 78 22 c025
+  cell 79 22 c017
+  cell 80 22 c002
+  rect 81 22 1 2 c035
+  cell 82 22 c055
+  cell 84 22 c049
+  cell 85 22 c018
+  cell 86 22 c025
+  rect 87 22 1 2 c018
+  cell 88 22 c060
+  rect 90 22 2 1 c019
+  cell 92 22 c010
+  cell 93 22 c053
+  cell 94 22 c023
+  cell 97 22 c015
+  rect 99 22 1 2 c031
+  cell 28 23 c021
+  cell 29 23 c005
+  cell 30 23 c012
+  rect 33 23 2 1 c024
+  cell 35 23 c044
+  rect 36 23 1 2 c049
+  cell 37 23 c030
+  cell 38 23 c062
+  cell 39 23 c030
+  cell 40 23 c002
+  cell 41 23 c054
+  cell 42 23 c048
+  cell 43 23 c009
+  cell 44 23 c049
+  cell 45 23 c035
+  rect 46 23 3 1 c030
+  cell 50 23 c054
+  cell 51 23 c009
+  cell 52 23 c052
+  cell 53 23 c018
+  cell 54 23 c030
+  cell 55 23 c009
+  cell 56 23 c036
+  rect 58 23 2 1 c008
+  cell 64 23 c045
+  cell 65 23 c042
+  cell 66 23 c022
+  rect 67 23 3 1 c008
+  cell 70 23 c044
+  rect 71 23 1 2 c055
+  rect 72 23 2 1 c049
+  cell 74 23 c035
+  cell 75 23 c052
+  cell 76 23 c062
+  cell 77 23 c054
+  cell 78 23 c017
+  cell 79 23 c049
+  cell 80 23 c009
+  cell 82 23 c025
+  cell 84 23 c035
+  rect 85 23 1 2 c049
+  cell 86 23 c002
+  cell 88 23 c019
+  cell 89 23 c033
+  cell 90 23 c002
+  cell 91 23 c050
+  cell 92 23 c002
+  rect 93 23 2 1 c061
+  rect 97 23 1 2 c043
+  cell 28 24 c047
+  rect 29 24 1 2 c020
+  cell 30 24 c021
+  cell 31 24 c008
+  cell 33 24 c017
+  cell 34 24 c014
+  rect 35 24 1 3 c002
+  cell 37 24 c025
+  cell 38 24 c054
+  cell 39 24 c034
+  cell 40 24 c014
+  cell 41 24 c052
+  cell 42 24 c009
+  cell 43 24 c030
+  cell 44 24 c052
+  cell 45 24 c054
+  cell 46 24 c052
+  cell 47 24 c030
+  cell 48 24 c052
+  cell 50 24 c062
+  cell 51 24 c034
+  rect 52 24 1 2 c030
+  cell 53 24 c033
+  cell 54 24 c052
+  rect 55 24 1 2 c030
+  cell 56 24 c048
+  rect 57 24 2 1 c008
+  rect 62 24 1 2 c046
+  cell 64 24 c041
+  cell 65 24 c057
+  cell 66 24 c045
+  cell 67 24 c032
+  rect 68 24 2 1 c042
+  cell 70 24 c008
+  rect 72 24 1 4 c017
+  rect 73 24 1 2 c035
+  cell 74 24 c030
+  rect 75 24 1 3 c002
+  cell 76 24 c009
+  cell 77 24 c025
+  cell 78 24 c062
+  rect 79 24 1 2 c035
+  cell 80 24 c054
+  rect 81 24 1 2 c049
+  cell 82 24 c048
+  cell 83 24 c025
+  cell 84 24 c002
+  cell 86 24 c049
+  cell 87 24 c060
+  cell 88 24 c029
+  rect 89 24 1 2 c002
+  cell 90 24 c014
+  cell 91 24 c019
+  cell 92 24 c044
+  rect 93 24 1 2 c014
+  rect 94 24 1 2 c061
+  cell 96 24 c005
+  cell 99 24 c015
+  cell 100 24 c031
+  cell 28 25 c040
+  cell 30 25 c038
+  cell 33 25 c033
+  cell 34 25 c048
+  cell 36 25 c035
+  cell 37 25 c054
+  cell 38 25 c030
+  cell 39 25 c062
+  rect 40 25 1 3 c002
+  cell 41 25 c030
+  rect 42 25 1 3 c054
+  cell 43 25 c052
+  rect 44 25 1 2 c030
+  cell 45 25 c009
+  cell 46 25 c030
+  cell 47 25 c009
+  rect 48 25 2 1 c030
+  cell 50 25 c034
+  cell 51 25 c052
+  cell 53 25 c054
+  rect 54 25 1 3 c009
+  cell 56 25 c052
+  cell 57 25 c008
+  cell 58 25 c022
+  cell 64 25 c057
+  rect 65 25 1 2 c032
+  cell 66 25 c057
+  cell 67 25 c045
+  rect 68 25 3 1 c022
+  cell 71 25 c017
+  rect 74 25 1 3 c062
+  cell 76 25 c035
+  cell 77 25 c049
+  cell 78 25 c035
+  cell 80 25 c017
+  cell 82 25 c025
+  rect 83 25 2 1 c035
+  cell 85 25 c054
+  cell 86 25 c018
+  cell 87 25 c014
+  cell 88 25 c018
+  cell 90 25 c060
+  cell 91 25 c050
+  cell 92 25 c014
+  cell 97 25 c031
+  cell 98 25 c020
+  cell 99 25 c043
+  cell 28 26 c020
+  cell 29 26 c012
+  cell 30 26 c039
+  cell 33 26 c055
+  cell 34 26 c018
+  cell 36 26 c029
+  cell 37 26 c062
+  rect 38 26 2 1 c054
+  cell 41 26 c034
+  cell 43 26 c030
+  rect 45 26 1 2 c030
+  cell 46 26 c060
+  cell 47 26 c049
+  rect 48 26 1 2 c009
+  cell 49 26 c054
+  rect 50 26 1 2 c027
+  cell 51 26 c009
+  cell 52 26 c034
+  cell 53 26 c052
+  cell 55 26 c054
+  cell 56 26 c022
+  rect 57 26 3 1 c044
+  rect 60 26 1 3 c022
+  cell 64 26 c042
+  cell 66 26 c042
+  rect 67 26 1 3 c044
+  cell 68 26 c022
+  rect 69 26 2 1 c044
+  cell 71 26 c054
+  cell 73 26 c062
+  cell 76 26 c062
+  cell 77 26 c009
+  cell 78 26 c017
+  cell 79 26 c009
+  cell 80 26 c049
+  rect 81 26 2 1 c035
+  cell 83 26 c025
+  cell 84 26 c017
+  rect 85 26 1 2 c018
+  cell 86 26 c025
+  cell 87 26 c049
+  cell 88 26 c027
+  cell 89 26 c029
+  cell 90 26 c019
+  cell 91 26 c033
+  cell 92 26 c002
+  cell 93 26 c050
+  cell 94 26 c010
+  cell 96 26 c015
+  rect 97 26 1 2 c063
+  cell 98 26 c031
+  cell 99 26 c051
+  cell 28 27 c012
+  cell 29 27 c039
+  cell 30 27 c005
+  rect 31 27 1 5 c008
+  cell 33 27 c014
+  rect 34 27 2 1 c017
+  cell 36 27 c035
+  cell 37 27 c030
+  cell 38 27 c009
+  cell 39 27 c054
+  cell 41 27 c030
+  rect 43 27 1 2 c052
+  cell 44 27 c009
+  cell 46 27 c034
+  cell 47 27 c009
+  cell 49 27 c034
+  cell 51 27 c034
+  cell 52 27 c052
+  rect 53 27 1 2 c002
+  rect 55 27 1 2 c030
+  rect 56 27 2 1 c054
+  cell 58 27 c036
+  cell 59 27 c056
+  cell 61 27 c042
+  rect 64 27 1 2 c045
+  cell 65 27 c057
+  cell 66 27 c032
+  cell 68 27 c036
+  rect 69 27 1 4 c055
+  rect 70 27 1 7 c002
+  cell 71 27 c055
+  cell 73 27 c017
+  cell 75 27 c054
+  cell 76 27 c002
+  cell 77 27 c062
+  cell 78 27 c027
+  cell 79 27 c062
+  rect 80 27 1 3 c035
+  rect 81 27 1 2 c049
+  cell 82 27 c025
+  cell 83 27 c049
+  cell 84 27 c001
+  rect 86 27 1 2 c002
+  cell 87 27 c036
+  cell 88 27 c018
+  cell 89 27 c060
+  cell 90 27 c027
+  cell 91 27 c018
+  rect 92 27 2 1 c014
+  cell 94 27 c023
+  rect 96 27 1 3 c008
+  cell 98 27 c043
+  cell 99 27 c063
+  cell 28 28 c003
+  rect 29 28 2 1 c012
+  cell 33 28 c056
+  rect 34 28 1 2 c017
+  cell 35 28 c035
+  rect 36 28 1 2 c056
+  cell 37 28 c035
+  cell 38 28 c062
+  cell 39 28 c049
+  cell 40 28 c054
+  cell 41 28 c034
+  rect 42 28 1 2 c035
+  cell 44 28 c034
+  rect 45 28 2 1 c054
+  cell 47 28 c030
+  rect 48 28 1 2 c052
+  cell 49 28 c001
+  cell 50 28 c052
+  rect 51 28 2 1 c030
+  cell 54 28 c002
+  cell 56 28 c030
+  cell 57 28 c036
+  cell 58 28 c055
+  cell 59 28 c010
+  cell 61 28 c008
+  cell 65 28 c046
+  cell 66 28 c022
+  cell 68 28 c056
+  cell 71 28 c017
+  cell 72 28 c049
+  cell 73 28 c009
+  rect 74 28 1 3 c035
+  rect 75 28 1 2 c062
+  cell 76 28 c025
+  cell 77 28 c035
+  cell 78 28 c025
+  rect 79 28 1 2 c035
+  cell 82 28 c055
+  cell 83 28 c018
+  cell 84 28 c017
+  rect 85 28 1 2 c027
+  rect 87 28 1 4 c002
+  rect 88 28 2 1 c025
+  cell 90 28 c049
+  cell 91 28 c060
+  cell 92 28 c014
+  cell 93 28 c050
+  cell 94 28 c061
+  cell 97 28 c043
+  rect 98 28 1 2 c020
+  cell 99 28 c043
+  cell 28 29 c016
+  rect 29 29 1 2 c047
+  cell 30 29 c000
+  cell 33 29 c025
+  cell 35 29 c017
+  cell 37 29 c030
+  cell 38 29 c055
+  rect 39 29 2 2 c002
+  cell 41 29 c054
+  cell 43 29 c034
+  cell 44 29 c009
+  rect 45 29 2 1 c030
+  rect 47 29 1 4 c009
+  rect 49 29 1 2 c034
+  rect 50 29 2 1 c030
+  cell 52 29 c034
+  cell 53 29 c052
+  cell 54 29 c030
+  cell 55 29 c009
+  cell 56 29 c054
+  cell 57 29 c048
+  rect 58 29 1 3 c054
+  rect 59 29 1 2 c036
+  cell 60 29 c044
+  cell 61 29 c022
+  cell 64 29 c032
+  cell 65 29 c057
+  cell 66 29 c044
+  cell 67 29 c056
+  cell 68 29 c024
+  cell 71 29 c055
+  cell 72 29 c035
+  cell 73 29 c054
+  cell 76 29 c035
+  rect 77 29 2 1 c062
+  cell 81 29 c035
+  cell 82 29 c017
+  cell 83 29 c049
+  cell 84 29 c055
+  cell 86 29 c035
+  rect 88 29 2 1 c018
+  cell 90 29 c025
+  cell 91 29 c018
+  rect 92 29 2 1 c019
+  cell 94 29 c029
+  rect 97 29 1 2 c011
+  cell 99 29 c063
+  cell 28 30 c011
+  cell 30 30 c040
+  cell 33 30 c056
+  cell 34 30 c049
+  cell 35 30 c048
+  cell 36 30 c035
+  cell 37 30 c019
+  rect 38 30 1 2 c017
+  cell 41 30 c025
+  rect 42 30 1 2 c030
+  cell 43 30 c027
+  cell 44 30 c034
+  rect 45 30 1 2 c030
+  cell 46 30 c009
+  cell 48 30 c030
+  rect 50 30 1 2 c052
+  cell 51 30 c030
+  cell 52 30 c060
+  rect 53 30 2 1 c009
+  cell 55 30 c017
+  cell 56 30 c009
+  cell 57 30 c025
+  cell 60 30 c036
+  rect 61 30 1 2 c008
+  cell 64 30 c057
+  cell 65 30 c045
+  cell 66 30 c002
+  cell 67 30 c024
+  cell 68 30 c048
+  cell 71 30 c035
+  cell 72 30 c049
+  cell 73 30 c027
+  rect 75 30 1 2 c035
+  cell 76 30 c001
+  rect 77 30 2 1 c035
+  cell 79 30 c049
+  cell 80 30 c017
+  cell 81 30 c055
+  cell 82 30 c056
+  cell 83 30 c018
+  rect 84 30 3 1 c025
+  cell 88 30 c014
+  cell 89 30 c027
+  cell 90 30 c049
+  rect 91 30 1 2 c033
+  rect 92 30 1 2 c014
+  cell 93 30 c027
+  cell 94 30 c037
+  cell 96 30 c059
+  cell 98 30 c021
+  rect 99 30 1 4 c020
+  cell 28 31 c005
+  cell 29 31 c006
+  cell 30 31 c031
+  cell 33 31 c055
+  rect 34 31 1 2 c024
+  rect 35 31 1 2 c017
+  cell 36 31 c018
+  cell 37 31 c017
+  cell 39 31 c060
+  cell 40 31 c009
+  cell 41 31 c034
+  cell 43 31 c030
+  rect 44 31 1 2 c048
+  cell 46 31 c034
+  cell 48 31 c009
+  rect 51 31 3 1 c009
+  cell 54 31 c060
+  cell 55 31 c052
+  cell 56 31 c014
+  cell 57 31 c052
+  cell 59 31 c049
+  cell 60 31 c048
+  cell 62 31 c032
+  cell 63 31 c013
+  cell 64 31 c045
+  cell 65 31 c032
+  cell 66 31 c022
+  cell 67 31 c036
+  cell 68 31 c035
+  cell 69 31 c029
+  cell 71 31 c062
+  rect 72 31 1 2 c054
+  cell 73 31 c017
+  rect 74 31 1 2 c062
+  rect 76 31 1 2 c002
+  cell 77 31 c009
+  cell 78 31 c035
+  cell 79 31 c017
+  rect 80 31 1 3 c035
+  cell 81 31 c049
+  rect 82 31 3 1 c035
+  cell 85 31 c025
+  cell 86 31 c001
+  rect 88 31 2 1 c025
+  cell 90 31 c018
+  rect 93 31 2 1 c014
+  cell 97 31 c020
+  cell 98 31 c011
+  cell 28 32 c026
+  cell 29 32 c003
+  cell 30 32 c039
+  cell 33 32 c033
+  rect 36 32 1 2 c017
+  cell 37 32 c034
+  cell 38 32 c062
+  cell 39 32 c034
+  rect 40 32 1 2 c002
+  cell 41 32 c035
+  cell 42 32 c048
+  cell 43 32 c062
+  rect 45 32 2 1 c054
+  cell 48 32 c054
+  cell 50 32 c054
+  cell 51 32 c009
+  cell 52 32 c034
+  cell 53 32 c048
+  cell 54 32 c009
+  cell 55 32 c030
+  cell 56 32 c054
+  cell 57 32 c009
+  cell 58 32 c030
+  cell 59 32 c018
+  cell 60 32 c017
+  rect 61 32 1 8 c044
+  cell 62 32 c013
+  rect 63 32 1 6 c008
+  cell 64 32 c032
+  cell 65 32 c057
+  rect 66 32 1 2 c044
+  cell 67 32 c009
+  rect 68 32 1 2 c062
+  cell 69 32 c030
+  cell 71 32 c035
+  cell 73 32 c054
+  cell 75 32 c049
+  cell 77 32 c049
+  rect 78 32 1 2 c025
+  rect 79 32 1 2 c035
+  rect 81 32 1 2 c035
+  cell 82 32 c017
+  rect 83 32 2 1 c025
+  cell 85 32 c018
+  cell 86 32 c002
+  cell 87 32 c025
+  cell 88 32 c060
+  rect 89 32 2 1 c029
+  cell 91 32 c027
+  cell 92 32 c023
+  cell 93 32 c018
+  cell 94 32 c050
+  cell 97 32 c012
+  cell 98 32 c020
+  cell 100 32 c015
+  cell 28 33 c012
+  cell 29 33 c015
+  cell 30 33 c038
+  rect 31 33 1 6 c008
+  rect 33 33 1 2 c024
+  rect 34 33 2 1 c056
+  rect 37 33 1 2 c009
+  rect 38 33 1 2 c048
+  cell 39 33 c002
+  rect 41 33 3 1 c054
+  rect 44 33 2 1 c017
+  rect 46 33 1 2 c009
+  cell 47 33 c030
+  rect 48 33 1 3 c009
+  cell 52 33 c052
+  rect 53 33 1 2 c054
+  cell 54 33 c052
+  cell 55 33 c035
+  rect 56 33 1 2 c017
+  cell 57 33 c062
+  cell 58 33 c035
+  cell 59 33 c017
+  cell 60 33 c054
+  cell 62 33 c042
+  rect 64 33 1 2 c045
+  cell 65 33 c022
+  cell 67 33 c030
+  cell 69 33 c054
+  rect 71 33 1 2 c001
+  cell 72 33 c027
+  cell 74 33 c009
+  cell 75 33 c035
+  cell 76 33 c060
+  cell 77 33 c035
+  rect 82 33 1 2 c035
+  cell 83 33 c049
+  cell 84 33 c025
+  cell 85 33 c049
+  cell 86 33 c060
+  cell 87 33 c036
+  cell 88 33 c025
+  cell 89 33 c027
+  cell 90 33 c025
+  cell 91 33 c018
+  cell 92 33 c043
+  rect 93 33 1 2 c050
+  cell 94 33 c037
+  cell 97 33 c031
+  cell 98 33 c011
+  cell 28 34 c040
+  cell 29 34 c047
+  cell 30 34 c028
+  cell 34 34 c055
+  rect 35 34 1 2 c049
+  cell 36 34 c025
+  cell 39 34 c048
+  cell 40 34 c054
+  cell 41 34 c009
+  cell 42 34 c054
+  cell 43 34 c009
+  rect 44 34 2 1 c034
+  cell 47 34 c062
+  cell 49 34 c034
+  cell 51 34 c009
+  cell 52 34 c034
+  cell 54 34 c034
+  cell 55 34 c054
+  cell 57 34 c034
+  rect 58 34 2 2 c054
+  rect 60 34 1 2 c017
+  cell 62 34 c046
+  cell 65 34 c041
+  rect 66 34 1 2 c002
+  cell 67 34 c009
+  cell 68 34 c017
+  cell 69 34 c002
+  cell 70 34 c062
+  rect 75 34 1 2 c054
+  cell 76 34 c001
+  cell 77 34 c055
+  rect 78 34 1 3 c035
+  cell 79 34 c062
+  rect 80 34 2 1 c049
+  cell 83 34 c025
+  cell 84 34 c009
+  rect 85 34 2 1 c025
+  cell 87 34 c049
+  cell 88 34 c001
+  rect 89 34 1 3 c025
+  cell 90 34 c029
+  cell 91 34 c014
+  cell 92 34 c010
+  cell 94 34 c050
+  cell 97 34 c005
+  cell 98 34 c038
+  cell 99 34 c043
+  rect 28 35 2 1 c007
+  cell 30 35 c039
+  cell 33 35 c048
+  cell 34 35 c036
+  cell 36 35 c048
+  cell 37 35 c035
+  cell 38 35 c062
+  cell 39 35 c054
+  cell 40 35 c001
+  cell 41 35 c030
+  cell 42 35 c034
+  rect 43 35 2 1 c054
+  cell 45 35 c035
+  cell 46 35 c048
+  cell 47 35 c009
+  cell 49 35 c052
+  cell 53 35 c036
+  rect 54 35 3 1 c009
+  cell 57 35 c054
+  cell 62 35 c013
+  cell 64 35 c042
+  cell 65 35 c057
+  cell 67 35 c017
+  rect 68 35 3 1 c054
+  cell 71 35 c062
+  cell 72 35 c035
+  cell 74 35 c035
+  cell 76 35 c062
+  cell 77 35 c049
+  rect 79 35 1 2 c017
+  cell 80 35 c027
+  cell 81 35 c025
+  cell 82 35 c049
+  cell 83 35 c060
+  cell 84 35 c035
+  cell 85 35 c027
+  cell 86 35 c002
+  cell 87 35 c009
+  rect 88 35 1 2 c025
+  rect 90 35 2 1 c018
+  rect 92 35 1 3 c029
+  cell 93 35 c018
+  cell 94 35 c061
+  rect 97 35 2 1 c011
+  cell 99 35 c021
+  cell 28 36 c015
+  cell 29 36 c028
+  cell 30 36 c026
+  cell 33 36 c036
+  rect 34 36 1 2 c056
+  cell 35 36 c055
+  cell 36 36 c056
+  cell 37 36 c055
+  cell 38 36 c054
+  cell 39 36 c009
+  cell 40 36 c060
+  cell 41 36 c009
+  rect 42 36 2 1 c048
+  cell 44 36 c054
+  cell 45 36 c012
+  cell 46 36 c060
+  rect 47 36 2 1 c054
+  cell 51 36 c009
+  cell 52 36 c034
+  cell 53 36 c017
+  rect 54 36 2 1 c034
+  rect 56 36 1 2 c009
+  cell 57 36 c062
+  cell 58 36 c018
+  cell 59 36 c030
+  cell 60 36 c009
+  cell 62 36 c032
+  cell 64 36 c057
+  rect 65 36 1 2 c042
+  rect 66 36 1 3 c044
+  cell 67 36 c009
+  cell 68 36 c062
+  cell 69 36 c048
+  cell 70 36 c055
+  cell 71 36 c001
+  cell 74 36 c017
+  rect 75 36 2 1 c035
+  cell 77 36 c054
+  cell 80 36 c035
+  cell 81 36 c018
+  cell 82 36 c035
+  cell 83 36 c001
+  cell 84 36 c018
+  cell 85 36 c049
+  rect 86 36 2 1 c027
+  cell 90 36 c035
+  cell 91 36 c055
+  cell 93 36 c014
+  cell 94 36 c010
+  cell 97 36 c063
+  cell 98 36 c043
+  rect 99 36 1 2 c011
+  cell 100 36 c004
+  cell 28 37 c016
+  cell 29 37 c007
+  cell 30 37 c016
+  cell 33 37 c024
+  cell 35 37 c017
+  rect 36 37 1 3 c055
+  cell 37 37 c049
+  cell 38 37 c009
+  cell 39 37 c017
+  rect 40 37 1 2 c002
+  cell 41 37 c055
+  cell 42 37 c030
+  cell 43 37 c048
+  cell 44 37 c036
+  cell 45 37 c030
+  rect 46 37 2 1 c009
+  cell 48 37 c049
+  cell 51 37 c035
+  cell 52 37 c002
+  cell 53 37 c030
+  cell 54 37 c052
+  cell 55 37 c062
+  rect 57 37 1 2 c009
+  cell 58 37 c034
+  cell 59 37 c054
+  cell 60 37 c048
+  cell 62 37 c057
+  cell 64 37 c032
+  cell 67 37 c036
+  cell 68 37 c017
+  cell 69 37 c054
+  cell 70 37 c025
+  cell 71 37 c062
+  cell 72 37 c055
+  rect 76 37 2 1 c055
+  rect 78 37 1 2 c054
+  cell 79 37 c049
+  cell 80 37 c055
+  cell 81 37 c049
+  cell 82 37 c055
+  cell 83 37 c025
+  rect 84 37 1 3 c033
+  rect 85 37 1 2 c025
+  rect 86 37 2 1 c049
+  cell 88 37 c001
+  cell 89 37 c029
+  rect 90 37 2 1 c027
+  cell 93 37 c050
+  rect 94 37 1 2 c014
+  cell 97 37 c021
+  cell 98 37 c011
+  cell 28 38 c051
+  cell 29 38 c005
+  cell 30 38 c028
+  cell 33 38 c036
+  rect 34 38 1 2 c018
+  cell 35 38 c055
+  cell 37 38 c054
+  cell 38 38 c048
+  cell 39 38 c054
+  rect 41 38 2 1 c017
+  rect 43 38 1 2 c036
+  cell 44 38 c056
+  cell 45 38 c036
+  cell 46 38 c009
+  cell 47 38 c056
+  cell 55 38 c054
+  cell 56 38 c048
+  cell 58 38 c017
+  cell 59 38 c052
+  cell 60 38 c055
+  cell 62 38 c046
+  rect 63 38 1 2 c013
+  cell 64 38 c042
+  cell 65 38 c057
+  cell 67 38 c050
+  cell 68 38 c054
+  cell 69 38 c025
+  cell 70 38 c035
+  cell 71 38 c017
+  cell 72 38 c035
+  rect 75 38 2 1 c035
+  cell 77 38 c017
+  rect 79 38 1 3 c035
+  cell 80 38 c017
+  cell 81 38 c025
+  cell 82 38 c056
+  cell 83 38 c050
+  rect 86 38 1 2 c002
+  rect 87 38 2 1 c018
+  cell 89 38 c025
+  rect 90 38 1 2 c018
+  cell 91 38 c001
+  cell 92 38 c014
+  rect 93 38 1 2 c029
+  cell 97 38 c043
+  cell 98 38 c020
+  cell 99 38 c043
+  cell 28 39 c063
+  cell 29 39 c040
+  cell 30 39 c012
+  cell 33 39 c055
+  cell 35 39 c018
+  rect 37 39 1 2 c055
+  cell 38 39 c062
+  cell 39 39 c055
+  cell 40 39 c017
+  cell 41 39 c048
+  cell 42 39 c036
+  rect 44 39 2 1 c048
+  cell 46 39 c055
+  cell 47 39 c002
+  cell 48 39 c030
+  cell 49 39 c055
+  cell 50 39 c025
+  cell 53 39 c047
+  cell 56 39 c017
+  rect 57 39 2 1 c049
+  cell 59 39 c048
+  cell 60 39 c017
+  cell 62 39 c042
+  cell 64 39 c045
+  rect 65 39 1 2 c032
+  cell 66 39 c002
+  rect 67 39 1 2 c049
+  cell 68 39 c048
+  cell 69 39 c062
+  cell 70 39 c049
+  rect 71 39 1 2 c035
+  cell 72 39 c027
+  rect 74 39 2 1 c049
+  cell 76 39 c054
+  cell 77 39 c035
+  cell 78 39 c049
+  rect 80 39 1 2 c049
+  cell 81 39 c024
+  cell 82 39 c055
+  cell 83 39 c024
+  cell 85 39 c024
+  cell 87 39 c060
+  cell 88 39 c025
+  cell 89 39 c049
+  cell 91 39 c029
+  cell 92 39 c037
+  rect 94 39 1 2 c050
+  cell 97 39 c011
+  cell 98 39 c043
+  cell 99 39 c063
+  cell 28 40 c015
+  rect 29 40 1 2 c006
+  cell 30 40 c026
+  rect 33 40 2 1 c056
+  cell 35 40 c027
+  cell 36 40 c029
+  rect 38 40 1 2 c048
+  cell 39 40 c054
+  cell 40 40 c002
+  cell 41 40 c030
+  rect 42 40 2 2 c008
+  cell 44 40 c045
+  cell 45 40 c030
+  rect 46 40 1 3 c036
+  cell 47 40 c054
+  cell 48 40 c048
+  cell 49 40 c062
+  rect 50 40 1 2 c054
+  cell 51 40 c030
+  cell 52 40 c048
+  rect 53 40 3 2 c054
+  rect 56 40 2 2 c009
+  cell 58 40 c054
+  cell 59 40 c017
+  cell 60 40 c034
+  cell 61 40 c008
+  cell 62 40 c046
+  cell 63 40 c008
+  cell 64 40 c042
+  rect 66 40 1 2 c044
+  rect 68 40 2 1 c017
+  cell 70 40 c035
+  cell 72 40 c062
+  rect 73 40 1 2 c035
+  cell 74 40 c049
+  cell 75 40 c035
+  rect 76 40 1 2 c017
+  cell 77 40 c009
+  cell 78 40 c055
+  cell 81 40 c056
+  cell 82 40 c024
+  cell 83 40 c022
+  rect 84 40 1 2 c008
+  cell 85 40 c002
+  cell 86 40 c033
+  cell 87 40 c056
+  cell 88 40 c049
+  cell 89 40 c027
+  rect 90 40 1 2 c025
+  cell 91 40 c014
+  rect 92 40 2 1 c050
+  cell 97 40 c043
+  cell 98 40 c020
+  cell 99 40 c051
+  rect 28 41 1 3 c008
+  cell 30 41 c006
+  cell 31 41 c008
+  cell 33 41 c024
+  cell 34 41 c033
+  cell 35 41 c025
+  cell 36 41 c050
+  cell 37 41 c035
+  cell 39 41 c017
+  cell 40 41 c060
+  cell 41 41 c009
+  cell 44 41 c015
+  cell 45 41 c024
+  cell 47 41 c060
+  rect 48 41 2 1 c017
+  rect 51 41 2 1 c009
+  rect 58 41 2 1 c048
+  cell 60 41 c055
+  cell 61 41 c044
+  cell 62 41 c032
+  cell 63 41 c013
+  rect 64 41 2 1 c057
+  cell 67 41 c048
+  cell 68 41 c055
+  rect 69 41 1 2 c035
+  cell 70 41 c027
+  cell 71 41 c049
+  rect 72 41 1 2 c035
+  cell 74 41 c025
+  cell 75 41 c033
+  cell 77 41 c024
+  rect 78 41 1 2 c049
+  rect 79 41 1 2 c055
+  cell 80 41 c056
+  rect 81 41 2 1 c055
+  cell 83 41 c036
+  cell 85 41 c045
+  rect 86 41 1 3 c044
+  cell 87 41 c050
+  cell 88 41 c019
+  rect 89 41 1 2 c018
+  cell 91 41 c018
+  cell 92 41 c029
+  cell 93 41 c037
+  cell 94 41 c014
+  rect 95 41 1 3 c008
+  rect 96 41 2 1 c020
+  rect 98 41 2 1 c043
+  cell 29 42 c005
+  cell 30 42 c043
+  cell 31 42 c021
+  cell 33 42 c053
+  rect 34 42 1 2 c024
+  cell 35 42 c054
+  cell 36 42 c024
+  cell 37 42 c049
+  cell 38 42 c056
+  cell 39 42 c033
+  cell 40 42 c024
+  cell 41 42 c036
+  cell 42 42 c013
+  cell 43 42 c008
+  rect 44 42 2 1 c036
+  rect 47 42 2 1 c048
+  cell 49 42 c054
+  rect 50 42 1 2 c030
+  rect 51 42 1 2 c048
+  rect 52 42 2 1 c009
+  cell 54 42 c049
+  rect 55 42 2 1 c054
+  cell 57 42 c036
+  cell 58 42 c009
+  cell 59 42 c054
+  cell 60 42 c024
+  cell 61 42 c008
+  cell 62 42 c057
+  cell 64 42 c041
+  cell 65 42 c057
+  cell 66 42 c022
+  cell 67 42 c035
+  cell 68 42 c017
+  cell 70 42 c035
+  cell 71 42 c062
+  cell 73 42 c017
+  cell 74 42 c024
+  cell 75 42 c056
+  cell 76 42 c048
+  cell 77 42 c056
+  cell 80 42 c033
+  cell 81 42 c055
+  cell 82 42 c036
+  cell 83 42 c002
+  rect 84 42 1 2 c041
+  cell 85 42 c057
+  cell 87 42 c053
+  rect 88 42 1 3 c014
+  cell 90 42 c029
+  cell 91 42 c060
+  cell 92 42 c025
+  cell 93 42 c019
+  cell 96 42 c020
+  rect 97 42 2 1 c043
+  rect 99 42 1 2 c063
+  rect 29 43 2 1 c044
+  cell 31 43 c008
+  cell 33 43 c056
+  rect 35 43 2 1 c017
+  cell 37 43 c030
+  cell 38 43 c055
+  rect 39 43 2 1 c056
+  cell 41 43 c044
+  rect 42 43 1 2 c046
+  cell 43 43 c013
+  cell 44 43 c008
+  cell 45 43 c044
+  cell 46 43 c056
+  cell 47 43 c055
+  cell 48 43 c048
+  cell 49 43 c009
+  cell 52 43 c048
+  rect 53 43 2 1 c054
+  rect 55 43 2 1 c017
+  rect 57 43 2 1 c054
+  cell 59 43 c048
+  cell 60 43 c056
+  rect 61 43 1 2 c044
+  rect 62 43 1 2 c046
+  cell 64 43 c057
+  cell 65 43 c041
+  rect 66 43 1 2 c044
+  cell 67 43 c009
+  rect 68 43 2 1 c025
+  cell 70 43 c017
+  rect 71 43 1 2 c056
+  cell 72 43 c018
+  rect 73 43 2 1 c055
+  cell 75 43 c025
+  cell 76 43 c055
+  cell 77 43 c024
+  cell 78 43 c056
+  cell 79 43 c033
+  cell 80 43 c055
+  cell 81 43 c033
+  cell 82 43 c002
+  cell 83 43 c008
+  cell 85 43 c046
+  cell 87 43 c024
+  rect 89 43 2 1 c019
+  cell 91 43 c014
+  cell 92 43 c029
+  cell 93 43 c014
+  rect 29 44 2 1 c008
+  rect 34 44 3 1 c033
+  cell 37 44 c036
+  cell 38 44 c056
+  cell 39 44 c022
+  cell 40 44 c008
+  cell 41 44 c022
+  cell 43 44 c008
+  rect 45 44 2 1 c008
+  cell 47 44 c036
+  rect 48 44 2 1 c056
+  cell 50 44 c044
+  cell 51 44 c002
+  cell 52 44 c044
+  cell 53 44 c054
+  cell 54 44 c024
+  cell 55 44 c055
+  cell 56 44 c002
+  cell 57 44 c048
+  cell 58 44 c055
+  rect 59 44 2 1 c002
+  cell 64 44 c041
+  rect 65 44 1 2 c057
+  cell 67 44 c053
+  cell 68 44 c048
+  rect 69 44 2 1 c002
+  cell 72 44 c002
+  cell 73 44 c036
+  cell 74 44 c017
+  rect 75 44 2 1 c044
+  rect 77 44 2 1 c002
+  cell 79 44 c053
+  cell 80 44 c022
+  cell 81 44 c044
+  cell 82 44 c008
+  rect 83 44 2 2 c042
+  cell 85 44 c045
+  rect 86 44 2 1 c022
+  cell 89 44 c014
+  rect 90 44 3 1 c019
+  rect 93 44 1 2 c053
+  cell 97 44 c008
+  cell 98 44 c051
+  cell 30 45 c021
+  cell 34 45 c055
+  cell 35 45 c024
+  cell 36 45 c055
+  cell 37 45 c033
+  cell 38 45 c002
+  cell 39 45 c013
+  cell 40 45 c046
+  cell 45 45 c046
+  cell 52 45 c022
+  rect 53 45 2 1 c008
+  rect 55 45 2 1 c022
+  cell 57 45 c008
+  cell 58 45 c044
+  rect 59 45 3 1 c008
+  cell 62 45 c042
+  rect 64 45 1 2 c057
+  cell 66 45 c022
+  cell 67 45 c044
+  rect 68 45 2 1 c008
+  cell 70 45 c044
+  rect 71 45 2 1 c008
+  cell 73 45 c022
+  rect 74 45 2 1 c008
+  cell 76 45 c045
+  cell 77 45 c008
+  cell 78 45 c046
+  cell 79 45 c008
+  cell 80 45 c004
+  rect 81 45 2 1 c042
+  rect 85 45 2 1 c057
+  cell 87 45 c042
+  rect 88 45 1 2 c057
+  cell 89 45 c013
+  rect 90 45 2 1 c029
+  rect 92 45 1 2 c014
+  rect 95 45 1 3 c008
+  cell 97 45 c051
+  cell 28 46 c021
+  rect 29 46 1 2 c012
+  cell 30 46 c044
+  cell 31 46 c012
+  cell 34 46 c050
+  cell 35 46 c019
+  cell 36 46 c033
+  rect 37 46 1 2 c008
+  rect 38 46 2 1 c046
+  cell 40 46 c013
+  cell 41 46 c046
+  cell 49 46 c046
+  cell 52 46 c013
+  rect 53 46 2 1 c046
+  rect 57 46 4 1 c013
+  rect 61 46 2 1 c046
+  cell 65 46 c013
+  cell 66 46 c057
+  cell 67 46 c046
+  rect 68 46 2 1 c013
+  cell 70 46 c057
+  cell 71 46 c046
+  cell 72 46 c042
+  rect 73 46 4 1 c046
+  cell 77 46 c042
+  cell 78 46 c045
+  cell 79 46 c032
+  cell 80 46 c057
+  cell 81 46 c032
+  cell 82 46 c042
+  cell 83 46 c013
+  cell 84 46 c046
+  rect 85 46 2 1 c042
+  cell 87 46 c045
+  cell 89 46 c032
+  cell 90 46 c013
+  cell 91 46 c037
+  rect 93 46 1 2 c037
+  cell 96 46 c063
+  cell 30 47 c012
+  cell 31 47 c051
+  cell 34 47 c033
+  cell 35 47 c044
+  cell 36 47 c008
+  cell 38 47 c022
+  cell 76 47 c041
+  rect 77 47 4 1 c008
+  cell 81 47 c041
+  rect 82 47 2 1 c022
+  rect 84 47 5 1 c008
+  rect 89 47 3 1 c022
+  cell 92 47 c002
+  cell 96 47 c043
+  rect 97 47 2 1 c031
+  cell 29 48 c011
+  cell 30 48 c040
+  rect 31 48 1 2 c011
+  rect 34 48 2 1 c053
+  rect 36 48 2 1 c044
+  rect 38 48 3 1 c032
+  rect 41 48 1 2 c057
+  rect 42 48 2 1 c042
+  cell 44 48 c057
+  cell 45 48 c042
+  rect 46 48 2 1 c057
+  cell 48 48 c046
+  cell 49 48 c057
+  cell 50 48 c042
+  cell 51 48 c046
+  cell 52 48 c045
+  cell 53 48 c042
+  cell 54 48 c045
+  cell 55 48 c042
+  cell 56 48 c046
+  cell 57 48 c042
+  rect 58 48 4 1 c057
+  cell 62 48 c032
+  rect 64 48 2 1 c032
+  cell 66 48 c042
+  rect 67 48 2 1 c032
+  cell 69 48 c042
+  rect 70 48 5 1 c032
+  cell 75 48 c045
+  cell 76 48 c032
+  cell 77 48 c045
+  rect 84 48 6 1 c045
+  cell 90 48 c044
+  cell 91 48 c002
+  rect 92 48 2 1 c014
+  rect 96 48 2 1 c031
+  rect 98 48 1 2 c015
+  cell 29 49 c063
+  cell 30 49 c020
+  cell 34 49 c033
+  cell 35 49 c048
+  cell 36 49 c033
+  cell 37 49 c056
+  rect 38 49 2 1 c044
+  cell 40 49 c032
+  cell 42 49 c032
+  rect 43 49 1 2 c057
+  cell 44 49 c042
+  rect 45 49 2 1 c057
+  cell 47 49 c032
+  cell 48 49 c041
+  rect 49 49 1 2 c044
+  cell 50 49 c041
+  rect 51 49 1 2 c044
+  cell 52 49 c022
+  cell 53 49 c044
+  rect 54 49 3 1 c022
+  cell 57 49 c044
+  rect 58 49 4 1 c022
+  cell 62 49 c046
+  cell 64 49 c041
+  cell 65 49 c032
+  rect 66 49 5 1 c044
+  rect 71 49 3 1 c022
+  cell 74 49 c044
+  cell 75 49 c022
+  rect 76 49 2 2 c044
+  cell 78 49 c045
+  cell 79 49 c022
+  cell 80 49 c045
+  cell 85 49 c057
+  cell 86 49 c032
+  cell 87 49 c045
+  rect 88 49 2 1 c044
+  cell 90 49 c002
+  cell 91 49 c050
+  rect 92 49 1 2 c061
+  cell 93 49 c037
+  cell 96 49 c043
+  cell 97 49 c063
+  cell 29 50 c012
+  cell 30 50 c011
+  cell 31 50 c012
+  cell 34 50 c053
+  cell 35 50 c019
+  cell 36 50 c002
+  cell 37 50 c019
+  rect 38 50 1 2 c033
+  rect 39 50 2 1 c044
+  cell 41 50 c022
+  cell 42 50 c057
+  cell 44 50 c057
+  rect 45 50 2 1 c022
+  rect 47 50 2 1 c044
+  cell 50 50 c002
+  rect 52 50 3 1 c002
+  rect 55 50 2 1 c023
+  cell 57 50 c002
+  cell 58 50 c023
+  rect 59 50 1 2 c024
+  cell 60 50 c023
+  rect 61 50 1 2 c044
+  rect 62 50 1 2 c042
+  cell 63 50 c046
+  cell 64 50 c032
+  cell 65 50 c022
+  rect 66 50 1 2 c044
+  cell 67 50 c023
+  cell 68 50 c048
+  cell 69 50 c010
+  rect 70 50 2 1 c023
+  rect 72 50 3 1 c002
+  cell 75 50 c044
+  rect 78 50 3 1 c044
+  cell 81 50 c022
+  rect 82 50 1 2 c044
+  rect 84 50 2 1 c045
+  rect 86 50 3 1 c044
+  cell 89 50 c010
+  cell 90 50 c014
+  cell 91 50 c010
+  cell 93 50 c053
+  cell 95 50 c008
+  cell 96 50 c063
+  cell 97 50 c043
+  cell 98 50 c063
+  cell 29 51 c059
+  rect 30 51 2 2 c021
+  cell 32 51 c040
+  cell 34 51 c033
+  cell 35 51 c025
+  cell 36 51 c024
+  cell 37 51 c033
+  rect 39 51 1 2 c056
+  cell 40 51 c024
+  rect 41 51 1 2 c044
+  cell 42 51 c046
+  rect 43 51 2 1 c022
+  cell 45 51 c044
+  rect 46 51 2 1 c036
+  cell 48 51 c055
+  cell 49 51 c025
+  cell 50 51 c017
+  cell 51 51 c048
+  cell 52 51 c055
+  rect 53 51 2 1 c017
+  cell 55 51 c054
+  cell 56 51 c017
+  cell 57 51 c048
+  cell 58 51 c036
+  cell 60 51 c053
+  cell 63 51 c008
+  rect 64 51 1 5 c041
+  cell 65 51 c045
+  rect 67 51 1 2 c036
+  cell 68 51 c056
+  cell 69 51 c055
+  cell 70 51 c056
+  cell 71 51 c055
+  cell 72 51 c014
+  cell 73 51 c025
+  rect 74 51 2 1 c056
+  cell 76 51 c024
+  rect 77 51 1 2 c019
+  cell 78 51 c053
+  cell 79 51 c019
+  rect 80 51 2 1 c053
+  cell 83 51 c022
+  rect 84 51 2 1 c032
+  rect 86 51 1 2 c044
+  cell 87 51 c010
+  cell 88 51 c014
+  cell 89 51 c053
+  rect 90 51 2 1 c029
+  rect 92 51 2 1 c050
+  cell 95 51 c020
+  cell 96 51 c011
+  rect 97 51 2 1 c031
+  cell 29 52 c008
+  cell 32 52 c008
+  cell 34 52 c024
+  rect 35 52 2 1 c033
+  cell 37 52 c049
+  rect 38 52 1 2 c056
+  rect 40 52 1 3 c002
+  cell 42 52 c057
+  rect 43 52 1 3 c022
+  cell 44 52 c044
+  cell 45 52 c036
+  cell 46 52 c024
+  cell 47 52 c056
+  cell 48 52 c009
+  cell 49 52 c017
+  cell 50 52 c048
+  cell 51 52 c017
+  cell 52 52 c054
+  cell 53 52 c050
+  cell 54 52 c054
+  cell 55 52 c009
+  rect 56 52 1 2 c048
+  cell 57 52 c033
+  rect 58 52 1 2 c055
+  cell 59 52 c036
+  rect 60 52 1 2 c033
+  cell 61 52 c008
+  cell 62 52 c032
+  cell 63 52 c046
+  cell 65 52 c057
+  rect 66 52 1 2 c022
+  cell 68 52 c055
+  rect 69 52 1 3 c049
+  cell 70 52 c024
+  rect 71 52 1 5 c049
+  cell 72 52 c056
+  cell 73 52 c055
+  cell 74 52 c049
+  cell 75 52 c018
+  cell 76 52 c056
+  cell 78 52 c025
+  cell 79 52 c037
+  rect 80 52 3 1 c033
+  cell 83 52 c053
+  cell 84 52 c013
+  cell 85 52 c032
+  rect 87 52 2 1 c019
+  cell 89 52 c018
+  cell 90 52 c014
+  rect 91 52 1 4 c050
+  cell 92 52 c014
+  rect 93 52 1 6 c044
+  rect 94 52 1 5 c008
+  cell 95 52 c015
+  cell 96 52 c043
+  cell 97 52 c031
+  cell 30 53 c005
+  rect 31 53 1 2 c021
+  cell 32 53 c040
+  cell 33 53 c008
+  cell 35 53 c024
+  cell 36 53 c056
+  rect 37 53 1 2 c055
+  cell 39 53 c055
+  rect 41 53 2 1 c022
+  cell 44 53 c048
+  cell 45 53 c033
+  cell 46 53 c036
+  cell 47 53 c048
+  cell 48 53 c017
+  rect 49 53 1 2 c054
+  cell 50 53 c025
+  rect 51 53 1 2 c048
+  rect 52 53 1 2 c017
+  cell 53 53 c056
+  rect 54 53 1 2 c017
+  cell 55 53 c054
+  cell 57 53 c054
+  cell 59 53 c055
+  cell 61 53 c002
+  rect 62 53 2 1 c042
+  cell 65 53 c041
+  cell 67 53 c024
+  cell 68 53 c033
+  rect 70 53 1 2 c002
+  cell 72 53 c055
+  cell 73 53 c049
+  cell 74 53 c025
+  cell 75 53 c049
+  cell 76 53 c047
+  cell 77 53 c056
+  cell 78 53 c017
+  cell 79 53 c050
+  cell 80 53 c056
+  cell 81 53 c024
+  cell 82 53 c033
+  rect 83 53 1 3 c044
+  rect 84 53 1 2 c022
+  cell 85 53 c041
+  rect 86 53 1 3 c002
+  cell 87 53 c037
+  rect 88 53 2 1 c029
+  cell 90 53 c025
+  rect 92 53 1 2 c050
+  cell 95 53 c011
+  cell 96 53 c031
+  cell 97 53 c063
+  cell 30 54 c021
+  rect 32 54 1 2 c047
+  rect 35 54 1 2 c014
+  cell 36 54 c025
+  cell 38 54 c049
+  cell 39 54 c018
+  cell 41 54 c024
+  cell 42 54 c044
+  rect 44 54 1 2 c044
+  rect 45 54 1 2 c018
+  cell 46 54 c056
+  cell 47 54 c017
+  cell 48 54 c048
+  rect 50 54 1 2 c017
+  cell 53 54 c048
+  cell 55 54 c048
+  cell 56 54 c055
+  cell 57 54 c056
+  cell 58 54 c024
+  cell 59 54 c056
+  cell 60 54 c024
+  cell 61 54 c044
+  cell 62 54 c032
+  rect 63 54 1 2 c008
+  cell 65 54 c032
+  rect 66 54 1 3 c044
+  cell 67 54 c061
+  cell 68 54 c055
+  cell 72 54 c049
+  cell 73 54 c055
+  rect 74 54 2 1 c018
+  cell 76 54 c002
+  cell 77 54 c033
+  cell 78 54 c055
+  cell 79 54 c017
+  cell 80 54 c019
+  cell 81 54 c033
+  cell 82 54 c061
+  cell 85 54 c044
+  rect 87 54 1 2 c018
+  cell 88 54 c027
+  cell 89 54 c033
+  cell 90 54 c014
+  rect 95 54 2 1 c020
+  rect 97 54 1 2 c031
+  cell 30 55 c005
+  cell 31 55 c000
+  cell 36 55 c018
+  cell 37 55 c033
+  cell 38 55 c056
+  rect 39 55 1 2 c055
+  cell 40 55 c024
+  rect 41 55 1 2 c055
+  rect 42 55 1 2 c024
+  cell 43 55 c044
+  cell 46 55 c024
+  rect 47 55 1 2 c048
+  cell 48 55 c009
+  cell 49 55 c062
+  cell 51 55 c009
+  cell 52 55 c054
+  cell 53 55 c017
+  cell 54 55 c035
+  cell 55 55 c002
+  cell 56 55 c017
+  cell 57 55 c049
+  cell 58 55 c056
+  cell 59 55 c036
+  cell 60 55 c033
+  cell 61 55 c002
+  cell 62 55 c046
+  cell 65 55 c057
+  rect 67 55 1 2 c024
+  cell 68 55 c056
+  cell 69 55 c025
+  cell 70 55 c018
+  cell 72 55 c018
+  rect 73 55 2 1 c025
+  cell 75 55 c018
+  cell 76 55 c044
+  cell 77 55 c019
+  cell 78 55 c049
+  cell 79 55 c014
+  cell 80 55 c048
+  cell 81 55 c018
+  cell 82 55 c033
+  cell 84 55 c023
+  rect 85 55 1 2 c014
+  cell 88 55 c014
+  rect 89 55 1 2 c027
+  cell 90 55 c050
+  cell 92 55 c061
+  cell 95 55 c021
+  rect 96 55 1 2 c043
+  rect 30 56 1 2 c021
+  rect 31 56 2 1 c011
+  cell 35 56 c033
+  cell 36 56 c024
+  cell 37 56 c019
+  cell 38 56 c024
+  rect 40 56 1 3 c002
+  cell 43 56 c033
+  cell 44 56 c054
+  cell 45 56 c056
+  cell 46 56 c048
+  cell 48 56 c035
+  cell 49 56 c017
+  cell 50 56 c055
+  cell 51 56 c034
+  cell 52 56 c030
+  rect 53 56 1 2 c055
+  cell 54 56 c023
+  cell 55 56 c035
+  cell 56 56 c055
+  cell 57 56 c017
+  cell 58 56 c055
+  cell 59 56 c048
+  cell 60 56 c036
+  cell 61 56 c044
+  rect 62 56 1 2 c042
+  cell 63 56 c046
+  cell 64 56 c022
+  rect 65 56 1 3 c032
+  rect 68 56 2 1 c055
+  cell 70 56 c002
+  cell 72 56 c033
+  cell 73 56 c036
+  rect 74 56 2 1 c049
+  cell 76 56 c018
+  rect 77 56 2 1 c017
+  cell 79 56 c050
+  cell 80 56 c035
+  cell 81 56 c019
+  cell 82 56 c018
+  cell 83 56 c053
+  cell 84 56 c010
+  cell 86 56 c018
+  cell 87 56 c029
+  cell 88 56 c027
+  cell 90 56 c029
+  rect 91 56 1 2 c014
+  cell 92 56 c060
+  rect 95 56 1 2 c043
+  cell 97 56 c063
+  cell 31 57 c020
+  rect 32 57 1 2 c021
+  cell 35 57 c053
+  rect 36 57 2 1 c025
+  cell 38 57 c055
+  cell 39 57 c056
+  cell 41 57 c025
+  cell 42 57 c056
+  rect 43 57 1 2 c055
+  rect 44 57 1 2 c056
+  cell 45 57 c048
+  cell 46 57 c055
+  rect 47 57 2 1 c017
+  cell 49 57 c030
+  cell 50 57 c017
+  cell 51 57 c048
+  cell 52 57 c017
+  cell 54 57 c024
+  cell 55 57 c030
+  cell 56 57 c048
+  cell 57 57 c025
+  cell 58 57 c024
+  cell 59 57 c055
+  cell 60 57 c024
+  cell 61 57 c002
+  cell 63 57 c042
+  cell 64 57 c032
+  cell 66 57 c002
+  cell 67 57 c033
+  cell 68 57 c024
+  cell 69 57 c056
+  cell 70 57 c017
+  cell 71 57 c055
+  cell 72 57 c029
+  cell 73 57 c055
+  cell 74 57 c025
+  rect 75 57 2 1 c055
+  cell 77 57 c049
+  cell 78 57 c055
+  cell 79 57 c017
+  rect 80 57 2 2 c049
+  cell 82 57 c027
+  cell 83 57 c018
+  cell 84 57 c056
+  rect 85 57 2 1 c029
+  cell 87 57 c014
+  cell 88 57 c025
+  rect 89 57 1 2 c050
+  cell 90 57 c027
+  cell 92 57 c061
+  cell 94 57 c039
+  cell 96 57 c063
+  cell 97 57 c043
+  rect 30 58 2 1 c063
+  cell 33 58 c043
+  cell 36 58 c050
+  rect 37 58 2 1 c049
+  cell 39 58 c025
+  rect 41 58 1 2 c055
+  cell 42 58 c048
+  rect 45 58 1 2 c017
+  cell 46 58 c053
+  cell 47 58 c055
+  cell 48 58 c017
+  rect 49 58 2 1 c055
+  cell 51 58 c049
+  cell 52 58 c025
+  rect 53 58 1 6 c017
+  cell 54 58 c014
+  rect 55 58 2 1 c055
+  cell 57 58 c048
+  rect 58 58 1 2 c055
+  rect 59 58 1 2 c024
+  cell 60 58 c055
+  cell 62 58 c057
+  rect 63 58 1 2 c008
+  rect 64 58 1 3 c041
+  rect 66 58 1 2 c044
+  cell 67 58 c061
+  cell 68 58 c017
+  rect 69 58 2 1 c049
+  cell 71 58 c056
+  cell 72 58 c025
+  rect 73 58 1 2 c056
+  rect 74 58 1 3 c049
+  rect 75 58 1 2 c056
+  cell 76 58 c049
+  rect 77 58 2 1 c025
+  cell 79 58 c050
+  rect 82 58 2 1 c025
+  cell 84 58 c055
+  rect 85 58 2 1 c027
+  rect 87 58 2 2 c053
+  cell 90 58 c029
+  cell 91 58 c050
+  rect 92 58 1 5 c044
+  cell 93 58 c008
+  cell 94 58 c043
+  rect 95 58 1 2 c020
+  cell 96 58 c043
+  cell 30 59 c008
+  cell 31 59 c020
+  cell 32 59 c047
+  cell 33 59 c063
+  cell 36 59 c053
+  rect 37 59 2 1 c019
+  cell 39 59 c049
+  rect 40 59 1 2 c025
+  cell 42 59 c025
+  cell 43 59 c056
+  cell 44 59 c050
+  cell 46 59 c055
+  cell 47 59 c009
+  rect 48 59 1 2 c036
+  cell 49 59 c017
+  cell 50 59 c048
+  cell 51 59 c054
+  cell 52 59 c049
+  cell 54 59 c002
+  cell 55 59 c055
+  cell 56 59 c017
+  cell 57 59 c056
+  cell 60 59 c056
+  cell 62 59 c032
+  cell 65 59 c041
+  cell 67 59 c019
+  cell 68 59 c001
+  rect 69 59 1 2 c056
+  cell 70 59 c001
+  cell 71 59 c017
+  cell 72 59 c049
+  cell 76 59 c018
+  cell 77 59 c055
+  cell 78 59 c027
+  rect 79 59 1 3 c025
+  cell 80 59 c018
+  rect 81 59 2 1 c025
+  cell 83 59 c033
+  cell 84 59 c001
+  cell 85 59 c050
+  cell 86 59 c025
+  cell 89 59 c014
+  cell 90 59 c050
+  rect 91 59 1 2 c014
+  cell 93 59 c044
+  cell 94 59 c031
+  cell 96 59 c020
+  cell 30 60 c059
+  cell 31 60 c031
+  cell 32 60 c011
+  cell 33 60 c005
+  cell 34 60 c008
+  cell 36 60 c010
+  rect 37 60 1 2 c024
+  cell 38 60 c019
+  cell 39 60 c050
+  cell 41 60 c049
+  cell 42 60 c024
+  rect 43 60 1 2 c049
+  cell 44 60 c017
+  cell 45 60 c056
+  cell 46 60 c019
+  cell 47 60 c055
+  cell 49 60 c037
+  cell 50 60 c017
+  rect 51 60 1 2 c055
+  cell 52 60 c035
+  cell 54 60 c056
+  cell 55 60 c049
+  cell 56 60 c055
+  cell 57 60 c024
+  cell 58 60 c048
+  cell 59 60 c033
+  cell 60 60 c014
+  rect 62 60 2 1 c046
+  cell 65 60 c032
+  cell 66 60 c022
+  rect 67 60 1 2 c024
+  cell 68 60 c056
+  cell 70 60 c002
+  cell 71 60 c049
+  cell 72 60 c018
+  rect 73 60 1 2 c025
+  cell 75 60 c024
+  cell 76 60 c025
+  cell 77 60 c027
+  cell 78 60 c018
+  rect 80 60 1 3 c025
+  cell 81 60 c001
+  cell 82 60 c025
+  cell 83 60 c060
+  cell 84 60 c014
+  cell 85 60 c029
+  rect 86 60 1 2 c002
+  cell 87 60 c053
+  cell 88 60 c014
+  cell 89 60 c019
+  cell 90 60 c037
+  rect 93 60 1 3 c008
+  cell 94 60 c020
+  rect 95 60 1 2 c011
+  rect 96 60 1 2 c063
+  cell 30 61 c008
+  cell 31 61 c020
+  cell 32 61 c005
+  cell 33 61 c016
+  cell 36 61 c033
+  cell 38 61 c056
+  cell 39 61 c055
+  cell 40 61 c024
+  cell 41 61 c055
+  cell 42 61 c029
+  cell 44 61 c035
+  cell 45 61 c048
+  rect 46 61 2 1 c024
+  cell 48 61 c001
+  rect 49 61 2 1 c025
+  cell 52 61 c055
+  cell 54 61 c002
+  cell 55 61 c017
+  cell 56 61 c024
+  rect 57 61 2 1 c056
+  rect 59 61 1 2 c024
+  cell 60 61 c009
+  cell 62 61 c057
+  rect 63 61 1 2 c008
+  cell 64 61 c032
+  cell 65 61 c041
+  rect 66 61 1 5 c044
+  cell 68 61 c017
+  cell 69 61 c025
+  cell 70 61 c060
+  cell 71 61 c055
+  rect 72 61 1 4 c049
+  rect 74 61 2 1 c025
+  cell 76 61 c033
+  cell 77 61 c018
+  cell 78 61 c049
+  cell 81 61 c025
+  cell 82 61 c055
+  cell 83 61 c049
+  rect 84 61 1 2 c025
+  rect 85 61 1 2 c061
+  cell 87 61 c010
+  cell 88 61 c027
+  cell 89 61 c014
+  cell 90 61 c050
+  cell 91 61 c061
+  rect 94 61 1 2 c043
+  cell 31 62 c059
+  cell 32 62 c047
+  cell 33 62 c040
+  cell 36 62 c024
+  cell 37 62 c025
+  cell 38 62 c019
+  cell 39 62 c025
+  rect 40 62 1 6 c002
+  cell 41 62 c024
+  cell 42 62 c056
+  cell 43 62 c017
+  cell 44 62 c025
+  rect 45 62 2 1 c033
+  cell 47 62 c049
+  cell 48 62 c024
+  rect 49 62 2 1 c055
+  rect 51 62 1 2 c024
+  cell 52 62 c056
+  cell 54 62 c025
+  rect 55 62 1 2 c055
+  cell 56 62 c017
+  cell 57 62 c055
+  cell 58 62 c049
+  cell 60 62 c056
+  cell 62 62 c042
+  cell 64 62 c057
+  cell 65 62 c045
+  cell 67 62 c033
+  cell 68 62 c025
+  cell 69 62 c017
+  cell 70 62 c049
+  cell 71 62 c025
+  cell 73 62 c055
+  cell 74 62 c054
+  cell 75 62 c049
+  cell 76 62 c050
+  rect 77 62 2 1 c025
+  cell 79 62 c018
+  rect 81 62 1 2 c029
+  cell 82 62 c025
+  cell 83 62 c018
+  cell 86 62 c044
+  cell 87 62 c053
+  cell 88 62 c025
+  cell 89 62 c050
+  rect 90 62 2 1 c037
+  rect 95 62 1 3 c043
+  rect 31 63 1 2 c008
+  cell 32 63 c026
+  rect 33 63 1 2 c005
+  cell 34 63 c008
+  cell 36 63 c053
+  cell 37 63 c019
+  cell 38 63 c017
+  cell 39 63 c029
+  rect 41 63 1 2 c033
+  cell 42 63 c049
+  rect 43 63 2 1 c018
+  cell 45 63 c024
+  rect 46 63 1 2 c056
+  cell 47 63 c048
+  cell 48 63 c055
+  cell 49 63 c048
+  cell 50 63 c056
+  cell 52 63 c017
+  rect 54 63 1 6 c002
+  cell 56 63 c056
+  cell 57 63 c048
+  cell 58 63 c017
+  cell 59 63 c056
+  cell 60 63 c019
+  cell 62 63 c057
+  rect 63 63 3 1 c032
+  cell 67 63 c024
+  rect 68 63 2 1 c056
+  rect 70 63 1 2 c018
+  cell 71 63 c055
+  cell 73 63 c025
+  cell 74 63 c027
+  cell 75 63 c002
+  cell 76 63 c025
+  cell 77 63 c024
+  cell 78 63 c018
+  cell 79 63 c025
+  cell 80 63 c049
+  cell 82 63 c049
+  cell 83 63 c024
+  cell 84 63 c029
+  rect 85 63 1 2 c050
+  cell 86 63 c001
+  cell 87 63 c036
+  cell 88 63 c019
+  rect 89 63 2 1 c029
+  rect 91 63 1 4 c044
+  rect 92 63 1 4 c008
+  rect 32 64 1 2 c020
+  cell 34 64 c011
+  cell 37 64 c033
+  cell 38 64 c056
+  cell 39 64 c033
+  cell 42 64 c001
+  cell 43 64 c056
+  cell 44 64 c019
+  cell 45 64 c055
+  rect 47 64 1 2 c056
+  cell 48 64 c024
+  cell 49 64 c056
+  cell 50 64 c055
+  cell 51 64 c017
+  rect 52 64 2 2 c055
+  cell 55 64 c056
+  cell 56 64 c049
+  cell 57 64 c017
+  cell 58 64 c056
+  cell 59 64 c033
+  cell 60 64 c024
+  cell 62 64 c041
+  rect 63 64 1 2 c032
+  cell 64 64 c045
+  cell 65 64 c032
+  cell 67 64 c014
+  cell 68 64 c033
+  cell 69 64 c049
+  cell 71 64 c025
+  cell 73 64 c049
+  cell 74 64 c029
+  cell 75 64 c019
+  cell 76 64 c010
+  rect 77 64 2 1 c025
+  cell 79 64 c018
+  cell 80 64 c025
+  cell 81 64 c049
+  cell 82 64 c018
+  cell 83 64 c027
+  cell 84 64 c049
+  cell 86 64 c033
+  rect 87 64 2 1 c014
+  rect 89 64 2 1 c050
+  cell 93 64 c044
+  cell 33 65 c012
+  cell 34 65 c020
+  cell 35 65 c008
+  cell 37 65 c056
+  cell 38 65 c025
+  cell 39 65 c048
+  rect 41 65 1 2 c056
+  rect 42 65 2 1 c024
+  cell 44 65 c056
+  cell 45 65 c017
+  cell 46 65 c033
+  rect 48 65 1 2 c056
+  rect 49 65 3 1 c024
+  cell 55 65 c024
+  cell 56 65 c017
+  rect 57 65 1 2 c055
+  cell 58 65 c033
+  cell 59 65 c055
+  rect 60 65 1 3 c033
+  cell 62 65 c042
+  rect 64 65 1 6 c022
+  cell 65 65 c057
+  cell 67 65 c033
+  cell 68 65 c056
+  cell 69 65 c024
+  cell 70 65 c025
+  cell 71 65 c035
+  cell 72 65 c025
+  cell 73 65 c033
+  rect 74 65 1 2 c024
+  cell 75 65 c053
+  cell 76 65 c024
+  cell 77 65 c019
+  cell 78 65 c025
+  cell 79 65 c029
+  cell 80 65 c049
+  cell 81 65 c014
+  rect 82 65 1 2 c029
+  cell 83 65 c025
+  cell 84 65 c027
+  cell 85 65 c019
+  cell 86 65 c029
+  rect 87 65 1 2 c014
+  cell 88 65 c029
+  rect 89 65 2 1 c014
+  cell 93 65 c043
+  rect 32 66 1 2 c021
+  cell 33 66 c011
+  cell 34 66 c021
+  cell 37 66 c010
+  cell 38 66 c037
+  cell 39 66 c018
+  cell 42 66 c055
+  rect 43 66 2 1 c018
+  cell 45 66 c056
+  cell 46 66 c025
+  cell 47 66 c024
+  rect 49 66 1 2 c024
+  cell 50 66 c056
+  cell 51 66 c048
+  cell 52 66 c017
+  cell 53 66 c024
+  cell 55 66 c025
+  cell 56 66 c055
+  cell 58 66 c036
+  cell 59 66 c050
+  cell 62 66 c057
+  cell 63 66 c045
+  cell 65 66 c032
+  cell 66 66 c022
+  cell 67 66 c018
+  cell 68 66 c033
+  cell 69 66 c056
+  cell 70 66 c018
+  cell 71 66 c050
+  cell 75 66 c002
+  rect 76 66 2 1 c053
+  cell 78 66 c018
+  cell 79 66 c014
+  rect 80 66 2 1 c018
+  cell 83 66 c049
+  rect 84 66 2 1 c014
+  cell 86 66 c019
+  rect 88 66 1 2 c014
+  rect 89 66 1 2 c037
+  cell 90 66 c014
+  cell 95 66 c031
+  cell 33 67 c038
+  cell 34 67 c011
+  cell 35 67 c015
+  cell 37 67 c053
+  rect 38 67 1 2 c019
+  cell 39 67 c025
+  rect 41 67 2 1 c024
+  cell 43 67 c018
+  cell 44 67 c025
+  cell 45 67 c053
+  cell 46 67 c056
+  cell 47 67 c033
+  cell 48 67 c017
+  cell 50 67 c024
+  cell 51 67 c055
+  cell 52 67 c033
+  rect 53 67 1 2 c049
+  cell 55 67 c049
+  rect 56 67 2 1 c056
+  cell 58 67 c037
+  cell 59 67 c017
+  cell 62 67 c042
+  cell 63 67 c008
+  cell 65 67 c045
+  cell 66 67 c044
+  cell 67 67 c019
+  rect 68 67 1 2 c025
+  rect 73 67 2 1 c033
+  cell 75 67 c024
+  cell 76 67 c053
+  cell 77 67 c025
+  rect 78 67 1 2 c024
+  rect 79 67 1 2 c019
+  cell 80 67 c025
+  cell 81 67 c050
+  cell 82 67 c014
+  cell 83 67 c027
+  rect 84 67 2 1 c050
+  cell 86 67 c053
+  rect 87 67 1 2 c050
+  rect 91 67 1 3 c008
+  cell 92 67 c043
+  cell 33 68 c020
+  cell 34 68 c021
+  cell 35 68 c031
+  cell 39 68 c024
+  cell 40 68 c053
+  cell 41 68 c024
+  cell 42 68 c056
+  cell 43 68 c025
+  cell 44 68 c033
+  cell 45 68 c025
+  cell 46 68 c048
+  rect 47 68 3 1 c056
+  cell 50 68 c018
+  cell 51 68 c056
+  cell 52 68 c055
+  cell 55 68 c056
+  cell 56 68 c055
+  cell 57 68 c056
+  cell 58 68 c048
+  rect 59 68 2 1 c024
+  rect 62 68 2 1 c057
+  cell 65 68 c032
+  cell 66 68 c022
+  cell 67 68 c029
+  cell 69 68 c027
+  rect 73 68 1 2 c033
+  cell 74 68 c019
+  cell 75 68 c053
+  cell 76 68 c024
+  cell 77 68 c014
+  cell 80 68 c037
+  cell 81 68 c033
+  cell 82 68 c018
+  rect 83 68 2 1 c014
+  rect 85 68 1 3 c019
+  cell 86 68 c014
+  cell 88 68 c060
+  cell 89 68 c061
+  cell 92 68 c020
+  cell 33 69 c011
+  cell 38 69 c014
+  cell 39 69 c029
+  rect 40 69 1 2 c002
+  cell 41 69 c049
+  cell 42 69 c018
+  rect 43 69 2 1 c019
+  rect 45 69 2 1 c049
+  cell 47 69 c055
+  rect 48 69 1 2 c056
+  cell 49 69 c048
+  cell 50 69 c033
+  cell 51 69 c024
+  cell 52 69 c049
+  cell 53 69 c033
+  cell 54 69 c044
+  cell 55 69 c025
+  rect 56 69 1 2 c056
+  rect 57 69 1 2 c033
+  cell 58 69 c024
+  cell 59 69 c019
+  rect 60 69 1 2 c024
+  rect 62 69 1 2 c042
+  cell 63 69 c008
+  rect 65 69 1 4 c045
+  cell 67 69 c014
+  rect 68 69 1 2 c029
+  cell 72 69 c018
+  cell 74 69 c024
+  cell 75 69 c050
+  rect 76 69 2 1 c010
+  cell 78 69 c014
+  cell 79 69 c018
+  cell 80 69 c014
+  cell 81 69 c050
+  cell 82 69 c014
+  rect 83 69 1 3 c027
+  cell 84 69 c010
+  cell 86 69 c050
+  rect 87 69 2 1 c014
+  cell 89 69 c010
+  cell 92 69 c044
+  cell 94 69 c051
+  cell 34 70 c008
+  cell 38 70 c053
+  rect 39 70 1 3 c014
+  cell 41 70 c055
+  rect 42 70 1 2 c056
+  cell 43 70 c025
+  cell 44 70 c055
+  cell 45 70 c024
+  cell 46 70 c056
+  cell 47 70 c025
+  cell 49 70 c037
+  cell 50 70 c055
+  cell 51 70 c049
+  cell 52 70 c055
+  cell 53 70 c019
+  rect 54 70 1 4 c002
+  cell 55 70 c049
+  rect 58 70 1 2 c056
+  cell 59 70 c024
+  cell 61 70 c002
+  cell 63 70 c013
+  cell 67 70 c010
+  cell 69 70 c025
+  cell 71 70 c029
+  cell 72 70 c061
+  rect 73 70 2 1 c019
+  rect 75 70 1 2 c002
+  rect 76 70 1 2 c053
+  cell 77 70 c033
+  cell 78 70 c010
+  rect 79 70 1 2 c029
+  cell 80 70 c050
+  rect 81 70 1 2 c027
+  cell 82 70 c018
+  cell 84 70 c050
+  cell 86 70 c014
+  cell 88 70 c014
+  cell 89 70 c061
+  cell 92 70 c008
+  cell 93 70 c044
+  cell 94 70 c015
+  cell 34 71 c021
+  cell 35 71 c058
+  cell 40 71 c012
+  cell 41 71 c025
+  cell 43 71 c055
+  rect 44 71 2 1 c049
+  cell 46 71 c019
+  cell 47 71 c049
+  cell 48 71 c025
+  cell 49 71 c055
+  cell 50 71 c025
+  cell 51 71 c055
+  rect 52 71 2 1 c056
+  cell 55 71 c018
+  cell 56 71 c024
+  cell 57 71 c056
+  cell 59 71 c033
+  cell 60 71 c019
+  rect 61 71 1 9 c044
+  cell 62 71 c045
+  cell 63 71 c057
+  cell 64 71 c041
+  cell 67 71 c053
+  cell 68 71 c025
+  cell 69 71 c029
+  cell 70 71 c033
+  cell 71 71 c024
+  cell 72 71 c029
+  cell 73 71 c056
+  cell 74 71 c019
+  rect 77 71 2 1 c053
+  cell 80 71 c018
+  rect 82 71 1 3 c029
+  cell 84 71 c029
+  cell 85 71 c014
+  cell 88 71 c018
+  rect 89 71 1 3 c044
+  rect 90 71 1 3 c008
+  cell 93 71 c021
+  cell 36 72 c011
+  rect 40 72 1 3 c002
+  rect 41 72 1 2 c033
+  cell 42 72 c025
+  cell 43 72 c018
+  cell 44 72 c037
+  cell 45 72 c027
+  rect 46 72 1 3 c029
+  cell 47 72 c018
+  cell 48 72 c055
+  rect 49 72 1 2 c024
+  cell 50 72 c055
+  cell 51 72 c056
+  cell 52 72 c049
+  cell 53 72 c033
+  cell 55 72 c055
+  rect 56 72 1 2 c056
+  cell 57 72 c048
+  cell 58 72 c033
+  rect 59 72 2 1 c014
+  cell 62 72 c057
+  rect 63 72 1 2 c008
+  cell 64 72 c022
+  cell 67 72 c018
+  cell 68 72 c024
+  cell 69 72 c025
+  cell 70 72 c018
+  cell 71 72 c019
+  cell 72 72 c050
+  cell 73 72 c014
+  cell 74 72 c053
+  cell 75 72 c019
+  cell 76 72 c056
+  cell 77 72 c023
+  cell 78 72 c033
+  cell 79 72 c019
+  cell 80 72 c014
+  cell 81 72 c050
+  cell 83 72 c061
+  rect 87 72 1 2 c014
+  cell 88 72 c037
+  cell 91 72 c043
+  cell 34 73 c043
+  rect 35 73 1 2 c020
+  rect 36 73 1 2 c063
+  cell 39 73 c053
+  cell 42 73 c049
+  cell 43 73 c033
+  cell 44 73 c029
+  cell 45 73 c025
+  cell 47 73 c033
+  cell 48 73 c049
+  rect 50 73 1 2 c056
+  cell 51 73 c018
+  cell 52 73 c055
+  rect 53 73 1 3 c056
+  cell 55 73 c056
+  cell 57 73 c033
+  cell 58 73 c024
+  cell 59 73 c033
+  cell 60 73 c024
+  cell 62 73 c045
+  rect 64 73 2 1 c041
+  rect 67 73 1 2 c033
+  cell 68 73 c050
+  cell 69 73 c018
+  cell 70 73 c060
+  cell 71 73 c018
+  cell 72 73 c025
+  rect 73 73 1 3 c053
+  cell 74 73 c037
+  cell 75 73 c014
+  cell 76 73 c010
+  cell 77 73 c019
+  cell 78 73 c014
+  cell 79 73 c053
+  cell 80 73 c019
+  rect 81 73 1 2 c014
+  cell 83 73 c027
+  cell 88 73 c061
+  cell 91 73 c063
+  rect 92 73 2 1 c051
+  cell 34 74 c063
+  cell 37 74 c008
+  cell 39 74 c061
+  cell 41 74 c001
+  cell 42 74 c029
+  rect 43 74 2 1 c019
+  cell 45 74 c056
+  cell 47 74 c049
+  cell 48 74 c056
+  cell 49 74 c033
+  rect 51 74 1 2 c056
+  rect 52 74 1 2 c049
+  rect 54 74 2 1 c055
+  cell 56 74 c024
+  cell 57 74 c019
+  rect 58 74 1 2 c053
+  rect 59 74 2 1 c019
+  cell 62 74 c032
+  cell 63 74 c042
+  cell 64 74 c022
+  cell 65 74 c032
+  cell 68 74 c019
+  cell 69 74 c014
+  cell 70 74 c025
+  cell 71 74 c017
+  cell 72 74 c018
+  cell 74 74 c010
+  cell 75 74 c031
+  rect 76 74 1 2 c019
+  cell 77 74 c050
+  cell 78 74 c056
+  cell 79 74 c014
+  cell 80 74 c033
+  cell 82 74 c018
+  cell 83 74 c001
+  cell 84 74 c014
+  cell 86 74 c014
+  cell 87 74 c050
+  rect 88 74 1 3 c044
+  rect 89 74 1 3 c008
+  cell 90 74 c015
+  cell 91 74 c043
+  rect 92 74 2 1 c063
+  cell 35 75 c011
+  cell 36 75 c021
+  cell 37 75 c012
+  cell 40 75 c056
+  cell 41 75 c061
+  cell 42 75 c019
+  cell 43 75 c050
+  cell 44 75 c018
+  cell 45 75 c024
+  cell 46 75 c018
+  cell 47 75 c025
+  cell 48 75 c002
+  cell 49 75 c053
+  cell 50 75 c019
+  cell 54 75 c019
+  cell 55 75 c033
+  cell 56 75 c056
+  cell 57 75 c024
+  cell 59 75 c014
+  cell 60 75 c033
+  rect 62 75 2 1 c057
+  rect 64 75 1 2 c032
+  cell 65 75 c045
+  cell 67 75 c037
+  cell 68 75 c018
+  cell 69 75 c029
+  cell 70 75 c050
+  cell 71 75 c024
+  cell 72 75 c029
+  cell 74 75 c033
+  rect 75 75 1 3 c002
+  cell 77 75 c055
+  cell 78 75 c014
+  cell 79 75 c053
+  cell 80 75 c019
+  cell 81 75 c050
+  cell 82 75 c027
+  cell 83 75 c050
+  cell 84 75 c001
+  cell 87 75 c037
+  cell 90 75 c043
+  rect 91 75 2 1 c063
+  cell 35 76 c020
+  cell 36 76 c011
+  cell 37 76 c005
+  rect 38 76 1 2 c008
+  cell 40 76 c061
+  rect 41 76 2 1 c050
+  cell 43 76 c027
+  cell 44 76 c025
+  cell 45 76 c033
+  cell 46 76 c019
+  rect 47 76 2 1 c033
+  cell 49 76 c024
+  cell 50 76 c053
+  cell 51 76 c033
+  cell 52 76 c024
+  cell 53 76 c033
+  cell 54 76 c056
+  cell 55 76 c002
+  rect 56 76 1 2 c024
+  cell 57 76 c018
+  cell 58 76 c056
+  cell 59 76 c019
+  cell 60 76 c014
+  rect 62 76 1 2 c057
+  cell 63 76 c041
+  rect 65 76 1 2 c032
+  cell 67 76 c056
+  rect 68 76 1 2 c029
+  rect 69 76 1 2 c025
+  cell 70 76 c055
+  cell 71 76 c025
+  cell 72 76 c056
+  rect 73 76 1 2 c024
+  cell 74 76 c053
+  cell 76 76 c060
+  cell 77 76 c056
+  cell 78 76 c061
+  cell 79 76 c056
+  cell 80 76 c014
+  cell 81 76 c019
+  cell 82 76 c050
+  rect 83 76 2 1 c014
+  cell 85 76 c001
+  rect 86 76 1 2 c037
+  cell 87 76 c061
+  rect 90 76 1 2 c063
+  cell 91 76 c043
+  cell 92 76 c031
+  rect 35 77 2 1 c021
+  rect 37 77 1 3 c011
+  cell 41 77 c010
+  cell 42 77 c050
+  rect 43 77 2 1 c018
+  rect 45 77 2 1 c025
+  rect 47 77 1 2 c024
+  cell 48 77 c033
+  cell 49 77 c019
+  rect 50 77 1 2 c033
+  cell 51 77 c024
+  cell 52 77 c025
+  rect 53 77 2 1 c024
+  cell 55 77 c033
+  cell 57 77 c024
+  cell 58 77 c033
+  rect 59 77 2 1 c010
+  cell 63 77 c032
+  cell 64 77 c022
+  rect 67 77 1 3 c050
+  cell 70 77 c056
+  rect 71 77 1 2 c019
+  cell 72 77 c053
+  cell 74 77 c037
+  cell 76 77 c019
+  rect 77 77 2 1 c014
+  cell 79 77 c019
+  cell 80 77 c061
+  cell 81 77 c050
+  rect 82 77 2 1 c014
+  rect 84 77 2 1 c050
+  rect 87 77 1 2 c044
+  rect 88 77 1 3 c008
+  cell 89 77 c011
+  cell 91 77 c020
+  cell 36 78 c021
+  cell 38 78 c011
+  rect 39 78 1 2 c008
+  cell 41 78 c053
+  rect 42 78 2 1 c019
+  cell 44 78 c050
+  cell 45 78 c019
+  rect 46 78 1 2 c014
+  cell 48 78 c019
+  cell 49 78 c024
+  rect 51 78 2 1 c056
+  cell 53 78 c024
+  cell 54 78 c033
+  cell 55 78 c002
+  cell 56 78 c050
+  cell 57 78 c025
+  cell 58 78 c014
+  rect 59 78 1 2 c053
+  rect 60 78 1 2 c033
+  cell 62 78 c032
+  rect 63 78 1 2 c057
+  rect 64 78 1 2 c032
+  rect 65 78 1 8 c045
+  cell 68 78 c027
+  cell 69 78 c060
+  cell 70 78 c023
+  cell 72 78 c010
+  rect 73 78 2 1 c014
+  cell 75 78 c024
+  cell 76 78 c061
+  rect 77 78 2 1 c033
+  rect 79 78 2 1 c050
+  cell 81 78 c014
+  rect 82 78 3 1 c050
+  rect 85 78 2 1 c014
+  rect 89 78 1 2 c020
+  rect 90 78 2 1 c043
+  rect 36 79 1 2 c020
+  cell 38 79 c021
+  cell 41 79 c061
+  rect 42 79 1 3 c050
+  cell 43 79 c029
+  cell 44 79 c056
+  cell 45 79 c033
+  cell 47 79 c033
+  cell 48 79 c002
+  cell 49 79 c010
+  cell 50 79 c024
+  cell 51 79 c033
+  rect 52 79 1 2 c025
+  cell 53 79 c033
+  cell 54 79 c024
+  cell 55 79 c053
+  cell 56 79 c056
+  cell 57 79 c018
+  cell 58 79 c025
+  cell 62 79 c042
+  cell 68 79 c037
+  cell 69 79 c025
+  cell 70 79 c018
+  cell 71 79 c050
+  rect 72 79 1 2 c053
+  cell 73 79 c014
+  cell 74 79 c019
+  cell 75 79 c010
+  rect 76 79 1 2 c014
+  cell 77 79 c019
+  cell 78 79 c050
+  cell 79 79 c053
+  cell 80 79 c050
+  cell 81 79 c060
+  cell 82 79 c037
+  rect 83 79 1 2 c014
+  rect 84 79 2 2 c050
+  rect 86 79 1 3 c044
+  rect 87 79 1 3 c008
+  cell 90 79 c020
+  rect 91 79 1 2 c043
+  rect 37 80 1 2 c021
+  cell 38 80 c020
+  cell 39 80 c005
+  cell 43 80 c025
+  cell 44 80 c029
+  cell 45 80 c019
+  cell 46 80 c056
+  cell 47 80 c025
+  cell 48 80 c019
+  cell 49 80 c024
+  cell 50 80 c019
+  cell 51 80 c053
+  cell 53 80 c056
+  cell 54 80 c025
+  rect 55 80 1 3 c002
+  cell 56 80 c037
+  rect 57 80 1 2 c033
+  rect 58 80 2 1 c018
+  cell 60 80 c014
+  cell 61 80 c022
+  cell 62 80 c046
+  cell 63 80 c042
+  rect 64 80 1 6 c022
+  cell 67 80 c014
+  cell 68 80 c027
+  cell 69 80 c029
+  cell 70 80 c014
+  cell 71 80 c019
+  rect 73 80 1 2 c053
+  rect 74 80 1 2 c014
+  cell 75 80 c050
+  cell 77 80 c029
+  cell 78 80 c014
+  cell 79 80 c010
+  cell 80 80 c014
+  rect 81 80 2 1 c050
+  cell 88 80 c020
+  rect 89 80 1 3 c043
+  rect 90 80 1 2 c063
+  cell 38 81 c011
+  cell 39 81 c012
+  rect 40 81 1 2 c008
+  rect 43 81 2 1 c019
+  cell 45 81 c025
+  cell 46 81 c024
+  cell 47 81 c001
+  rect 48 81 1 2 c029
+  rect 49 81 2 1 c033
+  cell 51 81 c024
+  rect 52 81 2 1 c019
+  rect 54 81 1 2 c049
+  cell 56 81 c024
+  cell 58 81 c029
+  cell 59 81 c053
+  cell 60 81 c010
+  rect 61 81 1 3 c044
+  cell 62 81 c032
+  rect 63 81 1 2 c057
+  rect 67 81 1 2 c019
+  cell 68 81 c029
+  cell 69 81 c001
+  cell 70 81 c060
+  cell 71 81 c053
+  cell 72 81 c010
+  cell 75 81 c019
+  cell 76 81 c050
+  cell 77 81 c019
+  cell 78 81 c061
+  cell 79 81 c023
+  rect 80 81 1 2 c010
+  cell 81 81 c019
+  cell 82 81 c014
+  cell 83 81 c029
+  cell 84 81 c014
+  cell 85 81 c023
+  cell 88 81 c063
+  cell 37 82 c047
+  cell 38 82 c021
+  cell 39 82 c011
+  cell 43 82 c033
+  rect 44 82 1 4 c014
+  cell 45 82 c029
+  cell 46 82 c055
+  cell 47 82 c029
+  cell 49 82 c053
+  cell 50 82 c033
+  cell 51 82 c025
+  rect 52 82 1 2 c033
+  cell 53 82 c019
+  cell 56 82 c053
+  cell 57 82 c024
+  rect 58 82 2 1 c019
+  cell 60 82 c053
+  rect 62 82 1 3 c057
+  cell 68 82 c019
+  cell 69 82 c033
+  rect 70 82 2 1 c014
+  cell 72 82 c050
+  cell 73 82 c033
+  cell 74 82 c025
+  rect 75 82 4 1 c014
+  cell 79 82 c010
+  cell 81 82 c014
+  cell 82 82 c037
+  cell 83 82 c050
+  rect 84 82 1 2 c061
+  rect 85 82 1 3 c044
+  rect 86 82 1 2 c008
+  cell 87 82 c063
+  cell 88 82 c031
+  cell 90 82 c043
+  cell 38 83 c012
+  rect 39 83 1 2 c020
+  rect 40 83 1 3 c011
+  rect 41 83 1 2 c008
+  cell 43 83 c053
+  cell 45 83 c033
+  cell 46 83 c024
+  cell 47 83 c025
+  rect 48 83 2 1 c019
+  cell 50 83 c053
+  cell 51 83 c033
+  cell 53 83 c033
+  cell 54 83 c029
+  cell 55 83 c019
+  cell 56 83 c014
+  cell 57 83 c025
+  cell 58 83 c024
+  cell 59 83 c010
+  cell 60 83 c033
+  cell 63 83 c046
+  cell 67 83 c061
+  cell 68 83 c014
+  rect 69 83 2 1 c050
+  rect 71 83 2 1 c014
+  cell 73 83 c019
+  cell 74 83 c024
+  cell 75 83 c050
+  rect 76 83 2 1 c014
+  rect 78 83 2 1 c050
+  cell 80 83 c002
+  cell 81 83 c029
+  rect 82 83 1 3 c014
+  cell 83 83 c023
+  cell 87 83 c051
+  cell 88 83 c043
+  cell 89 83 c015
+  cell 38 84 c011
+  cell 43 84 c061
+  cell 45 84 c014
+  cell 46 84 c060
+  rect 47 84 1 3 c029
+  cell 48 84 c033
+  cell 49 84 c014
+  cell 50 84 c029
+  cell 51 84 c024
+  rect 52 84 3 1 c019
+  cell 55 84 c029
+  cell 56 84 c033
+  cell 57 84 c024
+  cell 58 84 c019
+  cell 59 84 c033
+  cell 60 84 c019
+  cell 61 84 c002
+  cell 63 84 c057
+  cell 67 84 c053
+  cell 68 84 c050
+  cell 69 84 c014
+  cell 70 84 c063
+  cell 71 84 c029
+  cell 72 84 c050
+  rect 73 84 2 1 c014
+  cell 75 84 c036
+  cell 76 84 c050
+  cell 77 84 c019
+  cell 78 84 c014
+  rect 79 84 1 2 c050
+  cell 80 84 c061
+  cell 81 84 c060
+  cell 83 84 c050
+  rect 84 84 1 2 c044
+  cell 86 84 c044
+  rect 87 84 2 1 c063
+  cell 89 84 c020
+  cell 38 85 c043
+  cell 39 85 c011
+  rect 41 85 1 2 c012
+  cell 45 85 c019
+  cell 46 85 c025
+  cell 48 85 c019
+  cell 49 85 c033
+  cell 50 85 c019
+  cell 51 85 c014
+  cell 52 85 c019
+  cell 53 85 c024
+  rect 54 85 2 1 c014
+  rect 56 85 1 2 c053
+  cell 57 85 c018
+  cell 58 85 c050
+  rect 59 85 1 4 c053
+  cell 60 85 c014
+  cell 61 85 c044
+  rect 62 85 2 1 c046
+  cell 67 85 c010
+  rect 68 85 1 2 c061
+  rect 69 85 2 1 c050
+  rect 71 85 2 1 c014
+  cell 73 85 c019
+  rect 74 85 1 2 c029
+  cell 75 85 c050
+  cell 76 85 c014
+  cell 77 85 c010
+  cell 78 85 c050
+  cell 80 85 c029
+  cell 81 85 c014
+  rect 83 85 1 2 c061
+  rect 85 85 1 2 c008
+  cell 86 85 c063
+  cell 87 85 c043
+  cell 88 85 c051
+  cell 89 85 c063
+  cell 39 86 c063
+  rect 40 86 1 2 c020
+  cell 42 86 c008
+  cell 44 86 c053
+  cell 45 86 c014
+  cell 46 86 c019
+  cell 48 86 c014
+  cell 49 86 c050
+  cell 50 86 c053
+  cell 51 86 c025
+  rect 52 86 2 1 c033
+  cell 54 86 c019
+  cell 55 86 c014
+  cell 57 86 c029
+  cell 58 86 c019
+  cell 60 86 c053
+  cell 61 86 c041
+  cell 62 86 c045
+  cell 63 86 c046
+  rect 64 86 2 1 c041
+  cell 67 86 c061
+  cell 69 86 c037
+  rect 70 86 1 3 c002
+  rect 71 86 2 1 c050
+  cell 73 86 c017
+  cell 75 86 c014
+  rect 76 86 1 2 c050
+  cell 77 86 c037
+  cell 78 86 c027
+  rect 79 86 1 2 c014
+  rect 80 86 1 2 c050
+  cell 81 86 c027
+  cell 82 86 c050
+  rect 84 86 1 3 c008
+  cell 86 86 c031
+  cell 87 86 c063
+  cell 88 86 c031
+  cell 39 87 c043
+  rect 41 87 2 1 c020
+  rect 45 87 2 1 c050
+  cell 47 87 c025
+  cell 48 87 c024
+  cell 49 87 c027
+  cell 50 87 c025
+  cell 51 87 c027
+  cell 52 87 c019
+  rect 53 87 1 2 c033
+  rect 54 87 1 2 c014
+  cell 55 87 c019
+  rect 56 87 2 1 c014
+  cell 58 87 c053
+  cell 60 87 c044
+  cell 61 87 c022
+  cell 62 87 c042
+  cell 63 87 c032
+  rect 67 87 2 1 c010
+  rect 69 87 1 3 c053
+  cell 71 87 c050
+  cell 72 87 c014
+  cell 73 87 c027
+  rect 74 87 2 1 c050
+  cell 77 87 c050
+  cell 78 87 c014
+  cell 81 87 c061
+  cell 82 87 c037
+  rect 83 87 1 2 c044
+  cell 85 87 c051
+  cell 86 87 c043
+  rect 87 87 1 2 c031
+  cell 88 87 c043
+  cell 40 88 c021
+  cell 41 88 c012
+  rect 42 88 1 2 c043
+  cell 43 88 c008
+  cell 45 88 c010
+  rect 46 88 3 1 c014
+  rect 49 88 1 2 c029
+  rect 50 88 1 3 c050
+  cell 51 88 c019
+  cell 52 88 c033
+  rect 55 88 1 2 c014
+  cell 56 88 c061
+  cell 57 88 c033
+  cell 58 88 c010
+  cell 60 88 c002
+  rect 61 88 2 3 c057
+  cell 63 88 c046
+  cell 64 88 c044
+  rect 66 88 1 2 c022
+  cell 67 88 c002
+  cell 68 88 c010
+  cell 71 88 c014
+  rect 72 88 2 1 c053
+  rect 74 88 1 2 c050
+  cell 75 88 c061
+  rect 76 88 2 1 c014
+  cell 78 88 c019
+  cell 79 88 c050
+  cell 80 88 c029
+  cell 81 88 c050
+  cell 82 88 c010
+  rect 85 88 2 1 c063
+  cell 40 89 c011
+  rect 41 89 1 2 c043
+  cell 43 89 c020
+  rect 44 89 1 2 c008
+  cell 45 89 c044
+  cell 46 89 c010
+  cell 47 89 c014
+  cell 48 89 c050
+  cell 51 89 c050
+  cell 52 89 c014
+  cell 53 89 c018
+  cell 54 89 c019
+  rect 56 89 2 1 c010
+  rect 58 89 1 2 c053
+  cell 59 89 c023
+  cell 60 89 c041
+  cell 63 89 c041
+  rect 64 89 1 2 c022
+  cell 67 89 c044
+  cell 68 89 c061
+  cell 70 89 c061
+  rect 71 89 2 1 c050
+  cell 73 89 c029
+  cell 75 89 c025
+  cell 76 89 c050
+  cell 77 89 c014
+  cell 78 89 c050
+  cell 79 89 c029
+  cell 80 89 c050
+  cell 81 89 c023
+  rect 82 89 1 2 c044
+  rect 83 89 1 2 c008
+  cell 84 89 c031
+  cell 85 89 c043
+  cell 86 89 c031
+  cell 87 89 c063
+  cell 42 90 c011
+  cell 43 90 c051
+  cell 45 90 c002
+  cell 46 90 c061
+  cell 47 90 c050
+  rect 48 90 1 2 c018
+  cell 49 90 c050
+  cell 51 90 c029
+  cell 52 90 c033
+  cell 53 90 c019
+  cell 54 90 c014
+  cell 55 90 c053
+  rect 56 90 2 1 c044
+  rect 59 90 2 1 c008
+  cell 63 90 c013
+  cell 66 90 c032
+  cell 67 90 c041
+  cell 68 90 c022
+  cell 69 90 c023
+  cell 70 90 c044
+  cell 71 90 c022
+  cell 72 90 c061
+  rect 73 90 2 1 c014
+  rect 75 90 1 2 c050
+  cell 76 90 c014
+  cell 77 90 c050
+  cell 78 90 c019
+  cell 79 90 c037
+  cell 80 90 c014
+  rect 81 90 1 2 c044
+  cell 84 90 c043
+  rect 85 90 2 1 c063
+  cell 41 91 c020
+  rect 42 91 1 2 c063
+  cell 43 91 c043
+  cell 44 91 c005
+  rect 45 91 1 2 c008
+  rect 46 91 1 4 c044
+  rect 47 91 1 2 c061
+  cell 49 91 c018
+  cell 50 91 c014
+  cell 51 91 c050
+  rect 52 91 1 2 c014
+  cell 53 91 c029
+  cell 54 91 c019
+  cell 55 91 c033
+  cell 56 91 c044
+  cell 57 91 c041
+  cell 58 91 c057
+  cell 59 91 c046
+  cell 60 91 c042
+  cell 61 91 c045
+  rect 62 91 1 2 c057
+  rect 63 91 1 2 c046
+  cell 64 91 c041
+  cell 69 91 c022
+  cell 70 91 c041
+  cell 71 91 c044
+  cell 72 91 c014
+  cell 73 91 c050
+  cell 74 91 c033
+  cell 76 91 c029
+  cell 77 91 c061
+  rect 78 91 3 1 c050
+  rect 82 91 1 2 c008
+  cell 83 91 c020
+  rect 84 91 2 1 c063
+  cell 86 91 c015
+  cell 43 92 c063
+  rect 44 92 1 2 c020
+  cell 48 92 c050
+  cell 49 92 c037
+  rect 50 92 1 2 c050
+  cell 51 92 c027
+  cell 53 92 c024
+  cell 54 92 c029
+  cell 55 92 c050
+  rect 56 92 1 2 c014
+  rect 57 92 1 2 c044
+  cell 58 92 c046
+  rect 59 92 2 1 c057
+  cell 61 92 c022
+  cell 67 92 c032
+  cell 68 92 c057
+  cell 69 92 c042
+  cell 70 92 c022
+  cell 71 92 c050
+  cell 72 92 c061
+  cell 73 92 c029
+  rect 74 92 1 5 c050
+  cell 75 92 c014
+  cell 76 92 c061
+  rect 77 92 3 1 c050
+  cell 80 92 c037
+  rect 81 92 1 2 c008
+  cell 83 92 c063
+  rect 84 92 2 1 c031
+  cell 42 93 c043
+  cell 43 93 c021
+  rect 45 93 1 2 c043
+  rect 47 93 1 2 c044
+  cell 48 93 c061
+  cell 49 93 c025
+  rect 51 93 1 2 c014
+  rect 52 93 4 1 c019
+  rect 58 93 2 1 c044
+  cell 60 93 c022
+  cell 61 93 c044
+  cell 62 93 c046
+  cell 63 93 c057
+  cell 64 93 c022
+  rect 66 93 2 1 c044
+  cell 68 93 c022
+  cell 69 93 c044
+  cell 70 93 c023
+  rect 71 93 1 2 c061
+  rect 72 93 2 1 c050
+  cell 75 93 c010
+  rect 76 93 1 2 c014
+  cell 77 93 c037
+  cell 78 93 c050
+  cell 79 93 c053
+  rect 80 93 1 2 c044
+  cell 82 93 c063
+  cell 83 93 c043
+  rect 84 93 2 1 c063
+  cell 43 94 c031
+  cell 44 94 c043
+  cell 48 94 c014
+  cell 49 94 c050
+  cell 50 94 c014
+  cell 52 94 c014
+  cell 53 94 c061
+  cell 54 94 c029
+  cell 55 94 c014
+  cell 56 94 c050
+  cell 57 94 c053
+  cell 58 94 c061
+  rect 59 94 2 1 c044
+  cell 61 94 c032
+  cell 62 94 c045
+  cell 63 94 c041
+  cell 66 94 c022
+  rect 67 94 2 1 c044
+  cell 69 94 c002
+  cell 70 94 c050
+  cell 72 94 c037
+  cell 73 94 c053
+  rect 75 94 1 4 c061
+  cell 77 94 c023
+  cell 78 94 c014
+  rect 79 94 1 2 c044
+  rect 81 94 2 1 c031
+  rect 83 94 1 2 c063
+  cell 84 94 c051
+  cell 43 95 c043
+  rect 44 95 2 2 c063
+  rect 46 95 2 1 c020
+  cell 48 95 c044
+  cell 49 95 c061
+  cell 50 95 c037
+  cell 51 95 c018
+  cell 52 95 c029
+  rect 53 95 1 4 c050
+  cell 54 95 c014
+  cell 55 95 c037
+  cell 56 95 c018
+  cell 57 95 c019
+  cell 58 95 c010
+  rect 59 95 1 2 c023
+  cell 60 95 c044
+  rect 61 95 1 2 c041
+  cell 62 95 c042
+  cell 63 95 c032
+  cell 64 95 c041
+  cell 65 95 c032
+  rect 66 95 2 1 c044
+  rect 68 95 1 2 c061
+  cell 69 95 c053
+  rect 70 95 1 2 c014
+  rect 71 95 1 3 c050
+  cell 72 95 c014
+  cell 73 95 c010
+  rect 76 95 3 1 c037
+  cell 80 95 c008
+  cell 81 95 c031
+  cell 82 95 c059
+  cell 84 95 c031
+  rect 46 96 1 2 c020
+  cell 47 96 c044
+  cell 48 96 c020
+  cell 50 96 c010
+  rect 51 96 2 1 c050
+  cell 54 96 c029
+  cell 55 96 c014
+  rect 56 96 2 2 c050
+  cell 58 96 c019
+  cell 60 96 c010
+  rect 62 96 1 4 c057
+  cell 63 96 c042
+  rect 64 96 1 7 c022
+  cell 65 96 c041
+  rect 66 96 1 3 c044
+  cell 67 96 c023
+  cell 69 96 c061
+  cell 72 96 c050
+  cell 73 96 c061
+  rect 76 96 2 1 c037
+  rect 78 96 1 2 c044
+  rect 79 96 1 2 c008
+  rect 80 96 1 2 c031
+  cell 81 96 c043
+  rect 82 96 1 3 c031
+  cell 83 96 c051
+  cell 44 97 c031
+  rect 45 97 1 2 c043
+  cell 47 97 c043
+  rect 50 97 2 1 c014
+  cell 52 97 c060
+  cell 54 97 c014
+  cell 55 97 c010
+  rect 58 97 1 2 c014
+  cell 59 97 c010
+  rect 60 97 1 3 c053
+  rect 61 97 1 3 c044
+  rect 63 97 1 2 c057
+  cell 65 97 c032
+  cell 67 97 c061
+  cell 68 97 c023
+  rect 69 97 1 2 c050
+  cell 70 97 c037
+  cell 72 97 c037
+  rect 73 97 1 3 c050
+  cell 74 97 c014
+  cell 76 97 c061
+  cell 77 97 c037
+  rect 81 97 1 2 c063
+  cell 46 98 c043
+  cell 47 98 c021
+  cell 48 98 c063
+  cell 51 98 c014
+  cell 52 98 c019
+  rect 54 98 1 2 c050
+  rect 55 98 2 1 c019
+  cell 57 98 c050
+  cell 59 98 c014
+  cell 65 98 c045
+  cell 67 98 c037
+  rect 68 98 1 3 c014
+  cell 70 98 c019
+  rect 71 98 1 2 c014
+  cell 72 98 c060
+  rect 74 98 1 2 c050
+  cell 75 98 c037
+  cell 76 98 c050
+  cell 77 98 c044
+  rect 78 98 1 2 c008
+  cell 79 98 c063
+  cell 80 98 c051
+  cell 46 99 c063
+  cell 47 99 c059
+  cell 48 99 c031
+  cell 51 99 c037
+  rect 52 99 2 1 c014
+  cell 55 99 c050
+  cell 56 99 c014
+  cell 57 99 c019
+  cell 58 99 c050
+  cell 59 99 c053
+  cell 63 99 c032
+  rect 65 99 1 4 c044
+  cell 66 99 c010
+  cell 67 99 c050
+  rect 69 99 2 1 c002
+  rect 72 99 1 2 c050
+  rect 75 99 1 2 c023
+  rect 76 99 1 2 c044
+  rect 77 99 1 2 c008
+  cell 79 99 c031
+  rect 80 99 1 3 c063
+  cell 81 99 c020
+  rect 46 100 2 1 c031
+  cell 48 100 c063
+  cell 49 100 c031
+  cell 52 100 c053
+  rect 53 100 1 2 c061
+  rect 54 100 1 2 c014
+  cell 55 100 c029
+  rect 56 100 1 2 c050
+  cell 57 100 c037
+  cell 58 100 c010
+  cell 59 100 c050
+  cell 60 100 c014
+  rect 61 100 1 2 c053
+  rect 62 100 1 3 c044
+  rect 63 100 1 3 c045
+  rect 66 100 2 1 c037
+  cell 69 100 c014
+  cell 70 100 c037
+  cell 71 100 c050
+  cell 73 100 c023
+  rect 74 100 1 2 c037
+  rect 78 100 2 1 c015
+  cell 81 100 c063
+  cell 47 101 c043
+  cell 48 101 c031
+  cell 49 101 c020
+  cell 55 101 c037
+  cell 57 101 c014
+  rect 58 101 1 2 c050
+  cell 59 101 c014
+  cell 60 101 c053
+  cell 66 101 c010
+  cell 67 101 c061
+  rect 68 101 1 2 c050
+  cell 69 101 c061
+  cell 70 101 c060
+  rect 71 101 2 1 c037
+  cell 73 101 c014
+  rect 75 101 1 2 c044
+  rect 76 101 1 2 c008
+  rect 77 101 2 1 c043
+  rect 79 101 1 2 c063
+  rect 47 102 3 1 c063
+  cell 50 102 c043
+  cell 53 102 c010
+  cell 54 102 c023
+  cell 55 102 c050
+  rect 56 102 1 2 c014
+  cell 57 102 c050
+  cell 59 102 c053
+  cell 60 102 c033
+  cell 61 102 c014
+  rect 66 102 2 1 c023
+  rect 69 102 1 2 c050
+  cell 70 102 c061
+  rect 71 102 2 1 c050
+  cell 73 102 c061
+  rect 74 102 1 2 c044
+  cell 77 102 c043
+  cell 78 102 c063
+  cell 48 103 c043
+  cell 49 103 c031
+  cell 50 103 c020
+  rect 51 103 1 3 c063
+  cell 54 103 c010
+  cell 55 103 c037
+  rect 57 103 1 2 c023
+  rect 58 103 2 1 c014
+  cell 60 103 c053
+  cell 61 103 c010
+  cell 62 103 c053
+  cell 63 103 c041
+  rect 64 103 1 3 c044
+  rect 65 103 2 1 c061
+  cell 67 103 c050
+  cell 68 103 c060
+  rect 70 103 2 1 c050
+  cell 72 103 c061
+  cell 73 103 c023
+  cell 75 103 c008
+  rect 76 103 1 2 c063
+  cell 77 103 c011
+  rect 78 103 2 1 c031
+  rect 49 104 2 2 c063
+  cell 52 104 c031
+  rect 55 104 2 1 c061
+  cell 58 104 c053
+  rect 59 104 1 2 c050
+  cell 60 104 c014
+  cell 61 104 c037
+  cell 62 104 c014
+  rect 63 104 1 2 c044
+  rect 65 104 1 3 c010
+  rect 66 104 1 4 c061
+  rect 67 104 1 2 c037
+  rect 68 104 1 2 c061
+  cell 69 104 c019
+  rect 70 104 2 1 c037
+  cell 72 104 c023
+  cell 73 104 c044
+  cell 74 104 c008
+  cell 75 104 c043
+  cell 77 104 c063
+  rect 78 104 1 2 c015
+  cell 52 105 c020
+  cell 55 105 c023
+  rect 56 105 1 2 c061
+  cell 57 105 c010
+  cell 58 105 c014
+  cell 60 105 c037
+  rect 61 105 2 1 c061
+  cell 69 105 c023
+  rect 70 105 1 2 c037
+  cell 71 105 c061
+  rect 72 105 1 2 c044
+  rect 73 105 1 2 c008
+  cell 74 105 c044
+  cell 75 105 c063
+  cell 76 105 c015
+  rect 77 105 1 2 c043
+  cell 50 106 c063
+  cell 51 106 c043
+  cell 52 106 c031
+  cell 53 106 c063
+  cell 57 106 c061
+  cell 58 106 c050
+  cell 59 106 c053
+  cell 60 106 c014
+  cell 61 106 c023
+  cell 62 106 c050
+  rect 63 106 1 2 c002
+  cell 64 106 c023
+  cell 67 106 c010
+  cell 68 106 c014
+  rect 69 106 1 3 c037
+  rect 71 106 1 2 c044
+  cell 74 106 c031
+  cell 75 106 c043
+  cell 76 106 c063
+  rect 51 107 2 1 c063
+  rect 53 107 1 2 c031
+  cell 54 107 c063
+  cell 57 107 c010
+  rect 58 107 1 2 c023
+  cell 59 107 c044
+  rect 60 107 1 2 c061
+  cell 61 107 c014
+  cell 62 107 c061
+  cell 64 107 c014
+  cell 65 107 c050
+  cell 67 107 c053
+  cell 68 107 c023
+  cell 70 107 c023
+  cell 72 107 c008
+  cell 73 107 c043
+  rect 74 107 2 1 c063
+  cell 76 107 c031
+  rect 51 108 2 1 c043
+  cell 54 108 c011
+  cell 55 108 c063
+  cell 56 108 c043
+  rect 59 108 1 2 c061
+  rect 61 108 1 2 c061
+  cell 62 108 c050
+  cell 63 108 c060
+  rect 64 108 1 2 c050
+  cell 65 108 c014
+  cell 66 108 c023
+  rect 67 108 2 1 c061
+  cell 70 108 c044
+  cell 71 108 c008
+  cell 72 108 c063
+  cell 73 108 c031
+  cell 74 108 c063
+  rect 75 108 1 2 c043
+  cell 55 109 c031
+  cell 56 109 c020
+  rect 60 109 1 2 c010
+  rect 62 109 1 3 c061
+  cell 63 109 c010
+  rect 65 109 2 1 c061
+  cell 67 109 c037
+  cell 68 109 c061
+  rect 69 109 1 2 c044
+  rect 70 109 1 2 c008
+  rect 71 109 1 3 c063
+  cell 72 109 c031
+  cell 73 109 c015
+  rect 74 109 1 2 c031
+  cell 61 110 c050
+  rect 63 110 1 3 c044
+  rect 64 110 2 1 c037
+  cell 66 110 c023
+  cell 67 110 c061
+  rect 68 110 1 2 c044
+  cell 72 110 c043
+  rect 73 110 1 2 c063
+  cell 54 111 c043
+  cell 55 111 c031
+  cell 57 111 c031
+  cell 61 111 c023
+  rect 64 111 3 1 c061
+  rect 67 111 1 2 c044
+  cell 69 111 c008
+  cell 70 111 c015
+  cell 72 111 c020
+  cell 57 112 c059
+  rect 58 112 1 2 c043
+  cell 59 112 c008
+  cell 61 112 c061
+  rect 62 112 1 2 c037
+  cell 64 112 c023
+  cell 65 112 c061
+  rect 66 112 1 2 c044
+  cell 68 112 c008
+  rect 69 112 1 2 c063
+  cell 70 112 c031
+  cell 71 112 c015
+  cell 72 112 c031
+  rect 55 113 2 1 c031
+  rect 57 113 1 2 c043
+  cell 59 113 c011
+  cell 60 113 c008
+  cell 63 113 c061
+  cell 64 113 c015
+  cell 65 113 c002
+  cell 67 113 c008
+  rect 68 113 1 2 c043
+  rect 70 113 2 1 c043
+  cell 56 114 c015
+  rect 58 114 1 2 c063
+  cell 59 114 c031
+  cell 60 114 c043
+  cell 64 114 c002
+  cell 65 114 c044
+  cell 66 114 c008
+  cell 67 114 c043
+  cell 69 114 c031
+  cell 70 114 c063
+  cell 57 115 c063
+  rect 59 115 2 1 c063
+  cell 61 115 c031
+  cell 65 115 c008
+  cell 66 115 c051
+  rect 67 115 3 1 c063
+  cell 58 116 c043
+  cell 59 116 c011
+  cell 60 116 c031
+  rect 61 116 2 1 c063
+  cell 64 116 c008
+  rect 65 116 2 2 c063
+  cell 67 116 c031
+  rect 68 116 2 1 c063
+  cell 59 117 c031
+  cell 60 117 c063
+  cell 61 117 c011
+  cell 62 117 c051
+  rect 67 117 1 2 c063
+  cell 60 118 c043
+  cell 61 118 c031
+  rect 62 118 1 2 c044
+  rect 63 118 2 1 c008
+  rect 65 118 1 2 c044
+  cell 66 118 c031
+  cell 61 119 c043
+  cell 63 119 c051
+  rect 64 119 1 2 c044
+  cell 66 119 c015
+  cell 62 120 c031
+  cell 63 120 c044
+  cell 65 120 c011
+  cell 63 121 c020
+  cell 64 121 c063
+}
+
+export json png aseprite

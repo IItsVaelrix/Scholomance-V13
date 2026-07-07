@@ -99,6 +99,10 @@ export const COMBAT_RARITY_TIERS = Object.freeze([
   }),
 ]);
 
+// Rarity ordinal at which a cast earns a procedurally generated epic
+// animation (MYTHIC and above — "epic and above" in world terms).
+export const EPIC_CAST_MIN_RARITY_ORDINAL = 3;
+
 const STATUS_TIER_DEFINITIONS = Object.freeze([
   Object.freeze({ tier: 1, turns: 1, magnitude: 0.05 }),
   Object.freeze({ tier: 2, turns: 2, magnitude: 0.10 }),

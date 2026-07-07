@@ -5,9 +5,8 @@
  * 
  * @see ARCH_CONTRACT_OVERLAY_INTEGRITY.md - Layer separation requirements
  */
-
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { processorBridge } from '../../../lib/engine.adapter.js';
+import { submitAmpIntent } from '../../../lib/amp-client.js';
 import { usePrefersReducedMotion } from '../../../hooks/usePrefersReducedMotion.js';
 import type { AnimationIntent, ResolvedMotionOutput } from '../../../types/animation';
 
@@ -67,9 +66,11 @@ export function useAnimationIntent(
     
     const processIntent = async () => {
       try {
-        // V12 PERFORMANCE: Offload to Microprocessor Factory via Bridge
-        const result = await processorBridge.execute('amp.run', augmentedIntent);
-        if (isMounted) {
+        // V12 PERFORMANCE: Submit intent which correctly bridges Main Thread lighting and WebWorker composition
+        const result = await submitAmpIntent(augmentedIntent);
+        
+        // Ensure component is still mounted
+        if (isMounted && lastIntentRef.current === intentHash) {
           setMotion(result as ResolvedMotionOutput);
         }
       } catch (error) {

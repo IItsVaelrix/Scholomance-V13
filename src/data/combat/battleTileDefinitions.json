@@ -1,0 +1,295 @@
+{
+  "version": "TACTICAL-LATTICE-v1",
+  "tileTypes": {
+    "normal": {
+      "id": "normal",
+      "label": "Normal Tile",
+      "description": "Standard terrain. No special modifier.",
+      "walkable": true,
+      "blocksLineOfSight": false,
+      "movementCost": 1,
+      "glyph": "·",
+      "colorHint": "#4a4a5a",
+      "pulseIntensity": 0,
+      "interactionPriority": 0,
+      "category": "terrain",
+      "modifier": null
+    },
+    "high_ground": {
+      "id": "high_ground",
+      "label": "High Ground",
+      "description": "Elevated terrain. +1 range, +10% accuracy.",
+      "walkable": true,
+      "blocksLineOfSight": false,
+      "movementCost": 2,
+      "glyph": "▲",
+      "colorHint": "#7a8a6a",
+      "pulseIntensity": 0.2,
+      "interactionPriority": 3,
+      "category": "terrain",
+      "modifier": {
+        "kind": "accuracy_boost",
+        "value": 0.10,
+        "appliesTo": "caster_tile",
+        "duration": "static",
+        "rangeBonus": 1
+      }
+    },
+    "low_ground": {
+      "id": "low_ground",
+      "label": "Low Ground",
+      "description": "Sunken terrain. Accuracy penalty when attacking upward.",
+      "walkable": true,
+      "blocksLineOfSight": false,
+      "movementCost": 1,
+      "glyph": "▽",
+      "colorHint": "#3a3a4a",
+      "pulseIntensity": 0,
+      "interactionPriority": 1,
+      "category": "terrain",
+      "modifier": {
+        "kind": "accuracy_boost",
+        "value": -0.05,
+        "appliesTo": "caster_tile",
+        "duration": "static"
+      }
+    },
+    "blocked": {
+      "id": "blocked",
+      "label": "Blocked",
+      "description": "Impassable terrain.",
+      "walkable": false,
+      "blocksLineOfSight": true,
+      "movementCost": 99,
+      "glyph": "█",
+      "colorHint": "#1a1a2a",
+      "pulseIntensity": 0,
+      "interactionPriority": 0,
+      "category": "terrain",
+      "modifier": null
+    },
+    "hazard": {
+      "id": "hazard",
+      "label": "Hazard Tile",
+      "description": "Dangerous terrain. Damage or debuff at turn start.",
+      "walkable": true,
+      "blocksLineOfSight": false,
+      "movementCost": 1,
+      "glyph": "⚠",
+      "colorHint": "#aa4422",
+      "pulseIntensity": 0.6,
+      "interactionPriority": 5,
+      "category": "terrain",
+      "modifier": {
+        "kind": "zone_denial",
+        "value": -0.10,
+        "appliesTo": "caster_tile",
+        "duration": "static"
+      }
+    },
+    "fire": {
+      "id": "fire",
+      "label": "Fire Tile",
+      "description": "Aggressive damage square. Fire spells +15%.",
+      "walkable": true,
+      "blocksLineOfSight": false,
+      "movementCost": 1,
+      "glyph": "🔥",
+      "colorHint": "#cc4411",
+      "pulseIntensity": 0.5,
+      "interactionPriority": 4,
+      "category": "school",
+      "school": "FIRE",
+      "modifier": {
+        "kind": "school_boost",
+        "school": "FIRE",
+        "value": 0.15,
+        "appliesTo": "caster_tile",
+        "duration": "static"
+      }
+    },
+    "void": {
+      "id": "void",
+      "label": "Void Tile",
+      "description": "Risk/reward drain square. Siphon/corruption +20%, healing -10%.",
+      "walkable": true,
+      "blocksLineOfSight": false,
+      "movementCost": 1,
+      "glyph": "◉",
+      "colorHint": "#6622aa",
+      "pulseIntensity": 0.6,
+      "interactionPriority": 5,
+      "category": "school",
+      "school": "VOID",
+      "modifier": {
+        "kind": "school_boost",
+        "school": "VOID",
+        "value": 0.20,
+        "appliesTo": "caster_tile",
+        "duration": "static",
+        "healingPenalty": -0.10
+      }
+    },
+    "sonic": {
+      "id": "sonic",
+      "label": "Sonic Tile",
+      "description": "Resonance and machinery square. SONIC spells +15%, chain effects +1.",
+      "walkable": true,
+      "blocksLineOfSight": false,
+      "movementCost": 1,
+      "glyph": "♪",
+      "colorHint": "#22aacc",
+      "pulseIntensity": 0.4,
+      "interactionPriority": 4,
+      "category": "school",
+      "school": "SONIC",
+      "modifier": {
+        "kind": "chain_multiplier",
+        "school": "SONIC",
+        "value": 0.15,
+        "appliesTo": "caster_tile",
+        "duration": "static",
+        "chainBonus": 1
+      }
+    },
+    "ice": {
+      "id": "ice",
+      "label": "Ice Tile",
+      "description": "Control square. Slow/freeze effects +15%.",
+      "walkable": true,
+      "blocksLineOfSight": false,
+      "movementCost": 1,
+      "glyph": "❄",
+      "colorHint": "#88ccee",
+      "pulseIntensity": 0.3,
+      "interactionPriority": 3,
+      "category": "school",
+      "school": "ICE",
+      "modifier": {
+        "kind": "status_amplifier",
+        "school": "ICE",
+        "value": 0.15,
+        "appliesTo": "caster_tile",
+        "duration": "static"
+      }
+    },
+    "holy": {
+      "id": "holy",
+      "label": "Holy Tile",
+      "description": "Defensive square. Healing and shielding +15%.",
+      "walkable": true,
+      "blocksLineOfSight": false,
+      "movementCost": 1,
+      "glyph": "✦",
+      "colorHint": "#eedd66",
+      "pulseIntensity": 0.4,
+      "interactionPriority": 4,
+      "category": "school",
+      "school": "HOLY",
+      "modifier": {
+        "kind": "school_boost",
+        "school": "HOLY",
+        "value": 0.15,
+        "appliesTo": "caster_tile",
+        "duration": "static"
+      }
+    },
+    "null": {
+      "id": "null",
+      "label": "Null Tile",
+      "description": "Denial square. Spell modifiers reduced by 20% or cancelled.",
+      "walkable": true,
+      "blocksLineOfSight": false,
+      "movementCost": 1,
+      "glyph": "∅",
+      "colorHint": "#555555",
+      "pulseIntensity": 0.3,
+      "interactionPriority": 5,
+      "category": "premium",
+      "modifier": {
+        "kind": "nullification",
+        "value": -0.20,
+        "appliesTo": "caster_tile",
+        "duration": "static"
+      }
+    },
+    "rune": {
+      "id": "rune",
+      "label": "Rune Tile",
+      "description": "Premium spellcraft square. +1 spell die or +8% bridge stability.",
+      "walkable": true,
+      "blocksLineOfSight": false,
+      "movementCost": 1,
+      "glyph": "ᚱ",
+      "colorHint": "#cc88ff",
+      "pulseIntensity": 0.7,
+      "interactionPriority": 6,
+      "category": "premium",
+      "modifier": {
+        "kind": "spell_roll_bonus",
+        "value": 0.08,
+        "appliesTo": "caster_tile",
+        "duration": "static",
+        "spellDieBonus": 1,
+        "bridgeStabilityBonus": 0.08
+      }
+    },
+    "anchor": {
+      "id": "anchor",
+      "label": "Ritual Anchor Tile",
+      "description": "Ritual control square. Sustained spells last longer.",
+      "walkable": true,
+      "blocksLineOfSight": false,
+      "movementCost": 1,
+      "glyph": "⚓",
+      "colorHint": "#aa66cc",
+      "pulseIntensity": 0.5,
+      "interactionPriority": 6,
+      "category": "premium",
+      "modifier": {
+        "kind": "ritual_anchor",
+        "value": 0.12,
+        "appliesTo": "caster_tile",
+        "duration": "static"
+      }
+    }
+  },
+  "categories": {
+    "terrain": {
+      "label": "Terrain",
+      "description": "Standard terrain types with elevation and movement effects.",
+      "tiles": ["normal", "high_ground", "low_ground", "blocked", "hazard"]
+    },
+    "school": {
+      "label": "School Tile",
+      "description": "Tiles aligned to a magical school. Boost matching school actions.",
+      "tiles": ["fire", "void", "sonic", "ice", "holy"]
+    },
+    "premium": {
+      "label": "Premium Tile",
+      "description": "Rare tactical tiles with powerful positional effects.",
+      "tiles": ["null", "rune", "anchor"]
+    }
+  },
+  "distribution": {
+    "normalPercent": 70,
+    "schoolPercent": 20,
+    "premiumPercent": 10,
+    "boardSizes": {
+      "small": { "width": 8, "height": 8, "specialTiles": [8, 12], "premiumTiles": [2, 3], "blockers": [4, 6], "hazards": [0, 2] },
+      "medium": { "width": 10, "height": 10, "specialTiles": [10, 14], "premiumTiles": [3, 4], "blockers": [5, 8], "hazards": [1, 3] },
+      "large": { "width": 12, "height": 12, "specialTiles": [14, 18], "premiumTiles": [4, 6], "blockers": [6, 10], "hazards": [2, 4] }
+    }
+  },
+  "landmarkInfluence": {
+    "obelisk": ["sonic", "rune"],
+    "lava": ["fire"],
+    "graveyard": ["void"],
+    "church": ["holy"],
+    "glacier": ["ice"],
+    "library": ["rune", "anchor"],
+    "forge": ["fire", "sonic"],
+    "altar": ["anchor", "void"],
+    "crystal_cave": ["rune", "sonic"]
+  }
+}

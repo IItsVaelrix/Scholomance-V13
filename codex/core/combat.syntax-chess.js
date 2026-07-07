@@ -1,4 +1,5 @@
 import { tokenize } from './tokenizer.js';
+import { PREDICATES } from './semantics.registry.js';
 
 const STOP_WORDS = new Set([
   'a', 'an', 'and', 'as', 'at', 'be', 'by', 'for', 'from', 'in', 'is', 'it',
@@ -55,6 +56,9 @@ export const SYNTACTIC_ARCHETYPE_PROFILES = Object.freeze({
     favoredDevices: Object.freeze(['antithesis', 'metaphor', 'personification']),
     punishedTerms: Object.freeze(['shadow', 'darkness', 'void']),
     symbolicBody: Object.freeze(['shadow', 'silhouette', 'echo', 'veil', 'shade']),
+    // a Shade is unmade by being questioned and named, not lectured at
+    syntaxWeaknesses: Object.freeze(['PROBE', 'LITANY']),
+    syntaxResistances: Object.freeze(['WARD']),
   }),
   GOLEM_BASE: Object.freeze({
     archetype: 'GOLEM',
@@ -63,6 +67,9 @@ export const SYNTACTIC_ARCHETYPE_PROFILES = Object.freeze({
     favoredDevices: Object.freeze(['process_language', 'material_specificity']),
     punishedTerms: Object.freeze(['stone', 'force', 'bone']),
     symbolicBody: Object.freeze(['iron', 'joint', 'plate', 'core', 'hinge', 'armor']),
+    // long grinding process chains wear a Golem down; bare commands bounce off
+    syntaxWeaknesses: Object.freeze(['LITANY', 'RITUAL_CHAIN']),
+    syntaxResistances: Object.freeze(['COMMAND']),
   }),
   SERAPH_GLASS_BASE: Object.freeze({
     archetype: 'GLASS_SERAPH',
@@ -71,6 +78,9 @@ export const SYNTACTIC_ARCHETYPE_PROFILES = Object.freeze({
     favoredDevices: Object.freeze(['assonance', 'sonic_imagery', 'internal_rhyme']),
     punishedTerms: Object.freeze(['light', 'mirror', 'reflect']),
     symbolicBody: Object.freeze(['wing', 'pane', 'halo', 'choir', 'glass']),
+    // repeated resonant structure shatters glass; questions pass through it
+    syntaxWeaknesses: Object.freeze(['LITANY']),
+    syntaxResistances: Object.freeze(['PROBE']),
   }),
   ROT_BASE: Object.freeze({
     archetype: 'ROT_APOSTLE',
@@ -79,6 +89,20 @@ export const SYNTACTIC_ARCHETYPE_PROFILES = Object.freeze({
     favoredDevices: Object.freeze(['ritual_sequence', 'cleansing_imagery']),
     punishedTerms: Object.freeze(['rot', 'decay', 'poison', 'spore']),
     symbolicBody: Object.freeze(['spore', 'mold', 'wound', 'sermon', 'rot']),
+    // rot obeys the imperative scouring voice; statements feed its sermon
+    syntaxWeaknesses: Object.freeze(['COMMAND']),
+    syntaxResistances: Object.freeze(['WARD']),
+  }),
+  SENTINEL_BRAZIER_BASE: Object.freeze({
+    archetype: 'BRAZIER_SENTINEL',
+    weaknessFamilies: Object.freeze(['DISSONANCE', 'CORROSION', 'FRACTURE']),
+    resistanceFamilies: Object.freeze(['RESONANCE', 'FORCE', 'LIGHT']),
+    favoredDevices: Object.freeze(['sonic_imagery', 'assonance', 'process_language']),
+    punishedTerms: Object.freeze(['resonance', 'song', 'choir', 'ring']),
+    symbolicBody: Object.freeze(['matrix', 'brazier', 'torch', 'ring', 'containment', 'flame']),
+    // the matrix buckles under dissonant questioning and decisive command
+    syntaxWeaknesses: Object.freeze(['PROBE', 'COMMAND']),
+    syntaxResistances: Object.freeze(['LITANY', 'WARD']),
   }),
 });
 
@@ -201,6 +225,132 @@ function scoreNovelty(profile, verseIR) {
   return 0.45;
 }
 
+// ─── Verse form analysis — grammar as a combat surface ───────────────────────
+
+const WH_WORDS = new Set(['who', 'what', 'when', 'where', 'why', 'how', 'which', 'whose', 'whom']);
+
+const COMMAND_VERBS = new Set([
+  ...Object.keys(PREDICATES).map((predicate) => predicate.toLowerCase()),
+  'answer', 'banish', 'begone', 'bloom', 'break', 'burn', 'cleanse', 'crush',
+  'distill', 'drag', 'fall', 'feed', 'kneel', 'let', 'name', 'purify',
+  'refuse', 'rise', 'rust', 'salt', 'sing', 'speak', 'split', 'stand',
+  'testify', 'tune', 'wash', 'wear',
+]);
+
+const CHAIN_MARKERS = new Set(['then', 'until', 'after', 'before', 'first', 'next', 'finally']);
+
+const WARD_FRAME = /\b(is|are|shall|will|stands?|holds?|becomes?)\b/;
+
+function segmentSentences(raw) {
+  return String(raw || '')
+    .split(/(?<=[.!?])\s+|\n+/)
+    .map((segment) => segment.trim())
+    .filter(Boolean);
+}
+
+function resolveSentenceMood(segment, tokens) {
+  const first = tokens[0] || '';
+  if (/\?\s*$/.test(segment) || WH_WORDS.has(first)) return 'interrogative';
+  if (COMMAND_VERBS.has(first)) return 'imperative';
+  if (/!\s*$/.test(segment)) return 'exclamative';
+  return 'declarative';
+}
+
+/**
+ * Analyzes the grammatical FORM of a verse: sentence moods, rhythm, and
+ * shape tags (COMMAND / PROBE / WARD / LITANY / RITUAL_CHAIN / FREE_VERSE).
+ * Pure and deterministic; shape tags are matched against archetype
+ * syntaxWeaknesses/syntaxResistances so structure can beat structure.
+ */
+export function analyzeVerseForm(phrase) {
+  const raw = String(phrase || '');
+  const segments = segmentSentences(raw);
+  const sentences = segments.map((segment) => {
+    const tokens = tokenize(segment);
+    return {
+      text: segment,
+      tokens,
+      length: tokens.length,
+      first: tokens[0] || '',
+      mood: resolveSentenceMood(segment, tokens),
+    };
+  }).filter((sentence) => sentence.length > 0);
+
+  const moodCounts = { imperative: 0, interrogative: 0, declarative: 0, exclamative: 0 };
+  sentences.forEach((sentence) => { moodCounts[sentence.mood] += 1; });
+  const dominantMood = Object.entries(moodCounts)
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))[0]?.[0] || 'declarative';
+
+  // anaphora: repeated sentence-initial token across the verse
+  const initialCounts = new Map();
+  sentences.forEach((sentence) => {
+    if (sentence.first) {
+      initialCounts.set(sentence.first, (initialCounts.get(sentence.first) || 0) + 1);
+    }
+  });
+  const anaphora = sentences.length >= 2
+    && [...initialCounts.values()].some((count) => count >= 2);
+
+  const lowercase = raw.toLowerCase();
+  const chainHits = tokenize(lowercase).filter((token) => CHAIN_MARKERS.has(token)).length;
+
+  const lengths = sentences.map((sentence) => sentence.length);
+  const meanLength = lengths.length > 0
+    ? lengths.reduce((sum, length) => sum + length, 0) / lengths.length
+    : 0;
+  const variance = lengths.length > 0
+    ? lengths.reduce((sum, length) => sum + ((length - meanLength) ** 2), 0) / lengths.length
+    : 0;
+  // cadence is only meaningful across multiple sentences — a single line
+  // has no rhythm to control, so it earns nothing.
+  const cadence = sentences.length >= 2 && meanLength > 0
+    ? clampBetween(1 - (Math.sqrt(variance) / meanLength), 0, 1)
+    : 0;
+
+  const shapes = [];
+  if (anaphora) shapes.push('LITANY');
+  if (moodCounts.interrogative >= 2 || dominantMood === 'interrogative') shapes.push('PROBE');
+  if (dominantMood === 'imperative') shapes.push('COMMAND');
+  if (dominantMood === 'declarative' && WARD_FRAME.test(lowercase)) shapes.push('WARD');
+  if (chainHits >= 2) shapes.push('RITUAL_CHAIN');
+  if (shapes.length === 0) shapes.push('FREE_VERSE');
+
+  return {
+    sentences,
+    moodCounts,
+    dominantMood,
+    shapes,
+    anaphora,
+    rhythm: {
+      cadence: Number(cadence.toFixed(3)),
+      chainLength: chainHits,
+      sentenceCount: sentences.length,
+    },
+  };
+}
+
+function scoreSyntaxForm(form, syntacticProfile) {
+  const weaknesses = Array.isArray(syntacticProfile.syntaxWeaknesses)
+    ? syntacticProfile.syntaxWeaknesses
+    : [];
+  const resistances = Array.isArray(syntacticProfile.syntaxResistances)
+    ? syntacticProfile.syntaxResistances
+    : [];
+  const matchedSyntaxWeaknesses = weaknesses.filter((shape) => form.shapes.includes(shape));
+  const resistedSyntaxForms = resistances.filter((shape) => form.shapes.includes(shape));
+  const formMatch = weaknesses.length > 0
+    ? clampBetween(matchedSyntaxWeaknesses.length / weaknesses.length, 0, 1)
+    : 0;
+  const formResist = resistances.length > 0
+    ? clampBetween(resistedSyntaxForms.length / resistances.length, 0, 1)
+    : 0;
+  // controlled cadence only counts as pressure when the form actually bites
+  const rhythmScore = formMatch > 0
+    ? form.rhythm.cadence
+    : form.rhythm.cadence * 0.5;
+  return { matchedSyntaxWeaknesses, resistedSyntaxForms, formMatch, formResist, rhythmScore };
+}
+
 export function createNeutralSyntacticalChessResult() {
   return {
     score: 0,
@@ -210,12 +360,24 @@ export function createNeutralSyntacticalChessResult() {
     detectedDevices: [],
     diagnostics: ['SYNTACTICAL CHESS: NEUTRAL · No enemy symbolic profile available.'],
     state: 'neutral',
+    mood: 'declarative',
+    shapes: [],
+    rhythm: { cadence: 0, chainLength: 0, sentenceCount: 0 },
+    matchedSyntaxWeaknesses: [],
+    resistedSyntaxForms: [],
+    events: [],
   };
 }
 
 export function resolveSyntacticProfile(enemy = null) {
   if (enemy?.syntacticProfile) return enemy.syntacticProfile;
+  if (enemy?.role === 'sentinel' || enemy?.bestiaryId === 'sentinel-brazier') {
+    return SYNTACTIC_ARCHETYPE_PROFILES.SENTINEL_BRAZIER_BASE;
+  }
   const name = String(enemy?.name || '').toLowerCase();
+  if (name.includes('sentinel') || name.includes('brazier')) {
+    return SYNTACTIC_ARCHETYPE_PROFILES.SENTINEL_BRAZIER_BASE;
+  }
   if (name.includes('shade') || name.includes('revenant') || name.includes('cryptonym') || name.includes('hollow')) {
     return SYNTACTIC_ARCHETYPE_PROFILES.SHADE_BASE;
   }
@@ -255,7 +417,18 @@ export function evaluateSyntacticalChess({
   const literaryDeviceScore = scoreLiteraryDevices(detectedDevices, syntacticProfile.favoredDevices);
   const noveltyScore = scoreNovelty(profile, verseIR);
   const clarityScore = estimateClarity(tokens);
+  const form = analyzeVerseForm(phrase);
+  const {
+    matchedSyntaxWeaknesses,
+    resistedSyntaxForms,
+    formMatch,
+    formResist,
+    rhythmScore,
+  } = scoreSyntaxForm(form, syntacticProfile);
 
+  // Lexical layer (unchanged weights) + grammatical-form overlay:
+  // structure that matches an archetype's syntax weakness presses the
+  // advantage; feeding its favored form hands tempo back.
   const score = clampBetween(
     weaknessMatch * 0.30
     + metaphorPrecision * 0.20
@@ -263,7 +436,10 @@ export function evaluateSyntacticalChess({
     + literaryDeviceScore * 0.14
     + noveltyScore * 0.12
     + clarityScore * 0.08
-    - resistanceMatch * 0.18,
+    - resistanceMatch * 0.18
+    + formMatch * 0.10
+    + rhythmScore * 0.04
+    - formResist * 0.08,
     0,
     1
   );
@@ -293,7 +469,23 @@ export function evaluateSyntacticalChess({
   if (detectedDevices.length > 0) {
     diagnostics.push(`Detected devices: ${detectedDevices.slice(0, 4).join(', ')}.`);
   }
+  if (matchedSyntaxWeaknesses.length > 0) {
+    diagnostics.push(`Grammatical form ${matchedSyntaxWeaknesses.join('/')} pressed ${syntacticProfile.archetype}'s structure.`);
+  }
+  if (resistedSyntaxForms.length > 0) {
+    diagnostics.push(`Sentence form ${resistedSyntaxForms.join('/')} played into the enemy's favored structure.`);
+  }
   diagnostics.push(`Damage modifier: x${multiplier.toFixed(2)}.`);
+
+  const events = [];
+  if (matchedSyntaxWeaknesses.length > 0) {
+    events.push({
+      type: 'SYNTAX_FORM_ADVANTAGE',
+      archetype: syntacticProfile.archetype,
+      shapes: matchedSyntaxWeaknesses,
+      mood: form.dominantMood,
+    });
+  }
 
   return {
     score: Number(score.toFixed(3)),
@@ -303,6 +495,12 @@ export function evaluateSyntacticalChess({
     detectedDevices,
     diagnostics,
     state,
+    mood: form.dominantMood,
+    shapes: form.shapes,
+    rhythm: form.rhythm,
+    matchedSyntaxWeaknesses,
+    resistedSyntaxForms,
+    events,
     components: {
       weaknessMatch: Number(weaknessMatch.toFixed(3)),
       resistanceMatch: Number(resistanceMatch.toFixed(3)),
@@ -311,6 +509,9 @@ export function evaluateSyntacticalChess({
       literaryDeviceScore: Number(literaryDeviceScore.toFixed(3)),
       noveltyScore: Number(noveltyScore.toFixed(3)),
       clarityScore: Number(clarityScore.toFixed(3)),
+      formMatch: Number(formMatch.toFixed(3)),
+      formResist: Number(formResist.toFixed(3)),
+      rhythmScore: Number(rhythmScore.toFixed(3)),
     },
   };
 }

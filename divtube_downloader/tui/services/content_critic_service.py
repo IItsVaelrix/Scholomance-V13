@@ -1,13 +1,72 @@
+import io
 import json
 import os
 import threading
 import urllib.request
 import urllib.error
 
-from tui.services.env_config import get_config, get_model
+from openai import APIStatusError
+
+from tui.services.env_config import get_config, get_model, get_openai_client
 from tui.services.memory_service import MemoryService
 from tui.services.tool_service import ToolService
 from tui.utils.throttle import llm_throttle
+from tui.services.token_meter import meter
+
+
+# ── model price classification ──────────────────────────────────────
+# Provider /models endpoints disagree wildly on how (and whether) they
+# report price:
+#   • xai   → integer fields  prompt_text_token_price / completion_text_token_price
+#   • groq / openrouter → nested  pricing: {prompt, completion, ...}
+#   • blackbox / gemini → no price info at all
+# A model is only ever labelled "paid" when the API gives positive-price
+# evidence. When pricing is absent we treat it as free/available so it is
+# NEVER hidden from the picker.
+_PRICE_KEYS = (
+    "prompt_text_token_price", "completion_text_token_price",
+    "prompt_token_price", "completion_token_price",
+)
+_PRICING_SUBKEYS = ("prompt", "completion", "request", "image")
+
+
+def _model_is_paid(m):
+    if not isinstance(m, dict):
+        return False
+    mid = m.get("id", "")
+    # OpenRouter marks zero-cost variants with a ':free' suffix explicitly.
+    if isinstance(mid, str) and mid.endswith(":free"):
+        return False
+
+    prices = [m.get(k) for k in _PRICE_KEYS if k in m]
+    pricing = m.get("pricing")
+    if isinstance(pricing, dict):
+        prices.extend(pricing.get(k) for k in _PRICING_SUBKEYS)
+
+    for p in prices:
+        if p is None:
+            continue
+        try:
+            if float(p) > 0:
+                return True
+        except (TypeError, ValueError):
+            continue
+    return False
+
+
+def classify_models(raw_models):
+    """Split a raw /models list into (free, paid) id lists, sorted.
+
+    Accepts both dict entries (with metadata) and bare string ids."""
+    free, paid = [], []
+    for m in raw_models:
+        if isinstance(m, str):
+            free.append(m)
+            continue
+        m_id = m.get("id", "unknown")
+        (paid if _model_is_paid(m) else free).append(m_id)
+    return sorted(free), sorted(paid)
+
 
 class ContentCriticService:
     def __init__(self):
@@ -34,16 +93,21 @@ class ContentCriticService:
                     res_body = response.read()
                     res_json = json.loads(res_body)
                     
-                    if "data" in res_json:
-                        models = []
-                        for m in res_json["data"]:
-                            m_id = m.get("id", "unknown")
-                            models.append(m_id)
+                    # Endpoints return either {"data": [...]}, {"models": [...]}
+                    # or a bare list. Normalise so every provider works.
+                    if isinstance(res_json, list):
+                        data = res_json
+                    elif isinstance(res_json, dict):
+                        data = res_json.get("data") or res_json.get("models") or []
+                    else:
+                        data = []
 
+                    if data:
+                        free, paid = classify_models(data)
                         if on_fetched:
-                            on_fetched(models, []) # treat all as available
+                            on_fetched(free, paid)
                         else:
-                            callback(f"\n[bold magenta]❖ API MODELS ❖[/]\nAvailable: {len(models)}\n")
+                            callback(f"\n[bold magenta]❖ API MODELS ❖[/]\nFree: {len(free)}  Paid: {len(paid)}  (total {len(free) + len(paid)})\n")
                     else:
                         callback("[red]Error: Invalid response format from models endpoint.[/]")
             except urllib.error.HTTPError as e:
@@ -99,10 +163,7 @@ class ContentCriticService:
             ]
 
             def do_api_call(msgs, use_tools=True):
-                payload = {
-                    "model": model_name,
-                    "messages": msgs
-                }
+                kwargs = {"model": model_name, "messages": msgs}
                 if use_tools and hasattr(self, "tools") and self.tools.tools:
                     import copy
                     safe_tools = copy.deepcopy(self.tools.tools)
@@ -116,19 +177,29 @@ class ContentCriticService:
                             for item in d:
                                 _strip_custom(item)
                     _strip_custom(safe_tools)
-                    payload["tools"] = safe_tools
-                    
-                url = f"{base_url}/chat/completions" if not base_url.endswith("/chat/completions") else base_url
-                req = urllib.request.Request(url, method="POST")
-                req.add_header("Authorization", f"Bearer {api_key}")
-                req.add_header("Content-Type", "application/json")
-                req.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                req.add_header("HTTP-Referer", "https://github.com/DivTube")
-                req.add_header("X-Title", "DivTube Cockpit")
-                
-                data = json.dumps(payload).encode('utf-8')
-                with urllib.request.urlopen(req, data=data) as response:
-                    return json.loads(response.read())
+                    kwargs["tools"] = safe_tools
+
+                try:
+                    resp = get_openai_client(base_url, api_key).chat.completions.create(**kwargs)
+                except APIStatusError as e:
+                    # This critique loop branches on .code + .read() for its
+                    # tool-unsupported / 429 / 503 handling, so adapt the SDK's
+                    # structured error back into the urllib.error.HTTPError contract.
+                    body = e.response.text if e.response is not None else str(e)
+                    raise urllib.error.HTTPError(
+                        base_url, e.status_code, str(e), None,
+                        io.BytesIO(body.encode("utf-8", errors="replace")),
+                    )
+
+                # Flatten once to a plain dict; downstream reads message["tool_calls"]
+                # / message.get("content") and re-appends assistant turns into msgs.
+                # exclude_none drops null schema fields picky providers reject on echo.
+                res_json = resp.model_dump(exclude_none=True)
+                try:
+                    meter.record(model_name, res_json.get("usage"))
+                except Exception:
+                    pass  # telemetry must never break the critique turn
+                return res_json
 
             try:
                 MAX_TURNS = 3

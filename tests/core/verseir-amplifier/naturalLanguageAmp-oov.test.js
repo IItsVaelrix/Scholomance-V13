@@ -33,6 +33,16 @@ describe('naturalLanguageAmp OOV subject resolution', () => {
     expect(result.payload.oovResolutions).toEqual([]);
   });
 
+  it('honors explicit direct NLU mode for short editor prompts', async () => {
+    const result = await naturalLanguageAmp.analyze({
+      verseIR: { rawText: OOV_PROMPT },
+      options: { nluMode: 'direct' },
+    });
+
+    expect(result.payload.mode).toBe('direct');
+    expect(result.payload.generatedVerse).toBeNull();
+  });
+
   it('does not call the adapter when a subject already matched', async () => {
     const adapter = fakeAdapter({ glitchcore: ['dragon'] });
     const result = await naturalLanguageAmp.analyze({

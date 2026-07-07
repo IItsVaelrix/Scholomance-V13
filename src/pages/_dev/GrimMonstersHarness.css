@@ -1,0 +1,50 @@
+.grim-monsters-harness {
+  min-height: 100vh;
+  padding: 2.5rem 2rem;
+  background: radial-gradient(circle at 30% 20%, #1a0a0e 0%, #0b0608 70%);
+  color: #e8d8d8;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.grim-monsters-harness__header h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.grim-monsters-harness__header p {
+  margin: 0 0 2rem;
+  max-width: 60ch;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  opacity: 0.8;
+}
+
+.grim-monsters-harness__header code {
+  padding: 0 0.25rem;
+  background: hsla(356, 83%, 52%, 0.18);
+  border-radius: 2px;
+  font-size: 0.8em;
+}
+
+.grim-monsters-harness__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.grim-monsters-harness__cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.grim-monsters-harness__note {
+  font-size: 0.75rem;
+  opacity: 0.6;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-transform: uppercase;
+}

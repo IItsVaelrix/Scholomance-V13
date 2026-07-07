@@ -85,9 +85,13 @@ function applyMagicE(char, remainingWord, position) {
   const vowelPhoneme = MAGIC_MAP[char];
   if (!vowelPhoneme) return null;
 
-  const consonantPhoneme = remainingWord[remainingWord.length - 2] || 'K';
+  // Map the trailing consonant grapheme through CONSONANT_MAP so we emit valid
+  // ARPABET rather than a raw letter (e.g. 'C' -> 'K', 'X' -> ['K','S']).
+  const lastConsonantChar = remainingWord[remainingWord.length - 2] || 'K';
+  const mappedConsonant = CONSONANT_MAP[lastConsonantChar] || 'K';
+  const consonantPhonemes = Array.isArray(mappedConsonant) ? mappedConsonant : [mappedConsonant];
   return {
-    phonemes: [consonantPhoneme, vowelPhoneme + '1'],
+    phonemes: [...consonantPhonemes, vowelPhoneme + '1'],
     advance: remainingWord.length - position,
   };
 }

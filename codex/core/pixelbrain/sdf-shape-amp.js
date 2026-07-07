@@ -6,6 +6,8 @@
  */
 import { hashString } from './shared.js';
 import { evaluateSDF } from './sdf-evaluator.js';
+import { applyAuthoringSemantics } from './semantic-bridge.js';
+import { resolveRole, CanonicalRoles } from './semantic-registry.js';
 
 export const SDF_SHAPE_AMP_ID = 'sdf-shape';
 export const SDF_SHAPE_AMP_VERSION = '1.0.0';
@@ -69,9 +71,33 @@ export function SDFShapeAMP(context = {}, options = {}) {
     throw err(`SDFShapeAMP emitted ${cells.length} cells for ${partId}, required >=${minCells}`, {sdf: sdfDesc.id});
   }
 
+  // === SemQuant connective tissue wiring ===
+  // Apply authoring semantics if construction or part spec is provided
+  let semantic = null;
+  const authoringSource = context.sdf || context.part || context.construction || options.authoringSource;
+  if (authoringSource) {
+    try {
+      const semResult = applyAuthoringSemantics(authoringSource);
+      semantic = {
+        annotations: semResult.annotations || [],
+        sourceKind: semResult.sourceKind || 'sdf',
+      };
+    } catch (_) {}
+  }
+
+  // Enrich cells with resolved semantic role / part
+  const resolvedRole = resolveRole(partId) || CanonicalRoles.CORE;
+  const enrichedCells = cells.map(c => ({
+    ...c,
+    role: c.role || resolvedRole,
+    semanticRole: resolvedRole,
+    partId: c.partId || partId,
+  }));
+
   return {
-    partCells: cells,
-    sdfDebugMask: debug, // for diagnostics only
+    partCells: enrichedCells,
+    sdfDebugMask: debug,
+    semantic, // New: SemQuant annotations if available
   };
 }
 

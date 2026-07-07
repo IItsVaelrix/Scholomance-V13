@@ -8,34 +8,32 @@
  */
 
 import { on, emit } from './eventBus.js';
-import { getAmpStatus } from '../core/animation/amp/runAnimationAmp.ts';
-
-// Track all active animations for the inspector
-let activeAnimations = new Map();
+import { getAmpStatus, getAllActiveAnimations, getActiveAnimation } from '../../src/lib/amp-client.js';
 
 /**
  * Get the current AMP status
- * @returns {Object} AMP status object
+ * @returns {Promise<Object>} AMP status object
  */
-export function getAmpRuntimeStatus() {
+export async function getAmpRuntimeStatus() {
   return getAmpStatus();
 }
 
 /**
  * Get all active animations
- * @returns {Map<string, any>} Map of targetId to animation output
+ * @returns {Promise<Map<string, any>>} Map of targetId to animation output
  */
-export function getAmpActiveAnimations() {
-  return activeAnimations;
+export async function getAmpActiveAnimations() {
+  const entries = await getAllActiveAnimations();
+  return entries;
 }
 
 /**
  * Get a single active animation by targetId
  * @param {string} targetId 
- * @returns {any} Animation output or undefined
+ * @returns {Promise<any>} Animation output or undefined
  */
-export function getAmpAnimation(targetId) {
-  return activeAnimations.get(targetId);
+export async function getAmpAnimation(targetId) {
+  return getActiveAnimation(targetId);
 }
 
 /**
@@ -46,26 +44,27 @@ export function setupAmpPipeline() {
   /**
    * Handle getAmpStatus requests
    */
-  on('amp:getStatus', (payload) => {
+  on('amp:getStatus', async (payload) => {
     const { responseEventName } = payload;
-    const status = getAmpRuntimeStatus();
+    const status = await getAmpRuntimeStatus();
     emit(responseEventName, { status });
   });
 
   /**
    * Handle getActiveAnimations requests
    */
-  on('amp:getActiveAnimations', (payload) => {
+  on('amp:getActiveAnimations', async (payload) => {
     const { responseEventName } = payload;
-    emit(responseEventName, { animations: getAmpActiveAnimations() });
+    const animations = await getAmpActiveAnimations();
+    emit(responseEventName, { animations });
   });
 
   /**
    * Handle getActiveAnimation requests for a specific targetId
    */
-  on('amp:getActiveAnimation', (payload) => {
+  on('amp:getActiveAnimation', async (payload) => {
     const { targetId, responseEventName } = payload;
-    const animation = getAmpAnimation(targetId);
+    const animation = await getAmpAnimation(targetId);
     emit(responseEventName, { animation: animation || null });
   });
 

@@ -1,0 +1,37 @@
+{
+  "contract": "SCDL-FRAME-LOOP-v1",
+  "asset": "void_grass_tileset",
+  "loop": "variations",
+  "canvas": {
+    "width": 32,
+    "height": 32
+  },
+  "defaultDurationMs": 1000,
+  "sourceChecksum": "00000000ff5a89fe",
+  "frames": [
+    {
+      "index": 0,
+      "label": "rest",
+      "durationMs": 1000,
+      "packet": "pbasset_140a99ed"
+    },
+    {
+      "index": 1,
+      "label": "dense-foliage",
+      "durationMs": 1000,
+      "packet": "pbasset_aabcd7b0"
+    },
+    {
+      "index": 2,
+      "label": "corrupted",
+      "durationMs": 1000,
+      "packet": "pbasset_ad3a245a"
+    },
+    {
+      "index": 3,
+      "label": "path-edge",
+      "durationMs": 1000,
+      "packet": "pbasset_0341f7a2"
+    }
+  ]
+}

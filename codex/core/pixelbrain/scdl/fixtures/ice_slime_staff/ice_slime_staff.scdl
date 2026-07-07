@@ -1,0 +1,4742 @@
+# IceSlimeStaff — polished SCDL (rig-fit + vector orb/cradle + ether pulse)
+# Grip (45, 62) on 64x128; scale 0.5273
+
+asset IceSlimeStaff canvas 64x128
+
+palette {
+  orb_shine = #F4FBFF
+  orb_lit = #B8F3FF
+  orb_core = #4CC9F0
+  orb_rim = #15789D
+  orb_shadow = #082636
+  irid_violet = #C4B5FD
+  irid_cyan = #67E8F9
+  irid_blue = #38BDF8
+  silver_shine = #F8FAFC
+  silver_rim = #CBD5E1
+  silver_body = #94A3B8
+  ether_core = #22D3EE
+  ether_pulse = #67E8F9
+  ether_trail = #0E7490
+  c00 = #191648
+  c01 = #191649
+  c02 = #000003
+  c03 = #000004
+  c04 = #000002
+  c05 = #3482FF
+  c06 = #3582FF
+  c07 = #485C80
+  c08 = #3382FF
+  c09 = #1A1749
+  c10 = #102453
+  c11 = #495F82
+  c12 = #000010
+  c13 = #000011
+  c14 = #131045
+  c15 = #000112
+  c16 = #000000
+  c17 = #0B0B12
+  c18 = #0B0B13
+  c19 = #0A0A12
+  c20 = #0A0A11
+  c21 = #090911
+  c22 = #090910
+  c23 = #080810
+  c24 = #07070F
+  c25 = #00000F
+  c26 = #FFFFFF
+  c27 = #00BBDC
+  c28 = #00BADB
+  c29 = #00BBDB
+  c30 = #00BCDE
+  c31 = #00BDDE
+  c32 = #000001
+  c33 = #05050B
+  c34 = #010106
+  c35 = #000005
+  c36 = #020207
+  c37 = #030308
+  c38 = #232A32
+  c39 = #282E35
+  c40 = #262D34
+  c41 = #1E505E
+  c42 = #232A31
+  c43 = #272E35
+  c44 = #242B32
+  c45 = #272D35
+  c46 = #272D34
+  c47 = #242A32
+  c48 = #2B4267
+  c49 = #697380
+  c50 = #04070A
+  c51 = #05080B
+  c52 = #06080B
+  c53 = #000205
+  c54 = #010306
+  c55 = #000206
+  c56 = #010307
+  c57 = #020407
+  c58 = #030508
+  c59 = #05070A
+  c60 = #0D2145
+  c61 = #1A1649
+  c62 = #000007
+  c63 = #3282FF
+  c64 = #162B4F
+  c65 = #060A12
+  c66 = #04040B
+  c67 = #07070E
+  c68 = #06060D
+  c69 = #000006
+  c70 = #C9C9D2
+  c71 = #020208
+  c72 = #C8C8D1
+  c73 = #2F5C66
+  c74 = #00B9D8
+  c75 = #00BADA
+  c76 = #01B8D7
+  c77 = #00BAD9
+  c78 = #05070B
+  c79 = #6A7380
+  c80 = #6A7480
+  c81 = #20272F
+  c82 = #3C3F45
+  c83 = #030609
+}
+
+part orb_halo material cyan_glow {
+  glow radius 3
+  ring 45 20 radius 8 width 1 irid_violet
+  ring 45 20 radius 7 width 1 irid_cyan
+  ring 45 20 radius 6 width 2 irid_blue
+}
+
+part orb material void_ice {
+  sphere 45 20 radius 5 light -1 -1 orb_shine orb_lit orb_core orb_rim orb_shadow
+  glow radius 2
+}
+
+part orb_sparkle material sapphire_enamel {
+  cell 43 17 orb_shine
+  cell 44 16 orb_lit
+}
+
+part cradle material silver {
+  ring 45 24 radius 5 width 2 silver_rim
+  ring 45 24 radius 4 width 1 silver_body
+  rect 43 24 5 2 silver_body
+}
+
+part cradle_highlight material silver {
+  cell 43 23 silver_shine
+  cell 44 22 silver_shine
+}
+
+part shaft material darksteel {
+  cell 46 27 c16
+  cell 44 28 c16
+  cell 44 28 c16
+  cell 46 28 c16
+  cell 44 29 c16
+  cell 44 29 c16
+  cell 46 29 c16
+  cell 44 30 c16
+  cell 46 30 c16
+  cell 44 31 c16
+  cell 45 31 c17
+  cell 46 31 c16
+  cell 46 31 c16
+  cell 44 32 c16
+  cell 44 32 c16
+  cell 45 32 c18
+  cell 45 32 c19
+  cell 46 32 c16
+  cell 44 33 c16
+  cell 45 33 c19
+  cell 44 34 c16
+  cell 44 34 c16
+  cell 45 34 c18
+  cell 45 34 c17
+  cell 46 34 c16
+  cell 46 34 c16
+  cell 45 35 c17
+  cell 45 35 c17
+  cell 46 35 c16
+  cell 46 35 c16
+  cell 44 36 c16
+  cell 44 36 c16
+  cell 45 36 c18
+  cell 45 36 c18
+  cell 46 36 c16
+  cell 46 36 c16
+  cell 44 37 c16
+  cell 45 37 c20
+  cell 45 38 c20
+  cell 45 42 c19
+  cell 45 43 c21
+  cell 46 43 c16
+  cell 44 44 c16
+  cell 45 44 c19
+  cell 45 44 c18
+  cell 46 44 c16
+  cell 46 44 c16
+  cell 44 45 c16
+  cell 44 45 c18
+  cell 45 45 c17
+  cell 45 45 c20
+  cell 46 45 c16
+  cell 44 46 c18
+  cell 44 46 c18
+  cell 45 46 c20
+  cell 45 46 c17
+  cell 46 46 c17
+  cell 44 47 c20
+  cell 45 47 c17
+  cell 45 47 c20
+  cell 46 47 c18
+  cell 46 47 c18
+  cell 44 48 c17
+  cell 45 48 c20
+  cell 45 48 c17
+  cell 46 48 c18
+  cell 46 48 c18
+  cell 44 49 c18
+  cell 44 49 c18
+  cell 45 49 c17
+  cell 45 49 c20
+  cell 46 49 c20
+  cell 44 50 c18
+  cell 44 50 c18
+  cell 45 50 c20
+  cell 45 50 c17
+  cell 46 50 c17
+  cell 44 51 c20
+  cell 45 51 c17
+  cell 45 51 c20
+  cell 46 51 c18
+  cell 46 51 c18
+  cell 45 52 c22
+  cell 46 52 c18
+  cell 45 53 c22
+  cell 45 53 c23
+  cell 46 53 c18
+  cell 46 53 c20
+  cell 45 54 c24
+  cell 45 54 c24
+  cell 45 55 c23
+  cell 45 55 c20
+  cell 46 55 c17
+  cell 46 55 c17
+}
+
+part shaft_shadow material darksteel {
+  cell 46 29 c32
+  cell 46 30 c03
+  cell 46 30 c03
+  cell 46 31 c03
+  cell 46 31 c03
+  cell 46 32 c32
+  cell 46 33 c16
+  cell 46 34 c04
+  cell 46 34 c03
+  cell 46 35 c03
+  cell 46 35 c03
+  cell 46 36 c03
+  cell 46 36 c32
+  cell 46 43 c03
+  cell 46 44 c03
+  cell 46 44 c33
+  cell 46 45 c34
+  cell 46 46 c35
+  cell 46 46 c36
+  cell 46 47 c37
+  cell 46 47 c37
+  cell 46 48 c37
+  cell 46 48 c37
+  cell 46 49 c34
+  cell 46 50 c35
+  cell 46 50 c36
+  cell 46 51 c37
+  cell 46 51 c37
+  cell 46 52 c37
+  cell 46 53 c37
+  cell 46 53 c34
+  cell 46 54 c35
+  cell 46 55 c36
+  cell 46 55 c37
+}
+
+part shaft_highlight material darksteel {
+  cell 44 44 c16
+  cell 44 44 c66
+  cell 44 45 c37
+  cell 44 45 c37
+  cell 44 46 c37
+  cell 44 46 c37
+  cell 44 47 c34
+  cell 44 48 c35
+  cell 44 48 c36
+  cell 44 49 c37
+  cell 44 49 c37
+  cell 44 50 c37
+  cell 44 50 c37
+  cell 44 51 c34
+  cell 44 52 c03
+  cell 44 53 c35
+  cell 44 53 c35
+  cell 44 54 c35
+  cell 44 54 c35
+  cell 44 55 c35
+  cell 44 55 c34
+}
+
+part shaft_glint material cyan_glow {
+  glow radius 2
+  cell 44 53 c29
+  cell 44 53 c29
+  cell 44 54 c29
+  cell 44 54 c29
+  cell 44 55 c29
+  cell 44 55 c27
+}
+
+part shaft_lattice_glow material cyan_glow {
+  glow radius 2
+  cell 46 29 c27
+  cell 44 31 c28
+  cell 46 32 c29
+  cell 46 32 c30
+  cell 46 33 c29
+  cell 44 35 c29
+  cell 46 37 c29
+  cell 46 37 c31
+  cell 44 43 c30
+  cell 44 43 c28
+  cell 44 44 c29
+  cell 46 45 c29
+  cell 46 45 c29
+  cell 46 46 c29
+  cell 44 47 c29
+  cell 44 47 c29
+  cell 44 48 c29
+  cell 46 49 c29
+  cell 46 49 c29
+  cell 46 50 c29
+  cell 44 51 c29
+  cell 44 51 c29
+  cell 44 52 c28
+  cell 46 54 c29
+  cell 46 54 c29
+  cell 46 54 c29
+}
+
+part ribbon material void_ice {
+  cell 44 24 c00
+  cell 44 24 c01
+  cell 45 24 c01
+  cell 46 24 c01
+  cell 46 24 c00
+  cell 44 25 c02
+  cell 44 25 c03
+  cell 44 25 c04
+  cell 45 25 c01
+  cell 45 25 c00
+  cell 46 25 c03
+  cell 46 25 c03
+  cell 46 25 c03
+  cell 46 25 c02
+  cell 43 26 c06
+  cell 44 26 c07
+  cell 44 26 c04
+  cell 45 26 c01
+  cell 45 26 c01
+  cell 46 26 c05
+  cell 46 26 c05
+  cell 43 27 c06
+  cell 44 27 c04
+  cell 44 27 c02
+  cell 44 27 c08
+  cell 44 27 c02
+  cell 45 27 c01
+  cell 45 27 c00
+  cell 46 27 c08
+  cell 46 27 c08
+  cell 44 28 c08
+  cell 44 28 c08
+  cell 45 28 c00
+  cell 45 28 c09
+  cell 46 28 c08
+  cell 46 28 c10
+  cell 44 29 c08
+  cell 44 29 c08
+  cell 45 29 c09
+  cell 45 29 c09
+  cell 46 29 c08
+  cell 44 30 c08
+  cell 44 30 c05
+  cell 45 30 c00
+  cell 45 30 c09
+  cell 44 31 c05
+  cell 44 31 c05
+  cell 45 31 c09
+  cell 44 32 c08
+  cell 44 32 c08
+  cell 44 33 c08
+  cell 44 34 c08
+  cell 44 34 c05
+  cell 44 35 c11
+  cell 44 35 c06
+  cell 44 36 c05
+  cell 44 36 c08
+  cell 44 37 c08
+}
+
+part ribbon_highlight material void_ice {
+  cell 46 28 c12
+  cell 44 30 c25
+  cell 43 35 c26
+}
+
+part ribbon_shadow material void_ice {
+  cell 44 26 c12
+  cell 46 26 c13
+  cell 47 28 c14
+  cell 46 30 c15
+  cell 44 35 c12
+}
+
+part core_mount material silver {
+  cell 43 37 c38
+  cell 44 37 c39
+  cell 46 37 c40
+  cell 46 37 c41
+  cell 47 37 c42
+  cell 42 38 c44
+  cell 43 38 c45
+  cell 44 38 c43
+  cell 46 38 c43
+  cell 46 38 c39
+  cell 46 38 c45
+  cell 47 38 c43
+  cell 47 38 c44
+  cell 47 38 c43
+  cell 47 38 c39
+  cell 48 38 c44
+  cell 42 39 c38
+  cell 43 39 c45
+  cell 47 39 c46
+  cell 47 39 c45
+  cell 48 39 c47
+  cell 42 40 c47
+  cell 43 40 c47
+  cell 42 41 c44
+  cell 42 41 c44
+  cell 43 41 c39
+  cell 43 41 c45
+  cell 43 41 c39
+  cell 43 41 c43
+  cell 44 41 c45
+  cell 43 42 c44
+  cell 43 42 c43
+  cell 43 42 c42
+  cell 44 42 c43
+  cell 44 42 c41
+}
+
+part core_mount_shadow material silver {
+  cell 45 37 c49
+  cell 44 38 c50
+  cell 44 38 c51
+  cell 43 39 c52
+  cell 43 39 c53
+  cell 47 39 c54
+  cell 48 39 c54
+  cell 42 40 c55
+  cell 48 40 c56
+  cell 48 40 c56
+  cell 47 41 c52
+  cell 47 41 c52
+  cell 47 41 c52
+  cell 48 41 c56
+  cell 48 41 c57
+  cell 44 42 c50
+  cell 44 42 c58
+  cell 45 42 c49
+  cell 46 42 c52
+  cell 46 42 c51
+  cell 46 42 c59
+  cell 47 42 c52
+  cell 47 42 c57
+  cell 47 42 c57
+}
+
+part core_mount_highlight material silver {
+  cell 44 37 c48
+  cell 43 38 c44
+  cell 43 38 c39
+  cell 43 38 c43
+  cell 42 39 c47
+  cell 47 40 c42
+  cell 46 41 c46
+  cell 47 41 c40
+  cell 46 42 c45
+}
+
+part core_gem material void_ice {
+  cell 44 38 c09
+  cell 45 38 c09
+  cell 46 38 c09
+  cell 43 39 c60
+  cell 44 39 c03
+  cell 44 39 c09
+  cell 44 39 c03
+  cell 45 39 c09
+  cell 46 39 c09
+  cell 46 39 c03
+  cell 46 39 c61
+  cell 46 39 c03
+  cell 47 39 c62
+  cell 43 40 c63
+  cell 43 40 c64
+  cell 44 40 c02
+  cell 44 40 c02
+  cell 44 40 c61
+  cell 45 40 c09
+  cell 45 40 c09
+  cell 46 40 c61
+  cell 44 41 c02
+  cell 44 41 c09
+  cell 44 41 c09
+}
+
+part core_gem_shadow material void_ice {
+  cell 46 40 c35
+  cell 46 40 c61
+  cell 46 40 c03
+  cell 47 40 c16
+  cell 47 40 c65
+  cell 45 41 c09
+  cell 45 41 c09
+  cell 46 41 c09
+  cell 46 41 c03
+  cell 46 41 c09
+}
+
+part core_gem_highlight material void_ice {
+  cell 44 39 c61
+  cell 45 39 c09
+  cell 44 40 c61
+}
+
+part bezel_void_glow material cyan_glow {
+  glow radius 2
+  cell 42 56 c27
+  cell 48 56 c27
+  cell 39 57 c28
+  cell 39 57 c28
+  cell 40 57 c28
+  cell 40 57 c28
+  cell 40 57 c76
+  cell 40 57 c76
+  cell 41 57 c28
+  cell 41 57 c28
+  cell 41 57 c76
+  cell 42 57 c28
+  cell 42 57 c74
+  cell 42 57 c76
+  cell 42 57 c76
+  cell 43 57 c75
+  cell 43 57 c77
+  cell 47 57 c75
+  cell 47 57 c77
+  cell 48 57 c74
+  cell 48 57 c28
+  cell 48 57 c76
+  cell 48 57 c76
+  cell 49 57 c28
+  cell 49 57 c76
+  cell 49 57 c28
+  cell 50 57 c28
+  cell 50 57 c76
+  cell 50 57 c28
+  cell 39 58 c28
+  cell 40 58 c76
+  cell 40 58 c76
+  cell 40 58 c28
+  cell 40 58 c28
+  cell 41 58 c28
+  cell 41 58 c76
+  cell 41 58 c28
+  cell 42 58 c76
+  cell 42 58 c76
+  cell 42 58 c28
+  cell 42 58 c76
+  cell 43 58 c77
+  cell 43 58 c77
+  cell 47 58 c77
+  cell 47 58 c77
+  cell 48 58 c76
+  cell 48 58 c76
+  cell 48 58 c76
+  cell 48 58 c28
+  cell 49 58 c76
+  cell 49 58 c28
+  cell 49 58 c28
+  cell 50 58 c28
+  cell 50 58 c28
+  cell 42 59 c28
+  cell 43 59 c27
+  cell 47 59 c27
+  cell 48 59 c28
+}
+
+part grip material darksteel {
+  cell 44 56 c16
+  cell 44 56 c34
+  cell 45 56 c35
+  cell 46 56 c36
+  cell 46 56 c16
+  cell 43 57 c16
+  cell 43 57 c69
+  cell 44 57 c16
+  cell 44 57 c36
+  cell 44 57 c37
+  cell 44 57 c37
+  cell 45 57 c34
+  cell 45 57 c17
+  cell 46 57 c36
+  cell 46 57 c16
+  cell 46 57 c37
+  cell 46 57 c37
+  cell 47 57 c16
+  cell 47 57 c69
+  cell 43 58 c69
+  cell 43 58 c16
+  cell 44 58 c37
+  cell 44 58 c37
+  cell 44 58 c16
+  cell 44 58 c37
+  cell 45 58 c17
+  cell 45 58 c37
+  cell 46 58 c37
+  cell 46 58 c37
+  cell 46 58 c37
+  cell 46 58 c16
+  cell 47 58 c69
+  cell 47 58 c16
+  cell 43 59 c16
+  cell 43 59 c70
+  cell 44 59 c16
+  cell 44 59 c37
+  cell 44 59 c16
+  cell 44 59 c37
+  cell 45 59 c37
+  cell 45 59 c37
+  cell 46 59 c37
+  cell 46 59 c16
+  cell 46 59 c37
+  cell 46 59 c16
+  cell 47 59 c16
+  cell 47 59 c70
+  cell 43 60 c70
+  cell 43 60 c70
+  cell 44 60 c16
+  cell 44 60 c37
+  cell 44 60 c16
+  cell 44 60 c34
+  cell 45 60 c71
+  cell 46 60 c37
+  cell 46 60 c16
+  cell 46 60 c34
+  cell 46 60 c16
+  cell 47 60 c70
+  cell 47 60 c70
+  cell 43 61 c70
+  cell 43 61 c70
+  cell 44 61 c16
+  cell 46 61 c16
+  cell 47 61 c70
+  cell 47 61 c70
+  cell 43 62 c70
+  cell 44 62 c16
+  cell 46 62 c16
+  cell 47 62 c70
+  cell 43 63 c70
+  cell 43 63 c70
+  cell 44 63 c16
+  cell 44 63 c34
+  cell 44 63 c16
+  cell 44 63 c37
+  cell 45 63 c71
+  cell 46 63 c34
+  cell 46 63 c16
+  cell 46 63 c37
+  cell 46 63 c16
+  cell 47 63 c70
+  cell 47 63 c70
+  cell 43 64 c70
+  cell 43 64 c70
+  cell 44 64 c16
+  cell 44 64 c37
+  cell 44 64 c16
+  cell 44 64 c37
+  cell 45 64 c37
+  cell 45 64 c37
+  cell 46 64 c37
+  cell 46 64 c16
+  cell 46 64 c37
+  cell 46 64 c16
+  cell 47 64 c70
+  cell 47 64 c70
+  cell 43 65 c70
+  cell 43 65 c70
+  cell 44 65 c16
+  cell 44 65 c37
+  cell 44 65 c16
+  cell 44 65 c37
+  cell 45 65 c37
+  cell 45 65 c37
+  cell 46 65 c37
+  cell 46 65 c16
+  cell 46 65 c37
+  cell 46 65 c16
+  cell 47 65 c70
+  cell 47 65 c70
+  cell 43 66 c70
+  cell 43 66 c70
+  cell 44 66 c16
+  cell 44 66 c37
+  cell 44 66 c16
+  cell 44 66 c37
+  cell 45 66 c37
+  cell 45 66 c37
+  cell 46 66 c37
+  cell 46 66 c16
+  cell 46 66 c37
+  cell 46 66 c16
+  cell 47 66 c70
+  cell 47 66 c70
+  cell 43 67 c70
+  cell 44 67 c72
+  cell 44 67 c70
+  cell 45 67 c73
+  cell 46 67 c70
+  cell 46 67 c72
+  cell 47 67 c70
+}
+
+part grip_shadow material darksteel {
+  cell 47 44 c67
+  cell 47 45 c68
+  cell 47 45 c68
+  cell 47 46 c68
+  cell 47 46 c67
+  cell 47 47 c67
+  cell 47 47 c67
+  cell 47 48 c67
+  cell 47 48 c67
+  cell 47 49 c68
+  cell 47 49 c68
+  cell 47 50 c68
+  cell 47 50 c67
+  cell 47 51 c67
+  cell 47 51 c67
+  cell 47 52 c67
+  cell 47 53 c67
+  cell 47 53 c68
+  cell 47 54 c68
+  cell 47 54 c68
+  cell 47 55 c67
+  cell 47 55 c67
+  cell 47 56 c24
+}
+
+part grip_highlight material darksteel {
+  cell 43 44 c67
+  cell 43 45 c67
+  cell 43 45 c67
+  cell 43 46 c67
+  cell 43 46 c67
+  cell 43 47 c68
+  cell 43 47 c68
+  cell 43 48 c68
+  cell 43 48 c67
+  cell 43 49 c67
+  cell 43 49 c67
+  cell 43 50 c67
+  cell 43 50 c67
+  cell 43 51 c68
+  cell 43 51 c68
+  cell 43 52 c68
+  cell 43 53 c67
+  cell 43 53 c67
+  cell 43 54 c67
+  cell 43 54 c67
+  cell 43 55 c67
+  cell 43 55 c67
+  cell 43 56 c24
+}
+
+part grip_trim material silver {
+  cell 43 56 c42
+  cell 43 56 c78
+  cell 44 56 c52
+  cell 44 56 c49
+  cell 45 56 c49
+  cell 46 56 c49
+  cell 46 56 c52
+  cell 47 56 c78
+  cell 47 56 c42
+  cell 45 60 c79
+  cell 44 61 c79
+  cell 44 61 c54
+  cell 44 61 c79
+  cell 45 61 c79
+  cell 45 61 c80
+  cell 46 61 c79
+  cell 46 61 c79
+  cell 46 61 c54
+  cell 44 62 c79
+  cell 45 62 c79
+  cell 46 62 c79
+  cell 45 63 c79
+  cell 43 67 c81
+  cell 43 67 c82
+  cell 44 67 c56
+  cell 44 67 c83
+  cell 45 67 c83
+  cell 46 67 c83
+  cell 46 67 c56
+  cell 47 67 c82
+  cell 47 67 c81
+}
+
+part pommel_glow material cyan_glow {
+  glow radius 2
+  cell 44 68 c28
+  cell 44 68 c28
+  cell 45 68 c28
+  cell 45 68 c76
+  cell 46 68 c28
+  cell 46 68 c28
+  cell 43 69 c28
+  cell 43 69 c28
+  cell 44 69 c76
+  cell 44 69 c76
+  cell 44 69 c76
+  cell 44 69 c76
+  cell 45 69 c76
+  cell 45 69 c76
+  cell 46 69 c76
+  cell 46 69 c76
+  cell 46 69 c76
+  cell 46 69 c76
+  cell 47 69 c28
+  cell 47 69 c28
+  cell 43 70 c28
+  cell 43 70 c76
+  cell 43 70 c28
+  cell 44 70 c76
+  cell 44 70 c76
+  cell 44 70 c76
+  cell 44 70 c76
+  cell 45 70 c76
+  cell 45 70 c76
+  cell 46 70 c76
+  cell 46 70 c76
+  cell 46 70 c76
+  cell 46 70 c76
+  cell 47 70 c76
+  cell 47 70 c28
+  cell 47 70 c28
+  cell 43 71 c28
+  cell 44 71 c76
+  cell 44 71 c76
+  cell 44 71 c28
+  cell 44 71 c28
+  cell 45 71 c76
+  cell 45 71 c76
+  cell 46 71 c76
+  cell 46 71 c76
+  cell 46 71 c28
+  cell 46 71 c28
+  cell 47 71 c28
+  cell 45 72 c28
+}
+
+loop ether duration 220
+
+frame 1 "sparkle-peak" {
+  part ether_flow after cradle material cyan_glow {
+    glow radius 2
+    cell 44 34 ether_pulse
+    cell 45 34 ether_core
+    cell 46 34 ether_pulse
+    cell 44 43 ether_pulse
+    cell 45 43 ether_core
+    cell 46 43 ether_pulse
+    cell 45 42 ether_trail
+  }
+
+  part orb_sparkle material sapphire_enamel {
+    cell 42 16 orb_shine
+    cell 43 15 orb_shine
+    cell 47 17 orb_lit
+  }
+  part shaft_lattice_glow material cyan_glow {
+    glow radius 2
+    cell 46 29 c27
+    cell 44 31 c28
+    cell 46 32 c29
+    cell 46 32 c30
+    cell 46 33 c29
+    cell 44 35 c29
+    cell 46 37 c29
+    cell 46 37 c31
+    cell 44 43 c30
+    cell 44 43 c28
+  }
+}
+
+frame 2 "ether-mid" {
+  part ether_flow after cradle material cyan_glow {
+    glow radius 2
+    cell 44 34 ether_pulse
+    cell 45 34 ether_core
+    cell 46 34 ether_pulse
+    cell 44 43 ether_pulse
+    cell 45 43 ether_core
+    cell 46 43 ether_pulse
+    cell 45 42 ether_trail
+    cell 44 53 ether_pulse
+    cell 45 53 ether_core
+    cell 46 53 ether_pulse
+    cell 45 52 ether_trail
+  }
+
+  part shaft_lattice_glow material cyan_glow {
+    glow radius 2
+    cell 46 29 c27
+    cell 44 31 c28
+    cell 46 32 c29
+    cell 46 32 c30
+    cell 46 33 c29
+    cell 44 35 c29
+    cell 46 37 c29
+    cell 46 37 c31
+    cell 44 43 c30
+    cell 44 43 c28
+    cell 44 44 c29
+    cell 46 45 c29
+    cell 46 45 c29
+    cell 46 46 c29
+    cell 44 47 c29
+    cell 44 47 c29
+    cell 44 48 c29
+    cell 46 49 c29
+    cell 46 49 c29
+    cell 46 50 c29
+    cell 44 51 c29
+    cell 44 51 c29
+    cell 44 52 c28
+  }
+}
+
+frame 3 "ether-base" {
+  part ether_flow after cradle material cyan_glow {
+    glow radius 2
+    cell 44 34 ether_pulse
+    cell 45 34 ether_core
+    cell 46 34 ether_pulse
+    cell 44 43 ether_pulse
+    cell 45 43 ether_core
+    cell 46 43 ether_pulse
+    cell 45 42 ether_trail
+    cell 44 53 ether_pulse
+    cell 45 53 ether_core
+    cell 46 53 ether_pulse
+    cell 45 52 ether_trail
+    cell 44 62 ether_pulse
+    cell 45 62 ether_core
+    cell 46 62 ether_pulse
+    cell 45 61 ether_trail
+  }
+
+  part shaft_lattice_glow material cyan_glow {
+    glow radius 2
+    cell 46 29 c27
+    cell 44 31 c28
+    cell 46 32 c29
+    cell 46 32 c30
+    cell 46 33 c29
+    cell 44 35 c29
+    cell 46 37 c29
+    cell 46 37 c31
+    cell 44 43 c30
+    cell 44 43 c28
+    cell 44 44 c29
+    cell 46 45 c29
+    cell 46 45 c29
+    cell 46 46 c29
+    cell 44 47 c29
+    cell 44 47 c29
+    cell 44 48 c29
+    cell 46 49 c29
+    cell 46 49 c29
+    cell 46 50 c29
+    cell 44 51 c29
+    cell 44 51 c29
+    cell 44 52 c28
+    cell 46 54 c29
+    cell 46 54 c29
+    cell 46 54 c29
+  }
+}
+
+frame 4 "contactL" {
+  part ether_flow after cradle material cyan_glow {
+    glow radius 2
+    cell 44 34 ether_pulse
+    cell 45 34 ether_core
+    cell 46 34 ether_pulse
+    cell 44 43 ether_pulse
+    cell 45 43 ether_core
+    cell 46 43 ether_pulse
+    cell 45 42 ether_trail
+  }
+
+  part shaft material darksteel {
+    cell 46 26 c16
+    cell 44 27 c16
+    cell 44 27 c16
+    cell 46 27 c16
+    cell 44 28 c16
+    cell 44 28 c16
+    cell 46 28 c16
+    cell 44 29 c16
+    cell 46 29 c16
+    cell 44 30 c16
+    cell 45 30 c17
+    cell 46 30 c16
+    cell 46 30 c16
+    cell 44 31 c16
+    cell 44 31 c16
+    cell 45 31 c18
+    cell 45 31 c19
+    cell 46 31 c16
+    cell 44 32 c16
+    cell 45 32 c19
+    cell 44 33 c16
+    cell 44 33 c16
+    cell 45 33 c18
+    cell 45 33 c17
+    cell 46 33 c16
+    cell 46 33 c16
+    cell 45 34 c17
+    cell 45 34 c17
+    cell 46 34 c16
+    cell 46 34 c16
+    cell 44 35 c16
+    cell 44 35 c16
+    cell 45 35 c18
+    cell 45 35 c18
+    cell 46 35 c16
+    cell 46 35 c16
+    cell 44 36 c16
+    cell 45 36 c20
+    cell 45 37 c20
+    cell 45 41 c19
+    cell 45 42 c21
+    cell 46 42 c16
+    cell 44 43 c16
+    cell 45 43 c19
+    cell 45 43 c18
+    cell 46 43 c16
+    cell 46 43 c16
+    cell 44 44 c16
+    cell 44 44 c18
+    cell 45 44 c17
+    cell 45 44 c20
+    cell 46 44 c16
+    cell 44 45 c18
+    cell 44 45 c18
+    cell 45 45 c20
+    cell 45 45 c17
+    cell 46 45 c17
+    cell 44 46 c20
+    cell 45 46 c17
+    cell 45 46 c20
+    cell 46 46 c18
+    cell 46 46 c18
+    cell 44 47 c17
+    cell 45 47 c20
+    cell 45 47 c17
+    cell 46 47 c18
+    cell 46 47 c18
+    cell 44 48 c18
+    cell 44 48 c18
+    cell 45 48 c17
+    cell 45 48 c20
+    cell 46 48 c20
+    cell 44 49 c18
+    cell 44 49 c18
+    cell 45 49 c20
+    cell 45 49 c17
+    cell 46 49 c17
+    cell 44 50 c20
+    cell 45 50 c17
+    cell 45 50 c20
+    cell 46 50 c18
+    cell 46 50 c18
+    cell 45 51 c22
+    cell 46 51 c18
+    cell 45 52 c22
+    cell 45 52 c23
+    cell 46 52 c18
+    cell 46 52 c20
+    cell 45 53 c24
+    cell 45 53 c24
+    cell 45 54 c23
+    cell 45 54 c20
+    cell 46 54 c17
+    cell 46 54 c17
+  }
+
+  part shaft_shadow material darksteel {
+    cell 46 28 c32
+    cell 46 29 c03
+    cell 46 29 c03
+    cell 46 30 c03
+    cell 46 30 c03
+    cell 46 31 c32
+    cell 46 32 c16
+    cell 46 33 c04
+    cell 46 33 c03
+    cell 46 34 c03
+    cell 46 34 c03
+    cell 46 35 c03
+    cell 46 35 c32
+    cell 46 42 c03
+    cell 46 43 c03
+    cell 46 43 c33
+    cell 46 44 c34
+    cell 46 45 c35
+    cell 46 45 c36
+    cell 46 46 c37
+    cell 46 46 c37
+    cell 46 47 c37
+    cell 46 47 c37
+    cell 46 48 c34
+    cell 46 49 c35
+    cell 46 49 c36
+    cell 46 50 c37
+    cell 46 50 c37
+    cell 46 51 c37
+    cell 46 52 c37
+    cell 46 52 c34
+    cell 46 53 c35
+    cell 46 54 c36
+    cell 46 54 c37
+  }
+
+  part shaft_highlight material darksteel {
+    cell 44 43 c16
+    cell 44 43 c66
+    cell 44 44 c37
+    cell 44 44 c37
+    cell 44 45 c37
+    cell 44 45 c37
+    cell 44 46 c34
+    cell 44 47 c35
+    cell 44 47 c36
+    cell 44 48 c37
+    cell 44 48 c37
+    cell 44 49 c37
+    cell 44 49 c37
+    cell 44 50 c34
+    cell 44 51 c03
+    cell 44 52 c35
+    cell 44 52 c35
+    cell 44 53 c35
+    cell 44 53 c35
+    cell 44 54 c35
+    cell 44 54 c34
+  }
+
+  part shaft_glint material cyan_glow {
+    glow radius 2
+    cell 44 52 c29
+    cell 44 52 c29
+    cell 44 53 c29
+    cell 44 53 c29
+    cell 44 54 c29
+    cell 44 54 c27
+  }
+
+  part shaft_lattice_glow material cyan_glow {
+    glow radius 2
+    cell 46 28 c27
+    cell 44 30 c28
+    cell 46 31 c29
+    cell 46 31 c30
+    cell 46 32 c29
+    cell 44 34 c29
+    cell 46 36 c29
+    cell 46 36 c31
+    cell 44 42 c30
+    cell 44 42 c28
+    cell 44 43 c29
+    cell 46 44 c29
+    cell 46 44 c29
+    cell 46 45 c29
+    cell 44 46 c29
+    cell 44 46 c29
+    cell 44 47 c29
+    cell 46 48 c29
+    cell 46 48 c29
+    cell 46 49 c29
+    cell 44 50 c29
+    cell 44 50 c29
+    cell 44 51 c28
+    cell 46 53 c29
+    cell 46 53 c29
+    cell 46 53 c29
+  }
+
+  part ribbon material void_ice {
+    cell 44 23 c00
+    cell 44 23 c01
+    cell 45 23 c01
+    cell 46 23 c01
+    cell 46 23 c00
+    cell 44 24 c02
+    cell 44 24 c03
+    cell 44 24 c04
+    cell 45 24 c01
+    cell 45 24 c00
+    cell 46 24 c03
+    cell 46 24 c03
+    cell 46 24 c03
+    cell 46 24 c02
+    cell 43 25 c06
+    cell 44 25 c07
+    cell 44 25 c04
+    cell 45 25 c01
+    cell 45 25 c01
+    cell 46 25 c05
+    cell 46 25 c05
+    cell 43 26 c06
+    cell 44 26 c04
+    cell 44 26 c02
+    cell 44 26 c08
+    cell 44 26 c02
+    cell 45 26 c01
+    cell 45 26 c00
+    cell 46 26 c08
+    cell 46 26 c08
+    cell 44 27 c08
+    cell 44 27 c08
+    cell 45 27 c00
+    cell 45 27 c09
+    cell 46 27 c08
+    cell 46 27 c10
+    cell 44 28 c08
+    cell 44 28 c08
+    cell 45 28 c09
+    cell 45 28 c09
+    cell 46 28 c08
+    cell 44 29 c08
+    cell 44 29 c05
+    cell 45 29 c00
+    cell 45 29 c09
+    cell 44 30 c05
+    cell 44 30 c05
+    cell 45 30 c09
+    cell 44 31 c08
+    cell 44 31 c08
+    cell 44 32 c08
+    cell 44 33 c08
+    cell 44 33 c05
+    cell 44 34 c11
+    cell 44 34 c06
+    cell 44 35 c05
+    cell 44 35 c08
+    cell 44 36 c08
+  }
+
+  part ribbon_highlight material void_ice {
+    cell 46 27 c12
+    cell 44 29 c25
+    cell 43 34 c26
+  }
+
+  part ribbon_shadow material void_ice {
+    cell 44 25 c12
+    cell 46 25 c13
+    cell 47 27 c14
+    cell 46 29 c15
+    cell 44 34 c12
+  }
+
+  part core_mount material silver {
+    cell 43 36 c38
+    cell 44 36 c39
+    cell 46 36 c40
+    cell 46 36 c41
+    cell 47 36 c42
+    cell 42 37 c44
+    cell 43 37 c45
+    cell 44 37 c43
+    cell 46 37 c43
+    cell 46 37 c39
+    cell 46 37 c45
+    cell 47 37 c43
+    cell 47 37 c44
+    cell 47 37 c43
+    cell 47 37 c39
+    cell 48 37 c44
+    cell 42 38 c38
+    cell 43 38 c45
+    cell 47 38 c46
+    cell 47 38 c45
+    cell 48 38 c47
+    cell 42 39 c47
+    cell 43 39 c47
+    cell 42 40 c44
+    cell 42 40 c44
+    cell 43 40 c39
+    cell 43 40 c45
+    cell 43 40 c39
+    cell 43 40 c43
+    cell 44 40 c45
+    cell 43 41 c44
+    cell 43 41 c43
+    cell 43 41 c42
+    cell 44 41 c43
+    cell 44 41 c41
+  }
+
+  part core_mount_shadow material silver {
+    cell 45 36 c49
+    cell 44 37 c50
+    cell 44 37 c51
+    cell 43 38 c52
+    cell 43 38 c53
+    cell 47 38 c54
+    cell 48 38 c54
+    cell 42 39 c55
+    cell 48 39 c56
+    cell 48 39 c56
+    cell 47 40 c52
+    cell 47 40 c52
+    cell 47 40 c52
+    cell 48 40 c56
+    cell 48 40 c57
+    cell 44 41 c50
+    cell 44 41 c58
+    cell 45 41 c49
+    cell 46 41 c52
+    cell 46 41 c51
+    cell 46 41 c59
+    cell 47 41 c52
+    cell 47 41 c57
+    cell 47 41 c57
+  }
+
+  part core_mount_highlight material silver {
+    cell 44 36 c48
+    cell 43 37 c44
+    cell 43 37 c39
+    cell 43 37 c43
+    cell 42 38 c47
+    cell 47 39 c42
+    cell 46 40 c46
+    cell 47 40 c40
+    cell 46 41 c45
+  }
+
+  part core_gem material void_ice {
+    cell 44 37 c09
+    cell 45 37 c09
+    cell 46 37 c09
+    cell 43 38 c60
+    cell 44 38 c03
+    cell 44 38 c09
+    cell 44 38 c03
+    cell 45 38 c09
+    cell 46 38 c09
+    cell 46 38 c03
+    cell 46 38 c61
+    cell 46 38 c03
+    cell 47 38 c62
+    cell 43 39 c63
+    cell 43 39 c64
+    cell 44 39 c02
+    cell 44 39 c02
+    cell 44 39 c61
+    cell 45 39 c09
+    cell 45 39 c09
+    cell 46 39 c61
+    cell 44 40 c02
+    cell 44 40 c09
+    cell 44 40 c09
+  }
+
+  part core_gem_shadow material void_ice {
+    cell 46 39 c35
+    cell 46 39 c61
+    cell 46 39 c03
+    cell 47 39 c16
+    cell 47 39 c65
+    cell 45 40 c09
+    cell 45 40 c09
+    cell 46 40 c09
+    cell 46 40 c03
+    cell 46 40 c09
+  }
+
+  part core_gem_highlight material void_ice {
+    cell 44 38 c61
+    cell 45 38 c09
+    cell 44 39 c61
+  }
+
+  part bezel_void_glow material cyan_glow {
+    glow radius 2
+    cell 42 55 c27
+    cell 48 55 c27
+    cell 39 56 c28
+    cell 39 56 c28
+    cell 40 56 c28
+    cell 40 56 c28
+    cell 40 56 c76
+    cell 40 56 c76
+    cell 41 56 c28
+    cell 41 56 c28
+    cell 41 56 c76
+    cell 42 56 c28
+    cell 42 56 c74
+    cell 42 56 c76
+    cell 42 56 c76
+    cell 43 56 c75
+    cell 43 56 c77
+    cell 47 56 c75
+    cell 47 56 c77
+    cell 48 56 c74
+    cell 48 56 c28
+    cell 48 56 c76
+    cell 48 56 c76
+    cell 49 56 c28
+    cell 49 56 c76
+    cell 49 56 c28
+    cell 50 56 c28
+    cell 50 56 c76
+    cell 50 56 c28
+    cell 39 57 c28
+    cell 40 57 c76
+    cell 40 57 c76
+    cell 40 57 c28
+    cell 40 57 c28
+    cell 41 57 c28
+    cell 41 57 c76
+    cell 41 57 c28
+    cell 42 57 c76
+    cell 42 57 c76
+    cell 42 57 c28
+    cell 42 57 c76
+    cell 43 57 c77
+    cell 43 57 c77
+    cell 47 57 c77
+    cell 47 57 c77
+    cell 48 57 c76
+    cell 48 57 c76
+    cell 48 57 c76
+    cell 48 57 c28
+    cell 49 57 c76
+    cell 49 57 c28
+    cell 49 57 c28
+    cell 50 57 c28
+    cell 50 57 c28
+    cell 42 58 c28
+    cell 43 58 c27
+    cell 47 58 c27
+    cell 48 58 c28
+  }
+
+  part grip material darksteel {
+    cell 44 55 c16
+    cell 44 55 c34
+    cell 45 55 c35
+    cell 46 55 c36
+    cell 46 55 c16
+    cell 43 56 c16
+    cell 43 56 c69
+    cell 44 56 c16
+    cell 44 56 c36
+    cell 44 56 c37
+    cell 44 56 c37
+    cell 45 56 c34
+    cell 45 56 c17
+    cell 46 56 c36
+    cell 46 56 c16
+    cell 46 56 c37
+    cell 46 56 c37
+    cell 47 56 c16
+    cell 47 56 c69
+    cell 43 57 c69
+    cell 43 57 c16
+    cell 44 57 c37
+    cell 44 57 c37
+    cell 44 57 c16
+    cell 44 57 c37
+    cell 45 57 c17
+    cell 45 57 c37
+    cell 46 57 c37
+    cell 46 57 c37
+    cell 46 57 c37
+    cell 46 57 c16
+    cell 47 57 c69
+    cell 47 57 c16
+    cell 43 58 c16
+    cell 43 58 c70
+    cell 44 58 c16
+    cell 44 58 c37
+    cell 44 58 c16
+    cell 44 58 c37
+    cell 45 58 c37
+    cell 45 58 c37
+    cell 46 58 c37
+    cell 46 58 c16
+    cell 46 58 c37
+    cell 46 58 c16
+    cell 47 58 c16
+    cell 47 58 c70
+    cell 43 59 c70
+    cell 43 59 c70
+    cell 44 59 c16
+    cell 44 59 c37
+    cell 44 59 c16
+    cell 44 59 c34
+    cell 45 59 c71
+    cell 46 59 c37
+    cell 46 59 c16
+    cell 46 59 c34
+    cell 46 59 c16
+    cell 47 59 c70
+    cell 47 59 c70
+    cell 43 60 c70
+    cell 43 60 c70
+    cell 44 60 c16
+    cell 46 60 c16
+    cell 47 60 c70
+    cell 47 60 c70
+    cell 43 61 c70
+    cell 44 61 c16
+    cell 46 61 c16
+    cell 47 61 c70
+    cell 43 62 c70
+    cell 43 62 c70
+    cell 44 62 c16
+    cell 44 62 c34
+    cell 44 62 c16
+    cell 44 62 c37
+    cell 45 62 c71
+    cell 46 62 c34
+    cell 46 62 c16
+    cell 46 62 c37
+    cell 46 62 c16
+    cell 47 62 c70
+    cell 47 62 c70
+    cell 43 63 c70
+    cell 43 63 c70
+    cell 44 63 c16
+    cell 44 63 c37
+    cell 44 63 c16
+    cell 44 63 c37
+    cell 45 63 c37
+    cell 45 63 c37
+    cell 46 63 c37
+    cell 46 63 c16
+    cell 46 63 c37
+    cell 46 63 c16
+    cell 47 63 c70
+    cell 47 63 c70
+    cell 43 64 c70
+    cell 43 64 c70
+    cell 44 64 c16
+    cell 44 64 c37
+    cell 44 64 c16
+    cell 44 64 c37
+    cell 45 64 c37
+    cell 45 64 c37
+    cell 46 64 c37
+    cell 46 64 c16
+    cell 46 64 c37
+    cell 46 64 c16
+    cell 47 64 c70
+    cell 47 64 c70
+    cell 43 65 c70
+    cell 43 65 c70
+    cell 44 65 c16
+    cell 44 65 c37
+    cell 44 65 c16
+    cell 44 65 c37
+    cell 45 65 c37
+    cell 45 65 c37
+    cell 46 65 c37
+    cell 46 65 c16
+    cell 46 65 c37
+    cell 46 65 c16
+    cell 47 65 c70
+    cell 47 65 c70
+    cell 43 66 c70
+    cell 44 66 c72
+    cell 44 66 c70
+    cell 45 66 c73
+    cell 46 66 c70
+    cell 46 66 c72
+    cell 47 66 c70
+  }
+
+  part grip_shadow material darksteel {
+    cell 47 43 c67
+    cell 47 44 c68
+    cell 47 44 c68
+    cell 47 45 c68
+    cell 47 45 c67
+    cell 47 46 c67
+    cell 47 46 c67
+    cell 47 47 c67
+    cell 47 47 c67
+    cell 47 48 c68
+    cell 47 48 c68
+    cell 47 49 c68
+    cell 47 49 c67
+    cell 47 50 c67
+    cell 47 50 c67
+    cell 47 51 c67
+    cell 47 52 c67
+    cell 47 52 c68
+    cell 47 53 c68
+    cell 47 53 c68
+    cell 47 54 c67
+    cell 47 54 c67
+    cell 47 55 c24
+  }
+
+  part grip_highlight material darksteel {
+    cell 43 43 c67
+    cell 43 44 c67
+    cell 43 44 c67
+    cell 43 45 c67
+    cell 43 45 c67
+    cell 43 46 c68
+    cell 43 46 c68
+    cell 43 47 c68
+    cell 43 47 c67
+    cell 43 48 c67
+    cell 43 48 c67
+    cell 43 49 c67
+    cell 43 49 c67
+    cell 43 50 c68
+    cell 43 50 c68
+    cell 43 51 c68
+    cell 43 52 c67
+    cell 43 52 c67
+    cell 43 53 c67
+    cell 43 53 c67
+    cell 43 54 c67
+    cell 43 54 c67
+    cell 43 55 c24
+  }
+
+  part grip_trim material silver {
+    cell 43 55 c42
+    cell 43 55 c78
+    cell 44 55 c52
+    cell 44 55 c49
+    cell 45 55 c49
+    cell 46 55 c49
+    cell 46 55 c52
+    cell 47 55 c78
+    cell 47 55 c42
+    cell 45 59 c79
+    cell 44 60 c79
+    cell 44 60 c54
+    cell 44 60 c79
+    cell 45 60 c79
+    cell 45 60 c80
+    cell 46 60 c79
+    cell 46 60 c79
+    cell 46 60 c54
+    cell 44 61 c79
+    cell 45 61 c79
+    cell 46 61 c79
+    cell 45 62 c79
+    cell 43 66 c81
+    cell 43 66 c82
+    cell 44 66 c56
+    cell 44 66 c83
+    cell 45 66 c83
+    cell 46 66 c83
+    cell 46 66 c56
+    cell 47 66 c82
+    cell 47 66 c81
+  }
+
+  part pommel_glow material cyan_glow {
+    glow radius 2
+    cell 44 67 c28
+    cell 44 67 c28
+    cell 45 67 c28
+    cell 45 67 c76
+    cell 46 67 c28
+    cell 46 67 c28
+    cell 43 68 c28
+    cell 43 68 c28
+    cell 44 68 c76
+    cell 44 68 c76
+    cell 44 68 c76
+    cell 44 68 c76
+    cell 45 68 c76
+    cell 45 68 c76
+    cell 46 68 c76
+    cell 46 68 c76
+    cell 46 68 c76
+    cell 46 68 c76
+    cell 47 68 c28
+    cell 47 68 c28
+    cell 43 69 c28
+    cell 43 69 c76
+    cell 43 69 c28
+    cell 44 69 c76
+    cell 44 69 c76
+    cell 44 69 c76
+    cell 44 69 c76
+    cell 45 69 c76
+    cell 45 69 c76
+    cell 46 69 c76
+    cell 46 69 c76
+    cell 46 69 c76
+    cell 46 69 c76
+    cell 47 69 c76
+    cell 47 69 c28
+    cell 47 69 c28
+    cell 43 70 c28
+    cell 44 70 c76
+    cell 44 70 c76
+    cell 44 70 c28
+    cell 44 70 c28
+    cell 45 70 c76
+    cell 45 70 c76
+    cell 46 70 c76
+    cell 46 70 c76
+    cell 46 70 c28
+    cell 46 70 c28
+    cell 47 70 c28
+    cell 45 71 c28
+  }
+
+}
+
+frame 5 "riseL" {
+  part ether_flow after cradle material cyan_glow {
+    glow radius 2
+    cell 44 34 ether_pulse
+    cell 45 34 ether_core
+    cell 46 34 ether_pulse
+    cell 44 43 ether_pulse
+    cell 45 43 ether_core
+    cell 46 43 ether_pulse
+    cell 45 42 ether_trail
+    cell 44 53 ether_pulse
+    cell 45 53 ether_core
+    cell 46 53 ether_pulse
+    cell 45 52 ether_trail
+  }
+
+  part shaft material darksteel {
+    cell 46 26 c16
+    cell 44 27 c16
+    cell 44 27 c16
+    cell 46 27 c16
+    cell 44 28 c16
+    cell 44 28 c16
+    cell 46 28 c16
+    cell 44 29 c16
+    cell 46 29 c16
+    cell 44 30 c16
+    cell 45 30 c17
+    cell 46 30 c16
+    cell 46 30 c16
+    cell 44 31 c16
+    cell 44 31 c16
+    cell 45 31 c18
+    cell 45 31 c19
+    cell 46 31 c16
+    cell 44 32 c16
+    cell 45 32 c19
+    cell 44 33 c16
+    cell 44 33 c16
+    cell 45 33 c18
+    cell 45 33 c17
+    cell 46 33 c16
+    cell 46 33 c16
+    cell 45 34 c17
+    cell 45 34 c17
+    cell 46 34 c16
+    cell 46 34 c16
+    cell 44 35 c16
+    cell 44 35 c16
+    cell 45 35 c18
+    cell 45 35 c18
+    cell 46 35 c16
+    cell 46 35 c16
+    cell 44 36 c16
+    cell 45 36 c20
+    cell 45 37 c20
+    cell 45 41 c19
+    cell 45 42 c21
+    cell 46 42 c16
+    cell 44 43 c16
+    cell 45 43 c19
+    cell 45 43 c18
+    cell 46 43 c16
+    cell 46 43 c16
+    cell 44 44 c16
+    cell 44 44 c18
+    cell 45 44 c17
+    cell 45 44 c20
+    cell 46 44 c16
+    cell 44 45 c18
+    cell 44 45 c18
+    cell 45 45 c20
+    cell 45 45 c17
+    cell 46 45 c17
+    cell 44 46 c20
+    cell 45 46 c17
+    cell 45 46 c20
+    cell 46 46 c18
+    cell 46 46 c18
+    cell 44 47 c17
+    cell 45 47 c20
+    cell 45 47 c17
+    cell 46 47 c18
+    cell 46 47 c18
+    cell 44 48 c18
+    cell 44 48 c18
+    cell 45 48 c17
+    cell 45 48 c20
+    cell 46 48 c20
+    cell 44 49 c18
+    cell 44 49 c18
+    cell 45 49 c20
+    cell 45 49 c17
+    cell 46 49 c17
+    cell 44 50 c20
+    cell 45 50 c17
+    cell 45 50 c20
+    cell 46 50 c18
+    cell 46 50 c18
+    cell 45 51 c22
+    cell 46 51 c18
+    cell 45 52 c22
+    cell 45 52 c23
+    cell 46 52 c18
+    cell 46 52 c20
+    cell 45 53 c24
+    cell 45 53 c24
+    cell 45 54 c23
+    cell 45 54 c20
+    cell 46 54 c17
+    cell 46 54 c17
+  }
+
+  part shaft_shadow material darksteel {
+    cell 46 28 c32
+    cell 46 29 c03
+    cell 46 29 c03
+    cell 46 30 c03
+    cell 46 30 c03
+    cell 46 31 c32
+    cell 46 32 c16
+    cell 46 33 c04
+    cell 46 33 c03
+    cell 46 34 c03
+    cell 46 34 c03
+    cell 46 35 c03
+    cell 46 35 c32
+    cell 46 42 c03
+    cell 46 43 c03
+    cell 46 43 c33
+    cell 46 44 c34
+    cell 46 45 c35
+    cell 46 45 c36
+    cell 46 46 c37
+    cell 46 46 c37
+    cell 46 47 c37
+    cell 46 47 c37
+    cell 46 48 c34
+    cell 46 49 c35
+    cell 46 49 c36
+    cell 46 50 c37
+    cell 46 50 c37
+    cell 46 51 c37
+    cell 46 52 c37
+    cell 46 52 c34
+    cell 46 53 c35
+    cell 46 54 c36
+    cell 46 54 c37
+  }
+
+  part shaft_highlight material darksteel {
+    cell 44 43 c16
+    cell 44 43 c66
+    cell 44 44 c37
+    cell 44 44 c37
+    cell 44 45 c37
+    cell 44 45 c37
+    cell 44 46 c34
+    cell 44 47 c35
+    cell 44 47 c36
+    cell 44 48 c37
+    cell 44 48 c37
+    cell 44 49 c37
+    cell 44 49 c37
+    cell 44 50 c34
+    cell 44 51 c03
+    cell 44 52 c35
+    cell 44 52 c35
+    cell 44 53 c35
+    cell 44 53 c35
+    cell 44 54 c35
+    cell 44 54 c34
+  }
+
+  part shaft_glint material cyan_glow {
+    glow radius 2
+    cell 44 52 c29
+    cell 44 52 c29
+    cell 44 53 c29
+    cell 44 53 c29
+    cell 44 54 c29
+    cell 44 54 c27
+  }
+
+  part shaft_lattice_glow material cyan_glow {
+    glow radius 2
+    cell 46 28 c27
+    cell 44 30 c28
+    cell 46 31 c29
+    cell 46 31 c30
+    cell 46 32 c29
+    cell 44 34 c29
+    cell 46 36 c29
+    cell 46 36 c31
+    cell 44 42 c30
+    cell 44 42 c28
+    cell 44 43 c29
+    cell 46 44 c29
+    cell 46 44 c29
+    cell 46 45 c29
+    cell 44 46 c29
+    cell 44 46 c29
+    cell 44 47 c29
+    cell 46 48 c29
+    cell 46 48 c29
+    cell 46 49 c29
+    cell 44 50 c29
+    cell 44 50 c29
+    cell 44 51 c28
+    cell 46 53 c29
+    cell 46 53 c29
+    cell 46 53 c29
+  }
+
+  part ribbon material void_ice {
+    cell 44 23 c00
+    cell 44 23 c01
+    cell 45 23 c01
+    cell 46 23 c01
+    cell 46 23 c00
+    cell 44 24 c02
+    cell 44 24 c03
+    cell 44 24 c04
+    cell 45 24 c01
+    cell 45 24 c00
+    cell 46 24 c03
+    cell 46 24 c03
+    cell 46 24 c03
+    cell 46 24 c02
+    cell 43 25 c06
+    cell 44 25 c07
+    cell 44 25 c04
+    cell 45 25 c01
+    cell 45 25 c01
+    cell 46 25 c05
+    cell 46 25 c05
+    cell 43 26 c06
+    cell 44 26 c04
+    cell 44 26 c02
+    cell 44 26 c08
+    cell 44 26 c02
+    cell 45 26 c01
+    cell 45 26 c00
+    cell 46 26 c08
+    cell 46 26 c08
+    cell 44 27 c08
+    cell 44 27 c08
+    cell 45 27 c00
+    cell 45 27 c09
+    cell 46 27 c08
+    cell 46 27 c10
+    cell 44 28 c08
+    cell 44 28 c08
+    cell 45 28 c09
+    cell 45 28 c09
+    cell 46 28 c08
+    cell 44 29 c08
+    cell 44 29 c05
+    cell 45 29 c00
+    cell 45 29 c09
+    cell 44 30 c05
+    cell 44 30 c05
+    cell 45 30 c09
+    cell 44 31 c08
+    cell 44 31 c08
+    cell 44 32 c08
+    cell 44 33 c08
+    cell 44 33 c05
+    cell 44 34 c11
+    cell 44 34 c06
+    cell 44 35 c05
+    cell 44 35 c08
+    cell 44 36 c08
+  }
+
+  part ribbon_highlight material void_ice {
+    cell 46 27 c12
+    cell 44 29 c25
+    cell 43 34 c26
+  }
+
+  part ribbon_shadow material void_ice {
+    cell 44 25 c12
+    cell 46 25 c13
+    cell 47 27 c14
+    cell 46 29 c15
+    cell 44 34 c12
+  }
+
+  part core_mount material silver {
+    cell 43 36 c38
+    cell 44 36 c39
+    cell 46 36 c40
+    cell 46 36 c41
+    cell 47 36 c42
+    cell 42 37 c44
+    cell 43 37 c45
+    cell 44 37 c43
+    cell 46 37 c43
+    cell 46 37 c39
+    cell 46 37 c45
+    cell 47 37 c43
+    cell 47 37 c44
+    cell 47 37 c43
+    cell 47 37 c39
+    cell 48 37 c44
+    cell 42 38 c38
+    cell 43 38 c45
+    cell 47 38 c46
+    cell 47 38 c45
+    cell 48 38 c47
+    cell 42 39 c47
+    cell 43 39 c47
+    cell 42 40 c44
+    cell 42 40 c44
+    cell 43 40 c39
+    cell 43 40 c45
+    cell 43 40 c39
+    cell 43 40 c43
+    cell 44 40 c45
+    cell 43 41 c44
+    cell 43 41 c43
+    cell 43 41 c42
+    cell 44 41 c43
+    cell 44 41 c41
+  }
+
+  part core_mount_shadow material silver {
+    cell 45 36 c49
+    cell 44 37 c50
+    cell 44 37 c51
+    cell 43 38 c52
+    cell 43 38 c53
+    cell 47 38 c54
+    cell 48 38 c54
+    cell 42 39 c55
+    cell 48 39 c56
+    cell 48 39 c56
+    cell 47 40 c52
+    cell 47 40 c52
+    cell 47 40 c52
+    cell 48 40 c56
+    cell 48 40 c57
+    cell 44 41 c50
+    cell 44 41 c58
+    cell 45 41 c49
+    cell 46 41 c52
+    cell 46 41 c51
+    cell 46 41 c59
+    cell 47 41 c52
+    cell 47 41 c57
+    cell 47 41 c57
+  }
+
+  part core_mount_highlight material silver {
+    cell 44 36 c48
+    cell 43 37 c44
+    cell 43 37 c39
+    cell 43 37 c43
+    cell 42 38 c47
+    cell 47 39 c42
+    cell 46 40 c46
+    cell 47 40 c40
+    cell 46 41 c45
+  }
+
+  part core_gem material void_ice {
+    cell 44 37 c09
+    cell 45 37 c09
+    cell 46 37 c09
+    cell 43 38 c60
+    cell 44 38 c03
+    cell 44 38 c09
+    cell 44 38 c03
+    cell 45 38 c09
+    cell 46 38 c09
+    cell 46 38 c03
+    cell 46 38 c61
+    cell 46 38 c03
+    cell 47 38 c62
+    cell 43 39 c63
+    cell 43 39 c64
+    cell 44 39 c02
+    cell 44 39 c02
+    cell 44 39 c61
+    cell 45 39 c09
+    cell 45 39 c09
+    cell 46 39 c61
+    cell 44 40 c02
+    cell 44 40 c09
+    cell 44 40 c09
+  }
+
+  part core_gem_shadow material void_ice {
+    cell 46 39 c35
+    cell 46 39 c61
+    cell 46 39 c03
+    cell 47 39 c16
+    cell 47 39 c65
+    cell 45 40 c09
+    cell 45 40 c09
+    cell 46 40 c09
+    cell 46 40 c03
+    cell 46 40 c09
+  }
+
+  part core_gem_highlight material void_ice {
+    cell 44 38 c61
+    cell 45 38 c09
+    cell 44 39 c61
+  }
+
+  part bezel_void_glow material cyan_glow {
+    glow radius 2
+    cell 42 55 c27
+    cell 48 55 c27
+    cell 39 56 c28
+    cell 39 56 c28
+    cell 40 56 c28
+    cell 40 56 c28
+    cell 40 56 c76
+    cell 40 56 c76
+    cell 41 56 c28
+    cell 41 56 c28
+    cell 41 56 c76
+    cell 42 56 c28
+    cell 42 56 c74
+    cell 42 56 c76
+    cell 42 56 c76
+    cell 43 56 c75
+    cell 43 56 c77
+    cell 47 56 c75
+    cell 47 56 c77
+    cell 48 56 c74
+    cell 48 56 c28
+    cell 48 56 c76
+    cell 48 56 c76
+    cell 49 56 c28
+    cell 49 56 c76
+    cell 49 56 c28
+    cell 50 56 c28
+    cell 50 56 c76
+    cell 50 56 c28
+    cell 39 57 c28
+    cell 40 57 c76
+    cell 40 57 c76
+    cell 40 57 c28
+    cell 40 57 c28
+    cell 41 57 c28
+    cell 41 57 c76
+    cell 41 57 c28
+    cell 42 57 c76
+    cell 42 57 c76
+    cell 42 57 c28
+    cell 42 57 c76
+    cell 43 57 c77
+    cell 43 57 c77
+    cell 47 57 c77
+    cell 47 57 c77
+    cell 48 57 c76
+    cell 48 57 c76
+    cell 48 57 c76
+    cell 48 57 c28
+    cell 49 57 c76
+    cell 49 57 c28
+    cell 49 57 c28
+    cell 50 57 c28
+    cell 50 57 c28
+    cell 42 58 c28
+    cell 43 58 c27
+    cell 47 58 c27
+    cell 48 58 c28
+  }
+
+  part grip material darksteel {
+    cell 44 55 c16
+    cell 44 55 c34
+    cell 45 55 c35
+    cell 46 55 c36
+    cell 46 55 c16
+    cell 43 56 c16
+    cell 43 56 c69
+    cell 44 56 c16
+    cell 44 56 c36
+    cell 44 56 c37
+    cell 44 56 c37
+    cell 45 56 c34
+    cell 45 56 c17
+    cell 46 56 c36
+    cell 46 56 c16
+    cell 46 56 c37
+    cell 46 56 c37
+    cell 47 56 c16
+    cell 47 56 c69
+    cell 43 57 c69
+    cell 43 57 c16
+    cell 44 57 c37
+    cell 44 57 c37
+    cell 44 57 c16
+    cell 44 57 c37
+    cell 45 57 c17
+    cell 45 57 c37
+    cell 46 57 c37
+    cell 46 57 c37
+    cell 46 57 c37
+    cell 46 57 c16
+    cell 47 57 c69
+    cell 47 57 c16
+    cell 43 58 c16
+    cell 43 58 c70
+    cell 44 58 c16
+    cell 44 58 c37
+    cell 44 58 c16
+    cell 44 58 c37
+    cell 45 58 c37
+    cell 45 58 c37
+    cell 46 58 c37
+    cell 46 58 c16
+    cell 46 58 c37
+    cell 46 58 c16
+    cell 47 58 c16
+    cell 47 58 c70
+    cell 43 59 c70
+    cell 43 59 c70
+    cell 44 59 c16
+    cell 44 59 c37
+    cell 44 59 c16
+    cell 44 59 c34
+    cell 45 59 c71
+    cell 46 59 c37
+    cell 46 59 c16
+    cell 46 59 c34
+    cell 46 59 c16
+    cell 47 59 c70
+    cell 47 59 c70
+    cell 43 60 c70
+    cell 43 60 c70
+    cell 44 60 c16
+    cell 46 60 c16
+    cell 47 60 c70
+    cell 47 60 c70
+    cell 43 61 c70
+    cell 44 61 c16
+    cell 46 61 c16
+    cell 47 61 c70
+    cell 43 62 c70
+    cell 43 62 c70
+    cell 44 62 c16
+    cell 44 62 c34
+    cell 44 62 c16
+    cell 44 62 c37
+    cell 45 62 c71
+    cell 46 62 c34
+    cell 46 62 c16
+    cell 46 62 c37
+    cell 46 62 c16
+    cell 47 62 c70
+    cell 47 62 c70
+    cell 43 63 c70
+    cell 43 63 c70
+    cell 44 63 c16
+    cell 44 63 c37
+    cell 44 63 c16
+    cell 44 63 c37
+    cell 45 63 c37
+    cell 45 63 c37
+    cell 46 63 c37
+    cell 46 63 c16
+    cell 46 63 c37
+    cell 46 63 c16
+    cell 47 63 c70
+    cell 47 63 c70
+    cell 43 64 c70
+    cell 43 64 c70
+    cell 44 64 c16
+    cell 44 64 c37
+    cell 44 64 c16
+    cell 44 64 c37
+    cell 45 64 c37
+    cell 45 64 c37
+    cell 46 64 c37
+    cell 46 64 c16
+    cell 46 64 c37
+    cell 46 64 c16
+    cell 47 64 c70
+    cell 47 64 c70
+    cell 43 65 c70
+    cell 43 65 c70
+    cell 44 65 c16
+    cell 44 65 c37
+    cell 44 65 c16
+    cell 44 65 c37
+    cell 45 65 c37
+    cell 45 65 c37
+    cell 46 65 c37
+    cell 46 65 c16
+    cell 46 65 c37
+    cell 46 65 c16
+    cell 47 65 c70
+    cell 47 65 c70
+    cell 43 66 c70
+    cell 44 66 c72
+    cell 44 66 c70
+    cell 45 66 c73
+    cell 46 66 c70
+    cell 46 66 c72
+    cell 47 66 c70
+  }
+
+  part grip_shadow material darksteel {
+    cell 47 43 c67
+    cell 47 44 c68
+    cell 47 44 c68
+    cell 47 45 c68
+    cell 47 45 c67
+    cell 47 46 c67
+    cell 47 46 c67
+    cell 47 47 c67
+    cell 47 47 c67
+    cell 47 48 c68
+    cell 47 48 c68
+    cell 47 49 c68
+    cell 47 49 c67
+    cell 47 50 c67
+    cell 47 50 c67
+    cell 47 51 c67
+    cell 47 52 c67
+    cell 47 52 c68
+    cell 47 53 c68
+    cell 47 53 c68
+    cell 47 54 c67
+    cell 47 54 c67
+    cell 47 55 c24
+  }
+
+  part grip_highlight material darksteel {
+    cell 43 43 c67
+    cell 43 44 c67
+    cell 43 44 c67
+    cell 43 45 c67
+    cell 43 45 c67
+    cell 43 46 c68
+    cell 43 46 c68
+    cell 43 47 c68
+    cell 43 47 c67
+    cell 43 48 c67
+    cell 43 48 c67
+    cell 43 49 c67
+    cell 43 49 c67
+    cell 43 50 c68
+    cell 43 50 c68
+    cell 43 51 c68
+    cell 43 52 c67
+    cell 43 52 c67
+    cell 43 53 c67
+    cell 43 53 c67
+    cell 43 54 c67
+    cell 43 54 c67
+    cell 43 55 c24
+  }
+
+  part grip_trim material silver {
+    cell 43 55 c42
+    cell 43 55 c78
+    cell 44 55 c52
+    cell 44 55 c49
+    cell 45 55 c49
+    cell 46 55 c49
+    cell 46 55 c52
+    cell 47 55 c78
+    cell 47 55 c42
+    cell 45 59 c79
+    cell 44 60 c79
+    cell 44 60 c54
+    cell 44 60 c79
+    cell 45 60 c79
+    cell 45 60 c80
+    cell 46 60 c79
+    cell 46 60 c79
+    cell 46 60 c54
+    cell 44 61 c79
+    cell 45 61 c79
+    cell 46 61 c79
+    cell 45 62 c79
+    cell 43 66 c81
+    cell 43 66 c82
+    cell 44 66 c56
+    cell 44 66 c83
+    cell 45 66 c83
+    cell 46 66 c83
+    cell 46 66 c56
+    cell 47 66 c82
+    cell 47 66 c81
+  }
+
+  part pommel_glow material cyan_glow {
+    glow radius 2
+    cell 44 67 c28
+    cell 44 67 c28
+    cell 45 67 c28
+    cell 45 67 c76
+    cell 46 67 c28
+    cell 46 67 c28
+    cell 43 68 c28
+    cell 43 68 c28
+    cell 44 68 c76
+    cell 44 68 c76
+    cell 44 68 c76
+    cell 44 68 c76
+    cell 45 68 c76
+    cell 45 68 c76
+    cell 46 68 c76
+    cell 46 68 c76
+    cell 46 68 c76
+    cell 46 68 c76
+    cell 47 68 c28
+    cell 47 68 c28
+    cell 43 69 c28
+    cell 43 69 c76
+    cell 43 69 c28
+    cell 44 69 c76
+    cell 44 69 c76
+    cell 44 69 c76
+    cell 44 69 c76
+    cell 45 69 c76
+    cell 45 69 c76
+    cell 46 69 c76
+    cell 46 69 c76
+    cell 46 69 c76
+    cell 46 69 c76
+    cell 47 69 c76
+    cell 47 69 c28
+    cell 47 69 c28
+    cell 43 70 c28
+    cell 44 70 c76
+    cell 44 70 c76
+    cell 44 70 c28
+    cell 44 70 c28
+    cell 45 70 c76
+    cell 45 70 c76
+    cell 46 70 c76
+    cell 46 70 c76
+    cell 46 70 c28
+    cell 46 70 c28
+    cell 47 70 c28
+    cell 45 71 c28
+  }
+
+}
+
+frame 6 "passL" {
+  part ether_flow after cradle material cyan_glow {
+    glow radius 2
+    cell 44 34 ether_pulse
+    cell 45 34 ether_core
+    cell 46 34 ether_pulse
+    cell 44 43 ether_pulse
+    cell 45 43 ether_core
+    cell 46 43 ether_pulse
+    cell 45 42 ether_trail
+    cell 44 53 ether_pulse
+    cell 45 53 ether_core
+    cell 46 53 ether_pulse
+    cell 45 52 ether_trail
+    cell 44 62 ether_pulse
+    cell 45 62 ether_core
+    cell 46 62 ether_pulse
+    cell 45 61 ether_trail
+  }
+
+  part shaft material darksteel {
+    cell 46 26 c16
+    cell 44 27 c16
+    cell 44 27 c16
+    cell 46 27 c16
+    cell 44 28 c16
+    cell 44 28 c16
+    cell 46 28 c16
+    cell 44 29 c16
+    cell 46 29 c16
+    cell 44 30 c16
+    cell 45 30 c17
+    cell 46 30 c16
+    cell 46 30 c16
+    cell 44 31 c16
+    cell 44 31 c16
+    cell 45 31 c18
+    cell 45 31 c19
+    cell 46 31 c16
+    cell 44 32 c16
+    cell 45 32 c19
+    cell 44 33 c16
+    cell 44 33 c16
+    cell 45 33 c18
+    cell 45 33 c17
+    cell 46 33 c16
+    cell 46 33 c16
+    cell 45 34 c17
+    cell 45 34 c17
+    cell 46 34 c16
+    cell 46 34 c16
+    cell 44 35 c16
+    cell 44 35 c16
+    cell 45 35 c18
+    cell 45 35 c18
+    cell 46 35 c16
+    cell 46 35 c16
+    cell 44 36 c16
+    cell 45 36 c20
+    cell 45 37 c20
+    cell 45 41 c19
+    cell 45 42 c21
+    cell 46 42 c16
+    cell 44 43 c16
+    cell 45 43 c19
+    cell 45 43 c18
+    cell 46 43 c16
+    cell 46 43 c16
+    cell 44 44 c16
+    cell 44 44 c18
+    cell 45 44 c17
+    cell 45 44 c20
+    cell 46 44 c16
+    cell 44 45 c18
+    cell 44 45 c18
+    cell 45 45 c20
+    cell 45 45 c17
+    cell 46 45 c17
+    cell 44 46 c20
+    cell 45 46 c17
+    cell 45 46 c20
+    cell 46 46 c18
+    cell 46 46 c18
+    cell 44 47 c17
+    cell 45 47 c20
+    cell 45 47 c17
+    cell 46 47 c18
+    cell 46 47 c18
+    cell 44 48 c18
+    cell 44 48 c18
+    cell 45 48 c17
+    cell 45 48 c20
+    cell 46 48 c20
+    cell 44 49 c18
+    cell 44 49 c18
+    cell 45 49 c20
+    cell 45 49 c17
+    cell 46 49 c17
+    cell 44 50 c20
+    cell 45 50 c17
+    cell 45 50 c20
+    cell 46 50 c18
+    cell 46 50 c18
+    cell 45 51 c22
+    cell 46 51 c18
+    cell 45 52 c22
+    cell 45 52 c23
+    cell 46 52 c18
+    cell 46 52 c20
+    cell 45 53 c24
+    cell 45 53 c24
+    cell 45 54 c23
+    cell 45 54 c20
+    cell 46 54 c17
+    cell 46 54 c17
+  }
+
+  part shaft_shadow material darksteel {
+    cell 46 28 c32
+    cell 46 29 c03
+    cell 46 29 c03
+    cell 46 30 c03
+    cell 46 30 c03
+    cell 46 31 c32
+    cell 46 32 c16
+    cell 46 33 c04
+    cell 46 33 c03
+    cell 46 34 c03
+    cell 46 34 c03
+    cell 46 35 c03
+    cell 46 35 c32
+    cell 46 42 c03
+    cell 46 43 c03
+    cell 46 43 c33
+    cell 46 44 c34
+    cell 46 45 c35
+    cell 46 45 c36
+    cell 46 46 c37
+    cell 46 46 c37
+    cell 46 47 c37
+    cell 46 47 c37
+    cell 46 48 c34
+    cell 46 49 c35
+    cell 46 49 c36
+    cell 46 50 c37
+    cell 46 50 c37
+    cell 46 51 c37
+    cell 46 52 c37
+    cell 46 52 c34
+    cell 46 53 c35
+    cell 46 54 c36
+    cell 46 54 c37
+  }
+
+  part shaft_highlight material darksteel {
+    cell 44 43 c16
+    cell 44 43 c66
+    cell 44 44 c37
+    cell 44 44 c37
+    cell 44 45 c37
+    cell 44 45 c37
+    cell 44 46 c34
+    cell 44 47 c35
+    cell 44 47 c36
+    cell 44 48 c37
+    cell 44 48 c37
+    cell 44 49 c37
+    cell 44 49 c37
+    cell 44 50 c34
+    cell 44 51 c03
+    cell 44 52 c35
+    cell 44 52 c35
+    cell 44 53 c35
+    cell 44 53 c35
+    cell 44 54 c35
+    cell 44 54 c34
+  }
+
+  part shaft_glint material cyan_glow {
+    glow radius 2
+    cell 44 52 c29
+    cell 44 52 c29
+    cell 44 53 c29
+    cell 44 53 c29
+    cell 44 54 c29
+    cell 44 54 c27
+  }
+
+  part shaft_lattice_glow material cyan_glow {
+    glow radius 2
+    cell 46 28 c27
+    cell 44 30 c28
+    cell 46 31 c29
+    cell 46 31 c30
+    cell 46 32 c29
+    cell 44 34 c29
+    cell 46 36 c29
+    cell 46 36 c31
+    cell 44 42 c30
+    cell 44 42 c28
+    cell 44 43 c29
+    cell 46 44 c29
+    cell 46 44 c29
+    cell 46 45 c29
+    cell 44 46 c29
+    cell 44 46 c29
+    cell 44 47 c29
+    cell 46 48 c29
+    cell 46 48 c29
+    cell 46 49 c29
+    cell 44 50 c29
+    cell 44 50 c29
+    cell 44 51 c28
+    cell 46 53 c29
+    cell 46 53 c29
+    cell 46 53 c29
+  }
+
+  part ribbon material void_ice {
+    cell 44 23 c00
+    cell 44 23 c01
+    cell 45 23 c01
+    cell 46 23 c01
+    cell 46 23 c00
+    cell 44 24 c02
+    cell 44 24 c03
+    cell 44 24 c04
+    cell 45 24 c01
+    cell 45 24 c00
+    cell 46 24 c03
+    cell 46 24 c03
+    cell 46 24 c03
+    cell 46 24 c02
+    cell 43 25 c06
+    cell 44 25 c07
+    cell 44 25 c04
+    cell 45 25 c01
+    cell 45 25 c01
+    cell 46 25 c05
+    cell 46 25 c05
+    cell 43 26 c06
+    cell 44 26 c04
+    cell 44 26 c02
+    cell 44 26 c08
+    cell 44 26 c02
+    cell 45 26 c01
+    cell 45 26 c00
+    cell 46 26 c08
+    cell 46 26 c08
+    cell 44 27 c08
+    cell 44 27 c08
+    cell 45 27 c00
+    cell 45 27 c09
+    cell 46 27 c08
+    cell 46 27 c10
+    cell 44 28 c08
+    cell 44 28 c08
+    cell 45 28 c09
+    cell 45 28 c09
+    cell 46 28 c08
+    cell 44 29 c08
+    cell 44 29 c05
+    cell 45 29 c00
+    cell 45 29 c09
+    cell 44 30 c05
+    cell 44 30 c05
+    cell 45 30 c09
+    cell 44 31 c08
+    cell 44 31 c08
+    cell 44 32 c08
+    cell 44 33 c08
+    cell 44 33 c05
+    cell 44 34 c11
+    cell 44 34 c06
+    cell 44 35 c05
+    cell 44 35 c08
+    cell 44 36 c08
+  }
+
+  part ribbon_highlight material void_ice {
+    cell 46 27 c12
+    cell 44 29 c25
+    cell 43 34 c26
+  }
+
+  part ribbon_shadow material void_ice {
+    cell 44 25 c12
+    cell 46 25 c13
+    cell 47 27 c14
+    cell 46 29 c15
+    cell 44 34 c12
+  }
+
+  part core_mount material silver {
+    cell 43 36 c38
+    cell 44 36 c39
+    cell 46 36 c40
+    cell 46 36 c41
+    cell 47 36 c42
+    cell 42 37 c44
+    cell 43 37 c45
+    cell 44 37 c43
+    cell 46 37 c43
+    cell 46 37 c39
+    cell 46 37 c45
+    cell 47 37 c43
+    cell 47 37 c44
+    cell 47 37 c43
+    cell 47 37 c39
+    cell 48 37 c44
+    cell 42 38 c38
+    cell 43 38 c45
+    cell 47 38 c46
+    cell 47 38 c45
+    cell 48 38 c47
+    cell 42 39 c47
+    cell 43 39 c47
+    cell 42 40 c44
+    cell 42 40 c44
+    cell 43 40 c39
+    cell 43 40 c45
+    cell 43 40 c39
+    cell 43 40 c43
+    cell 44 40 c45
+    cell 43 41 c44
+    cell 43 41 c43
+    cell 43 41 c42
+    cell 44 41 c43
+    cell 44 41 c41
+  }
+
+  part core_mount_shadow material silver {
+    cell 45 36 c49
+    cell 44 37 c50
+    cell 44 37 c51
+    cell 43 38 c52
+    cell 43 38 c53
+    cell 47 38 c54
+    cell 48 38 c54
+    cell 42 39 c55
+    cell 48 39 c56
+    cell 48 39 c56
+    cell 47 40 c52
+    cell 47 40 c52
+    cell 47 40 c52
+    cell 48 40 c56
+    cell 48 40 c57
+    cell 44 41 c50
+    cell 44 41 c58
+    cell 45 41 c49
+    cell 46 41 c52
+    cell 46 41 c51
+    cell 46 41 c59
+    cell 47 41 c52
+    cell 47 41 c57
+    cell 47 41 c57
+  }
+
+  part core_mount_highlight material silver {
+    cell 44 36 c48
+    cell 43 37 c44
+    cell 43 37 c39
+    cell 43 37 c43
+    cell 42 38 c47
+    cell 47 39 c42
+    cell 46 40 c46
+    cell 47 40 c40
+    cell 46 41 c45
+  }
+
+  part core_gem material void_ice {
+    cell 44 37 c09
+    cell 45 37 c09
+    cell 46 37 c09
+    cell 43 38 c60
+    cell 44 38 c03
+    cell 44 38 c09
+    cell 44 38 c03
+    cell 45 38 c09
+    cell 46 38 c09
+    cell 46 38 c03
+    cell 46 38 c61
+    cell 46 38 c03
+    cell 47 38 c62
+    cell 43 39 c63
+    cell 43 39 c64
+    cell 44 39 c02
+    cell 44 39 c02
+    cell 44 39 c61
+    cell 45 39 c09
+    cell 45 39 c09
+    cell 46 39 c61
+    cell 44 40 c02
+    cell 44 40 c09
+    cell 44 40 c09
+  }
+
+  part core_gem_shadow material void_ice {
+    cell 46 39 c35
+    cell 46 39 c61
+    cell 46 39 c03
+    cell 47 39 c16
+    cell 47 39 c65
+    cell 45 40 c09
+    cell 45 40 c09
+    cell 46 40 c09
+    cell 46 40 c03
+    cell 46 40 c09
+  }
+
+  part core_gem_highlight material void_ice {
+    cell 44 38 c61
+    cell 45 38 c09
+    cell 44 39 c61
+  }
+
+  part bezel_void_glow material cyan_glow {
+    glow radius 2
+    cell 42 55 c27
+    cell 48 55 c27
+    cell 39 56 c28
+    cell 39 56 c28
+    cell 40 56 c28
+    cell 40 56 c28
+    cell 40 56 c76
+    cell 40 56 c76
+    cell 41 56 c28
+    cell 41 56 c28
+    cell 41 56 c76
+    cell 42 56 c28
+    cell 42 56 c74
+    cell 42 56 c76
+    cell 42 56 c76
+    cell 43 56 c75
+    cell 43 56 c77
+    cell 47 56 c75
+    cell 47 56 c77
+    cell 48 56 c74
+    cell 48 56 c28
+    cell 48 56 c76
+    cell 48 56 c76
+    cell 49 56 c28
+    cell 49 56 c76
+    cell 49 56 c28
+    cell 50 56 c28
+    cell 50 56 c76
+    cell 50 56 c28
+    cell 39 57 c28
+    cell 40 57 c76
+    cell 40 57 c76
+    cell 40 57 c28
+    cell 40 57 c28
+    cell 41 57 c28
+    cell 41 57 c76
+    cell 41 57 c28
+    cell 42 57 c76
+    cell 42 57 c76
+    cell 42 57 c28
+    cell 42 57 c76
+    cell 43 57 c77
+    cell 43 57 c77
+    cell 47 57 c77
+    cell 47 57 c77
+    cell 48 57 c76
+    cell 48 57 c76
+    cell 48 57 c76
+    cell 48 57 c28
+    cell 49 57 c76
+    cell 49 57 c28
+    cell 49 57 c28
+    cell 50 57 c28
+    cell 50 57 c28
+    cell 42 58 c28
+    cell 43 58 c27
+    cell 47 58 c27
+    cell 48 58 c28
+  }
+
+  part grip material darksteel {
+    cell 44 55 c16
+    cell 44 55 c34
+    cell 45 55 c35
+    cell 46 55 c36
+    cell 46 55 c16
+    cell 43 56 c16
+    cell 43 56 c69
+    cell 44 56 c16
+    cell 44 56 c36
+    cell 44 56 c37
+    cell 44 56 c37
+    cell 45 56 c34
+    cell 45 56 c17
+    cell 46 56 c36
+    cell 46 56 c16
+    cell 46 56 c37
+    cell 46 56 c37
+    cell 47 56 c16
+    cell 47 56 c69
+    cell 43 57 c69
+    cell 43 57 c16
+    cell 44 57 c37
+    cell 44 57 c37
+    cell 44 57 c16
+    cell 44 57 c37
+    cell 45 57 c17
+    cell 45 57 c37
+    cell 46 57 c37
+    cell 46 57 c37
+    cell 46 57 c37
+    cell 46 57 c16
+    cell 47 57 c69
+    cell 47 57 c16
+    cell 43 58 c16
+    cell 43 58 c70
+    cell 44 58 c16
+    cell 44 58 c37
+    cell 44 58 c16
+    cell 44 58 c37
+    cell 45 58 c37
+    cell 45 58 c37
+    cell 46 58 c37
+    cell 46 58 c16
+    cell 46 58 c37
+    cell 46 58 c16
+    cell 47 58 c16
+    cell 47 58 c70
+    cell 43 59 c70
+    cell 43 59 c70
+    cell 44 59 c16
+    cell 44 59 c37
+    cell 44 59 c16
+    cell 44 59 c34
+    cell 45 59 c71
+    cell 46 59 c37
+    cell 46 59 c16
+    cell 46 59 c34
+    cell 46 59 c16
+    cell 47 59 c70
+    cell 47 59 c70
+    cell 43 60 c70
+    cell 43 60 c70
+    cell 44 60 c16
+    cell 46 60 c16
+    cell 47 60 c70
+    cell 47 60 c70
+    cell 43 61 c70
+    cell 44 61 c16
+    cell 46 61 c16
+    cell 47 61 c70
+    cell 43 62 c70
+    cell 43 62 c70
+    cell 44 62 c16
+    cell 44 62 c34
+    cell 44 62 c16
+    cell 44 62 c37
+    cell 45 62 c71
+    cell 46 62 c34
+    cell 46 62 c16
+    cell 46 62 c37
+    cell 46 62 c16
+    cell 47 62 c70
+    cell 47 62 c70
+    cell 43 63 c70
+    cell 43 63 c70
+    cell 44 63 c16
+    cell 44 63 c37
+    cell 44 63 c16
+    cell 44 63 c37
+    cell 45 63 c37
+    cell 45 63 c37
+    cell 46 63 c37
+    cell 46 63 c16
+    cell 46 63 c37
+    cell 46 63 c16
+    cell 47 63 c70
+    cell 47 63 c70
+    cell 43 64 c70
+    cell 43 64 c70
+    cell 44 64 c16
+    cell 44 64 c37
+    cell 44 64 c16
+    cell 44 64 c37
+    cell 45 64 c37
+    cell 45 64 c37
+    cell 46 64 c37
+    cell 46 64 c16
+    cell 46 64 c37
+    cell 46 64 c16
+    cell 47 64 c70
+    cell 47 64 c70
+    cell 43 65 c70
+    cell 43 65 c70
+    cell 44 65 c16
+    cell 44 65 c37
+    cell 44 65 c16
+    cell 44 65 c37
+    cell 45 65 c37
+    cell 45 65 c37
+    cell 46 65 c37
+    cell 46 65 c16
+    cell 46 65 c37
+    cell 46 65 c16
+    cell 47 65 c70
+    cell 47 65 c70
+    cell 43 66 c70
+    cell 44 66 c72
+    cell 44 66 c70
+    cell 45 66 c73
+    cell 46 66 c70
+    cell 46 66 c72
+    cell 47 66 c70
+  }
+
+  part grip_shadow material darksteel {
+    cell 47 43 c67
+    cell 47 44 c68
+    cell 47 44 c68
+    cell 47 45 c68
+    cell 47 45 c67
+    cell 47 46 c67
+    cell 47 46 c67
+    cell 47 47 c67
+    cell 47 47 c67
+    cell 47 48 c68
+    cell 47 48 c68
+    cell 47 49 c68
+    cell 47 49 c67
+    cell 47 50 c67
+    cell 47 50 c67
+    cell 47 51 c67
+    cell 47 52 c67
+    cell 47 52 c68
+    cell 47 53 c68
+    cell 47 53 c68
+    cell 47 54 c67
+    cell 47 54 c67
+    cell 47 55 c24
+  }
+
+  part grip_highlight material darksteel {
+    cell 43 43 c67
+    cell 43 44 c67
+    cell 43 44 c67
+    cell 43 45 c67
+    cell 43 45 c67
+    cell 43 46 c68
+    cell 43 46 c68
+    cell 43 47 c68
+    cell 43 47 c67
+    cell 43 48 c67
+    cell 43 48 c67
+    cell 43 49 c67
+    cell 43 49 c67
+    cell 43 50 c68
+    cell 43 50 c68
+    cell 43 51 c68
+    cell 43 52 c67
+    cell 43 52 c67
+    cell 43 53 c67
+    cell 43 53 c67
+    cell 43 54 c67
+    cell 43 54 c67
+    cell 43 55 c24
+  }
+
+  part grip_trim material silver {
+    cell 43 55 c42
+    cell 43 55 c78
+    cell 44 55 c52
+    cell 44 55 c49
+    cell 45 55 c49
+    cell 46 55 c49
+    cell 46 55 c52
+    cell 47 55 c78
+    cell 47 55 c42
+    cell 45 59 c79
+    cell 44 60 c79
+    cell 44 60 c54
+    cell 44 60 c79
+    cell 45 60 c79
+    cell 45 60 c80
+    cell 46 60 c79
+    cell 46 60 c79
+    cell 46 60 c54
+    cell 44 61 c79
+    cell 45 61 c79
+    cell 46 61 c79
+    cell 45 62 c79
+    cell 43 66 c81
+    cell 43 66 c82
+    cell 44 66 c56
+    cell 44 66 c83
+    cell 45 66 c83
+    cell 46 66 c83
+    cell 46 66 c56
+    cell 47 66 c82
+    cell 47 66 c81
+  }
+
+  part pommel_glow material cyan_glow {
+    glow radius 2
+    cell 44 67 c28
+    cell 44 67 c28
+    cell 45 67 c28
+    cell 45 67 c76
+    cell 46 67 c28
+    cell 46 67 c28
+    cell 43 68 c28
+    cell 43 68 c28
+    cell 44 68 c76
+    cell 44 68 c76
+    cell 44 68 c76
+    cell 44 68 c76
+    cell 45 68 c76
+    cell 45 68 c76
+    cell 46 68 c76
+    cell 46 68 c76
+    cell 46 68 c76
+    cell 46 68 c76
+    cell 47 68 c28
+    cell 47 68 c28
+    cell 43 69 c28
+    cell 43 69 c76
+    cell 43 69 c28
+    cell 44 69 c76
+    cell 44 69 c76
+    cell 44 69 c76
+    cell 44 69 c76
+    cell 45 69 c76
+    cell 45 69 c76
+    cell 46 69 c76
+    cell 46 69 c76
+    cell 46 69 c76
+    cell 46 69 c76
+    cell 47 69 c76
+    cell 47 69 c28
+    cell 47 69 c28
+    cell 43 70 c28
+    cell 44 70 c76
+    cell 44 70 c76
+    cell 44 70 c28
+    cell 44 70 c28
+    cell 45 70 c76
+    cell 45 70 c76
+    cell 46 70 c76
+    cell 46 70 c76
+    cell 46 70 c28
+    cell 46 70 c28
+    cell 47 70 c28
+    cell 45 71 c28
+  }
+
+}
+
+frame 7 "fallL" {
+  part ether_flow after cradle material cyan_glow {
+    glow radius 2
+    cell 44 34 ether_pulse
+    cell 45 34 ether_core
+    cell 46 34 ether_pulse
+    cell 44 43 ether_pulse
+    cell 45 43 ether_core
+    cell 46 43 ether_pulse
+    cell 45 42 ether_trail
+  }
+
+  part shaft material darksteel {
+    cell 46 27 c16
+    cell 44 28 c16
+    cell 44 28 c16
+    cell 46 28 c16
+    cell 44 29 c16
+    cell 44 29 c16
+    cell 46 29 c16
+    cell 44 30 c16
+    cell 46 30 c16
+    cell 44 31 c16
+    cell 45 31 c17
+    cell 46 31 c16
+    cell 46 31 c16
+    cell 44 32 c16
+    cell 44 32 c16
+    cell 45 32 c18
+    cell 45 32 c19
+    cell 46 32 c16
+    cell 44 33 c16
+    cell 45 33 c19
+    cell 44 34 c16
+    cell 44 34 c16
+    cell 45 34 c18
+    cell 45 34 c17
+    cell 46 34 c16
+    cell 46 34 c16
+    cell 45 35 c17
+    cell 45 35 c17
+    cell 46 35 c16
+    cell 46 35 c16
+    cell 44 36 c16
+    cell 44 36 c16
+    cell 45 36 c18
+    cell 45 36 c18
+    cell 46 36 c16
+    cell 46 36 c16
+    cell 44 37 c16
+    cell 45 37 c20
+    cell 45 38 c20
+    cell 45 42 c19
+    cell 45 43 c21
+    cell 46 43 c16
+    cell 44 44 c16
+    cell 45 44 c19
+    cell 45 44 c18
+    cell 46 44 c16
+    cell 46 44 c16
+    cell 44 45 c16
+    cell 44 45 c18
+    cell 45 45 c17
+    cell 45 45 c20
+    cell 46 45 c16
+    cell 44 46 c18
+    cell 44 46 c18
+    cell 45 46 c20
+    cell 45 46 c17
+    cell 46 46 c17
+    cell 44 47 c20
+    cell 45 47 c17
+    cell 45 47 c20
+    cell 46 47 c18
+    cell 46 47 c18
+    cell 44 48 c17
+    cell 45 48 c20
+    cell 45 48 c17
+    cell 46 48 c18
+    cell 46 48 c18
+    cell 44 49 c18
+    cell 44 49 c18
+    cell 45 49 c17
+    cell 45 49 c20
+    cell 46 49 c20
+    cell 44 50 c18
+    cell 44 50 c18
+    cell 45 50 c20
+    cell 45 50 c17
+    cell 46 50 c17
+    cell 44 51 c20
+    cell 45 51 c17
+    cell 45 51 c20
+    cell 46 51 c18
+    cell 46 51 c18
+    cell 45 52 c22
+    cell 46 52 c18
+    cell 45 53 c22
+    cell 45 53 c23
+    cell 46 53 c18
+    cell 46 53 c20
+    cell 45 54 c24
+    cell 45 54 c24
+    cell 45 55 c23
+    cell 45 55 c20
+    cell 46 55 c17
+    cell 46 55 c17
+  }
+
+  part shaft_shadow material darksteel {
+    cell 46 29 c32
+    cell 46 30 c03
+    cell 46 30 c03
+    cell 46 31 c03
+    cell 46 31 c03
+    cell 46 32 c32
+    cell 46 33 c16
+    cell 46 34 c04
+    cell 46 34 c03
+    cell 46 35 c03
+    cell 46 35 c03
+    cell 46 36 c03
+    cell 46 36 c32
+    cell 46 43 c03
+    cell 46 44 c03
+    cell 46 44 c33
+    cell 46 45 c34
+    cell 46 46 c35
+    cell 46 46 c36
+    cell 46 47 c37
+    cell 46 47 c37
+    cell 46 48 c37
+    cell 46 48 c37
+    cell 46 49 c34
+    cell 46 50 c35
+    cell 46 50 c36
+    cell 46 51 c37
+    cell 46 51 c37
+    cell 46 52 c37
+    cell 46 53 c37
+    cell 46 53 c34
+    cell 46 54 c35
+    cell 46 55 c36
+    cell 46 55 c37
+  }
+
+  part shaft_highlight material darksteel {
+    cell 44 44 c16
+    cell 44 44 c66
+    cell 44 45 c37
+    cell 44 45 c37
+    cell 44 46 c37
+    cell 44 46 c37
+    cell 44 47 c34
+    cell 44 48 c35
+    cell 44 48 c36
+    cell 44 49 c37
+    cell 44 49 c37
+    cell 44 50 c37
+    cell 44 50 c37
+    cell 44 51 c34
+    cell 44 52 c03
+    cell 44 53 c35
+    cell 44 53 c35
+    cell 44 54 c35
+    cell 44 54 c35
+    cell 44 55 c35
+    cell 44 55 c34
+  }
+
+  part shaft_glint material cyan_glow {
+    glow radius 2
+    cell 44 53 c29
+    cell 44 53 c29
+    cell 44 54 c29
+    cell 44 54 c29
+    cell 44 55 c29
+    cell 44 55 c27
+  }
+
+  part shaft_lattice_glow material cyan_glow {
+    glow radius 2
+    cell 46 29 c27
+    cell 44 31 c28
+    cell 46 32 c29
+    cell 46 32 c30
+    cell 46 33 c29
+    cell 44 35 c29
+    cell 46 37 c29
+    cell 46 37 c31
+    cell 44 43 c30
+    cell 44 43 c28
+    cell 44 44 c29
+    cell 46 45 c29
+    cell 46 45 c29
+    cell 46 46 c29
+    cell 44 47 c29
+    cell 44 47 c29
+    cell 44 48 c29
+    cell 46 49 c29
+    cell 46 49 c29
+    cell 46 50 c29
+    cell 44 51 c29
+    cell 44 51 c29
+    cell 44 52 c28
+    cell 46 54 c29
+    cell 46 54 c29
+    cell 46 54 c29
+  }
+
+  part ribbon material void_ice {
+    cell 44 24 c00
+    cell 44 24 c01
+    cell 45 24 c01
+    cell 46 24 c01
+    cell 46 24 c00
+    cell 44 25 c02
+    cell 44 25 c03
+    cell 44 25 c04
+    cell 45 25 c01
+    cell 45 25 c00
+    cell 46 25 c03
+    cell 46 25 c03
+    cell 46 25 c03
+    cell 46 25 c02
+    cell 43 26 c06
+    cell 44 26 c07
+    cell 44 26 c04
+    cell 45 26 c01
+    cell 45 26 c01
+    cell 46 26 c05
+    cell 46 26 c05
+    cell 43 27 c06
+    cell 44 27 c04
+    cell 44 27 c02
+    cell 44 27 c08
+    cell 44 27 c02
+    cell 45 27 c01
+    cell 45 27 c00
+    cell 46 27 c08
+    cell 46 27 c08
+    cell 44 28 c08
+    cell 44 28 c08
+    cell 45 28 c00
+    cell 45 28 c09
+    cell 46 28 c08
+    cell 46 28 c10
+    cell 44 29 c08
+    cell 44 29 c08
+    cell 45 29 c09
+    cell 45 29 c09
+    cell 46 29 c08
+    cell 44 30 c08
+    cell 44 30 c05
+    cell 45 30 c00
+    cell 45 30 c09
+    cell 44 31 c05
+    cell 44 31 c05
+    cell 45 31 c09
+    cell 44 32 c08
+    cell 44 32 c08
+    cell 44 33 c08
+    cell 44 34 c08
+    cell 44 34 c05
+    cell 44 35 c11
+    cell 44 35 c06
+    cell 44 36 c05
+    cell 44 36 c08
+    cell 44 37 c08
+  }
+
+  part ribbon_highlight material void_ice {
+    cell 46 28 c12
+    cell 44 30 c25
+    cell 43 35 c26
+  }
+
+  part ribbon_shadow material void_ice {
+    cell 44 26 c12
+    cell 46 26 c13
+    cell 47 28 c14
+    cell 46 30 c15
+    cell 44 35 c12
+  }
+
+  part core_mount material silver {
+    cell 43 37 c38
+    cell 44 37 c39
+    cell 46 37 c40
+    cell 46 37 c41
+    cell 47 37 c42
+    cell 42 38 c44
+    cell 43 38 c45
+    cell 44 38 c43
+    cell 46 38 c43
+    cell 46 38 c39
+    cell 46 38 c45
+    cell 47 38 c43
+    cell 47 38 c44
+    cell 47 38 c43
+    cell 47 38 c39
+    cell 48 38 c44
+    cell 42 39 c38
+    cell 43 39 c45
+    cell 47 39 c46
+    cell 47 39 c45
+    cell 48 39 c47
+    cell 42 40 c47
+    cell 43 40 c47
+    cell 42 41 c44
+    cell 42 41 c44
+    cell 43 41 c39
+    cell 43 41 c45
+    cell 43 41 c39
+    cell 43 41 c43
+    cell 44 41 c45
+    cell 43 42 c44
+    cell 43 42 c43
+    cell 43 42 c42
+    cell 44 42 c43
+    cell 44 42 c41
+  }
+
+  part core_mount_shadow material silver {
+    cell 45 37 c49
+    cell 44 38 c50
+    cell 44 38 c51
+    cell 43 39 c52
+    cell 43 39 c53
+    cell 47 39 c54
+    cell 48 39 c54
+    cell 42 40 c55
+    cell 48 40 c56
+    cell 48 40 c56
+    cell 47 41 c52
+    cell 47 41 c52
+    cell 47 41 c52
+    cell 48 41 c56
+    cell 48 41 c57
+    cell 44 42 c50
+    cell 44 42 c58
+    cell 45 42 c49
+    cell 46 42 c52
+    cell 46 42 c51
+    cell 46 42 c59
+    cell 47 42 c52
+    cell 47 42 c57
+    cell 47 42 c57
+  }
+
+  part core_mount_highlight material silver {
+    cell 44 37 c48
+    cell 43 38 c44
+    cell 43 38 c39
+    cell 43 38 c43
+    cell 42 39 c47
+    cell 47 40 c42
+    cell 46 41 c46
+    cell 47 41 c40
+    cell 46 42 c45
+  }
+
+  part core_gem material void_ice {
+    cell 44 38 c09
+    cell 45 38 c09
+    cell 46 38 c09
+    cell 43 39 c60
+    cell 44 39 c03
+    cell 44 39 c09
+    cell 44 39 c03
+    cell 45 39 c09
+    cell 46 39 c09
+    cell 46 39 c03
+    cell 46 39 c61
+    cell 46 39 c03
+    cell 47 39 c62
+    cell 43 40 c63
+    cell 43 40 c64
+    cell 44 40 c02
+    cell 44 40 c02
+    cell 44 40 c61
+    cell 45 40 c09
+    cell 45 40 c09
+    cell 46 40 c61
+    cell 44 41 c02
+    cell 44 41 c09
+    cell 44 41 c09
+  }
+
+  part core_gem_shadow material void_ice {
+    cell 46 40 c35
+    cell 46 40 c61
+    cell 46 40 c03
+    cell 47 40 c16
+    cell 47 40 c65
+    cell 45 41 c09
+    cell 45 41 c09
+    cell 46 41 c09
+    cell 46 41 c03
+    cell 46 41 c09
+  }
+
+  part core_gem_highlight material void_ice {
+    cell 44 39 c61
+    cell 45 39 c09
+    cell 44 40 c61
+  }
+
+  part bezel_void_glow material cyan_glow {
+    glow radius 2
+    cell 42 56 c27
+    cell 48 56 c27
+    cell 39 57 c28
+    cell 39 57 c28
+    cell 40 57 c28
+    cell 40 57 c28
+    cell 40 57 c76
+    cell 40 57 c76
+    cell 41 57 c28
+    cell 41 57 c28
+    cell 41 57 c76
+    cell 42 57 c28
+    cell 42 57 c74
+    cell 42 57 c76
+    cell 42 57 c76
+    cell 43 57 c75
+    cell 43 57 c77
+    cell 47 57 c75
+    cell 47 57 c77
+    cell 48 57 c74
+    cell 48 57 c28
+    cell 48 57 c76
+    cell 48 57 c76
+    cell 49 57 c28
+    cell 49 57 c76
+    cell 49 57 c28
+    cell 50 57 c28
+    cell 50 57 c76
+    cell 50 57 c28
+    cell 39 58 c28
+    cell 40 58 c76
+    cell 40 58 c76
+    cell 40 58 c28
+    cell 40 58 c28
+    cell 41 58 c28
+    cell 41 58 c76
+    cell 41 58 c28
+    cell 42 58 c76
+    cell 42 58 c76
+    cell 42 58 c28
+    cell 42 58 c76
+    cell 43 58 c77
+    cell 43 58 c77
+    cell 47 58 c77
+    cell 47 58 c77
+    cell 48 58 c76
+    cell 48 58 c76
+    cell 48 58 c76
+    cell 48 58 c28
+    cell 49 58 c76
+    cell 49 58 c28
+    cell 49 58 c28
+    cell 50 58 c28
+    cell 50 58 c28
+    cell 42 59 c28
+    cell 43 59 c27
+    cell 47 59 c27
+    cell 48 59 c28
+  }
+
+  part grip material darksteel {
+    cell 44 56 c16
+    cell 44 56 c34
+    cell 45 56 c35
+    cell 46 56 c36
+    cell 46 56 c16
+    cell 43 57 c16
+    cell 43 57 c69
+    cell 44 57 c16
+    cell 44 57 c36
+    cell 44 57 c37
+    cell 44 57 c37
+    cell 45 57 c34
+    cell 45 57 c17
+    cell 46 57 c36
+    cell 46 57 c16
+    cell 46 57 c37
+    cell 46 57 c37
+    cell 47 57 c16
+    cell 47 57 c69
+    cell 43 58 c69
+    cell 43 58 c16
+    cell 44 58 c37
+    cell 44 58 c37
+    cell 44 58 c16
+    cell 44 58 c37
+    cell 45 58 c17
+    cell 45 58 c37
+    cell 46 58 c37
+    cell 46 58 c37
+    cell 46 58 c37
+    cell 46 58 c16
+    cell 47 58 c69
+    cell 47 58 c16
+    cell 43 59 c16
+    cell 43 59 c70
+    cell 44 59 c16
+    cell 44 59 c37
+    cell 44 59 c16
+    cell 44 59 c37
+    cell 45 59 c37
+    cell 45 59 c37
+    cell 46 59 c37
+    cell 46 59 c16
+    cell 46 59 c37
+    cell 46 59 c16
+    cell 47 59 c16
+    cell 47 59 c70
+    cell 43 60 c70
+    cell 43 60 c70
+    cell 44 60 c16
+    cell 44 60 c37
+    cell 44 60 c16
+    cell 44 60 c34
+    cell 45 60 c71
+    cell 46 60 c37
+    cell 46 60 c16
+    cell 46 60 c34
+    cell 46 60 c16
+    cell 47 60 c70
+    cell 47 60 c70
+    cell 43 61 c70
+    cell 43 61 c70
+    cell 44 61 c16
+    cell 46 61 c16
+    cell 47 61 c70
+    cell 47 61 c70
+    cell 43 62 c70
+    cell 44 62 c16
+    cell 46 62 c16
+    cell 47 62 c70
+    cell 43 63 c70
+    cell 43 63 c70
+    cell 44 63 c16
+    cell 44 63 c34
+    cell 44 63 c16
+    cell 44 63 c37
+    cell 45 63 c71
+    cell 46 63 c34
+    cell 46 63 c16
+    cell 46 63 c37
+    cell 46 63 c16
+    cell 47 63 c70
+    cell 47 63 c70
+    cell 43 64 c70
+    cell 43 64 c70
+    cell 44 64 c16
+    cell 44 64 c37
+    cell 44 64 c16
+    cell 44 64 c37
+    cell 45 64 c37
+    cell 45 64 c37
+    cell 46 64 c37
+    cell 46 64 c16
+    cell 46 64 c37
+    cell 46 64 c16
+    cell 47 64 c70
+    cell 47 64 c70
+    cell 43 65 c70
+    cell 43 65 c70
+    cell 44 65 c16
+    cell 44 65 c37
+    cell 44 65 c16
+    cell 44 65 c37
+    cell 45 65 c37
+    cell 45 65 c37
+    cell 46 65 c37
+    cell 46 65 c16
+    cell 46 65 c37
+    cell 46 65 c16
+    cell 47 65 c70
+    cell 47 65 c70
+    cell 43 66 c70
+    cell 43 66 c70
+    cell 44 66 c16
+    cell 44 66 c37
+    cell 44 66 c16
+    cell 44 66 c37
+    cell 45 66 c37
+    cell 45 66 c37
+    cell 46 66 c37
+    cell 46 66 c16
+    cell 46 66 c37
+    cell 46 66 c16
+    cell 47 66 c70
+    cell 47 66 c70
+    cell 43 67 c70
+    cell 44 67 c72
+    cell 44 67 c70
+    cell 45 67 c73
+    cell 46 67 c70
+    cell 46 67 c72
+    cell 47 67 c70
+  }
+
+  part grip_shadow material darksteel {
+    cell 47 44 c67
+    cell 47 45 c68
+    cell 47 45 c68
+    cell 47 46 c68
+    cell 47 46 c67
+    cell 47 47 c67
+    cell 47 47 c67
+    cell 47 48 c67
+    cell 47 48 c67
+    cell 47 49 c68
+    cell 47 49 c68
+    cell 47 50 c68
+    cell 47 50 c67
+    cell 47 51 c67
+    cell 47 51 c67
+    cell 47 52 c67
+    cell 47 53 c67
+    cell 47 53 c68
+    cell 47 54 c68
+    cell 47 54 c68
+    cell 47 55 c67
+    cell 47 55 c67
+    cell 47 56 c24
+  }
+
+  part grip_highlight material darksteel {
+    cell 43 44 c67
+    cell 43 45 c67
+    cell 43 45 c67
+    cell 43 46 c67
+    cell 43 46 c67
+    cell 43 47 c68
+    cell 43 47 c68
+    cell 43 48 c68
+    cell 43 48 c67
+    cell 43 49 c67
+    cell 43 49 c67
+    cell 43 50 c67
+    cell 43 50 c67
+    cell 43 51 c68
+    cell 43 51 c68
+    cell 43 52 c68
+    cell 43 53 c67
+    cell 43 53 c67
+    cell 43 54 c67
+    cell 43 54 c67
+    cell 43 55 c67
+    cell 43 55 c67
+    cell 43 56 c24
+  }
+
+  part grip_trim material silver {
+    cell 43 56 c42
+    cell 43 56 c78
+    cell 44 56 c52
+    cell 44 56 c49
+    cell 45 56 c49
+    cell 46 56 c49
+    cell 46 56 c52
+    cell 47 56 c78
+    cell 47 56 c42
+    cell 45 60 c79
+    cell 44 61 c79
+    cell 44 61 c54
+    cell 44 61 c79
+    cell 45 61 c79
+    cell 45 61 c80
+    cell 46 61 c79
+    cell 46 61 c79
+    cell 46 61 c54
+    cell 44 62 c79
+    cell 45 62 c79
+    cell 46 62 c79
+    cell 45 63 c79
+    cell 43 67 c81
+    cell 43 67 c82
+    cell 44 67 c56
+    cell 44 67 c83
+    cell 45 67 c83
+    cell 46 67 c83
+    cell 46 67 c56
+    cell 47 67 c82
+    cell 47 67 c81
+  }
+
+  part pommel_glow material cyan_glow {
+    glow radius 2
+    cell 44 68 c28
+    cell 44 68 c28
+    cell 45 68 c28
+    cell 45 68 c76
+    cell 46 68 c28
+    cell 46 68 c28
+    cell 43 69 c28
+    cell 43 69 c28
+    cell 44 69 c76
+    cell 44 69 c76
+    cell 44 69 c76
+    cell 44 69 c76
+    cell 45 69 c76
+    cell 45 69 c76
+    cell 46 69 c76
+    cell 46 69 c76
+    cell 46 69 c76
+    cell 46 69 c76
+    cell 47 69 c28
+    cell 47 69 c28
+    cell 43 70 c28
+    cell 43 70 c76
+    cell 43 70 c28
+    cell 44 70 c76
+    cell 44 70 c76
+    cell 44 70 c76
+    cell 44 70 c76
+    cell 45 70 c76
+    cell 45 70 c76
+    cell 46 70 c76
+    cell 46 70 c76
+    cell 46 70 c76
+    cell 46 70 c76
+    cell 47 70 c76
+    cell 47 70 c28
+    cell 47 70 c28
+    cell 43 71 c28
+    cell 44 71 c76
+    cell 44 71 c76
+    cell 44 71 c28
+    cell 44 71 c28
+    cell 45 71 c76
+    cell 45 71 c76
+    cell 46 71 c76
+    cell 46 71 c76
+    cell 46 71 c28
+    cell 46 71 c28
+    cell 47 71 c28
+    cell 45 72 c28
+  }
+
+}
+
+frame 8 "contactR" {
+  part ether_flow after cradle material cyan_glow {
+    glow radius 2
+    cell 44 34 ether_pulse
+    cell 45 34 ether_core
+    cell 46 34 ether_pulse
+    cell 44 43 ether_pulse
+    cell 45 43 ether_core
+    cell 46 43 ether_pulse
+    cell 45 42 ether_trail
+    cell 44 53 ether_pulse
+    cell 45 53 ether_core
+    cell 46 53 ether_pulse
+    cell 45 52 ether_trail
+  }
+
+  part shaft material darksteel {
+    cell 46 26 c16
+    cell 44 27 c16
+    cell 44 27 c16
+    cell 46 27 c16
+    cell 44 28 c16
+    cell 44 28 c16
+    cell 46 28 c16
+    cell 44 29 c16
+    cell 46 29 c16
+    cell 44 30 c16
+    cell 45 30 c17
+    cell 46 30 c16
+    cell 46 30 c16
+    cell 44 31 c16
+    cell 44 31 c16
+    cell 45 31 c18
+    cell 45 31 c19
+    cell 46 31 c16
+    cell 44 32 c16
+    cell 45 32 c19
+    cell 44 33 c16
+    cell 44 33 c16
+    cell 45 33 c18
+    cell 45 33 c17
+    cell 46 33 c16
+    cell 46 33 c16
+    cell 45 34 c17
+    cell 45 34 c17
+    cell 46 34 c16
+    cell 46 34 c16
+    cell 44 35 c16
+    cell 44 35 c16
+    cell 45 35 c18
+    cell 45 35 c18
+    cell 46 35 c16
+    cell 46 35 c16
+    cell 44 36 c16
+    cell 45 36 c20
+    cell 45 37 c20
+    cell 45 41 c19
+    cell 45 42 c21
+    cell 46 42 c16
+    cell 44 43 c16
+    cell 45 43 c19
+    cell 45 43 c18
+    cell 46 43 c16
+    cell 46 43 c16
+    cell 44 44 c16
+    cell 44 44 c18
+    cell 45 44 c17
+    cell 45 44 c20
+    cell 46 44 c16
+    cell 44 45 c18
+    cell 44 45 c18
+    cell 45 45 c20
+    cell 45 45 c17
+    cell 46 45 c17
+    cell 44 46 c20
+    cell 45 46 c17
+    cell 45 46 c20
+    cell 46 46 c18
+    cell 46 46 c18
+    cell 44 47 c17
+    cell 45 47 c20
+    cell 45 47 c17
+    cell 46 47 c18
+    cell 46 47 c18
+    cell 44 48 c18
+    cell 44 48 c18
+    cell 45 48 c17
+    cell 45 48 c20
+    cell 46 48 c20
+    cell 44 49 c18
+    cell 44 49 c18
+    cell 45 49 c20
+    cell 45 49 c17
+    cell 46 49 c17
+    cell 44 50 c20
+    cell 45 50 c17
+    cell 45 50 c20
+    cell 46 50 c18
+    cell 46 50 c18
+    cell 45 51 c22
+    cell 46 51 c18
+    cell 45 52 c22
+    cell 45 52 c23
+    cell 46 52 c18
+    cell 46 52 c20
+    cell 45 53 c24
+    cell 45 53 c24
+    cell 45 54 c23
+    cell 45 54 c20
+    cell 46 54 c17
+    cell 46 54 c17
+  }
+
+  part shaft_shadow material darksteel {
+    cell 46 28 c32
+    cell 46 29 c03
+    cell 46 29 c03
+    cell 46 30 c03
+    cell 46 30 c03
+    cell 46 31 c32
+    cell 46 32 c16
+    cell 46 33 c04
+    cell 46 33 c03
+    cell 46 34 c03
+    cell 46 34 c03
+    cell 46 35 c03
+    cell 46 35 c32
+    cell 46 42 c03
+    cell 46 43 c03
+    cell 46 43 c33
+    cell 46 44 c34
+    cell 46 45 c35
+    cell 46 45 c36
+    cell 46 46 c37
+    cell 46 46 c37
+    cell 46 47 c37
+    cell 46 47 c37
+    cell 46 48 c34
+    cell 46 49 c35
+    cell 46 49 c36
+    cell 46 50 c37
+    cell 46 50 c37
+    cell 46 51 c37
+    cell 46 52 c37
+    cell 46 52 c34
+    cell 46 53 c35
+    cell 46 54 c36
+    cell 46 54 c37
+  }
+
+  part shaft_highlight material darksteel {
+    cell 44 43 c16
+    cell 44 43 c66
+    cell 44 44 c37
+    cell 44 44 c37
+    cell 44 45 c37
+    cell 44 45 c37
+    cell 44 46 c34
+    cell 44 47 c35
+    cell 44 47 c36
+    cell 44 48 c37
+    cell 44 48 c37
+    cell 44 49 c37
+    cell 44 49 c37
+    cell 44 50 c34
+    cell 44 51 c03
+    cell 44 52 c35
+    cell 44 52 c35
+    cell 44 53 c35
+    cell 44 53 c35
+    cell 44 54 c35
+    cell 44 54 c34
+  }
+
+  part shaft_glint material cyan_glow {
+    glow radius 2
+    cell 44 52 c29
+    cell 44 52 c29
+    cell 44 53 c29
+    cell 44 53 c29
+    cell 44 54 c29
+    cell 44 54 c27
+  }
+
+  part shaft_lattice_glow material cyan_glow {
+    glow radius 2
+    cell 46 28 c27
+    cell 44 30 c28
+    cell 46 31 c29
+    cell 46 31 c30
+    cell 46 32 c29
+    cell 44 34 c29
+    cell 46 36 c29
+    cell 46 36 c31
+    cell 44 42 c30
+    cell 44 42 c28
+    cell 44 43 c29
+    cell 46 44 c29
+    cell 46 44 c29
+    cell 46 45 c29
+    cell 44 46 c29
+    cell 44 46 c29
+    cell 44 47 c29
+    cell 46 48 c29
+    cell 46 48 c29
+    cell 46 49 c29
+    cell 44 50 c29
+    cell 44 50 c29
+    cell 44 51 c28
+    cell 46 53 c29
+    cell 46 53 c29
+    cell 46 53 c29
+  }
+
+  part ribbon material void_ice {
+    cell 44 23 c00
+    cell 44 23 c01
+    cell 45 23 c01
+    cell 46 23 c01
+    cell 46 23 c00
+    cell 44 24 c02
+    cell 44 24 c03
+    cell 44 24 c04
+    cell 45 24 c01
+    cell 45 24 c00
+    cell 46 24 c03
+    cell 46 24 c03
+    cell 46 24 c03
+    cell 46 24 c02
+    cell 43 25 c06
+    cell 44 25 c07
+    cell 44 25 c04
+    cell 45 25 c01
+    cell 45 25 c01
+    cell 46 25 c05
+    cell 46 25 c05
+    cell 43 26 c06
+    cell 44 26 c04
+    cell 44 26 c02
+    cell 44 26 c08
+    cell 44 26 c02
+    cell 45 26 c01
+    cell 45 26 c00
+    cell 46 26 c08
+    cell 46 26 c08
+    cell 44 27 c08
+    cell 44 27 c08
+    cell 45 27 c00
+    cell 45 27 c09
+    cell 46 27 c08
+    cell 46 27 c10
+    cell 44 28 c08
+    cell 44 28 c08
+    cell 45 28 c09
+    cell 45 28 c09
+    cell 46 28 c08
+    cell 44 29 c08
+    cell 44 29 c05
+    cell 45 29 c00
+    cell 45 29 c09
+    cell 44 30 c05
+    cell 44 30 c05
+    cell 45 30 c09
+    cell 44 31 c08
+    cell 44 31 c08
+    cell 44 32 c08
+    cell 44 33 c08
+    cell 44 33 c05
+    cell 44 34 c11
+    cell 44 34 c06
+    cell 44 35 c05
+    cell 44 35 c08
+    cell 44 36 c08
+  }
+
+  part ribbon_highlight material void_ice {
+    cell 46 27 c12
+    cell 44 29 c25
+    cell 43 34 c26
+  }
+
+  part ribbon_shadow material void_ice {
+    cell 44 25 c12
+    cell 46 25 c13
+    cell 47 27 c14
+    cell 46 29 c15
+    cell 44 34 c12
+  }
+
+  part core_mount material silver {
+    cell 43 36 c38
+    cell 44 36 c39
+    cell 46 36 c40
+    cell 46 36 c41
+    cell 47 36 c42
+    cell 42 37 c44
+    cell 43 37 c45
+    cell 44 37 c43
+    cell 46 37 c43
+    cell 46 37 c39
+    cell 46 37 c45
+    cell 47 37 c43
+    cell 47 37 c44
+    cell 47 37 c43
+    cell 47 37 c39
+    cell 48 37 c44
+    cell 42 38 c38
+    cell 43 38 c45
+    cell 47 38 c46
+    cell 47 38 c45
+    cell 48 38 c47
+    cell 42 39 c47
+    cell 43 39 c47
+    cell 42 40 c44
+    cell 42 40 c44
+    cell 43 40 c39
+    cell 43 40 c45
+    cell 43 40 c39
+    cell 43 40 c43
+    cell 44 40 c45
+    cell 43 41 c44
+    cell 43 41 c43
+    cell 43 41 c42
+    cell 44 41 c43
+    cell 44 41 c41
+  }
+
+  part core_mount_shadow material silver {
+    cell 45 36 c49
+    cell 44 37 c50
+    cell 44 37 c51
+    cell 43 38 c52
+    cell 43 38 c53
+    cell 47 38 c54
+    cell 48 38 c54
+    cell 42 39 c55
+    cell 48 39 c56
+    cell 48 39 c56
+    cell 47 40 c52
+    cell 47 40 c52
+    cell 47 40 c52
+    cell 48 40 c56
+    cell 48 40 c57
+    cell 44 41 c50
+    cell 44 41 c58
+    cell 45 41 c49
+    cell 46 41 c52
+    cell 46 41 c51
+    cell 46 41 c59
+    cell 47 41 c52
+    cell 47 41 c57
+    cell 47 41 c57
+  }
+
+  part core_mount_highlight material silver {
+    cell 44 36 c48
+    cell 43 37 c44
+    cell 43 37 c39
+    cell 43 37 c43
+    cell 42 38 c47
+    cell 47 39 c42
+    cell 46 40 c46
+    cell 47 40 c40
+    cell 46 41 c45
+  }
+
+  part core_gem material void_ice {
+    cell 44 37 c09
+    cell 45 37 c09
+    cell 46 37 c09
+    cell 43 38 c60
+    cell 44 38 c03
+    cell 44 38 c09
+    cell 44 38 c03
+    cell 45 38 c09
+    cell 46 38 c09
+    cell 46 38 c03
+    cell 46 38 c61
+    cell 46 38 c03
+    cell 47 38 c62
+    cell 43 39 c63
+    cell 43 39 c64
+    cell 44 39 c02
+    cell 44 39 c02
+    cell 44 39 c61
+    cell 45 39 c09
+    cell 45 39 c09
+    cell 46 39 c61
+    cell 44 40 c02
+    cell 44 40 c09
+    cell 44 40 c09
+  }
+
+  part core_gem_shadow material void_ice {
+    cell 46 39 c35
+    cell 46 39 c61
+    cell 46 39 c03
+    cell 47 39 c16
+    cell 47 39 c65
+    cell 45 40 c09
+    cell 45 40 c09
+    cell 46 40 c09
+    cell 46 40 c03
+    cell 46 40 c09
+  }
+
+  part core_gem_highlight material void_ice {
+    cell 44 38 c61
+    cell 45 38 c09
+    cell 44 39 c61
+  }
+
+  part bezel_void_glow material cyan_glow {
+    glow radius 2
+    cell 42 55 c27
+    cell 48 55 c27
+    cell 39 56 c28
+    cell 39 56 c28
+    cell 40 56 c28
+    cell 40 56 c28
+    cell 40 56 c76
+    cell 40 56 c76
+    cell 41 56 c28
+    cell 41 56 c28
+    cell 41 56 c76
+    cell 42 56 c28
+    cell 42 56 c74
+    cell 42 56 c76
+    cell 42 56 c76
+    cell 43 56 c75
+    cell 43 56 c77
+    cell 47 56 c75
+    cell 47 56 c77
+    cell 48 56 c74
+    cell 48 56 c28
+    cell 48 56 c76
+    cell 48 56 c76
+    cell 49 56 c28
+    cell 49 56 c76
+    cell 49 56 c28
+    cell 50 56 c28
+    cell 50 56 c76
+    cell 50 56 c28
+    cell 39 57 c28
+    cell 40 57 c76
+    cell 40 57 c76
+    cell 40 57 c28
+    cell 40 57 c28
+    cell 41 57 c28
+    cell 41 57 c76
+    cell 41 57 c28
+    cell 42 57 c76
+    cell 42 57 c76
+    cell 42 57 c28
+    cell 42 57 c76
+    cell 43 57 c77
+    cell 43 57 c77
+    cell 47 57 c77
+    cell 47 57 c77
+    cell 48 57 c76
+    cell 48 57 c76
+    cell 48 57 c76
+    cell 48 57 c28
+    cell 49 57 c76
+    cell 49 57 c28
+    cell 49 57 c28
+    cell 50 57 c28
+    cell 50 57 c28
+    cell 42 58 c28
+    cell 43 58 c27
+    cell 47 58 c27
+    cell 48 58 c28
+  }
+
+  part grip material darksteel {
+    cell 44 55 c16
+    cell 44 55 c34
+    cell 45 55 c35
+    cell 46 55 c36
+    cell 46 55 c16
+    cell 43 56 c16
+    cell 43 56 c69
+    cell 44 56 c16
+    cell 44 56 c36
+    cell 44 56 c37
+    cell 44 56 c37
+    cell 45 56 c34
+    cell 45 56 c17
+    cell 46 56 c36
+    cell 46 56 c16
+    cell 46 56 c37
+    cell 46 56 c37
+    cell 47 56 c16
+    cell 47 56 c69
+    cell 43 57 c69
+    cell 43 57 c16
+    cell 44 57 c37
+    cell 44 57 c37
+    cell 44 57 c16
+    cell 44 57 c37
+    cell 45 57 c17
+    cell 45 57 c37
+    cell 46 57 c37
+    cell 46 57 c37
+    cell 46 57 c37
+    cell 46 57 c16
+    cell 47 57 c69
+    cell 47 57 c16
+    cell 43 58 c16
+    cell 43 58 c70
+    cell 44 58 c16
+    cell 44 58 c37
+    cell 44 58 c16
+    cell 44 58 c37
+    cell 45 58 c37
+    cell 45 58 c37
+    cell 46 58 c37
+    cell 46 58 c16
+    cell 46 58 c37
+    cell 46 58 c16
+    cell 47 58 c16
+    cell 47 58 c70
+    cell 43 59 c70
+    cell 43 59 c70
+    cell 44 59 c16
+    cell 44 59 c37
+    cell 44 59 c16
+    cell 44 59 c34
+    cell 45 59 c71
+    cell 46 59 c37
+    cell 46 59 c16
+    cell 46 59 c34
+    cell 46 59 c16
+    cell 47 59 c70
+    cell 47 59 c70
+    cell 43 60 c70
+    cell 43 60 c70
+    cell 44 60 c16
+    cell 46 60 c16
+    cell 47 60 c70
+    cell 47 60 c70
+    cell 43 61 c70
+    cell 44 61 c16
+    cell 46 61 c16
+    cell 47 61 c70
+    cell 43 62 c70
+    cell 43 62 c70
+    cell 44 62 c16
+    cell 44 62 c34
+    cell 44 62 c16
+    cell 44 62 c37
+    cell 45 62 c71
+    cell 46 62 c34
+    cell 46 62 c16
+    cell 46 62 c37
+    cell 46 62 c16
+    cell 47 62 c70
+    cell 47 62 c70
+    cell 43 63 c70
+    cell 43 63 c70
+    cell 44 63 c16
+    cell 44 63 c37
+    cell 44 63 c16
+    cell 44 63 c37
+    cell 45 63 c37
+    cell 45 63 c37
+    cell 46 63 c37
+    cell 46 63 c16
+    cell 46 63 c37
+    cell 46 63 c16
+    cell 47 63 c70
+    cell 47 63 c70
+    cell 43 64 c70
+    cell 43 64 c70
+    cell 44 64 c16
+    cell 44 64 c37
+    cell 44 64 c16
+    cell 44 64 c37
+    cell 45 64 c37
+    cell 45 64 c37
+    cell 46 64 c37
+    cell 46 64 c16
+    cell 46 64 c37
+    cell 46 64 c16
+    cell 47 64 c70
+    cell 47 64 c70
+    cell 43 65 c70
+    cell 43 65 c70
+    cell 44 65 c16
+    cell 44 65 c37
+    cell 44 65 c16
+    cell 44 65 c37
+    cell 45 65 c37
+    cell 45 65 c37
+    cell 46 65 c37
+    cell 46 65 c16
+    cell 46 65 c37
+    cell 46 65 c16
+    cell 47 65 c70
+    cell 47 65 c70
+    cell 43 66 c70
+    cell 44 66 c72
+    cell 44 66 c70
+    cell 45 66 c73
+    cell 46 66 c70
+    cell 46 66 c72
+    cell 47 66 c70
+  }
+
+  part grip_shadow material darksteel {
+    cell 47 43 c67
+    cell 47 44 c68
+    cell 47 44 c68
+    cell 47 45 c68
+    cell 47 45 c67
+    cell 47 46 c67
+    cell 47 46 c67
+    cell 47 47 c67
+    cell 47 47 c67
+    cell 47 48 c68
+    cell 47 48 c68
+    cell 47 49 c68
+    cell 47 49 c67
+    cell 47 50 c67
+    cell 47 50 c67
+    cell 47 51 c67
+    cell 47 52 c67
+    cell 47 52 c68
+    cell 47 53 c68
+    cell 47 53 c68
+    cell 47 54 c67
+    cell 47 54 c67
+    cell 47 55 c24
+  }
+
+  part grip_highlight material darksteel {
+    cell 43 43 c67
+    cell 43 44 c67
+    cell 43 44 c67
+    cell 43 45 c67
+    cell 43 45 c67
+    cell 43 46 c68
+    cell 43 46 c68
+    cell 43 47 c68
+    cell 43 47 c67
+    cell 43 48 c67
+    cell 43 48 c67
+    cell 43 49 c67
+    cell 43 49 c67
+    cell 43 50 c68
+    cell 43 50 c68
+    cell 43 51 c68
+    cell 43 52 c67
+    cell 43 52 c67
+    cell 43 53 c67
+    cell 43 53 c67
+    cell 43 54 c67
+    cell 43 54 c67
+    cell 43 55 c24
+  }
+
+  part grip_trim material silver {
+    cell 43 55 c42
+    cell 43 55 c78
+    cell 44 55 c52
+    cell 44 55 c49
+    cell 45 55 c49
+    cell 46 55 c49
+    cell 46 55 c52
+    cell 47 55 c78
+    cell 47 55 c42
+    cell 45 59 c79
+    cell 44 60 c79
+    cell 44 60 c54
+    cell 44 60 c79
+    cell 45 60 c79
+    cell 45 60 c80
+    cell 46 60 c79
+    cell 46 60 c79
+    cell 46 60 c54
+    cell 44 61 c79
+    cell 45 61 c79
+    cell 46 61 c79
+    cell 45 62 c79
+    cell 43 66 c81
+    cell 43 66 c82
+    cell 44 66 c56
+    cell 44 66 c83
+    cell 45 66 c83
+    cell 46 66 c83
+    cell 46 66 c56
+    cell 47 66 c82
+    cell 47 66 c81
+  }
+
+  part pommel_glow material cyan_glow {
+    glow radius 2
+    cell 44 67 c28
+    cell 44 67 c28
+    cell 45 67 c28
+    cell 45 67 c76
+    cell 46 67 c28
+    cell 46 67 c28
+    cell 43 68 c28
+    cell 43 68 c28
+    cell 44 68 c76
+    cell 44 68 c76
+    cell 44 68 c76
+    cell 44 68 c76
+    cell 45 68 c76
+    cell 45 68 c76
+    cell 46 68 c76
+    cell 46 68 c76
+    cell 46 68 c76
+    cell 46 68 c76
+    cell 47 68 c28
+    cell 47 68 c28
+    cell 43 69 c28
+    cell 43 69 c76
+    cell 43 69 c28
+    cell 44 69 c76
+    cell 44 69 c76
+    cell 44 69 c76
+    cell 44 69 c76
+    cell 45 69 c76
+    cell 45 69 c76
+    cell 46 69 c76
+    cell 46 69 c76
+    cell 46 69 c76
+    cell 46 69 c76
+    cell 47 69 c76
+    cell 47 69 c28
+    cell 47 69 c28
+    cell 43 70 c28
+    cell 44 70 c76
+    cell 44 70 c76
+    cell 44 70 c28
+    cell 44 70 c28
+    cell 45 70 c76
+    cell 45 70 c76
+    cell 46 70 c76
+    cell 46 70 c76
+    cell 46 70 c28
+    cell 46 70 c28
+    cell 47 70 c28
+    cell 45 71 c28
+  }
+
+}
+
+export json svg phaser png
