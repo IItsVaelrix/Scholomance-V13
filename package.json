@@ -91,7 +91,7 @@
     "immune:stasis:all": "node tests/qa/immunity.stasis.test.js && node tests/qa/immunity.glyph-stasis.test.js",
     "queue": "node scripts/scd64-queue.mjs",
     "diagnostic:scan": "node codex/core/diagnostic/run-diagnostic.cli.js",
-    "diagnostic:scan:ci": "node codex/core/diagnostic/run-diagnostic.cli.js --trigger ci",
+    "diagnostic:scan:ci": "node codex/core/diagnostic/run-diagnostic.cli.js --trigger ci --max-file-bytes 2000000",
     "bytecode-synthesis": "node scripts/prove_bytecode_diagnostic_synthesis.js",
     "bible:synthesis": "node scripts/bible-synthesis.js",
     "memory:infuse": "node scripts/memory-cell-infusion.js",
