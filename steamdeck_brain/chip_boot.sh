@@ -159,6 +159,9 @@ fi
 # ─── Step 3: Start Ollama Server ────────────────────────────────────────────
 echo -e "${YELLOW}[3/6]${NC} Starting Ollama server..."
 if ! pgrep -x ollama >/dev/null; then
+    # Steam Deck APU is an integrated GPU; Ollama skips iGPUs unless this is set, else
+    # the model runs 100% on CPU. Offload to the GPU (RADV VANGOGH) over Vulkan.
+    export OLLAMA_IGPU_ENABLE="${OLLAMA_IGPU_ENABLE:-1}"
     ollama serve &>/tmp/ollama.log &
     OLLAMA_PID=$!
     echo "  Ollama server starting (PID: $OLLAMA_PID)..."
@@ -181,7 +184,9 @@ fi
 
 # ─── Step 4: Pull Model ─────────────────────────────────────────────────────
 echo -e "${YELLOW}[4/6]${NC} Ensuring model ${MODEL}..."
-if $QUICK && ollama list 2>/dev/null | grep -q "${MODEL%:*}"; then
+if [[ "$MODEL" == deepseek-* ]] || [[ "$MODEL" == dspark* ]]; then
+    echo -e "${GREEN}  Model ${MODEL} is an API endpoint or local DSpark server. Skipping Ollama pull ✓${NC}"
+elif $QUICK && ollama list 2>/dev/null | grep -q "${MODEL%:*}"; then
     echo -e "${GREEN}  Model ${MODEL} already present (--quick) ✓${NC}"
 else
     echo "  Pulling ${MODEL} (this may take a few minutes)..."
@@ -229,9 +234,16 @@ python3 "$SCRIPT_DIR/substrate_engine.py" --db "$SUBSTRATE_DB" stats 2>/dev/null
 if $SEED_ONLY; then
     echo ""
     echo -e "${GREEN}✅ Substrate seeded. Start the brain manually:${NC}"
-    echo "   python3 ${SCRIPT_DIR}/steamdeck_brain.py --model ${MODEL}"
+    echo "   uv run --with numpy ${SCRIPT_DIR}/steamdeck_brain.py --model ${MODEL}"
 else
-    echo -e "${YELLOW}[6/6]${NC} Launching brain..."
+    echo -e "${YELLOW}Starting Brain Daemon in background (Port 9090)...${NC}"
+    uv run --with numpy "$SCRIPT_DIR/brain_daemon.py" --model "$MODEL" --db "$SUBSTRATE_DB" --personality Vaelrix --llm &
+    DAEMON_PID=$!
+
+    
+    echo -e "${YELLOW}Waiting for daemon to stabilize...${NC}"
+    sleep 3
+
     echo ""
     echo -e "${GREEN}╔══════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${GREEN}║     🧠  Brain Boost Active — Substrate + ${MODEL}         ║${NC}"
@@ -239,5 +251,9 @@ else
     echo -e "${GREEN}╚══════════════════════════════════════════════════════════════╝${NC}"
     echo ""
     
-    exec python3 "$SCRIPT_DIR/steamdeck_brain.py" --model "$MODEL" --db "$SUBSTRATE_DB"
+    uv run --with numpy "$SCRIPT_DIR/steamdeck_brain.py" --model "$MODEL" --db "$SUBSTRATE_DB" --use-daemon --daemon-port 9090 --personality Vaelrix
+    
+    echo "Shutting down background daemon..."
+    kill $DAEMON_PID || true
+
 fi

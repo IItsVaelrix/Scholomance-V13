@@ -63,11 +63,15 @@ class NGramEmbeddingProvider:
             return [0.0] * self.dim
         
         # 2. Build sparse feature hash
+        #    NOTE: must use _stable_hash, NOT builtin hash(). Python salts
+        #    str hashing per-process (PYTHONHASHSEED), which would make every
+        #    daemon embed queries in a different projection space than the
+        #    stored substrate vectors → retrieval returns ~nothing.
         features = {}
         for ng in ngrams:
             h = self._stable_hash(ng)
             for bucket in range(4):
-                bh = hash(f"{h}:{bucket}") & 0xFFFFFFFF
+                bh = self._stable_hash(f"{h}:{bucket}") & 0xFFFFFFFF
                 features[bh] = features.get(bh, 0) + 1.0 / (bucket + 1)
         
         # 3. Random projection: sparse → dense

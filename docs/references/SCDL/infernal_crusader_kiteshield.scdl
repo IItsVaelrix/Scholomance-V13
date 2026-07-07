@@ -1,0 +1,460 @@
+scdl_version: "1.0"
+asset:
+  id: "infernal_crusader_kiteshield"
+  name: "Infernal Crusader Kiteshield"
+  class: "shield.kite"
+  style: ["pixel_art", "infernal_crusader", "dark_iron", "ruby_core", "lava_fissures"]
+  intent: "A disciplined infernal crusader kite shield powered by a central ruby sigil. Fury is contained, not chaotic."
+  source_diagram: "infernal_crusader_kiteshield_reference_sheet.png"
+
+canvas:
+  width: 64
+  height: 96
+  unit: "px"
+  origin: "top_left"
+  anchor:
+    x: 32
+    y: 92
+  symmetry:
+    primary_axis: "vertical"
+    mirror_x: 32
+    allow_asymmetric_detail: true
+    asymmetry_budget_px: 36
+  transparent_background: true
+  pixel_rules:
+    integer_cells_only: true
+    no_subpixel_geometry: true
+    no_antialiasing: true
+    outline_required: true
+    max_palette_colors: 14
+
+palette:
+  - id: deep_shadow
+    index: 1
+    name: "Deep Shadow"
+    hex: "#0D0F12"
+    role: "occlusion, outermost dark outline, inner crack shadow"
+  - id: obsidian_iron
+    index: 2
+    name: "Obsidian Iron"
+    hex: "#1B1D22"
+    role: "main blackened metal base"
+  - id: charcoal_steel
+    index: 3
+    name: "Charcoal Steel"
+    hex: "#30343B"
+    role: "secondary metal planes"
+  - id: dark_iron
+    index: 4
+    name: "Dark Iron"
+    hex: "#4A4F57"
+    role: "beveled panels, rim midtone"
+  - id: ash_gray
+    index: 5
+    name: "Ash Gray"
+    hex: "#7A8088"
+    role: "edge breaks, rivet mid highlights"
+  - id: rim_highlight
+    index: 6
+    name: "Rim Highlight"
+    hex: "#A8AFB7"
+    role: "sharp metallic glints and readable rim accents"
+  - id: obsidian_red
+    index: 7
+    name: "Obsidian Red"
+    hex: "#2B0F13"
+    role: "lava halo shadow and infernal metal staining"
+  - id: lava_red
+    index: 8
+    name: "Lava Red"
+    hex: "#C61D1D"
+    role: "main fissure color"
+  - id: ember_orange
+    index: 9
+    name: "Ember Orange"
+    hex: "#FF6A1A"
+    role: "inner fissure heat"
+  - id: molten_yellow
+    index: 10
+    name: "Molten Yellow"
+    hex: "#FFC33A"
+    role: "small hottest lava pixels"
+  - id: ruby_core
+    index: 11
+    name: "Ruby Core"
+    hex: "#B0002A"
+    role: "ruby body and dark gem facets"
+  - id: ruby_bright
+    index: 12
+    name: "Ruby Bright"
+    hex: "#FF3D5A"
+    role: "ruby facets and core glow"
+  - id: glow_highlight
+    index: 13
+    name: "Glow Highlight"
+    hex: "#FFE9E9"
+    role: "ruby sparkle and white-pink glow"
+  - id: white_hot
+    index: 14
+    name: "White Hot"
+    hex: "#FFFFFF"
+    role: "single-pixel hottest highlights only"
+
+masks:
+  outer_kite:
+    type: polygon
+    points:
+      - [32, 2]
+      - [42, 10]
+      - [52, 16]
+      - [58, 32]
+      - [57, 58]
+      - [51, 75]
+      - [42, 86]
+      - [32, 94]
+      - [22, 86]
+      - [13, 75]
+      - [7, 58]
+      - [6, 32]
+      - [12, 16]
+      - [22, 10]
+  inner_face:
+    type: polygon
+    points:
+      - [32, 8]
+      - [41, 15]
+      - [50, 21]
+      - [54, 35]
+      - [53, 57]
+      - [47, 73]
+      - [39, 83]
+      - [32, 89]
+      - [25, 83]
+      - [17, 73]
+      - [11, 57]
+      - [10, 35]
+      - [14, 21]
+      - [23, 15]
+  lower_tip_guard:
+    type: polygon
+    points:
+      - [32, 74]
+      - [40, 83]
+      - [36, 88]
+      - [32, 91]
+      - [28, 88]
+      - [24, 83]
+  ruby_diamond:
+    type: polygon
+    points:
+      - [32, 36]
+      - [40, 44]
+      - [32, 53]
+      - [24, 44]
+
+parts:
+  - id: outer_rim
+    order: 10
+    mask: outer_kite
+    type: stroked_polygon
+    stroke_width: 5
+    colors:
+      outline: deep_shadow
+      body: charcoal_steel
+      bevel_dark: obsidian_iron
+      bevel_light: ash_gray
+      glint: rim_highlight
+    notes: "Heavy iron border with aggressive crusader silhouette. This carries the shield readability at 1x."
+    approx_filled_px: 620
+
+  - id: side_reinforcements
+    order: 20
+    type: mirrored_components
+    mirror_x: 32
+    components:
+      - polygon:
+          points: [[8, 28], [13, 26], [15, 66], [10, 67]]
+          fill: dark_iron
+          outline: deep_shadow
+      - polygon:
+          points: [[11, 18], [18, 14], [16, 25], [9, 30]]
+          fill: charcoal_steel
+          outline: deep_shadow
+      - polygon:
+          points: [[13, 68], [19, 76], [23, 84], [18, 80], [12, 72]]
+          fill: obsidian_iron
+          outline: deep_shadow
+    rivets:
+      positions_left: [[11, 24], [12, 39], [12, 55], [16, 72]]
+      mirror: true
+      radius: 1
+      fill: ash_gray
+      shadow: deep_shadow
+    approx_filled_px: 260
+
+  - id: face_plate
+    order: 30
+    mask: inner_face
+    type: filled_polygon
+    fill: obsidian_iron
+    secondary_fill: charcoal_steel
+    outline: deep_shadow
+    surface_texture:
+      deterministic_noise_seed: "infernal-face-plate-v1"
+      density: 0.18
+      colors: [charcoal_steel, dark_iron, deep_shadow]
+      avoid_masks: [ruby_diamond]
+    bevel_lines:
+      - path: [[32, 8], [32, 34]]
+        color: dark_iron
+      - path: [[32, 54], [32, 89]]
+        color: dark_iron
+      - path: [[14, 22], [25, 38], [24, 55], [18, 72]]
+        color: charcoal_steel
+        mirror: true
+      - path: [[19, 17], [30, 31]]
+        color: deep_shadow
+        mirror: true
+    notes: "Scorched dark metal face. Texture must stay low contrast so lava fissures remain primary."
+    approx_filled_px: 1050
+
+  - id: central_sigil_ring
+    order: 50
+    type: ring
+    center: [32, 44]
+    outer_radius: 15
+    inner_radius: 11
+    colors:
+      outline: deep_shadow
+      shadow: dark_iron
+      body: ash_gray
+      highlight: rim_highlight
+    breaks:
+      - arc_deg: [38, 58]
+      - arc_deg: [122, 142]
+      - arc_deg: [218, 238]
+      - arc_deg: [302, 322]
+    cross_arms:
+      vertical:
+        from: [32, 18]
+        to: [32, 72]
+        width: 2
+        color: rim_highlight
+        shadow: deep_shadow
+      horizontal:
+        from: [11, 44]
+        to: [53, 44]
+        width: 2
+        color: rim_highlight
+        shadow: deep_shadow
+      cardinal_spikes:
+        - [[32, 18], [35, 23], [29, 23]]
+        - [[32, 72], [35, 67], [29, 67]]
+        - [[11, 44], [16, 41], [16, 47]]
+        - [[53, 44], [48, 41], [48, 47]]
+    notes: "Round sigil must remain centralized and visible behind the ruby."
+    approx_filled_px: 420
+
+  - id: ruby_core
+    order: 70
+    mask: ruby_diamond
+    type: faceted_gem
+    center: [32, 44]
+    fill: ruby_core
+    facets:
+      - polygon: [[32, 36], [36, 41], [32, 43], [28, 41]]
+        color: ruby_bright
+      - polygon: [[24, 44], [32, 43], [30, 49], [27, 48]]
+        color: lava_red
+      - polygon: [[40, 44], [32, 43], [34, 49], [37, 48]]
+        color: ruby_core
+      - polygon: [[30, 49], [34, 49], [32, 53]]
+        color: obsidian_red
+    highlights:
+      - [29, 39, glow_highlight]
+      - [30, 38, white_hot]
+      - [34, 40, glow_highlight]
+      - [27, 43, ruby_bright]
+    glow:
+      radius: 4
+      color: obsidian_red
+      falloff: "pixel_dithered"
+    notes: "Ruby is the power source. It must be the highest contrast cluster on the shield."
+    approx_filled_px: 120
+
+  - id: lava_fissures
+    order: 80
+    type: path_set
+    origin: [32, 44]
+    rule: "Radiate from ruby center outward. Keep cracks jagged, thin, and branching."
+    glow_layers:
+      - width: 3
+        color: obsidian_red
+        alpha: 1.0
+      - width: 1
+        color: lava_red
+        alpha: 1.0
+      - width: 1
+        color: ember_orange
+        alpha: 1.0
+        placement: "inner_core_segments_only"
+      - width: 1
+        color: molten_yellow
+        alpha: 1.0
+        placement: "rare_hot_pixels"
+    paths:
+      - id: north_main
+        points: [[32, 36], [32, 30], [30, 25], [32, 19], [32, 8]]
+        hot_pixels: [[32, 31], [31, 24], [32, 18]]
+      - id: north_west_branch
+        points: [[29, 38], [25, 32], [22, 25], [17, 19], [14, 16]]
+        hot_pixels: [[25, 32], [20, 23]]
+      - id: north_east_branch
+        points: [[35, 38], [39, 32], [43, 26], [49, 21], [53, 18]]
+        hot_pixels: [[39, 32], [47, 22]]
+      - id: west_main
+        points: [[24, 44], [18, 44], [13, 42], [8, 42]]
+        hot_pixels: [[19, 44], [12, 42]]
+      - id: east_main
+        points: [[40, 44], [46, 44], [51, 42], [56, 42]]
+        hot_pixels: [[45, 44], [52, 42]]
+      - id: south_main
+        points: [[32, 53], [32, 61], [31, 70], [32, 82], [32, 91]]
+        hot_pixels: [[32, 61], [31, 71], [32, 83]]
+      - id: south_west_branch
+        points: [[28, 51], [23, 58], [19, 66], [16, 75]]
+        hot_pixels: [[23, 58], [18, 68]]
+      - id: south_east_branch
+        points: [[36, 51], [41, 58], [45, 66], [48, 75]]
+        hot_pixels: [[41, 58], [46, 68]]
+      - id: minor_left_upper
+        points: [[24, 35], [20, 31], [18, 28]]
+      - id: minor_right_upper
+        points: [[40, 35], [44, 31], [46, 28]]
+      - id: minor_left_lower
+        points: [[25, 57], [21, 62], [19, 69]]
+      - id: minor_right_lower
+        points: [[39, 57], [43, 62], [45, 69]]
+    clipping_mask: inner_face
+    notes: "Fissures should appear to break the face plate from the ruby outward, not sit on top like decoration."
+    approx_filled_px: 380
+
+  - id: rim_highlights_and_details
+    order: 90
+    type: detail_pass
+    strokes:
+      - path: [[32, 3], [32, 24]]
+        color: rim_highlight
+      - path: [[10, 32], [10, 58]]
+        color: ash_gray
+        mirror: true
+      - path: [[20, 12], [29, 20]]
+        color: rim_highlight
+        mirror: true
+      - path: [[20, 82], [29, 90]]
+        color: ash_gray
+        mirror: true
+    rivets:
+      radius: 1
+      color: rim_highlight
+      shadow: deep_shadow
+      positions:
+        - [12, 26]
+        - [11, 42]
+        - [13, 59]
+        - [19, 78]
+        - [52, 26]
+        - [53, 42]
+        - [51, 59]
+        - [45, 78]
+    notes: "Use highlights sparingly. The metal should read powerful and heavy, not shiny-clean."
+    approx_filled_px: 140
+
+  - id: lower_tip_reinforcement
+    order: 100
+    mask: lower_tip_guard
+    type: filled_polygon
+    fill: charcoal_steel
+    outline: deep_shadow
+    bevel:
+      left: dark_iron
+      right: ash_gray
+      center_line: rim_highlight
+    crusader_mark:
+      center: [32, 82]
+      color: lava_red
+      shape: "tiny_cross"
+    notes: "Armored point with small crusader motif, matching the diagram breakdown."
+    approx_filled_px: 120
+
+construction_order:
+  - "01 outer_rim"
+  - "02 face_plate"
+  - "03 central_sigil_ring"
+  - "04 ruby_core"
+  - "05 lava_fissures"
+  - "06 rim_highlights_and_details"
+  - "07 lower_tip_reinforcement"
+
+pixelbrain_export:
+  packet_type: "pixelbrain.asset.v1"
+  asset_type: "equipment.shield"
+  dimensions: [64, 96]
+  recommended_preview_scale: 4
+  part_id_mapping:
+    outer_rim: 1
+    side_reinforcements: 2
+    face_plate: 3
+    central_sigil_ring: 4
+    ruby_core: 5
+    lava_fissures: 6
+    rim_highlights_and_details: 7
+    lower_tip_reinforcement: 8
+  render_passes:
+    - "base_shadow"
+    - "metal_fill"
+    - "bevels"
+    - "sigil"
+    - "ruby"
+    - "lava_glow"
+    - "final_highlights"
+  emit_cells:
+    required_fields: ["x", "y", "color", "partId"]
+    optional_fields: ["shading", "emphasis", "isRim", "isMotif"]
+
+counts:
+  sprite_dimensions: "64x96"
+  total_canvas_cells: 6144
+  palette_colors: 14
+  approximate_filled_pixels: 2850
+  by_section:
+    outer_rim_and_reinforcements: 880
+    face_plate_base_metal: 1050
+    center_sigil_ring: 420
+    ruby_core: 120
+    lava_fissures_and_glow: 380
+  expected_empty_cells: 3294
+  note: "Counts are target implementation counts from the reference diagram. Exact output may vary by rasterizer, but should remain within +/- 6%."
+
+audits:
+  readability:
+    one_x_requirements:
+      - "Silhouette reads as a kite shield."
+      - "Ruby core is visible as central power source."
+      - "Round sigil reads behind ruby."
+      - "Lava fissures radiate from center outward."
+    failure_conditions:
+      - "Ruby blends into lava cracks."
+      - "Cracks look random instead of radial."
+      - "Rim consumes the face plate."
+      - "Palette exceeds 14 colors."
+  symmetry_check:
+    mirror_axis: 32
+    strict_parts: [outer_rim, face_plate, central_sigil_ring, ruby_core, lower_tip_reinforcement]
+    flexible_parts: [lava_fissures, surface_texture, rivets]
+  implementation_tests:
+    - "Render at 1x, 2x, and 4x. Verify no subpixel blur."
+    - "Check all emitted cells use palette IDs only."
+    - "Verify all lava paths are clipped to inner_face."
+    - "Verify ruby_core overlaps above sigil_ring."
+    - "Verify final filled-pixel count is between 2679 and 3021."

@@ -1,19 +1,22 @@
 [Unit]
 # ─────────────────────────────────────────────────────────────────────────────
-# scholomance-brain.service — SteamDeck Brain HTTP daemon (always-on)
+# scholomance-brain.service — SteamDeck Brain HTTP daemon (no-llm by default)
 # ─────────────────────────────────────────────────────────────────────────────
 # Runs brain_daemon.py (http://127.0.0.1:9090) as a one-shot user service.
 # DivTube connects to this daemon over HTTP; it does not own its lifecycle.
-# Restart is disabled so manual launches can refresh the port; WantedBy=default.target
-# + linger (see install.sh) still auto-starts it at boot.
+#
+# No-llm mode: the daemon serves the full ForceField + SCDNA pipeline without
+# loading or calling Ollama. No 7B model is touched, no extra RAM is pinned.
+# If you want the Ollama-backed LLM bridge instead, run the daemon manually:
+#   ./launch-brain-stack.sh   (or set SCHOLOMANCE_WITH_OLLAMA=1)
+#
+# Restart is disabled and auto-start is opt-in. Manual launches control the
+# lifecycle; the daemon will not fight itself for the port.
 #
 # This file is a TEMPLATE: @PYTHON@, @SCRIPT_DIR@ and @BRAIN_DAEMON@ are
 # substituted by install.sh.
-Description=Scholomance SteamDeck Brain daemon (Cortex + Ollama bridge)
-# Ollama is the brain's only runtime dependency; bind to it but stay resilient
-# if it is managed elsewhere (Wants, not Requires, so the brain still retries).
-Wants=scholomance-ollama.service
-After=scholomance-ollama.service network-online.target
+Description=Scholomance SteamDeck Brain daemon (no-llm: ForceField + SCDNA)
+After=network-online.target
 # Must live in [Unit] — systemd ignores it under [Service].
 StartLimitIntervalSec=0
 
@@ -23,16 +26,14 @@ WorkingDirectory=@SCRIPT_DIR@
 # Optional overrides: drop KEY=VALUE lines (BRAIN_MODEL, BRAIN_DB, BRAIN_PORT,
 # BRAIN_PERSONALITY, BRAIN_EXTRA_ARGS) into this file. "-" = ok if missing.
 EnvironmentFile=-%h/.config/scholomance-brain.env
-Environment=BRAIN_MODEL=qwen3.5:9b
+Environment=BRAIN_MODEL=qwen2.5-coder:7b
 Environment=BRAIN_PORT=9090
 Environment=BRAIN_DB=%h/.substrate/memory.sqlite
-# Wait (best-effort) for Ollama's API before launching so the daemon's eager
-# OllamaBridge check doesn't sys.exit on a cold boot. Times out after 60s.
-ExecStartPre=/bin/sh -c 'for i in $(seq 1 60); do curl -sf http://localhost:11434/api/tags >/dev/null 2>&1 && exit 0; sleep 1; done; exit 0'
-ExecStart=@PYTHON@ @BRAIN_DAEMON@ --model ${BRAIN_MODEL} --port ${BRAIN_PORT} --db ${BRAIN_DB} $BRAIN_EXTRA_ARGS
-# Do not auto-restart: the daemon now refreshes its own port on manual launch,
-# and an always-restarting service would fight that behavior.
+ExecStart=@PYTHON@ @BRAIN_DAEMON@ --no-llm --model ${BRAIN_MODEL} --port ${BRAIN_PORT} --db ${BRAIN_DB} $BRAIN_EXTRA_ARGS
+# No auto-restart. Manual launches own the lifecycle; the daemon will not
+# fight itself for the port and will not pin RAM for a model.
 Restart=no
 
 [Install]
-WantedBy=default.target
+# No default.target — the service does NOT auto-start at boot/login.
+# Enable it explicitly with:  systemctl --user enable scholomance-brain.service

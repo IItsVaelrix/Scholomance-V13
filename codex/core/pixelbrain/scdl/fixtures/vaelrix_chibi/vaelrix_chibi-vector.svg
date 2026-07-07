@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="768" viewBox="0 0 512 768" role="img" aria-labelledby="title desc">
+  <title id="title">Vaelrix Chibi Vector</title>
+  <desc id="desc">A polished vector chibi character with a clearly readable face, violet hair, cyan eyes, and a dark Scholomance robe.</desc>
+  <defs>
+    <radialGradient id="skinGrad" cx="38%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#ffe9ca"/>
+      <stop offset="48%" stop-color="#e7bb89"/>
+      <stop offset="100%" stop-color="#a96d55"/>
+    </radialGradient>
+
+    <linearGradient id="hairGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#9a82ff"/>
+      <stop offset="42%" stop-color="#4a2e91"/>
+      <stop offset="100%" stop-color="#17102c"/>
+    </linearGradient>
+
+    <linearGradient id="robeGrad" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stop-color="#5540a0"/>
+      <stop offset="55%" stop-color="#241846"/>
+      <stop offset="100%" stop-color="#0d0918"/>
+    </linearGradient>
+
+    <radialGradient id="eyeGrad" cx="42%" cy="32%" r="68%">
+      <stop offset="0%" stop-color="#f4ffff"/>
+      <stop offset="26%" stop-color="#8ff4ff"/>
+      <stop offset="58%" stop-color="#00b7e8"/>
+      <stop offset="100%" stop-color="#004d86"/>
+    </radialGradient>
+
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="170%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#05030a" flood-opacity="0.45"/>
+    </filter>
+
+    <filter id="cyanGlow" x="-90%" y="-90%" width="280%" height="280%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.0 0 0 0 0 0.85 0 0 0 0 1 0 0 0 0.75 0" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <style>
+      .ink { stroke: #130d1f; stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; }
+      .thin-ink { stroke: #130d1f; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+      .face-line { stroke: #6c3b39; stroke-width: 4; stroke-linecap: round; fill: none; opacity: 0.72; }
+      .highlight { fill: #fff4d7; opacity: 0.72; }
+      .gold { fill: #d8b84c; stroke: #5d4216; stroke-width: 5; stroke-linejoin: round; }
+    </style>
+  </defs>
+
+  <g filter="url(#softShadow)">
+    <ellipse cx="256" cy="704" rx="120" ry="30" fill="#07050d" opacity="0.55"/>
+
+    <g id="body">
+      <path class="ink" fill="url(#robeGrad)" d="M178 364 C196 338 230 328 256 328 C282 328 316 338 334 364 L381 674 C342 700 293 710 256 710 C219 710 170 700 131 674 Z"/>
+      <path fill="#130d1f" opacity="0.4" d="M256 355 C236 430 229 552 239 690 C207 688 175 681 149 668 L185 384 C203 366 225 357 256 355 Z"/>
+      <path fill="#6d58be" opacity="0.45" d="M292 367 C322 389 342 493 354 647 C335 659 318 665 297 668 C294 576 286 454 276 369 Z"/>
+      <path class="gold" d="M169 438 C217 455 295 455 343 438 L350 469 C301 486 211 486 162 469 Z"/>
+      <circle cx="256" cy="455" r="18" fill="#00e5ff" stroke="#041522" stroke-width="6" filter="url(#cyanGlow)"/>
+      <circle cx="250" cy="449" r="5" fill="#f4ffff"/>
+
+      <path class="ink" fill="#473383" d="M170 381 C130 414 104 496 106 560 C107 588 133 597 151 576 C163 528 180 457 204 400 Z"/>
+      <path class="ink" fill="#4f3a90" d="M342 381 C382 414 408 496 406 560 C405 588 379 597 361 576 C349 528 332 457 308 400 Z"/>
+      <path fill="#e0b382" stroke="#130d1f" stroke-width="6" d="M115 564 C129 552 149 553 160 568 C154 589 134 601 116 591 C108 585 107 574 115 564 Z"/>
+      <path fill="#e0b382" stroke="#130d1f" stroke-width="6" d="M397 564 C383 552 363 553 352 568 C358 589 378 601 396 591 C404 585 405 574 397 564 Z"/>
+
+      <path fill="#11101c" stroke="#130d1f" stroke-width="7" d="M177 676 C190 660 222 660 236 679 L230 719 C205 726 176 720 159 704 C161 692 166 683 177 676 Z"/>
+      <path fill="#11101c" stroke="#130d1f" stroke-width="7" d="M335 676 C322 660 290 660 276 679 L282 719 C307 726 336 720 353 704 C351 692 346 683 335 676 Z"/>
+    </g>
+
+    <g id="head-and-hair">
+      <path class="ink" fill="url(#hairGrad)" d="M130 227 Q 110 160 140 120 L 100 40 L 190 70 L 240 10 L 280 70 L 370 20 L 340 100 Q 400 160 382 229 C413 232 426 270 410 306 C398 332 374 344 350 338 C331 396 292 427 253 427 C212 427 175 396 157 338 C132 344 108 332 96 306 C80 270 98 232 130 227 Z"/>
+
+      <path class="ink" fill="url(#skinGrad)" d="M143 227 C143 131 189 83 256 83 C323 83 369 131 369 227 C369 319 321 388 256 388 C191 388 143 319 143 227 Z"/>
+
+      <path fill="#f5d1a1" stroke="#130d1f" stroke-width="6" d="M132 248 C104 241 91 267 101 291 C110 312 132 320 151 306 Z"/>
+      <path fill="#d89d72" d="M121 263 C111 265 107 277 113 287 C119 298 131 300 140 292 C131 290 123 279 121 263 Z"/>
+      <path fill="#f5d1a1" stroke="#130d1f" stroke-width="6" d="M380 248 C408 241 421 267 411 291 C402 312 380 320 361 306 Z"/>
+      <path fill="#d89d72" d="M391 263 C401 265 405 277 399 287 C393 298 381 300 372 292 C381 290 389 279 391 263 Z"/>
+
+      <path class="ink" fill="url(#hairGrad)" d="M121 210 L 160 100 L 220 140 L 260 50 L 300 130 L 360 80 L 390 214 C355 160 314 126 265 119 C206 111 158 143 121 210 Z"/>
+      <path fill="#a891ff" opacity="0.85" d="M177 107 C200 72 238 58 276 63 C235 80 211 112 194 164 C189 149 183 128 177 107 Z"/>
+      <path fill="#251547" d="M137 224 C158 137 204 89 265 85 C219 137 195 197 188 286 C174 254 156 235 137 224 Z"/>
+      <path fill="#2b1853" d="M377 226 C357 139 312 91 258 84 C311 142 330 202 331 294 C345 259 357 240 377 226 Z"/>
+      <path class="thin-ink" fill="#3c2474" d="M226 72 C246 116 238 182 207 246 C194 196 174 162 143 142 C163 101 190 78 226 72 Z"/>
+      <path class="thin-ink" fill="#4d3190" d="M286 70 C271 128 277 190 305 249 C325 199 343 164 373 145 C356 101 326 77 286 70 Z"/>
+      <path class="thin-ink" fill="#6b50d0" d="M234 82 C252 124 253 192 247 259 C232 203 212 163 184 132 C195 105 211 89 234 82 Z"/>
+      <path class="thin-ink" fill="#21143d" d="M254 64 C272 124 273 190 254 274 C239 200 230 129 254 64 Z"/>
+
+      <path fill="#6c4ddb" opacity="0.65" d="M179 92 C205 62 246 50 282 59 C235 62 203 80 181 119 Z"/>
+    </g>
+
+    <g id="face">
+      <path fill="#f8dfbd" opacity="0.55" d="M184 180 C211 140 307 136 335 183 C317 165 288 155 256 155 C224 155 199 164 184 180 Z"/>
+      <path fill="#bd795c" opacity="0.26" d="M167 270 C183 340 216 372 256 374 C198 371 158 314 150 251 Z"/>
+      <path fill="#8c5949" opacity="0.18" d="M344 240 C342 310 310 363 256 374 C317 363 361 318 363 247 Z"/>
+
+      <path class="face-line" d="M183 222 C203 204 228 203 246 218"/>
+      <path class="face-line" d="M266 218 C285 203 311 204 330 222"/>
+
+      <g id="left-eye" filter="url(#cyanGlow)">
+        <path fill="#f8ffff" stroke="#130d1f" stroke-width="7" d="M174 244 C185 218 229 216 242 244 C232 276 187 278 174 244 Z"/>
+        <ellipse cx="209" cy="246" rx="19" ry="25" fill="url(#eyeGrad)" stroke="#06324b" stroke-width="4"/>
+        <ellipse cx="211" cy="251" rx="7" ry="12" fill="#06182d"/>
+        <circle cx="201" cy="235" r="7" fill="#ffffff"/>
+        <circle cx="217" cy="241" r="3" fill="#d9ffff"/>
+      </g>
+
+      <g id="right-eye" filter="url(#cyanGlow)">
+        <path fill="#f8ffff" stroke="#130d1f" stroke-width="7" d="M270 244 C281 218 325 216 338 244 C328 276 283 278 270 244 Z"/>
+        <ellipse cx="305" cy="246" rx="19" ry="25" fill="url(#eyeGrad)" stroke="#06324b" stroke-width="4"/>
+        <ellipse cx="307" cy="251" rx="7" ry="12" fill="#06182d"/>
+        <circle cx="297" cy="235" r="7" fill="#ffffff"/>
+        <circle cx="313" cy="241" r="3" fill="#d9ffff"/>
+      </g>
+
+      <path class="face-line" d="M255 261 L230 295 L250 305"/>
+      <path fill="none" stroke="#5f2e35" stroke-width="6" stroke-linecap="round" d="M230 329 C244 342 270 342 284 329"/>
+      <path fill="#e77892" opacity="0.45" d="M187 309 C205 299 225 304 236 320 C217 326 196 323 187 309 Z"/>
+      <path fill="#e77892" opacity="0.45" d="M325 309 C307 299 287 304 276 320 C295 326 316 323 325 309 Z"/>
+      <path fill="#00e5ff" opacity="0.9" d="M350 305 L366 315 L350 325 L334 315 Z" filter="url(#cyanGlow)"/>
+      <path fill="#fff4d7" opacity="0.65" d="M201 159 C219 146 250 139 285 143 C250 148 225 157 204 175 Z"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,181 @@
+asset holy_fire_claymore canvas 64x128
+
+palette {
+  voidblack = #090A12
+  outline   = #23180C
+  ironedge  = #4B3A22
+  golddeep  = #8A5C10
+  goldmid   = #C88B19
+  gold      = #F2C84A
+  goldhi    = #FFF3A6
+  whitehot  = #FFFBE8
+  emberdeep = #7A1205
+  emberred  = #C82108
+  ember     = #FF5A0A
+  flame     = #FF9E19
+  flamehi   = #FFE35B
+  leather   = #2B1816
+  leatherhi = #B66A3C
+  wrap      = #F07A3B
+  shadowvio = #24122F
+}
+
+# -----------------------------------------------------------------------------
+# HOLY FIRE CLAYMORE
+# Design target: ceremonial fantasy sword, gold forged shell, red sanctified core,
+# fire aura shaped like a cathedral flame. Structure uses symmetry; flame sparks
+# and glints are hand placed so the sprite does not feel machine mirrored.
+# -----------------------------------------------------------------------------
+
+part rear_fire_shadow material shadow_fire {
+  symmetry x
+  polygon 31 83 25 83 23 75 19 68 22 72 17 62 20 65 15 52 18 56 14 42 19 46 17 32 21 36 19 22 24 26 25 12 28 16 31 0 emberdeep
+  polygon 22 80 17 70 21 75 15 62 19 66 13 52 17 56 emberdeep
+  polygon 20 50 15 38 19 42 13 28 17 32 emberdeep
+  polygon 23 28 18 18 21 22 16 8 20 12 emberdeep
+}
+
+part rear_fire_body material holy_fire {
+  symmetry x
+  polygon 31 81 27 81 25 73 21 65 24 70 19 59 22 63 17 50 20 54 16 40 21 44 19 30 23 34 21 20 26 24 27 10 30 14 31 2 flame
+  polygon 24 78 19 68 23 73 17 60 21 64 15 50 19 54 flame
+  polygon 22 48 17 36 21 40 15 26 19 30 flame
+  polygon 25 26 20 16 23 20 18 6 22 10 flame
+  glow radius 3
+}
+
+part rear_fire_hot_edges material divine_flame_core {
+  symmetry x
+  polygon 31 75 27 75 25 67 23 62 24 67 31 70 flamehi
+  polygon 31 49 27 49 25 41 22 37 24 41 31 44 flamehi
+  polygon 31 31 28 31 26 25 24 20 25 25 31 28 flamehi
+  line 25 71 22 64 flamehi
+  line 24 48 20 40 flamehi
+  line 23 29 18 20 flamehi
+  glow radius 2
+}
+
+part blade_black_backing material blacksteel {
+  polygon 31 1 32 1 41 18 39 77 34 88 30 88 24 77 22 18 outline
+  polygon 28 10 35 10 38 23 37 74 33 84 30 84 27 74 26 23 outline
+}
+
+part blade_gold_shell material gold {
+  symmetry x
+  polygon 24 20 31 3 31 84 27 77 27 26 golddeep
+  polygon 26 19 31 8 31 78 29 72 29 25 goldmid
+  polygon 29 15 31 10 31 76 30 70 30 24 gold
+  line 24 20 31 3 outline
+  line 26 77 31 84 outline
+}
+
+part blade_central_holy_core material divine_flame_core {
+  polygon 29 18 34 18 36 28 36 70 32 82 27 70 27 28 emberdeep
+  polygon 30 23 33 23 34 31 34 67 32 76 29 67 29 31 emberred
+  rect 31 32 2 30 ember
+  rect 31 45 2 14 flamehi
+  cell 31 46 whitehot
+  cell 32 46 whitehot
+  line 28 29 28 69 emberdeep
+  line 35 29 35 69 emberdeep
+  glow radius 3
+}
+
+part blade_facets material gold {
+  symmetry x
+  polygon 25 23 30 10 30 33 28 42 25 39 gold
+  polygon 25 44 30 37 30 53 28 57 25 53 goldmid
+  polygon 26 60 30 55 30 74 28 72 26 68 gold
+  line 25 23 30 10 goldhi
+  line 25 60 30 55 goldhi
+}
+
+part blade_white_glints material holy_fire {
+  symmetry x
+  polygon 26 11 30 8 30 14 28 19 25 17 whitehot
+  polygon 24 43 29 39 29 44 26 48 24 47 whitehot
+  polygon 25 58 29 55 29 60 26 63 25 62 whitehot
+  line 25 22 28 18 goldhi
+  line 24 52 27 49 goldhi
+  glow radius 1
+}
+
+part crossguard_back_shadow material bronze {
+  rect 11 83 42 9 outline
+  rect 13 86 38 8 golddeep
+  rect 7 86 8 6 outline
+  rect 49 86 8 6 outline
+}
+
+part crossguard_gold material gold {
+  symmetry x
+  polygon 8 84 31 84 31 92 9 92 6 88 goldmid
+  rect 14 85 17 5 gold
+  rect 18 86 9 2 goldhi
+  cell 10 84 whitehot
+  cell 11 85 goldhi
+  cell 14 90 golddeep
+  cell 26 91 golddeep
+  line 8 84 31 84 whitehot
+}
+
+part guard_center_ring material gold {
+  circle 31.5 88 radius 6 golddeep
+  circle 31.5 88 radius 4 gold
+  circle 31.5 88 radius 2 goldhi
+  cell 31 86 whitehot
+  cell 32 86 whitehot
+  line 27 91 36 85 golddeep
+}
+
+part grip_shadow material leather_brown {
+  rect 28 92 8 26 outline
+  rect 29 92 6 26 leather
+  rect 30 92 4 26 shadowvio
+}
+
+part grip_spiral_wrap material leather_brown {
+  line 28 94 35 100 wrap
+  line 28 101 35 107 wrap
+  line 28 108 35 114 wrap
+  line 35 96 28 102 leatherhi
+  line 35 103 28 109 leatherhi
+  line 35 110 29 116 leatherhi
+  cell 29 95 goldhi
+  cell 34 105 goldhi
+  cell 29 113 goldhi
+}
+
+part pommel_back material bronze {
+  circle 31.5 121 radius 7 outline
+  rect 28 116 8 5 outline
+}
+
+part pommel_gold material gold {
+  circle 31.5 121 radius 6 golddeep
+  circle 31.5 121 radius 4 gold
+  rect 29 116 6 5 goldmid
+  rect 30 117 4 3 goldhi
+  line 27 121 36 121 goldhi
+  line 31 117 31 125 goldhi
+  cell 29 118 whitehot
+  cell 34 118 goldhi
+}
+
+part ember_particles material divine_flame_core {
+  cell 31 0 ember
+  cell 41 5 emberdeep
+  cell 22 6 emberdeep
+  cell 45 17 ember
+  cell 18 31 ember
+  cell 47 39 flame
+  cell 16 51 ember
+  cell 43 58 flamehi
+  cell 19 76 ember
+  cell 45 77 ember
+  cell 51 91 goldhi
+  cell 12 91 goldhi
+  glow radius 1
+}
+
+export json png aseprite

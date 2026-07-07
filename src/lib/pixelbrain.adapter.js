@@ -81,6 +81,8 @@ import {
 // --- Character Creator (PDR 2026-06-12) ---
 import {
   forgeCharacter as codexForgeCharacter,
+  forgeCharacterFromWandVector as codexForgeCharacterFromWandVector,
+  exportCharacterToPbrainBlueprint as codexExportCharacterToPbrainBlueprint,
   normalizeCharacterSpec as codexNormalizeCharacterSpec,
   validateCharacterSpec as codexValidateCharacterSpec,
   hashCharacterSpec as codexHashCharacterSpec,
@@ -882,6 +884,14 @@ export const normalizePB_NOISE_v1 = codexNormalizePB_NOISE_v1;
 
 export function forgeCharacter(spec, opts) {
   return codexForgeCharacter(spec, opts);
+}
+
+export function forgeCharacterFromWandVector(wandProposal, baseSpec = {}, opts = {}) {
+  return codexForgeCharacterFromWandVector(wandProposal, baseSpec, opts);
+}
+
+export function exportCharacterToPbrainBlueprint(character) {
+  return codexExportCharacterToPbrainBlueprint(character);
 }
 
 export function normalizeCharacterSpec(spec) {

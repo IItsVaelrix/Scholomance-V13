@@ -1,0 +1,54 @@
+.slime-portrait {
+  box-sizing: border-box;
+  padding: 1rem;
+  min-width: 240px;
+  max-width: 320px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .slime-portrait {
+    animation: grim-shimmer var(--grim-animation-duration, 800ms) ease-in-out infinite;
+  }
+
+  @keyframes grim-shimmer {
+    0%, 100% { filter: none; }
+    50%      { filter: hue-rotate(20deg) brightness(1.15); }
+  }
+
+  .slime-portrait__sprite-wrap {
+    will-change: transform;
+  }
+
+  @keyframes jello-ripple {
+    0%, 72%  { transform: scale(1, 1)         translate3d(0, 0, 0); }
+    76%      { transform: scale(1.08, 0.92)   translate3d(-2px, 0, 0); }
+    82%      { transform: scale(0.96, 1.06)   translate3d(1px,  -1px, 0); }
+    88%      { transform: scale(1.04, 0.97)   translate3d(-1px, 1px, 0); }
+    94%      { transform: scale(0.99, 1.02)   translate3d(1px,  0, 0); }
+    100%     { transform: scale(1, 1)         translate3d(0, 0, 0); }
+  }
+
+  @keyframes jello-skew {
+    0%, 72%  { filter: none; }
+    80%      { filter: contrast(1.04) saturate(1.08); }
+    100%     { filter: none; }
+  }
+
+  @keyframes jello-shine {
+    0%, 100% { opacity: 0; transform: translateX(-30%) skewX(-15deg); }
+    40%      { opacity: 0.18; }
+    50%      { opacity: 0.22; transform: translateX(30%) skewX(-15deg); }
+    60%      { opacity: 0.18; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slime-portrait,
+  .slime-portrait__sprite-wrap,
+  .slime-portrait__sprite,
+  .slime-portrait__shine {
+    animation: none;
+  }
+}

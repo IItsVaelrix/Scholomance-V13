@@ -1,7 +1,9 @@
 .iso-map-canvas {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-  background: #0a0a0f;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  cursor: pointer;
+  background: #05070f;
+  border: none;
+  outline: none;
+  cursor: crosshair;
+  touch-action: none;
 }

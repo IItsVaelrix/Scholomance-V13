@@ -54,6 +54,32 @@ const bundleLocation = await bundle({
   entryPoint: resolve(__dirname, "../src/video/index.ts"),
 });
 
+console.log("Copying public assets to bundle location...");
+import { copyFileSync } from "fs";
+if (existsSync(resolve(__dirname, `../public/${trackId}.wav`))) {
+  copyFileSync(
+    resolve(__dirname, `../public/${trackId}.wav`),
+    resolve(bundleLocation, `${trackId}.wav`)
+  );
+} else if (existsSync(resolve(__dirname, `../public/${trackId}.mp3`))) {
+  copyFileSync(
+    resolve(__dirname, `../public/${trackId}.mp3`),
+    resolve(bundleLocation, `${trackId}.mp3`)
+  );
+}
+
+import { mkdirSync } from "fs";
+const resonanceDir = resolve(bundleLocation, "data/resonance");
+if (!existsSync(resonanceDir)) {
+  mkdirSync(resonanceDir, { recursive: true });
+}
+if (existsSync(resolve(__dirname, `../public/data/resonance/${trackId}.resonance.json`))) {
+  copyFileSync(
+    resolve(__dirname, `../public/data/resonance/${trackId}.resonance.json`),
+    resolve(resonanceDir, `${trackId}.resonance.json`)
+  );
+}
+
 console.log("Selecting composition...");
 const composition = await selectComposition({
   serveUrl: bundleLocation,

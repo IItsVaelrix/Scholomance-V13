@@ -1,7 +1,7 @@
 /**
  * Audio Forge — Scheduler
  *
- * Coordinates: cache → worker → AudioBuffer → playback.
+ * Coordinates: cache → worker → main-thread fallback → playback.
  *
  * AMENDMENT 1: Raw PCM Float32Array → createBuffer + copyToChannel.
  * decodeAudioData is for encoded file data (WAV/MP3/OGG), not raw samples.
@@ -9,15 +9,19 @@
  * AMENDMENT 3: Stereo panning applied here via StereoPannerNode.
  * Core renderer returns mono. Adapter applies packet.routing.pan.
  *
+ * AMENDMENT 4: Worker timeout/failure falls back to main-thread renderSfxBuffer
+ * before the sine emergency tone. Worker is optional.
+ *
  * LAYER: src/audio (browser adapter) — AudioContext required.
  */
 
 import { AUDIO_WORKER_JOB_TYPES } from './audio-forge.worker.js';
 import { createWorkerTimeoutError } from '../../codex/core/audio-forge/audio-bytecode-error.js';
+import { renderSfxBuffer } from '../../codex/core/audio-forge/dsp/buffer-renderer.js';
 
 // ─── In-Memory Cache ──────────────────────────────────────────────────────────
 
-const MAX_CACHE_ENTRIES = 64;
+const MAX_CACHE_ENTRIES = 96;
 const audioBufferCache = new Map(); // checksum → AudioBuffer
 
 function cacheGet(checksum) {
@@ -25,8 +29,8 @@ function cacheGet(checksum) {
 }
 
 function cacheSet(checksum, audioBuffer) {
+  if (!checksum || !audioBuffer) return;
   if (audioBufferCache.size >= MAX_CACHE_ENTRIES) {
-    // Evict oldest entry (Map preserves insertion order)
     const firstKey = audioBufferCache.keys().next().value;
     audioBufferCache.delete(firstKey);
   }
@@ -42,10 +46,6 @@ export function clearAudioBufferCache() {
 /**
  * Converts a raw mono PCM Float32Array into an AudioBuffer.
  *
- * IMPORTANT: This uses createBuffer + copyToChannel, NOT decodeAudioData.
- * decodeAudioData decodes encoded file formats (WAV/MP3/OGG).
- * Raw PCM samples must use createBuffer + copyToChannel.
- *
  * @param {AudioContext} audioContext
  * @param {Float32Array} channelData - Mono PCM samples in [-1, 1]
  * @param {number} sampleRate
@@ -60,9 +60,7 @@ export function createMonoAudioBuffer(audioContext, channelData, sampleRate) {
 // ─── Fallback Tone ────────────────────────────────────────────────────────────
 
 /**
- * Plays a simple sine burst when the worker times out.
- * Frequency is derived from packet.routing.bus for variety.
- * Never throws — always degrades gracefully.
+ * Emergency sine burst when synthesis fails entirely.
  *
  * @param {object} packet
  * @param {AudioContext} audioContext
@@ -101,13 +99,26 @@ function playFallbackTone(packet, audioContext, mixer) {
       try { osc.disconnect(); gain.disconnect(); panner.disconnect(); } catch { /* no-op */ }
     };
   } catch {
-    // Fallback tone also failed — silently eat it
+    // Emergency tone also failed — silently eat it
   }
 }
 
 // ─── Worker Bridge ────────────────────────────────────────────────────────────
 
 let _pendingJobs = new Map(); // jobId → { resolve, reject, timeoutId }
+
+/**
+ * Rejects all in-flight worker jobs (e.g. after worker crash).
+ *
+ * @param {Error} error
+ */
+export function rejectAllPendingWorkerJobs(error) {
+  for (const [id, pending] of _pendingJobs.entries()) {
+    clearTimeout(pending.timeoutId);
+    pending.reject(error);
+    _pendingJobs.delete(id);
+  }
+}
 
 /**
  * Sends a job to the worker and awaits response.
@@ -131,7 +142,6 @@ function dispatchWorkerJob(worker, message, timeoutMs = 300) {
 
 /**
  * Routes an incoming worker message to the correct pending job resolver.
- * Must be called from the forge's onmessage handler.
  *
  * @param {MessageEvent} event
  */
@@ -145,8 +155,6 @@ export function handleWorkerMessage(event) {
   pending.resolve(response);
 }
 
-// ─── Scheduler ────────────────────────────────────────────────────────────────
-
 let _jobCounter = 0;
 
 function nextJobId(eventType) {
@@ -155,60 +163,112 @@ function nextJobId(eventType) {
 }
 
 /**
- * Schedules a PB-SFX-v1 packet for playback.
- *
- * Flow:
- *   1. Cache hit → play immediately from cached AudioBuffer
- *   2. Cache miss → dispatch RENDER_ONE_SHOT to worker
- *   3. Worker returns Float32Array → createBuffer + copyToChannel → cache → play
- *   4. Worker timeout → playFallbackTone
+ * Renders packet PCM via worker, then main-thread fallback.
  *
  * @param {object} params
- * @param {object} params.packet        - PB-SFX-v1 packet
+ * @param {object} params.packet
+ * @param {number} params.sampleRate
+ * @param {Worker|null} [params.worker]
+ * @param {number} [params.workerTimeoutMs=400]
+ * @returns {Promise<{ pcm: Float32Array|null, source: 'cache'|'worker'|'main'|'failed', diagnostics: string[] }>}
+ */
+export async function resolvePacketPcm({
+  packet,
+  sampleRate,
+  worker = null,
+  workerTimeoutMs = 400,
+}) {
+  const diagnostics = [];
+
+  if (worker) {
+    const jobId = nextJobId(packet.eventType);
+    try {
+      const response = await dispatchWorkerJob(
+        worker,
+        { id: jobId, type: AUDIO_WORKER_JOB_TYPES.RENDER_ONE_SHOT, packet, sampleRate },
+        workerTimeoutMs,
+      );
+      if (response?.ok && response.buffer instanceof Float32Array && response.buffer.length > 0) {
+        if (Array.isArray(response.diagnostics)) diagnostics.push(...response.diagnostics);
+        return { pcm: response.buffer, source: 'worker', diagnostics };
+      }
+      if (response?.error) diagnostics.push(`WORKER_RENDER_FAILED:${response.error}`);
+    } catch (err) {
+      diagnostics.push(`WORKER_TIMEOUT_OR_ERROR:${err?.message ?? String(err)}`);
+    }
+  }
+
+  const mainResult = renderSfxBuffer(packet, sampleRate);
+  if (mainResult.ok && mainResult.channelData.length > 0) {
+    diagnostics.push(...mainResult.diagnostics);
+    return { pcm: mainResult.channelData, source: 'main', diagnostics };
+  }
+
+  diagnostics.push(...mainResult.diagnostics);
+  return { pcm: null, source: 'failed', diagnostics };
+}
+
+/**
+ * Resolves or renders an AudioBuffer for a packet (cache-aware).
+ *
+ * @param {object} params
+ * @param {object} params.packet
  * @param {AudioContext} params.audioContext
- * @param {Worker} params.worker
+ * @param {Worker|null} [params.worker]
+ * @returns {Promise<{ audioBuffer: AudioBuffer|null, source: string, diagnostics: string[] }>}
+ */
+export async function resolvePacketAudioBuffer({ packet, audioContext, worker = null }) {
+  const checksum = packet.checksum ?? '';
+  const sampleRate = audioContext.sampleRate;
+
+  const cached = checksum ? cacheGet(checksum) : null;
+  if (cached) {
+    return { audioBuffer: cached, source: 'cache', diagnostics: [] };
+  }
+
+  const { pcm, source, diagnostics } = await resolvePacketPcm({
+    packet,
+    sampleRate,
+    worker,
+  });
+
+  if (!pcm || pcm.length === 0) {
+    return { audioBuffer: null, source: 'failed', diagnostics };
+  }
+
+  const audioBuffer = createMonoAudioBuffer(audioContext, pcm, sampleRate);
+  if (checksum) cacheSet(checksum, audioBuffer);
+  return { audioBuffer, source, diagnostics };
+}
+
+/**
+ * Schedules a PB-SFX-v1 packet for playback.
+ *
+ * @param {object} params
+ * @param {object} params.packet
+ * @param {AudioContext} params.audioContext
+ * @param {Worker|null} [params.worker]
  * @param {import('./audio-mixer.js').AudioMixerInstance} params.mixer
  * @returns {Promise<void>}
  */
-export async function schedulePacket({ packet, audioContext, worker, mixer }) {
-  const checksum = packet.checksum ?? '';
-  const sampleRate = audioContext.sampleRate;
+export async function schedulePacket({ packet, audioContext, worker = null, mixer }) {
   const panValue = packet?.routing?.pan ?? 0;
   const busName = packet?.routing?.bus ?? 'combat';
 
-  // Cache hit
-  let audioBuffer = cacheGet(checksum);
+  const { audioBuffer } = await resolvePacketAudioBuffer({
+    packet,
+    audioContext,
+    worker,
+  });
 
-  // Cache miss: render via worker
   if (!audioBuffer) {
-    const jobId = nextJobId(packet.eventType);
-    let response;
-    try {
-      response = await dispatchWorkerJob(
-        worker,
-        { id: jobId, type: AUDIO_WORKER_JOB_TYPES.RENDER_ONE_SHOT, packet, sampleRate },
-        400, // 400ms timeout for MVP one-shot sounds
-      );
-    } catch (_timeoutErr) {
-      playFallbackTone(packet, audioContext, mixer);
-      return;
-    }
-
-    if (!response?.ok || !(response.buffer instanceof Float32Array) || response.buffer.length === 0) {
-      playFallbackTone(packet, audioContext, mixer);
-      return;
-    }
-
-    // AMENDMENT 1: raw PCM → createBuffer + copyToChannel. Never decodeAudioData.
-    audioBuffer = createMonoAudioBuffer(audioContext, response.buffer, sampleRate);
-    if (checksum) cacheSet(checksum, audioBuffer);
+    playFallbackTone(packet, audioContext, mixer);
+    return;
   }
 
-  // Play
   const source = audioContext.createBufferSource();
   source.buffer = audioBuffer;
 
-  // AMENDMENT 3: pan in browser adapter, never in core
   const panner = audioContext.createStereoPanner();
   panner.pan.value = Math.max(-1, Math.min(1, Number.isFinite(panValue) ? panValue : 0));
 

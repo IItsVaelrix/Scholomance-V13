@@ -14,6 +14,7 @@ import hashlib
 from textual.widgets import Static, Button
 from textual.containers import Grid
 from textual import on
+from tui.ui.sigils import title
 
 # ── Scholomance palette (matches app.py) ────────────────────────────
 CRIMSON    = "#DC143C"
@@ -60,7 +61,7 @@ class MemoryCellWidget(Static):
         self._auto_refresh = None
 
     def on_mount(self):
-        self.border_title = "❖ MEMORY CELLS ❖"
+        self.border_title = title("MEMORY CELLS")
         self.styles.height = "22"
         self._build_grid()
         self._auto_refresh = self.set_interval(10.0, self._refresh)

@@ -1,0 +1,49 @@
+asset void_forest_grass_tile canvas 32x32
+
+palette {
+  dirt_base = #161018
+  dirt_mid  = #2a1f2e
+  grass_sh  = #163628
+  grass_mid = #255940
+  grass_hi  = #3bb37a
+  void_dark = #240b36
+  void_glow = #9d2bba
+}
+
+part base_dirt material obsidian {
+  rect 0 0 32 32 dirt_base
+  rect 4 4 24 24 dirt_mid
+  circle 12 18 radius 6 dirt_base
+  circle 24 24 radius 5 dirt_base
+}
+
+part surface_grass material pine_needle {
+  rect 0 0 32 14 grass_sh
+  polygon 0 14 6 20 14 16 22 22 32 14 32 0 0 0 grass_mid
+  
+  # Tuft highlights
+  circle 6 8 radius 4 grass_hi
+  circle 24 6 radius 5 grass_hi
+  circle 14 10 radius 4 grass_hi
+  
+  # Grass blades
+  line 4 18 4 12 grass_hi
+  line 12 20 12 14 grass_hi
+  line 22 24 22 18 grass_hi
+  line 28 16 28 10 grass_hi
+}
+
+part void_crystals material void_core {
+  # Sharp void crystals jutting from the dirt
+  polygon 6 28 8 16 10 28 void_dark
+  polygon 22 30 26 12 30 30 void_dark
+}
+
+part crystal_glow material void_rune_glow {
+  # Bright glowing cores of the void crystals
+  line 8 26 8 18 void_glow
+  line 26 28 26 16 void_glow
+  glow radius 3
+}
+
+export json png aseprite

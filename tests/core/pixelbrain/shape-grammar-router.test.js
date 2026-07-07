@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { forgeArmor } from '../../../codex/core/pixelbrain/factory/armor-factory.js';
-import { executeRoute } from '../../../codex/core/pixelbrain/microprocessor-route.js';
+import { validateRoute } from '../../../codex/core/pixelbrain/microprocessor-route.js';
 import { forgeItemAsset } from '../../../codex/core/pixelbrain/item-foundry.js';
 import { normalizeItemSpec } from '../../../codex/core/pixelbrain/item-spec.js';
 import { buildVoidChestplateSpec } from '../../../scripts/generate-void-chestplate.mjs';
@@ -48,7 +48,7 @@ describe('PixelBrain deterministic shape grammar router', () => {
       )),
     };
     const { routeDefinition, context } = routeFor(spec, bundle);
-    const result = executeRoute(routeDefinition, { ...context, spec: brokenSpec });
+    const result = validateRoute(routeDefinition, { ...context, spec: brokenSpec });
 
     expect(result.diagnostics.ok).toBe(false);
     expect(result.diagnostics.failures).toEqual(
@@ -67,7 +67,7 @@ describe('PixelBrain deterministic shape grammar router', () => {
     const bundle = forgeItemAsset(spec, { includePng: false });
     const { routeDefinition, context } = routeFor(spec, bundle);
     const withoutEmblem = bundle.assetPacket.geometry.coordinates.filter((cell) => cell.partId !== 'emblem');
-    const result = executeRoute(routeDefinition, {
+    const result = validateRoute(routeDefinition, {
       ...context,
       fills: { coordinates: withoutEmblem },
     });
@@ -90,7 +90,7 @@ describe('PixelBrain deterministic shape grammar router', () => {
     const bundle = forgeItemAsset(spec, { includePng: false });
     const { routeDefinition, context } = routeFor(spec, bundle);
     const oneSided = bundle.assetPacket.geometry.coordinates.filter((cell) => cell.partId !== 'right_pauldron');
-    const result = executeRoute(routeDefinition, {
+    const result = validateRoute(routeDefinition, {
       ...context,
       fills: { coordinates: oneSided },
     });
@@ -111,7 +111,7 @@ describe('PixelBrain deterministic shape grammar router', () => {
     const bundle = forgeItemAsset(spec, { includePng: false });
     const { routeDefinition, context } = routeFor(spec, bundle);
     const { center_core: _centerCore, ...masks } = bundle.geometry.masks;
-    const result = executeRoute(routeDefinition, {
+    const result = validateRoute(routeDefinition, {
       ...context,
       geometry: { ...bundle.geometry, masks },
     });

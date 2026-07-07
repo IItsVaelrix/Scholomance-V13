@@ -1,0 +1,439 @@
+{
+  "version": "SCDNA-v1",
+  "genes": {
+    "BUGPATTERN_COLOR_DRAGON_FRONTEND_FALLBACK": {
+      "version": "SCDNA-v1",
+      "identity": {
+        "stableId": "BUGPATTERN_COLOR_DRAGON_FRONTEND_FALLBACK",
+        "contentHash": "scdna-cdragon-ui-phoneme-v1",
+        "sourceKind": "bug"
+      },
+      "domain": {
+        "primary": "code",
+        "secondary": [
+          "phoneme",
+          "ui",
+          "rhyme-coloring",
+          "determinism"
+        ],
+        "activationBrains": [
+          "CODE_BRAIN",
+          "PHONEME_BRAIN",
+          "UI_BRAIN",
+          "RISK_BRAIN",
+          "TEST_BRAIN"
+        ]
+      },
+      "retrieval": {
+        "lookupMode": "hybrid",
+        "priority": 0.95,
+        "confidence": 0.98,
+        "originalConfidence": 0.98,
+        "freshness": 0.9,
+        "canonical": true,
+        "minConfidence": 0.45
+      },
+      "instruction": {
+        "action": "warn",
+        "imperative": "Do not let frontend fallback logic recompute vowel-family truth when backend resonance data already exists.",
+        "forbiddenDrift": [
+          "Do not patch only the visual color palette",
+          "Do not bypass backend resonance gates",
+          "Do not trust frontend-only phoneme analysis over backend truth"
+        ],
+        "requiredChecks": [
+          "Verify backend resonance indices are passed to frontend",
+          "Verify frontend renders confirmed indices only",
+          "Run rhyme coloring regression tests"
+        ]
+      },
+      "risk": {
+        "riskClass": "high",
+        "blastRadius": "cross_system",
+        "staleRisk": 0.1,
+        "misuseRisk": 0.75
+      },
+      "english": {
+        "shortMeaning": "Frontend rhyme coloring bug caused by weaker local vowel-family fallback.",
+        "expandedMeaning": "This pattern indicates a desync between backend phoneme authority and frontend rendering logic. The backend should remain the source of truth for vowel-family and resonance decisions. The frontend may render confirmed indices but should not independently recalculate linguistic truth.",
+        "operatorInstruction": "When this gene activates, inspect backend-to-frontend resonance data flow before changing UI color logic."
+      },
+      "lifecycle": {
+        "status": "active",
+        "contradictionCount": 0,
+        "lastContradictionAtIndex": null,
+        "degradationFactor": 0.85,
+        "recoveryIncrement": 0.02,
+        "deprecationThreshold": 0.45,
+        "supersededBy": null,
+        "quarantineReason": null
+      }
+    },
+    "ARCH_RULE_BACKEND_TRUTH_AUTHORITY": {
+      "version": "SCDNA-v1",
+      "identity": {
+        "stableId": "ARCH_RULE_BACKEND_TRUTH_AUTHORITY",
+        "contentHash": "scdna-arch-backend-truth-v1",
+        "sourceKind": "architecture"
+      },
+      "domain": {
+        "primary": "architecture",
+        "secondary": [
+          "determinism",
+          "authority",
+          "frontend",
+          "backend"
+        ],
+        "activationBrains": [
+          "ARCHITECTURE_BRAIN",
+          "DETERMINISM_BRAIN",
+          "RISK_BRAIN"
+        ]
+      },
+      "retrieval": {
+        "lookupMode": "exact",
+        "priority": 0.9,
+        "confidence": 0.97,
+        "originalConfidence": 0.97,
+        "freshness": 0.95,
+        "canonical": true,
+        "minConfidence": 0.45
+      },
+      "instruction": {
+        "action": "route",
+        "imperative": "Backend computation and canonical data are the source of truth. Frontend display must reflect backend state, never recompute it.",
+        "forbiddenDrift": [
+          "Do not implement duplicate logic in frontend",
+          "Do not treat frontend cache as authoritative",
+          "Do not bypass backend validation gates"
+        ],
+        "requiredChecks": [
+          "Confirm backend endpoint returns computed value",
+          "Confirm frontend consumes value without transformation",
+          "Verify no shadow computation exists in UI layer"
+        ]
+      },
+      "risk": {
+        "riskClass": "medium",
+        "blastRadius": "cross_system",
+        "staleRisk": 0.05,
+        "misuseRisk": 0.6
+      },
+      "english": {
+        "shortMeaning": "Backend truth authority: the server owns canonical state and computation.",
+        "expandedMeaning": "This architectural rule prevents frontend drift by declaring that authoritative logic lives in backend services. The UI layer renders and reacts; it does not independently calculate combat, scoring, or phoneme truth.",
+        "operatorInstruction": "When this gene activates, route authority questions to backend code and tests, not frontend components."
+      },
+      "lifecycle": {
+        "status": "active",
+        "contradictionCount": 0,
+        "lastContradictionAtIndex": null,
+        "degradationFactor": 0.85,
+        "recoveryIncrement": 0.02,
+        "deprecationThreshold": 0.45,
+        "supersededBy": null,
+        "quarantineReason": null
+      }
+    },
+    "TOOL_RULE_SEARCH_BEFORE_ASSUME": {
+      "version": "SCDNA-v1",
+      "identity": {
+        "stableId": "TOOL_RULE_SEARCH_BEFORE_ASSUME",
+        "contentHash": "scdna-tool-search-before-assume-v1",
+        "sourceKind": "tool"
+      },
+      "domain": {
+        "primary": "memory",
+        "secondary": [
+          "search",
+          "retrieval",
+          "governance",
+          "evidence"
+        ],
+        "activationBrains": [
+          "MEMORY_BRAIN",
+          "RISK_BRAIN",
+          "DETERMINISM_BRAIN"
+        ]
+      },
+      "retrieval": {
+        "lookupMode": "symbolic",
+        "priority": 0.85,
+        "confidence": 0.96,
+        "originalConfidence": 0.96,
+        "freshness": 0.9,
+        "canonical": true,
+        "minConfidence": 0.45
+      },
+      "instruction": {
+        "action": "warn",
+        "imperative": "Do not assume memory state. Search the codebase or memory substrate before declaring a fact about implementation.",
+        "forbiddenDrift": [
+          "Do not answer from model memory alone when code truth is available",
+          "Do not skip search because the answer feels obvious",
+          "Do not cite unverified assumptions as facts"
+        ],
+        "requiredChecks": [
+          "Run a targeted search for the symbol or pattern",
+          "Cross-check with at least one source file or memory record",
+          "Record the evidence reference in the context ledger"
+        ]
+      },
+      "risk": {
+        "riskClass": "medium",
+        "blastRadius": "module",
+        "staleRisk": 0.2,
+        "misuseRisk": 0.5
+      },
+      "english": {
+        "shortMeaning": "Search before assume: verify claims against substrate before acting.",
+        "expandedMeaning": "This rule guards against hallucinated implementation details by requiring evidence retrieval before confident statements about code, memory, or system behavior.",
+        "operatorInstruction": "When this gene activates, require a search step and record evidence before accepting the task's premises."
+      },
+      "lifecycle": {
+        "status": "active",
+        "contradictionCount": 0,
+        "lastContradictionAtIndex": null,
+        "degradationFactor": 0.85,
+        "recoveryIncrement": 0.02,
+        "deprecationThreshold": 0.45,
+        "supersededBy": null,
+        "quarantineReason": null
+      }
+    },
+    "sprite.holy_fire_claymore.v1": {
+      "version": "SCDNA-v1",
+      "identity": {
+        "stableId": "sprite.holy_fire_claymore.v1",
+        "contentHash": "scdna-0dc24ca790a95ef0b731b9d1",
+        "sourceKind": "sprite"
+      },
+      "domain": {
+        "primary": "pixel",
+        "secondary": [],
+        "activationBrains": [
+          "PIXEL_BRAIN",
+          "LORE_BRAIN"
+        ]
+      },
+      "retrieval": {
+        "lookupMode": "hybrid",
+        "priority": 0.5,
+        "confidence": 0.9,
+        "originalConfidence": 0.9,
+        "freshness": 0.9,
+        "canonical": true,
+        "minConfidence": 0.45
+      },
+      "instruction": {
+        "action": "recall",
+        "imperative": "When forging or recalling the Holy Fire Claymore, load skeleton holy_fire_claymore.from_image.v1 (PBRAIN-v1, 64x128, 2322 coords, 32 colors) and render the sprite from its coordinates; preserve the vertical symmetry axis at x=31.5.",
+        "forbiddenDrift": [
+          "Do not derive canonical state from the raster preview."
+        ],
+        "requiredChecks": [
+          "Verify FNV-1a-32 checksum 6DB23A1A before use.",
+          "Preserve vertical symmetry axis x=31.5."
+        ]
+      },
+      "risk": {
+        "riskClass": "low",
+        "blastRadius": "local",
+        "staleRisk": 0.0,
+        "misuseRisk": 0.0
+      },
+      "english": {
+        "shortMeaning": "Holy Fire Claymore sprite skeleton: 64x128 traced PixelBrain asset; render from coordinates and keep vertical symmetry.",
+        "expandedMeaning": "Traced from claymore_holy_fire_upscale; 13 semantic parts (blade_core/edge, crossguard, grip_wrap, holy_fire, embers, pommel). Symmetry score 0.84.",
+        "operatorInstruction": "When forging or recalling the Holy Fire Claymore, load skeleton holy_fire_claymore.from_image.v1 (PBRAIN-v1, 64x128, 2322 coords, 32 colors) and render the sprite from its coordinates; preserve the vertical symmetry axis at x=31.5."
+      },
+      "lifecycle": {
+        "status": "deprecated",
+        "contradictionCount": 0,
+        "lastContradictionAtIndex": null,
+        "degradationFactor": 0.85,
+        "recoveryIncrement": 0.02,
+        "deprecationThreshold": 0.45,
+        "supersededBy": "sprite.holy_fire_claymore.v2",
+        "quarantineReason": null
+      }
+    },
+    "sprite.holy_fire_claymore.v2": {
+      "version": "SCDNA-v1",
+      "identity": {
+        "stableId": "sprite.holy_fire_claymore.v2",
+        "contentHash": "scdna-0e040bdcea9aea16f3ea9ab4",
+        "sourceKind": "sprite"
+      },
+      "domain": {
+        "primary": "pixel",
+        "secondary": [],
+        "activationBrains": [
+          "PIXEL_BRAIN",
+          "LORE_BRAIN"
+        ]
+      },
+      "retrieval": {
+        "lookupMode": "hybrid",
+        "priority": 0.5,
+        "confidence": 0.9,
+        "originalConfidence": 0.9,
+        "freshness": 0.9,
+        "canonical": true,
+        "minConfidence": 0.45
+      },
+      "instruction": {
+        "action": "recall",
+        "imperative": "When forging or recalling the Holy Fire Claymore, load skeleton holy_fire_claymore.from_image.v1 (PBRAIN-v1, 64x128, 2322 coords, 32 colors) and render the sprite from its coordinates; preserve the vertical symmetry axis at x=31.5.",
+        "forbiddenDrift": [
+          "Do not derive canonical state from the raster preview."
+        ],
+        "requiredChecks": [
+          "Verify FNV-1a-32 checksum 6DB23A1A with vaelrix_forcefield.pixelbrain.pbrain_checksum (Python json.dumps(packet-minus-checksum, separators=(',',':'))). JS verifiers fail: JSON.parse collapses float 64.0 to 64.",
+          "Preserve vertical symmetry axis x=31.5."
+        ]
+      },
+      "risk": {
+        "riskClass": "low",
+        "blastRadius": "local",
+        "staleRisk": 0.0,
+        "misuseRisk": 0.0
+      },
+      "english": {
+        "shortMeaning": "Holy Fire Claymore sprite skeleton: 64x128 traced PixelBrain asset; render from coordinates and keep vertical symmetry.",
+        "expandedMeaning": "Traced from claymore_holy_fire_upscale; 13 semantic parts. Checksum is Python-compact FNV-1a-32; JS verifiers fail on float 64.0.",
+        "operatorInstruction": "When forging or recalling the Holy Fire Claymore, load skeleton holy_fire_claymore.from_image.v1 (PBRAIN-v1, 64x128, 2322 coords, 32 colors) and render the sprite from its coordinates; preserve the vertical symmetry axis at x=31.5."
+      },
+      "lifecycle": {
+        "status": "active",
+        "contradictionCount": 0,
+        "lastContradictionAtIndex": null,
+        "degradationFactor": 0.85,
+        "recoveryIncrement": 0.02,
+        "deprecationThreshold": 0.45,
+        "supersededBy": null,
+        "quarantineReason": null
+      }
+    },
+    "sprite.void_ice_claymore.v1": {
+      "version": "SCDNA-v1",
+      "identity": {
+        "stableId": "sprite.void_ice_claymore.v1",
+        "contentHash": "scdna-e4ccfd87f07923d38c90802a",
+        "sourceKind": "sprite"
+      },
+      "domain": {
+        "primary": "pixel",
+        "secondary": [],
+        "activationBrains": [
+          "PIXEL_BRAIN",
+          "LORE_BRAIN"
+        ]
+      },
+      "retrieval": {
+        "lookupMode": "hybrid",
+        "priority": 0.5,
+        "confidence": 0.88,
+        "originalConfidence": 0.88,
+        "freshness": 0.9,
+        "canonical": true,
+        "minConfidence": 0.45
+      },
+      "instruction": {
+        "action": "recall",
+        "imperative": "When forging or recalling the Void Ice Claymore, load skeleton void_ice_claymore.morph.v1 (PBRAIN-v1, 64x128, 2322 coords, 24 colors) and render from its coordinates; it is a luminance-ramp morph of holy_fire_claymore (icy_fire flames, sapphire blade, voidsteel hilt, amethyst pommel). Preserve vertical symmetry axis x=31.5.",
+        "forbiddenDrift": [
+          "Do not derive canonical state from the raster preview."
+        ],
+        "requiredChecks": [
+          "Verify FNV-1a-32 checksum 1A72809C with vaelrix_forcefield.pixelbrain.pbrain_checksum (Python json.dumps(packet-minus-checksum, separators=(',',':'))).",
+          "Preserve vertical symmetry axis x=31.5."
+        ]
+      },
+      "risk": {
+        "riskClass": "low",
+        "blastRadius": "local",
+        "staleRisk": 0.0,
+        "misuseRisk": 0.0
+      },
+      "english": {
+        "shortMeaning": "Void Ice Claymore: ice-flame + void recolor morph of the Holy Fire Claymore; render from coordinates, keep vertical symmetry.",
+        "expandedMeaning": "Per-part luminance-preserving ramp remap onto material-registry void/ice materials. Geometry identical to holy_fire_claymore.from_image.v1.",
+        "operatorInstruction": "When forging or recalling the Void Ice Claymore, load skeleton void_ice_claymore.morph.v1 (PBRAIN-v1, 64x128, 2322 coords, 24 colors) and render from its coordinates; it is a luminance-ramp morph of holy_fire_claymore (icy_fire flames, sapphire blade, voidsteel hilt, amethyst pommel). Preserve vertical symmetry axis x=31.5."
+      },
+      "lifecycle": {
+        "status": "active",
+        "contradictionCount": 0,
+        "lastContradictionAtIndex": null,
+        "degradationFactor": 0.85,
+        "recoveryIncrement": 0.02,
+        "deprecationThreshold": 0.45,
+        "supersededBy": null,
+        "quarantineReason": null
+      }
+    },
+    "WAND_CHEMICAL_STROKE_PROPAGATION": {
+      "version": "SCDNA-v1",
+      "identity": {
+        "stableId": "WAND_CHEMICAL_STROKE_PROPAGATION",
+        "contentHash": "scdna-wand-stroke-chem-v1",
+        "sourceKind": "rule"
+      },
+      "domain": {
+        "primary": "pixel",
+        "secondary": ["architecture", "formula", "propagation", "scdl", "tactical"],
+        "activationBrains": [
+          "PIXEL_BRAIN",
+          "ARCHITECTURE_BRAIN",
+          "LORE_BRAIN"
+        ]
+      },
+      "retrieval": {
+        "lookupMode": "hybrid",
+        "priority": 0.92,
+        "confidence": 0.95,
+        "originalConfidence": 0.95,
+        "freshness": 0.95,
+        "canonical": true,
+        "minConfidence": 0.45
+      },
+      "instruction": {
+        "action": "route",
+        "imperative": "When handling mathematical stroke formulas or Wand propagation tasks, treat the formula as a chemical reaction law. Do not perform culinary batch sampling or parameter jitter. Instead: 1) Parse the stroke formula's parametric kinetics (path, width(t), pressure, bleed). 2) Propagate by recursive generative unfolding using PixelBrain/SCDL laws as reaction mechanisms (symmetry as replication catalyst, material resonance as reagent selection, vector/ring/path ops as bonding, TurboQuant as crystallization/quantization step, photonic scoring as selection pressure). 3) Output expanded geometry or sub-formulas that self-organize according to the original law. Prioritize deterministic rule application over trial-and-error variations.",
+        "forbiddenDrift": [
+          "Do not implement propagation as repeated calls with small random param tweaks",
+          "Do not rely on score-and-pick from multiple independent evaluations",
+          "Do not treat the stroke as a static recipe to be varied and tasted",
+          "Do not bypass the formula's own math in favor of external heuristics"
+        ],
+        "requiredChecks": [
+          "Verify that propagation applies the original formula's functions recursively or via field rules",
+          "Confirm use of symmetry, material, and SCDL-compatible ops as the propagation operators",
+          "Ensure TurboQuant and photonic mechanisms are used for state selection, not just post-filtering",
+          "Validate output remains expressible as efficient SCDL or PixelBrain packet"
+        ]
+      },
+      "risk": {
+        "riskClass": "medium",
+        "blastRadius": "module",
+        "staleRisk": 0.1,
+        "misuseRisk": 0.4
+      },
+      "english": {
+        "shortMeaning": "Wand stroke formulas must propagate chemically via generative rules, not culinarily via batch sampling.",
+        "expandedMeaning": "The Wand's core power is authoring pure mathematical models of strokes. Propagation must honor that by letting the model act as a reaction law that unfolds deterministically using the engine's existing symmetries, quantizers, and perception systems. This produces self-consistent, evolvable art instead of ad-hoc variations.",
+        "operatorInstruction": "When this gene is active for a prompt involving Wand, stroke formulas, propagation, tactical art assets, or procedural pixel generation: redirect any 'try variations' thinking toward recursive application of the formula's math under PixelBrain laws. Use the formula parameters as kinetics, not as knobs for manual experimentation."
+      },
+      "lifecycle": {
+        "status": "active",
+        "contradictionCount": 0,
+        "lastContradictionAtIndex": null,
+        "degradationFactor": 0.85,
+        "recoveryIncrement": 0.02,
+        "deprecationThreshold": 0.45,
+        "supersededBy": null,
+        "quarantineReason": null
+      }
+    }
+  }
+}

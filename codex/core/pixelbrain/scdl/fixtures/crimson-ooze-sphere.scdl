@@ -1,0 +1,24 @@
+# crimson-ooze-sphere.scdl
+# SCDL v1 sphere op — crimson-ooze palette.
+
+asset crimson_ooze canvas 24x24
+
+palette {
+  core   = #DA1B1B
+  rim    = #651515
+  glow   = #F87272
+  shine  = #F99494
+  shadow = #200909
+}
+
+part body material crimson_ooze_material {
+  sphere 12 12 radius 10 shine glow core rim shadow
+  glow radius 2
+}
+
+part highlight material emissive {
+  circle 7 7 radius 1 shine
+  circle 9 9 radius 1 shine
+}
+
+export json svg phaser png

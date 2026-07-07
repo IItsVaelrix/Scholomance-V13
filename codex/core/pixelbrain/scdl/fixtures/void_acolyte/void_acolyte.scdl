@@ -1,0 +1,161 @@
+# void_acolyte.scdl
+# SCDL v1.1 character model — hooded Scholomance acolyte with orb staff.
+# Vector + sphere authoring style, symmetry x for paired limbs/eyes.
+# 4-frame idle loop: rest → hood-dip → glow-surge → gold-glint.
+
+asset void_acolyte canvas 32x48
+
+palette {
+  hoodhi    = #453070
+  hood      = #2C1F4D
+  hooddeep  = #1B1230
+  robe      = #362463
+  robeshade = #241743
+  robehi    = #4B3585
+  skinshine = #F7E3C3
+  skin      = #E8C9A0
+  skinshade = #C79B6B
+  skinshadow= #7A5638
+  gold      = #D8B84C
+  golddark  = #A8862F
+  eye       = #00E5FF
+  eyebright = #A8F4FF
+  glint     = #FFE9A6
+  boot      = #16101F
+  wood      = #5C4028
+  wooddark  = #3A2817
+  orbshine  = #B7F3FF
+  orbcore   = #00E5FF
+  orbrim    = #0077A8
+  orbshadow = #023347
+}
+
+# --- staff first: body and hand paint over it where they meet ---
+part staff material bark {
+  line 25 13 25 46 wood
+  line 26 13 26 46 wooddark
+  cell 25 27 gold
+}
+
+part orb material void_core {
+  sphere 25.5 8.5 radius 3.5 light -1 -1 orbshine orbcore orbcore orbrim orbshadow
+  glow radius 3
+}
+
+# --- robe body: A-line silhouette, seam, hem ---
+part robe material void_cloth {
+  polygon 10 17 21 17 25 46 6 46 robe
+  rect 15 24 2 22 robeshade
+  line 20 27 23 43 robeshade
+  rect 7 44 18 2 golddark
+  cell 5 44 robe
+  cell 5 45 robeshade
+  cell 22 17 robehi
+}
+
+part belt material gold {
+  rect 11 26 10 2 golddark
+  cell 15 26 gold
+  cell 16 26 gold
+}
+
+part arms material void_cloth {
+  symmetry x
+  rect 7 18 3 9 robehi
+  rect 7 27 2 2 skin
+}
+
+part boots material voidsteel {
+  symmetry x
+  rect 10 45 4 3 boot
+}
+
+# --- hood over shoulders, face inside ---
+part hood material void_cloth {
+  circle 15.5 10 radius 7.5 hoodhi
+  circle 15.5 10.5 radius 6 hooddeep
+}
+
+part face material skin_light {
+  sphere 15.5 11.5 radius 4.5 light -1 -1 skinshine skin skin skinshade skinshadow
+}
+
+part eyes material cyan_glow {
+  symmetry x
+  cell 13 11 eye
+  glow radius 1
+}
+
+part eyespark material cyan_glow {
+  cell 18 11 eyebright
+}
+
+part amulet material cyan_glow {
+  cell 15 21 eye
+  cell 16 21 eye
+  glow radius 2
+}
+
+# --- idle loop: tiny ritual motion, ominous presence ---
+# f0 rest → f1 hood-dip (inhale: hood + shoulders sink) →
+# f2 glow-surge (energy peak: eyes flare, amulet + orb spark, still low) →
+# f3 gold-glint (release: hood rises, staff band gleams, hem settles) → f0
+loop idle duration 400
+
+frame 1 "hood-dip" {
+  part hood material void_cloth {
+    circle 15.5 11 radius 7.5 hoodhi
+    circle 15.5 11.5 radius 6 hooddeep
+  }
+  part hoodbrow after face material void_cloth {
+    rect 12 7 8 2 hood
+  }
+  part arms material void_cloth {
+    symmetry x
+    rect 7 19 3 8 robehi
+    rect 7 27 2 2 skin
+  }
+}
+
+frame 2 "glow-surge" {
+  part hood material void_cloth {
+    circle 15.5 11 radius 7.5 hoodhi
+    circle 15.5 11.5 radius 6 hooddeep
+  }
+  part hoodbrow after face material void_cloth {
+    rect 12 7 8 2 hood
+  }
+  part arms material void_cloth {
+    symmetry x
+    rect 7 19 3 8 robehi
+    rect 7 27 2 2 skin
+  }
+  part eyes material cyan_glow {
+    symmetry x
+    cell 13 11 eye
+    cell 13 10 eyebright
+    glow radius 2
+  }
+  part amulet material cyan_glow {
+    cell 15 21 eyebright
+    cell 16 21 eyebright
+    glow radius 3
+  }
+  part orbspark after orb material cyan_glow {
+    cell 22 5 orbshine
+  }
+}
+
+frame 3 "gold-glint" {
+  part staff material bark {
+    line 25 13 25 46 wood
+    line 26 13 26 46 wooddark
+    cell 25 26 glint
+    cell 25 27 glint
+  }
+  part hemsettle after robe material void_cloth {
+    cell 4 45 robeshade
+  }
+}
+
+export json svg phaser png aseprite

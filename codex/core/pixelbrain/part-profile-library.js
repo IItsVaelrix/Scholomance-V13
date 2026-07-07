@@ -2519,3 +2519,109 @@ registerPartProfile('tool.pickaxe.inlay.void_runes', (params = {}, options = {})
     },
   };
 });
+
+/** Loot chest body — tapered crate base; recolored via semantic `source` material. */
+registerPartProfile('loot.chest.body', (params = {}, options = {}) => {
+  const cx = roundInt(params.cx ?? 20);
+  const half = roundInt(params.half ?? 11);
+  const top = roundInt(params.top ?? 14);
+  const bottom = roundInt(params.bottom ?? 23);
+  const cells = [];
+  for (let y = top; y <= bottom; y += 1) {
+    const taper = Math.floor((y - top) * 0.12);
+    const span = Math.max(5, half - taper);
+    for (let x = cx - span; x <= cx + span; x += 1) cells.push({ x, y });
+  }
+  for (let x = cx - half + 1; x <= cx + half - 1; x += 1) cells.push({ x, y: bottom + 1 });
+  return {
+    cells,
+    anchors: {
+      base: { x: cx, y: bottom + 1 },
+      top: { x: cx, y: top },
+      center: { x: cx, y: Math.floor((top + bottom) / 2) },
+    },
+  };
+});
+
+/** Loot chest lid — arched cover hinged at the body seam. */
+registerPartProfile('loot.chest.lid', (params = {}, options = {}) => {
+  const cx = roundInt(params.cx ?? 20);
+  const half = roundInt(params.half ?? 12);
+  const top = roundInt(params.top ?? 5);
+  const hinge = roundInt(params.hinge ?? 13);
+  const cells = [];
+  for (let y = top; y <= hinge; y += 1) {
+    const t = (y - top) / Math.max(1, hinge - top);
+    const arch = Math.max(4, Math.round(half * (1 - t * t * 0.32)));
+    for (let x = cx - arch; x <= cx + arch; x += 1) cells.push({ x, y });
+  }
+  return {
+    cells,
+    anchors: {
+      base: { x: cx, y: hinge },
+      tip: { x: cx, y: top },
+      center: { x: cx, y: Math.floor((top + hinge) / 2) },
+    },
+  };
+});
+
+/** Horizontal reinforcement band across the chest front. */
+registerPartProfile('loot.chest.band', (params = {}, options = {}) => {
+  const cx = roundInt(params.cx ?? 20);
+  const half = roundInt(params.half ?? 10);
+  const y0 = roundInt(params.y0 ?? 15);
+  const y1 = roundInt(params.y1 ?? 16);
+  const cells = [];
+  for (let y = y0; y <= y1; y += 1) {
+    for (let x = cx - half; x <= cx + half; x += 1) cells.push({ x, y });
+  }
+  return {
+    cells,
+    anchors: {
+      base: { x: cx, y: y1 },
+      center: { x: cx, y: Math.floor((y0 + y1) / 2) },
+    },
+  };
+});
+
+/** Central clasp / lock plate. */
+registerPartProfile('loot.chest.lock', (params = {}, options = {}) => {
+  const cx = roundInt(params.cx ?? 20);
+  const cy = roundInt(params.cy ?? 12);
+  const half = roundInt(params.half ?? 2);
+  const cells = [];
+  for (let y = cy - half; y <= cy + half; y += 1) {
+    for (let x = cx - half; x <= cx + half; x += 1) cells.push({ x, y });
+  }
+  cells.push({ x: cx, y: cy - half - 1 });
+  return {
+    cells,
+    anchors: {
+      base: { x: cx, y: cy + half },
+      center: { x: cx, y: cy },
+    },
+  };
+});
+
+/** Soft outer halo used for high-tier chest glow. */
+registerPartProfile('loot.chest.glow', (params = {}, options = {}) => {
+  const cx = roundInt(params.cx ?? 20);
+  const cy = roundInt(params.cy ?? 10);
+  const rx = roundInt(params.rx ?? 14);
+  const ry = roundInt(params.ry ?? 10);
+  const cells = [];
+  for (let y = cy - ry - 1; y <= cy + ry + 1; y += 1) {
+    for (let x = cx - rx - 1; x <= cx + rx + 1; x += 1) {
+      const nx = (x - cx) / rx;
+      const ny = (y - cy) / ry;
+      const d = nx * nx + ny * ny;
+      if (d >= 0.82 && d <= 1.12) cells.push({ x, y });
+    }
+  }
+  return {
+    cells,
+    anchors: {
+      center: { x: cx, y: cy },
+    },
+  };
+});

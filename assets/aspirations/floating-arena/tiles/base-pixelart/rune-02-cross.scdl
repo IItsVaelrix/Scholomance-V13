@@ -1,0 +1,42 @@
+# rune-02-cross.scdl
+# Base pixel art for rune glyph inspired by ref crop rune-02-cross
+asset rune_02_cross canvas 64x64
+
+palette {
+  deep_ice   = #1a253f
+  base_ice   = #2a3a5a
+  lit_ice    = #4a6a9a
+  glow_blue  = #3db8ff
+  rune_core  = #a0d8ff
+  frost      = #c8e0f0
+  dark_line  = #0f1a30
+}
+
+part slab material ice {
+  rect 2 2 60 60 base_ice
+  polygon 2 2 30 2 30 30 2 30 lit_ice
+  polygon 32 2 62 2 62 30 32 30 lit_ice
+  polygon 2 32 30 32 30 62 2 62 deep_ice
+  polygon 32 32 62 32 62 62 32 62 deep_ice
+  line 2 2 62 2 frost
+  line 2 2 2 62 frost
+  line 0 0 64 0 dark_line
+  line 0 0 0 64 dark_line
+  line 64 0 64 64 dark_line
+  line 0 64 64 64 dark_line
+}
+
+part rune material glow {
+  glow radius 2
+  # Cross with extended arms and inner detail
+  line 12 32 52 32 rune_core
+  line 32 12 32 52 rune_core
+  polygon 24 24 40 24 40 40 24 40 glow_blue
+  cell 32 32 rune_core
+  cell 18 32 frost
+  cell 46 32 frost
+  cell 32 18 frost
+  cell 32 46 frost
+}
+
+export png json

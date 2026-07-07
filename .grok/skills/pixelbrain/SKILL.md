@@ -86,6 +86,7 @@ The textual pair-programmer lives alongside a full visual cockpit at `/pixelbrai
 - **Mentor Station**: The "RUN PROFESSIONAL CRITIQUE" instrument runs the exact ordered checklist (silhouette/readability first), uses the Library's language (especially construction-lines.md phrases for drift, non-radial spokes, weak focal on Void Shields), and always ends with a clear next action + "Apply" or "Load Drill" buttons.
 - **Construction First**: Dedicated support for emitting 00_Reference guides (center + concentric rings + radials) + audit against your inked structure. This is the single highest-leverage habit for shields, orbs, radials, and focal elements.
 - **Aseprite Roundtrip Bench**: 1:1 export/import that preserves layers and construction specs. The canonical flow for real production work.
+- **AI Reference Ingestion**: AI-enhanced images (generated via Imagine or external) belong in `assets/aspirations/`. Use `scripts/prepare-ai-reference.mjs` then `scripts/pixelbrain-silhouette-scan.mjs` to turn them into sealed `.silh` moulds + gates. AI is reference only — never final asset. See `assets/aspirations/README.md` + `prompt-recipes.md` and the SCDNA isometric gene.
 - **Drills**: One-click load of the exact 20-40 minute Void Shield construction drill from the Library, with success criteria and re-critique loop.
 - **Fixed Pro Sizes + Target Previews**: Work at 48/64/96 (or the editor default) with strong zoom/pan and 1-bit / icon-size readability simulators.
 

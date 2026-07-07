@@ -28,6 +28,8 @@ import {
   rasterConstructionGuides,
 } from './raster-math.js';
 import { clampNumber, hashString, GOLDEN_RATIO, goldenRingRadii } from './shared.js';
+import { CanonicalRoles } from './semantic-registry.js';
+import { applyAuthoringSemantics } from './semantic-bridge.js';
 
 export const CONSTRUCTION_LINE_MICROPROCESSOR_ID = 'pixelbrain.constructionLines';
 export const CONSTRUCTION_VERSION = 'construction-v1';
@@ -208,8 +210,8 @@ export function applyConstructionLines(base = [], constructionSpec = {}, options
   const { cx, cy } = { cx: spec.center.x, cy: spec.center.y };
 
   const guideCells = [];
-  const emit = (x, y) => {
-    guideCells.push({
+  const emit = (x, y, extra = {}) => {
+    const cell = {
       x: Math.round(x),
       y: Math.round(y),
       snappedX: Math.round(x),
@@ -218,11 +220,13 @@ export function applyConstructionLines(base = [], constructionSpec = {}, options
       color: GUIDE_COLOR,
       emphasis: GUIDE_EMPHASIS,
       partId: 'reference',
-      role: 'construction',
+      role: CanonicalRoles.CONSTRUCTION_GUIDE || 'constructionGuide',
       source: 'construction-mp',
       isGuide: true,
       ringRole: null, // filled below if applicable
-    });
+      ...extra,
+    };
+    guideCells.push(cell);
   };
 
   // Use high-level raster (populates via side effects on guideCells via closure)
@@ -349,7 +353,7 @@ export function applyConstructionLines(base = [], constructionSpec = {}, options
     merged = Array.from(baseMap.values());
   }
 
-  return Object.freeze({
+  const baseResult = Object.freeze({
     referenceCells,
     skeleton,
     constructionSkeleton: skeleton,
@@ -361,6 +365,26 @@ export function applyConstructionLines(base = [], constructionSpec = {}, options
       ringCount: ringRadii.length,
     }),
   });
+
+  // Connective tissue: wire SemQuant authoring semantics (if not disabled)
+  if (options.withSemantics !== false) {
+    try {
+      const semResult = applyAuthoringSemantics(spec);
+      return {
+        ...baseResult,
+        semantic: {
+          annotations: semResult.annotations || [],
+          roles: (semResult.annotations || []).filter(a => a.domain === 'role').map(a => a.canonicalType),
+          unifier: 'SemQuant/PB-SEM-v1',
+        },
+      };
+    } catch (_) {
+      // Graceful: construction still works without semantics
+      return baseResult;
+    }
+  }
+
+  return baseResult;
 }
 
 /**

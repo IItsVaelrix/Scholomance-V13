@@ -42,6 +42,23 @@ export function rngFromStringSeed(stringSeed) {
  * @param {string}        params.eventType
  * @returns {string}
  */
-export function buildPacketSeedString({ battleId, tile, turn, eventType }) {
-  return `${eventType}:battle_${battleId}:tile_${tile}:turn_${turn}`;
+export function buildPacketSeedString({
+  battleId,
+  tile,
+  turn,
+  eventType,
+  stepIndex,
+  surface,
+  variant,
+}) {
+  const parts = [
+    eventType,
+    `battle_${battleId}`,
+    `tile_${tile}`,
+    `turn_${turn}`,
+  ];
+  if (stepIndex != null) parts.push(`step_${stepIndex}`);
+  if (surface != null && surface !== '') parts.push(`surface_${surface}`);
+  if (variant != null) parts.push(`variant_${variant}`);
+  return parts.join(':');
 }

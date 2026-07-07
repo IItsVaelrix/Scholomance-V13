@@ -1,0 +1,164 @@
+asset voidmetal_fire_legs canvas 96x112
+
+palette {
+  bgshadow      = #0B0C12
+  blackink      = #080910
+  voidblack     = #151620
+  voiddeep      = #222431
+  steelshadow   = #2B2D38
+  steeldeep     = #373944
+  steelmid      = #4B4E5A
+  steelhi       = #86858F
+  silveredge    = #D3CED7
+  oxblooddeep   = #3E0B16
+  oxblood       = #7E1827
+  crimsonedge   = #D43C47
+  redglint      = #FF6A61
+  purpledeep    = #321344
+  purplemid     = #6D2C8B
+  violetglint   = #C58AF0
+  emberdeep     = #7B1309
+  ember         = #D83212
+  orangehot     = #FF711D
+  goldhot       = #FFC35C
+  whitehot      = #FFF0A6
+}
+
+# Silhouette shadow
+part silhouette_shadow material source {
+  polygon 48 10 65 10 74 20 78 35 73 55 69 65 72 80 70 95 62 105 48 108 34 105 26 95 24 80 27 65 23 55 18 35 22 20 31 10 bgshadow
+}
+
+# Base voidsteel leg armor mass
+part legs_base material voidsteel {
+  symmetry x
+  # Pelvis / Tassets
+  polygon 48 15 35 15 25 24 22 36 29 52 46 56 48 56 voidblack
+  polygon 47 25 36 26 27 35 32 49 46 53 voiddeep
+  polygon 46 34 37 35 32 44 45 48 steelshadow
+  polygon 44 38 39 40 44 44 steelmid
+  
+  # Thigh plates
+  polygon 45 52 32 50 25 58 29 65 42 70 47 68 voidblack
+  polygon 44 55 34 54 29 61 32 64 43 67 voiddeep
+  polygon 42 59 36 58 32 62 41 64 steelmid
+  
+  # Knees
+  polygon 48 65 39 67 36 78 48 83 voiddeep
+  polygon 47 70 41 71 39 77 47 80 steeldeep
+  polygon 46 73 43 74 42 76 46 77 steelhi
+  
+  # Greaves
+  polygon 48 82 37 80 32 88 34 100 48 104 voidblack
+  polygon 47 86 38 85 35 91 37 98 47 101 voiddeep
+  polygon 46 90 40 89 38 94 46 97 steelmid
+}
+
+# Crimson utility trim
+part red_trim material ruby {
+  symmetry x
+  # Tasset outer trim
+  path "M 35 15 L 25 24 L 22 36 L 29 52" oxblooddeep
+  line 25 24 22 36 crimsonedge
+  line 22 36 29 52 oxblood
+  
+  # Knee spikes / guards
+  polygon 36 78 30 73 39 67 48 65 48 70 39 71 35 77 oxblooddeep
+  line 30 73 39 67 crimsonedge
+  line 39 67 48 65 redglint
+}
+
+# Silver bevels and structure
+part structural_edges material silver {
+  symmetry x
+  # Pelvis
+  line 48 15 35 15 silveredge
+  line 35 15 25 24 steelhi
+  line 29 52 48 56 steelhi
+  
+  # Thighs
+  line 45 52 32 50 steelhi
+  line 32 50 25 58 steelhi
+  line 25 58 29 65 steelhi
+  line 29 65 42 70 steelhi
+  
+  # Knees
+  line 48 65 39 67 silveredge
+  line 36 78 48 83 steelhi
+  
+  # Greaves
+  line 48 82 37 80 steelhi
+  line 37 80 32 88 steelhi
+  line 32 88 34 100 steelhi
+  line 34 100 48 104 silveredge
+  line 48 82 48 104 silveredge
+}
+
+# Purple enamel structural reinforcement 
+part utility_enamel material amethyst {
+  symmetry x
+  # Side thigh plating
+  polygon 25 45 20 48 24 55 28 50 purpledeep
+  line 20 48 24 55 violetglint
+  
+  # Greave side plating
+  polygon 34 85 28 89 31 96 36 91 purplemid
+  line 28 89 31 96 violetglint
+}
+
+# Utility lava veins running through the armor plates
+part fire_cracks material divine_flame_core {
+  symmetry x
+  # Tasset crack
+  line 48 30 42 26 orangehot
+  line 42 26 36 28 ember
+  line 36 28 32 35 emberdeep
+  
+  # Thigh core heat
+  line 45 55 38 58 orangehot
+  line 38 58 32 55 ember
+  
+  # Greave central fracture
+  line 48 90 44 94 orangehot
+  line 44 94 40 98 ember
+  line 40 98 42 102 emberdeep
+  
+  # Knee heat vent
+  line 45 74 40 75 ember
+  glow radius 1
+}
+
+# Heat cores
+part fire_crack_cores material divine_flame_core {
+  symmetry x
+  line 48 30 44 28 goldhot
+  cell 38 58 goldhot
+  line 48 90 46 92 goldhot
+}
+
+# Embers
+part ember_runes material void_rune_glow {
+  symmetry x
+  line 38 22 41 21 ember
+  line 35 63 37 61 ember
+  line 44 101 47 101 ember
+  cell 45 28 orangehot
+  cell 39 53 orangehot
+  glow radius 1
+}
+
+# Contour ink for pixel art style
+part ink_contour material onyx {
+  symmetry x
+  line 48 10 31 10 blackink
+  line 31 10 22 20 blackink
+  line 22 20 18 35 blackink
+  line 18 35 23 55 blackink
+  line 23 55 27 65 blackink
+  line 27 65 24 80 blackink
+  line 24 80 26 95 blackink
+  line 26 95 34 105 blackink
+  line 34 105 48 108 blackink
+}
+
+export json svg png aseprite

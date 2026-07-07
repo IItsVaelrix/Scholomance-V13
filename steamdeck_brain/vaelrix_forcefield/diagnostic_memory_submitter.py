@@ -124,20 +124,22 @@ def _classify_source(signal: str) -> str:
 # Core submission API
 # ---------------------------------------------------------------------------
 
-def submit_health_signal(
+def _insert_signal(
+    conn: sqlite3.Connection,
     signal: str,
-    source: str = "brain",
-    session_id: str | None = None,
-    db_path: str | None = None,
+    source: str,
+    session_id: str | None,
+    now: float,
 ) -> dict[str, Any]:
     """
-    Submit a single health signal to diagnostic memory.
+    Parse one signal and INSERT OR IGNORE it on an already-open connection.
 
-    Returns a dict with the submission result.
+    Does NOT commit or close — callers batch many of these into a single
+    transaction (see ``submit_to_diagnostic_memory``). Opening/committing/
+    closing a fresh connection per signal is what made per-``ask()`` submission
+    dominate runtime latency; this helper keeps the parse + insert and leaves
+    transaction control to the caller.
     """
-    conn = _ensure_db(db_path)
-    now = time.time()
-
     # Try to parse as a standard PixelBrain health bytecode first.
     try:
         parsed = parse_health(signal)
@@ -197,12 +199,10 @@ def submit_health_signal(
             now,
         ),
     )
-    conn.commit()
-
     # Determine if it was actually inserted or ignored as duplicate.
-    cursor = conn.execute("SELECT changes()")
-    inserted = cursor.fetchone()[0] > 0
-    conn.close()
+    # changes() reflects the most recent INSERT; a following SELECT does not
+    # reset it, so this is correct even on a shared/batched connection.
+    inserted = conn.execute("SELECT changes()").fetchone()[0] > 0
 
     return {
         "signal": signal[:120],
@@ -215,6 +215,26 @@ def submit_health_signal(
         "source": source,
         "sessionId": session_id,
     }
+
+
+def submit_health_signal(
+    signal: str,
+    source: str = "brain",
+    session_id: str | None = None,
+    db_path: str | None = None,
+) -> dict[str, Any]:
+    """
+    Submit a single health signal to diagnostic memory in its own transaction.
+
+    Returns a dict with the submission result.
+    """
+    conn = _ensure_db(db_path)
+    try:
+        result = _insert_signal(conn, signal, source, session_id, time.time())
+        conn.commit()
+        return result
+    finally:
+        conn.close()
 
 
 def submit_to_diagnostic_memory(
@@ -248,22 +268,26 @@ def submit_to_diagnostic_memory(
     if tiered_signals:
         batches.append((tiered_signals, "tiered"))
 
-    for signals, source in batches:
-        for signal in signals:
-            try:
-                result = submit_health_signal(
-                    signal,
-                    source=source,
-                    session_id=session_id,
-                    db_path=db_path,
-                )
-                all_submissions.append(result)
-                if result["inserted"]:
-                    inserted += 1
-                else:
-                    duplicates += 1
-            except Exception:
-                failed += 1
+    # One connection + one commit for the whole batch. Previously each signal
+    # opened/committed/closed its own connection, so a 10-signal ask() paid 10x
+    # the SQLite open/checkpoint cost (~100ms/ask in profiling).
+    conn = _ensure_db(db_path)
+    now = time.time()
+    try:
+        for signals, source in batches:
+            for signal in signals:
+                try:
+                    result = _insert_signal(conn, signal, source, session_id, now)
+                    all_submissions.append(result)
+                    if result["inserted"]:
+                        inserted += 1
+                    else:
+                        duplicates += 1
+                except Exception:
+                    failed += 1
+        conn.commit()
+    finally:
+        conn.close()
 
     return {
         "total": len(all_submissions),

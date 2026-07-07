@@ -1,0 +1,29 @@
+# prop-crystal-cluster.scdl
+# Small base pixel art prop for crystal clusters placed around the arena.
+asset prop_crystal_cluster canvas 48x64
+
+palette {
+  amethdark = #3b2170
+  amethbody = #5b34a8
+  amethlite = #8b5cf6
+  amethhi   = #b794f6
+  deep      = #0e1526
+  frost     = #a8c3e2
+}
+
+part mound material ice {
+  polygon 6 48 18 42 30 40 42 44 42 52 18 52 deep
+}
+
+part crystals material amethyst {
+  # main spire
+  polygon 20 8 14 40 24 48 26 16 amethlite
+  polygon 20 8 26 16 24 48 30 38 amethdark
+  polygon 20 8 18 18 24 42 22 16 amethbody
+  # side shards
+  polygon 10 22 6 42 14 46 12 26 amethlite
+  polygon 34 24 38 42 30 46 32 28 amethbody
+  cell 22 6 amethhi
+}
+
+export png json

@@ -19,6 +19,9 @@ divtube_memory.db
 niche_database.sqlite
 *.log
 
+# Aether reserve state (per-machine spend tracking)
+.aether_meter.json
+
 # Backups
 *.bak
 .blackboxcli/

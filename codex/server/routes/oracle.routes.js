@@ -1,22 +1,7 @@
 import { z } from 'zod';
-import Database from 'better-sqlite3';
-import { join } from 'path';
-import { existsSync } from 'fs';
+import { generateSentenceFromSeed } from '../services/turboQuant.service.js';
 
 const MAX_QUERY_LENGTH = 200; // max words
-const DB_PATH = join(process.cwd(), 'oracle_memory.sqlite');
-
-let turboQuantDB = null;
-function getTurboQuantDB() {
-  if (!turboQuantDB && existsSync(DB_PATH)) {
-    try {
-      turboQuantDB = new Database(DB_PATH, { readonly: true });
-    } catch (err) {
-      console.warn('[Oracle] Failed to mount TurboQuant Memory Cells:', err);
-    }
-  }
-  return turboQuantDB;
-}
 
 const oracleQuerySchema = z.object({
   query: z.string().min(1).max(2000), // ~2000 chars covers 200 words safely
@@ -24,7 +9,8 @@ const oracleQuerySchema = z.object({
     hhm: z.any().nullish(),
     tokenWeights: z.record(z.any()).nullish(),
     verseIR: z.any().nullish(),
-    emotion: z.any().nullish()
+    emotion: z.any().nullish(),
+    speculativeEnvelope: z.any().nullish()
   }).nullish()
 });
 
@@ -39,67 +25,28 @@ async function generateOracleDialogue(query, telemetry) {
   }
 
   const queryLower = query.toLowerCase();
-  
+
   // Extract CODEx Telemetry
   const emotionType = telemetry?.emotion?.primary || 'neutral';
   const syllableCount = telemetry?.verseIR?.metadata?.syllableCount || 0;
-  
+
   // Basic NLP intent matching
   const wantsHelpWithRhythm = queryLower.includes('rhythm') || queryLower.includes('meter') || queryLower.includes('flow');
   const wantsHelpWithTone = queryLower.includes('tone') || queryLower.includes('feel') || queryLower.includes('heavy') || queryLower.includes('light');
-  
+
   let responseText = '';
 
   // --- TURBOQUANT MEMORY CELL GENERATION ---
-  const db = getTurboQuantDB();
-  if (db) {
-    try {
-      // Find a seed word from the query
-      const queryTokens = queryLower.replace(/[^\w\s]/g, '').split(/\s+/).filter(w => w.length > 3);
-      
-      let w1 = '__START1__';
-      let w2 = '__START2__';
-      
-      // If we find a matching starting state in the DB with one of the user's words
-      for (const token of queryTokens) {
-        const row = db.prepare("SELECT w2 FROM memory_cells WHERE w1 = '__START2__' AND w2 = ? LIMIT 1").get(token);
-        if (row) {
-          w1 = '__START2__';
-          w2 = token;
-          break;
-        }
-      }
+  const queryTokens = queryLower.replace(/[^\w\s]/g, '').split(/\s+/).filter(w => w.length > 3);
+  const sentence = generateSentenceFromSeed(queryTokens);
 
-      const words = [];
-      if (w2 !== '__START2__') words.push(w2);
-
-      let safety = 0;
-      while (safety < 30) {
-        // Weighted random selection: Order by RANDOM() * weight
-        const row = db.prepare("SELECT w3 FROM memory_cells WHERE w1 = ? AND w2 = ? ORDER BY RANDOM() * weight DESC LIMIT 1").get(w1, w2);
-        
-        if (!row || row.w3 === '__END__') break;
-        
-        words.push(row.w3);
-        w1 = w2;
-        w2 = row.w3;
-        safety++;
-      }
-
-      if (words.length > 1) {
-        // Capitalize first letter and add punctuation
-        const sentence = words.join(' ');
-        responseText = sentence.charAt(0).toUpperCase() + sentence.slice(1) + '.';
-        
-        // Add contextual prefix based on telemetry
-        if (emotionType === 'aggressive') {
-          responseText = "The archive burns: " + responseText;
-        } else if (emotionType === 'melancholic') {
-          responseText = "A sorrowful echo returns: " + responseText;
-        }
-      }
-    } catch (err) {
-      console.warn('[Oracle] TurboQuant generation failed, falling back to heuristic.', err);
+  if (sentence) {
+    responseText = sentence;
+    // Add contextual prefix based on telemetry
+    if (emotionType === 'aggressive') {
+      responseText = "The archive burns: " + responseText;
+    } else if (emotionType === 'melancholic') {
+      responseText = "A sorrowful echo returns: " + responseText;
     }
   }
 
@@ -138,7 +85,11 @@ async function generateOracleDialogue(query, telemetry) {
   const recommendedTokens = [];
   if (telemetry?.tokenWeights) {
     const sorted = Object.entries(telemetry.tokenWeights)
-      .sort((a, b) => (b[1]?.document ?? 0) - (a[1]?.document ?? 0))
+      .sort((a, b) => {
+        const diff = (b[1]?.document ?? 0) - (a[1]?.document ?? 0);
+        if (diff !== 0) return diff;
+        return a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0;
+      })
       .slice(0, 4);
     for (const [token] of sorted) {
       recommendedTokens.push(token);

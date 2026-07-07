@@ -306,7 +306,7 @@ export interface MotionProcessor {
   supports(intent: AnimationIntent): boolean;
   
   /** Transform motion working state */
-  run(input: MotionWorkingState): MotionWorkingState;
+  run(input: MotionWorkingState): MotionWorkingState | Promise<MotionWorkingState>;
   
   /** Processor priority within stage (higher = runs first) */
   priority?: number;

@@ -128,6 +128,46 @@ function createToolError(error) {
     };
 }
 
+/**
+ * Direct (Ollama-free) bridge into the Vaelrix brain network + ForceField.
+ * Called from the governing MCP layer so every connected model/agent gets
+ * a native tap into the specialized brains (CODE, PIXEL, LORE, ARCHITECTURE, etc.)
+ * and the full amplifier/arbiter/SCDNA pipeline.
+ */
+function callDirectBrain(action, args = {}) {
+    const script = path.join(ROOT, 'steamdeck_brain', 'direct_brain.py');
+    const pythonPath = path.join(ROOT, 'steamdeck_brain');
+    let cmd = `python3 "${script}" --action ${action}`;
+    if (args.query) {
+        const safe = String(args.query).replace(/"/g, '\\"');
+        cmd += ` --query "${safe}"`;
+    }
+    if (args.name || args.brain) cmd += ` --name ${args.name || args.brain}`;
+    if (args.domain) cmd += ` --domain ${args.domain}`;
+
+    try {
+        const out = execSync(cmd, {
+            encoding: 'utf8',
+            cwd: ROOT,
+            env: { ...process.env, PYTHONPATH: pythonPath },
+            maxBuffer: 8 * 1024 * 1024,
+            timeout: 180_000,
+        });
+        return JSON.parse(out);
+    } catch (err) {
+        const stdout = err.stdout ? String(err.stdout) : '';
+        const stderr = err.stderr ? String(err.stderr) : '';
+        let parsed = null;
+        try { parsed = stdout ? JSON.parse(stdout) : null; } catch {}
+        return {
+            error: err.message || 'direct_brain execution failed',
+            stdout: stdout.slice(0, 2000),
+            stderr: stderr.slice(0, 1000),
+            parsed,
+        };
+    }
+}
+
 function registerJsonResource(server, name, uri, reader) {
     server.resource(name, uri, async () => createResourcePayload(uri, await reader()));
 }
@@ -167,6 +207,10 @@ const TOOL_ALIASES = new Map(Object.entries({
     mcp_scholomance_collab_skill_scholomance_feedback: ['scholomance_feedback'],
     mcp_scholomance_collab_skill_scholomance_knowledge: ['skill_scholomance'],
     mcp_scholomance_collab_agent_list: ['agent_list'],
+    mcp_scholomance_collab_brain_list: ['brain_list', 'list_brains'],
+    mcp_scholomance_collab_brain_forcefield_ask: ['brain_ask', 'forcefield', 'ask_brain'],
+    mcp_scholomance_collab_brain_run: ['brain_run', 'run_brain'],
+    mcp_scholomance_collab_brain_scdna_genes: ['scdna_genes', 'genes'],
     mcp_scholomance_collab_task_list: ['task_list'],
     mcp_scholomance_collab_pipeline_list: ['pipeline_list'],
     mcp_scholomance_collab_fs_find: ['fs_find', 'find_file'],
@@ -1941,6 +1985,41 @@ ${JSON.stringify(debugTraceIR, null, 2)}
         const decisions = resolveDesignDecisions(signal);
         const spec      = buildGrimSpec(intent, signal, decisions, component_name || null);
         return { signal, decisions, spec };
+    });
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // DIRECT BRAIN NETWORK + FORCEFIELD (governing layer tap, zero Ollama)
+    // Every agent/model connected to this MCP now has native access to the
+    // specialized brains (CODE_BRAIN, PIXEL_BRAIN, LORE_BRAIN, ...) and the
+    // full vaelrix_forcefield pipeline (routing, amplifiers, council arbiter,
+    // SCDNA genes, health signals, determinism audit) without going through
+    // the SteamDeck daemon or any LLM.
+    // ─────────────────────────────────────────────────────────────────────────
+    registerTool(server, 'mcp_scholomance_collab_brain_list', {}, () => {
+        return callDirectBrain('list');
+    });
+
+    registerTool(server, 'mcp_scholomance_collab_brain_forcefield_ask', {
+        query: z.string().min(1).describe('Natural language query or task. Runs the complete brain network + ForceField deterministically.'),
+        deterministic: z.boolean().optional().default(true).describe('Return structured findings instead of LLM synthesis (default true)'),
+    }, async ({ query, deterministic }) => {
+        const res = callDirectBrain('forcefield', { query });
+        return createToolSuccess('brain_forcefield_ask', res);
+    });
+
+    registerTool(server, 'mcp_scholomance_collab_brain_run', {
+        name: z.string().min(1).describe('Brain identifier, e.g. CODE_BRAIN, PIXEL_BRAIN, LORE_BRAIN, ARCHITECTURE_BRAIN, DETERMINISM_BRAIN'),
+        query: z.string().min(1).describe('Query for the chosen specialized brain'),
+    }, async ({ name, query }) => {
+        const res = callDirectBrain('brain', { name, query });
+        return createToolSuccess('brain_run', res);
+    });
+
+    registerTool(server, 'mcp_scholomance_collab_brain_scdna_genes', {
+        domain: z.string().optional().default('all').describe('Filter genes by domain (code, pixel, lore, ui, all, ...)'),
+    }, async ({ domain }) => {
+        const res = callDirectBrain('genes', { domain });
+        return createToolSuccess('brain_scdna_genes', res);
     });
 }
 

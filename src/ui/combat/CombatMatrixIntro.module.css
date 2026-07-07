@@ -1,0 +1,124 @@
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-system) + 3);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #020508;
+  pointer-events: auto;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0) 0,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.12) 3px
+  );
+  opacity: 0.35;
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 62% at 50% 50%, transparent 42%, rgba(2, 5, 8, 0.82) 100%);
+}
+
+.hud {
+  position: relative;
+  z-index: 2;
+  width: min(92vw, 520px);
+  padding: 1.25rem 1.35rem;
+  border: 1px solid rgba(103, 247, 255, 0.28);
+  border-radius: 8px;
+  background: rgba(2, 8, 14, 0.72);
+  box-shadow:
+    0 0 28px rgba(103, 247, 255, 0.08),
+    inset 0 0 18px rgba(0, 255, 170, 0.04);
+  backdrop-filter: blur(2px);
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.625rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(103, 247, 255, 0.72);
+}
+
+.title {
+  margin: 0.45rem 0 0;
+  font-family: var(--font-display, 'Cinzel', Georgia, serif);
+  font-size: clamp(1.35rem, 4vw, 1.85rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #e8fff8;
+  text-shadow: 0 0 18px rgba(103, 247, 255, 0.22);
+}
+
+.status {
+  margin: 0.85rem 0 0;
+  min-height: 1.1rem;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: #67f7ff;
+}
+
+.progressTrack {
+  margin-top: 1rem;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(103, 247, 255, 0.14);
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #00ff88, #67f7ff);
+  transform-origin: left center;
+}
+
+.enter .progressBar {
+  animation: matrix-progress var(--matrix-duration) linear forwards;
+}
+
+.visible .progressBar {
+  transform: scaleX(0);
+}
+
+.exit {
+  animation: matrix-root-out var(--matrix-exit) ease-in forwards;
+}
+
+@keyframes matrix-progress {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+@keyframes matrix-root-out {
+  to { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter .progressBar {
+    animation: none;
+    transform: scaleX(0);
+  }
+}

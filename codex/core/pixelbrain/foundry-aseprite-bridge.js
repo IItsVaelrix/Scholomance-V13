@@ -3,7 +3,7 @@ import {
   importFromAseprite,
   validateAsepriteImportPayload,
 } from './template-grid-engine.js';
-import { createPixelBrainAssetPacket } from './pixelbrain-asset-packet.js';
+import { forgePacket } from './semantic-bridge.js';
 import {
   decodeAsepriteBinary,
   encodeAsepriteBinary,
@@ -342,7 +342,8 @@ export function importAsepriteToFoundryAsset(payload, options = {}) {
     });
   });
 
-  const assetPacket = createPixelBrainAssetPacket({
+  const motifRoles = [...new Set(coordinates.map((c) => c.motifRole).filter(Boolean))];
+  const assetPacket = forgePacket({
     id: options.assetId || `${payload.meta?.id || 'foundry'}-aseprite-edit`,
     source: {
       kind: 'aseprite-manual-edit',
@@ -376,7 +377,10 @@ export function importAsepriteToFoundryAsset(payload, options = {}) {
       createdBy: 'foundry-aseprite-bridge',
       operations: ['import-aseprite-to-foundry-asset'],
     },
-  });
+  }, {
+    id: payload.meta?.id || null,
+    parts: [{ id: 'body' }, ...motifRoles.map((role) => ({ id: role, role }))],
+  }, { sourceKind: 'aseprite-manual-edit' });
 
   return {
     ok: true,

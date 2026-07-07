@@ -1,0 +1,239 @@
+asset voidmetal_fire_chestplate canvas 96x112
+
+palette {
+  bgshadow      = #11121A
+  voidblack     = #171821
+  voiddeep      = #252631
+  steeldeep     = #30313B
+  steelmid      = #444651
+  steelhi       = #82808C
+  silveredge    = #C8C4CC
+  oxblooddeep   = #4E101C
+  oxblood       = #8E1F2B
+  crimsonedge   = #D13C45
+  purpledeep    = #3A184D
+  purplemid     = #6A2C85
+  violetglint   = #B37AD9
+  emberdeep     = #8A160D
+  ember         = #E13A14
+  orangehot     = #FF741E
+  goldhot       = #FFC15A
+  whitehot      = #FFF2B0
+  gemdark       = #7B0E08
+  gemmid        = #D92B12
+  gemhot        = #FF6A1F
+  gemshine      = #FFF0A0
+}
+
+# outer drop shadow, keeps the sprite readable on dark dungeon walls
+part silhouette_shadow material source {
+  polygon 48 8 68 10 76 20 85 27 92 42 87 58 78 65 75 84 68 96 60 105 48 111 36 105 28 96 21 84 18 65 9 58 4 42 11 27 20 20 28 10 bgshadow
+}
+
+# main cuirass mass, authored left half and mirrored
+part torso_base material voidsteel {
+  symmetry x
+  polygon 48 14 35 17 26 28 21 43 23 67 29 91 40 106 48 111 voidblack
+  polygon 47 24 33 26 25 42 27 64 34 86 47 99 voiddeep
+  polygon 46 39 32 42 27 54 31 64 45 63 steeldeep
+  polygon 45 67 32 69 35 89 45 98 steeldeep
+  polygon 44 26 36 31 33 38 45 39 steelmid
+}
+
+# heavy outside bevels and bottom fang geometry
+part torso_edges material silver {
+  symmetry x
+  line 48 14 35 17 silveredge
+  line 35 17 26 28 steelhi
+  line 26 28 21 43 steelhi
+  line 21 43 23 67 steelhi
+  line 23 67 29 91 steelhi
+  line 29 91 40 106 steelhi
+  line 40 106 48 111 silveredge
+  line 48 30 33 37 silveredge
+  line 33 37 27 54 steelhi
+  line 27 54 31 64 steelhi
+  line 31 64 45 63 steelhi
+  line 48 63 36 72 steelhi
+  line 36 72 40 98 steelhi
+}
+
+part collar_back material blacksteel {
+  path "M 23 15 Q 48 2 73 15 L 69 29 Q 48 22 27 29 Z" steeldeep
+  path "M 30 15 Q 48 8 66 15 L 62 23 Q 48 19 34 23 Z" voidblack
+  ellipse 48 17 radius 23 ry 10 steelhi
+  ellipse 48 18 radius 17 ry 6 voiddeep
+  polygon 43 26 53 26 49 39 47 39 voidblack
+}
+
+part collar_trim material ruby {
+  path "M 25 24 L 34 20 L 42 25 L 48 34 L 54 25 L 62 20 L 71 24 L 67 31 L 57 28 L 48 41 L 39 28 L 29 31 Z" oxblooddeep
+  line 28 24 40 27 crimsonedge
+  line 56 27 68 24 crimsonedge
+  line 38 27 48 39 crimsonedge
+  line 58 27 48 39 crimsonedge
+  line 48 34 48 44 ember
+}
+
+part shoulder_mass material voidsteel {
+  symmetry x
+  polygon 13 25 24 13 36 21 39 38 33 54 17 61 5 51 8 36 voiddeep
+  polygon 11 34 25 21 35 27 36 38 31 48 17 54 8 48 steeldeep
+  polygon 18 28 28 23 33 31 32 40 21 45 12 42 steelmid
+  polygon 6 50 17 61 33 54 31 64 16 70 5 58 voidblack
+  ellipse 22 39 radius 17 ry 12 steelhi
+}
+
+part shoulder_red_blades material ruby {
+  symmetry x
+  polygon 29 8 38 16 37 43 27 42 24 22 oxblooddeep
+  polygon 32 12 36 18 35 39 29 37 28 23 crimsonedge
+  polygon 8 40 23 32 34 40 24 45 10 51 oxblood
+  polygon 8 56 23 59 32 55 29 66 14 70 oxblooddeep
+  line 29 8 38 16 crimsonedge
+  line 24 22 27 42 crimsonedge
+  line 8 40 23 32 crimsonedge
+  line 8 56 23 59 crimsonedge
+}
+
+part shoulder_enamel material amethyst {
+  symmetry x
+  polygon 13 31 23 23 31 30 30 38 20 41 13 38 purpledeep
+  polygon 14 33 23 27 28 32 27 36 20 38 15 36 purplemid
+  line 16 37 25 30 violetglint
+  line 14 34 21 29 violetglint
+}
+
+part shoulder_bosses material silver {
+  symmetry x
+  polygon 31 38 38 31 45 38 38 45 steeldeep
+  polygon 34 38 38 34 42 38 38 42 oxblooddeep
+  line 31 38 38 31 silveredge
+  line 38 31 45 38 steelhi
+  line 45 38 38 45 steelhi
+  line 38 45 31 38 silveredge
+}
+
+part side_lamellar material blacksteel {
+  symmetry x
+  polygon 19 59 31 63 31 69 19 70 steeldeep
+  polygon 20 71 33 72 35 79 22 82 voiddeep
+  polygon 24 84 38 86 40 95 30 100 voiddeep
+  line 20 63 31 66 steelhi
+  line 22 75 35 77 steelhi
+  line 30 89 40 93 steelhi
+  line 19 70 31 69 silveredge
+}
+
+part belt_and_tasset material blacksteel {
+  symmetry x
+  polygon 28 91 40 89 48 96 48 104 36 102 28 98 voiddeep
+  polygon 18 84 30 86 30 98 20 100 oxblooddeep
+  polygon 20 87 28 89 27 96 21 97 steeldeep
+  line 18 84 30 86 silveredge
+  line 30 86 30 98 steelhi
+  line 28 91 40 89 crimsonedge
+  line 40 89 48 96 silveredge
+  polygon 43 94 53 94 56 104 48 111 40 104 steeldeep
+  polygon 46 98 50 98 50 105 46 105 emberdeep
+  line 44 96 52 96 crimsonedge
+}
+
+part gem_cradle material silver {
+  polygon 48 42 58 50 58 65 48 75 38 65 38 50 steeldeep
+  polygon 48 37 63 51 63 67 48 83 33 67 33 51 voidblack
+  line 48 37 63 51 silveredge
+  line 63 51 63 67 steelhi
+  line 63 67 48 83 silveredge
+  line 48 83 33 67 steelhi
+  line 33 67 33 51 silveredge
+  line 33 51 48 37 silveredge
+  polygon 48 40 57 52 55 65 48 76 41 65 39 52 gemdark
+}
+
+part central_gem material divine_flame_core {
+  sphere 48 58 radius 9 light -1 -1 gemshine whitehot gemhot gemmid gemdark
+  polygon 48 44 56 58 48 75 40 58 gemmid
+  polygon 48 47 53 58 48 70 43 58 orangehot
+  line 48 44 56 58 whitehot
+  line 56 58 48 75 ember
+  line 48 75 40 58 emberdeep
+  line 40 58 48 44 goldhot
+  glow radius 4
+}
+
+part fire_cracks material divine_flame_core {
+  symmetry x
+  line 48 55 38 48 orangehot
+  line 38 48 31 43 ember
+  line 31 43 27 35 emberdeep
+  line 38 48 34 55 goldhot
+  line 34 55 27 58 ember
+  line 48 62 39 66 orangehot
+  line 39 66 33 75 ember
+  line 33 75 34 87 emberdeep
+  line 39 66 27 68 ember
+  line 48 47 43 35 orangehot
+  line 43 35 39 26 ember
+  line 48 72 44 86 orangehot
+  line 44 86 42 101 emberdeep
+  line 48 58 26 55 ember
+  glow radius 2
+}
+
+part fire_crack_cores material divine_flame_core {
+  symmetry x
+  line 48 55 40 49 whitehot
+  line 48 62 41 66 goldhot
+  line 48 47 44 37 goldhot
+  line 48 72 45 84 goldhot
+  cell 34 55 whitehot
+  cell 39 66 whitehot
+  cell 43 35 goldhot
+  glow radius 1
+}
+
+part ember_runes material void_rune_glow {
+  symmetry x
+  line 33 25 35 23 ember
+  line 35 23 36 26 ember
+  line 39 27 41 24 ember
+  line 41 24 42 28 ember
+  line 29 72 32 72 ember
+  line 32 72 31 75 ember
+  line 36 83 39 84 ember
+  line 39 84 37 87 ember
+  line 21 91 25 91 ember
+  line 25 91 23 95 ember
+  line 17 37 20 35 violetglint
+  line 20 35 21 38 violetglint
+  line 18 45 24 45 purplemid
+  line 13 63 18 64 purplemid
+  cell 31 21 orangehot
+  cell 29 26 ember
+  cell 24 28 violetglint
+  cell 27 31 purplemid
+  cell 41 95 orangehot
+  glow radius 1
+}
+
+part ink_contour material onyx {
+  symmetry x
+  line 48 8 67 10 voidblack
+  line 67 10 76 20 voidblack
+  line 76 20 85 27 voidblack
+  line 85 27 92 42 voidblack
+  line 92 42 87 58 voidblack
+  line 87 58 78 65 voidblack
+  line 78 65 75 84 voidblack
+  line 75 84 68 96 voidblack
+  line 68 96 60 105 voidblack
+  line 60 105 48 111 voidblack
+  line 29 8 38 16 voidblack
+  line 5 51 8 36 voidblack
+  line 8 36 13 25 voidblack
+  line 13 25 24 13 voidblack
+  line 24 13 29 8 voidblack
+}
+
+export json svg png aseprite

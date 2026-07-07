@@ -1,0 +1,31 @@
+# slime-vector.scdl
+# SCDL v1 with vector ops — same visual as fixtures/slime/slime.scdl
+# (pixel-grid, 316 cells) but the source is 9 geometric ops.
+#
+# Body shading: a stack of concentric rings from outer→inner. Ring radii
+# chosen to match the cosθ-tier distribution of the pixel-grid version.
+
+asset slime canvas 24x24
+
+palette {
+  core   = #EA1F2D
+  rim    = #761926
+  glow   = #FC8390
+  shine  = #FFE5EA
+  shadow = #2B080B
+}
+
+part body material crimson_ooze {
+  circle 12 12 radius 10 core
+  ring   12 12 radius 10 width 2 shadow
+  ring   12 12 radius 8  width 1 rim
+  ring   12 12 radius 7  width 1 glow
+  glow radius 2
+}
+
+part highlight material emissive {
+  circle 7 7 radius 1 shine
+  circle 9 9 radius 1 shine
+}
+
+export json svg phaser png

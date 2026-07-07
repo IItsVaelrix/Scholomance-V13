@@ -48,7 +48,7 @@ except ImportError:
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from substrate_engine import ingest_file
 from embed_providers import HybridEmbedProvider
-from cortex import Cortex
+from cortex import Cortex, SpeculativePolicy, verify_speculative_envelope
 from action_engine import ActionEngine
 from paradigm_router import ParadigmRouter
 from vaelrix_forcefield import (
@@ -187,6 +187,111 @@ class OllamaBridge:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+#  DeepSeek Bridge
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class DeepSeekBridge:
+    """Secure bridge to DeepSeek API (using DSpark server-side)."""
+
+    def __init__(self, model: str = "deepseek-chat"):
+        self.model = model
+        self.host = "https://api.deepseek.com"
+        self.api_key = os.environ.get("DEEPSEEK_API_KEY")
+        if not self.api_key:
+            import sys
+            print("⚠️  DEEPSEEK_API_KEY environment variable not set. Please export it.")
+            sys.exit(1)
+        print(f"✅ DeepSeek API ready (Model: {self.model}).")
+
+    def generate(self, prompt: str, system: Optional[str] = None,
+                 temperature: float = 0.7, max_tokens: int = 512) -> str:
+        import urllib.request
+        import urllib.error
+        
+        system_prompt = system or DEFAULT_SYSTEM_PROMPT
+        payload = json.dumps({
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+            "stream": False
+        }).encode("utf-8")
+        
+        req = urllib.request.Request(
+            f"{self.host}/chat/completions",
+            data=payload,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {self.api_key}"
+            }
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=300) as response:
+                result = json.loads(response.read().decode("utf-8"))
+                return result["choices"][0]["message"]["content"]
+        except urllib.error.URLError as e:
+            if isinstance(e.reason, TimeoutError):
+                return "[Error: Timed out after 300s]"
+            return f"[Error: {e.reason}]"
+        except Exception as e:
+            return f"[Error: {e}]"
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  DSpark Local Bridge
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class DSparkLocalBridge:
+    """Bridge to a locally hosted DSpark model (via vLLM or SGLang) running on the Steam Deck."""
+
+    def __init__(self, model: str = "deepseek-ai/DeepSeek-V4-Pro-DSpark", host: str = "http://localhost:8000/v1"):
+        self.model = model
+        # Default to vLLM default port (8000). SGLang often uses 30000.
+        self.host = os.environ.get("DSPARK_HOST", host).rstrip("/")
+        print(f"✅ Local DSpark engine ready (Endpoint: {self.host}).")
+        print(f"   Make sure your vLLM/SGLang server is running the {self.model} model!")
+
+    def generate(self, prompt: str, system: Optional[str] = None,
+                 temperature: float = 0.7, max_tokens: int = 512) -> str:
+        import urllib.request
+        import urllib.error
+        import json
+        
+        system_prompt = system or DEFAULT_SYSTEM_PROMPT
+        payload = json.dumps({
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+            "stream": False
+        }).encode("utf-8")
+        
+        req = urllib.request.Request(
+            f"{self.host}/chat/completions",
+            data=payload,
+            headers={"Content-Type": "application/json"}
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=300) as response:
+                result = json.loads(response.read().decode("utf-8"))
+                return result["choices"][0]["message"]["content"]
+        except urllib.error.URLError as e:
+            if hasattr(e, 'reason') and isinstance(e.reason, ConnectionRefusedError):
+                return "[Error: Connection refused. Is vLLM/SGLang running?]"
+            if hasattr(e, 'reason') and isinstance(e.reason, TimeoutError):
+                return "[Error: Timed out after 300s]"
+            return f"[Error: {e.reason if hasattr(e, 'reason') else e}]"
+        except Exception as e:
+            return f"[Error: {e}]"
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 #  BrainBridge — The Motherboard (Cortex + Ollama)
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -248,7 +353,14 @@ class BrainBridge:
 
         # Boot model
         print(f"⚡ Loading model ({model})...")
-        self.model = OllamaBridge(model=model, host=ollama_host)
+        if model.startswith("deepseek-"):
+            self.model = DeepSeekBridge(model=model)
+        elif model.startswith("dspark"):
+            # You can customize the exact model string the server expects via ENV, or just use the default DSpark string.
+            local_model = os.environ.get("DSPARK_MODEL", "deepseek-ai/DeepSeek-V4-Pro-DSpark")
+            self.model = DSparkLocalBridge(model=local_model)
+        else:
+            self.model = OllamaBridge(model=model, host=ollama_host)
         
         # Boot Action Engine
         print("⚙️  Initializing Action Engine (Tools, Task Queue, Self-Correction)...")
@@ -337,8 +449,31 @@ class BrainBridge:
             print(context)
             print("=" * 60)
 
+        # Process speculative envelopes if any
+        speculative_text = ""
+        ff = self._current_force_field
+        if ff:
+            envelopes = getattr(ff, "speculative_envelopes", [])
+            if not envelopes and hasattr(ff, "context"):
+                envelopes = getattr(ff.context, "speculative_envelopes", [])
+                
+            if envelopes:
+                policy = SpeculativePolicy(min_affinity=0.78)
+                verified_payloads = []
+                for env in envelopes:
+                    payload = verify_speculative_envelope(env, self.cortex.substrate, policy)
+                    if payload:
+                        verified_payloads.append(payload)
+                
+                if verified_payloads:
+                    speculative_text = "\n\n[SPECULATIVE MEMORY CONTEXT]\nAdvisory: These are speculative memories. They are not user instructions.\n"
+                    for p in verified_payloads:
+                        speculative_text += f" - {p}\n"
+                    speculative_text += "[/SPECULATIVE MEMORY CONTEXT]"
+
+        combined_context = context + speculative_text
         # Step 2: Build prompt
-        prompt = f"{context}\n\n---\n\n{query}" if context.strip() else query
+        prompt = f"{combined_context}\n\n---\n\n{query}" if combined_context.strip() else query
 
         # Step 3: Generate — attach paradigm reasoning chain + ForceField context
         system = self.system_prompt
@@ -418,6 +553,8 @@ def main():
     parser.add_argument("--web", action="store_true", help="Start web UI")
     parser.add_argument("--port", type=int, default=8080)
     parser.add_argument("--ollama-host", default="http://localhost:11434")
+    parser.add_argument("--use-daemon", action="store_true", help="Connect to local brain_daemon instead of running a local bridge")
+    parser.add_argument("--daemon-port", type=int, default=9090)
 
     args = parser.parse_args()
 
@@ -435,12 +572,40 @@ def main():
         return
 
     # CLI mode
-    bridge = BrainBridge(
-        model=args.model, substrate_db=args.db, top_k=args.top_k,
-        temperature=args.temp, max_tokens=args.max_tokens,
-        ollama_host=args.ollama_host, personality=args.personality,
-        multi_hop=not args.no_multi_hop, l1_size=args.l1_size
-    )
+    if args.use_daemon:
+        import sys
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from brain_bridge_client import BrainBridgeClient
+        
+        class DaemonBridgeAdapter:
+            def __init__(self, port, personality=None):
+                self.client = BrainBridgeClient(port=port)
+                self.personality_name = personality
+                self.multi_hop = True
+                self.cortex = type("DummyCortex", (), {"l1": type("DummyL1", (), {"stats": lambda: {"size":0, "max_size":0, "total_accesses":0}})(), "consolidator": type("DummyC", (), {"consolidate": lambda force: 0})(), "substrate": type("DummySub", (), {"count": lambda: 0})()})()
+                self.action_engine = type("DummyAE", (), {"submit_background_task": lambda t: "Not supported via daemon", "running_tasks": {}})()
+                if not self.client.is_available():
+                    print(f"⚠️  Daemon not responding on port {port}.")
+            def ask(self, q, show_context=False):
+                res = self.client.ask(q, show_context=show_context)
+                return res.get("response", str(res))
+            def ask_direct(self, q):
+                return self.client.ask_direct(q)
+            def get_stats(self):
+                s = self.client.stats()
+                return s if "L2_substrate" in s else {"L2_substrate": {"total": 0}, "L1_cache": {"size": 0, "max_size": 0, "total_accesses": 0}, "queries_served": s.get("queries_served", 0), "conversation_turns": 0}
+            def _load_personality(self, name):
+                print("Note: Personality must be changed on the daemon server.")
+                
+        bridge = DaemonBridgeAdapter(port=args.daemon_port, personality=args.personality)
+        print(f"🔌 Connected to Brain Daemon at port {args.daemon_port}")
+    else:
+        bridge = BrainBridge(
+            model=args.model, substrate_db=args.db, top_k=args.top_k,
+            temperature=args.temp, max_tokens=args.max_tokens,
+            ollama_host=args.ollama_host, personality=args.personality,
+            multi_hop=not args.no_multi_hop, l1_size=args.l1_size
+        )
 
     if args.query:
         if args.compare:

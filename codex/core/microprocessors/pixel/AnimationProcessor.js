@@ -53,14 +53,27 @@ export async function compileAnimation({ source, targets = ['phaser', 'bytecode'
       if (blueprint.transforms.blur) flattenedState.blur = blueprint.transforms.blur.base ?? 0;
     }
 
+    // Use RENDERER from blueprint if present, else default
+    const rendererHint = blueprint.backendHints?.css?.renderer;
+    const resolvedTargetType = typeof rendererHint === 'string' && VALID_RENDERERS.includes(rendererHint) 
+      ? rendererHint 
+      : (VALID_RENDERERS.includes(primaryTarget) ? primaryTarget : 'framer');
+
+    let requestedProcessors = undefined;
+    if (blueprint.metadata?.source) {
+      requestedProcessors = blueprint.metadata.source.split(/\s+/).filter(Boolean);
+    }
+
     intent = {
       version: 'v1.0',
       targetId: blueprint.target.value,
-      targetType,
-      trigger: 'mount',
+      targetType: resolvedTargetType,
+      trigger: 'bytecode',
       durationMs: blueprint.durationMs,
-      loop: blueprint.loop === 'infinite' ? true : blueprint.loop > 1,
-      state: flattenedState
+      loop: blueprint.loop === 'infinite' || blueprint.loop > 0,
+      state: flattenedState,
+      constraints: blueprint.constraints,
+      requestedProcessors
     };
   } else {
     intent = source;

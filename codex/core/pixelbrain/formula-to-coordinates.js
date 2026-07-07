@@ -5,13 +5,14 @@
  * Supports parametric curves, grid projections, edge traces, and fractals.
  */
 
-import { clamp01, GOLDEN_RATIO, roundTo, clampNumber } from './shared.js';
+import { clamp01, GOLDEN_RATIO, roundTo, clampNumber, pseudoRandom, applyChaikin, applyAffine, applyOffsetCurve } from './shared.js';
 import {
   FORMULA_TYPES,
   GRID_TYPES,
   COLOR_FORMULA_TYPES,
 } from './image-to-bytecode-formula.js';
 import { getRotationAtTime } from './gear-glide-amp.js';
+import { perlinNoiseGrid } from './procedural-noise.js';
 
 const MAX_FRACTAL_ITERATIONS = 6;
 
@@ -34,6 +35,9 @@ export function evaluateFormula(formula, canvasSize, time = 0, options = {}) {
   }
 
   const { strict = false } = options;
+  // Stronger determinism contract: seed + precision from top level or formula
+  const effectiveSeed = formula.seed != null ? (formula.seed >>> 0) : (options.seed != null ? options.seed : 42);
+  const effectivePrecision = formula.precision != null ? formula.precision : (options.precision != null ? options.precision : 3);
 
   let coordinates = [];
 
@@ -58,6 +62,12 @@ export function evaluateFormula(formula, canvasSize, time = 0, options = {}) {
       break;
     case FORMULA_TYPES.VECTORIZED_TEXT:
       coordinates = evaluateVectorizedText(coordinateFormula, canvasSize, time);
+      break;
+    case FORMULA_TYPES.MATHEMATICAL_STROKE:
+      coordinates = evaluateMathematicalStroke(coordinateFormula, canvasSize, time);
+      break;
+    case FORMULA_TYPES.MATH_EXPRESSION:
+      coordinates = evaluateMathExpression(coordinateFormula, canvasSize, time);
       break;
     default:
       if (strict) {
@@ -240,13 +250,18 @@ export function evaluateGridProjection(formula, canvasSize, time = 0) {
  * Evaluate edge trace formula
  */
 export function evaluateEdgeTrace(formula, canvasSize, _time = 0) {
-  const { tracePath = [] } = formula;
-  if (tracePath.length === 0) return [];
+  const sourcePath = Array.isArray(formula.unitTracePath) && formula.unitTracePath.length > 0
+    ? formula.unitTracePath.map((p) => ({
+        x: Number(p.x) * canvasSize.width,
+        y: Number(p.y) * canvasSize.height,
+      }))
+    : (formula.tracePath || []);
+  if (sourcePath.length === 0) return [];
 
-  const totalPoints = tracePath.length;
+  const totalPoints = sourcePath.length;
   const _speed = 0.02;
 
-  return tracePath.map((p, index) => ({
+  return sourcePath.map((p, index) => ({
     x: roundTo(p.x, 1),
     y: roundTo(p.y, 1),
     z: 0,
@@ -682,4 +697,224 @@ export function evaluateVectorizedText(formula, canvasSize, _time = 0) {
   });
 
   return coordinates;
+}
+
+/**
+ * MATHEMATICAL_STROKE evaluator
+ * Per user's vision: Does NOT take pixel strokes.
+ * Instead, user (or Wand) defines a *mathematical formula* that simulates a brush stroke.
+ * Path is parametric. Width/pressure/bleed are also math functions of t.
+ * Then we rasterize a variable-thickness "stroke" using efficient offset curves.
+ * This produces clean, deterministic coords that are ideal for SCDL lowering + propagation.
+ */
+export function evaluateMathematicalStroke(formula, canvasSize, time = 0) {
+  const params = formula.parameters || formula;
+  const {
+    cx = canvasSize.width / 2,
+    cy = canvasSize.height / 2,
+    length = 180,
+    angle = 0,
+    baseWidth = 4,
+    widthVariation = 0.6,   // 0..1 : how much the width breathes (sinusoidal pressure sim)
+    frequency = 1.8,        // oscillations per stroke (simulates hand tremor / brush texture)
+    density = 1.0,          // point density along path
+    bleed = 0.3,            // soft edge bleed factor (for ring-like thickness)
+    n = 128,
+  } = params;
+
+  const coords = [];
+  const rad = (angle * Math.PI) / 180;
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+
+  const steps = Math.max(16, Math.floor(n * density));
+
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps; // 0 to 1 along the stroke
+
+    // Core parametric path (straight for base, can be made curved by caller composing)
+    const px = cx + (t - 0.5) * length * cos;
+    const py = cy + (t - 0.5) * length * sin;
+
+    // Simulate pressure / width as math function (no pixel input)
+    const pressure = Math.sin(t * Math.PI) * widthVariation + (1 - widthVariation * 0.5);
+    const w = Math.max(1, baseWidth * pressure);
+
+    // Add center line
+    coords.push({
+      x: roundTo(px, 1),
+      y: roundTo(py, 1),
+      z: 0,
+      emphasis: clamp01(pressure),
+      source: 'mathematical_stroke',
+      t,
+      role: 'stroke.center',
+    });
+
+    // Variable thickness: offset perpendicular points (simulates brush width)
+    const halfW = w / 2;
+    const perpCos = -sin;
+    const perpSin = cos;
+
+    // Edge points (for SCDL ring/path conversion)
+    coords.push({
+      x: roundTo(px + halfW * perpCos, 1),
+      y: roundTo(py + halfW * perpSin, 1),
+      z: 0,
+      emphasis: clamp01(pressure * (1 - bleed)),
+      source: 'mathematical_stroke',
+      t,
+      role: 'stroke.edge',
+    });
+    coords.push({
+      x: roundTo(px - halfW * perpCos, 1),
+      y: roundTo(py - halfW * perpSin, 1),
+      z: 0,
+      emphasis: clamp01(pressure * (1 - bleed)),
+      source: 'mathematical_stroke',
+      t,
+      role: 'stroke.edge',
+    });
+
+    // Bleed / texture samples (for soft fill propagation)
+    if (bleed > 0.05 && i % 2 === 0) {
+      const b = halfW * bleed * (0.6 + 0.4 * Math.sin(t * frequency * 6));
+      coords.push({
+        x: roundTo(px + b * perpCos * 0.7, 1),
+        y: roundTo(py + b * perpSin * 0.7, 1),
+        z: 0,
+        emphasis: clamp01(pressure * bleed * 0.6),
+        source: 'mathematical_stroke',
+        t,
+        role: 'stroke.bleed',
+      });
+    }
+  }
+
+  return coords;
+}
+
+/**
+ * MATH_EXPRESSION evaluator - implements the "Standard Procedural-to-Vector Pipeline"
+ * State-free AST of mathematical expressions.
+ * Supports: trig, arithmetic, mod, fract, noise (wired from procedural-noise), variables x/y/t/seed.
+ * Domain: normalized unit space. Geometry: samples expression to produce point list (value drives emphasis/offset).
+ * Deterministic via seed + fixed roundTo.
+ */
+export function evaluateMathExpression(formula, canvasSize, time = 0) {
+  const expr = formula.expression;
+  const seed = formula.seed != null ? (formula.seed >>> 0) : 42;
+  const precision = formula.precision != null ? Math.max(1, Math.min(6, formula.precision)) : 3;
+
+  const width = canvasSize.width || 100;
+  const height = canvasSize.height || 100;
+
+  // Evaluate the AST to a scalar at (ux, uy) in unit domain [0,1]
+  function evalNode(node, ux, uy, ut) {
+    if (!node || typeof node !== 'object') return 0;
+
+    if (node.op === 'x') return ux;
+    if (node.op === 'y') return uy;
+    if (node.op === 't') return ut;
+    if (node.op === 'seed') return seed / 0xffffffff || 0;
+
+    if (node.value !== undefined) return Number(node.value);
+
+    if (node.op === 'sin') return Math.sin(evalNode(node.arg, ux, uy, ut) * Math.PI * 2);
+    if (node.op === 'cos') return Math.cos(evalNode(node.arg, ux, uy, ut) * Math.PI * 2);
+    if (node.op === 'abs') return Math.abs(evalNode(node.arg, ux, uy, ut));
+    if (node.op === 'fract') return evalNode(node.arg, ux, uy, ut) % 1;
+    if (node.op === 'floor') return Math.floor(evalNode(node.arg, ux, uy, ut));
+    if (node.op === 'neg') return -evalNode(node.arg, ux, uy, ut);
+
+    if (node.op === 'noise') {
+      const val = evalNode(node.arg, ux, uy, ut);
+      // Use seeded perlin-like from procedural-noise, scaled by arg
+      const freq = Math.max(0.1, Math.abs(val) * 4 + 1);
+      const grid = perlinNoiseGrid(2, 2, freq, { seed: (seed + Math.floor(ut * 100)) >>> 0 });
+      const n = grid && grid.length ? grid[0] : (pseudoRandom(seed + ux * 1000 + uy * 100) - 0.5) * 2;
+      return n;
+    }
+
+    if (node.op === 'add') return evalNode(node.left, ux, uy, ut) + evalNode(node.right, ux, uy, ut);
+    if (node.op === 'sub') return evalNode(node.left, ux, uy, ut) - evalNode(node.right, ux, uy, ut);
+    if (node.op === 'mul') return evalNode(node.left, ux, uy, ut) * evalNode(node.right, ux, uy, ut);
+    if (node.op === 'div') {
+      const r = evalNode(node.right, ux, uy, ut) || 1e-9;
+      return evalNode(node.left, ux, uy, ut) / r;
+    }
+    if (node.op === 'mod') {
+      const l = evalNode(node.left, ux, uy, ut);
+      const r = evalNode(node.right, ux, uy, ut) || 1;
+      return ((l % r) + r) % r;
+    }
+    if (node.op === 'pow') return Math.pow(evalNode(node.left, ux, uy, ut), evalNode(node.right, ux, uy, ut));
+    if (node.op === 'min') return Math.min(evalNode(node.left, ux, uy, ut), evalNode(node.right, ux, uy, ut));
+    if (node.op === 'max') return Math.max(evalNode(node.left, ux, uy, ut), evalNode(node.right, ux, uy, ut));
+
+    return 0;
+  }
+
+  // Geometry Generation: sample unit domain on a grid, emit vector points where value drives position/emphasis
+  // This maps evaluated math directly to vector primitives (points + emphasis)
+  const points = [];
+  const samples = 32; // bounded
+  const ut = (time % 10000) / 10000; // normalized time
+
+  for (let i = 0; i <= samples; i++) {
+    for (let j = 0; j <= samples; j++) {
+      const ux = i / samples;
+      const uy = j / samples;
+      let v = evalNode(expr, ux, uy, ut);
+
+      // Threshold / map to geometry (thresholded values -> points for vector path)
+      if (Math.abs(v) > 0.1) {  // simple threshold for interesting loci
+        const x = ux * width;
+        const y = uy * height;
+        points.push({
+          x: roundTo(x, precision),
+          y: roundTo(y, precision),
+          z: 0,
+          emphasis: clamp01((v + 1) / 2),
+          source: 'math_expression',
+          t: ux,
+          value: roundTo(v, 4),
+        });
+      }
+    }
+  }
+
+  // Also emit a parametric line driven by expression for curve-like output
+  for (let i = 0; i < 64; i++) {
+    const t = i / 63;
+    const ux = t;
+    const uy = 0.5 + evalNode(expr, t, 0.5, ut) * 0.4;
+    const x = ux * width;
+    const y = uy * height;
+    points.push({
+      x: roundTo(x, precision),
+      y: roundTo(y, precision),
+      z: 0,
+      emphasis: clamp01(0.5 + 0.5 * Math.sin(t * 6)),
+      source: 'math_expression',
+      t,
+    });
+  }
+
+  // Apply pure modifiers if declared on the formula (immutable composition)
+  let finalPoints = points;
+  if (Array.isArray(formula.modifiers)) {
+    for (const mod of formula.modifiers) {
+      if (mod.type === 'chaikin') finalPoints = applyChaikin(finalPoints, mod.iterations || 1);
+      else if (mod.type === 'affine') finalPoints = applyAffine(finalPoints, mod.matrix);
+      else if (mod.type === 'offset') finalPoints = applyOffsetCurve(finalPoints, mod.distance || 1, mod.side || 1);
+    }
+  }
+
+  // Enforce global round + seed contract
+  return finalPoints.map(p => ({
+    ...p,
+    x: roundTo(p.x, precision),
+    y: roundTo(p.y, precision),
+  }));
 }

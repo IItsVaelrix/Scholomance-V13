@@ -119,6 +119,8 @@ export const VOID_CHESTPLATE_EXACT_PALETTE = Object.freeze([
   '#16161F',
 ]);
 
+import { resolveRole, CanonicalRoles } from './semantic-registry.js';
+
 // Simple rehydrator stub: assigns part based on region heuristics for the chestplate
 export function rehydrateVoidChestplateCells(coordinates, options = {}) {
   const w = options.width || 64;
@@ -128,7 +130,7 @@ export function rehydrateVoidChestplateCells(coordinates, options = {}) {
   return coordinates.map(cell => {
     let partId = cell.partId || 'unknown';
     let material = cell.material || 'voidsteel';
-    let role = cell.role || 'body';
+    let role = resolveRole(cell) || cell.role || CanonicalRoles.BODY;
 
     const { x, y, color } = cell;
 

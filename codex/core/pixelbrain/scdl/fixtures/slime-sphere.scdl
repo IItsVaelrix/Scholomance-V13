@@ -1,0 +1,28 @@
+# slime-sphere.scdl
+# SCDL v1 with the sphere op — same visual as fixtures/slime/slime.scdl
+# (316 cell ops) but the body is ONE op with 5 tier colors.
+#
+# Tier order on the op: shine glow core rim shadow (brightest → darkest)
+# Light direction defaults to (-1, -1) — upper-left, omitted here for brevity.
+
+asset slime canvas 24x24
+
+palette {
+  core   = #EA1F2D
+  rim    = #761926
+  glow   = #FC8390
+  shine  = #FFE5EA
+  shadow = #2B080B
+}
+
+part body material crimson_ooze {
+  sphere 12 12 radius 10 shine glow core rim shadow
+  glow radius 2
+}
+
+part highlight material emissive {
+  circle 7 7 radius 1 shine
+  circle 9 9 radius 1 shine
+}
+
+export json svg phaser png

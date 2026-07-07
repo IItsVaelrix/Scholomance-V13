@@ -24,29 +24,37 @@ async function getAmpRuntime() {
   return ampRuntime;
 }
 
+async function executeDirect(id, payload, context) {
+  const { verseIRMicroprocessors } = await import('../microprocessors/index.js');
+  return verseIRMicroprocessors.execute(id, payload, context);
+}
+
+async function executePipelineDirect(sequence, payload, context) {
+  const { verseIRMicroprocessors } = await import('../microprocessors/index.js');
+  return verseIRMicroprocessors.executePipeline(sequence, payload, context);
+}
+
 class ProcessorBridge {
   async execute(id, payload, context = {}, options = {}) {
-    // AMP special handler - delegates to animation AMP
-    if (id === 'amp.run') {
-      const { runAnimationAmp } = await import('../animation/amp/runAnimationAmp.ts');
-      return await runAnimationAmp(payload);
-    }
-
     if (typeof window !== 'undefined' && typeof Worker !== 'undefined') {
-      // Browser: use worker, fall back on any error
+      // Browser: use worker, then the same registered processor directly.
       try {
         const { workerClient } = await import('./microprocessor.worker-client.js');
         return await workerClient.execute(id, payload, context, options);
       } catch (err) {
-        console.warn(`[ProcessorBridge] Worker failed for [${id}] — using fallback. Reason: ${err.message}`);
-        const fallback = FALLBACKS[id];
-        if (fallback) return fallback(payload, context);
-        throw err;
+        console.warn(`[ProcessorBridge] Worker failed for [${id}] — executing directly. Reason: ${err.message}`);
+        try {
+          return await executeDirect(id, payload, context);
+        } catch (directErr) {
+          console.warn(`[ProcessorBridge] Direct execution failed for [${id}]. Reason: ${directErr.message}`);
+          const fallback = FALLBACKS[id];
+          if (fallback) return fallback(payload, context);
+          throw directErr;
+        }
       }
     } else {
       // Node.js (or browser without Worker support): lazy import avoids bundling Node-only APIs
-      const { verseIRMicroprocessors } = await import('../microprocessors/index.js');
-      return await verseIRMicroprocessors.execute(id, payload, context);
+      return executeDirect(id, payload, context);
     }
   }
 
@@ -56,12 +64,11 @@ class ProcessorBridge {
         const { workerClient } = await import('./microprocessor.worker-client.js');
         return await workerClient.executePipeline(sequence, payload, context, options);
       } catch (err) {
-        console.warn(`[ProcessorBridge] Pipeline failed [${sequence.join(' → ')}]: ${err.message}`);
-        throw err;
+        console.warn(`[ProcessorBridge] Worker pipeline failed [${sequence.join(' → ')}] — executing directly. Reason: ${err.message}`);
+        return executePipelineDirect(sequence, payload, context);
       }
     } else {
-      const { verseIRMicroprocessors } = await import('../microprocessors/index.js');
-      return await verseIRMicroprocessors.executePipeline(sequence, payload, context);
+      return executePipelineDirect(sequence, payload, context);
     }
   }
 }

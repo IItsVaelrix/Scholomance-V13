@@ -168,15 +168,21 @@ export function createLexiconAdapter(dbPath, options = {}) {
           LIMIT ?
         `),
         lookupRhymeFamily: db.prepare(`
-          SELECT rhyme_family, ipa AS pronunciation
+          SELECT rhyme_family, rhyme_key, ipa AS pronunciation
           FROM rhyme_index
           LEFT JOIN entry ON entry.headword_lower = rhyme_index.word_lower
           WHERE word_lower = ?
         `),
+        // Group by rhyme_key (vowel family + coda, e.g. "U-N") — NOT rhyme_family,
+        // which is only the bare vowel family ("U") and lumps ~14k unrelated words
+        // into one bucket, surfacing them alphabetically ("aaron, abduct, ..."). The
+        // length/word ordering keeps results deterministic and favours concise,
+        // higher-utility rhymes when the LIMIT truncates a large key bucket.
         lookupRhymes: db.prepare(`
           SELECT word_lower
           FROM rhyme_index
-          WHERE rhyme_family = ? AND word_lower != ?
+          WHERE rhyme_key = ? AND word_lower != ?
+          ORDER BY LENGTH(word_lower) ASC, word_lower ASC
           LIMIT ?
         `),
         lookupSynonyms: db.prepare(`
@@ -234,11 +240,11 @@ export function createLexiconAdapter(dbPath, options = {}) {
     const normalized = normalizeWord(word);
     if (!normalized) return { family: null, words: [] };
     const familyRow = stmts.lookupRhymeFamily.get(normalized);
-    if (!familyRow?.rhyme_family) {
+    if (!familyRow?.rhyme_key) {
       return { family: null, words: [] };
     }
     const boundedLimit = toBoundedLimit(limit, DEFAULT_RHYME_LIMIT);
-    const rows = stmts.lookupRhymes.all(familyRow.rhyme_family, normalized, boundedLimit);
+    const rows = stmts.lookupRhymes.all(familyRow.rhyme_key, normalized, boundedLimit);
     return {
       family: familyRow.rhyme_family,
       words: rows.map((row) => row.word_lower),

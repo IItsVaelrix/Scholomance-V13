@@ -1,0 +1,127 @@
+asset void_forest_grass_tile canvas 32x32
+
+palette {
+  void_black = #0a0a13
+  cave_shadow = #11111f
+  outline_black = #05050a
+  deep_stone = #171827
+  mid_stone = #25283a
+  raised_stone = #3a3d52
+  edge_highlight = #51556e
+  
+  void_soil_dark = #16091f
+  void_soil_mid = #261032
+  purple_pool = #3a1454
+  
+  core_magenta = #ff4dff
+  hot_purple = #d936ff
+  blade_mid = #9d28d9
+  blade_shadow = #4c137a
+  glow_aura = #7b1fcf
+}
+
+part side_walls material black_steel {
+  # Left wall base
+  polygon 2 16 16 23 16 30 2 23 deep_stone
+  # Right wall base
+  polygon 16 23 30 16 30 23 16 30 void_black
+  
+  # Left wall cracks
+  line 8 19 8 26 outline_black
+  line 12 21 12 28 outline_black
+  
+  # Right wall cracks
+  line 24 20 24 27 outline_black
+  
+  # Center edge
+  line 16 23 16 30 outline_black
+  
+  # Top edge highlight
+  line 2 16 16 23 edge_highlight
+  line 16 23 30 16 edge_highlight
+}
+
+part top_stone material voidsteel {
+  # Main slab
+  polygon 2 16 16 9 30 16 16 23 mid_stone
+  
+  # Raised stone bits
+  polygon 4 16 10 13 12 14 6 17 raised_stone
+  polygon 26 16 20 13 18 14 24 17 raised_stone
+  polygon 16 21 12 19 16 17 20 19 raised_stone
+  
+  # Inner soil pocket
+  polygon 8 16 16 12 24 16 16 20 void_soil_dark
+  polygon 10 16 16 13 22 16 16 19 void_soil_mid
+  polygon 12 16 16 14 20 16 16 18 purple_pool
+}
+
+part grass material void_rune_glow {
+  cell 10 8 hot_purple
+  cell 11 9 blade_mid
+  cell 22 9 hot_purple
+  cell 23 9 hot_purple
+  cell 12 10 blade_mid
+  cell 21 10 blade_mid
+  cell 23 10 hot_purple
+  cell 9 11 core_magenta
+  cell 10 11 core_magenta
+  cell 12 11 blade_mid
+  cell 17 11 blade_mid
+  cell 20 11 blade_mid
+  cell 22 11 hot_purple
+  cell 24 11 hot_purple
+  cell 11 12 core_magenta
+  cell 13 12 blade_mid
+  cell 16 12 blade_mid
+  cell 19 12 blade_mid
+  cell 22 12 blade_mid
+  cell 24 12 hot_purple
+  cell 11 13 core_magenta
+  cell 13 13 blade_shadow
+  cell 15 13 blade_mid
+  cell 19 13 blade_shadow
+  cell 21 13 blade_mid
+  cell 23 13 hot_purple
+  cell 12 14 core_magenta
+  cell 14 14 blade_shadow
+  cell 15 14 blade_mid
+  cell 16 14 blade_shadow
+  cell 18 14 blade_shadow
+  cell 20 14 blade_mid
+  cell 21 14 blade_mid
+  cell 23 14 hot_purple
+  cell 12 15 hot_purple
+  cell 13 15 blade_shadow
+  cell 14 15 blade_shadow
+  cell 15 15 blade_shadow
+  cell 16 15 blade_mid
+  cell 17 15 blade_shadow
+  cell 18 15 blade_shadow
+  cell 19 15 blade_mid
+  cell 20 15 blade_mid
+  cell 22 15 hot_purple
+  cell 10 16 blade_shadow
+  cell 13 16 blade_mid
+  cell 14 16 blade_shadow
+  cell 15 16 blade_shadow
+  cell 16 16 blade_mid
+  cell 17 16 blade_shadow
+  cell 18 16 blade_shadow
+  cell 19 16 blade_mid
+  cell 21 16 hot_purple
+  cell 11 17 blade_shadow
+  cell 13 17 blade_mid
+  cell 15 17 blade_shadow
+  cell 16 17 blade_mid
+  cell 17 17 blade_shadow
+  cell 19 17 blade_mid
+  cell 11 18 blade_shadow
+  cell 16 18 blade_mid
+  cell 18 18 blade_mid
+  cell 12 19 blade_shadow
+  
+  glow radius 3
+}
+
+export json png

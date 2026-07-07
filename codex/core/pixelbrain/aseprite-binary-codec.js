@@ -1,3 +1,4 @@
+import { unzlibSync } from 'fflate';
 export const ASEPRITE_BINARY_CODEC_VERSION = '0.1.0';
 
 const ASE_MAGIC = 0xA5E0;
@@ -261,23 +262,31 @@ function decodeCelChunk(buffer, offset, chunkEnd, layers) {
   const x = readInt16LE(buffer, offset + 2);
   const y = readInt16LE(buffer, offset + 4);
   const celType = readUInt16LE(buffer, offset + 7);
-  if (celType !== 0) return { offset: chunkEnd };
+  if (celType !== 0 && celType !== 2) return { offset: chunkEnd };
 
   const width = readUInt16LE(buffer, offset + 16);
   const height = readUInt16LE(buffer, offset + 18);
-  const pixelsOffset = offset + 20;
+  let pixelsOffset = offset + 20;
+  
+  let pixelData;
+  if (celType === 2) {
+    const compressed = buffer.subarray(pixelsOffset, chunkEnd);
+    pixelData = unzlibSync(compressed);
+  } else {
+    pixelData = buffer.subarray(pixelsOffset, chunkEnd);
+  }
   const layer = layers[layerIndex] || { name: `Layer ${layerIndex + 1}`, cells: [] };
   layers[layerIndex] = layer;
 
   for (let py = 0; py < height; py += 1) {
     for (let px = 0; px < width; px += 1) {
-      const idx = pixelsOffset + ((py * width + px) * 4);
-      const alpha = readUInt8(buffer, idx + 3);
+      const idx = ((py * width + px) * 4);
+      const alpha = pixelData[idx + 3];
       if (alpha === 0) continue;
       layer.cells.push({
         x: x + px,
         y: y + py,
-        color: rgbaToHex(readUInt8(buffer, idx), readUInt8(buffer, idx + 1), readUInt8(buffer, idx + 2)),
+        color: rgbaToHex(pixelData[idx], pixelData[idx + 1], pixelData[idx + 2]),
         emphasis: Number((alpha / 255).toFixed(4)),
         metadata: {
           partId: layer.name,
@@ -304,6 +313,7 @@ export function decodeAsepriteBinary(input) {
   const frames = [];
   let offset = 128;
   for (let frameIndex = 0; frameIndex < framesCount; frameIndex += 1) {
+    layers.forEach((layer) => { layer.cells = []; });
     const frameBytes = readUInt32LE(buffer, offset);
     const frameEnd = offset + frameBytes;
     if (readUInt16LE(buffer, offset + 4) !== FRAME_MAGIC) throw new Error('Invalid Aseprite frame magic');

@@ -1,0 +1,4244 @@
+{
+  "project": {
+    "version": "1",
+    "projectId": "daydreaming-nightmares",
+    "title": "Daydreaming Nightmares",
+    "canvas": {
+      "width": 1920,
+      "height": 1080,
+      "fps": 30,
+      "durationFrames": 7200,
+      "backgroundColor": "#008080"
+    },
+    "assets": [
+      {
+        "id": "asset-audio",
+        "kind": "audio",
+        "name": "Daydreaming Nightmares V2.wav",
+        "url": "/daydreaming-nightmares.wav"
+      }
+    ],
+    "timeline": {
+      "tracks": [
+        {
+          "id": "t-audio-1",
+          "name": "Audio",
+          "type": "audio",
+          "hidden": false,
+          "locked": false,
+          "clips": [
+            {
+              "id": "clip-audio",
+              "trackId": "t-audio-1",
+              "assetId": "asset-audio",
+              "kind": "audio",
+              "startFrame": 0,
+              "durationFrames": 7200,
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 0
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            }
+          ]
+        },
+        {
+          "id": "t-vbg-1",
+          "name": "Background",
+          "type": "video",
+          "hidden": false,
+          "locked": false,
+          "clips": [
+            {
+              "id": "clip-win98-ui",
+              "trackId": "t-vbg-1",
+              "kind": "template",
+              "metadata": {
+                "templateType": "win98-window",
+                "text": "Daydreaming Nightmares"
+              },
+              "startFrame": 0,
+              "durationFrames": 7200,
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 0
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            }
+          ]
+        },
+        {
+          "id": "t-text-1",
+          "name": "Lyrics",
+          "type": "video",
+          "hidden": false,
+          "locked": false,
+          "clips": [
+            {
+              "id": "clip-text-0",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 0,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "[Cinematic Intro]",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-1",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 79,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Daydreaming Nightmares",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-2",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 158,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Daydreaming Nightmares",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-3",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 237,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Daydreaming Nightmares",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-4",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 316,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Daydreaming Nightmares",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-5",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 395,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "[Verse 1]",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-6",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 474,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Feeling decay now, steel in the rib-cage",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-7",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 553,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "stealing my faith, wow.",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-8",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 632,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Realness embraced by ripping the cage down",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-9",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 711,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "still, I'm awake, how belligerent",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-10",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 790,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "stay down! You uppity fake clown",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-11",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 869,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "I'm struggling right now",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-12",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 948,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Love muscle cuddling the knife, see it shine now",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-13",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 1027,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Suffering high brow,",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-14",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 1106,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Musket at the skull, comfortable, the pull, trigger pulling just to strike down! (BOOM!)",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-15",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 1185,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "bullet hitting white gowns",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-16",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 1264,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "motivated psychic, Logia to hater touch",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-17",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 1343,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Can't embrace a faker, like the paper to my fire brush",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-18",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 1422,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Bonded with a liar once",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-19",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 1501,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Now I see the truth like an Agent Smith smacked me in the face and said, ''You're one of us''",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-20",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 1580,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "pummel fake smiles with a bludgeon and a blunderbuss",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-21",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 1659,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "blast radius leaving your corpse as buckets of dust.",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-22",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 1738,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "[Chorus]",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-23",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 1817,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Mortician Mic,",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-24",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 1896,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Daydreaming Nightmares",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-25",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 1975,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Mortician Mic,",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-26",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 2054,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Daydreaming Nightmares",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-27",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 2133,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Forfeit the fight",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-28",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 2212,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "and I'm standing right there",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-29",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 2291,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Injecting hatred",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-30",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 2370,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "and rage in your fine tears.",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-31",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 2449,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "[Prechorus]",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-32",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 2528,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Daydreaming Nightmares.",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-33",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 2607,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Daydreaming Nightmares.",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-34",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 2686,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Nightmares.",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-35",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 2765,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "NIGHTMARES!!!!",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-36",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 2844,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "[Verse 2]",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-37",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 2923,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Isotope to bonds, Lycan knows the bomb",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-38",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 3002,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Hydrochloric palms, pyro war I brought, microscopic harm",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-39",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 3081,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "My demonic arms, supersonic drawl, YO!",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-40",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 3160,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Suicidal brawls, FLOW!",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-41",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 3239,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "EUPHRATES! Know! Hades couldn't catalog victims",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-42",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 3318,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "I've been sending too many. WOAH!",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-43",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 3397,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Labeled since embryo, placenta wrote genetic code",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-44",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 3476,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Ones and zeros codec, mastering sound in stereo",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-45",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 3555,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Radio Mysterio, hitting targets, Brady throw",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-46",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 3634,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Plato knows my philosophy enslaves the data whole",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-47",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 3713,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Kratos with the Blades, Pathos getting slayed",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-48",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 3792,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "chaos in the veins,",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-49",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 3871,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Macrocosm shattered like a dinner plate",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-50",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 3950,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Incinerate rappers, I'm on a different stage",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-51",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 4029,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "I could lift Galactus and stare and make him admit mistakes",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-52",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 4108,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "I'm the fucking phantom of fear, and I accept my place",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-53",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 4187,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "I'm the Alucard of suffering, yet I refuse to take...",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-54",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 4266,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "[Cinematic break]",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-55",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 4345,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "I SNATCH!!!!",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-56",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 4424,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "[Chorus]",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-57",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 4503,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Mortician Mic,",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-58",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 4582,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Daydreaming Nightmares",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-59",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 4661,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Mortician Mic,",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-60",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 4740,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Daydreaming Nightmares",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-61",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 4819,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Forfeit the fight",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-62",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 4898,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "and I'm standing right there",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-63",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 4977,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Injecting hatred",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-64",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 5056,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "and rage in your fine tears.",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-65",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 5135,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "[Prechorus]",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-66",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 5214,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Daydreaming Nightmares.",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-67",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 5293,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Daydreaming Nightmares.",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-68",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 5372,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Nightmares.",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-69",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 5451,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "NIGHTMARES!!!!",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-70",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 5530,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "[Cinematic Outro, dual vocals, Agatha Blacklight and Vaelrix]",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-71",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 5609,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "(Mortician Mic,",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-72",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 5688,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Daydreaming Nightmares Nightmares....)",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-73",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 5767,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "(Mortician Mic,",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-74",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 5846,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Daydreaming Nightmares Nightmares....)",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-75",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 5925,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Smiles never last",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-76",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 6004,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Suffering's evergreen.",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-77",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 6083,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "I wonder if she thinks about me",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-78",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 6162,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "as much as I think about her",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-79",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 6241,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Smiles never last",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-80",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 6320,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Suffering's Evergreen",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-81",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 6399,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "and I can't even sleep",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-82",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 6478,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "my sorrow lives in my dreams",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-83",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 6557,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Smiles never last",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-84",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 6636,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Suffering sets the scene",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-85",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 6715,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "She follows me when I'm  awake",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-86",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 6794,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Why? Did I make a mistake?",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-87",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 6873,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "(Mortician Mic,",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-88",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 6952,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Daydreaming Nightmares Nightmares....)",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-89",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 7031,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "(Mortician Mic,",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            },
+            {
+              "id": "clip-text-90",
+              "trackId": "t-text-1",
+              "kind": "text",
+              "startFrame": 7110,
+              "durationFrames": 79,
+              "metadata": {
+                "text": "Daydreaming Nightmares Nightmares....)",
+                "fontSize": 64,
+                "color": "#ffffff",
+                "fontFamily": "Arial",
+                "fontWeight": "bold"
+              },
+              "opacity": {
+                "defaultValue": 1
+              },
+              "transform": {
+                "position": {
+                  "x": {
+                    "defaultValue": 0
+                  },
+                  "y": {
+                    "defaultValue": 400
+                  }
+                },
+                "scale": {
+                  "x": {
+                    "defaultValue": 1
+                  },
+                  "y": {
+                    "defaultValue": 1
+                  }
+                },
+                "rotation": {
+                  "defaultValue": 0
+                },
+                "anchor": {
+                  "x": 0.5,
+                  "y": 0.5
+                }
+              },
+              "effects": [],
+              "transitions": [],
+              "keyframes": []
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "manifest": {
+    "exportedAt": "2026-06-30T11:51:10.050Z",
+    "packetId": "daydreaming-nightmares",
+    "title": "Daydreaming Nightmares",
+    "format": "json",
+    "canvas": {
+      "width": 1920,
+      "height": 1080,
+      "fps": 30,
+      "durationFrames": 7200,
+      "backgroundColor": "#008080"
+    },
+    "numTracks": 3,
+    "numAssets": 1
+  }
+}

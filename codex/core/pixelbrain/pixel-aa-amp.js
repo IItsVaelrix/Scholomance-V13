@@ -16,7 +16,7 @@ function parseHex(hex) {
 }
 
 function rgbToHex(r, g, b) {
-  return `#${[r, g, b].map(x => Math.round(x).toString(16).padStart(2, '0')).join('')}`;
+  return `#${[r, g, b].map(x => Math.round(x).toString(16).padStart(2, '0')).join('').toUpperCase()}`;
 }
 
 export function applyPixelAA(fills, spec) {
@@ -97,7 +97,14 @@ export function applyPixelAA(fills, spec) {
           ...cell, 
           slot: blendedSlot !== undefined ? blendedSlot : cell.slot,
           isRim: isRimCell !== undefined ? isRimCell : cell.isRim,
-          color: blended 
+          color: blended,
+          colorProvenance: Object.freeze({
+            amp: 'pixel-aa-amp',
+            version: '1.0.0',
+            kind: 'inner-corner-50-50',
+            inputs: Object.freeze([cell.color, r1.color, r2.color]),
+            formula: 'cell50_rimAverage50',
+          }),
         };
       }
     }

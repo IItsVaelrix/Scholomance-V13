@@ -1,0 +1,83 @@
+asset barrel canvas 64x48
+
+palette {
+  wood_darkest = #3a200d
+  wood_dark    = #5e3313
+  wood_mid     = #985521
+  wood_light   = #ce843e
+  wood_highlight = #e8b36a
+  
+  hoop_dark    = #2c2c35
+  hoop_base    = #5f5f66
+  hoop_hi      = #a8a8b0
+  hoop_glint   = #d4d4e0
+}
+
+# Regal barrel - elegant staves + refined, attached-looking hoops
+# Stronger classic barrel bulge (narrower top/bottom, wider middle)
+
+  symmetry x
+  # Left 4 staves (right half mirrored automatically)
+  # 1. Far left deep shadow (now anti-aliased on outer edge)
+  polygon 19 7  23 7  21 23  23 40  19 40  17 23  wood_darkest
+  # Manual anti-aliasing for the outer curve steps
+  cell 18 14 wood_darkest
+  cell 18 15 wood_darkest
+  cell 18 31 wood_darkest
+  cell 18 32 wood_darkest
+  cell 17 22 wood_darkest
+  cell 17 24 wood_darkest
+  cell 19 8 wood_darkest
+  cell 19 39 wood_darkest
+
+  # 2. Left shadow
+  polygon 23 7  27 7  26 23  27 40  23 40  21 23  wood_dark
+
+  # 3. Left mid
+  polygon 27 7  31 7  30 23  31 40  27 40  26 23  wood_mid
+
+  # 4. Center-left (extends to X=32 center)
+  polygon 31 7  32 7  32 23  32 40  31 40  30 23  wood_light
+  
+  # Subtle vertical highlight
+  line 31 8 31 39 wood_highlight
+}
+
+part hoops material darksteel {
+  symmetry x
+  # Top hoop
+  line 18 15 32 15 hoop_dark
+  line 18 14 32 14 hoop_base
+  line 18 13 32 13 hoop_base
+  line 18 12 32 12 hoop_hi
+  line 20 11 30 11 hoop_glint
+  
+  # Hoop AA
+  cell 17 14 hoop_dark
+  cell 17 13 hoop_base
+
+  # Bottom hoop
+  line 18 34 32 34 hoop_dark
+  line 18 33 32 33 hoop_base
+  line 18 32 32 32 hoop_base
+  line 18 31 32 31 hoop_hi
+  line 20 30 30 30 hoop_glint
+  
+  # Hoop AA
+  cell 17 33 hoop_dark
+  cell 17 32 hoop_base
+
+
+
+# Top lid and bottom base for classic barrel look
+part lid material bark {
+  rect 21 5 42 2 wood_darkest     # top rim
+  line 22 4 49 4 wood_light       # lid highlight edge
+}
+
+part base material bark {
+  rect 21 41 42 2 wood_darkest    # bottom rim
+  line 22 43 49 43 wood_dark      # base shadow
+}
+
+export png aseprite

@@ -11,6 +11,15 @@ Scholomance V11 is a ritual-themed, text-combat MUD where syntax is a living wor
 
 ---
 
+## SCDNA Genes (Mandatory Inheritance)
+
+All agents **must** internalize active SCDNA genes before touching assets, SCDL pipelines, isometric/2.5D rendering, or pixelbrain work.
+
+Current active genes:
+- `SCDNA_Gene_Isometric_Asset_Integrity.md` — Never force 2D assets into 2.5D space. Always redesign via SCDL source + proper masking/clipping/anchoring (see the gene for the exact process used on the VOID tutorial island tiles).
+- `SCDNA_Gene_Combat_Galaxy_Viewport_Fill.md` — The galaxy background in the Combat arena MUST always take up the entire viewport (dynamic sizing from live game scale). Agents are strictly forbidden from changing the galaxy fill logic, resize handling, or reducing its coverage in any way.
+- `SCDNA_Gene_Character_Skeleton_Manifold.md` — Every character sprite is a chart of one canonical skeleton manifold. Bind parts to named joint anchors; derive each facing as a projection chart; author animation as a single trajectory. No literal cell plotting or per-direction re-derivation.
+
 ## The Stack
 
 | Layer | Technology |

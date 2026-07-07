@@ -77,10 +77,14 @@ export function tokenTruesight(tokenData: any, fallbackWord: string): { color: s
   // The safe-guard chain is critical here: if the upstream `tokenData.vowelFamily`
   // is malformed, we fall through to the live engine, and if that also fails we
   // land on VOID. We never let a misfire become a NaN/Infinity-poisoned color.
-  const liveAnalysis = engine.analyzeDeep?.(clean) || null;
-  const family = safeVowelFamily(tokenData?.vowelFamily)
-    || safeVowelFamily(tokenData?.rhymeFamily)
-    || safeVowelFamily(liveAnalysis?.vowelFamily);
+  //
+  // The live G2P pass is LAZY: in the common server-analyzed case the backend
+  // family is present and usable, so we never run analyzeDeep at all. Computing
+  // it eagerly (and discarding it) was a full G2P pass wasted per resonant word.
+  const backendFamily = safeVowelFamily(tokenData?.vowelFamily)
+    || safeVowelFamily(tokenData?.rhymeFamily);
+  const family = backendFamily
+    || safeVowelFamily(engine.analyzeDeep?.(clean)?.vowelFamily);
   const school = safeSchoolForFamily(engine, family);
   return { color: generateSchoolColor(school), school, analysis: tokenData || null };
 }

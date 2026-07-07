@@ -3,7 +3,17 @@
     "scholomance-collab": {
       "command": "node",
       "args": ["--env-file=.env", "codex/server/collab/mcp-bridge-entry.js"],
-      "cwd": "/home/deck/Downloads/Scholomance-V12-main"
+      "cwd": "/home/deck/Downloads/Scholomance-V12-main",
+      "_note": "Governing MCP layer. Now includes direct brain network + forcefield tools (mcp_scholomance_collab_brain_*). No Ollama required."
+    },
+    "scholomance-brain": {
+      "command": "python3",
+      "args": ["steamdeck_brain/mcp_brain_bridge.py"],
+      "cwd": "/home/deck/Downloads/Scholomance-V12-main",
+      "env": {
+        "PYTHONPATH": "steamdeck_brain"
+      },
+      "_note": "Dedicated brain MCP (now prefers direct ForceField path for ask_brain)."
     }
   }
 }

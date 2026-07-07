@@ -1,0 +1,138 @@
+{
+  "version": "TACTICAL-LATTICE-v1",
+  "palettes": {
+    "normal": {
+      "base": "#3a3a4a",
+      "edge": "#4a4a5a",
+      "glow": "#5a5a6a",
+      "hover": "#6a6a7a",
+      "selected": "#7a7aaa",
+      "threatened": "#aa3333"
+    },
+    "high_ground": {
+      "base": "#4a5a3a",
+      "edge": "#5a6a4a",
+      "glow": "#6a7a5a",
+      "hover": "#7a8a6a",
+      "selected": "#8aaa7a",
+      "threatened": "#aa5533"
+    },
+    "low_ground": {
+      "base": "#2a2a3a",
+      "edge": "#3a3a4a",
+      "glow": "#4a4a5a",
+      "hover": "#5a5a6a",
+      "selected": "#6a6a8a",
+      "threatened": "#882222"
+    },
+    "blocked": {
+      "base": "#1a1a2a",
+      "edge": "#2a2a3a",
+      "glow": "#1a1a2a",
+      "hover": "#2a2a3a",
+      "selected": "#2a2a3a",
+      "threatened": "#2a2a3a"
+    },
+    "hazard": {
+      "base": "#5a2211",
+      "edge": "#7a3322",
+      "glow": "#aa4422",
+      "hover": "#cc5533",
+      "selected": "#ee6644",
+      "threatened": "#ff4400"
+    },
+    "fire": {
+      "base": "#6a2200",
+      "edge": "#8a3311",
+      "glow": "#cc4411",
+      "hover": "#ee5522",
+      "selected": "#ff7733",
+      "threatened": "#ff2200"
+    },
+    "void": {
+      "base": "#2a1144",
+      "edge": "#3a1166",
+      "glow": "#6622aa",
+      "hover": "#7733bb",
+      "selected": "#9944dd",
+      "threatened": "#aa11ff"
+    },
+    "sonic": {
+      "base": "#0a3344",
+      "edge": "#115566",
+      "glow": "#22aacc",
+      "hover": "#33bbdd",
+      "selected": "#44ccee",
+      "threatened": "#00aaff"
+    },
+    "ice": {
+      "base": "#2a4466",
+      "edge": "#3a5577",
+      "glow": "#88ccee",
+      "hover": "#99ddff",
+      "selected": "#aaeeff",
+      "threatened": "#4488ff"
+    },
+    "holy": {
+      "base": "#4a4422",
+      "edge": "#6a6633",
+      "glow": "#eedd66",
+      "hover": "#ffee77",
+      "selected": "#ffff88",
+      "threatened": "#ffaa00"
+    },
+    "null": {
+      "base": "#2a2a2a",
+      "edge": "#3a3a3a",
+      "glow": "#555555",
+      "hover": "#666666",
+      "selected": "#888888",
+      "threatened": "#333333"
+    },
+    "rune": {
+      "base": "#3a2266",
+      "edge": "#4a3377",
+      "glow": "#cc88ff",
+      "hover": "#dd99ff",
+      "selected": "#eeaaff",
+      "threatened": "#9944ff"
+    },
+    "anchor": {
+      "base": "#332244",
+      "edge": "#443366",
+      "glow": "#aa66cc",
+      "hover": "#bb77dd",
+      "selected": "#cc88ee",
+      "threatened": "#8833cc"
+    }
+  },
+  "transitionColors": {
+    "codeFlood": ["#00ff41", "#7722aa", "#00cc33", "#5511aa"],
+    "wireframe": "#00ff41",
+    "gridLines": "#334455",
+    "gridLineActive": "#6688aa",
+    "dissolveParticle": "#00ff41"
+  },
+  "overlayColors": {
+    "movementRange": "rgba(66, 133, 244, 0.3)",
+    "movementRangeEdge": "rgba(66, 133, 244, 0.6)",
+    "enemyThreat": "rgba(234, 67, 53, 0.25)",
+    "enemyThreatEdge": "rgba(234, 67, 53, 0.5)",
+    "spellRange": "rgba(251, 188, 4, 0.25)",
+    "spellRangeEdge": "rgba(251, 188, 4, 0.5)",
+    "lineOfSight": "rgba(52, 168, 83, 0.2)",
+    "lineOfSightBlocked": "rgba(234, 67, 53, 0.15)",
+    "controlPlayer": "rgba(66, 133, 244, 0.15)",
+    "controlEnemy": "rgba(234, 67, 53, 0.15)",
+    "controlNeutral": "rgba(128, 128, 128, 0.1)"
+  },
+  "schoolGlyphMap": {
+    "FIRE": { "glyph": "🔥", "cssClass": "tile-fire" },
+    "VOID": { "glyph": "◉", "cssClass": "tile-void" },
+    "SONIC": { "glyph": "♪", "cssClass": "tile-sonic" },
+    "ICE": { "glyph": "❄", "cssClass": "tile-ice" },
+    "HOLY": { "glyph": "✦", "cssClass": "tile-holy" },
+    "PSYCHIC": { "glyph": "◈", "cssClass": "tile-psychic" },
+    "MYTH": { "glyph": "✧", "cssClass": "tile-myth" }
+  }
+}

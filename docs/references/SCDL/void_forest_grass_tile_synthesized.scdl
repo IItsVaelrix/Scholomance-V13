@@ -1,0 +1,29 @@
+asset void_forest_grass_tile canvas 32x32
+
+palette {
+  void_soil_dark = #1A1A1A
+  void_soil_mid  = #2B2B2B
+  grass_shadow   = #5D2377
+  grass_mid      = #7C25A6
+  grass_highlight = #9032B4
+}
+
+part void_soil material obsidian {
+  rect 0 0 32 32 void_soil_dark
+  rect 2 2 28 28 void_soil_mid
+}
+
+part surface_grass material pine_needle {
+  polygon 16 5 17 7 14 7 16 9 14 10 18 10 16 11 18 11 grass_shadow
+  polygon 5 12 10 12 10 15 5 13 25 12 26 13 25 14 grass_shadow
+  polygon 7 14 12 14 11 16 16 16 19 17 20 19 17 20 grass_mid
+  polygon 21 14 27 14 25 15 grass_shadow
+  
+  cell 16 10 grass_highlight
+  cell 19 18 grass_highlight
+  cell 8 15 grass_highlight
+  cell 6 13 grass_highlight
+  cell 15 16 grass_highlight
+}
+
+export json png aseprite

@@ -1,0 +1,43 @@
+# forest_map — SCDL v1.2 canonical scene-graph fixture (PR-1, geometry only)
+asset forest_map canvas 160x90
+
+palette {
+  skyc    = #1B2A4A
+  ridgec  = #16223C
+  groundc = #101C2E
+  trunkc  = #26180E
+  leafc   = #14301E
+  leafhi  = #23532F
+}
+
+def tree {
+  part trunk material bark { rect -1 0 3 10 trunkc }
+  part canopy material pine_needle {
+    circle 0 -4 radius 6 leafc
+    circle -2 -6 radius 3 leafhi
+  }
+}
+
+def shrub {
+  part blob material pine_needle {
+    symmetry x
+    circle 2 0 radius 2 leafc
+  }
+}
+
+part sky material void_cloth { rect 0 0 160 50 skyc }
+part ridge material darksteel { polygon 0 50 40 30 90 44 130 26 160 38 160 50 ridgec }
+part ground material bark { rect 0 50 160 40 groundc }
+
+group forest at 0 62 {
+  instance tree at 22 0
+  instance tree as leaning at 52 2 rotate 8 scale 1.2
+  instance tree at 84 -2 mirror x
+  group knoll at 116 4 rotate 3 {
+    instance tree at 0 0 scale 0.8
+    instance shrub at 14 6
+  }
+  instance shrub at 8 8 scale 1.5
+}
+
+export json png svg phaser

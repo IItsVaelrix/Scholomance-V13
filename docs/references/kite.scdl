@@ -1,0 +1,204 @@
+asset kite canvas 32x32
+
+palette {
+  c000 = #080107
+  c001 = #51769e
+  c002 = #183551
+  c003 = #fffff4
+  c004 = #406995
+  c005 = #254a70
+  c006 = #ffffd2
+  c007 = #375a80
+  c008 = #6c490c
+  c009 = #0d2640
+  c010 = #3f3f3f
+  c011 = #213f60
+}
+
+part mortar material source {
+  ring 16 16 7 1 c000
+  ring 16 16 8 1 c000
+  ring 16 16 9 1 c000
+  ring 16 16 10 1 c000
+  ring 16 16 11 1 c000
+  ring 16 16 12 1 c000
+  ring 16 16 13 1 c000
+  ring 16 16 14 1 c000
+  ring 16 16 15 1 c000
+  ring 16 16 16 1 c000
+  ring 16 16 17 1 c000
+  ring 16 16 18 1 c000
+  rect 0 0 7 1 c000
+  rect 26 0 6 1 c000
+  rect 0 1 6 1 c000
+  rect 27 1 5 1 c000
+  rect 0 2 4 1 c000
+  rect 29 2 3 1 c000
+  rect 0 3 3 1 c000
+  rect 30 3 2 1 c000
+  rect 0 4 2 2 c000
+  rect 31 4 1 2 c000
+  cell 0 6 c000
+  rect 11 12 11 1 c000
+  rect 15 13 2 7 c000
+  rect 20 13 2 1 c000
+  rect 10 15 1 2 c000
+  rect 22 16 1 3 c000
+  rect 16 20 1 3 c000
+  rect 15 21 1 2 c000
+  rect 0 26 1 6 c000
+  rect 1 27 1 5 c000
+  rect 31 27 1 5 c000
+  rect 2 29 1 3 c000
+  rect 30 29 1 3 c000
+  rect 3 30 1 2 c000
+  rect 29 30 1 2 c000
+  rect 4 31 2 1 c000
+  rect 27 31 2 1 c000
+}
+
+part slab_0 material source {
+  rect 20 16 2 3 c009
+  rect 17 18 3 1 c009
+  rect 18 19 3 1 c009
+  rect 19 20 2 2 c009
+  rect 17 21 2 2 c009
+  cell 19 22 c009
+  rect 18 23 1 2 c009
+  rect 17 24 1 2 c009
+}
+
+part slab_1 material source {
+  rect 10 17 2 1 c002
+  rect 14 17 1 4 c002
+  rect 11 18 3 1 c002
+  rect 12 19 2 2 c002
+  cell 11 20 c002
+  rect 13 21 1 2 c002
+}
+
+part slab_2 material source {
+  rect 18 4 1 6 c005
+  cell 17 5 c005
+  rect 19 6 2 1 c005
+  cell 19 7 c005
+  rect 17 9 1 2 c005
+  cell 19 9 c005
+}
+
+part slab_3 material source {
+  rect 18 14 1 4 c002
+  rect 20 14 2 1 c002
+  rect 17 15 1 3 c002
+  rect 19 15 2 1 c002
+  rect 19 16 1 2 c002
+}
+
+part slab_4 material source {
+  rect 11 13 1 4 c011
+  rect 12 15 1 3 c011
+  rect 14 15 1 2 c011
+  rect 13 16 1 2 c011
+}
+
+part cracks material source {
+  cell 14 2 c003
+  cell 17 2 c003
+  rect 11 3 2 1 c003
+  rect 19 3 2 1 c003
+  cell 13 4 c007
+  cell 14 4 c001
+  rect 15 4 1 4 c006
+  cell 16 4 c008
+  cell 19 4 c000
+  cell 20 4 c003
+  cell 23 4 c010
+  cell 10 5 c001
+  rect 11 5 3 1 c004
+  cell 14 5 c006
+  cell 16 5 c006
+  rect 19 5 2 1 c011
+  rect 24 5 1 2 c010
+  cell 9 6 c004
+  cell 10 6 c000
+  rect 11 6 2 1 c004
+  cell 13 6 c007
+  cell 14 6 c000
+  cell 16 6 c008
+  rect 17 6 1 2 c000
+  rect 21 6 2 1 c009
+  rect 7 7 1 4 c003
+  cell 9 7 c011
+  cell 10 7 c005
+  cell 11 7 c001
+  cell 12 7 c004
+  cell 13 7 c005
+  rect 14 7 1 4 c007
+  rect 16 7 1 4 c000
+  rect 20 7 1 3 c011
+  cell 21 7 c000
+  rect 22 7 1 2 c009
+  rect 24 7 1 3 c003
+  cell 9 8 c005
+  rect 10 8 3 1 c007
+  cell 13 8 c004
+  rect 15 8 1 3 c000
+  cell 17 8 c007
+  cell 19 8 c009
+  cell 21 8 c011
+  rect 9 9 2 1 c011
+  cell 11 9 c007
+  cell 12 9 c004
+  rect 13 9 1 2 c007
+  rect 21 9 2 1 c002
+  cell 9 10 c011
+  cell 10 10 c000
+  cell 11 10 c005
+  cell 12 10 c007
+  cell 18 10 c002
+  cell 19 10 c011
+  cell 20 10 c002
+  cell 22 10 c009
+  rect 9 11 6 1 c003
+  rect 15 11 2 1 c006
+  rect 17 11 2 1 c003
+  cell 19 11 c006
+  cell 20 11 c003
+  cell 9 13 c002
+  rect 12 13 3 1 c005
+  rect 17 13 3 1 c011
+  rect 22 13 1 3 c009
+  cell 23 13 c003
+  cell 9 14 c011
+  cell 10 14 c005
+  cell 12 14 c005
+  cell 13 14 c011
+  cell 14 14 c005
+  cell 17 14 c011
+  cell 19 14 c011
+  cell 9 15 c002
+  cell 13 15 c005
+  cell 21 15 c000
+  rect 23 15 1 2 c003
+  cell 8 16 c010
+  cell 10 18 c009
+  cell 11 19 c009
+  rect 17 19 1 2 c002
+  cell 21 19 c000
+  cell 22 19 c003
+  cell 15 20 c008
+  cell 18 20 c002
+  rect 21 20 1 2 c003
+  rect 12 21 1 3 c009
+  rect 14 21 1 2 c009
+  rect 13 23 1 3 c009
+  cell 20 23 c003
+  rect 14 24 1 2 c009
+  cell 12 25 c010
+  cell 19 25 c003
+  rect 15 26 2 2 c009
+  cell 14 28 c010
+  cell 17 28 c010
+}
+
+export json png aseprite

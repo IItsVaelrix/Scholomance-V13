@@ -1,0 +1,75 @@
+asset barrel canvas 64x48
+
+palette {
+  wood_darkest   = #3a200d
+  wood_dark      = #5e3313
+  wood_mid       = #985521
+  wood_light     = #ce843e
+  wood_highlight = #e8b36a
+
+  hoop_dark  = #2c2c35
+  hoop_base  = #5f5f66
+  hoop_hi    = #a8a8b0
+  hoop_glint = #d4d4e0
+}
+
+# Refined barrel — rounded bulging silhouette, cylindrical stave shading,
+# clean two-hoop wrap. Left half authored; symmetry x mirrors to the right
+# (canvas center = 32) for perfect left/right symmetry.
+
+# 1. Body silhouette: one filled blob, bulged sides + rounded top/bottom.
+part silhouette material bark {
+  symmetry x
+  polygon 32 7  26 7  22 9  19 13  17 18  17 24  17 30  19 35  22 39  26 41  32 41  wood_mid
+}
+
+# 2. Vertical stave shading over the blob (darkest edge -> highlight center).
+part staves material bark {
+  symmetry x
+  rect 18 10 3 28 wood_darkest
+  rect 21 10 3 28 wood_dark
+  rect 24 10 3 28 wood_mid
+  rect 27 10 3 28 wood_light
+  rect 30 10 2 28 wood_highlight
+}
+
+# 3. Cylindrical edge shadow — darken the far left curve back to round.
+part edge_shadow material bark {
+  symmetry x
+  polygon 17 18  19 14  20 14  18 20  18 28  20 34  19 34  17 30  17 24  wood_darkest
+}
+
+# 4. Rounded dark caps re-round the top and bottom over the square stave ends.
+part cap_top material bark {
+  symmetry x
+  polygon 32 7  26 7  22 9  18 13  22 12  26 10  32 10  wood_darkest
+  line 24 10 32 10 wood_dark
+}
+
+part cap_bottom material bark {
+  symmetry x
+  polygon 32 41  26 41  22 39  18 35  22 37  26 39  32 38  wood_darkest
+  line 24 38 32 38 wood_dark
+}
+
+# 5. Upper hoop — clean metal band wrapping the barrel.
+part hoop_top material darksteel {
+  symmetry x
+  line 18 17 32 17 hoop_dark
+  line 18 16 32 16 hoop_base
+  line 18 15 32 15 hoop_base
+  line 18 14 32 14 hoop_hi
+  line 19 13 27 13 hoop_glint
+}
+
+# 6. Lower hoop.
+part hoop_bottom material darksteel {
+  symmetry x
+  line 18 33 32 33 hoop_dark
+  line 18 32 32 32 hoop_base
+  line 18 31 32 31 hoop_base
+  line 18 30 32 30 hoop_hi
+  line 19 29 27 29 hoop_glint
+}
+
+export png aseprite

@@ -20,7 +20,7 @@ const DEFAULT_CANVAS = Object.freeze({
   background: '#00000000',
 });
 
-function stableJson(value) {
+export function stableJson(value) {
   if (value === undefined || typeof value === 'function' || typeof value === 'symbol') return 'null';
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`;
@@ -53,7 +53,7 @@ export function normalizePixelBrainCanvas(canvas = {}) {
 }
 
 export function normalizePixelBrainCoordinate(coord = {}) {
-  return Object.freeze({
+  const base = {
     ...clonePlain(coord),
     x: toFiniteNumber(coord.x ?? coord.snappedX, 0),
     y: toFiniteNumber(coord.y ?? coord.snappedY, 0),
@@ -62,7 +62,18 @@ export function normalizePixelBrainCoordinate(coord = {}) {
     snappedY: toFiniteNumber(coord.snappedY ?? coord.y, 0),
     color: String(coord.color || '#ffffff'),
     emphasis: toFiniteNumber(coord.emphasis ?? coord.pressure, 1),
-  });
+  };
+
+  // Preserve SemQuant / authoring semantic fields (partId, role, sourceOpId, semanticRole etc.)
+  // These are lightweight metadata for connective tissue between authoring and runtime.
+  if (coord.partId) base.partId = String(coord.partId);
+  if (coord.role) base.role = String(coord.role);
+  if (coord.sourceOpId) base.sourceOpId = String(coord.sourceOpId);
+  if (coord.material) base.material = String(coord.material);
+  if (coord.semanticRole) base.semanticRole = String(coord.semanticRole);
+  if (coord.semanticDomain) base.semanticDomain = String(coord.semanticDomain);
+
+  return Object.freeze(base);
 }
 
 function normalizePaletteRecord(palette, index = 0) {
@@ -145,11 +156,13 @@ function normalizeGeometry(input = {}) {
       : [];
 
   const normalizedCoordinates = Object.freeze(coordinates.map(normalizePixelBrainCoordinate));
+  const sceneGraph = input.geometry?.sceneGraph || null;
   return Object.freeze({
     mode: input.geometry?.mode || (cells.length ? 'template-grid' : 'coordinates'),
     bounds: Object.freeze(clonePlain(input.geometry?.bounds || {})),
     coordinates: normalizedCoordinates,
     cells: Object.freeze(clonePlain(cells)),
+    ...(sceneGraph ? { sceneGraph: Object.freeze(clonePlain(sceneGraph)) } : {}),
   });
 }
 

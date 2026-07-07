@@ -16,6 +16,7 @@
  * single chunk is a valid VoxelVolume consumable by Level 1 / Level 2 paths.
  */
 
+import { fnv1a32Hex } from './shared.js';
 import { createVoxelVolume, cellIndex, setCellMaterial, ENERGY_TYPES } from './voxel-volume.js';
 import { generateCompositeSeeds, generateFibonacciSeeds } from './wand-seed-lift.js';
 import { propagate, assignMaterial } from './qbit-field.js';
@@ -42,16 +43,8 @@ export const CHUNK_SIZE_MIN = 8;
 export const CHUNK_SIZE_MAX = 128;
 export const CHUNK_COUNT_MIN = 1;
 
-/** FNV-1a 32-bit hex (matches the language white paper §4.1). */
-function fnv1a8Hex(input) {
-  const text = String(input ?? '');
-  let hash = 0x811c9dc5;
-  for (let i = 0; i < text.length; i++) {
-    hash ^= text.charCodeAt(i);
-    hash = Math.imul(hash, 0x01000193);
-  }
-  return (hash >>> 0).toString(16).toUpperCase().padStart(8, '0');
-}
+/** FNV-1a 32-bit hex (matches the language white paper §4.1) — shared canonical implementation. */
+const fnv1a8Hex = fnv1a32Hex;
 
 /** Canonicalize a JSON-serializable value: sort object keys, recurse. */
 function canonicalize(value) {

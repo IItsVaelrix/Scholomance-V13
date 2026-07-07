@@ -1,0 +1,44 @@
+asset void_ice_sunflower canvas 80x45
+
+palette {
+  void_core = #200A5C
+  void_glow = #4E1E8A
+  void_edge = #7040B8
+  ice_petal = #00E5FF
+  ice_hi    = #B2FFFF
+  ice_shadow= #0088AA
+  stem      = #130840
+  stem_hi   = #32106D
+}
+
+part stem material void_stem {
+  rect 38 25 4 20 stem
+  rect 39 25 1 20 stem_hi
+}
+
+part leaves material void_leaf {
+  symmetry x
+  circle 32 32 radius 4 stem
+  circle 32 32 radius 2 stem_hi
+}
+
+part petals material ice_shard {
+  symmetry x
+  # center is 40, 20
+  circle 40 8 radius 5 ice_petal
+  circle 40 8 radius 2 ice_hi
+  circle 52 20 radius 5 ice_petal
+  circle 52 20 radius 2 ice_hi
+  
+  circle 48 12 radius 4 ice_shadow
+  circle 48 12 radius 2 ice_hi
+}
+
+part core material void_energy {
+  circle 40 20 radius 8 void_glow
+  circle 40 20 radius 5 void_core
+  circle 40 20 radius 3 void_edge
+  glow radius 3
+}
+
+export png

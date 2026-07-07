@@ -1,32 +1,3 @@
-{
-  "lexiconic": {
-    "title": "Sonic Thaumaturgy",
-    "yt": "9_QmbwbY0tc",
-    "sc": "https://soundcloud.com/vaelrix/black-box-of-limitless-pills-4",
-    "school": "SONIC"
-  },
-  "schism": {
-    "title": "Psychic Schism",
-    "yt": "3tmd-ClpJxA",
-    "sc": "https://soundcloud.com/vaelrix/bionic-slavery-1",
-    "school": "PSYCHIC"
-  },
-  "void": {
-    "title": "VOID",
-    "yt": "F2yr6zQwqQk",
-    "sc": "https://soundcloud.com/vaelrix/solar-ray",
-    "school": "VOID"
-  },
-  "alchemy": {
-    "title": "Verbal Alchemy",
-    "yt": "GtgyCnJcZRw",
-    "sc": "https://soundcloud.com/vaelrix/vaelrix-verbal-alchemy",
-    "school": "ALCHEMY"
-  },
-  "will": {
-    "title": "Willpower Surge",
-    "yt": "5iIUiYkmkw8",
-    "sc": "https://on.soundcloud.com/aXSjrTPcfYxzdToj8p",
-    "school": "WILL"
-  }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:74b61efa5869352fd12c7fd7517fe3d939b3b57e7108ace3b95c6d1d40386c91
+size 798

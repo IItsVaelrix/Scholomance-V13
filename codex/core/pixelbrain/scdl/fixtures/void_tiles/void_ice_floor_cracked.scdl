@@ -1,0 +1,110 @@
+# void_ice_floor_cracked — variant floor: crevasse with void-light seeping out
+# Isometric 2:1 diamond, 128x64. Light law: upper-left (-1,-1).
+asset void_ice_floor_cracked canvas 128x64
+
+palette {
+  abyss    = #04060e
+  deep     = #0e1526
+  dark     = #182238
+  base     = #22304f
+  mid      = #2d4066
+  lit      = #3d5480
+  bright   = #52709f
+  sheen    = #7291bd
+  frost    = #a8c3e2
+  spec     = #e3eef9
+  cyanhot  = #67e8f9
+  cyansoft = #b7f4fd
+}
+
+# ── ice slab: body + directional edge bands (shared set law) ─────────────
+part slab material void_ice {
+  polygon 64 -1 129 32 64 65 -1 32 base
+  polygon -1 32 64 -1 64 4 8 32 bright
+  polygon 64 -1 129 32 120 32 64 4 lit
+  polygon -1 32 64 65 64 59 8 32 dark
+  polygon 64 65 129 32 120 32 64 59 deep
+  line 0 32 64 0 sheen
+  line 64 0 127 31 lit
+  line 0 33 63 63 deep
+  line 64 63 127 33 abyss
+}
+
+# ── facet mosaic, quieter than the base floor ────────────────────────────
+part facets material diamond {
+  polygon 30 26 48 16 62 22 44 32 lit
+  polygon 62 22 80 14 96 22 78 28 mid
+  polygon 44 32 62 22 78 28 60 38 mid
+  polygon 78 28 96 22 110 30 94 36 base
+  polygon 34 38 44 32 60 38 48 44 base
+  polygon 60 38 78 28 94 36 76 46 dark
+  polygon 48 44 60 38 76 46 62 52 dark
+  polygon 22 30 30 26 44 32 34 38 bright
+  cell 52 28 mid
+  cell 70 24 mid
+  cell 86 28 base
+  cell 56 40 base
+  cell 84 38 base
+  cell 68 48 dark
+}
+
+# ── crevasse — jagged fracture cutting the SE half open ──────────────────
+part crevasse material voidsteel {
+  # widened chasm body, following the iso diagonal
+  polygon 38 40 50 34 68 38 88 34 104 40 96 46 70 46 50 46 deep
+  polygon 44 40 56 37 70 41 88 37 98 41 90 44 68 44 52 44 abyss
+  # fracture lips catching light on the NW side
+  line 38 40 50 34 sheen
+  line 50 34 68 38 lit
+  line 68 38 88 34 sheen
+  line 88 34 104 40 lit
+  # shattered shards at the chasm mouth
+  polygon 34 42 38 40 44 42 38 45 dark
+  polygon 100 42 104 40 110 43 104 45 dark
+  # hairline branch cracks running off the main break
+  line 44 42 36 50 deep
+  line 76 44 82 52 deep
+  line 82 52 90 54 abyss
+  line 92 40 102 34 dark
+}
+
+# ── voidlight — cold energy welling up from the crack ────────────────────
+part voidlight material cyan_glow {
+  glow radius 3
+  # glow bed inside the chasm
+  line 50 42 66 42 cyanhot
+  line 72 41 88 40 cyanhot
+  cell 48 42 cyansoft
+  cell 68 42 cyansoft
+  cell 70 41 cyansoft
+  cell 90 40 cyansoft
+  cell 94 41 cyansoft
+  # motes drifting above the break
+  cell 58 36 cyansoft
+  cell 80 32 cyansoft
+  cell 66 30 cyansoft
+}
+
+# ── frost bloom along the lit crest ──────────────────────────────────────
+part frostbloom material diamond {
+  cell 12 30 frost
+  cell 18 27 frost
+  cell 24 24 frost
+  cell 30 21 frost
+  cell 36 18 frost
+  cell 42 15 frost
+  cell 48 12 frost
+  cell 54 9 frost
+  cell 60 6 frost
+  cell 15 29 sheen
+  cell 27 23 sheen
+  cell 39 17 sheen
+  cell 51 11 sheen
+  cell 26 22 spec
+  cell 27 22 spec
+  cell 50 10 spec
+  cell 51 10 spec
+  cell 40 26 frost
+  cell 56 20 frost
+  cell 30 34 frost
+}

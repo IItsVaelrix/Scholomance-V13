@@ -8,8 +8,6 @@ import {
   QBIT_WORLD_PRESETS,
   MATERIAL_NAMES,
 } from '../../../codex/core/pixelbrain/qbit-world-game-loop.js';
-import { buildQbitWorldGodotExport } from '../../lib/godot-export/qbitWorldGodotExport.js';
-import { downloadTextFile } from '../../components/GodotExportButton/downloadTextFile.js';
 import './QbitWorldPage.css';
 
 const MATERIAL_COLORS = {
@@ -136,14 +134,7 @@ export default function QbitWorldPage() {
     setNotice(`${resource.amount} ${resource.energyType.toLowerCase()} ${resource.materialName}`);
   }
 
-  function exportGodotWorld() {
-    const text = buildQbitWorldGodotExport({
-      schoolWeights: QBIT_WORLD_PRESETS[presetId],
-      options: { size: 32, maxRadius: 24 },
-    });
-    downloadTextFile(`qbit-world-${presetId.toLowerCase()}.qworld`, text);
-    setNotice(`exported qbit-world-${presetId.toLowerCase()}.qworld`);
-  }
+
 
   return (
     <section className={`qbit-world-page qbit-world-page--${presetId.toLowerCase()}`}>
@@ -164,15 +155,7 @@ export default function QbitWorldPage() {
               {PRESET_LABELS[id] ?? id}
             </button>
           ))}
-          <button
-            type="button"
-            className="qbit-preset"
-            onClick={exportGodotWorld}
-            aria-label="Export QBIT world for Godot"
-          >
-            <Download size={15} aria-hidden="true" />
-            Godot
-          </button>
+
         </div>
       </header>
 

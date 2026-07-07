@@ -51,13 +51,19 @@ class BrainBridgeClient:
             with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                 data = json.loads(resp.read().decode())
                 return {
-                    "response": data.get("response", "[Error: no response]"),
+                    "response": data.get("response", "[PB-ERR-v1-STATE-CRITICAL-BRAIN-204--No Response]"),
                     "tool_calls": data.get("tool_calls", [])
                 }
+        except urllib.error.HTTPError as e:
+            try:
+                err_data = json.loads(e.read().decode())
+                return {"response": f"[{err_data.get('error', 'PB-ERR-v1-STATE-CRITICAL-BRAIN-500--Internal Error')}]", "tool_calls": []}
+            except Exception:
+                return {"response": f"[PB-ERR-v1-STATE-CRITICAL-BRAIN-500--{e.reason}]", "tool_calls": []}
         except urllib.error.URLError as e:
-            return {"response": f"[Error: daemon unavailable - {e.reason}]", "tool_calls": []}
+            return {"response": f"[PB-ERR-v1-STATE-CRITICAL-BRAIN-503--Daemon Unavailable: {e.reason}]", "tool_calls": []}
         except Exception as e:
-            return {"response": f"[Error: {e}]", "tool_calls": []}
+            return {"response": f"[PB-ERR-v1-STATE-CRITICAL-BRAIN-500--{e}]", "tool_calls": []}
 
     def ask_direct(self, query: str) -> str:
         """Query without substrate augmentation."""

@@ -48,6 +48,11 @@ describe('Material Registry — gemstones and metals', () => {
     expect(resolveMaterialId('black_steel')).toBe('black_steel');
   });
 
+  it('resolves snow as a production terrain material', () => {
+    expect(resolveMaterialId('snow')).toBe('snow');
+    expect(MATERIAL_PALETTES.snow.anchors.whiteCore).toMatch(/^#[0-9A-Fa-f]{6}$/);
+  });
+
   it('tags every material with a category, surfaced through MATERIAL_OPTIONS', () => {
     for (const [id, definition] of Object.entries(MATERIAL_PALETTES)) {
       expect(definition.category, `${id} must declare a category`).toBeTruthy();

@@ -27,6 +27,9 @@ import { computePacketChecksum } from '../pb-sfx.checksum.js';
 import { rngFromStringSeed } from './seeded-rng-bridge.js';
 import { buildWavetable, buildWavetableBuffer, buildFmBuffer } from './oscillators.js';
 import { buildNoiseBuffer } from './noise.js';
+import { buildTransientBuffer } from './transient.js';
+import { buildElectricShockBuffer, buildHighVoltageZapBuffer } from './electric-shock.js';
+import { TRANSIENT_SURFACES } from '../pb-sfx.schema.js';
 import { buildEnvelopeCurve } from './envelopes.js';
 import { applyEqChain } from './parametric-eq.js';
 import { applySoftClip } from './distortion.js';
@@ -82,6 +85,26 @@ function sanitizeSamples(buffer) {
  * @param {Float32Array} buffer
  * @returns {Float32Array} Same buffer, modified in-place
  */
+const TRANSIENT_SURFACE_DEFAULTS = Object.freeze({
+  [TRANSIENT_SURFACES.STONE]:   { attackMs: 1.2, decayMs: 52, brightnessHz: 820, bodyHz: 170, bodyMix: 0.38, noiseMix: 0.62 },
+  [TRANSIENT_SURFACES.ICE]:     { attackMs: 0.8, decayMs: 38, brightnessHz: 1400, bodyHz: 240, bodyMix: 0.22, noiseMix: 0.78 },
+  [TRANSIENT_SURFACES.SLATE]:   { attackMs: 1.0, decayMs: 46, brightnessHz: 980, bodyHz: 200, bodyMix: 0.30, noiseMix: 0.70 },
+  [TRANSIENT_SURFACES.METAL]:   { attackMs: 0.6, decayMs: 34, brightnessHz: 1800, bodyHz: 320, bodyMix: 0.18, noiseMix: 0.82 },
+  [TRANSIENT_SURFACES.ORGANIC]: { attackMs: 2.0, decayMs: 64, brightnessHz: 520, bodyHz: 120, bodyMix: 0.45, noiseMix: 0.55 },
+});
+
+function resolveTransientSurfaceProfile(surface, voice) {
+  const defaults = TRANSIENT_SURFACE_DEFAULTS[surface] ?? TRANSIENT_SURFACE_DEFAULTS[TRANSIENT_SURFACES.STONE];
+  return {
+    attackMs: Number.isFinite(voice.attackMs) ? voice.attackMs : defaults.attackMs,
+    decayMs: Number.isFinite(voice.decayMs) ? voice.decayMs : defaults.decayMs,
+    brightnessHz: Number.isFinite(voice.brightnessHz) ? voice.brightnessHz : defaults.brightnessHz,
+    bodyHz: Number.isFinite(voice.bodyHz) ? voice.bodyHz : defaults.bodyHz,
+    bodyMix: Number.isFinite(voice.bodyMix) ? voice.bodyMix : defaults.bodyMix,
+    noiseMix: Number.isFinite(voice.noiseMix) ? voice.noiseMix : defaults.noiseMix,
+  };
+}
+
 function peakLimit(buffer) {
   const peak = computePeak(buffer);
   if (peak === 0 || peak <= 1) return buffer;
@@ -135,6 +158,46 @@ function renderVoice(voice, envelopeDefs, durationMs, sampleRate, affinityProfil
       const mod = Number.isFinite(voice.modFreq) ? voice.modFreq : baseFreq / 2;
       const idx = Number.isFinite(voice.modIndex) ? voice.modIndex : 2;
       raw = buildFmBuffer({ carrierFreq: carrier, modFreq: mod, modIndex: idx, durationSamples, sampleRate }, rng);
+      break;
+    }
+    case VOICE_TYPES.TRANSIENT: {
+      const surface = Object.values(TRANSIENT_SURFACES).includes(voice.surface)
+        ? voice.surface
+        : TRANSIENT_SURFACES.STONE;
+      const surfaceProfile = resolveTransientSurfaceProfile(surface, voice);
+      raw = buildTransientBuffer({
+        durationSamples,
+        sampleRate,
+        ...surfaceProfile,
+      }, rng);
+      break;
+    }
+    case VOICE_TYPES.ELECTRIC: {
+      raw = buildElectricShockBuffer({
+        durationSamples,
+        sampleRate,
+        centerFreqHz: Number.isFinite(voice.centerFreqHz) ? voice.centerFreqHz : 2800,
+        q: Number.isFinite(voice.q) ? voice.q : 16,
+        shRateHz: Number.isFinite(voice.shRateHz) ? voice.shRateHz : 48,
+        shDepth: Number.isFinite(voice.shDepth) ? voice.shDepth : 0.9,
+        shMode: voice.shMode ?? 'both',
+        cutoffSpreadHz: Number.isFinite(voice.cutoffSpreadHz) ? voice.cutoffSpreadHz : 1000,
+      }, rng);
+      break;
+    }
+    case VOICE_TYPES.ZAP: {
+      raw = buildHighVoltageZapBuffer({
+        durationSamples,
+        sampleRate,
+        carrierFreq: Number.isFinite(voice.carrierFreq) ? voice.carrierFreq : 420,
+        modFreq: Number.isFinite(voice.modFreq) ? voice.modFreq : 163,
+        modIndex: Number.isFinite(voice.modIndex) ? voice.modIndex : 10,
+        burstDensity: Number.isFinite(voice.burstDensity) ? voice.burstDensity : 0.012,
+        burstDecayMs: Number.isFinite(voice.burstDecayMs) ? voice.burstDecayMs : 7,
+        metallicMix: Number.isFinite(voice.metallicMix) ? voice.metallicMix : 0.5,
+        snapMix: Number.isFinite(voice.snapMix) ? voice.snapMix : 0.5,
+        impact: Number.isFinite(voice.impact) ? voice.impact : 0.85,
+      }, rng);
       break;
     }
     default: {

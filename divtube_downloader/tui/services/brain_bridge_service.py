@@ -51,7 +51,7 @@ class BrainBridgeService:
     def start_daemon(self, model: str = "qwen2.5:1.5b", substrate_db: str = "~/.substrate/memory.sqlite"):
         """Start the brain daemon in background."""
         steamdeck_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        brain_dir = os.path.join(os.path.dirname(os.path.dirname(steamdeck_dir)), "steamdeck_brain")
+        brain_dir = os.path.join(os.path.dirname(steamdeck_dir), "steamdeck_brain")
         script_path = os.path.join(brain_dir, "brain_daemon.py")
 
         if not os.path.exists(script_path):
@@ -59,7 +59,7 @@ class BrainBridgeService:
 
         try:
             self.process = subprocess.Popen(
-                ["python3", script_path, "--model", model, "--port", str(self.port), "--db", substrate_db],
+                ["uv", "run", "--with", "numpy", script_path, "--model", model, "--port", str(self.port), "--db", substrate_db, "--llm", "--personality", "Vaelrix"],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 start_new_session=True
@@ -106,7 +106,7 @@ class BrainBridgeService:
             else:
                 # Fallback: call steamdeck_brain.py directly
                 steamdeck_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-                brain_dir = os.path.join(os.path.dirname(os.path.dirname(steamdeck_dir)), "steamdeck_brain")
+                brain_dir = os.path.join(os.path.dirname(steamdeck_dir), "steamdeck_brain")
                 script = os.path.join(brain_dir, "steamdeck_brain.py")
 
                 cmd = ["python3", script, "-q", query, "--model", "qwen2.5:1.5b"]

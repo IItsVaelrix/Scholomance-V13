@@ -196,6 +196,15 @@ class Substrate:
         self.dim = dim
         self.top_k = top_k
         self.embed = embedding_provider or EmbeddingProvider(dim)
+        
+        try:
+            import sys
+            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+            from turbo_quant.provider import TurboQuantEmbedProvider
+            self.tq = TurboQuantEmbedProvider(embedding_dim=dim, bits_per_coord=2)
+        except ImportError:
+            self.tq = None
+
         self._ensure_db()
     
     def _ensure_db(self):
@@ -213,7 +222,22 @@ class Substrate:
                     metadata    TEXT DEFAULT '{}',
                     created_at  REAL NOT NULL,
                     access_count INTEGER DEFAULT 0,
-                    last_access  REAL DEFAULT 0
+                    last_access  REAL DEFAULT 0,
+                    gene_id      TEXT DEFAULT NULL
+                )
+            """)
+            try:
+                conn.execute("ALTER TABLE memories ADD COLUMN gene_id TEXT DEFAULT NULL")
+            except sqlite3.OperationalError:
+                pass
+            
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS genes (
+                    id TEXT PRIMARY KEY,
+                    type TEXT NOT NULL,
+                    centroid BLOB NOT NULL,
+                    checksum TEXT,
+                    count INTEGER
                 )
             """)
             conn.execute("""
@@ -258,13 +282,35 @@ class Substrate:
         packed, scale, zp = quantize_4bit(vector)
         metadata_json = json.dumps(metadata or {})
         
+        gene_id = None
+        if hasattr(self, 'tq') and self.tq:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.execute("SELECT id, centroid FROM genes")
+            genes = cursor.fetchall()
+            conn.close()
+            if genes:
+                import numpy as np
+                from turbo_quant.packet import TurboQuantPacket
+                query_np = np.array(vector, dtype=np.float32)
+                query_packet = self.tq.compress(query_np)
+                
+                best_sim = -1
+                for gid, gcentroid in genes:
+                    gpacket = TurboQuantPacket(norm=1.0, packed_bits=gcentroid, original_id=gid)
+                    sim = self.tq.bitwise_similarity(query_packet, gpacket)
+                    if sim > best_sim:
+                        best_sim = sim
+                        gene_id = gid
+                        
         conn = sqlite3.connect(self.db_path)
         try:
             cursor = conn.execute(
-                """INSERT INTO memories (text, embedding, scale, zero_point, metadata, created_at)
-                   VALUES (?, ?, ?, ?, ?, ?)""",
-                (text, packed, scale, zp, metadata_json, time.time())
+                """INSERT INTO memories (text, embedding, scale, zero_point, metadata, created_at, gene_id)
+                   VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                (text, packed, scale, zp, metadata_json, time.time(), gene_id)
             )
+            if gene_id:
+                conn.execute("UPDATE genes SET count = count + 1 WHERE id = ?", (gene_id,))
             conn.commit()
             return cursor.lastrowid
         finally:
@@ -288,6 +334,98 @@ class Substrate:
             ids.append(self.store(text, meta, vec))
         return ids
     
+    def rebuild_genes(self):
+        """
+        One migration pass: re-embed each memory ->
+        assign gene_id -> compute + compress gene centroids -> write genes table.
+        """
+        if not hasattr(self, 'tq') or not self.tq:
+            import logging
+            logging.error("TurboQuant not available. Cannot build genes.")
+            return
+
+        import hashlib
+        import numpy as np
+
+        def kmeans(X, n_clusters, max_iter=50):
+            if len(X) <= n_clusters: return X, np.arange(len(X))
+            indices = np.random.choice(len(X), n_clusters, replace=False)
+            centroids = X[indices].copy()
+            for _ in range(max_iter):
+                distances = np.linalg.norm(X[:, None] - centroids, axis=2)
+                labels = np.argmin(distances, axis=1)
+                new_centroids = np.array([X[labels == i].mean(axis=0) if np.sum(labels == i) > 0 else centroids[i] for i in range(n_clusters)])
+                if np.allclose(centroids, new_centroids): break
+                centroids = new_centroids
+            return centroids, labels
+
+        print("Re-embedding all memories and rebuilding Gene Router...")
+        conn = sqlite3.connect(self.db_path)
+        
+        cursor = conn.execute("SELECT id, text, metadata FROM memories")
+        memories = cursor.fetchall()
+        
+        groups = {}
+        for mid, text, meta_json in memories:
+            meta = json.loads(meta_json) if meta_json else {}
+            tag = meta.get("tag", "none")
+            
+            vec = self.embed.encode(text)
+            groups.setdefault(tag, []).append((mid, vec))
+            
+            packed, scale, zp = quantize_4bit(vec)
+            conn.execute(
+                "UPDATE memories SET embedding = ?, scale = ?, zero_point = ? WHERE id = ?",
+                (packed, scale, zp, mid)
+            )
+            
+        conn.execute("DELETE FROM genes")
+        
+        for tag, items in groups.items():
+            mids = [item[0] for item in items]
+            vectors = np.array([item[1] for item in items], dtype=np.float32)
+            
+            n = len(mids)
+            if n > 800:
+                k = int(math.ceil(n / 500))
+                centroids, labels = kmeans(vectors, k)
+                
+                for i in range(k):
+                    gene_id = f"{tag}#{i:02d}"
+                    cluster_mids = [mids[j] for j in range(n) if labels[j] == i]
+                    
+                    if not cluster_mids:
+                        continue
+                    
+                    for mid in cluster_mids:
+                        conn.execute("UPDATE memories SET gene_id = ? WHERE id = ?", (gene_id, mid))
+                        
+                    centroid = centroids[i]
+                    packet = self.tq.compress(centroid, original_id=gene_id)
+                    checksum = hashlib.sha256(packet.packed_bits).hexdigest()
+                    
+                    conn.execute(
+                        "INSERT INTO genes (id, type, centroid, checksum, count) VALUES (?, ?, ?, ?, ?)",
+                        (gene_id, tag, packet.packed_bits, checksum, len(cluster_mids))
+                    )
+            else:
+                gene_id = f"{tag}#00"
+                for mid in mids:
+                    conn.execute("UPDATE memories SET gene_id = ? WHERE id = ?", (gene_id, mid))
+                
+                centroid = vectors.mean(axis=0)
+                packet = self.tq.compress(centroid, original_id=gene_id)
+                checksum = hashlib.sha256(packet.packed_bits).hexdigest()
+                
+                conn.execute(
+                    "INSERT INTO genes (id, type, centroid, checksum, count) VALUES (?, ?, ?, ?, ?)",
+                    (gene_id, tag, packet.packed_bits, checksum, len(mids))
+                )
+        
+        conn.commit()
+        conn.close()
+        print("Gene Router rebuild complete.")
+
     def retrieve(self, query: str, top_k: Optional[int] = None, metadata_filter: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
         Query the substrate for memories relevant to the input.
@@ -306,46 +444,96 @@ class Substrate:
         k = top_k or self.top_k
         query_vec = self.embed.encode(query)
         
-        # Load all stored memories and brute-force search
-        # (Optimization note: for >10K docs, swap to FAISS)
         conn = sqlite3.connect(self.db_path)
         try:
-            # If metadata_filter is provided, use SQLite JSON functions to filter before O(n) scan
-            if metadata_filter:
-                conditions = []
-                params = []
-                for key, val in metadata_filter.items():
-                    conditions.append(f"json_extract(metadata, '$.{key}') = ?")
-                    params.append(val)
-                where_clause = " WHERE " + " AND ".join(conditions)
-                query_sql = f"SELECT id, text, embedding, scale, zero_point, metadata FROM memories{where_clause}"
-                cursor = conn.execute(query_sql, params)
-            else:
-                cursor = conn.execute("SELECT id, text, embedding, scale, zero_point, metadata FROM memories")
-            
             scored = []
-            for row in cursor:
-                mem_id, text, packed, scale, zp, metadata_json = row
-                stored_vec = dequantize_4bit(packed, scale, zp, self.dim)
-                sim = cosine_similarity(query_vec, stored_vec)
-                scored.append((sim, {
-                    "id": mem_id,
-                    "text": text,
-                    "similarity": round(sim, 4),
-                    "metadata": json.loads(metadata_json) if metadata_json else {}
-                }))
+            did_search = False
             
-            # Sort by similarity descending
+            if hasattr(self, 'tq') and self.tq:
+                cursor = conn.execute("SELECT id, centroid FROM genes")
+                genes = cursor.fetchall()
+                if genes:
+                    import numpy as np
+                    from turbo_quant.packet import TurboQuantPacket
+                    query_np = np.array(query_vec, dtype=np.float32)
+                    query_packet = self.tq.compress(query_np)
+                    
+                    gene_scores = []
+                    for gid, gcentroid in genes:
+                        gpacket = TurboQuantPacket(norm=1.0, packed_bits=gcentroid, original_id=gid)
+                        sim = self.tq.bitwise_similarity(query_packet, gpacket)
+                        gene_scores.append((sim, gid))
+                        
+                    gene_scores.sort(key=lambda x: -x[0])
+                    
+                    for nprobe in [3, 10, len(genes)]:
+                        top_genes = [g[1] for g in gene_scores[:nprobe]]
+                        
+                        if metadata_filter:
+                            conditions = ["gene_id IN (" + ",".join("?" for _ in top_genes) + ")"]
+                            params = list(top_genes)
+                            for key, val in metadata_filter.items():
+                                conditions.append(f"json_extract(metadata, '$.{key}') = ?")
+                                params.append(val)
+                            where_clause = " WHERE " + " AND ".join(conditions)
+                            query_sql = f"SELECT id, text, embedding, scale, zero_point, metadata FROM memories{where_clause}"
+                            cursor = conn.execute(query_sql, params)
+                        else:
+                            placeholders = ",".join("?" for _ in top_genes)
+                            cursor = conn.execute(f"SELECT id, text, embedding, scale, zero_point, metadata FROM memories WHERE gene_id IN ({placeholders})", top_genes)
+                        
+                        scored = []
+                        for row in cursor:
+                            mem_id, text, packed, scale, zp, metadata_json = row
+                            stored_vec = dequantize_4bit(packed, scale, zp, self.dim)
+                            sim = cosine_similarity(query_vec, stored_vec)
+                            scored.append((sim, {
+                                "id": mem_id,
+                                "text": text,
+                                "similarity": round(sim, 4),
+                                "metadata": json.loads(metadata_json) if metadata_json else {}
+                            }))
+                            
+                        did_search = True
+                        if len(scored) >= k:
+                            scored.sort(key=lambda x: -x[0])
+                            if scored[0][0] >= 0.25:
+                                break
+            
+            if not did_search:
+                if metadata_filter:
+                    conditions = []
+                    params = []
+                    for key, val in metadata_filter.items():
+                        conditions.append(f"json_extract(metadata, '$.{key}') = ?")
+                        params.append(val)
+                    where_clause = " WHERE " + " AND ".join(conditions)
+                    query_sql = f"SELECT id, text, embedding, scale, zero_point, metadata FROM memories{where_clause}"
+                    cursor = conn.execute(query_sql, params)
+                else:
+                    cursor = conn.execute("SELECT id, text, embedding, scale, zero_point, metadata FROM memories")
+                
+                scored = []
+                for row in cursor:
+                    mem_id, text, packed, scale, zp, metadata_json = row
+                    stored_vec = dequantize_4bit(packed, scale, zp, self.dim)
+                    sim = cosine_similarity(query_vec, stored_vec)
+                    scored.append((sim, {
+                        "id": mem_id,
+                        "text": text,
+                        "similarity": round(sim, 4),
+                        "metadata": json.loads(metadata_json) if metadata_json else {}
+                    }))
+            
             scored.sort(key=lambda x: -x[0])
             
-            # Update access stats
             best_ids = [s[1]["id"] for s in scored[:k]]
-            for mid in best_ids:
+            if best_ids:
                 conn.execute(
-                    "UPDATE memories SET access_count = access_count + 1, last_access = ? WHERE id = ?",
-                    (time.time(), mid)
+                    f"UPDATE memories SET access_count = access_count + 1, last_access = ? WHERE id IN ({','.join('?' for _ in best_ids)})",
+                    [time.time()] + best_ids
                 )
-            conn.commit()
+                conn.commit()
             
             return [s[1] for s in scored[:k]]
         finally:

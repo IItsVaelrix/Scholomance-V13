@@ -8,6 +8,9 @@ import {
   ERROR_SEVERITY,
   MODULE_IDS,
 } from '../pixelbrain/bytecode-error.js';
+import { SpeculativeContextBuffer } from './speculative-context-buffer.js';
+
+export const defaultSpeculativeBuffer = new SpeculativeContextBuffer();
 
 export const MEMORY_CELL_CONTRACT = 'SCHOL-MEMCELL-v1';
 export const MEMORY_CELL_OSMOSIS_CONTRACT = 'SCHOL-MEMCELL-OSMOSIS-v1';
@@ -143,12 +146,22 @@ export function evaluateMemoryCellOsmosis(packet, observation = {}) {
   });
 }
 
-export function scanMemoryCells(cells, observation, { includeSilent = false } = {}) {
+export function scanMemoryCells(cells, observation, { includeSilent = false, buffer = defaultSpeculativeBuffer } = {}) {
   const results = [];
+  const normalizedObs = normalizeObservation(observation);
   for (const cell of cells || []) {
-    const result = evaluateMemoryCellOsmosis(cell, observation);
+    const result = evaluateMemoryCellOsmosis(cell, normalizedObs);
     if (includeSilent || result.status === 'anomaly') {
       results.push(result);
+      if (buffer) {
+        buffer.stage({
+          id: crypto.randomUUID(),
+          cellId: result.cellId,
+          anomalyKind: result.anomalyKind,
+          similarity: result.similarity,
+          drift: result.drift,
+        }, normalizedObs.quantized);
+      }
     }
   }
   return Object.freeze(results.map(stableClone));

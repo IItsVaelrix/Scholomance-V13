@@ -1,0 +1,231 @@
+asset voidmetal_fire_greaves_slim_plate canvas 80x112
+
+palette {
+  void0      = #05070C
+  void1      = #090B12
+  chain      = #07090E
+  seam       = #0E111A
+  steel0     = #171A22
+  steel1     = #252A34
+  steel2     = #383E4A
+  steel3     = #555B66
+  edge       = #8A909A
+  coldhi     = #C7CBD2
+  leather    = #23120F
+  strap      = #130D12
+  rivet      = #B0A17E
+  sootred    = #380711
+  oxblood    = #671019
+  ember0     = #D72A07
+  ember1     = #FF5A00
+  ember2     = #FF9B20
+  core       = #FFD56B
+  whitecore  = #FFF0B2
+  purple0    = #241634
+  purple1    = #63307B
+  purple2    = #B36BD0
+}
+
+# Narrow rear silhouette first. Later plates carve it into segmented armor.
+part rear_leg_silhouette material black_steel {
+  symmetry x
+  polygon 20 13 33 11 37 28 36 54 33 82 31 105 25 111 18 108 16 91 18 61 17 32 steel0
+  polygon 24 27 35 24 35 52 32 77 24 78 20 57 steel1
+  polygon 22 82 32 80 31 104 25 110 20 106 19 93 steel1
+}
+
+# More daylight between the legs; this prevents the tank-block read.
+part inner_void_gap material blacksteel {
+  polygon 35 8 45 8 44 31 41 45 39 45 36 31 chain
+  polygon 33 29 40 26 40 81 36 91 32 65 chain
+  polygon 40 26 47 29 48 65 44 91 40 81 chain
+  rect 37 62 6 45 void0
+}
+
+part slim_waist_belt material leather_brown {
+  rect 27 4 26 4 leather
+  rect 32 1 16 4 strap
+  rect 37 2 6 6 steel2
+  rect 38 3 4 3 void1
+  cell 30 5 rivet
+  cell 35 5 rivet
+  cell 44 5 rivet
+  cell 50 5 rivet
+}
+
+part codpiece_center material voidsteel {
+  polygon 34 7 46 7 45 22 41 35 40 39 39 35 35 22 steel1
+  polygon 36 9 44 9 43 20 40 30 37 20 steel2
+  line 40 8 40 37 edge
+  line 36 12 39 30 steel3
+  line 44 12 41 30 steel3
+  cell 39 10 coldhi
+}
+
+# Hip plates are shorter, thinner, and stepped like overlapping lamellae.
+part hip_lamellae_slim material voidsteel {
+  symmetry x
+  polygon 17 11 32 8 37 19 35 25 20 24 14 17 steel2
+  polygon 18 21 35 21 34 30 21 34 15 28 steel1
+  polygon 20 31 34 29 33 38 23 43 18 37 steel0
+  line 17 11 32 8 edge
+  line 20 24 35 25 steel3
+  line 21 34 34 30 steel3
+  cell 28 11 rivet
+  cell 19 23 rivet
+}
+
+part purple_heat_sheen material amethyst {
+  symmetry x
+  polygon 22 13 31 11 35 18 32 27 23 25 18 18 purple0
+  polygon 25 15 32 18 29 23 22 21 purple1
+  line 25 15 31 18 purple2
+  line 21 23 27 25 purple2
+}
+
+# Slender articulated thigh: many plates, less monolithic surface.
+part upper_thigh_plates material voidsteel {
+  symmetry x
+  polygon 20 31 35 26 37 40 34 49 21 49 17 40 steel1
+  polygon 22 33 35 30 35 39 21 43 18 39 steel2
+  polygon 19 45 35 41 35 53 24 59 18 55 steel0
+  polygon 23 58 34 53 36 65 31 74 21 70 18 62 steel1
+  line 22 33 35 30 edge
+  line 21 43 35 39 steel3
+  line 19 45 35 41 seam
+  line 23 58 34 53 steel3
+}
+
+part inner_thigh_plates material voidsteel {
+  symmetry x
+  polygon 31 28 38 31 37 56 33 66 29 55 steel0
+  polygon 32 31 37 34 36 44 31 43 steel2
+  polygon 31 46 36 45 35 56 30 58 steel1
+  line 32 31 37 34 edge
+  line 31 46 36 45 steel3
+}
+
+part side_buckle_straps material leather_brown {
+  symmetry x
+  rect 31 41 4 3 strap
+  rect 29 57 4 3 strap
+  rect 30 75 4 3 strap
+  rect 29 92 4 3 strap
+  cell 31 42 rivet
+  cell 30 58 rivet
+  cell 31 76 rivet
+  cell 30 93 rivet
+}
+
+part knee_plate_stack material voidsteel {
+  symmetry x
+  polygon 18 63 35 58 38 69 32 80 20 79 14 69 steel1
+  polygon 21 64 34 61 35 68 30 75 20 74 17 69 steel2
+  polygon 21 75 35 69 31 82 21 80 steel0
+  line 18 63 35 58 edge
+  line 21 64 34 61 coldhi
+  line 21 75 35 69 steel3
+}
+
+# Narrow shin column with separate upper/lower plates.
+part shin_plate_column material voidsteel {
+  symmetry x
+  polygon 20 78 33 75 35 90 31 98 22 98 18 88 steel1
+  polygon 22 80 33 78 33 89 21 92 19 88 steel2
+  polygon 19 95 34 91 33 105 26 111 20 106 steel0
+  polygon 23 98 33 95 31 105 25 109 21 105 steel1
+  line 22 80 33 78 edge
+  line 21 92 33 89 steel3
+  line 19 95 34 91 seam
+  line 23 98 33 95 steel3
+}
+
+part ankle_and_sabaton material black_steel {
+  symmetry x
+  polygon 18 103 31 100 37 106 34 111 17 111 12 108 steel0
+  polygon 20 101 31 101 34 105 23 107 15 107 steel2
+  polygon 27 100 34 104 36 108 28 108 steel1
+  line 20 101 31 101 edge
+  line 14 108 34 108 steel3
+}
+
+# Thin bevel strokes sell plates without widening the silhouette.
+part plate_bevel_lines material silver {
+  symmetry x
+  line 25 12 24 24 steel3
+  line 31 9 35 20 edge
+  line 19 31 35 26 seam
+  line 21 43 35 39 seam
+  line 23 58 34 53 seam
+  line 21 64 34 61 seam
+  line 22 80 33 78 seam
+  line 23 98 33 95 seam
+  line 27 101 28 109 coldhi
+}
+
+part rivets material bronze {
+  symmetry x
+  cell 23 13 rivet
+  cell 32 11 rivet
+  cell 19 24 rivet
+  cell 31 31 rivet
+  cell 22 36 rivet
+  cell 32 45 rivet
+  cell 21 58 rivet
+  cell 31 65 rivet
+  cell 20 72 rivet
+  cell 30 82 rivet
+  cell 21 99 rivet
+  cell 30 104 rivet
+}
+
+# Organic cracks are intentionally not mirrored; the armor should feel forged, not cloned.
+part ember_undercracks material shadow_fire {
+  line 24 36 21 43 oxblood
+  line 21 43 20 50 oxblood
+  line 21 43 28 45 oxblood
+  line 56 35 60 42 oxblood
+  line 60 42 64 39 oxblood
+  line 60 42 59 50 oxblood
+  line 25 78 20 87 oxblood
+  line 20 87 23 96 oxblood
+  line 20 87 16 92 oxblood
+  line 54 74 61 84 oxblood
+  line 61 84 59 96 oxblood
+  line 61 84 66 90 oxblood
+  line 24 103 21 109 oxblood
+  line 55 101 58 109 oxblood
+  glow radius 2
+}
+
+part ember_cracks material divine_flame_core {
+  line 24 36 21 43 ember1
+  line 21 43 20 49 ember2
+  line 21 43 27 45 ember0
+  line 56 35 60 42 ember1
+  line 60 42 64 39 ember2
+  line 60 42 59 49 ember0
+  line 25 78 20 87 ember1
+  line 20 87 23 95 ember2
+  line 20 87 16 91 ember0
+  line 54 74 61 84 ember1
+  line 61 84 59 95 ember2
+  line 61 84 66 89 ember0
+  line 24 103 21 109 ember1
+  line 55 101 58 109 ember1
+  cell 21 43 core
+  cell 60 42 core
+  cell 20 87 whitecore
+  cell 61 84 whitecore
+  glow radius 3
+}
+
+part molten_vent_hits material divine_flame_core {
+  polygon 19 86 21 87 20 91 17 91 ember2
+  polygon 59 83 62 84 61 89 58 88 ember2
+  polygon 19 41 22 43 20 45 18 44 core
+  polygon 59 40 62 42 61 44 58 44 core
+  glow radius 2
+}
+
+export json png aseprite

@@ -1,0 +1,131 @@
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-system) + 4);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #04030a;
+  pointer-events: auto;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0) 0,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.14) 3px
+  );
+  opacity: 0.4;
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 78% 60% at 50% 48%, transparent 38%, rgba(4, 3, 10, 0.88) 100%);
+}
+
+.hud {
+  position: relative;
+  z-index: 2;
+  width: min(92vw, 560px);
+  padding: 1.4rem 1.5rem;
+  border: 1px solid rgba(68, 232, 192, 0.35);
+  border-radius: 10px;
+  background: rgba(8, 12, 22, 0.78);
+  box-shadow:
+    0 0 32px rgba(34, 170, 204, 0.12),
+    inset 0 0 22px rgba(68, 232, 192, 0.05);
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0 0 0.5rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(136, 238, 255, 0.75);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.6rem, 4vw, 2.35rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #e8fff8;
+  text-shadow: 0 0 24px rgba(68, 232, 192, 0.35);
+}
+
+.subtitle {
+  margin: 0.35rem 0 0.85rem;
+  font-size: clamp(1rem, 2.4vw, 1.25rem);
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(170, 255, 230, 0.82);
+}
+
+.status {
+  margin: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: rgba(103, 220, 255, 0.9);
+}
+
+.progressTrack {
+  margin-top: 1rem;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(34, 170, 204, 0.15);
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #22aacc, #44e8c0, #88eeff);
+  animation: polaris-progress var(--matrix-duration) linear forwards;
+}
+
+.enter {
+  opacity: 0;
+  animation: polaris-root-in 420ms ease-out forwards;
+}
+
+.visible {
+  opacity: 1;
+}
+
+.exit {
+  animation: polaris-root-out var(--matrix-exit) ease-in forwards;
+}
+
+@keyframes polaris-root-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes polaris-root-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes polaris-progress {
+  from { width: 0; }
+  to { width: 100%; }
+}

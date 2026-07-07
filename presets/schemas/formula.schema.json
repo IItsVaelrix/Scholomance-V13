@@ -15,7 +15,8 @@
         "fibonacci",
         "template_based",
         "composite",
-        "vectorized_text"
+        "vectorized_text",
+        "math_expression"
       ]
     }
   },
@@ -190,6 +191,61 @@
       },
       "required": ["type", "text"],
       "additionalProperties": false
+    },
+    {
+      "properties": {
+        "type": { "const": "math_expression" },
+        "seed": { "type": "integer", "minimum": 0 },
+        "precision": { "type": "integer", "minimum": 1, "maximum": 6, "default": 3 },
+        "expression": {
+          "description": "Recursive math AST node. Supports procedural vector generation: trig, arithmetic, noise, variables x/y/t over unit domain.",
+          "oneOf": [
+            { "$ref": "#/definitions/mathVar" },
+            { "$ref": "#/definitions/mathConst" },
+            { "$ref": "#/definitions/mathUnary" },
+            { "$ref": "#/definitions/mathBinary" }
+          ]
+        }
+      },
+      "required": ["type", "expression"],
+      "additionalProperties": false
     }
-  ]
+  ],
+  "definitions": {
+    "mathVar": {
+      "type": "object",
+      "properties": {
+        "op": { "type": "string", "enum": ["x", "y", "t", "seed"] }
+      },
+      "required": ["op"],
+      "additionalProperties": false
+    },
+    "mathConst": {
+      "type": "object",
+      "properties": {
+        "value": { "type": "number" }
+      },
+      "required": ["value"],
+      "additionalProperties": false
+    },
+    "mathUnary": {
+      "type": "object",
+      "properties": {
+        "op": { "type": "string", "enum": ["sin", "cos", "abs", "fract", "floor", "noise", "neg"] },
+        "arg": { "$ref": "#" }
+      },
+      "required": ["op", "arg"],
+      "additionalProperties": false
+    },
+    "mathBinary": {
+      "type": "object",
+      "properties": {
+        "op": { "type": "string", "enum": ["add", "sub", "mul", "div", "mod", "pow", "min", "max"] },
+        "left": { "$ref": "#" },
+        "right": { "$ref": "#" }
+      },
+      "required": ["op", "left", "right"],
+      "additionalProperties": false
+    }
+  }
 }

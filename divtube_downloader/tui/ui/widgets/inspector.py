@@ -2,13 +2,14 @@ from textual.widgets import Static
 from textual.app import ComposeResult
 from textual.containers import Vertical
 from tui.ui.widgets.glyph import AnimatedGlyph
+from tui.ui.sigils import title, STATE
 
-def _row(label: str, value: str, color: str, dot: str = "●") -> str:
+def _row(label: str, value: str, color: str, dot: str = STATE) -> str:
     return f"[#8B5CF6]{label:<8}[/] [{color}]{dot}[/] [#E2E8F0]{value}[/]"
 
 class Inspector(Static):
     def on_mount(self) -> None:
-        self.border_title = "❖ INTEL INSPECTOR ❖"
+        self.border_title = title("INTEL INSPECTOR")
         self._update_periodic()
 
     def _update_periodic(self):
@@ -61,6 +62,6 @@ class Inspector(Static):
             Static(_row("Model",  "big-pickle",  "#B388FF"),       id="insp-prompt"),
             Static(_row("Engine", "DivTube-V1",  "#B388FF"),       id="insp-engine"),
             Static(_row("Tokens", "N/A",         "#6A5A6A", "─"),  id="insp-tokens"),
-            AnimatedGlyph(classes="glyph-container"),
+            AnimatedGlyph(id="activity-glyph", classes="glyph-container"),
             classes="inspector-box"
         )

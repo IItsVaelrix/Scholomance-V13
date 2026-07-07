@@ -4,9 +4,20 @@ from textual.app import App, ComposeResult
 from textual.widgets import Static
 
 from tui.ui.app import FileSelectScreen
+from tui.ui.theme import THEMES
 
 
 class _Host(App):
+    THEME_NAME = "obsidian_crimson"
+
+    def get_css_variables(self) -> dict:
+        # Mirror DivTubeApp: expose the theme.py palette as $tokens so screen
+        # CSS that references e.g. $accent-primary resolves under run_test().
+        variables = super().get_css_variables()
+        palette = THEMES.get(self.THEME_NAME, {})
+        variables.update({k.replace("_", "-"): v for k, v in palette.items()})
+        return variables
+
     def compose(self) -> ComposeResult:
         yield Static("host")
 

@@ -1,0 +1,130 @@
+# vaelrix_chibi.scdl
+# SCDL v1.1 chibi character model — head-dominant Vaelrix apprentice.
+# Construction-first, vector-authored, lowered to lattice cells by SCDL.
+
+asset vaelrix_chibi canvas 32x48
+
+palette {
+  outline    = #130D1F
+  hairhi     = #8C6CFF
+  hair       = #4A3585
+  hairdeep   = #21143D
+  skinshine  = #F8E8CC
+  skin       = #E8C9A0
+  skinshade  = #B98262
+  robehi     = #5440A0
+  robe       = #302052
+  robedeep   = #1B1230
+  gold       = #D8B84C
+  golddark   = #8C6C25
+  eye        = #00E5FF
+  eyebright  = #A8F4FF
+  mouth      = #3A1D2A
+  boot       = #16101F
+  shadow     = #0A0710
+}
+
+part shadow material void_cloth {
+  ellipse 15.5 45 radius 8 ry 2 shadow
+}
+
+part robe material void_cloth {
+  polygon 11 22 20 22 23 42 8 42 robe
+  polygon 12 22 16 22 14 41 9 41 robedeep
+  rect 11 27 10 2 golddark
+  cell 15 27 gold
+  cell 16 27 gold
+  cell 19 23 robehi
+  line 20 27 22 39 robedeep
+}
+
+part boots material voidsteel {
+  rect 11 41 4 4 boot
+  rect 17 41 4 4 boot
+}
+
+part head material skin_light {
+  sphere 15.5 13.5 radius 8.5 light -1 -1 skinshine skin skin skinshade outline
+}
+
+part ears material skin_light {
+  symmetry x
+  cell 7 14 skin
+  cell 7 15 skinshade
+}
+
+part hair_back material hair_void {
+  circle 15.5 10.5 radius 8.5 hairdeep
+}
+
+part hair material hair_void {
+  polygon 8 14 8 7 12 3 16 3 21 3 24 8 24 14 26 15 27 17 26 19 25 21 23 22 22 21 21 25 18 27 16 27 13 27 11 25 10 21 8 22 7 21 6 19 5 17 6 15 hair
+  polygon 8 13 17 3 24 13 17 7 hairhi
+  line 14 5 14 9 hairdeep
+  line 18 5 18 9 hairdeep
+}
+
+part eyes material cyan_glow {
+  symmetry x
+  rect 11 13 3 4 eyebright
+  rect 12 14 2 3 eye
+  cell 12 13 skinshine
+  glow radius 1
+}
+
+part mouth material skin_light {
+  cell 15 20 mouth
+  cell 16 20 mouth
+}
+
+part nose material skin_light {
+  line 16 16 15 19 skinshade
+}
+
+part cheek_sigil material cyan_glow {
+  cell 20 18 eye
+  cell 21 18 eye
+  glow radius 1
+}
+
+part sleeves material void_cloth {
+  symmetry x
+  polygon 9 23 7 30 9 32 12 25 robehi
+  cell 8 32 skin
+}
+
+loop idle duration 420
+
+frame 1 "blink" {
+  part eyes material cyan_glow {
+    symmetry x
+    rect 11 15 3 1 eye
+  }
+}
+
+frame 2 "glow" {
+  part eyes material cyan_glow {
+    symmetry x
+    rect 11 13 3 4 eyebright
+    rect 12 14 2 3 eye
+    cell 12 13 skinshine
+    cell 12 12 eyebright
+    glow radius 2
+  }
+  part cheek_sigil material cyan_glow {
+    cell 20 18 eyebright
+    cell 21 18 eyebright
+    glow radius 2
+  }
+}
+
+frame 3 "settle" {
+  part hair material hair_void {
+    polygon 8 14 8 7 12 3 16 3 21 3 24 8 24 14 26 15 27 17 26 19 25 21 23 22 22 21 21 25 18 27 16 27 13 27 11 25 10 21 8 22 7 21 6 19 5 17 6 15 hair
+    polygon 8 13 17 3 24 13 17 7 hairhi
+    line 14 5 14 9 hairdeep
+    line 18 5 18 9 hairdeep
+  }
+}
+
+export json svg phaser png aseprite

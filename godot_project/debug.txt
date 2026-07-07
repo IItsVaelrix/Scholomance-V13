@@ -1,8 +1,0 @@
-Starting tests...
-Running scenario: golden-combat-sequence-1-basic-loop.json
-  -> Passed
-Running scenario: golden-combat-sequence-2-status-effects.json
-  -> Passed
-Running scenario: golden-combat-sequence-3-pathing-blockers.json
-  -> Passed
-All GoldenCombatTests passed.

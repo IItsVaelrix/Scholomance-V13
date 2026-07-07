@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MudletPackage>
+<MudletPackage version="1.001">
+  <ScriptPackage>
+    <ScriptGroup isActive="yes" isFolder="yes">
+      <name>Vaelrix</name>
+      <packageName>Vaelrix</packageName>
+      <script></script>
+      <command></command>
+      <scriptLanguage>lua</scriptLanguage>
+      <mInstalled>true</mInstalled>
+      <mModuleMasterLocation></mModuleMasterLocation>
+      <mModulePriority>0</mModulePriority>
+      <mModuleSync>false</mModuleSync>
+      <children>
+        <Script isActive="yes" isFolder="no">
+          <name>Vaelrix Core</name>
+          <packageName></packageName>
+          <script>--[[
+  Vaelrix Core (embedded)
+  This is the same content as vaelrix.lua.
+  Prefer loading the standalone vaelrix.lua for easier editing.
+  Generated from the Scholomance project.
+]]
+-- Paste the complete content of vaelrix.lua here if you are using the XML-only import.
+-- For the best experience, load vaelrix.lua directly as a Script instead of this XML.
+print("Vaelrix XML placeholder loaded — use the standalone vaelrix.lua for full features.")</script>
+          <command></command>
+          <scriptLanguage>lua</scriptLanguage>
+          <mInstalled>false</mInstalled>
+          <mModuleMasterLocation></mModuleMasterLocation>
+          <mModulePriority>0</mModulePriority>
+          <mModuleSync>false</mModuleSync>
+        </Script>
+      </children>
+    </ScriptGroup>
+  </ScriptPackage>
+</MudletPackage>

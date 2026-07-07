@@ -1,0 +1,22 @@
+{
+  "input": "/home/deck/Downloads/Scholomance-V12-main/docs/references/trees/Pine Tree Isometric.aseprite",
+  "width": 80,
+  "height": 120,
+  "centerAxisX": 40,
+  "symmetryBeforePct": 5.35,
+  "symmetryAfterPct": 100,
+  "frames": [
+    { "index": 0, "name": "Base Pine", "cellsBefore": 3008, "cellsAfter": 3267, "symmetry": 1418, "edges": 176, "lighting": 766 },
+    { "index": 1, "name": "Snow Cap", "cellsBefore": 3008, "cellsAfter": 3267, "symmetry": 1330, "edges": 180, "lighting": 762 },
+    { "index": 2, "name": "Ember Autumn", "cellsBefore": 3008, "cellsAfter": 3267, "symmetry": 1266, "edges": 176, "lighting": 766 },
+    { "index": 3, "name": "Void Corrupted", "cellsBefore": 3008, "cellsAfter": 3267, "symmetry": 1266, "edges": 176, "lighting": 766 }
+  ],
+  "outputs": [
+    "Pine Tree Isometric.aseprite",
+    "tree_fixed.png",
+    "Pine Tree Base Pine.png",
+    "Pine Tree Snow Cap.png",
+    "Pine Tree Ember Autumn.png",
+    "Pine Tree Void Corrupted.png"
+  ]
+}

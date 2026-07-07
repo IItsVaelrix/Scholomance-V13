@@ -1,0 +1,7164 @@
+{
+  "contract": "PB-SCDNA-GENE-v1",
+  "version": "1.0.0",
+  "assetId": "void_forest_grass_tile",
+  "geneId": "gene_soil_001",
+  "geneType": "SOIL_CLUSTER",
+  "canvas": {
+    "width": 32,
+    "height": 32
+  },
+  "bounds": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+  },
+  "role": "soil_base",
+  "materialHint": "obsidian",
+  "paletteRoles": [
+    "soil_base",
+    "soil_mid"
+  ],
+  "coordinates": [
+    {
+      "x": 0,
+      "y": 0,
+      "color": "#0D0C12",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "color": "#0D0C12",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 0,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 0,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 0,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 0,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 0,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 0,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 0,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 0,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 0,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 0,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 0,
+      "color": "#0C0B13",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 0,
+      "color": "#0C0B13",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 0,
+      "color": "#0C0B13",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 0,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 0,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 0,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 0,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 0,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 0,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 0,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 0,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 0,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 0,
+      "color": "#0D0C12",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 1,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 1,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 1,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 1,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 1,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 1,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 1,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 1,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 1,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 1,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 1,
+      "color": "#111016",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 1,
+      "color": "#111016",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 1,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 1,
+      "color": "#0C0B11",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 1,
+      "color": "#0D0C12",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 1,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 1,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 1,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 1,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 1,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 1,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 1,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 1,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 1,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 1,
+      "color": "#0D0C12",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 2,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "color": "#0D0C12",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 2,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 2,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 2,
+      "color": "#0C0B13",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 2,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 2,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 2,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 2,
+      "color": "#110F1A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 2,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 2,
+      "color": "#121119",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 2,
+      "color": "#121119",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 2,
+      "color": "#13111C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 2,
+      "color": "#13111C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 2,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 2,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 2,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 2,
+      "color": "#0D0C12",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 2,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 2,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 2,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 2,
+      "color": "#0D0C12",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 2,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 2,
+      "color": "#0D0C12",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 2,
+      "color": "#0D0C12",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 2,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 2,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 2,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 3,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 3,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 3,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 3,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 3,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 3,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 3,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 3,
+      "color": "#121119",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 3,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 3,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 3,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 3,
+      "color": "#13111C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 3,
+      "color": "#13111C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 3,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 3,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 3,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 3,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 3,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 3,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 3,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 3,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 3,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 3,
+      "color": "#0D0C12",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 3,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 3,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "color": "#13111C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 4,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 4,
+      "color": "#121119",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 4,
+      "color": "#121119",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 4,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 4,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 4,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 4,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 4,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 4,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 4,
+      "color": "#14121D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 4,
+      "color": "#14121D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 4,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 4,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 4,
+      "color": "#110F1A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 4,
+      "color": "#110F1A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 4,
+      "color": "#110F1A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 4,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 4,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 4,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 4,
+      "color": "#0D0C12",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 4,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 4,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 5,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 5,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 5,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 5,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 5,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 5,
+      "color": "#110F1A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 5,
+      "color": "#13111C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 5,
+      "color": "#13111C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 5,
+      "color": "#14121D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 5,
+      "color": "#15131E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 5,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 5,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 5,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 5,
+      "color": "#181425",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 5,
+      "color": "#27123D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 5,
+      "color": "#341153",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 5,
+      "color": "#171228",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 5,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 5,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 5,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 5,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 5,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 5,
+      "color": "#12101D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 5,
+      "color": "#13111C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 5,
+      "color": "#110F1A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 5,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 5,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 5,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 5,
+      "color": "#0D0C12",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 5,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 5,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 6,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 6,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 6,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 6,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 6,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 6,
+      "color": "#13111C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 6,
+      "color": "#14121D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 6,
+      "color": "#14121D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 6,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 6,
+      "color": "#15131E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 6,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 6,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 6,
+      "color": "#1C142C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 6,
+      "color": "#201331",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 6,
+      "color": "#2B1343",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 6,
+      "color": "#301E50",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 6,
+      "color": "#221236",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 6,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 6,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 6,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 6,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 6,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 6,
+      "color": "#14121D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 6,
+      "color": "#14121D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 6,
+      "color": "#13111C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 6,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 6,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 6,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 6,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 6,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 6,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 7,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 7,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 7,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 7,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 7,
+      "color": "#13111C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 7,
+      "color": "#14121D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 7,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 7,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 7,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 7,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 7,
+      "color": "#171523",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 7,
+      "color": "#171523",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 7,
+      "color": "#1C142C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 7,
+      "color": "#342850",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 7,
+      "color": "#2F1B4E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 7,
+      "color": "#3D106B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 7,
+      "color": "#32284B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 7,
+      "color": "#1C142B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 7,
+      "color": "#181425",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 7,
+      "color": "#171522",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 7,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 7,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 7,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 7,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 7,
+      "color": "#14121D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 7,
+      "color": "#13111C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 7,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 7,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 7,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 7,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 7,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 8,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 8,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 8,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 8,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 8,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 8,
+      "color": "#14121D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 8,
+      "color": "#121119",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 8,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 8,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 8,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 8,
+      "color": "#171523",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 8,
+      "color": "#171523",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 8,
+      "color": "#1A1627",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 8,
+      "color": "#1B0A36",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 8,
+      "color": "#250551",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 8,
+      "color": "#30055F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 8,
+      "color": "#34076C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 8,
+      "color": "#320967",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 8,
+      "color": "#1F0E3A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 8,
+      "color": "#1C132E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 8,
+      "color": "#171523",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 8,
+      "color": "#171523",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 8,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 8,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 8,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 8,
+      "color": "#14121D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 8,
+      "color": "#13111C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 8,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 8,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 8,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 8,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 8,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 9,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 9,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 9,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 9,
+      "color": "#12101D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 9,
+      "color": "#12101D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 9,
+      "color": "#14121D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 9,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 9,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 9,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 9,
+      "color": "#171523",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 9,
+      "color": "#171523",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 9,
+      "color": "#282A37",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 9,
+      "color": "#292838",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 9,
+      "color": "#201732",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 9,
+      "color": "#251146",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 9,
+      "color": "#34036C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 9,
+      "color": "#3D0062",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 9,
+      "color": "#240852",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 9,
+      "color": "#220849",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 9,
+      "color": "#2B283B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 9,
+      "color": "#2C2B3B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 9,
+      "color": "#171523",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 9,
+      "color": "#171523",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 9,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 9,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 9,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 9,
+      "color": "#13111C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 9,
+      "color": "#13111C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 9,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 9,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 9,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 9,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 10,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 10,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 10,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 10,
+      "color": "#12101D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 10,
+      "color": "#14121D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 10,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 10,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 10,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 10,
+      "color": "#171523",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 10,
+      "color": "#171523",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 10,
+      "color": "#2B2A3A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 10,
+      "color": "#000002",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 10,
+      "color": "#010008",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 10,
+      "color": "#200F3B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 10,
+      "color": "#2E0160",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 10,
+      "color": "#2E0062",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 10,
+      "color": "#34006C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 10,
+      "color": "#2C045C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 10,
+      "color": "#23094A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 10,
+      "color": "#1E1333",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 10,
+      "color": "#2C2B3B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 10,
+      "color": "#000002",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 10,
+      "color": "#292836",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 10,
+      "color": "#171523",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 10,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 10,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 10,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 10,
+      "color": "#13111C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 10,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 10,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 10,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 10,
+      "color": "#0C0B13",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 11,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 11,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 11,
+      "color": "#110F1A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 11,
+      "color": "#12101D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 11,
+      "color": "#141220",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 11,
+      "color": "#171226",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 11,
+      "color": "#201331",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 11,
+      "color": "#171522",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 11,
+      "color": "#2C2B3B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 11,
+      "color": "#2B2A3A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 11,
+      "color": "#37354A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 11,
+      "color": "#2B253F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 11,
+      "color": "#2B283D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 11,
+      "color": "#2B1A44",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 11,
+      "color": "#21014C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 11,
+      "color": "#6B0EA4",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 11,
+      "color": "#2A0459",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 11,
+      "color": "#260357",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 11,
+      "color": "#23044A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 11,
+      "color": "#201B32",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 11,
+      "color": "#131023",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 11,
+      "color": "#2C2B3B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 11,
+      "color": "#232232",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 11,
+      "color": "#000002",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 11,
+      "color": "#171523",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 11,
+      "color": "#1B132A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 11,
+      "color": "#161422",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 11,
+      "color": "#13111E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 11,
+      "color": "#110F1C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 11,
+      "color": "#110F1A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 11,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 11,
+      "color": "#0C0B13",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 12,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 12,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 12,
+      "color": "#110F1A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 12,
+      "color": "#13111E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 12,
+      "color": "#161221",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 12,
+      "color": "#351554",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 12,
+      "color": "#32154B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 12,
+      "color": "#371E55",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 12,
+      "color": "#302448",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 12,
+      "color": "#221438",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 12,
+      "color": "#321950",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 12,
+      "color": "#180733",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 12,
+      "color": "#13072B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 12,
+      "color": "#402063",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 12,
+      "color": "#481679",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 12,
+      "color": "#200346",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 12,
+      "color": "#200346",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 12,
+      "color": "#200049",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 12,
+      "color": "#150430",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 12,
+      "color": "#20003D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 12,
+      "color": "#131023",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 12,
+      "color": "#180F2A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 12,
+      "color": "#2C2141",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 12,
+      "color": "#2E2043",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 12,
+      "color": "#3B275A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 12,
+      "color": "#39155D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 12,
+      "color": "#27113F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 12,
+      "color": "#190F28",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 12,
+      "color": "#110F1C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 12,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 12,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 13,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 13,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 13,
+      "color": "#110F1A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 13,
+      "color": "#15111F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 13,
+      "color": "#26113C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 13,
+      "color": "#35165A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 13,
+      "color": "#380065",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 13,
+      "color": "#2D0460",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 13,
+      "color": "#2F1054",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 13,
+      "color": "#35096B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 13,
+      "color": "#400676",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 13,
+      "color": "#290A4D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 13,
+      "color": "#3A2455",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 13,
+      "color": "#3A2659",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 13,
+      "color": "#2A2440",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 13,
+      "color": "#040112",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 13,
+      "color": "#170338",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 13,
+      "color": "#1A013B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 13,
+      "color": "#110327",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 13,
+      "color": "#120227",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 13,
+      "color": "#1B023B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 13,
+      "color": "#1D093A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 13,
+      "color": "#32214D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 13,
+      "color": "#351953",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 13,
+      "color": "#341A57",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 13,
+      "color": "#3A1E58",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 13,
+      "color": "#3D0F67",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 13,
+      "color": "#371456",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 13,
+      "color": "#1A1029",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 13,
+      "color": "#110F1C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 13,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 13,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 14,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 14,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 14,
+      "color": "#13111E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 14,
+      "color": "#14101F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 14,
+      "color": "#1E0443",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 14,
+      "color": "#27084C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 14,
+      "color": "#2D0065",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 14,
+      "color": "#300167",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 14,
+      "color": "#390375",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 14,
+      "color": "#380065",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 14,
+      "color": "#3A0066",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 14,
+      "color": "#340062",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 14,
+      "color": "#422166",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 14,
+      "color": "#312D46",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 14,
+      "color": "#242136",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 14,
+      "color": "#2C293C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 14,
+      "color": "#221F30",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 14,
+      "color": "#201D30",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 14,
+      "color": "#120428",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 14,
+      "color": "#220548",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 14,
+      "color": "#210444",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 14,
+      "color": "#2D055D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 14,
+      "color": "#31006B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 14,
+      "color": "#2D0061",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 14,
+      "color": "#300265",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 14,
+      "color": "#320562",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 14,
+      "color": "#390063",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 14,
+      "color": "#1A1029",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 14,
+      "color": "#110F1C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 14,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 14,
+      "color": "#0F0E14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 15,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 15,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 15,
+      "color": "#000002",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 15,
+      "color": "#2B2A38",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 15,
+      "color": "#3C235C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 15,
+      "color": "#150230",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 15,
+      "color": "#2C0062",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 15,
+      "color": "#2D0367",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 15,
+      "color": "#31016E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 15,
+      "color": "#330068",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 15,
+      "color": "#2C0361",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 15,
+      "color": "#2C005A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 15,
+      "color": "#2D075A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 15,
+      "color": "#3D1D5E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 15,
+      "color": "#341B55",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 15,
+      "color": "#2D144D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 15,
+      "color": "#252037",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 15,
+      "color": "#262336",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 15,
+      "color": "#1C192C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 15,
+      "color": "#2C293E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 15,
+      "color": "#3A1C5A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 15,
+      "color": "#22004A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 15,
+      "color": "#2F006B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 15,
+      "color": "#310167",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 15,
+      "color": "#390071",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 15,
+      "color": "#31006B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 15,
+      "color": "#260055",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 15,
+      "color": "#19023A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 15,
+      "color": "#2B2839",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 15,
+      "color": "#000002",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 15,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 15,
+      "color": "#0F0E14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 16,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 16,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 16,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 16,
+      "color": "#2A273A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 16,
+      "color": "#2B283B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 16,
+      "color": "#431F65",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 16,
+      "color": "#20014D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 16,
+      "color": "#45127B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 16,
+      "color": "#38006E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 16,
+      "color": "#260355",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 16,
+      "color": "#29025B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 16,
+      "color": "#310058",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 16,
+      "color": "#230247",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 16,
+      "color": "#2E1451",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 16,
+      "color": "#451C6B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 16,
+      "color": "#401668",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 16,
+      "color": "#3B1F59",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 16,
+      "color": "#2B283B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 16,
+      "color": "#3B2357",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 16,
+      "color": "#392155",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 16,
+      "color": "#30154C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 16,
+      "color": "#4A2072",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 16,
+      "color": "#581B92",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 16,
+      "color": "#260056",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 16,
+      "color": "#24024F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 16,
+      "color": "#25084A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 16,
+      "color": "#2D2A3D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 16,
+      "color": "#2A273A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 16,
+      "color": "#000002",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 16,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 16,
+      "color": "#0F0E14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 17,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 17,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 17,
+      "color": "#171522",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 17,
+      "color": "#171522",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 17,
+      "color": "#151321",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 17,
+      "color": "#2B2A38",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 17,
+      "color": "#28223C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 17,
+      "color": "#3F1173",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 17,
+      "color": "#3C205D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 17,
+      "color": "#361D57",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 17,
+      "color": "#1D0340",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 17,
+      "color": "#180435",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 17,
+      "color": "#1E0441",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 17,
+      "color": "#280B4E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 17,
+      "color": "#330C5D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 17,
+      "color": "#401C64",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 17,
+      "color": "#461A71",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 17,
+      "color": "#44206A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 17,
+      "color": "#462A65",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 17,
+      "color": "#2A0A49",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 17,
+      "color": "#271344",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 17,
+      "color": "#33224E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 17,
+      "color": "#2C2342",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 17,
+      "color": "#35254C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 17,
+      "color": "#2B283D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 17,
+      "color": "#313042",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 17,
+      "color": "#181623",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 17,
+      "color": "#171522",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 17,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 17,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 17,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 18,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 18,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 18,
+      "color": "#08070F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 18,
+      "color": "#0A0813",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 18,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 18,
+      "color": "#000002",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 18,
+      "color": "#000000",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 18,
+      "color": "#2E2D3B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 18,
+      "color": "#070415",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 18,
+      "color": "#22212F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 18,
+      "color": "#1D182C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 18,
+      "color": "#1B182B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 18,
+      "color": "#251B3D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 18,
+      "color": "#260054",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 18,
+      "color": "#2F0060",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 18,
+      "color": "#380470",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 18,
+      "color": "#320063",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 18,
+      "color": "#561097",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 18,
+      "color": "#310461",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 18,
+      "color": "#4C1678",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 18,
+      "color": "#481B70",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 18,
+      "color": "#2A1C3F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 18,
+      "color": "#292836",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 18,
+      "color": "#2B2A38",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 18,
+      "color": "#292639",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 18,
+      "color": "#191724",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 18,
+      "color": "#191724",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 18,
+      "color": "#000002",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 18,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 18,
+      "color": "#080810",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 18,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 18,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 19,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 19,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 19,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 19,
+      "color": "#090810",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 19,
+      "color": "#171522",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 19,
+      "color": "#181623",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 19,
+      "color": "#181624",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 19,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 19,
+      "color": "#2C2C38",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 19,
+      "color": "#282834",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 19,
+      "color": "#2C293A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 19,
+      "color": "#252235",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 19,
+      "color": "#1E053E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 19,
+      "color": "#280650",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 19,
+      "color": "#320369",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 19,
+      "color": "#2F0362",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 19,
+      "color": "#340067",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 19,
+      "color": "#2B0054",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 19,
+      "color": "#380675",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 19,
+      "color": "#30055F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 19,
+      "color": "#390F61",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 19,
+      "color": "#2F2442",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 19,
+      "color": "#0C0A18",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 19,
+      "color": "#090712",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 19,
+      "color": "#13101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 19,
+      "color": "#181623",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 19,
+      "color": "#120E1C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 19,
+      "color": "#08070F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 19,
+      "color": "#08070F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 19,
+      "color": "#110F1A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 19,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 19,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 20,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 20,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 20,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 20,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 20,
+      "color": "#08070F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 20,
+      "color": "#191725",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 20,
+      "color": "#181624",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 20,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 20,
+      "color": "#181623",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 20,
+      "color": "#282834",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 20,
+      "color": "#000000",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 20,
+      "color": "#2C243B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 20,
+      "color": "#2D243F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 20,
+      "color": "#2F1B4E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 20,
+      "color": "#23034C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 20,
+      "color": "#260353",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 20,
+      "color": "#210349",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 20,
+      "color": "#1F0242",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 20,
+      "color": "#23044A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 20,
+      "color": "#180435",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 20,
+      "color": "#2B283B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 20,
+      "color": "#0E0C17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 20,
+      "color": "#0F0D18",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 20,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 20,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 20,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 20,
+      "color": "#08070F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 20,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 20,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 20,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 20,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 21,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 21,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 21,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 21,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 21,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 21,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 21,
+      "color": "#090810",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 21,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 21,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 21,
+      "color": "#181623",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 21,
+      "color": "#050409",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 21,
+      "color": "#2B2A3A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 21,
+      "color": "#2D2A3B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 21,
+      "color": "#290B51",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 21,
+      "color": "#36126A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 21,
+      "color": "#470E83",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 21,
+      "color": "#21034B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 21,
+      "color": "#271640",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 21,
+      "color": "#271442",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 21,
+      "color": "#2E1C46",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 21,
+      "color": "#312146",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 21,
+      "color": "#13111C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 21,
+      "color": "#14121D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 21,
+      "color": "#14121D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 21,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 21,
+      "color": "#08070F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 21,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 21,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 21,
+      "color": "#110F1A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 21,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 21,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 21,
+      "color": "#0C0B13",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 22,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 22,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 22,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 22,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 22,
+      "color": "#121119",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 22,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 22,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 22,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 22,
+      "color": "#181623",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 22,
+      "color": "#181623",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 22,
+      "color": "#181824",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 22,
+      "color": "#171523",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 22,
+      "color": "#2C293A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 22,
+      "color": "#292838",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 22,
+      "color": "#302D40",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 22,
+      "color": "#34264A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 22,
+      "color": "#09061B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 22,
+      "color": "#201E2C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 22,
+      "color": "#2C293A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 22,
+      "color": "#000000",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 22,
+      "color": "#13111E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 22,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 22,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 22,
+      "color": "#090810",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 22,
+      "color": "#090810",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 22,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 22,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 22,
+      "color": "#13111E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 22,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 22,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 22,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 22,
+      "color": "#0C0B13",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 23,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 23,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 23,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 23,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 23,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 23,
+      "color": "#13111E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 23,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 23,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 23,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 23,
+      "color": "#090810",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 23,
+      "color": "#171522",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 23,
+      "color": "#181623",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 23,
+      "color": "#171522",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 23,
+      "color": "#191724",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 23,
+      "color": "#282A37",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 23,
+      "color": "#1C1C28",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 23,
+      "color": "#2B2A38",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 23,
+      "color": "#2B2B37",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 23,
+      "color": "#000000",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 23,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 23,
+      "color": "#171522",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 23,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 23,
+      "color": "#08070D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 23,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 23,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 23,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 23,
+      "color": "#13111E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 23,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 23,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 23,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 23,
+      "color": "#0C0B13",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 23,
+      "color": "#0C0B13",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 24,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 24,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 24,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 24,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 24,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 24,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 24,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 24,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 24,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 24,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 24,
+      "color": "#090810",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 24,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 24,
+      "color": "#1A1825",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 24,
+      "color": "#191724",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 24,
+      "color": "#181623",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 24,
+      "color": "#2B2B37",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 24,
+      "color": "#2B2D3A",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 24,
+      "color": "#14121D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 24,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 24,
+      "color": "#181623",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 24,
+      "color": "#090810",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 24,
+      "color": "#08070F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 24,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 24,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 24,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 24,
+      "color": "#13111E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 24,
+      "color": "#13111E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 24,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 24,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 24,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 24,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 24,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 25,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 25,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 25,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 25,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 25,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 25,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 25,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 25,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 25,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 25,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 25,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 25,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 25,
+      "color": "#08070F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 25,
+      "color": "#181623",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 25,
+      "color": "#181623",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 25,
+      "color": "#171522",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 25,
+      "color": "#13101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 25,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 25,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 25,
+      "color": "#08070F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 25,
+      "color": "#08070F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 25,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 25,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 25,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 25,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 25,
+      "color": "#13111E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 25,
+      "color": "#121119",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 25,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 25,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 25,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 25,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 25,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 26,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 26,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 26,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 26,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 26,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 26,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 26,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 26,
+      "color": "#121119",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 26,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 26,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 26,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 26,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 26,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 26,
+      "color": "#080810",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 26,
+      "color": "#171522",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 26,
+      "color": "#171522",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 26,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 26,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 26,
+      "color": "#08070F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 26,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 26,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 26,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 26,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 26,
+      "color": "#13111E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 26,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 26,
+      "color": "#12101D",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 26,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 26,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 26,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 26,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 26,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 26,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 27,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 27,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 27,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 27,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 27,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 27,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 27,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 27,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 27,
+      "color": "#121119",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 27,
+      "color": "#121119",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 27,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 27,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 27,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 27,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 27,
+      "color": "#080810",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 27,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 27,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 27,
+      "color": "#08070F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 27,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 27,
+      "color": "#161421",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 27,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 27,
+      "color": "#13111E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 27,
+      "color": "#13111E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 27,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 27,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 27,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 27,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 27,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 27,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 27,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 27,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 27,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 28,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 28,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 28,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 28,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 28,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 28,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 28,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 28,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 28,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 28,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 28,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 28,
+      "color": "#13111E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 28,
+      "color": "#13111E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 28,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 28,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 28,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 28,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 28,
+      "color": "#151320",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 28,
+      "color": "#14121F",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 28,
+      "color": "#13111E",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 28,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 28,
+      "color": "#13111C",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 28,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 28,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 28,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 28,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 28,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 28,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 28,
+      "color": "#0D0C12",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 28,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 28,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 28,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 29,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 29,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 29,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 29,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 29,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 29,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 29,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 29,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 29,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 29,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 29,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 29,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 29,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 29,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 29,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 29,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 29,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 29,
+      "color": "#12101B",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 29,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 29,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 29,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 29,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 29,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 29,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 29,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 29,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 29,
+      "color": "#0C0B13",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 29,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 29,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 29,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 29,
+      "color": "#0D0C12",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 29,
+      "color": "#0D0C12",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 30,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 30,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 30,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 30,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 30,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 30,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 30,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 30,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 30,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 30,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 30,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 30,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 30,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 30,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 30,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 30,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 30,
+      "color": "#111018",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 30,
+      "color": "#121119",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 30,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 30,
+      "color": "#0E0D15",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 30,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 30,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 30,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 30,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 30,
+      "color": "#0C0B13",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 30,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 30,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 30,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 30,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 30,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 30,
+      "color": "#0D0C12",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 30,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 0,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 1,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 2,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 3,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 4,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 5,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 6,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 7,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 8,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 9,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 10,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 11,
+      "y": 31,
+      "color": "#0F0E16",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 12,
+      "y": 31,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 13,
+      "y": 31,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 14,
+      "y": 31,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 15,
+      "y": 31,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 16,
+      "y": 31,
+      "color": "#100F17",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 17,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 18,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 19,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 20,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 21,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 22,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 23,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 24,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 25,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 26,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 27,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 28,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 29,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 30,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    },
+    {
+      "x": 31,
+      "y": 31,
+      "color": "#0D0C14",
+      "role": "soil_base",
+      "isMotif": false
+    }
+  ],
+  "geometryHints": {
+    "closed": true,
+    "preferredPrimitive": "rect",
+    "preserveAsMotif": false
+  },
+  "checksum": "scd64:7cKRqMIMRLQkW2DwLSKYNWQYopB9lB0sus0U2dKL800000000000000000000000"
+}

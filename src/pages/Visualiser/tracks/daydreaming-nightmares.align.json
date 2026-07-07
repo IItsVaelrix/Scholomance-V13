@@ -1,0 +1,5056 @@
+{
+  "schemaVersion": "scholomance.align.v1",
+  "trackId": "daydreaming-nightmares",
+  "bpm": 120,
+  "offsetMs": 0,
+  "lyricsHash": "50f655eead159784",
+  "audioUrl": "/daydreaming-nightmares.wav",
+  "audioHash": "52dfeff691322864",
+  "generatedAt": "2026-06-30T17:11:43.788Z",
+  "wordTimings": [
+    {
+      "word": "Daydreaming",
+      "startMs": 3459,
+      "endMs": 3669,
+      "beat": {
+        "index": 6,
+        "phase": 0.918,
+        "bar": 1,
+        "barPhase": 0.7295
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.659
+    },
+    {
+      "word": "Nightmares",
+      "startMs": 3677,
+      "endMs": 3877,
+      "beat": {
+        "index": 7,
+        "phase": 0.354,
+        "bar": 1,
+        "barPhase": 0.8385
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "Daydreaming",
+      "startMs": 3808,
+      "endMs": 3929,
+      "beat": {
+        "index": 7,
+        "phase": 0.616,
+        "bar": 1,
+        "barPhase": 0.904
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.47
+    },
+    {
+      "word": "Nightmares",
+      "startMs": 3949,
+      "endMs": 4069,
+      "beat": {
+        "index": 7,
+        "phase": 0.898,
+        "bar": 1,
+        "barPhase": 0.9745
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.393
+    },
+    {
+      "word": "Daydreaming",
+      "startMs": 4156,
+      "endMs": 4249,
+      "beat": {
+        "index": 8,
+        "phase": 0.312,
+        "bar": 2,
+        "barPhase": 0.078
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.412
+    },
+    {
+      "word": "Nightmares",
+      "startMs": 4318,
+      "endMs": 4589,
+      "beat": {
+        "index": 8,
+        "phase": 0.636,
+        "bar": 2,
+        "barPhase": 0.159
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.802
+    },
+    {
+      "word": "Daydreaming",
+      "startMs": 4690,
+      "endMs": 5230,
+      "beat": {
+        "index": 9,
+        "phase": 0.38,
+        "bar": 2,
+        "barPhase": 0.345
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.673
+    },
+    {
+      "word": "Nightmares",
+      "startMs": 5363,
+      "endMs": 5970,
+      "beat": {
+        "index": 10,
+        "phase": 0.726,
+        "bar": 2,
+        "barPhase": 0.6815
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.557
+    },
+    {
+      "word": "Feeling",
+      "startMs": 7650,
+      "endMs": 7850,
+      "beat": {
+        "index": 15,
+        "phase": 0.3,
+        "bar": 3,
+        "barPhase": 0.825
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "decay",
+      "startMs": 22768,
+      "endMs": 23048,
+      "beat": {
+        "index": 45,
+        "phase": 0.536,
+        "bar": 11,
+        "barPhase": 0.384
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.729
+    },
+    {
+      "word": "now,",
+      "startMs": 23312,
+      "endMs": 23888,
+      "beat": {
+        "index": 46,
+        "phase": 0.624,
+        "bar": 11,
+        "barPhase": 0.656
+      },
+      "school": "DIVINATION",
+      "confidence": 0.872
+    },
+    {
+      "word": "steel",
+      "startMs": 23890,
+      "endMs": 24090,
+      "beat": {
+        "index": 47,
+        "phase": 0.78,
+        "bar": 11,
+        "barPhase": 0.945
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "in",
+      "startMs": 23908,
+      "endMs": 24308,
+      "beat": {
+        "index": 47,
+        "phase": 0.816,
+        "bar": 11,
+        "barPhase": 0.954
+      },
+      "school": "SONIC",
+      "confidence": 0.641
+    },
+    {
+      "word": "the",
+      "startMs": 24380,
+      "endMs": 24428,
+      "beat": {
+        "index": 48,
+        "phase": 0.76,
+        "bar": 12,
+        "barPhase": 0.19
+      },
+      "school": "WILL",
+      "confidence": 0.938
+    },
+    {
+      "word": "rib-cage",
+      "startMs": 24543,
+      "endMs": 24648,
+      "beat": {
+        "index": 49,
+        "phase": 0.086,
+        "bar": 12,
+        "barPhase": 0.2715
+      },
+      "school": "SONIC",
+      "confidence": 0.742
+    },
+    {
+      "word": "stealing",
+      "startMs": 24938,
+      "endMs": 25309,
+      "beat": {
+        "index": 49,
+        "phase": 0.876,
+        "bar": 12,
+        "barPhase": 0.469
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.446
+    },
+    {
+      "word": "my",
+      "startMs": 25379,
+      "endMs": 25469,
+      "beat": {
+        "index": 50,
+        "phase": 0.758,
+        "bar": 12,
+        "barPhase": 0.6895
+      },
+      "school": "SONIC",
+      "confidence": 0.542
+    },
+    {
+      "word": "faith,",
+      "startMs": 25634,
+      "endMs": 25789,
+      "beat": {
+        "index": 51,
+        "phase": 0.268,
+        "bar": 12,
+        "barPhase": 0.817
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.853
+    },
+    {
+      "word": "wow.",
+      "startMs": 26076,
+      "endMs": 26649,
+      "beat": {
+        "index": 52,
+        "phase": 0.152,
+        "bar": 13,
+        "barPhase": 0.038
+      },
+      "school": "DIVINATION",
+      "confidence": 0.793
+    },
+    {
+      "word": "Realness",
+      "startMs": 26981,
+      "endMs": 27069,
+      "beat": {
+        "index": 53,
+        "phase": 0.962,
+        "bar": 13,
+        "barPhase": 0.4905
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.274
+    },
+    {
+      "word": "embraced",
+      "startMs": 27120,
+      "endMs": 27429,
+      "beat": {
+        "index": 54,
+        "phase": 0.24,
+        "bar": 13,
+        "barPhase": 0.56
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.478
+    },
+    {
+      "word": "by",
+      "startMs": 27492,
+      "endMs": 27589,
+      "beat": {
+        "index": 54,
+        "phase": 0.984,
+        "bar": 13,
+        "barPhase": 0.746
+      },
+      "school": "SONIC",
+      "confidence": 0.546
+    },
+    {
+      "word": "ripping",
+      "startMs": 27678,
+      "endMs": 27929,
+      "beat": {
+        "index": 55,
+        "phase": 0.356,
+        "bar": 13,
+        "barPhase": 0.839
+      },
+      "school": "SONIC",
+      "confidence": 0.572
+    },
+    {
+      "word": "the",
+      "startMs": 27980,
+      "endMs": 28069,
+      "beat": {
+        "index": 55,
+        "phase": 0.96,
+        "bar": 13,
+        "barPhase": 0.99
+      },
+      "school": "WILL",
+      "confidence": 0.813
+    },
+    {
+      "word": "cage",
+      "startMs": 28142,
+      "endMs": 28389,
+      "beat": {
+        "index": 56,
+        "phase": 0.284,
+        "bar": 14,
+        "barPhase": 0.071
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.682
+    },
+    {
+      "word": "down",
+      "startMs": 28398,
+      "endMs": 28749,
+      "beat": {
+        "index": 56,
+        "phase": 0.796,
+        "bar": 14,
+        "barPhase": 0.199
+      },
+      "school": "DIVINATION",
+      "confidence": 0.651
+    },
+    {
+      "word": "still,",
+      "startMs": 28699,
+      "endMs": 28989,
+      "beat": {
+        "index": 57,
+        "phase": 0.398,
+        "bar": 14,
+        "barPhase": 0.3495
+      },
+      "school": "SONIC",
+      "confidence": 0.758
+    },
+    {
+      "word": "I'm",
+      "startMs": 29048,
+      "endMs": 29129,
+      "beat": {
+        "index": 58,
+        "phase": 0.096,
+        "bar": 14,
+        "barPhase": 0.524
+      },
+      "school": "SONIC",
+      "confidence": 0.29
+    },
+    {
+      "word": "awake,",
+      "startMs": 29187,
+      "endMs": 29609,
+      "beat": {
+        "index": 58,
+        "phase": 0.374,
+        "bar": 14,
+        "barPhase": 0.5935
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.594
+    },
+    {
+      "word": "how",
+      "startMs": 29535,
+      "endMs": 29949,
+      "beat": {
+        "index": 59,
+        "phase": 0.07,
+        "bar": 14,
+        "barPhase": 0.7675
+      },
+      "school": "DIVINATION",
+      "confidence": 0.845
+    },
+    {
+      "word": "belligerent",
+      "startMs": 30046,
+      "endMs": 30710,
+      "beat": {
+        "index": 60,
+        "phase": 0.092,
+        "bar": 15,
+        "barPhase": 0.023
+      },
+      "school": "SONIC",
+      "confidence": 0.661
+    },
+    {
+      "word": "stay",
+      "startMs": 30720,
+      "endMs": 31150,
+      "beat": {
+        "index": 61,
+        "phase": 0.44,
+        "bar": 15,
+        "barPhase": 0.36
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.878
+    },
+    {
+      "word": "down!",
+      "startMs": 31230,
+      "endMs": 32030,
+      "beat": {
+        "index": 62,
+        "phase": 0.46,
+        "bar": 15,
+        "barPhase": 0.615
+      },
+      "school": "DIVINATION",
+      "confidence": 0.801
+    },
+    {
+      "word": "You",
+      "startMs": 32070,
+      "endMs": 32210,
+      "beat": {
+        "index": 64,
+        "phase": 0.14,
+        "bar": 16,
+        "barPhase": 0.035
+      },
+      "school": "ABJURATION",
+      "confidence": 0.482
+    },
+    {
+      "word": "uppity",
+      "startMs": 32275,
+      "endMs": 32710,
+      "beat": {
+        "index": 64,
+        "phase": 0.55,
+        "bar": 16,
+        "barPhase": 0.1375
+      },
+      "school": "WILL",
+      "confidence": 0.687
+    },
+    {
+      "word": "fake",
+      "startMs": 32879,
+      "endMs": 33030,
+      "beat": {
+        "index": 65,
+        "phase": 0.758,
+        "bar": 16,
+        "barPhase": 0.4395
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.764
+    },
+    {
+      "word": "clown",
+      "startMs": 33088,
+      "endMs": 33410,
+      "beat": {
+        "index": 66,
+        "phase": 0.176,
+        "bar": 16,
+        "barPhase": 0.544
+      },
+      "school": "DIVINATION",
+      "confidence": 0.873
+    },
+    {
+      "word": "I'm",
+      "startMs": 33529,
+      "endMs": 33530,
+      "beat": {
+        "index": 67,
+        "phase": 0.058,
+        "bar": 16,
+        "barPhase": 0.7645
+      },
+      "school": "SONIC",
+      "confidence": 0.182
+    },
+    {
+      "word": "struggling",
+      "startMs": 33529,
+      "endMs": 34130,
+      "beat": {
+        "index": 67,
+        "phase": 0.058,
+        "bar": 16,
+        "barPhase": 0.7645
+      },
+      "school": "WILL",
+      "confidence": 0.66
+    },
+    {
+      "word": "right",
+      "startMs": 34226,
+      "endMs": 34430,
+      "beat": {
+        "index": 68,
+        "phase": 0.452,
+        "bar": 17,
+        "barPhase": 0.113
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.782
+    },
+    {
+      "word": "now",
+      "startMs": 34490,
+      "endMs": 34810,
+      "beat": {
+        "index": 68,
+        "phase": 0.98,
+        "bar": 17,
+        "barPhase": 0.245
+      },
+      "school": "DIVINATION",
+      "confidence": 0.894
+    },
+    {
+      "word": "Love",
+      "startMs": 35038,
+      "endMs": 35310,
+      "beat": {
+        "index": 70,
+        "phase": 0.076,
+        "bar": 17,
+        "barPhase": 0.519
+      },
+      "school": "WILL",
+      "confidence": 0.521
+    },
+    {
+      "word": "muscle",
+      "startMs": 35410,
+      "endMs": 35651,
+      "beat": {
+        "index": 70,
+        "phase": 0.82,
+        "bar": 17,
+        "barPhase": 0.705
+      },
+      "school": "WILL",
+      "confidence": 0.562
+    },
+    {
+      "word": "cuddling",
+      "startMs": 35712,
+      "endMs": 36171,
+      "beat": {
+        "index": 71,
+        "phase": 0.424,
+        "bar": 17,
+        "barPhase": 0.856
+      },
+      "school": "WILL",
+      "confidence": 0.533
+    },
+    {
+      "word": "the",
+      "startMs": 36246,
+      "endMs": 36331,
+      "beat": {
+        "index": 72,
+        "phase": 0.492,
+        "bar": 18,
+        "barPhase": 0.123
+      },
+      "school": "WILL",
+      "confidence": 0.756
+    },
+    {
+      "word": "knife,",
+      "startMs": 36432,
+      "endMs": 36651,
+      "beat": {
+        "index": 72,
+        "phase": 0.864,
+        "bar": 18,
+        "barPhase": 0.216
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.567
+    },
+    {
+      "word": "see",
+      "startMs": 36780,
+      "endMs": 36851,
+      "beat": {
+        "index": 73,
+        "phase": 0.56,
+        "bar": 18,
+        "barPhase": 0.39
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.597
+    },
+    {
+      "word": "it",
+      "startMs": 36989,
+      "endMs": 36991,
+      "beat": {
+        "index": 73,
+        "phase": 0.978,
+        "bar": 18,
+        "barPhase": 0.4945
+      },
+      "school": "SONIC",
+      "confidence": 0.454
+    },
+    {
+      "word": "shine",
+      "startMs": 36989,
+      "endMs": 37391,
+      "beat": {
+        "index": 73,
+        "phase": 0.978,
+        "bar": 18,
+        "barPhase": 0.4945
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.644
+    },
+    {
+      "word": "now",
+      "startMs": 37477,
+      "endMs": 37671,
+      "beat": {
+        "index": 74,
+        "phase": 0.954,
+        "bar": 18,
+        "barPhase": 0.7385
+      },
+      "school": "DIVINATION",
+      "confidence": 0.967
+    },
+    {
+      "word": "Suffering",
+      "startMs": 37802,
+      "endMs": 38271,
+      "beat": {
+        "index": 75,
+        "phase": 0.604,
+        "bar": 18,
+        "barPhase": 0.901
+      },
+      "school": "WILL",
+      "confidence": 0.674
+    },
+    {
+      "word": "high",
+      "startMs": 38291,
+      "endMs": 38571,
+      "beat": {
+        "index": 76,
+        "phase": 0.582,
+        "bar": 19,
+        "barPhase": 0.1455
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.798
+    },
+    {
+      "word": "brow,",
+      "startMs": 38661,
+      "endMs": 39011,
+      "beat": {
+        "index": 77,
+        "phase": 0.322,
+        "bar": 19,
+        "barPhase": 0.3305
+      },
+      "school": "DIVINATION",
+      "confidence": 0.757
+    },
+    {
+      "word": "Musket",
+      "startMs": 39055,
+      "endMs": 39371,
+      "beat": {
+        "index": 78,
+        "phase": 0.11,
+        "bar": 19,
+        "barPhase": 0.5275
+      },
+      "school": "WILL",
+      "confidence": 0.565
+    },
+    {
+      "word": "at",
+      "startMs": 39404,
+      "endMs": 39491,
+      "beat": {
+        "index": 78,
+        "phase": 0.808,
+        "bar": 19,
+        "barPhase": 0.702
+      },
+      "school": "WILL",
+      "confidence": 0.363
+    },
+    {
+      "word": "the",
+      "startMs": 39706,
+      "endMs": 39751,
+      "beat": {
+        "index": 79,
+        "phase": 0.412,
+        "bar": 19,
+        "barPhase": 0.853
+      },
+      "school": "WILL",
+      "confidence": 0.431
+    },
+    {
+      "word": "skull,",
+      "startMs": 39706,
+      "endMs": 40151,
+      "beat": {
+        "index": 79,
+        "phase": 0.412,
+        "bar": 19,
+        "barPhase": 0.853
+      },
+      "school": "WILL",
+      "confidence": 0.674
+    },
+    {
+      "word": "comfortable,",
+      "startMs": 40216,
+      "endMs": 40691,
+      "beat": {
+        "index": 80,
+        "phase": 0.432,
+        "bar": 20,
+        "barPhase": 0.108
+      },
+      "school": "WILL",
+      "confidence": 0.452
+    },
+    {
+      "word": "the",
+      "startMs": 40751,
+      "endMs": 40832,
+      "beat": {
+        "index": 81,
+        "phase": 0.502,
+        "bar": 20,
+        "barPhase": 0.3755
+      },
+      "school": "WILL",
+      "confidence": 0.55
+    },
+    {
+      "word": "pull,",
+      "startMs": 40890,
+      "endMs": 41152,
+      "beat": {
+        "index": 81,
+        "phase": 0.78,
+        "bar": 20,
+        "barPhase": 0.445
+      },
+      "school": "VOID",
+      "confidence": 0.714
+    },
+    {
+      "word": "trigger",
+      "startMs": 41215,
+      "endMs": 41512,
+      "beat": {
+        "index": 82,
+        "phase": 0.43,
+        "bar": 20,
+        "barPhase": 0.6075
+      },
+      "school": "SONIC",
+      "confidence": 0.761
+    },
+    {
+      "word": "pulling",
+      "startMs": 41586,
+      "endMs": 41852,
+      "beat": {
+        "index": 83,
+        "phase": 0.172,
+        "bar": 20,
+        "barPhase": 0.793
+      },
+      "school": "VOID",
+      "confidence": 0.784
+    },
+    {
+      "word": "just",
+      "startMs": 41935,
+      "endMs": 42032,
+      "beat": {
+        "index": 83,
+        "phase": 0.87,
+        "bar": 20,
+        "barPhase": 0.9675
+      },
+      "school": "WILL",
+      "confidence": 0.317
+    },
+    {
+      "word": "to",
+      "startMs": 42120,
+      "endMs": 42192,
+      "beat": {
+        "index": 84,
+        "phase": 0.24,
+        "bar": 21,
+        "barPhase": 0.06
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.645
+    },
+    {
+      "word": "strike",
+      "startMs": 42120,
+      "endMs": 42572,
+      "beat": {
+        "index": 84,
+        "phase": 0.24,
+        "bar": 21,
+        "barPhase": 0.06
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.617
+    },
+    {
+      "word": "down!",
+      "startMs": 42631,
+      "endMs": 43712,
+      "beat": {
+        "index": 85,
+        "phase": 0.262,
+        "bar": 21,
+        "barPhase": 0.3155
+      },
+      "school": "DIVINATION",
+      "confidence": 0.81
+    },
+    {
+      "word": "(BOOM!)",
+      "startMs": 43734,
+      "endMs": 43934,
+      "beat": {
+        "index": 87,
+        "phase": 0.468,
+        "bar": 21,
+        "barPhase": 0.867
+      },
+      "school": "ABJURATION",
+      "confidence": 0.1
+    },
+    {
+      "word": "bullet",
+      "startMs": 44001,
+      "endMs": 44272,
+      "beat": {
+        "index": 88,
+        "phase": 0.002,
+        "bar": 22,
+        "barPhase": 0.0005
+      },
+      "school": "VOID",
+      "confidence": 0.716
+    },
+    {
+      "word": "hitting",
+      "startMs": 44292,
+      "endMs": 44592,
+      "beat": {
+        "index": 88,
+        "phase": 0.584,
+        "bar": 22,
+        "barPhase": 0.146
+      },
+      "school": "SONIC",
+      "confidence": 0.558
+    },
+    {
+      "word": "white",
+      "startMs": 44698,
+      "endMs": 44912,
+      "beat": {
+        "index": 89,
+        "phase": 0.396,
+        "bar": 22,
+        "barPhase": 0.349
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.502
+    },
+    {
+      "word": "gowns",
+      "startMs": 45023,
+      "endMs": 45292,
+      "beat": {
+        "index": 90,
+        "phase": 0.046,
+        "bar": 22,
+        "barPhase": 0.5115
+      },
+      "school": "DIVINATION",
+      "confidence": 0.751
+    },
+    {
+      "word": "motivated",
+      "startMs": 45278,
+      "endMs": 45973,
+      "beat": {
+        "index": 90,
+        "phase": 0.556,
+        "bar": 22,
+        "barPhase": 0.639
+      },
+      "school": "ABJURATION",
+      "confidence": 0.686
+    },
+    {
+      "word": "psychic,",
+      "startMs": 46091,
+      "endMs": 46333,
+      "beat": {
+        "index": 92,
+        "phase": 0.182,
+        "bar": 23,
+        "barPhase": 0.0455
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.451
+    },
+    {
+      "word": "Logia",
+      "startMs": 46788,
+      "endMs": 46913,
+      "beat": {
+        "index": 93,
+        "phase": 0.576,
+        "bar": 23,
+        "barPhase": 0.394
+      },
+      "school": "DIVINATION",
+      "confidence": 0.218
+    },
+    {
+      "word": "to",
+      "startMs": 46973,
+      "endMs": 47033,
+      "beat": {
+        "index": 93,
+        "phase": 0.946,
+        "bar": 23,
+        "barPhase": 0.4865
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.516
+    },
+    {
+      "word": "hater",
+      "startMs": 47136,
+      "endMs": 47373,
+      "beat": {
+        "index": 94,
+        "phase": 0.272,
+        "bar": 23,
+        "barPhase": 0.568
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.677
+    },
+    {
+      "word": "touch",
+      "startMs": 47438,
+      "endMs": 47633,
+      "beat": {
+        "index": 94,
+        "phase": 0.876,
+        "bar": 23,
+        "barPhase": 0.719
+      },
+      "school": "WILL",
+      "confidence": 0.666
+    },
+    {
+      "word": "Can't",
+      "startMs": 47809,
+      "endMs": 47973,
+      "beat": {
+        "index": 95,
+        "phase": 0.618,
+        "bar": 23,
+        "barPhase": 0.9045
+      },
+      "school": "WILL",
+      "confidence": 0.727
+    },
+    {
+      "word": "embrace",
+      "startMs": 47972,
+      "endMs": 48273,
+      "beat": {
+        "index": 95,
+        "phase": 0.944,
+        "bar": 23,
+        "barPhase": 0.986
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.903
+    },
+    {
+      "word": "a",
+      "startMs": 48343,
+      "endMs": 48413,
+      "beat": {
+        "index": 96,
+        "phase": 0.686,
+        "bar": 24,
+        "barPhase": 0.1715
+      },
+      "school": "WILL",
+      "confidence": 0.576
+    },
+    {
+      "word": "faker,",
+      "startMs": 48692,
+      "endMs": 48773,
+      "beat": {
+        "index": 97,
+        "phase": 0.384,
+        "bar": 24,
+        "barPhase": 0.346
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.59
+    },
+    {
+      "word": "like",
+      "startMs": 48831,
+      "endMs": 48953,
+      "beat": {
+        "index": 97,
+        "phase": 0.662,
+        "bar": 24,
+        "barPhase": 0.4155
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.149
+    },
+    {
+      "word": "the",
+      "startMs": 49017,
+      "endMs": 49073,
+      "beat": {
+        "index": 98,
+        "phase": 0.034,
+        "bar": 24,
+        "barPhase": 0.5085
+      },
+      "school": "WILL",
+      "confidence": 0.913
+    },
+    {
+      "word": "paper",
+      "startMs": 49156,
+      "endMs": 49434,
+      "beat": {
+        "index": 98,
+        "phase": 0.312,
+        "bar": 24,
+        "barPhase": 0.578
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.969
+    },
+    {
+      "word": "to",
+      "startMs": 49528,
+      "endMs": 49614,
+      "beat": {
+        "index": 99,
+        "phase": 0.056,
+        "bar": 24,
+        "barPhase": 0.764
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.942
+    },
+    {
+      "word": "my",
+      "startMs": 49690,
+      "endMs": 49774,
+      "beat": {
+        "index": 99,
+        "phase": 0.38,
+        "bar": 24,
+        "barPhase": 0.845
+      },
+      "school": "SONIC",
+      "confidence": 0.744
+    },
+    {
+      "word": "fire",
+      "startMs": 49876,
+      "endMs": 50414,
+      "beat": {
+        "index": 99,
+        "phase": 0.752,
+        "bar": 24,
+        "barPhase": 0.938
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.536
+    },
+    {
+      "word": "brush",
+      "startMs": 50422,
+      "endMs": 50622,
+      "beat": {
+        "index": 100,
+        "phase": 0.844,
+        "bar": 25,
+        "barPhase": 0.211
+      },
+      "school": "WILL",
+      "confidence": 0.1
+    },
+    {
+      "word": "Bonded",
+      "startMs": 50573,
+      "endMs": 50875,
+      "beat": {
+        "index": 101,
+        "phase": 0.146,
+        "bar": 25,
+        "barPhase": 0.2865
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.499
+    },
+    {
+      "word": "with",
+      "startMs": 50895,
+      "endMs": 51035,
+      "beat": {
+        "index": 101,
+        "phase": 0.79,
+        "bar": 25,
+        "barPhase": 0.4475
+      },
+      "school": "SONIC",
+      "confidence": 0.507
+    },
+    {
+      "word": "a",
+      "startMs": 51083,
+      "endMs": 51155,
+      "beat": {
+        "index": 102,
+        "phase": 0.166,
+        "bar": 25,
+        "barPhase": 0.5415
+      },
+      "school": "WILL",
+      "confidence": 0.574
+    },
+    {
+      "word": "liar",
+      "startMs": 51269,
+      "endMs": 51535,
+      "beat": {
+        "index": 102,
+        "phase": 0.538,
+        "bar": 25,
+        "barPhase": 0.6345
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.564
+    },
+    {
+      "word": "once",
+      "startMs": 51695,
+      "endMs": 51875,
+      "beat": {
+        "index": 103,
+        "phase": 0.39,
+        "bar": 25,
+        "barPhase": 0.8475
+      },
+      "school": "WILL",
+      "confidence": 0.577
+    },
+    {
+      "word": "Now",
+      "startMs": 51966,
+      "endMs": 52055,
+      "beat": {
+        "index": 103,
+        "phase": 0.932,
+        "bar": 25,
+        "barPhase": 0.983
+      },
+      "school": "DIVINATION",
+      "confidence": 0.913
+    },
+    {
+      "word": "I",
+      "startMs": 52128,
+      "endMs": 52216,
+      "beat": {
+        "index": 104,
+        "phase": 0.256,
+        "bar": 26,
+        "barPhase": 0.064
+      },
+      "school": "SONIC",
+      "confidence": 0.756
+    },
+    {
+      "word": "see",
+      "startMs": 52314,
+      "endMs": 52396,
+      "beat": {
+        "index": 104,
+        "phase": 0.628,
+        "bar": 26,
+        "barPhase": 0.157
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.755
+    },
+    {
+      "word": "the",
+      "startMs": 52453,
+      "endMs": 52536,
+      "beat": {
+        "index": 104,
+        "phase": 0.906,
+        "bar": 26,
+        "barPhase": 0.2265
+      },
+      "school": "WILL",
+      "confidence": 0.774
+    },
+    {
+      "word": "truth",
+      "startMs": 52593,
+      "endMs": 52876,
+      "beat": {
+        "index": 105,
+        "phase": 0.186,
+        "bar": 26,
+        "barPhase": 0.2965
+      },
+      "school": "ABJURATION",
+      "confidence": 0.744
+    },
+    {
+      "word": "like",
+      "startMs": 52964,
+      "endMs": 53116,
+      "beat": {
+        "index": 105,
+        "phase": 0.928,
+        "bar": 26,
+        "barPhase": 0.482
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.428
+    },
+    {
+      "word": "an",
+      "startMs": 53173,
+      "endMs": 53256,
+      "beat": {
+        "index": 106,
+        "phase": 0.346,
+        "bar": 26,
+        "barPhase": 0.5865
+      },
+      "school": "WILL",
+      "confidence": 0.464
+    },
+    {
+      "word": "Agent",
+      "startMs": 53336,
+      "endMs": 53597,
+      "beat": {
+        "index": 106,
+        "phase": 0.672,
+        "bar": 26,
+        "barPhase": 0.668
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.481
+    },
+    {
+      "word": "Smith",
+      "startMs": 53661,
+      "endMs": 53897,
+      "beat": {
+        "index": 107,
+        "phase": 0.322,
+        "bar": 26,
+        "barPhase": 0.8305
+      },
+      "school": "SONIC",
+      "confidence": 0.535
+    },
+    {
+      "word": "smacked",
+      "startMs": 53917,
+      "endMs": 54157,
+      "beat": {
+        "index": 107,
+        "phase": 0.834,
+        "bar": 26,
+        "barPhase": 0.9585
+      },
+      "school": "WILL",
+      "confidence": 0.644
+    },
+    {
+      "word": "me",
+      "startMs": 54197,
+      "endMs": 54317,
+      "beat": {
+        "index": 108,
+        "phase": 0.394,
+        "bar": 27,
+        "barPhase": 0.0985
+      },
+      "school": "WILL",
+      "confidence": 0.818
+    },
+    {
+      "word": "in",
+      "startMs": 54357,
+      "endMs": 54457,
+      "beat": {
+        "index": 108,
+        "phase": 0.714,
+        "bar": 27,
+        "barPhase": 0.1785
+      },
+      "school": "SONIC",
+      "confidence": 0.649
+    },
+    {
+      "word": "the",
+      "startMs": 54520,
+      "endMs": 54577,
+      "beat": {
+        "index": 109,
+        "phase": 0.04,
+        "bar": 27,
+        "barPhase": 0.26
+      },
+      "school": "WILL",
+      "confidence": 0.861
+    },
+    {
+      "word": "face",
+      "startMs": 54682,
+      "endMs": 54817,
+      "beat": {
+        "index": 109,
+        "phase": 0.364,
+        "bar": 27,
+        "barPhase": 0.341
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.805
+    },
+    {
+      "word": "and",
+      "startMs": 54868,
+      "endMs": 54937,
+      "beat": {
+        "index": 109,
+        "phase": 0.736,
+        "bar": 27,
+        "barPhase": 0.434
+      },
+      "school": "WILL",
+      "confidence": 0.234
+    },
+    {
+      "word": "said,",
+      "startMs": 55031,
+      "endMs": 55158,
+      "beat": {
+        "index": 110,
+        "phase": 0.062,
+        "bar": 27,
+        "barPhase": 0.5155
+      },
+      "school": "WILL",
+      "confidence": 0.321
+    },
+    {
+      "word": "''You're",
+      "startMs": 55193,
+      "endMs": 55338,
+      "beat": {
+        "index": 110,
+        "phase": 0.386,
+        "bar": 27,
+        "barPhase": 0.5965
+      },
+      "school": "DIVINATION",
+      "confidence": 0.193
+    },
+    {
+      "word": "one",
+      "startMs": 55379,
+      "endMs": 55518,
+      "beat": {
+        "index": 110,
+        "phase": 0.758,
+        "bar": 27,
+        "barPhase": 0.6895
+      },
+      "school": "WILL",
+      "confidence": 0.313
+    },
+    {
+      "word": "of",
+      "startMs": 55565,
+      "endMs": 55658,
+      "beat": {
+        "index": 111,
+        "phase": 0.13,
+        "bar": 27,
+        "barPhase": 0.7825
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.466
+    },
+    {
+      "word": "us''",
+      "startMs": 55727,
+      "endMs": 55938,
+      "beat": {
+        "index": 111,
+        "phase": 0.454,
+        "bar": 27,
+        "barPhase": 0.8635
+      },
+      "school": "WILL",
+      "confidence": 0.428
+    },
+    {
+      "word": "pummel",
+      "startMs": 56052,
+      "endMs": 56358,
+      "beat": {
+        "index": 112,
+        "phase": 0.104,
+        "bar": 28,
+        "barPhase": 0.026
+      },
+      "school": "WILL",
+      "confidence": 0.581
+    },
+    {
+      "word": "fake",
+      "startMs": 56378,
+      "endMs": 56619,
+      "beat": {
+        "index": 112,
+        "phase": 0.756,
+        "bar": 28,
+        "barPhase": 0.189
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.523
+    },
+    {
+      "word": "smiles",
+      "startMs": 56659,
+      "endMs": 57039,
+      "beat": {
+        "index": 113,
+        "phase": 0.318,
+        "bar": 28,
+        "barPhase": 0.3295
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.45
+    },
+    {
+      "word": "with",
+      "startMs": 57121,
+      "endMs": 57219,
+      "beat": {
+        "index": 114,
+        "phase": 0.242,
+        "bar": 28,
+        "barPhase": 0.5605
+      },
+      "school": "SONIC",
+      "confidence": 0.583
+    },
+    {
+      "word": "a",
+      "startMs": 57283,
+      "endMs": 57339,
+      "beat": {
+        "index": 114,
+        "phase": 0.566,
+        "bar": 28,
+        "barPhase": 0.6415
+      },
+      "school": "WILL",
+      "confidence": 0.622
+    },
+    {
+      "word": "bludgeon",
+      "startMs": 57446,
+      "endMs": 57759,
+      "beat": {
+        "index": 114,
+        "phase": 0.892,
+        "bar": 28,
+        "barPhase": 0.723
+      },
+      "school": "WILL",
+      "confidence": 0.514
+    },
+    {
+      "word": "and",
+      "startMs": 57817,
+      "endMs": 57920,
+      "beat": {
+        "index": 115,
+        "phase": 0.634,
+        "bar": 28,
+        "barPhase": 0.9085
+      },
+      "school": "WILL",
+      "confidence": 0.63
+    },
+    {
+      "word": "a",
+      "startMs": 57980,
+      "endMs": 58020,
+      "beat": {
+        "index": 115,
+        "phase": 0.96,
+        "bar": 28,
+        "barPhase": 0.99
+      },
+      "school": "WILL",
+      "confidence": 0.334
+    },
+    {
+      "word": "blunderbuss",
+      "startMs": 58119,
+      "endMs": 58700,
+      "beat": {
+        "index": 116,
+        "phase": 0.238,
+        "bar": 29,
+        "barPhase": 0.0595
+      },
+      "school": "WILL",
+      "confidence": 0.649
+    },
+    {
+      "word": "blast",
+      "startMs": 58816,
+      "endMs": 59080,
+      "beat": {
+        "index": 117,
+        "phase": 0.632,
+        "bar": 29,
+        "barPhase": 0.408
+      },
+      "school": "WILL",
+      "confidence": 0.591
+    },
+    {
+      "word": "radius",
+      "startMs": 59180,
+      "endMs": 59621,
+      "beat": {
+        "index": 118,
+        "phase": 0.36,
+        "bar": 29,
+        "barPhase": 0.59
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.594
+    },
+    {
+      "word": "leaving",
+      "startMs": 59721,
+      "endMs": 59961,
+      "beat": {
+        "index": 119,
+        "phase": 0.442,
+        "bar": 29,
+        "barPhase": 0.8605
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.728
+    },
+    {
+      "word": "your",
+      "startMs": 60046,
+      "endMs": 60101,
+      "beat": {
+        "index": 120,
+        "phase": 0.092,
+        "bar": 30,
+        "barPhase": 0.023
+      },
+      "school": "DIVINATION",
+      "confidence": 0.708
+    },
+    {
+      "word": "corpse",
+      "startMs": 60186,
+      "endMs": 60461,
+      "beat": {
+        "index": 120,
+        "phase": 0.372,
+        "bar": 30,
+        "barPhase": 0.093
+      },
+      "school": "DIVINATION",
+      "confidence": 0.467
+    },
+    {
+      "word": "as",
+      "startMs": 60557,
+      "endMs": 60621,
+      "beat": {
+        "index": 121,
+        "phase": 0.114,
+        "bar": 30,
+        "barPhase": 0.2785
+      },
+      "school": "WILL",
+      "confidence": 0.399
+    },
+    {
+      "word": "buckets",
+      "startMs": 60743,
+      "endMs": 61002,
+      "beat": {
+        "index": 121,
+        "phase": 0.486,
+        "bar": 30,
+        "barPhase": 0.3715
+      },
+      "school": "WILL",
+      "confidence": 0.366
+    },
+    {
+      "word": "of",
+      "startMs": 61091,
+      "endMs": 61182,
+      "beat": {
+        "index": 122,
+        "phase": 0.182,
+        "bar": 30,
+        "barPhase": 0.5455
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.552
+    },
+    {
+      "word": "dust.",
+      "startMs": 61254,
+      "endMs": 61522,
+      "beat": {
+        "index": 122,
+        "phase": 0.508,
+        "bar": 30,
+        "barPhase": 0.627
+      },
+      "school": "WILL",
+      "confidence": 0.488
+    },
+    {
+      "word": "Mortician",
+      "startMs": 62263,
+      "endMs": 62923,
+      "beat": {
+        "index": 124,
+        "phase": 0.526,
+        "bar": 31,
+        "barPhase": 0.1315
+      },
+      "school": "SONIC",
+      "confidence": 0.619
+    },
+    {
+      "word": "Mic,",
+      "startMs": 63018,
+      "endMs": 63243,
+      "beat": {
+        "index": 126,
+        "phase": 0.036,
+        "bar": 31,
+        "barPhase": 0.509
+      },
+      "school": "SONIC",
+      "confidence": 0.577
+    },
+    {
+      "word": "Daydreaming",
+      "startMs": 63297,
+      "endMs": 64304,
+      "beat": {
+        "index": 126,
+        "phase": 0.594,
+        "bar": 31,
+        "barPhase": 0.6485
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.594
+    },
+    {
+      "word": "Nightmares",
+      "startMs": 64365,
+      "endMs": 66105,
+      "beat": {
+        "index": 128,
+        "phase": 0.73,
+        "bar": 32,
+        "barPhase": 0.1825
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.675
+    },
+    {
+      "word": "Mortician",
+      "startMs": 67453,
+      "endMs": 68467,
+      "beat": {
+        "index": 134,
+        "phase": 0.906,
+        "bar": 33,
+        "barPhase": 0.7265
+      },
+      "school": "SONIC",
+      "confidence": 0.512
+    },
+    {
+      "word": "Mic,",
+      "startMs": 68507,
+      "endMs": 68767,
+      "beat": {
+        "index": 137,
+        "phase": 0.014,
+        "bar": 34,
+        "barPhase": 0.2535
+      },
+      "school": "SONIC",
+      "confidence": 0.466
+    },
+    {
+      "word": "Daydreaming",
+      "startMs": 68847,
+      "endMs": 70248,
+      "beat": {
+        "index": 137,
+        "phase": 0.694,
+        "bar": 34,
+        "barPhase": 0.4235
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.671
+    },
+    {
+      "word": "Nightmares",
+      "startMs": 70217,
+      "endMs": 71529,
+      "beat": {
+        "index": 140,
+        "phase": 0.434,
+        "bar": 35,
+        "barPhase": 0.1085
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.545
+    },
+    {
+      "word": "Forfeit",
+      "startMs": 71587,
+      "endMs": 72150,
+      "beat": {
+        "index": 143,
+        "phase": 0.174,
+        "bar": 35,
+        "barPhase": 0.7935
+      },
+      "school": "DIVINATION",
+      "confidence": 0.529
+    },
+    {
+      "word": "the",
+      "startMs": 72283,
+      "endMs": 72510,
+      "beat": {
+        "index": 144,
+        "phase": 0.566,
+        "bar": 36,
+        "barPhase": 0.1415
+      },
+      "school": "WILL",
+      "confidence": 0.439
+    },
+    {
+      "word": "fight",
+      "startMs": 72570,
+      "endMs": 73010,
+      "beat": {
+        "index": 145,
+        "phase": 0.14,
+        "bar": 36,
+        "barPhase": 0.285
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.602
+    },
+    {
+      "word": "and",
+      "startMs": 73330,
+      "endMs": 73410,
+      "beat": {
+        "index": 146,
+        "phase": 0.66,
+        "bar": 36,
+        "barPhase": 0.665
+      },
+      "school": "WILL",
+      "confidence": 0.773
+    },
+    {
+      "word": "I'm",
+      "startMs": 73470,
+      "endMs": 73571,
+      "beat": {
+        "index": 146,
+        "phase": 0.94,
+        "bar": 36,
+        "barPhase": 0.735
+      },
+      "school": "SONIC",
+      "confidence": 0.251
+    },
+    {
+      "word": "standing",
+      "startMs": 73676,
+      "endMs": 73951,
+      "beat": {
+        "index": 147,
+        "phase": 0.352,
+        "bar": 36,
+        "barPhase": 0.838
+      },
+      "school": "WILL",
+      "confidence": 0.466
+    },
+    {
+      "word": "right",
+      "startMs": 74051,
+      "endMs": 74251,
+      "beat": {
+        "index": 148,
+        "phase": 0.102,
+        "bar": 37,
+        "barPhase": 0.0255
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.525
+    },
+    {
+      "word": "there",
+      "startMs": 74350,
+      "endMs": 74651,
+      "beat": {
+        "index": 148,
+        "phase": 0.7,
+        "bar": 37,
+        "barPhase": 0.175
+      },
+      "school": "WILL",
+      "confidence": 0.789
+    },
+    {
+      "word": "Injecting",
+      "startMs": 74884,
+      "endMs": 75332,
+      "beat": {
+        "index": 149,
+        "phase": 0.768,
+        "bar": 37,
+        "barPhase": 0.442
+      },
+      "school": "WILL",
+      "confidence": 0.492
+    },
+    {
+      "word": "hatred",
+      "startMs": 75392,
+      "endMs": 75892,
+      "beat": {
+        "index": 150,
+        "phase": 0.784,
+        "bar": 37,
+        "barPhase": 0.696
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.569
+    },
+    {
+      "word": "and",
+      "startMs": 75932,
+      "endMs": 76012,
+      "beat": {
+        "index": 151,
+        "phase": 0.864,
+        "bar": 37,
+        "barPhase": 0.966
+      },
+      "school": "WILL",
+      "confidence": 0.244
+    },
+    {
+      "word": "rage",
+      "startMs": 76112,
+      "endMs": 76392,
+      "beat": {
+        "index": 152,
+        "phase": 0.224,
+        "bar": 38,
+        "barPhase": 0.056
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.772
+    },
+    {
+      "word": "in",
+      "startMs": 76416,
+      "endMs": 76533,
+      "beat": {
+        "index": 152,
+        "phase": 0.832,
+        "bar": 38,
+        "barPhase": 0.208
+      },
+      "school": "SONIC",
+      "confidence": 0.576
+    },
+    {
+      "word": "your",
+      "startMs": 76553,
+      "endMs": 76673,
+      "beat": {
+        "index": 153,
+        "phase": 0.106,
+        "bar": 38,
+        "barPhase": 0.2765
+      },
+      "school": "DIVINATION",
+      "confidence": 0.531
+    },
+    {
+      "word": "fine",
+      "startMs": 76677,
+      "endMs": 76877,
+      "beat": {
+        "index": 153,
+        "phase": 0.354,
+        "bar": 38,
+        "barPhase": 0.3385
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "tears.",
+      "startMs": 76788,
+      "endMs": 76973,
+      "beat": {
+        "index": 153,
+        "phase": 0.576,
+        "bar": 38,
+        "barPhase": 0.394
+      },
+      "school": "WILL",
+      "confidence": 0.406
+    },
+    {
+      "word": "Daydreaming",
+      "startMs": 82639,
+      "endMs": 82884,
+      "beat": {
+        "index": 165,
+        "phase": 0.278,
+        "bar": 41,
+        "barPhase": 0.3195
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.494
+    },
+    {
+      "word": "Nightmares.",
+      "startMs": 89884,
+      "endMs": 89997,
+      "beat": {
+        "index": 179,
+        "phase": 0.768,
+        "bar": 44,
+        "barPhase": 0.942
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.272
+    },
+    {
+      "word": "Daydreaming",
+      "startMs": 90070,
+      "endMs": 90137,
+      "beat": {
+        "index": 180,
+        "phase": 0.14,
+        "bar": 45,
+        "barPhase": 0.035
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.545
+    },
+    {
+      "word": "Nightmares.",
+      "startMs": 90209,
+      "endMs": 90477,
+      "beat": {
+        "index": 180,
+        "phase": 0.418,
+        "bar": 45,
+        "barPhase": 0.1045
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.678
+    },
+    {
+      "word": "Nightmares.",
+      "startMs": 90557,
+      "endMs": 90697,
+      "beat": {
+        "index": 181,
+        "phase": 0.114,
+        "bar": 45,
+        "barPhase": 0.2785
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.673
+    },
+    {
+      "word": "NIGHTMARES!!!!",
+      "startMs": 90757,
+      "endMs": 90817,
+      "beat": {
+        "index": 181,
+        "phase": 0.514,
+        "bar": 45,
+        "barPhase": 0.3785
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.382
+    },
+    {
+      "word": "Isotope",
+      "startMs": 90906,
+      "endMs": 91037,
+      "beat": {
+        "index": 181,
+        "phase": 0.812,
+        "bar": 45,
+        "barPhase": 0.453
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.785
+    },
+    {
+      "word": "to",
+      "startMs": 91091,
+      "endMs": 91177,
+      "beat": {
+        "index": 182,
+        "phase": 0.182,
+        "bar": 45,
+        "barPhase": 0.5455
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.582
+    },
+    {
+      "word": "bonds,",
+      "startMs": 91254,
+      "endMs": 91379,
+      "beat": {
+        "index": 182,
+        "phase": 0.508,
+        "bar": 45,
+        "barPhase": 0.627
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.1
+    },
+    {
+      "word": "Lycan",
+      "startMs": 91361,
+      "endMs": 91561,
+      "beat": {
+        "index": 182,
+        "phase": 0.722,
+        "bar": 45,
+        "barPhase": 0.6805
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "knows",
+      "startMs": 91556,
+      "endMs": 91724,
+      "beat": {
+        "index": 183,
+        "phase": 0.112,
+        "bar": 45,
+        "barPhase": 0.778
+      },
+      "school": "ABJURATION",
+      "confidence": 0.1
+    },
+    {
+      "word": "the",
+      "startMs": 91602,
+      "endMs": 91872,
+      "beat": {
+        "index": 183,
+        "phase": 0.204,
+        "bar": 45,
+        "barPhase": 0.801
+      },
+      "school": "WILL",
+      "confidence": 0.1
+    },
+    {
+      "word": "bomb",
+      "startMs": 91254,
+      "endMs": 91497,
+      "beat": {
+        "index": 182,
+        "phase": 0.508,
+        "bar": 45,
+        "barPhase": 0.627
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.616
+    },
+    {
+      "word": "Hydrochloric",
+      "startMs": 91556,
+      "endMs": 92197,
+      "beat": {
+        "index": 183,
+        "phase": 0.112,
+        "bar": 45,
+        "barPhase": 0.778
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.457
+    },
+    {
+      "word": "palms,",
+      "startMs": 92252,
+      "endMs": 92538,
+      "beat": {
+        "index": 184,
+        "phase": 0.504,
+        "bar": 46,
+        "barPhase": 0.126
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.583
+    },
+    {
+      "word": "pyro",
+      "startMs": 92618,
+      "endMs": 92938,
+      "beat": {
+        "index": 185,
+        "phase": 0.236,
+        "bar": 46,
+        "barPhase": 0.309
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.522
+    },
+    {
+      "word": "war",
+      "startMs": 92972,
+      "endMs": 93118,
+      "beat": {
+        "index": 185,
+        "phase": 0.944,
+        "bar": 46,
+        "barPhase": 0.486
+      },
+      "school": "DIVINATION",
+      "confidence": 0.356
+    },
+    {
+      "word": "I",
+      "startMs": 93158,
+      "endMs": 93278,
+      "beat": {
+        "index": 186,
+        "phase": 0.316,
+        "bar": 46,
+        "barPhase": 0.579
+      },
+      "school": "SONIC",
+      "confidence": 0.669
+    },
+    {
+      "word": "brought,",
+      "startMs": 93320,
+      "endMs": 93598,
+      "beat": {
+        "index": 186,
+        "phase": 0.64,
+        "bar": 46,
+        "barPhase": 0.66
+      },
+      "school": "DIVINATION",
+      "confidence": 0.381
+    },
+    {
+      "word": "microscopic",
+      "startMs": 93669,
+      "endMs": 94258,
+      "beat": {
+        "index": 187,
+        "phase": 0.338,
+        "bar": 46,
+        "barPhase": 0.8345
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.486
+    },
+    {
+      "word": "harm",
+      "startMs": 94342,
+      "endMs": 94638,
+      "beat": {
+        "index": 188,
+        "phase": 0.684,
+        "bar": 47,
+        "barPhase": 0.171
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.635
+    },
+    {
+      "word": "My",
+      "startMs": 94714,
+      "endMs": 94798,
+      "beat": {
+        "index": 189,
+        "phase": 0.428,
+        "bar": 47,
+        "barPhase": 0.357
+      },
+      "school": "SONIC",
+      "confidence": 0.727
+    },
+    {
+      "word": "demonic",
+      "startMs": 94876,
+      "endMs": 95298,
+      "beat": {
+        "index": 189,
+        "phase": 0.752,
+        "bar": 47,
+        "barPhase": 0.438
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.488
+    },
+    {
+      "word": "arms,",
+      "startMs": 95387,
+      "endMs": 95618,
+      "beat": {
+        "index": 190,
+        "phase": 0.774,
+        "bar": 47,
+        "barPhase": 0.6935
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.327
+    },
+    {
+      "word": "supersonic",
+      "startMs": 95735,
+      "endMs": 96358,
+      "beat": {
+        "index": 191,
+        "phase": 0.47,
+        "bar": 47,
+        "barPhase": 0.8675
+      },
+      "school": "ABJURATION",
+      "confidence": 0.48
+    },
+    {
+      "word": "drawl,",
+      "startMs": 96455,
+      "endMs": 96698,
+      "beat": {
+        "index": 192,
+        "phase": 0.91,
+        "bar": 48,
+        "barPhase": 0.2275
+      },
+      "school": "DIVINATION",
+      "confidence": 0.666
+    },
+    {
+      "word": "YO!",
+      "startMs": 96757,
+      "endMs": 97018,
+      "beat": {
+        "index": 193,
+        "phase": 0.514,
+        "bar": 48,
+        "barPhase": 0.3785
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.669
+    },
+    {
+      "word": "Suicidal",
+      "startMs": 97105,
+      "endMs": 97699,
+      "beat": {
+        "index": 194,
+        "phase": 0.21,
+        "bar": 48,
+        "barPhase": 0.5525
+      },
+      "school": "ABJURATION",
+      "confidence": 0.477
+    },
+    {
+      "word": "brawls,",
+      "startMs": 97779,
+      "endMs": 98039,
+      "beat": {
+        "index": 195,
+        "phase": 0.558,
+        "bar": 48,
+        "barPhase": 0.8895
+      },
+      "school": "DIVINATION",
+      "confidence": 0.644
+    },
+    {
+      "word": "FLOW!",
+      "startMs": 98011,
+      "endMs": 98399,
+      "beat": {
+        "index": 196,
+        "phase": 0.022,
+        "bar": 49,
+        "barPhase": 0.0055
+      },
+      "school": "ABJURATION",
+      "confidence": 0.706
+    },
+    {
+      "word": "EUPHRATES!",
+      "startMs": 98475,
+      "endMs": 99059,
+      "beat": {
+        "index": 196,
+        "phase": 0.95,
+        "bar": 49,
+        "barPhase": 0.2375
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.591
+    },
+    {
+      "word": "Know!",
+      "startMs": 99172,
+      "endMs": 99439,
+      "beat": {
+        "index": 198,
+        "phase": 0.344,
+        "bar": 49,
+        "barPhase": 0.586
+      },
+      "school": "ABJURATION",
+      "confidence": 0.807
+    },
+    {
+      "word": "Hades",
+      "startMs": 99520,
+      "endMs": 99779,
+      "beat": {
+        "index": 199,
+        "phase": 0.04,
+        "bar": 49,
+        "barPhase": 0.76
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.828
+    },
+    {
+      "word": "couldn't",
+      "startMs": 99869,
+      "endMs": 100119,
+      "beat": {
+        "index": 199,
+        "phase": 0.738,
+        "bar": 49,
+        "barPhase": 0.9345
+      },
+      "school": "VOID",
+      "confidence": 0.548
+    },
+    {
+      "word": "catalog",
+      "startMs": 100170,
+      "endMs": 100819,
+      "beat": {
+        "index": 200,
+        "phase": 0.34,
+        "bar": 50,
+        "barPhase": 0.085
+      },
+      "school": "WILL",
+      "confidence": 0.718
+    },
+    {
+      "word": "victims",
+      "startMs": 100913,
+      "endMs": 101179,
+      "beat": {
+        "index": 201,
+        "phase": 0.826,
+        "bar": 50,
+        "barPhase": 0.4565
+      },
+      "school": "SONIC",
+      "confidence": 0.474
+    },
+    {
+      "word": "I've",
+      "startMs": 101239,
+      "endMs": 101379,
+      "beat": {
+        "index": 202,
+        "phase": 0.478,
+        "bar": 50,
+        "barPhase": 0.6195
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.272
+    },
+    {
+      "word": "been",
+      "startMs": 101424,
+      "endMs": 101499,
+      "beat": {
+        "index": 202,
+        "phase": 0.848,
+        "bar": 50,
+        "barPhase": 0.712
+      },
+      "school": "SONIC",
+      "confidence": 0.138
+    },
+    {
+      "word": "sending",
+      "startMs": 101610,
+      "endMs": 101860,
+      "beat": {
+        "index": 203,
+        "phase": 0.22,
+        "bar": 50,
+        "barPhase": 0.805
+      },
+      "school": "WILL",
+      "confidence": 0.497
+    },
+    {
+      "word": "too",
+      "startMs": 101912,
+      "endMs": 102040,
+      "beat": {
+        "index": 203,
+        "phase": 0.824,
+        "bar": 50,
+        "barPhase": 0.956
+      },
+      "school": "ABJURATION",
+      "confidence": 0.896
+    },
+    {
+      "word": "many.",
+      "startMs": 102121,
+      "endMs": 103220,
+      "beat": {
+        "index": 204,
+        "phase": 0.242,
+        "bar": 51,
+        "barPhase": 0.0605
+      },
+      "school": "WILL",
+      "confidence": 0.948
+    },
+    {
+      "word": "WOAH!",
+      "startMs": 103305,
+      "endMs": 103424,
+      "beat": {
+        "index": 206,
+        "phase": 0.61,
+        "bar": 51,
+        "barPhase": 0.6525
+      },
+      "school": "ABJURATION",
+      "confidence": 0.1
+    },
+    {
+      "word": "Labeled",
+      "startMs": 103305,
+      "endMs": 103580,
+      "beat": {
+        "index": 206,
+        "phase": 0.61,
+        "bar": 51,
+        "barPhase": 0.6525
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.606
+    },
+    {
+      "word": "since",
+      "startMs": 103600,
+      "endMs": 103760,
+      "beat": {
+        "index": 207,
+        "phase": 0.2,
+        "bar": 51,
+        "barPhase": 0.8
+      },
+      "school": "SONIC",
+      "confidence": 0.299
+    },
+    {
+      "word": "embryo,",
+      "startMs": 103860,
+      "endMs": 104240,
+      "beat": {
+        "index": 207,
+        "phase": 0.72,
+        "bar": 51,
+        "barPhase": 0.93
+      },
+      "school": "WILL",
+      "confidence": 0.71
+    },
+    {
+      "word": "placenta",
+      "startMs": 104187,
+      "endMs": 104442,
+      "beat": {
+        "index": 208,
+        "phase": 0.374,
+        "bar": 52,
+        "barPhase": 0.0935
+      },
+      "school": "WILL",
+      "confidence": 0.1
+    },
+    {
+      "word": "wrote",
+      "startMs": 104327,
+      "endMs": 104980,
+      "beat": {
+        "index": 208,
+        "phase": 0.654,
+        "bar": 52,
+        "barPhase": 0.1635
+      },
+      "school": "ABJURATION",
+      "confidence": 0.456
+    },
+    {
+      "word": "genetic",
+      "startMs": 105023,
+      "endMs": 105360,
+      "beat": {
+        "index": 210,
+        "phase": 0.046,
+        "bar": 52,
+        "barPhase": 0.5115
+      },
+      "school": "WILL",
+      "confidence": 0.441
+    },
+    {
+      "word": "code",
+      "startMs": 105557,
+      "endMs": 105840,
+      "beat": {
+        "index": 211,
+        "phase": 0.114,
+        "bar": 52,
+        "barPhase": 0.7785
+      },
+      "school": "ABJURATION",
+      "confidence": 0.59
+    },
+    {
+      "word": "Ones",
+      "startMs": 105929,
+      "endMs": 106060,
+      "beat": {
+        "index": 211,
+        "phase": 0.858,
+        "bar": 52,
+        "barPhase": 0.9645
+      },
+      "school": "WILL",
+      "confidence": 0.477
+    },
+    {
+      "word": "and",
+      "startMs": 106068,
+      "endMs": 106200,
+      "beat": {
+        "index": 212,
+        "phase": 0.136,
+        "bar": 53,
+        "barPhase": 0.034
+      },
+      "school": "WILL",
+      "confidence": 0.446
+    },
+    {
+      "word": "zeros",
+      "startMs": 106300,
+      "endMs": 106540,
+      "beat": {
+        "index": 212,
+        "phase": 0.6,
+        "bar": 53,
+        "barPhase": 0.15
+      },
+      "school": "SONIC",
+      "confidence": 0.494
+    },
+    {
+      "word": "codec,",
+      "startMs": 106602,
+      "endMs": 106901,
+      "beat": {
+        "index": 213,
+        "phase": 0.204,
+        "bar": 53,
+        "barPhase": 0.301
+      },
+      "school": "ABJURATION",
+      "confidence": 0.509
+    },
+    {
+      "word": "mastering",
+      "startMs": 106981,
+      "endMs": 107541,
+      "beat": {
+        "index": 213,
+        "phase": 0.962,
+        "bar": 53,
+        "barPhase": 0.4905
+      },
+      "school": "WILL",
+      "confidence": 0.599
+    },
+    {
+      "word": "sound",
+      "startMs": 107647,
+      "endMs": 107881,
+      "beat": {
+        "index": 215,
+        "phase": 0.294,
+        "bar": 53,
+        "barPhase": 0.8235
+      },
+      "school": "DIVINATION",
+      "confidence": 0.67
+    },
+    {
+      "word": "in",
+      "startMs": 107921,
+      "endMs": 108021,
+      "beat": {
+        "index": 215,
+        "phase": 0.842,
+        "bar": 53,
+        "barPhase": 0.9605
+      },
+      "school": "SONIC",
+      "confidence": 0.399
+    },
+    {
+      "word": "stereo",
+      "startMs": 108135,
+      "endMs": 108641,
+      "beat": {
+        "index": 216,
+        "phase": 0.27,
+        "bar": 54,
+        "barPhase": 0.0675
+      },
+      "school": "WILL",
+      "confidence": 0.631
+    },
+    {
+      "word": "Radio",
+      "startMs": 108831,
+      "endMs": 109261,
+      "beat": {
+        "index": 217,
+        "phase": 0.662,
+        "bar": 54,
+        "barPhase": 0.4155
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.816
+    },
+    {
+      "word": "Mysterio,",
+      "startMs": 109342,
+      "endMs": 110001,
+      "beat": {
+        "index": 218,
+        "phase": 0.684,
+        "bar": 54,
+        "barPhase": 0.671
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.617
+    },
+    {
+      "word": "hitting",
+      "startMs": 110062,
+      "endMs": 110281,
+      "beat": {
+        "index": 220,
+        "phase": 0.124,
+        "bar": 55,
+        "barPhase": 0.031
+      },
+      "school": "SONIC",
+      "confidence": 0.314
+    },
+    {
+      "word": "targets,",
+      "startMs": 110387,
+      "endMs": 110681,
+      "beat": {
+        "index": 220,
+        "phase": 0.774,
+        "bar": 55,
+        "barPhase": 0.1935
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.588
+    },
+    {
+      "word": "Brady",
+      "startMs": 110875,
+      "endMs": 111161,
+      "beat": {
+        "index": 221,
+        "phase": 0.75,
+        "bar": 55,
+        "barPhase": 0.4375
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.584
+    },
+    {
+      "word": "throw",
+      "startMs": 111246,
+      "endMs": 111422,
+      "beat": {
+        "index": 222,
+        "phase": 0.492,
+        "bar": 55,
+        "barPhase": 0.623
+      },
+      "school": "ABJURATION",
+      "confidence": 0.606
+    },
+    {
+      "word": "Plato",
+      "startMs": 111571,
+      "endMs": 111882,
+      "beat": {
+        "index": 223,
+        "phase": 0.142,
+        "bar": 55,
+        "barPhase": 0.7855
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.401
+    },
+    {
+      "word": "knows",
+      "startMs": 111902,
+      "endMs": 112202,
+      "beat": {
+        "index": 223,
+        "phase": 0.804,
+        "bar": 55,
+        "barPhase": 0.951
+      },
+      "school": "ABJURATION",
+      "confidence": 0.599
+    },
+    {
+      "word": "my",
+      "startMs": 112268,
+      "endMs": 112402,
+      "beat": {
+        "index": 224,
+        "phase": 0.536,
+        "bar": 56,
+        "barPhase": 0.134
+      },
+      "school": "SONIC",
+      "confidence": 0.611
+    },
+    {
+      "word": "philosophy",
+      "startMs": 112422,
+      "endMs": 113082,
+      "beat": {
+        "index": 224,
+        "phase": 0.844,
+        "bar": 56,
+        "barPhase": 0.211
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.33
+    },
+    {
+      "word": "enslaves",
+      "startMs": 113086,
+      "endMs": 113286,
+      "beat": {
+        "index": 226,
+        "phase": 0.172,
+        "bar": 56,
+        "barPhase": 0.543
+      },
+      "school": "WILL",
+      "confidence": 0.1
+    },
+    {
+      "word": "the",
+      "startMs": 113313,
+      "endMs": 113470,
+      "beat": {
+        "index": 226,
+        "phase": 0.626,
+        "bar": 56,
+        "barPhase": 0.6565
+      },
+      "school": "WILL",
+      "confidence": 0.1
+    },
+    {
+      "word": "data",
+      "startMs": 113499,
+      "endMs": 113635,
+      "beat": {
+        "index": 226,
+        "phase": 0.998,
+        "bar": 56,
+        "barPhase": 0.7495
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.1
+    },
+    {
+      "word": "whole",
+      "startMs": 113661,
+      "endMs": 113784,
+      "beat": {
+        "index": 227,
+        "phase": 0.322,
+        "bar": 56,
+        "barPhase": 0.8305
+      },
+      "school": "ABJURATION",
+      "confidence": 0.1
+    },
+    {
+      "word": "Kratos",
+      "startMs": 113661,
+      "endMs": 113917,
+      "beat": {
+        "index": 227,
+        "phase": 0.322,
+        "bar": 56,
+        "barPhase": 0.8305
+      },
+      "school": "WILL",
+      "confidence": 0.1
+    },
+    {
+      "word": "with",
+      "startMs": 113122,
+      "endMs": 113422,
+      "beat": {
+        "index": 226,
+        "phase": 0.244,
+        "bar": 56,
+        "barPhase": 0.561
+      },
+      "school": "SONIC",
+      "confidence": 0.365
+    },
+    {
+      "word": "the",
+      "startMs": 113499,
+      "endMs": 113582,
+      "beat": {
+        "index": 226,
+        "phase": 0.998,
+        "bar": 56,
+        "barPhase": 0.7495
+      },
+      "school": "WILL",
+      "confidence": 0.474
+    },
+    {
+      "word": "Blades,",
+      "startMs": 113661,
+      "endMs": 113762,
+      "beat": {
+        "index": 227,
+        "phase": 0.322,
+        "bar": 56,
+        "barPhase": 0.8305
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.321
+    },
+    {
+      "word": "Pathos",
+      "startMs": 115008,
+      "endMs": 115667,
+      "beat": {
+        "index": 230,
+        "phase": 0.016,
+        "bar": 57,
+        "barPhase": 0.504
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.546
+    },
+    {
+      "word": "getting",
+      "startMs": 115687,
+      "endMs": 115968,
+      "beat": {
+        "index": 231,
+        "phase": 0.374,
+        "bar": 57,
+        "barPhase": 0.8435
+      },
+      "school": "WILL",
+      "confidence": 0.539
+    },
+    {
+      "word": "slayed",
+      "startMs": 116008,
+      "endMs": 116348,
+      "beat": {
+        "index": 232,
+        "phase": 0.016,
+        "bar": 58,
+        "barPhase": 0.004
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.578
+    },
+    {
+      "word": "chaos",
+      "startMs": 116401,
+      "endMs": 116708,
+      "beat": {
+        "index": 232,
+        "phase": 0.802,
+        "bar": 58,
+        "barPhase": 0.2005
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.406
+    },
+    {
+      "word": "in",
+      "startMs": 116773,
+      "endMs": 116868,
+      "beat": {
+        "index": 233,
+        "phase": 0.546,
+        "bar": 58,
+        "barPhase": 0.3865
+      },
+      "school": "SONIC",
+      "confidence": 0.576
+    },
+    {
+      "word": "the",
+      "startMs": 116935,
+      "endMs": 117008,
+      "beat": {
+        "index": 233,
+        "phase": 0.87,
+        "bar": 58,
+        "barPhase": 0.4675
+      },
+      "school": "WILL",
+      "confidence": 0.631
+    },
+    {
+      "word": "veins,",
+      "startMs": 117098,
+      "endMs": 117348,
+      "beat": {
+        "index": 234,
+        "phase": 0.196,
+        "bar": 58,
+        "barPhase": 0.549
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.461
+    },
+    {
+      "word": "Macrocosm",
+      "startMs": 117469,
+      "endMs": 118049,
+      "beat": {
+        "index": 234,
+        "phase": 0.938,
+        "bar": 58,
+        "barPhase": 0.7345
+      },
+      "school": "WILL",
+      "confidence": 0.552
+    },
+    {
+      "word": "shattered",
+      "startMs": 118166,
+      "endMs": 118429,
+      "beat": {
+        "index": 236,
+        "phase": 0.332,
+        "bar": 59,
+        "barPhase": 0.083
+      },
+      "school": "WILL",
+      "confidence": 0.438
+    },
+    {
+      "word": "like",
+      "startMs": 118491,
+      "endMs": 118609,
+      "beat": {
+        "index": 236,
+        "phase": 0.982,
+        "bar": 59,
+        "barPhase": 0.2455
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.224
+    },
+    {
+      "word": "a",
+      "startMs": 118653,
+      "endMs": 118789,
+      "beat": {
+        "index": 237,
+        "phase": 0.306,
+        "bar": 59,
+        "barPhase": 0.3265
+      },
+      "school": "WILL",
+      "confidence": 0.637
+    },
+    {
+      "word": "dinner",
+      "startMs": 118816,
+      "endMs": 119109,
+      "beat": {
+        "index": 237,
+        "phase": 0.632,
+        "bar": 59,
+        "barPhase": 0.408
+      },
+      "school": "SONIC",
+      "confidence": 0.494
+    },
+    {
+      "word": "plate",
+      "startMs": 119164,
+      "endMs": 119430,
+      "beat": {
+        "index": 238,
+        "phase": 0.328,
+        "bar": 59,
+        "barPhase": 0.582
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.505
+    },
+    {
+      "word": "Incinerate",
+      "startMs": 119536,
+      "endMs": 120170,
+      "beat": {
+        "index": 239,
+        "phase": 0.072,
+        "bar": 59,
+        "barPhase": 0.768
+      },
+      "school": "SONIC",
+      "confidence": 0.528
+    },
+    {
+      "word": "rappers,",
+      "startMs": 120209,
+      "endMs": 120530,
+      "beat": {
+        "index": 240,
+        "phase": 0.418,
+        "bar": 60,
+        "barPhase": 0.1045
+      },
+      "school": "WILL",
+      "confidence": 0.471
+    },
+    {
+      "word": "I'm",
+      "startMs": 120558,
+      "endMs": 120710,
+      "beat": {
+        "index": 241,
+        "phase": 0.116,
+        "bar": 60,
+        "barPhase": 0.279
+      },
+      "school": "SONIC",
+      "confidence": 0.17
+    },
+    {
+      "word": "on",
+      "startMs": 120766,
+      "endMs": 120890,
+      "beat": {
+        "index": 241,
+        "phase": 0.532,
+        "bar": 60,
+        "barPhase": 0.383
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.666
+    },
+    {
+      "word": "a",
+      "startMs": 120929,
+      "endMs": 121031,
+      "beat": {
+        "index": 241,
+        "phase": 0.858,
+        "bar": 60,
+        "barPhase": 0.4645
+      },
+      "school": "WILL",
+      "confidence": 0.485
+    },
+    {
+      "word": "different",
+      "startMs": 121092,
+      "endMs": 121391,
+      "beat": {
+        "index": 242,
+        "phase": 0.184,
+        "bar": 60,
+        "barPhase": 0.546
+      },
+      "school": "SONIC",
+      "confidence": 0.386
+    },
+    {
+      "word": "stage",
+      "startMs": 121417,
+      "endMs": 121751,
+      "beat": {
+        "index": 242,
+        "phase": 0.834,
+        "bar": 60,
+        "barPhase": 0.7085
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.531
+    },
+    {
+      "word": "I",
+      "startMs": 121927,
+      "endMs": 122051,
+      "beat": {
+        "index": 243,
+        "phase": 0.854,
+        "bar": 60,
+        "barPhase": 0.9635
+      },
+      "school": "SONIC",
+      "confidence": 0.596
+    },
+    {
+      "word": "could",
+      "startMs": 122113,
+      "endMs": 122211,
+      "beat": {
+        "index": 244,
+        "phase": 0.226,
+        "bar": 61,
+        "barPhase": 0.0565
+      },
+      "school": "VOID",
+      "confidence": 0.158
+    },
+    {
+      "word": "lift",
+      "startMs": 122276,
+      "endMs": 122371,
+      "beat": {
+        "index": 244,
+        "phase": 0.552,
+        "bar": 61,
+        "barPhase": 0.138
+      },
+      "school": "SONIC",
+      "confidence": 0.298
+    },
+    {
+      "word": "Galactus",
+      "startMs": 122438,
+      "endMs": 122912,
+      "beat": {
+        "index": 244,
+        "phase": 0.876,
+        "bar": 61,
+        "barPhase": 0.219
+      },
+      "school": "WILL",
+      "confidence": 0.338
+    },
+    {
+      "word": "and",
+      "startMs": 122996,
+      "endMs": 123072,
+      "beat": {
+        "index": 245,
+        "phase": 0.992,
+        "bar": 61,
+        "barPhase": 0.498
+      },
+      "school": "WILL",
+      "confidence": 0.365
+    },
+    {
+      "word": "stare",
+      "startMs": 122996,
+      "endMs": 123312,
+      "beat": {
+        "index": 245,
+        "phase": 0.992,
+        "bar": 61,
+        "barPhase": 0.498
+      },
+      "school": "WILL",
+      "confidence": 0.406
+    },
+    {
+      "word": "and",
+      "startMs": 123321,
+      "endMs": 123452,
+      "beat": {
+        "index": 246,
+        "phase": 0.642,
+        "bar": 61,
+        "barPhase": 0.6605
+      },
+      "school": "WILL",
+      "confidence": 0.184
+    },
+    {
+      "word": "make",
+      "startMs": 123530,
+      "endMs": 123632,
+      "beat": {
+        "index": 247,
+        "phase": 0.06,
+        "bar": 61,
+        "barPhase": 0.765
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.366
+    },
+    {
+      "word": "him",
+      "startMs": 123669,
+      "endMs": 123834,
+      "beat": {
+        "index": 247,
+        "phase": 0.338,
+        "bar": 61,
+        "barPhase": 0.8345
+      },
+      "school": "SONIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "admit",
+      "startMs": 123669,
+      "endMs": 124092,
+      "beat": {
+        "index": 247,
+        "phase": 0.338,
+        "bar": 61,
+        "barPhase": 0.8345
+      },
+      "school": "SONIC",
+      "confidence": 0.443
+    },
+    {
+      "word": "mistakes",
+      "startMs": 124180,
+      "endMs": 124613,
+      "beat": {
+        "index": 248,
+        "phase": 0.36,
+        "bar": 62,
+        "barPhase": 0.09
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.425
+    },
+    {
+      "word": "I'm",
+      "startMs": 124691,
+      "endMs": 124813,
+      "beat": {
+        "index": 249,
+        "phase": 0.382,
+        "bar": 62,
+        "barPhase": 0.3455
+      },
+      "school": "SONIC",
+      "confidence": 0.303
+    },
+    {
+      "word": "the",
+      "startMs": 124853,
+      "endMs": 124993,
+      "beat": {
+        "index": 249,
+        "phase": 0.706,
+        "bar": 62,
+        "barPhase": 0.4265
+      },
+      "school": "WILL",
+      "confidence": 0.458
+    },
+    {
+      "word": "fucking",
+      "startMs": 125039,
+      "endMs": 125333,
+      "beat": {
+        "index": 250,
+        "phase": 0.078,
+        "bar": 62,
+        "barPhase": 0.5195
+      },
+      "school": "WILL",
+      "confidence": 0.509
+    },
+    {
+      "word": "phantom",
+      "startMs": 125364,
+      "endMs": 125673,
+      "beat": {
+        "index": 250,
+        "phase": 0.728,
+        "bar": 62,
+        "barPhase": 0.682
+      },
+      "school": "WILL",
+      "confidence": 0.565
+    },
+    {
+      "word": "of",
+      "startMs": 125736,
+      "endMs": 125833,
+      "beat": {
+        "index": 251,
+        "phase": 0.472,
+        "bar": 62,
+        "barPhase": 0.868
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.577
+    },
+    {
+      "word": "fear,",
+      "startMs": 125945,
+      "endMs": 126133,
+      "beat": {
+        "index": 251,
+        "phase": 0.89,
+        "bar": 62,
+        "barPhase": 0.9725
+      },
+      "school": "SONIC",
+      "confidence": 0.565
+    },
+    {
+      "word": "and",
+      "startMs": 126293,
+      "endMs": 126394,
+      "beat": {
+        "index": 252,
+        "phase": 0.586,
+        "bar": 63,
+        "barPhase": 0.1465
+      },
+      "school": "WILL",
+      "confidence": 0.659
+    },
+    {
+      "word": "I",
+      "startMs": 126432,
+      "endMs": 126554,
+      "beat": {
+        "index": 252,
+        "phase": 0.864,
+        "bar": 63,
+        "barPhase": 0.216
+      },
+      "school": "SONIC",
+      "confidence": 0.619
+    },
+    {
+      "word": "accept",
+      "startMs": 126594,
+      "endMs": 126854,
+      "beat": {
+        "index": 253,
+        "phase": 0.188,
+        "bar": 63,
+        "barPhase": 0.297
+      },
+      "school": "WILL",
+      "confidence": 0.288
+    },
+    {
+      "word": "my",
+      "startMs": 126943,
+      "endMs": 127074,
+      "beat": {
+        "index": 253,
+        "phase": 0.886,
+        "bar": 63,
+        "barPhase": 0.4715
+      },
+      "school": "SONIC",
+      "confidence": 0.692
+    },
+    {
+      "word": "place",
+      "startMs": 127106,
+      "endMs": 127374,
+      "beat": {
+        "index": 254,
+        "phase": 0.212,
+        "bar": 63,
+        "barPhase": 0.553
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.482
+    },
+    {
+      "word": "I'm",
+      "startMs": 127454,
+      "endMs": 127634,
+      "beat": {
+        "index": 254,
+        "phase": 0.908,
+        "bar": 63,
+        "barPhase": 0.727
+      },
+      "school": "SONIC",
+      "confidence": 0.302
+    },
+    {
+      "word": "the",
+      "startMs": 127616,
+      "endMs": 127754,
+      "beat": {
+        "index": 255,
+        "phase": 0.232,
+        "bar": 63,
+        "barPhase": 0.808
+      },
+      "school": "WILL",
+      "confidence": 0.262
+    },
+    {
+      "word": "Alucard",
+      "startMs": 127802,
+      "endMs": 128315,
+      "beat": {
+        "index": 255,
+        "phase": 0.604,
+        "bar": 63,
+        "barPhase": 0.901
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.601
+    },
+    {
+      "word": "of",
+      "startMs": 128355,
+      "endMs": 128435,
+      "beat": {
+        "index": 256,
+        "phase": 0.71,
+        "bar": 64,
+        "barPhase": 0.1775
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.36
+    },
+    {
+      "word": "suffering,",
+      "startMs": 128522,
+      "endMs": 128975,
+      "beat": {
+        "index": 257,
+        "phase": 0.044,
+        "bar": 64,
+        "barPhase": 0.261
+      },
+      "school": "WILL",
+      "confidence": 0.672
+    },
+    {
+      "word": "yet",
+      "startMs": 129033,
+      "endMs": 129155,
+      "beat": {
+        "index": 258,
+        "phase": 0.066,
+        "bar": 64,
+        "barPhase": 0.5165
+      },
+      "school": "WILL",
+      "confidence": 0.548
+    },
+    {
+      "word": "I",
+      "startMs": 129195,
+      "endMs": 129295,
+      "beat": {
+        "index": 258,
+        "phase": 0.39,
+        "bar": 64,
+        "barPhase": 0.5975
+      },
+      "school": "SONIC",
+      "confidence": 0.562
+    },
+    {
+      "word": "refuse",
+      "startMs": 129358,
+      "endMs": 129796,
+      "beat": {
+        "index": 258,
+        "phase": 0.716,
+        "bar": 64,
+        "barPhase": 0.679
+      },
+      "school": "ABJURATION",
+      "confidence": 0.702
+    },
+    {
+      "word": "to",
+      "startMs": 129845,
+      "endMs": 129956,
+      "beat": {
+        "index": 259,
+        "phase": 0.69,
+        "bar": 64,
+        "barPhase": 0.9225
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.594
+    },
+    {
+      "word": "take...",
+      "startMs": 130078,
+      "endMs": 130316,
+      "beat": {
+        "index": 260,
+        "phase": 0.156,
+        "bar": 65,
+        "barPhase": 0.039
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.532
+    },
+    {
+      "word": "I",
+      "startMs": 131889,
+      "endMs": 132037,
+      "beat": {
+        "index": 263,
+        "phase": 0.778,
+        "bar": 65,
+        "barPhase": 0.9445
+      },
+      "school": "SONIC",
+      "confidence": 0.753
+    },
+    {
+      "word": "SNATCH!!!!",
+      "startMs": 132121,
+      "endMs": 133698,
+      "beat": {
+        "index": 264,
+        "phase": 0.242,
+        "bar": 66,
+        "barPhase": 0.0605
+      },
+      "school": "WILL",
+      "confidence": 0.531
+    },
+    {
+      "word": "Mortician",
+      "startMs": 133998,
+      "endMs": 134638,
+      "beat": {
+        "index": 267,
+        "phase": 0.996,
+        "bar": 66,
+        "barPhase": 0.999
+      },
+      "school": "SONIC",
+      "confidence": 0.56
+    },
+    {
+      "word": "Mic,",
+      "startMs": 134698,
+      "endMs": 134939,
+      "beat": {
+        "index": 269,
+        "phase": 0.396,
+        "bar": 67,
+        "barPhase": 0.349
+      },
+      "school": "SONIC",
+      "confidence": 0.49
+    },
+    {
+      "word": "Daydreaming",
+      "startMs": 135024,
+      "endMs": 136439,
+      "beat": {
+        "index": 270,
+        "phase": 0.048,
+        "bar": 67,
+        "barPhase": 0.512
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.578
+    },
+    {
+      "word": "Nightmares",
+      "startMs": 136394,
+      "endMs": 137860,
+      "beat": {
+        "index": 272,
+        "phase": 0.788,
+        "bar": 68,
+        "barPhase": 0.197
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.519
+    },
+    {
+      "word": "Mortician",
+      "startMs": 137787,
+      "endMs": 138541,
+      "beat": {
+        "index": 275,
+        "phase": 0.574,
+        "bar": 68,
+        "barPhase": 0.8935
+      },
+      "school": "SONIC",
+      "confidence": 0.601
+    },
+    {
+      "word": "Mic,",
+      "startMs": 138483,
+      "endMs": 138767,
+      "beat": {
+        "index": 276,
+        "phase": 0.966,
+        "bar": 69,
+        "barPhase": 0.2415
+      },
+      "school": "SONIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "Daydreaming",
+      "startMs": 138770,
+      "endMs": 138970,
+      "beat": {
+        "index": 277,
+        "phase": 0.54,
+        "bar": 69,
+        "barPhase": 0.385
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.1
+    },
+    {
+      "word": "Nightmares",
+      "startMs": 138953,
+      "endMs": 139153,
+      "beat": {
+        "index": 277,
+        "phase": 0.906,
+        "bar": 69,
+        "barPhase": 0.4765
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "Forfeit",
+      "startMs": 139157,
+      "endMs": 139318,
+      "beat": {
+        "index": 278,
+        "phase": 0.314,
+        "bar": 69,
+        "barPhase": 0.5785
+      },
+      "school": "DIVINATION",
+      "confidence": 0.1
+    },
+    {
+      "word": "the",
+      "startMs": 139266,
+      "endMs": 139466,
+      "beat": {
+        "index": 278,
+        "phase": 0.532,
+        "bar": 69,
+        "barPhase": 0.633
+      },
+      "school": "WILL",
+      "confidence": 0.1
+    },
+    {
+      "word": "fight",
+      "startMs": 139400,
+      "endMs": 139600,
+      "beat": {
+        "index": 278,
+        "phase": 0.8,
+        "bar": 69,
+        "barPhase": 0.7
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "and",
+      "startMs": 138801,
+      "endMs": 139301,
+      "beat": {
+        "index": 277,
+        "phase": 0.602,
+        "bar": 69,
+        "barPhase": 0.4005
+      },
+      "school": "WILL",
+      "confidence": 0.599
+    },
+    {
+      "word": "I'm",
+      "startMs": 139421,
+      "endMs": 140182,
+      "beat": {
+        "index": 278,
+        "phase": 0.842,
+        "bar": 69,
+        "barPhase": 0.7105
+      },
+      "school": "SONIC",
+      "confidence": 0.582
+    },
+    {
+      "word": "standing",
+      "startMs": 140225,
+      "endMs": 140742,
+      "beat": {
+        "index": 280,
+        "phase": 0.45,
+        "bar": 70,
+        "barPhase": 0.1125
+      },
+      "school": "WILL",
+      "confidence": 0.732
+    },
+    {
+      "word": "right",
+      "startMs": 145690,
+      "endMs": 145970,
+      "beat": {
+        "index": 291,
+        "phase": 0.38,
+        "bar": 72,
+        "barPhase": 0.845
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.635
+    },
+    {
+      "word": "there",
+      "startMs": 146053,
+      "endMs": 146391,
+      "beat": {
+        "index": 292,
+        "phase": 0.106,
+        "bar": 73,
+        "barPhase": 0.0265
+      },
+      "school": "WILL",
+      "confidence": 0.631
+    },
+    {
+      "word": "Injecting",
+      "startMs": 146587,
+      "endMs": 147032,
+      "beat": {
+        "index": 293,
+        "phase": 0.174,
+        "bar": 73,
+        "barPhase": 0.2935
+      },
+      "school": "WILL",
+      "confidence": 0.532
+    },
+    {
+      "word": "hatred",
+      "startMs": 147092,
+      "endMs": 147553,
+      "beat": {
+        "index": 294,
+        "phase": 0.184,
+        "bar": 73,
+        "barPhase": 0.546
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.515
+    },
+    {
+      "word": "and",
+      "startMs": 147613,
+      "endMs": 147713,
+      "beat": {
+        "index": 295,
+        "phase": 0.226,
+        "bar": 73,
+        "barPhase": 0.8065
+      },
+      "school": "WILL",
+      "confidence": 0.535
+    },
+    {
+      "word": "rage",
+      "startMs": 147795,
+      "endMs": 148074,
+      "beat": {
+        "index": 295,
+        "phase": 0.59,
+        "bar": 73,
+        "barPhase": 0.8975
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.586
+    },
+    {
+      "word": "in",
+      "startMs": 148120,
+      "endMs": 148234,
+      "beat": {
+        "index": 296,
+        "phase": 0.24,
+        "bar": 74,
+        "barPhase": 0.06
+      },
+      "school": "SONIC",
+      "confidence": 0.296
+    },
+    {
+      "word": "your",
+      "startMs": 148305,
+      "endMs": 148374,
+      "beat": {
+        "index": 296,
+        "phase": 0.61,
+        "bar": 74,
+        "barPhase": 0.1525
+      },
+      "school": "DIVINATION",
+      "confidence": 0.242
+    },
+    {
+      "word": "fine",
+      "startMs": 148491,
+      "endMs": 148735,
+      "beat": {
+        "index": 296,
+        "phase": 0.982,
+        "bar": 74,
+        "barPhase": 0.2455
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.654
+    },
+    {
+      "word": "tears.",
+      "startMs": 148816,
+      "endMs": 149196,
+      "beat": {
+        "index": 297,
+        "phase": 0.632,
+        "bar": 74,
+        "barPhase": 0.408
+      },
+      "school": "WILL",
+      "confidence": 0.612
+    },
+    {
+      "word": "Daydreaming",
+      "startMs": 149164,
+      "endMs": 149404,
+      "beat": {
+        "index": 298,
+        "phase": 0.328,
+        "bar": 74,
+        "barPhase": 0.582
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.1
+    },
+    {
+      "word": "Nightmares.",
+      "startMs": 149350,
+      "endMs": 149591,
+      "beat": {
+        "index": 298,
+        "phase": 0.7,
+        "bar": 74,
+        "barPhase": 0.675
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "Daydreaming",
+      "startMs": 149513,
+      "endMs": 149760,
+      "beat": {
+        "index": 299,
+        "phase": 0.026,
+        "bar": 74,
+        "barPhase": 0.7565
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.1
+    },
+    {
+      "word": "Nightmares.",
+      "startMs": 149675,
+      "endMs": 149911,
+      "beat": {
+        "index": 299,
+        "phase": 0.35,
+        "bar": 74,
+        "barPhase": 0.8375
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "Nightmares.",
+      "startMs": 149861,
+      "endMs": 150048,
+      "beat": {
+        "index": 299,
+        "phase": 0.722,
+        "bar": 74,
+        "barPhase": 0.9305
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "NIGHTMARES!!!!",
+      "startMs": 150024,
+      "endMs": 150171,
+      "beat": {
+        "index": 300,
+        "phase": 0.048,
+        "bar": 75,
+        "barPhase": 0.012
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "(Mortician",
+      "startMs": 150024,
+      "endMs": 150281,
+      "beat": {
+        "index": 300,
+        "phase": 0.048,
+        "bar": 75,
+        "barPhase": 0.012
+      },
+      "school": "SONIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "Mic,",
+      "startMs": 150209,
+      "endMs": 150381,
+      "beat": {
+        "index": 300,
+        "phase": 0.418,
+        "bar": 75,
+        "barPhase": 0.1045
+      },
+      "school": "SONIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "Daydreaming",
+      "startMs": 149350,
+      "endMs": 149637,
+      "beat": {
+        "index": 298,
+        "phase": 0.7,
+        "bar": 74,
+        "barPhase": 0.675
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.709
+    },
+    {
+      "word": "Nightmares",
+      "startMs": 149675,
+      "endMs": 149997,
+      "beat": {
+        "index": 299,
+        "phase": 0.35,
+        "bar": 74,
+        "barPhase": 0.8375
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.254
+    },
+    {
+      "word": "Nightmares....)",
+      "startMs": 150024,
+      "endMs": 150498,
+      "beat": {
+        "index": 300,
+        "phase": 0.048,
+        "bar": 75,
+        "barPhase": 0.012
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.376
+    },
+    {
+      "word": "(Mortician",
+      "startMs": 150558,
+      "endMs": 150700,
+      "beat": {
+        "index": 301,
+        "phase": 0.116,
+        "bar": 75,
+        "barPhase": 0.279
+      },
+      "school": "SONIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "Mic,",
+      "startMs": 150682,
+      "endMs": 150882,
+      "beat": {
+        "index": 301,
+        "phase": 0.364,
+        "bar": 75,
+        "barPhase": 0.341
+      },
+      "school": "SONIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "Daydreaming",
+      "startMs": 150558,
+      "endMs": 150799,
+      "beat": {
+        "index": 301,
+        "phase": 0.116,
+        "bar": 75,
+        "barPhase": 0.279
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.782
+    },
+    {
+      "word": "Nightmares",
+      "startMs": 150906,
+      "endMs": 151480,
+      "beat": {
+        "index": 301,
+        "phase": 0.812,
+        "bar": 75,
+        "barPhase": 0.453
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.828
+    },
+    {
+      "word": "Nightmares....)",
+      "startMs": 151603,
+      "endMs": 152221,
+      "beat": {
+        "index": 303,
+        "phase": 0.206,
+        "bar": 75,
+        "barPhase": 0.8015
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.652
+    },
+    {
+      "word": "Smiles",
+      "startMs": 181440,
+      "endMs": 182523,
+      "beat": {
+        "index": 362,
+        "phase": 0.88,
+        "bar": 90,
+        "barPhase": 0.72
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.609
+    },
+    {
+      "word": "never",
+      "startMs": 182624,
+      "endMs": 183204,
+      "beat": {
+        "index": 365,
+        "phase": 0.248,
+        "bar": 91,
+        "barPhase": 0.312
+      },
+      "school": "WILL",
+      "confidence": 0.863
+    },
+    {
+      "word": "last",
+      "startMs": 183298,
+      "endMs": 183944,
+      "beat": {
+        "index": 366,
+        "phase": 0.596,
+        "bar": 91,
+        "barPhase": 0.649
+      },
+      "school": "WILL",
+      "confidence": 0.812
+    },
+    {
+      "word": "Suffering's",
+      "startMs": 184484,
+      "endMs": 185024,
+      "beat": {
+        "index": 368,
+        "phase": 0.968,
+        "bar": 92,
+        "barPhase": 0.242
+      },
+      "school": "WILL",
+      "confidence": 0.804
+    },
+    {
+      "word": "evergreen.",
+      "startMs": 185016,
+      "endMs": 185725,
+      "beat": {
+        "index": 370,
+        "phase": 0.032,
+        "bar": 92,
+        "barPhase": 0.508
+      },
+      "school": "WILL",
+      "confidence": 0.624
+    },
+    {
+      "word": "I",
+      "startMs": 185736,
+      "endMs": 185885,
+      "beat": {
+        "index": 371,
+        "phase": 0.472,
+        "bar": 92,
+        "barPhase": 0.868
+      },
+      "school": "SONIC",
+      "confidence": 0.563
+    },
+    {
+      "word": "wonder",
+      "startMs": 185922,
+      "endMs": 186345,
+      "beat": {
+        "index": 371,
+        "phase": 0.844,
+        "bar": 92,
+        "barPhase": 0.961
+      },
+      "school": "WILL",
+      "confidence": 0.867
+    },
+    {
+      "word": "if",
+      "startMs": 186409,
+      "endMs": 186505,
+      "beat": {
+        "index": 372,
+        "phase": 0.818,
+        "bar": 93,
+        "barPhase": 0.2045
+      },
+      "school": "SONIC",
+      "confidence": 0.507
+    },
+    {
+      "word": "she",
+      "startMs": 186595,
+      "endMs": 186685,
+      "beat": {
+        "index": 373,
+        "phase": 0.19,
+        "bar": 93,
+        "barPhase": 0.2975
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.776
+    },
+    {
+      "word": "thinks",
+      "startMs": 186758,
+      "endMs": 186925,
+      "beat": {
+        "index": 373,
+        "phase": 0.516,
+        "bar": 93,
+        "barPhase": 0.379
+      },
+      "school": "SONIC",
+      "confidence": 0.505
+    },
+    {
+      "word": "about",
+      "startMs": 186990,
+      "endMs": 187365,
+      "beat": {
+        "index": 373,
+        "phase": 0.98,
+        "bar": 93,
+        "barPhase": 0.495
+      },
+      "school": "DIVINATION",
+      "confidence": 0.824
+    },
+    {
+      "word": "me",
+      "startMs": 187454,
+      "endMs": 187745,
+      "beat": {
+        "index": 374,
+        "phase": 0.908,
+        "bar": 93,
+        "barPhase": 0.727
+      },
+      "school": "WILL",
+      "confidence": 0.943
+    },
+    {
+      "word": "as",
+      "startMs": 187779,
+      "endMs": 187905,
+      "beat": {
+        "index": 375,
+        "phase": 0.558,
+        "bar": 93,
+        "barPhase": 0.8895
+      },
+      "school": "WILL",
+      "confidence": 0.895
+    },
+    {
+      "word": "much",
+      "startMs": 188005,
+      "endMs": 188265,
+      "beat": {
+        "index": 376,
+        "phase": 0.01,
+        "bar": 94,
+        "barPhase": 0.0025
+      },
+      "school": "WILL",
+      "confidence": 0.93
+    },
+    {
+      "word": "as",
+      "startMs": 188313,
+      "endMs": 188445,
+      "beat": {
+        "index": 376,
+        "phase": 0.626,
+        "bar": 94,
+        "barPhase": 0.1565
+      },
+      "school": "WILL",
+      "confidence": 0.937
+    },
+    {
+      "word": "I",
+      "startMs": 188662,
+      "endMs": 188726,
+      "beat": {
+        "index": 377,
+        "phase": 0.324,
+        "bar": 94,
+        "barPhase": 0.331
+      },
+      "school": "SONIC",
+      "confidence": 0.92
+    },
+    {
+      "word": "think",
+      "startMs": 188786,
+      "endMs": 189126,
+      "beat": {
+        "index": 377,
+        "phase": 0.572,
+        "bar": 94,
+        "barPhase": 0.393
+      },
+      "school": "SONIC",
+      "confidence": 0.792
+    },
+    {
+      "word": "about",
+      "startMs": 189196,
+      "endMs": 189806,
+      "beat": {
+        "index": 378,
+        "phase": 0.392,
+        "bar": 94,
+        "barPhase": 0.598
+      },
+      "school": "DIVINATION",
+      "confidence": 0.686
+    },
+    {
+      "word": "her",
+      "startMs": 189869,
+      "endMs": 192807,
+      "beat": {
+        "index": 379,
+        "phase": 0.738,
+        "bar": 94,
+        "barPhase": 0.9345
+      },
+      "school": "SONIC",
+      "confidence": 0.809
+    },
+    {
+      "word": "Smiles",
+      "startMs": 192818,
+      "endMs": 193567,
+      "beat": {
+        "index": 385,
+        "phase": 0.636,
+        "bar": 96,
+        "barPhase": 0.409
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.857
+    },
+    {
+      "word": "never",
+      "startMs": 193654,
+      "endMs": 194307,
+      "beat": {
+        "index": 387,
+        "phase": 0.308,
+        "bar": 96,
+        "barPhase": 0.827
+      },
+      "school": "WILL",
+      "confidence": 0.789
+    },
+    {
+      "word": "last",
+      "startMs": 194351,
+      "endMs": 195028,
+      "beat": {
+        "index": 388,
+        "phase": 0.702,
+        "bar": 97,
+        "barPhase": 0.1755
+      },
+      "school": "WILL",
+      "confidence": 0.822
+    },
+    {
+      "word": "Suffering's",
+      "startMs": 195558,
+      "endMs": 196048,
+      "beat": {
+        "index": 391,
+        "phase": 0.116,
+        "bar": 97,
+        "barPhase": 0.779
+      },
+      "school": "WILL",
+      "confidence": 0.778
+    },
+    {
+      "word": "Evergreen",
+      "startMs": 196069,
+      "endMs": 196748,
+      "beat": {
+        "index": 392,
+        "phase": 0.138,
+        "bar": 98,
+        "barPhase": 0.0345
+      },
+      "school": "WILL",
+      "confidence": 0.692
+    },
+    {
+      "word": "and",
+      "startMs": 196765,
+      "endMs": 196888,
+      "beat": {
+        "index": 393,
+        "phase": 0.53,
+        "bar": 98,
+        "barPhase": 0.3825
+      },
+      "school": "WILL",
+      "confidence": 0.842
+    },
+    {
+      "word": "I",
+      "startMs": 196928,
+      "endMs": 197008,
+      "beat": {
+        "index": 393,
+        "phase": 0.856,
+        "bar": 98,
+        "barPhase": 0.464
+      },
+      "school": "SONIC",
+      "confidence": 0.858
+    },
+    {
+      "word": "can't",
+      "startMs": 197090,
+      "endMs": 197428,
+      "beat": {
+        "index": 394,
+        "phase": 0.18,
+        "bar": 98,
+        "barPhase": 0.545
+      },
+      "school": "WILL",
+      "confidence": 0.706
+    },
+    {
+      "word": "even",
+      "startMs": 197462,
+      "endMs": 197689,
+      "beat": {
+        "index": 394,
+        "phase": 0.924,
+        "bar": 98,
+        "barPhase": 0.731
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.92
+    },
+    {
+      "word": "sleep",
+      "startMs": 197787,
+      "endMs": 198049,
+      "beat": {
+        "index": 395,
+        "phase": 0.574,
+        "bar": 98,
+        "barPhase": 0.8935
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.695
+    },
+    {
+      "word": "my",
+      "startMs": 198135,
+      "endMs": 198289,
+      "beat": {
+        "index": 396,
+        "phase": 0.27,
+        "bar": 99,
+        "barPhase": 0.0675
+      },
+      "school": "SONIC",
+      "confidence": 0.742
+    },
+    {
+      "word": "sorrow",
+      "startMs": 198321,
+      "endMs": 198789,
+      "beat": {
+        "index": 396,
+        "phase": 0.642,
+        "bar": 99,
+        "barPhase": 0.1605
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.714
+    },
+    {
+      "word": "lives",
+      "startMs": 198829,
+      "endMs": 199089,
+      "beat": {
+        "index": 397,
+        "phase": 0.658,
+        "bar": 99,
+        "barPhase": 0.4145
+      },
+      "school": "SONIC",
+      "confidence": 0.524
+    },
+    {
+      "word": "in",
+      "startMs": 199343,
+      "endMs": 199409,
+      "beat": {
+        "index": 398,
+        "phase": 0.686,
+        "bar": 99,
+        "barPhase": 0.6715
+      },
+      "school": "SONIC",
+      "confidence": 0.616
+    },
+    {
+      "word": "my",
+      "startMs": 199529,
+      "endMs": 200049,
+      "beat": {
+        "index": 399,
+        "phase": 0.058,
+        "bar": 99,
+        "barPhase": 0.7645
+      },
+      "school": "SONIC",
+      "confidence": 0.923
+    },
+    {
+      "word": "dreams",
+      "startMs": 200069,
+      "endMs": 203731,
+      "beat": {
+        "index": 400,
+        "phase": 0.138,
+        "bar": 100,
+        "barPhase": 0.0345
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.825
+    },
+    {
+      "word": "Smiles",
+      "startMs": 203847,
+      "endMs": 204571,
+      "beat": {
+        "index": 407,
+        "phase": 0.694,
+        "bar": 101,
+        "barPhase": 0.9235
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.848
+    },
+    {
+      "word": "never",
+      "startMs": 204683,
+      "endMs": 205191,
+      "beat": {
+        "index": 409,
+        "phase": 0.366,
+        "bar": 102,
+        "barPhase": 0.3415
+      },
+      "school": "WILL",
+      "confidence": 0.892
+    },
+    {
+      "word": "last",
+      "startMs": 205380,
+      "endMs": 206111,
+      "beat": {
+        "index": 410,
+        "phase": 0.76,
+        "bar": 102,
+        "barPhase": 0.69
+      },
+      "school": "WILL",
+      "confidence": 0.796
+    },
+    {
+      "word": "Suffering",
+      "startMs": 206657,
+      "endMs": 207072,
+      "beat": {
+        "index": 413,
+        "phase": 0.314,
+        "bar": 103,
+        "barPhase": 0.3285
+      },
+      "school": "WILL",
+      "confidence": 0.737
+    },
+    {
+      "word": "sets",
+      "startMs": 207092,
+      "endMs": 207292,
+      "beat": {
+        "index": 414,
+        "phase": 0.184,
+        "bar": 103,
+        "barPhase": 0.546
+      },
+      "school": "WILL",
+      "confidence": 0.48
+    },
+    {
+      "word": "the",
+      "startMs": 207312,
+      "endMs": 207452,
+      "beat": {
+        "index": 414,
+        "phase": 0.624,
+        "bar": 103,
+        "barPhase": 0.656
+      },
+      "school": "WILL",
+      "confidence": 0.654
+    },
+    {
+      "word": "scene",
+      "startMs": 207447,
+      "endMs": 207932,
+      "beat": {
+        "index": 414,
+        "phase": 0.894,
+        "bar": 103,
+        "barPhase": 0.7235
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.438
+    },
+    {
+      "word": "She",
+      "startMs": 208252,
+      "endMs": 208372,
+      "beat": {
+        "index": 416,
+        "phase": 0.504,
+        "bar": 104,
+        "barPhase": 0.126
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.945
+    },
+    {
+      "word": "follows",
+      "startMs": 208491,
+      "endMs": 208792,
+      "beat": {
+        "index": 416,
+        "phase": 0.982,
+        "bar": 104,
+        "barPhase": 0.2455
+      },
+      "school": "NECROMANCY",
+      "confidence": 0.888
+    },
+    {
+      "word": "me",
+      "startMs": 208817,
+      "endMs": 209132,
+      "beat": {
+        "index": 417,
+        "phase": 0.634,
+        "bar": 104,
+        "barPhase": 0.4085
+      },
+      "school": "WILL",
+      "confidence": 0.836
+    },
+    {
+      "word": "when",
+      "startMs": 209188,
+      "endMs": 209352,
+      "beat": {
+        "index": 418,
+        "phase": 0.376,
+        "bar": 104,
+        "barPhase": 0.594
+      },
+      "school": "WILL",
+      "confidence": 0.783
+    },
+    {
+      "word": "I'm",
+      "startMs": 209513,
+      "endMs": 209673,
+      "beat": {
+        "index": 419,
+        "phase": 0.026,
+        "bar": 104,
+        "barPhase": 0.7565
+      },
+      "school": "SONIC",
+      "confidence": 0.593
+    },
+    {
+      "word": "awake",
+      "startMs": 209676,
+      "endMs": 210213,
+      "beat": {
+        "index": 419,
+        "phase": 0.352,
+        "bar": 104,
+        "barPhase": 0.838
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.896
+    },
+    {
+      "word": "Why?",
+      "startMs": 210372,
+      "endMs": 210588,
+      "beat": {
+        "index": 420,
+        "phase": 0.744,
+        "bar": 105,
+        "barPhase": 0.186
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "Did",
+      "startMs": 211951,
+      "endMs": 212108,
+      "beat": {
+        "index": 423,
+        "phase": 0.902,
+        "bar": 105,
+        "barPhase": 0.9755
+      },
+      "school": "SONIC",
+      "confidence": 0.628
+    },
+    {
+      "word": "I",
+      "startMs": 212137,
+      "endMs": 212229,
+      "beat": {
+        "index": 424,
+        "phase": 0.274,
+        "bar": 106,
+        "barPhase": 0.0685
+      },
+      "school": "SONIC",
+      "confidence": 0.775
+    },
+    {
+      "word": "make",
+      "startMs": 212346,
+      "endMs": 212491,
+      "beat": {
+        "index": 424,
+        "phase": 0.692,
+        "bar": 106,
+        "barPhase": 0.173
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.94
+    },
+    {
+      "word": "a",
+      "startMs": 212509,
+      "endMs": 212572,
+      "beat": {
+        "index": 425,
+        "phase": 0.018,
+        "bar": 106,
+        "barPhase": 0.2545
+      },
+      "school": "WILL",
+      "confidence": 0.989
+    },
+    {
+      "word": "mistake?",
+      "startMs": 212652,
+      "endMs": 213297,
+      "beat": {
+        "index": 425,
+        "phase": 0.304,
+        "bar": 106,
+        "barPhase": 0.326
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.946
+    },
+    {
+      "word": "(Mortician",
+      "startMs": 213344,
+      "endMs": 213517,
+      "beat": {
+        "index": 426,
+        "phase": 0.688,
+        "bar": 106,
+        "barPhase": 0.672
+      },
+      "school": "SONIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "Mic,",
+      "startMs": 213537,
+      "endMs": 213737,
+      "beat": {
+        "index": 427,
+        "phase": 0.074,
+        "bar": 106,
+        "barPhase": 0.7685
+      },
+      "school": "SONIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "Daydreaming",
+      "startMs": 213757,
+      "endMs": 213957,
+      "beat": {
+        "index": 427,
+        "phase": 0.514,
+        "bar": 106,
+        "barPhase": 0.8785
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.1
+    },
+    {
+      "word": "Nightmares",
+      "startMs": 214018,
+      "endMs": 214177,
+      "beat": {
+        "index": 428,
+        "phase": 0.036,
+        "bar": 107,
+        "barPhase": 0.009
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "Nightmares....)",
+      "startMs": 214197,
+      "endMs": 214397,
+      "beat": {
+        "index": 428,
+        "phase": 0.394,
+        "bar": 107,
+        "barPhase": 0.0985
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "(Mortician",
+      "startMs": 214343,
+      "endMs": 214617,
+      "beat": {
+        "index": 428,
+        "phase": 0.686,
+        "bar": 107,
+        "barPhase": 0.1715
+      },
+      "school": "SONIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "Mic,",
+      "startMs": 214637,
+      "endMs": 214837,
+      "beat": {
+        "index": 429,
+        "phase": 0.274,
+        "bar": 107,
+        "barPhase": 0.3185
+      },
+      "school": "SONIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "Daydreaming",
+      "startMs": 214877,
+      "endMs": 215057,
+      "beat": {
+        "index": 429,
+        "phase": 0.754,
+        "bar": 107,
+        "barPhase": 0.4385
+      },
+      "school": "ALCHEMY",
+      "confidence": 0.1
+    },
+    {
+      "word": "Nightmares",
+      "startMs": 215016,
+      "endMs": 215277,
+      "beat": {
+        "index": 430,
+        "phase": 0.032,
+        "bar": 107,
+        "barPhase": 0.508
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.1
+    },
+    {
+      "word": "Nightmares....)",
+      "startMs": 215365,
+      "endMs": 215497,
+      "beat": {
+        "index": 430,
+        "phase": 0.73,
+        "bar": 107,
+        "barPhase": 0.6825
+      },
+      "school": "PSYCHIC",
+      "confidence": 0.1
+    }
+  ]
+}

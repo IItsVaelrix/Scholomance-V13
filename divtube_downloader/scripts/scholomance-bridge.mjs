@@ -322,27 +322,38 @@ async function cmdArchiveFiles() {
 }
 
 async function cmdArchiveSearch(query) {
+  const { execSync } = await import('node:child_process');
   const q = query.toLowerCase();
   const root = PROJECT_ROOT;
   const results = [];
+  
+  // 1. Path match (fast)
   for (const relPath of walkFiles(root, root)) {
     if (results.length >= 50) break;
     if (relPath.toLowerCase().includes(q)) {
       results.push({ file_path: relPath, match: 'path' });
     }
   }
+
+  // 2. Content match via grep (much faster than fs.readFileSync on 34k files)
   if (results.length < 20) {
-    for (const relPath of walkFiles(root, root)) {
-      if (results.length >= 50) break;
-      if (results.some(r => r.file_path === relPath)) continue;
-      try {
-        const content = fs.readFileSync(path.join(root, relPath), 'utf8').slice(0, 2000);
-        if (content.toLowerCase().includes(q)) {
-          results.push({ file_path: relPath, match: 'content' });
+    try {
+      // Use grep -rlI to quickly find non-binary files containing the exact string
+      const grepCmd = `grep -rlI --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist --exclude-dir=build --exclude-dir=.venv "${query.replace(/"/g, '\\"')}" .`;
+      const output = execSync(grepCmd, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+      const lines = output.split('\n').map(l => l.trim().replace(/^\.\//, '')).filter(Boolean);
+      for (const line of lines) {
+        if (results.length >= 50) break;
+        // Ignore dirs grep might still catch despite -I
+        const firstSegment = line.split('/')[0];
+        if (IGNORED_DIRS.has(firstSegment)) continue;
+        
+        if (!results.some(r => r.file_path === line)) {
+          results.push({ file_path: line, match: 'content' });
         }
-      } catch {
-        // binary or unreadable
       }
+    } catch {
+      // grep returns exit code 1 if no matches found, which throws
     }
   }
   return { query, count: results.length, results };

@@ -22,5 +22,17 @@
       "/home/deck/Downloads/Scholomance-V12-main"
     ]
   },
-  "enableAllProjectMcpServers": true
+  "enableAllProjectMcpServers": true,
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/scdna-gene-inject.sh\""
+          }
+        ]
+      }
+    ]
+  }
 }

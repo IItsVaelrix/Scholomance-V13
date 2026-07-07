@@ -3,10 +3,85 @@ import { describe, expect, it, vi } from 'vitest';
 import { panelAnalysisRoutes } from '../../codex/server/routes/panelAnalysis.routes.js';
 
 describe('[Server] panelAnalysis.routes', () => {
-  async function buildApp() {
+  async function buildApp(options = {}) {
     const app = Fastify({ logger: false });
-    await app.register(panelAnalysisRoutes);
+    const panelAnalysisService = options.panelAnalysisService || {
+      analyzePanels: vi.fn(async () => createStubPayload()),
+      close: vi.fn(),
+    };
+    await app.register(panelAnalysisRoutes, { panelAnalysisService });
     return app;
+  }
+
+  function createStubPayload(marker = 'full') {
+    return {
+      marker,
+      analysis: {
+        allConnections: [
+          {
+            syntax: {
+              gate: 'test',
+              reasons: ['fixture'],
+            },
+          },
+        ],
+        statistics: null,
+        schemePattern: 'AA',
+        rhymeGroups: [],
+        schoolWeights: {},
+        dominantSchool: null,
+        syntaxSummary: {
+          tokenCount: 2,
+        },
+        compiler: null,
+        wordAnalyses: [],
+        lineSyllableCounts: [],
+        verseIRAmplifier: null,
+      },
+      scheme: {
+        groups: [],
+      },
+      meter: null,
+      literaryDevices: [],
+      genreProfile: null,
+      emotion: 'Neutral',
+      scoreData: {
+        totalScore: 0,
+        traces: [
+          {
+            commentary: 'fixture',
+          },
+        ],
+      },
+      rhymeAstrology: null,
+      narrativeAMP: null,
+      oracle: null,
+      vowelSummary: {
+        families: [],
+        totalWords: 0,
+        uniqueWords: 0,
+      },
+    };
+  }
+
+  function createEmptyStubPayload() {
+    return {
+      analysis: null,
+      scheme: null,
+      meter: null,
+      literaryDevices: [],
+      genreProfile: null,
+      emotion: 'Neutral',
+      scoreData: null,
+      rhymeAstrology: null,
+      narrativeAMP: null,
+      oracle: null,
+      vowelSummary: {
+        families: [],
+        totalWords: 0,
+        uniqueWords: 0,
+      },
+    };
   }
 
   it('returns unified panel analysis payload', async () => {
@@ -71,6 +146,57 @@ describe('[Server] panelAnalysis.routes', () => {
     expect(second.body).toBe(first.body);
   });
 
+  it('passes analysis profile to the service and keeps profile-specific cache entries separate', async () => {
+    const analyzePanels = vi.fn(async (_text, options = {}) => (
+      createStubPayload(options.analysisProfile || 'full')
+    ));
+    const app = Fastify({ logger: false });
+    await app.register(panelAnalysisRoutes, {
+      panelAnalysisService: {
+        analyzePanels,
+        close: vi.fn(),
+      },
+    });
+    const text = 'Ash and ember answer air';
+
+    const editorFirst = await app.inject({
+      method: 'POST',
+      url: '/api/analysis/panels',
+      payload: { text, analysisProfile: 'editor', nluMode: 'generate' },
+    });
+    const full = await app.inject({
+      method: 'POST',
+      url: '/api/analysis/panels',
+      payload: { text, analysisProfile: 'full', nluMode: 'generate' },
+    });
+    const editorSecond = await app.inject({
+      method: 'POST',
+      url: '/api/analysis/panels',
+      payload: { text, analysisProfile: 'editor', nluMode: 'direct' },
+    });
+
+    await app.close();
+
+    expect(editorFirst.statusCode).toBe(200);
+    expect(full.statusCode).toBe(200);
+    expect(editorSecond.statusCode).toBe(200);
+    expect(editorFirst.headers['x-cache']).toBe('MISS');
+    expect(full.headers['x-cache']).toBe('MISS');
+    expect(editorSecond.headers['x-cache']).toBe('HIT');
+    expect(analyzePanels).toHaveBeenCalledTimes(2);
+    expect(analyzePanels).toHaveBeenNthCalledWith(1, text, {
+      analysisProfile: 'editor',
+      nluMode: 'generate',
+    });
+    expect(analyzePanels).toHaveBeenNthCalledWith(2, text, {
+      analysisProfile: 'full',
+      nluMode: 'generate',
+    });
+    expect(editorFirst.json().data.marker).toBe('editor');
+    expect(full.json().data.marker).toBe('full');
+    expect(editorSecond.body).toBe(editorFirst.body);
+  });
+
   it('rejects invalid body payload', async () => {
     const app = await buildApp();
 
@@ -89,7 +215,12 @@ describe('[Server] panelAnalysis.routes', () => {
   });
 
   it('returns empty panel payload for empty text', async () => {
-    const app = await buildApp();
+    const app = await buildApp({
+      panelAnalysisService: {
+        analyzePanels: vi.fn(async () => createEmptyStubPayload()),
+        close: vi.fn(),
+      },
+    });
 
     const response = await app.inject({
       method: 'POST',
@@ -209,4 +340,3 @@ describe('[Server] panelAnalysis.routes', () => {
     expect(close).toHaveBeenCalledTimes(1);
   });
 });
-

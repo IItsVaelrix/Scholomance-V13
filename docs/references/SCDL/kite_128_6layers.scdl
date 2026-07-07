@@ -1,0 +1,1766 @@
+asset kite_128_6layers canvas 128x128
+
+palette {
+  c000 = #dac293
+  c001 = #805e27
+  c002 = #3c5c82
+  c003 = #6b6766
+  c004 = #2b3e54
+  c005 = #1a2632
+}
+
+part c005 material source {
+  ring 64 64 52 1 c005
+  ring 64 64 54 1 c005
+  ring 64 64 55 1 c005
+  ring 64 64 56 1 c005
+  ring 64 64 57 1 c005
+  ring 64 64 58 1 c005
+  ring 64 64 59 1 c005
+  ring 64 64 60 1 c005
+  ring 64 64 61 1 c005
+  ring 64 64 62 1 c005
+  ring 64 64 63 1 c005
+  ring 64 64 64 1 c005
+  rect 0 0 56 1 c005
+  rect 73 0 55 1 c005
+  rect 0 1 51 1 c005
+  rect 78 1 50 1 c005
+  rect 0 2 47 1 c005
+  rect 82 2 46 1 c005
+  rect 0 3 44 1 c005
+  rect 85 3 43 1 c005
+  rect 0 4 41 1 c005
+  rect 88 4 40 1 c005
+  rect 0 5 38 1 c005
+  rect 91 5 37 1 c005
+  rect 0 6 36 1 c005
+  rect 93 6 35 1 c005
+  rect 0 7 34 1 c005
+  rect 95 7 33 1 c005
+  rect 0 8 32 1 c005
+  rect 97 8 31 1 c005
+  rect 0 9 31 1 c005
+  rect 98 9 30 1 c005
+  rect 0 10 29 1 c005
+  rect 100 10 28 1 c005
+  rect 0 11 28 1 c005
+  rect 59 11 5 1 c005
+  rect 65 11 3 1 c005
+  rect 101 11 27 1 c005
+  rect 0 12 26 1 c005
+  rect 103 12 25 1 c005
+  rect 0 13 25 1 c005
+  rect 57 13 3 1 c005
+  rect 69 13 2 1 c005
+  rect 104 13 24 1 c005
+  rect 0 14 24 1 c005
+  rect 54 14 4 1 c005
+  cell 60 14 c005
+  rect 70 14 5 1 c005
+  rect 105 14 23 1 c005
+  rect 0 15 23 1 c005
+  rect 51 15 4 1 c005
+  rect 73 15 5 1 c005
+  rect 106 15 22 1 c005
+  rect 0 16 21 1 c005
+  rect 47 16 1 2 c005
+  rect 49 16 3 1 c005
+  cell 53 16 c005
+  rect 70 16 1 3 c005
+  rect 76 16 3 1 c005
+  rect 108 16 20 1 c005
+  rect 0 17 20 1 c005
+  rect 45 17 2 2 c005
+  rect 48 17 2 1 c005
+  cell 63 17 c005
+  rect 79 17 6 1 c005
+  rect 109 17 19 1 c005
+  rect 0 18 19 1 c005
+  rect 41 18 4 1 c005
+  cell 80 18 c005
+  rect 82 18 6 1 c005
+  rect 110 18 18 1 c005
+  rect 0 19 18 1 c005
+  cell 36 19 c005
+  rect 39 19 3 1 c005
+  cell 43 19 c005
+  cell 62 19 c005
+  rect 85 19 5 2 c005
+  cell 92 19 c005
+  rect 111 19 17 1 c005
+  rect 0 20 17 1 c005
+  rect 34 20 2 1 c005
+  rect 38 20 2 1 c005
+  rect 70 20 1 2 c005
+  cell 83 20 c005
+  rect 90 20 1 8 c005
+  rect 93 20 2 1 c005
+  rect 112 20 16 1 c005
+  rect 0 21 16 2 c005
+  cell 37 21 c005
+  cell 84 21 c005
+  rect 86 21 4 1 c005
+  rect 91 21 2 5 c005
+  cell 95 21 c005
+  rect 113 21 15 2 c005
+  cell 32 22 c005
+  cell 39 22 c005
+  rect 87 22 3 2 c005
+  rect 93 22 1 36 c005
+  cell 96 22 c005
+  rect 0 23 15 1 c005
+  cell 31 23 c005
+  cell 33 23 c005
+  cell 40 23 c005
+  cell 59 23 c005
+  cell 67 23 c005
+  cell 69 23 c005
+  rect 94 23 2 19 c005
+  rect 114 23 14 1 c005
+  rect 0 24 14 1 c005
+  rect 32 24 1 2 c005
+  rect 88 24 2 1 c005
+  cell 99 24 c005
+  rect 115 24 13 1 c005
+  rect 0 25 13 1 c005
+  rect 89 25 1 2 c005
+  cell 96 25 c005
+  cell 100 25 c005
+  rect 116 25 12 1 c005
+  rect 0 26 12 2 c005
+  rect 40 26 1 2 c005
+  rect 68 26 3 1 c005
+  cell 86 26 c005
+  rect 92 26 1 37 c005
+  cell 101 26 c005
+  rect 117 26 11 2 c005
+  cell 26 27 c005
+  rect 32 27 1 14 c005
+  cell 60 27 c005
+  cell 67 27 c005
+  cell 83 27 c005
+  rect 91 27 1 40 c005
+  cell 102 27 c005
+  rect 0 28 11 1 c005
+  cell 25 28 c005
+  cell 53 28 c005
+  cell 85 28 c005
+  cell 87 28 c005
+  cell 89 28 c005
+  cell 100 28 c005
+  cell 103 28 c005
+  rect 118 28 10 1 c005
+  rect 0 29 10 2 c005
+  cell 24 29 c005
+  rect 90 29 1 4 c005
+  rect 101 29 1 71 c005
+  cell 104 29 c005
+  rect 119 29 9 2 c005
+  rect 23 30 1 2 c005
+  rect 26 30 1 69 c005
+  rect 66 30 1 2 c005
+  cell 70 30 c005
+  rect 88 30 2 1 c005
+  rect 102 30 1 69 c005
+  rect 105 30 1 2 c005
+  rect 0 31 9 1 c005
+  rect 22 31 1 2 c005
+  rect 25 31 1 67 c005
+  cell 89 31 c005
+  rect 103 31 1 67 c005
+  rect 106 31 1 2 c005
+  rect 120 31 8 1 c005
+  rect 0 32 8 2 c005
+  rect 24 32 1 65 c005
+  cell 88 32 c005
+  rect 104 32 1 65 c005
+  rect 121 32 7 2 c005
+  cell 21 33 c005
+  rect 23 33 1 63 c005
+  rect 61 33 1 2 c005
+  cell 67 33 c005
+  cell 89 33 c005
+  rect 105 33 1 63 c005
+  cell 107 33 c005
+  rect 0 34 7 2 c005
+  rect 20 34 1 2 c005
+  cell 31 34 c005
+  cell 66 34 c005
+  cell 90 34 c005
+  rect 100 34 1 67 c005
+  rect 108 34 1 2 c005
+  rect 122 34 6 2 c005
+  rect 22 35 1 59 c005
+  rect 106 35 1 59 c005
+  rect 0 36 6 2 c005
+  cell 19 36 c005
+  rect 21 36 1 57 c005
+  rect 66 36 1 4 c005
+  rect 89 36 2 1 c005
+  rect 107 36 1 57 c005
+  cell 109 36 c005
+  rect 123 36 5 2 c005
+  rect 18 37 1 2 c005
+  cell 27 37 c005
+  rect 88 37 2 1 c005
+  rect 110 37 1 2 c005
+  rect 0 38 5 3 c005
+  rect 20 38 1 53 c005
+  cell 40 38 c005
+  cell 83 38 c005
+  cell 86 38 c005
+  rect 108 38 1 53 c005
+  rect 124 38 4 3 c005
+  rect 17 39 1 2 c005
+  rect 19 39 1 51 c005
+  cell 33 39 c005
+  rect 87 39 1 4 c005
+  rect 90 39 1 2 c005
+  rect 109 39 1 51 c005
+  rect 111 39 1 2 c005
+  rect 27 40 1 60 c005
+  cell 43 40 c005
+  cell 83 40 c005
+  rect 0 41 4 3 c005
+  rect 16 41 1 2 c005
+  rect 18 41 1 47 c005
+  rect 33 41 1 12 c005
+  cell 66 41 c005
+  rect 86 41 1 2 c005
+  rect 88 41 1 4 c005
+  rect 110 41 1 47 c005
+  rect 112 41 1 2 c005
+  rect 125 41 3 3 c005
+  rect 61 42 1 2 c005
+  rect 89 42 2 4 c005
+  rect 94 42 1 10 c005
+  cell 99 42 c005
+  rect 15 43 1 3 c005
+  rect 17 43 1 43 c005
+  cell 32 43 c005
+  rect 40 43 2 1 c005
+  cell 44 43 c005
+  cell 66 43 c005
+  cell 97 43 c005
+  rect 111 43 1 43 c005
+  rect 113 43 1 3 c005
+  rect 0 44 3 3 c005
+  cell 29 44 c005
+  rect 31 44 1 2 c005
+  cell 46 44 c005
+  rect 126 44 2 3 c005
+  rect 14 45 1 3 c005
+  rect 30 45 1 2 c005
+  rect 54 45 2 1 c005
+  cell 60 45 c005
+  cell 69 45 c005
+  cell 71 45 c005
+  cell 73 45 c005
+  rect 96 45 4 1 c005
+  rect 114 45 1 3 c005
+  rect 16 46 1 37 c005
+  cell 37 46 c005
+  rect 97 46 3 1 c005
+  rect 112 46 1 37 c005
+  rect 0 47 2 4 c005
+  cell 82 47 c005
+  rect 85 47 1 2 c005
+  rect 87 47 1 2 c005
+  rect 89 47 2 1 c005
+  cell 96 47 c005
+  rect 99 47 1 55 c005
+  rect 127 47 1 4 c005
+  rect 13 48 1 4 c005
+  rect 34 48 2 1 c005
+  rect 37 48 1 2 c005
+  cell 86 48 c005
+  rect 97 48 2 1 c005
+  rect 115 48 1 4 c005
+  rect 15 49 1 31 c005
+  rect 28 49 1 52 c005
+  cell 34 49 c005
+  cell 38 49 c005
+  rect 52 49 1 2 c005
+  rect 54 49 1 2 c005
+  rect 57 49 4 1 c005
+  rect 66 49 4 1 c005
+  cell 71 49 c005
+  rect 73 49 4 1 c005
+  rect 89 49 2 3 c005
+  cell 95 49 c005
+  cell 97 49 c005
+  rect 113 49 1 31 c005
+  rect 39 50 2 1 c005
+  rect 45 50 7 1 c005
+  rect 55 50 4 1 c005
+  rect 61 50 1 2 c005
+  rect 66 50 3 1 c005
+  cell 70 50 c005
+  rect 72 50 2 1 c005
+  rect 75 50 3 1 c005
+  rect 79 50 3 2 c005
+  rect 86 50 3 10 c005
+  rect 0 51 1 5 c005
+  rect 34 51 1 4 c005
+  cell 36 51 c005
+  rect 41 51 1 2 c005
+  rect 44 51 1 2 c005
+  cell 60 51 c005
+  rect 66 51 1 3 c005
+  rect 82 51 2 2 c005
+  rect 12 52 1 5 c005
+  rect 14 52 1 25 c005
+  cell 40 52 c005
+  rect 90 52 1 19 c005
+  rect 114 52 1 25 c005
+  rect 116 52 1 5 c005
+  rect 61 53 1 4 c005
+  cell 82 53 c005
+  rect 89 53 1 21 c005
+  rect 98 53 1 50 c005
+  cell 42 54 c005
+  cell 67 54 c005
+  rect 84 54 2 4 c005
+  rect 35 55 1 3 c005
+  cell 40 55 c005
+  cell 66 55 c005
+  rect 83 55 1 4 c005
+  rect 34 56 1 3 c005
+  rect 37 56 1 5 c005
+  rect 11 57 1 15 c005
+  rect 13 57 1 15 c005
+  rect 29 57 1 45 c005
+  cell 40 57 c005
+  rect 66 57 1 3 c005
+  cell 68 57 c005
+  cell 72 57 c005
+  rect 115 57 1 15 c005
+  rect 117 57 1 15 c005
+  cell 36 58 c005
+  cell 67 58 c005
+  cell 30 59 c005
+  rect 35 59 1 5 c005
+  rect 61 59 1 2 c005
+  cell 75 59 c005
+  rect 81 59 2 1 c005
+  rect 84 59 2 1 c005
+  rect 39 60 2 1 c005
+  cell 47 60 c005
+  rect 77 60 1 2 c005
+  rect 86 60 1 22 c005
+  rect 88 60 1 17 c005
+  rect 36 61 1 7 c005
+  cell 40 61 c005
+  cell 54 61 c005
+  rect 66 61 1 2 c005
+  cell 76 61 c005
+  rect 84 61 2 3 c005
+  rect 87 61 1 19 c005
+  rect 97 61 1 43 c005
+  rect 30 62 1 41 c005
+  rect 61 62 1 4 c005
+  rect 74 62 1 3 c005
+  cell 81 62 c005
+  cell 96 62 c005
+  rect 37 63 1 7 c005
+  rect 39 63 2 1 c005
+  rect 77 63 1 2 c005
+  cell 42 64 c005
+  rect 75 64 2 1 c005
+  rect 82 64 2 1 c005
+  rect 85 64 1 20 c005
+  rect 66 65 2 1 c005
+  rect 81 65 2 25 c005
+  rect 84 65 1 21 c005
+  rect 96 65 1 40 c005
+  rect 31 66 1 38 c005
+  rect 38 66 1 6 c005
+  cell 47 66 c005
+  rect 66 66 1 16 c005
+  rect 75 66 2 1 c005
+  cell 80 66 c005
+  rect 42 67 1 3 c005
+  rect 54 67 1 2 c005
+  rect 61 67 1 4 c005
+  rect 67 67 2 1 c005
+  cell 70 67 c005
+  rect 74 67 2 3 c005
+  rect 78 67 1 8 c005
+  rect 83 67 1 22 c005
+  cell 67 68 c005
+  cell 71 68 c005
+  rect 80 68 1 2 c005
+  rect 35 69 1 4 c005
+  rect 39 69 2 8 c005
+  cell 60 69 c005
+  rect 76 69 1 32 c005
+  rect 79 69 1 3 c005
+  cell 93 69 c005
+  rect 95 69 1 37 c005
+  rect 32 70 1 35 c005
+  cell 47 70 c005
+  cell 64 70 c005
+  rect 67 70 2 1 c005
+  rect 71 70 1 3 c005
+  rect 73 70 1 16 c005
+  rect 75 70 1 33 c005
+  cell 77 70 c005
+  cell 91 70 c005
+  cell 94 70 c005
+  rect 34 71 1 2 c005
+  cell 36 71 c005
+  rect 59 71 2 1 c005
+  rect 74 71 1 33 c005
+  rect 80 71 1 23 c005
+  rect 92 71 2 3 c005
+  rect 12 72 1 5 c005
+  rect 41 72 1 10 c005
+  cell 58 72 c005
+  rect 60 72 2 1 c005
+  cell 67 72 c005
+  cell 70 72 c005
+  cell 72 72 c005
+  rect 77 72 1 27 c005
+  rect 94 72 1 34 c005
+  rect 116 72 1 5 c005
+  rect 0 73 1 55 c005
+  rect 33 73 1 33 c005
+  rect 38 73 1 2 c005
+  rect 42 73 2 1 c005
+  rect 54 73 1 2 c005
+  rect 61 73 1 3 c005
+  rect 79 73 1 23 c005
+  rect 42 74 1 10 c005
+  cell 44 74 c005
+  cell 46 74 c005
+  rect 59 74 2 2 c005
+  rect 67 74 3 2 c005
+  rect 72 74 1 33 c005
+  rect 43 75 1 2 c005
+  cell 48 75 c005
+  rect 71 75 1 33 c005
+  rect 45 76 2 1 c005
+  cell 56 76 c005
+  rect 59 76 1 4 c005
+  rect 67 76 2 13 c005
+  rect 78 76 1 22 c005
+  rect 93 76 1 31 c005
+  rect 13 77 1 4 c005
+  rect 34 77 1 29 c005
+  rect 40 77 1 2 c005
+  rect 44 77 1 12 c005
+  cell 50 77 c005
+  cell 54 77 c005
+  cell 57 77 c005
+  rect 60 77 2 1 c005
+  rect 69 77 2 1 c005
+  rect 115 77 1 4 c005
+  rect 1 78 1 50 c005
+  rect 45 78 1 3 c005
+  cell 58 78 c005
+  rect 60 78 1 12 c005
+  rect 70 78 1 2 c005
+  rect 127 78 1 50 c005
+  rect 43 79 1 7 c005
+  cell 46 79 c005
+  rect 56 79 1 3 c005
+  cell 61 79 c005
+  cell 69 79 c005
+  rect 92 79 1 29 c005
+  rect 35 80 1 27 c005
+  rect 48 80 2 3 c005
+  rect 51 80 1 2 c005
+  rect 58 80 1 3 c005
+  cell 65 80 c005
+  rect 14 81 1 3 c005
+  rect 46 81 2 2 c005
+  rect 55 81 1 25 c005
+  cell 59 81 c005
+  rect 69 81 2 1 c005
+  rect 114 81 1 3 c005
+  rect 2 82 1 46 c005
+  rect 36 82 1 26 c005
+  rect 45 82 1 8 c005
+  cell 50 82 c005
+  cell 53 82 c005
+  rect 69 82 1 9 c005
+  rect 91 82 1 26 c005
+  rect 126 82 1 46 c005
+  rect 15 83 1 3 c005
+  rect 49 83 1 14 c005
+  cell 51 83 c005
+  rect 54 83 1 3 c005
+  rect 66 83 1 2 c005
+  rect 70 83 1 8 c005
+  rect 90 83 1 26 c005
+  rect 113 83 1 3 c005
+  rect 37 84 1 24 c005
+  rect 46 84 3 3 c005
+  rect 50 84 1 16 c005
+  rect 52 84 1 2 c005
+  rect 58 84 2 7 c005
+  cell 64 84 c005
+  rect 3 85 1 43 c005
+  rect 56 85 1 5 c005
+  cell 61 85 c005
+  rect 65 85 1 3 c005
+  rect 125 85 1 43 c005
+  rect 16 86 1 2 c005
+  rect 57 86 1 5 c005
+  rect 64 86 1 4 c005
+  rect 66 86 1 3 c005
+  rect 89 86 1 24 c005
+  rect 112 86 1 2 c005
+  rect 46 87 2 5 c005
+  rect 51 87 4 1 c005
+  cell 61 87 c005
+  rect 73 87 1 18 c005
+  rect 88 87 1 23 c005
+  rect 4 88 1 40 c005
+  rect 17 88 1 2 c005
+  rect 38 88 1 21 c005
+  rect 48 88 1 8 c005
+  rect 51 88 2 13 c005
+  rect 54 88 1 17 c005
+  rect 111 88 1 2 c005
+  rect 124 88 1 40 c005
+  rect 39 89 1 21 c005
+  cell 53 89 c005
+  cell 68 89 c005
+  rect 86 89 2 22 c005
+  rect 18 90 1 2 c005
+  cell 66 90 c005
+  rect 81 90 1 3 c005
+  cell 85 90 c005
+  rect 110 90 1 2 c005
+  rect 5 91 1 37 c005
+  rect 40 91 1 19 c005
+  cell 53 91 c005
+  rect 56 91 1 17 c005
+  cell 65 91 c005
+  rect 123 91 1 37 c005
+  cell 19 92 c005
+  cell 41 92 c005
+  rect 47 92 1 2 c005
+  cell 64 92 c005
+  rect 83 92 3 1 c005
+  cell 109 92 c005
+  rect 6 93 1 35 c005
+  rect 20 93 1 2 c005
+  rect 53 93 1 12 c005
+  rect 57 93 1 16 c005
+  rect 59 93 1 10 c005
+  rect 65 93 3 2 c005
+  rect 70 93 1 17 c005
+  rect 84 93 1 19 c005
+  rect 108 93 1 2 c005
+  rect 122 93 1 35 c005
+  rect 41 94 1 17 c005
+  rect 58 94 1 17 c005
+  rect 60 94 1 19 c005
+  cell 64 94 c005
+  rect 68 94 2 17 c005
+  rect 83 94 1 2 c005
+  rect 85 94 1 18 c005
+  rect 7 95 1 33 c005
+  cell 21 95 c005
+  rect 42 95 1 16 c005
+  rect 66 95 2 1 c005
+  rect 81 95 1 3 c005
+  cell 107 95 c005
+  rect 121 95 1 33 c005
+  rect 22 96 1 2 c005
+  rect 43 96 1 16 c005
+  cell 64 96 c005
+  rect 67 96 1 17 c005
+  rect 82 96 1 3 c005
+  rect 106 96 1 2 c005
+  rect 8 97 1 31 c005
+  rect 23 97 1 2 c005
+  cell 48 97 c005
+  rect 61 97 1 17 c005
+  rect 65 97 2 17 c005
+  cell 80 97 c005
+  rect 105 97 1 2 c005
+  rect 120 97 1 31 c005
+  rect 9 98 1 30 c005
+  rect 64 98 1 18 c005
+  rect 83 98 1 14 c005
+  rect 119 98 1 30 c005
+  cell 24 99 c005
+  rect 44 99 1 13 c005
+  cell 104 99 c005
+  rect 10 100 1 28 c005
+  cell 25 100 c005
+  rect 45 100 1 12 c005
+  cell 79 100 c005
+  rect 82 100 1 13 c005
+  cell 103 100 c005
+  rect 118 100 1 28 c005
+  rect 11 101 1 27 c005
+  cell 26 101 c005
+  cell 48 101 c005
+  cell 52 101 c005
+  rect 62 101 1 14 c005
+  rect 81 101 1 12 c005
+  cell 102 101 c005
+  rect 117 101 1 27 c005
+  cell 27 102 c005
+  rect 46 102 1 11 c005
+  cell 49 102 c005
+  rect 79 102 1 12 c005
+  cell 101 102 c005
+  rect 12 103 1 25 c005
+  cell 28 103 c005
+  rect 47 103 1 10 c005
+  rect 51 103 1 2 c005
+  rect 63 103 1 13 c005
+  rect 80 103 1 10 c005
+  cell 100 103 c005
+  rect 116 103 1 25 c005
+  rect 13 104 1 24 c005
+  cell 29 104 c005
+  rect 59 104 1 8 c005
+  rect 77 104 2 1 c005
+  cell 99 104 c005
+  rect 115 104 1 24 c005
+  rect 14 105 1 23 c005
+  rect 30 105 2 1 c005
+  rect 48 105 1 8 c005
+  rect 76 105 1 2 c005
+  rect 97 105 2 1 c005
+  rect 114 105 1 23 c005
+  rect 15 106 1 22 c005
+  rect 31 106 2 1 c005
+  rect 49 106 1 8 c005
+  rect 78 106 1 8 c005
+  rect 96 106 2 1 c005
+  rect 113 106 1 22 c005
+  cell 33 107 c005
+  rect 50 107 1 7 c005
+  rect 52 107 2 1 c005
+  cell 55 107 c005
+  rect 74 107 2 1 c005
+  rect 77 107 1 7 c005
+  cell 95 107 c005
+  rect 16 108 1 20 c005
+  rect 34 108 2 1 c005
+  rect 53 108 2 1 c005
+  rect 73 108 2 1 c005
+  rect 93 108 2 1 c005
+  rect 112 108 1 20 c005
+  rect 17 109 1 19 c005
+  cell 36 109 c005
+  rect 51 109 1 5 c005
+  rect 55 109 1 2 c005
+  cell 73 109 c005
+  rect 75 109 2 6 c005
+  cell 92 109 c005
+  rect 111 109 1 19 c005
+  rect 18 110 1 18 c005
+  rect 37 110 2 1 c005
+  rect 52 110 1 5 c005
+  cell 57 110 c005
+  rect 71 110 2 1 c005
+  rect 90 110 2 1 c005
+  rect 110 110 1 18 c005
+  rect 19 111 1 17 c005
+  rect 39 111 2 1 c005
+  rect 73 111 1 4 c005
+  rect 88 111 2 1 c005
+  rect 109 111 1 17 c005
+  rect 20 112 1 16 c005
+  rect 41 112 2 1 c005
+  rect 53 112 1 3 c005
+  cell 57 112 c005
+  cell 70 112 c005
+  rect 74 112 1 3 c005
+  rect 86 112 2 1 c005
+  rect 108 112 1 16 c005
+  rect 21 113 2 15 c005
+  rect 43 113 3 1 c005
+  rect 54 113 1 2 c005
+  rect 68 113 1 2 c005
+  rect 72 113 1 2 c005
+  rect 83 113 3 1 c005
+  rect 106 113 2 15 c005
+  rect 23 114 1 14 c005
+  rect 45 114 3 1 c005
+  cell 55 114 c005
+  cell 65 114 c005
+  rect 81 114 3 1 c005
+  rect 105 114 1 14 c005
+  rect 24 115 1 13 c005
+  rect 48 115 4 1 c005
+  cell 57 115 c005
+  cell 69 115 c005
+  cell 71 115 c005
+  rect 77 115 4 1 c005
+  rect 104 115 1 13 c005
+  rect 25 116 1 12 c005
+  rect 52 116 5 1 c005
+  rect 72 116 5 1 c005
+  rect 103 116 1 12 c005
+  rect 26 117 2 11 c005
+  rect 57 117 2 1 c005
+  rect 61 117 5 1 c005
+  rect 69 117 3 1 c005
+  rect 101 117 2 11 c005
+  rect 28 118 1 10 c005
+  rect 100 118 1 10 c005
+  rect 29 119 2 9 c005
+  rect 98 119 2 9 c005
+  rect 31 120 1 8 c005
+  rect 97 120 1 8 c005
+  rect 32 121 2 7 c005
+  rect 95 121 2 7 c005
+  rect 34 122 2 6 c005
+  rect 93 122 2 6 c005
+  rect 36 123 2 5 c005
+  rect 91 123 2 5 c005
+  rect 38 124 3 4 c005
+  rect 88 124 3 4 c005
+  rect 41 125 3 3 c005
+  rect 85 125 3 3 c005
+  rect 44 126 3 2 c005
+  rect 82 126 3 2 c005
+  rect 47 127 4 1 c005
+  rect 78 127 4 1 c005
+}
+
+part c000 material source {
+  rect 63 4 2 1 c000
+  rect 61 5 2 1 c000
+  rect 65 5 2 1 c000
+  rect 59 6 2 1 c000
+  rect 63 6 1 2 c000
+  rect 67 6 2 1 c000
+  rect 57 7 2 1 c000
+  cell 64 7 c000
+  rect 69 7 2 1 c000
+  rect 55 8 2 1 c000
+  rect 71 8 2 1 c000
+  rect 53 9 2 1 c000
+  rect 63 9 2 1 c000
+  rect 73 9 3 1 c000
+  rect 50 10 3 5 c000
+  rect 75 10 3 1 c000
+  rect 47 11 3 5 c000
+  cell 53 11 c000
+  rect 78 11 3 1 c000
+  rect 43 12 4 3 c000
+  rect 81 12 4 1 c000
+  rect 39 13 4 1 c000
+  rect 53 13 2 1 c000
+  rect 79 13 2 4 c000
+  rect 84 13 5 1 c000
+  rect 33 14 7 1 c000
+  cell 41 14 c000
+  cell 53 14 c000
+  cell 75 14 c000
+  rect 81 14 1 3 c000
+  rect 89 14 4 1 c000
+  rect 27 15 7 1 c000
+  cell 42 15 c000
+  rect 44 15 3 2 c000
+  cell 50 15 c000
+  cell 78 15 c000
+  cell 95 15 c000
+  cell 100 15 c000
+  rect 27 16 1 6 c000
+  rect 43 16 1 2 c000
+  cell 64 16 c000
+  cell 82 16 c000
+  rect 29 17 2 1 c000
+  rect 40 17 3 1 c000
+  cell 44 17 c000
+  cell 97 17 c000
+  cell 40 18 c000
+  rect 63 18 1 26 c000
+  rect 62 20 1 4 c000
+  rect 61 21 1 8 c000
+  rect 60 23 1 4 c000
+  cell 68 23 c000
+  rect 27 24 1 3 c000
+  rect 58 24 2 2 c000
+  cell 70 24 c000
+  cell 57 25 c000
+  rect 62 25 1 6 c000
+  cell 31 26 c000
+  rect 27 28 1 2 c000
+  rect 31 28 1 4 c000
+  cell 96 28 c000
+  rect 61 30 1 3 c000
+  rect 27 31 1 5 c000
+  cell 96 31 c000
+  rect 62 32 1 9 c000
+  cell 100 32 c000
+  cell 31 33 c000
+  rect 96 33 1 6 c000
+  cell 30 34 c000
+  cell 29 35 c000
+  rect 31 35 1 6 c000
+  cell 29 37 c000
+  cell 27 38 c000
+  rect 61 38 1 3 c000
+  cell 84 40 c000
+  cell 96 40 c000
+  rect 42 41 2 3 c000
+  rect 62 42 1 2 c000
+  rect 95 42 1 2 c000
+  cell 28 43 c000
+  rect 30 43 1 2 c000
+  rect 41 44 1 4 c000
+  rect 44 44 2 3 c000
+  cell 97 44 c000
+  rect 39 45 2 3 c000
+  rect 42 45 2 2 c000
+  rect 46 45 8 2 c000
+  rect 56 45 1 3 c000
+  rect 58 45 2 3 c000
+  rect 61 45 1 2 c000
+  rect 68 45 1 3 c000
+  rect 70 45 1 3 c000
+  cell 79 45 c000
+  rect 54 46 2 2 c000
+  cell 57 46 c000
+  rect 60 46 1 2 c000
+  rect 62 46 1 2 c000
+  rect 65 46 3 1 c000
+  rect 69 46 1 2 c000
+  rect 71 46 1 2 c000
+  rect 73 46 1 2 c000
+  rect 75 46 2 1 c000
+  cell 83 46 c000
+  cell 90 46 c000
+  rect 95 46 1 2 c000
+  rect 36 47 2 1 c000
+  rect 43 47 2 1 c000
+  rect 46 47 6 1 c000
+  cell 53 47 c000
+  rect 63 47 2 1 c000
+  cell 79 47 c000
+  rect 63 48 1 2 c000
+  cell 62 50 c000
+  cell 84 52 c000
+  rect 94 52 1 5 c000
+  cell 63 54 c000
+  cell 62 56 c000
+  cell 61 58 c000
+  cell 93 58 c000
+  cell 34 59 c000
+  cell 63 59 c000
+  cell 30 60 c000
+  rect 93 60 1 3 c000
+  cell 63 62 c000
+  rect 92 63 1 4 c000
+  cell 31 64 c000
+  cell 91 68 c000
+  cell 34 70 c000
+  cell 90 73 c000
+  rect 89 74 1 3 c000
+  cell 39 78 c000
+  cell 61 78 c000
+  rect 88 78 1 2 c000
+  cell 40 80 c000
+  cell 61 80 c000
+  rect 86 82 1 2 c000
+  cell 41 83 c000
+  cell 85 85 c000
+  cell 84 87 c000
+  cell 67 89 c000
+  cell 83 89 c000
+  cell 56 90 c000
+  cell 58 91 c000
+  cell 82 91 c000
+  cell 57 92 c000
+  cell 46 93 c000
+  cell 81 93 c000
+  cell 80 95 c000
+  rect 79 96 1 2 c000
+  cell 78 98 c000
+  rect 77 99 1 2 c000
+  cell 76 101 c000
+  cell 75 103 c000
+  cell 74 104 c000
+  cell 73 106 c000
+  cell 72 107 c000
+  cell 70 110 c000
+  cell 69 111 c000
+  cell 68 112 c000
+  cell 67 113 c000
+  cell 66 114 c000
+  cell 62 115 c000
+  cell 65 115 c000
+  rect 63 116 2 1 c000
+  cell 63 118 c000
+}
+
+part c003 material source {
+  rect 63 5 2 1 c003
+  rect 61 6 1 5 c003
+  rect 64 6 3 1 c003
+  rect 59 7 2 4 c003
+  rect 62 7 1 3 c003
+  rect 65 7 4 3 c003
+  rect 57 8 2 4 c003
+  rect 69 8 2 4 c003
+  rect 55 9 2 4 c003
+  rect 71 9 2 4 c003
+  rect 53 10 2 1 c003
+  rect 67 10 2 1 c003
+  rect 73 10 2 4 c003
+  rect 54 11 1 2 c003
+  cell 68 11 c003
+  rect 75 11 3 3 c003
+  cell 53 12 c003
+  rect 78 12 3 1 c003
+  rect 78 13 1 2 c003
+  rect 81 13 3 1 c003
+  rect 40 14 1 3 c003
+  cell 42 14 c003
+  rect 76 14 2 1 c003
+  rect 82 14 7 1 c003
+  rect 34 15 6 3 c003
+  rect 41 15 1 2 c003
+  cell 43 15 c003
+  rect 82 15 6 1 c003
+  rect 28 16 6 1 c003
+  cell 42 16 c003
+  rect 83 16 6 1 c003
+  rect 31 17 3 2 c003
+  rect 85 17 4 1 c003
+  rect 28 18 1 24 c003
+  rect 34 18 5 1 c003
+  cell 97 18 c003
+  cell 32 19 c003
+  cell 34 19 c003
+  cell 94 19 c003
+  rect 29 20 1 15 c003
+  rect 30 21 1 13 c003
+  rect 27 22 1 2 c003
+  cell 31 24 c003
+  cell 96 24 c003
+  cell 27 27 c003
+  cell 96 29 c003
+  cell 76 31 c003
+  cell 98 31 c003
+  cell 31 32 c003
+  cell 96 32 c003
+  rect 97 33 3 2 c003
+  rect 30 35 1 8 c003
+  rect 97 35 1 3 c003
+  cell 99 35 c003
+  cell 27 36 c003
+  cell 29 36 c003
+  cell 98 37 c003
+  rect 29 38 1 5 c003
+  cell 40 40 c003
+  rect 31 41 1 3 c003
+  cell 96 41 c003
+  cell 28 44 c003
+  cell 32 44 c003
+  rect 95 44 1 2 c003
+  cell 29 45 c003
+  cell 28 46 c003
+  rect 29 47 2 1 c003
+  rect 30 48 1 2 c003
+  cell 32 48 c003
+  rect 29 49 1 2 c003
+  rect 31 49 1 15 c003
+  rect 32 50 1 17 c003
+  rect 30 51 1 4 c003
+  rect 29 52 1 3 c003
+  cell 76 53 c003
+  cell 34 55 c003
+  cell 95 55 c003
+  rect 33 56 1 3 c003
+  rect 30 57 1 2 c003
+  cell 93 59 c003
+  rect 33 60 1 7 c003
+  rect 34 62 1 2 c003
+  rect 34 65 1 2 c003
+  cell 91 67 c003
+  rect 32 68 2 1 c003
+  cell 33 69 c003
+  cell 92 70 c003
+  cell 90 71 c003
+  rect 37 73 1 2 c003
+  cell 34 75 c003
+  rect 36 76 3 2 c003
+  rect 35 78 1 2 c003
+  rect 37 78 2 5 c003
+  rect 36 79 1 3 c003
+  cell 39 79 c003
+  cell 87 80 c003
+  rect 39 81 2 2 c003
+  rect 38 83 2 1 c003
+  cell 41 84 c003
+  cell 85 84 c003
+  cell 38 85 c003
+  cell 40 85 c003
+  rect 41 86 2 1 c003
+  cell 84 86 c003
+  rect 38 87 2 1 c003
+  cell 42 87 c003
+  cell 41 88 c003
+  cell 43 89 c003
+  rect 82 90 2 1 c003
+  cell 44 91 c003
+  cell 80 94 c003
+  cell 52 102 c003
+  cell 73 105 c003
+  cell 71 108 c003
+  cell 68 111 c003
+  cell 74 111 c003
+  cell 61 114 c003
+  cell 68 117 c003
+  cell 61 120 c003
+}
+
+part c004 material source {
+  cell 64 11 c004
+  rect 61 12 1 3 c004
+  cell 63 12 c004
+  rect 65 12 2 4 c004
+  cell 60 13 c004
+  rect 62 13 1 6 c004
+  rect 67 13 2 1 c004
+  rect 71 13 2 1 c004
+  cell 59 14 c004
+  rect 68 14 2 2 c004
+  rect 93 14 2 5 c004
+  cell 60 15 c004
+  cell 64 15 c004
+  rect 67 15 1 8 c004
+  rect 70 15 3 1 c004
+  rect 88 15 5 1 c004
+  rect 96 15 1 2 c004
+  rect 98 15 2 1 c004
+  cell 48 16 c004
+  rect 61 16 1 3 c004
+  rect 65 16 1 3 c004
+  rect 69 16 1 2 c004
+  rect 71 16 5 3 c004
+  rect 89 16 4 3 c004
+  rect 95 16 1 4 c004
+  rect 99 16 2 2 c004
+  cell 28 17 c004
+  cell 53 17 c004
+  rect 66 17 1 4 c004
+  rect 76 17 3 2 c004
+  rect 60 18 1 5 c004
+  rect 68 18 1 5 c004
+  rect 79 18 1 27 c004
+  rect 81 18 1 27 c004
+  cell 31 19 c004
+  cell 59 19 c004
+  rect 69 19 3 1 c004
+  rect 77 19 2 8 c004
+  rect 80 19 1 26 c004
+  rect 82 19 3 1 c004
+  cell 96 19 c004
+  rect 99 19 2 1 c004
+  cell 30 20 c004
+  cell 41 20 c004
+  cell 43 20 c004
+  cell 61 20 c004
+  cell 72 20 c004
+  rect 74 20 3 1 c004
+  rect 82 20 1 24 c004
+  cell 84 20 c004
+  rect 33 21 1 2 c004
+  rect 35 21 2 9 c004
+  cell 39 21 c004
+  cell 58 21 c004
+  rect 69 21 1 2 c004
+  cell 73 21 c004
+  rect 76 21 1 3 c004
+  rect 83 21 1 6 c004
+  rect 85 21 1 7 c004
+  rect 97 21 1 12 c004
+  cell 99 21 c004
+  cell 31 22 c004
+  rect 34 22 1 7 c004
+  rect 37 22 1 3 c004
+  cell 41 22 c004
+  cell 59 22 c004
+  rect 70 22 1 2 c004
+  rect 74 22 2 1 c004
+  rect 84 22 1 18 c004
+  rect 86 22 1 4 c004
+  rect 98 22 1 9 c004
+  cell 58 23 c004
+  rect 71 23 2 5 c004
+  cell 96 23 c004
+  rect 33 24 1 15 c004
+  rect 40 24 1 2 c004
+  cell 56 24 c004
+  rect 87 24 1 4 c004
+  cell 31 25 c004
+  rect 73 25 2 2 c004
+  rect 76 25 1 6 c004
+  rect 88 25 1 5 c004
+  cell 99 25 c004
+  cell 32 26 c004
+  cell 91 26 c004
+  rect 96 26 1 2 c004
+  rect 100 26 1 2 c004
+  cell 31 27 c004
+  cell 57 27 c004
+  rect 59 27 1 5 c004
+  rect 68 27 3 1 c004
+  rect 78 27 1 18 c004
+  rect 86 27 1 11 c004
+  cell 89 27 c004
+  rect 99 27 1 6 c004
+  rect 37 28 2 1 c004
+  cell 56 28 c004
+  cell 58 28 c004
+  rect 60 28 1 6 c004
+  rect 67 28 3 3 c004
+  rect 72 28 4 1 c004
+  rect 83 28 1 10 c004
+  cell 90 28 c004
+  rect 37 29 1 2 c004
+  cell 54 29 c004
+  rect 70 29 2 1 c004
+  rect 73 29 1 3 c004
+  rect 75 29 1 2 c004
+  rect 77 29 1 2 c004
+  rect 85 29 1 12 c004
+  rect 87 29 1 10 c004
+  cell 89 29 c004
+  rect 100 29 1 3 c004
+  cell 27 30 c004
+  rect 34 30 1 18 c004
+  rect 36 30 1 2 c004
+  cell 38 30 c004
+  rect 43 30 1 2 c004
+  cell 46 30 c004
+  cell 57 30 c004
+  rect 71 30 2 1 c004
+  rect 74 30 1 2 c004
+  cell 96 30 c004
+  rect 35 31 1 17 c004
+  rect 67 31 1 2 c004
+  rect 69 31 2 1 c004
+  rect 72 31 1 4 c004
+  cell 88 31 c004
+  rect 66 32 1 2 c004
+  cell 68 32 c004
+  rect 70 32 2 1 c004
+  rect 76 32 2 1 c004
+  cell 89 32 c004
+  cell 98 32 c004
+  rect 37 33 2 1 c004
+  rect 74 33 2 1 c004
+  cell 77 33 c004
+  rect 88 33 1 4 c004
+  cell 90 33 c004
+  cell 100 33 c004
+  rect 36 34 1 13 c004
+  rect 59 34 1 2 c004
+  rect 67 34 2 11 c004
+  rect 70 34 2 1 c004
+  rect 74 34 1 4 c004
+  rect 76 34 1 11 c004
+  rect 89 34 1 2 c004
+  rect 37 35 2 1 c004
+  rect 40 35 1 3 c004
+  cell 58 35 c004
+  rect 60 35 2 1 c004
+  rect 69 35 2 1 c004
+  cell 73 35 c004
+  rect 77 35 1 10 c004
+  cell 90 35 c004
+  rect 98 35 1 2 c004
+  rect 37 36 1 2 c004
+  rect 60 36 1 4 c004
+  rect 72 36 1 9 c004
+  rect 75 36 1 9 c004
+  rect 99 36 1 6 c004
+  rect 38 37 2 3 c004
+  cell 44 37 c004
+  cell 61 37 c004
+  cell 69 37 c004
+  cell 73 37 c004
+  rect 90 37 1 2 c004
+  rect 42 38 2 2 c004
+  rect 45 38 1 6 c004
+  rect 47 38 1 2 c004
+  rect 70 38 1 3 c004
+  rect 88 38 2 3 c004
+  rect 97 38 2 5 c004
+  cell 27 39 c004
+  rect 37 39 1 7 c004
+  rect 40 39 2 1 c004
+  rect 46 39 1 5 c004
+  cell 48 39 c004
+  rect 56 39 1 2 c004
+  rect 59 39 1 6 c004
+  cell 69 39 c004
+  rect 71 39 1 6 c004
+  rect 73 39 2 6 c004
+  cell 83 39 c004
+  rect 86 39 1 2 c004
+  cell 96 39 c004
+  cell 33 40 c004
+  rect 38 40 1 6 c004
+  cell 42 40 c004
+  rect 44 40 1 3 c004
+  cell 66 40 c004
+  rect 32 41 1 2 c004
+  rect 39 41 3 2 c004
+  rect 60 41 2 1 c004
+  rect 69 41 1 4 c004
+  rect 83 41 1 3 c004
+  rect 89 41 2 1 c004
+  cell 28 42 c004
+  rect 48 42 1 3 c004
+  rect 70 42 1 3 c004
+  rect 96 42 1 3 c004
+  cell 29 43 c004
+  rect 39 43 1 2 c004
+  rect 47 43 1 2 c004
+  rect 57 43 1 2 c004
+  rect 60 43 1 2 c004
+  cell 87 43 c004
+  rect 98 43 2 2 c004
+  cell 40 44 c004
+  cell 49 44 c004
+  cell 51 44 c004
+  rect 54 44 3 1 c004
+  cell 58 44 c004
+  cell 28 45 c004
+  rect 32 45 1 3 c004
+  cell 29 46 c004
+  rect 31 46 1 3 c004
+  cell 96 46 c004
+  rect 28 47 1 2 c004
+  rect 97 47 2 1 c004
+  cell 29 48 c004
+  rect 36 48 1 3 c004
+  rect 95 48 2 1 c004
+  cell 32 49 c004
+  rect 35 49 1 6 c004
+  rect 96 49 1 13 c004
+  rect 98 49 1 4 c004
+  cell 30 50 c004
+  cell 34 50 c004
+  rect 37 50 2 6 c004
+  rect 53 50 1 2 c004
+  rect 59 50 2 1 c004
+  rect 69 50 1 24 c004
+  rect 71 50 1 18 c004
+  rect 74 50 1 12 c004
+  rect 78 50 1 17 c004
+  rect 95 50 1 5 c004
+  rect 97 50 1 11 c004
+  cell 29 51 c004
+  rect 39 51 2 1 c004
+  rect 45 51 8 1 c004
+  rect 54 51 6 1 c004
+  rect 67 51 2 3 c004
+  rect 70 51 1 16 c004
+  rect 72 51 2 6 c004
+  rect 75 51 3 2 c004
+  rect 36 52 1 6 c004
+  rect 39 52 1 8 c004
+  rect 45 52 4 1 c004
+  rect 55 52 7 1 c004
+  rect 79 52 3 7 c004
+  cell 89 52 c004
+  rect 33 53 1 3 c004
+  rect 40 53 2 2 c004
+  rect 44 53 3 21 c004
+  cell 50 53 c004
+  rect 52 53 2 2 c004
+  rect 57 53 4 16 c004
+  rect 75 53 1 6 c004
+  rect 77 53 1 7 c004
+  rect 83 53 1 2 c004
+  rect 54 54 1 7 c004
+  rect 56 54 1 22 c004
+  cell 66 54 c004
+  rect 68 54 1 3 c004
+  rect 76 54 1 7 c004
+  rect 82 54 1 5 c004
+  rect 29 55 2 2 c004
+  rect 41 55 3 9 c004
+  rect 47 55 1 4 c004
+  rect 50 55 2 1 c004
+  rect 53 55 1 4 c004
+  rect 55 55 1 26 c004
+  rect 67 55 1 3 c004
+  rect 38 56 1 10 c004
+  cell 40 56 c004
+  rect 48 56 3 2 c004
+  cell 66 56 c004
+  rect 95 56 1 13 c004
+  rect 52 57 1 27 c004
+  cell 61 57 c004
+  rect 73 57 1 13 c004
+  rect 94 57 1 13 c004
+  cell 35 58 c004
+  rect 40 58 1 2 c004
+  rect 48 58 2 17 c004
+  rect 68 58 1 9 c004
+  rect 72 58 1 14 c004
+  rect 84 58 2 1 c004
+  cell 33 59 c004
+  rect 36 59 1 2 c004
+  rect 50 59 2 18 c004
+  rect 67 59 1 6 c004
+  rect 79 59 2 7 c004
+  rect 83 59 1 5 c004
+  rect 34 60 1 2 c004
+  rect 53 60 1 22 c004
+  cell 66 60 c004
+  rect 75 60 1 4 c004
+  rect 81 60 2 2 c004
+  rect 84 60 2 1 c004
+  cell 87 60 c004
+  cell 30 61 c004
+  rect 37 61 1 2 c004
+  rect 39 61 1 2 c004
+  rect 47 61 1 5 c004
+  cell 40 62 c004
+  rect 54 62 1 5 c004
+  rect 76 62 2 1 c004
+  rect 82 62 1 2 c004
+  cell 76 63 c004
+  rect 81 63 1 2 c004
+  rect 93 63 1 6 c004
+  rect 96 63 1 2 c004
+  rect 34 64 2 1 c004
+  rect 39 64 3 5 c004
+  rect 43 64 1 9 c004
+  cell 66 64 c004
+  cell 84 64 c004
+  cell 31 65 c004
+  rect 35 65 1 4 c004
+  rect 42 65 1 2 c004
+  rect 74 65 4 1 c004
+  rect 83 65 1 2 c004
+  cell 61 66 c004
+  cell 67 66 c004
+  cell 74 66 c004
+  rect 77 66 1 4 c004
+  rect 79 66 1 3 c004
+  rect 32 67 3 1 c004
+  rect 47 67 1 3 c004
+  rect 76 67 1 2 c004
+  cell 80 67 c004
+  rect 92 67 1 3 c004
+  rect 34 68 1 2 c004
+  rect 36 68 1 3 c004
+  rect 68 68 1 2 c004
+  rect 70 68 1 4 c004
+  cell 32 69 c004
+  rect 41 69 1 3 c004
+  rect 54 69 1 4 c004
+  rect 57 69 3 2 c004
+  cell 67 69 c004
+  cell 71 69 c004
+  cell 91 69 c004
+  rect 33 70 1 3 c004
+  rect 37 70 1 3 c004
+  rect 42 70 1 3 c004
+  cell 60 70 c004
+  cell 74 70 c004
+  cell 80 70 c004
+  cell 93 70 c004
+  rect 47 71 1 10 c004
+  rect 57 71 2 1 c004
+  rect 67 71 2 1 c004
+  cell 77 71 c004
+  rect 91 71 1 11 c004
+  cell 94 71 c004
+  rect 36 72 1 4 c004
+  cell 38 72 c004
+  rect 57 72 1 5 c004
+  rect 59 72 1 2 c004
+  rect 68 72 1 2 c004
+  cell 79 72 c004
+  cell 90 72 c004
+  rect 34 73 2 2 c004
+  rect 58 73 1 5 c004
+  cell 60 73 c004
+  cell 67 73 c004
+  rect 70 73 3 1 c004
+  cell 43 74 c004
+  rect 45 74 1 2 c004
+  rect 70 74 2 1 c004
+  rect 90 74 1 9 c004
+  rect 92 74 2 2 c004
+  rect 35 75 1 3 c004
+  rect 37 75 2 1 c004
+  rect 44 75 1 2 c004
+  cell 46 75 c004
+  rect 49 75 1 5 c004
+  rect 54 75 1 2 c004
+  rect 70 75 1 2 c004
+  cell 78 75 c004
+  cell 34 76 c004
+  rect 48 76 1 4 c004
+  cell 60 76 c004
+  cell 69 76 c004
+  rect 92 76 1 3 c004
+  cell 39 77 c004
+  rect 43 77 1 2 c004
+  rect 45 77 2 1 c004
+  rect 51 77 1 3 c004
+  rect 56 77 1 2 c004
+  rect 88 77 2 1 c004
+  cell 36 78 c004
+  cell 46 78 c004
+  rect 50 78 1 4 c004
+  rect 54 78 1 5 c004
+  rect 57 78 1 8 c004
+  cell 69 78 c004
+  rect 89 78 1 8 c004
+  cell 40 79 c004
+  cell 58 79 c004
+  cell 39 80 c004
+  cell 46 80 c004
+  cell 59 80 c004
+  rect 69 80 2 1 c004
+  rect 88 80 1 7 c004
+  cell 45 81 c004
+  rect 87 81 1 8 c004
+  cell 41 82 c004
+  cell 51 82 c004
+  rect 56 82 1 3 c004
+  rect 59 82 1 2 c004
+  cell 70 82 c004
+  cell 37 83 c004
+  rect 40 83 1 2 c004
+  rect 46 83 3 1 c004
+  cell 50 83 c004
+  rect 53 83 1 4 c004
+  cell 58 83 c004
+  rect 38 84 2 1 c004
+  rect 42 84 1 2 c004
+  rect 51 84 1 3 c004
+  rect 86 84 1 5 c004
+  rect 39 85 1 2 c004
+  cell 41 85 c004
+  cell 38 86 c004
+  rect 40 86 1 5 c004
+  rect 43 86 1 3 c004
+  cell 52 86 c004
+  cell 54 86 c004
+  cell 73 86 c004
+  rect 85 86 1 4 c004
+  cell 41 87 c004
+  cell 48 87 c004
+  cell 39 88 c004
+  rect 42 88 1 7 c004
+  cell 53 88 c004
+  rect 84 88 1 4 c004
+  rect 41 89 1 3 c004
+  rect 44 89 1 2 c004
+  rect 43 90 1 6 c004
+  rect 45 90 1 10 c004
+  cell 53 90 c004
+  cell 83 91 c004
+  cell 85 91 c004
+  rect 44 92 1 7 c004
+  cell 46 92 c004
+  cell 53 92 c004
+  rect 82 92 1 4 c004
+  cell 41 93 c004
+  cell 83 93 c004
+  cell 85 93 c004
+  rect 46 94 2 8 c004
+  cell 81 94 c004
+  cell 48 96 c004
+  cell 80 96 c004
+  rect 83 96 1 2 c004
+  rect 49 97 1 5 c004
+  rect 48 98 1 3 c004
+  rect 79 98 3 2 c004
+  rect 78 99 1 5 c004
+  cell 82 99 c004
+  rect 50 100 1 7 c004
+  rect 80 100 2 1 c004
+  rect 51 101 1 2 c004
+  rect 77 101 1 3 c004
+  rect 79 101 2 1 c004
+  rect 47 102 2 1 c004
+  rect 76 102 1 3 c004
+  cell 80 102 c004
+  rect 48 103 2 2 c004
+  rect 52 103 1 4 c004
+  cell 59 103 c004
+  rect 75 104 1 3 c004
+  cell 49 105 c004
+  rect 51 105 1 4 c004
+  rect 53 105 2 2 c004
+  rect 74 105 1 2 c004
+  rect 77 105 2 1 c004
+  cell 55 106 c004
+  cell 77 106 c004
+  cell 54 107 c004
+  cell 73 107 c004
+  rect 76 107 1 2 c004
+  rect 52 108 1 2 c004
+  rect 55 108 2 1 c004
+  rect 72 108 1 2 c004
+  cell 75 108 c004
+  rect 53 109 2 3 c004
+  rect 56 109 2 1 c004
+  cell 71 109 c004
+  rect 74 109 1 2 c004
+  rect 56 110 1 5 c004
+  cell 73 110 c004
+  rect 55 111 1 3 c004
+  rect 57 111 2 1 c004
+  rect 70 111 3 1 c004
+  cell 54 112 c004
+  rect 58 112 2 4 c004
+  rect 69 112 1 3 c004
+  rect 71 112 2 1 c004
+  rect 57 113 1 2 c004
+  rect 60 113 1 6 c004
+  rect 70 113 2 2 c004
+  rect 67 114 1 2 c004
+  rect 61 115 1 2 c004
+  rect 66 115 1 3 c004
+  rect 68 115 1 2 c004
+  cell 70 115 c004
+  cell 58 116 c004
+  cell 62 116 c004
+  cell 65 116 c004
+  cell 69 116 c004
+  cell 59 117 c004
+  rect 67 117 1 2 c004
+  rect 61 118 1 2 c004
+  cell 62 120 c004
+  cell 63 121 c004
+}
+
+part c002 material source {
+  cell 62 12 c002
+  rect 64 12 1 3 c002
+  rect 63 13 1 4 c002
+  rect 58 14 1 7 c002
+  cell 67 14 c002
+  rect 55 15 3 9 c002
+  rect 59 15 1 4 c002
+  cell 61 15 c002
+  rect 52 16 1 29 c002
+  rect 54 16 1 13 c002
+  rect 60 16 1 2 c002
+  cell 66 16 c002
+  rect 68 16 1 2 c002
+  rect 50 17 2 27 c002
+  rect 47 18 3 20 c002
+  rect 53 18 1 10 c002
+  cell 69 18 c002
+  rect 42 19 1 19 c002
+  rect 44 19 3 11 c002
+  cell 61 19 c002
+  rect 72 19 5 1 c002
+  rect 40 20 1 3 c002
+  rect 59 20 1 2 c002
+  cell 69 20 c002
+  rect 71 20 1 3 c002
+  cell 73 20 c002
+  rect 38 21 1 7 c002
+  cell 41 21 c002
+  rect 43 21 1 9 c002
+  rect 72 21 1 2 c002
+  rect 74 21 2 1 c002
+  cell 58 22 c002
+  rect 73 22 1 3 c002
+  rect 39 23 1 14 c002
+  rect 41 23 1 16 c002
+  rect 74 23 2 2 c002
+  rect 55 24 1 20 c002
+  cell 57 24 c002
+  cell 76 24 c002
+  rect 37 25 1 3 c002
+  rect 56 25 1 3 c002
+  rect 75 25 1 3 c002
+  rect 58 26 1 2 c002
+  rect 73 27 2 1 c002
+  rect 77 27 1 2 c002
+  rect 40 28 1 7 c002
+  rect 57 28 1 2 c002
+  rect 70 28 2 1 c002
+  cell 34 29 c002
+  cell 38 29 c002
+  rect 53 29 1 16 c002
+  rect 56 29 1 10 c002
+  rect 58 29 1 6 c002
+  cell 72 29 c002
+  cell 74 29 c002
+  cell 35 30 c002
+  rect 44 30 2 7 c002
+  rect 54 30 1 14 c002
+  rect 37 31 2 2 c002
+  rect 46 31 1 8 c002
+  rect 57 31 1 12 c002
+  cell 68 31 c002
+  cell 71 31 c002
+  rect 75 31 1 2 c002
+  cell 77 31 c002
+  rect 36 32 1 2 c002
+  rect 43 32 1 6 c002
+  rect 59 32 1 2 c002
+  rect 69 32 1 3 c002
+  rect 73 32 2 1 c002
+  cell 68 33 c002
+  rect 70 33 2 1 c002
+  rect 73 33 1 2 c002
+  cell 76 33 c002
+  rect 37 34 2 1 c002
+  cell 60 34 c002
+  rect 75 34 1 2 c002
+  cell 77 34 c002
+  rect 71 35 2 1 c002
+  cell 38 36 c002
+  rect 58 36 2 3 c002
+  rect 69 36 3 1 c002
+  cell 73 36 c002
+  cell 45 37 c002
+  rect 70 37 2 1 c002
+  cell 37 38 c002
+  rect 44 38 1 2 c002
+  rect 48 38 2 1 c002
+  cell 69 38 c002
+  cell 71 38 c002
+  rect 73 38 2 1 c002
+  rect 49 39 1 5 c002
+  rect 58 39 1 5 c002
+  cell 39 40 c002
+  cell 41 40 c002
+  rect 47 40 2 2 c002
+  cell 60 40 c002
+  cell 69 40 c002
+  rect 56 41 1 3 c002
+  cell 70 41 c002
+  cell 47 42 c002
+  cell 60 42 c002
+  cell 50 44 c002
+  rect 49 52 6 1 c002
+  rect 47 53 3 2 c002
+  rect 51 53 1 2 c002
+  rect 54 53 3 1 c002
+  cell 50 54 c002
+  cell 55 54 c002
+  rect 48 55 2 1 c002
+  rect 52 55 1 2 c002
+  rect 51 56 1 3 c002
+  cell 50 58 c002
+  cell 47 59 c002
+  cell 53 59 c002
+}
+
+part c001 material source {
+  rect 64 17 1 30 c001
+  rect 65 19 1 27 c001
+  rect 66 21 1 9 c001
+  cell 62 24 c001
+  rect 67 24 3 2 c001
+  cell 70 25 c001
+  cell 57 26 c001
+  cell 59 26 c001
+  cell 67 26 c001
+  cell 61 29 c001
+  cell 62 31 c001
+  cell 66 35 c001
+  cell 61 36 c001
+  cell 62 41 c001
+  rect 84 41 2 6 c001
+  cell 66 42 c001
+  rect 86 43 1 5 c001
+  rect 42 44 2 1 c001
+  rect 61 44 3 1 c001
+  rect 66 44 1 2 c001
+  rect 82 44 2 2 c001
+  rect 87 44 1 3 c001
+  cell 57 45 c001
+  rect 62 45 2 1 c001
+  cell 67 45 c001
+  rect 72 45 1 5 c001
+  rect 74 45 5 1 c001
+  rect 80 45 2 5 c001
+  rect 88 45 1 5 c001
+  rect 38 46 1 3 c001
+  cell 63 46 c001
+  rect 74 46 1 3 c001
+  rect 77 46 3 1 c001
+  cell 82 46 c001
+  cell 89 46 c001
+  rect 42 47 1 7 c001
+  rect 45 47 1 3 c001
+  rect 52 47 1 2 c001
+  rect 57 47 1 2 c001
+  rect 61 47 1 3 c001
+  rect 65 47 3 2 c001
+  rect 75 47 4 2 c001
+  rect 83 47 2 4 c001
+  rect 39 48 3 2 c001
+  rect 43 48 2 3 c001
+  rect 46 48 6 2 c001
+  rect 53 48 4 1 c001
+  rect 58 48 3 1 c001
+  rect 62 48 1 2 c001
+  rect 64 48 1 22 c001
+  rect 68 48 4 1 c001
+  cell 73 48 c001
+  rect 79 48 1 2 c001
+  rect 82 48 1 3 c001
+  rect 89 48 2 1 c001
+  cell 53 49 c001
+  rect 55 49 2 1 c001
+  rect 65 49 1 31 c001
+  cell 70 49 c001
+  rect 77 49 2 1 c001
+  rect 85 49 3 1 c001
+  cell 41 50 c001
+  rect 63 50 1 4 c001
+  rect 85 50 1 4 c001
+  rect 43 51 1 4 c001
+  rect 62 51 1 5 c001
+  cell 84 51 c001
+  cell 84 53 c001
+  rect 63 55 1 4 c001
+  rect 62 57 1 44 c001
+  rect 63 60 1 2 c001
+  cell 61 61 c001
+  rect 63 63 1 40 c001
+  cell 66 63 c001
+  cell 61 71 c001
+  rect 64 71 1 13 c001
+  cell 61 76 c001
+  rect 61 81 1 4 c001
+  rect 65 81 1 4 c001
+  cell 66 82 c001
+  cell 64 85 c001
+  cell 66 85 c001
+  cell 61 86 c001
+  rect 61 88 1 9 c001
+  rect 65 88 1 3 c001
+  cell 66 89 c001
+  rect 60 90 1 4 c001
+  rect 64 90 1 2 c001
+  rect 67 90 2 3 c001
+  cell 57 91 c001
+  rect 59 91 1 2 c001
+  rect 66 91 1 2 c001
+  rect 69 91 2 2 c001
+  rect 58 92 1 2 c001
+  cell 65 92 c001
+  cell 64 93 c001
+  rect 68 93 2 1 c001
+  rect 64 95 2 1 c001
+  rect 65 96 2 1 c001
+  cell 64 97 c001
+}
+
+export json png aseprite

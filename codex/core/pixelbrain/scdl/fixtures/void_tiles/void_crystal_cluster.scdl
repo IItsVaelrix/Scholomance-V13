@@ -1,0 +1,113 @@
+# void_crystal_cluster — large amethyst crystal formation, tutorial island prop
+# 128x128, transparent background, bottom-center anchored.
+# Light law: upper-left (-1,-1). Left faces lit, right faces shadowed.
+asset void_crystal_cluster canvas 128x128
+
+palette {
+  abyss    = #04060e
+  deep     = #0e1526
+  dark     = #182238
+  base     = #22304f
+  mid      = #2d4066
+  frost    = #a8c3e2
+  spec     = #e3eef9
+  cyanhot  = #67e8f9
+  cyansoft = #b7f4fd
+  amethdark = #3b2170
+  amethbody = #5b34a8
+  amethlite = #8b5cf6
+  amethhi   = #b794f6
+  amethspec = #e9e2fc
+}
+
+# ── rubble mound the crystals erupt from ─────────────────────────────────
+part mound material void_ice {
+  polygon 18 108 34 98 58 94 84 96 108 104 116 112 96 120 64 124 30 120 12 114 deep
+  polygon 30 104 52 98 76 100 98 108 84 114 52 116 28 112 dark
+  polygon 40 102 60 98 76 102 64 108 46 108 base
+  # snow dusting on the lit NW shoulder
+  cell 30 102 frost
+  cell 36 100 frost
+  cell 44 98 frost
+  cell 52 96 frost
+  cell 34 103 spec
+  cell 48 97 spec
+  # scattered shards at the base
+  polygon 14 110 20 106 24 112 18 114 dark
+  polygon 102 110 110 106 114 114 106 116 abyss
+}
+
+# ── great shard — the centerpiece spire ──────────────────────────────────
+part greatshard material amethyst {
+  # lit left face
+  polygon 70 14 50 92 64 104 68 40 amethlite
+  # shadowed right face
+  polygon 70 14 68 40 64 104 86 94 amethdark
+  # body core face between them
+  polygon 70 14 66 44 64 100 70 96 72 44 amethbody
+  # ridge light running to the tip
+  line 70 14 65 60 amethhi
+  line 65 60 64 100 amethlite
+  # tip flare
+  cell 70 13 amethspec
+  cell 69 15 amethspec
+  cell 70 16 amethhi
+  cell 71 18 amethhi
+  # facet cut near the shoulder
+  polygon 62 52 68 46 70 56 64 60 amethhi
+  polygon 72 52 76 48 78 60 74 62 amethdark
+}
+
+# ── flanking shards ──────────────────────────────────────────────────────
+part leftshard material amethyst {
+  polygon 32 44 20 94 32 104 34 62 amethlite
+  polygon 32 44 34 62 32 104 46 92 amethdark
+  line 32 44 32 76 amethhi
+  cell 32 43 amethspec
+  cell 31 45 amethhi
+  # small facet glint
+  polygon 28 66 32 62 34 70 30 72 amethhi
+}
+
+part rightshard material amethyst {
+  polygon 100 52 86 96 100 108 102 68 amethbody
+  polygon 100 52 102 68 100 108 114 94 amethdark
+  line 100 52 100 80 amethlite
+  cell 100 51 amethhi
+  cell 99 53 amethlite
+}
+
+# ── front kneeling shard, snapped short ──────────────────────────────────
+part frontshard material amethyst {
+  polygon 50 72 42 106 52 112 54 84 amethbody
+  polygon 50 72 54 84 52 112 62 104 amethdark
+  cell 50 71 amethhi
+  line 50 72 51 90 amethlite
+}
+
+# ── inner void-light — cores burning inside each shard ───────────────────
+part cores material cyan_glow {
+  glow radius 4
+  line 68 30 66 76 cyanhot
+  cell 67 78 cyansoft
+  cell 68 26 cyansoft
+  line 31 56 31 84 cyansoft
+  line 100 62 100 90 cyansoft
+  cell 51 84 cyansoft
+  cell 51 92 cyanhot
+  # ground glow where the cores meet the mound
+  cell 60 104 cyansoft
+  cell 66 106 cyanhot
+  cell 72 104 cyansoft
+}
+
+# ── frost sparkle on lit crystal faces ───────────────────────────────────
+part sparkle material diamond {
+  cell 58 44 amethspec
+  cell 54 62 amethspec
+  cell 60 80 amethspec
+  cell 26 60 amethspec
+  cell 24 78 amethspec
+  cell 96 70 amethhi
+  cell 46 84 amethspec
+}

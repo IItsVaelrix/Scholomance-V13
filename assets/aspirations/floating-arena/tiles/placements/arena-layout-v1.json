@@ -1,0 +1,45 @@
+{
+  "name": "floating-ritual-arena",
+  "description": "Tile placement to reconstruct the AI reference scene (minus characters). Base tile size 64. Central circle is a special larger feature.",
+  "tileSize": 64,
+  "canvas": { "width": 1280, "height": 720 },
+  "scaleFactor": 1.8,
+  "floorTiles": [
+    {"type": "rune-01-star", "gridX": 3, "gridY": 2},
+    {"type": "rune-02-cross", "gridX": 4, "gridY": 2},
+    {"type": "rune-03-diamond", "gridX": 5, "gridY": 2},
+    {"type": "rune-tile-base", "gridX": 6, "gridY": 2},
+    {"type": "rune-01-star", "gridX": 3, "gridY": 3},
+    {"type": "rune-tile-var-a", "gridX": 4, "gridY": 3},
+    {"type": "rune-02-cross", "gridX": 5, "gridY": 3},
+    {"type": "rune-03-diamond", "gridX": 6, "gridY": 3},
+    {"type": "rune-tile-base", "gridX": 3, "gridY": 4},
+    {"type": "rune-01-star", "gridX": 4, "gridY": 4},
+    {"type": "rune-tile-var-a", "gridX": 5, "gridY": 4},
+    {"type": "rune-02-cross", "gridX": 6, "gridY": 4},
+    {"type": "rune-03-diamond", "gridX": 3, "gridY": 5},
+    {"type": "rune-tile-base", "gridX": 4, "gridY": 5},
+    {"type": "rune-01-star", "gridX": 5, "gridY": 5},
+    {"type": "rune-tile-var-a", "gridX": 6, "gridY": 5}
+  ],
+  "edges": [
+    {"type": "edge-ice-border", "gridX": 2, "gridY": 1, "rotation": 0},
+    {"type": "edge-ice-border", "gridX": 7, "gridY": 3, "rotation": 90},
+    {"type": "edge-ice-border", "gridX": 4, "gridY": 6, "rotation": 180}
+  ],
+  "props": [
+    {"type": "prop-crystal-cluster", "gridX": 2, "gridY": 2, "scale": 1.1},
+    {"type": "prop-crystal-cluster", "gridX": 7, "gridY": 4, "scale": 0.9},
+    {"type": "prop-crystal-cluster", "gridX": 3, "gridY": 6, "scale": 1.0}
+  ],
+  "features": [
+    {
+      "type": "central-circle-base",
+      "gridX": 4.2,
+      "gridY": 3.5,
+      "size": "large",
+      "layer": "overlay"
+    }
+  ],
+  "notes": "Expanded layout using multiple unique runes from the reference crops. Use enhanced PNGs/JPGs for visuals. Base SCDL versions for engine data. Add more unique glyphs (we have refs up to rune-08) as needed."
+}

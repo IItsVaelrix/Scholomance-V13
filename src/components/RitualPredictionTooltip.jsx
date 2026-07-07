@@ -4,7 +4,7 @@ import { ResizableBox } from 'react-resizable';
 import { useTheme } from '../hooks/useTheme.jsx';
 import { useWordLookup } from '../hooks/useWordLookup.jsx';
 import { ScholomanceCorpusAPI } from '../lib/scholomanceCorpus.api.js';
-import { buildRitualPrediction, posToRole } from '../lib/ritualPredictionTooltip.js';
+import { buildRitualPrediction, reconcileWithLexicon } from '../lib/ritualPredictionTooltip.js';
 import { resolveOverlayPlacement } from '../lib/truesight/overlay-placement.js';
 import { ArrowLeft, ArrowRight, BookOpen, ChevronDown, ChevronRight, Copy, Replace, Search, Sparkles, X } from 'lucide-react';
 import './RitualPredictionTooltip.css';
@@ -13,8 +13,8 @@ const TOOLTIP_MIN_WIDTH = 300;
 const TOOLTIP_MIN_HEIGHT = 300;
 const TOOLTIP_MAX_WIDTH = 680;
 const TOOLTIP_MAX_HEIGHT = 720;
-const TOOLTIP_DEFAULT_WIDTH = 380;
-const TOOLTIP_DEFAULT_HEIGHT = 500;
+const TOOLTIP_DEFAULT_WIDTH = 420;
+const TOOLTIP_DEFAULT_HEIGHT = 580;
 
 const DRAG_IGNORE_SELECTOR = [
   '.rp-close-btn',
@@ -30,7 +30,7 @@ const DRAG_IGNORE_SELECTOR = [
   'input',
   'textarea',
   'select',
-  '.react-resizable-handle',
+  '.react-resizable-handle'
 ].join(', ');
 
 const CARD_INITIAL = { opacity: 0, scale: 0.94, y: 8 };
@@ -200,7 +200,11 @@ function ResonanceSection({ partners }) {
       <div className="rp-section-label">Resonance (this line)</div>
       <ul className="rp-resonance-list">
         {partners.map((p, i) => (
-          <li key={i} className="rp-resonance-row">
+          <li
+            key={i}
+            className={`rp-resonance-row ${p.confirmed === false ? 'rp-resonance--unconfirmed' : ''}`}
+            title={p.confirmed === false ? 'Unconfirmed by the lexicon (local phoneme estimate)' : undefined}
+          >
             <span className={`rp-resonance-tier rp-tier--${p.type}`}>{RHYME_TIER_LABEL[p.type] || p.type}</span>
             <span className="rp-resonance-word">{p.word}</span>
             <span className="rp-resonance-score">{p.score.toFixed(2)}</span>
@@ -263,7 +267,7 @@ function DiagnosticsSection({ diagnostics }) {
         aria-expanded={isOpen}
       >
         {isOpen ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
-        <span>Diagnostics</span>
+        <span>Arcane Traces</span>
       </button>
       <AnimatePresence>
         {isOpen && (
@@ -359,15 +363,24 @@ const RitualPredictionTooltip = ({
     return () => { cancelled = true; };
   }, [activeWord]);
 
-  // Use the precomputed prediction for the root word; otherwise build one for
-  // whatever word we've navigated to.
-  const prediction = useMemo(() => {
+  // Provisional, instant prediction: the precomputed one for the root word,
+  // otherwise a locally-built heuristic for whatever word we've navigated to.
+  const basePrediction = useMemo(() => {
     if (!activeWord) return predictionProp;
     if (predictionProp && normalizeWord(predictionProp.word) === normalizeWord(activeWord)) {
       return predictionProp;
     }
     return buildRitualPrediction({ word: activeWord, line: 0, column: 0, contextLine: seedContextLine, surroundingText: seedContextLine });
   }, [predictionProp, activeWord, seedContextLine]);
+
+  const prediction = useMemo(() => {
+    if (!basePrediction) return basePrediction;
+    const lexMatch = lookupData && normalizeWord(lookupData.word) === normalizeWord(activeWord)
+      ? lookupData
+      : null;
+    if (lexMatch) return reconcileWithLexicon(basePrediction, lexMatch);
+    return { ...basePrediction, prediction: { ...basePrediction.prediction, provisional: true } };
+  }, [basePrediction, lookupData, activeWord]);
 
   const navigateTo = useCallback((nextWord) => {
     const clean = String(nextWord || '').trim();
@@ -392,7 +405,6 @@ const RitualPredictionTooltip = ({
     });
   }, []);
 
-  // ── Position (skip entirely when embedded in a mobile sheet) ──────────────
   const posRef = useRef({ x: anchorRect?.x ?? x ?? 0, y: anchorRect?.y ?? y ?? 0 });
   const posInitialized = useRef(false);
   const [size, setSize] = useState({ width: TOOLTIP_DEFAULT_WIDTH, height: TOOLTIP_DEFAULT_HEIGHT });
@@ -566,8 +578,17 @@ const RitualPredictionTooltip = ({
     }
     return lex.definition?.text ? [lex.definition.text] : [];
   })();
-  const lexRole = posToRole(pos);
-  const roleConflict = lexRole && lexRole !== pred.role;
+  const { rhymes, slantRhymes, synonyms, antonyms } = cleanWordLists(activeWord, lex);
+  const similes = corpusData.semantic
+    .map((r) => (typeof r === 'string' ? r : r?.word))
+    .filter((w) => {
+      const n = normalizeWord(w);
+      return n && n !== normalizeWord(activeWord)
+        && !rhymes.some((r) => normalizeWord(r) === n)
+        && !slantRhymes.some((r) => normalizeWord(r) === n)
+        && !synonyms.some((r) => normalizeWord(r) === n)
+        && !antonyms.some((r) => normalizeWord(r) === n);
+    }).slice(0, 8);
 
   const { rhymes, slantRhymes, synonyms, antonyms } = cleanWordLists(activeWord, lex);
   const similes = corpusData.semantic
@@ -588,7 +609,7 @@ const RitualPredictionTooltip = ({
       <div className="rp-card-frame">
         <div className="rp-header" onPointerDown={handleDragStart}>
           <div className="rp-header-top">
-            <h3 id={titleId} className="rp-title">Ritual Prediction</h3>
+            <h3 id={titleId} className="rp-title">Arcane Resonance</h3>
             <button
               type="button"
               className="rp-close-btn"
@@ -602,36 +623,27 @@ const RitualPredictionTooltip = ({
           <Breadcrumb history={history} index={historyIndex} onJump={jumpToCrumb} />
           <div className="rp-word-row">
             <span className="rp-word">{word}</span>
-            {pronunciation && <span className="rp-pron">{pronunciation}</span>}
             <ConfidenceBadge confidence={pred.confidence} factors={pred.confidenceFactors} />
           </div>
+          {pronunciation && <div className="rp-pron">{pronunciation}</div>}
           <div className="rp-ritual-name">{pred.ritualName}</div>
         </div>
 
         <div key={activeWord} className={`rp-body rp-ink ${isDragging ? 'rp-pointer-none' : ''}`}>
           <section className="rp-section">
-            <div className="rp-section-label">Role</div>
+            <div className="rp-section-label">Lexicon & Structure</div>
             <div className="rp-role-row">
               <span className={`rp-role-badge rp-role--${pred.role}`}>{ROLE_LABELS[pred.role] || 'Unknown'}</span>
               {pred.roleSignal && <span className="rp-role-signal">via {pred.roleSignal}</span>}
+              {pos && <span className="rp-lex-pos">{pos}</span>}
+              {pred.provisional && <span className="rp-role-provisional" title="Awaiting lexicon confirmation">provisional</span>}
             </div>
-            <span className="rp-role-desc">{ROLE_DESCRIPTIONS[pred.role] || ''}</span>
-          </section>
-
-          <section className="rp-section">
-            <div className="rp-section-label"><BookOpen size={11} /> Lexicon</div>
+            <div className="rp-role-desc">{ROLE_DESCRIPTIONS[pred.role] || ''}</div>
+            
             {lookupLoading && !lex && <div className="rp-lexicon-status">consulting the lexicon...</div>}
-            {pos && (
-              <div className="rp-lex-pos-row">
-                <span className="rp-lex-pos">{pos}</span>
-                {lexRole && (
-                  <span className={`rp-lex-role-note ${roleConflict ? 'rp-lex-role-conflict' : ''}`}>
-                    {roleConflict ? `→ corrects role to ${lexRole}` : `confirms ${lexRole}`}
-                  </span>
-                )}
-              </div>
-            )}
-            {definitions.map((def, i) => <p key={i} className="rp-lex-def">{def}</p>)}
+            <div className="rp-definitions-group">
+              {definitions.map((def, i) => <p key={i} className="rp-lex-def">{def}</p>)}
+            </div>
             <RuneRow label="syn" words={synonyms} onNavigate={navigateTo} onTransmute={onTransmute} />
             <RuneRow label="ant" words={antonyms} onNavigate={navigateTo} onTransmute={onTransmute} />
             <RuneRow label="rhyme" words={rhymes} onNavigate={navigateTo} onTransmute={onTransmute} />
@@ -639,10 +651,12 @@ const RitualPredictionTooltip = ({
             <RuneRow label="simile" words={similes} onNavigate={navigateTo} onTransmute={onTransmute} />
           </section>
 
-          <section className="rp-section">
-            <div className="rp-section-label">Why this prediction</div>
-            <WhyFactorsSection factors={details.whyFactors} fallback={details.why} />
-          </section>
+          {details.whyFactors?.length > 0 && (
+            <section className="rp-section">
+              <div className="rp-section-label">Divination Insights</div>
+              <WhyFactorsSection factors={details.whyFactors} fallback={details.why} />
+            </section>
+          )}
 
           <ResonanceSection partners={details.resonancePartners} />
 

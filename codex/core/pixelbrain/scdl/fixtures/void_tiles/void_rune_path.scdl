@@ -1,0 +1,117 @@
+# void_rune_path — walkway tile: trodden ice with a glowing rune circuit
+# Isometric 2:1 diamond, 128x64. Path runs NE edge → SW edge (grid +y axis).
+# Light law: upper-left (-1,-1).
+asset void_rune_path canvas 128x64
+
+palette {
+  abyss    = #04060e
+  deep     = #0e1526
+  dark     = #182238
+  base     = #22304f
+  mid      = #2d4066
+  lit      = #3d5480
+  bright   = #52709f
+  sheen    = #7291bd
+  frost    = #a8c3e2
+  spec     = #e3eef9
+  cyanhot  = #67e8f9
+  cyansoft = #b7f4fd
+  runedim  = #4650a8
+  runeviol = #7c8cff
+  runehi   = #b4bcff
+}
+
+# ── ice slab (shared set law) ────────────────────────────────────────────
+part slab material void_ice {
+  polygon 64 -1 129 32 64 65 -1 32 base
+  polygon -1 32 64 -1 64 4 8 32 bright
+  polygon 64 -1 129 32 120 32 64 4 lit
+  polygon -1 32 64 65 64 59 8 32 dark
+  polygon 64 65 129 32 120 32 64 59 deep
+  line 0 32 64 0 sheen
+  line 64 0 127 31 lit
+  line 0 33 63 63 deep
+  line 64 63 127 33 abyss
+}
+
+# ── quiet facet texture off the path ─────────────────────────────────────
+part facets material diamond {
+  polygon 26 28 40 20 52 26 38 34 lit
+  polygon 52 26 66 18 78 24 64 32 mid
+  polygon 96 24 108 28 100 34 88 30 mid
+  polygon 100 40 112 34 116 36 104 42 dark
+  cell 46 30 mid
+  cell 72 28 base
+  cell 94 32 base
+}
+
+# ── trodden causeway — worn band crossing NE edge → SW edge ──────────────
+part causeway material voidsteel {
+  # band body (parallelogram along the iso axis)
+  polygon 84 10 108 22 44 54 20 42 deep
+  # walked-smooth center strip
+  polygon 88 14 102 21 40 52 26 45 dark
+  # NW border curb catching light
+  line 84 10 20 42 sheen
+  line 85 11 21 43 mid
+  # SE border curb falling to shadow
+  line 108 22 44 54 abyss
+  line 107 21 43 53 deep
+  # wear chips along the curbs
+  cell 76 16 mid
+  cell 60 24 mid
+  cell 44 32 mid
+  cell 30 40 mid
+  cell 98 26 abyss
+  cell 82 34 abyss
+  cell 66 42 abyss
+  cell 52 48 abyss
+  # cracked flagstone seams across the band
+  line 80 16 92 22 abyss
+  line 64 24 76 30 abyss
+  line 48 32 60 38 abyss
+  line 32 40 44 46 abyss
+}
+
+# ── rune circuit — conduit line with glyph nodes, humming in the stone ───
+part runes material void_rune_glow {
+  glow radius 3
+  # conduit rail down the center of the causeway
+  line 94 17 30 49 runedim
+  line 94 16 62 32 runeviol
+  line 62 32 30 48 runeviol
+  # glyph node plates (small iso diamonds on the walkline)
+  polygon 88 16 94 19 88 22 82 19 runedim
+  polygon 64 28 70 31 64 34 58 31 runedim
+  polygon 40 40 46 43 40 46 34 43 runedim
+  # glyph strokes
+  line 85 18 91 18 runehi
+  cell 88 20 runeviol
+  line 61 30 67 30 runehi
+  cell 64 32 cyanhot
+  line 37 42 43 42 runehi
+  cell 40 44 runeviol
+  # energy nodes flaring where conduit meets glyphs
+  cell 88 17 cyanhot
+  cell 40 41 cyanhot
+  # faint spill onto the curbs
+  cell 74 24 runedim
+  cell 50 36 runedim
+}
+
+# ── frost bloom on the lit crest (set law) ───────────────────────────────
+part frostbloom material diamond {
+  cell 12 30 frost
+  cell 20 26 frost
+  cell 28 22 frost
+  cell 36 18 frost
+  cell 44 14 frost
+  cell 52 10 frost
+  cell 60 6 frost
+  cell 16 28 sheen
+  cell 32 20 sheen
+  cell 48 12 sheen
+  cell 24 23 spec
+  cell 25 23 spec
+  cell 56 8 spec
+}

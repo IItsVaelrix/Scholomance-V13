@@ -1,0 +1,622 @@
+{
+  "schemaVersion": "scholomance.graph.v1",
+  "graphId": "crimson-fire-slime",
+  "title": "Crimson Slime (Fire Affinity)",
+  "determinism": {
+    "seed": "424242",
+    "canonicalJsonVersion": "canonical-json.v1",
+    "createdBy": "human",
+    "compilationMode": "shadow"
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "kind": "Semantic Normalize",
+      "label": "Semantic Normalize",
+      "inputs": {},
+      "outputs": {},
+      "params": {
+        "strict": true,
+        "raw": "Crimson slime monster with fire affinity"
+      },
+      "compiler": {
+        "resolverId": "unknown",
+        "version": "v1",
+        "pure": true,
+        "deterministic": true,
+        "allowAsync": false
+      },
+      "provenance": {
+        "source": "manual"
+      }
+    },
+    {
+      "id": "n2",
+      "kind": "Color Resolve",
+      "label": "Color Resolve",
+      "inputs": {},
+      "outputs": {},
+      "params": {
+        "colorSpace": "rgb",
+        "primary": "#DC143C",
+        "secondary": "#FF4500",
+        "glow": "#FFD700"
+      },
+      "compiler": {
+        "resolverId": "unknown",
+        "version": "v1",
+        "pure": true,
+        "deterministic": true,
+        "allowAsync": false
+      },
+      "provenance": {
+        "source": "manual"
+      }
+    },
+    {
+      "id": "n3",
+      "kind": "Geometry Kernel (Vector)",
+      "label": "Geometry Kernel (Vector)",
+      "inputs": {},
+      "outputs": {},
+      "params": {
+        "rationale": "A round but non-spherical crimson slime with fire affinity. The body is a squat gelatinous blob with a flattened base, sagging side weight, domed top, molten inner glow, small ember face, surface flames, and heat shimmer. It should read as a grounded slime creature, not a ball or orb.",
+        "confidence": 0.95,
+        "reviewRequired": false,
+        "sourceIntentHash": "round-non-spherical-crimson-fire-slime-v2",
+        "proposedFormula": {
+          "role": "creature.slime.crimson_fire_squash",
+          "material": "crimson_slime_fire",
+          "formula": {
+            "type": "composite",
+            "children": [
+              {
+                "role": "body.squashed_silhouette",
+                "material": "crimson_slime",
+                "paletteChannel": "body.base",
+                "formula": {
+                  "type": "edge_trace",
+                  "tracePath": [
+                    {
+                      "x": 24,
+                      "y": 11
+                    },
+                    {
+                      "x": 31,
+                      "y": 12
+                    },
+                    {
+                      "x": 37,
+                      "y": 16
+                    },
+                    {
+                      "x": 41,
+                      "y": 23
+                    },
+                    {
+                      "x": 43,
+                      "y": 31
+                    },
+                    {
+                      "x": 40,
+                      "y": 37
+                    },
+                    {
+                      "x": 34,
+                      "y": 40
+                    },
+                    {
+                      "x": 27,
+                      "y": 41
+                    },
+                    {
+                      "x": 20,
+                      "y": 41
+                    },
+                    {
+                      "x": 13,
+                      "y": 40
+                    },
+                    {
+                      "x": 8,
+                      "y": 36
+                    },
+                    {
+                      "x": 5,
+                      "y": 30
+                    },
+                    {
+                      "x": 6,
+                      "y": 23
+                    },
+                    {
+                      "x": 10,
+                      "y": 17
+                    },
+                    {
+                      "x": 17,
+                      "y": 12
+                    }
+                  ],
+                  "closed": true
+                }
+              },
+              {
+                "role": "body.flattened_base",
+                "material": "deep_crimson_shadow",
+                "paletteChannel": "body.shadow",
+                "formula": {
+                  "type": "edge_trace",
+                  "tracePath": [
+                    {
+                      "x": 10,
+                      "y": 36
+                    },
+                    {
+                      "x": 16,
+                      "y": 38
+                    },
+                    {
+                      "x": 24,
+                      "y": 39
+                    },
+                    {
+                      "x": 32,
+                      "y": 38
+                    },
+                    {
+                      "x": 39,
+                      "y": 36
+                    },
+                    {
+                      "x": 36,
+                      "y": 41
+                    },
+                    {
+                      "x": 28,
+                      "y": 43
+                    },
+                    {
+                      "x": 19,
+                      "y": 43
+                    },
+                    {
+                      "x": 12,
+                      "y": 41
+                    }
+                  ],
+                  "closed": true
+                }
+              },
+              {
+                "role": "body.inner_molten_pool",
+                "material": "molten_crimson",
+                "paletteChannel": "body.glow",
+                "formula": {
+                  "type": "edge_trace",
+                  "tracePath": [
+                    {
+                      "x": 24,
+                      "y": 17
+                    },
+                    {
+                      "x": 30,
+                      "y": 18
+                    },
+                    {
+                      "x": 35,
+                      "y": 22
+                    },
+                    {
+                      "x": 37,
+                      "y": 28
+                    },
+                    {
+                      "x": 34,
+                      "y": 33
+                    },
+                    {
+                      "x": 28,
+                      "y": 35
+                    },
+                    {
+                      "x": 20,
+                      "y": 35
+                    },
+                    {
+                      "x": 14,
+                      "y": 32
+                    },
+                    {
+                      "x": 12,
+                      "y": 27
+                    },
+                    {
+                      "x": 14,
+                      "y": 22
+                    },
+                    {
+                      "x": 18,
+                      "y": 18
+                    }
+                  ],
+                  "closed": true
+                }
+              },
+              {
+                "role": "body.top_gloss_squiggle",
+                "material": "gloss_hot_crimson",
+                "paletteChannel": "body.highlight",
+                "formula": {
+                  "type": "mathematical_stroke",
+                  "parameters": {
+                    "cx": 22,
+                    "cy": 17,
+                    "length": 13,
+                    "angle": -8,
+                    "baseWidth": 1.6,
+                    "widthVariation": 0.45,
+                    "frequency": 1.1,
+                    "density": 2,
+                    "bleed": 0.08,
+                    "n": 32
+                  }
+                }
+              },
+              {
+                "role": "face.left_eye",
+                "material": "charcoal_core",
+                "paletteChannel": "face.dark",
+                "formula": {
+                  "type": "edge_trace",
+                  "tracePath": [
+                    {
+                      "x": 16,
+                      "y": 26
+                    },
+                    {
+                      "x": 18,
+                      "y": 24
+                    },
+                    {
+                      "x": 20,
+                      "y": 26
+                    },
+                    {
+                      "x": 19,
+                      "y": 29
+                    },
+                    {
+                      "x": 17,
+                      "y": 29
+                    }
+                  ],
+                  "closed": true
+                }
+              },
+              {
+                "role": "face.right_eye",
+                "material": "charcoal_core",
+                "paletteChannel": "face.dark",
+                "formula": {
+                  "type": "edge_trace",
+                  "tracePath": [
+                    {
+                      "x": 29,
+                      "y": 26
+                    },
+                    {
+                      "x": 31,
+                      "y": 24
+                    },
+                    {
+                      "x": 33,
+                      "y": 26
+                    },
+                    {
+                      "x": 32,
+                      "y": 29
+                    },
+                    {
+                      "x": 30,
+                      "y": 29
+                    }
+                  ],
+                  "closed": true
+                }
+              },
+              {
+                "role": "face.small_ember_mouth",
+                "material": "ember_orange",
+                "paletteChannel": "face.fire",
+                "formula": {
+                  "type": "mathematical_stroke",
+                  "parameters": {
+                    "cx": 24,
+                    "cy": 32,
+                    "length": 8,
+                    "angle": 0,
+                    "baseWidth": 1.25,
+                    "widthVariation": 0.25,
+                    "frequency": 0.8,
+                    "density": 2,
+                    "bleed": 0.05,
+                    "n": 20
+                  }
+                }
+              },
+              {
+                "role": "fire.surface_left",
+                "material": "flame_red_orange",
+                "paletteChannel": "fire.outer",
+                "formula": {
+                  "type": "edge_trace",
+                  "tracePath": [
+                    {
+                      "x": 13,
+                      "y": 16
+                    },
+                    {
+                      "x": 15,
+                      "y": 9
+                    },
+                    {
+                      "x": 19,
+                      "y": 15
+                    },
+                    {
+                      "x": 17,
+                      "y": 20
+                    }
+                  ],
+                  "closed": true
+                }
+              },
+              {
+                "role": "fire.surface_center",
+                "material": "flame_yellow_core",
+                "paletteChannel": "fire.core",
+                "formula": {
+                  "type": "edge_trace",
+                  "tracePath": [
+                    {
+                      "x": 22,
+                      "y": 12
+                    },
+                    {
+                      "x": 25,
+                      "y": 4
+                    },
+                    {
+                      "x": 29,
+                      "y": 13
+                    },
+                    {
+                      "x": 27,
+                      "y": 19
+                    },
+                    {
+                      "x": 23,
+                      "y": 18
+                    }
+                  ],
+                  "closed": true
+                }
+              },
+              {
+                "role": "fire.surface_right",
+                "material": "flame_orange",
+                "paletteChannel": "fire.outer",
+                "formula": {
+                  "type": "edge_trace",
+                  "tracePath": [
+                    {
+                      "x": 31,
+                      "y": 16
+                    },
+                    {
+                      "x": 36,
+                      "y": 10
+                    },
+                    {
+                      "x": 38,
+                      "y": 18
+                    },
+                    {
+                      "x": 34,
+                      "y": 22
+                    }
+                  ],
+                  "closed": true
+                }
+              },
+              {
+                "role": "aura.low_heat_shimmer",
+                "material": "transparent_heat",
+                "paletteChannel": "aura.heat",
+                "formula": {
+                  "type": "parametric_curve",
+                  "parameters": {
+                    "cx": 24,
+                    "cy": 30,
+                    "a": 22,
+                    "b": 9,
+                    "c": 1.35,
+                    "n": 96
+                  }
+                }
+              },
+              {
+                "role": "embers.left_lava_drop",
+                "material": "lava_drop",
+                "paletteChannel": "embers",
+                "formula": {
+                  "type": "edge_trace",
+                  "tracePath": [
+                    {
+                      "x": 5,
+                      "y": 23
+                    },
+                    {
+                      "x": 7,
+                      "y": 20
+                    },
+                    {
+                      "x": 9,
+                      "y": 23
+                    },
+                    {
+                      "x": 8,
+                      "y": 26
+                    },
+                    {
+                      "x": 6,
+                      "y": 26
+                    }
+                  ],
+                  "closed": true
+                }
+              },
+              {
+                "role": "embers.right_lava_drop",
+                "material": "lava_drop",
+                "paletteChannel": "embers",
+                "formula": {
+                  "type": "edge_trace",
+                  "tracePath": [
+                    {
+                      "x": 40,
+                      "y": 21
+                    },
+                    {
+                      "x": 42,
+                      "y": 18
+                    },
+                    {
+                      "x": 44,
+                      "y": 21
+                    },
+                    {
+                      "x": 43,
+                      "y": 24
+                    },
+                    {
+                      "x": 41,
+                      "y": 24
+                    }
+                  ],
+                  "closed": true
+                }
+              }
+            ]
+          }
+        },
+        "seed": "slime.crimson.fire.squashed.round.v2",
+        "precision": 3
+      },
+      "compiler": {
+        "resolverId": "unknown",
+        "version": "v1",
+        "pure": true,
+        "deterministic": true,
+        "allowAsync": false
+      },
+      "provenance": {
+        "source": "manual"
+      }
+    },
+    {
+      "id": "n4",
+      "kind": "PixelBrain Compile",
+      "label": "PixelBrain Compile",
+      "inputs": {},
+      "outputs": {},
+      "params": {
+        "targetResolution": 64,
+        "useSymmetry": true,
+        "antiAlias": true
+      },
+      "compiler": {
+        "resolverId": "unknown",
+        "version": "v1",
+        "pure": true,
+        "deterministic": true,
+        "allowAsync": false
+      },
+      "provenance": {
+        "source": "manual"
+      }
+    },
+    {
+      "id": "n5",
+      "kind": "Spell Effect",
+      "label": "Spell Effect",
+      "inputs": {},
+      "outputs": {},
+      "params": {
+        "damage": 15,
+        "element": "Fire",
+        "dot": true
+      },
+      "compiler": {
+        "resolverId": "unknown",
+        "version": "v1",
+        "pure": true,
+        "deterministic": true,
+        "allowAsync": false
+      },
+      "provenance": {
+        "source": "manual"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "id": "c1",
+      "source": {
+        "nodeId": "n1",
+        "socket": "normalized"
+      },
+      "target": {
+        "nodeId": "n2",
+        "socket": "intent"
+      },
+      "type": "pixelbrain.packet"
+    },
+    {
+      "id": "c3",
+      "source": {
+        "nodeId": "n3",
+        "socket": "vector"
+      },
+      "target": {
+        "nodeId": "n4",
+        "socket": "vector"
+      },
+      "type": "pixelbrain.packet"
+    },
+    {
+      "id": "c5",
+      "source": {
+        "nodeId": "n2",
+        "socket": "palette"
+      },
+      "target": {
+        "nodeId": "n4",
+        "socket": "palette"
+      },
+      "type": "pixelbrain.packet"
+    }
+  ],
+  "uiLayout": {
+    "renderer": "rete",
+    "version": "rete-layout.v1",
+    "positions": {}
+  },
+  "metadata": {
+    "tags": [],
+    "domain": "mixed",
+    "authoringSurface": "ScholomanceReteGraphEditor"
+  },
+  "diagnostics": []
+}

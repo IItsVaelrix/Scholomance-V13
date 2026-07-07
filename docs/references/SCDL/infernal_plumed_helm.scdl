@@ -1,0 +1,855 @@
+asset infernal_plumed_helm canvas 96x96
+
+palette {
+  void0 = #07070B
+  void1 = #12121A
+  void2 = #1E1F2A
+  shadow = #09080C
+  steel0 = #171720
+  steel1 = #2B2C3A
+  steel2 = #444454
+  steel3 = #666778
+  edge = #9A9AA6
+  coldhi = #C5C6D2
+  purple = #42304E
+  purplehi = #715080
+  seam = #0B0A0E
+  riv = #B9AEBE
+  rivr = #4E414B
+  emberdeep = #5A0C06
+  ember = #D3290B
+  lava = #FF6B10
+  hot = #FFD15A
+  white = #FFF4B2
+  eye = #FF2E0C
+  eyehi = #FF9A21
+  plume0 = #370705
+  plume1 = #7D1009
+  plume2 = #C92718
+  plume3 = #EF5131
+  plumehi = #FF8A52
+  black = #000000
+}
+
+part crest_back_arc material blacksteel {
+  symmetry x
+  polygon 31 23 47 18 47 36 29 37 27 29 steel0
+  polygon 34 24 47 21 47 34 33 34 31 29 steel1
+  polygon 37 27 43 27 43 35 35 35 35 31 void0
+  line 34 24 47 21 edge
+  line 31 29 33 34 steel3
+}
+
+part crest_spikes material darksteel {
+  symmetry x
+  polygon 38 23 41 11 44 23 coldhi
+  polygon 31 28 32 18 35 28 edge
+  polygon 47 20 48 7 50 20 edge
+}
+
+part helmet_outer_shell material voidsteel {
+  symmetry x
+  polygon 20 39 31 27 47 22 47 62 39 69 25 67 18 55 steel0
+  polygon 24 38 34 29 47 25 47 55 40 61 28 59 22 51 steel1
+  polygon 32 31 47 26 47 46 36 48 27 44 purple
+  line 24 38 34 29 edge
+  line 34 29 47 25 steel3
+  line 31 47 47 45 seam
+}
+
+part helmet_brow_plate material voidsteel {
+  symmetry x
+  polygon 18 46 31 42 47 44 47 53 38 56 23 54 steel1
+  polygon 23 47 34 45 46 46 42 52 27 53 steel2
+  line 23 47 34 45 edge
+  line 29 51 40 52 rivr
+}
+
+part eye_glow material ruby {
+  symmetry x
+  polygon 25 54 44 53 39 59 28 60 22 57 emberdeep
+  polygon 27 55 42 54 37 58 29 59 eye
+  line 30 56 38 56 eyehi
+  glow radius 2
+}
+
+part eye_socket_edge material blacksteel {
+  symmetry x
+  line 23 57 29 60 void0
+  line 29 60 38 59 void0
+  line 38 59 44 53 void0
+  cell 24 56 black
+  cell 25 57 black
+  cell 43 54 black
+}
+
+part center_nasal_ridge material voidsteel {
+  polygon 44 26 52 26 54 58 48 68 42 58 steel0
+  polygon 47 27 52 31 52 56 48 62 48 28 steel2
+  polygon 44 30 48 28 48 62 44 57 steel3
+  line 48 28 48 60 coldhi
+  line 44 30 48 28 edge
+  line 52 31 48 28 edge
+}
+
+part mouth_void material blacksteel {
+  polygon 39 61 57 61 57 83 50 91 46 91 39 83 black
+  polygon 42 63 54 63 54 82 48 88 42 82 void0
+}
+
+part cheek_guard_main material voidsteel {
+  symmetry x
+  polygon 22 58 39 58 39 85 31 91 22 84 17 69 steel1
+  polygon 26 61 37 61 36 81 31 87 26 80 21 69 steel2
+  polygon 19 66 25 69 28 84 23 81 17 70 steel0
+  line 26 61 37 61 edge
+  line 37 61 36 81 steel3
+  line 26 65 26 80 coldhi
+  line 22 84 31 91 seam
+}
+
+part jaw_inner_plate material blacksteel {
+  symmetry x
+  polygon 38 62 44 65 43 88 36 92 34 72 steel0
+  line 39 64 44 66 edge
+  line 43 70 42 85 steel3
+}
+
+part lower_trim_points material darksteel {
+  symmetry x
+  polygon 33 88 39 85 40 92 36 94 edge
+  polygon 25 82 31 88 29 90 23 84 steel2
+}
+
+part ember_undercracks material shadow_fire {
+  line 32 35 30 45 emberdeep
+  line 30 45 34 54 emberdeep
+  line 34 54 31 61 emberdeep
+  line 25 68 29 74 emberdeep
+  line 29 74 27 83 emberdeep
+  line 58 37 61 47 emberdeep
+  line 61 47 58 55 emberdeep
+  line 64 66 61 73 emberdeep
+  line 61 73 64 83 emberdeep
+}
+
+part ember_cracks_hot material divine_flame_core {
+  line 32 36 30 44 lava
+  line 30 44 34 53 hot
+  line 34 53 31 61 lava
+  cell 30 44 white
+  cell 33 52 hot
+  line 25 69 29 74 lava
+  line 29 74 27 82 hot
+  line 58 38 61 47 lava
+  line 61 47 58 55 hot
+  line 64 67 61 73 lava
+  line 61 73 64 82 hot
+  cell 61 47 white
+  glow radius 2
+}
+
+part rivet_detail material silver {
+  symmetry x
+  cell 27 50 riv
+  cell 34 51 riv
+  cell 24 66 riv
+  cell 35 74 riv
+  cell 29 84 riv
+  cell 28 50 rivr
+  cell 35 51 rivr
+  cell 25 66 rivr
+  cell 36 74 rivr
+  cell 30 84 rivr
+}
+
+part purple_cold_glints material amethyst {
+  symmetry x
+  cell 38 32 purplehi
+  cell 41 34 purplehi
+  line 29 40 35 34 purplehi
+  cell 27 72 purplehi
+  cell 31 80 purple
+}
+
+part eye_glow_hint material divine_flame_core {
+  cell 48 56 eyehi
+  glow radius 2
+}
+
+# BEGIN GENERATED HairFlowAMP rear_plume
+part rear_plume material hair_red {
+  cell 41 18 plume0
+  cell 41 19 plume0
+  cell 41 20 plume0
+  cell 42 18 plume0
+  cell 42 19 plume0
+  cell 42 20 plume0
+  cell 43 17 plume1
+  cell 43 18 plume0
+  cell 43 19 plume0
+  cell 45 17 plume0
+  cell 45 18 plume1
+  cell 45 19 plume0
+  cell 46 17 plume0
+  cell 46 18 plume0
+  cell 46 19 plume1
+  cell 48 17 plume1
+  cell 48 18 plume1
+  cell 48 19 plume0
+  cell 49 17 plume0
+  cell 49 18 plume0
+  cell 49 19 plume0
+  cell 50 17 plume1
+  cell 50 18 plume0
+  cell 50 19 plume0
+  cell 52 17 plume0
+  cell 52 18 plume0
+  cell 52 19 plume0
+  cell 53 18 plume0
+  cell 53 19 plume0
+  cell 53 20 plume1
+  cell 54 18 plume1
+  cell 54 19 plume0
+  cell 54 20 plume0
+  cell 56 18 plume0
+  cell 56 19 plume0
+  cell 56 20 plume0
+  cell 57 18 plume0
+  cell 57 19 plume0
+  cell 57 20 plume0
+  cell 58 19 plume0
+  cell 58 20 plume0
+  cell 58 21 plume0
+  cell 60 19 plume1
+  cell 60 20 plume0
+  cell 60 21 plume1
+  cell 61 19 plume0
+  cell 61 20 plume0
+  cell 61 21 plume0
+  cell 62 19 plume0
+  cell 62 20 plume0
+  cell 62 21 plume0
+  cell 64 20 plume0
+  cell 65 20 plume0
+  cell 66 21 plume0
+  cell 68 21 plume1
+  cell 69 21 plume0
+  cell 70 21 plume0
+  cell 72 22 plume0
+  cell 73 22 plume0
+  cell 74 23 plume0
+  cell 75 23 plume0
+  cell 76 24 plume0
+  cell 78 25 plume0
+  cell 79 25 plumehi
+  cell 80 26 plumehi
+  cell 81 27 plumehi
+  cell 42 21 plume0
+  cell 44 19 plume0
+  cell 44 20 plume1
+  cell 44 21 plume0
+  cell 45 20 plume1
+  cell 46 20 plume1
+  cell 47 17 plume1
+  cell 47 18 plume1
+  cell 47 19 plume1
+  cell 49 16 plume0
+  cell 51 18 plume0
+  cell 51 15 plume0
+  cell 51 16 plume0
+  cell 51 17 plume0
+  cell 52 15 plume0
+  cell 52 16 plume0
+  cell 53 14 plume1
+  cell 53 15 plume0
+  cell 53 16 plume0
+  cell 55 14 plume1
+  cell 55 15 plume0
+  cell 55 16 plume0
+  cell 56 13 plume1
+  cell 56 14 plume1
+  cell 56 15 plume0
+  cell 57 13 plume1
+  cell 57 14 plume1
+  cell 57 15 plume0
+  cell 58 12 plume0
+  cell 58 13 plume1
+  cell 58 14 plume1
+  cell 60 12 plume0
+  cell 60 13 plume1
+  cell 60 14 plume1
+  cell 61 12 plume1
+  cell 61 13 plume1
+  cell 61 14 plume1
+  cell 62 12 plume1
+  cell 62 13 plume0
+  cell 62 14 plume1
+  cell 64 12 plume1
+  cell 64 13 plume1
+  cell 64 14 plume0
+  cell 65 12 plume1
+  cell 65 13 plume0
+  cell 65 14 plume1
+  cell 66 12 plume0
+  cell 66 13 plume1
+  cell 66 14 plume0
+  cell 68 12 plume0
+  cell 68 13 plume0
+  cell 68 14 plume0
+  cell 69 12 plume0
+  cell 69 13 plume0
+  cell 69 14 plume1
+  cell 70 12 plume0
+  cell 70 13 plume0
+  cell 70 14 plume0
+  cell 72 11 plume0
+  cell 72 12 plume0
+  cell 72 13 plume1
+  cell 73 12 plume0
+  cell 74 12 plume0
+  cell 76 12 plume0
+  cell 77 11 plumehi
+  cell 78 11 plume0
+  cell 80 11 plume1
+  cell 81 10 plume1
+  cell 82 10 plume1
+  cell 83 9 plume1
+  cell 85 9 plume0
+  cell 86 9 plume1
+  cell 87 8 plume1
+  cell 89 8 plume0
+  cell 90 8 plume0
+  cell 92 8 plume0
+  cell 93 8 plume0
+  cell 94 8 plume0
+  cell 43 20 plume0
+  cell 47 20 plume0
+  cell 51 19 plume0
+  cell 53 17 plume0
+  cell 54 16 plume1
+  cell 54 17 plume1
+  cell 55 17 plume0
+  cell 55 18 plume0
+  cell 57 16 plume0
+  cell 57 17 plume0
+  cell 58 15 plume1
+  cell 58 16 plume1
+  cell 58 17 plume0
+  cell 59 15 plume1
+  cell 59 16 plume0
+  cell 59 17 plume0
+  cell 61 15 plume1
+  cell 61 16 plume0
+  cell 61 17 plume0
+  cell 62 15 plume1
+  cell 62 16 plume0
+  cell 62 17 plume0
+  cell 63 16 plume0
+  cell 65 16 plume1
+  cell 66 16 plume0
+  cell 67 16 plume0
+  cell 69 16 plume0
+  cell 70 17 plume1
+  cell 71 17 plume0
+  cell 72 18 plume0
+  cell 74 18 plume0
+  cell 75 19 plume0
+  cell 76 20 plume0
+  cell 77 20 plume0
+  cell 78 21 plumehi
+  cell 79 22 plumehi
+  cell 80 23 plumehi
+  cell 42 22 plume0
+  cell 43 21 plume0
+  cell 43 22 plume0
+  cell 46 21 plume0
+  cell 48 20 plume0
+  cell 50 15 plume1
+  cell 51 14 plume1
+  cell 52 13 plume1
+  cell 54 15 plume1
+  cell 53 13 plume1
+  cell 54 13 plume1
+  cell 55 13 plume1
+  cell 53 12 plume1
+  cell 54 12 plume1
+  cell 55 12 plume1
+  cell 54 10 plume1
+  cell 55 11 plume1
+  cell 56 12 plume1
+  cell 55 9 plume1
+  cell 56 9 plume1
+  cell 57 9 plume1
+  cell 55 8 plume1
+  cell 56 8 plume1
+  cell 57 8 plume1
+  cell 56 7 plume1
+  cell 57 7 plume1
+  cell 58 7 plume1
+  cell 57 6 plume1
+  cell 58 5 plume1
+  cell 59 3 plume1
+  cell 59 2 plume1
+  cell 60 1 plume1
+  cell 61 0 plume1
+  cell 44 18 plume0
+  cell 50 16 plume1
+  cell 57 12 plume1
+  cell 56 10 plume1
+  cell 57 11 plume1
+  cell 58 9 plume1
+  cell 59 9 plume0
+  cell 58 8 plume1
+  cell 59 8 plume0
+  cell 59 7 plume1
+  cell 60 7 plume0
+  cell 58 6 plume1
+  cell 59 6 plume1
+  cell 60 6 plume0
+  cell 59 4 plume1
+  cell 60 5 plume1
+  cell 61 6 plume0
+  cell 60 2 plume1
+  cell 61 3 plume1
+  cell 62 4 plume0
+  cell 61 1 plume1
+  cell 62 2 plume1
+  cell 63 3 plume0
+  cell 63 0 plume1
+  cell 63 1 plume1
+  cell 63 2 plume0
+  cell 64 0 plume1
+  cell 64 1 plume1
+  cell 64 2 plume0
+  cell 65 0 plume1
+  cell 66 1 plume1
+  cell 66 0 plume0
+  cell 67 0 plume1
+  cell 42 23 plume0
+  cell 44 22 plume0
+  cell 44 23 plume0
+  cell 45 21 plume1
+  cell 45 22 plume0
+  cell 46 22 plume1
+  cell 48 21 plume0
+  cell 48 22 plume0
+  cell 49 20 plume0
+  cell 49 21 plume0
+  cell 50 20 plume0
+  cell 50 21 plume0
+  cell 52 20 plume0
+  cell 52 21 plume0
+  cell 58 18 plume0
+  cell 59 18 plume0
+  cell 63 17 plume0
+  cell 65 17 plume0
+  cell 66 17 plume0
+  cell 67 17 plume0
+  cell 69 17 plume0
+  cell 72 17 plume0
+  cell 73 17 plume0
+  cell 74 17 plume0
+  cell 76 17 plume0
+  cell 77 17 plume0
+  cell 78 17 plume0
+  cell 80 16 plume1
+  cell 81 16 plume0
+  cell 82 16 plume0
+  cell 83 15 plume0
+  cell 85 15 plume0
+  cell 86 15 plume0
+  cell 87 15 plume0
+  cell 89 15 plume0
+  cell 90 15 plume1
+  cell 92 14 plumehi
+  cell 93 14 plumehi
+  cell 94 14 plumehi
+  cell 53 21 plume0
+  cell 54 21 plume0
+  cell 56 21 plume0
+  cell 57 21 plume0
+  cell 61 22 plume0
+  cell 63 22 plume0
+  cell 65 22 plume0
+  cell 66 23 plume0
+  cell 67 24 plume0
+  cell 68 24 plume0
+  cell 69 25 plume0
+  cell 70 26 plume0
+  cell 72 26 plume0
+  cell 73 27 plume0
+  cell 74 28 plume0
+  cell 75 29 plume0
+  cell 76 30 plume0
+  cell 77 30 plume0
+  cell 78 31 plume0
+  cell 79 32 plume0
+  cell 80 33 plume0
+  cell 81 33 plume0
+  cell 83 34 plume0
+  cell 84 35 plumehi
+  cell 85 35 plumehi
+  cell 86 36 plumehi
+  cell 43 23 plume0
+  cell 43 24 plume0
+  cell 45 23 plume0
+  cell 45 24 plume0
+  cell 46 23 plume0
+  cell 47 24 plume0
+  cell 47 21 plume1
+  cell 49 22 plume0
+  cell 50 22 plume0
+  cell 56 17 plume0
+  cell 56 16 plume0
+  cell 59 14 plume1
+  cell 58 11 plume1
+  cell 59 12 plume1
+  cell 60 10 plume1
+  cell 60 11 plume1
+  cell 61 10 plume1
+  cell 61 11 plume1
+  cell 63 9 plume1
+  cell 63 10 plume1
+  cell 63 11 plume1
+  cell 64 9 plume0
+  cell 64 10 plume1
+  cell 64 11 plume1
+  cell 65 9 plume1
+  cell 65 10 plume0
+  cell 65 11 plume1
+  cell 67 8 plume1
+  cell 67 9 plume1
+  cell 67 10 plume1
+  cell 68 8 plume1
+  cell 68 9 plume1
+  cell 68 10 plume0
+  cell 69 8 plume1
+  cell 69 9 plume0
+  cell 69 10 plume1
+  cell 71 9 plume0
+  cell 72 10 plume0
+  cell 73 10 plume0
+  cell 75 10 plume0
+  cell 76 11 plumehi
+  cell 78 12 plumehi
+  cell 80 14 plume0
+  cell 47 22 plume0
+  cell 51 21 plume0
+  cell 54 14 plume1
+  cell 59 13 plume1
+  cell 60 15 plume1
+  cell 62 11 plume0
+  cell 63 12 plume0
+  cell 63 13 plume1
+  cell 66 10 plume1
+  cell 66 11 plume1
+  cell 67 11 plume0
+  cell 67 12 plume0
+  cell 68 11 plume0
+  cell 70 10 plume0
+  cell 70 11 plume0
+  cell 71 11 plume0
+  cell 71 12 plume0
+  cell 71 13 plume0
+  cell 74 11 plume0
+  cell 74 13 plume0
+  cell 75 12 plume0
+  cell 75 13 plume0
+  cell 75 14 plume0
+  cell 76 13 plume0
+  cell 76 14 plume0
+  cell 77 13 plume0
+  cell 77 14 plume0
+  cell 77 15 plume0
+  cell 79 14 plume0
+  cell 80 15 plume0
+  cell 81 15 plume0
+  cell 84 16 plume0
+  cell 85 17 plume0
+  cell 86 17 plume0
+  cell 88 18 plumehi
+  cell 89 18 plumehi
+  cell 91 18 plumehi
+  cell 46 24 plume0
+  cell 47 23 plume1
+  cell 48 23 plume0
+  cell 51 20 plume0
+  cell 51 22 plume0
+  cell 55 19 plume0
+  cell 60 17 plume0
+  cell 65 8 plume0
+  cell 65 7 plume1
+  cell 66 6 plume1
+  cell 67 5 plume1
+  cell 68 4 plume1
+  cell 69 3 plume1
+  cell 70 2 plume1
+  cell 71 1 plume1
+  cell 72 0 plume1
+  cell 47 25 plume0
+  cell 49 24 plume0
+  cell 49 23 plume0
+  cell 50 24 plume0
+  cell 51 23 plume0
+  cell 52 23 plume0
+  cell 55 20 plume0
+  cell 63 15 plume0
+  cell 63 14 plume0
+  cell 70 9 plume1
+  cell 71 10 plume0
+  cell 70 7 plume1
+  cell 71 8 plume1
+  cell 72 9 plume0
+  cell 72 7 plume1
+  cell 73 7 plume1
+  cell 74 6 plume1
+  cell 75 5 plume1
+  cell 77 5 plume1
+  cell 78 4 plume1
+  cell 79 4 plume0
+  cell 81 4 plume0
+  cell 82 4 plume0
+  cell 83 4 plumehi
+  cell 85 4 plumehi
+  cell 86 4 plumehi
+  cell 89 4 plumehi
+  cell 48 24 plume0
+  cell 50 23 plume0
+  cell 52 22 plume0
+  cell 52 24 plume0
+  cell 51 25 plume0
+  cell 54 22 plume0
+  cell 54 23 plume0
+  cell 54 24 plume0
+  cell 54 25 plume0
+  cell 55 22 plume0
+  cell 55 23 plume0
+  cell 55 24 plume0
+  cell 57 22 plume0
+  cell 56 23 plume0
+  cell 56 24 plume0
+  cell 56 25 plume0
+  cell 55 26 plume0
+  cell 58 22 plume0
+  cell 57 23 plume0
+  cell 57 24 plume0
+  cell 57 25 plume0
+  cell 56 26 plume0
+  cell 60 23 plume0
+  cell 60 24 plume0
+  cell 59 25 plume0
+  cell 58 26 plume0
+  cell 58 27 plume0
+  cell 60 25 plume0
+  cell 60 26 plume0
+  cell 60 27 plume0
+  cell 61 25 plume0
+  cell 61 26 plume0
+  cell 61 27 plume0
+  cell 63 26 plume0
+  cell 62 27 plume0
+  cell 61 28 plume0
+  cell 63 27 plume0
+  cell 63 28 plume0
+  cell 63 29 plume0
+  cell 64 27 plume0
+  cell 64 28 plume0
+  cell 64 29 plume0
+  cell 67 28 plume0
+  cell 66 29 plume0
+  cell 65 30 plume0
+  cell 67 29 plume0
+  cell 67 30 plume0
+  cell 67 31 plume0
+  cell 68 29 plume0
+  cell 68 30 plume0
+  cell 68 31 plume0
+  cell 70 30 plume0
+  cell 69 31 plume0
+  cell 68 32 plume0
+  cell 70 31 plume0
+  cell 70 32 plume0
+  cell 70 33 plume0
+  cell 72 31 plume0
+  cell 72 32 plume0
+  cell 72 33 plume0
+  cell 73 32 plume0
+  cell 73 33 plume0
+  cell 73 34 plume0
+  cell 74 32 plume0
+  cell 74 33 plume0
+  cell 74 34 plume0
+  cell 76 33 plume0
+  cell 75 34 plume0
+  cell 74 35 plume0
+  cell 77 34 plume0
+  cell 76 35 plume0
+  cell 75 36 plume0
+  cell 77 36 plume0
+  cell 78 36 plume0
+  cell 80 37 plume0
+  cell 81 38 plume0
+  cell 82 39 plume0
+  cell 83 39 plume0
+  cell 84 40 plumehi
+  cell 85 41 plumehi
+  cell 86 42 plumehi
+  cell 87 43 plumehi
+  cell 53 22 plume0
+  cell 53 23 plume0
+  cell 53 24 plume0
+  cell 56 22 plume0
+  cell 58 23 plume0
+  cell 58 24 plume0
+  cell 59 22 plume1
+  cell 59 23 plume1
+  cell 59 24 plume0
+  cell 60 22 plume1
+  cell 62 22 plume0
+  cell 62 23 plume0
+  cell 63 21 plume0
+  cell 63 23 plume0
+  cell 64 21 plume1
+  cell 64 22 plume1
+  cell 64 23 plume0
+  cell 65 21 plume1
+  cell 67 21 plume0
+  cell 69 20 plume1
+  cell 71 20 plume0
+  cell 72 20 plume0
+  cell 73 20 plume0
+  cell 75 20 plume1
+  cell 76 19 plume1
+  cell 77 19 plume0
+  cell 79 19 plume0
+  cell 80 19 plume0
+  cell 82 19 plume0
+  cell 83 19 plume0
+  cell 84 19 plumehi
+  cell 86 20 plumehi
+  cell 87 20 plumehi
+  cell 60 16 plume0
+  cell 67 13 plume0
+  cell 73 13 plume0
+  cell 74 14 plume0
+  cell 76 15 plume0
+  cell 78 16 plume0
+  cell 79 17 plume0
+  cell 80 18 plume0
+  cell 81 18 plume0
+  cell 83 20 plumehi
+  cell 84 21 plumehi
+  cell 85 22 plumehi
+  cell 86 23 plumehi
+  cell 88 24 plumehi
+  cell 59 19 plume0
+  cell 59 20 plume0
+  cell 60 18 plume0
+  cell 62 18 plume1
+  cell 63 18 plume0
+  cell 64 18 plume0
+  cell 66 18 plume0
+  cell 67 18 plume0
+  cell 68 18 plume1
+  cell 75 17 plume0
+  cell 81 17 plume0
+  cell 82 17 plume0
+  cell 83 17 plume0
+  cell 87 17 plume1
+  cell 89 16 plume0
+  cell 90 16 plume0
+  cell 91 16 plume0
+  cell 93 17 plumehi
+  cell 94 17 plumehi
+  cell 95 17 plumehi
+  cell 59 10 plume1
+  cell 61 9 plume1
+  cell 62 10 plume1
+  cell 61 8 plume1
+  cell 62 9 plume1
+  cell 61 7 plume1
+  cell 62 8 plume1
+  cell 63 8 plume1
+  cell 64 8 plume0
+  cell 63 6 plume1
+  cell 64 7 plume1
+  cell 64 5 plume1
+  cell 65 6 plume1
+  cell 66 7 plume0
+  cell 65 4 plume1
+  cell 66 4 plume1
+  cell 67 4 plume0
+  cell 65 3 plume1
+  cell 66 3 plume1
+  cell 67 3 plume0
+  cell 67 2 plume1
+  cell 68 3 plume0
+  cell 68 1 plume1
+  cell 69 2 plume0
+  cell 69 0 plume1
+  cell 70 1 plume0
+  cell 71 0 plume0
+  cell 66 8 plume1
+  cell 67 7 plume1
+  cell 68 6 plume1
+  cell 69 7 plume1
+  cell 70 8 plume0
+  cell 69 5 plume1
+  cell 70 6 plume1
+  cell 71 7 plume0
+  cell 70 5 plume1
+  cell 71 5 plume1
+  cell 72 5 plume0
+  cell 70 4 plume1
+  cell 71 4 plume1
+  cell 72 4 plume0
+  cell 71 2 plume1
+  cell 72 3 plume1
+  cell 73 4 plume0
+  cell 73 2 plume1
+  cell 74 1 plume1
+  cell 75 0 plume1
+  cell 49 15 plume0
+  cell 61 18 plume0
+  cell 64 16 plume1
+  cell 64 17 plume1
+  cell 65 15 plume1
+  cell 67 15 plume0
+  cell 68 15 plume1
+  cell 68 16 plume1
+  cell 68 17 plume0
+  cell 69 15 plume1
+  cell 71 14 plume1
+  cell 71 15 plume1
+  cell 71 16 plume0
+  cell 72 14 plume1
+  cell 72 15 plume0
+  cell 73 14 plume0
+  cell 73 15 plume0
+  cell 75 15 plume0
+  cell 79 13 plume0
+  cell 79 15 plume0
+  cell 80 13 plume0
+  cell 81 13 plume0
+  cell 81 14 plume0
+  cell 83 14 plume0
+  cell 83 16 plume0
+  cell 84 14 plume0
+  cell 84 15 plume0
+  cell 85 14 plume0
+  cell 85 16 plume0
+  cell 87 14 plume0
+  cell 87 16 plume0
+  cell 88 15 plume0
+  cell 88 16 plume0
+  cell 88 17 plume0
+  cell 90 17 plume0
+  cell 92 17 plume0
+  cell 93 18 plume0
+  cell 94 19 plume0
+  cell 95 19 plume0
+}
+# END GENERATED HairFlowAMP rear_plume
+
+export json png aseprite

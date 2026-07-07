@@ -47,6 +47,10 @@ const VALID_DIRECTIVES = new Set([
   "CONSTRAINT",
   "QA",
   "METADATA",
+  "RENDERER",
+  "GPU",
+  "REDUCED",
+  "TRACE"
 ]);
 
 // ─── Parser State ────────────────────────────────────────────────────────────
@@ -127,9 +131,19 @@ function parseDirective(state: ParserState, line: string, lineNum: number): void
 function buildBlueprint(state: ParserState): AnimationBlueprintV1 {
   const get = (key: string): string | undefined => state.directives.get(key)?.join(" ");
   
-  const targetParts = (get("TARGET") || "").split(/\s+/);
-  const selectorType = (targetParts[0] || "id") as any;
-  const targetValue = targetParts.slice(1).join(" ") || "";
+  let targetParts = (get("TARGET") || "").split(/\s+/);
+  if (!targetParts[0] && state.directives.get("ANIM_START")) {
+    const startArgs = state.directives.get("ANIM_START") || [];
+    if (startArgs[0] === "TARGET") {
+      targetParts = startArgs.slice(1);
+    }
+  }
+  const selectorType = targetParts[0] && targetParts[0].includes(":") 
+    ? targetParts[0].split(":")[0] as any 
+    : (targetParts[0] || "id") as any;
+  const targetValue = targetParts[0] && targetParts[0].includes(":")
+    ? targetParts[0].split(":")[1]
+    : targetParts.slice(1).join(" ") || targetParts[0] || "";
 
   const easingParts = (get("EASE") || "").split(/\s+/);
   const easingType = (easingParts[0] || "token") as any;
@@ -155,14 +169,48 @@ function buildBlueprint(state: ParserState): AnimationBlueprintV1 {
 
   // Parse transforms
   const transforms: any = {};
-  for (const transform of ["SCALE", "ROTATE", "TRANSLATE_X", "TRANSLATE_Y", "OPACITY", "GLOW", "BLUR"]) {
+  const transformKeys: Record<string, string> = {
+    "SCALE": "scale",
+    "ROTATE": "rotate",
+    "TRANSLATE_X": "translateX",
+    "TRANSLATE_Y": "translateY",
+    "OPACITY": "opacity",
+    "GLOW": "glow",
+    "BLUR": "blur"
+  };
+  
+  for (const transform of Object.keys(transformKeys)) {
     const value = get(transform);
     if (value) {
-      const key = transform.toLowerCase().replace("_", "");
+      const key = transformKeys[transform];
       transforms[key] = parseTransform(value);
     }
   }
   if (Object.keys(transforms).length > 0) blueprint.transforms = transforms;
+
+  // Add backend hints and constraints
+  const renderer = get("RENDERER");
+  if (renderer) {
+    blueprint.backendHints = { ...blueprint.backendHints, css: { renderer } };
+  }
+
+  const gpu = get("GPU");
+  const reduced = get("REDUCED");
+  if (gpu !== undefined || reduced !== undefined) {
+    blueprint.constraints = {
+      ...blueprint.constraints,
+      requireParityAcrossBackends: gpu === "1" ? true : undefined,
+    };
+    if (reduced === "1" || reduced === "true") {
+      blueprint.constraints.allowBackendDegradation = true;
+    }
+  }
+
+  // Add tracing/processor hints
+  const traces = state.directives.get("TRACE");
+  if (traces && traces.length > 0) {
+    blueprint.metadata = { ...blueprint.metadata, source: traces.join(" ") };
+  }
 
   return blueprint;
 }
@@ -170,6 +218,11 @@ function buildBlueprint(state: ParserState): AnimationBlueprintV1 {
 function parseTransform(value: string): any {
   const parts = value.split(/\s+/);
   const result: any = {};
+  
+  if (parts.length === 1 && !isNaN(parseFloat(parts[0]))) {
+    return { base: parseFloat(parts[0]) };
+  }
+
   for (let i = 0; i < parts.length; i++) {
     const key = parts[i].toLowerCase();
     const next = parts[i + 1];

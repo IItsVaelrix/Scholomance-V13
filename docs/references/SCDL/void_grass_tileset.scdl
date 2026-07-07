@@ -1,0 +1,88 @@
+asset void_grass_tileset canvas 32x32
+
+palette {
+  dirt_side = #1A1C29
+  dirt_dark = #0E0F1A
+  grass_base = #1C1236
+  grass_mid = #2D1D52
+  grass_high = #432E7A
+  cyan_core = #A5F3FC
+  cyan_glow = #06B6D4
+  magenta_core = #F0ABFC
+  magenta_glow = #C026D3
+}
+
+part base material darksteel {
+  # Left dirt face
+  polygon 0 8 16 16 16 32 0 24 dirt_dark
+  # Right dirt face
+  polygon 16 16 32 8 32 24 16 32 dirt_side
+}
+
+part grass material void_cloth {
+  # Top grass surface
+  polygon 16 0 32 8 16 16 0 8 grass_base
+  # Basic texture pattern
+  cell 16 4 grass_mid
+  cell 12 6 grass_high
+  cell 20 6 grass_mid
+  cell 16 12 grass_high
+  cell 8 8 grass_mid
+  cell 24 8 grass_mid
+}
+
+loop variations duration 1000
+
+# Frame 1: Dense Foliage (the equivalent to the reference image)
+frame 1 "dense-foliage" {
+  part tall_grass after grass material void_cloth {
+    line 18 8 18 4 grass_high
+    line 20 7 20 3 grass_high
+    line 22 9 22 5 grass_mid
+    
+    line 8 10 8 6 grass_high
+    line 10 11 10 7 grass_mid
+  }
+  part bush after tall_grass material void_cloth {
+    circle 24 6 radius 4 grass_base
+    circle 24 6 radius 3 grass_mid
+    cell 24 5 grass_high
+    cell 23 6 grass_high
+    cell 25 7 grass_high
+  }
+  part flowers after bush material cyan_glow {
+    cell 18 3 magenta_core
+    cell 20 2 magenta_core
+    cell 24 4 cyan_core
+    glow radius 3
+  }
+}
+
+# Frame 2: Sparse/Corrupted (bare dirt patches)
+frame 2 "corrupted" {
+  part grass material void_cloth {
+    # Replace base grass with a patchy version
+    polygon 16 0 32 8 16 16 0 8 grass_base
+    # Dig a small dirt crater
+    polygon 12 8 16 6 20 8 16 10 dirt_dark
+    cell 16 8 dirt_side
+    cell 16 4 grass_high
+  }
+  part crystal after grass material cyan_glow {
+    polygon 16 8 18 4 16 1 14 4 cyan_core
+    cell 16 4 cyan_glow
+    glow radius 4
+  }
+}
+
+# Frame 3: Edge Transition (example of a path edge)
+frame 3 "path-edge" {
+  part grass material void_cloth {
+    # Only grass on the left half, dirt on right
+    polygon 16 0 32 8 16 16 0 8 dirt_side
+    polygon 16 0 16 16 0 8 grass_base
+    line 16 0 16 16 grass_high
+  }
+}
+
+export json png svg

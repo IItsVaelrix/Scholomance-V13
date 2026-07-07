@@ -164,3 +164,131 @@ export function createEmptyGrid(width = INITIAL_GRID_SIZE, height = INITIAL_GRID
   }
   return grid;
 }
+
+// ============================================================================
+// TACTICAL GRID BATTLEFIELD SYSTEM — Data Contracts
+// Added for Card Combat Engine (Tactical Grid). Coexists with resonance grid.
+// See codex/core/tactical.engine.js for pure implementations.
+// ============================================================================
+
+/**
+ * Card kinds that become distinct battlefield entity categories on placement.
+ * @typedef {'unit'|'structure'|'artifact'|'manaSource'|'spell'|'environment'} TacticalCardKind
+ */
+
+/**
+ * Runtime battlefield entity kinds.
+ * @typedef {'unit'|'structure'|'artifact'|'manaSource'|'zoneEffect'} TacticalEntityKind
+ */
+
+/**
+ * Terrain types for Tutorial Island and future maps.
+ * @typedef {'ice'|'voidStone'|'frozenRuins'|'manaCrystal'|'abyss'|'snow'|'runeTile'|'stone'} TacticalTerrainType
+ */
+
+/**
+ * Scholomance symbol tile buffs. Visually distinct, tooltip-backed strategic zones.
+ * @typedef {'eye'|'fang'|'halo'|'void'|'frost'|'crown'|'mirror'|'star'} ScholomanceSymbol
+ */
+
+/**
+ * Full tactical tile shape (extends resonance GridCell with height + symbol + modifiers).
+ * @typedef {Object} TacticalGridTile
+ * @property {number} x
+ * @property {number} y
+ * @property {number} height
+ * @property {TacticalTerrainType} terrainType
+ * @property {string|null} occupantId
+ * @property {ScholomanceSymbol|null} buffSymbol
+ * @property {number} movementCost
+ * @property {boolean} lineOfSightBlock
+ * @property {number} rangeModifier
+ * @property {number} accuracyModifier
+ * @property {number} damageModifier
+ * @property {string|null} elementalAffinity
+ * @property {boolean} isSpawnable
+ * @property {boolean} isObjectiveTile
+ * @property {any[]} statusEffects
+ */
+
+/**
+ * Core numeric stats carried by cards and battlefield entities.
+ * @typedef {Object} TacticalCardStats
+ * @property {number} [health]
+ * @property {number} [mana]
+ * @property {number} [armor]
+ * @property {number} [ward]
+ * @property {number} [attack]
+ * @property {number} [spellPower]
+ * @property {number} [range]
+ * @property {number} [movement]
+ * @property {number} [initiative]
+ * @property {number} [accuracy]
+ * @property {number} [evasion]
+ * @property {number} [criticalChance]
+ * @property {number} [criticalDamage]
+ * @property {number} [heightAffinity]
+ * @property {number} [manaGeneration]
+ * @property {number} [spellRadius]
+ */
+
+/**
+ * Placement constraints for a card.
+ * @typedef {Object} TacticalPlacementRule
+ * @property {TacticalTerrainType[]} allowedTerrains
+ * @property {number[]} allowedHeights
+ * @property {string[]} [requiredKeywords]
+ * @property {boolean} [requiresEmpty]
+ */
+
+/**
+ * Full card definition. Card is both readable object and deployable entity.
+ * @typedef {Object} TacticalCardDefinition
+ * @property {string} id
+ * @property {string} name
+ * @property {TacticalCardKind} kind
+ * @property {number} cost
+ * @property {string} [className]
+ * @property {string} [element]
+ * @property {string} rarity
+ * @property {TacticalCardStats} stats
+ * @property {string[]} keywords
+ * @property {any[]} abilities
+ * @property {TacticalPlacementRule} placementRules
+ * @property {{ frameKey?: string, iconKey?: string, scdlAsset?: string, palette?: Record<string,string> }} visualProfile
+ */
+
+/**
+ * Live battlefield entity created from a placed card.
+ * @typedef {Object} TacticalBattlefieldEntity
+ * @property {string} id
+ * @property {string} cardId
+ * @property {string} ownerId
+ * @property {TacticalEntityKind} kind
+ * @property {number} x
+ * @property {number} y
+ * @property {number} height
+ * @property {TacticalCardStats} stats
+ * @property {any[]} statusEffects
+ * @property {Record<string, number>} cooldowns
+ * @property {string} [name]
+ * @property {string} [school]
+ */
+
+/**
+ * Result of an accuracy calculation (for previews + tooltips).
+ * @typedef {Object} AccuracyResult
+ * @property {number} finalAccuracy
+ * @property {Object} breakdown
+ * @property {boolean} [blocked]
+ */
+
+/**
+ * Result of a damage calculation (inspectable breakdown).
+ * @typedef {Object} DamageResult
+ * @property {number} finalDamage
+ * @property {Object} breakdown
+ */
+
+// Convenience re-exports for module consumers who want a single import surface.
+export const TACTICAL_GRID_DEFAULT_SIZE = 9;

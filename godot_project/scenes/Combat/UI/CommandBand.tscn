@@ -1,9 +1,0 @@
-[gd_scene load_steps=2 format=3]
-
-[ext_resource type="Script" path="res://scripts/Combat/UI/CommandBand.gd" id="1_band"]
-
-[node name="CommandBand" type="HFlowContainer"]
-anchors_preset = 10
-anchor_right = 1.0
-grow_horizontal = 2
-script = ExtResource("1_band")

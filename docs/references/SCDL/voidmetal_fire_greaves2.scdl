@@ -1,0 +1,213 @@
+asset voidmetal_fire_greaves canvas 80x112
+
+palette {
+  void0      = #05070C
+  void1      = #0B0E16
+  shadow     = #11141D
+  steel0     = #1A1D27
+  steel1     = #2A2E3A
+  steel2     = #3C414C
+  steel3     = #5C606B
+  edge       = #8D929B
+  coldhi     = #C9CDD6
+  leather    = #241310
+  strap      = #151018
+  chain      = #090B10
+  rivet      = #A99A7A
+  sootred    = #3A0711
+  oxblood    = #6A1019
+  ember0     = #D32608
+  ember1     = #FF5A00
+  ember2     = #FF9A1F
+  core       = #FFD66A
+  whitecore  = #FFF2B5
+  purple0    = #2A173A
+  purple1    = #6B2F82
+  purple2    = #B06BCE
+}
+
+# rear mass first: every later plate cuts into this shadow silhouette
+part rear_leg_mass material black_steel {
+  symmetry x
+  polygon 10 12 29 6 36 29 35 58 31 89 28 107 19 111 10 104 8 84 11 58 7 31 void0
+  polygon 15 28 32 25 34 57 28 84 17 82 13 58 steel0
+  polygon 16 84 30 83 33 106 27 111 15 108 12 96 steel0
+}
+
+part inner_chain_gap material blacksteel {
+  rect 35 9 10 56 chain
+  polygon 31 28 39 25 39 70 34 74 30 55 chain
+  polygon 41 25 49 28 50 55 46 74 41 70 chain
+  rect 36 62 8 42 void0
+}
+
+part waist_belt material leather_brown {
+  rect 22 4 36 5 leather
+  rect 31 1 18 4 strap
+  rect 37 2 6 7 steel2
+  rect 38 3 4 3 void1
+  cell 25 5 rivet
+  cell 32 5 rivet
+  cell 47 5 rivet
+  cell 54 5 rivet
+}
+
+part codpiece_center material voidsteel {
+  polygon 31 7 49 7 48 22 43 33 40 38 37 33 32 22 steel1
+  polygon 35 9 45 9 44 21 40 29 36 21 steel2
+  line 40 8 40 36 edge
+  line 34 12 39 30 steel3
+  line 46 12 41 30 steel3
+  cell 39 11 coldhi
+}
+
+part hip_lamellae material voidsteel {
+  symmetry x
+  polygon 9 10 29 7 36 21 34 31 14 28 6 18 steel2
+  polygon 12 19 34 21 33 32 15 36 8 29 steel1
+  polygon 14 29 34 31 32 42 16 45 11 37 steel0
+  polygon 16 40 33 42 32 52 18 55 13 48 steel1
+  line 9 10 29 7 edge
+  line 14 28 34 31 steel3
+  line 16 45 32 42 steel3
+}
+
+part purple_heat_bloom material amethyst {
+  symmetry x
+  polygon 16 13 27 10 34 20 30 31 18 28 12 20 purple0
+  polygon 21 15 30 20 27 26 18 23 purple1
+  line 23 14 29 18 purple2
+  line 18 24 25 27 purple2
+}
+
+part thigh_main_plates material voidsteel {
+  symmetry x
+  polygon 15 34 34 27 37 55 31 69 17 63 12 47 steel1
+  polygon 18 36 34 32 35 45 18 50 13 45 steel2
+  polygon 16 51 35 47 34 60 20 66 14 60 steel0
+  polygon 21 67 33 62 36 74 29 84 17 77 15 70 steel1
+  line 18 36 34 32 edge
+  line 16 51 35 47 steel3
+  line 21 67 33 62 steel3
+  line 33 28 37 55 shadow
+}
+
+part side_straps material leather_brown {
+  symmetry x
+  rect 30 43 5 3 strap
+  rect 28 58 5 3 strap
+  rect 29 76 5 3 strap
+  rect 28 92 5 3 strap
+  cell 30 44 rivet
+  cell 29 59 rivet
+  cell 30 77 rivet
+  cell 29 93 rivet
+}
+
+part knee_guards material voidsteel {
+  symmetry x
+  polygon 15 62 35 58 39 72 31 85 16 80 10 69 steel1
+  polygon 18 64 34 61 36 70 29 78 17 76 13 69 steel2
+  polygon 20 75 34 70 31 85 18 81 steel0
+  line 15 62 35 58 edge
+  line 18 64 34 61 coldhi
+  line 20 75 34 70 steel3
+}
+
+part shin_greaves material voidsteel {
+  symmetry x
+  polygon 14 79 31 76 35 104 27 111 15 107 11 93 steel1
+  polygon 17 82 31 79 33 94 20 98 13 92 steel2
+  polygon 16 96 33 94 31 106 23 111 14 105 steel0
+  line 17 82 31 79 edge
+  line 16 96 33 94 steel3
+  line 31 79 35 104 shadow
+}
+
+part sabaton_boots material black_steel {
+  symmetry x
+  polygon 9 103 28 99 37 107 34 111 12 111 6 108 steel0
+  polygon 14 101 29 101 33 106 21 108 9 107 steel2
+  polygon 21 100 31 103 34 108 25 108 steel1
+  line 14 101 29 101 edge
+  line 8 108 34 108 steel3
+}
+
+part plate_edge_cuts material silver {
+  symmetry x
+  line 20 11 20 28 steel3
+  line 27 9 26 25 edge
+  line 13 36 35 32 shadow
+  line 18 50 35 47 shadow
+  line 20 66 34 60 shadow
+  line 17 82 31 79 shadow
+  line 20 98 33 94 shadow
+  line 24 101 25 109 coldhi
+}
+
+part rivets material bronze {
+  symmetry x
+  cell 17 13 rivet
+  cell 28 11 rivet
+  cell 13 26 rivet
+  cell 31 32 rivet
+  cell 18 39 rivet
+  cell 31 44 rivet
+  cell 18 58 rivet
+  cell 31 65 rivet
+  cell 17 72 rivet
+  cell 30 82 rivet
+  cell 18 99 rivet
+  cell 28 104 rivet
+}
+
+# glow underpaint: broad warm damage seams, intentionally hand-placed instead of mirrored
+part ember_undercracks material shadow_fire {
+  line 24 35 20 42 oxblood
+  line 20 42 18 50 oxblood
+  line 20 42 28 45 oxblood
+  line 57 34 61 42 oxblood
+  line 61 42 66 39 oxblood
+  line 61 42 60 51 oxblood
+  line 25 78 18 88 oxblood
+  line 18 88 22 99 oxblood
+  line 18 88 13 93 oxblood
+  line 54 73 62 85 oxblood
+  line 62 85 59 98 oxblood
+  line 62 85 68 90 oxblood
+  line 24 103 20 109 oxblood
+  line 56 101 59 109 oxblood
+  glow radius 2
+}
+
+part ember_cracks material divine_flame_core {
+  line 24 35 20 42 ember1
+  line 20 42 19 49 ember2
+  line 20 42 27 45 ember0
+  line 57 34 61 42 ember1
+  line 61 42 65 39 ember2
+  line 61 42 60 50 ember0
+  line 25 78 18 88 ember1
+  line 18 88 22 98 ember2
+  line 18 88 14 92 ember0
+  line 54 73 62 85 ember1
+  line 62 85 59 97 ember2
+  line 62 85 67 90 ember0
+  line 24 103 20 109 ember1
+  line 56 101 59 109 ember1
+  cell 20 42 core
+  cell 61 42 core
+  cell 18 88 whitecore
+  cell 62 85 whitecore
+  glow radius 3
+}
+
+part molten_vents material divine_flame_core {
+  polygon 18 87 21 88 19 92 16 92 ember2
+  polygon 59 84 63 85 61 90 57 89 ember2
+  polygon 20 40 22 42 20 45 18 44 core
+  polygon 59 40 62 42 61 45 58 44 core
+  glow radius 2
+}
+
+export json png aseprite

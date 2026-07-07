@@ -1,0 +1,123 @@
+# void_rune_focus — tutorial centerpiece: an awakened sigil ring in the ice
+# Isometric 2:1 diamond, 128x64. Light law: upper-left (-1,-1);
+# the sigil itself is emissive and overrides ambient shading.
+asset void_rune_focus canvas 128x64
+
+palette {
+  abyss    = #04060e
+  deep     = #0e1526
+  dark     = #182238
+  base     = #22304f
+  mid      = #2d4066
+  lit      = #3d5480
+  bright   = #52709f
+  sheen    = #7291bd
+  frost    = #a8c3e2
+  spec     = #e3eef9
+  cyanhot  = #67e8f9
+  cyansoft = #b7f4fd
+  cyandeep = #0e7490
+  runedim  = #4650a8
+  runeviol = #7c8cff
+  runehi   = #b4bcff
+}
+
+# ── ice slab (shared set law) ────────────────────────────────────────────
+part slab material void_ice {
+  polygon 64 -1 129 32 64 65 -1 32 base
+  polygon -1 32 64 -1 64 4 8 32 bright
+  polygon 64 -1 129 32 120 32 64 4 lit
+  polygon -1 32 64 65 64 59 8 32 dark
+  polygon 64 65 129 32 120 32 64 59 deep
+  line 0 32 64 0 sheen
+  line 64 0 127 31 lit
+  line 0 33 63 63 deep
+  line 64 63 127 33 abyss
+}
+
+# ── polished basin the ring is carved into ───────────────────────────────
+part basin material void_ice {
+  polygon 64 10 112 32 64 54 16 32 dark
+  polygon 64 12 108 32 64 52 20 32 deep
+  # basin lip catching light on the NW arc
+  line 16 32 64 10 lit
+  line 20 30 60 12 mid
+}
+
+# ── carved sigil ring — twin ellipses with radial glyph ticks ────────────
+part ring material void_rune_glow {
+  glow radius 4
+  # outer and inner conduit rings (iso circles)
+  ellipse 64 32 radius 42 ry 21 runedim
+  ellipse 64 32 radius 41 ry 20 runeviol
+  ellipse 64 32 radius 30 ry 15 runeviol
+  ellipse 64 32 radius 29 ry 14 runedim
+  # lit arc — NW quarter of the outer ring burns brighter
+  cell 57 12 runehi
+  cell 52 13 runehi
+  cell 47 14 runehi
+  cell 42 16 runehi
+  cell 38 17 runehi
+  cell 34 19 runehi
+  cell 30 21 runehi
+  cell 28 23 runehi
+  cell 26 25 runehi
+  cell 49 12 cyansoft
+  cell 40 15 cyansoft
+  cell 31 19 cyansoft
+  # radial glyph ticks between the rings (compass + quarters)
+  line 64 11 64 17 runehi
+  line 64 53 64 47 runeviol
+  line 23 32 34 32 runehi
+  line 105 32 94 32 runeviol
+  line 40 21 46 25 runehi
+  line 88 21 82 25 runeviol
+  line 40 43 46 39 runeviol
+  line 88 43 82 39 runedim
+  # orbit beads on the outer ring
+  cell 50 13 cyanhot
+  cell 92 20 cyansoft
+  cell 100 38 cyanhot
+  cell 64 52 cyansoft
+  cell 30 42 cyanhot
+  cell 26 28 cyansoft
+}
+
+# ── central glyph — the void anchor stone ────────────────────────────────
+part anchor material void_core {
+  # carved socket shadow
+  polygon 64 24 78 32 64 40 50 32 abyss
+  # anchor crystal, lit as a sphere so it reads as a raised gem
+  sphere 64 31 radius 6 light -1 -1 spec cyansoft cyanhot cyandeep abyss
+  # glyph strokes radiating from the anchor
+  line 64 22 64 18 runehi
+  line 64 42 64 46 runeviol
+  line 52 28 46 26 runehi
+  line 76 28 82 26 runeviol
+  line 52 36 46 38 runedim
+  line 76 36 82 38 runedim
+}
+
+# ── stray charge — motes drifting off the awakened ring ──────────────────
+part motes material cyan_glow {
+  glow radius 2
+  cell 44 18 cyansoft
+  cell 86 14 cyansoft
+  cell 108 28 cyansoft
+  cell 96 44 cyansoft
+  cell 34 46 cyansoft
+  cell 18 36 cyansoft
+}
+
+# ── frost bloom on the lit crest (set law) ───────────────────────────────
+part frostbloom material diamond {
+  cell 12 30 frost
+  cell 22 25 frost
+  cell 32 20 frost
+  cell 42 15 frost
+  cell 52 10 frost
+  cell 17 27 sheen
+  cell 37 17 sheen
+  cell 27 22 spec
+  cell 47 12 spec
+}

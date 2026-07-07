@@ -421,6 +421,55 @@ function extractDefinitionsFromEntries(entries) {
 async function constrainLexicalEntry(entry, options = {}) {
   if (!entry) return null;
   entry.definitions = (entry.definitions || []).slice(0, MAX_DEFINITION_COUNT);
+
+  if (options.phonemeEngine) {
+    const candidates = Array.isArray(entry.rhymes) ? entry.rhymes : [];
+    
+    // Ensure the XLR (Scholomance Lexical Registry) word list is integrated before phoneme analysis
+    if (typeof options.phonemeEngine.ensureAuthorityBatch === 'function') {
+      await options.phonemeEngine.ensureAuthorityBatch([entry.word, ...candidates]);
+    }
+
+    // Call primeG2PBatch for OOV fallback before judging!
+    if (typeof options.phonemeEngine.primeG2PBatch === 'function') {
+      await options.phonemeEngine.primeG2PBatch([entry.word, ...candidates]);
+    }
+
+    const targetAnalysis = options.phonemeEngine.analyzeWord(entry.word);
+    
+    // Fix pronunciation fallback using XLR/CMUDICT phonemes if pronunciation is missing
+    if (!entry.pronunciation && targetAnalysis && Array.isArray(targetAnalysis.phonemes)) {
+      entry.pronunciation = `/${targetAnalysis.phonemes.join(' ')}/`;
+    }
+    
+    // External providers can over-broaden rel_rhy; filter those through local
+    // phoneme analysis. Scholomance lexicon rhymes are already DB rhyme-key
+    // matches, so they remain authoritative and are only ranked below.
+    if (!options.trustPerfectRhymes && targetAnalysis && Array.isArray(entry.rhymes)) {
+      const perfectRhymes = [];
+      const demotedToSlant = [];
+      const originalRhymes = [...entry.rhymes];
+      
+      for (const candidate of entry.rhymes) {
+        const candidateAnalysis = options.phonemeEngine.analyzeWord(candidate);
+        if (candidateAnalysis && candidateAnalysis.rhymeKey === targetAnalysis.rhymeKey) {
+          perfectRhymes.push(candidate);
+        } else {
+          demotedToSlant.push(candidate);
+        }
+      }
+      
+      if (perfectRhymes.length === 0 && originalRhymes.length > 0) {
+        entry.rhymes = originalRhymes;
+      } else {
+        entry.rhymes = perfectRhymes;
+        if (demotedToSlant.length > 0) {
+          entry.slantRhymes = [...(entry.slantRhymes || []), ...demotedToSlant];
+        }
+      }
+    }
+  }
+
   entry.synonyms = await rankSuggestionGroup(entry.word, entry.synonyms || [], 'synonyms', options);
   entry.antonyms = await rankSuggestionGroup(entry.word, entry.antonyms || [], 'antonyms', options);
   entry.rhymes = await rankSuggestionGroup(entry.word, entry.rhymes || [], 'rhymes', options);
@@ -577,21 +626,28 @@ export function createWordLookupService(options = {}) {
         };
       }
 
-      const constrained = await constrainLexicalEntry(entry, { phonemeEngine });
+      // Capture whether the dictionary itself supplied native slant rhymes
+      // before ranking, so the Datamuse supplement only fills a real gap.
+      const slantRhymesWereEmpty = (entry.slantRhymes?.length || 0) === 0;
+      const constrained = await constrainLexicalEntry(entry, {
+        phonemeEngine,
+        trustPerfectRhymes: true,
+      });
 
       // The local Scholomance dictionary does not currently supply slant rhyme
       // data, and lookupFromExternalApis (the only Datamuse rel_nry path) is
       // short-circuited when the local dict returns a valid entry. Without this
       // supplement, the "Shadow Echo" channel renders its "no echoes in archive"
-      // placeholder for every word in the local dictionary. When the entry is
-      // otherwise valid but lacks slantRhymes, fetch them directly from Datamuse
-      // and re-rank so the channel surfaces real words.
-      if (hasLexicalData(constrained) && (constrained.slantRhymes?.length || 0) === 0) {
+      // placeholder for every word in the local dictionary. When the archive had
+      // no native slant data, fetch from Datamuse so the channel surfaces real
+      // words without disturbing authoritative perfect rhymes.
+      if (hasLexicalData(constrained) && slantRhymesWereEmpty) {
         const supplemental = await fetchSlantRhymesFromDatamuse(word, fetchImpl, externalApiTimeoutMs);
         if (supplemental.length > 0) {
+          const currentSlants = Array.isArray(constrained.slantRhymes) ? constrained.slantRhymes : [];
           constrained.slantRhymes = await rankSuggestionGroup(
             constrained.word,
-            supplemental,
+            [...currentSlants, ...supplemental],
             'slantRhymes',
             { phonemeEngine },
           );

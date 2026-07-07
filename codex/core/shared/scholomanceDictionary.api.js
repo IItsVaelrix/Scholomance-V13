@@ -131,10 +131,23 @@ function createUnavailableError() {
 
 function buildUrl(base, params) {
   let absoluteBase = base;
-  if (base.startsWith('/') && typeof window !== 'undefined') {
-    absoluteBase = `${window.location.origin}${base}`;
+  let origin = 'http://localhost';
+  
+  if (typeof window !== 'undefined') {
+    origin = window.location.origin;
+    if (base.startsWith('/')) {
+      absoluteBase = `${origin}${base}`;
+    }
+  } else if (typeof process !== 'undefined' && process.env) {
+    const port = process.env.PORT || 3000;
+    origin = process.env.PUBLIC_SERVER_URL || `http://localhost:${port}`;
+    if (base.startsWith('/')) {
+      // Strip trailing slash from origin to prevent double slashes
+      absoluteBase = `${origin.replace(/\/+$/, '')}${base}`;
+    }
   }
-  const url = new URL(absoluteBase, typeof window !== 'undefined' ? window.location.origin : 'http://localhost');
+
+  const url = new URL(absoluteBase, origin);
   Object.entries(params || {}).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== "") {
       url.searchParams.set(key, String(value));
@@ -341,21 +354,21 @@ export const ScholomanceDictionaryAPI = {
   },
 
   /**
-   * Fetches unified Read panel analysis (rhyme, score, astrology, narrative) from the backend.
+   * Fetches unified Read panel analysis from the backend.
    * @param {string} text
-   * @param {{ nluMode?: 'direct'|'generate' }} [options]
+   * @param {{ nluMode?: 'direct'|'generate', analysisProfile?: 'editor'|'full' }} [options]
    * @returns {Promise<{ source: string, data: any }>}
    */
-  async analyzePanels(text, { nluMode = 'generate' } = {}) {
+  async analyzePanels(text, { nluMode = 'generate', analysisProfile = 'full' } = {}) {
     const baseUrl = resolveBaseUrl();
     if (!baseUrl || !text) return null;
 
-    const url = buildAuthorityUrl('/api/analysis/panels');
+    const url = buildUrl(buildAuthorityUrl('/api/analysis/panels'));
 
     return await requestJson(baseUrl, url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, nluMode })
+      body: JSON.stringify({ text, nluMode, analysisProfile })
     });
   }
 };

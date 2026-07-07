@@ -574,7 +574,7 @@ describe('[Server] index route integration', () => {
       url: '/api/word-lookup/arcana',
     });
     expect(lookupResponse.statusCode).toBe(200);
-    expect(lookupResponse.json().source).toBe('scholomance-local');
+    expect(lookupResponse.json().source).toBe('scholomance-merged');
 
     const metricsJar = createCookieJar();
     await registerAndLogin(metricsJar, `metrics_${Date.now()}_${Math.random().toString(16).slice(2)}`);

@@ -1,0 +1,263 @@
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-system) + 3);
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 40%, rgba(120, 70, 180, 0.14) 0%, transparent 68%),
+    rgba(2, 6, 14, 0.68);
+  backdrop-filter: blur(5px);
+}
+
+.panel {
+  position: relative;
+  width: min(94vw, 520px);
+  max-height: min(88vh, 680px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  overflow: hidden;
+  background: linear-gradient(165deg, rgba(14, 18, 34, 0.98) 0%, rgba(5, 8, 16, 0.99) 100%);
+  border: 1px solid rgba(180, 130, 255, 0.28);
+  box-shadow:
+    0 22px 56px rgba(0, 0, 0, 0.74),
+    0 0 32px rgba(140, 90, 255, 0.08) inset;
+}
+
+.chromeHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(180, 130, 255, 0.16);
+  background: linear-gradient(180deg, rgba(22, 16, 38, 0.55), transparent);
+}
+
+.chromeBadge {
+  padding: 0.28rem 0.55rem;
+  border-radius: 4px;
+  border: 1px solid rgba(200, 160, 255, 0.35);
+  background: rgba(140, 90, 255, 0.1);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #e8d8ff;
+}
+
+.chromeLabel {
+  flex: 1;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(230, 220, 255, 0.62);
+}
+
+.closeBtn {
+  border: 0;
+  background: transparent;
+  color: rgba(230, 220, 255, 0.8);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.panelBody {
+  padding: 1rem 1.15rem 0.5rem;
+  overflow-y: auto;
+}
+
+.epithet {
+  margin: 0 0 0.35rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(200, 170, 255, 0.62);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.35rem;
+  color: #f4ecff;
+}
+
+.subtitle {
+  margin: 0.2rem 0 0.5rem;
+  color: rgba(220, 205, 255, 0.72);
+  font-size: 0.875rem;
+}
+
+.schoolLine {
+  margin: 0 0 1rem;
+  font-size: 0.8125rem;
+  color: rgba(210, 195, 255, 0.78);
+}
+
+.section {
+  margin-bottom: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(180, 130, 255, 0.1);
+}
+
+.section:last-child {
+  border-bottom: 0;
+}
+
+.sectionLabel {
+  margin: 0 0 0.45rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #c8a0ff;
+}
+
+.sectionList {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: rgba(230, 235, 248, 0.82);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.45rem;
+}
+
+.tag {
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(200, 160, 255, 0.28);
+  background: rgba(120, 70, 180, 0.14);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  color: #eadfff;
+}
+
+.chessArchetype {
+  margin: 0 0 0.5rem;
+  font-size: 0.8125rem;
+  color: rgba(220, 205, 255, 0.85);
+}
+
+.chessGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
+.chessKey {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(200, 170, 255, 0.55);
+}
+
+.chessCounsel {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: rgba(230, 235, 248, 0.78);
+  font-style: italic;
+}
+
+.footer {
+  padding: 0.75rem 1rem 1rem;
+  border-top: 1px solid rgba(180, 130, 255, 0.12);
+}
+
+.dismissBtn {
+  width: 100%;
+  padding: 0.55rem 0.85rem;
+  border-radius: 6px;
+  border: 1px solid rgba(200, 160, 255, 0.35);
+  background: rgba(120, 70, 180, 0.18);
+  color: #f4ecff;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.dismissBtn:hover {
+  background: rgba(140, 90, 255, 0.28);
+}
+
+.glossaryTerm {
+  position: relative;
+  display: inline;
+  border-bottom: 1px dotted rgba(200, 160, 255, 0.45);
+  cursor: help;
+  outline: none;
+}
+
+.glossaryTerm:focus-visible {
+  border-bottom-color: rgba(230, 200, 255, 0.9);
+  box-shadow: 0 1px 0 rgba(230, 200, 255, 0.35);
+}
+
+.glossaryTip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 180px;
+  max-width: 260px;
+  padding: 0.5rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid rgba(200, 160, 255, 0.35);
+  background: rgba(10, 14, 28, 0.98);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+  color: rgba(235, 240, 252, 0.92);
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.12s ease, visibility 0.12s ease;
+}
+
+.glossaryTerm:hover .glossaryTip,
+.glossaryTerm:focus-visible .glossaryTip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.glossaryTipTitle {
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #d8b8ff;
+}
+
+.glossaryTipBody {
+  color: rgba(230, 235, 248, 0.86);
+}
+
+.tag.glossaryTerm {
+  display: inline-flex;
+  align-items: center;
+}

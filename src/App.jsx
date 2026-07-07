@@ -3,6 +3,9 @@ import { useOutlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import Navigation from "./components/Navigation/Navigation.jsx";
 import AtmosphereSync from "./components/AtmosphereSync.jsx";
+import GameBackgroundMusicSync from "./components/GameBackgroundMusicSync.jsx";
+import GameAudioForgeSync from "./components/GameAudioForgeSync.jsx";
+import GameObeliskElectricSync from "./components/GameObeliskElectricSync.jsx";
 import { SongProvider } from "./hooks/useCurrentSong.jsx";
 import { CODExProvider } from "./hooks/useCODExPipeline.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
@@ -13,6 +16,8 @@ import { PredictorProvider } from "./hooks/usePredictor.jsx";
 import { usePrefersReducedMotion } from "./hooks/usePrefersReducedMotion.js";
 import { MotionInspector } from "./ui/animation/components/MotionInspector";
 import { MotionDebugBadge } from "./ui/animation/components/MotionDebugBadge";
+import { InventoryOverlay } from "./ui/inventory/InventoryOverlay.jsx";
+import { CharacterCompendiumOverlay } from "./ui/character/CharacterCompendiumOverlay.jsx";
 
 const fullMotionVariants = {
   initial: { opacity: 0, y: 20 },
@@ -47,6 +52,9 @@ export default function App() {
   const shouldReduceMotion = prefersReducedMotion;
   const pageVariants = shouldReduceMotion ? reducedMotionVariants : fullMotionVariants;
 
+  // Remove navigation bar only on the battle/combat page so the grid can fill the full viewport.
+  const isBattlePage = location.pathname === '/combat' || location.pathname.startsWith('/combat/');
+
   useEffect(() => {
     const main = document.getElementById("main-content");
     if (main) {
@@ -64,23 +72,36 @@ export default function App() {
           <AuthScopedProviders>
             <SongProvider>
               <AtmosphereSync />
-              <div className="aurora-background" aria-hidden="true" />
-              <div className="vignette" aria-hidden="true" />
-              <div className="scanlines" aria-hidden="true" />
+              <GameBackgroundMusicSync />
+              <GameAudioForgeSync />
+              <GameObeliskElectricSync />
+              {/* Hide global decorative layers on battle page so only the pure grid is visible */}
+              {!isBattlePage && (
+                <>
+                  <div className="aurora-background" aria-hidden="true" />
+                  <div className="vignette" aria-hidden="true" />
+                  <div className="scanlines" aria-hidden="true" />
+                </>
+              )}
               
               {/* Animation AMP Debug Tooling (Phase 4) */}
-              {import.meta.env.DEV && (
+              {import.meta.env.DEV && !isBattlePage && (
                 <>
                   <MotionInspector />
                   <MotionDebugBadge />
                 </>
               )}
 
+              <InventoryOverlay />
+              <CharacterCompendiumOverlay />
+
               <div className="page-container">
-                <a href="#main-content" className="skip-link">
-                  Skip to main content
-                </a>
-                <Navigation />
+                {!isBattlePage && (
+                  <a href="#main-content" className="skip-link">
+                    Skip to main content
+                  </a>
+                )}
+                {!isBattlePage && <Navigation />}
                 <div className="page-body">
                   <AnimatePresence mode="wait" initial={false}>
                     <motion.main

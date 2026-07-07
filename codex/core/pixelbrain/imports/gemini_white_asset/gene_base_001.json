@@ -1,0 +1,4090 @@
+{
+  "contract": "PB-SCDNA-GENE-v1",
+  "version": "1.0.0",
+  "assetId": "gemini_white_asset",
+  "geneId": "gene_base_001",
+  "geneType": "TILE_SURFACE",
+  "canvas": {
+    "width": 88,
+    "height": 48
+  },
+  "bounds": {
+    "x": 33,
+    "y": 3,
+    "w": 22,
+    "h": 42
+  },
+  "role": "tile_surface",
+  "materialHint": "obsidian",
+  "paletteRoles": [
+    "base"
+  ],
+  "coordinates": [
+    {
+      "x": 43,
+      "y": 3,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 3,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 4,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 4,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 4,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 5,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 5,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 5,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 5,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 5,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 5,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 6,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 6,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 6,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 6,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 6,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 6,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 7,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 7,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 7,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 7,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 7,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 7,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 7,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 7,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 8,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 8,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 8,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 8,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 8,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 8,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 8,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 8,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 8,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 9,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 9,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 9,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 9,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 9,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 9,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 9,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 9,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 10,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 10,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 10,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 10,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 10,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 10,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 10,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 10,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 11,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 11,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 11,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 11,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 11,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 11,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 11,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 11,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 12,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 12,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 12,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 12,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 12,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 12,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 12,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 12,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 12,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 12,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 13,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 13,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 13,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 13,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 13,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 13,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 13,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 13,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 13,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 13,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 14,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 14,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 14,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 14,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 14,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 14,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 14,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 14,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 14,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 14,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 15,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 15,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 15,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 15,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 15,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 15,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 15,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 15,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 16,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 16,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 16,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 16,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 16,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 16,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 16,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 16,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 17,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 17,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 17,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 17,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 17,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 17,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 17,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 17,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 18,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 18,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 18,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 18,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 18,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 18,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 18,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 18,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 19,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 19,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 19,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 19,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 19,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 19,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 19,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 19,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 20,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 20,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 20,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 20,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 20,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 20,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 20,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 20,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 20,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 21,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 21,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 21,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 21,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 21,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 21,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 21,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 21,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 21,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 21,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 22,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 22,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 22,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 22,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 22,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 22,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 22,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 22,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 22,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 22,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 22,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 22,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 23,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 23,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 23,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 23,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 23,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 23,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 23,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 23,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 23,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 23,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 23,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 23,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 23,
+      "color": "#A38973",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 51,
+      "y": 23,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 36,
+      "y": 24,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 24,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 24,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 24,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 24,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 24,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 24,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 24,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 24,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 24,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 24,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 24,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 24,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 24,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 24,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 51,
+      "y": 24,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 35,
+      "y": 25,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 36,
+      "y": 25,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 25,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 25,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 25,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 25,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 25,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 25,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 25,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 25,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 25,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 25,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 25,
+      "color": "#A38973",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 25,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 25,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 25,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 51,
+      "y": 25,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 52,
+      "y": 25,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 35,
+      "y": 26,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 36,
+      "y": 26,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 26,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 26,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 26,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 26,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 26,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 26,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 26,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 26,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 26,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 26,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 26,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 26,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 26,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 26,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 51,
+      "y": 26,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 52,
+      "y": 26,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 34,
+      "y": 27,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 35,
+      "y": 27,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 36,
+      "y": 27,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 27,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 27,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 27,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 27,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 27,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 27,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 27,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 27,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 27,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 27,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 27,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 27,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 27,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 27,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 51,
+      "y": 27,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 52,
+      "y": 27,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 53,
+      "y": 27,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 34,
+      "y": 28,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 35,
+      "y": 28,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 36,
+      "y": 28,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 28,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 28,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 28,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 28,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 28,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 28,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 28,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 28,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 28,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 28,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 28,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 28,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 28,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 28,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 51,
+      "y": 28,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 52,
+      "y": 28,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 53,
+      "y": 28,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 54,
+      "y": 28,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 33,
+      "y": 29,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 34,
+      "y": 29,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 35,
+      "y": 29,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 36,
+      "y": 29,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 29,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 29,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 29,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 29,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 29,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 29,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 29,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 29,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 29,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 29,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 29,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 29,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 29,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 29,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 51,
+      "y": 29,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 52,
+      "y": 29,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 53,
+      "y": 29,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 54,
+      "y": 29,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 33,
+      "y": 30,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 34,
+      "y": 30,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 35,
+      "y": 30,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 36,
+      "y": 30,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 30,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 30,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 30,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 30,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 30,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 30,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 30,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 30,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 30,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 30,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 30,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 30,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 30,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 30,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 51,
+      "y": 30,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 52,
+      "y": 30,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 53,
+      "y": 30,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 54,
+      "y": 30,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 33,
+      "y": 31,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 34,
+      "y": 31,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 35,
+      "y": 31,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 36,
+      "y": 31,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 31,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 31,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 31,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 31,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 31,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 31,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 31,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 31,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 31,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 31,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 31,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 31,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 31,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 31,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 51,
+      "y": 31,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 52,
+      "y": 31,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 53,
+      "y": 31,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 54,
+      "y": 31,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 33,
+      "y": 32,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 34,
+      "y": 32,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 35,
+      "y": 32,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 36,
+      "y": 32,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 32,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 32,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 32,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 32,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 32,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 32,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 32,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 32,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 32,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 32,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 32,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 32,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 32,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 32,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 51,
+      "y": 32,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 52,
+      "y": 32,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 53,
+      "y": 32,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 54,
+      "y": 32,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 33,
+      "y": 33,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 34,
+      "y": 33,
+      "color": "#386694",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 35,
+      "y": 33,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 36,
+      "y": 33,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 33,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 33,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 33,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 33,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 33,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 33,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 33,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 33,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 33,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 33,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 33,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 33,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 33,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 33,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 51,
+      "y": 33,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 52,
+      "y": 33,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 53,
+      "y": 33,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 54,
+      "y": 33,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 33,
+      "y": 34,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 34,
+      "y": 34,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 35,
+      "y": 34,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 36,
+      "y": 34,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 34,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 34,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 34,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 34,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 34,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 34,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 34,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 34,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 34,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 34,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 34,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 34,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 34,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 34,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 51,
+      "y": 34,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 52,
+      "y": 34,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 53,
+      "y": 34,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 54,
+      "y": 34,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 33,
+      "y": 35,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 34,
+      "y": 35,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 35,
+      "y": 35,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 36,
+      "y": 35,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 35,
+      "color": "#4D8DC2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 35,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 35,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 35,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 35,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 35,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 35,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 35,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 35,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 35,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 35,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 35,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 35,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 35,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 51,
+      "y": 35,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 52,
+      "y": 35,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 53,
+      "y": 35,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 54,
+      "y": 35,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 33,
+      "y": 36,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 34,
+      "y": 36,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 35,
+      "y": 36,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 36,
+      "y": 36,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 36,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 36,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 36,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 36,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 36,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 36,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 36,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 36,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 36,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 36,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 36,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 36,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 36,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 36,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 51,
+      "y": 36,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 52,
+      "y": 36,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 53,
+      "y": 36,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 34,
+      "y": 37,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 35,
+      "y": 37,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 36,
+      "y": 37,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 37,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 37,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 37,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 37,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 37,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 37,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 37,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 37,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 37,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 37,
+      "color": "#D2FAFE",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 37,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 37,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 37,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 37,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 51,
+      "y": 37,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 52,
+      "y": 37,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 53,
+      "y": 37,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 34,
+      "y": 38,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 35,
+      "y": 38,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 36,
+      "y": 38,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 38,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 38,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 38,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 38,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 38,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 38,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 38,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 38,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 38,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 38,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 38,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 38,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 38,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 38,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 51,
+      "y": 38,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 52,
+      "y": 38,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 35,
+      "y": 39,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 36,
+      "y": 39,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 39,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 39,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 39,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 39,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 39,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 39,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 39,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 39,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 39,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 39,
+      "color": "#11348C",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 39,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 39,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 39,
+      "color": "#53EDF9",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 39,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 51,
+      "y": 39,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 52,
+      "y": 39,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 36,
+      "y": 40,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 40,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 40,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 40,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 40,
+      "color": "#1C8CDF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 40,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 40,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 40,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 40,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 40,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 40,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 40,
+      "color": "#1652B2",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 40,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 40,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 40,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 51,
+      "y": 40,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 41,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 41,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 41,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 41,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 41,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 41,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 41,
+      "color": "#2DB9EF",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 41,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 41,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 41,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 41,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 41,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 41,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 41,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 35,
+      "y": 42,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 36,
+      "y": 42,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 42,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 42,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 42,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 42,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 42,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 42,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 42,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 42,
+      "color": "#344765",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 42,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 42,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 42,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 42,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 42,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 42,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 51,
+      "y": 42,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 52,
+      "y": 42,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 34,
+      "y": 43,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 35,
+      "y": 43,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 36,
+      "y": 43,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 43,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 43,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 43,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 43,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 43,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 43,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 43,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 43,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 43,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 43,
+      "color": "#0E1130",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 43,
+      "color": "#ABE4F1",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 43,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 43,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 43,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 51,
+      "y": 43,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 52,
+      "y": 43,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 36,
+      "y": 44,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 37,
+      "y": 44,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 38,
+      "y": 44,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 39,
+      "y": 44,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 40,
+      "y": 44,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 41,
+      "y": 44,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 42,
+      "y": 44,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 43,
+      "y": 44,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 44,
+      "y": 44,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 45,
+      "y": 44,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 46,
+      "y": 44,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 47,
+      "y": 44,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 48,
+      "y": 44,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 49,
+      "y": 44,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    },
+    {
+      "x": 50,
+      "y": 44,
+      "color": "#BFD1DC",
+      "role": "tile_surface",
+      "isMotif": false
+    }
+  ],
+  "geometryHints": {
+    "closed": true,
+    "preferredPrimitive": "rect",
+    "preserveAsMotif": false
+  },
+  "checksum": "scd64:Ui95VpWe0hxwE971YqrjJTstYK4nxkAhmmWeOmD4lgs000000000000000000000"
+}

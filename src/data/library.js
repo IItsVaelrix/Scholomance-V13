@@ -45,12 +45,12 @@ export const LINKS = [
   { id: "watch",      path: "/watch",      label: "Watch" },
   { id: "listen",     path: "/listen",     label: "Listen" },
   { id: "read",       path: "/read",       label: "Scribe" },
-  { id: "visualiser", path: "/visualiser", label: "Visualiser" },
-  { id: "oracle",     path: "/oracle",     label: "Oracle" },
+  { id: "visualiser", path: "/visualiser", label: "Visualizer" },
   { id: "blog",       path: "/blog",       label: "Blog" },
 ];
 
 export const INTERNAL_MODULES = [
+  { id: "oracle", path: "/oracle", label: "Oracle" },
   { id: "pixelbrain", path: "/pixelbrain", label: "PixelBrain" },
   { id: "career", path: "/career", label: "Career" },
   { id: "collab", path: "/collab", label: "Collab" },

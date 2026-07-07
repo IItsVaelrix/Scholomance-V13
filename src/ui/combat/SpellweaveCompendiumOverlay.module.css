@@ -1,0 +1,112 @@
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: rgba(6, 4, 10, 0.72);
+  cursor: pointer;
+}
+
+.panel {
+  position: relative;
+  width: min(920px, 94vw);
+  max-height: 86vh;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  border: 1px solid rgba(212, 175, 95, 0.35);
+  background: linear-gradient(180deg, rgba(24, 16, 28, 0.96), rgba(10, 8, 14, 0.98));
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55);
+}
+
+.chromeHeader {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid rgba(212, 175, 95, 0.22);
+}
+
+.chromeBadge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  color: #d4af5f;
+}
+
+.chromeLabel {
+  font-family: Georgia, serif;
+  color: rgba(255, 248, 235, 0.88);
+}
+
+.closeBtn {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  color: #d4af5f;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.tierRail {
+  padding: 0.75rem;
+  border-right: 1px solid rgba(212, 175, 95, 0.15);
+  overflow-y: auto;
+}
+
+.tierBtn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin-bottom: 0.35rem;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 248, 235, 0.78);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  cursor: pointer;
+}
+
+.tierBtnActive {
+  border-color: rgba(212, 175, 95, 0.45);
+  color: #f6e7c0;
+}
+
+.entryPane {
+  padding: 1rem 1.1rem;
+  overflow-y: auto;
+}
+
+.entryCard {
+  border: 1px solid rgba(212, 175, 95, 0.18);
+  background: rgba(255, 255, 255, 0.02);
+  padding: 0.75rem 0.85rem;
+  margin-bottom: 0.55rem;
+}
+
+.entryTitle {
+  font-family: Georgia, serif;
+  color: #f3e3bf;
+  margin-bottom: 0.25rem;
+}
+
+.entryMeta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: rgba(255, 248, 235, 0.55);
+}
+
+.locked {
+  opacity: 0.45;
+  font-style: italic;
+}

@@ -1,0 +1,193 @@
+# infernal_crusader_kiteshield_refined_v4_pure.scdl
+# Pure SCDL source: no YAML, no JSON wrapper.
+# Visual target: heavier kite shield, smaller ruby, visible ring, thinner branching lava cracks.
+
+asset infernal_crusader_kiteshield canvas 64x96
+
+palette {
+  deep_shadow    = #0D0F12
+  obsidian_iron  = #1B1D22
+  charcoal       = #30343B
+  dark_iron      = #4A4F57
+  ash_gray       = #7A8088
+  rim_highlight  = #A8AFB7
+  obsidian_red   = #2B0F13
+  lava_red       = #C61D1D
+  ember_orange   = #FF6A1A
+  molten_yellow  = #FFC33A
+  ruby_core      = #B0002A
+  ruby_bright    = #FF3D5A
+  glow_high      = #FFE9E9
+  white_hot      = #FFFFFF
+}
+
+part outer_rim_heavy material black_steel {
+  polygon 32 1 25 6 18 10 12 18 8 29 6 43 6 55 9 68 15 80 24 90 32 95 40 90 49 80 55 68 58 55 58 43 56 29 52 18 46 10 39 6 deep_shadow
+  polygon 32 3 26 8 20 13 15 21 11 31 9 43 9 55 12 66 18 77 26 87 32 92 38 87 46 77 52 66 55 55 55 43 53 31 49 21 44 13 38 8 obsidian_iron
+  polygon 32 6 27 11 22 16 17 24 13 33 12 44 12 54 15 64 21 75 28 84 32 88 36 84 43 75 49 64 52 54 52 44 51 33 47 24 42 16 37 11 charcoal
+}
+
+part side_flanges material black_steel {
+  polygon 8 35 3 39 4 55 9 61 12 55 11 39 obsidian_iron
+  polygon 56 35 61 39 60 55 55 61 52 55 53 39 obsidian_iron
+  polygon 9 38 6 42 7 53 10 57 11 50 11 41 dark_iron
+  polygon 55 38 58 42 57 53 54 57 53 50 53 41 dark_iron
+  cell 7 42 ash_gray
+  cell 7 53 ash_gray
+  cell 57 42 ash_gray
+  cell 57 53 ash_gray
+  cell 10 35 ash_gray
+  cell 54 35 ash_gray
+}
+
+part face_plate_armored material darksteel {
+  polygon 32 9 24 17 19 27 16 41 17 55 22 69 29 80 32 85 35 80 42 69 47 55 48 41 45 27 40 17 dark_iron
+  polygon 32 13 26 20 22 31 20 43 22 53 28 57 32 54 36 57 42 53 44 43 42 31 38 20 charcoal
+  polygon 31 15 25 24 22 38 24 47 31 43 obsidian_iron
+  polygon 33 15 39 24 42 38 40 47 33 43 obsidian_iron
+  polygon 31 56 23 58 22 68 29 80 31 70 obsidian_iron
+  polygon 33 56 41 58 42 68 35 80 33 70 obsidian_iron
+  polygon 32 13 29 24 29 41 32 45 35 41 35 24 dark_iron
+  polygon 32 69 29 78 32 84 35 78 dark_iron
+}
+
+part top_crest material black_steel {
+  polygon 32 2 28 10 32 20 36 10 dark_iron
+  polygon 32 5 30 11 32 16 34 11 rim_highlight
+  polygon 16 18 8 20 14 25 20 23 ash_gray
+  polygon 48 18 56 20 50 25 44 23 ash_gray
+  polygon 20 12 14 13 18 18 24 17 dark_iron
+  polygon 44 12 50 13 46 18 40 17 dark_iron
+}
+
+part plate_facets material darksteel {
+  line 32 8 32 83 rim_highlight
+  line 23 20 30 42 ash_gray
+  line 41 20 34 42 ash_gray
+  line 18 43 27 47 ash_gray
+  line 46 43 37 47 ash_gray
+  line 23 62 29 69 dark_iron
+  line 41 62 35 69 dark_iron
+  line 21 31 28 26 deep_shadow
+  line 43 31 36 26 deep_shadow
+  line 20 52 28 56 deep_shadow
+  line 44 52 36 56 deep_shadow
+  cell 25 19 rim_highlight
+  cell 39 19 rim_highlight
+  cell 20 35 ash_gray
+  cell 44 35 ash_gray
+  cell 22 73 ash_gray
+  cell 42 73 ash_gray
+  cell 31 10 white_hot
+}
+
+part lava_fissure_shadow material divine_flame_core {
+  line 32 45 32 18 obsidian_red
+  line 32 45 21 24 obsidian_red
+  line 32 45 43 24 obsidian_red
+  line 32 45 14 45 obsidian_red
+  line 32 45 50 45 obsidian_red
+  line 32 45 24 67 obsidian_red
+  line 32 45 40 67 obsidian_red
+  line 32 45 32 80 obsidian_red
+}
+
+part center_sigil_ring_heavy material holy_steel {
+  ring 32 45 radius 20 width 2 deep_shadow
+  ring 32 45 radius 18 width 3 ash_gray
+  ring 32 45 radius 14 width 1 dark_iron
+  line 32 27 32 63 rim_highlight
+  line 15 45 49 45 rim_highlight
+  line 20 34 27 40 ash_gray
+  line 44 34 37 40 ash_gray
+  line 20 56 27 50 ash_gray
+  line 44 56 37 50 ash_gray
+  cell 32 27 white_hot
+  cell 32 63 white_hot
+  cell 15 45 white_hot
+  cell 49 45 white_hot
+}
+
+part lava_fissures_branching material divine_flame_core {
+  line 32 45 32 22 lava_red
+  line 32 43 23 26 lava_red
+  line 32 43 41 26 lava_red
+  line 30 46 15 45 lava_red
+  line 34 46 49 45 lava_red
+  line 31 49 23 66 lava_red
+  line 33 49 41 66 lava_red
+  line 32 49 32 78 lava_red
+  line 32 23 29 17 ember_orange
+  line 32 23 35 17 lava_red
+  line 24 27 20 20 ember_orange
+  line 24 30 18 31 lava_red
+  line 40 27 44 20 ember_orange
+  line 40 30 46 31 lava_red
+  line 17 45 13 38 ember_orange
+  line 17 45 13 53 lava_red
+  line 47 45 51 38 ember_orange
+  line 47 45 51 53 lava_red
+  line 24 65 19 70 ember_orange
+  line 25 61 19 59 lava_red
+  line 40 65 45 70 ember_orange
+  line 39 61 45 59 lava_red
+  line 32 70 28 77 ember_orange
+  line 32 70 36 77 lava_red
+  cell 32 23 molten_yellow
+  cell 23 27 ember_orange
+  cell 41 27 ember_orange
+  cell 15 45 molten_yellow
+  cell 49 45 molten_yellow
+  cell 24 65 ember_orange
+  cell 40 65 ember_orange
+  cell 32 72 molten_yellow
+  glow radius 1
+}
+
+part ruby_core_faceted material ruby {
+  polygon 32 35 26 40 25 47 32 55 39 47 38 40 ruby_core
+  polygon 32 36 28 40 32 44 36 40 ruby_bright
+  polygon 28 41 32 44 29 50 25 47 lava_red
+  polygon 36 41 32 44 35 50 39 47 ruby_core
+  polygon 32 44 29 50 32 54 35 50 ruby_core
+  polygon 30 38 32 36 34 38 32 41 ruby_bright
+  cell 29 39 glow_high
+  cell 30 38 white_hot
+  cell 31 40 glow_high
+  cell 28 41 ruby_bright
+  cell 36 47 ember_orange
+  glow radius 2
+}
+
+part lower_tip_reinforcement material darksteel {
+  polygon 32 70 26 82 32 91 38 82 dark_iron
+  polygon 32 74 29 82 32 87 35 82 charcoal
+  line 32 72 32 89 rim_highlight
+  line 28 82 36 82 ash_gray
+  cell 31 80 lava_red
+  cell 32 80 molten_yellow
+  cell 33 80 lava_red
+}
+
+part rim_finish material silver {
+  line 32 2 26 8 rim_highlight
+  line 32 2 38 8 rim_highlight
+  line 14 24 10 34 ash_gray
+  line 50 24 54 34 ash_gray
+  line 11 61 18 76 ash_gray
+  line 53 61 46 76 ash_gray
+  line 23 88 32 94 rim_highlight
+  line 41 88 32 94 rim_highlight
+  cell 11 32 rim_highlight
+  cell 53 32 rim_highlight
+  cell 9 44 ash_gray
+  cell 55 44 ash_gray
+  cell 12 56 rim_highlight
+  cell 52 56 rim_highlight
+  cell 18 76 ash_gray
+  cell 46 76 ash_gray
+  cell 26 89 ash_gray
+  cell 38 89 ash_gray
+}
+
+export json svg phaser

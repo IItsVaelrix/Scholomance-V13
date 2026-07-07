@@ -44,6 +44,12 @@ class NicheService:
                 for name, config in defaults.items():
                     conn.execute("INSERT INTO niches (name, config) VALUES (?, ?)", (name, json.dumps(config)))
                 
+    def list_niches(self):
+        """Return the names of every stored niche (alphabetical)."""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute("SELECT name FROM niches ORDER BY name")
+            return [row[0] for row in cursor]
+
     def get_niche(self, name):
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.execute("SELECT config FROM niches WHERE name = ? COLLATE NOCASE", (name,))

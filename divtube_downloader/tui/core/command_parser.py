@@ -8,8 +8,22 @@ def _get_project_root():
     global _PROJECT_ROOT
     if _PROJECT_ROOT is not None:
         return _PROJECT_ROOT
-    # walk up from this file's location to find project root
     current = os.path.dirname(os.path.abspath(__file__))
+    # Prefer the git repository top so @ spans the WHOLE Scholomance tree.
+    # (When launched from the divtube_downloader cockpit the @ resolver and
+    # Grok agent must never be trapped to only the subfolder.)
+    try:
+        import subprocess
+        top = subprocess.check_output(
+            ["git", "rev-parse", "--show-toplevel"],
+            text=True, cwd=current, stderr=subprocess.DEVNULL,
+        ).strip()
+        if top and os.path.isdir(top):
+            _PROJECT_ROOT = top
+            return top
+    except Exception:
+        pass
+    # Fall back to a marker walk when this isn't a git checkout.
     markers = (".git", "package.json", "build.gradle", "pyproject.toml")
     for _ in range(10):
         if any(os.path.exists(os.path.join(current, m)) for m in markers):
@@ -128,7 +142,18 @@ class CommandRegistry:
         args = parts[1:]
 
         if cmd in self.commands:
-            self.commands[cmd]["handler"](ui_context, args)
+            try:
+                self.commands[cmd]["handler"](ui_context, args)
+            except Exception as exc:
+                # A failing command handler must never crash the whole TUI back
+                # to the terminal — surface it as an in-app error instead.
+                import traceback
+                detail = str(exc).replace("[", "\\[")
+                ui_context.log_msg(f"[#FF5C7A]✗ {cmd} failed:[/] {detail}")
+                try:
+                    ui_context.log_msg(f"[#6A5A6A]{traceback.format_exc().replace('[', chr(92) + '[')}[/]")
+                except Exception:
+                    pass
         elif cmd.startswith("/"):
             # Forward unrecognized slash commands to the AI agent natively
             ui_context.log_msg(f"[#6A5A6A]Forwarding {cmd} to Vaelrix...[/]")

@@ -101,6 +101,14 @@ export function hashString(value) {
 }
 
 /**
+ * FNV-1a-32 of a string as upper-case zero-padded 8-hex — the checksum
+ * presentation used by .pbrain packets, nl-compile digests, and chunk keys.
+ */
+export function fnv1a32Hex(value) {
+  return hashString(value).toString(16).toUpperCase().padStart(8, '0');
+}
+
+/**
  * Deterministic pseudo-random number generator for mathematical purity
  */
 export function pseudoRandom(seed) {
@@ -173,4 +181,59 @@ export function hslToHex(h, s, l) {
   };
 
   return `#${channel(0)}${channel(8)}${channel(4)}`;
+}
+
+/**
+ * PURE MODIFIERS for procedural vector art (immutable, return new arrays)
+ * Part of Standard Pipeline: Compose Modifiers mathematically without destroying source formula.
+ */
+export function applyChaikin(points, iterations = 1) {
+  if (!points || points.length < 3) return points ? [...points] : [];
+  let result = points.map(p => ({ ...p }));
+  for (let it = 0; it < iterations; it++) {
+    const newPts = [];
+    for (let i = 0; i < result.length - 1; i++) {
+      const p0 = result[i];
+      const p1 = result[i + 1];
+      const qx = p0.x * 0.75 + p1.x * 0.25;
+      const qy = p0.y * 0.75 + p1.y * 0.25;
+      const rx = p0.x * 0.25 + p1.x * 0.75;
+      const ry = p0.y * 0.25 + p1.y * 0.75;
+      newPts.push({ ...p0, x: qx, y: qy });
+      newPts.push({ ...p1, x: rx, y: ry });
+    }
+    result = newPts;
+  }
+  return result.map(p => ({ ...p }));
+}
+
+export function applyAffine(points, matrix = { a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0 }) {
+  if (!points) return [];
+  const { a = 1, b = 0, c = 0, d = 1, tx = 0, ty = 0 } = matrix;
+  return points.map(p => ({
+    ...p,
+    x: roundTo(a * p.x + c * p.y + tx, 3),
+    y: roundTo(b * p.x + d * p.y + ty, 3),
+  }));
+}
+
+export function applyOffsetCurve(points, distance = 2, side = 1) {
+  if (!points || points.length < 2) return points ? [...points] : [];
+  const result = [];
+  for (let i = 0; i < points.length; i++) {
+    const prev = points[Math.max(0, i - 1)];
+    const curr = points[i];
+    const next = points[Math.min(points.length - 1, i + 1)];
+    const dx = next.x - prev.x;
+    const dy = next.y - prev.y;
+    const len = Math.hypot(dx, dy) || 1;
+    const ox = -dy / len * distance * side;
+    const oy = dx / len * distance * side;
+    result.push({
+      ...curr,
+      x: roundTo(curr.x + ox, 3),
+      y: roundTo(curr.y + oy, 3),
+    });
+  }
+  return result;
 }

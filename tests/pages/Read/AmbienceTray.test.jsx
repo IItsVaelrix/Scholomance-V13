@@ -16,21 +16,28 @@ function fakeService() {
 }
 
 describe('AmbienceTray', () => {
-  it('renders the three soundscapes and a master slider', () => {
+  it('renders the single soundscape and a master slider', () => {
     render(<AmbienceTray service={fakeService()} />);
-    expect(screen.getByRole('button', { name: /rain/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /café plaza/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /wind through a house/i })).toBeInTheDocument();
+    expect(screen.getByText(/rain \+ forest stream/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /play rain \+ forest stream/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /café plaza/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /wind through a house/i })).not.toBeInTheDocument();
     expect(screen.getByLabelText(/master ambience volume/i)).toBeInTheDocument();
   });
 
-  it('toggling a channel flips its aria-pressed state', async () => {
+  it('morphs the rain control from play to pause and back', async () => {
     render(<AmbienceTray service={fakeService()} />);
-    const rain = screen.getByRole('button', { name: /rain/i });
-    expect(rain).toHaveAttribute('aria-pressed', 'false');
-    fireEvent.click(rain);
+    const playRain = screen.getByRole('button', { name: /play rain/i });
+    expect(playRain).toHaveAttribute('aria-pressed', 'false');
+
+    fireEvent.click(playRain);
     await waitFor(() =>
-      expect(screen.getByRole('button', { name: /rain/i })).toHaveAttribute('aria-pressed', 'true'),
+      expect(screen.getByRole('button', { name: /pause rain/i })).toHaveAttribute('aria-pressed', 'true'),
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /pause rain/i }));
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: /play rain/i })).toHaveAttribute('aria-pressed', 'false'),
     );
   });
 });

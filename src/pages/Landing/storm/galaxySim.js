@@ -92,6 +92,110 @@ function createVolumetricSprites() {
   };
 }
 
+/**
+ * Renders the galaxy using layered volumetric sprites & composition modes
+ */
+function drawGalaxyLayers(ctx, state, includeSparkles = true) {
+  const { particles, sprites, centerX, centerY } = state;
+  if (!sprites) return;
+
+  ctx.save();
+
+  // 1. Draw Nebula Gas Glows (Screen blend mode for realistic starlight scattering)
+  ctx.globalCompositeOperation = 'screen';
+  for (const p of particles) {
+    if (p.type !== 'gas' || p.species === 'dust') continue;
+
+    let sprite = null;
+    if (p.species === 'h-alpha') sprite = sprites.hAlpha;
+    else if (p.species === 'oIII') sprite = sprites.oIII;
+    else if (p.species === 'sulfur') sprite = sprites.sulfur;
+
+    if (sprite) {
+      const scale = p.size / sprite.width;
+      const size = p.size;
+      // Starlight scattering: gas brightness peaks near the core due to supermassive excitation
+      const dist = Math.hypot(p.x, p.y);
+      const exciter = Math.max(0.4, 1.2 - dist / 320);
+      ctx.globalAlpha = exciter;
+
+      ctx.drawImage(
+        sprite,
+        p.x + centerX - size / 2,
+        p.y + centerY - size / 2,
+        size,
+        size
+      );
+    }
+  }
+
+  // 2. Draw Dust Lanes (Multiply blend mode to simulate volumetric starlight absorption)
+  ctx.globalCompositeOperation = 'multiply';
+  ctx.globalAlpha = 0.55;
+  for (const p of particles) {
+    if (p.type === 'gas' && p.species === 'dust') {
+      const sprite = sprites.dust;
+      const size = p.size;
+      ctx.drawImage(
+        sprite,
+        p.x + centerX - size / 2,
+        p.y + centerY - size / 2,
+        size,
+        size
+      );
+    }
+  }
+
+  // 3. Draw Stars (Lighter blend mode for radiant starlight)
+  ctx.globalCompositeOperation = 'lighter';
+  for (const p of particles) {
+    if (p.type !== 'star') continue;
+
+    // Phase function starlight bloom
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x + centerX, p.y + centerY, p.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  if (includeSparkles) {
+    // 3.5 Draw Sparkles (interactive trails from the Wand)
+    for (const p of particles) {
+      if (p.type !== 'sparkle') continue;
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = Math.max(0, Math.min(1, p.life));
+      ctx.beginPath();
+      ctx.arc(p.x + centerX, p.y + centerY, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.globalAlpha = 1.0;
+
+  // 4. Draw Supermassive Black Hole & Accretion Disk (Core)
+  const distToCore = 0;
+  const coreGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 32);
+  coreGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+  coreGrad.addColorStop(0.15, 'rgba(123, 108, 255, 0.9)');
+  coreGrad.addColorStop(0.4, 'rgba(0, 245, 255, 0.4)');
+  coreGrad.addColorStop(1, 'rgba(123, 108, 255, 0)');
+  ctx.fillStyle = coreGrad;
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, 32, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Core diffraction spikes
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  ctx.moveTo(centerX - 42, centerY);
+  ctx.lineTo(centerX + 42, centerY);
+  ctx.moveTo(centerX, centerY - 42);
+  ctx.lineTo(centerX, centerY + 42);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
 export function initGalaxy(width, height) {
   const particles = [];
   const sprites = createVolumetricSprites();
@@ -211,188 +315,73 @@ export function initGalaxy(width, height) {
     });
   }
 
-  return {
+  const state = {
     particles,
     sprites,
     clock: 0,
+    width,
+    height,
     centerX: width / 2,
     centerY: height * 0.44 // Positioned elegantly behind the scrying orb
   };
+
+  // MATHEMATICAL CACHING: Pre-render the entire static galaxy (stars, dust, gas, core) 
+  // into an offscreen canvas. This avoids doing 250+ expensive globalCompositeOperation 
+  // blend mode calculations (screen, multiply) per frame.
+  const cachedCanvas = document.createElement('canvas');
+  cachedCanvas.width = width;
+  cachedCanvas.height = height;
+  const offCtx = cachedCanvas.getContext('2d');
+  
+  // Render the static layers once
+  drawGalaxyLayers(offCtx, state, false);
+  
+  state.cachedCanvas = cachedCanvas;
+
+  return state;
 }
 
 export function updateGalaxy(state, dt) {
   state.clock += dt;
-  const N = state.particles.length;
-
-  // Euler-Cromer multi-step N-Body update loop
-  for (let i = 0; i < N; i++) {
-    const p = state.particles[i];
-
-    const rSq = p.x * p.x + p.y * p.y;
-    const r = Math.sqrt(rSq) || 0.1;
-
-    // 1. Keplerian Massive Central Core potential gradient
-    const fCore = (G * M_CORE) / (rSq * r + EPSILON_SQ);
-    let ax = -p.x * fCore;
-    let ay = -p.y * fCore;
-
-    // 2. Dark Matter Halo acceleration (Navarro-Frenk-White flat profile)
-    const fHalo = (V_HALO * V_HALO) / (rSq + R_HALO * R_HALO);
-    ax += -p.x * fHalo;
-    ay += -p.y * fHalo;
-
-    // 3. Density Wave Theory tangential pull
-    const theta = Math.atan2(p.y, p.x);
-    // Find expected arm angle at this radius
-    const thetaArm = (1 / SPIRAL_B) * Math.log(Math.max(10, r) / SPIRAL_A) + PATTERN_SPEED * state.clock;
-    const deltaTheta = theta - thetaArm;
-    // Tangential gravitational potential well force
-    const aDW = -C_DW * Math.sin(2 * deltaTheta);
-    // Unit tangential vector
-    const tx = -Math.sin(theta);
-    const ty = Math.cos(theta);
-    ax += aDW * tx;
-    ay += aDW * ty;
-
-    // 4. Pairwise stardust softened N-body gravity
-    // We sample other particles (especially massive ones) to create local clustering, spurs and tidal filaments
-    const nSamples = Math.min(N, 60); // Sample 60 random neighbors for efficiency
-    for (let k = 0; k < nSamples; k++) {
-      const idx = (i + k + 1) % N;
-      if (idx === i) continue;
-      const pj = state.particles[idx];
-
-      const dx = pj.x - p.x;
-      const dy = pj.y - p.y;
-      const distSq = dx * dx + dy * dy;
-      const factor = (G * pj.mass) / (distSq * Math.sqrt(distSq) + EPSILON_SQ);
-      ax += dx * factor;
-      ay += dy * factor;
-    }
-
-    // Apply accelerations
-    p.vx += ax * dt;
-    p.vy += ay * dt;
-
-    // Viscous dissipation / damping to prevent arm runaway heating
-    const friction = p.type === 'gas' ? 0.035 : 0.015;
-    p.vx *= (1 - friction * dt);
-    p.vy *= (1 - friction * dt);
-  }
-
-  // Update positions based on integrated velocities
-  for (let i = 0; i < N; i++) {
-    const p = state.particles[i];
-    p.x += p.vx * dt;
-    p.y += p.vy * dt;
-  }
+  // If we are using mathematical caching, we don't need to run the expensive $O(N^2)$ N-body physics 
+  // on the static galaxy elements every frame. They will just rotate visually.
+  // We only need to update the dynamic sparkles (handled in photonicStorm.js)
 }
 
+
+
 /**
- * Renders the galaxy using layered volumetric sprites & composition modes
+ * Main render entrypoint called every frame.
+ * Uses the mathematically cached canvas for the static galaxy and just rotates it,
+ * while dynamically drawing the interactive sparkles on top.
  */
 export function drawGalaxy(ctx, state) {
-  const { particles, sprites, centerX, centerY } = state;
-  if (!sprites) return;
+  if (state.cachedCanvas) {
+    ctx.save();
+    // Translate to center to rotate the cached image
+    ctx.translate(state.centerX, state.centerY);
+    
+    // The density wave pattern speed drives the slow rotation of the galaxy
+    ctx.rotate(state.clock * PATTERN_SPEED);
+    
+    // Draw the pre-calculated galaxy
+    ctx.drawImage(state.cachedCanvas, -state.centerX, -state.centerY);
+    ctx.restore();
 
-  ctx.save();
-
-  // 1. Draw Nebula Gas Glows (Screen blend mode for realistic starlight scattering)
-  ctx.globalCompositeOperation = 'screen';
-  for (const p of particles) {
-    if (p.type !== 'gas' || p.species === 'dust') continue;
-
-    let sprite = null;
-    if (p.species === 'h-alpha') sprite = sprites.hAlpha;
-    else if (p.species === 'oIII') sprite = sprites.oIII;
-    else if (p.species === 'sulfur') sprite = sprites.sulfur;
-
-    if (sprite) {
-      const scale = p.size / sprite.width;
-      const size = p.size;
-      // Starlight scattering: gas brightness peaks near the core due to supermassive excitation
-      const dist = Math.hypot(p.x, p.y);
-      const exciter = Math.max(0.4, 1.2 - dist / 320);
-      ctx.globalAlpha = exciter;
-
-      ctx.drawImage(
-        sprite,
-        p.x + centerX - size / 2,
-        p.y + centerY - size / 2,
-        size,
-        size
-      );
+    // Draw dynamic interactive sparkles over the cached galaxy
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (const p of state.particles) {
+      if (p.type !== 'sparkle') continue;
+      ctx.fillStyle = p.color || '#fff';
+      ctx.globalAlpha = Math.max(0, Math.min(1, p.life));
+      ctx.beginPath();
+      // Sparkles are absolute coordinates, so we draw them directly
+      ctx.arc(p.x + state.centerX, p.y + state.centerY, p.size, 0, Math.PI * 2);
+      ctx.fill();
     }
+    ctx.restore();
+  } else {
+    drawGalaxyLayers(ctx, state, true);
   }
-
-  // 2. Draw Dust Lanes (Multiply blend mode to simulate volumetric starlight absorption)
-  ctx.globalCompositeOperation = 'multiply';
-  ctx.globalAlpha = 0.55;
-  for (const p of particles) {
-    if (p.type === 'gas' && p.species === 'dust') {
-      const sprite = sprites.dust;
-      const size = p.size;
-      ctx.drawImage(
-        sprite,
-        p.x + centerX - size / 2,
-        p.y + centerY - size / 2,
-        size,
-        size
-      );
-    }
-  }
-
-  // 3. Draw Stars (Lighter blend mode for radiant starlight)
-  ctx.globalCompositeOperation = 'lighter';
-  for (const p of particles) {
-    if (p.type !== 'star') continue;
-
-    // Phase function starlight bloom
-    ctx.fillStyle = p.color;
-    ctx.beginPath();
-    ctx.arc(p.x + centerX, p.y + centerY, p.size, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Occasional giant star flares (deterministic flicker)
-    if (p.size > 2.2 && ((p.id * 17 + Math.floor(state.clock * 5)) % 20 === 0)) {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-      ctx.fillRect(p.x + centerX - 3, p.y + centerY - 0.5, 6, 1);
-      ctx.fillRect(p.x + centerX - 0.5, p.y + centerY - 3, 1, 6);
-    }
-  }
-
-  // 3.5 Draw Sparkles (interactive trails from the Wand)
-  for (const p of particles) {
-    if (p.type !== 'sparkle') continue;
-    ctx.fillStyle = p.color;
-    ctx.globalAlpha = Math.max(0, Math.min(1, p.life));
-    ctx.beginPath();
-    ctx.arc(p.x + centerX, p.y + centerY, p.size, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.globalAlpha = 1.0;
-
-  // 4. Draw Supermassive Black Hole & Accretion Disk (Core)
-  const distToCore = 0;
-  const coreGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 32);
-  coreGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-  coreGrad.addColorStop(0.15, 'rgba(123, 108, 255, 0.9)');
-  coreGrad.addColorStop(0.4, 'rgba(0, 245, 255, 0.4)');
-  coreGrad.addColorStop(1, 'rgba(123, 108, 255, 0)');
-  ctx.fillStyle = coreGrad;
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, 32, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Core diffraction spikes
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-  ctx.lineWidth = 1.2;
-  ctx.beginPath();
-  ctx.moveTo(centerX - 42, centerY);
-  ctx.lineTo(centerX + 42, centerY);
-  ctx.moveTo(centerX, centerY - 42);
-  ctx.lineTo(centerX, centerY + 42);
-  ctx.stroke();
-
-  ctx.restore();
 }

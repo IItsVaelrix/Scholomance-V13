@@ -15,9 +15,22 @@
   -webkit-text-fill-color: transparent;
 }
 
+.photonic-lab-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
 .photonic-bridge-lab p.subtitle {
   color: var(--text-muted);
-  margin-bottom: 2rem;
+  margin-bottom: 0;
+}
+
+.send-forge-btn {
+  flex: 0 0 auto;
+  margin-top: 0.35rem;
 }
 
 .lab-container {
@@ -28,6 +41,10 @@
 }
 
 @media (max-width: 768px) {
+  .photonic-lab-header {
+    flex-direction: column;
+  }
+
   .lab-container {
     grid-template-columns: 1fr;
   }

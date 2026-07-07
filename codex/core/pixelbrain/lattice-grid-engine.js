@@ -19,6 +19,7 @@
 import { safeDivide, toFinite } from '../shared/math/safe.js';
 import { verseIRMicroprocessors } from '../microprocessors/index.js';
 import { generateSymmetryOverlay } from './symmetry-amp.js';
+import { buildLatticePerceptionFrame } from './lattice-perception-bridge.js';
 
 /**
  * LATTICE CONSTANTS — Spatial bytecode registers
@@ -42,6 +43,33 @@ function generateBufferHash(buffer) {
 }
 
 /**
+ * Opt-in perception step. Runs the shadow-perception microprocessor over the
+ * lattice cells and assembles a PerceptionFrame. Returns the SAME lattice object
+ * with a `perception` property attached when enabled; untouched when disabled.
+ */
+export async function applyLatticePerception(lattice, cols, rows, perceptionOptions = {}) {
+  if (!perceptionOptions || perceptionOptions.enabled !== true) return lattice;
+
+  const coordinates = Array.from(lattice.cells.values()).map((c) => ({
+    col: c.col, row: c.row, color: c.color, emphasis: c.emphasis,
+    colorIntensity: c.colorIntensity,
+  }));
+
+  const { shadowField } = await verseIRMicroprocessors.execute('amp.shadow-perception', {
+    coordinates, vectorField: [], cols, rows,
+  });
+
+  const { frame, snapshot } = buildLatticePerceptionFrame({
+    lattice, shadowField, cols, rows,
+    previous: perceptionOptions.previous || null,
+    generation: Number.isInteger(perceptionOptions.generation) ? perceptionOptions.generation : 0,
+  });
+
+  lattice.perception = { frame, snapshot };
+  return lattice;
+}
+
+/**
  * Generate complete lattice grid from image analysis
  *
  * AUTOMATIC SYMMETRY DETECTION:
@@ -49,9 +77,11 @@ function generateBufferHash(buffer) {
  * Detected symmetry is automatically applied to the lattice.
  *
  * @param {Object} imageAnalysis - Backend analysis result
+ * @param {Object} [options] - Optional configuration
+ * @param {Object} [options.perception] - Opt-in perception config ({ enabled, previous, generation })
  * @returns {Object} Lattice grid with symmetry applied
  */
-export async function generateLatticeGrid(imageAnalysis) {
+export async function generateLatticeGrid(imageAnalysis, options = {}) {
   const { pixelData, dimensions } = imageAnalysis;
   const { width: srcW, height: srcH } = dimensions;
 
@@ -173,9 +203,11 @@ export async function generateLatticeGrid(imageAnalysis) {
       });
     });
 
+    await applyLatticePerception(transformedLattice, cols, rows, options?.perception);
     return transformedLattice;
   }
 
+  await applyLatticePerception(lattice, cols, rows, options?.perception);
   return lattice;
 }
 

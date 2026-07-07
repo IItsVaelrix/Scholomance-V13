@@ -1,7 +1,12 @@
 /**
  * IMMUNITY SERVICE
- * 
+ *
  * Server-side orchestrator for the Scholomance Immune System.
+ *
+ * Wires the QBIT Immune Checkpoint v1 (PDR-2026-07-03) between the raw
+ * layer scanners and the diagnostic emitter. The checkpoint is the
+ * evidence governor: a rule fire is an OBSERVATION, not a violation,
+ * until the checkpoint decides what to do with it.
  */
 
 import { randomUUID } from 'node:crypto';
@@ -12,6 +17,16 @@ import { scanProtocol, harvestAsyncSurface } from '../../core/immunity/protocol.
 import { INNATE_RULES } from '../../core/immunity/innate.rules.js';
 import { PATHOGEN_REGISTRY } from '../../core/immunity/pathogenRegistry.js';
 import {
+  checkpointDiagnosticObservation,
+  persistCheckpointCell,
+  updateMemoryCellWithObservation,
+  createDefaultMemoryCell,
+  evaluateRuleReputation,
+  ImmuneCheckpointConfig,
+} from '../../core/immunity/qbit-immune-checkpoint.js';
+import { encodeBytecodeHealth } from '../../core/diagnostic/BytecodeHealth.js';
+import { CELL_IDS, HEALTH_CODES } from '../../core/diagnostic/diagnostic-constants.js';
+import {
   BytecodeError,
   decodeBytecodeError,
   ERROR_CATEGORIES,
@@ -21,11 +36,43 @@ import {
 } from '../../core/pixelbrain/bytecode-error.js';
 
 const RULESET_VERSION = '1.1.0';
+const CHECKPOINT_VERSION = ImmuneCheckpointConfig.schemaVersion;
 const MAX_MEMORY_ROWS = 500;
 const DAY_MS = 24 * 60 * 60 * 1000;
 const PROTOCOL_PATHOGEN_ID = 'pathogen.async-protocol-drift';
 const VALID_OVERRIDE_LAYERS = new Set(['innate', 'adaptive', 'protocol']);
 const VALID_WORKFLOW_EVENTS = new Set(['merge', 'pr', 'refactor', 'aiCommit']);
+
+// ─── Checkpoint buckets ────────────────────────────────────────────────────
+//
+// Each violation from the raw scanners is rerouted through the QBIT Immune
+// Checkpoint before emission. The action the checkpoint returns determines
+// which bucket the original violation lands in:
+//
+//   VIOLATION      → emitted as-is, with checkpointConfirmed flag
+//   HEALTH_SIGNAL  → suppressed, replaced by a PB-OK-v1 green-path signal
+//   WARN           → emitted with downgraded severity (not blocking)
+//   NEEDS_MERLIN   → emitted, flagged for human review
+//   SUPPRESSED     → suppressed (only with allowHardSuppression: true)
+const CHECKPOINT_BUCKETS = Object.freeze({
+  VIOLATION: 'VIOLATION',
+  WARN: 'WARN',
+  NEEDS_MERLIN: 'NEEDS_MERLIN',
+  HEALTH_SIGNAL: 'HEALTH_SIGNAL',
+  SUPPRESSED: 'SUPPRESSED',
+});
+
+const DEFAULT_CHECKPOINT_RULE_CONFIDENCE = {
+  innate: 0.9,
+  adaptive: 0.85,
+  protocol: 0.9,
+};
+
+const DEFAULT_CHECKPOINT_EVIDENCE_COUNT = {
+  innate: 3,
+  adaptive: 2,
+  protocol: 2,
+};
 
 function createLogger(log) {
   if (log && typeof log === 'object') {
@@ -41,6 +88,221 @@ function createLogger(log) {
     warn: () => {},
     error: () => {},
   };
+}
+
+// ─── Checkpoint adapters ────────────────────────────────────────────────────
+//
+// The QBIT Immune Checkpoint is a pure module that takes two DI adapters
+// (memory, vaccines). This section builds sensible defaults from the
+// existing INNATE_RULES + PATHOGEN_REGISTRY + a per-process Map. Production
+// wiring can override via the createImmunityService({ memory, vaccines, ... })
+// options.
+
+/**
+ * Default in-process memory adapter. A Map keyed by checkpoint key
+ * (ruleId:path:location:bytecodeShape). Persists across scans within the
+ * process lifetime; cleared on server restart.
+ *
+ * Counters are a per-key record of { confirms, refutes, warnings, ... }.
+ */
+function createDefaultMemoryAdapter() {
+  const store = new Map();
+  return {
+    get(key) {
+      return store.has(key) ? store.get(key) : null;
+    },
+    upsert(key, cell) {
+      store.set(key, cell);
+      return { ok: true, key };
+    },
+    size() {
+      return store.size;
+    },
+    snapshot() {
+      const out = {};
+      for (const [k, v] of store.entries()) out[k] = v;
+      return out;
+    },
+  };
+}
+
+/**
+ * Default vaccines adapter. Matches against the PATHOGEN registry only.
+ *
+ * Per the PDR §"Integration Points" the vaccine check is for "known
+ * pathogens" — confirmed disease classes registered with the adaptive
+ * immune layer. Innate rules are pattern-based signals whose evidence
+ * lives in the rule itself and in the QBIT memory cell, not in a vaccine.
+ *
+ * Matches by:
+ *   1. envelope.pathogenId (the canonical adaptive scan output)
+ *   2. envelope.opcode / envelope.id (pathogens that publish a stable id)
+ *
+ * Returns a structured verdict the checkpoint can act on.
+ */
+function createDefaultVaccinesAdapter(innateRules, pathogenRegistry) {
+  const pathogenIndex = new Map();
+  for (const pathogen of pathogenRegistry || []) {
+    if (pathogen?.id) pathogenIndex.set(pathogen.id, pathogen);
+  }
+  // Pathogen ids derived from innate rules' repairKey fall through; we
+  // intentionally do NOT match on ruleId alone. (See the comment above.)
+  void innateRules;
+
+  return {
+    match(envelope) {
+      if (!envelope || typeof envelope !== 'object') {
+        return { matched: false };
+      }
+      const pathogenId = typeof envelope.pathogenId === 'string' ? envelope.pathogenId : null;
+
+      if (pathogenId && pathogenIndex.has(pathogenId)) {
+        const pathogen = pathogenIndex.get(pathogenId);
+        return {
+          matched: true,
+          vaccineId: `PB-XP-v1-HLTH-IMMUNE-${pathogenId.replace(/[^A-Z0-9]/gi, '').toUpperCase().slice(0, 8)}`,
+          pathogenId,
+          name: pathogen.name || pathogenId,
+          source: 'pathogen-registry',
+        };
+      }
+      // Fallback: opcode / id from the envelope (for adaptive hits that
+      // emit a pathogen-like envelope).
+      const opcode = envelope.opcode || envelope.id;
+      if (opcode && pathogenIndex.has(opcode)) {
+        const pathogen = pathogenIndex.get(opcode);
+        return {
+          matched: true,
+          vaccineId: `PB-XP-v1-HLTH-IMMUNE-${opcode.replace(/[^A-Z0-9]/gi, '').toUpperCase().slice(0, 8)}`,
+          pathogenId: opcode,
+          name: pathogen.name || opcode,
+          source: 'pathogen-opcode',
+        };
+      }
+      return { matched: false };
+    },
+  };
+}
+
+/**
+ * Convert a raw scanner violation into a checkpoint observation.
+ *
+ * Innate violations carry ruleId; adaptive violations carry pathogenId;
+ * protocol violations carry ruleId + pathogenId (pathogen.async-protocol-drift).
+ * We synthesize a stable bytecode envelope from the violation's own fields.
+ */
+function violationToObservation(violation, layer, filePath, defaultConfidence, defaultEvidence) {
+  if (!violation || typeof violation !== 'object') return null;
+  const ruleId = String(violation.ruleId || violation.pathogenId || '').trim() || 'rule.absent';
+  const line = Number.isFinite(violation.context?.line) ? Math.trunc(violation.context.line) : null;
+  const column = Number.isFinite(violation.context?.column) ? Math.trunc(violation.context.column) : null;
+  const bytecodeEnvelope = {
+    opcode: violation.pathogenId || violation.ruleId || 'unknown',
+    layer,
+    severity: violation.severity || 'WARN',
+    score: Number.isFinite(violation.score) ? violation.score : null,
+    threshold: Number.isFinite(violation.threshold) ? violation.threshold : null,
+    // PDR §"Deterministic Memory Key" forbids timestamps + runtime key order.
+    // We surface only stable diagnostic metadata in the envelope.
+    ruleId: violation.ruleId || null,
+    pathogenId: violation.pathogenId || null,
+  };
+  return {
+    ruleId,
+    filePath,
+    location: { line, column },
+    ruleConfidence: Number.isFinite(violation.ruleConfidence)
+      ? Math.max(0, Math.min(1, violation.ruleConfidence))
+      : defaultConfidence,
+    evidenceCount: Number.isFinite(violation.evidenceCount)
+      ? Math.max(0, Math.trunc(violation.evidenceCount))
+      : defaultEvidence,
+    bytecodeEnvelope,
+    bytecodeShapeHash: `shape.${ruleId}`,
+    suspectNovelAntigen: violation.suspectNovelAntigen === true,
+  };
+}
+
+/**
+ * Run a single violation through the checkpoint, returning a structured
+ * bucket assignment plus the underlying decision.
+ */
+function runCheckpointForViolation({
+  violation,
+  layer,
+  filePath,
+  memory,
+  vaccines,
+  config,
+  runIndex,
+  logger,
+}) {
+  const defaultConfidence = DEFAULT_CHECKPOINT_RULE_CONFIDENCE[layer] || 0.7;
+  const defaultEvidence = DEFAULT_CHECKPOINT_EVIDENCE_COUNT[layer] || 1;
+  const observation = violationToObservation(violation, layer, filePath, defaultConfidence, defaultEvidence);
+  if (!observation) {
+    return { bucket: CHECKPOINT_BUCKETS.WARN, reason: 'MALFORMED_VIOLATION', decision: null };
+  }
+  let decision;
+  try {
+    decision = checkpointDiagnosticObservation({
+      observation,
+      memory,
+      vaccines,
+      config,
+      runIndex,
+    });
+  } catch (error) {
+    logger?.warn({ err: error, ruleId: observation.ruleId }, '[Immunity] Checkpoint failed; falling through to WARN.');
+    return { bucket: CHECKPOINT_BUCKETS.WARN, reason: 'CHECKPOINT_THREW', decision: null };
+  }
+
+  // Persist the updated memory cell (if any). The checkpoint returns null
+  // for cells when the action is VACCINE_MATCH (no memory write needed).
+  if (decision.memoryCell && decision.key) {
+    try {
+      persistCheckpointCell(memory, decision.key, decision.memoryCell);
+    } catch (error) {
+      logger?.warn({ err: error, key: decision.key }, '[Immunity] Failed to persist checkpoint cell.');
+    }
+  }
+
+  return {
+    bucket: decision.action,
+    reason: decision.reason,
+    decision,
+    apoptosisCandidate: decision.reputation?.candidate === true ? decision.reputation : null,
+  };
+}
+
+/**
+ * Convert a checkpoint decision into a PB-OK-v1 green-path health signal.
+ * HEALTH_SIGNAL is "evidence-aware non-accusation" (PDR §"Emission Actions"):
+ * the rule fired but memory strongly refutes it. We surface that as a
+ * positive health signal so the dashboard shows the immune system is
+ * learning.
+ */
+function emitHealthSignalForCheckpoint({
+  checkpointDecision,
+  violation,
+  layer,
+  filePath,
+  runIndex,
+}) {
+  return encodeBytecodeHealth(
+    CELL_IDS.IMMUNITY_SCAN,
+    `CHECKPOINT_HEALTH_SIGNAL_${layer.toUpperCase()}`,
+    {
+      ruleId: violation?.ruleId || null,
+      pathogenId: violation?.pathogenId || null,
+      filePath,
+      checkpointKey: checkpointDecision?.key || null,
+      reason: checkpointDecision?.reason || 'MEMORY_REFUTES_RULE',
+      verdict: checkpointDecision?.verdict || 'REFUTED',
+      runIndex,
+      healthCode: HEALTH_CODES.IMMUNE_PASS_COORD,
+    },
+  );
 }
 
 function generateId(prefix) {
@@ -277,7 +539,8 @@ function throwScanViolation(violation, filePath) {
   );
 }
 
-export async function createImmunityService({ log, db } = {}) {
+export async function createImmunityService(options = {}) {
+  const { log, db, memory, vaccines, allowHardSuppression: allowHardSuppressionOption } = options;
   const logger = createLogger(log);
   const hasDb = isExecutableDb(db);
   const memoryScans = [];
@@ -331,6 +594,22 @@ export async function createImmunityService({ log, db } = {}) {
       await db.execute(`
         CREATE INDEX IF NOT EXISTS idx_immunity_override_timestamp
         ON immunity_override_audit(timestamp)
+      `);
+      await db.execute(`
+        CREATE TABLE IF NOT EXISTS immunity_apoptosis_audit (
+          id TEXT PRIMARY KEY,
+          rule_id TEXT NOT NULL,
+          file_path TEXT,
+          observation_count INTEGER NOT NULL DEFAULT 0,
+          local_false_positive_rate REAL NOT NULL DEFAULT 0,
+          bytecode TEXT NOT NULL,
+          timestamp TEXT NOT NULL,
+          result_json TEXT NOT NULL
+        )
+      `);
+      await db.execute(`
+        CREATE INDEX IF NOT EXISTS idx_immunity_apoptosis_timestamp
+        ON immunity_apoptosis_audit(timestamp)
       `);
       persistenceReady = true;
     } catch (error) {
@@ -436,6 +715,64 @@ export async function createImmunityService({ log, db } = {}) {
       .sort((left, right) => Date.parse(right.timestamp) - Date.parse(left.timestamp));
   }
 
+  // ─── QBIT Immune Checkpoint wiring ─────────────────────────────────────────
+  //
+  // The checkpoint is the evidence governor between raw scanners and
+  // emission. Adapters are DI: production callers can override via the
+  // `memory` and `vaccines` options to createImmunityService.
+  const checkpointConfig = { ...ImmuneCheckpointConfig };
+  const memoryAdapter = (options && options.memory) || createDefaultMemoryAdapter();
+  const vaccinesAdapter = (options && options.vaccines) || createDefaultVaccinesAdapter(INNATE_RULES, PATHOGEN_REGISTRY);
+  const allowHardSuppression = Boolean(options?.allowHardSuppression);
+  const checkpointStats = {
+    totalObservations: 0,
+    buckets: { VIOLATION: 0, WARN: 0, NEEDS_MERLIN: 0, HEALTH_SIGNAL: 0, SUPPRESSED: 0 },
+    apoptosisCandidates: 0,
+    healthSignalsEmitted: 0,
+  };
+  const apoptosisAudit = [];
+
+  async function persistApoptosisCandidate(candidate) {
+    if (!candidate) return;
+    apoptosisAudit.push(candidate);
+    if (apoptosisAudit.length > MAX_MEMORY_ROWS) {
+      apoptosisAudit.splice(0, apoptosisAudit.length - MAX_MEMORY_ROWS);
+    }
+    if (!(await ensurePersistence())) return;
+    try {
+      await db.execute(`
+        INSERT INTO immunity_apoptosis_audit (
+          id, rule_id, file_path, observation_count,
+          local_false_positive_rate, bytecode, timestamp, result_json
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `, [
+        candidate.id,
+        candidate.ruleId,
+        candidate.filePath || null,
+        candidate.observationCount || 0,
+        candidate.localFalsePositiveRate || 0,
+        candidate.bytecode,
+        candidate.timestamp,
+        JSON.stringify(candidate),
+      ]);
+    } catch (error) {
+      logger.warn({ err: error, auditId: candidate.id }, '[Immunity] Failed to persist apoptosis audit.');
+    }
+  }
+
+  function recordCheckpointStats(bucket, decision) {
+    checkpointStats.totalObservations += 1;
+    if (Object.prototype.hasOwnProperty.call(checkpointStats.buckets, bucket)) {
+      checkpointStats.buckets[bucket] += 1;
+    }
+    if (bucket === CHECKPOINT_BUCKETS.HEALTH_SIGNAL) {
+      checkpointStats.healthSignalsEmitted += 1;
+    }
+    if (decision?.reputation?.candidate) {
+      checkpointStats.apoptosisCandidates += 1;
+    }
+  }
+
   await ensurePersistence();
 
   return {
@@ -457,6 +794,15 @@ export async function createImmunityService({ log, db } = {}) {
 
     /**
      * Executes a full multi-layer scan on a file.
+     *
+     * Every raw violation is rerouted through the QBIT Immune Checkpoint
+     * before emission. The checkpoint's action buckets the violation:
+     *
+     *   VIOLATION     → emitted as-is (confirmed by memory or vaccine match)
+     *   WARN          → emitted with downgraded severity
+     *   NEEDS_MERLIN  → emitted, flagged for human review
+     *   HEALTH_SIGNAL → suppressed; PB-OK-v1-IMMUNE-PASS-COORD emitted instead
+     *   SUPPRESSED    → suppressed (only with allowHardSuppression: true)
      */
     async scanFile(content, filePath, options = {}) {
       const { runAdaptive = false, runProtocol = true, throwOnError = false } = options;
@@ -464,8 +810,8 @@ export async function createImmunityService({ log, db } = {}) {
       const path = normalizeRequiredString(filePath, 'filePath');
       const startedAt = performance.now();
       const timestamp = toIsoTimestamp();
-      const timingsMs = { innate: 0, adaptive: 0, protocol: 0 };
-      const layersRun = { innate: true, adaptive: false, protocol: false };
+      const timingsMs = { innate: 0, adaptive: 0, protocol: 0, checkpoint: 0 };
+      const layersRun = { innate: true, adaptive: false, protocol: false, checkpoint: true };
 
       logger.info({ filePath: path }, '[Immunity] Initiating scan.');
 
@@ -495,17 +841,115 @@ export async function createImmunityService({ log, db } = {}) {
         timingsMs.protocol = Number((performance.now() - protocolStartedAt).toFixed(2));
       }
 
+      // ─── QBIT Immune Checkpoint routing ──────────────────────────────────
+      // Run a single shared runIndex per scan so every observation in this
+      // file shares a logical clock tick. The checkpoint keys remain stable
+      // across runs.
+      const checkpointStartedAt = performance.now();
+      const scanRunIndex = Date.parse(timestamp) || Date.now();
+      const suppressed = [];
+      const healthSignals = [];
+      const apoptosisCandidatesThisScan = [];
+
+      const routeOne = (violation, layer) => {
+        const routed = runCheckpointForViolation({
+          violation,
+          layer,
+          filePath: path,
+          memory: memoryAdapter,
+          vaccines: vaccinesAdapter,
+          config: checkpointConfig,
+          runIndex: scanRunIndex,
+          logger,
+        });
+        recordCheckpointStats(routed.bucket, routed.decision);
+        if (routed.bucket === CHECKPOINT_BUCKETS.SUPPRESSED && !allowHardSuppression) {
+          // PDR §"Next risks" / default: HEALTH_SIGNAL beats SUPPRESSED.
+          // Downgrade the verdict rather than hard-suppress.
+          routed.bucket = CHECKPOINT_BUCKETS.HEALTH_SIGNAL;
+        }
+        if (routed.bucket === CHECKPOINT_BUCKETS.HEALTH_SIGNAL) {
+          healthSignals.push(emitHealthSignalForCheckpoint({
+            checkpointDecision: routed.decision,
+            violation,
+            layer,
+            filePath: path,
+            runIndex: scanRunIndex,
+          }));
+          suppressed.push({
+            layer,
+            ruleId: violation?.ruleId || violation?.pathogenId || null,
+            reason: routed.reason,
+            verdict: routed.decision?.verdict || 'REFUTED',
+          });
+          return null; // Suppress from the emitted buckets.
+        }
+        if (routed.bucket === CHECKPOINT_BUCKETS.SUPPRESSED) {
+          suppressed.push({
+            layer,
+            ruleId: violation?.ruleId || violation?.pathogenId || null,
+            reason: routed.reason,
+            verdict: routed.decision?.verdict || 'REFUTED',
+          });
+          return null;
+        }
+        if (routed.apoptosisCandidate) {
+          apoptosisCandidatesThisScan.push({
+            id: generateId('apoptosis'),
+            ruleId: routed.apoptosisCandidate.ruleId || violation?.ruleId || null,
+            filePath: path,
+            observationCount: routed.apoptosisCandidate.observationCount || 0,
+            localFalsePositiveRate: routed.apoptosisCandidate.localFalsePositiveRate || 0,
+            bytecode: routed.apoptosisCandidate.bytecode,
+            timestamp,
+          });
+        }
+        // Annotate the violation with checkpoint context so downstream
+        // consumers (dashboard, scanners, audits) can see WHY it was kept.
+        return {
+          ...violation,
+          checkpoint: {
+            action: routed.bucket,
+            reason: routed.reason,
+            verdict: routed.decision?.verdict || null,
+            checkpointKey: routed.decision?.key || null,
+            reputation: routed.decision?.reputation?.candidate
+              ? {
+                  candidate: true,
+                  localFalsePositiveRate: routed.decision.reputation.localFalsePositiveRate,
+                  observationCount: routed.decision.reputation.observationCount,
+                  bytecode: routed.decision.reputation.bytecode,
+                }
+              : { candidate: false },
+          },
+        };
+      };
+
+      const routedInnate = innateViolations.map(v => routeOne(v, 'innate')).filter(Boolean);
+      const routedAdaptive = adaptiveViolations.map(v => routeOne(v, 'adaptive')).filter(Boolean);
+      const routedProtocol = protocolViolations.map(v => routeOne(v, 'protocol')).filter(Boolean);
+
+      timingsMs.checkpoint = Number((performance.now() - checkpointStartedAt).toFixed(2));
+
+      // Persist any apoptosis candidates flagged during this scan.
+      for (const candidate of apoptosisCandidatesThisScan) {
+        // Best-effort: do not block the scan on audit persistence.
+        persistApoptosisCandidate(candidate).catch((err) => {
+          logger.warn({ err, auditId: candidate.id }, '[Immunity] Apoptosis audit persistence failed.');
+        });
+      }
+
       const result = {
         filePath: path,
-        innate: innateViolations.map(v => ({
+        innate: routedInnate.map(v => ({
           ...v,
           summary: `[${v.severity}] ${v.name} (${v.ruleId}): ${v.repair.title}`,
         })),
-        adaptive: adaptiveViolations.map(v => ({
+        adaptive: routedAdaptive.map(v => ({
           ...v,
           summary: `[ADAPTIVE] ${v.name}: Similarity to known pathogen (score: ${v.score.toFixed(2)})`,
         })),
-        protocol: protocolViolations.map(v => ({
+        protocol: routedProtocol.map(v => ({
           ...v,
           summary: `[PROTOCOL] ${v.name} at ${path}:${v.context.line}: missing await on ${v.context.callExpr}`,
         })),
@@ -513,9 +957,26 @@ export async function createImmunityService({ log, db } = {}) {
         durationMs: Number((performance.now() - startedAt).toFixed(2)),
         timingsMs,
         layersRun,
+        checkpoint: {
+          version: CHECKPOINT_VERSION,
+          runIndex: scanRunIndex,
+          buckets: { ...checkpointStats.buckets },
+          suppressedCount: suppressed.length,
+          healthSignalsEmitted: healthSignals.length,
+          apoptosisCandidates: apoptosisCandidatesThisScan.map(c => ({
+            id: c.id,
+            ruleId: c.ruleId,
+            observationCount: c.observationCount,
+            localFalsePositiveRate: c.localFalsePositiveRate,
+            bytecode: c.bytecode,
+            timestamp: c.timestamp,
+          })),
+          suppressed,
+        },
+        healthSignals,
       };
 
-      const totalCount = innateViolations.length + adaptiveViolations.length + protocolViolations.length;
+      const totalCount = routedInnate.length + routedAdaptive.length + routedProtocol.length;
       result.totalViolations = totalCount;
       result.blocked = totalCount > 0;
 
@@ -523,12 +984,12 @@ export async function createImmunityService({ log, db } = {}) {
         id: generateId('scan'),
         filePath: path,
         timestamp,
-        timestampMs: Date.parse(timestamp) || Date.now(),
+        timestampMs: scanRunIndex,
         durationMs: result.durationMs,
         counts: {
-          innate: innateViolations.length,
-          adaptive: adaptiveViolations.length,
-          protocol: protocolViolations.length,
+          innate: routedInnate.length,
+          adaptive: routedAdaptive.length,
+          protocol: routedProtocol.length,
           total: totalCount,
         },
         blocked: totalCount > 0,
@@ -539,10 +1000,11 @@ export async function createImmunityService({ log, db } = {}) {
           adaptive: result.adaptive.map(summarizeAdaptiveViolation),
           protocol: result.protocol.map(summarizeProtocolViolation),
         },
+        checkpoint: result.checkpoint,
       });
 
       if (throwOnError && totalCount > 0) {
-        const first = innateViolations[0] || adaptiveViolations[0] || protocolViolations[0];
+        const first = routedInnate[0] || routedAdaptive[0] || routedProtocol[0];
         throwScanViolation(first, path);
       }
 
@@ -666,6 +1128,23 @@ export async function createImmunityService({ log, db } = {}) {
               }
             : null,
           last24h: buildLayerStats(events24h, 'protocol'),
+        },
+        checkpoint: {
+          version: CHECKPOINT_VERSION,
+          totalObservations: checkpointStats.totalObservations,
+          buckets: { ...checkpointStats.buckets },
+          healthSignalsEmitted: checkpointStats.healthSignalsEmitted,
+          apoptosisCandidates: checkpointStats.apoptosisCandidates,
+          allowHardSuppression,
+          memorySize: typeof memoryAdapter.size === 'function' ? memoryAdapter.size() : null,
+          recentApoptosis: apoptosisAudit.slice(-10).map((entry) => ({
+            id: entry.id,
+            ruleId: entry.ruleId,
+            observationCount: entry.observationCount,
+            localFalsePositiveRate: entry.localFalsePositiveRate,
+            bytecode: entry.bytecode,
+            timestamp: entry.timestamp,
+          })),
         },
         override: {
           last30d: overrides30d,

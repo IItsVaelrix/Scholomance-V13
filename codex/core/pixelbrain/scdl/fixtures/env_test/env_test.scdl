@@ -1,0 +1,66 @@
+asset env_test canvas 160x90
+
+palette {
+  skyhi    = #1B2A4A
+  skylo    = #2E4A7A
+  starlite = #C8E4FF
+  ridgefar = #16223C
+  ridgenear = #0E1830
+  ground   = #101C2E
+  grounddk = #0A1220
+  water    = #10395C
+  waterhi  = #2E6E9E
+  trunk    = #26180E
+  canopy   = #14301E
+  canopyhi = #23532F
+  windowg  = #E8C468
+}
+
+part sky material void_cloth {
+  rect 0 0 160 45 skyhi
+  rect 0 30 160 15 skylo
+  cell 12 6 starlite
+  cell 40 12 starlite
+  cell 75 4 starlite
+  cell 110 9 starlite
+  cell 140 15 starlite
+}
+
+part ridge_far material darksteel {
+  polygon 0 45 25 30 55 42 90 26 125 40 160 32 160 45 ground
+}
+
+part ridge_near material darksteel {
+  polygon 0 60 30 44 70 56 110 40 160 52 160 60 0 60 ridgenear
+}
+
+part ground material bark {
+  rect 0 60 160 30 ground
+  rect 0 84 160 6 grounddk
+}
+
+part lake material sapphire {
+  ellipse 115 74 radius 30 ry 9 waterhi
+  polygon 88 72 142 72 148 78 82 78 water
+}
+
+part tree_a material bark {
+  rect 34 52 3 14 trunk
+  circle 35 48 radius 7 canopy
+  circle 33 46 radius 4 canopyhi
+}
+
+part tree_b material bark {
+  rect 60 56 2 10 trunk
+  circle 61 52 radius 5 canopy
+  circle 59.5 50.5 radius 2.5 canopyhi
+}
+
+part hut material void_cloth {
+  rect 8 66 18 12 grounddk
+  polygon 6 66 17 58 28 66 ridgenear
+  rect 13 70 4 4 windowg
+  glow radius 2
+}
+
+export json png svg phaser

@@ -1,0 +1,26 @@
+import { chromium } from 'playwright';
+
+(async () => {
+  console.log('Starting Playwright...');
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+  
+  page.on('console', msg => console.log('[BROWSER CONSOLE]', msg.type(), msg.text()));
+  page.on('pageerror', err => console.log('[BROWSER ERROR]', err.message));
+  page.on('requestfailed', request => console.log('[NETWORK ERROR]', request.url(), request.failure().errorText));
+
+  console.log('Navigating to http://localhost:5173/ ...');
+  try {
+    await page.goto('http://localhost:5173/', { waitUntil: 'networkidle', timeout: 30000 });
+    console.log('Page loaded successfully.');
+    
+    // Wait a few seconds to let things run
+    await page.waitForTimeout(5000);
+    
+    console.log('Closing...');
+  } catch (err) {
+    console.log('Navigation failed:', err.message);
+  } finally {
+    await browser.close();
+  }
+})();

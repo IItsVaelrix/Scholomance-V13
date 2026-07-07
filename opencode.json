@@ -11,6 +11,15 @@
       "type": "local",
       "command": ["node", "--env-file=.env", "codex/server/collab/mcp-bridge-entry.js"],
       "enabled": true
+    },
+    "scholomance-brain": {
+      "type": "local",
+      "command": ["python3", "steamdeck_brain/mcp_brain_bridge.py"],
+      "cwd": "/home/deck/Downloads/Scholomance-V12-main",
+      "env": {
+        "PYTHONPATH": "steamdeck_brain"
+      },
+      "enabled": true
     }
   }
 }

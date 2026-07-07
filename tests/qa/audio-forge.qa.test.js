@@ -139,6 +139,53 @@ describe('Audio Forge — QA Integration Tests', () => {
   });
 
   // 8
+  it('FOOTSTEP uses TRANSIENT voice and renders on main thread', () => {
+    const { packet } = resolveIntent('FOOTSTEP', {
+      surface: 'arcane_slate',
+      stepIndex: 2,
+      battleId: 'qa-footstep',
+    });
+    const validation = validateSfxPacket(packet);
+    expect(validation.ok).toBe(true);
+    expect(packet.synthesis.voices[0].type).toBe('transient');
+
+    const result = renderSfxBuffer(packet, 44100);
+    expect(result.ok).toBe(true);
+    expect(result.channelData.length).toBeGreaterThan(0);
+  });
+
+  // 8a
+  it('OBELISK_CHARGE and OBELISK_DISCHARGE render FM zap templates without NaN', () => {
+    for (const [eventType, payload] of [
+      ['OBELISK_CHARGE', { intensity: 0.95, pulseIndex: 3, battleId: 'qa-obelisk' }],
+      ['OBELISK_DISCHARGE', { intensity: 1, pulseIndex: 4, battleId: 'qa-obelisk' }],
+    ]) {
+      const { packet, warnings } = resolveIntent(eventType, payload);
+      expect(warnings.some((w) => w.includes('FALLBACK_PACKET'))).toBe(false);
+      expect(validateSfxPacket(packet).ok).toBe(true);
+      expect(packet.synthesis.voices[0].type).toBe('zap');
+      expect(packet.synthesis.voices[0].modIndex).toBeGreaterThanOrEqual(7);
+
+      const result = renderSfxBuffer(packet, 44100);
+      expect(result.ok).toBe(true);
+      for (let i = 0; i < result.channelData.length; i++) {
+        expect(Number.isFinite(result.channelData[i])).toBe(true);
+      }
+    }
+  });
+
+  // 8b
+  it('SPELL_CAST and UI_CONFIRM have dedicated templates (not fallback)', () => {
+    const { packet: cast, warnings: castWarnings } = resolveIntent('SPELL_CAST', { affinity: AFFINITIES.LIGHT });
+    const { packet: confirm, warnings: confirmWarnings } = resolveIntent('UI_CONFIRM', {});
+
+    expect(castWarnings.some((w) => w.includes('FALLBACK_PACKET'))).toBe(false);
+    expect(confirmWarnings.some((w) => w.includes('FALLBACK_PACKET'))).toBe(false);
+    expect(validateSfxPacket(cast).ok).toBe(true);
+    expect(validateSfxPacket(confirm).ok).toBe(true);
+  });
+
+  // 9
   it('affinity intent resolver injects correct base frequency for each school', () => {
     const affinityFreqMap = {
       [AFFINITIES.ALCHEMY]: 432,

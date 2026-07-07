@@ -1,0 +1,14 @@
+{
+  "columns": 6,
+  "image": "arena-floor-tileset.png",
+  "imageheight": 64,
+  "imagewidth": 384,
+  "margin": 0,
+  "name": "arena-floor",
+  "spacing": 0,
+  "tilecount": 6,
+  "tileheight": 64,
+  "tilewidth": 64,
+  "type": "tileset",
+  "version": "1.10"
+}
