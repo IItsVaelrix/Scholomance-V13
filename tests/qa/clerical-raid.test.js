@@ -19,6 +19,8 @@ import { AGENT_INDEX } from '../../codex/core/immunity/clerical-raid.schema.js';
 
 describe('Clerical RAID', () => {
   it('seeds fifty patterns (PDR Phase 1 target)', () => {
+      expect(SEED_PATTERNS.length).toBe(52);
+      expect(SEED_STATS.total).toBe(52);
     expect(SEED_PATTERNS.length).toBe(52);
     expect(SEED_STATS.total).toBe(52);
   });
