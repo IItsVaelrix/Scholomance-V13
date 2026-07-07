@@ -220,15 +220,13 @@ function cleanWordLists(activeWord, lex) {
   const normalized = normalizeWord(activeWord);
   const normalizeItem = (w) => normalizeWord(typeof w === 'string' ? w : w?.word);
 
-  const takeUnique = (list, limit = 8) => {
-    const seen = new Set([normalized]);
-    return (list || []).filter((w) => {
-      const n = normalizeItem(w);
-      if (!n || seen.has(n)) return false;
-      seen.add(n);
-      return true;
-    }).slice(0, limit);
-  };
+  const seen = new Set([normalized]);
+  const takeUnique = (list, limit = 8) => (list || []).filter((w) => {
+    const n = normalizeItem(w);
+    if (!n || seen.has(n)) return false;
+    seen.add(n);
+    return true;
+  }).slice(0, limit);
 
   return {
     rhymes: takeUnique(lex.rhymes, 8),
@@ -375,9 +373,6 @@ const RitualPredictionTooltip = ({
     return buildRitualPrediction({ word: activeWord, line: 0, column: 0, contextLine: seedContextLine, surroundingText: seedContextLine });
   }, [predictionProp, activeWord, seedContextLine]);
 
-  // Single prediction authority: once the lexicon lookup for the active word
-  // resolves, the backend is the source of truth — role and resonance tiers are
-  // reconciled from it. Until then the local heuristic renders as provisional.
   const prediction = useMemo(() => {
     if (!basePrediction) return basePrediction;
     const lexMatch = lookupData && normalizeWord(lookupData.word) === normalizeWord(activeWord)
@@ -410,7 +405,6 @@ const RitualPredictionTooltip = ({
     });
   }, []);
 
-  // ── Position (skip entirely when embedded in a mobile sheet) ──────────────
   const posRef = useRef({ x: anchorRect?.x ?? x ?? 0, y: anchorRect?.y ?? y ?? 0 });
   const posInitialized = useRef(false);
   const [size, setSize] = useState({ width: TOOLTIP_DEFAULT_WIDTH, height: TOOLTIP_DEFAULT_HEIGHT });
@@ -596,6 +590,18 @@ const RitualPredictionTooltip = ({
         && !antonyms.some((r) => normalizeWord(r) === n);
     }).slice(0, 8);
 
+  const { rhymes, slantRhymes, synonyms, antonyms } = cleanWordLists(activeWord, lex);
+  const similes = corpusData.semantic
+    .map((r) => (typeof r === 'string' ? r : r?.word))
+    .filter((w) => {
+      const n = normalizeWord(w);
+      return n && n !== normalizeWord(activeWord)
+        && !rhymes.some((r) => normalizeWord(r) === n)
+        && !slantRhymes.some((r) => normalizeWord(r) === n)
+        && !synonyms.some((r) => normalizeWord(r) === n)
+        && !antonyms.some((r) => normalizeWord(r) === n);
+    }).slice(0, 8);
+
   const canTransmute = typeof onTransmute === 'function' && rootWord && normalizeWord(activeWord) !== normalizeWord(rootWord);
 
   const cardBody = (
@@ -635,11 +641,9 @@ const RitualPredictionTooltip = ({
             <div className="rp-role-desc">{ROLE_DESCRIPTIONS[pred.role] || ''}</div>
             
             {lookupLoading && !lex && <div className="rp-lexicon-status">consulting the lexicon...</div>}
-            
             <div className="rp-definitions-group">
               {definitions.map((def, i) => <p key={i} className="rp-lex-def">{def}</p>)}
             </div>
-
             <RuneRow label="syn" words={synonyms} onNavigate={navigateTo} onTransmute={onTransmute} />
             <RuneRow label="ant" words={antonyms} onNavigate={navigateTo} onTransmute={onTransmute} />
             <RuneRow label="rhyme" words={rhymes} onNavigate={navigateTo} onTransmute={onTransmute} />

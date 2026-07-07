@@ -13,8 +13,11 @@ mixer for now — re-add their ids to `AMBIENCE_CHANNELS` in
 
 ## Inactive (procedural CC0 placeholders, not currently mixed)
 
-These contain no third-party recordings and carry no external copyright —
-released as CC0 / public domain.
+These loops are **procedurally generated placeholders** synthesized locally
+with ffmpeg from filtered noise. They contain no third-party recordings and
+carry no external copyright — released as CC0 / public domain. They exist so
+the focus-mode mixer is audible out of the box; swap them for curated
+recordings whenever you like.
 
 | Channel | File | Source | Author | License |
 | --- | --- | --- | --- | --- |

@@ -26,6 +26,7 @@ export function createAmbienceMixerService({ createEngine }) {
     master: 0.7,
     channels: {
       rain: { enabled: false, volume: 0.5, available: true },
+
     },
   };
 

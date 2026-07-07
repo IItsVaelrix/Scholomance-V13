@@ -199,7 +199,6 @@ def _insert_signal(
             now,
         ),
     )
-
     # Determine if it was actually inserted or ignored as duplicate.
     # changes() reflects the most recent INSERT; a following SELECT does not
     # reset it, so this is correct even on a shared/batched connection.

@@ -200,9 +200,11 @@ class FileSelectScreen(ModalScreen[str]):
         if self.archive:
             return
         import subprocess
-        # Anchor the picker at the real project root (the git repo top). Even
-        # when the cockpit is divtube_downloader/, @ and file pickers must span
-        # the full Scholomance tree for the agent operating inside the TUI.
+        # Anchor the picker at the real project root (the git repo top), not the
+        # divtube_downloader subfolder. Even when the cockpit is divtube_downloader/,
+        # @ and file pickers must span the full Scholomance tree for the agent
+        # operating inside the TUI, and its paths match how resolve_at_references()
+        # resolves them (both share _get_project_root()).
         from tui.core.command_parser import _get_project_root
         cwd = _get_project_root()
         try:

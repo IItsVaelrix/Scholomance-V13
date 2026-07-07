@@ -15,6 +15,10 @@ from tui.services.token_meter import meter
 # can fetch the side-by-side blob from the tool service and render it inline.
 _WID_RX = re.compile(r"\[write_id=(w\d+)\]")
 
+# Compiled once: pulls the write_id out of a replace_file_content result so we
+# can fetch the side-by-side blob from the tool service and render it inline.
+_WID_RX = re.compile(r"\[write_id=(w\d+)\]")
+
 
 GOLD    = "#FFD700"
 PURPLE  = "#B388FF"
