@@ -5,15 +5,7 @@ function buildCombatError(status, payload) {
   return new Error(message);
 }
 
-export async function scoreCombatScroll({
-  scrollText,
-  weave,
-  playerId,
-  arenaSchool,
-  opponentSchool,
-  scholomance = null,
-  compendiumContext = null,
-} = {}) {
+export async function scoreCombatScroll({ scrollText, weave, playerId, arenaSchool, opponentSchool } = {}) {
   const response = await fetch(buildAuthorityUrl('/api/combat/score'), {
     method: 'POST',
     credentials: 'include',
@@ -26,8 +18,6 @@ export async function scoreCombatScroll({
       ...(playerId ? { playerId } : {}),
       ...(arenaSchool ? { arenaSchool } : {}),
       ...(opponentSchool ? { opponentSchool } : {}),
-      ...(scholomance ? { scholomance } : {}),
-      ...(compendiumContext ? { compendiumContext } : {}),
     }),
   });
 

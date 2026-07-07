@@ -36,27 +36,9 @@ function validateRouteRequiredEmitters(routeDefinition) {
 }
 
 /**
- * Run a route's contract checks and (optionally) execute its real steps.
- *
- * The route is a *contract* on the data flow that the foundry must produce
- * outside the route. Most steps in factory grammars are contract-only: their
- * `seam` declaration is what gets validated, not their `execute` body (which
- * is omitted). A small number of steps (currently `createVolumeLiftStep`) are
- * real executors that mutate the results — they are the only reason a
- * `step.execute(results)` call exists in this module.
- *
- *   - `validateRoute` runs the contract only (ownership + seam walk +
- *     required-output validation). No step `execute` is called. Use this for
- *     test assertions on failure modes and for "would this spec produce a
- *     valid route?" checks.
- *   - `executeRoute` runs the contract *and* calls each step's `execute`
- *     body. Use this only when a real executor must run (e.g. volume lift,
- *     which produces `results.voxel.volume` consumed by the foundry).
- *
- * Both functions return `{ diagnostics, ...context }` and never throw; all
- * failures land in `diagnostics.failures` with a `PB_ROUTE_*` code.
+ * Executes a deterministic sequence of microprocessors.
  */
-function runRoute(routeDefinition, context, { execute }) {
+export function executeRoute(routeDefinition, context) {
   const previousEmits = new Set();
   const currentMutations = new Set();
 
@@ -77,36 +59,35 @@ function runRoute(routeDefinition, context, { execute }) {
     return results;
   }
 
-  for (const step of routeDefinition.steps || []) {
+  for (const step of routeDefinition.steps) {
     if (step.seam) {
       try {
-        validateSeam(step.seam, previousEmits, currentMutations);
+         validateSeam(step.seam, previousEmits, currentMutations);
       } catch (e) {
-        results.diagnostics.ok = false;
-        results.diagnostics.failures.push({
-          code: 'PB_ROUTE_SEAM_VIOLATION',
-          route: routeDefinition.name,
-          step: step.name,
-          seam: step.seam.id,
-          message: e.message
-        });
-        return results; // Fail fast on seam violations
+         results.diagnostics.ok = false;
+         results.diagnostics.failures.push({
+           code: "PB_ROUTE_SEAM_VIOLATION",
+           route: routeDefinition.name,
+           step: step.name,
+           seam: step.seam.id,
+           message: e.message
+         });
+         return results; // Fail fast on seam violations
       }
     }
 
-    if (execute && typeof step.execute === 'function') {
-      try {
-        step.execute(results);
-      } catch (e) {
-        results.diagnostics.ok = false;
-        results.diagnostics.failures.push({
-          code: 'PB_ROUTE_EXECUTION_ERROR',
-          route: routeDefinition.name,
-          step: step.name,
-          message: e.message
-        });
-        return results;
-      }
+    // Execute microprocessor
+    try {
+      step.execute(results);
+    } catch (e) {
+       results.diagnostics.ok = false;
+       results.diagnostics.failures.push({
+         code: "PB_ROUTE_EXECUTION_ERROR",
+         route: routeDefinition.name,
+         step: step.name,
+         message: e.message
+       });
+       return results;
     }
     results.diagnostics.steps.push({
       name: step.name,
@@ -115,9 +96,11 @@ function runRoute(routeDefinition, context, { execute }) {
     });
   }
 
-  // After all steps, validate required outputs against the lattice that the
-  // foundry (or, for volume lift, the route itself) has produced.
+  // After all steps, validate required outputs if provided by the route or context
   if (routeDefinition.requiredOutputs) {
+    // Need a unified representation of the lattice to check
+    // Currently relying on results.silhouette, results.fills, etc.
+    // Build a temp lattice object for checking
     const lattice = {
       cells: results.fills?.coordinates || results.silhouette?.cells || [],
       parts: results.spec?.parts || [],
@@ -127,31 +110,15 @@ function runRoute(routeDefinition, context, { execute }) {
 
     const reqDiagnostics = validateRequiredOutputs(routeDefinition.requiredOutputs, lattice);
     if (!reqDiagnostics.ok) {
-      results.diagnostics.ok = false;
-      results.diagnostics.failures.push(...reqDiagnostics.failures.map(f => ({
-        ...f,
-        route: routeDefinition.name,
-        step: routeDefinition.requiredOutputSteps?.[f.requiredOutput] || null,
-        seam: routeDefinition.requiredOutputSeams?.[f.requiredOutput] || null,
-      })));
+       results.diagnostics.ok = false;
+       results.diagnostics.failures.push(...reqDiagnostics.failures.map(f => ({
+         ...f,
+         route: routeDefinition.name,
+         step: routeDefinition.requiredOutputSteps?.[f.requiredOutput] || null,
+         seam: routeDefinition.requiredOutputSeams?.[f.requiredOutput] || null,
+       })));
     }
   }
 
   return results;
-}
-
-/**
- * Validate a route's contract without executing any step.
- * Use this for contract-level assertions (ownership, seams, required outputs).
- */
-export function validateRoute(routeDefinition, context) {
-  return runRoute(routeDefinition, context, { execute: false });
-}
-
-/**
- * Validate a route's contract and execute its real steps.
- * Use this only when a step's `execute` body is required (e.g. `createVolumeLiftStep`).
- */
-export function executeRoute(routeDefinition, context) {
-  return runRoute(routeDefinition, context, { execute: true });
 }

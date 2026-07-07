@@ -98,12 +98,6 @@ tmp-*.png
 !godot_project/assets/blocks/*.png
 *.bmp
 
-# SCDL compile dumps — regenerable build artifacts (the .scdl is the source, and
-# -frameloop.json manifests are kept). Sibling -png.png is already ignored above.
-*-json.json
-*-phaser.json
-*-svg.svg
-
 # Keys
 key1
 key1.pub
@@ -148,9 +142,3 @@ steamdeck_brain/__pycache__/
 *.pyc
 # SCDNA compiler runtime artifacts (generated at default paths)
 steamdeck_brain/vaelrix_forcefield/scdna/compiler.history.jsonl
-
-# Generated assets
-generated-assets/
-public/generated-assets/
-public/assets/
-*-aseprite.aseprite

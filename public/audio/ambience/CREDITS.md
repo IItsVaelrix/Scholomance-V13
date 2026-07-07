@@ -1,18 +1,5 @@
 # Ambience Loop Credits
 
-The focus-mode mixer currently exposes a **single channel** (Rain + Forest
-Stream). The other loops below are kept on disk but are not wired into the
-mixer for now — re-add their ids to `AMBIENCE_CHANNELS` in
-`src/lib/ambient/ambienceMixer.service.js` to bring them back.
-
-## Active channel
-
-| Channel | File | Source | Author | License |
-| --- | --- | --- | --- | --- |
-| Rain + Forest Stream | rain-forest-stream.mp3 | A 120s seamless loop (crossfaded, normalized to ~-18 LUFS) cut from a user-supplied "Relaxing Rain Noise + Forest Stream" recording | Unknown — user-supplied | ⚠️ **Unverified.** Confirm you have the right to use this recording and fill in the real source/author/license before distributing. |
-
-## Inactive (procedural CC0 placeholders, not currently mixed)
-
 These loops are **procedurally generated placeholders** synthesized locally
 with ffmpeg from filtered noise. They contain no third-party recordings and
 carry no external copyright — released as CC0 / public domain. They exist so

@@ -1,6 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
 import { ORACLE_ERRORS } from './useWordLookup.jsx';
-import { queryOracle } from '../lib/oracle.adapter.js';
 
 /**
  * useOracleQuery Hook
@@ -64,7 +63,17 @@ export function useOracleQuery() {
     };
 
     try {
-      const json = await queryOracle(trimmedQuery, telemetry);
+      const response = await fetch('/api/oracle/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: trimmedQuery, telemetry }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const json = await response.json();
       
       applyStateIfCurrent({
         data: json.data,

@@ -108,9 +108,6 @@ export async function createCombatScoreService(options = {}) {
       speakerId: speakerId || 'speaker:unknown',
       speakerType: 'PLAYER',
       speakerProfile,
-      scholomance: context.scholomance || null,
-      compendiumContext: context.compendiumContext || null,
-      defender: context.defender || null,
     });
     const { nextVoiceProfile, ...publicResponse } = normalized;
 

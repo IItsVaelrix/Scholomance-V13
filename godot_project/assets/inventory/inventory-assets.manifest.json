@@ -1,0 +1,119 @@
+{
+  "kind": "scholomance.inventory.assets.v1",
+  "generatedAt": "2026-06-17",
+  "sourceSystems": [
+    "PixelBrain Foundry",
+    "DivWand",
+    "Wand",
+    "Photonic Bridge"
+  ],
+  "divWandNode": {
+    "id": "inventory.surface.void-scholar",
+    "role": "inventory-ui",
+    "layout": {
+      "width": 640,
+      "height": 420,
+      "slots": 24
+    },
+    "props": {
+      "schoolWeights": {
+        "VOID": 0.62,
+        "QBIT": 0.2,
+        "WILL": 0.18
+      },
+      "interactive": true
+    }
+  },
+  "wandProposal": {
+    "sourceIntentHash": "inventory-voidmetal-cave-alt-i",
+    "proposedFormula": {
+      "type": "inventory-grid",
+      "columns": 6,
+      "rows": 4,
+      "motif": "photonic-sigil-slot"
+    },
+    "confidence": 0.91,
+    "reviewRequired": false
+  },
+  "photonicBridge": {
+    "ok": false,
+    "routeId": "retina_bridge_78392A7B",
+    "packet": null,
+    "bridgeReport": null,
+    "preview": {
+      "ok": false,
+      "packetId": null,
+      "bitWidth": null,
+      "values": [],
+      "buckets": {
+        "negative": 0,
+        "zero": 0,
+        "positive": 0
+      },
+      "previewHash": "741638A5"
+    },
+    "delta": {
+      "ok": false,
+      "fromPacketId": null,
+      "toPacketId": null,
+      "changedCount": 0,
+      "runs": [],
+      "deltaHash": "77074BA4"
+    },
+    "opticalSimulation": {
+      "mode": "off",
+      "softwareOnly": true,
+      "hardwareBacked": false,
+      "opticalFit": 0,
+      "operationCount": 0,
+      "linearPath": [],
+      "electronicBoundaries": [],
+      "phaseBuckets": {
+        "forward": 0,
+        "inverted": 0,
+        "dark": 0
+      },
+      "simulationHash": "58D4BE31"
+    },
+    "diagnostics": [
+      "RETINA_BRIDGE_ROUTE null"
+    ]
+  },
+  "assets": {
+    "panel": {
+      "packetId": "inventory.inventory_panel",
+      "png": "res://assets/inventory/inventory_panel.png",
+      "cells": 733676
+    },
+    "slot": {
+      "packetId": "inventory.inventory_slot",
+      "png": "res://assets/inventory/inventory_slot.png",
+      "cells": 12728
+    },
+    "voidmetal": {
+      "packetId": "inventory.voidmetal_icon",
+      "png": "res://assets/inventory/voidmetal_icon.png",
+      "cells": 5402
+    },
+    "torch": {
+      "packetId": "inventory.torch_icon",
+      "png": "res://assets/inventory/torch_icon.png",
+      "cells": 4096
+    },
+    "stick": {
+      "packetId": "inventory.stick_icon",
+      "png": "res://assets/inventory/stick_icon.png",
+      "cells": 4096
+    },
+    "sword": {
+      "packetId": "inventory.sword_icon",
+      "png": "res://assets/inventory/sword_icon.png",
+      "cells": 4096
+    },
+    "empty": {
+      "packetId": "inventory.empty_icon",
+      "png": "res://assets/inventory/empty_icon.png",
+      "cells": 4288
+    }
+  }
+}

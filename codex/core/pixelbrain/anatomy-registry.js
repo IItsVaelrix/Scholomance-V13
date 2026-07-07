@@ -4,7 +4,7 @@
  * The canonical database for PixelBrain anatomical structures.
  * Defines the rigid skeletal constraints, anchor points, and topological trees
  * for different species and forms (Humanoid, Quadruped, Avian, etc.).
- * 
+ *
  * Used by the Character Forge and SCDL Semantic Unifier to guarantee that
  * when a user builds a "humanoid", they provide all required anatomy anchors,
  * and that AI-generated coordinate layouts adhere to a recognizable structural manifold.
@@ -172,7 +172,7 @@ export function getAnatomySchema(speciesId) {
 /**
  * Validate that a provided skeleton object fulfills the required anchors
  * for a specific species schema.
- * 
+ *
  * @param {string} speciesId - e.g. 'humanoid'
  * @param {Object} skeleton - flat key-value pairs of anchor names to coordinates {x, y}
  * @returns {Object} { valid: boolean, missingAnchors: string[] }

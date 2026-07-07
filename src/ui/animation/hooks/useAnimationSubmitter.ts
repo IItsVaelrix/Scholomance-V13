@@ -8,7 +8,8 @@
  */
 
 import { useCallback } from 'react';
-import { submitAmpIntent } from '../../../lib/amp-client.js';
+import { attachAnimationPhotonicRoute } from '../../../lib/animation-photonic.adapter.js';
+import { processorBridge } from '../../../lib/engine.adapter.js';
 import { usePrefersReducedMotion } from '../../../hooks/usePrefersReducedMotion.js';
 import type { AnimationIntent, ResolvedMotionOutput } from '../../../types/animation';
 
@@ -30,8 +31,9 @@ export function useAnimationSubmitter() {
       }
     };
 
-    // V12 PERFORMANCE: Submit intent which correctly bridges Main Thread lighting and WebWorker composition
-    return await submitAmpIntent(augmentedIntent);
+    // V12 PERFORMANCE: Offload to Microprocessor Factory via Bridge
+    const result = await processorBridge.execute('amp.run', augmentedIntent);
+    return attachAnimationPhotonicRoute(result) as ResolvedMotionOutput;
   }, [prefersReducedMotion]);
 
   return { submitIntent };

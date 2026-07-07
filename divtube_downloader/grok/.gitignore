@@ -1,8 +1,0 @@
-*
-!.gitignore
-!README.md
-!mcp-bridge-entry.mjs
-!scratch/
-!scratch/.gitkeep
-!output/
-!output/.gitkeep

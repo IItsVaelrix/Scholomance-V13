@@ -27,12 +27,9 @@ import { createInvalidPacketError } from '../../codex/core/audio-forge/audio-byt
 function deriveNumericSeed(eventType, context = {}) {
   const str = buildPacketSeedString({
     battleId:  context.battleId  ?? 'default',
-    tile:      context.tile      ?? context.tx ?? 0,
+    tile:      context.tile      ?? 0,
     turn:      context.turn      ?? 0,
     eventType,
-    stepIndex: context.stepIndex,
-    surface:   context.surface,
-    variant:   context.variant ?? context.pulseIndex,
   });
   return hashString(str) >>> 0;
 }

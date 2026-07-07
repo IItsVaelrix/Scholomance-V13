@@ -14,16 +14,9 @@ import os
 import asyncio
 
 from tui.ui.layout import get_layout
-from tui.ui.theme import THEMES
-from tui.ui.sigils import title as _sigil_title
 from tui.core.command_parser import CommandRegistry
 from tui.ui.widgets.command_area import CommandSubmitted
-from tui.services.agent_service import (
-    AgentService,
-    CMD_DOWNLOAD_AUDIO,
-    CMD_DOWNLOAD_VIDEO,
-    parse_download_args,
-)
+from tui.services.agent_service import AgentService
 from tui.services.memory_service import MemoryService
 from tui.services.export_service import ExportService
 from tui.services.config_service import ConfigService
@@ -74,52 +67,52 @@ def _guess_language(filename: str) -> str:
     return EXT_LANG.get(ext, "text")
 
 
-def _copy_to_clipboard(text: str, log_fn, app=None) -> None:
-    """Copy *text* to the system clipboard.
-
-    Preference order:
-      1. A confirmable CLI backend (wl-copy / xclip / xsel / pbcopy) when one is
-         installed — we know it succeeded.
-      2. OSC 52: ask the terminal itself to take the text. Needs no binary, so it
-         works on the Steam Deck's Konsole (which ships none of the above) and
-         over SSH. Best-effort — the terminal may silently drop it.
-      3. Temp file, only if there's no app to emit OSC 52 through.
-    """
+def _copy_to_clipboard(text: str, log_fn) -> None:
+    """Copy *text* to the system clipboard, falling back to a file if no tool exists."""
     import shutil
     import subprocess
 
-    backends = (
-        ("wl-copy", ["wl-copy"]),                            # Wayland / KDE / Deck
-        ("xclip",   ["xclip", "-selection", "clipboard"]),   # X11
-        ("xsel",    ["xsel", "--clipboard", "--input"]),     # X11
-        ("pbcopy",  ["pbcopy"]),                             # macOS
-    )
-    for name, cmd in backends:
-        if shutil.which(name):
-            try:
-                subprocess.run(cmd, input=text, text=True, check=True, timeout=5)
-                log_fn(f"[{SUCCESS}]✔ Copied {len(text)} characters to clipboard[/]")
-                return
-            except Exception:
-                pass
-
-    # No CLI tool present — hand it to the terminal via OSC 52.
-    if app is not None:
+    copied = False
+    # Try wl-copy (Wayland / KDE / Steam Deck)
+    if shutil.which("wl-copy"):
         try:
-            app.copy_to_clipboard(text)
-            log_fn(f"[{SUCCESS}]✔ Copied {len(text)} characters to clipboard[/] "
-                   f"[{MUTED}](via terminal · OSC 52)[/]")
-            return
+            subprocess.run(["wl-copy"], input=text, text=True, check=True, timeout=5)
+            copied = True
+        except Exception:
+            pass
+    # Try xclip (X11)
+    if not copied and shutil.which("xclip"):
+        try:
+            subprocess.run(["xclip", "-selection", "clipboard"], input=text, text=True, check=True, timeout=5)
+            copied = True
+        except Exception:
+            pass
+    # Try xsel (X11)
+    if not copied and shutil.which("xsel"):
+        try:
+            subprocess.run(["xsel", "--clipboard", "--input"], input=text, text=True, check=True, timeout=5)
+            copied = True
+        except Exception:
+            pass
+    # macOS pbcopy
+    if not copied and shutil.which("pbcopy"):
+        try:
+            subprocess.run(["pbcopy"], input=text, text=True, check=True, timeout=5)
+            copied = True
         except Exception:
             pass
 
-    # Last resort: write to a temp file and tell the user.
+    if copied:
+        log_fn(f"[{SUCCESS}]✔ Copied {len(text)} characters to clipboard[/]")
+        return
+
+    # Fallback: write to a temp file and tell the user.
     import tempfile
     try:
         fd, path = tempfile.mkstemp(prefix="divtube-copy-", suffix=".txt")
         with os.fdopen(fd, "w", encoding="utf-8") as f:
             f.write(text)
-        log_fn(f"[{WARNING}]⚠ No clipboard available.[/]")
+        log_fn(f"[{WARNING}]⚠ No clipboard tool found (wl-copy/xclip/xsel/pbcopy).[/]")
         log_fn(f"[{MUTED}]  Saved copy to:[/] {path}")
     except Exception as e:
         log_fn(f"[{ERROR}]✗ Could not copy or save:[/] {e}")
@@ -161,29 +154,29 @@ class FileSelectScreen(ModalScreen[str]):
     CSS = """
     FileSelectScreen {
         align: center middle;
-        background: $background 92%;
+        background: rgba(13, 13, 13, 0.92);
     }
     #file-select-container {
         width: 80;
         height: 25;
-        border: round $accent-primary;
-        background: $surface;
+        border: panel #DC143C;
+        background: #1C1C1C;
         padding: 1 2;
         box-sizing: border-box;
     }
     .modal-title {
         text-align: center;
         margin-bottom: 1;
-        color: $accent-tertiary;
+        color: #B388FF;
     }
     #file-filter {
         margin-bottom: 1;
-        border: round $panel-border;
-        background: $background;
+        border: panel #B81030;
+        background: #0D0D0D;
         transition: border 200ms;
     }
     #file-filter:focus {
-        border: round $accent-primary;
+        border: panel #FF3355;
     }
     """
     IGNORE_DIRS = {"node_modules", ".git", "dist", "build", ".cache",
@@ -201,9 +194,8 @@ class FileSelectScreen(ModalScreen[str]):
             return
         import subprocess
         # Anchor the picker at the real project root (the git repo top), not the
-        # divtube_downloader subfolder. Even when the cockpit is divtube_downloader/,
-        # @ and file pickers must span the full Scholomance tree for the agent
-        # operating inside the TUI, and its paths match how resolve_at_references()
+        # divtube_downloader subfolder — so @ finds files anywhere in the
+        # Scholomance tree, and its paths match how resolve_at_references()
         # resolves them (both share _get_project_root()).
         from tui.core.command_parser import _get_project_root
         cwd = _get_project_root()
@@ -281,19 +273,9 @@ class FileSelectScreen(ModalScreen[str]):
             olist.clear_options()
             return
 
-        # Capture the app on the UI thread. `self.app` is backed by the
-        # `active_app` ContextVar, which is NOT propagated into a bare
-        # threading.Thread — touching it inside run() raised NoActiveAppError
-        # (and, once the screen was torn down, "Event loop is closed").
-        app = self.app
-
         def run():
             paths = self.archive.search_paths(q, limit=100)
-            try:
-                app.call_from_thread(self._apply_archive_results, req, paths)
-            except Exception:
-                # App/loop torn down before this late result arrived — drop it.
-                pass
+            self.app.call_from_thread(self._apply_archive_results, req, paths)
 
         threading.Thread(target=run, daemon=True).start()
 
@@ -343,20 +325,20 @@ class WidgetModalScreen(ModalScreen):
     CSS = """
     WidgetModalScreen {
         align: center middle;
-        background: $background 92%;
+        background: rgba(13, 13, 13, 0.92);
     }
     #widget-modal-container {
         width: 90%;
         height: 90%;
-        border: round $accent-primary;
-        background: $surface;
+        border: panel #DC143C;
+        background: #1C1C1C;
         padding: 1 2;
         box-sizing: border-box;
     }
     .modal-title {
         text-align: center;
         margin-bottom: 1;
-        color: $accent-tertiary;
+        color: #B388FF;
     }
     """
 
@@ -411,26 +393,219 @@ class ModelSelectScreen(ModalScreen[str]):
             self.dismiss(val)
 
 class DivTubeAgentApp(App):
-    # Stylesheet lives in app.tcss (hot-reloadable via `textual run --dev`).
-    # All colours there are $tokens resolved from THEME_NAME by
-    # get_css_variables — theme.py is the single source of truth.
-    CSS_PATH = "app.tcss"
+    CSS = '''
+    Screen {
+        background: #0D0D0D;
+    }
 
-    # Active palette key in tui/ui/theme.py. Swap + call refresh_css() to
-    # re-skin the whole app at runtime without touching a single rule.
-    THEME_NAME = "obsidian_crimson"
+    Header {
+        background: #1C1C1C;
+        color: #F8FAFC;
+        text-style: bold;
+        padding: 0 1;
+    }
+    HeaderTitle {
+        color: #B388FF;
+        text-style: bold;
+    }
+    Footer {
+        background: #1C1C1C;
+    }
+    FooterKey {
+        background: #1C1C1C;
+        color: #9B8A9B;
+        transition: background 200ms, color 200ms;
+    }
+    FooterKey > .footer-key--key {
+        color: #0D0D0D;
+        background: #B388FF;
+        text-style: bold;
+    }
+    FooterKey > .footer-key--description {
+        color: #C0B0C0;
+    }
+    FooterKey:hover {
+        background: #2D181E;
+        color: #F8FAFC;
+    }
 
-    def get_css_variables(self) -> dict:
-        """Expose the active theme.py palette to the stylesheet as $tokens.
+    #sidebar {
+        width: 32;
+        background: #1C1C1C;
+        border: panel #8B5CF6;
+        border-title-color: #F8FAFC;
+        border-title-align: center;
+        padding: 1 1;
+        margin: 1 0 1 1;
+    }
+    #aether-meter {
+        height: 6;
+        background: #1C1C1C;
+        border: panel #B388FF;
+        border-title-color: #F8FAFC;
+        border-title-align: center;
+        padding: 0 1;
+        margin: 1 1 0 0;
+    }
+    #inspector {
+        height: 1fr;
+        background: #1C1C1C;
+        border: panel #DC143C;
+        border-title-color: #F8FAFC;
+        border-title-align: center;
+        padding: 1 1;
+        margin: 1 1 1 0;
+    }
+    #radar {
+        height: 1fr;
+        background: #0D0D0D;
+        border: panel #FFD700;
+        border-title-color: #F8FAFC;
+        border-title-align: center;
+        padding: 1 1;
+        margin: 0 1 1 0;
+        text-align: center;
+        content-align: center middle;
+    }
+    #right-panel {
+        width: 42;
+        background: #0D0D0D;
+    }
+    #code-viewer {
+        height: 1fr;
+        background: #0D0D0D;
+        border: panel #DC143C;
+        border-title-color: #F8FAFC;
+        border-title-align: center;
+        padding: 0 1;
+        margin: 1 1 1 0;
+    }
 
-        Keys are hyphenated (accent_primary -> $accent-primary). These override
-        Textual's built-in design tokens where the names collide (background,
-        surface, success, warning, error), which is intentional — it keeps
-        default widget chrome in palette."""
-        variables = super().get_css_variables()
-        palette = THEMES.get(self.THEME_NAME, {})
-        variables.update({k.replace("_", "-"): v for k, v in palette.items()})
-        return variables
+    .sidebar-heading {
+        margin-top: 1;
+        margin-bottom: 0;
+        text-style: bold;
+        color: #8B5CF6;
+        padding-left: 1;
+    }
+    .sidebar-button {
+        width: 100%;
+        height: 1;
+        border: none;
+        background: transparent;
+        color: #9B8A9B;
+        content-align: left middle;
+        padding-left: 2;
+        transition: background 200ms, color 200ms;
+    }
+    .sidebar-button:hover {
+        background: #2D181E;
+        color: #B388FF;
+        text-style: bold;
+    }
+
+    #center-panel {
+        width: 1fr;
+        background: #0D0D0D;
+        padding: 1 1;
+    }
+
+    .chat-log-cls {
+        background: #1C1C1C;
+        color: #F8FAFC;
+        border: panel #DC143C;
+        border-title-color: #F8FAFC;
+        border-title-align: center;
+        padding: 0 1;
+        scrollbar-color: #8B5CF6;
+        scrollbar-color-hover: #B388FF;
+        scrollbar-color-active: #B388FF;
+        scrollbar-background: #0D0D0D;
+        scrollbar-size-vertical: 1;
+    }
+
+    #typewriter-box {
+        background: #1C1C1C;
+        color: #F8FAFC;
+        height: auto;
+        min-height: 3;
+        max-height: 30;
+        border: panel #FFD700;
+        border-title-color: #F8FAFC;
+        border-title-align: center;
+        padding: 0 1;
+        overflow-y: scroll;
+        display: none;
+        margin-top: 1;
+    }
+    #typewriter-box.-active {
+        display: block;
+    }
+
+    #command-input {
+        dock: bottom;
+        width: 100%;
+        height: 3;
+        margin: 1;
+        background: #1C1C1C;
+        border: tall #2D181E;
+    }
+    #command-input.expanded {
+        height: 15;
+    }
+    #command-input:focus {
+        border: panel #F43F5E;
+    }
+
+    .cmd-list { padding: 1 0 0 1; }
+    .muted { color: #6A5A6A; }
+    .glyph-container {
+        dock: bottom;
+        content-align: center middle;
+        padding-bottom: 1;
+        height: 9;
+        color: #8B5CF6;
+    }
+
+    #loading-bar { display: none; height: 1; margin: 1 0; }
+    #loading-bar.working > Bar > .bar--bar { color: #E11D48; }
+    #loading-bar.finished > Bar > .bar--bar { color: #10B981; }
+    #loading-bar.working .bar--bar { color: #E11D48; }
+    #loading-bar.finished .bar--bar { color: #10B981; }
+
+    ModelSelectScreen {
+        align: center middle;
+        background: rgba(13, 13, 13, 0.92);
+    }
+    #model-dialog {
+        width: 60;
+        height: 20;
+        background: #1C1C1C;
+        border: panel #8B5CF6;
+        border-title-color: #F8FAFC;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    #model-title {
+        background: #2D181E;
+        color: #B388FF;
+        text-style: bold;
+        content-align: center middle;
+        width: 100%;
+        padding: 1;
+        border-bottom: solid #8B5CF6;
+    }
+    OptionList {
+        background: transparent;
+        border: none;
+        padding: 1 1;
+    }
+    OptionList > .option-list--option-highlighted {
+        background: #2D181E;
+        color: #F8FAFC;
+        text-style: bold;
+    }
+    '''
 
     BINDINGS = [
         ("q", "quit", "Quit"),
@@ -540,39 +715,6 @@ class DivTubeAgentApp(App):
         self.log_msg(f"[{WARNING}]⛔ Stopped agent[/]{suffix}")
 
     def setup_commands(self):
-        def handle_download(ui, args):
-            url, audio = parse_download_args(args)
-            if not url:
-                ui.log_msg("[#FF5C7A]Usage:[/] /download <url> [--audio]")
-                return
-            cmd = CMD_DOWNLOAD_AUDIO if audio else CMD_DOWNLOAD_VIDEO
-
-            # Loading meter: start it now (UI thread), then drive it live from the
-            # yt-dlp progress streamed back through run_command's worker thread.
-            bar = ui.query_one("#loading-bar")
-            bar.styles.display = "block"
-            bar.remove_class("finished")
-            bar.add_class("working")
-            bar.progress = 0
-
-            def on_progress(percent, speed, eta):
-                def upd():
-                    bar.progress = max(0.0, min(100.0, percent))
-                ui.call_from_thread(upd)
-
-            def on_done(success):
-                def fin():
-                    bar.progress = 100
-                    bar.remove_class("working")
-                    bar.add_class("finished")
-                    ui.set_timer(2.0, lambda: setattr(bar.styles, "display", "none"))
-                ui.call_from_thread(fin)
-
-            ui.agent.run_command(
-                cmd, url, ui.log_msg, ui,
-                on_progress=on_progress, on_done=on_done,
-            )
-
         def handle_clear(ui, args):
             chat = ui._get_active_chat()
             chat.clear()
@@ -585,7 +727,7 @@ class DivTubeAgentApp(App):
                 ui.log_msg(f"[{WARNING}]Nothing to copy — chat is empty.[/]")
                 return
             text = "\n".join(lines)
-            _copy_to_clipboard(text, ui.log_msg, app=ui)
+            _copy_to_clipboard(text, ui.log_msg)
 
         def handle_code(ui, args):
             if not args:
@@ -634,7 +776,7 @@ class DivTubeAgentApp(App):
         r("/undo-replace", handle_undo_replace,                                 "Roll back last write",   "/undo-replace [write_id|--list]")
         r("/undo-list",    handle_undo_list,                                    "List pending undos",     "/undo-list")
         self.registry.register("/analyze", lambda ui, args: ui.agent.run_command("1", args[0] if args else "", ui.log_msg, ui), "Analyze URL", "/analyze <url>")
-        self.registry.register("/download", handle_download, "Download URL (--audio = MP3)", "/download <url> [--audio]")
+        self.registry.register("/download", lambda ui, args: ui.agent.run_command("2", args[0] if args else "", ui.log_msg, ui), "Download URL", "/download <url>")
         def handle_memory(ui, args):
             sub = args[0].lower() if args else ""
 
@@ -646,7 +788,7 @@ class DivTubeAgentApp(App):
         r("/undo-replace", handle_undo_replace,                                 "Roll back last write",   "/undo-replace [write_id|--list]")
         r("/undo-list",    handle_undo_list,                                    "List pending undos",     "/undo-list")
         self.registry.register("/analyze", lambda ui, args: ui.agent.run_command("1", args[0] if args else "", ui.log_msg, ui), "Analyze URL", "/analyze <url>")
-        self.registry.register("/download", handle_download, "Download URL (--audio = MP3)", "/download <url> [--audio]")
+        self.registry.register("/download", lambda ui, args: ui.agent.run_command("2", args[0] if args else "", ui.log_msg, ui), "Download URL", "/download <url>")
         def handle_memory(ui, args):
             sub = args[0].lower() if args else ""
 
@@ -1263,7 +1405,6 @@ class DivTubeAgentApp(App):
 
         self.setup_turbo_commands()
         self.setup_daemon_commands()
-        self.setup_lab_commands()
 
     def setup_daemon_commands(self):
         """Brain daemon control commands."""
@@ -1336,62 +1477,6 @@ class DivTubeAgentApp(App):
             threading.Thread(target=run, daemon=True).start()
 
         r("/vaelrix", handle_vaelrix, "Ask Vaelrix (SteamDeck brain)", "/vaelrix <question>")
-
-    def setup_lab_commands(self):
-        """Intel Lab (full YouTube intel report) + Niche registry commands.
-
-        Both services were fully built but had no command entrypoint. Services
-        are created lazily on first use so app startup never pays for the intel
-        package import or the niche sqlite open."""
-        r = self.registry.register
-
-        def handle_intel(ui, args):
-            url = args[0].strip() if args else ""
-            if not url:
-                ui.log_msg(f"[{ERROR}]Usage:[/] /intel <youtube-url>")
-                return
-            if getattr(ui, "intel", None) is None:
-                from tui.services.intel_lab_service import IntelLabService
-                ui.intel = IntelLabService()
-            ui.log_msg(f"[{MUTED}]Running Intel Lab analysis on [bold]{url}[/]…[/]")
-            ui.intel.run_intel(url, ui.log_msg)
-
-        def handle_niche(ui, args):
-            if getattr(ui, "niche", None) is None:
-                from tui.services.niche_service import NicheService
-                ui.niche = NicheService()
-            sub = (args[0].lower() if args else "list")
-            rest = args[1:]
-
-            if sub == "list":
-                names = ui.niche.list_niches()
-                if not names:
-                    ui.log_msg(f"[{MUTED}]No niches registered.[/]")
-                    return
-                ui.log_msg(f"[{GOLD}]Niches:[/] " + ", ".join(names))
-            elif sub == "show":
-                if not rest:
-                    ui.log_msg(f"[{ERROR}]Usage:[/] /niche show <name>")
-                    return
-                ui.log_msg(f"[{GOLD}]{rest[0]}[/]\n{ui.niche.get_niche(rest[0])}")
-            elif sub in ("import", "export"):
-                if not rest:
-                    ui.log_msg(f"[{ERROR}]Usage:[/] /niche {sub} <file.nichepack>")
-                    return
-                try:
-                    if sub == "import":
-                        n = ui.niche.import_pack(rest[0])
-                        ui.log_msg(f"[{SUCCESS}]✔ Imported {n} niche(s) from {rest[0]}[/]")
-                    else:
-                        n = ui.niche.export_pack(rest[0])
-                        ui.log_msg(f"[{SUCCESS}]✔ Exported {n} niche(s) to {rest[0]}[/]")
-                except Exception as e:
-                    ui.log_msg(f"[{ERROR}]Niche {sub} failed:[/] {e}")
-            else:
-                ui.log_msg(f"[{ERROR}]Unknown subcommand '{sub}'.[/] Use list | show | import | export")
-
-        r("/intel", handle_intel, "Full YouTube intel report (telemetry + critique)", "/intel <url>")
-        r("/niche", handle_niche, "Niche registry: list/show/import/export", "/niche [list|show <name>|import <f>|export <f>]")
 
     def setup_turbo_commands(self):
         """TurboQuant SEO plugin commands (spec v1.0, phases 0-3)."""
@@ -1726,40 +1811,27 @@ class DivTubeAgentApp(App):
         self.log_msg(f"Type [bold {GOLD}]/help[/] for commands.\n")
 
     def _render_banner(self):
-        # Typographic masthead — no border box. The chat panel already owns the
-        # crimson accent; a second crimson frame in here would be accent-on-accent.
-        # Gold is the single ceremonial mark, under one muted hairline.
         title = "✦  D I V T U B E   C O C K P I T  ✦"
         sub   = "determinism engine · cockpit online"
-        self.log_msg(f"[bold {GOLD}]{title}[/]")
-        self.log_msg(f"[{MUTED}]{sub}[/]\n")
-
-    # Agent-activity markers: colour is drawn from the palette (purple→crimson→
-    # gold tracks think→look→respond), not off-brand blue/red/yellow.
-    _AI_STATE_MARKERS = {
-        "thinking":   (PURPLE,  "ᗣ THINKING"),
-        "looking":    (CRIMSON, "ᗣ LOOKING"),
-        "responding": (GOLD,    "ᗣ RESPONDING"),
-    }
+        width = max(len(title), len(sub)) + 4
+        bar   = "─" * (width - 2)
+        self.log_msg(f"[{CRIMSON}]╭{bar}╮[/]")
+        self.log_msg(f"[{CRIMSON}]│[/][bold {GOLD}]{title.center(width - 2)}[/][{CRIMSON}]│[/]")
+        self.log_msg(f"[{CRIMSON}]│[/][{PURPLE_LT}]{sub.center(width - 2)}[/][{CRIMSON}]│[/]")
+        self.log_msg(f"[{CRIMSON}]╰{bar}╯[/]")
 
     def set_ai_state(self, state):
         def _update():
             chat = self._get_active_chat()
-            base_title = (str(chat.border_title).split("  [")[0]
-                          if chat.border_title else _sigil_title("COCKPIT"))
-            marker = self._AI_STATE_MARKERS.get(state)
-            if marker:
-                color, label = marker
-                chat.border_title = f"{base_title}  [bold {color}]{label}[/]"
+            base_title = str(chat.border_title).split("  [")[0] if chat.border_title else "✦ COCKPIT ✦"
+            if state == "thinking":
+                chat.border_title = f"{base_title}  [bold #3b82f6]ᗣ THINKING[/]"
+            elif state == "looking":
+                chat.border_title = f"{base_title}  [bold #ef4444]ᗣ LOOKING[/]"
+            elif state == "responding":
+                chat.border_title = f"{base_title}  [bold #eab308]ᗣ RESPONDING[/]"
             else:
                 chat.border_title = base_title
-            # Drive the cockpit's activity light: pulse while the agent works,
-            # recede when idle. Non-fatal if the inspector glyph isn't mounted.
-            try:
-                glyph = self.query_one("#activity-glyph")
-                glyph.start() if marker else glyph.stop()
-            except Exception:
-                pass
         self.call_from_thread(_update)
 
     def typewriter_log_msg(self, msg, delay=0.005):
@@ -1767,7 +1839,7 @@ class DivTubeAgentApp(App):
         def _task():
             box = self.query_one("#typewriter-box")
             self.call_from_thread(lambda: box.add_class("-active"))
-            self.call_from_thread(lambda: setattr(box, "border_title", _sigil_title("AI IS TYPING…")))
+            self.call_from_thread(lambda: setattr(box, "border_title", "❖ AI IS TYPING... ❖"))
             
             from rich.markdown import Markdown
             current_text = ""
@@ -1835,7 +1907,7 @@ class DivTubeAgentApp(App):
             viewer = self.query_one("#code-viewer")
             lang = _guess_language(filename) if filename else language
             viewer.set_code(code, filename=filename, language=lang)
-            viewer.border_title = f"{_sigil_title('CODE')} — {filename or 'snippet'}"
+            viewer.border_title = f"❖ CODE ❖ — {filename or 'snippet'}"
             viewer.styles.display = "block"
         if self._thread_id == threading.get_ident():
             _render()

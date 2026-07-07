@@ -1,10 +1,9 @@
-import { Link } from 'react-router-dom';
+import { GlyphButton } from './GlyphButton';
 
 export type ArticleHeroProps = {
   eyebrow?: string;
   title: string;
   lede: string;
-  /** In-app target for the CTA (React Router). Defaults to the Skills band filter. */
   ctaHref?: string;
   ctaLabel?: string;
   /** Render the decorative cosmic aperture + orbiting moons (hero-only crown). */
@@ -15,7 +14,7 @@ export function ArticleHero({
   eyebrow = 'The origin feed for creative engineering doctrine',
   title,
   lede,
-  ctaHref = '/blog?kind=skill',
+  ctaHref = '/skills',
   ctaLabel = 'Enter the Skills Index',
   aperture = false,
 }: ArticleHeroProps) {
@@ -42,10 +41,7 @@ export function ArticleHero({
       <h1 className="cz-hero__title">{title}</h1>
       <p className="cz-hero__lede">{lede}</p>
       <p>
-        <Link className="cz-button" data-variant="solid" to={ctaHref}>
-          <span aria-hidden="true">◇</span>
-          {ctaLabel}
-        </Link>
+        <GlyphButton href={ctaHref}>{ctaLabel}</GlyphButton>
       </p>
     </section>
   );

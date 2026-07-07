@@ -25,7 +25,6 @@ import {
   PixelBrainPage,
   CareerPage,
   WandPage,
-  WandGraphPage,
   DivWandPage,
   QbitWorldPage,
   PhotonicBridgeLab,
@@ -37,10 +36,8 @@ import {
   VisualizerReleasePage,
   OraclePage,
   ScholoTimeLabPage,
-  TileForgeLab,
   PAGE_COMPONENTS,
 } from "./lib/routes.js";
-import VideoForgePage from "./pages/VideoForge/VideoForgePage.tsx";
 
 import { AdminRoute } from "./components/AdminRoute.jsx";
 
@@ -52,16 +49,26 @@ import { AdminRoute } from "./components/AdminRoute.jsx";
 // /combat-godot-spike during `npm run dev`.
 let devSpikeRoutes = [];
 if (import.meta.env.DEV) {
+  // Godot WASM spike retained as the documented fallback path. The Phaser 4 spike was
+  // retired once its verdict (uplift = go) folded into the real ResonanceScene on 2026-06-05.
+  const CombatGodotSpike = React.lazy(() =>
+    import("./pages/CombatGodotSpike/CombatGodotSpike.jsx")
+  );
   const ImmuneHarness = React.lazy(() =>
     import("./pages/_dev/ImmuneHarness.jsx")
   );
   const LexicalHarness = React.lazy(() =>
     import("./pages/_dev/LexicalHarness.jsx")
   );
-  const GrimMonstersHarness = React.lazy(() =>
-    import("./pages/_dev/GrimMonstersHarness.jsx")
-  );
   devSpikeRoutes = [
+    {
+      path: "combat-godot-spike",
+      element: (
+        <React.Suspense fallback={null}>
+          <CombatGodotSpike />
+        </React.Suspense>
+      ),
+    },
     {
       // TrueSight Immune Probe harness (SPATIAL-IMMUNE-DIAGNOSTICS.md).
       path: "__immune/truesight",
@@ -77,14 +84,6 @@ if (import.meta.env.DEV) {
       element: (
         <React.Suspense fallback={null}>
           <LexicalHarness />
-        </React.Suspense>
-      ),
-    },
-    {
-      path: "__grim/monsters",
-      element: (
-        <React.Suspense fallback={null}>
-          <GrimMonstersHarness />
         </React.Suspense>
       ),
     },
@@ -113,22 +112,19 @@ const router = createBrowserRouter([
           { path: "pixelbrain", element: <AdminRoute><PixelBrainPage /></AdminRoute> },
           { path: "career", element: <AdminRoute><CareerPage /></AdminRoute> },
           { path: "wand", element: <AdminRoute><WandPage /></AdminRoute> },
-          { path: "wand/graph", element: <AdminRoute><WandGraphPage /></AdminRoute> },
           { path: "div-wand", element: <AdminRoute><DivWandPage /></AdminRoute> },
           { path: "qbit-world", element: <AdminRoute><QbitWorldPage /></AdminRoute> },
           { path: "internal/photonic-bridge", element: <AdminRoute><PhotonicBridgeLab /></AdminRoute> },
           { path: "internal/studio", element: <AdminRoute><StudioUpload /></AdminRoute> },
           { path: "internal/pixel-lotus/actor-forge", element: <AdminRoute><ActorForgeLab /></AdminRoute> },
           { path: "internal/pixel-lotus/iso-map-sandbox", element: <AdminRoute><IsoMapSandbox /></AdminRoute> },
-          { path: "internal/pixel-lotus/tile-forge", element: <AdminRoute><TileForgeLab /></AdminRoute> },
           { path: "internal/time-lab", element: <AdminRoute><ScholoTimeLabPage /></AdminRoute> },
           { path: "blog", element: <BlogIndexPage /> },
           { path: "blog/:slug", element: <BlogArticlePage /> },
           { path: "visualiser", element: <BytecodeVisualiserPage /> },
           { path: "card", element: <ResonanceCardPage /> },
-          { path: "video-forge", element: <VideoForgePage /> },
           { path: "release", element: <VisualizerReleasePage /> },
-          { path: "oracle", element: <AdminRoute><OraclePage /></AdminRoute> },
+          { path: "oracle", element: <OraclePage /> },
         ],
       },
     ],

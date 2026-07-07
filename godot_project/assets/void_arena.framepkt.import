@@ -1,0 +1,15 @@
+[remap]
+
+importer="scholomance.frame_timeline.godot"
+type="PackedScene"
+uid="uid://bmxhy7ykim8vh"
+path="res://.godot/imported/void_arena.framepkt-26b51a9d07bb50387475de06db445ff5.tscn"
+
+[deps]
+
+source_file="res://assets/void_arena.framepkt"
+dest_files=["res://.godot/imported/void_arena.framepkt-26b51a9d07bb50387475de06db445ff5.tscn"]
+
+[params]
+
+strict_validation=false

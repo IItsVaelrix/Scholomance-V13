@@ -55,11 +55,12 @@ export default function TruesightPlugin({ analyzedDocument: _analyzedDocument, i
     // tests/qa/features/charStart-convention.test.jsx as the regression guard.
     const lookupTokenData = (node, text) => {
       const { analyzedWordsByCharStart: liveByCharStart, analyzedWordsByIdentity: liveByIdentity } = inputsRef.current;
-      // Pass the live Maps straight through. resolveTokenDataAtPosition reads
-      // them via .get(), so we no longer rebuild the entire map into an object
-      // (Object.fromEntries) on every single word lookup -- that was O(N) per
-      // word and O(N²) across a full recolor when the gate arrives.
-      return resolveTokenDataAtPosition(node, text, liveByCharStart, liveByIdentity);
+      return resolveTokenDataAtPosition(
+        node,
+        text,
+        liveByCharStart instanceof Map ? Object.fromEntries(liveByCharStart) : liveByCharStart,
+        liveByIdentity instanceof Map ? Object.fromEntries(liveByIdentity) : liveByIdentity
+      );
     };
 
     const transformListener = (textNode) => {
@@ -83,21 +84,20 @@ export default function TruesightPlugin({ analyzedDocument: _analyzedDocument, i
 
           const tokenData = lookupTokenData(textNode, textContent);
 
+          const wordInfo = wordTruesight(textContent);
+          const tokenInfo = tokenTruesight(tokenData || { token: textContent }, textContent);
+
           const isGated = resonantCharStarts instanceof Map;
           const tier = isGated ? (resonantCharStarts.get(globalCharStart) || null) : 'rhyme';
 
-          // Compute only the analysis we actually use. wordTruesight and
-          // tokenTruesight each run a G2P pass; the previous code ran BOTH per
-          // word and discarded one. Gated+resonant uses the token analysis;
-          // every other case uses the word analysis.
-          let truesight;
-          let shouldColor;
+          let truesight = wordInfo;
+          let shouldColor = false;
           if (isGated) {
             shouldColor = tier !== null;
-            truesight = shouldColor ? tokenTruesight(tokenData || { token: textContent }, textContent) : wordTruesight(textContent);
+            truesight = shouldColor ? tokenInfo : wordInfo;
           } else {
-            truesight = wordTruesight(textContent);
-            shouldColor = Boolean(truesight);
+            truesight = wordInfo;
+            shouldColor = Boolean(wordInfo);
           }
 
           const color = (!isQuarantined && shouldColor && truesight?.color) ? truesight.color : null;
@@ -150,18 +150,20 @@ export default function TruesightPlugin({ analyzedDocument: _analyzedDocument, i
 
       const tokenData = lookupTokenData(targetNode, word);
 
+      const wordInfo = wordTruesight(word);
+      const tokenInfo = tokenTruesight(tokenData || { token: word }, word);
+
       const isGated = resonantCharStarts instanceof Map;
       const tier = isGated ? (resonantCharStarts.get(globalCharStart) || null) : 'rhyme';
 
-      // Compute only the analysis we actually use (see the active branch).
-      let truesight;
-      let shouldColor;
+      let truesight = wordInfo;
+      let shouldColor = false;
       if (isGated) {
         shouldColor = tier !== null;
-        truesight = shouldColor ? tokenTruesight(tokenData || { token: word }, word) : wordTruesight(word);
+        truesight = shouldColor ? tokenInfo : wordInfo;
       } else {
-        truesight = wordTruesight(word);
-        shouldColor = Boolean(truesight);
+        truesight = wordInfo;
+        shouldColor = Boolean(wordInfo);
       }
 
       const color = (!isQuarantined && shouldColor && truesight?.color) ? truesight.color : null;

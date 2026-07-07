@@ -580,86 +580,6 @@ export const MATERIAL_PALETTES = Object.freeze({
     }),
     rules: Object.freeze({ preserveAlpha: true, preserveShape: true, forceColdHue: true }),
   }),
-  voidsoil: Object.freeze({
-    id: 'voidsoil',
-    emissionFactor: DEFAULT_EMISSION_FACTOR,
-    label: 'Void Soil',
-    category: MATERIAL_CATEGORIES.ORGANIC,
-    anchors: Object.freeze({
-      void: '#03040A', shadow: '#070B1A', deep: '#10163A', body: '#17245C', frost: '#32227A', spectral: '#5146C8', whiteCore: '#20D8FF'
-    }),
-    rules: Object.freeze({ preserveAlpha: true, preserveShape: true }),
-  }),
-  voidbark: Object.freeze({
-    id: 'voidbark',
-    emissionFactor: DEFAULT_EMISSION_FACTOR,
-    label: 'Void Bark',
-    category: MATERIAL_CATEGORIES.ORGANIC,
-    anchors: Object.freeze({
-      void: '#03040A', shadow: '#090711', deep: '#070B1A', body: '#10163A', frost: '#17245C', spectral: '#282060', whiteCore: '#5146C8'
-    }),
-    rules: Object.freeze({ preserveAlpha: true, preserveShape: true }),
-  }),
-  voidpine: Object.freeze({
-    id: 'voidpine',
-    emissionFactor: DEFAULT_EMISSION_FACTOR,
-    label: 'Void Pine',
-    category: MATERIAL_CATEGORIES.ORGANIC,
-    anchors: Object.freeze({
-      void: '#03040A', shadow: '#070B1A', deep: '#10163A', body: '#17245C', frost: '#32227A', spectral: '#5146C8', whiteCore: '#0C7896'
-    }),
-    rules: Object.freeze({ preserveAlpha: true, preserveShape: true }),
-  }),
-  astralmoss: Object.freeze({
-    id: 'astralmoss',
-    emissionFactor: DEFAULT_EMISSION_FACTOR,
-    label: 'Astral Moss',
-    category: MATERIAL_CATEGORIES.ORGANIC,
-    anchors: Object.freeze({
-      void: '#03040A', shadow: '#070B1A', deep: '#10163A', body: '#2B6CFF', frost: '#20D8FF', spectral: '#0C7896', whiteCore: '#48F2FF'
-    }),
-    rules: Object.freeze({ preserveAlpha: true, preserveShape: true }),
-  }),
-  corrupted_snow: Object.freeze({
-    id: 'corrupted_snow',
-    emissionFactor: DEFAULT_EMISSION_FACTOR,
-    label: 'Corrupted Snow',
-    category: MATERIAL_CATEGORIES.ORGANIC,
-    anchors: Object.freeze({
-      void: '#03040A', shadow: '#070B1A', deep: '#10163A', body: '#566083', frost: '#BBC7E8', spectral: '#20D8FF', whiteCore: '#48F2FF'
-    }),
-    rules: Object.freeze({ preserveAlpha: true, preserveShape: true }),
-  }),
-  rune_glow: Object.freeze({
-    id: 'rune_glow',
-    emissionFactor: DEFAULT_EMISSION_FACTOR,
-    label: 'Rune Glow',
-    category: MATERIAL_CATEGORIES.FLAME,
-    anchors: Object.freeze({
-      void: '#03040A', shadow: '#070B1A', deep: '#10163A', body: '#2B6CFF', frost: '#48F2FF', spectral: '#20D8FF', whiteCore: '#0C7896'
-    }),
-    rules: Object.freeze({ preserveAlpha: true, preserveShape: true }),
-  }),
-  abyss: Object.freeze({
-    id: 'abyss',
-    emissionFactor: DEFAULT_EMISSION_FACTOR,
-    label: 'Abyss',
-    category: MATERIAL_CATEGORIES.ORGANIC,
-    anchors: Object.freeze({
-      void: '#000000', shadow: '#03040A', deep: '#070B1A', body: '#090711', frost: '#10163A', spectral: '#17245C', whiteCore: '#282060'
-    }),
-    rules: Object.freeze({ preserveAlpha: true, preserveShape: true, deepenLowValuesToBlack: true }),
-  }),
-  voidcrystal: Object.freeze({
-    id: 'voidcrystal',
-    emissionFactor: DEFAULT_EMISSION_FACTOR,
-    label: 'Void Crystal',
-    category: MATERIAL_CATEGORIES.GEMSTONE,
-    anchors: Object.freeze({
-      void: '#03040A', shadow: '#070B1A', deep: '#10163A', body: '#190B2E', frost: '#32227A', spectral: '#5146C8', whiteCore: '#2B6CFF'
-    }),
-    rules: Object.freeze({ preserveAlpha: true, preserveShape: true }),
-  }),
   // ── Character Creator Materials ─────────────────────────────────────
   skin_light: Object.freeze({
     id: 'skin_light',
@@ -925,22 +845,6 @@ export const MATERIAL_PALETTES = Object.freeze({
     }),
     rules: Object.freeze({ preserveAlpha: true, preserveShape: true, boostHighlightsToWhite: true }),
   }),
-  snow: Object.freeze({
-    id: 'snow',
-    emissionFactor: DEFAULT_EMISSION_FACTOR,
-    label: 'Snow',
-    category: MATERIAL_CATEGORIES.ORGANIC,
-    anchors: Object.freeze({
-      void: '#5F728F',
-      shadow: '#8094B2',
-      deep: '#A8B8D0',
-      body: '#C7D8EA',
-      frost: '#E3EEF8',
-      spectral: '#F5FBFF',
-      whiteCore: '#FFFFFF',
-    }),
-    rules: Object.freeze({ preserveAlpha: true, preserveShape: true, boostHighlightsToWhite: true }),
-  }),
 });
 
 /**
@@ -1011,7 +915,6 @@ export const MATERIAL_SHADER_INDEX = Object.freeze({
   trim_comet_gold: 57,
   neon_mint_signal: 58,
   slime_gel: 59,
-  snow: 60,
 });
 
 export const MATERIAL_OPTIONS = Object.freeze(

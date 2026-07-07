@@ -22,7 +22,6 @@ memory = SessionMemory(max_turns=6)
 class ChatRequest(BaseModel):
     session_id: str
     message: str
-    speculativeEnvelope: dict = None
 
 class ChatResponse(BaseModel):
     response: str
@@ -64,7 +63,7 @@ def chat(req: ChatRequest):
         bot_response = chatbot.generate_response(history)
     
     # Retrieve Oracle context and attach it to the final output
-    oracle_context = get_oracle_context(req.message, req.speculativeEnvelope)
+    oracle_context = get_oracle_context(req.message)
     if oracle_context:
         # Prepend the refined literary quote so the Oracle speaks first
         bot_response = f"*{oracle_context}*\n\n{bot_response}"

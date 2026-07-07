@@ -96,14 +96,6 @@ Every debug operation or QA audit must include:
 
 *Thresholds are non-negotiable. Flag any code that attempts to bypass the Stasis Field.*
 
-### Pipeline Discipline (PixelBrain & Wand)
-1. **Never Patch the Render:** If a Scholomance rendering engine or foundry (like `forgeCharacterFromWandVector` or `compileSCDL`) returns empty raster data or drops fills, you MUST STOP and debug the registry alignment. You are strictly forbidden from writing fallback visualization scripts (e.g., raw SVG string builders) to force an output.
-2. **Foundry Segregation:** Prop and Environment Wand proposals MUST be routed to `item-foundry.js` or `compileSCDL`. Never pass non-anatomical props to the Character foundry (`forgeCharacterFromWandVector`), as the material mappings will fatally drop the data.
-3. **Asset Export Paths:** All generated PixelBrain or game assets (e.g., sprites, .aseprite files, morphed images, output from generator scripts) MUST be exported strictly to the `docs/references/` folder. Do not clutter the root, `.tmp`, or source directories with generated visual assets.
-4. **Aseprite Import Bridging:** When the user supplies a hand-painted `.aseprite` file for PixelBrain ingestion, you MUST use `importAsepriteBinaryToFoundryAsset(readFileSync('file.aseprite'))` from `foundry-aseprite-bridge.js`. Do not request the user to convert to PNG or look for external CLI tools.
-5. **Organic Shape Generation:** When procedurally generating organic shapes or botanical elements, you MUST use PixelBrain's built-in harmonic functions (e.g., `FORMULA_TYPES.FIBONACCI`, `wandSeed: 'fibonacci'`, `GRID_TYPES.FIBONACCI` found in `template-grid-engine.js` and `wand-seed-lift.js`) rather than manually stacking blocky primitives like `circle` or `rect`.
-6. **Bio-Digital Synthesis (SCDNA Transport):** Do not repurpose diagnostic channels (like `BytecodeHealth`) to transport massive data payloads (e.g., megabytes of pixel coordinate arrays). The diagnostic channel is strictly a verified manifest. The JS engine must store deterministic SCDNA packet payloads in a dedicated registry (`pixelbrain/imports/`), and the diagnostic channel must only announce the packet's readiness with an SCD64 checksum and reference (`PB-OK-v1-SCDNA-GENE-READY` + `payloadRef`). The LLM is responsible for fetching these gene packets via MCP (`fetch_scdna_gene_packet`) to perform semantic SCDL synthesis, allowing the compiler to stand as the final SCD64 checksum validator.
-
 ## Test Coverage Targets (Your Enforcement Charter)
 
 | Layer | Target | Tool |
@@ -224,20 +216,3 @@ If HOLD: [exact condition that must be met before merge]
 - **Codex context**: `CODEX.md`
 - **Claude context**: `CLAUDE.md`
 - **Unity context**: `UNITY.md`
-
-## SCDNA Gene Injection (Proactive Context)
-
-Use the SCDNA system for dynamic, intent-matched rules and directives.
-
-- Run the injector for relevant prompts: `python -m vaelrix_forcefield.scdna.inject --prompt "..." --agent gemini`
-- Genes are stored in `steamdeck_brain/vaelrix_forcefield/scdna/compiler.json` (merged with defaults in registry.py).
-- Relevant domains for you: architecture, code, pixel, risk, determinism.
-- The hook `scripts/scdna-gene-inject.sh` (and variants) can be wired into your environment for automatic injection on prompt submit.
-- Always incorporate active genes into your reasoning, especially for propagation, formulas, PixelBrain, and architectural decisions.
-- Example gene (WAND_CHEMICAL_STROKE_PROPAGATION): Use chemical/rule-based unfolding for stroke formulas rather than batch sampling.
-
-This ensures consistent, evolvable "DNA" across agents without manual repetition. Genes provide imperatives, checks, and forbidden drifts.
-
-### Asset Generation & Iteration (SCDL)
-* **Authoring Guide Mandate:** Whenever you are tasked with generating or modifying a `.scdl` file, you MUST first read and strictly adhere to the guidelines in `docs/scholomance-encyclopedia/Scholomance White Papers/SCDL_AUTHORING_GUIDE.md`. Do not rely on assumptions about the SCDL grammar or syntax.
-*When compiling `.scdl` (Scholomance DNA Language) files using `scdl.cli.js` (e.g., `node codex/core/pixelbrain/scdl/scdl.cli.js compile`), **always** direct the output image artifacts to `docs/references/` using the `--out-dir docs/references/` flag, rather than directly outputting to `public/assets/`. You may later copy or rename the approved final iteration into `public/assets/` if explicitly requested to finalize the item for the engine.*

@@ -34,6 +34,7 @@
  * @bytecode SCHOL-TRUESIGHT-CHARSTART-AUTHORITY
  */
 
+const PARAGRAPH_TYPE = 'paragraph';
 const ROOT_TYPE = 'root';
 
 /**
@@ -52,30 +53,20 @@ export function computeCharStartFromLexical(node) {
   let cursor = node;
 
   // Walk from the node up to the root. At each level, sum the text of every
-  // previous sibling. Add 1 per previous TOP-LEVEL block sibling for the
-  // joining newline.
-  //
-  // The joining newline is owned by the root-children level, NOT by the
-  // 'paragraph' type. `$getScrollText()` serializes as
-  // `root.getChildren().map(c => c.getTextContent()).join('\n')`, so the ONLY
-  // newlines are between direct children of the root, regardless of their
-  // type (paragraph, heading, or any future block). Keying the newline on
-  // `type === 'paragraph'` silently undercounted by one per non-paragraph
-  // block and drifted the gate; keying it on "this level's parent is the
-  // root" matches the serializer exactly. See the non-paragraph-block guard
-  // in tests/qa/features/charStart-convention.test.jsx.
+  // previous sibling and add 1 per previous paragraph sibling to account for
+  // the joining newline.
   while (cursor && cursor.getType && cursor.getType() !== ROOT_TYPE) {
-    const parent = cursor.getParent ? cursor.getParent() : null;
-    const isRootChildLevel = !!(parent && parent.getType && parent.getType() === ROOT_TYPE);
     let previousSibling = cursor.getPreviousSibling ? cursor.getPreviousSibling() : null;
     while (previousSibling) {
-      offset += textLengthOf(previousSibling);
-      if (isRootChildLevel) {
-        offset += 1; // joining newline between top-level blocks
+      const siblingType = previousSibling.getType ? previousSibling.getType() : null;
+      const siblingTextLength = textLengthOf(previousSibling);
+      offset += siblingTextLength;
+      if (siblingType === PARAGRAPH_TYPE) {
+        offset += 1; // joining newline
       }
       previousSibling = previousSibling.getPreviousSibling ? previousSibling.getPreviousSibling() : null;
     }
-    cursor = parent;
+    cursor = cursor.getParent ? cursor.getParent() : null;
   }
 
   return offset;
@@ -94,51 +85,27 @@ export function computeCharStartFromLexical(node) {
  * explicitly (e.g. fall back to the live `wordTruesight` analysis, which
  * does NOT inherit the position of a different occurrence of the same text).
  *
- * Both upstream containers may be a `Map` OR a plain object. Maps are read via
- * `.get(key)` and objects via bracket access — so the caller can pass the live
- * `Map` straight through WITHOUT materializing it into an object on every word
- * lookup (the previous `Object.fromEntries(map)` per-call rebuild was O(N) per
- * word → O(N²) per full recolor on the gate-arrival hot path).
- *
  * @param {object} node - The Lexical text-bearing node.
  * @param {string} textContent - The text content of the node (used for identity).
- * @param {Map|object|null} analyzedWordsByCharStart - Position-keyed upstream container.
- * @param {Map|object|null} analyzedWordsByIdentity - Identity-keyed upstream container.
+ * @param {object|null} analyzedWordsByCharStart - Position-keyed upstream map.
+ * @param {object|null} analyzedWordsByIdentity - Identity-keyed upstream map.
  * @returns {object|null} The per-position analysis, or `null` if no match.
  */
 export function resolveTokenDataAtPosition(node, textContent, analyzedWordsByCharStart, analyzedWordsByIdentity) {
   const charStart = computeCharStartFromLexical(node);
 
-  const byCharStart = lookupKey(analyzedWordsByCharStart, charStart);
-  if (byCharStart != null) return byCharStart;
+  if (analyzedWordsByCharStart && analyzedWordsByCharStart[charStart] != null) {
+    return analyzedWordsByCharStart[charStart];
+  }
 
-  const byIdentity = lookupKey(analyzedWordsByIdentity, buildIdentityKey(textContent, charStart));
-  if (byIdentity != null) return byIdentity;
+  if (analyzedWordsByIdentity) {
+    const identity = buildIdentityKey(textContent, charStart);
+    if (analyzedWordsByIdentity[identity] != null) {
+      return analyzedWordsByIdentity[identity];
+    }
+  }
 
   return null;
-}
-
-/**
- * Read `key` from a container that may be a `Map` or a plain object. Returns
- * `undefined` for a missing key or a nullish container.
- *
- * @param {Map|object|null|undefined} container
- * @param {string|number} key
- * @returns {*}
- */
-function lookupKey(container, key) {
-  if (!container) return undefined;
-  if (container instanceof Map) {
-    // Maps are key-type-strict; the previous Object.fromEntries path coerced
-    // numeric charStart keys to strings and so matched either way. Preserve
-    // that forgiveness: try the raw (numeric) key first, then its string form,
-    // so a Map keyed by either type still resolves.
-    const direct = container.get(key);
-    if (direct !== undefined) return direct;
-    if (typeof key === 'number') return container.get(String(key));
-    return direct;
-  }
-  return container[key];
 }
 
 /**
@@ -165,15 +132,6 @@ export function buildIdentityKey(text, charStart) {
  */
 function textLengthOf(node) {
   if (!node) return 0;
-  // Fast path: Lexical TextNodes expose getTextContentSize(), which returns the
-  // length WITHOUT allocating the concatenated string. Most siblings on the hot
-  // walk are leaves, so preferring this avoids building (and discarding) a fresh
-  // string for every previous sibling on every word lookup. Element nodes that
-  // lack it fall back to getTextContent().length.
-  if (typeof node.getTextContentSize === 'function') {
-    const size = node.getTextContentSize();
-    if (typeof size === 'number' && Number.isFinite(size)) return size;
-  }
   if (typeof node.getTextContent === 'function') {
     const text = node.getTextContent();
     return typeof text === 'string' ? text.length : 0;

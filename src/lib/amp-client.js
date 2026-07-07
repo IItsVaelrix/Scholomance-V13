@@ -10,8 +10,7 @@
  * @see ARCH_CONTRACT_OVERLAY_INTEGRITY.md - Layer separation requirements
  */
 
-import { runAnimationAmp, getActiveAnimation as getActiveAnimationCore, getAllActiveAnimations as getAllActiveAnimationsCore, clearActiveAnimation as clearActiveAnimationCore, shutdownAnimationAmp } from '../../codex/core/animation/amp/runAnimationAmp.ts';
-import { processorBridge } from '../../codex/core/shared/processor-bridge.js';
+import { attachAnimationPhotonicRoute } from './animation-photonic.adapter.js';
 
 /**
  * @typedef {Object} AmpStatus
@@ -22,28 +21,30 @@ import { processorBridge } from '../../codex/core/shared/processor-bridge.js';
 
 /**
  * Get the current AMP status
- * @returns {Promise<AmpStatus>}
+ * @returns {AmpStatus}
  */
 export async function getAmpStatus() {
-  // Mock status or import getAmpStatus if exported
-  return { isRunning: true, activeCount: getAllActiveAnimationsCore().size, config: {} };
+  const { getAmpStatus: getStatus } = await import('../../codex/core/animation/amp/runAnimationAmp.ts');
+  return getStatus();
 }
 
 /**
  * Get all active animations
- * @returns {Promise<Map<string, any>>}
+ * @returns {Map<string, any>}
  */
 export async function getAllActiveAnimations() {
-  return getAllActiveAnimationsCore();
+  const { getAllActiveAnimations: getAll } = await import('../../codex/core/animation/amp/runAnimationAmp.ts');
+  return getAll();
 }
 
 /**
  * Get a single active animation by targetId
  * @param {string} targetId
- * @returns {Promise<any | undefined>}
+ * @returns {any | undefined}
  */
 export async function getActiveAnimation(targetId) {
-  return getActiveAnimationCore(targetId);
+  const { getActiveAnimation: getActive } = await import('../../codex/core/animation/amp/runAnimationAmp.ts');
+  return getActive(targetId);
 }
 
 /**
@@ -52,19 +53,9 @@ export async function getActiveAnimation(targetId) {
  * @returns {Promise<any>}
  */
 export async function submitAmpIntent(intent) {
-  // Lighting cue: happens instantly on the Main Thread for DOM mutations
+  const { runAnimationAmp } = await import('../../codex/core/animation/amp/runAnimationAmp.ts');
   const output = await runAnimationAmp(intent);
-  
-  // Heavy composition: banished to the WebWorker to prevent micro-stutters
-  if (output && output.success) {
-    try {
-      return await processorBridge.execute('amp.attachPhotonicRoute', output);
-    } catch (e) {
-      console.warn('[AnimationAMP] Failed to attach photonic route via worker, falling back', e);
-      return output;
-    }
-  }
-  return output;
+  return attachAnimationPhotonicRoute(output);
 }
 
 /**
@@ -74,7 +65,8 @@ export async function submitAmpIntent(intent) {
  * @param {string} targetId
  */
 export async function clearActiveAnimation(targetId) {
-  clearActiveAnimationCore(targetId);
+  const { clearActiveAnimation: clearActive } = await import('../../codex/core/animation/amp/runAnimationAmp.ts');
+  return clearActive(targetId);
 }
 
 /**

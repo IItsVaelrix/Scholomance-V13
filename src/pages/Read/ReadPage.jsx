@@ -684,7 +684,6 @@ export default function ReadPage() {
       return;
     }
 
-
     const pos = resolveTooltipPosition(activation.anchorRect);
     const analysis = buildTooltipAnalysis(activation);
 
@@ -766,7 +765,6 @@ export default function ReadPage() {
     if (!isPredictive) {
       setTooltipState({ token: null, position: { x: 0, y: 0 }, localAnalysis: null, pinned: false });
       setIsWordSheetOpen(false);
-
     }
   }, [isPredictive]);
 

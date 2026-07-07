@@ -4,7 +4,6 @@ import { verseIRMicroprocessors } from "../../codex/core/microprocessors/index.j
 import { parseBooleanEnvFlag } from "./useCODExPipeline.jsx";
 import { ScholomanceDictionaryAPI } from "../lib/scholomanceDictionary.api.js";
 import { shouldPreserveArtifactOnError } from "../lib/truesight/synthesisErrorPolicy.js";
-import { buildIdentityKey } from "../lib/lexical/charStart.js";
 
 const USE_SERVER_ANALYSIS = parseBooleanEnvFlag(import.meta.env.VITE_USE_SERVER_PANEL_ANALYSIS, true);
 
@@ -55,10 +54,7 @@ export function useVerseSynthesis(content, options = {}) {
       let result;
 
       if (USE_SERVER_ANALYSIS && ScholomanceDictionaryAPI.isEnabled()) {
-        const response = await ScholomanceDictionaryAPI.analyzePanels(text, {
-          nluMode: 'direct',
-          analysisProfile: 'editor',
-        });
+        const response = await ScholomanceDictionaryAPI.analyzePanels(text, { nluMode: 'generate' });
         if (response?.data) {
           result = response.data;
           // Hydrate Maps which are lost during JSON serialization
@@ -70,14 +66,6 @@ export function useVerseSynthesis(content, options = {}) {
             result.analysis.wordAnalyses.forEach(profile => {
               const identity = `${profile.lineIndex}:${profile.wordIndex}:${profile.charStart}`;
               result.tokenByIdentity.set(identity, profile);
-              // Also index by the position-bound text identity the Lexical
-              // resolver queries (buildIdentityKey(word, charStart)). The colon
-              // key above serves index-based consumers; the editor's identity
-              // fallback carries no line/word indices, so without this dash key
-              // it could never match a colon-keyed entry (dead fallback).
-              if (profile.word) {
-                result.tokenByIdentity.set(buildIdentityKey(profile.word, profile.charStart), profile);
-              }
               result.tokenByCharStart.set(profile.charStart, profile);
               if (!result.tokenByNormalizedWord.has(profile.normalizedWord)) {
                 result.tokenByNormalizedWord.set(profile.normalizedWord, profile);

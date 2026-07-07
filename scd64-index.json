@@ -310,17 +310,15 @@
         136,
         135,
         120,
-        120,
         119,
         150,
         134,
-        136,
+        120,
         104,
         150,
         115
       ],
       "norm": 0.9999999980146622
-      "norm": 0.9999999962673974
     },
     "scdFull": {
       "schema": "SCD64_DIAGNOSTIC",
@@ -419,13 +417,12 @@
               "legacyMatches": 0,
               "fixMatches": 1,
               "lines": 1750
-              "lines": 1752
             },
             {
               "file": "src/lib/truesight/compiler/compileVerseToIR.js",
               "legacyMatches": 0,
               "fixMatches": 0,
-              "lines": 5
+              "lines": 853
             },
             {
               "file": "codex/core/phonology/phoneme.engine.js",
@@ -466,13 +463,12 @@
               "legacyMatches": 0,
               "fixMatches": 1,
               "lines": 1750
-              "lines": 1752
             },
             {
               "file": "src/lib/truesight/compiler/compileVerseToIR.js",
               "legacyMatches": 0,
               "fixMatches": 0,
-              "lines": 5
+              "lines": 853
             },
             {
               "file": "codex/core/phonology/phoneme.engine.js",
@@ -509,13 +505,12 @@
               "legacyMatches": 0,
               "fixMatches": 1,
               "lines": 1750
-              "lines": 1752
             },
             {
               "file": "src/lib/truesight/compiler/compileVerseToIR.js",
               "legacyMatches": 0,
               "fixMatches": 0,
-              "lines": 5
+              "lines": 853
             },
             {
               "file": "codex/core/phonology/phoneme.engine.js",
@@ -688,7 +683,6 @@
       "source": "generateSCD64"
     },
     "timestamp": 1783431061805
-    "timestamp": 1783188241822
   },
   "03030742C01B6AC16D9C5B00CF603CFBD906A4D5F91679A661F84A3B19C5CB5A": {
     "quantized": {
@@ -972,7 +966,6 @@
       "source": "generateSCD64"
     },
     "timestamp": 1783431060945
-    "timestamp": 1783188240611
   },
   "01861DF4C31AC92C24D4754DD1043D244908E4B3317B90735048A13A0AB2B33C": {
     "quantized": {
@@ -1281,6 +1274,5 @@
       "source": "generateSCD64"
     },
     "timestamp": 1783431061814
-    "timestamp": 1783188241835
   }
 }

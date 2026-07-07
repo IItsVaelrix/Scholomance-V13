@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 /**
  * SCHOLOMANCE FAIRLY ODD WAND - INTERACTIVE UX TEST-DRIVE
  * 
@@ -7,19 +6,8 @@ import { Link } from "react-router-dom";
  *              evaluation, role-dispatched rendering, and robust fail-closed validation.
  */
 
-import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-// Lazy load the graph editor to avoid loading Rete/React plugin modules until needed.
-// This helps prevent duplicate React copies and invalid hook calls.
-const ScholomanceGraphEditor = lazy(() => 
-  import('../../features/graph-editor').then(module => ({ 
-    default: module.ScholomanceGraphEditor 
-  }))
-);
-
-// Keep the packet creator as it doesn't pull heavy React deps
-import { createExampleWandMathPacket } from '../../features/graph-editor';
 import {
   Sparkles,
   Terminal,
@@ -48,55 +36,17 @@ import {
 import { generateCatalogId } from '../../lib/catalogId.js';
 import { roleDispatcher } from '../../ui/features/mysticHolistics/hero/roleDispatcher';
 import { registerBuiltInDrawers } from '../../ui/features/mysticHolistics/hero/roleDrawers';
+import { useGodotExportFlag } from '../../hooks/useGodotExportFlag.js';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js';
+import { downloadTextFile } from '../../components/GodotExportButton/downloadTextFile.js';
+import { buildWandGodotExport } from '../../lib/godot-export/wandGodotExport.js';
 import { routeRetinaPacketToPhotonicBridge } from '../../lib/photonic-retina/index.js';
-import { deriveWandFillBytecode, forgeCharacterFromWandVector } from '../../lib/pixelbrain.adapter.js';
+import { deriveWandFillBytecode } from '../../lib/pixelbrain.adapter.js';
 import { publishWandFill } from '../../lib/wandPixelbrainBridge.js';
 
 import './WandPage.css';
 
 // ── INITIAL PRESETS ──────────────────────────────────────────────────────────
-
-const STROKE_FORMULA_PRESET = {
-  rationale: "Mathematical stroke simulation: parametric path + pressure math + bleed. Then intelligent propagation.",
-  proposedFormula: {
-    role: "stroke.mathematical",
-    material: "aurora",
-    paletteChannel: 0,
-    seed: 1337,
-    precision: 3,
-    formula: {
-      type: "mathematical_stroke",
-      parameters: {
-        cx: 400, cy: 300, length: 220, angle: -18,
-        baseWidth: 5.5, widthVariation: 0.75, frequency: 2.1,
-        density: 1.0, bleed: 0.38, n: 96
-      }
-    }
-  }
-};
-
-// New: math_expression example for full procedural-to-vector (AST + noise + modifiers)
-const MATH_EXPRESSION_PRESET = {
-  rationale: "General procedural vector math AST: sin/cos + seeded noise + mod for organic vector forms. Direct to vectorPaths + SVG.",
-  proposedFormula: {
-    role: "sigil.procedural",
-    material: "gold",
-    seed: 424242,
-    precision: 3,
-    modifiers: [{ type: 'chaikin', iterations: 1 }],
-    formula: {
-      type: "math_expression",
-      seed: 424242,
-      precision: 3,
-      expression: {
-        op: "add",
-        left: { op: "sin", arg: { op: "mul", left: { value: 3 }, right: { op: "x" } } },
-        right: { op: "noise", arg: { op: "y" } }
-      }
-    }
-  }
-};
 
 const INITIAL_PRESETS = [
   {
@@ -307,175 +257,13 @@ const INITIAL_PRESETS = [
         }
       }
     }
-  },
-  // User's vision realized: pure mathematical stroke formula (no pixel brush)
-  {
-    id: "preset-mathematical-stroke",
-    name: "Sigil Stroke (Math)",
-    description: "Mathematical stroke simulation + automatic propagation",
-    proposal: {
-      rationale: STROKE_FORMULA_PRESET.rationale,
-      proposedFormula: STROKE_FORMULA_PRESET.proposedFormula
-    }
-  },
-  // All 5: Character model via Wand with vectorized art
-  {
-    id: "preset-character-vector-chibi",
-    name: "Vaelrix Chibi (Wand Vector)",
-    description: "Construction-first chibi model: head-dominant silhouette, large eyes, robe, hair, and boots",
-    proposal: {
-      rationale: "Drive a readable chibi from Wand vector construction: large head mass, compact robe body, expressive eyes, and clean hair clumps lowered through PixelBrain.",
-      confidence: 0.98,
-      reviewRequired: false,
-      sourceIntentHash: "vaelrix-chibi-wand-vector-v1",
-      evalSuiteId: "suite-character-wand",
-      proposedFormula: {
-        role: "character.vaelrix.chibi",
-        material: "vaelrix",
-        paletteChannel: 0,
-        formula: {
-          type: "composite",
-          children: [
-            {
-              role: "head",
-              anchor: { x: 0.5, y: 0.28 },
-              size: { w: 0.34, h: 0.38 },
-              material: "skin_light",
-              formula: {
-                type: "edge_trace",
-                unitTracePath: [
-                  { x: 0.5, y: 0.02 }, { x: 0.78, y: 0.08 }, { x: 0.94, y: 0.32 },
-                  { x: 0.88, y: 0.66 }, { x: 0.68, y: 0.92 }, { x: 0.5, y: 0.98 },
-                  { x: 0.32, y: 0.92 }, { x: 0.12, y: 0.66 }, { x: 0.06, y: 0.32 },
-                  { x: 0.22, y: 0.08 }, { x: 0.5, y: 0.02 }
-                ]
-              }
-            },
-            {
-              role: "robe",
-              anchor: { x: 0.5, y: 0.66 },
-              size: { w: 0.28, h: 0.38 },
-              material: "void_cloth",
-              formula: {
-                type: "edge_trace",
-                unitTracePath: [
-                  { x: 0.28, y: 0.04 }, { x: 0.72, y: 0.04 }, { x: 0.92, y: 0.94 },
-                  { x: 0.08, y: 0.94 }, { x: 0.28, y: 0.04 }
-                ]
-              }
-            },
-            {
-              role: "hair",
-              anchor: { x: 0.5, y: 0.31 },
-              size: { w: 0.69, h: 0.5 },
-              material: "hair_void",
-              formula: {
-                type: "edge_trace",
-                unitTracePath: [
-                  { x: 0.14, y: 0.46 }, { x: 0.14, y: 0.17 }, { x: 0.32, y: 0.00 }, { x: 0.50, y: 0.00 },
-                  { x: 0.73, y: 0.00 }, { x: 0.86, y: 0.21 }, { x: 0.86, y: 0.46 }, { x: 0.95, y: 0.50 },
-                  { x: 1.00, y: 0.58 }, { x: 0.95, y: 0.67 }, { x: 0.91, y: 0.75 }, { x: 0.82, y: 0.79 },
-                  { x: 0.77, y: 0.75 }, { x: 0.73, y: 0.92 }, { x: 0.59, y: 1.00 }, { x: 0.50, y: 1.00 },
-                  { x: 0.36, y: 1.00 }, { x: 0.27, y: 0.92 }, { x: 0.23, y: 0.75 }, { x: 0.14, y: 0.79 },
-                  { x: 0.09, y: 0.75 }, { x: 0.05, y: 0.67 }, { x: 0.00, y: 0.58 }, { x: 0.05, y: 0.50 }
-                ]
-              }
-            },
-            {
-              role: "leftEye",
-              anchor: { x: 0.42, y: 0.31 },
-              size: { w: 0.07, h: 0.09 },
-              material: "eye_void_glow",
-              formula: {
-                type: "edge_trace",
-                unitTracePath: [
-                  { x: 0.18, y: 0.08 }, { x: 0.82, y: 0.08 }, { x: 0.92, y: 0.82 },
-                  { x: 0.26, y: 0.92 }, { x: 0.18, y: 0.08 }
-                ]
-              }
-            },
-            {
-              role: "rightEye",
-              anchor: { x: 0.58, y: 0.31 },
-              size: { w: 0.07, h: 0.09 },
-              material: "eye_void_glow",
-              formula: {
-                type: "edge_trace",
-                unitTracePath: [
-                  { x: 0.18, y: 0.08 }, { x: 0.82, y: 0.08 }, { x: 0.92, y: 0.82 },
-                  { x: 0.26, y: 0.92 }, { x: 0.18, y: 0.08 }
-                ]
-              }
-            },
-            {
-              role: "mouth",
-              anchor: { x: 0.5, y: 0.41 },
-              size: { w: 0.05, h: 0.03 },
-              material: "skin_light",
-              formula: {
-                type: "edge_trace",
-                unitTracePath: [
-                  { x: 0.1, y: 0.45 }, { x: 0.5, y: 0.72 }, { x: 0.9, y: 0.45 }
-                ]
-              }
-            },
-            {
-              role: "nose",
-              anchor: { x: 0.5, y: 0.37 },
-              size: { w: 0.04, h: 0.08 },
-              material: "skin_light",
-              formula: {
-                type: "edge_trace",
-                unitTracePath: [
-                  { x: 0.8, y: 0.1 }, { x: 0.2, y: 0.9 }, { x: 0.0, y: 0.9 }
-                ]
-              }
-            },
-            {
-              role: "boots",
-              anchor: { x: 0.5, y: 0.83 },
-              size: { w: 0.22, h: 0.08 },
-              material: "leather_brown",
-              formula: {
-                type: "edge_trace",
-                unitTracePath: [
-                  { x: 0.06, y: 0.18 }, { x: 0.38, y: 0.18 }, { x: 0.38, y: 0.78 },
-                  { x: 0.06, y: 0.78 }, { x: 0.06, y: 0.18 }, { x: 0.62, y: 0.18 },
-                  { x: 0.94, y: 0.18 }, { x: 0.94, y: 0.78 }, { x: 0.62, y: 0.78 },
-                  { x: 0.62, y: 0.18 }
-                ]
-              }
-            }
-          ]
-        }
-      }
-    }
   }
 ];
 
-const REGISTERED_DRAWER_ROLES = [
-  "shrine.window",
-  "shrine.moon",
-  "shrine.cabinet",
-  "shrine.altar",
-  "sigil.capsule",
-  "text.vector",
-  "ink.ballpoint",
-  "stroke.mathematical",
-  "character.vaelrix.chibi",
-  "head",
-  "robe",
-  "hair",
-  "leftEye",
-  "rightEye",
-  "mouth",
-  "nose",
-  "boots",
-];
+const REGISTERED_DRAWER_ROLES = ["shrine.window", "shrine.moon", "shrine.cabinet", "shrine.altar", "sigil.capsule", "text.vector", "ink.ballpoint"];
 
-const clamp01 = (value) => Math.max(0, Math.min(1, Number(value) || 0));
-
-export default function WandPage({ onSendToVideoForge } = {}) {
+export default function WandPage() {
+  const isGodotExportEnabled = useGodotExportFlag();
   const prefersReducedMotion = usePrefersReducedMotion();
   const [proposal, setProposal] = useState(INITIAL_PRESETS[0].proposal);
   const [rawJsonText, setRawJsonText] = useState(JSON.stringify(INITIAL_PRESETS[0].proposal, null, 2));
@@ -490,16 +278,10 @@ export default function WandPage({ onSendToVideoForge } = {}) {
   const [terminalLogs, setTerminalLogs] = useState([]);
   const [quantStats, setQuantStats] = useState(null);
   const [photonicRoute, setPhotonicRoute] = useState(null);
-  const [characterPreview, setCharacterPreview] = useState(null); // for Wand vector character models
 
   // Animation time
   const [time, setTime] = useState(0);
   const [isAnimating, setIsAnimating] = useState(() => !prefersReducedMotion);
-
-  // Rete graph editor state (for visual Wand / math_expression authoring)
-  // IMPORTANT: These must be inside the component, never at module scope.
-  const [showGraphEditor, setShowGraphEditor] = useState(false);
-  const [graphPacket, setGraphPacket] = useState(null);
 
   // Honor reduced-motion: never auto-run the temporal-shift loop when the user
   // has asked the OS to minimize motion (LAW: usePrefersReducedMotion gates motion).
@@ -546,75 +328,6 @@ export default function WandPage({ onSendToVideoForge } = {}) {
       }
     }
   }, [addTerminalLog]);
-
-  // ── STROKE FORMULA + EFFICIENT PROPAGATION (user vision) ────────────────────
-  // The Wand authors the *math* of a stroke (no pixel stroking).
-  // Then we use fast, deterministic "ML-style" propagation:
-  // 1. Efficient param sampling (no heavy training).
-  // 2. TurboQuant for fast coherence features.
-  // 3. Photonic route scoring as perception model to select good propagations.
-  // 4. Automatic symmetry + composite application → full asset "without thinking".
-  const propagateStrokeFormula = useCallback((baseFormula, options = {}) => {
-    const { samples = 7, symmetry = 'vertical' } = options;
-    const baseParams = baseFormula.parameters || baseFormula;
-
-    const propagated = [];
-    const scores = [];
-
-    // Base evaluation
-    const baseCoords = evaluateFormula({ coordinateFormula: baseFormula }, { width: 800, height: 600 }, time);
-    propagated.push(...baseCoords.map(c => ({ ...c, source: 'propagated.base' })));
-
-    // Efficient sampling of variations (the "ML propagation" step - cheap because formula eval is O(n))
-    for (let s = 0; s < samples; s++) {
-      const jitter = (s + 1) / (samples + 1);
-      const varied = {
-        ...baseParams,
-        length: baseParams.length * (0.92 + jitter * 0.16),
-        angle: baseParams.angle + (jitter - 0.5) * 22,
-        widthVariation: clamp01(baseParams.widthVariation + (jitter - 0.5) * 0.25),
-        frequency: baseParams.frequency * (0.85 + jitter * 0.3),
-        bleed: clamp01(baseParams.bleed * (0.7 + jitter * 0.6)),
-      };
-
-      const varFormula = { ...baseFormula, parameters: varied };
-      const varCoords = evaluateFormula({ coordinateFormula: varFormula }, { width: 800, height: 600 }, time + s * 17);
-
-      // "Machine learning" scoring: use photonic route + quant as perception (no real NN, but efficient simulation)
-      let score = 0.6;
-      try {
-        const q = quantizeFlatCoordinates(varCoords.map(c => [c.x, c.y]));
-        score = (q?.stats?.uniqueRatio || 0.7) * 0.6 + (varCoords.length > 40 ? 0.3 : 0.1);
-      } catch {
-        // Quantization is advisory; keep propagation deterministic if telemetry fails.
-      }
-
-      // Auto-propagate: compose with symmetry (existing engine power)
-      if (symmetry && varCoords.length > 0) {
-        const symCoords = varCoords.map(c => {
-          const mx = 800 - c.x; // vertical mirror example
-          return { ...c, x: mx, y: c.y + (s % 2) * 12, source: 'propagated.sym' };
-        });
-        propagated.push(...symCoords);
-      }
-
-      propagated.push(...varCoords.map(c => ({ ...c, source: 'propagated.variation' })));
-      scores.push(score);
-    }
-
-    // Efficient selection of best propagations (the "without thinking" part)
-    const bestIndices = scores
-      .map((sc, i) => ({ sc, i }))
-      .sort((a, b) => b.sc - a.sc)
-      .slice(0, 3)
-      .map(x => x.i);
-
-    const final = propagated.filter((_, idx) => idx < baseCoords.length || bestIndices.includes(Math.floor(idx / (propagated.length / samples))));
-
-    addTerminalLog(`Stroke formula propagated: ${samples} variations sampled, ${final.length} coherent points selected via photonic scoring.`, 'success');
-
-    return final;
-  }, [time, addTerminalLog]);
 
   // ── TURBOQUANT REACTIVE QUANTIZER & PHOTONIC ROUTE ──────────────────────────
   useEffect(() => {
@@ -682,86 +395,6 @@ export default function WandPage({ onSendToVideoForge } = {}) {
 
     return () => clearTimeout(timer);
   }, [coordinates]);
-
-  // ── RECURSIVE EVALUATOR ─────────────────────────────────────────────────────
-  const evaluateProposalCoordinates = useCallback((proposedFormula, canvasSize, t) => {
-    const { role, material = 'aura', formula } = proposedFormula;
-
-    if (formula.type === 'composite') {
-      const coords = [];
-      formula.children.forEach(child => {
-        const subWidth = (child.size?.w ?? 1.0) * canvasSize.width;
-        const subHeight = (child.size?.h ?? 1.0) * canvasSize.height;
-        const childCanvas = { width: subWidth, height: subHeight };
-
-        const rawCoords = evaluateFormula({ coordinateFormula: child.formula }, childCanvas, t);
-
-        const worldAnchorX = child.anchor.x * canvasSize.width;
-        const worldAnchorY = child.anchor.y * canvasSize.height;
-
-        const dx = worldAnchorX - subWidth / 2;
-        const dy = worldAnchorY - subHeight / 2;
-
-        let angleDeg = child.rotation ?? 0;
-        if (child.rotationSpeed) {
-          angleDeg += child.rotationSpeed * (t / 1000);
-        }
-        if (child.rotationSwingRange) {
-          const swingSpeed = child.rotationSwingSpeed ?? 1.0;
-          angleDeg += Math.sin((t / 1000) * swingSpeed) * child.rotationSwingRange;
-        }
-
-        const rotateLocal = angleDeg !== 0;
-        const rad = angleDeg * Math.PI / 180;
-        const cosVal = Math.cos(rad);
-        const sinVal = Math.sin(rad);
-        const localCenterX = subWidth / 2;
-        const localCenterY = subHeight / 2;
-
-        rawCoords.forEach(c => {
-          let px = c.x;
-          let py = c.y;
-
-          if (rotateLocal) {
-            const rx = px - localCenterX;
-            const ry = py - localCenterY;
-            px = localCenterX + rx * cosVal - ry * sinVal;
-            py = localCenterY + rx * sinVal + ry * cosVal;
-          }
-
-          coords.push({
-            ...c,
-            x: px + dx,
-            y: py + dy,
-            role: child.role,
-            material: child.material || material,
-            paletteChannel: child.paletteChannel !== undefined ? child.paletteChannel : proposedFormula.paletteChannel
-          });
-        });
-      });
-      return coords;
-    } else {
-      if (formula.type === 'mathematical_stroke') {
-        const strokeCoords = evaluateFormula({ coordinateFormula: formula }, canvasSize, t);
-        // Auto-propagate on evaluation for "without thinking" feel (user vision)
-        const propagated = propagateStrokeFormula(formula, { samples: 5, symmetry: 'vertical' });
-        return [...strokeCoords, ...propagated].map(c => ({
-          ...c,
-          role,
-          material,
-          paletteChannel: proposedFormula.paletteChannel
-        }));
-      }
-
-      const rawCoords = evaluateFormula({ coordinateFormula: formula }, canvasSize, t);
-      return rawCoords.map(c => ({
-        ...c,
-        role,
-        material,
-        paletteChannel: proposedFormula.paletteChannel
-      }));
-    }
-  }, [propagateStrokeFormula]);
 
   // ── DETECT CHANGES AND RUN DEBOUNCED ENGINE ──────────────────────────────────
   // `silent` is used by the animation tick: it re-evaluates geometry for the
@@ -843,31 +476,13 @@ export default function WandPage({ onSendToVideoForge } = {}) {
         const uniqueRoles = Array.from(new Set(finalCoords.map(c => c.role)));
         addTerminalLog(`Successfully evaluated ${finalCoords.length} points across roles: [${uniqueRoles.join(', ')}]`, "success");
       }
-
-      // All 5 #3: Live character vector preview in cockpit
-      const role = currentProposal.proposedFormula?.role || '';
-      if (role.includes('character') || role.includes('chibi')) {
-        try {
-          const preview = forgeCharacterFromWandVector(currentProposal.proposedFormula, {
-            canvas: { width: 64, height: 64 },
-            materials: { skin: 'skin_light', hair: 'hair_void', eyes: 'eye_void_glow' }
-          }, { direction: 'south' });
-          setCharacterPreview(preview);
-          addTerminalLog(`Character vector model: ${preview.vectorPaths?.length || 0} paths, ${preview.diagnostics?.cellCount || 0} cells`, "success");
-        } catch (e) {
-          setCharacterPreview(null);
-          addTerminalLog(`Character preview error: ${e.message}`, "error");
-        }
-      } else {
-        setCharacterPreview(null);
-      }
     } catch (e) {
       if (!silent) {
         addTerminalLog(`Runtime evaluation error: ${e.message}`, "error");
       }
       setCoordinates([]);
     }
-  }, [time, addTerminalLog, evaluateProposalCoordinates]);
+  }, [time, addTerminalLog]);
 
   // Debounced wrapper
   const triggerDebouncedEvaluation = useCallback((currentProposal) => {
@@ -901,6 +516,74 @@ export default function WandPage({ onSendToVideoForge } = {}) {
         errors: [`Invalid JSON Syntax: ${e.message}`],
         bytecodeError: { bytecode: "PB-ERR-v1-FORMULA-CRIT-IMGFOR-0B03-PARSE" }
       });
+    }
+  };
+
+  // ── RECURSIVE EVALUATOR ─────────────────────────────────────────────────────
+  const evaluateProposalCoordinates = (proposedFormula, canvasSize, t) => {
+    const { role, material = 'aura', formula } = proposedFormula;
+
+    if (formula.type === 'composite') {
+      const coords = [];
+      formula.children.forEach(child => {
+        const subWidth = (child.size?.w ?? 1.0) * canvasSize.width;
+        const subHeight = (child.size?.h ?? 1.0) * canvasSize.height;
+        const childCanvas = { width: subWidth, height: subHeight };
+
+        const rawCoords = evaluateFormula({ coordinateFormula: child.formula }, childCanvas, t);
+
+        const worldAnchorX = child.anchor.x * canvasSize.width;
+        const worldAnchorY = child.anchor.y * canvasSize.height;
+
+        const dx = worldAnchorX - subWidth / 2;
+        const dy = worldAnchorY - subHeight / 2;
+
+        let angleDeg = child.rotation ?? 0;
+        if (child.rotationSpeed) {
+          angleDeg += child.rotationSpeed * (t / 1000);
+        }
+        if (child.rotationSwingRange) {
+          const swingSpeed = child.rotationSwingSpeed ?? 1.0;
+          angleDeg += Math.sin((t / 1000) * swingSpeed) * child.rotationSwingRange;
+        }
+
+        const rotateLocal = angleDeg !== 0;
+        const rad = angleDeg * Math.PI / 180;
+        const cosVal = Math.cos(rad);
+        const sinVal = Math.sin(rad);
+        const localCenterX = subWidth / 2;
+        const localCenterY = subHeight / 2;
+
+        rawCoords.forEach(c => {
+          let px = c.x;
+          let py = c.y;
+
+          if (rotateLocal) {
+            const rx = px - localCenterX;
+            const ry = py - localCenterY;
+            px = localCenterX + rx * cosVal - ry * sinVal;
+            py = localCenterY + rx * sinVal + ry * cosVal;
+          }
+
+          coords.push({
+            ...c,
+            x: px + dx,
+            y: py + dy,
+            role: child.role,
+            material: child.material || material,
+            paletteChannel: child.paletteChannel !== undefined ? child.paletteChannel : proposedFormula.paletteChannel
+          });
+        });
+      });
+      return coords;
+    } else {
+      const rawCoords = evaluateFormula({ coordinateFormula: formula }, canvasSize, t);
+      return rawCoords.map(c => ({
+        ...c,
+        role,
+        material,
+        paletteChannel: proposedFormula.paletteChannel
+      }));
     }
   };
 
@@ -1023,7 +706,15 @@ export default function WandPage({ onSendToVideoForge } = {}) {
     addTerminalLog(`FORMULA PERSISTED: Catalog ID ${catId} - saved in Local Sanctuary.`, "success");
   };
 
-
+  const handleGodotArtifactExport = () => {
+    try {
+      const artifactText = buildWandGodotExport(proposal);
+      downloadTextFile(`wand_${proposal.proposedFormula?.role || 'proposal'}_${Date.now()}.wand`, artifactText);
+      addTerminalLog('Godot Wand artifact exported.', 'success');
+    } catch (err) {
+      addTerminalLog(`Godot export failed: ${err.message}`, 'error');
+    }
+  };
 
   // Emit a PixelBrain fill bytecode derived from this proposal, for the
   // template/fill pipeline to consume (replaces PixelBrain's manual dropdowns).
@@ -1051,78 +742,12 @@ export default function WandPage({ onSendToVideoForge } = {}) {
     }
   };
 
-  const handleSendToVideoForge = () => {
-    if (!onSendToVideoForge) return;
-
-    try {
-      const canvas = canvasRef.current;
-      if (!canvas) {
-        throw new Error('Preview canvas is not ready');
-      }
-
-      const pf = proposal?.proposedFormula || {};
-      onSendToVideoForge({
-        source: 'wand',
-        kind: 'image',
-        name: `Wand ${pf.role || 'artifact'}`,
-        url: canvas.toDataURL('image/png'),
-        width: 800,
-        height: 600,
-        metadata: {
-          source: 'wand',
-          role: pf.role,
-          material: pf.material,
-          coordinateCount: metrics.pointCount,
-          proposal: JSON.parse(JSON.stringify(proposal)),
-        },
-      });
-      addTerminalLog('Sent Wand preview frame to VideoForge timeline.', 'success');
-    } catch (err) {
-      addTerminalLog(`VideoForge handoff failed: ${err.message}`, 'error');
-    }
-  };
-
   const handleLoadPreset = (presetProposal, name) => {
     // Deep-copy: presets are module-level constants (and saved catalog entries).
     // Editing must never mutate the source object that every card renders from.
     const draft = JSON.parse(JSON.stringify(presetProposal));
     handleProposalChange(draft, 'visual');
     addTerminalLog(`Loaded preset: "${name}"`, "info");
-  };
-
-  // User's exact vision: "the wand ... create the mathematical formulas to simulate a stroke
-  // and then use efficient machine learning algorithms to propagate that formula without thinking"
-  const handlePropagateStroke = () => {
-    const formula = proposal.proposedFormula?.formula;
-    if (!formula || formula.type !== 'mathematical_stroke') {
-      addTerminalLog('Load the "Sigil Stroke (Math)" preset or switch to a mathematical_stroke formula first.', 'warn');
-      return;
-    }
-
-    const propagatedCoords = propagateStrokeFormula(formula, { samples: 9, symmetry: 'vertical' });
-
-    // Feed directly to the photonic bridge + publish as a rich stroke asset
-    const strokeSpec = {
-      bytecode: 'mathematical_stroke:v1',
-      schoolId: 'PSYCHIC',
-      rarity: 'RARE',
-      effect: 'RESONANT',
-      role: 'stroke.mathematical',
-      material: proposal.proposedFormula.material || 'aurora',
-      coordinates: propagatedCoords.slice(0, 420), // efficient cap
-      canvas: { width: 800, height: 600 },
-      metadata: {
-        propagation: 'efficient-sampling+photonic-scoring+symmetry',
-        baseParams: formula.parameters,
-        pointCount: propagatedCoords.length,
-      }
-    };
-
-    publishWandFill(strokeSpec);
-    addTerminalLog(`Stroke formula propagated without thinking. ${propagatedCoords.length} points. Ready for PixelBrain / tactical entities / SCDL export.`, 'success');
-
-    // Re-evaluate so the canvas shows the propagated result immediately
-    handleProposalChange({ ...proposal }, 'visual');
   };
 
   const handleDeleteCustomPreset = (catId, e) => {
@@ -1250,7 +875,17 @@ export default function WandPage({ onSendToVideoForge } = {}) {
             <Save className="btn-icon" />
             Persist Catalog
           </button>
-
+          {isGodotExportEnabled && (
+            <button
+              className="action-btn animate-btn"
+              onClick={handleGodotArtifactExport}
+              type="button"
+              title="Export Godot Wand artifact"
+            >
+              <Download className="btn-icon" />
+              Export Godot
+            </button>
+          )}
           <button
             className="action-btn animate-btn"
             onClick={handleSendToPixelBrain}
@@ -1260,18 +895,6 @@ export default function WandPage({ onSendToVideoForge } = {}) {
             <Sparkles className="btn-icon" />
             Send → PixelBrain
           </button>
-          {onSendToVideoForge && (
-            <button
-              className="action-btn animate-btn"
-              onClick={handleSendToVideoForge}
-              type="button"
-              disabled={!validationResult.valid}
-              title="Send the current Wand canvas frame into VideoForge as an image clip"
-            >
-              <Layers className="btn-icon" />
-              Send → VideoForge
-            </button>
-          )}
         </div>
       </header>
 
@@ -2087,33 +1710,6 @@ export default function WandPage({ onSendToVideoForge } = {}) {
                       )}
                     </div>
 
-                    {/* All 5 #3: Character Vector Model Live Preview */}
-                    {characterPreview && (
-                      <div className="telemetry-column border-left-gold" style={{ gridColumn: '1 / -1', marginTop: 12 }}>
-                        <div className="telemetry-header-bar">
-                          <span className="telemetry-title text-gold">🧝 CHARACTER VECTOR MODEL (Wand)</span>
-                          <span className="backend-badge grade-badge grade-s">VECTORIZED ART</span>
-                        </div>
-                        <div className="telemetry-grid-2">
-                          <div className="metric-box">
-                            <span className="metric-label">VECTOR PATHS</span>
-                            <span className="metric-value text-glow-gold">{characterPreview.vectorPaths?.length || 0}</span>
-                            <span className="metric-sub">Roles: {characterPreview.vectorPaths?.map(p => p.role).join(', ') || '—'}</span>
-                          </div>
-                          <div className="metric-box">
-                            <span className="metric-label">RASTER CELLS</span>
-                            <span className="metric-value">{characterPreview.diagnostics?.cellCount || 0}</span>
-                            <span className="metric-sub">After PixelBrain fill</span>
-                          </div>
-                        </div>
-                        <div style={{ fontSize: 11, opacity: 0.8, marginTop: 8 }}>
-                          Vectorized art ready for Aseprite 00_Reference / SVG export. Use in CHARACTER-SPEC-v1 as vectorWand.
-
-
-                        </div>
-                      </div>
-                    )}
-
                     {/* Right Column: Photonic Bridge */}
                     {photonicRoute && (
                       <div className="telemetry-column border-left-cyan">
@@ -2151,26 +1747,6 @@ export default function WandPage({ onSendToVideoForge } = {}) {
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
-
-          {/* Rete.js Graph Editor Dedicated Link */}
-          <div style={{ marginTop: 16, padding: 16, background: 'linear-gradient(90deg, #111, #1a1a24)', border: '1px solid rgba(0, 242, 254, 0.3)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div>
-              <h3 style={{ margin: 0, color: '#4facfe', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Sparkles size={16} /> Scholomance Graph Studio
-              </h3>
-              <p style={{ margin: '4px 0 0 0', color: '#888', fontSize: '12px' }}>
-                Launch the dedicated, full-screen procedural graph architecture environment.
-              </p>
-            </div>
-            <Link to="/wand/graph" style={{
-              padding: '8px 24px', backgroundColor: '#4facfe', color: '#fff', 
-              textDecoration: 'none', borderRadius: '8px', fontSize: '13px', 
-              fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px',
-              boxShadow: '0 4px 12px rgba(79, 172, 254, 0.3)'
-            }}>
-              Launch Studio 🚀
-            </Link>
           </div>
 
           {/* REAL-TIME DIAGNOSTICS & TERMINAL */}

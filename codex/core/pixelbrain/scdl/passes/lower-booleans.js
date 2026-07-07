@@ -38,7 +38,7 @@ export function applyBooleanOp(boolOp, targets, part, W, H, ops, errors) {
   let material = part.material || 'source';
 
   if (boolOp === 'union') {
-    role = baseRole || 'union-result'; 
+    role = baseRole || 'union-result';
   } else if (boolOp === 'subtract') {
     role = baseRole || part.role || 'body';
   } else if (boolOp === 'intersect') {
