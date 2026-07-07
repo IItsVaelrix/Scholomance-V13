@@ -3,6 +3,10 @@
  * 
  * Bridges image analysis results with PixelBrain's semantic parameter system.
  * Converts visual features into parameters that Layer 1 can reason about.
+ *
+ * Connective tissue note: authoring-time semantics live in ./semantic/ + semantic-bridge.js
+ * (roles, effects, parts from SCDL/Construction). Use mergeAuthoringAndImageSemantics
+ * for combined view.
  */
 
 import { clamp01 } from './shared.js';

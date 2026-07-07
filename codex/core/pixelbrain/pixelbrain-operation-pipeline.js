@@ -12,8 +12,12 @@ import {
   derivePixelBrainRenderPacket,
   normalizePixelBrainAssetPacket,
 } from './pixelbrain-asset-packet.js';
+import { runPixelBrainRenderFidelityPipeline } from './render-fidelity-pipeline.js';
 import { templatize, fillTemplate } from './template-fill-bridge.js';
 import { resolvePixelBrainPaletteAuthority } from './palette-authority-bridge.js';
+import { enrichPacketWithSemantics, applyAuthoringSemantics } from './semantic-bridge.js';
+
+const PIXELBRAIN_FIDELITY_KIND = 'pixelbrain.fidelity.v1';
 
 function stableJson(value) {
   if (value === undefined || typeof value === 'function' || typeof value === 'symbol') return 'null';
@@ -38,6 +42,52 @@ function diagnostic(stageId, status, input, output, extra = {}) {
     errors: Object.freeze(extra.errors || []),
     durationMs: extra.durationMs || 0,
     metadata: Object.freeze(extra.metadata || {}),
+  });
+}
+
+function deriveRenderFidelityPacket(packet, options = {}) {
+  const materialId = options.material || packet.material.id;
+  const renderPacket = derivePixelBrainRenderPacket(packet, { ...options, material: materialId });
+  const fidelity = runPixelBrainRenderFidelityPipeline({
+    canvas: packet.canvas,
+    renderPacket,
+    materialId,
+  }, options);
+  const coordinates = Object.freeze(Array.isArray(fidelity.coordinates)
+    ? fidelity.coordinates.map((coord) => Object.freeze({ ...coord }))
+    : [...renderPacket.coordinates]);
+  const payloadIds = Object.freeze(Object.keys(fidelity.payloads || {}));
+
+  return Object.freeze({
+    kind: PIXELBRAIN_FIDELITY_KIND,
+    schemaVersion: 1,
+    ok: fidelity.ok === true,
+    renderPacketId: renderPacket.id,
+    material: Object.freeze({ id: materialId }),
+    canvas: renderPacket.canvas,
+    coordinates,
+    payloads: Object.freeze(fidelity.payloads || {}),
+    diagnostics: Object.freeze({
+      pipeline: 'pixelbrain.render-fidelity-pipeline',
+      coordinateCount: coordinates.length,
+      payloadIds,
+    }),
+  });
+}
+
+function buildFinalRenderPacket(renderPacket, fidelityPacket) {
+  if (!fidelityPacket) return renderPacket;
+  return Object.freeze({
+    ...renderPacket,
+    id: `pbfidelity_${digest({ renderPacketId: renderPacket.id, coordinates: fidelityPacket.coordinates })}`,
+    sourceRenderPacketId: renderPacket.id,
+    coordinates: fidelityPacket.coordinates,
+    fidelity: Object.freeze({
+      kind: fidelityPacket.kind,
+      ok: fidelityPacket.ok,
+      pipeline: fidelityPacket.diagnostics.pipeline,
+      payloadIds: fidelityPacket.diagnostics.payloadIds,
+    }),
   });
 }
 
@@ -108,6 +158,16 @@ function runStage(packet, stage, context) {
         },
       });
     }
+    case 'fidelity':
+    case 'renderFidelity':
+      return deriveRenderFidelityPacket(packet, options);
+    case 'semantic':
+      // Apply SemQuant authoring semantics if authoring source provided
+      if (options.authoringSource) {
+        return enrichPacketWithSemantics(packet, options.authoringSource, options);
+      }
+      // Or just return enriched if input already has
+      return enrichPacketWithSemantics(packet, null, options);
     case 'export': {
       if (typeof context.exportPacket === 'function') {
         return context.exportPacket(derivePixelBrainExportPacket(packet, options.target || 'json', options), options);
@@ -123,6 +183,7 @@ export function runPixelBrainOperationPipeline(input = {}, context = {}) {
   const stages = Array.isArray(input.stages) ? input.stages : [];
   let current = createPixelBrainAssetPacket(input.packet || input.asset || input);
   let exportPacket = null;
+  let fidelityPacket = null;
   const diagnostics = [];
 
   for (const stage of stages) {
@@ -134,8 +195,15 @@ export function runPixelBrainOperationPipeline(input = {}, context = {}) {
         current = next;
       } else if (next?.kind === 'pixelbrain.export.v1') {
         exportPacket = next;
+      } else if (next?.kind === PIXELBRAIN_FIDELITY_KIND) {
+        fidelityPacket = next;
       }
-      diagnostics.push(diagnostic(stageId, next === before && stageId !== 'normalize' ? 'skipped' : 'ok', before, current));
+      diagnostics.push(diagnostic(
+        stageId,
+        next === before && stageId !== 'normalize' ? 'skipped' : 'ok',
+        before,
+        next?.kind === PIXELBRAIN_FIDELITY_KIND ? next : current
+      ));
     } catch (error) {
       // Stage failures speak the canonical taxonomy: a thrown BytecodeError
       // passes through verbatim; anything else is wrapped as STATE/CRIT so
@@ -158,10 +226,16 @@ export function runPixelBrainOperationPipeline(input = {}, context = {}) {
     }
   }
 
+  const renderPacket = derivePixelBrainRenderPacket(current, fidelityPacket?.material?.id
+    ? { material: fidelityPacket.material.id }
+    : {});
+
   return Object.freeze({
     ok: diagnostics.every((entry) => entry.status !== 'error'),
     packet: current,
-    renderPacket: derivePixelBrainRenderPacket(current),
+    renderPacket,
+    finalRenderPacket: buildFinalRenderPacket(renderPacket, fidelityPacket),
+    fidelityPacket,
     exportPacket,
     diagnostics: Object.freeze(diagnostics),
   });

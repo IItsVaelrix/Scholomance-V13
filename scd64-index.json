@@ -280,37 +280,37 @@
     "meta": {
       "source": "generateSCD64"
     },
-    "timestamp": 1782237143665
+    "timestamp": 1783431081139
   },
   "027A31419CB4CC0B9F1F902A538FF6984A434E89A48D72BE9F705917B9342193": {
     "quantized": {
       "data": [
         150,
-        117,
+        133,
         120,
         120,
         134,
         133,
         119,
         104,
-        119,
-        136,
-        135,
-        119,
-        119,
-        152,
-        135,
-        119,
-        136,
-        119,
-        119,
-        119,
-        135,
-        119,
-        136,
-        135,
-        104,
         120,
+        136,
+        135,
+        119,
+        119,
+        136,
+        135,
+        119,
+        136,
+        119,
+        119,
+        119,
+        119,
+        119,
+        136,
+        135,
+        120,
+        119,
         150,
         134,
         120,
@@ -318,7 +318,7 @@
         150,
         115
       ],
-      "norm": 1.000000002313358
+      "norm": 0.9999999980146622
     },
     "scdFull": {
       "schema": "SCD64_DIAGNOSTIC",
@@ -416,7 +416,7 @@
               "file": "src/pages/Read/ReadPage.jsx",
               "legacyMatches": 0,
               "fixMatches": 1,
-              "lines": 1708
+              "lines": 1750
             },
             {
               "file": "src/lib/truesight/compiler/compileVerseToIR.js",
@@ -462,7 +462,7 @@
               "file": "src/pages/Read/ReadPage.jsx",
               "legacyMatches": 0,
               "fixMatches": 1,
-              "lines": 1708
+              "lines": 1750
             },
             {
               "file": "src/lib/truesight/compiler/compileVerseToIR.js",
@@ -504,7 +504,7 @@
               "file": "src/pages/Read/ReadPage.jsx",
               "legacyMatches": 0,
               "fixMatches": 1,
-              "lines": 1708
+              "lines": 1750
             },
             {
               "file": "src/lib/truesight/compiler/compileVerseToIR.js",
@@ -682,7 +682,7 @@
     "meta": {
       "source": "generateSCD64"
     },
-    "timestamp": 1782237128478
+    "timestamp": 1783431061805
   },
   "03030742C01B6AC16D9C5B00CF603CFBD906A4D5F91679A661F84A3B19C5CB5A": {
     "quantized": {
@@ -965,7 +965,7 @@
     "meta": {
       "source": "generateSCD64"
     },
-    "timestamp": 1782237126635
+    "timestamp": 1783431060945
   },
   "01861DF4C31AC92C24D4754DD1043D244908E4B3317B90735048A13A0AB2B33C": {
     "quantized": {
@@ -1273,6 +1273,6 @@
     "meta": {
       "source": "generateSCD64"
     },
-    "timestamp": 1782237128496
+    "timestamp": 1783431061814
   }
 }
