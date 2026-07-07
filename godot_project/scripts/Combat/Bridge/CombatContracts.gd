@@ -1,0 +1,7 @@
+extends RefCounted
+class_name CombatContracts
+
+const TYPE_STATE_PATCH = "COMBAT_STATE_PATCH"
+const TYPE_COMBAT_EVENT = "COMBAT_EVENT"
+const TYPE_ERROR = "COMBAT_ERROR"
+const TYPE_COMMAND = "COMBAT_COMMAND"

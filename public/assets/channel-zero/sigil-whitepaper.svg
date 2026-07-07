@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="none">
+<defs>
+<linearGradient id="g" x1="38" y1="220" x2="218" y2="36" gradientUnits="userSpaceOnUse"><stop stop-color="#C65BFF"/><stop offset="1" stop-color="#00E0FF"/></linearGradient>
+<filter id="glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="256" height="256" rx="40" fill="#0A0D16" fill-opacity=".02"/>
+<g stroke="url(#g)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
+<path d="M58 110.0v36.0"/>
+<path d="M78 91.0v74.0"/>
+<path d="M98 73.0v110.0"/>
+<path d="M118 87.0v82.0"/>
+<path d="M138 62.0v132.0"/>
+<path d="M158 87.0v82.0"/>
+<path d="M178 73.0v110.0"/>
+<path d="M198 91.0v74.0"/>
+<path d="M42 128h20M194 128h20" opacity=".55"/>
+<circle cx="128" cy="128" r="88" opacity=".18"/>
+</g>
+<title>sigil-whitepaper</title>
+</svg>

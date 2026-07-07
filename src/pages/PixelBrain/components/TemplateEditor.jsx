@@ -647,13 +647,11 @@ function TemplateEditorComponent({ onCommitAsset, onGridChange, initialAssetPack
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
-
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = () => {
       try {
         const data = JSON.parse(String(reader.result));
         const isPixelBrainPacket = data?.kind === 'pixelbrain.asset.v1'
-          || data?.version?.startsWith('pixelbrain')
           || Array.isArray(data?.geometry?.coordinates)
           || Array.isArray(data?.coordinates);
         const result = isPixelBrainPacket

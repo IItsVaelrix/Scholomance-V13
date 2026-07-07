@@ -21,8 +21,6 @@ describe('Clerical RAID', () => {
   it('seeds fifty patterns (PDR Phase 1 target)', () => {
       expect(SEED_PATTERNS.length).toBe(52);
       expect(SEED_STATS.total).toBe(52);
-    expect(SEED_PATTERNS.length).toBe(52);
-    expect(SEED_STATS.total).toBe(52);
   });
 
   it('returns CONFIRMED with ~1.0 confidence when report matches a seed exactly', () => {

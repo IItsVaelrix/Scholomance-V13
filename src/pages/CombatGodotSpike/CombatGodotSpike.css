@@ -1,0 +1,144 @@
+/* CombatGodotSpike.css — disposable dev-only spike surface.
+   Full-bleed engine host + instrumentation rail. No school theming on purpose:
+   this is a measurement rig, not a player-facing world surface. */
+
+.godot-spike-root {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: #050507;
+  color: #d8d8e0;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  z-index: 9000;
+}
+
+.godot-spike-banner {
+  padding: 6px 14px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: #ffd166;
+  background: repeating-linear-gradient(
+    45deg, #1a1407, #1a1407 10px, #221a08 10px, #221a08 20px
+  );
+  border-bottom: 1px solid #3a2f0c;
+}
+
+.godot-spike-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.godot-spike-iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #000;
+}
+
+.godot-spike-placeholder {
+  max-width: 560px;
+  padding: 28px 32px;
+  text-align: center;
+  line-height: 1.6;
+  border: 1px dashed #2a2a3a;
+  border-radius: 10px;
+  background: #0b0b12;
+}
+
+.godot-spike-placeholder code {
+  color: #00e5ff;
+  font-size: 0.92em;
+}
+
+.godot-spike-dim {
+  color: #6a6a7a;
+}
+
+/* Instrumentation rail */
+.godot-spike-instruments {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 16px;
+  padding: 12px 16px;
+  border-top: 1px solid #1c1c28;
+  background: #08080d;
+  max-height: 34vh;
+}
+
+.godot-spike-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-self: start;
+}
+
+.godot-spike-metric-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6a6a7a;
+}
+
+.godot-spike-metric-value {
+  font-size: 22px;
+  color: #00e5ff;
+}
+
+.godot-spike-bridge {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.godot-spike-bridge-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6a6a7a;
+  margin-bottom: 8px;
+}
+
+.godot-spike-cast-btn {
+  font-family: inherit;
+  font-size: 12px;
+  padding: 5px 12px;
+  color: #050507;
+  background: #00e5ff;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.godot-spike-cast-btn:disabled {
+  background: #2a2a3a;
+  color: #6a6a7a;
+  cursor: not-allowed;
+}
+
+.godot-spike-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.godot-spike-log li {
+  display: grid;
+  grid-template-columns: 64px 110px 1fr;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.godot-spike-log-t { color: #4a4a5a; }
+.godot-spike-log-out .godot-spike-log-dir { color: #ffd166; }
+.godot-spike-log-in  .godot-spike-log-dir { color: #00e5ff; }
+.godot-spike-log-msg { color: #b8b8c4; overflow: hidden; text-overflow: ellipsis; }

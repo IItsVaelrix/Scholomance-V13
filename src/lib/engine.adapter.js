@@ -107,7 +107,6 @@ export function hslToHex(h, s, l) {
  */
 import { validateProposal as coreValidateProposal } from '../../codex/core/modulation/planner/formula-validator.js';
 import { evaluateFormula as coreEvaluateFormula } from '../../codex/core/pixelbrain/formula-to-coordinates.js';
-import { evaluateMathematicalStroke as coreEvaluateMathematicalStroke } from '../../codex/core/pixelbrain/formula-to-coordinates.js';
 import { 
   snapToPixelGrid as coreSnapToPixelGrid,
   resolvePixelGridSize as coreResolvePixelGridSize
@@ -120,10 +119,6 @@ export function validateProposal(proposal) {
 
 export function evaluateFormula(formula, canvasSize, time = 0, options = {}) {
   return coreEvaluateFormula(formula, canvasSize, time, options);
-}
-
-export function evaluateMathematicalStroke(formula, canvasSize, time = 0) {
-  return coreEvaluateMathematicalStroke(formula, canvasSize, time);
 }
 
 export function snapToPixelGrid(coordinates, gridSize) {

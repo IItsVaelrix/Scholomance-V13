@@ -10,29 +10,28 @@ import {
   ChevronRight,
   User,
   LogOut,
-  Newspaper,
+  MessageSquare,
 } from "lucide-react";
 import { LINKS, INTERNAL_MODULES } from "../../data/library";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion.js";
 import { preloadRoute } from "../../lib/routes.js";
 import { triggerHapticPulse, UI_HAPTICS } from "../../lib/platform/haptics.js";
-
-const PRODUCTION_NAV_IDS = Object.freeze(["watch", "listen", "read", "visualiser", "blog"]);
+import { isAdminUser } from "../../lib/admin.js";
 
 const ICON_MAP = {
   watch: Eye,
   listen: Headphones,
   read: BookOpen,
   visualiser: Activity,
-  blog: Newspaper,
+  oracle: MessageSquare,
 };
 
 const ROUTE_COPY = {
   watch: "Witness the live arena and current ritual signal.",
   listen: "Tune stations, broadcasts, and ambient transmission.",
   read: "Compose scrolls and inspect their hidden anatomy.",
-  visualiser: "Kinetic lyric visualizer - phoneme school colors, beat sync.",
+  visualiser: "Kinetic lyric visualiser - phoneme school colors, beat sync.",
   oracle: "Consult the Oracle for Lyrical Analysis.",
   blog: "Read transmissions, skills, verdicts, and whitepapers.",
   pixelbrain: "Neural network visualization and metadata mapping.",
@@ -58,32 +57,26 @@ export default function Navigation() {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   const IS_PROD = typeof import.meta !== "undefined" && import.meta.env.PROD === true;
-  const publicNavLinks = useMemo(
-    () => LINKS.filter((link) => PRODUCTION_NAV_IDS.includes(link.id)),
-    [],
-  );
-  const showAccountNavigation = !IS_PROD;
+  const isInternalAdmin = isAdminUser(user);
 
   const allNavLinks = useMemo(() => [
-    ...(IS_PROD ? publicNavLinks : LINKS),
-    ...(!IS_PROD ? INTERNAL_MODULES : []),
-  ], [IS_PROD, publicNavLinks]);
+    ...LINKS,
+    ...(!IS_PROD || isInternalAdmin ? INTERNAL_MODULES : []),
+  ], [IS_PROD, isInternalAdmin]);
 
   const primaryLinks = useMemo(
-    () => publicNavLinks.filter((l) => ICON_MAP[l.id]),
-    [publicNavLinks],
+    () => LINKS.filter((l) => ICON_MAP[l.id]),
+    [],
   );
 
   const allLinks = useMemo(() => [
     ...allNavLinks,
-    ...(showAccountNavigation
-      ? [{
-          id: user ? "profile" : "auth",
-          path: user ? "/profile" : "/auth",
-          label: user ? user.username : "Portal",
-        }]
-      : []),
-  ], [allNavLinks, showAccountNavigation, user]);
+    {
+      id: user ? "profile" : "auth",
+      path: user ? "/profile" : "/auth",
+      label: user ? user.username : "Portal",
+    },
+  ], [allNavLinks, user]);
 
   const currentPage = useMemo(
     () => allLinks.find((l) => location.pathname === l.path || location.pathname.startsWith(l.path + "/")),
@@ -231,7 +224,7 @@ export default function Navigation() {
         </div>
 
         <div className="rail-right">
-          {showAccountNavigation && user && (
+          {user && (
             <button
               className="rail-link rail-link--user rail-link--logout"
               onClick={handleLogout}
@@ -244,16 +237,14 @@ export default function Navigation() {
             </button>
           )}
 
-          {showAccountNavigation && (
-            <NavLink
-              to={user ? "/profile" : "/auth"}
-              onClick={(e) => handleRailNavClick(e, user ? "/profile" : "/auth")}
-              className={`rail-link rail-link--user${isActiveLink(user ? "/profile" : "/auth") ? " rail-link--active" : ""}`}
-              aria-label={user ? `Profile: ${user.username}` : "Sign in"}
-            >
-              <User size={15} aria-hidden="true" />
-            </NavLink>
-          )}
+          <NavLink
+            to={user ? "/profile" : "/auth"}
+            onClick={(e) => handleRailNavClick(e, user ? "/profile" : "/auth")}
+            className={`rail-link rail-link--user${isActiveLink(user ? "/profile" : "/auth") ? " rail-link--active" : ""}`}
+            aria-label={user ? `Profile: ${user.username}` : "Sign in"}
+          >
+            <User size={15} aria-hidden="true" />
+          </NavLink>
 
           <button
             className="rail-menu-btn"
@@ -346,7 +337,7 @@ export default function Navigation() {
                     </motion.div>
                   );
                 })}
-                {showAccountNavigation && user && (
+                {user && (
                   <motion.button
                     type="button"
                     className="nav-mobile-link nav-mobile-link--button nav-mobile-link--logout"

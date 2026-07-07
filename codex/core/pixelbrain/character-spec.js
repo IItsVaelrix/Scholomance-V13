@@ -191,12 +191,6 @@ export function normalizeCharacterSpec(input = {}) {
     ? deepFreeze({ ...input.combatProfile })
     : null;
 
-  // First-class vectorWand support: Wand formula proposal for vectorized character art
-  // Can be a full composite or single formula; forgeCharacter will route to vector path if present.
-  const vectorWand = input.vectorWand && typeof input.vectorWand === 'object'
-    ? deepFreeze({ ...input.vectorWand })
-    : null;
-
   const spec = {
     contract: CHARACTER_SPEC_VERSION,
     id,
@@ -215,7 +209,6 @@ export function normalizeCharacterSpec(input = {}) {
     details,
     ...(combatProfile ? { combatProfile } : {}),
     ...(materials ? { materials } : {}),
-    ...(vectorWand ? { vectorWand } : {}),
   };
 
   return deepFreeze(spec);
@@ -233,11 +226,7 @@ function normalizeBody(raw) {
 
 export function validateCharacterSpec(spec) {
   if (!spec || spec.contract !== CHARACTER_SPEC_VERSION) throw err('spec contract mismatch');
-
-  // With vectorWand, body profile is optional (Wand provides the vector construction)
-  if (!spec.vectorWand && !spec.body?.profile) {
-    throw err('body.profile is required unless vectorWand is provided');
-  }
+  if (!spec.body?.profile) throw err('body.profile is required');
 
   // Validate materials exist in registry
   if (spec.materials) {

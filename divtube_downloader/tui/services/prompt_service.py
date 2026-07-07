@@ -1,19 +1,12 @@
-import io
 import json
 import re
 import threading
+import urllib.request
 import urllib.error
 
-from openai import APIStatusError
-
-from tui.services.env_config import get_config, get_model, get_openai_client
+from tui.services.env_config import get_config, get_model
 from tui.services.tool_service import ToolService, get_pending_diff, _side_by_side_pairs
 from tui.utils.throttle import llm_throttle
-from tui.services.token_meter import meter
-
-# Compiled once: pulls the write_id out of a replace_file_content result so we
-# can fetch the side-by-side blob from the tool service and render it inline.
-_WID_RX = re.compile(r"\[write_id=(w\d+)\]")
 
 # Compiled once: pulls the write_id out of a replace_file_content result so we
 # can fetch the side-by-side blob from the tool service and render it inline.
@@ -94,7 +87,10 @@ class PromptService:
         return base
 
     def _call_api(self, messages, model_name, base_url, api_key, use_tools=True):
-        kwargs = {"model": model_name, "messages": messages}
+        payload = {
+            "model": model_name,
+            "messages": messages
+        }
         if use_tools and self.tools.tools:
             import copy
             safe_tools = copy.deepcopy(self.tools.tools)
@@ -108,40 +104,22 @@ class PromptService:
                     for item in d:
                         remove_defaults(item)
             remove_defaults(safe_tools)
-            kwargs["tools"] = safe_tools
+            payload["tools"] = safe_tools
 
-        try:
-            resp = get_openai_client(base_url, api_key).chat.completions.create(**kwargs)
-        except APIStatusError as e:
-            # The agent loop speaks the urllib.error.HTTPError contract (.code +
-            # .read()) for its 429/503/tool-unsupported retry logic, so adapt the
-            # SDK's structured error back into that shape instead of rewriting it.
-            body = e.response.text if e.response is not None else str(e)
-            raise urllib.error.HTTPError(
-                base_url, e.status_code, str(e), None,
-                io.BytesIO(body.encode("utf-8", errors="replace")),
-            )
+        url = f"{base_url}/chat/completions"
+        if not url.endswith("/chat/completions"):
+            url = f"{url.rstrip('/')}/chat/completions"
 
-        # Downstream consumes plain dicts (message["tool_calls"], message.get(
-        # "content"), …) and re-appends assistant turns straight into `messages`,
-        # so flatten the Pydantic response once here. exclude_none drops the
-        # schema's null fields (audio/refusal/function_call) that picky
-        # OpenAI-compat providers reject when echoed back.
-        res_json = resp.model_dump(exclude_none=True)
-        usage = res_json.get("usage")
-        try:
-            meter.record(model_name, usage)
-        except Exception:
-            pass  # telemetry must never break the agent turn
-        try:
-            if isinstance(usage, dict):
-                # Feed actual token consumption into the TPM rate window.
-                llm_throttle.record(usage.get("total_tokens")
-                                    or (usage.get("prompt_tokens", 0)
-                                        + usage.get("completion_tokens", 0)))
-        except Exception:
-            pass  # rate accounting must never break the agent turn
-        return res_json
+        req = urllib.request.Request(url, method="POST")
+        req.add_header("Authorization", f"Bearer {api_key}")
+        req.add_header("Content-Type", "application/json")
+        req.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+        req.add_header("HTTP-Referer", "https://github.com/DivTube")
+        req.add_header("X-Title", "DivTube Cockpit")
+
+        data = json.dumps(payload).encode("utf-8")
+        with urllib.request.urlopen(req, data=data) as response:
+            return json.loads(response.read())
 
     def prompt(self, text, callback, system_hint=None, model=None, state_callback=None, controller=None, agent_id="divtube"):
         def set_state(s):
@@ -416,7 +394,7 @@ class PromptService:
 
                     callback(f"\n[bold {GOLD}]❖ AI RESPONSE ❖[/] [{MUTED}]({model_name})[/]\n")
                     if reply:
-                        if hasattr(callback, "__self__") and hasattr(callback.__self__, "typewriter_log_msg"):
+                        if hasattr(callback.__self__, "typewriter_log_msg"):
                             callback.__self__.typewriter_log_msg(reply)
                         else:
                             from rich.markdown import Markdown

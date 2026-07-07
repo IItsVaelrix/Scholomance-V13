@@ -73,16 +73,7 @@ const RETINA_PRESETS = {
   },
 };
 
-function serializePacket(packet) {
-  if (!packet) return null;
-
-  return {
-    ...packet,
-    data: ArrayBuffer.isView(packet.data) ? Array.from(packet.data) : packet.data,
-  };
-}
-
-export default function PhotonicBridgeLab({ onSendToVideoForge } = {}) {
+export default function PhotonicBridgeLab() {
   const [packetConfig, setPacketConfig] = useState({ ...PRESETS.perfectPhotonic.packet });
   const [mode, setMode] = useState(PHOTONIC_BRIDGE_MODES.SHADOW);
   const [backends, setBackends] = useState([]);
@@ -140,58 +131,14 @@ export default function PhotonicBridgeLab({ onSendToVideoForge } = {}) {
     }));
   };
 
-  const handleSendToVideoForge = () => {
-    if (!onSendToVideoForge) return;
-
-    onSendToVideoForge({
-      source: 'photonic',
-      kind: 'pixelbrain',
-      name: `Photonic Bridge ${retinaBridgeReport?.compatibilityGrade || report.compatibilityGrade} packet`,
-      pixelBrainPacket: {
-        source: 'photonic-bridge',
-        packetConfig: { ...packetConfig },
-        retinaPresetId,
-        retinaConfig: { ...retinaConfig },
-        retinaPacket: serializePacket(retinaPacket),
-        retinaSnapshot,
-        bridgeReport: retinaBridgeReport,
-        simulationReport: report,
-        hardwareReport: hwReport,
-      },
-      metadata: {
-        source: 'photonic',
-        packetId: retinaPacket?.packetId || report.packetId,
-        compatibilityGrade: retinaBridgeReport?.compatibilityGrade || report.compatibilityGrade,
-        compatibilityScore: retinaBridgeReport?.compatibilityScore ?? report.compatibilityScore,
-        mode,
-        backendId: selectedBackendId || null,
-      },
-    });
-  };
-
   const retinaPreviewValues = Array.from(retinaPacket?.data || []).slice(0, 32);
 
   return (
     <div className="photonic-bridge-lab">
-      <div className="photonic-lab-header">
-        <div>
-          <h1>Photonic Bridge Lab</h1>
-          <p className="subtitle">
-            Internal diagnostic UI for Phase 1 of the Photonic Quantization Bridge (Software Simulator).
-          </p>
-        </div>
-        {onSendToVideoForge && (
-          <button
-            type="button"
-            className="preset-btn send-forge-btn"
-            onClick={handleSendToVideoForge}
-            title="Send the current Photonic Bridge diagnostic packet into VideoForge"
-            aria-label="Send Photonic Bridge diagnostic packet to VideoForge"
-          >
-            Send to VideoForge
-          </button>
-        )}
-      </div>
+      <h1>Photonic Bridge Lab</h1>
+      <p className="subtitle">
+        Internal diagnostic UI for Phase 1 of the Photonic Quantization Bridge (Software Simulator).
+      </p>
 
       <div className="presets">
         {Object.values(PRESETS).map(preset => (

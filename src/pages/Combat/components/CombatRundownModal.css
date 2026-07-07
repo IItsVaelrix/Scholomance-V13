@@ -1,0 +1,439 @@
+.rundown-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(6px);
+  z-index: var(--z-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: rundownFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rundown-modal-container {
+  position: relative;
+  width: 540px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #030307;
+  border: 1px solid var(--gold, #c9a227);
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.95), 0 0 30px rgba(201, 162, 39, 0.15);
+  padding: 28px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gold, #c9a227) transparent;
+}
+
+.rundown-modal-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.rundown-modal-container::-webkit-scrollbar-thumb {
+  background: var(--gold, #c9a227);
+  border-radius: 3px;
+}
+
+/* Arcane Corners */
+.modal-corner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--gold, #c9a227);
+  pointer-events: none;
+}
+.modal-corner.tl { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+.modal-corner.tr { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+.modal-corner.bl { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+.modal-corner.br { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+.rundown-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  background: transparent;
+  border: none;
+  color: var(--gold, #c9a227);
+  font-size: 1.8rem;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s, transform 0.2s;
+  line-height: 1;
+}
+
+.rundown-modal-close:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.rundown-modal-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Header */
+.rundown-header-section {
+  text-align: center;
+  padding-top: 8px;
+}
+
+.rundown-modal-result-title {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.rundown-modal-result-title.victory {
+  color: var(--color-gold-bright, #fff0a5);
+  text-shadow: 0 0 15px rgba(201, 162, 39, 0.4);
+}
+
+.rundown-modal-result-title.defeat {
+  color: #ff5252;
+  text-shadow: 0 0 15px rgba(255, 82, 82, 0.4);
+}
+
+.rundown-modal-subtitle {
+  font-family: 'Georgia', serif;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--battle-text-dim, #90a4ae);
+  margin: 6px 0 0 0;
+}
+
+.rundown-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201, 162, 39, 0.3) 15%, rgba(201, 162, 39, 0.3) 85%, transparent);
+}
+
+/* Summary stats & grade */
+.rundown-summary-row {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+}
+
+.rundown-grade-chamber {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 120px;
+}
+
+.rundown-grade-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: var(--battle-text-dim, #90a4ae);
+  text-transform: uppercase;
+}
+
+.rundown-grade-seal {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px double var(--gold, #c9a227);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 900;
+  background: radial-gradient(circle at center, rgba(201, 162, 39, 0.1) 0%, transparent 75%);
+  box-shadow: 0 0 15px rgba(201, 162, 39, 0.1);
+}
+
+.rundown-grade-seal.s {
+  color: #fff0a5;
+  border-color: #fff0a5;
+  text-shadow: 0 0 12px #fff0a5;
+  box-shadow: 0 0 20px rgba(255, 240, 165, 0.25);
+  background: radial-gradient(circle at center, rgba(255, 240, 165, 0.15) 0%, transparent 75%);
+}
+
+.rundown-grade-seal.a {
+  color: var(--gold, #c9a227);
+  text-shadow: 0 0 8px rgba(201, 162, 39, 0.5);
+}
+
+.rundown-grade-seal.b {
+  color: #00f0ff;
+  border-color: #00f0ff;
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+}
+
+.rundown-grade-seal.c {
+  color: var(--battle-text-main, #e0e0e0);
+  border-color: var(--battle-text-main, #e0e0e0);
+}
+
+.rundown-grade-seal.d {
+  color: #90a4ae;
+  border-color: #90a4ae;
+}
+
+.rundown-stats-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.rundown-stat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rundown-stat-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.6rem;
+  color: var(--battle-text-dim, #90a4ae);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.rundown-stat-value {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #f4ecd8;
+}
+
+/* Impressive Verse */
+.rundown-impressive-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rundown-section-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.75rem;
+  color: var(--gold, #c9a227);
+  letter-spacing: 0.15em;
+  margin: 0 0 4px 0;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.rundown-section-title.oracle {
+  color: var(--color-cyan, #00f0ff);
+}
+
+.rundown-spell-card {
+  background: rgba(10, 10, 20, 0.6);
+  border: 1px solid rgba(201, 162, 39, 0.15);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rundown-spell-phrase {
+  font-family: 'Georgia', serif;
+  font-size: 1.15rem;
+  font-style: italic;
+  line-height: 1.6;
+  color: #f4ecd8;
+  margin: 0;
+  padding: 0;
+  white-space: pre-wrap;
+}
+
+.rundown-spell-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.rundown-score-badge {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.8rem;
+  color: var(--battle-text-dim, #90a4ae);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rundown-score-val {
+  color: var(--gold, #c9a227);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.rundown-reasons-wrap {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rundown-reason-badge {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.65rem;
+  background: rgba(201, 162, 39, 0.08);
+  border: 1px solid rgba(201, 162, 39, 0.25);
+  color: #fff0a5;
+  padding: 3px 8px;
+  border-radius: 2px;
+  letter-spacing: 0.03em;
+}
+
+/* Disclosure */
+.rundown-disclosure-area {
+  margin-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 12px;
+}
+
+.rundown-disclosure-toggle {
+  background: transparent;
+  border: none;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.75rem;
+  color: var(--gold, #c9a227);
+  cursor: pointer;
+  padding: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.rundown-disclosure-toggle:hover {
+  opacity: 1;
+}
+
+.rundown-breakdown-panel {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: panelSlideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.breakdown-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.breakdown-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.65rem;
+  color: var(--battle-text-dim, #90a4ae);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.breakdown-meter-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.5);
+  height: 8px;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.breakdown-meter {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(201, 162, 39, 0.5), var(--gold, #c9a227));
+  box-shadow: 0 0 8px rgba(201, 162, 39, 0.3);
+}
+
+.breakdown-value {
+  position: absolute;
+  right: 0;
+  top: -16px;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.65rem;
+  color: #f4ecd8;
+}
+
+/* Oracle */
+.rundown-oracle-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rundown-oracle-card {
+  background: rgba(0, 240, 255, 0.03);
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  padding: 16px;
+}
+
+.rundown-oracle-msg {
+  font-family: 'Georgia', serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--color-cyan-pale, #e0f8ff);
+  margin: 0;
+  text-align: left;
+}
+
+.rundown-no-spells {
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  color: var(--battle-text-dim, #90a4ae);
+  margin: 0;
+  padding: 12px;
+  text-align: center;
+}
+
+/* Footer buttons */
+.rundown-footer-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+}
+
+.rundown-btn {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+/* Animations */
+@keyframes rundownFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes panelSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rundown-modal-backdrop,
+  .rundown-breakdown-panel {
+    animation: none;
+  }
+
+  .rundown-modal-close,
+  .rundown-disclosure-toggle {
+    transition: none;
+  }
+}

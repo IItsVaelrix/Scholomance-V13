@@ -122,27 +122,6 @@ verseIRMicroprocessors.register('amp.run', async (payload, context) => {
   }
 });
 
-verseIRMicroprocessors.register('amp.status', async () => {
-  const { getAmpStatus } = await import('../animation/amp/runAnimationAmp.ts');
-  return getAmpStatus();
-});
-
-verseIRMicroprocessors.register('amp.getAllActive', async () => {
-  const { getAllActiveAnimations } = await import('../animation/amp/runAnimationAmp.ts');
-  const active = getAllActiveAnimations();
-  return Array.from(active.entries()); // Map is not serializable across postMessage
-});
-
-verseIRMicroprocessors.register('amp.getActive', async (targetId) => {
-  const { getActiveAnimation } = await import('../animation/amp/runAnimationAmp.ts');
-  return getActiveAnimation(targetId);
-});
-
-verseIRMicroprocessors.register('amp.clearActive', async (targetId) => {
-  const { clearActiveAnimation } = await import('../animation/amp/runAnimationAmp.ts');
-  return clearActiveAnimation(targetId);
-});
-
 // --- Symmetry AMP Microprocessors ---
 verseIRMicroprocessors.register('amp.symmetry', async (payload, context) => {
   const { runSymmetryAmpProcessor } = await import('../pixelbrain/symmetry-amp.js');
@@ -152,17 +131,6 @@ verseIRMicroprocessors.register('amp.symmetry', async (payload, context) => {
 verseIRMicroprocessors.register('amp.coord-symmetry', async (payload, context) => {
   const { runCoordSymmetryAmp } = await import('../pixelbrain/coord-symmetry-amp.js');
   return runCoordSymmetryAmp(payload, context);
-});
-
-verseIRMicroprocessors.register('amp.shadow-perception', async (payload, _context) => {
-  const { runShadowPerceptionAmp } = await import('../pixelbrain/shadow-perception-amp.js');
-  return runShadowPerceptionAmp(payload);
-});
-
-// --- Photonic Retina Microprocessors (Lazy) ---
-verseIRMicroprocessors.register('amp.attachPhotonicRoute', async (payload, context) => {
-  const { attachAnimationPhotonicRoute } = await import('../../../src/lib/animation-photonic.adapter.js');
-  return attachAnimationPhotonicRoute(payload, context);
 });
 
 // --- IDE Microprocessors (Lazy) ---
@@ -186,17 +154,6 @@ verseIRMicroprocessors.register('arbiter.predict', async (payload, context) => {
 verseIRMicroprocessors.register('compose.formula.v1', async (payload, context) => {
   const { composeFormulaProcessor } = await import('../modulation/processors/compose-formula.js');
   return composeFormulaProcessor(payload, payload?.params || {}, context);
-});
-
-// --- Arena Visual Tick (offloaded per-frame arena work) ---
-verseIRMicroprocessors.register('arena.tick', async (payload, context) => {
-  const { arenaTickProcessor } = await import('./arena/arena-tick.processor.js');
-  return arenaTickProcessor(payload, context);
-});
-
-verseIRMicroprocessors.register('amp.turboquant.similarity', async (payload, _context) => {
-  const { runTurboQuantAmp } = await import('./turboquant-amp.js');
-  return runTurboQuantAmp(payload);
 });
 
 export { verseIRMicroprocessors };

@@ -1,0 +1,182 @@
+.enemy-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+}
+
+.enemy-modal-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 450px;
+  max-width: 90vw;
+  z-index: 1001;
+}
+
+.enemy-modal-frame {
+  background: #05050a;
+  border: 1px solid var(--gold);
+  position: relative;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 20px rgba(201, 162, 39, 0.2);
+  padding: 24px;
+}
+
+.enemy-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--gold);
+  font-size: 1.2rem;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.enemy-modal-close:hover { opacity: 1; }
+
+.enemy-modal-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.enemy-header-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 1px solid rgba(201, 162, 39, 0.15);
+  padding-bottom: 20px;
+}
+
+.enemy-sigil-chamber {
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle at center, rgba(101, 31, 255, 0.1) 0%, transparent 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(101, 31, 255, 0.2);
+}
+
+.enemy-title-block {
+  flex: 1;
+}
+
+.enemy-modal-name {
+  margin: 0;
+  font-family: 'Spectral', serif;
+  font-size: 1.8rem;
+  letter-spacing: 0.05em;
+  color: var(--battle-text-main);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.enemy-modal-school-badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--battle-accent);
+  letter-spacing: 0.2em;
+  margin-top: 4px;
+}
+
+.enemy-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.stat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-label {
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.1em;
+}
+
+.stat-value {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section-title {
+  font-size: 0.75rem;
+  color: var(--gold);
+  letter-spacing: 0.15em;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.trait-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.trait-list li {
+  font-size: 0.8rem;
+  color: var(--battle-text-dim);
+  line-height: 1.4;
+}
+
+.ability-card {
+  background: rgba(101, 31, 255, 0.05);
+  border: 1px solid rgba(101, 31, 255, 0.15);
+  padding: 12px;
+}
+
+.ability-name {
+  font-size: 0.9rem;
+  color: var(--battle-accent);
+  font-weight: 700;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.ability-desc {
+  font-size: 0.75rem;
+  color: var(--battle-text-dim);
+  margin: 0;
+  font-style: italic;
+}
+
+.enemy-modal-footer {
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: rgba(255, 255, 255, 0.2);
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+
+.modal-corner {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border: 2px solid var(--gold);
+}
+
+.modal-corner.tl { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+.modal-corner.tr { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+.modal-corner.bl { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+.modal-corner.br { bottom: -2px; right: -2px; border-left: none; border-top: none; }

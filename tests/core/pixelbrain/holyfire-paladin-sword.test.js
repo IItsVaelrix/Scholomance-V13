@@ -22,8 +22,8 @@ import { MATERIAL_PALETTES, MATERIAL_SHADER_INDEX } from '../../../codex/core/pi
 import { forgeHolyFirePaladinSword as forgeHolyFirePaladinSwordWeaponRoute } from '../../../codex/core/pixelbrain/factory/weapon-factory.js';
 import { applyHolyFireMotif } from '../../../codex/core/pixelbrain/holyfire-motif-amp.js';
 import { composeSilhouette } from '../../../codex/core/pixelbrain/silhouette-composer.js';
-import { validateRoute } from '../../../codex/core/pixelbrain/microprocessor-route.js';
-import { buildHolyFirePaladinSwordSpec, HOLYFIRE_PALADIN_MATERIALS } from '../../../scripts/generate-holyfire-paladin-sword.mjs';
+import { executeRoute } from '../../../codex/core/pixelbrain/microprocessor-route.js';
+import { buildHolyFirePaladinSwordSpec, forgeHolyFirePaladinSword, HOLYFIRE_PALADIN_MATERIALS } from '../../../scripts/generate-holyfire-paladin-sword.mjs';
 
 const ANCHOR_KEYS = ['void', 'shadow', 'deep', 'body', 'frost', 'spectral', 'whiteCore'];
 const HEX_RE = /^#[\dA-Fa-f]{6}$/;
@@ -173,7 +173,7 @@ describe('Holy Fire Paladin Sword PDR implementation', () => {
       const { routeDefinition } = forgeHolyFirePaladinSwordWeaponRoute(spec, bundle.construction);
       // Strip all holyFire cells from the lattice
       const stripped = bundle.assetPacket.geometry.coordinates.filter((c) => c.partId !== 'holyFire');
-      const result = validateRoute(routeDefinition, {
+      const result = executeRoute(routeDefinition, {
         spec,
         silhouette: bundle.silhouette,
         fills: { coordinates: stripped },

@@ -1,8 +1,4 @@
 // Event emitter for progression events
-import { PROGRESSION_EVENTS } from '../../codex/core/events/scholomance-event-map.js';
-
-export { PROGRESSION_EVENTS };
-
 const eventListeners = new Map();
 
 export function emitXPEvent(event, data) {

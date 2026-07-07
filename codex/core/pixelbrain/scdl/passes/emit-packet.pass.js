@@ -140,4 +140,3 @@ function emitSceneGraphPacket(ast) {
     },
   });
 }
-

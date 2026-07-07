@@ -128,26 +128,6 @@ describe('Truesight charStart convention - single source of truth', () => {
     const { root } = makeParagraphChain(['Hello', 'World']);
     expect(computeCharStartFromLexical(root)).toBe(0);
   });
-
-  it('adds the joining newline for a NON-paragraph top-level block, matching $getScrollText', () => {
-    // $getScrollText() is `root.getChildren().map(c => c.getTextContent()).join('\n')`
-    // -- it joins ALL top-level children with '\n' regardless of type. So a
-    // heading (or any future block) at the root must contribute a joining
-    // newline exactly like a paragraph. Keying the newline on type==='paragraph'
-    // silently undercounted by one per non-paragraph block and drifted the gate.
-    const root = makeNode('root', '');
-    const heading = makeNode('heading', 'Hi', root);          // length 2
-    const paragraph = makeNode('paragraph', 'There', root);   // after 'Hi' + '\n'
-    paragraph.setPreviousSibling(heading);
-    const headingLeaf = makeNode('text', 'Hi', heading);
-    const paragraphLeaf = makeNode('text', 'There', paragraph);
-
-    expect(computeCharStartFromLexical(headingLeaf)).toBe(0);
-    // 2 (len 'Hi') + 1 (joining newline) = 3, the same offset $getScrollText
-    // assigns to 'There' in "Hi\nThere".
-    expect(computeCharStartFromLexical(paragraphLeaf)).toBe(3);
-    expect('Hi\nThere'.indexOf('There')).toBe(3); // pin the serializer parity
-  });
 });
 
 describe('Truesight charStart convention - position-only lookup hierarchy', () => {
@@ -172,66 +152,6 @@ describe('Truesight charStart convention - position-only lookup hierarchy', () =
       token: 'hear',
       vowelFamily: 'IY',
     });
-  });
-
-  it('resolves a Map container by charStart (no Object.fromEntries materialization needed)', () => {
-    // The hot-path fix: resolveTokenDataAtPosition reads Maps via .get() so the
-    // caller can pass the live Map straight through instead of rebuilding it
-    // into an object on every word lookup. Numeric-keyed Map (the server shape:
-    // tokenByCharStart.set(profile.charStart, profile)) must resolve.
-    const { leaves } = makeParagraphChain(['see', 'hear']);
-    const node = leaves[2];
-    const cs = computeCharStartFromLexical(node);
-    const byCharStart = new Map([[cs, { token: 'hear', vowelFamily: 'IY' }]]);
-    expect(resolveTokenDataAtPosition(node, 'hear', byCharStart, null)).toEqual({
-      token: 'hear',
-      vowelFamily: 'IY',
-    });
-  });
-
-  it('resolves a Map identity container, and forgives string-keyed numeric Maps', () => {
-    const { leaves } = makeParagraphChain(['see', 'hear']);
-    const node = leaves[2];
-    const cs = computeCharStartFromLexical(node);
-    const byIdentity = new Map([[`hear-${cs}`, { token: 'hear', vowelFamily: 'IY' }]]);
-    expect(resolveTokenDataAtPosition(node, 'hear', null, byIdentity)).toEqual({
-      token: 'hear',
-      vowelFamily: 'IY',
-    });
-    // A Map whose charStart key is a STRING (e.g. if it ever round-trips JSON)
-    // must still resolve against the numeric charStart, preserving the
-    // type-forgiveness the old Object.fromEntries path had for free.
-    const stringKeyed = new Map([[String(cs), { token: 'hear', vowelFamily: 'IY' }]]);
-    expect(resolveTokenDataAtPosition(node, 'hear', stringKeyed, null)).toEqual({
-      token: 'hear',
-      vowelFamily: 'IY',
-    });
-  });
-
-  it('identity fallback matches producer-built maps (colon + dash dual keying)', () => {
-    // The producers (useVerseSynthesis server hydrator + codex VerseSynthesis)
-    // key tokenByIdentity by BOTH `lineIndex:wordIndex:charStart` (for the
-    // index-based consumers like ReadPage.truesightDebugWords) AND
-    // buildIdentityKey(word, charStart) (for THIS resolver). Pin that the
-    // resolver's query format matches the dash key, so the identity fallback
-    // is no longer dead -- and that the old colon-only map would NOT have matched.
-    const { leaves } = makeParagraphChain(['see', 'hear']);
-    const node = leaves[2]; // 'hear'
-    const cs = computeCharStartFromLexical(node);
-    const profile = { word: 'hear', charStart: cs, lineIndex: 0, wordIndex: 1, vowelFamily: 'IY' };
-
-    // Reproduce the producer's dual-keying exactly.
-    const tokenByIdentity = new Map();
-    tokenByIdentity.set(`${profile.lineIndex}:${profile.wordIndex}:${profile.charStart}`, profile);
-    tokenByIdentity.set(buildIdentityKey(profile.word, profile.charStart), profile);
-
-    // byCharStart deliberately absent -- the only case the fallback exists for.
-    expect(resolveTokenDataAtPosition(node, 'hear', null, tokenByIdentity)).toEqual(profile);
-
-    // Regression guard: the colon key ALONE (the pre-fix producer output) never
-    // matched the resolver's dash query, which is why the fallback was dead.
-    const colonOnly = new Map([[`0:1:${cs}`, profile]]);
-    expect(resolveTokenDataAtPosition(node, 'hear', null, colonOnly)).toBeNull();
   });
 
   it('returns null when neither charStart nor identity matches - and does NOT fall back to a text-keyed cache', () => {
@@ -301,23 +221,6 @@ describe('Truesight charStart convention - source-level invariants', () => {
     // late-arriving resonance never re-coloured them. Lock the dual registration.
     expect(src).toMatch(/registerNodeTransform\(\s*TextNode\s*,\s*transformListener\s*\)/);
     expect(src).toMatch(/registerNodeTransform\(\s*TruesightWordNode\s*,\s*transformListener\s*\)/);
-  });
-
-  it('both tokenByIdentity producers index by buildIdentityKey (producer/consumer format parity)', () => {
-    // The identity fallback was dead because producers keyed tokenByIdentity by
-    // `lineIndex:wordIndex:charStart` while the resolver queried
-    // buildIdentityKey(text, charStart). Lock that BOTH producers now also emit
-    // the dash key from the same canonical helper, so the formats can't drift.
-    const producers = [
-      resolvePath(here, '../../../src/hooks/useVerseSynthesis.js'),
-      resolvePath(here, '../../../codex/core/shared/truesight/compiler/VerseSynthesis.js'),
-    ];
-    for (const producerPath of producers) {
-      const src = readFileSync(producerPath, 'utf8');
-      expect(src, `${producerPath} must import the canonical buildIdentityKey`).toMatch(/import\s*\{[^}]*buildIdentityKey[^}]*\}\s*from\s*['"][^'"]*charStart\.js['"]/);
-      // The dash key must be set ON the identity map (not just imported).
-      expect(src, `${producerPath} must set tokenByIdentity via buildIdentityKey`).toMatch(/tokenByIdentity[\s\S]{0,160}buildIdentityKey\(/);
-    }
   });
 
   it('charStart.js is framework-agnostic (no React, no lexical, no global mutable state)', () => {

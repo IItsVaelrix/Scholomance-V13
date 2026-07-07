@@ -1,6 +1,5 @@
 import {
   COMBAT_ARENA_SCHOOL,
-  EPIC_CAST_MIN_RARITY_ORDINAL,
   FAILURE_CAST_THRESHOLD,
   MIN_COMBAT_DAMAGE,
   clamp01,
@@ -9,12 +8,8 @@ import {
 } from './combat.balance.js';
 import { buildCombatProfile } from './combat.profile.js';
 import { buildSpeakingTraces } from './speaking/index.js';
-import { calculateCompendiumAmplification } from './spellweave-compendium/compendium.engine.js';
 import { calculateSyntacticBridge } from './spellweave.engine.js';
 import { evaluateSyntacticalChess } from './combat.syntax-chess.js';
-import { INEXPLICABLE_ELEMENT_DOMAINS } from './verseir-amplifier/plugins/inexplicableElements.js';
-import { hashString } from './pixelbrain/shared.js';
-import { tokenize } from './tokenizer.js';
 
 const SCORE_TO_DAMAGE_MULTIPLIER = 1.1;
 const SCORE_TO_DAMAGE_OFFSET = 6;
@@ -126,78 +121,6 @@ function isFailureCast(profile) {
   );
 }
 
-// ─── Cast events: discovery + epic animation cues ────────────────────────────
-
-const INEXPLICABLE_LEXEME_INDEX = (() => {
-  const index = new Map();
-  for (const domain of INEXPLICABLE_ELEMENT_DOMAINS) {
-    for (const lexeme of domain.lexemes) {
-      index.set(lexeme, domain.id);
-    }
-  }
-  return index;
-})();
-
-const SCHOOL_ANIMATION_MOTIFS = Object.freeze({
-  VOID: 'collapse-star',
-  SONIC: 'shatter-wave',
-  ALCHEMY: 'transmute-bloom',
-  PSYCHIC: 'mind-spiral',
-  WILL: 'force-lattice',
-});
-
-// U+241F (symbol for unit separator) keeps verse/weave boundaries unambiguous
-// in the seed text, so 'a b'+'c' never collides with 'a'+'b c'.
-const SEED_SEPARATOR = '␟';
-
-/**
- * Builds the typed cast event descriptors the UI consumes. Pure data —
- * dedupe of "first ever discovery" and the actual UI reactions belong to
- * runtime/UI layers. Deterministic: same inputs, same events, same seeds.
- */
-export function buildCastEvents({ verse = '', weave = '', rarity = null, bridge = null, syntacticalChess = null, school = null } = {}) {
-  const events = [];
-
-  const seen = new Set();
-  const scanSource = (text, source) => {
-    for (const token of tokenize(text)) {
-      if (!INEXPLICABLE_LEXEME_INDEX.has(token) || seen.has(token)) continue;
-      seen.add(token);
-      events.push({
-        type: 'DISCOVERY_INEXPLICABLE',
-        word: token,
-        domain: INEXPLICABLE_LEXEME_INDEX.get(token),
-        source,
-        seed: hashString(token) >>> 0,
-      });
-    }
-  };
-  scanSource(verse, 'verse');
-  scanSource(weave, 'weave');
-
-  if ((Number(rarity?.ordinal) || 0) >= EPIC_CAST_MIN_RARITY_ORDINAL) {
-    const motifBase = SCHOOL_ANIMATION_MOTIFS[school] || 'arcane-sigil';
-    const motif = bridge?.chainType === 'SEQUENCE' && (bridge?.strikes || 1) > 1
-      ? `${motifBase}-combo`
-      : motifBase;
-    events.push({
-      type: 'EPIC_CAST',
-      rarityId: rarity.id,
-      animationCue: {
-        seed: hashString(`${verse}${SEED_SEPARATOR}${weave}`) >>> 0,
-        school: school || null,
-        rarityId: rarity.id,
-        motif,
-      },
-    });
-  }
-
-  if (Array.isArray(bridge?.events)) events.push(...bridge.events);
-  if (Array.isArray(syntacticalChess?.events)) events.push(...syntacticalChess.events);
-
-  return events;
-}
-
 // Lore Sheet Rating Ladder
 const RATINGS = {
   NEOPHYTE: 'Neophyte',
@@ -226,8 +149,6 @@ export function calculateCombatScore({
   speakerType = 'PLAYER',
   speakerProfile = null,
   defender = null,
-  scholomance = null,
-  compendiumContext = null,
 } = {}) {
   const totalScore = getCombatTotalScore(scoreData);
   const traces = getCombatTraces(scoreData);
@@ -286,19 +207,6 @@ export function calculateCombatScore({
     profile,
   });
 
-  const compendium = calculateCompendiumAmplification({
-    verse: text,
-    weave,
-    bridge,
-    scholomance: scholomance || compendiumContext?.scholomance || null,
-    syntacticalChess,
-    encounter: compendiumContext?.encounter || defender || null,
-    verseIRAmplifier: scoreData?.verseIRAmplifier || profile.verseIRAmplifier || null,
-    usedEntryIds: compendiumContext?.usedEntryIds || [],
-    unlockedEntryIds: compendiumContext?.unlockedEntryIds || [],
-    discoveredEntryIds: compendiumContext?.discoveredEntryIds || [],
-  });
-
   const rawDamage = baseDamage
     * arenaResonanceMultiplier
     * schoolAffinityMultiplier
@@ -315,8 +223,7 @@ export function calculateCombatScore({
     * syntacticalChess.multiplier
     * (profile.rarity?.totalMultiplier ?? 1)
     * (profile.abyssalResonanceMultiplier ?? 1)
-    * supportPenalty
-    * compendium.compendiumMultiplier;
+    * supportPenalty;
 
   const damage = Math.max(computeDamageFloor(profile), Math.round(rawDamage));
   const baseHealing = computeHealingAmount(profile, damage);
@@ -340,28 +247,11 @@ export function calculateCombatScore({
     CODEX: { rating: getRatingForValue(codexVal), value: codexVal, justification: 'Lore density and continuity weight.' },
   };
 
-  const compendiumCommentary = compendium.counselLines.join(' ');
   const commentary = bridge.collapsed
     ? "Syntactic Collapse: The Weave has frayed."
-    : [
-      profile.commentary || profile.rarity?.praise || '',
-      compendiumCommentary,
-      ...syntacticalChess.diagnostics,
-    ].filter(Boolean).join(' ');
-
-  const events = buildCastEvents({
-    verse: text,
-    weave,
-    rarity: profile.rarity,
-    bridge,
-    syntacticalChess,
-    school: bridge.school || profile.school,
-  });
+    : [profile.commentary || profile.rarity?.praise || '', ...syntacticalChess.diagnostics].filter(Boolean).join(' ');
 
   return {
-    events,
-    strikes: bridge.strikes || 1,
-    chainType: bridge.chainType || 'SINGLE',
     totalScore,
     traces: combinedTraces,
     explainTrace: combinedTraces,
@@ -402,10 +292,6 @@ export function calculateCombatScore({
     syntacticalChess,
     rhymeQuality: profile.rhymeQuality ?? null,
     verseIRImpactMultiplier: profile.verseIRAmplifier?.impactMultiplier ?? null,
-    compendiumMultiplier: compendium.compendiumMultiplier,
-    tierBreakdown: compendium.tierBreakdown,
-    compendiumCounselLines: compendium.counselLines,
-    newlyDiscoveredEntryIds: compendium.newlyDiscoveredEntryIds,
   };
 }
 
@@ -423,8 +309,6 @@ export function normalizeCombatScore(scoreData, options = {}) {
     speakerType: options.speakerType,
     speakerProfile: options.speakerProfile,
     defender: options.defender,
-    scholomance: options.scholomance,
-    compendiumContext: options.compendiumContext,
   });
 }
 

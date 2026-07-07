@@ -15,16 +15,8 @@ import { detectScheme, analyzeMeter } from "../../rhymeScheme.detector.js";
 import { normalizeVowelFamily } from "../../../phonology/vowelFamily.js";
 import { analyzeLiteraryDevices, detectEmotionDetailed } from "../../literaryDevices.detector.js";
 import { resolveSonicChroma } from "../../../phonology/chroma.resolver.js";
-import { decodeBytecode } from "../bytecodeRenderer.js";
 import { buildResonancePalette, resolveResonanceColor } from "../color/rhymeColorRegistry.js";
 import { resolveVerseIrColor } from "../color/pcaChroma.js";
-import { auditTokenWeights } from "../../../tokenization/tokenWeightError.js";
-import { combineTokenWeights } from "../../../tokenization/tokenWeightSchema.js";
-// The canonical position-bound text identity used by the Lexical editor's
-// resolver (resolveTokenDataAtPosition). charStart.js is framework-agnostic
-// (no react/lexical imports), so importing the format keeps producer and
-// consumer on ONE definition instead of a drifting duplicate string.
-import { buildIdentityKey } from "../../../../../src/lib/lexical/charStart.js";
 
 /**
  * Executes a total linguistic synthesis of the given text.
@@ -82,9 +74,6 @@ export function synthesizeVerse(text, options = {}) {
         })
       : null;
 
-    const visualBytecode = token.visualBytecode || token.trueVisionBytecode || null;
-    const decoded = visualBytecode ? decodeBytecode(visualBytecode) : null;
-
     const unifiedToken = {
       ...token,
       ...syntaxToken,
@@ -93,20 +82,12 @@ export function synthesizeVerse(text, options = {}) {
       verseIrColor,
       precomputed: {
         sonicChroma,
-        decoded,
+        decoded: null,
         hex: verseIrColor?.hex || (sonicChroma ? `hsl(${sonicChroma.h}, ${sonicChroma.s}%, ${sonicChroma.l}%)` : null)
       }
     };
 
     tokenByIdentity.set(identityKey, unifiedToken);
-    // Also index by the position-bound text identity the Lexical resolver
-    // queries (buildIdentityKey(word, charStart)). The colon key
-    // `lineIndex:wordIndex:charStart` is for index-based consumers (ReadPage's
-    // truesightDebugWords); the editor's identity fallback never carried
-    // line/word indices, so without this dash key it could never match.
-    if (token.word) {
-      tokenByIdentity.set(buildIdentityKey(token.word, token.charStart), unifiedToken);
-    }
     tokenByCharStart.set(token.charStart, unifiedToken);
     
     if (!tokenByNormalizedWord.has(token.normalized)) {
@@ -116,45 +97,6 @@ export function synthesizeVerse(text, options = {}) {
 
   // 7. Authority Registry Unification
   const rhymeColorRegistry = buildResonancePalette(Array.from(tokenByIdentity.values()), currentSchool);
-
-  const rawDocWeights = analyzedDoc.parsed?.tokenWeights ?? {};
-  const combinedTokenWeights = {};
-
-  for (const [normalizedWord, unifiedToken] of tokenByNormalizedWord.entries()) {
-    if (!normalizedWord) continue;
-
-    const docWeight = rawDocWeights[normalizedWord] ?? null;
-    const syntacticWeight = typeof unifiedToken?.hhm?.tokenWeight === 'number'
-      ? unifiedToken.hhm.tokenWeight
-      : null;
-
-    if (docWeight === null && syntacticWeight === null) {
-      continue;
-    }
-
-    combinedTokenWeights[normalizedWord] = combineTokenWeights({
-      normalized: normalizedWord,
-      document: docWeight,
-      syntactic: syntacticWeight,
-      activation: null,
-    });
-  }
-
-  for (const [word, weight] of Object.entries(rawDocWeights)) {
-    if (!(word in combinedTokenWeights)) {
-      combinedTokenWeights[word] = weight;
-    }
-  }
-
-  let tokenWeightDiagnostic = null;
-  try {
-    tokenWeightDiagnostic = auditTokenWeights({
-      analyzedDocument: analyzedDoc,
-      rankedCandidates: [],
-    });
-  } catch (auditError) {
-    console.warn('[VerseSynthesis] tokenWeight audit failed silently:', auditError);
-  }
 
   return Object.freeze({
     timestamp: Date.now(), // EXEMPT
@@ -169,11 +111,7 @@ export function synthesizeVerse(text, options = {}) {
     tokenByCharStart,
     tokenByNormalizedWord,
     rhymeColorRegistry,
-    totalSyllables: verseIR.metadata?.syllableCount ?? verseIR.tokens.reduce((n, t) => n + (t.syllableCount || 0), 0),
-    tokenWeights: Object.keys(combinedTokenWeights).length > 0
-      ? combinedTokenWeights
-      : rawDocWeights,
-    tokenWeightDiagnostic,
+    totalSyllables: verseIR?.tokens?.reduce((n, t) => n + (t.syllableCount || 0), 0) || 0,
     isPure: true
   });
 }
@@ -193,8 +131,6 @@ function createEmptyArtifact() {
     tokenByNormalizedWord: new Map(),
     rhymeColorRegistry: new Map(),
     totalSyllables: 0,
-    tokenWeights: {},
-    tokenWeightDiagnostic: null,
     isPure: true
   });
 }
