@@ -1,0 +1,584 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://bkdwytn1tueb1" path="res://addons/scholomance_godot_bridge/runtime/frame_timeline_runner.gd" id="1_4kr4c"]
+
+[node name="FrameTimelineArtifact" type="Node2D" unique_id=798968216]
+
+[node name="VoidArenaFrameTimeline" type="Node2D" parent="." unique_id=398435046]
+script = ExtResource("1_4kr4c")
+
+[node name="tilemap_base" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1859793535]
+
+[node name="@ColorRect@19406" type="ColorRect" parent="VoidArenaFrameTimeline/tilemap_base" unique_id=723732347]
+offset_right = 1920.0
+offset_bottom = 1080.0
+color = Color(0.06666667, 0.06666667, 0.09411765, 1)
+
+[node name="amethyst_crack_0" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=173865675]
+z_index = 1
+position = Vector2(656, 272)
+scale = Vector2(0.8, 0.8)
+
+[node name="@ColorRect@19407" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_0" unique_id=400926018]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_1" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=221782915]
+z_index = 1
+position = Vector2(688, 304)
+rotation = 0.7
+scale = Vector2(0.95, 0.9)
+
+[node name="@ColorRect@19408" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_1" unique_id=178333377]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_2" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1061957732]
+z_index = 1
+position = Vector2(752, 208)
+rotation = 1.4
+scale = Vector2(1.1, 1)
+
+[node name="@ColorRect@19409" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_2" unique_id=639990996]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_3" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1914406354]
+z_index = 1
+position = Vector2(784, 304)
+rotation = 2.1
+scale = Vector2(0.8, 1.1)
+
+[node name="@ColorRect@19410" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_3" unique_id=477263603]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_4" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1854187227]
+z_index = 1
+position = Vector2(720, 336)
+rotation = 2.8
+scale = Vector2(0.95, 1.2)
+
+[node name="@ColorRect@19411" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_4" unique_id=433293307]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_5" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1177209478]
+z_index = 1
+position = Vector2(1392, 368)
+rotation = 3.5
+scale = Vector2(1.1, 0.8)
+
+[node name="@ColorRect@19412" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_5" unique_id=2129358209]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_6" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1202033819]
+z_index = 1
+position = Vector2(1488, 432)
+rotation = 4.2
+scale = Vector2(0.8, 0.9)
+
+[node name="@ColorRect@19413" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_6" unique_id=256904197]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_7" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=13904877]
+z_index = 1
+position = Vector2(1424, 464)
+rotation = 4.9
+scale = Vector2(0.95, 1)
+
+[node name="@ColorRect@19414" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_7" unique_id=1010785183]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_8" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1872678666]
+z_index = 1
+position = Vector2(1520, 368)
+rotation = 5.6
+scale = Vector2(1.1, 1.1)
+
+[node name="@ColorRect@19415" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_8" unique_id=260119155]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_9" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1540850480]
+z_index = 1
+position = Vector2(1392, 432)
+rotation = 0.016814692
+scale = Vector2(0.8, 1.2)
+
+[node name="@ColorRect@19416" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_9" unique_id=695082658]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_10" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1097461405]
+z_index = 1
+position = Vector2(1136, 784)
+rotation = 0.7168147
+scale = Vector2(0.95, 0.8)
+
+[node name="@ColorRect@19417" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_10" unique_id=542421470]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_11" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1457729047]
+z_index = 1
+position = Vector2(1232, 848)
+rotation = 1.4168147
+scale = Vector2(1.1, 0.9)
+
+[node name="@ColorRect@19418" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_11" unique_id=796613453]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_12" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=512812957]
+z_index = 1
+position = Vector2(1168, 880)
+rotation = 2.1168146
+scale = Vector2(0.8, 1)
+
+[node name="@ColorRect@19419" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_12" unique_id=499596777]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_13" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1273175339]
+z_index = 1
+position = Vector2(1264, 784)
+rotation = 2.8168147
+scale = Vector2(0.95, 1.1)
+
+[node name="@ColorRect@19420" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_13" unique_id=1918082651]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_14" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=374712663]
+z_index = 1
+position = Vector2(1200, 848)
+rotation = 3.5168147
+scale = Vector2(1.1, 1.2)
+
+[node name="@ColorRect@19421" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_14" unique_id=37667160]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_15" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1225605687]
+z_index = 1
+position = Vector2(1552, 720)
+rotation = 4.2168145
+scale = Vector2(0.8, 0.8)
+
+[node name="@ColorRect@19422" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_15" unique_id=621598823]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_16" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=689510018]
+z_index = 1
+position = Vector2(1584, 656)
+rotation = 4.916815
+scale = Vector2(0.95, 0.9)
+
+[node name="@ColorRect@19423" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_16" unique_id=456934571]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_17" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1211252296]
+z_index = 1
+position = Vector2(1392, 496)
+rotation = 5.6168146
+scale = Vector2(1.1, 1)
+
+[node name="@ColorRect@19424" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_17" unique_id=248674154]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_18" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1237293887]
+z_index = 1
+position = Vector2(1168, 432)
+rotation = 0.033629384
+scale = Vector2(0.8, 1.1)
+
+[node name="@ColorRect@19425" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_18" unique_id=1204788485]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_19" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1054022728]
+z_index = 1
+position = Vector2(912, 496)
+rotation = 0.7336294
+scale = Vector2(0.95, 1.2)
+
+[node name="@ColorRect@19426" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_19" unique_id=763897961]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_20" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=26389518]
+z_index = 1
+position = Vector2(848, 592)
+rotation = 1.4336294
+scale = Vector2(1.1, 0.8)
+
+[node name="@ColorRect@19427" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_20" unique_id=2126266096]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_21" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=2138298918]
+z_index = 1
+position = Vector2(848, 720)
+rotation = 2.1336293
+scale = Vector2(0.8, 0.9)
+
+[node name="@ColorRect@19428" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_21" unique_id=434827669]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_22" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1191529634]
+z_index = 1
+position = Vector2(912, 784)
+rotation = 2.8336294
+scale = Vector2(0.95, 1)
+
+[node name="@ColorRect@19429" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_22" unique_id=1747199020]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_23" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1898118072]
+z_index = 1
+position = Vector2(336, 176)
+rotation = 3.5336294
+scale = Vector2(1.1, 1.1)
+
+[node name="@ColorRect@19430" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_23" unique_id=916155597]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="amethyst_crack_24" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1173656876]
+z_index = 1
+position = Vector2(1744, 944)
+rotation = 4.233629
+scale = Vector2(0.8, 1.2)
+
+[node name="@ColorRect@19431" type="ColorRect" parent="VoidArenaFrameTimeline/amethyst_crack_24" unique_id=321753979]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.48235294, 0.18431373, 0.74509805, 1)
+
+[node name="fissure_spiral_0" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=2007432100]
+z_index = 2
+position = Vector2(1520, 688)
+
+[node name="@ColorRect@19432" type="ColorRect" parent="VoidArenaFrameTimeline/fissure_spiral_0" unique_id=1016360389]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0, 0.8980392, 1, 1)
+
+[node name="fissure_spiral_1" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1358715193]
+z_index = 2
+position = Vector2(1488, 688)
+
+[node name="@ColorRect@19433" type="ColorRect" parent="VoidArenaFrameTimeline/fissure_spiral_1" unique_id=2023084541]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0, 0.8980392, 1, 1)
+
+[node name="fissure_spiral_2" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=758226354]
+z_index = 2
+position = Vector2(1456, 688)
+
+[node name="@ColorRect@19434" type="ColorRect" parent="VoidArenaFrameTimeline/fissure_spiral_2" unique_id=1578452704]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0, 0.8980392, 1, 1)
+
+[node name="fissure_spiral_3" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=995640784]
+z_index = 2
+position = Vector2(1424, 688)
+rotation = 0.7853982
+
+[node name="@ColorRect@19435" type="ColorRect" parent="VoidArenaFrameTimeline/fissure_spiral_3" unique_id=1688843847]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0, 0.8980392, 1, 1)
+
+[node name="fissure_spiral_4" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1867249311]
+z_index = 2
+position = Vector2(1360, 560)
+rotation = 1.5707964
+
+[node name="@ColorRect@19436" type="ColorRect" parent="VoidArenaFrameTimeline/fissure_spiral_4" unique_id=1573232018]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0, 0.8980392, 1, 1)
+
+[node name="fissure_spiral_5" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=364815172]
+z_index = 2
+position = Vector2(1360, 592)
+rotation = 1.5707964
+
+[node name="@ColorRect@19437" type="ColorRect" parent="VoidArenaFrameTimeline/fissure_spiral_5" unique_id=1729629283]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0, 0.8980392, 1, 1)
+
+[node name="fissure_spiral_6" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=134988764]
+z_index = 2
+position = Vector2(1360, 624)
+rotation = 1.5707964
+
+[node name="@ColorRect@19438" type="ColorRect" parent="VoidArenaFrameTimeline/fissure_spiral_6" unique_id=926975303]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0, 0.8980392, 1, 1)
+
+[node name="fissure_spiral_7" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=928897406]
+z_index = 2
+position = Vector2(1360, 528)
+rotation = 2.3561945
+
+[node name="@ColorRect@19439" type="ColorRect" parent="VoidArenaFrameTimeline/fissure_spiral_7" unique_id=1845136884]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0, 0.8980392, 1, 1)
+
+[node name="fissure_spiral_8" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1512172843]
+z_index = 2
+position = Vector2(1136, 464)
+rotation = 3.1415927
+
+[node name="@ColorRect@19440" type="ColorRect" parent="VoidArenaFrameTimeline/fissure_spiral_8" unique_id=1400671750]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0, 0.8980392, 1, 1)
+
+[node name="fissure_spiral_9" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=378222858]
+z_index = 2
+position = Vector2(1072, 464)
+rotation = 3.1415927
+
+[node name="@ColorRect@19441" type="ColorRect" parent="VoidArenaFrameTimeline/fissure_spiral_9" unique_id=715215962]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0, 0.8980392, 1, 1)
+
+[node name="fissure_spiral_10" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1187556784]
+z_index = 2
+position = Vector2(1008, 464)
+rotation = 3.1415927
+
+[node name="@ColorRect@19442" type="ColorRect" parent="VoidArenaFrameTimeline/fissure_spiral_10" unique_id=1268337595]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0, 0.8980392, 1, 1)
+
+[node name="fissure_spiral_11" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=881587994]
+z_index = 2
+position = Vector2(880, 464)
+rotation = 3.9269907
+
+[node name="@ColorRect@19443" type="ColorRect" parent="VoidArenaFrameTimeline/fissure_spiral_11" unique_id=193011189]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0, 0.8980392, 1, 1)
+
+[node name="fissure_spiral_12" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=2061437467]
+z_index = 2
+position = Vector2(880, 560)
+rotation = 4.712389
+
+[node name="@ColorRect@19444" type="ColorRect" parent="VoidArenaFrameTimeline/fissure_spiral_12" unique_id=74503830]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0, 0.8980392, 1, 1)
+
+[node name="fissure_spiral_13" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1738153279]
+z_index = 2
+position = Vector2(880, 624)
+rotation = 4.712389
+
+[node name="@ColorRect@19445" type="ColorRect" parent="VoidArenaFrameTimeline/fissure_spiral_13" unique_id=266514924]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0, 0.8980392, 1, 1)
+
+[node name="fissure_spiral_14" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1724668191]
+z_index = 2
+position = Vector2(912, 656)
+rotation = 5.497787
+
+[node name="@ColorRect@19446" type="ColorRect" parent="VoidArenaFrameTimeline/fissure_spiral_14" unique_id=1966748554]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0, 0.8980392, 1, 1)
+
+[node name="fissure_spiral_15" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=431244741]
+z_index = 2
+position = Vector2(944, 656)
+
+[node name="@ColorRect@19447" type="ColorRect" parent="VoidArenaFrameTimeline/fissure_spiral_15" unique_id=1601231623]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0, 0.8980392, 1, 1)
+
+[node name="fissure_spiral_16" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1223361171]
+z_index = 2
+position = Vector2(976, 656)
+
+[node name="@ColorRect@19448" type="ColorRect" parent="VoidArenaFrameTimeline/fissure_spiral_16" unique_id=895462295]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0, 0.8980392, 1, 1)
+
+[node name="singularity_marker" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=1752545092]
+z_index = 3
+position = Vector2(960, 672)
+
+[node name="@ColorRect@19449" type="ColorRect" parent="VoidArenaFrameTimeline/singularity_marker" unique_id=1815041859]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+
+[node name="pillar_a" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=588590637]
+z_index = 4
+position = Vector2(734, 255)
+scale = Vector2(1, 2.8)
+
+[node name="@ColorRect@19450" type="ColorRect" parent="VoidArenaFrameTimeline/pillar_a" unique_id=1347654988]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.050980393, 0.050980393, 0.101960786, 1)
+
+[node name="pillar_b" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=915826353]
+z_index = 4
+position = Vector2(1467, 413)
+scale = Vector2(1, 1.9)
+
+[node name="@ColorRect@19451" type="ColorRect" parent="VoidArenaFrameTimeline/pillar_b" unique_id=1208207237]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.050980393, 0.050980393, 0.101960786, 1)
+
+[node name="pillar_c" type="Node2D" parent="VoidArenaFrameTimeline" unique_id=474511838]
+z_index = 4
+position = Vector2(1187, 825)
+scale = Vector2(1, 1.2)
+
+[node name="@ColorRect@19452" type="ColorRect" parent="VoidArenaFrameTimeline/pillar_c" unique_id=2087506398]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.050980393, 0.050980393, 0.101960786, 1)

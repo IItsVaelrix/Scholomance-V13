@@ -4,7 +4,7 @@
  * Content is authored here; ArticlePage.tsx routes to the right entry by slug.
  */
 
-import { Children, Fragment, isValidElement, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export interface TocItem {
   href: string;
@@ -553,69 +553,4 @@ export const ARTICLES: Article[] = [
 
 export function getArticle(slug: string): Article | undefined {
   return ARTICLES.find((a) => a.slug === slug);
-}
-
-/* ── seed → lightweight-text conversion ──────────────────────────────── */
-/* Used when an admin edits a seed: the rich JSX is flattened into the
- * MarkdownLite source format so it becomes an editable shadow post. The
- * original seed JSX is never mutated. Best-effort -- tables flatten to text. */
-
-function inlineText(node: ReactNode): string {
-  if (node == null || node === false || node === true) return '';
-  if (typeof node === 'string') return node;
-  if (typeof node === 'number') return String(node);
-  if (Array.isArray(node)) return node.map(inlineText).join('');
-  if (isValidElement(node)) {
-    const el = node as { type: unknown; props: { children?: ReactNode } };
-    const inner = inlineText(el.props.children);
-    if (el.type === 'strong' || el.type === 'b') return `**${inner}**`;
-    if (el.type === 'em' || el.type === 'i') return `*${inner}*`;
-    return inner;
-  }
-  return '';
-}
-
-function asTopLevel(node: ReactNode): ReactNode[] {
-  if (isValidElement(node) && (node as { type: unknown }).type === Fragment) {
-    return Children.toArray((node as { props: { children?: ReactNode } }).props.children);
-  }
-  return Children.toArray(node);
-}
-
-function blockText(node: ReactNode): string {
-  const blocks: string[] = [];
-  for (const child of asTopLevel(node)) {
-    if (!isValidElement(child)) {
-      const t = inlineText(child).trim();
-      if (t) blocks.push(t);
-      continue;
-    }
-    const el = child as { type: unknown; props: { children?: ReactNode } };
-    if (el.type === 'ul' || el.type === 'ol') {
-      const items: string[] = [];
-      Children.forEach(el.props.children, (li) => {
-        if (isValidElement(li)) {
-          const text = inlineText((li as { props: { children?: ReactNode } }).props.children).trim();
-          if (text) items.push(`- ${text}`);
-        }
-      });
-      if (items.length) blocks.push(items.join('\n'));
-    } else {
-      const t = inlineText(el.props.children).trim();
-      if (t) blocks.push(t);
-    }
-  }
-  return blocks.join('\n\n');
-}
-
-export function seedArticleToBody(slug: string): string {
-  const article = getArticle(slug);
-  if (!article) return '';
-  return article.sections
-    .map((s) => {
-      const prefix = s.level === 2 ? '##' : '###';
-      const body = blockText(s.content);
-      return body ? `${prefix} ${s.heading}\n\n${body}` : `${prefix} ${s.heading}`;
-    })
-    .join('\n\n');
 }

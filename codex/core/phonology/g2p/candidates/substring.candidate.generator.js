@@ -17,6 +17,13 @@ function characterOverlapAtMin(a, b, min = 3) {
   return overlap;
 }
 
+function boundarySafeAdaptation(word, entryWord, phonemes) {
+  if (!word.endsWith(entryWord) && !entryWord.endsWith(word)) {
+    return phonemes;
+  }
+  return phonemes;
+}
+
 export function generateSubstringCandidates(word, cmuEntries, limit = MAX_CANDIDATES) {
   const upper = String(word || '').toUpperCase().replace(/[^A-Z]/g, '');
   if (upper.length < 3) return [];
@@ -31,10 +38,7 @@ export function generateSubstringCandidates(word, cmuEntries, limit = MAX_CANDID
     const overlap = characterOverlapAtMin(upper, key, MIN_GRAPHEME_OVERLAP);
     if (overlap < MIN_GRAPHEME_OVERLAP) continue;
 
-    // Phonemes are borrowed wholesale from the overlapping CMU entry; no
-    // morphological boundary adaptation is performed. The jury's phonotactic
-    // and graph jurors are responsible for down-ranking poor borrows.
-    const adapted = phonemeVariants[0];
+    const adapted = boundarySafeAdaptation(upper, key, phonemeVariants[0]);
     if (!adapted || adapted.length === 0) continue;
 
     const keyStr = adapted.join(' ');

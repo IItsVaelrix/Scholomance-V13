@@ -32,21 +32,3 @@ export {
   createPacketDelta,
   routeRetinaPacketToPhotonicBridge,
 } from './retina-bridge.js';
-
-export {
-  cellIndex,
-  cellCount,
-  cellSignature,
-  buildCellSignatures,
-  diffCellSignatures,
-} from './retina-cell-index.js';
-
-export {
-  SHADOW_DELTA_EPSILON,
-  diffShadowField,
-} from './retina-shadow-field.js';
-
-export {
-  assemblePerceptionFrame,
-  fullAttendFrame,
-} from './retina-perception.js';

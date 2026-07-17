@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/VoidArenaScene.gd" id="1_void_scene"]
+
+[node name="VoidArena" type="Node2D"]
+script = ExtResource("1_void_scene")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(960, 540)
+zoom = Vector2(1, 1)

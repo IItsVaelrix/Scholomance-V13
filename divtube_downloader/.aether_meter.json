@@ -1,0 +1,8 @@
+{
+  "prompt_tokens": 2508261,
+  "completion_tokens": 32909,
+  "calls": 333,
+  "cost_usd": 11.832232,
+  "budget_usd": 20.0,
+  "last_model": "groq/compound"
+}

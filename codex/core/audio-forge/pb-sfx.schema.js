@@ -40,16 +40,11 @@ export const SFX_EVENT_TYPES = Object.freeze({
   SYNTACTICAL_CHESS_ADVANTAGE: 'SYNTACTICAL_CHESS_ADVANTAGE',
   ORACLE_MARGINALIA:           'ORACLE_MARGINALIA',
   NEXUS_UNLOCK:                'NEXUS_UNLOCK',
-  FOOTSTEP:                    'FOOTSTEP',
   SPELL_CAST:                  'SPELL_CAST',
   SPELL_HIT:                   'SPELL_HIT',
   SPELL_FAIL:                  'SPELL_FAIL',
   UI_CONFIRM:                  'UI_CONFIRM',
   UI_CANCEL:                   'UI_CANCEL',
-  OBELISK_CHARGE:              'OBELISK_CHARGE',
-  OBELISK_DISCHARGE:           'OBELISK_DISCHARGE',
-  VOID_SPELL_CAST:             'VOID_SPELL_CAST',
-  VOID_SPELL_HIT:              'VOID_SPELL_HIT',
 });
 
 // ─── Voice Types ──────────────────────────────────────────────────────────────
@@ -59,25 +54,6 @@ export const VOICE_TYPES = Object.freeze({
   NOISE:     'noise',
   FM:        'fm',
   ADDITIVE:  'additive',
-  TRANSIENT: 'transient',
-  ELECTRIC:  'electric',
-  ZAP:       'zap',
-});
-
-/** Sample-and-hold routing for electric shock voices. */
-export const ELECTRIC_SH_MODES = Object.freeze({
-  AMPLITUDE: 'amplitude',
-  CUTOFF:    'cutoff',
-  BOTH:      'both',
-});
-
-/** Surface profiles for locomotion / impact events. */
-export const TRANSIENT_SURFACES = Object.freeze({
-  STONE:    'stone',
-  ICE:      'ice',
-  SLATE:    'slate',
-  METAL:    'metal',
-  ORGANIC:  'organic',
 });
 
 // ─── Noise Types ──────────────────────────────────────────────────────────────
@@ -209,30 +185,6 @@ export function validateSfxPacket(packet) {
           }
           if (typeof voice.modFreq !== 'number' || !Number.isFinite(voice.modFreq)) {
             warnings.push(`VOICE[${i}]_FM_MOD_INVALID: defaulting to 220`);
-          }
-        }
-        if (voice.type === VOICE_TYPES.TRANSIENT) {
-          if (voice.surface != null && !Object.values(TRANSIENT_SURFACES).includes(voice.surface)) {
-            warnings.push(`VOICE[${i}]_TRANSIENT_SURFACE_UNKNOWN:${String(voice.surface)} — defaulting to stone`);
-          }
-        }
-        if (voice.type === VOICE_TYPES.ELECTRIC) {
-          if (voice.shMode != null && !Object.values(ELECTRIC_SH_MODES).includes(voice.shMode)) {
-            warnings.push(`VOICE[${i}]_ELECTRIC_SH_MODE_UNKNOWN:${String(voice.shMode)} — defaulting to both`);
-          }
-          if (typeof voice.centerFreqHz !== 'number' || !Number.isFinite(voice.centerFreqHz)) {
-            warnings.push(`VOICE[${i}]_ELECTRIC_CENTER_INVALID: defaulting to 2800 Hz`);
-          }
-          if (typeof voice.q !== 'number' || !Number.isFinite(voice.q)) {
-            warnings.push(`VOICE[${i}]_ELECTRIC_Q_INVALID: defaulting to 16`);
-          }
-        }
-        if (voice.type === VOICE_TYPES.ZAP) {
-          if (typeof voice.carrierFreq !== 'number' || !Number.isFinite(voice.carrierFreq)) {
-            warnings.push(`VOICE[${i}]_ZAP_CARRIER_INVALID: defaulting to 420 Hz`);
-          }
-          if (typeof voice.modIndex !== 'number' || !Number.isFinite(voice.modIndex)) {
-            warnings.push(`VOICE[${i}]_ZAP_MOD_INDEX_INVALID: defaulting to 10`);
           }
         }
         if (!Object.values(ENVELOPE_ROLES).includes(voice.envelopeRole)) {

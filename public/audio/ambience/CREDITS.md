@@ -1,5 +1,6 @@
 # Ambience Loop Credits
 
+<<<<<<< HEAD
 The focus-mode mixer currently exposes a **single channel** (Rain + Forest
 Stream). The other loops below are kept on disk but are not wired into the
 mixer for now — re-add their ids to `AMBIENCE_CHANNELS` in
@@ -13,6 +14,8 @@ mixer for now — re-add their ids to `AMBIENCE_CHANNELS` in
 
 ## Inactive (procedural CC0 placeholders, not currently mixed)
 
+=======
+>>>>>>> v13/main
 These loops are **procedurally generated placeholders** synthesized locally
 with ffmpeg from filtered noise. They contain no third-party recordings and
 carry no external copyright — released as CC0 / public domain. They exist so

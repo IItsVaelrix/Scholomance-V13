@@ -1,7 +1,7 @@
 import requests
 import json
 
-def get_oracle_context(query: str, speculativeEnvelope: dict = None) -> str:
+def get_oracle_context(query: str) -> str:
     """
     Pings the central Javascript/WASM TurboQuant API over localhost HTTP.
     This routes the Oracle memory to the core CODEx Authority Server.
@@ -14,8 +14,6 @@ def get_oracle_context(query: str, speculativeEnvelope: dict = None) -> str:
                 "emotion": {"primary": "neutral"}
             }
         }
-        if speculativeEnvelope:
-            payload["telemetry"]["speculativeEnvelope"] = speculativeEnvelope
         
         response = requests.post(url, json=payload, timeout=5)
         

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="none">
+<defs>
+<linearGradient id="g" x1="38" y1="220" x2="218" y2="36" gradientUnits="userSpaceOnUse"><stop stop-color="#7A42FF"/><stop offset="1" stop-color="#C65BFF"/></linearGradient>
+<filter id="glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="256" height="256" rx="40" fill="#0A0D16" fill-opacity=".02"/>
+<g stroke="url(#g)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
+<path d="M128 42 202 84v88l-74 42-74-42V84l74-42Z"/>
+<path d="M128 42v86l74 44M128 128 54 84M128 128l74-44"/>
+<path d="M94 103v50l34 20 34-20v-50l-34-20-34 20Z" opacity=".62"/>
+<circle cx="128" cy="128" r="12" opacity=".9"/>
+</g>
+<title>sigil-postmortem</title>
+</svg>

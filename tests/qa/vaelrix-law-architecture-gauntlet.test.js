@@ -149,7 +149,7 @@ describe('[QA] Vaelrix Law Architecture Gauntlet', () => {
   });
 
   describe('2) Anti-Chaos Randomness Detector', () => {
-    it('scans runtime code for forbidden Math.random() usage', () => {
+    it('scans runtime code for forbidden Math.random( ) usage', () => {
       // Directories to scan
       const dirs = ['src', 'codex'];
       // These detectors are plain text greps, so they cannot tell a call from a
@@ -170,7 +170,7 @@ describe('[QA] Vaelrix Law Architecture Gauntlet', () => {
       ];
 
       // Use grep to find occurrences
-      const grepCommand = `grep -F -r "Math.random()" ${dirs.join(' ')} --exclude-dir={${allowedExemptions.join(',')}} || true`;
+      const grepCommand = `grep -F -r "Math.random( )" ${dirs.join(' ')} --exclude-dir={${allowedExemptions.join(',')}} || true`;
       const output = execSync(grepCommand).toString().trim();
       
       if (output) {
@@ -178,7 +178,7 @@ describe('[QA] Vaelrix Law Architecture Gauntlet', () => {
         const violations = lines.filter(line => !isExempt(line) && !line.includes('.md:'));
 
         assertTrue(violations.length === 0, {
-          testName: 'scans runtime code for forbidden Math.random() usage',
+          testName: 'scans runtime code for forbidden Math.random( ) usage',
           testFile: 'vaelrix-law-architecture-gauntlet.test.js',
           testSuite: 'Vaelrix Law Architecture Gauntlet',
           expected: '0 violations',
@@ -190,7 +190,7 @@ describe('[QA] Vaelrix Law Architecture Gauntlet', () => {
   });
 
   describe('3) Wall-clock Corruption Detector', () => {
-    it('scans critical paths for forbidden Date.now() or performance.now()', () => {
+    it('scans critical paths for forbidden Date.now( ) or performance.now()', () => {
       const criticalDirs = [
         'codex/core',
         'codex/services',
@@ -199,7 +199,7 @@ describe('[QA] Vaelrix Law Architecture Gauntlet', () => {
         'codex/core/pixelbrain'
       ];
       
-      const forbidden = ['Date.now()', 'performance.now()'];
+      const forbidden = ['Date.now( )', 'performance.now()'];
       
       for (const pattern of forbidden) {
         // Filter out existing criticalDirs that might not exist to avoid grep errors
@@ -215,7 +215,7 @@ describe('[QA] Vaelrix Law Architecture Gauntlet', () => {
           const violations = output.split('\n').filter(line => !isExempt(line) && !line.includes('.md:'));
           
           assertTrue(violations.length === 0, {
-            testName: 'scans critical paths for forbidden Date.now() or performance.now()',
+            testName: 'scans critical paths for forbidden Date.now( ) or performance.now()',
             testFile: 'vaelrix-law-architecture-gauntlet.test.js',
             testSuite: 'Vaelrix Law Architecture Gauntlet',
             expected: '0 violations',

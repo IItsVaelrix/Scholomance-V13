@@ -52,4 +52,3 @@ export function expandVectorPass(ast, _errors) {
 
   return { ...ast, parts: newParts };
 }
-
