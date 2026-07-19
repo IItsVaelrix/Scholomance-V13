@@ -118,11 +118,18 @@ describe('visualizer ↔ Scribe gate parity (Petrichor)', () => {
     });
     expect(applied.syncMode).toBe('gated');
 
-    const vizGate = new Map(applied.gate);
-    expect(vizGate.size).toBe(scribeGate.size);
-    for (const [cs, tier] of scribeGate) {
-      expect(vizGate.get(cs)).toBe(tier);
+    // Apply omits a serialized gate Map (lines already carry tier). Parity is
+    // gateSize plus per-tier counts on painted tokens.
+    expect(applied.gateSize).toBe(scribeGate.size);
+    const vizTierCounts = { rhyme: 0, assonance: 0 };
+    for (const row of applied.lines || []) {
+      for (const tok of row) {
+        if (tok?.tier === 'rhyme' || tok?.tier === 'assonance') vizTierCounts[tok.tier] += 1;
+      }
     }
+    const scribeTierCounts = { rhyme: 0, assonance: 0 };
+    for (const tier of scribeGate.values()) scribeTierCounts[tier] += 1;
+    expect(vizTierCounts).toEqual(scribeTierCounts);
 
     // Disk bake must include the multi pass (Approach A regression).
     const diskPath = join(ROOT, `public/data/truesight/${PETRICHOR.id}.truesight-v1.json`);

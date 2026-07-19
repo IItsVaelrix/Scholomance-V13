@@ -31,9 +31,10 @@ export const DEFAULT_MIN_RESONANCE_SCORE = 0.95;
 export const RHYME_TIER_TYPES = new Set(['identity', 'perfect', 'near', 'slant']);
 // Assonance tints only solid vowel echoes. The weak band (below this) is the
 // long tail of incidental same-vowel pairs that read as noise rather than
-// resonance, so it is left grey. Tuned against a representative dense verse to
-// keep assonance from over-representing the palette.
-export const DEFAULT_ASSONANCE_MIN_SCORE = 0.60;
+// resonance, so it is left grey. Floor matches STRESSED_ASSONANCE_SCORE (0.62)
+// so only stressed vowel echoes tint; sub-stressed fractions stay grey. Paired
+// with the multi floor below for ~18% fewer colored words on baked artifacts.
+export const DEFAULT_ASSONANCE_MIN_SCORE = 0.62;
 
 /**
  * A multi is trusted by its STRUCTURE, not by a similarity number.
@@ -44,8 +45,12 @@ export const DEFAULT_ASSONANCE_MIN_SCORE = 0.60;
  * slant link earned by the rest of the chain averaging above 0.80. Its `score` is the
  * mean link strength, an ordering, not a verdict. Judging it by the word bar would
  * censor every multi with an honest weak tail — which is most of them.
+ *
+ * 0.87 filters soft multi tails that were flooding the rhyme-glow tier
+ * (prior 0.70 admitted every baked multi). Paired with the assonance floor for
+ * ~18% fewer colored words without touching the word-rhyme 0.95 bar.
  */
-export const DEFAULT_MULTI_MIN_SCORE = 0.70;
+export const DEFAULT_MULTI_MIN_SCORE = 0.87;
 
 /**
  * Multis are passed SEPARATELY, never merged into `connections`.
