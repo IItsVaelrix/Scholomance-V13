@@ -4,6 +4,7 @@ import os
 import subprocess
 
 from tui.services.exec_session_service import get_exec_session
+from tui.services import harness_tools
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 BRIDGE_SCRIPT = os.path.join(PROJECT_ROOT, "divtube_downloader", "scripts", "scholomance-bridge.mjs")
@@ -352,6 +353,123 @@ class ToolService:
                                 "description": "Optional specific file or directory path to diff (default: all)"
                             }
                         }
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "is_coding_action": True,
+                "function": {
+                    "name": "file_create",
+                    "description": "Create a new file with the given content (creates parent dirs). Fails if the file exists unless overwrite=true. Prefer this over bash heredocs.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "path": {"type": "string", "description": "Relative path to create"},
+                            "content": {"type": "string", "description": "Full file contents"},
+                            "overwrite": {
+                                "type": "boolean",
+                                "description": "Replace an existing file (default false)"
+                            }
+                        },
+                        "required": ["path", "content"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "is_coding_action": True,
+                "function": {
+                    "name": "test_run",
+                    "description": "Run tests and return structured pass/fail/skip counts. Use runner=vitest (default) or runner=npm with suite=script name.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "runner": {
+                                "type": "string",
+                                "enum": ["vitest", "npm"],
+                                "description": "Test runner (default vitest)"
+                            },
+                            "target": {
+                                "type": "string",
+                                "description": "Optional file/dir filter passed to the runner"
+                            },
+                            "suite": {
+                                "type": "string",
+                                "description": "npm script name when runner=npm (default: test)"
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "is_coding_action": True,
+                "function": {
+                    "name": "git_history",
+                    "description": "Structured git log --follow or git blame for a file (no shell scraping).",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "path": {"type": "string", "description": "Relative file path"},
+                            "mode": {
+                                "type": "string",
+                                "enum": ["log", "blame"],
+                                "description": "log (default) or blame"
+                            },
+                            "limit": {
+                                "type": "integer",
+                                "description": "Max log entries (default 20)"
+                            }
+                        },
+                        "required": ["path"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "is_coding_action": True,
+                "function": {
+                    "name": "typecheck",
+                    "description": "Run TypeScript typecheck and return structured errors (file, line, column, code, message).",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "project": {
+                                "type": "string",
+                                "description": "Optional tsconfig path for `tsc -p`. Omit to run `npm run typecheck`."
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "is_coding_action": True,
+                "function": {
+                    "name": "scholo_gate",
+                    "description": "Shadow-only Semantic Calculus gate (scripts/scholo-gate.mjs). Maps an intent to npm-script candidates / kind / law — never executes commands.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "intent": {
+                                "type": "string",
+                                "description": "Natural language intent, e.g. 'run the tests'"
+                            },
+                            "derived": {
+                                "type": "boolean",
+                                "description": "Treat as model-proposed utterance (--derived)"
+                            },
+                            "taint": {
+                                "type": "string",
+                                "description": "Optional untrusted source marker (--taint=...)"
+                            },
+                            "log": {
+                                "type": "boolean",
+                                "description": "Append to semantic-calculus corpus (--log)"
+                            }
+                        },
+                        "required": ["intent"]
                     }
                 }
             },
@@ -1159,6 +1277,10 @@ class ToolService:
                             "target_file": {
                                 "type": "string",
                                 "description": "Target file for the patch (relative to project root)"
+                            },
+                            "dry_run": {
+                                "type": "boolean",
+                                "description": "If true, diagnose and preview the patch without writing files or running verification."
                             }
                         },
                         "required": ["symptoms"]
@@ -1265,6 +1387,16 @@ class ToolService:
             return self._tui_inspect(kwargs, callback)
         elif tool_name == "git_diff":
             return self._git_diff(kwargs, callback)
+        elif tool_name == "file_create":
+            return self._file_create(kwargs, callback)
+        elif tool_name == "test_run":
+            return self._test_run(kwargs, callback)
+        elif tool_name == "git_history":
+            return self._git_history(kwargs, callback)
+        elif tool_name == "typecheck":
+            return self._typecheck(kwargs, callback)
+        elif tool_name == "scholo_gate":
+            return self._scholo_gate(kwargs, callback)
         elif tool_name == "replace_file_content":
             return self._replace_file_content(kwargs, callback)
         elif tool_name == "search_youtube":
@@ -2002,17 +2134,20 @@ class ToolService:
         result = _run_bridge("diagnostic-violations", *args)
         if isinstance(result, dict) and "error" not in result:
             violations = result.get("violations", [])
+            normalized = [harness_tools.normalize_violation(v) for v in violations]
             if callback:
-                callback(f"  [#7CFF8B]✓[/] diagnostic_violations: {len(violations)} matches")
-            if not violations:
+                callback(f"  [#7CFF8B]✓[/] diagnostic_violations: {len(normalized)} matches")
+            if not normalized:
                 return "No violations match the given filters."
-            lines = [f"--- Violations ({result.get('count', len(violations))} total) ---"]
-            for v in violations[:20]:
-                ctx = v.get("context", {})
-                lines.append(f"  [{v.get('severity', '?')}] {ctx.get('ruleId', v.get('cell', '?'))} - {v.get('message', v.get('checkId', ''))}")
-            if len(violations) > 20:
-                lines.append(f"  ... and {len(violations) - 20} more")
-            return "\n".join(lines)
+            payload = {
+                "reportId": result.get("reportId"),
+                "count": result.get("count", len(normalized)),
+                "violations": normalized,
+            }
+            text = harness_tools.format_violations_text(
+                violations, total=payload["count"]
+            )
+            return text + "\n\n" + json.dumps(payload, indent=2, default=str)[:4000]
         return self._fmt_bridge("diagnostic_violations", result, callback)
 
     def _diagnostic_health(self, kwargs, callback):
@@ -2247,6 +2382,76 @@ class ToolService:
             return f"Memory set: key='{key}'"
         return self._fmt_bridge("memory_set", result, callback)
 
+    def _file_create(self, kwargs, callback):
+        path = kwargs.get("path", "")
+        content = kwargs.get("content", "")
+        overwrite = bool(kwargs.get("overwrite", False))
+        result = harness_tools.file_create(PROJECT_ROOT, path, content, overwrite=overwrite)
+        if callback:
+            if result.get("ok"):
+                callback(f"  [#7CFF8B]✓[/] file_create({path})")
+            else:
+                callback(f"  [#FF5C7A]✗[/] file_create: {result.get('error', 'failed')}")
+        return json.dumps(result, indent=2)
+
+    def _test_run(self, kwargs, callback):
+        if callback:
+            callback(f"  [bold #FFD700]⚡[/] test_run({kwargs.get('runner', 'vitest')})")
+        try:
+            result = harness_tools.run_tests(
+                PROJECT_ROOT,
+                runner=kwargs.get("runner") or "vitest",
+                target=kwargs.get("target"),
+                suite=kwargs.get("suite"),
+            )
+        except subprocess.TimeoutExpired:
+            result = {"ok": False, "error": "test_run timed out"}
+        if callback:
+            mark = "#7CFF8B" if result.get("ok") else "#FF5C7A"
+            callback(
+                f"  [{mark}]✓[/] test_run: passed={result.get('passed')} "
+                f"failed={result.get('failed')} exit={result.get('exit_code')}"
+            )
+        return json.dumps(result, indent=2, default=str)[:6000]
+
+    def _git_history(self, kwargs, callback):
+        path = kwargs.get("path", "")
+        mode = kwargs.get("mode") or "log"
+        limit = int(kwargs.get("limit") or 20)
+        result = harness_tools.git_history(PROJECT_ROOT, path, mode=mode, limit=limit)
+        if callback:
+            n = len(result.get("entries") or [])
+            callback(f"  [#7CFF8B]✓[/] git_history({mode}, {path}): {n} entries")
+        return json.dumps(result, indent=2, default=str)[:6000]
+
+    def _typecheck(self, kwargs, callback):
+        if callback:
+            callback("  [bold #FFD700]⚡[/] typecheck")
+        try:
+            result = harness_tools.run_typecheck(PROJECT_ROOT, project=kwargs.get("project"))
+        except subprocess.TimeoutExpired:
+            result = {"ok": False, "error": "typecheck timed out", "errors": []}
+        if callback:
+            mark = "#7CFF8B" if result.get("ok") else "#FF5C7A"
+            callback(f"  [{mark}]✓[/] typecheck: {len(result.get('errors') or [])} errors")
+        return json.dumps(result, indent=2, default=str)[:6000]
+
+    def _scholo_gate(self, kwargs, callback):
+        intent = kwargs.get("intent", "")
+        if callback:
+            callback(f"  [bold #FFD700]⚡[/] scholo_gate('{intent[:50]}')")
+        result = harness_tools.scholo_gate(
+            PROJECT_ROOT,
+            intent,
+            derived=bool(kwargs.get("derived")),
+            taint=kwargs.get("taint"),
+            log=bool(kwargs.get("log")),
+        )
+        if callback:
+            kind = result.get("kind", "?")
+            callback(f"  [#7CFF8B]✓[/] scholo_gate: kind={kind}")
+        return json.dumps(result, indent=2, default=str)[:6000]
+
     def _heal(self, kwargs, callback):
         symptoms = kwargs.get("symptoms", [])
         if not symptoms:
@@ -2267,15 +2472,25 @@ class ToolService:
             args.extend(["--patch", kwargs["patch_content"]])
         if kwargs.get("target_file"):
             args.extend(["--target-file", kwargs["target_file"]])
+        if kwargs.get("dry_run"):
+            args.append("--dry-run")
         result = _run_bridge("heal", *args, timeout=600)
         if isinstance(result, dict) and "error" not in result:
             status = result.get("status", "?")
             iters = result.get("iterations", "?")
             verdict = result.get("verdict", "?")
-            pattern_name = result.get("pattern", {}).get("name", "none")
+            pattern_name = (result.get("pattern") or {}).get("name", "none")
             if callback:
-                callback(f"  [#7CFF8B]✓[/] Heal complete: {status} ({iters} iters, verdict={verdict}, pattern={pattern_name})")
-            return f"Heal result: status={status}, iterations={iters}, verdict={verdict}, pattern={pattern_name}\n" + json.dumps(result, indent=2, default=str)
+                prefix = "Heal dry-run" if result.get("dry_run") else "Heal complete"
+                callback(
+                    f"  [#7CFF8B]✓[/] {prefix}: {status} "
+                    f"({iters} iters, verdict={verdict}, pattern={pattern_name})"
+                )
+            return (
+                f"Heal result: status={status}, iterations={iters}, "
+                f"verdict={verdict}, pattern={pattern_name}\n"
+                + json.dumps(result, indent=2, default=str)
+            )
         return self._fmt_bridge("heal", result, callback)
 
     def _apply_patch(self, kwargs, callback):

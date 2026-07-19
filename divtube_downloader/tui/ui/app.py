@@ -1166,7 +1166,7 @@ class DivTubeAgentApp(App):
 
         def handle_provider(ui, args):
             if not args:
-                ui.log_msg(f"[{ERROR}]Usage:[/] /provider <openai|xai(grok)|opencode|router(openrouter)|gemini|blackbox|groq|custom_base_url>")
+                ui.log_msg(f"[{ERROR}]Usage:[/] /provider <openai|xai(grok)|opencode|router(openrouter)|gemini|blackbox|groq|qwen(token-plan)|qwen-paygo|qwen-cn|custom_base_url>")
                 return
 
             provider, base_url, models_url, default_model, key_restored = set_provider(args[0])

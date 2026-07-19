@@ -119,6 +119,26 @@ export class IterativeHealer {
         return this._buildResult('ESCALATED', diagnosis, iteration, iterRecord, taskId);
       }
 
+      // Dry-run: diagnose + resolve patch, but never write or verify.
+      if (opts.dryRun) {
+        const preview = typeof patchToApply === 'string'
+          ? patchToApply.slice(0, 4000)
+          : String(patchToApply).slice(0, 4000);
+        iterRecord.status = 'DRY_RUN';
+        iterRecord.wouldApply = true;
+        iterRecord.patchPreview = preview;
+        this.iterationHistory.push(iterRecord);
+        const base = this._buildResult('DRY_RUN', diagnosis, iteration, iterRecord, taskId);
+        return {
+          ...base,
+          dry_run: true,
+          target_file: targetFile,
+          patch_preview: preview,
+          would_apply: true,
+          would_test_suite: testSuite,
+        };
+      }
+
       const applyResult = this._applyPatch(targetFile, patchToApply, iteration);
       iterRecord.appliedFix = true;
       iterRecord.applyResult = applyResult;

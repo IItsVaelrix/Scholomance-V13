@@ -30,6 +30,7 @@ const CORPUS = 'bench/semantic-calculus/corpus/cli-intents.jsonl';
 
 const args = process.argv.slice(2);
 const shouldLog = args.includes('--log');
+const asJson = args.includes('--json');
 const utterance = args.filter((a) => !a.startsWith('--')).join(' ').trim();
 
 /**
@@ -46,7 +47,7 @@ const taint = args.filter((a) => a.startsWith('--taint=')).map((a) => a.slice('-
 const spoken = asDerived || taint.length ? derivedUtterance(utterance, taint) : userUtterance(utterance);
 
 if (!utterance) {
-  console.error('usage: npx tsx scripts/scholo-gate.mjs [--log] [--derived] [--taint=<src>] "<what you want>"');
+  console.error('usage: npx tsx scripts/scholo-gate.mjs [--json] [--log] [--derived] [--taint=<src>] "<what you want>"');
   process.exit(2);
 }
 
@@ -116,6 +117,74 @@ const epistemic = deriveEpistemic({
   lexiconRole: role === 'inquiry' ? 'inquiry' : undefined,
 });
 
+// F21 — 'allow' is not the whole gate. A model-proposed act is permitted and
+// still unexecutable until a human ratifies it, so reporting a bare yes here
+// would promise something assertExecutable refuses.
+const confirmation = kind === 'Do' ? requiredConfirmation(risk.confirmationPolicy, spoken) : 'none';
+const needed = confirmationsRequired(confirmation);
+const wouldRun = kind === 'Do' && law.decision === 'allow' && needed === 0;
+const pickEntry = verdict.pick ? entryFor(lex, verdict.pick.key) : undefined;
+
+if (asJson) {
+  const payload = {
+    ok: true,
+    intent: utterance,
+    kind,
+    bound,
+    pick: verdict.pick
+      ? {
+          key: verdict.pick.key,
+          score: verdict.pick.score,
+          command: pickEntry?.command ?? null,
+          consequence: pickEntry?.consequence ?? null,
+          effect: pickEntry?.effect ?? null,
+        }
+      : null,
+    rival: verdict.rival
+      ? { key: verdict.rival.key, score: verdict.rival.score }
+      : null,
+    risk: {
+      consequence: risk.consequence,
+      minMargin: risk.minMargin,
+      confirmationPolicy: risk.confirmationPolicy,
+    },
+    law: { decision: law.decision, ruleIds: law.ruleIds },
+    epistemic,
+    phase,
+    probeId: probeNote || null,
+    margin: verdict.margin,
+    reason: verdict.reason,
+    confirmations_required: needed,
+    confirmation,
+    would_execute: wouldRun,
+    utteranceTrust: spoken.trust,
+    utteranceTaint: spoken.taint,
+  };
+  if (shouldLog) {
+    mkdirSync(dirname(CORPUS), { recursive: true });
+    appendFileSync(CORPUS, JSON.stringify({
+      id: `cli-${Date.now().toString(36)}`,
+      utterance,
+      lexiconVersion: lex.version,
+      proposerId: proposal.proposerId,
+      candidates: proposal.candidates,
+      kind,
+      law: law.decision,
+      epistemic,
+      utteranceTrust: spoken.trust,
+      utteranceTaint: spoken.taint,
+      phase,
+      probeId: probeNote || undefined,
+      margin: verdict.margin,
+      schemaVersion: 'SEMANTIC_ACT_v2',
+      capturedAt: new Date().toISOString(),
+    }) + '\n');
+    payload.logged = CORPUS;
+  }
+  console.log(JSON.stringify(payload));
+  process.exit(0);
+}
+
 // ── Report ──────────────────────────────────────────────────────────────────
 console.log(`\n  ${C.d}${utterance}${C.r}`);
 console.log(`  ${C.d}${'─'.repeat(Math.min(60, utterance.length + 2))}${C.r}`);
@@ -166,13 +235,6 @@ if (kind === 'Do' && law.decision === 'escalate' && law.ruleIds.some((r) => r.st
   console.log(`  ${C.d}The act is a Do and the words bound fine — a ${spoken.trust} speaker`);
   console.log(`  cannot authorize one. Untrusted may inform, never authorize.${C.r}`);
 }
-
-// F21 — 'allow' is not the whole gate. A model-proposed act is permitted and
-// still unexecutable until a human ratifies it, so reporting a bare yes here
-// would promise something assertExecutable refuses.
-const confirmation = kind === 'Do' ? requiredConfirmation(risk.confirmationPolicy, spoken) : 'none';
-const needed = confirmationsRequired(confirmation);
-const wouldRun = kind === 'Do' && law.decision === 'allow' && needed === 0;
 
 console.log(`\n  ${C.d}would execute:${C.r} ${wouldRun ? `${C.g}yes${C.r}` : `${C.red}NO${C.r}`}` +
   `  ${C.d}(kind=Do AND law=allow AND confirmed)  ·  nothing ran either way${C.r}`);

@@ -750,6 +750,7 @@ async function cmdHeal(opts = {}) {
     maxIterations: parseInt(opts.maxIterations) || 3,
     patchContent: opts.patch || null,
     targetFile: opts.targetFile || null,
+    dryRun: Boolean(opts.dryRun),
   });
 }
 
@@ -1202,6 +1203,7 @@ async function main() {
         maxIterations: rest.flags['max-iterations'] || 3,
         patch: rest.flags.patch || null,
         targetFile: rest.flags['target-file'] || null,
+        dryRun: rest.flags['dry-run'] === true || rest.flags['dry-run'] === 'true' || rest.flags['dry-run'] === '',
       });
       break;
 

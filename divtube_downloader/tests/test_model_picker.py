@@ -21,6 +21,57 @@ class TestProviderAliases(unittest.TestCase):
     def test_openrouter_alias(self):
         self.assertEqual(resolve_provider("openrouter")[0], "router")
 
+    def test_qwen_default_is_token_plan(self):
+        canonical, base_url, models_url, default_model = resolve_provider("qwen")
+        self.assertEqual(canonical, "qwen")
+        self.assertEqual(
+            base_url,
+            "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+        )
+        self.assertEqual(models_url, base_url)
+        self.assertEqual(default_model, "qwen3.7-max")
+
+    def test_qwen_token_plan_aliases(self):
+        for name in (
+            "alibaba",
+            "qwencloud",
+            "qwen-cloud",
+            "token-plan",
+            "tokenplan",
+            "qwen-token",
+            "ALIBABA",
+        ):
+            with self.subTest(name=name):
+                self.assertEqual(resolve_provider(name)[0], "qwen")
+
+    def test_qwen_paygo_dashscope(self):
+        canonical, base_url, models_url, default_model = resolve_provider("qwen-paygo")
+        self.assertEqual(canonical, "qwen-paygo")
+        self.assertEqual(
+            base_url, "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
+        )
+        self.assertEqual(models_url, base_url)
+        self.assertEqual(default_model, "qwen3.7-max")
+
+    def test_qwen_paygo_aliases(self):
+        for name in ("dashscope", "qwen-intl", "alibaba-intl"):
+            with self.subTest(name=name):
+                self.assertEqual(resolve_provider(name)[0], "qwen-paygo")
+
+    def test_qwen_cn_region(self):
+        canonical, base_url, models_url, default_model = resolve_provider("qwen-cn")
+        self.assertEqual(canonical, "qwen-cn")
+        self.assertEqual(
+            base_url, "https://dashscope.aliyuncs.com/compatible-mode/v1"
+        )
+        self.assertEqual(models_url, base_url)
+        self.assertEqual(default_model, "qwen3.7-max")
+
+    def test_qwen_cn_aliases(self):
+        for name in ("alibaba-cn", "dashscope-cn", "qwen-china"):
+            with self.subTest(name=name):
+                self.assertEqual(resolve_provider(name)[0], "qwen-cn")
+
     def test_unknown_name_is_custom_url(self):
         canonical, base_url, models_url, default_model = resolve_provider(
             "https://my.host/v1"
