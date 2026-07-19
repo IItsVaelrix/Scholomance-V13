@@ -9,11 +9,19 @@ from tui.services import harness_tools
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 BRIDGE_SCRIPT = os.path.join(PROJECT_ROOT, "divtube_downloader", "scripts", "scholomance-bridge.mjs")
 
+# Ensure nvm node/npm are visible for the whole TUI process (bash_session,
+# run_command, bridge). Desktop launches often skip ~/.bashrc.
+_node_bin_dir = harness_tools.resolve_node_bin_dir()
+if _node_bin_dir:
+    os.environ["PATH"] = _node_bin_dir + os.pathsep + os.environ.get("PATH", "")
+
 
 def _node_bin():
-    n = "/home/deck/.nvm/versions/node/v20.20.2/bin/node"
-    if os.path.exists(n):
-        return n
+    bin_dir = harness_tools.resolve_node_bin_dir()
+    if bin_dir:
+        n = os.path.join(bin_dir, "node")
+        if os.path.exists(n):
+            return n
     return "node"
 
 
@@ -22,7 +30,13 @@ def _run_bridge(command, *args, timeout=30, stdin=None):
     cmd = [node, BRIDGE_SCRIPT, command] + list(args)
     try:
         proc = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=timeout, cwd=PROJECT_ROOT, input=stdin
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            cwd=PROJECT_ROOT,
+            input=stdin,
+            env=harness_tools.node_env(),
         )
         if proc.returncode != 0:
             return {"error": proc.stderr.strip() or f"exit code {proc.returncode}"}
@@ -1750,7 +1764,7 @@ class ToolService:
         try:
             result = subprocess.run(
                 cmd_str, capture_output=True, text=True, timeout=15,
-                shell=True, cwd=PROJECT_ROOT
+                shell=True, cwd=PROJECT_ROOT, env=harness_tools.node_env(),
             )
             out = result.stdout.strip()
             err = result.stderr.strip()

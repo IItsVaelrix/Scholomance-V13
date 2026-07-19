@@ -6,9 +6,11 @@ without importing the full TUI tool surface.
 
 from __future__ import annotations
 
+import glob
 import json
 import os
 import re
+import shutil
 import subprocess
 from typing import Any
 
@@ -17,6 +19,48 @@ TSC_ERROR_RE = re.compile(
     r"^(?P<file>[^(]+)\((?P<line>\d+),(?P<col>\d+)\):\s*"
     r"error\s+(?P<code>TS\d+):\s*(?P<message>.*)$"
 )
+
+# DivTube is often launched from a desktop shortcut / konsole without sourcing
+# ~/.bashrc, so nvm's node/npm are missing from PATH. Resolve them explicitly.
+_NVM_NODE_GLOB = os.path.expanduser("~/.nvm/versions/node/*/bin")
+
+
+def resolve_node_bin_dir() -> str | None:
+    """Return a directory that contains node/npm/npx, or None."""
+    nvm_bin = os.environ.get("NVM_BIN")
+    if nvm_bin and os.path.isfile(os.path.join(nvm_bin, "node")):
+        return nvm_bin
+    # Prefer the same pin tool_service._node_bin uses when present.
+    pinned = "/home/deck/.nvm/versions/node/v20.20.2/bin"
+    if os.path.isfile(os.path.join(pinned, "node")):
+        return pinned
+    candidates = sorted(glob.glob(_NVM_NODE_GLOB), reverse=True)
+    for d in candidates:
+        if os.path.isfile(os.path.join(d, "node")):
+            return d
+    which_node = shutil.which("node")
+    if which_node:
+        return os.path.dirname(os.path.realpath(which_node))
+    return None
+
+
+def node_env(base: dict | None = None) -> dict:
+    """Environment with nvm/node bin prepended so npm/npx resolve reliably."""
+    env = dict(base if base is not None else os.environ)
+    bin_dir = resolve_node_bin_dir()
+    if bin_dir:
+        env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
+    return env
+
+
+def _tool(name: str) -> str:
+    """Absolute path to node/npm/npx when possible; else bare name."""
+    bin_dir = resolve_node_bin_dir()
+    if bin_dir:
+        candidate = os.path.join(bin_dir, name)
+        if os.path.isfile(candidate):
+            return candidate
+    return shutil.which(name) or name
 
 
 def normalize_violation(v: dict) -> dict:
@@ -225,11 +269,16 @@ def file_create(
 
 def run_typecheck(project_root: str, project: str | None = None, timeout: int = 300) -> dict:
     if project:
-        cmd = ["npx", "tsc", "-p", project, "--noEmit"]
+        cmd = [_tool("npx"), "tsc", "-p", project, "--noEmit"]
     else:
-        cmd = ["npm", "run", "typecheck"]
+        cmd = [_tool("npm"), "run", "typecheck"]
     proc = subprocess.run(
-        cmd, capture_output=True, text=True, timeout=timeout, cwd=project_root
+        cmd,
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+        cwd=project_root,
+        env=node_env(),
     )
     errors = parse_tsc_errors(proc.stdout, proc.stderr)
     return {
@@ -250,19 +299,24 @@ def run_tests(
 ) -> dict:
     runner = (runner or "vitest").lower()
     if runner == "vitest":
-        cmd = ["npx", "vitest", "run", "--reporter=json"]
+        cmd = [_tool("npx"), "vitest", "run", "--reporter=json"]
         if target:
             cmd.append(target)
     elif runner == "npm":
         script = suite or "test"
-        cmd = ["npm", "run", script]
+        cmd = [_tool("npm"), "run", script]
         if target:
             cmd.extend(["--", target])
     else:
         return {"ok": False, "error": f"Unknown runner: {runner}", "exit_code": 2}
 
     proc = subprocess.run(
-        cmd, capture_output=True, text=True, timeout=timeout, cwd=project_root
+        cmd,
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+        cwd=project_root,
+        env=node_env(),
     )
     out = {
         "ok": proc.returncode == 0,
@@ -351,7 +405,7 @@ def scholo_gate(
     if not intent or not intent.strip():
         return {"ok": False, "error": "intent is required"}
     script = os.path.join(project_root, "scripts", "scholo-gate.mjs")
-    cmd = ["npx", "tsx", script, "--json"]
+    cmd = [_tool("npx"), "tsx", script, "--json"]
     if derived:
         cmd.append("--derived")
     if taint:
@@ -361,7 +415,12 @@ def scholo_gate(
     cmd.append(intent.strip())
     try:
         proc = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=timeout, cwd=project_root
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            cwd=project_root,
+            env=node_env(),
         )
     except FileNotFoundError as e:
         return {"ok": False, "error": str(e)}
