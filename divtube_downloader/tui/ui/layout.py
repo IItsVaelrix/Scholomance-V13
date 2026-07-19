@@ -4,7 +4,7 @@ from textual.widgets import Header, Footer, RichLog, Input, Static, ProgressBar,
 from tui.ui.widgets.sidebar import Sidebar
 from tui.ui.widgets.inspector import Inspector
 from tui.ui.widgets.code_box import CodeBox
-from tui.ui.widgets.scd64_radar import SCD64Radar
+from tui.ui.widgets.test_run_panel import TestRunPanel
 from tui.ui.widgets.command_area import CommandArea
 from tui.ui.widgets.token_meter import AetherMeter
 from tui.ui.sigils import title
@@ -36,7 +36,7 @@ def get_layout() -> ComposeResult:
         with Vertical(id="right-panel"):
             yield AetherMeter(id="aether-meter")
             yield Inspector(id="inspector")
-            yield SCD64Radar(id="radar")
+            yield TestRunPanel(id="test-run")
             yield CodeBox(id="code-viewer", filename="")
 
     yield Footer()

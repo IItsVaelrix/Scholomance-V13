@@ -47,7 +47,7 @@ FooterKey:hover {
 }
 
 /* ── resting panels: ONE uniform muted boundary, no per-panel colour ────── */
-#sidebar, #aether-meter, #inspector, #radar, #code-viewer {
+#sidebar, #aether-meter, #inspector, #test-run, #code-viewer {
     background: $surface;
     border: round $panel-border;
     border-title-color: $text-secondary;
@@ -57,9 +57,9 @@ FooterKey:hover {
 #sidebar      { width: 32;    padding: 1 1; margin: 1 0 1 1; }
 #aether-meter { height: 6;    padding: 0 1; margin: 1 1 0 0; }
 #inspector    { height: 1fr;  padding: 1 1; margin: 1 1 1 0; }
-#radar        { height: 1fr;  padding: 1 1; margin: 0 1 1 0;
-                background: $background; text-align: center;
-                content-align: center middle; }
+#test-run     { height: 1fr;  padding: 1 1; margin: 0 1 1 0;
+                background: $background; text-align: left;
+                content-align: left top; }
 #code-viewer  { height: 1fr;  padding: 0 1; margin: 1 1 1 0; }
 
 #right-panel  { width: 42; background: $background; }

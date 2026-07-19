@@ -296,7 +296,9 @@ def run_tests(
     target: str | None = None,
     suite: str | None = None,
     timeout: int = 600,
+    on_line=None,
 ) -> dict:
+    """Run tests. Optional on_line(line: str, fraction: float) for UI progress."""
     runner = (runner or "vitest").lower()
     if runner == "vitest":
         cmd = [_tool("npx"), "vitest", "run", "--reporter=json"]
@@ -310,28 +312,82 @@ def run_tests(
     else:
         return {"ok": False, "error": f"Unknown runner: {runner}", "exit_code": 2}
 
-    proc = subprocess.run(
-        cmd,
-        capture_output=True,
-        text=True,
-        timeout=timeout,
-        cwd=project_root,
-        env=node_env(),
-    )
+    stdout_chunks: list[str] = []
+    stderr_chunks: list[str] = []
+    try:
+        proc = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            cwd=project_root,
+            env=node_env(),
+        )
+    except FileNotFoundError as e:
+        return {"ok": False, "error": str(e), "exit_code": 127, "tests": []}
+
+    import time
+    import threading
+
+    t0 = time.monotonic()
+    line_n = 0
+
+    def _read_stderr():
+        if not proc.stderr:
+            return
+        for line in proc.stderr:
+            stderr_chunks.append(line)
+
+    err_thread = threading.Thread(target=_read_stderr, daemon=True)
+    err_thread.start()
+
+    try:
+        assert proc.stdout is not None
+        for line in proc.stdout:
+            stdout_chunks.append(line)
+            line_n += 1
+            # Soft progress: asymptote toward 0.9 while still reading.
+            elapsed = time.monotonic() - t0
+            frac = min(0.9, 0.08 + min(0.7, elapsed / max(8.0, timeout * 0.15)) + min(0.12, line_n / 200.0))
+            if on_line:
+                try:
+                    on_line(line.rstrip("\n"), frac)
+                except Exception:
+                    pass
+            if time.monotonic() - t0 > timeout:
+                proc.kill()
+                break
+        proc.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        return {
+            "ok": False,
+            "error": "test_run timed out",
+            "exit_code": -1,
+            "runner": runner,
+            "passed": 0,
+            "failed": 0,
+            "skipped": 0,
+            "tests": [],
+        }
+    finally:
+        err_thread.join(timeout=2)
+
+    text = "".join(stdout_chunks)
+    err_text = "".join(stderr_chunks)
+    code = proc.returncode if proc.returncode is not None else -1
     out = {
-        "ok": proc.returncode == 0,
+        "ok": code == 0,
         "runner": runner,
         "passed": 0,
         "failed": 0,
         "skipped": 0,
         "tests": [],
-        "exit_code": proc.returncode,
-        "stdout_tail": (proc.stdout or "")[-3000:],
-        "stderr_tail": (proc.stderr or "")[-2000:],
+        "exit_code": code,
+        "stdout_tail": text[-3000:],
+        "stderr_tail": err_text[-2000:],
     }
     if runner == "vitest":
-        # JSON may be embedded in stdout; try whole stdout then last {...} blob.
-        text = proc.stdout or ""
         parsed = None
         try:
             parsed = parse_vitest_json(text)
@@ -345,7 +401,16 @@ def run_tests(
                     parsed = None
         if parsed:
             out.update(parsed)
-            out["ok"] = proc.returncode == 0 and parsed.get("failed", 0) == 0
+            out["ok"] = code == 0 and parsed.get("failed", 0) == 0
+    elif runner == "npm" and not out["tests"]:
+        out["tests"] = [{
+            "name": suite or "test",
+            "status": "pass" if code == 0 else "fail",
+        }]
+        if code == 0:
+            out["passed"] = 1
+        else:
+            out["failed"] = 1
     return out
 
 

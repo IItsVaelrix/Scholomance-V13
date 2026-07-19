@@ -2408,18 +2408,74 @@ class ToolService:
                 callback(f"  [#FF5C7A]✗[/] file_create: {result.get('error', 'failed')}")
         return json.dumps(result, indent=2)
 
+    def _resolve_test_panel(self, callback):
+        app = getattr(callback, "__self__", None)
+        if app is None:
+            return None, None
+        try:
+            return app, app.query_one("#test-run")
+        except Exception:
+            return app, None
+
     def _test_run(self, kwargs, callback):
+        runner = kwargs.get("runner") or "vitest"
+        target = kwargs.get("target")
+        suite = kwargs.get("suite")
         if callback:
-            callback(f"  [bold #FFD700]⚡[/] test_run({kwargs.get('runner', 'vitest')})")
+            callback(f"  [bold #FFD700]⚡[/] test_run({runner})")
+
+        app, panel = self._resolve_test_panel(callback)
+
+        def ui(fn, *args, **kw):
+            if app is None or panel is None:
+                return
+            try:
+                app.call_from_thread(fn, *args, **kw)
+            except Exception:
+                try:
+                    fn(*args, **kw)
+                except Exception:
+                    pass
+
+        if panel is not None:
+            ui(panel.begin_run, runner, target, suite)
+
+        def on_line(line, fraction):
+            ui(panel.on_progress, fraction, line) if panel is not None else None
+
+        panel_done = False
         try:
             result = harness_tools.run_tests(
                 PROJECT_ROOT,
-                runner=kwargs.get("runner") or "vitest",
-                target=kwargs.get("target"),
-                suite=kwargs.get("suite"),
+                runner=runner,
+                target=target,
+                suite=suite,
+                on_line=on_line if panel is not None else None,
             )
         except subprocess.TimeoutExpired:
-            result = {"ok": False, "error": "test_run timed out"}
+            result = {"ok": False, "error": "test_run timed out", "tests": []}
+            if panel is not None:
+                ui(panel.fail, "test_run timed out")
+                panel_done = True
+        except Exception as e:
+            result = {"ok": False, "error": str(e), "tests": []}
+            if panel is not None:
+                ui(panel.fail, str(e))
+                panel_done = True
+
+        if panel is not None and not panel_done:
+            if result.get("error") and not result.get("tests"):
+                ui(panel.fail, result.get("error", "failed"))
+            else:
+                ui(
+                    panel.play_results,
+                    result.get("tests") or [],
+                    result.get("passed", 0),
+                    result.get("failed", 0),
+                    result.get("skipped", 0),
+                    result.get("ok", False),
+                )
+
         if callback:
             mark = "#7CFF8B" if result.get("ok") else "#FF5C7A"
             callback(

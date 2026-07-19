@@ -471,23 +471,8 @@ class DivTubeAgentApp(App):
         except Exception:
             pass
         await scd64_service.start()
-        
-        # Connect radar widget updates
-        def on_scd64_update(state):
-            try:
-                radar = self.query_one("#radar")
-                self.call_from_thread(radar.update_state, state)
-            except Exception:
-                pass
-        scd64_service.subscribe(on_scd64_update)
-
-        # Trigger initial radar tick loop
-        async def radar_loop():
-            while scd64_service.running:
-                await scd64_service.tick()
-                await asyncio.sleep(0.5)
-        
-        asyncio.create_task(radar_loop())
+        # QBIT Field Radar was replaced by TestRunPanel (#test-run).
+        # Keep the SCD64 service alive for other consumers; no radar UI loop.
 
     # ── Agent run controller ─────────────────────────────────────────
     def begin_agent(self):
