@@ -64,6 +64,15 @@ class TestRunPanel(Static):
                     pass
                 setattr(self, attr, None)
 
+    def _safe_interval(self, seconds, callback):
+        """set_interval only works on a mounted widget with a running app loop."""
+        try:
+            if not self.is_attached or getattr(self, "app", None) is None:
+                return None
+            return self.set_interval(seconds, callback)
+        except Exception:
+            return None
+
     def begin_run(self, runner: str, target: str | None = None, suite: str | None = None):
         self._cancel_timers()
         self._run_gen += 1
@@ -79,10 +88,7 @@ class TestRunPanel(Static):
         self._ok = False
         self._error = ""
         self._spin_i = 0
-        try:
-            self._spin_timer = self.set_interval(0.12, self._tick_spin)
-        except RuntimeError:
-            self._spin_timer = None
+        self._spin_timer = self._safe_interval(0.12, self._tick_spin)
         self._render()
 
     def on_progress(self, fraction: float | None = None, line: str | None = None):
@@ -128,9 +134,8 @@ class TestRunPanel(Static):
                 self._state = "done"
             self._render()
 
-        try:
-            self._timer = self.set_interval(0.055, tick)
-        except RuntimeError:
+        self._timer = self._safe_interval(0.055, tick)
+        if self._timer is None:
             # Off-app / no event loop (unit tests): reveal all immediately.
             self._revealed = len(self._tests)
             self._state = "done"
