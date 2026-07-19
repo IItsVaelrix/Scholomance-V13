@@ -6,6 +6,7 @@ from tui.ui.widgets.inspector import Inspector
 from tui.ui.widgets.code_box import CodeBox
 from tui.ui.widgets.test_run_panel import TestRunPanel
 from tui.ui.widgets.command_area import CommandArea
+from tui.ui.widgets.resize_handle import CommandResizeHandle
 from tui.ui.widgets.token_meter import AetherMeter
 from tui.ui.sigils import title
 
@@ -31,6 +32,7 @@ def get_layout() -> ComposeResult:
                     yield _make_log("chat-vaelrix", title("VAELRIX COCKPIT"))
             yield Static("", id="typewriter-box")
             yield ProgressBar(id="loading-bar", show_eta=False, total=100)
+            yield CommandResizeHandle(id="command-resize")
             yield CommandArea(placeholder="▸ command (/help) or paste a URL…", id="command-input")
         
         with Vertical(id="right-panel"):

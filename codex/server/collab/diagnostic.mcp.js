@@ -53,7 +53,15 @@ async function listReportIds(rootDir = ROOT) {
 /**
  * `diagnostic_trigger_full_scan` — execute a full codebase audit and persist the report.
  *
- * @param {{trigger?: string, writeMemory?: boolean, memoryMax?: number, memoryIncludeHealth?: boolean}} params
+ * @param {{
+ *   trigger?: string,
+ *   writeMemory?: boolean,
+ *   memoryMax?: number,
+ *   memoryIncludeHealth?: boolean,
+ *   maxFileBytes?: number,
+ *   maxFiles?: number,
+ *   maxTotalBytes?: number,
+ * }} params
  * @returns {Promise<object>} The generated report
  */
 export async function triggerFullScan({
@@ -61,11 +69,20 @@ export async function triggerFullScan({
   writeMemory = true,
   memoryMax = 32,
   memoryIncludeHealth = false,
+  maxFileBytes,
+  maxFiles,
+  maxTotalBytes,
 } = {}) {
   try {
+    const limits = {
+      ...DEFAULT_SCAN_LIMITS,
+      ...(Number.isInteger(maxFileBytes) && maxFileBytes > 0 ? { maxFileBytes } : {}),
+      ...(Number.isInteger(maxFiles) && maxFiles > 0 ? { maxFiles } : {}),
+      ...(Number.isInteger(maxTotalBytes) && maxTotalBytes > 0 ? { maxTotalBytes } : {}),
+    };
     const fileSource = createFilesystemFileSource({
       rootDir: ROOT,
-      limits: DEFAULT_SCAN_LIMITS,
+      limits,
     });
     const report = await runDiagnostic({
       snapshot: { root: ROOT, timestamp: Date.now() }, // EXEMPT — envelope metadata

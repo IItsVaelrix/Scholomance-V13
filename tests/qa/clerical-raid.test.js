@@ -48,6 +48,22 @@ describe('Clerical RAID', () => {
     expect(result.escalationRequired).toBe(true);
   });
 
+  it('does not Merlin-name a pattern for weak unrelated symptoms', () => {
+    const raid = createRaidWithSeeds();
+    const result = raid.query({
+      symptoms: ['audit smoke unrelated'],
+      filePaths: ['package.json'],
+      errorMessages: [],
+    });
+    expect(result.verdict).not.toBe('CONFIRMED');
+    expect(result.verdict).not.toBe('NEEDS_MERLIN');
+    expect(result.fixPath).toBeNull();
+    // Weak hits may hint a pattern under DENIED, but must not claim Merlin.
+    if (result.verdict === 'NOVEL') {
+      expect(result.matchedPattern).toBeNull();
+    }
+  });
+
   it('cosineSimilarity is 1 for identical vectors', () => {
     const a = bugToVector(
       { symptoms: ['null pointer', 'schema validation failed'], filePaths: ['codex/core'] },
@@ -110,7 +126,8 @@ describe('Clerical RAID', () => {
       observed_behavior: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
     };
     const { trained, query } = autoTrainFromMerlinReport(raid, novel, { train: true });
-    expect(['NOVEL', 'NEEDS_MERLIN']).toContain(query.verdict);
+    // Tightened floors may land unique noise in DENIED rather than NOVEL.
+    expect(['NOVEL', 'NEEDS_MERLIN', 'DENIED']).toContain(query.verdict);
     expect(trained).toBeTruthy();
     expect(raid.patterns.length).toBe(n0 + 1);
   });

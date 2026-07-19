@@ -25,6 +25,30 @@ def _node_bin():
     return "node"
 
 
+def _extract_bridge_json(text):
+    """Parse JSON from bridge stdout/stderr, tolerating leading log noise."""
+    if not text:
+        return None
+    raw = text.strip()
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        pass
+    # Prefer the last successfully decoded JSON value. Immunity used to print
+    # a pseudo-object log line before the real payload; taking the first '{'
+    # would fail. Walk candidates from the end.
+    decoder = json.JSONDecoder()
+    for opener in ("{", "["):
+        idx = raw.rfind(opener)
+        while idx >= 0:
+            try:
+                value, _ = decoder.raw_decode(raw, idx)
+                return value
+            except json.JSONDecodeError:
+                idx = raw.rfind(opener, 0, idx)
+    return None
+
+
 def _run_bridge(command, *args, timeout=30, stdin=None):
     node = _node_bin()
     cmd = [node, BRIDGE_SCRIPT, command] + list(args)
@@ -38,13 +62,19 @@ def _run_bridge(command, *args, timeout=30, stdin=None):
             input=stdin,
             env=harness_tools.node_env(),
         )
+        payload = _extract_bridge_json(proc.stdout)
+        if payload is None:
+            payload = _extract_bridge_json(proc.stderr)
         if proc.returncode != 0:
-            return {"error": proc.stderr.strip() or f"exit code {proc.returncode}"}
-        return json.loads(proc.stdout)
+            if isinstance(payload, dict) and payload.get("error"):
+                return payload
+            err = (proc.stderr or proc.stdout or "").strip() or f"exit code {proc.returncode}"
+            return {"error": err}
+        if payload is None:
+            return {"error": "Failed to parse bridge output"}
+        return payload
     except subprocess.TimeoutExpired:
         return {"error": "Command timed out"}
-    except json.JSONDecodeError:
-        return {"error": "Failed to parse bridge output"}
     except Exception as e:
         return {"error": str(e)}
 
@@ -490,6 +520,56 @@ class ToolService:
             {
                 "type": "function",
                 "function": {
+                    "name": "browser_inspect",
+                    "description": "Headless Playwright inspect of a LOCAL app URL (localhost/127.0.0.1 only). Returns title, headings/buttons/links/inputs, console errors, optional screenshot under the repo.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "url": {
+                                "type": "string",
+                                "description": "Local URL, e.g. http://127.0.0.1:5173/"
+                            },
+                            "selector": {
+                                "type": "string",
+                                "description": "Optional CSS selector to wait for"
+                            },
+                            "wait_ms": {
+                                "type": "integer",
+                                "description": "Extra wait after DOMContentLoaded (ms)"
+                            },
+                            "screenshot": {
+                                "type": "string",
+                                "description": "Optional relative path to write a full-page PNG"
+                            }
+                        },
+                        "required": ["url"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "dependency_graph",
+                    "description": "Build a module dependency graph from an entry file (madge). Returns nodes/edges truncated by depth.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "entry": {
+                                "type": "string",
+                                "description": "Repo-relative entry file, e.g. 'src/pages/Combat/CombatPage.jsx'"
+                            },
+                            "depth": {
+                                "type": "integer",
+                                "description": "BFS depth from entry (default 2, max 8)"
+                            }
+                        },
+                        "required": ["entry"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
                     "name": "search_code",
                     "description": "Grep the codebase for a pattern. Searches file contents recursively.",
                     "parameters": {
@@ -628,45 +708,30 @@ class ToolService:
                     }
                 }
             },
-            {
-                "type": "function",
-                "function": {
-                    "name": "cleri_scan",
-                    "description": "Scan a symptom description against the Clerical RAID pattern corpus. Returns the best-matching bug pattern, confidence score, verdict, and fix path.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "symptoms": {
-                                "type": "string",
-                                "description": "Natural-language symptom description (e.g. 'null pointer in combat update loop')"
-                            }
-                        },
-                        "required": ["symptoms"]
-                    }
-                }
-            },
-            {
-                "type": "function",
-                "function": {
-                    "name": "cleri_stats",
-                    "description": "Get Clerical RAID engine statistics: total pattern count, query/confirm/deny counts, memory footprint.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {}
-                    }
-                }
-            },
+
             {
                 "type": "function",
                 "function": {
                     "name": "cleri_probe",
-                    "description": "Run a structural prion scan against the codebase. Walks source files looking for code-level structural misfolds matching a hypothesis.",
+                    "description": "Evidence-first Cleri Probe investigation (scripts/cleri-probe.js investigate). Maps a hypothesis to pathology classes, verifies findings, returns structured JSON.",
                     "parameters": {
                         "type": "object",
                         "properties": {
                             "hypothesis": {
                                 "type": "string",
                                 "description": "Code smell or structural hypothesis (e.g. 'unseeded Math.random in combat logic')"
+                            },
+                            "scope": {
+                                "type": "string",
+                                "description": "Optional repo-relative path/glob to scope (comma-separated for multiple)"
+                            },
+                            "plan_only": {
+                                "type": "boolean",
+                                "description": "If true, return the investigation plan without verifying findings"
+                            },
+                            "include_tests": {
+                                "type": "boolean",
+                                "description": "Analyze test paths as product code"
                             }
                         },
                         "required": ["hypothesis"]
@@ -869,7 +934,7 @@ class ToolService:
                 "type": "function",
                 "function": {
                     "name": "diagnostic_scan",
-                    "description": "Run a full codebase diagnostic scan. Executes all diagnostic cells (innate, adaptive, bridge, fixture, coverage) against the entire codebase and persists the report.",
+                    "description": "Run a full codebase diagnostic scan. Executes all diagnostic cells (innate, adaptive, bridge, fixture, coverage) against the entire codebase and persists the report. Oversized asset JSON is skipped automatically.",
                     "parameters": {
                         "type": "object",
                         "properties": {
@@ -877,6 +942,10 @@ class ToolService:
                                 "type": "string",
                                 "description": "Trigger source identifier (default 'mcp')",
                                 "default": "mcp"
+                            },
+                            "max_file_bytes": {
+                                "type": "integer",
+                                "description": "Optional per-file byte cap (default 1000000; oversized files are skipped)"
                             }
                         }
                     }
@@ -977,20 +1046,21 @@ class ToolService:
                     }
                 }
             },
+
             {
                 "type": "function",
                 "function": {
                     "name": "immunity_scan",
-                    "description": "Scan a source file through the Scholomance immune system. Checks Innate Layer (fixed rules) and Adaptive Layer (pathogen registry) for violations.",
+                    "description": "Scan a single source file through the immune system (innate/adaptive/protocol/checkpoint). Path is relative to project root.",
                     "parameters": {
                         "type": "object",
                         "properties": {
-                            "file_path": {
+                            "path": {
                                 "type": "string",
                                 "description": "Relative file path to scan (e.g. 'src/pages/Combat/CombatPage.jsx')"
                             }
                         },
-                        "required": ["file_path"]
+                        "required": ["path"]
                     }
                 }
             },
@@ -1411,14 +1481,15 @@ class ToolService:
             return self._typecheck(kwargs, callback)
         elif tool_name == "scholo_gate":
             return self._scholo_gate(kwargs, callback)
+        elif tool_name == "browser_inspect":
+            return self._browser_inspect(kwargs, callback)
+        elif tool_name == "dependency_graph":
+            return self._dependency_graph(kwargs, callback)
         elif tool_name == "replace_file_content":
             return self._replace_file_content(kwargs, callback)
         elif tool_name == "search_youtube":
             return self._search_youtube(kwargs, callback)
-        elif tool_name == "cleri_scan":
-            return self._cleri_scan(kwargs, callback)
-        elif tool_name == "cleri_stats":
-            return self._cleri_stats(kwargs, callback)
+
         elif tool_name == "cleri_probe":
             return self._cleri_probe(kwargs, callback)
         elif tool_name == "health_emit":
@@ -1449,6 +1520,7 @@ class ToolService:
             return self._diagnostic_health(kwargs, callback)
         elif tool_name == "diagnostic_hints":
             return self._diagnostic_hints(kwargs, callback)
+
         elif tool_name == "immunity_scan":
             return self._immunity_scan(kwargs, callback)
         elif tool_name == "immunity_status":
@@ -1874,22 +1946,33 @@ class ToolService:
         except Exception as e:
             return f"Format error: {e}"
 
-    def _cleri_scan(self, kwargs, callback):
-        text = kwargs.get("symptoms", "")
-        if not text:
-            return "Error: No symptom text provided."
-        result = _run_bridge("scan", text)
-        return self._fmt_bridge("cleri_scan", result, callback)
 
-    def _cleri_stats(self, kwargs, callback):
-        result = _run_bridge("stats")
-        return self._fmt_bridge("cleri_stats", result, callback)
 
     def _cleri_probe(self, kwargs, callback):
-        text = kwargs.get("hypothesis", "")
+        text = kwargs.get("hypothesis") or kwargs.get("text") or ""
         if not text:
             return "Error: No hypothesis provided."
-        result = _run_bridge("probe", text, "--mode=prion")
+        args = [text]
+        scope = kwargs.get("scope") or kwargs.get("scopes")
+        if scope:
+            if isinstance(scope, (list, tuple)):
+                scope = ",".join(str(s) for s in scope if s)
+            args.extend(["--scope", str(scope)])
+        if kwargs.get("plan_only"):
+            args.append("--plan-only")
+        if kwargs.get("include_tests"):
+            args.append("--include-tests")
+        # Investigation can walk large trees; give it room.
+        result = _run_bridge("probe", *args, timeout=180)
+        if isinstance(result, dict) and "error" not in result:
+            findings = result.get("findings") or []
+            status = result.get("status") or result.get("contract") or "ok"
+            if callback:
+                callback(
+                    f"  [#7CFF8B]✓[/] cleri_probe: {status} "
+                    f"({len(findings)} findings)"
+                )
+            return json.dumps(result, indent=2, default=str)[:6000]
         return self._fmt_bridge("cleri_probe", result, callback)
 
     def _health_emit(self, kwargs, callback):
@@ -2102,16 +2185,26 @@ class ToolService:
 
     def _diagnostic_scan(self, kwargs, callback):
         trigger = kwargs.get("trigger", "mcp")
-        result = _run_bridge("diagnostic-scan", "--trigger", trigger)
+        args = ["--trigger", str(trigger)]
+        max_file_bytes = kwargs.get("max_file_bytes")
+        if max_file_bytes is not None:
+            args.extend(["--max-file-bytes", str(int(max_file_bytes))])
+        # Full scans are heavy; keep the bridge alive long enough.
+        result = _run_bridge("diagnostic-scan", *args, timeout=600)
         if isinstance(result, dict) and "error" not in result:
             violations = result.get("violations", [])
+            summary = result.get("summary") or {}
             if callback:
-                callback(f"  [#7CFF8B]✓[/] diagnostic_scan: {len(violations)} violations")
+                callback(
+                    f"  [#7CFF8B]✓[/] diagnostic_scan: "
+                    f"{len(violations) or summary.get('totalErrors', '?')} violations"
+                )
             return (
                 f"--- Diagnostic Scan Complete ---\n"
                 f"  Report: {result.get('reportId', 'N/A')}\n"
                 f"  Cells: {result.get('cells', [])}\n"
                 f"  Violations: {len(violations)}\n"
+                f"  Summary: {json.dumps(summary, default=str)[:500]}\n"
                 f"  Checksum: {result.get('checksum', 'N/A')}"
             )
         return self._fmt_bridge("diagnostic_scan", result, callback)
@@ -2201,25 +2294,37 @@ class ToolService:
             return json.dumps(result, indent=2, default=str)[:2000]
         return self._fmt_bridge("diagnostic_hints", result, callback)
 
+
+
     def _immunity_scan(self, kwargs, callback):
-        file_path = kwargs.get("file_path", "")
-        if not file_path:
-            return "Error: file_path is required."
-        result = _run_bridge("immunity-scan", file_path)
+        path = kwargs.get("path") or kwargs.get("file_path") or ""
+        if not path:
+            return "Error: path is required."
+        result = _run_bridge("immunity-scan", path, timeout=60)
         if isinstance(result, dict) and "error" not in result:
-            status = result.get("status", "UNKNOWN")
-            report = result.get("report", "")
+            total = result.get("totalViolations", len(result.get("innate") or []))
+            blocked = result.get("blocked", False)
             if callback:
-                callback(f"  [#7CFF8B]✓[/] immunity_scan({file_path}): {status}")
-            return report or json.dumps(result, indent=2, default=str)[:3000]
+                mark = "#FF5C7A" if blocked or total else "#7CFF8B"
+                callback(f"  [{mark}]✓[/] immunity_scan({path}): {total} violations")
+            return json.dumps(result, indent=2, default=str)[:6000]
         return self._fmt_bridge("immunity_scan", result, callback)
 
     def _immunity_status(self, kwargs, callback):
+        # Get immunity system status
         result = _run_bridge("immunity-status")
+        
+        # Also get RAID stats (since cleri_stats was retired)
+        raid_stats = _run_bridge("stats")
+        
         if isinstance(result, dict) and "error" not in result:
+            # Merge RAID stats into the response
+            if isinstance(raid_stats, dict) and "error" not in raid_stats:
+                result["raid"] = raid_stats
+            
             if callback:
-                callback("  [#7CFF8B]✓[/] immunity_status")
-            return json.dumps(result, indent=2, default=str)[:2000]
+                callback("  [#7CFF8B]✓[/] immunity_status (includes RAID stats)")
+            return json.dumps(result, indent=2, default=str)[:3000]
         return self._fmt_bridge("immunity_status", result, callback)
 
     def _raid_query(self, kwargs, callback):
@@ -2520,6 +2625,41 @@ class ToolService:
         if callback:
             kind = result.get("kind", "?")
             callback(f"  [#7CFF8B]✓[/] scholo_gate: kind={kind}")
+        return json.dumps(result, indent=2, default=str)[:6000]
+
+    def _browser_inspect(self, kwargs, callback):
+        url = kwargs.get("url", "")
+        if not url:
+            return "Error: url is required (localhost only)."
+        if callback:
+            callback(f"  [bold #FFD700]⚡[/] browser_inspect({url[:80]})")
+        result = harness_tools.browser_inspect(
+            PROJECT_ROOT,
+            url,
+            selector=kwargs.get("selector"),
+            wait_ms=int(kwargs.get("wait_ms") or 0),
+            screenshot=kwargs.get("screenshot"),
+        )
+        if callback:
+            mark = "#7CFF8B" if result.get("ok") else "#FF5C7A"
+            title = result.get("title") or result.get("error") or "?"
+            callback(f"  [{mark}]✓[/] browser_inspect: {title}")
+        return json.dumps(result, indent=2, default=str)[:6000]
+
+    def _dependency_graph(self, kwargs, callback):
+        entry = kwargs.get("entry") or kwargs.get("path") or ""
+        if not entry:
+            return "Error: entry path is required."
+        depth = int(kwargs.get("depth") or 2)
+        if callback:
+            callback(f"  [bold #FFD700]⚡[/] dependency_graph({entry})")
+        result = harness_tools.dependency_graph(PROJECT_ROOT, entry, depth=depth)
+        if callback:
+            mark = "#7CFF8B" if result.get("ok") else "#FF5C7A"
+            callback(
+                f"  [{mark}]✓[/] dependency_graph: "
+                f"{result.get('node_count', 0)} nodes / {result.get('edge_count', 0)} edges"
+            )
         return json.dumps(result, indent=2, default=str)[:6000]
 
     def _heal(self, kwargs, callback):

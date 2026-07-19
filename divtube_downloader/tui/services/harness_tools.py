@@ -512,3 +512,157 @@ def scholo_gate(
             "exit_code": proc.returncode,
             "error": "Failed to parse scholo-gate JSON; see raw_tail",
         }
+
+
+def browser_inspect(
+    project_root: str,
+    url: str,
+    *,
+    selector: str | None = None,
+    wait_ms: int = 0,
+    screenshot: str | None = None,
+    timeout: int = 90,
+) -> dict[str, Any]:
+    """Headless Playwright inspect (localhost-only). See browser-inspect.mjs."""
+    script = os.path.join(project_root, "divtube_downloader", "scripts", "browser-inspect.mjs")
+    if not os.path.isfile(script):
+        return {"ok": False, "error": f"browser-inspect.mjs not found at {script}"}
+    cmd = [_tool("node"), script, "--url", url]
+    if selector:
+        cmd.extend(["--selector", selector])
+    if wait_ms:
+        cmd.extend(["--wait-ms", str(int(wait_ms))])
+    if screenshot:
+        cmd.extend(["--screenshot", screenshot])
+    try:
+        proc = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            cwd=project_root,
+            env=node_env(),
+        )
+    except FileNotFoundError as e:
+        return {"ok": False, "error": str(e)}
+    except subprocess.TimeoutExpired:
+        return {"ok": False, "error": "browser_inspect timed out"}
+    text = (proc.stdout or "").strip()
+    if not text:
+        return {
+            "ok": False,
+            "error": (proc.stderr or f"exit {proc.returncode}").strip(),
+            "exit_code": proc.returncode,
+        }
+    try:
+        data = json.loads(text)
+        if isinstance(data, dict):
+            data.setdefault("ok", proc.returncode == 0)
+            if proc.stderr:
+                data["stderr_tail"] = proc.stderr[-500:]
+            return data
+    except json.JSONDecodeError:
+        pass
+    return {
+        "ok": False,
+        "error": "Failed to parse browser_inspect JSON",
+        "raw_tail": text[-3000:],
+        "stderr_tail": (proc.stderr or "")[-1000:],
+        "exit_code": proc.returncode,
+    }
+
+
+_IMPORT_RE = re.compile(
+    r"""(?:import\s+(?:type\s+)?(?:[^'"]+\s+from\s+)?|export\s+(?:type\s+)?[^'"]*\s+from\s+|require\s*\(\s*)['"]([^'"]+)['"]""",
+    re.MULTILINE,
+)
+_RESOLVE_EXTS = (
+    "",
+    ".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".json",
+    "/index.js", "/index.jsx", "/index.ts", "/index.tsx",
+)
+
+
+def _resolve_import(project_root: str, from_file: str, spec: str) -> str | None:
+    """Resolve a relative import to a repo-relative path; ignore packages."""
+    if not spec or not spec.startswith("."):
+        return None
+    base_dir = os.path.dirname(os.path.join(project_root, from_file))
+    candidate = os.path.normpath(os.path.join(base_dir, spec))
+    root_norm = os.path.normpath(project_root)
+    if not candidate.startswith(root_norm):
+        return None
+    for ext in _RESOLVE_EXTS:
+        path = candidate + ext
+        if os.path.isfile(path):
+            return os.path.relpath(path, project_root).replace("\\", "/")
+    return None
+
+
+def _parse_local_imports(project_root: str, rel_path: str) -> list[str]:
+    abs_path = os.path.join(project_root, rel_path)
+    try:
+        with open(abs_path, "r", encoding="utf-8", errors="replace") as f:
+            text = f.read()
+    except OSError:
+        return []
+    # Strip block comments lightly so commented imports don't expand the graph.
+    text = re.sub(r"/\*.*?\*/", "", text, flags=re.DOTALL)
+    deps = []
+    seen = set()
+    for m in _IMPORT_RE.finditer(text):
+        spec = m.group(1)
+        resolved = _resolve_import(project_root, rel_path, spec)
+        if resolved and resolved not in seen:
+            seen.add(resolved)
+            deps.append(resolved)
+    return deps
+
+
+def dependency_graph(
+    project_root: str,
+    entry: str,
+    *,
+    depth: int = 2,
+    include_npm: bool = False,
+    timeout: int = 120,
+) -> dict[str, Any]:
+    """BFS dependency graph from an entry file (relative imports only)."""
+    del include_npm, timeout  # reserved; walker is local/sync
+    if not entry:
+        return {"ok": False, "error": "entry path is required"}
+    entry_key = entry.replace("\\", "/").lstrip("./")
+    abs_entry = os.path.normpath(os.path.join(project_root, entry_key))
+    root_norm = os.path.normpath(project_root)
+    if not abs_entry.startswith(root_norm):
+        return {"ok": False, "error": "entry escapes project root"}
+    if not os.path.isfile(abs_entry):
+        return {"ok": False, "error": f"entry not found: {entry}"}
+
+    depth = max(0, min(int(depth), 8))
+    nodes: set[str] = {entry_key}
+    edges: list[dict] = []
+    frontier = [entry_key]
+    for _ in range(depth):
+        nxt = []
+        for src in frontier:
+            for dst in _parse_local_imports(project_root, src):
+                edges.append({"from": src, "to": dst})
+                if dst not in nodes:
+                    nodes.add(dst)
+                    nxt.append(dst)
+        frontier = nxt
+        if not frontier:
+            break
+    return {
+        "ok": True,
+        "entry": entry,
+        "resolved_entry": entry_key,
+        "depth": depth,
+        "nodes": sorted(nodes),
+        "edges": edges[:500],
+        "node_count": len(nodes),
+        "edge_count": min(len(edges), 500),
+        "truncated": len(edges) > 500,
+        "external_skipped": True,
+    }
