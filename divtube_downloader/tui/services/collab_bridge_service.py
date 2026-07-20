@@ -82,3 +82,147 @@ class CollabBridgeService:
                 return 200 <= resp.status < 300
         except (urllib.error.URLError, ConnectionError, TimeoutError, OSError):
             return False
+
+    # ── HTTP helpers ──────────────────────────────────────────────────────
+
+    def _http_request(
+        self,
+        method: str,
+        path: str,
+        body: dict | None,
+        timeout: float,
+        extra_headers: dict[str, str] | None = None,
+    ) -> tuple[int, dict[str, str], bytes]:
+        """Perform a single HTTP request. Returns (status, headers, body_bytes)."""
+        url = f"{self.base_url}{path}"
+        data = json.dumps(body).encode("utf-8") if body is not None else None
+        req = urllib.request.Request(url, data=data, method=method)
+        req.add_header("Content-Type", "application/json")
+        req.add_header("Accept", "application/json, text/event-stream")
+        if self.key:
+            req.add_header("Authorization", f"Bearer {self.key}")
+        if self.agent_id:
+            req.add_header("X-Agent-ID", self.agent_id)
+        if self._session_id:
+            req.add_header("mcp-session-id", self._session_id)
+        if extra_headers:
+            for k, v in extra_headers.items():
+                req.add_header(k, v)
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                return resp.status, dict(resp.headers), resp.read()
+        except urllib.error.HTTPError as e:
+            return e.code, dict(e.headers or {}), e.read() or b""
+
+    def _ensure_session(self) -> None:
+        """Perform the MCP ``initialize`` handshake if no session is active."""
+        with self._lock:
+            if self._session_id is not None:
+                return
+            init_body = {
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "initialize",
+                "params": {
+                    "protocolVersion": "2024-11-05",
+                    "capabilities": {},
+                    "clientInfo": {"name": "divtube-tui", "version": "0.1.0"},
+                },
+            }
+            status, headers, raw = self._http_request(
+                "POST", "/mcp", init_body, INIT_TIMEOUT_S
+            )
+            if status < 200 or status >= 300:
+                raise RuntimeError(
+                    f"collab /mcp initialize failed: HTTP {status}"
+                )
+            # MCP returns the session id in the response header.
+            session = headers.get("Mcp-Session-Id") or headers.get("mcp-session-id")
+            if not session:
+                raise RuntimeError(
+                    "collab /mcp initialize returned no Mcp-Session-Id header"
+                )
+            self._session_id = session
+            # Best-effort: parse serverInfo from the response body.
+            try:
+                parsed = json.loads(raw or b"{}")
+            except json.JSONDecodeError:
+                parsed = {}
+            self._server_info = (
+                parsed.get("result", {}).get("serverInfo")
+                if isinstance(parsed, dict) else None
+            )
+
+    def _maybe_rotate_session(self, headers: dict[str, str]) -> None:
+        """Server may rotate the session id; pick up the new value if present."""
+        new_id = headers.get("Mcp-Session-Id") or headers.get("mcp-session-id")
+        if new_id and new_id != self._session_id:
+            self._session_id = new_id
+
+    # ── Core dispatcher ───────────────────────────────────────────────────
+
+    def call_tool(
+        self,
+        name: str,
+        args: dict,
+        callback: Callable[[str], None],
+    ) -> None:
+        """Dispatch a ``tools/call`` to the bridge. Result is delivered via callback."""
+
+        def run():
+            err = self.auth_error()
+            if err:
+                callback(f"[{ERROR}]{name}: {err}[/]")
+                return
+            try:
+                self._ensure_session()
+            except Exception as e:
+                callback(f"[{ERROR}]{name}: initialize failed — {e}[/]")
+                return
+            body = {
+                "jsonrpc": "2.0",
+                "id": 2,
+                "method": "tools/call",
+                "params": {"name": name, "arguments": args or {}},
+            }
+            try:
+                status, headers, raw = self._http_request(
+                    "POST", "/mcp", body, TOOL_TIMEOUT_S
+                )
+            except Exception as e:
+                callback(f"[{ERROR}]{name}: transport error — {e}[/]")
+                return
+            self._maybe_rotate_session(headers)
+            if status < 200 or status >= 300:
+                callback(
+                    f"[{ERROR}]{name}: HTTP {status} — "
+                    f"{raw[:200].decode('utf-8', errors='replace')}[/]"
+                )
+                return
+            try:
+                parsed = json.loads(raw)
+            except json.JSONDecodeError as e:
+                callback(f"[{ERROR}]{name}: non-JSON response ({e})[/]")
+                return
+            if isinstance(parsed, dict) and parsed.get("error"):
+                msg = parsed["error"].get("message", "unknown error")
+                callback(f"[{ERROR}]{name}: {msg}[/]")
+                return
+            result = parsed.get("result") if isinstance(parsed, dict) else None
+            if result is None:
+                callback(f"[{MUTED}]{name}: empty result[/]")
+                return
+            callback(json.dumps(result, indent=2, default=str))
+
+        threading.Thread(target=run, daemon=True).start()
+
+    def close(self) -> None:
+        """Send ``DELETE /mcp`` to close the session. Never raises."""
+        if not self._session_id:
+            return
+        try:
+            self._http_request("DELETE", "/mcp", None, 5.0)
+        except Exception:
+            pass
+        self._session_id = None
+        self._server_info = None
