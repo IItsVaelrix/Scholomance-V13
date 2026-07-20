@@ -230,6 +230,174 @@
   font-size: 0.9rem;
 }
 
+/* ── Compose console chrome ── */
+.update-ledger--compose {
+  position: relative;
+  isolation: isolate;
+}
+
+.update-ledger__frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  padding: 14px;
+  gap: 10px;
+  border-radius: 12px;
+  background:
+    linear-gradient(165deg, rgb(6 8 16 / 0.96), rgb(2 3 8 / 0.98));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    inset 0 -2px 6px rgb(0 0 0 / 0.45),
+    0 0 0 1px rgb(var(--wand-amethyst-rgb) / 0.22),
+    0 0 18px rgb(var(--wand-arc-blue-rgb) / 0.1);
+  animation: update-ledger-ignition 850ms ease-out both;
+}
+
+.update-ledger--compose::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  padding: 1px;
+  background: linear-gradient(
+    125deg,
+    rgb(var(--wand-amethyst-rgb) / 0.38),
+    rgb(var(--wand-arc-blue-rgb) / 0.14) 40%,
+    rgb(var(--wand-gold-rgb) / 0.22) 72%,
+    rgb(var(--wand-amethyst-rgb) / 0.28)
+  );
+  background-size: 220% 220%;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: update-ledger-living-rim 8s linear infinite;
+}
+
+.update-ledger--compose:focus-within::before {
+  background: linear-gradient(
+    125deg,
+    rgb(var(--wand-amethyst-rgb) / 0.62),
+    rgb(var(--wand-arc-blue-rgb) / 0.28) 40%,
+    rgb(var(--wand-gold-rgb) / 0.42) 72%,
+    rgb(var(--wand-amethyst-rgb) / 0.48)
+  );
+  animation-duration: 4s;
+}
+
+.update-ledger__header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 0 0 auto;
+  min-height: 48px;
+}
+
+.update-ledger__chip {
+  flex: 0 0 auto;
+  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(var(--wand-gold-rgb) / 0.88);
+  padding: 0.2rem 0.45rem;
+  border: 1px solid rgb(var(--wand-gold-rgb) / 0.28);
+  border-radius: 4px;
+  background: rgb(4 6 12 / 0.72);
+  white-space: nowrap;
+}
+
+.update-ledger__boot {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  background: rgb(2 4 8 / 0.55);
+  border-left: 2px solid rgb(var(--wand-gold-rgb) / 0.35);
+}
+
+.update-ledger__boot-line {
+  margin: 0;
+  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', monospace;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  color: rgb(var(--wand-gold-rgb) / 0.72);
+}
+
+.update-ledger__scroll-host {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 0;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background:
+    linear-gradient(180deg, rgb(4 6 12 / 0.92), rgb(2 3 8 / 0.96));
+  border-radius: 8px;
+}
+
+.update-ledger--compose .update-ledger__entries {
+  gap: 0.65rem;
+  padding: 0.3rem 0.4rem 0.5rem 0.2rem;
+}
+
+.update-ledger--compose .update-ledger__entry {
+  padding: 0.45rem 0.55rem;
+  display: grid;
+  grid-template-columns: 4.5rem 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 0.55rem;
+  row-gap: 0.1rem;
+}
+
+.update-ledger--compose .update-ledger__date {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  margin: 0;
+  padding-top: 0.12rem;
+  font-size: 0.68rem;
+  line-height: 1.3;
+}
+
+.update-ledger--compose .update-ledger__entry-title {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.update-ledger--compose .update-ledger__summary {
+  grid-column: 2;
+  grid-row: 2;
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .update-ledger,
   .update-ledger *,

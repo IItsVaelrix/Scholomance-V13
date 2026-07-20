@@ -19,7 +19,7 @@ const M_CORE = 180000; // Massive black hole / bulge mass
 const V_HALO = 140; // Dark Matter Halo velocity scale
 const R_HALO = 160; // Halo scale radius (Rh)
 const EPSILON_SQ = 225; // Softening parameter (epsilon = 15 px)
-const PATTERN_SPEED = 0.05; // Density wave pattern rotation speed (rad/s)
+export const PATTERN_SPEED = 0.05; // Density wave pattern rotation speed (rad/s)
 const C_DW = 12.0; // Density wave tangential force scale
 const SPIRAL_B = 0.26; // Logarithmic spiral flare constant (b)
 const SPIRAL_A = 12.0; // Logarithmic spiral scale constant (a)
@@ -351,36 +351,53 @@ export function updateGalaxy(state, dt) {
 
 
 /**
+ * Bake a cached galaxy plate for Compose/DOM hosts that blit outside StormCanvas.
+ */
+export function bakeGalaxyPlate(width, height) {
+  const state = initGalaxy(width, height);
+  return {
+    canvas: state.cachedCanvas,
+    centerX: state.centerX,
+    centerY: state.centerY,
+    patternSpeed: PATTERN_SPEED,
+    state,
+  };
+}
+
+/** Blit + rotate the pre-rendered static galaxy plate. */
+export function drawGalaxyPlate(ctx, state) {
+  if (!state.cachedCanvas) return;
+  ctx.save();
+  ctx.translate(state.centerX, state.centerY);
+  ctx.rotate(state.clock * PATTERN_SPEED);
+  ctx.drawImage(state.cachedCanvas, -state.centerX, -state.centerY);
+  ctx.restore();
+}
+
+/** Draw dynamic interactive sparkles (no plate rotation). */
+export function drawGalaxySparkles(ctx, state) {
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  for (const p of state.particles) {
+    if (p.type !== 'sparkle') continue;
+    ctx.fillStyle = p.color || '#fff';
+    ctx.globalAlpha = Math.max(0, Math.min(1, p.life));
+    ctx.beginPath();
+    ctx.arc(p.x + state.centerX, p.y + state.centerY, p.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+/**
  * Main render entrypoint called every frame.
  * Uses the mathematically cached canvas for the static galaxy and just rotates it,
  * while dynamically drawing the interactive sparkles on top.
  */
 export function drawGalaxy(ctx, state) {
   if (state.cachedCanvas) {
-    ctx.save();
-    // Translate to center to rotate the cached image
-    ctx.translate(state.centerX, state.centerY);
-    
-    // The density wave pattern speed drives the slow rotation of the galaxy
-    ctx.rotate(state.clock * PATTERN_SPEED);
-    
-    // Draw the pre-calculated galaxy
-    ctx.drawImage(state.cachedCanvas, -state.centerX, -state.centerY);
-    ctx.restore();
-
-    // Draw dynamic interactive sparkles over the cached galaxy
-    ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
-    for (const p of state.particles) {
-      if (p.type !== 'sparkle') continue;
-      ctx.fillStyle = p.color || '#fff';
-      ctx.globalAlpha = Math.max(0, Math.min(1, p.life));
-      ctx.beginPath();
-      // Sparkles are absolute coordinates, so we draw them directly
-      ctx.arc(p.x + state.centerX, p.y + state.centerY, p.size, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.restore();
+    drawGalaxyPlate(ctx, state);
+    drawGalaxySparkles(ctx, state);
   } else {
     drawGalaxyLayers(ctx, state, true);
   }

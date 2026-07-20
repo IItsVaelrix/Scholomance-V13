@@ -1,0 +1,230 @@
+{
+  "color": {
+    "primary": {
+      "50": {
+        "$value": "#eff6ff",
+        "$type": "color",
+        "$description": "Primary color - lightest"
+      },
+      "100": {
+        "$value": "#dbeafe",
+        "$type": "color",
+        "$description": "Primary color - 100"
+      },
+      "500": {
+        "$value": "#3b82f6",
+        "$type": "color",
+        "$description": "Primary color - base"
+      },
+      "900": {
+        "$value": "#1e3a8a",
+        "$type": "color",
+        "$description": "Primary color - darkest"
+      }
+    },
+    "neutral": {
+      "0": {
+        "$value": "#ffffff",
+        "$type": "color",
+        "$description": "White"
+      },
+      "500": {
+        "$value": "#6b7280",
+        "$type": "color",
+        "$description": "Neutral gray"
+      },
+      "900": {
+        "$value": "#111827",
+        "$type": "color",
+        "$description": "Black"
+      }
+    }
+  },
+  "spacing": {
+    "xs": {
+      "$value": 4,
+      "$type": "dimension",
+      "$description": "Extra small spacing"
+    },
+    "sm": {
+      "$value": 8,
+      "$type": "dimension",
+      "$description": "Small spacing"
+    },
+    "md": {
+      "$value": 16,
+      "$type": "dimension",
+      "$description": "Medium spacing"
+    },
+    "lg": {
+      "$value": 24,
+      "$type": "dimension",
+      "$description": "Large spacing"
+    },
+    "xl": {
+      "$value": 32,
+      "$type": "dimension",
+      "$description": "Extra large spacing"
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "base": {
+        "$value": "Inter, system-ui, sans-serif",
+        "$type": "fontFamily",
+        "$description": "Base font family"
+      },
+      "mono": {
+        "$value": "Fira Code, monospace",
+        "$type": "fontFamily",
+        "$description": "Monospace font family"
+      }
+    },
+    "fontSize": {
+      "sm": {
+        "$value": 14,
+        "$type": "fontSize",
+        "$description": "Small font size"
+      },
+      "base": {
+        "$value": 16,
+        "$type": "fontSize",
+        "$description": "Base font size"
+      },
+      "lg": {
+        "$value": 18,
+        "$type": "fontSize",
+        "$description": "Large font size"
+      },
+      "xl": {
+        "$value": 20,
+        "$type": "fontSize",
+        "$description": "Extra large font size"
+      }
+    },
+    "fontWeight": {
+      "normal": {
+        "$value": 400,
+        "$type": "fontWeight",
+        "$description": "Normal font weight"
+      },
+      "medium": {
+        "$value": 500,
+        "$type": "fontWeight",
+        "$description": "Medium font weight"
+      },
+      "bold": {
+        "$value": 700,
+        "$type": "fontWeight",
+        "$description": "Bold font weight"
+      }
+    }
+  },
+  "border": {
+    "radius": {
+      "sm": {
+        "$value": 4,
+        "$type": "borderRadius",
+        "$description": "Small border radius"
+      },
+      "md": {
+        "$value": 8,
+        "$type": "borderRadius",
+        "$description": "Medium border radius"
+      },
+      "lg": {
+        "$value": 12,
+        "$type": "borderRadius",
+        "$description": "Large border radius"
+      },
+      "full": {
+        "$value": 9999,
+        "$type": "borderRadius",
+        "$description": "Full border radius (pill)"
+      }
+    },
+    "width": {
+      "thin": {
+        "$value": 1,
+        "$type": "borderWidth",
+        "$description": "Thin border"
+      },
+      "medium": {
+        "$value": 2,
+        "$type": "borderWidth",
+        "$description": "Medium border"
+      }
+    }
+  },
+  "shadow": {
+    "sm": {
+      "$value": {
+        "offsetX": 0,
+        "offsetY": 1,
+        "blur": 2,
+        "spread": 0,
+        "color": "rgba(0, 0, 0, 0.05)"
+      },
+      "$type": "shadow",
+      "$description": "Small shadow"
+    },
+    "md": {
+      "$value": {
+        "offsetX": 0,
+        "offsetY": 4,
+        "blur": 6,
+        "spread": -1,
+        "color": "rgba(0, 0, 0, 0.1)"
+      },
+      "$type": "shadow",
+      "$description": "Medium shadow"
+    },
+    "lg": {
+      "$value": {
+        "offsetX": 0,
+        "offsetY": 10,
+        "blur": 15,
+        "spread": -3,
+        "color": "rgba(0, 0, 0, 0.1)"
+      },
+      "$type": "shadow",
+      "$description": "Large shadow"
+    }
+  },
+  "animation": {
+    "duration": {
+      "fast": {
+        "$value": 150,
+        "$type": "duration",
+        "$description": "Fast animation duration"
+      },
+      "normal": {
+        "$value": 300,
+        "$type": "duration",
+        "$description": "Normal animation duration"
+      },
+      "slow": {
+        "$value": 500,
+        "$type": "duration",
+        "$description": "Slow animation duration"
+      }
+    },
+    "easing": {
+      "ease-in": {
+        "$value": [0.4, 0, 1, 1],
+        "$type": "cubicBezier",
+        "$description": "Ease-in timing function"
+      },
+      "ease-out": {
+        "$value": [0, 0, 0.2, 1],
+        "$type": "cubicBezier",
+        "$description": "Ease-out timing function"
+      },
+      "ease-in-out": {
+        "$value": [0.4, 0, 0.2, 1],
+        "$type": "cubicBezier",
+        "$description": "Ease-in-out timing function"
+      }
+    }
+  }
+}

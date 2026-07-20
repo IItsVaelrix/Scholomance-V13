@@ -1,0 +1,127 @@
+{
+  "contract": "PB-UI-SCENE-v1",
+  "definitions": {
+    "galaxy-backdrop": {
+      "accessibility": {
+        "ariaRole": "presentation",
+        "focusRetention": "none",
+        "keyboard": [],
+        "nameFrom": "author",
+        "requiredAttributes": []
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "children": [
+              {
+                "id": "galaxy-plate",
+                "interactive": false,
+                "label": "Static galaxy plate",
+                "role": "presentation",
+                "visible": true
+              },
+              {
+                "id": "storm-overlay",
+                "interactive": false,
+                "label": "Photonic storm overlay",
+                "role": "presentation",
+                "visible": true
+              }
+            ],
+            "id": "root",
+            "interactive": false,
+            "role": "presentation",
+            "visible": true
+          }
+        ],
+        "rootRole": "presentation",
+        "slots": []
+      },
+      "capabilities": [
+        {
+          "id": "procedural-glow",
+          "required": false
+        },
+        {
+          "id": "semantic-text",
+          "required": false
+        }
+      ],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": {
+        "layoutId": "galaxy-stack"
+      },
+      "defaultVisuals": [],
+      "description": "Landing full-bleed galaxy plate + storm overlay — compose chrome",
+      "events": [],
+      "kind": "galaxy-backdrop",
+      "provenance": {
+        "author": "compose-galaxy-backdrop",
+        "contentHash": "scd64:galaxy-backdrop-v1",
+        "establishedAt": "2026-07-20T00:00:00.000Z",
+        "sourceKind": "migrated",
+        "sourcePath": "src/pages/Landing/StormCanvas.jsx"
+      },
+      "states": [
+        {
+          "default": false,
+          "name": "reducedMotion",
+          "type": "boolean"
+        }
+      ],
+      "version": "1.0.0"
+    }
+  },
+  "id": "scene:galaxy-backdrop",
+  "layouts": {
+    "galaxy-stack": {
+      "absolute": {
+        "heightPx": 1080,
+        "widthPx": 1920,
+        "xPx": 0,
+        "yPx": 0,
+        "zIndex": 0
+      },
+      "contract": "PB-LAYOUT-v1",
+      "mode": "absolute",
+      "version": "1.0.0"
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "id": "galaxy-backdrop.galaxy-plate",
+        "kind": "container",
+        "props": {
+          "label": "Static galaxy plate",
+          "part": "galaxy-plate"
+        },
+        "role": "presentation"
+      },
+      {
+        "id": "galaxy-backdrop.storm-overlay",
+        "kind": "container",
+        "props": {
+          "label": "Photonic storm overlay",
+          "part": "storm-overlay"
+        },
+        "role": "presentation"
+      }
+    ],
+    "id": "galaxy-backdrop",
+    "kind": "galaxy-backdrop",
+    "layoutRef": "galaxy-stack",
+    "props": {
+      "aria-hidden": "true",
+      "reducedMotion": false
+    },
+    "role": "presentation",
+    "state": {
+      "reducedMotion": false
+    },
+    "visualRefs": []
+  },
+  "sourceChecksum": "scd64:8500a9d0df4eaa4f",
+  "version": "1.0.0",
+  "visuals": {}
+}

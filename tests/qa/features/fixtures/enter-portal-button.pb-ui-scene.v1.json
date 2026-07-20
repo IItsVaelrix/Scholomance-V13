@@ -1,0 +1,166 @@
+{
+  "contract": "PB-UI-SCENE-v1",
+  "definitions": {
+    "enter-portal-button": {
+      "accessibility": {
+        "ariaRole": "button",
+        "focusRetention": "none",
+        "keyboard": [
+          "Enter: activate",
+          "Space: activate"
+        ],
+        "nameFrom": "author",
+        "requiredAttributes": [
+          "aria-label"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "children": [
+              {
+                "id": "hit-target",
+                "interactive": true,
+                "label": "Enter hit target",
+                "role": "button",
+                "visible": true
+              },
+              {
+                "id": "rings",
+                "interactive": false,
+                "label": "Energy rings",
+                "role": "presentation",
+                "visible": true
+              },
+              {
+                "id": "content",
+                "interactive": false,
+                "label": "Portal content",
+                "role": "group",
+                "visible": true
+              }
+            ],
+            "id": "root",
+            "interactive": true,
+            "role": "button",
+            "visible": true
+          }
+        ],
+        "rootRole": "button",
+        "slots": []
+      },
+      "capabilities": [
+        {
+          "id": "focusable-controls",
+          "required": true
+        },
+        {
+          "id": "semantic-text",
+          "required": true
+        },
+        {
+          "id": "procedural-glow",
+          "required": false
+        }
+      ],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": {
+        "layoutId": "portal-stack"
+      },
+      "defaultVisuals": [],
+      "description": "Landing Enter Scholomance portal orb — compose chrome",
+      "events": [
+        {
+          "type": "PORTAL.ENTER"
+        },
+        {
+          "type": "PORTAL.FOCUS"
+        }
+      ],
+      "kind": "enter-portal-button",
+      "provenance": {
+        "author": "compose-enter-portal",
+        "contentHash": "scd64:enter-portal-button-v1",
+        "establishedAt": "2026-07-20T00:00:00.000Z",
+        "sourceKind": "migrated",
+        "sourcePath": "src/pages/Landing/LandingPage.jsx"
+      },
+      "states": [
+        {
+          "default": false,
+          "name": "pressed",
+          "type": "boolean"
+        },
+        {
+          "default": false,
+          "name": "dissolving",
+          "type": "boolean"
+        }
+      ],
+      "version": "1.0.0"
+    }
+  },
+  "id": "scene:enter-portal-button",
+  "layouts": {
+    "portal-stack": {
+      "absolute": {
+        "heightPx": 440,
+        "widthPx": 440,
+        "xPx": 0,
+        "yPx": 0,
+        "zIndex": 2
+      },
+      "contract": "PB-LAYOUT-v1",
+      "mode": "absolute",
+      "version": "1.0.0"
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "id": "enter-portal-button.hit-target",
+        "kind": "container",
+        "props": {
+          "label": "Enter hit target",
+          "part": "hit-target"
+        },
+        "role": "button"
+      },
+      {
+        "id": "enter-portal-button.rings",
+        "kind": "container",
+        "props": {
+          "label": "Energy rings",
+          "part": "rings"
+        },
+        "role": "presentation"
+      },
+      {
+        "id": "enter-portal-button.content",
+        "kind": "container",
+        "props": {
+          "label": "Portal content",
+          "part": "content"
+        },
+        "role": "group"
+      }
+    ],
+    "id": "enter-portal-button",
+    "kind": "enter-portal-button",
+    "layoutRef": "portal-stack",
+    "props": {
+      "aria-label": "Enter Scholomance",
+      "dissolving": false,
+      "pressed": false
+    },
+    "role": "button",
+    "state": {
+      "dissolving": false,
+      "pressed": false
+    },
+    "visualRefs": []
+  },
+  "sourceChecksum": "scd64:49fd3de015d6d254",
+  "version": "1.0.0",
+  "visuals": {}
+}

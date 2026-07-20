@@ -16,6 +16,7 @@ export default function StormCanvas({
   className = "",
   debug = false,
   onStrike,
+  skipGalaxyPlate = false,
 }) {
   const canvasRef = useRef(null);
   const onStrikeRef = useRef(onStrike);
@@ -33,6 +34,7 @@ export default function StormCanvas({
       intensity,
       variant,
       debug,
+      skipGalaxyPlate,
       onStrike: (telemetry) => onStrikeRef.current?.(telemetry),
     });
 
@@ -120,7 +122,7 @@ export default function StormCanvas({
       }
       storm.dispose();
     };
-  }, [intensity, variant, debug]);
+  }, [intensity, variant, debug, skipGalaxyPlate]);
 
   return <canvas ref={canvasRef} className={className} aria-hidden="true" />;
 }

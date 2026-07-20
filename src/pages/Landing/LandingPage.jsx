@@ -2,8 +2,9 @@ import { useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import WatercolorDissolve from "./WatercolorDissolve.jsx";
 import GrimoireTitle from "../../components/grimoire/GrimoireTitle.jsx";
-import StormCanvas from "./StormCanvas.jsx";
 import UpdateLedgerWindow from "./UpdateLedgerWindow.jsx";
+import { ComposeEnterPortal } from "../../core/compose/migrated/ComposeEnterPortal";
+import { ComposeGalaxyBackdrop } from "../../core/compose/migrated/ComposeGalaxyBackdrop";
 import "./LandingPage.css";
 
 const STORM_DEBUG = typeof window !== "undefined" && window.location.search.includes("debug");
@@ -23,16 +24,9 @@ export default function LandingPage() {
     navigate("/read");
   }, [navigate]);
 
-  const handleKeyDown = useCallback((e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      handleEnter();
-    }
-  }, [handleEnter]);
-
   return (
     <div className="portal-scene" aria-label="Scholomance - enter the portal">
-      <StormCanvas className="portal-storm" variant="scene" intensity={1.4} debug={STORM_DEBUG} />
+      <ComposeGalaxyBackdrop className="portal-storm" variant="scene" intensity={1.4} debug={STORM_DEBUG} />
 
       <span className="portal-moon" aria-hidden="true">
         <span className="portal-moon-cloud portal-moon-cloud--slow" />
@@ -42,14 +36,7 @@ export default function LandingPage() {
         <div className="landing-gate landing-gate--portal">
           <div className="portal-halo" aria-hidden="true" />
           <WatercolorDissolve dissolving={dissolving} onDissolveComplete={handleDissolveComplete}>
-            <div
-              className="portal-gate"
-              role="button"
-              tabIndex={0}
-              aria-label="Enter Scholomance"
-              onClick={handleEnter}
-              onKeyDown={handleKeyDown}
-            >
+            <ComposeEnterPortal onEnter={handleEnter} dissolving={dissolving}>
               <span className="portal-ring portal-ring--energy" aria-hidden="true" />
               <span className="portal-ring portal-ring--edge" aria-hidden="true" />
               <span className="portal-aperture" aria-hidden="true" />
@@ -77,7 +64,7 @@ export default function LandingPage() {
                   Step through
                 </p>
               </div>
-            </div>
+            </ComposeEnterPortal>
           </WatercolorDissolve>
         </div>
         <div className="landing-gate landing-gate--ledger">

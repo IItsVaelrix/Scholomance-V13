@@ -1,0 +1,20 @@
+[
+  {
+    "path": "scripts/align_lyrics.py",
+    "score": 0.91,
+    "preview": "lyric alignment MMS_FA",
+    "chunkIndex": 0
+  },
+  {
+    "path": "scripts/align-track.mts",
+    "score": 0.86,
+    "preview": "WhisperX aligner",
+    "chunkIndex": 0
+  },
+  {
+    "path": "codex/core/phonology/syllabifier.js",
+    "score": 0.72,
+    "preview": "syllable helpers",
+    "chunkIndex": 0
+  }
+]

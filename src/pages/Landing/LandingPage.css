@@ -68,8 +68,8 @@
   align-items: stretch;
   justify-content: stretch;
   /* Cap height so the chronicle scrollports instead of growing with entries */
-  height: min(58vh, 34rem);
-  max-height: min(58vh, 34rem);
+  height: min(78vh, 44rem);
+  max-height: min(78vh, 44rem);
   min-height: 0;
   /* Scene uses cursor:none for the orb; restore a real pointer for ledger chrome */
   cursor: auto;
@@ -96,8 +96,8 @@
   }
 
   .landing-gate--ledger {
-    height: min(42vh, 24rem);
-    max-height: min(42vh, 24rem);
+    height: min(56vh, 32rem);
+    max-height: min(56vh, 32rem);
     min-height: 0;
   }
 }
@@ -141,6 +141,53 @@
   pointer-events: none;
   z-index: 0;
   opacity: 0.85;
+}
+
+.compose-galaxy-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  contain: strict;
+}
+
+.compose-galaxy-backdrop__plate-host,
+.compose-galaxy-backdrop__storm-host,
+.portal-storm-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.galaxy-plate {
+  width: 100%;
+  height: 100%;
+  display: block;
+  /* opacity lives on .portal-storm host so plate + overlay dim together */
+  will-change: transform;
+  contain: layout paint;
+  animation-name: galaxy-plate-spin;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  /* duration set inline from PATTERN_SPEED */
+}
+
+.galaxy-plate--static {
+  animation: none !important;
+}
+
+@keyframes galaxy-plate-spin {
+  from { transform: rotate(0rad); }
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .galaxy-plate {
+    animation: none !important;
+  }
 }
 
 /* Static moon: a cold witness above the scrying chamber */
@@ -278,13 +325,88 @@
   user-select: none;
   z-index: 2;
   margin-inline: auto;
-  transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+  contain: layout paint;
+  transform: translateZ(0);
+  transition:
+    transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1),
+    filter 0.28s ease;
 }
 
 .portal-gate:hover,
 .portal-gate:focus-visible {
-  transform: scale(1.025);
+  transform: translateZ(0) scale(1.028);
   outline: none;
+}
+
+.portal-gate:focus-visible {
+  box-shadow:
+    0 0 0 2px rgba(191, 227, 255, 0.55),
+    0 0 28px rgba(123, 108, 255, 0.45),
+    0 0 48px rgba(123, 108, 255, 0.22);
+}
+
+.portal-gate--compose.portal-gate--pressed:not(.portal-gate--dissolving) {
+  transform: translateZ(0) scale(0.985);
+  filter: brightness(1.08);
+}
+
+.portal-gate--compose.portal-gate--pressed:not(.portal-gate--dissolving) .portal-ring--energy {
+  filter:
+    drop-shadow(0 0 14px rgba(123, 108, 255, 0.65))
+    drop-shadow(0 0 24px rgba(191, 227, 255, 0.35));
+}
+
+.portal-gate__rings,
+.portal-gate__content-host {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.portal-gate__content-host {
+  z-index: 5;
+}
+
+.portal-gate--compose .portal-ring--energy {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.portal-gate--compose .portal-ring--edge {
+  border-color: rgba(191, 227, 255, 0.42);
+  box-shadow:
+    0 0 26px rgba(123, 108, 255, 0.32),
+    inset 0 0 30px rgba(191, 227, 255, 0.12);
+}
+
+.portal-gate--compose .portal-ring--energy {
+  background: conic-gradient(
+    from 0deg,
+    rgba(123, 108, 255, 0) 0deg,
+    rgba(123, 108, 255, 0) 32deg,
+    var(--portal-arc) 88deg,
+    var(--portal-amethyst) 155deg,
+    rgba(123, 108, 255, 0) 210deg,
+    rgba(191, 227, 255, 0) 245deg,
+    var(--portal-gold) 315deg,
+    rgba(123, 108, 255, 0) 360deg
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-gate,
+  .portal-gate--compose.portal-gate--pressed:not(.portal-gate--dissolving) {
+    transition: none;
+  }
+
+  .portal-gate--compose .portal-ring--energy {
+    animation: none;
+    will-change: auto;
+  }
 }
 
 /* Slowly rotating energy ring — amethyst/arc arcs masked into a thin rim */

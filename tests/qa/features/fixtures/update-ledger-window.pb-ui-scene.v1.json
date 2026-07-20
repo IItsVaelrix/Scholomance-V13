@@ -1,0 +1,169 @@
+{
+  "contract": "PB-UI-SCENE-v1",
+  "definitions": {
+    "update-ledger-window": {
+      "accessibility": {
+        "ariaRole": "region",
+        "focusRetention": "none",
+        "keyboard": [
+          "Tab: focus scroll region when entries present"
+        ],
+        "nameFrom": "author",
+        "requiredAttributes": [
+          "aria-label"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "children": [
+              {
+                "id": "header",
+                "interactive": false,
+                "label": "Ledger header",
+                "role": "banner",
+                "visible": true
+              },
+              {
+                "id": "boot",
+                "interactive": false,
+                "label": "Boot sequence",
+                "role": "status",
+                "visible": true
+              },
+              {
+                "id": "scroll",
+                "interactive": true,
+                "label": "Entry list",
+                "role": "region",
+                "visible": true
+              }
+            ],
+            "id": "root",
+            "interactive": false,
+            "role": "region",
+            "visible": true
+          }
+        ],
+        "rootRole": "region",
+        "slots": [
+          {
+            "accepts": [
+              "wand",
+              "token",
+              "native-dom"
+            ],
+            "maxChildren": 1,
+            "name": "ornament",
+            "required": false
+          }
+        ]
+      },
+      "capabilities": [
+        {
+          "id": "focusable-controls",
+          "required": true
+        },
+        {
+          "id": "semantic-text",
+          "required": true
+        },
+        {
+          "id": "procedural-glow",
+          "required": false
+        }
+      ],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": {
+        "layoutId": "ledger-flow"
+      },
+      "defaultVisuals": [],
+      "description": "Landing Update Ledger — Scholomance chronicle console chrome",
+      "events": [
+        {
+          "type": "LEDGER.BOOT_COMPLETE"
+        },
+        {
+          "type": "LEDGER.ENTRY_FOCUS"
+        }
+      ],
+      "kind": "update-ledger-window",
+      "provenance": {
+        "author": "compose-update-ledger",
+        "contentHash": "scd64:update-ledger-window-v1",
+        "establishedAt": "2026-07-20T00:00:00.000Z",
+        "sourceKind": "migrated",
+        "sourcePath": "src/pages/Landing/UpdateLedgerWindow.jsx"
+      },
+      "states": [
+        {
+          "default": 0,
+          "name": "entryCount",
+          "type": "number"
+        }
+      ],
+      "version": "1.0.0"
+    }
+  },
+  "id": "scene:update-ledger-window",
+  "layouts": {
+    "ledger-flow": {
+      "contract": "PB-LAYOUT-v1",
+      "flow": {
+        "align": "stretch",
+        "direction": "column",
+        "gapPx": 12,
+        "justify": "start",
+        "wrap": false
+      },
+      "mode": "flow",
+      "version": "1.0.0"
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "id": "update-ledger-window.header",
+        "kind": "container",
+        "props": {
+          "label": "Ledger header",
+          "part": "header"
+        },
+        "role": "banner"
+      },
+      {
+        "id": "update-ledger-window.boot",
+        "kind": "container",
+        "props": {
+          "label": "Boot sequence",
+          "part": "boot"
+        },
+        "role": "status"
+      },
+      {
+        "id": "update-ledger-window.scroll",
+        "kind": "container",
+        "props": {
+          "label": "Entry list",
+          "part": "scroll"
+        },
+        "role": "region"
+      }
+    ],
+    "id": "update-ledger-window",
+    "kind": "update-ledger-window",
+    "layoutRef": "ledger-flow",
+    "props": {
+      "aria-label": "Scholomance Update Ledger",
+      "entryCount": 0
+    },
+    "role": "region",
+    "state": {
+      "entryCount": 0
+    },
+    "visualRefs": []
+  },
+  "sourceChecksum": "scd64:e3b23a9fd3148778",
+  "version": "1.0.0",
+  "visuals": {}
+}

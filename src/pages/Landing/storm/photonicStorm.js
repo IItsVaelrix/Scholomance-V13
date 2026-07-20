@@ -13,7 +13,7 @@
 
 import { routeRetinaPacketToPhotonicBridge } from '../../../lib/photonic-retina/index.js';
 import { generateBoltFromPacket } from './photonicBolt.js';
-import { initGalaxy, updateGalaxy, drawGalaxy } from './galaxySim.js';
+import { initGalaxy, updateGalaxy, drawGalaxyPlate, drawGalaxySparkles } from './galaxySim.js';
 import { freshRng } from '../../../lib/math/seededRng.js';
 
 const rng = freshRng();
@@ -161,6 +161,7 @@ export function createPhotonicStorm(options = {}) {
     intensity: options.intensity ?? 1,
     variant: options.variant || 'scene',
     debug: Boolean(options.debug),
+    skipGalaxyPlate: Boolean(options.skipGalaxyPlate),
     onStrike: typeof options.onStrike === 'function' ? options.onStrike : null,
     width: 1,
     height: 1,
@@ -572,7 +573,10 @@ export function createPhotonicStorm(options = {}) {
 
   function paint(ctx) {
     if (state.galaxy) {
-      drawGalaxy(ctx, state.galaxy);
+      if (!state.skipGalaxyPlate) {
+        drawGalaxyPlate(ctx, state.galaxy);
+      }
+      drawGalaxySparkles(ctx, state.galaxy);
     }
 
     ctx.save();

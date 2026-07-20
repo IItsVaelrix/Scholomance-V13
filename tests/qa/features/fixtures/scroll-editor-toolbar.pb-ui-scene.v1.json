@@ -1,0 +1,281 @@
+{
+  "contract": "PB-UI-SCENE-v1",
+  "definitions": {
+    "toolbar": {
+      "accessibility": {
+        "ariaRole": "toolbar",
+        "focusRetention": "none",
+        "keyboard": [
+          "ArrowRight: focus next control",
+          "ArrowLeft: focus previous control",
+          "Home: focus first",
+          "End: focus last"
+        ],
+        "nameFrom": "author",
+        "requiredAttributes": [
+          "aria-label"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "children": [
+              {
+                "id": "edit",
+                "interactive": true,
+                "label": "Edit",
+                "role": "button",
+                "visible": true
+              },
+              {
+                "id": "new",
+                "interactive": true,
+                "label": "New",
+                "role": "button",
+                "visible": true
+              },
+              {
+                "id": "minimap",
+                "interactive": true,
+                "label": "Minimap",
+                "role": "button",
+                "visible": true
+              },
+              {
+                "id": "search",
+                "interactive": true,
+                "label": "Search",
+                "role": "button",
+                "visible": true
+              },
+              {
+                "id": "atmos",
+                "interactive": true,
+                "label": "Atmos",
+                "role": "button",
+                "visible": true
+              },
+              {
+                "id": "focus",
+                "interactive": true,
+                "label": "Focus",
+                "role": "button",
+                "visible": true
+              },
+              {
+                "id": "settings",
+                "interactive": true,
+                "label": "Settings",
+                "role": "button",
+                "visible": true
+              }
+            ],
+            "id": "root",
+            "interactive": true,
+            "role": "toolbar",
+            "visible": true
+          }
+        ],
+        "rootRole": "toolbar",
+        "slots": [
+          {
+            "accepts": [
+              "wand",
+              "token",
+              "native-dom"
+            ],
+            "maxChildren": 1,
+            "name": "ornament",
+            "required": false
+          }
+        ]
+      },
+      "capabilities": [
+        {
+          "id": "focusable-controls",
+          "required": true
+        },
+        {
+          "id": "semantic-text",
+          "required": true
+        },
+        {
+          "id": "procedural-glow",
+          "required": false
+        }
+      ],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": {
+        "layoutId": "toolbar-flow"
+      },
+      "defaultVisuals": [
+        {
+          "visualId": "toolbar-wand-ornament"
+        }
+      ],
+      "description": "Scroll editor top toolbar — IDE chrome action cluster",
+      "events": [
+        {
+          "type": "TOOLBAR.FOCUS_NEXT"
+        },
+        {
+          "type": "TOOLBAR.FOCUS_PREV"
+        },
+        {
+          "type": "TOOLBAR.EDIT"
+        },
+        {
+          "type": "TOOLBAR.NEW_SCROLL"
+        },
+        {
+          "type": "TOOLBAR.TOGGLE_MINIMAP"
+        },
+        {
+          "type": "TOOLBAR.OPEN_SEARCH"
+        },
+        {
+          "type": "TOOLBAR.CYCLE_ATMOS"
+        },
+        {
+          "type": "TOOLBAR.TOGGLE_FOCUS"
+        },
+        {
+          "type": "TOOLBAR.OPEN_SETTINGS"
+        }
+      ],
+      "kind": "toolbar",
+      "provenance": {
+        "author": "compose-phase1",
+        "contentHash": "scd64:scroll-editor-toolbar-v1",
+        "establishedAt": "2026-07-19T00:00:00.000Z",
+        "sourceKind": "migrated",
+        "sourcePath": "src/pages/Read/IDEChrome.jsx#TopBar"
+      },
+      "states": [
+        {
+          "ariaMapping": "aria-disabled",
+          "default": false,
+          "name": "disabled",
+          "type": "boolean"
+        },
+        {
+          "default": "horizontal",
+          "enumValues": [
+            "horizontal",
+            "vertical"
+          ],
+          "name": "orientation",
+          "type": "enum"
+        }
+      ],
+      "version": "1.0.0"
+    }
+  },
+  "id": "scene:scroll-editor-toolbar",
+  "layouts": {
+    "toolbar-flow": {
+      "contract": "PB-LAYOUT-v1",
+      "flow": {
+        "align": "center",
+        "direction": "row",
+        "gapPx": 8,
+        "justify": "start",
+        "wrap": false
+      },
+      "mode": "flow",
+      "version": "1.0.0"
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "id": "scroll-editor-toolbar.edit",
+        "kind": "button",
+        "props": {
+          "event": "TOOLBAR.EDIT",
+          "label": "Edit"
+        },
+        "role": "button"
+      },
+      {
+        "id": "scroll-editor-toolbar.new",
+        "kind": "button",
+        "props": {
+          "event": "TOOLBAR.NEW_SCROLL",
+          "label": "New"
+        },
+        "role": "button"
+      },
+      {
+        "id": "scroll-editor-toolbar.minimap",
+        "kind": "button",
+        "props": {
+          "event": "TOOLBAR.TOGGLE_MINIMAP",
+          "label": "Minimap"
+        },
+        "role": "button"
+      },
+      {
+        "id": "scroll-editor-toolbar.search",
+        "kind": "button",
+        "props": {
+          "event": "TOOLBAR.OPEN_SEARCH",
+          "label": "Search"
+        },
+        "role": "button"
+      },
+      {
+        "id": "scroll-editor-toolbar.atmos",
+        "kind": "button",
+        "props": {
+          "event": "TOOLBAR.CYCLE_ATMOS",
+          "label": "Atmos"
+        },
+        "role": "button"
+      },
+      {
+        "id": "scroll-editor-toolbar.focus",
+        "kind": "button",
+        "props": {
+          "event": "TOOLBAR.TOGGLE_FOCUS",
+          "label": "Focus"
+        },
+        "role": "button"
+      },
+      {
+        "id": "scroll-editor-toolbar.settings",
+        "kind": "button",
+        "props": {
+          "event": "TOOLBAR.OPEN_SETTINGS",
+          "label": "Settings"
+        },
+        "role": "button"
+      }
+    ],
+    "id": "scroll-editor-toolbar",
+    "kind": "toolbar",
+    "layoutRef": "toolbar-flow",
+    "props": {
+      "aria-label": "Scroll editor toolbar",
+      "disabled": false,
+      "orientation": "horizontal"
+    },
+    "role": "toolbar",
+    "state": {
+      "disabled": false
+    },
+    "visualRefs": [
+      "toolbar-wand-ornament"
+    ]
+  },
+  "sourceChecksum": "scd64:c854a6e555f46462",
+  "version": "1.0.0",
+  "visuals": {
+    "toolbar-wand-ornament": {
+      "formulaId": "ide-topbar-aurora-sigil",
+      "kind": "wand",
+      "placementSlot": "ornament",
+      "role": "ornament"
+    }
+  }
+}
