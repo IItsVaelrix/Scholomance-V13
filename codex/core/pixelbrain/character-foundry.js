@@ -1,4 +1,5 @@
 import { composeCharacterSilhouette } from './character-silhouette-composer.js';
+import { buildCharacterRouteDefinition, validateCharacterDirection } from './character-factory.js';
 import { createCharacterSkeleton, hashCharacterSkeleton, validateCharacterSkeleton } from './character-construction-skeleton.js';
 import { normalizeCharacterSpec, validateCharacterSpec, hashCharacterSpec } from './character-spec.js';
 import { MATERIAL_PALETTES, resolveMaterialId } from './material-registry.js';
@@ -465,6 +466,15 @@ export function forgeCharacter(rawSpec, opts = {}) {
   let specHash = hashCharacterSpec(spec);
   let allCells = [];
 
+  // Seam-contract route for the compose pipeline (PDR CharacterFactory route).
+  // The route is direction-aware (face features don't render facing north), so
+  // it is built per direction and validated against that direction's filled
+  // lattice — a part that silently renders nothing becomes a loud
+  // PB_ROUTE_REQUIRED_OUTPUT_EMPTY diagnostic instead of a visual defect.
+  const routeFailures = [];
+  let routeOk = true;
+  const routeDirections = {};
+
   for (const dir of directions) {
     const silhouette = composeCharacterSilhouette(spec, { direction: dir });
     silhouettes[dir] = silhouette;
@@ -474,6 +484,14 @@ export function forgeCharacter(rawSpec, opts = {}) {
 
     const fills = applyCharacterFills({ silhouette, spec, direction: dir });
     filledResults[dir] = fills;
+
+    const routeDefinition = buildCharacterRouteDefinition(spec, dir, silhouette);
+    const dirRoute = validateCharacterDirection(routeDefinition, spec, fills.coordinates);
+    routeDirections[dir] = { ok: dirRoute.ok, route: routeDefinition.name, failures: dirRoute.failures };
+    if (!dirRoute.ok) {
+      routeOk = false;
+      routeFailures.push(...dirRoute.failures.map((f) => ({ ...f, direction: dir })));
+    }
 
     let rgba = rasterizeCells(fills.coordinates, canvas.width, canvas.height, 1);
     rgba = applyXBR2x(rgba, canvas.width,     canvas.height);
@@ -495,7 +513,14 @@ export function forgeCharacter(rawSpec, opts = {}) {
     const primaryDir = directions[0];
     const primaryFills = filledResults[primaryDir];
     const svgString = render(primaryFills, spec, opts);
-    return Object.freeze({ svg: svgString, spec, specHash, canvas, fills: filledResults });
+    return Object.freeze({
+      svg: svgString,
+      spec,
+      specHash,
+      canvas,
+      fills: filledResults,
+      routeDiagnostics: Object.freeze({ ok: routeOk, route: 'character.compose.v1', failures: routeFailures, directions: routeDirections }),
+    });
   }
 
   const character = Object.freeze({
@@ -518,6 +543,7 @@ export function forgeCharacter(rawSpec, opts = {}) {
         Object.entries(filledResults).map(([dir, fills]) => [dir, fills.diagnostics.uniqueColors])
       ),
       directions,
+      route: Object.freeze({ ok: routeOk, route: 'character.compose.v1', failures: routeFailures, directions: routeDirections }),
     },
   });
 
