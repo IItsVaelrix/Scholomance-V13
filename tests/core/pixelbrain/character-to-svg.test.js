@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 import { join, dirname } from 'path';
 import { characterToSVG } from '../../../codex/core/pixelbrain/character-to-svg.js';
 import { forgeCharacter } from '../../../codex/core/pixelbrain/character-foundry.js';
