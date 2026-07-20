@@ -45,10 +45,13 @@ function resolveRuntimeDatabasePath(envVarName, fallbackPath) {
 function seedPersistentDisk(dictPath, corpusPath) {
   if (!IS_PRODUCTION) return;
 
-  // If we are already pointing to the baked-in /app/data, no need to seed.
-  // This is common in the new Fly.io/Turso infrastructure.
+  // If we are already pointing to the baked-in /app/data, no need to seed a
+  // volume copy for runtime reads — but REPLACE any stale /var/data dict that
+  // would otherwise hijack adapters via resolveDatabasePath's volume fallback.
   if (dictPath.startsWith('/app/data') && corpusPath.startsWith('/app/data')) {
-    console.log('[RITUAL] Skipping seeding — using baked-in image databases directly.');
+    console.log('[RITUAL] Skipping volume seed — using baked-in image databases directly.');
+    refreshStaleVolumeCopy(SEED_DICT_PATH, '/var/data/scholomance_dict.sqlite');
+    refreshStaleVolumeCopy(SEED_CORPUS_PATH, '/var/data/scholomance_corpus.sqlite');
     return;
   }
 
@@ -60,6 +63,29 @@ function seedPersistentDisk(dictPath, corpusPath) {
     console.log(`[RITUAL] Seeding corpus from baked-in image: ${SEED_CORPUS_PATH} → ${corpusPath}`);
     copyFileSync(SEED_CORPUS_PATH, corpusPath);
   }
+}
+
+/**
+ * When the volume holds an older thin dict (no lexical-graph overlay) and the
+ * image bake-in is richer, overwrite the volume copy so nothing silently
+ * prefers the stale file.
+ */
+function refreshStaleVolumeCopy(seedPath, volumePath) {
+  if (!existsSync(seedPath) || !existsSync('/var/data')) return;
+  try {
+    mkdirSync('/var/data', { recursive: true });
+  } catch {
+    // best-effort
+  }
+  if (!existsSync(volumePath)) {
+    console.log(`[RITUAL] Mirroring bake-in DB to volume: ${seedPath} → ${volumePath}`);
+    copyFileSync(seedPath, volumePath);
+    return;
+  }
+  // Always refresh from bake-in when using /app/data — volume is not the
+  // Leximancy authority; keeping it in sync prevents path-resolution traps.
+  console.log(`[RITUAL] Refreshing volume DB from bake-in: ${seedPath} → ${volumePath}`);
+  copyFileSync(seedPath, volumePath);
 }
 
 function runCommand(command, args, options = {}) {

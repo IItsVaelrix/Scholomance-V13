@@ -116,12 +116,20 @@ function createFixtureDb(dbPath) {
   lemmas.run('mystery', 'mystery', 'syn.arcana', 2, 'noun');
   lemmas.run('enigma', 'enigma', 'syn.arcana', 3, 'noun');
   lemmas.run('banality', 'banality', 'syn.banal', 1, 'noun');
+  // banality has a second POS in the same synset to test lookupSymbolsLoose's POS union
+  lemmas.run('banality', 'banality', 'syn.banal', 2, 'verb');
+  // arcana + mystery share a second, verb-POS synset so synonym results carry
+  // a multi-POS set and batchLookupPos has a multi-POS word to classify.
+  lemmas.run('arcana', 'arcana', 'syn.arcana2', 1, 'verb');
+  lemmas.run('mystery', 'mystery', 'syn.arcana2', 1, 'verb');
 
   const rels = db.prepare(`
     INSERT INTO wordnet_rel(synset_id, rel, target_synset_id, source, source_url)
     VALUES (?, ?, ?, 'oewn', 'https://en-word.net/')
   `);
   rels.run('syn.arcana', 'antonym', 'syn.banal');
+  // exemplifies relation to test lookupSymbolsLoose's POS union (banality has noun+verb in syn.banal)
+  rels.run('syn.arcana', 'exemplifies', 'syn.banal');
 
   db.close();
 }
@@ -278,6 +286,7 @@ describe('[Server] lexicon.sqlite.adapter', () => {
     expect(adapter.batchValidateWords(['arcana'])).toEqual([]);
     expect(adapter.searchEntries('arcana')).toEqual([]);
     expect(adapter.suggestEntries('ar')).toEqual([]);
+    expect(adapter.batchLookupPos(['arcana'])).toEqual({});
     expect(() => adapter.close()).not.toThrow();
     // Adapter returns empty results silently when db is unavailable
     expect(adapter.__unsafe.connected).toBe(false);
@@ -306,6 +315,36 @@ describe('[Server] lexicon.sqlite.adapter', () => {
 
     const valid = adapter.batchValidateWords(['Arcana', 'banana', 'unknown']);
     expect(valid).toEqual(['arcana', 'banana']);
+
+    adapter.close();
+  });
+
+  it('carries deduped POS sets on lemma lookups and classifies words in batch', () => {
+    tempDir = mkdtempSync(path.join(os.tmpdir(), 'lexicon-adapter-'));
+    const dbPath = path.join(tempDir, 'fixture.sqlite');
+    createFixtureDb(dbPath);
+    const adapter = createLexiconAdapter(dbPath);
+
+    const synonyms = adapter.lookupSynonyms('arcana');
+    expect(synonyms).toContainEqual({ lemma: 'mystery', pos: ['noun', 'verb'] });
+    expect(synonyms).toContainEqual({ lemma: 'enigma', pos: ['noun'] });
+    // never itself, still deduped
+    expect(synonyms.map((entry) => entry.lemma)).not.toContain('arcana');
+
+    // banality now has two POS in syn.banal, so antonyms show the union
+    expect(adapter.lookupAntonyms('arcana'))
+      .toEqual([{ lemma: 'banality', pos: ['noun', 'verb'] }]);
+
+    // lookupSymbolsLoose also unions POS across seen-set (banality reached via exemplifies)
+    expect(adapter.lookupSymbolsLoose('arcana'))
+      .toEqual([{ lemma: 'banality', via: 'exemplifies', pos: ['noun', 'verb'] }]);
+
+    const pos = adapter.batchLookupPos(['Arcana', 'mystery', 'unknown']);
+    expect(pos).toEqual({
+      arcana: ['noun', 'verb'],
+      mystery: ['noun', 'verb'],
+    });
+    expect(adapter.batchLookupPos([])).toEqual({});
 
     adapter.close();
   });

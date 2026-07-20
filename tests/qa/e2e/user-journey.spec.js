@@ -14,8 +14,8 @@ test.describe("Portal user journey", () => {
   });
 
   test("registers, logs in, opens the profile, and logs out", async ({ page }) => {
-    await page.goto("/");
-    await page.getByRole("link", { name: "Portal" }).click();
+    // Auth journey is not about Landing twin-gate — enter shell directly.
+    await page.goto("/auth");
     await expect(page.getByRole("heading", { name: "Synchronize essence" })).toBeVisible();
 
     await page.getByRole("button", { name: /Register here/i }).click();

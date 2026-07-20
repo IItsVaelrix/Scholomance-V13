@@ -17,9 +17,7 @@ export function TemplateBrowser({ project, setProject, setStatus, setSelectedCli
     const tmpl = getTemplate(templateId);
     if (!tmpl) return;
     
-    const resolved = TemplateResolver.resolveTemplateAssets(tmpl, project);
-
-    const newP = tmpl.apply(resolved, project);
+    const newP = TemplateResolver.applyTemplate(tmpl, project);
     setProject(newP);
     setSelectedClipId(null);
     setStatus(`Applied ${tmpl.name}`);

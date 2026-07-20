@@ -50,8 +50,9 @@ import {
   bindInquiryProbe,
   listProbeIds,
   probeRegistryVersion,
+  type ProbeFormula,
 } from './probeRegistry.ts';
-import type { ProbeFormula, TrustPartitionedContext } from './types.ts';
+import type { TrustPartitionedContext } from './types.ts';
 
 export type LexiconRole = 'action' | 'surface' | 'inquiry';
 

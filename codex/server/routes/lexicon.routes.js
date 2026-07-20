@@ -91,10 +91,10 @@ export async function lexiconRoutes(fastify, opts = {}) {
       const word = parsedParams.data.word;
       const entries = adapter.lookupWord(word, 5);
       const synonyms = typeof adapter.lookupSynonyms === 'function'
-        ? adapter.lookupSynonyms(word, 20)
+        ? adapter.lookupSynonyms(word, 20).map((entry) => entry.lemma)
         : [];
       const antonyms = typeof adapter.lookupAntonyms === 'function'
-        ? adapter.lookupAntonyms(word, 20)
+        ? adapter.lookupAntonyms(word, 20).map((entry) => entry.lemma)
         : [];
       const rhymeData = adapter.lookupRhymes(word, 50);
       // The local dict used to emit no slantRhymes key at all, so the "Shadow Echo"

@@ -3,7 +3,7 @@ import type { TimelineClip, VideoProjectPacketV1 } from '../../video/editor/core
 import { useTimelineMutator } from './hooks/useTimelineMutator';
 
 function makeId(prefix: string) {
-  return `${prefix}-${Math.random().toString(36).slice(2, 10)}`; // EXEMPT
+  return `${prefix}-${crypto.randomUUID()}`;
 }
 
 export interface TransitionPanelProps {
@@ -12,12 +12,12 @@ export interface TransitionPanelProps {
 }
 
 export function TransitionPanel({ activeClip, updateProject }: TransitionPanelProps) {
-  if (!activeClip) return null;
-
   const mutator = useTimelineMutator(updateProject);
+  if (!activeClip) return null;
+  const clip = activeClip;
 
   function addLegacyTransitionLocal(transitionId: 'crossfade' | 'wipe-left' | 'dip-to-color' | 'glitch', side: 'in' | 'out') {
-    mutator.addLegacyTransition(activeClip.id, {
+    mutator.addLegacyTransition(clip.id, {
       id: makeId('tr'),
       transitionId,
       side,

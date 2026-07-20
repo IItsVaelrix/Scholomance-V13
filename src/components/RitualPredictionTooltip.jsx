@@ -1,14 +1,13 @@
 import { useRef, useLayoutEffect, useEffect, useState, useMemo, useId, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ResizableBox } from 'react-resizable';
 import { useTheme } from '../hooks/useTheme.jsx';
 import { useWordLookup } from '../hooks/useWordLookup.jsx';
-import { ScholomanceCorpusAPI } from '../lib/scholomanceCorpus.api.js';
 import { buildRitualPrediction, reconcileWithLexicon } from '../lib/ritualPredictionTooltip.js';
-import { PhonemeEngine } from '../../codex/core/phonology/phoneme.engine.js';
+import { PhonemeEngine } from '../lib/engine.adapter.js';
 import { ScholomanceDictionaryAPI } from '../lib/scholomanceDictionary.api.js';
 import { resolveOverlayPlacement } from '../lib/truesight/overlay-placement.js';
-import { AlertTriangle, ArrowLeft, ArrowRight, BookOpen, ChevronDown, ChevronRight, Copy, Replace, Search, Sparkles, X } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ArrowRight, ChevronRight, Copy, Replace, Search, X } from 'lucide-react';
 import './RitualPredictionTooltip.css';
 
 const TOOLTIP_MIN_WIDTH = 300;
@@ -49,22 +48,6 @@ const CARD_EXIT = {
   transition: { duration: 0.14, ease: 'easeIn' },
 };
 
-const ROLE_LABELS = {
-  anchor: 'Anchor',
-  modifier: 'Modifier',
-  trigger: 'Trigger',
-  connector: 'Connector',
-  unknown: 'Unknown',
-};
-
-const ROLE_DESCRIPTIONS = {
-  anchor: 'A stable naming point - identifies a concept or entity.',
-  modifier: 'Qualifies or intensifies - shapes the meaning of another element.',
-  trigger: 'Initiates action or transformation - a dynamic force.',
-  connector: 'Links elements - a structural binding in the syntax.',
-  unknown: 'Resists classification - may be a proper noun or rare token.',
-};
-
 const RHYME_TIER_LABEL = {
   identity: 'identity',
   perfect: 'perfect',
@@ -79,49 +62,23 @@ function normalizeWord(value) {
 }
 
 
-function ConfidenceBadge({ confidence, factors }) {
-  const [open, setOpen] = useState(false);
-  const pct = Math.round(confidence * 100);
-  const tier = pct >= 80 ? 'high' : pct >= 50 ? 'mid' : 'low';
-  const hasFactors = Array.isArray(factors) && factors.length > 0;
+// Syllable rhythm: one pip per syllable, the primary-stress syllable drawn as a
+// gold ring. Reads the binary stressPattern ("0101" -> 1 = stressed); falls back
+// to plain pips when only a count is known. Presents SOUND humanly — no raw
+// engine keys (vowel family / coda / rhyme key are deliberately not shown).
+function StressRhythm({ syllableCount, stressPattern }) {
+  const count = Number(syllableCount) || 0;
+  if (count <= 0) return null;
+  const pattern = typeof stressPattern === 'string' ? stressPattern : '';
+  const pips = Array.from({ length: count }, (_, i) => pattern[i] === '1');
   return (
-    <span className="rp-confidence-wrap">
-      <button
-        type="button"
-        className={`rp-confidence-badge rp-confidence--${tier}`}
-        aria-label={`Confidence ${pct}%${hasFactors ? ' - show breakdown' : ''}`}
-        aria-expanded={hasFactors ? open : undefined}
-        onClick={hasFactors ? () => setOpen((v) => !v) : undefined}
-        data-static={hasFactors ? undefined : 'true'}
-      >
-        {pct}%
-      </button>
-      <AnimatePresence>
-        {open && hasFactors && (
-          <motion.div
-            className="rp-confidence-breakdown"
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.14 }}
-          >
-            {factors.map((f, i) => (
-              <div key={i} className="rp-conf-factor">
-                <span className="rp-conf-label">{f.label}</span>
-                <span className={`rp-conf-delta ${f.delta >= 0 ? 'rp-conf-pos' : 'rp-conf-neg'}`}>
-                  {f.delta >= 0 ? '+' : ''}{Math.round(f.delta * 100)}
-                </span>
-              </div>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <span className="rp-rhythm" aria-label={`${count} syllable${count === 1 ? '' : 's'}`}>
+      <span className="rp-rhythm-lab">{count} syl</span>
+      {pips.map((stressed, i) => (
+        <span key={i} className={`rp-pip ${stressed ? 'rp-pip--stress' : ''}`} />
+      ))}
     </span>
   );
-}
-
-function AuraTag({ label }) {
-  return <span className="rp-aura-tag">{label}</span>;
 }
 
 // A failed lookup used to render as an empty rune row, which reads as "this word
@@ -146,13 +103,13 @@ function OracleNotice({ error, onRetry }) {
 // Suggestion pills. In a poem context (onTransmute provided) the primary click
 // transmutes the word in the text one-click; a secondary ⌕ icon explores
 // (navigates the card). Without a transmute handler the pill just navigates.
-function RuneRow({ label, words, onNavigate, onTransmute }) {
+function RuneRow({ label, words, tier = 'perfect', onNavigate, onTransmute }) {
   if (!words || words.length === 0) return null;
   return (
-    <div className="rp-rune-row">
+    <div className={`rp-rune-row rp-rune-row--${tier}`}>
       <span className="rp-rune-label">{label}</span>
       <span className="rp-rune-pills">
-        {words.slice(0, 8).map((w, i) => {
+        {words.slice(0, 10).map((w, i) => {
           const text = typeof w === 'string' ? w : (w?.word || '');
           if (!text) return null;
           if (onTransmute) {
@@ -215,25 +172,26 @@ function Breadcrumb({ history, index, onJump }) {
   );
 }
 
+// The line-resonance ribbon: how this word sonically bonds with the other
+// words already in its line. An unconfirmed bond (local phoneme estimate, not
+// lexicon-verified) is marked so the ribbon never overstates a match.
 function ResonanceSection({ partners }) {
   if (!partners || partners.length === 0) return null;
   return (
-    <section className="rp-section">
-      <div className="rp-section-label">Resonance (this line)</div>
-      <ul className="rp-resonance-list">
-        {partners.map((p, i) => (
-          <li
-            key={i}
-            className={`rp-resonance-row ${p.confirmed === false ? 'rp-resonance--unconfirmed' : ''}`}
-            title={p.confirmed === false ? 'Unconfirmed by the lexicon (local phoneme estimate)' : undefined}
-          >
-            <span className={`rp-resonance-tier rp-tier--${p.type}`}>{RHYME_TIER_LABEL[p.type] || p.type}</span>
-            <span className="rp-resonance-word">{p.word}</span>
-            <span className="rp-resonance-score">{p.score.toFixed(2)}</span>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <div className="rp-resonance" role="list" aria-label="Resonance in this line">
+      <span className="rp-resonance-lab">in this line</span>
+      {partners.map((p, i) => (
+        <span
+          key={i}
+          role="listitem"
+          className={`rp-bond ${p.confirmed === false ? 'rp-bond--unconfirmed' : ''}`}
+          title={p.confirmed === false ? 'Unconfirmed by the lexicon (local phoneme estimate)' : `resonance ${p.score.toFixed(2)}`}
+        >
+          <span className={`rp-bond-tier rp-tier--${p.type}`}>{RHYME_TIER_LABEL[p.type] || p.type}</span>
+          <span className="rp-bond-word">{p.word}</span>
+        </span>
+      ))}
+    </div>
   );
 }
 
@@ -253,74 +211,11 @@ function cleanWordLists(activeWord, lex) {
   };
 
   return {
-    rhymes: takeUnique(lex.rhymes, 8),
-    slantRhymes: takeUnique(lex.slantRhymes, 8),
-    synonyms: takeUnique(lex.synonyms, 8),
-    antonyms: takeUnique(lex.antonyms, 8),
+    rhymes: takeUnique(lex.rhymes, 10),
+    slantRhymes: takeUnique(lex.slantRhymes, 10),
+    synonyms: takeUnique(lex.synonyms, 5),
+    antonyms: takeUnique(lex.antonyms, 5),
   };
-}
-
-function WhyFactorsSection({ factors, fallback }) {
-  if (!factors || factors.length === 0) {
-    return fallback ? <p className="rp-why-text">{fallback}</p> : null;
-  }
-  return (
-    <ul className="rp-why-list">
-      {factors.map((f, i) => (
-        <li key={i} className="rp-why-row">
-          <span className="rp-why-detail">{f.detail}</span>
-          <span className="rp-why-weight" title="signal weight">{Math.round(f.weight * 100)}</span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function DiagnosticsSection({ diagnostics }) {
-  const [isOpen, setIsOpen] = useState(false);
-  if (!diagnostics) return null;
-  const { warnings, debugTrace } = diagnostics;
-  if ((!warnings || warnings.length === 0) && (!debugTrace || debugTrace.length === 0)) return null;
-
-  return (
-    <div className="rp-diagnostics">
-      <button
-        type="button"
-        className="rp-diagnostics-toggle"
-        onClick={() => setIsOpen(!isOpen)}
-        aria-expanded={isOpen}
-      >
-        {isOpen ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
-        <span>Arcane Traces</span>
-      </button>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            className="rp-diagnostics-body"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.18 }}
-          >
-            {warnings?.length > 0 && (
-              <div className="rp-diag-warnings">
-                {warnings.map((w, i) => (
-                  <div key={i} className="rp-diag-warn">{w}</div>
-                ))}
-              </div>
-            )}
-            {debugTrace?.length > 0 && (
-              <div className="rp-diag-trace">
-                {debugTrace.map((t, i) => (
-                  <div key={i} className="rp-diag-line">{t}</div>
-                ))}
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
 }
 
 const RitualPredictionTooltip = ({
@@ -377,37 +272,6 @@ const RitualPredictionTooltip = ({
     if (activeWord) lookup(activeWord);
   }, [activeWord, lookup]);
 
-  const [corpusData, setCorpusData] = useState({ semantic: [], search: [] });
-  const [corpusLoading, setCorpusLoading] = useState(false);
-  const [corpusError, setCorpusError] = useState(null);
-  useEffect(() => {
-    if (!activeWord || !ScholomanceCorpusAPI.isEnabled()) {
-      setCorpusData({ semantic: [], search: [] });
-      setCorpusError(null);
-      return;
-    }
-    setCorpusLoading(true);
-    setCorpusError(null);
-    let cancelled = false;
-    // These used to be .catch(() => []). A timed-out or rate-limited corpus then
-    // rendered identically to a word the corpus simply has nothing for, which is
-    // most of why this panel looked like it failed at random.
-    Promise.allSettled([
-      ScholomanceCorpusAPI.semantic(activeWord, 8),
-      ScholomanceCorpusAPI.search(activeWord, 3),
-    ]).then(([semanticResult, searchResult]) => {
-      if (cancelled) return;
-      setCorpusData({
-        semantic: semanticResult.status === 'fulfilled' ? semanticResult.value : [],
-        search: searchResult.status === 'fulfilled' ? searchResult.value : [],
-      });
-      const failure = [semanticResult, searchResult].find((r) => r.status === 'rejected');
-      setCorpusError(failure ? (failure.reason?.message || 'The Corpus Oracle did not answer.') : null);
-    }).finally(() => {
-      if (!cancelled) setCorpusLoading(false);
-    });
-    return () => { cancelled = true; };
-  }, [activeWord]);
 
   // The local PhonemeEngine guesses phonemes from spelling when it has no
   // authority for a word, and does not label the guess as one: it reported
@@ -654,7 +518,7 @@ const RitualPredictionTooltip = ({
 
   if (!prediction) return null;
 
-  const { word, source, prediction: pred, details, diagnostics } = prediction;
+  const { word, source, prediction: pred, details } = prediction;
 
   // ── Lexicon data (only when it matches the active word) ───────────────────
   const lexMatches = lookupData && normalizeWord(lookupData.word) === normalizeWord(activeWord);
@@ -680,177 +544,121 @@ const RitualPredictionTooltip = ({
 
   const canTransmute = typeof onTransmute === 'function' && rootWord && normalizeWord(activeWord) !== normalizeWord(rootWord);
 
+  const phonology = pred.phonology || null;
+  const estimated = Boolean(phonology?.estimated);
+
   const cardBody = (
     <div className="rp-card">
       <div className="rp-card-frame">
-        <div className="rp-header" onPointerDown={handleDragStart}>
-          <div className="rp-header-top">
-            <h3 id={titleId} className="rp-title">Arcane Resonance</h3>
-            <button
-              type="button"
-              className="rp-close-btn"
-              onClick={() => onClose?.()}
-              onPointerDown={(e) => e.stopPropagation()}
-              aria-label="Close prediction"
-            >
-              <X size={14} />
-            </button>
-          </div>
-          <Breadcrumb history={history} index={historyIndex} onJump={jumpToCrumb} />
-          <div className="rp-word-row">
-            <span className="rp-word">{word}</span>
-            <ConfidenceBadge confidence={pred.confidence} factors={pred.confidenceFactors} />
-          </div>
-          {pronunciation && <div className="rp-pron">{pronunciation}</div>}
-          <div className="rp-ritual-name">{pred.ritualName}</div>
-        </div>
-
-        <div key={activeWord} className={`rp-body rp-ink ${isDragging ? 'rp-pointer-none' : ''}`}>
-          <section className="rp-section">
-            <div className="rp-section-label">Lexicon & Structure</div>
-            <div className="rp-role-row">
-              <span className={`rp-role-badge rp-role--${pred.role}`}>{ROLE_LABELS[pred.role] || 'Unknown'}</span>
-              {pred.roleSignal && <span className="rp-role-signal">via {pred.roleSignal}</span>}
-              {pos && <span className="rp-lex-pos">{pos}</span>}
-              {pred.provisional && <span className="rp-role-provisional" title="Awaiting lexicon confirmation">provisional</span>}
+        <div className="rp-inner">
+          {/* ── Title bar: the word is the card name, pronunciation its cost ── */}
+          <div className="rp-header" onPointerDown={handleDragStart}>
+            <div className="rp-title-bar">
+              <span id={titleId} className="rp-word">{word}</span>
+              <div className="rp-title-right">
+                {pronunciation && <span className="rp-pron">{pronunciation}</span>}
+                <button
+                  type="button"
+                  className="rp-close-btn"
+                  onClick={() => onClose?.()}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  aria-label="Close card"
+                >
+                  <X size={13} />
+                </button>
+              </div>
             </div>
-            <div className="rp-role-desc">{ROLE_DESCRIPTIONS[pred.role] || ''}</div>
-            
-            {lookupLoading && !lex && <div className="rp-lexicon-status">consulting the lexicon...</div>}
+            <Breadcrumb history={history} index={historyIndex} onJump={jumpToCrumb} />
+            {/* ── Type line: part of speech + syllable/stress rhythm ── */}
+            <div className="rp-type-line">
+              <span className="rp-pos">{pos || 'word'}</span>
+              <div className="rp-type-right">
+                {estimated && (
+                  <span
+                    className="rp-estimated"
+                    title="Not in the dictionary — the pronunciation and rhythm are derived from the spelling, so treat the sound as an estimate."
+                  >
+                    sound estimated
+                  </span>
+                )}
+                <StressRhythm syllableCount={phonology?.syllableCount} stressPattern={phonology?.stressPattern} />
+              </div>
+            </div>
+          </div>
+
+          {/* ── Rules text box: the swap palette + flavor-text meaning ── */}
+          <div key={activeWord} className={`rp-body ${isDragging ? 'rp-pointer-none' : ''}`}>
+            {lookupLoading && !lex && <div className="rp-lexicon-status">consulting the lexicon…</div>}
             {!lookupLoading && lookupStatus !== 'ready' && (
               <OracleNotice error={lookupError} onRetry={retryLookup} />
             )}
-            <div className="rp-definitions-group">
-              {definitions.map((def, i) => <p key={i} className="rp-lex-def">{def}</p>)}
-            </div>
-            <RuneRow label="syn" words={synonyms} onNavigate={navigateTo} onTransmute={onTransmute} />
-            <RuneRow label="ant" words={antonyms} onNavigate={navigateTo} onTransmute={onTransmute} />
-            <RuneRow label="rhyme" words={rhymes} onNavigate={navigateTo} onTransmute={onTransmute} />
-            <RuneRow label="slant" words={slantRhymes} onNavigate={navigateTo} onTransmute={onTransmute} />
-          </section>
 
-          {details.whyFactors?.length > 0 && (
-            <section className="rp-section">
-              <div className="rp-section-label">Divination Insights</div>
-              <WhyFactorsSection factors={details.whyFactors} fallback={details.why} />
-            </section>
-          )}
+            <div className="rp-textbox">
+              <RuneRow label="rhyme" tier="perfect" words={rhymes} onNavigate={navigateTo} onTransmute={onTransmute} />
+              <RuneRow label="slant" tier="slant" words={slantRhymes} onNavigate={navigateTo} onTransmute={onTransmute} />
+              <RuneRow label="syn" tier="syn" words={synonyms} onNavigate={navigateTo} onTransmute={onTransmute} />
+              <RuneRow label="ant" tier="ant" words={antonyms} onNavigate={navigateTo} onTransmute={onTransmute} />
 
-          <ResonanceSection partners={details.resonancePartners} />
-
-          {pred.phonology && (
-            <section className={`rp-section ${pred.phonology.estimated ? 'rp-section--estimated' : ''}`}>
-              <div className="rp-section-label">
-                <Sparkles size={11} /> Phonology
-                {/* The engine sources a pronunciation by LOOKING IT UP or by GUESSING
-                    it from the spelling, and the panel used to print both with the
-                    same confidence. "saudade" is not in CMU, so its phonemes are
-                    invented from its letters — and the vowel, coda and rhyme key
-                    below are all invented with them. Say which it is. */}
-                {pred.phonology.estimated && (
-                  <span className="rp-phon-estimated" title="Not in the dictionary — these phonemes are derived from the spelling, so the vowel, coda and rhyme key are estimates.">
-                    estimated from spelling
-                  </span>
-                )}
-              </div>
-              <div className="rp-phon-grid">
-                {pred.phonology.vowelFamily && <span className="rp-phon-cell"><b>vowel</b> {String(pred.phonology.vowelFamily).toUpperCase()}</span>}
-                {pred.phonology.syllableCount > 0 && <span className="rp-phon-cell"><b>syllables</b> {pred.phonology.syllableCount}</span>}
-                {pred.phonology.stressPattern && <span className="rp-phon-cell"><b>stress</b> {pred.phonology.stressPattern}</span>}
-                {pred.phonology.coda && <span className="rp-phon-cell"><b>coda</b> {pred.phonology.coda}</span>}
-                {pred.phonology.rhymeKey && <span className="rp-phon-cell"><b>rhyme</b> {pred.phonology.rhymeKey}</span>}
-              </div>
-              {pred.phonology.extendedRhymeKeys?.length > 0 && (
-                <div className="rp-aura-tags" role="list" aria-label="Extended rhyme keys">
-                  {pred.phonology.extendedRhymeKeys.slice(0, 6).map((k, i) => <AuraTag key={i} label={k} />)}
+              {definitions.length > 0 && (
+                <div className="rp-flavor">
+                  {definitions.map((def, i) => (
+                    <p key={i} className="rp-def">
+                      <span className="rp-def-marker">{definitions.length > 1 ? `${i + 1} · ` : ''}{pos || 'def'}</span>
+                      {def}
+                    </p>
+                  ))}
                 </div>
               )}
-            </section>
-          )}
+            </div>
 
-          {details.nearbySignals.length > 0 && (
-            <section className="rp-section">
-              <div className="rp-section-label">Nearby Signals</div>
-              <ul className="rp-signals-list">
-                {details.nearbySignals.map((signal, i) => (
-                  <li key={i}>{signal}</li>
-                ))}
-              </ul>
-            </section>
-          )}
+            <ResonanceSection partners={details.resonancePartners} />
 
-          {(corpusData.semantic.length > 0 || corpusData.search.length > 0 || corpusLoading || corpusError) && (
-            <section className="rp-section">
-              <div className="rp-section-label">Scholomance Corpus</div>
-              {corpusLoading && <div className="rp-lexicon-status">consulting the corpus...</div>}
-              {!corpusLoading && corpusError && (
-                <OracleNotice error={{ message: corpusError, severity: 'WARN' }} />
-              )}
-              {/* Labelled for what /api/corpus/semantic actually returns: words
-                  ranked by phoneme distance, not by meaning. */}
-              <RuneRow
-                label="sound-alike"
-                words={corpusData.semantic.map((r) => (typeof r === 'string' ? r : r?.word)).filter(Boolean)}
-                onNavigate={navigateTo}
-                onTransmute={onTransmute}
-              />
-              {corpusData.search.map((result, i) => (
-                <p key={i} className="rp-lex-def rp-corpus-snippet">
-                  {result.snippet || result.text}
-                </p>
-              ))}
-            </section>
-          )}
-
-          <section className="rp-section">
-            <div className="rp-section-label">Suggested Actions</div>
             <div className="rp-actions">
               {canTransmute && (
                 <button type="button" className="rp-action-btn rp-action-btn--accent" onClick={() => onTransmute(activeWord)}>
                   <Replace size={12} />
-                  <span>{`Replace "${rootWord}" → "${activeWord}"`}</span>
+                  <span>{`Replace “${rootWord}” → “${activeWord}”`}</span>
                 </button>
               )}
-              <button type="button" className="rp-action-btn" onClick={handleCopy}>
+              <button type="button" className="rp-action-btn" onClick={handleCopy} aria-label="Copy this card">
                 <Copy size={12} />
-                <span>Copy prediction</span>
+                <span>Copy</span>
               </button>
             </div>
-          </section>
+          </div>
 
-          <DiagnosticsSection diagnostics={diagnostics} />
+          {sessionHistory.length > 1 && typeof onSessionNavigate === 'function' && (
+            <div className="rp-session-nav" role="navigation" aria-label="Session word history">
+              <button
+                type="button"
+                className="rp-nav-btn"
+                onClick={() => onSessionNavigate(-1)}
+                disabled={sessionIndex <= 0}
+                aria-label="Previous session word"
+              >
+                <ArrowLeft size={13} />
+              </button>
+              <span className="rp-nav-pos">{sessionIndex + 1} / {sessionHistory.length}</span>
+              <button
+                type="button"
+                className="rp-nav-btn"
+                onClick={() => onSessionNavigate(1)}
+                disabled={sessionIndex >= sessionHistory.length - 1}
+                aria-label="Next session word"
+              >
+                <ArrowRight size={13} />
+              </button>
+            </div>
+          )}
+
+          {/* ── Collector line: where the word lives in the manuscript ── */}
+          {!isEmbedded && source?.filePath && (
+            <div className="rp-footer">
+              <span className="rp-source-path">{source.filePath}</span>
+              <span className="rp-source-loc">L{source.line} · C{source.column}</span>
+            </div>
+          )}
         </div>
-
-        {sessionHistory.length > 1 && typeof onSessionNavigate === 'function' && (
-          <div className="rp-session-nav" role="navigation" aria-label="Session word history">
-            <button
-              type="button"
-              className="rp-nav-btn"
-              onClick={() => onSessionNavigate(-1)}
-              disabled={sessionIndex <= 0}
-              aria-label="Previous session word"
-            >
-              <ArrowLeft size={13} />
-            </button>
-            <span className="rp-nav-pos">{sessionIndex + 1} / {sessionHistory.length}</span>
-            <button
-              type="button"
-              className="rp-nav-btn"
-              onClick={() => onSessionNavigate(1)}
-              disabled={sessionIndex >= sessionHistory.length - 1}
-              aria-label="Next session word"
-            >
-              <ArrowRight size={13} />
-            </button>
-          </div>
-        )}
-
-        {!isEmbedded && source?.filePath && (
-          <div className="rp-footer">
-            <span className="rp-source-path">{source.filePath}</span>
-            <span className="rp-source-loc">L{source.line} C{source.column}</span>
-          </div>
-        )}
       </div>
     </div>
   );

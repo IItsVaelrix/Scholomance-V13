@@ -31,28 +31,6 @@ type SignalChamberSceneType = {
   updateState: (state: Record<string, unknown>) => void;
 };
 import HolographicEmbed from './HolographicEmbed.jsx';
-import { BytecodeVisualiser } from '../Visualiser/BytecodeVisualiser';
-import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
-
-/** Extract an HSL hue (0..360) from a hex or hsl color string. */
-function colorToHue(color: string | undefined, fallback = 286): number {
-  if (!color) return fallback;
-  const hslMatch = color.match(/hsl\(\s*([\d.]+)/i);
-  if (hslMatch) return parseFloat(hslMatch[1]);
-  const hex = color.replace('#', '');
-  if (!/^[0-9a-fA-F]{6}$/.test(hex)) return fallback;
-  const r = parseInt(hex.slice(0, 2), 16) / 255;
-  const g = parseInt(hex.slice(2, 4), 16) / 255;
-  const b = parseInt(hex.slice(4, 6), 16) / 255;
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const d = max - min;
-  if (d === 0) return fallback;
-  let h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
-  h *= 60;
-  if (h < 0) h += 360;
-  return Math.round(h);
-}
 
 interface SignalChamberConsoleProps {
   overrideSchoolId?: string;
@@ -65,7 +43,6 @@ export const SignalChamberConsole: React.FC<SignalChamberConsoleProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef     = useRef<SignalChamberSceneType | null>(null);
-  const reducedMotion = usePrefersReducedMotion();
 
   const allSchoolIds = useMemo(() => Object.keys(SCHOOLS), []);
 
@@ -84,7 +61,6 @@ export const SignalChamberConsole: React.FC<SignalChamberConsoleProps> = ({
     togglePlayPause,
     sinkId,
     getBPM,
-    getByteFrequencyData,
   } = useAmbientPlayer(allSchoolIds);
 
   const currentSchoolId = overrideSchoolId || rawSchoolId;
@@ -262,18 +238,6 @@ export const SignalChamberConsole: React.FC<SignalChamberConsoleProps> = ({
         className="signal-chamber-canvas"
         aria-hidden="true"
       />
-
-      {/* Live spectral mandala overlay - reacts to the playing audio, hued to
-          the active school. Synthetic spectrum when paused so the orb stays alive. */}
-      <div className="signal-chamber-fft" aria-hidden="true">
-        <BytecodeVisualiser
-          getByteFrequencyData={isPlaying ? getByteFrequencyData : undefined}
-          bpm={getBPM?.() || 120}
-          hue={colorToHue(currentStation?.color)}
-          reducedMotion={reducedMotion}
-          minimal
-        />
-      </div>
 
       <div className="signal-chamber-player-overlay">
         <HolographicEmbed

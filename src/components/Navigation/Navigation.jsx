@@ -62,7 +62,9 @@ export default function Navigation() {
     () => LINKS.filter((link) => PRODUCTION_NAV_IDS.includes(link.id)),
     [],
   );
-  const showAccountNavigation = !IS_PROD;
+  // Always show Portal/profile. Production used to hide this (`!IS_PROD`), which
+  // removed the only UI path to /auth while the route still existed.
+  const showAccountNavigation = true;
 
   const allNavLinks = useMemo(() => [
     ...(IS_PROD ? publicNavLinks : LINKS),

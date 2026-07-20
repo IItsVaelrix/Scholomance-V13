@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import type { LegacyClipTransitionBinding } from '../../../video/editor/core/video-project-packet';
 import {
   addClip,
   deleteClip,
@@ -83,7 +84,7 @@ export function useTimelineMutator<TProject extends VideoProjectPacketV1Like>(
         );
       },
 
-      addLegacyTransition(clipId: ClipId, transition: unknown) {
+      addLegacyTransition(clipId: ClipId, transition: LegacyClipTransitionBinding) {
         setProject((project: any) => addLegacyTransition(project, clipId, transition));
       },
 

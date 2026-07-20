@@ -13,6 +13,18 @@ PROVIDERS = {
     "gemini":   ("https://generativelanguage.googleapis.com/v1beta/openai",
                  "https://generativelanguage.googleapis.com/v1beta/openai", "gemini-2.5-flash"),
     "jules":    ("https://api.jules.ai/v1", "https://api.jules.ai/v1", "jules"),
+    # Qwen Cloud (https://www.qwencloud.com/) OpenAI-compatible APIs.
+    # Default /provider qwen is Token Plan Individual (subscription Credits).
+    # Pay-as-you-go DashScope and China are separate keys — do not mix plan
+    # keys (sk-sp-…) with paygo URLs or vice versa.
+    # https://docs.qwencloud.com/token-plan/personal/token-plan-personal-quickstart
+    "qwen":      ("https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+                  "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+                  "qwen3.7-max"),
+    "qwen-paygo": ("https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+                   "https://dashscope-intl.aliyuncs.com/compatible-mode/v1", "qwen3.7-max"),
+    "qwen-cn":   ("https://dashscope.aliyuncs.com/compatible-mode/v1",
+                  "https://dashscope.aliyuncs.com/compatible-mode/v1", "qwen3.7-max"),
 }
 # Friendly/brand names users actually type → canonical provider key above.
 PROVIDER_ALIASES = {
@@ -21,6 +33,18 @@ PROVIDER_ALIASES = {
     "x.ai": "xai",
     "x": "xai",
     "openrouter": "router",
+    "alibaba": "qwen",
+    "qwencloud": "qwen",
+    "qwen-cloud": "qwen",
+    "token-plan": "qwen",
+    "tokenplan": "qwen",
+    "qwen-token": "qwen",
+    "dashscope": "qwen-paygo",
+    "qwen-intl": "qwen-paygo",
+    "alibaba-intl": "qwen-paygo",
+    "alibaba-cn": "qwen-cn",
+    "dashscope-cn": "qwen-cn",
+    "qwen-china": "qwen-cn",
 }
 
 

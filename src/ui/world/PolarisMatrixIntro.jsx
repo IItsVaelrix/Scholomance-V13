@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { getActivePhase } from '../../phaser/battle-transition.fx.js';
+import { freshRng } from '../../lib/math/seededRng.js';
 import {
   POLARIS_MATRIX_INTRO_DURATION_MS,
   POLARIS_MATRIX_INTRO_EXIT_MS,
@@ -59,6 +60,7 @@ export default function PolarisMatrixIntro({
     if (!ctx) return undefined;
 
     const glyphs = '♪01◉';
+    const rng = freshRng();
     const fontSize = 15;
     let columns = 0;
     let drops = [];
@@ -71,7 +73,7 @@ export default function PolarisMatrixIntro({
       canvas.width = width;
       canvas.height = height;
       columns = Math.max(1, Math.floor(width / fontSize));
-      drops = Array.from({ length: columns }, () => Math.floor(Math.random() * height / fontSize)); // EXEMPT
+      drops = Array.from({ length: columns }, () => Math.floor(rng() * height / fontSize));
     };
 
     resize();
@@ -84,18 +86,18 @@ export default function PolarisMatrixIntro({
       for (let column = 0; column < columns; column += 1) {
         const x = column * fontSize;
         const y = drops[column] * fontSize;
-        const glyph = glyphs[Math.floor(Math.random() * glyphs.length)]; // EXEMPT
+        const glyph = glyphs[Math.floor(rng() * glyphs.length)];
 
         ctx.font = `600 ${fontSize}px "JetBrains Mono", monospace`;
         ctx.fillStyle = 'rgba(68, 232, 192, 0.9)';
         ctx.fillText(glyph, x, y);
 
-        if (Math.random() > 0.988) { // EXEMPT
+        if (rng() > 0.988) {
           ctx.fillStyle = 'rgba(136, 238, 255, 0.95)';
           ctx.fillText('♪', x, y - fontSize * 0.7);
         }
 
-        if (y > height && Math.random() > 0.965) { // EXEMPT
+        if (y > height && rng() > 0.965) {
           drops[column] = 0;
         }
         drops[column] += 1;

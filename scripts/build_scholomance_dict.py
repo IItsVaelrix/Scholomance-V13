@@ -14,6 +14,7 @@ Output:
 from __future__ import annotations
 
 import argparse
+from datetime import datetime
 import gzip
 import io
 import json
@@ -24,6 +25,13 @@ import sys
 import time
 import xml.etree.ElementTree as ET
 from typing import Optional
+
+from oewn_antonym_project import (
+    apply_oewn_antonyms,
+    file_sha256,
+    parse_oewn_antonyms,
+    project_antonyms,
+)
 
 DEFAULT_DB_PATH = "scholomance_dict.sqlite"
 DEFAULT_CMU_PATH = os.path.join("node_modules", "cmudict", "lib", "cmu", "cmudict.0.7a")
@@ -392,7 +400,7 @@ def ingest_oewn_xml(
                     elif ctag == "SynsetRelation":
                         rel = child.get("relType") or child.get("type") or child.get("rel")
                         target = child.get("target") or child.get("targetSynset")
-                        if rel and target:
+                        if rel and rel != "antonym" and target:
                             rel_rows.append((syn_id, rel, target, "oewn", source_url))
 
                 syn_rows.append((
@@ -490,6 +498,32 @@ def ingest_oewn_xml(
         conn.commit()
 
     return syn_count, lemma_count, rel_count
+
+
+def apply_builder_oewn_antonyms(
+    conn: sqlite3.Connection,
+    xml_path: str,
+    *,
+    source_url: str,
+    timestamp: str,
+    max_unresolved_ratio: float = 0.02,
+):
+    """Project and apply OEWN antonyms after the primary XML ingest."""
+    parsed = parse_oewn_antonyms(xml_path)
+    existing_synsets = {
+        row[0] for row in conn.execute("SELECT id FROM wordnet_synset")
+    }
+    projection = project_antonyms(parsed, existing_synsets)
+    result = apply_oewn_antonyms(
+        conn,
+        projection,
+        release=parsed.release,
+        source_url=source_url,
+        source_sha256=file_sha256(xml_path),
+        timestamp=timestamp,
+        max_unresolved_ratio=max_unresolved_ratio,
+    )
+    return result, projection
 
 
 # ---------------------------------------------------------------------------
@@ -598,8 +632,19 @@ def main() -> None:
                      help="Path to CMU pronouncing dictionary file.")
     ap.add_argument("--oewn_path", required=True,
                      help="Path to OEWN XML file (.xml or .xml.gz).")
+    ap.add_argument(
+        "--antonym-timestamp",
+        help="ISO-8601 timestamp for OEWN antonym provenance.",
+    )
 
     args = ap.parse_args()
+
+    if not args.antonym_timestamp:
+        sys.exit("ERROR: --antonym-timestamp is required to stamp OEWN antonyms")
+    try:
+        datetime.fromisoformat(args.antonym_timestamp.replace("Z", "+00:00"))
+    except ValueError:
+        sys.exit("ERROR: --antonym-timestamp must be an ISO-8601 timestamp")
 
     if not os.path.exists(args.cmu_path):
         print(f"ERROR: CMU dict not found at: {args.cmu_path}")
@@ -638,7 +683,17 @@ def main() -> None:
         syn_count, lemma_count, rel_count = ingest_oewn_xml(
             conn, args.oewn_path, source_url="https://en-word.net/",
         )
-        print(f"  Inserted {syn_count:,} synsets, {lemma_count:,} lemmas, {rel_count:,} relations.")
+        antonym_result, _ = apply_builder_oewn_antonyms(
+            conn,
+            args.oewn_path,
+            source_url="https://en-word.net/",
+            timestamp=args.antonym_timestamp,
+        )
+        print(
+            f"  Inserted {syn_count:,} synsets, {lemma_count:,} lemmas, "
+            f"{rel_count:,} non-antonym relations, "
+            f"{antonym_result.inserted_count:,} projected antonyms."
+        )
 
         # Step 3: Cross-reference — enrich CMU entries with WordNet definitions
         print("Step 3/4: Enriching entries with WordNet definitions...")

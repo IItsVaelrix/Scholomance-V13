@@ -1,6 +1,8 @@
 import { VideoTemplateDefinition, VideoProjectPacketV1, VideoAssetRecord, createEmptyProject } from './video-project-packet';
 import { AudioReactivityAdapter } from './audio-reactivity-adapter';
 
+export type { VideoTemplateDefinition } from './video-project-packet';
+
 /** Registry of available templates */
 const templates: VideoTemplateDefinition[] = [];
 

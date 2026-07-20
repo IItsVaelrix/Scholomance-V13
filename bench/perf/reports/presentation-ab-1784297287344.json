@@ -1,0 +1,164 @@
+[
+  {
+    "route": "/listen",
+    "mode": "before",
+    "inventory": {
+      "canvasCount": 0,
+      "canvases": [],
+      "blendedLayers": 0,
+      "glassLayers": 0
+    },
+    "frames": {
+      "frames": 360,
+      "avgMs": 16.67,
+      "p50Ms": 16.7,
+      "p95Ms": 16.8,
+      "fps": 60,
+      "pctOver16": 61.4,
+      "pctOver20": 0,
+      "pctOver33": 0
+    }
+  },
+  {
+    "route": "/listen",
+    "mode": "after",
+    "inventory": {
+      "canvasCount": 0,
+      "canvases": [],
+      "blendedLayers": 0,
+      "glassLayers": 0
+    },
+    "frames": {
+      "frames": 360,
+      "avgMs": 16.67,
+      "p50Ms": 16.7,
+      "p95Ms": 16.8,
+      "fps": 60,
+      "pctOver16": 60.6,
+      "pctOver20": 0,
+      "pctOver33": 0
+    }
+  },
+  {
+    "route": "/visualiser",
+    "mode": "before",
+    "inventory": {
+      "canvasCount": 4,
+      "canvases": [
+        {
+          "className": "bcv-miniwave",
+          "w": 128,
+          "h": 38,
+          "cssW": 128,
+          "cssH": 38,
+          "area": 4864,
+          "parentBlend": "normal",
+          "parentFilter": "blur(4px)"
+        },
+        {
+          "className": "bcv-miniwave",
+          "w": 128,
+          "h": 38,
+          "cssW": 128,
+          "cssH": 38,
+          "area": 4864,
+          "parentBlend": "normal",
+          "parentFilter": "blur(4px)"
+        },
+        {
+          "className": "bcv-miniwave",
+          "w": 128,
+          "h": 38,
+          "cssW": 128,
+          "cssH": 38,
+          "area": 4864,
+          "parentBlend": "normal",
+          "parentFilter": "blur(4px)"
+        },
+        {
+          "className": "bcv-canvas",
+          "w": 223,
+          "h": 223,
+          "cssW": 223,
+          "cssH": 223,
+          "area": 49729,
+          "parentBlend": "normal",
+          "parentFilter": "none"
+        }
+      ],
+      "blendedLayers": 1,
+      "glassLayers": 7
+    },
+    "frames": {
+      "frames": 325,
+      "avgMs": 18.46,
+      "p50Ms": 16.7,
+      "p95Ms": 33.3,
+      "fps": 54.2,
+      "pctOver16": 64.6,
+      "pctOver20": 5.5,
+      "pctOver33": 3.4
+    }
+  },
+  {
+    "route": "/visualiser",
+    "mode": "after",
+    "inventory": {
+      "canvasCount": 4,
+      "canvases": [
+        {
+          "className": "bcv-miniwave",
+          "w": 128,
+          "h": 38,
+          "cssW": 128,
+          "cssH": 38,
+          "area": 4864,
+          "parentBlend": "normal",
+          "parentFilter": "none"
+        },
+        {
+          "className": "bcv-miniwave",
+          "w": 128,
+          "h": 38,
+          "cssW": 128,
+          "cssH": 38,
+          "area": 4864,
+          "parentBlend": "normal",
+          "parentFilter": "none"
+        },
+        {
+          "className": "bcv-miniwave",
+          "w": 128,
+          "h": 38,
+          "cssW": 128,
+          "cssH": 38,
+          "area": 4864,
+          "parentBlend": "normal",
+          "parentFilter": "none"
+        },
+        {
+          "className": "bcv-canvas",
+          "w": 223,
+          "h": 223,
+          "cssW": 223,
+          "cssH": 223,
+          "area": 49729,
+          "parentBlend": "normal",
+          "parentFilter": "none"
+        }
+      ],
+      "blendedLayers": 0,
+      "glassLayers": 1
+    },
+    "frames": {
+      "frames": 360,
+      "avgMs": 16.67,
+      "p50Ms": 16.7,
+      "p95Ms": 16.7,
+      "fps": 60,
+      "pctOver16": 63.1,
+      "pctOver20": 0,
+      "pctOver33": 0
+    }
+  }
+]

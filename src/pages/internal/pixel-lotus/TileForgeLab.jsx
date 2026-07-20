@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import TileForgeCanvas from './TileForgeCanvas.jsx';
-import { TileForgePipeline } from '../../../../codex/core/pixelbrain/tile-forge/tile-forge.pipeline.js';
-import { TILE_FORGE_PRESETS } from '../../../../codex/core/pixelbrain/tile-forge/tile-forge.presets.js';
-
-import { IsoTileGeometryMicroprocessor } from '../../../../codex/core/pixelbrain/amps/geometry/processors/iso-tile-geometry.microprocessor.js';
-import { TileSocketMicroprocessor } from '../../../../codex/core/pixelbrain/amps/geometry/processors/tile-socket.microprocessor.js';
-import { FibonacciFieldMicroprocessor } from '../../../../codex/core/pixelbrain/amps/fibonacci/fibonacci-field.microprocessor.js';
-import { VolumeMicroprocessor } from '../../../../codex/core/pixelbrain/amps/volume/processors/volume.microprocessor.js';
-import { PerlinFieldMicroprocessor } from '../../../../codex/core/pixelbrain/amps/noise/perlin-field.microprocessor.js';
-import { BiomeMaterialMicroprocessor } from '../../../../codex/core/pixelbrain/amps/biome/biome-material.microprocessor.js';
+import {
+  BiomeMaterialMicroprocessor,
+  FibonacciFieldMicroprocessor,
+  IsoTileGeometryMicroprocessor,
+  PerlinFieldMicroprocessor,
+  TileForgePipeline,
+  TILE_FORGE_PRESETS,
+  TileSocketMicroprocessor,
+  VolumeMicroprocessor,
+} from '../../../lib/pixelbrain/tileForge.adapter.js';
 
 // Mocks
 const MockGeometry = { run: () => ({ output: {}, diagnostics: [], processor: {id: 'geometry', version: '1.0'}, hash: 'hash' }) };

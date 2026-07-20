@@ -1,0 +1,30 @@
+.bcv-stage-art {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  line-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Scale to fit the stage column — never crop top/bottom or sides. */
+.bcv-stage-art__img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 78vh;
+  border-radius: 7px;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.bcv-stage-art--empty {
+  min-height: 12rem;
+  aspect-ratio: 1;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(46, 230, 255, 0.12), transparent 55%),
+    radial-gradient(circle at 50% 50%, rgba(12, 10, 28, 0.85), rgba(4, 4, 12, 0.95));
+}

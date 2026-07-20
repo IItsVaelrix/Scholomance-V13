@@ -25,6 +25,10 @@
  */
 
 import type { RiskProfile } from './types.ts';
+import {
+  assessCandidateMargin,
+  validateClosedCandidates,
+} from '../candidate-lattice/index.js';
 
 export interface Candidate {
   /** MUST be a key the lexicon already knows. Inventing one is a hard error. */
@@ -63,18 +67,10 @@ export const PROPOSAL_ERRORS = Object.freeze({
  * @throws if any candidate names a referent the lexicon does not have.
  */
 export function validateProposal(proposal: Proposal, known: readonly string[]): void {
-  const set = new Set(known);
-  for (const c of proposal.candidates) {
-    if (!set.has(c.key)) {
-      // The model tried to mint a binding. This is the failure the harness exists
-      // to catch: an invented candidate is indistinguishable from a confident
-      // hallucination, and accepting it would make the lexicon advisory.
-      throw new Error(`${PROPOSAL_ERRORS.INVENTED_CANDIDATE}: ${JSON.stringify(c.key)}`);
-    }
-    if (!Number.isFinite(c.score) || c.score < 0 || c.score > 1) {
-      throw new Error(`${PROPOSAL_ERRORS.INVALID_SCORE}: ${c.key}=${c.score}`);
-    }
-  }
+  validateClosedCandidates(proposal.candidates, known, {
+    invented: PROPOSAL_ERRORS.INVENTED_CANDIDATE,
+    invalidScore: PROPOSAL_ERRORS.INVALID_SCORE,
+  });
 }
 
 export type MarginVerdict =
@@ -90,16 +86,33 @@ export type MarginVerdict =
  * that from a coin flip is the exact soft Do this architecture exists to prevent.
  */
 export function assessMargin(proposal: Proposal, risk: RiskProfile): MarginVerdict {
-  const ranked = [...proposal.candidates].sort((a, b) => b.score - a.score);
-  if (ranked.length === 0) return { decided: false, margin: 0, reason: 'no-candidates' };
-  if (ranked.length === 1) {
-    return { decided: true, pick: ranked[0], margin: ranked[0].score, reason: 'sole-candidate' };
+  const assessment = assessCandidateMargin(proposal.candidates, risk.minMargin);
+  if (assessment.status === 'empty') {
+    return { decided: false, margin: 0, reason: 'no-candidates' };
   }
-  const margin = ranked[0].score - ranked[1].score;
-  if (margin >= risk.minMargin) {
-    return { decided: true, pick: ranked[0], margin, reason: 'clear-margin' };
+  if (assessment.status === 'single') {
+    return {
+      decided: true,
+      pick: assessment.ranked[0],
+      margin: assessment.margin,
+      reason: 'sole-candidate',
+    };
   }
-  return { decided: false, margin, reason: 'thin-margin', pick: ranked[0], rival: ranked[1] };
+  if (assessment.status === 'clear') {
+    return {
+      decided: true,
+      pick: assessment.ranked[0],
+      margin: assessment.margin,
+      reason: 'clear-margin',
+    };
+  }
+  return {
+    decided: false,
+    margin: assessment.margin,
+    reason: 'thin-margin',
+    pick: assessment.ranked[0],
+    rival: assessment.ranked[1],
+  };
 }
 
 // ── A reference proposer ─────────────────────────────────────────────────────

@@ -146,6 +146,7 @@ export type MetadataSpec = {
   createdAt?: string;
   tags?: string[];
   feature?: string;
+  source?: string;
 };
 
 // ─── Error Codes ─────────────────────────────────────────────────────────────

@@ -544,7 +544,7 @@ export default function ActorForgeLab() {
   id: forge.character.spec.id,
   displayName: characterName,
   artStyle: STYLE_PRESETS[stylePreset].label,
-  specHash: forge.character.specHash,
+  specHash: (forge.character as any).specHash,
   totalCells: (forge.character as any).diagnostics?.totalCells,
   paletteSizes: (forge.character as any).diagnostics?.paletteSizes,
   frame: `${forge.character.canvas.width}×${forge.character.canvas.height}`,

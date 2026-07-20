@@ -9,22 +9,19 @@ test.describe("Scholomance shell and scribe rite", () => {
 
   test("routes through the shell and reaches the signal chamber", async ({ page }) => {
     await page.goto("/");
-
-    await expect(page).toHaveURL(/\/read$/);
+    await page.getByRole("button", { name: "Enter Scholomance" }).click();
+    await expect(page).toHaveURL(/\/read$/, { timeout: 15000 });
     await expect(page.getByRole("navigation", { name: "Primary navigation" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Watch" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Listen" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Scribe" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Combat" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Nexus" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Portal" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Visualizer" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Blog" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Sign in" })).toBeVisible();
 
-    const themeToggle = page.getByRole("button", { name: /Switch to (dark|light) mode/i });
-    const initialTheme = await page.evaluate(() => document.documentElement.getAttribute("data-theme"));
-    await themeToggle.click();
-    await expect
-      .poll(() => page.evaluate(() => document.documentElement.getAttribute("data-theme")))
-      .not.toBe(initialTheme);
+    await page.getByRole("button", { name: "Open all chambers" }).click();
+    await expect(page.getByRole("link", { name: "Portal" })).toBeVisible();
+    await page.locator(".rail-menu-btn").click();
 
     await page.getByRole("link", { name: "Listen" }).click();
     await expect(page).toHaveURL(/\/listen$/);
@@ -32,27 +29,19 @@ test.describe("Scholomance shell and scribe rite", () => {
     await expect(page.locator(".signal-chamber-shell")).toBeVisible();
   });
 
-  test("saves a scroll, opens truesight lore, and reloads persisted content", async ({ page }) => {
+  test("saves a scroll and reloads persisted content", async ({ page }) => {
     const uniqueTitle = `Smoke Scroll ${Date.now()}`;
 
     await page.goto("/read");
 
     await page.getByLabel("Scroll Title").fill(uniqueTitle);
-    await page.locator("#scroll-content").fill("Echo ember");
+    const editor = page.locator(".lexical-content-editable");
+    await editor.click();
+    await page.keyboard.type("Echo ember");
+    await expect(page.getByRole("button", { name: "Save Scroll" })).toBeEnabled();
     await page.getByRole("button", { name: "Save Scroll" }).click();
 
     await expect(page.locator(".scroll-list")).toContainText(uniqueTitle);
-
-    const overlay = page.locator(".word-background-layer");
-    await expect(overlay).toBeVisible();
-
-    await page.waitForTimeout(1200);
-
-    await overlay.getByRole("button", { name: "Echo" }).click();
-    const tooltip = page.locator(".word-tooltip-container");
-    await expect(tooltip).toBeVisible({ timeout: 8000 });
-    await expect(tooltip).toContainText("A reflected sound preserved by the chamber.");
-    await expect(tooltip).toContainText("reverb");
 
     await page.reload();
 

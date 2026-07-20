@@ -1,6 +1,12 @@
 import React, { Suspense, lazy } from 'react';
 import { AbsoluteFill, Audio, Sequence, useCurrentFrame, useVideoConfig } from 'remotion';
-import type { VideoProjectPacketV1, TimelineClip, TimelineTrack } from '../core/video-project-packet';
+import type {
+  ClipTransitionBinding,
+  LegacyClipTransitionBinding,
+  VideoProjectPacketV1,
+  TimelineClip,
+  TimelineTrack,
+} from '../core/video-project-packet';
 import { ClipRenderer } from './ClipRenderer';
 import { EffectStackRenderer } from './EffectStackRenderer';
 import { getValueAtFrame } from '../core/keyframe-engine';
@@ -187,8 +193,19 @@ function renderBasicTransitions(project: VideoProjectPacketV1, frame: number) {
       const fromClip = track.clips[i];
       const toClip = track.clips[i + 1];
 
-      const outTransition = fromClip.transitions?.find((t) => t.side === 'out');
-      const inTransition = toClip.transitions?.find((t) => t.side === 'in');
+      const isLegacy = (
+        transition: LegacyClipTransitionBinding | ClipTransitionBinding,
+      ): transition is LegacyClipTransitionBinding => 'side' in transition;
+      const outTransition = fromClip.transitions?.find((transition) =>
+        isLegacy(transition)
+          ? transition.side === 'out'
+          : transition.fromClipId === fromClip.id && transition.toClipId === toClip.id
+      );
+      const inTransition = toClip.transitions?.find((transition) =>
+        isLegacy(transition)
+          ? transition.side === 'in'
+          : transition.fromClipId === fromClip.id && transition.toClipId === toClip.id
+      );
       
       const transition = outTransition || inTransition;
       if (!transition) continue;

@@ -13,6 +13,7 @@ import { resolvePlsVerseIRState } from "../../lib/pls/verseIRBridge.js";
 import { BytecodeError, ERROR_CATEGORIES, ERROR_SEVERITY, ERROR_CODES, MODULE_IDS } from "../../lib/pixelbrain.adapter.js";
 import { AnimatedSurface } from "../../components/AnimatedSurface";
 import { resolveOverlayPlacement } from "../../lib/truesight/overlay-placement.js";
+import { extractPreviousWord } from "../../../codex/core/spellcheckContext.js";
 
 
 const MAX_CONTENT_LENGTH = 50000;
@@ -357,6 +358,7 @@ function getCaretViewportCoords(measurement, textarea, prefix = "", topology = n
  *   onSave?: () => void,
  *   onCancel?: () => void,
  *   onCursorChange?: (pos: { line: number, col: number }) => void,
+ *   onSelectionTextChange?: (selection: string) => void,
  *   onWordActivate?: (token: object) => void,
  *   onScrollChange?: (top: number) => void,
  *   analyzedDocument?: object | null,
@@ -415,6 +417,7 @@ const ScrollEditor = forwardRef(/**
   onSave,
   onCancel,
   onCursorChange,
+  onSelectionTextChange,
   onWordActivate,
   onScrollChange,
   analyzedDocument = null,
@@ -943,7 +946,11 @@ const ScrollEditor = forwardRef(/**
     }
     
     let isCancelled = false;
-    getSpellingSuggestions(hoveredMisspelling.word, null, 3).then(suggestions => {
+    getSpellingSuggestions(
+      hoveredMisspelling.word,
+      hoveredMisspelling.prevWord || null,
+      3,
+    ).then(suggestions => {
       if (!isCancelled) setSpellcheckSuggestions(suggestions);
     });
     return () => { isCancelled = true; };
@@ -1146,6 +1153,14 @@ const ScrollEditor = forwardRef(/**
     emitCursorChange(event.target);
   }, [emitCursorChange]);
 
+  const handleSelectionChange = useCallback((event) => {
+    const textarea = event.currentTarget;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    onSelectionTextChange?.(start === end ? "" : textarea.value.slice(start, end));
+    emitCursorChange(textarea);
+  }, [emitCursorChange, onSelectionTextChange]);
+
   const handleTextareaClick = useCallback((event) => {
     const textarea = event.currentTarget;
     emitCursorChange(textarea);
@@ -1244,7 +1259,8 @@ const ScrollEditor = forwardRef(/**
     if (prefix && checkSpelling && getSpellingSuggestions) {
       const isValidSpelling = await checkSpelling(prefix);
       if (!isValidSpelling) {
-        const spellingCorrections = await getSpellingSuggestions(prefix, null, 3);
+        const prevWord = extractPreviousWord(textBefore, prefix);
+        const spellingCorrections = await getSpellingSuggestions(prefix, prevWord, 3);
         if (spellingCorrections && spellingCorrections.length > 0) {
           suggestionsList = spellingCorrections.map(word => ({
             token: word,
@@ -1675,8 +1691,12 @@ const ScrollEditor = forwardRef(/**
                                   const r = e.currentTarget.getBoundingClientRect();
                                   const container = editorContainerRef.current;
                                   const cRect = container ? container.getBoundingClientRect() : { left: 0, top: 0 };
+                                  const prevToken = [...tokArr.slice(0, tokIdx)]
+                                    .reverse()
+                                    .find((entry) => WORD_TOKEN_REGEX.test(entry.token) && !entry.isWhitespace);
                                   setHoveredMisspelling({
                                     word: token.trim(),
+                                    prevWord: prevToken ? prevToken.token.trim() : null,
                                     charStart,
                                     x: r.left - cRect.left,
                                     y: r.bottom - cRect.top
@@ -1708,6 +1728,7 @@ const ScrollEditor = forwardRef(/**
             onChange={handleContentChange}
             onKeyDown={isEditable ? handleKeyDown : undefined}
             onKeyUp={handleCursorChange}
+            onSelect={handleSelectionChange}
             onClick={handleTextareaClick}
             onBlur={() => {
               setIntellisenseSuggestions([]);

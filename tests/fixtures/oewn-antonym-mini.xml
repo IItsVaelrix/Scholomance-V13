@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LexicalResource>
+  <Lexicon id="oewn" label="Open English WordNet" language="en" version="2024">
+    <LexicalEntry id="oewn-hot-a">
+      <Lemma writtenForm="hot" partOfSpeech="a"/>
+      <Sense id="oewn-hot-1" synset="oewn-syn-hot">
+        <SenseRelation relType="antonym" target="oewn-cold-1"/>
+      </Sense>
+    </LexicalEntry>
+    <LexicalEntry id="oewn-cold-a">
+      <Lemma writtenForm="cold" partOfSpeech="a"/>
+      <Sense id="oewn-cold-1" synset="oewn-syn-cold">
+        <SenseRelation relType="antonym" target="oewn-hot-1"/>
+      </Sense>
+    </LexicalEntry>
+    <LexicalEntry id="oewn-good-a">
+      <Lemma writtenForm="good" partOfSpeech="a"/>
+      <Sense id="oewn-good-1" synset="oewn-syn-good">
+        <SenseRelation relType="antonym" target="oewn-bad-missing"/>
+      </Sense>
+    </LexicalEntry>
+    <Synset id="oewn-syn-hot" partOfSpeech="a">
+      <Definition>having a high temperature</Definition>
+    </Synset>
+    <Synset id="oewn-syn-cold" partOfSpeech="a">
+      <Definition>having a low temperature</Definition>
+      <SynsetRelation relType="antonym" target="oewn-syn-hot"/>
+    </Synset>
+    <Synset id="oewn-syn-good" partOfSpeech="a">
+      <Definition>morally excellent</Definition>
+    </Synset>
+  </Lexicon>
+</LexicalResource>

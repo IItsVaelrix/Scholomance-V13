@@ -178,12 +178,20 @@ function computeSuggestionSignals(sourceWord, suggestionWord, index, total, cate
 
   const inverseAntonymAffix = Number(hasAntonymAffix(source) !== hasAntonymAffix(suggestion));
 
+  // Spellcheck signal = grapheme proximity to the source term (not content-word bias).
+  const spellcheck = clamp01(
+    (overlapSimilarity * 0.45)
+    + (prefixSimilarity * 0.25)
+    + (lengthSimilarity * 0.20)
+    + (rankBias * 0.10),
+  );
+
   if (category === 'rhymes') {
     return {
       predictor: clamp01((rankBias * 0.30) + (lengthSimilarity * 0.15) + (suffixSimilarity * 0.45) + (prefixSimilarity * 0.10)),
       phoneme: clamp01((rankBias * 0.10) + (overlapSimilarity * 0.15) + (suffixSimilarity * 0.75)),
       syntax: clamp01((contentBias * 0.80) + (rankBias * 0.20)),
-      spellcheck: clamp01((contentBias * 0.70) + (rankBias * 0.30)),
+      spellcheck,
     };
   }
 
@@ -193,7 +201,7 @@ function computeSuggestionSignals(sourceWord, suggestionWord, index, total, cate
       predictor: clamp01((rankBias * 0.30) + (lengthSimilarity * 0.20) + (blendedEcho * 0.40) + (prefixSimilarity * 0.10)),
       phoneme: clamp01((rankBias * 0.15) + (suffixSimilarity * 0.45) + (overlapSimilarity * 0.40)),
       syntax: clamp01((contentBias * 0.80) + (rankBias * 0.20)),
-      spellcheck: clamp01((contentBias * 0.75) + (rankBias * 0.25)),
+      spellcheck,
     };
   }
 
@@ -202,7 +210,7 @@ function computeSuggestionSignals(sourceWord, suggestionWord, index, total, cate
       predictor: clamp01((rankBias * 0.35) + (lengthSimilarity * 0.20) + (inverseAntonymAffix * 0.35) + (prefixSimilarity * 0.10)),
       phoneme: clamp01((rankBias * 0.35) + (overlapSimilarity * 0.35) + (suffixSimilarity * 0.30)),
       syntax: clamp01((contentBias * 0.80) + (rankBias * 0.20)),
-      spellcheck: clamp01((contentBias * 0.70) + (rankBias * 0.30)),
+      spellcheck,
     };
   }
 
@@ -210,7 +218,7 @@ function computeSuggestionSignals(sourceWord, suggestionWord, index, total, cate
     predictor: clamp01((rankBias * 0.35) + (lengthSimilarity * 0.30) + (overlapSimilarity * 0.20) + (prefixSimilarity * 0.15)),
     phoneme: clamp01((rankBias * 0.20) + (suffixSimilarity * 0.45) + (overlapSimilarity * 0.35)),
     syntax: clamp01((contentBias * 0.80) + (rankBias * 0.20)),
-    spellcheck: clamp01((contentBias * 0.75) + (rankBias * 0.25)),
+    spellcheck,
   };
 }
 

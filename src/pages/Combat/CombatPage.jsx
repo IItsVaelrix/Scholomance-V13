@@ -15,10 +15,16 @@ import {
   lookupSceneEnemyToken,
   resolveWeaveTargetsFromParsed,
 } from '../../game/combat/weave-scene-targets.js';
-import { parseWeave, resolveWeaveLexeme } from '../../../codex/core/spellweave.engine.js';
 import { shouldEngageCombatBattle } from '../../game/combat/sentinelRobots.js';
-import { lookupWeaveToken } from '../../../codex/core/semantics.registry.js';
-import { tokenize } from '../../../codex/core/tokenizer.js';
+import {
+  computeThreatMap,
+  lookupWeaveToken,
+  OBELISK_DISCOVERY_FLASH_XP,
+  parseWeave,
+  resolveWeaveLexeme,
+  SCHOLOMANCE_XP_ACTIONS,
+  tokenize,
+} from '../../lib/combat/combatCodex.adapter.js';
 import { Sparkles, Zap, Trash2, Terminal } from 'lucide-react';
 import CombatCommandsConsole from '../../ui/combat/CombatCommandsConsole.jsx';
 import '../DivWand/DivWandPage.css'; // Reuse the sleek DivWand CSS
@@ -29,8 +35,6 @@ import {
   getSpellweaveCompendiumLedger,
   recordCompendiumDiscoveries,
 } from '../../game/combat/spellweaveCompendium.persistence.js';
-import { SCHOLOMANCE_XP_ACTIONS } from '../../../codex/core/scholomance-xp.schema.js';
-import { OBELISK_DISCOVERY_FLASH_XP } from '../../../codex/core/obelisk-puzzle.signals.js';
 import DiscoveryFlash from '../../ui/combat/DiscoveryFlash.jsx';
 import CombatResultsOverlay from '../../ui/combat/CombatResultsOverlay.jsx';
 import CombatBeastiaryOverlay from '../../ui/combat/CombatBeastiaryOverlay.jsx';
@@ -40,7 +44,6 @@ import CombatMatrixIntro from '../../ui/combat/CombatMatrixIntro.jsx';
 import PolarisMatrixIntro from '../../ui/world/PolarisMatrixIntro.jsx';
 import TacticalTileTooltip from './TacticalTileTooltip.jsx';
 import TacticalOverlayControls from './TacticalOverlayControls.jsx';
-import { computeThreatMap } from '../../../codex/core/combat/tactical-board.threat-map.js';
 import { resolveTransitionMode } from '../../phaser/battle-transition.fx.js';
 import './TacticalBattleBoard.css';
 import {
@@ -1017,6 +1020,7 @@ export default function CombatPage() {
       {tooltip && (
         <div
           className={`combat-tooltip${tooltip.bestiaryAvailable ? ' combat-tooltip--interactive' : ''}`}
+          role={tooltip.bestiaryAvailable ? 'dialog' : 'tooltip'}
           style={{
             left: tooltip.x + 15,
             top: tooltip.y + 15,

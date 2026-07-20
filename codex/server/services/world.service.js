@@ -49,10 +49,10 @@ function lookupLexicalData(adapter, lexeme) {
   const entry = entries[0] || null;
   const definition = extractDefinition(adapter, entry);
   const synonyms = typeof adapter?.lookupSynonyms === 'function'
-    ? adapter.lookupSynonyms(normalizedLexeme, 12)
+    ? adapter.lookupSynonyms(normalizedLexeme, 12).map((row) => row.lemma)
     : [];
   const antonyms = typeof adapter?.lookupAntonyms === 'function'
-    ? adapter.lookupAntonyms(normalizedLexeme, 12)
+    ? adapter.lookupAntonyms(normalizedLexeme, 12).map((row) => row.lemma)
     : [];
   const rhymeData = typeof adapter?.lookupRhymes === 'function'
     ? adapter.lookupRhymes(normalizedLexeme, 16)

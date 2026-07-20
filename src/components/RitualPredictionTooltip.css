@@ -1,61 +1,60 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   SCHOLOMANCE — RITUAL PREDICTION TOOLTIP
-   Arcane prediction card · Parchment & gold · School-resonant chrome
+   SCHOLOMANCE — RITUAL CARD (Poetic IntelliSense)
+   A word as an MTG spellcard, drowned in Lovecraftian bioluminescence.
+   Gold frame · violet eldritch accent · bone ink on abyssal obsidian.
    Layer 4: Interactive Chrome  z: 1300
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .ritual-prediction-tooltip {
-  --rp-void: #04020a;
-  --rp-abyss: #0c0818;
-  --rp-surface: #110e1e;
-  --rp-gold: #c8a84b;
-  --rp-gold-bright: #f0c060;
-  --rp-gold-dim: rgba(200, 168, 75, 0.28);
-  --rp-gold-glow: rgba(200, 168, 75, 0.12);
-  --rp-parchment: #ecddb8;
-  --rp-parchment-mid: #dece9e;
-  --rp-text-light: #f0e4c4;
-  --rp-text-muted: #a89070;
-  --rp-text-dim: #7a6a50;
-  --rp-border: rgba(200, 168, 75, 0.22);
-  --rp-border-inner: rgba(200, 168, 75, 0.12);
-  --rp-role-anchor: #4a9e7a;
-  --rp-role-trigger: #c86848;
-  --rp-role-modifier: #6878c8;
-  --rp-role-connector: #a88440;
-  --rp-role-unknown: #7a7088;
-  --rp-conf-high: #4a9e7a;
-  --rp-conf-mid: #c8a84b;
-  --rp-conf-low: #c86848;
+  /* dark (abyssal) is the default; [data-theme='light'] flips to aged vellum */
+  --rp-void: #060a0c;
+  --rp-stock-top: #0c1113;
+  --rp-stock-bot: #05090b;
+  --rp-edge: rgba(201, 162, 39, 0.22);
+  --rp-gold: #c9a227;
+  --rp-gold-dim: rgba(201, 162, 39, 0.28);
+  --rp-bevel: #7a5f1e;
+  --rp-ink: #d9cfbf;
+  --rp-ink-soft: #a89a80;
+  --rp-ink-faint: #6f6350;
+  --rp-purple: #b39cff;
+  --rp-purple-deep: #8a6fd6;
+  --rp-ichor: #d8604d;
+  --rp-glow: rgba(201, 162, 39, 0.30);
+  --rp-biolum: rgba(139, 92, 246, 0.26);
+
+  --rp-serif: "Cinzel", "Trajan Pro", "Optima", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+  --rp-body: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, "Times New Roman", serif;
+  --rp-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
 
   pointer-events: auto;
   outline: none;
-  filter: drop-shadow(0 18px 44px rgba(0, 0, 0, 0.82));
+  filter: drop-shadow(0 18px 44px rgba(0, 0, 0, 0.72));
 }
 
 .ritual-prediction-tooltip[data-theme='light'] {
-  --rp-void: #f8f4ea;
-  --rp-abyss: #f0ead8;
-  --rp-surface: #faf6ee;
-  --rp-gold: #8a7030;
-  --rp-gold-bright: #a08040;
-  --rp-gold-dim: rgba(138, 112, 48, 0.22);
-  --rp-gold-glow: rgba(138, 112, 48, 0.08);
-  --rp-parchment: #2a2018;
-  --rp-parchment-mid: #3a3020;
-  --rp-text-light: #1a1410;
-  --rp-text-muted: #6a5a40;
-  --rp-text-dim: #8a7a60;
-  --rp-border: rgba(138, 112, 48, 0.28);
-  --rp-border-inner: rgba(138, 112, 48, 0.14);
+  --rp-void: #e9e1cf;
+  --rp-stock-top: #f3ecda;
+  --rp-stock-bot: #e4d9bd;
+  --rp-edge: rgba(122, 95, 30, 0.30);
+  --rp-gold: #9a7b1f;
+  --rp-gold-dim: rgba(122, 95, 30, 0.30);
+  --rp-bevel: #6f571a;
+  --rp-ink: #2a2216;
+  --rp-ink-soft: #5c4e33;
+  --rp-ink-faint: #8a7a55;
+  --rp-purple: #6a51b0;
+  --rp-purple-deep: #5238a0;
+  --rp-ichor: #b23a2a;
+  --rp-glow: rgba(154, 123, 31, 0.28);
+  --rp-biolum: rgba(106, 81, 176, 0.30);
 }
 
-/* ── Card shell ─────────────────────────────────────────────────────── */
+/* ── Card shell: frame (gold bevel) → inner (stock) ─────────────────────── */
 .rp-card {
   width: 100%;
   height: 100%;
-  position: relative;
-  font-family: var(--font-sans, "Space Grotesk", system-ui, sans-serif);
+  font-family: var(--rp-body);
   pointer-events: auto;
   user-select: text;
 }
@@ -64,1058 +63,540 @@
   position: relative;
   width: 100%;
   height: 100%;
+  padding: 8px;
+  border-radius: 13px;
+  background: linear-gradient(150deg, var(--rp-gold), var(--rp-bevel) 42%, #2a2110 82%, var(--rp-gold));
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5), 0 0 30px var(--rp-glow);
+}
+
+/* bioluminescent halo behind the frame */
+.rp-card-frame::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: 20px;
+  z-index: -1;
+  background: radial-gradient(60% 55% at 50% 26%, var(--rp-biolum), transparent 70%);
+  filter: blur(9px);
+  animation: rp-breathe 6.5s ease-in-out infinite;
+}
+
+@keyframes rp-breathe {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.rp-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  background:
-    radial-gradient(ellipse at 20% 10%, var(--rp-gold-glow) 0%, transparent 50%),
-    linear-gradient(170deg, var(--rp-surface) 0%, var(--rp-abyss) 100%);
-  border: 1.5px solid var(--rp-border);
-  border-radius: 8px;
+  min-height: 0;
+  border-radius: 7px;
   overflow: hidden;
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.4),
-    0 0 16px var(--rp-gold-glow),
-    inset 0 0 30px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(168deg, var(--rp-stock-top), var(--rp-stock-bot));
+  border: 1px solid rgba(0, 0, 0, 0.45);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.42), inset 0 0 0 1px var(--rp-edge);
 }
 
-.rp-card-frame::before {
-  content: '';
+/* faint eldritch coil watermark in the stock */
+.rp-inner::after {
+  content: "";
   position: absolute;
-  inset: 5px;
-  border: 1px solid var(--rp-border-inner);
-  border-radius: 4px;
+  inset: 0;
   pointer-events: none;
-  z-index: 1;
+  z-index: 0;
+  opacity: 0.5;
+  background:
+    radial-gradient(circle at 50% 46%, transparent 30%, color-mix(in srgb, var(--rp-purple) 9%, transparent) 31%, transparent 33%),
+    radial-gradient(circle at 50% 46%, transparent 46%, color-mix(in srgb, var(--rp-gold) 7%, transparent) 47%, transparent 49%),
+    conic-gradient(from 210deg at 50% 46%, transparent, color-mix(in srgb, var(--rp-purple) 7%, transparent), transparent 42%);
+  mix-blend-mode: screen;
 }
 
-/* ── Header ─────────────────────────────────────────────────────────── */
+.ritual-prediction-tooltip[data-theme='light'] .rp-inner::after {
+  mix-blend-mode: multiply;
+  opacity: 0.26;
+}
+
+.rp-inner > * { position: relative; z-index: 1; }
+
+/* ── Header: title bar + breadcrumb + type line (the drag handle) ──────── */
 .rp-header {
-  padding: 12px 14px 10px;
-  border-bottom: 1px solid var(--rp-border-inner);
-  position: relative;
-  z-index: 15;
-  cursor: grab;
-  user-select: none;
   flex-shrink: 0;
+  cursor: grab;
+  touch-action: none;
 }
+.ritual-prediction-tooltip.rp-is-dragging .rp-header { cursor: grabbing; }
 
-.rp-header:active {
-  cursor: grabbing;
-}
-
-.rp-header-top {
+.rp-title-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 6px;
+  gap: 12px;
+  padding: 12px 16px 10px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--rp-gold) 14%, transparent), transparent);
+  border-bottom: 1px solid var(--rp-edge);
 }
 
-.rp-title {
-  font-family: var(--font-display, "Crimson Pro", Georgia, serif);
-  font-size: 0.72rem;
+.rp-word {
+  font-family: var(--rp-serif);
   font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: 1.5rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--rp-ink);
+  text-shadow: 0 0 16px var(--rp-biolum);
+  word-break: break-word;
+}
+
+.rp-title-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.rp-pron {
+  font-family: var(--rp-mono);
+  font-size: 0.78rem;
   color: var(--rp-gold);
-  margin: 0;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  padding: 3px 9px;
+  border: 1px solid var(--rp-edge);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--rp-gold) 8%, transparent);
 }
 
 .rp-close-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
-  border: none;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  color: var(--rp-ink-faint);
   background: transparent;
-  color: var(--rp-text-muted);
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background var(--transition-fast, 150ms ease), color var(--transition-fast, 150ms ease);
-}
-
-.rp-close-btn:hover {
-  background: rgba(200, 168, 75, 0.12);
-  color: var(--rp-gold-bright);
-}
-
-.rp-word-row {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  margin-bottom: 2px;
-}
-
-.rp-word {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--rp-text-light);
-  letter-spacing: 0.02em;
-  word-break: break-all;
-}
-
-.rp-ritual-name {
-  font-family: var(--font-display, "Crimson Pro", Georgia, serif);
-  font-size: 0.78rem;
-  color: var(--rp-text-muted);
-  font-style: italic;
-  word-break: break-word;
-}
-
-/* ── Confidence badge ───────────────────────────────────────────────── */
-.rp-confidence-badge {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.62rem;
-  font-weight: 600;
-  padding: 1px 6px;
-  border-radius: 3px;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.rp-confidence--high {
-  background: rgba(74, 158, 122, 0.15);
-  color: var(--rp-conf-high);
-  border: 1px solid rgba(74, 158, 122, 0.3);
-}
-
-.rp-confidence--mid {
-  background: rgba(200, 168, 75, 0.12);
-  color: var(--rp-conf-mid);
-  border: 1px solid rgba(200, 168, 75, 0.28);
-}
-
-.rp-confidence--low {
-  background: rgba(200, 104, 72, 0.12);
-  color: var(--rp-conf-low);
-  border: 1px solid rgba(200, 104, 72, 0.28);
-}
-
-/* ── Body ───────────────────────────────────────────────────────────── */
-.rp-body {
-  padding: 10px 14px 8px;
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  position: relative;
-  z-index: 2;
-  scrollbar-width: thin;
-  scrollbar-color: var(--rp-gold-dim) transparent;
-}
-
-.rp-pointer-none {
-  pointer-events: none;
-}
-
-.rp-body::-webkit-scrollbar {
-  width: 4px;
-}
-
-.rp-body::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.rp-body::-webkit-scrollbar-thumb {
-  background: var(--rp-gold-dim);
-  border-radius: 2px;
-}
-
-/* ── Sections ───────────────────────────────────────────────────────── */
-.rp-section {
-  margin-bottom: 10px;
-}
-
-.rp-section:last-child {
-  margin-bottom: 0;
-}
-
-.rp-section-label {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--rp-gold);
-  margin-bottom: 4px;
-}
-
-/* ── Family & Aura ──────────────────────────────────────────────────── */
-.rp-family-value {
-  font-family: var(--font-display, "Crimson Pro", Georgia, serif);
-  font-size: 0.82rem;
-  color: var(--rp-text-light);
-  margin-bottom: 6px;
-}
-
-.rp-aura-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.rp-aura-tag {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.58rem;
-  padding: 1px 5px;
-  border-radius: 3px;
-  background: rgba(100, 90, 160, 0.12);
-  color: var(--rp-text-muted);
-  border: 1px solid rgba(100, 90, 160, 0.18);
-  white-space: nowrap;
-}
-
-/* ── Role ───────────────────────────────────────────────────────────── */
-.rp-role-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.rp-role-badge {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.6rem;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 3px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.rp-role--anchor {
-  background: rgba(74, 158, 122, 0.14);
-  color: var(--rp-role-anchor);
-  border: 1px solid rgba(74, 158, 122, 0.3);
-}
-
-.rp-role--trigger {
-  background: rgba(200, 104, 72, 0.14);
-  color: var(--rp-role-trigger);
-  border: 1px solid rgba(200, 104, 72, 0.3);
-}
-
-.rp-role--modifier {
-  background: rgba(104, 120, 200, 0.14);
-  color: var(--rp-role-modifier);
-  border: 1px solid rgba(104, 120, 200, 0.3);
-}
-
-.rp-role--connector {
-  background: rgba(168, 132, 64, 0.14);
-  color: var(--rp-role-connector);
-  border: 1px solid rgba(168, 132, 64, 0.3);
-}
-
-.rp-role--unknown {
-  background: rgba(122, 112, 136, 0.14);
-  color: var(--rp-role-unknown);
-  border: 1px solid rgba(122, 112, 136, 0.3);
-}
-
-.rp-role-desc {
-  font-size: 0.72rem;
-  color: var(--rp-text-muted);
-  line-height: 1.4;
-}
-
-/* ── Why text ───────────────────────────────────────────────────────── */
-.rp-why-text {
-  font-size: 0.74rem;
-  color: var(--rp-text-light);
-  line-height: 1.5;
-  margin: 0;
-}
-
-/* ── Role signal ────────────────────────────────────────────────────── */
-.rp-role-signal {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.58rem;
-  color: var(--rp-text-dim);
-  align-self: center;
-}
-
-/* Provisional marker: the lexicon lookup has not confirmed this prediction yet,
-   so the role/resonance are the local heuristic's best guess. */
-.rp-role-provisional {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.55rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--rp-text-dim);
-  opacity: 0.7;
-  align-self: center;
-  font-style: italic;
-}
-
-/* ── Confidence breakdown popover ───────────────────────────────────── */
-.rp-confidence-wrap {
-  position: relative;
-  display: inline-flex;
-}
-
-button.rp-confidence-badge {
-  cursor: pointer;
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-}
-
-button.rp-confidence-badge[data-static] {
-  cursor: default;
-}
-
-.rp-confidence-breakdown {
-  position: absolute;
-  top: calc(100% + 4px);
-  right: 0;
-  z-index: 30;
-  min-width: 168px;
-  padding: 6px 8px;
-  background: var(--rp-surface);
-  border: 1px solid var(--rp-border);
+  border: 1px solid transparent;
   border-radius: 5px;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  transition: color 0.14s, background 0.14s, border-color 0.14s;
 }
+.rp-close-btn:hover {
+  color: var(--rp-ichor);
+  background: color-mix(in srgb, var(--rp-ichor) 10%, transparent);
+  border-color: color-mix(in srgb, var(--rp-ichor) 30%, transparent);
+}
+.rp-close-btn:focus-visible { outline: 2px solid var(--rp-gold); outline-offset: 1px; }
 
-.rp-conf-factor {
+/* ── Type line: part of speech + syllable/stress rhythm ────────────────── */
+.rp-type-line {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 2px 0;
+  padding: 6px 16px;
+  border-bottom: 1px solid var(--rp-edge);
+  background: color-mix(in srgb, var(--rp-gold) 5%, transparent);
 }
 
-.rp-conf-label {
-  font-size: 0.6rem;
-  color: var(--rp-text-muted);
+.rp-pos {
+  font-family: var(--rp-serif);
+  font-style: italic;
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+  color: var(--rp-ink-soft);
 }
 
-.rp-conf-delta {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.6rem;
-  font-weight: 700;
-}
-
-.rp-conf-pos { color: var(--rp-conf-high); }
-.rp-conf-neg { color: var(--rp-conf-low); }
-
-/* ── Why factors ────────────────────────────────────────────────────── */
-.rp-why-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.rp-why-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 2px 0;
-  border-bottom: 1px solid rgba(100, 90, 160, 0.08);
-}
-
-.rp-why-row:last-child { border-bottom: none; }
-
-.rp-why-detail {
-  font-size: 0.7rem;
-  color: var(--rp-text-light);
-  line-height: 1.4;
-}
-
-.rp-why-weight {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.56rem;
-  color: var(--rp-text-dim);
-  flex-shrink: 0;
-}
-
-/* ── Resonance (deepRhyme) ──────────────────────────────────────────── */
-.rp-resonance-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.rp-resonance-row {
+.rp-type-right {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 2px 0;
-}
-
-/* Local phoneme estimate not confirmed by the lexicon — de-emphasised so the
-   eye trusts backend-confirmed resonance first. */
-.rp-resonance--unconfirmed {
-  opacity: 0.55;
-}
-
-.rp-resonance--unconfirmed .rp-resonance-tier {
-  border-style: dashed;
-}
-
-.rp-resonance-tier {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.54rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 1px 5px;
-  border-radius: 3px;
-  background: rgba(104, 120, 200, 0.14);
-  color: var(--rp-role-modifier);
-  border: 1px solid rgba(104, 120, 200, 0.28);
-  flex-shrink: 0;
-  min-width: 56px;
-  text-align: center;
-}
-
-.rp-tier--perfect, .rp-tier--identity {
-  background: rgba(74, 158, 122, 0.16);
-  color: var(--rp-role-anchor);
-  border-color: rgba(74, 158, 122, 0.32);
-}
-
-.rp-tier--near {
-  background: rgba(200, 168, 75, 0.14);
-  color: var(--rp-conf-mid);
-  border-color: rgba(200, 168, 75, 0.3);
-}
-
-.rp-tier--slant, .rp-tier--assonance, .rp-tier--consonance {
-  background: rgba(200, 104, 72, 0.12);
-  color: var(--rp-role-trigger);
-  border-color: rgba(200, 104, 72, 0.28);
-}
-
-.rp-resonance-word {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.7rem;
-  color: var(--rp-text-light);
-  flex: 1;
-  word-break: break-all;
-}
-
-.rp-resonance-score {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.6rem;
-  color: var(--rp-text-muted);
+  gap: 10px;
   flex-shrink: 0;
 }
 
-/* ── Phonology grid ─────────────────────────────────────────────────── */
-.rp-phon-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 10px;
-  margin-bottom: 4px;
-}
-
-.rp-phon-cell {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.62rem;
-  color: var(--rp-text-light);
-}
-
-.rp-phon-cell b {
-  color: var(--rp-text-dim);
-  font-weight: 600;
-  margin-right: 3px;
+.rp-estimated {
+  font-family: var(--rp-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  font-size: 0.54rem;
-}
-
-/* ── Lexicon ────────────────────────────────────────────────────────── */
-.rp-section-label svg {
-  vertical-align: -1px;
-  margin-right: 3px;
-}
-
-.rp-lexicon-status {
-  font-size: 0.66rem;
-  color: var(--rp-text-dim);
-  font-style: italic;
-}
-
-/* A guessed pronunciation must not LOOK like a looked-up one. */
-.rp-phon-estimated {
-  margin-left: auto;
-  padding: 0.05rem 0.35rem;
-  border: 1px dashed var(--rp-border);
+  color: var(--rp-purple);
+  border: 1px solid color-mix(in srgb, var(--rp-purple) 44%, transparent);
   border-radius: 3px;
-  font-size: 0.58rem;
-  font-style: italic;
-  letter-spacing: 0.02em;
-  text-transform: none;
-  color: var(--rp-text-dim);
+  padding: 1px 6px;
   cursor: help;
 }
 
-/* The whole panel is an estimate, so the whole panel reads as one. */
-.rp-section--estimated .rp-phon-grid,
-.rp-section--estimated .rp-aura-tags {
-  opacity: 0.72;
-}
-
-.rp-section--estimated .rp-phon-cell {
-  border-style: dashed;
-}
-
-/* Oracle failure notice — the card must say why a rune row is empty. */
-.rp-oracle-notice {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin: 0.3rem 0;
-  padding: 0.35rem 0.5rem;
-  border: 1px solid var(--rp-border-inner);
-  border-left: 2px solid var(--rp-role-unknown);
-  border-radius: 4px;
-  background: rgba(122, 112, 136, 0.08);
-  font-size: 0.66rem;
-  line-height: 1.35;
-}
-
-.rp-oracle-notice--warn {
-  border-left-color: var(--rp-role-trigger);
-  background: rgba(200, 104, 72, 0.08);
-}
-
-.rp-oracle-notice-icon {
-  flex: 0 0 auto;
-  color: var(--rp-text-muted);
-}
-
-.rp-oracle-notice--warn .rp-oracle-notice-icon {
-  color: var(--rp-role-trigger);
-}
-
-.rp-oracle-notice-text {
-  flex: 1 1 auto;
-  color: var(--rp-text-muted);
-}
-
-.rp-oracle-retry {
-  flex: 0 0 auto;
-  padding: 0.15rem 0.4rem;
-  border: 1px solid var(--rp-border);
-  border-radius: 3px;
-  background: transparent;
-  color: var(--rp-gold);
-  font: inherit;
-  font-size: 0.62rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: background 0.14s ease, color 0.14s ease;
-}
-
-.rp-oracle-retry:hover {
-  background: var(--rp-gold-glow);
-  color: var(--rp-gold-bright);
-}
-
-.rp-oracle-retry:focus-visible {
-  outline: 2px solid var(--rp-gold-bright);
-  outline-offset: 1px;
-}
-
-.rp-lex-pos-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 3px;
-}
-
-.rp-lex-pos {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
+.rp-rhythm { display: flex; align-items: center; gap: 6px; }
+.rp-rhythm-lab {
+  font-family: var(--rp-mono);
   font-size: 0.6rem;
-  font-weight: 700;
-  color: var(--rp-gold-bright);
-  text-transform: lowercase;
-}
-
-.rp-lex-def {
-  font-size: 0.72rem;
-  color: var(--rp-text-light);
-  line-height: 1.45;
-  margin: 0 0 5px;
-}
-
-.rp-lex-chips {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px;
-  margin-top: 3px;
-}
-
-.rp-lex-chip-label {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.54rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--rp-text-dim);
-  margin-right: 2px;
+  color: var(--rp-ink-faint);
+}
+.rp-pip {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--rp-ink-faint) 60%, transparent);
+}
+.rp-pip--stress {
+  width: 11px;
+  height: 11px;
+  background: transparent;
+  border: 2px solid var(--rp-gold);
+  box-shadow: 0 0 8px var(--rp-glow);
 }
 
-/* ── Signals list ───────────────────────────────────────────────────── */
-.rp-signals-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.rp-signals-list li {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.64rem;
-  color: var(--rp-text-muted);
-  padding: 2px 0;
-  border-bottom: 1px solid rgba(100, 90, 160, 0.08);
-}
-
-.rp-signals-list li:last-child {
-  border-bottom: none;
-}
-
-/* ── Actions ────────────────────────────────────────────────────────── */
-.rp-actions {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.rp-action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--font-sans, "Space Grotesk", system-ui, sans-serif);
-  font-size: 0.64rem;
-  font-weight: 500;
-  padding: 4px 8px;
-  border: 1px solid var(--rp-border);
-  border-radius: 4px;
-  background: rgba(200, 168, 75, 0.06);
-  color: var(--rp-text-muted);
-  cursor: pointer;
-  transition: background var(--transition-fast, 150ms ease), color var(--transition-fast, 150ms ease), border-color var(--transition-fast, 150ms ease);
-}
-
-.rp-action-btn:hover {
-  background: rgba(200, 168, 75, 0.14);
-  color: var(--rp-gold-bright);
-  border-color: var(--rp-gold-dim);
-}
-
-/* ── Diagnostics ────────────────────────────────────────────────────── */
-.rp-diagnostics {
-  margin-top: 8px;
-  border-top: 1px solid var(--rp-border-inner);
-  padding-top: 6px;
-}
-
-.rp-diagnostics-toggle {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.58rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--rp-text-dim);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 2px 0;
-  transition: color var(--transition-fast, 150ms ease);
-}
-
-.rp-diagnostics-toggle:hover {
-  color: var(--rp-text-muted);
-}
-
-.rp-diagnostics-body {
-  overflow: hidden;
-}
-
-.rp-diag-warnings {
-  margin-bottom: 4px;
-}
-
-.rp-diag-warn {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.58rem;
-  color: #c89040;
-  padding: 1px 0;
-}
-
-.rp-diag-trace {
-  margin-top: 2px;
-}
-
-.rp-diag-line {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.56rem;
-  color: var(--rp-text-dim);
-  padding: 1px 0;
-  opacity: 0.8;
-}
-
-/* ── Dragging state ─────────────────────────────────────────────────── */
-.ritual-prediction-tooltip.rp-is-dragging {
-  filter: drop-shadow(0 24px 55px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 18px var(--rp-gold-glow));
-  cursor: grabbing;
-  user-select: none;
-}
-
-.ritual-prediction-tooltip.rp-is-dragging * {
-  transition: none;
-}
-
-/* ── React-resizable handles (scoped) ───────────────────────────────── */
-.ritual-prediction-tooltip .react-resizable {
-  position: relative;
-}
-
-.ritual-prediction-tooltip .react-resizable-handle {
-  position: absolute;
-  z-index: 10;
-}
-
-.ritual-prediction-tooltip .react-resizable-handle-se {
-  bottom: 0;
-  right: 0;
-  width: 14px;
-  height: 14px;
-  cursor: se-resize;
-  background: linear-gradient(135deg, transparent 40%, var(--rp-gold-dim) 40%, var(--rp-gold-dim) 60%, transparent 60%);
-  border-radius: 0 0 6px 0;
-}
-
-.ritual-prediction-tooltip .react-resizable-handle-sw {
-  bottom: 0;
-  left: 0;
-  width: 12px;
-  height: 12px;
-  cursor: sw-resize;
-}
-
-.ritual-prediction-tooltip .react-resizable-handle-nw {
-  top: 0;
-  left: 0;
-  width: 12px;
-  height: 12px;
-  cursor: nw-resize;
-}
-
-.ritual-prediction-tooltip .react-resizable-handle-ne {
-  top: 0;
-  right: 0;
-  width: 12px;
-  height: 12px;
-  cursor: ne-resize;
-}
-
-.ritual-prediction-tooltip .react-resizable-handle-e {
-  right: 0;
-  top: 0;
-  width: 6px;
-  height: 100%;
-  cursor: e-resize;
-}
-
-.ritual-prediction-tooltip .react-resizable-handle-s {
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 6px;
-  cursor: s-resize;
-}
-
-/* ── Footer ─────────────────────────────────────────────────────────── */
-.rp-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 14px;
-  border-top: 1px solid var(--rp-border-inner);
-  position: relative;
-  z-index: 2;
-  flex-shrink: 0;
-}
-
-.rp-source-path {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.56rem;
-  color: var(--rp-text-dim);
-  max-width: 240px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.rp-source-loc {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.56rem;
-  color: var(--rp-text-dim);
-  white-space: nowrap;
-}
-
-/* ── Pronunciation ──────────────────────────────────────────────────── */
-.rp-pron {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.66rem;
-  color: var(--rp-text-muted);
-  font-style: italic;
-}
-
-/* ── Breadcrumb (word navigation history) ───────────────────────────── */
+/* ── Breadcrumb (word navigation history) ──────────────────────────────── */
 .rp-breadcrumb {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
-  align-items: center;
   gap: 2px;
-  margin-bottom: 6px;
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.58rem;
+  padding: 6px 16px 0;
+  font-family: var(--rp-mono);
+  font-size: 0.64rem;
 }
-
-.rp-crumb-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.rp-crumb-sep {
-  color: var(--rp-text-dim);
-  opacity: 0.7;
-}
-
-.rp-crumb-trunc {
-  color: var(--rp-text-dim);
-  margin-right: 2px;
-}
-
+.rp-crumb-item { display: inline-flex; align-items: center; }
+.rp-crumb-sep { color: var(--rp-ink-faint); margin: 0 1px; }
+.rp-crumb-trunc { color: var(--rp-ink-faint); margin-right: 2px; }
 .rp-crumb-btn {
   background: none;
   border: none;
-  padding: 0 1px;
-  color: var(--rp-text-muted);
-  cursor: pointer;
+  padding: 1px 3px;
+  color: var(--rp-ink-faint);
   font: inherit;
-  text-decoration: underline dotted transparent;
-  transition: color 150ms ease, text-decoration-color 150ms ease;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: color 0.12s, background 0.12s;
+}
+.rp-crumb-btn:hover { color: var(--rp-purple); background: color-mix(in srgb, var(--rp-purple) 10%, transparent); }
+.rp-crumb-current { color: var(--rp-gold); padding: 1px 3px; }
+
+/* ── Body (scrolls) ────────────────────────────────────────────────────── */
+.rp-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px 4px 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rp-gold-dim) transparent;
+}
+.rp-body::-webkit-scrollbar { width: 8px; }
+.rp-body::-webkit-scrollbar-thumb { background: var(--rp-gold-dim); border-radius: 4px; }
+.rp-pointer-none { pointer-events: none; }
+
+.rp-lexicon-status {
+  font-family: var(--rp-mono);
+  font-size: 0.72rem;
+  color: var(--rp-ink-faint);
+  font-style: italic;
+  padding: 8px 12px;
 }
 
-.rp-crumb-btn:hover {
-  color: var(--rp-gold-bright);
-  text-decoration-color: var(--rp-gold-dim);
-}
-
-.rp-crumb-current {
-  color: var(--rp-gold);
-  font-weight: 700;
-}
-
-/* ── Suggestion runes (clickable, navigate the card) ────────────────── */
-.rp-rune-row {
+/* ── Oracle notice (lookup failure — never reads as "no rhymes") ────────── */
+.rp-oracle-notice {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 6px;
-  margin-top: 4px;
+  margin: 6px 12px;
+  padding: 6px 9px;
+  border-radius: 5px;
+  font-size: 0.74rem;
+  line-height: 1.35;
+  border: 1px solid;
 }
-
-.rp-rune-label {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.54rem;
+.rp-oracle-notice--warn {
+  color: var(--rp-ichor);
+  background: color-mix(in srgb, var(--rp-ichor) 10%, transparent);
+  border-color: color-mix(in srgb, var(--rp-ichor) 32%, transparent);
+}
+.rp-oracle-notice--info {
+  color: var(--rp-purple);
+  background: color-mix(in srgb, var(--rp-purple) 10%, transparent);
+  border-color: color-mix(in srgb, var(--rp-purple) 30%, transparent);
+}
+.rp-oracle-notice-icon { flex-shrink: 0; }
+.rp-oracle-notice-text { flex: 1; }
+.rp-oracle-retry {
+  flex-shrink: 0;
+  font-family: var(--rp-mono);
+  font-size: 0.66rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--rp-text-dim);
-  flex-shrink: 0;
-  padding-top: 1px;
-}
-
-.rp-rune-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.rp-rune {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.62rem;
-  padding: 1px 6px;
+  color: inherit;
+  background: transparent;
+  border: 1px solid currentColor;
   border-radius: 3px;
-  background: rgba(100, 90, 160, 0.12);
-  color: var(--rp-text-light);
-  border: 1px solid rgba(100, 90, 160, 0.2);
+  padding: 2px 7px;
   cursor: pointer;
-  transition: transform 120ms ease, background 150ms ease, border-color 150ms ease, color 150ms ease;
+  opacity: 0.85;
+}
+.rp-oracle-retry:hover { opacity: 1; }
+
+/* ── Text box: the swap palette (chip rows) ────────────────────────────── */
+.rp-textbox { padding: 8px 12px 4px; }
+
+.rp-rune-row {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 8px;
+  align-items: start;
+  padding: 6px 0;
+}
+.rp-rune-row + .rp-rune-row {
+  border-top: 1px dashed color-mix(in srgb, var(--rp-ink-faint) 26%, transparent);
 }
 
-.rp-rune:hover {
-  background: rgba(200, 168, 75, 0.16);
-  border-color: var(--rp-gold-dim);
-  color: var(--rp-gold-bright);
-  transform: translateY(-1px);
-}
+/* per-tier accent */
+.rp-rune-row--perfect { --rp-accent: var(--rp-gold); }
+.rp-rune-row--slant { --rp-accent: var(--rp-purple-deep); }
+.rp-rune-row--syn { --rp-accent: var(--rp-purple); }
+.rp-rune-row--ant { --rp-accent: var(--rp-ichor); }
 
-.rp-rune:active {
-  transform: translateY(0) scale(0.96);
+.rp-rune-label {
+  font-family: var(--rp-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rp-ink-faint);
+  text-align: right;
+  padding-top: 6px;
 }
+.rp-rune-pills { display: flex; flex-wrap: wrap; gap: 6px; }
 
-/* Transmute pill (primary one-click = replace in text) paired with an explore
-   icon. They read as one capsule. */
-.rp-rune-group {
-  display: inline-flex;
-  align-items: stretch;
-  border-radius: 3px;
+/* a chip. Two flavours: plain (navigate) and transmute (swap) + ⌕ explore */
+.rp-rune,
+.rp-rune--transmute {
+  font-family: var(--rp-body);
+  font-size: 0.9rem;
+  color: var(--rp-ink);
+  padding: 4px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  background: color-mix(in srgb, var(--rp-accent) 9%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rp-accent) 32%, transparent);
+  transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.14s, background 0.14s;
 }
-
-.rp-rune-group .rp-rune--transmute {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  border-right: none;
-}
-
+.rp-rune:hover,
 .rp-rune--transmute:hover {
-  background: rgba(200, 168, 75, 0.22);
+  transform: translateY(-2px);
+  background: color-mix(in srgb, var(--rp-accent) 20%, transparent);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--rp-accent) 28%, transparent),
+              0 0 0 1px color-mix(in srgb, var(--rp-accent) 55%, transparent);
 }
+.rp-rune:focus-visible,
+.rp-rune--transmute:focus-visible { outline: 2px solid var(--rp-accent); outline-offset: 1px; }
 
+/* transmute + explore share a group; transmute is the wide primary, ⌕ the tail */
+.rp-rune-group { display: inline-flex; align-items: stretch; }
+.rp-rune-group .rp-rune--transmute { border-top-right-radius: 0; border-bottom-right-radius: 0; }
 .rp-rune-explore {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 4px;
-  border: 1px solid rgba(100, 90, 160, 0.2);
-  border-top-right-radius: 3px;
-  border-bottom-right-radius: 3px;
-  background: rgba(100, 90, 160, 0.18);
-  color: var(--rp-text-dim);
+  width: 22px;
+  color: var(--rp-ink-faint);
+  background: color-mix(in srgb, var(--rp-accent) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rp-accent) 32%, transparent);
+  border-left: none;
+  border-radius: 0 5px 5px 0;
   cursor: pointer;
-  transition: background 150ms ease, color 150ms ease;
+  transition: color 0.14s, background 0.14s;
+}
+.rp-rune-explore:hover { color: var(--rp-accent); background: color-mix(in srgb, var(--rp-accent) 16%, transparent); }
+.rp-rune-explore:focus-visible { outline: 2px solid var(--rp-accent); outline-offset: 1px; }
+
+/* ── Flavor text: the meaning (up to 5 definitions) ────────────────────── */
+.rp-flavor {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 10px 2px 6px;
+  padding-top: 11px;
+  border-top: 1px solid var(--rp-edge);
+}
+.rp-def {
+  margin: 0;
+  font-family: var(--rp-body);
+  font-style: italic;
+  font-size: 0.9rem;
+  line-height: 1.46;
+  color: var(--rp-ink-soft);
+  text-wrap: pretty;
+}
+.rp-def-marker {
+  font-style: normal;
+  font-family: var(--rp-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--rp-gold);
+  border: 1px solid var(--rp-edge);
+  border-radius: 3px;
+  padding: 1px 5px;
+  margin-right: 7px;
+  white-space: nowrap;
 }
 
-.rp-rune-explore:hover {
-  background: rgba(104, 120, 200, 0.24);
-  color: var(--rp-role-modifier);
+/* ── Line resonance ribbon ─────────────────────────────────────────────── */
+.rp-resonance {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 6px 0 0;
+  padding: 9px 16px;
+  border-top: 1px solid var(--rp-edge);
+  background: color-mix(in srgb, var(--rp-purple) 8%, transparent);
 }
+.rp-resonance-lab {
+  font-family: var(--rp-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rp-ink-faint);
+}
+.rp-bond { display: inline-flex; align-items: baseline; gap: 5px; font-size: 0.85rem; color: var(--rp-ink); }
+.rp-bond--unconfirmed { opacity: 0.66; }
+.rp-bond--unconfirmed .rp-bond-word { font-style: italic; }
+.rp-bond-tier {
+  font-family: var(--rp-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.05em;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.rp-tier--identity,
+.rp-tier--perfect { color: var(--rp-gold); background: color-mix(in srgb, var(--rp-gold) 14%, transparent); }
+.rp-tier--near { color: var(--rp-purple); background: color-mix(in srgb, var(--rp-purple) 16%, transparent); }
+.rp-tier--slant { color: var(--rp-purple-deep); background: color-mix(in srgb, var(--rp-purple-deep) 18%, transparent); }
+.rp-tier--assonance,
+.rp-tier--consonance { color: var(--rp-ink-faint); background: color-mix(in srgb, var(--rp-ink-faint) 16%, transparent); }
 
-/* ── Session navigation ─────────────────────────────────────────────── */
+/* ── Actions (transmute / copy) ────────────────────────────────────────── */
+.rp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 12px 4px;
+}
+.rp-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--rp-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  color: var(--rp-ink-soft);
+  background: transparent;
+  border: 1px solid var(--rp-edge);
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: color 0.14s, background 0.14s, border-color 0.14s;
+}
+.rp-action-btn:hover { color: var(--rp-gold); border-color: color-mix(in srgb, var(--rp-gold) 45%, transparent); }
+.rp-action-btn:focus-visible { outline: 2px solid var(--rp-gold); outline-offset: 1px; }
+.rp-action-btn--accent {
+  color: #07090e;
+  background: var(--rp-gold);
+  border-color: var(--rp-gold);
+  font-weight: 700;
+}
+.ritual-prediction-tooltip[data-theme='light'] .rp-action-btn--accent { color: #f3ecda; }
+.rp-action-btn--accent:hover { color: #07090e; box-shadow: 0 0 12px var(--rp-glow); }
+
+/* ── Session navigation (prev/next word in the writing session) ────────── */
 .rp-session-nav {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 6px 14px;
-  border-top: 1px solid var(--rp-border-inner);
-  position: relative;
-  z-index: 2;
-  flex-shrink: 0;
+  padding: 6px;
+  border-top: 1px solid var(--rp-edge);
+  background: color-mix(in srgb, var(--rp-gold) 4%, transparent);
 }
-
 .rp-nav-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 26px;
   height: 22px;
-  border: 1px solid var(--rp-border);
+  color: var(--rp-ink-soft);
+  background: transparent;
+  border: 1px solid var(--rp-edge);
   border-radius: 4px;
-  background: rgba(200, 168, 75, 0.06);
-  color: var(--rp-text-muted);
   cursor: pointer;
-  transition: background 150ms ease, color 150ms ease, opacity 150ms ease;
+  transition: color 0.14s, background 0.14s;
 }
-
-.rp-nav-btn:hover:not(:disabled) {
-  background: rgba(200, 168, 75, 0.14);
-  color: var(--rp-gold-bright);
-}
-
-.rp-nav-btn:disabled {
-  opacity: 0.35;
-  cursor: default;
-}
-
+.rp-nav-btn:hover:not(:disabled) { color: var(--rp-gold); background: color-mix(in srgb, var(--rp-gold) 10%, transparent); }
+.rp-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 .rp-nav-pos {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 0.62rem;
-  color: var(--rp-text-muted);
-  min-width: 48px;
+  font-family: var(--rp-mono);
+  font-size: 0.66rem;
+  color: var(--rp-ink-faint);
+  min-width: 44px;
   text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
-/* ── Transmute accent action ────────────────────────────────────────── */
-.rp-action-btn--accent {
-  background: rgba(200, 168, 75, 0.14);
-  color: var(--rp-gold-bright);
-  border-color: var(--rp-gold-dim);
+/* ── Collector footer ──────────────────────────────────────────────────── */
+.rp-footer {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 16px 9px;
+  border-top: 1px solid rgba(0, 0, 0, 0.4);
+  background: linear-gradient(0deg, color-mix(in srgb, var(--rp-gold) 8%, transparent), transparent);
+  font-family: var(--rp-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.03em;
+  color: var(--rp-ink-faint);
 }
+.rp-source-path { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-source-loc { flex-shrink: 0; font-variant-numeric: tabular-nums; }
 
-.rp-action-btn--accent:hover {
-  background: rgba(200, 168, 75, 0.22);
+/* ── Dragging ──────────────────────────────────────────────────────────── */
+.ritual-prediction-tooltip.rp-is-dragging { filter: drop-shadow(0 24px 54px rgba(0, 0, 0, 0.8)); }
+.ritual-prediction-tooltip.rp-is-dragging * { user-select: none; }
+
+/* ── Resize handles ────────────────────────────────────────────────────── */
+.ritual-prediction-tooltip .react-resizable-handle { position: absolute; z-index: 10; }
+.ritual-prediction-tooltip .react-resizable-handle-se {
+  bottom: 0; right: 0; width: 14px; height: 14px; cursor: se-resize;
+  background: linear-gradient(135deg, transparent 40%, var(--rp-gold-dim) 40%, var(--rp-gold-dim) 60%, transparent 60%);
+  border-radius: 0 0 6px 0;
 }
+.ritual-prediction-tooltip .react-resizable-handle-sw { bottom: 0; left: 0; width: 12px; height: 12px; cursor: sw-resize; }
+.ritual-prediction-tooltip .react-resizable-handle-nw { top: 0; left: 0; width: 12px; height: 12px; cursor: nw-resize; }
+.ritual-prediction-tooltip .react-resizable-handle-ne { top: 0; right: 0; width: 12px; height: 12px; cursor: ne-resize; }
+.ritual-prediction-tooltip .react-resizable-handle-e { right: 0; top: 0; width: 6px; height: 100%; cursor: e-resize; }
+.ritual-prediction-tooltip .react-resizable-handle-s { bottom: 0; left: 0; width: 100%; height: 6px; cursor: s-resize; }
 
-/* ── Embedded (mobile sheet) ────────────────────────────────────────── */
-.ritual-prediction-tooltip.rp-embedded {
-  position: relative;
-  width: 100%;
-  filter: none;
-}
-
-.ritual-prediction-tooltip.rp-embedded .rp-card,
+/* ── Embedded (mobile sheet): no frame chrome / drop shadow ────────────── */
+.ritual-prediction-tooltip.rp-embedded { filter: none; }
 .ritual-prediction-tooltip.rp-embedded .rp-card-frame {
-  height: auto;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
 }
+.ritual-prediction-tooltip.rp-embedded .rp-card-frame::before { display: none; }
+.ritual-prediction-tooltip.rp-embedded .rp-inner { border-radius: 0; border: none; box-shadow: none; }
+.ritual-prediction-tooltip.rp-embedded .rp-header { cursor: default; }
 
-.ritual-prediction-tooltip.rp-embedded .rp-header {
-  cursor: default;
-}
-
-/* ── Bespoke ink-in animation (replaces heavy framer keyframe stacks) ── */
-.rp-ink {
-  animation: rp-ink-in 0.34s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-@keyframes rp-ink-in {
-  from {
-    opacity: 0;
-    filter: blur(2px) brightness(0.6);
-    transform: translateY(6px);
-  }
-  60% {
-    filter: blur(0.3px) brightness(1.15);
-  }
-  to {
-    opacity: 1;
-    filter: blur(0) brightness(1);
-    transform: translateY(0);
-  }
-}
-
-/* ── Reduced motion ─────────────────────────────────────────────────── */
+/* ── Reduced motion ────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .ritual-prediction-tooltip {
-    filter: none;
-  }
-  .rp-ink {
-    animation: none;
-  }
-  .rp-rune:hover {
-    transform: none;
-  }
+  .rp-card-frame::before { animation: none; }
+  .rp-rune,
+  .rp-rune--transmute { transition: none; }
 }
-
-/* ── React Resizable Handles ────────────────────────────────────────── */
-.react-resizable-handle { position: absolute; width: 15px; height: 15px; background: transparent; z-index: 50; }
-.react-resizable-handle-se { bottom: 0; right: 0; cursor: se-resize; }
-.react-resizable-handle-sw { bottom: 0; left: 0; cursor: sw-resize; }
-.react-resizable-handle-ne { top: 0; right: 0; cursor: ne-resize; }
-.react-resizable-handle-nw { top: 0; left: 0; cursor: nw-resize; }
-.react-resizable-handle-e { top: 15px; bottom: 15px; right: 0; width: 10px; height: auto; cursor: e-resize; }
-.react-resizable-handle-s { left: 15px; right: 15px; bottom: 0; height: 10px; width: auto; cursor: s-resize; }

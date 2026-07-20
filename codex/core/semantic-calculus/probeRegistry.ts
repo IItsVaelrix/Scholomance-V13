@@ -25,7 +25,7 @@ export interface ProbeFormula {
   citeSeeds: readonly string[];
 }
 
-const CSP_PROBE: ProbeFormula = Object.freeze({
+const CSP_PROBE = Object.freeze<ProbeFormula>({
   id: 'runtime.csp.img_src',
   version: '1.0.0',
   patterns: [
@@ -92,7 +92,7 @@ const CSP_PROBE: ProbeFormula = Object.freeze({
   citeSeeds: ['codex/server/index.js'],
 });
 
-const CDN_PROBE: ProbeFormula = Object.freeze({
+const CDN_PROBE = Object.freeze<ProbeFormula>({
   id: 'cdn.asset.http',
   version: '1.0.0',
   patterns: [
@@ -136,7 +136,7 @@ const CDN_PROBE: ProbeFormula = Object.freeze({
   citeSeeds: ['src/pages/Visualiser/tracks'],
 });
 
-const RENDER_STACK_PROBE: ProbeFormula = Object.freeze({
+const RENDER_STACK_PROBE = Object.freeze<ProbeFormula>({
   id: 'render.stack.listen',
   version: '1.0.0',
   patterns: [
@@ -205,7 +205,7 @@ const RENDER_STACK_PROBE: ProbeFormula = Object.freeze({
   citeSeeds: ['src/pages/Listen'],
 });
 
-const STATION_VIS_PROBE: ProbeFormula = Object.freeze({
+const STATION_VIS_PROBE = Object.freeze<ProbeFormula>({
   id: 'motion.visibility.station',
   version: '1.0.0',
   patterns: [
@@ -264,7 +264,7 @@ const STATION_VIS_PROBE: ProbeFormula = Object.freeze({
  * plan/report split: hypotheses chosen after looking at the evidence are not
  * hypotheses, they are descriptions.
  */
-const TRUESIGHT_OOM_PROBE: ProbeFormula = Object.freeze({
+const TRUESIGHT_OOM_PROBE = Object.freeze<ProbeFormula>({
   id: 'truesight.payload.oom',
   version: '2.0.0',
   patterns: [
@@ -430,7 +430,7 @@ const TRUESIGHT_OOM_PROBE: ProbeFormula = Object.freeze({
  * a corner of it may be the design working. h_intended exists so that answer can
  * win.
  */
-const LISTEN_HIDDEN_ANIM_PROBE: ProbeFormula = Object.freeze({
+const LISTEN_HIDDEN_ANIM_PROBE = Object.freeze<ProbeFormula>({
   id: 'listen.hidden.animation',
   version: '2.0.0',
   patterns: [
@@ -575,7 +575,7 @@ const LISTEN_HIDDEN_ANIM_PROBE: ProbeFormula = Object.freeze({
  *   2. Frame fan-out — each tick mints its own rAF / motion instance / tween
  *      instead of one shared loop
  */
-const PAINT_OVERDRAW_PROBE: ProbeFormula = Object.freeze({
+const PAINT_OVERDRAW_PROBE = Object.freeze<ProbeFormula>({
   id: 'render.paint.overdraw',
   version: '1.0.0',
   patterns: [

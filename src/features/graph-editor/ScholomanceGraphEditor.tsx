@@ -381,13 +381,16 @@ export function ScholomanceGraphEditor({ initialPacket, onPacketChange, seed = '
       // cleanup editor
       editor.clear();
     };
-  }, []); // Only run once on mount
+    // The Rete editor owns a mount-scoped lifecycle; changing these inputs is
+    // handled by packet import rather than reconstructing editor listeners.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const addNode = async (kind: string) => {
     if (!editorRef.current) return;
     const def = getNodeDefinition(kind);
     if (!def) {
-      alert(`Unknown node kind: ${kind}`);
+      setJsonError(`Unknown node kind: ${kind}`);
       return;
     }
     console.log('[editor] Adding node', kind);

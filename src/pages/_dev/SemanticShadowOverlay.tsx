@@ -24,9 +24,11 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
-import { selectKind } from '../../../codex/core/semantic-calculus/kind.ts';
-import { userUtterance } from '../../../codex/core/semantic-calculus/utterance.ts';
-import { emptyContext } from '../../../codex/core/semantic-calculus/trustPartition.ts';
+import {
+  emptyContext,
+  selectKind,
+  userUtterance,
+} from '../../lib/semantic-calculus/semanticShadow.adapter.ts';
 import './SemanticShadowOverlay.css';
 
 type Kind = 'Do' | 'Clarify' | 'Probe' | 'Theory' | 'Hypothesis';

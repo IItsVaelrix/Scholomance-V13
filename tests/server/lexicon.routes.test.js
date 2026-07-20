@@ -73,8 +73,8 @@ function createAdapterMocks() {
 
   return {
     lookupWord: vi.fn(() => [entry]),
-    lookupSynonyms: vi.fn(() => ['mystery']),
-    lookupAntonyms: vi.fn(() => ['banality']),
+    lookupSynonyms: vi.fn(() => [{ lemma: 'mystery', pos: ['noun'] }]),
+    lookupAntonyms: vi.fn(() => [{ lemma: 'banality', pos: ['noun'] }]),
     lookupRhymes: vi.fn(() => ({ family: 'AA', words: ['banana'] })),
     batchLookupFamilies: vi.fn(() => ({ ARCANA: 'AA' })),
     batchValidateWords: vi.fn(() => ['arcana']),

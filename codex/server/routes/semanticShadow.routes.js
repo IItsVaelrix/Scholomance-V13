@@ -23,6 +23,7 @@ import { appendFile, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
+import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 
 const CAPTURE_PATH = resolve(process.cwd(), 'bench/semantic-calculus/corpus/shadow-intents.jsonl');
@@ -107,7 +108,7 @@ export async function semanticShadowRoutes(fastify, _opts) {
       }
 
       const row = {
-        id: `sh-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
+        id: `sh-${randomUUID()}`,
         ...parsed.data,
         // Wall-clock is fine HERE: this is corpus metadata, not a sealed act body.
         // Nothing in this file feeds the determinism input list (§3.2).

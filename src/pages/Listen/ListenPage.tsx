@@ -280,20 +280,6 @@ export default function ListenPage() {
                   onOrbClick={triggerIgnition}
                 />
               </div>
-              
-              <div className="black-hole-embed">
-                <motion.button
-                  type="button"
-                  onClick={() => {
-                    window.location.href = "/visualiser";
-                  }}
-                  className="black-hole-btn"
-                  aria-label="Enter the Visualiser - explore the resonance field"
-                >
-                  <span className="black-hole-horizon"></span>
-                  <span className="black-hole-text">Enter the Visualiser</span>
-                </motion.button>
-              </div>
             </main>
 
             {/* Right Sidebar: Parameters */}

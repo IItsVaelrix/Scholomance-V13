@@ -225,6 +225,7 @@ function lineLooksLikePlaceholder(line) {
     l.includes('your-api') ||
     l.includes('your_key') ||
     l.includes('example.com') ||
+    l.includes('akiaiosfodnn7example') ||
     l.includes('xxx') ||
     l.includes('<redacted>') ||
     l.includes('polish_allow_secret')

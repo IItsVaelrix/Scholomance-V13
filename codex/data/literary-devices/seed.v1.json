@@ -1,0 +1,401 @@
+{
+  "seedVersion": "1",
+  "devices": [
+    {
+      "slug": "antithesis",
+      "name": "Antithesis",
+      "aliases": ["antithetical pairing", "rhetorical antithesis"],
+      "definition": "A rhetorical figure that places two contrasting ideas in parallel grammatical structure, sharpening each by proximity to its opposite.",
+      "definitionsProvenance": [{ "source": "Scholomance craft notes", "license": "Project" }],
+      "detectionSignals": [
+        {
+          "id": "antithesis.semantic_opposition",
+          "kind": "semantic_opposition",
+          "description": "Detects two semantically opposed spans linked by parallel structure.",
+          "weight": 1,
+          "parameters": { "requireParallelism": true, "maxClauseGap": 1 },
+          "scope": "line"
+        },
+        {
+          "id": "antithesis.syntactic_parallel",
+          "kind": "syntactic_parallel",
+          "description": "Confirms the opposed clauses share matching grammatical shape.",
+          "weight": 0.6,
+          "parameters": { "clauseCount": 2, "matchPos": true },
+          "scope": "line"
+        }
+      ],
+      "purposes": [
+        { "id": "contrast", "description": "Sharpen opposition between two ideas" },
+        { "id": "balance", "description": "Create rhetorical balance through parallel structure" }
+      ],
+      "compatibleStructures": ["couplet", "parallel_clause", "chiasmus"],
+      "examples": [
+        {
+          "text": "It was the best of times, it was the worst of times.",
+          "license": "Public Domain",
+          "source": "Charles Dickens, A Tale of Two Cities (1859)"
+        }
+      ],
+      "relations": [
+        { "targetSlug": "juxtaposition", "relation": "commonly_confused_with", "strength": 0.85 },
+        { "targetSlug": "paradox", "relation": "commonly_confused_with", "strength": 0.75 },
+        { "targetSlug": "oxymoron", "relation": "commonly_confused_with", "strength": 0.6 },
+        { "targetSlug": "volta", "relation": "related_device", "strength": 0.4 }
+      ]
+    },
+    {
+      "slug": "juxtaposition",
+      "name": "Juxtaposition",
+      "aliases": ["juxtaposed imagery", "juxtaposing"],
+      "definition": "The placement of two dissimilar or contrasting elements side by side without a grammatical connective, letting the reader infer the relationship between them.",
+      "definitionsProvenance": [{ "source": "Scholomance craft notes", "license": "Project" }],
+      "detectionSignals": [
+        {
+          "id": "juxtaposition.semantic_incongruity",
+          "kind": "semantic_incongruity",
+          "description": "Flags two incongruous images or ideas placed within a shared local window.",
+          "weight": 1,
+          "parameters": { "windowTokens": 20, "requireNoExplicitConnective": true },
+          "scope": "line"
+        },
+        {
+          "id": "juxtaposition.line_position",
+          "kind": "line_position",
+          "description": "Confirms the contrasting elements occupy adjacent lines or clauses.",
+          "weight": 0.5,
+          "parameters": { "adjacentLines": true },
+          "scope": "stanza"
+        }
+      ],
+      "purposes": [
+        { "id": "contrast", "description": "Highlight difference by proximity rather than statement" },
+        { "id": "defamiliarization", "description": "Unsettle expectation by pairing unlike images" }
+      ],
+      "compatibleStructures": ["stanza_break", "image_pair", "parallel_clause"],
+      "examples": [
+        {
+          "text": "A dog starv'd at his Master's Gate, / Predicts the ruin of the State.",
+          "license": "Public Domain",
+          "source": "William Blake, Auguries of Innocence (1803)"
+        }
+      ],
+      "relations": [
+        { "targetSlug": "paradox", "relation": "commonly_confused_with", "strength": 0.6 },
+        { "targetSlug": "oxymoron", "relation": "commonly_confused_with", "strength": 0.55 }
+      ]
+    },
+    {
+      "slug": "paradox",
+      "name": "Paradox",
+      "aliases": ["paradoxical statement", "logical paradox"],
+      "definition": "A statement that appears self-contradictory or logically impossible on its surface, yet reveals a deeper coherent truth on reflection.",
+      "definitionsProvenance": [{ "source": "Scholomance craft notes", "license": "Project" }],
+      "detectionSignals": [
+        {
+          "id": "paradox.semantic_opposition",
+          "kind": "semantic_opposition",
+          "description": "Detects a single clause asserting mutually exclusive predicates of the same subject.",
+          "weight": 1,
+          "parameters": { "requireSingleClause": true },
+          "scope": "line"
+        },
+        {
+          "id": "paradox.semantic_incongruity",
+          "kind": "semantic_incongruity",
+          "description": "Confirms the contradiction resolves to a coherent reading rather than nonsense.",
+          "weight": 0.5,
+          "parameters": { "requireResolvableContradiction": true },
+          "scope": "line"
+        }
+      ],
+      "purposes": [
+        { "id": "provoke_thought", "description": "Force reflection to resolve an apparent contradiction" },
+        { "id": "compress_meaning", "description": "Hold two truths in one compact statement" }
+      ],
+      "compatibleStructures": ["aphorism", "couplet", "epigram"],
+      "examples": [
+        {
+          "text": "I must be cruel, only to be kind.",
+          "license": "Public Domain",
+          "source": "William Shakespeare, Hamlet, Act 3 Scene 4 (c. 1600)"
+        }
+      ],
+      "relations": [
+        { "targetSlug": "oxymoron", "relation": "commonly_confused_with", "strength": 0.7 }
+      ]
+    },
+    {
+      "slug": "oxymoron",
+      "name": "Oxymoron",
+      "aliases": ["compressed contradiction", "self-contradicting phrase"],
+      "definition": "A compressed figure combining two normally incompatible terms, usually adjective and noun, into a single tightly bound phrase.",
+      "definitionsProvenance": [{ "source": "Scholomance craft notes", "license": "Project" }],
+      "detectionSignals": [
+        {
+          "id": "oxymoron.semantic_opposition",
+          "kind": "semantic_opposition",
+          "description": "Detects two contradictory terms within a tight token span, typically adjective-noun.",
+          "weight": 1,
+          "parameters": { "maxTokenSpan": 2, "requireAdjectiveNounPair": true },
+          "scope": "token"
+        },
+        {
+          "id": "oxymoron.custom",
+          "kind": "custom",
+          "description": "Flags idiomatic compressed-contradiction phrases not caught by the adjective-noun pattern.",
+          "weight": 0.4,
+          "parameters": { "matchKnownIdioms": true },
+          "scope": "token"
+        }
+      ],
+      "purposes": [
+        { "id": "tension", "description": "Compress contradiction into a single vivid phrase" },
+        { "id": "compression", "description": "Say two opposed things in minimal space" }
+      ],
+      "compatibleStructures": ["noun_phrase", "compound_epithet"],
+      "examples": [
+        {
+          "text": "Parting is such sweet sorrow.",
+          "license": "Public Domain",
+          "source": "William Shakespeare, Romeo and Juliet, Act 2 Scene 2 (c. 1597)"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "slug": "metaphor",
+      "name": "Metaphor",
+      "aliases": ["metaphorical comparison", "figurative equation"],
+      "definition": "A figure that asserts one thing is another, mapping the qualities of a source domain onto a target domain without an explicit comparison marker.",
+      "definitionsProvenance": [{ "source": "Scholomance craft notes", "license": "Project" }],
+      "detectionSignals": [
+        {
+          "id": "metaphor.comparison_marker",
+          "kind": "comparison_marker",
+          "description": "Detects an equative or identity construction between two domains without 'like'/'as'.",
+          "weight": 1,
+          "parameters": { "requireExplicitMarker": false, "equateForm": true },
+          "scope": "line"
+        },
+        {
+          "id": "metaphor.custom",
+          "kind": "custom",
+          "description": "Flags cross-domain attribute mapping consistent with conceptual metaphor.",
+          "weight": 0.5,
+          "parameters": { "domainMapping": true },
+          "scope": "document"
+        }
+      ],
+      "purposes": [
+        { "id": "comparison", "description": "Map qualities from one domain onto another" },
+        { "id": "vividness", "description": "Make an abstraction concrete through imagery" },
+        { "id": "compression", "description": "State a comparison as identity for economy" }
+      ],
+      "compatibleStructures": ["noun_phrase", "extended_conceit", "line"],
+      "examples": [
+        {
+          "text": "All the world's a stage, and all the men and women merely players.",
+          "license": "Public Domain",
+          "source": "William Shakespeare, As You Like It, Act 2 Scene 7 (c. 1599)"
+        }
+      ],
+      "relations": [
+        { "targetSlug": "simile", "relation": "commonly_confused_with", "strength": 0.8 },
+        { "targetSlug": "personification", "relation": "related_device", "strength": 0.5 }
+      ]
+    },
+    {
+      "slug": "simile",
+      "name": "Simile",
+      "aliases": ["explicit comparison", "simile construction"],
+      "definition": "A figure that compares two unlike things using an explicit comparison marker such as 'like' or 'as', naming both the compared item and its analogue.",
+      "definitionsProvenance": [{ "source": "Scholomance craft notes", "license": "Project" }],
+      "detectionSignals": [
+        {
+          "id": "simile.comparison_marker",
+          "kind": "comparison_marker",
+          "description": "Detects an explicit comparison marker joining two distinct referents.",
+          "weight": 1,
+          "parameters": { "markers": ["like", "as"], "requireExplicitMarker": true },
+          "scope": "line"
+        }
+      ],
+      "purposes": [
+        { "id": "comparison", "description": "Compare two things explicitly" },
+        { "id": "vividness", "description": "Make an image concrete through analogy" },
+        { "id": "clarity", "description": "Signal the comparison openly rather than by assertion" }
+      ],
+      "compatibleStructures": ["noun_phrase", "comparative_clause", "line"],
+      "examples": [
+        {
+          "text": "O my Luve's like a red, red rose / That's newly sprung in June.",
+          "license": "Public Domain",
+          "source": "Robert Burns, A Red, Red Rose (1794)"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "slug": "anaphora",
+      "name": "Anaphora",
+      "aliases": ["anaphoric repetition", "initial repetition"],
+      "definition": "The deliberate repetition of a word or phrase at the beginning of successive clauses, lines, or sentences to build emphasis and momentum.",
+      "definitionsProvenance": [{ "source": "Scholomance craft notes", "license": "Project" }],
+      "detectionSignals": [
+        {
+          "id": "anaphora.token_repeat",
+          "kind": "token_repeat",
+          "description": "Detects the same token or phrase recurring at clause- or line-initial position.",
+          "weight": 1,
+          "parameters": { "position": "line_start", "minRepeats": 2 },
+          "scope": "stanza"
+        },
+        {
+          "id": "anaphora.line_position",
+          "kind": "line_position",
+          "description": "Confirms the repeated span anchors the start of each unit.",
+          "weight": 0.5,
+          "parameters": { "anchor": "start" },
+          "scope": "stanza"
+        }
+      ],
+      "purposes": [
+        { "id": "emphasis", "description": "Drive emphasis through repeated openings" },
+        { "id": "momentum", "description": "Build rhetorical momentum across successive units" },
+        { "id": "unity", "description": "Bind a passage together around a repeated phrase" }
+      ],
+      "compatibleStructures": ["stanza", "list", "refrain_chain"],
+      "examples": [
+        {
+          "text": "Blessed are they that mourn: for they shall be comforted. Blessed are the meek: for they shall inherit the earth.",
+          "license": "Public Domain",
+          "source": "Matthew 5:4-5, King James Version"
+        }
+      ],
+      "relations": [
+        { "targetSlug": "refrain", "relation": "commonly_confused_with", "strength": 0.55 }
+      ]
+    },
+    {
+      "slug": "volta",
+      "name": "Volta",
+      "aliases": ["the turn", "sonnet turn"],
+      "definition": "A structural turn, typically in a sonnet, where the argument, tone, or emotional register pivots, most often between octave and sestet or before a closing couplet.",
+      "definitionsProvenance": [{ "source": "Scholomance craft notes", "license": "Project" }],
+      "detectionSignals": [
+        {
+          "id": "volta.line_position",
+          "kind": "line_position",
+          "description": "Flags a structural pivot near the conventional turn position (e.g. line 9 or the closing couplet).",
+          "weight": 1,
+          "parameters": { "anchor": "structural_turn", "typicalLine": 9 },
+          "scope": "document"
+        },
+        {
+          "id": "volta.semantic_opposition",
+          "kind": "semantic_opposition",
+          "description": "Confirms a tonal or argumentative reversal across the pivot.",
+          "weight": 0.6,
+          "parameters": { "requireToneShift": true },
+          "scope": "document"
+        }
+      ],
+      "purposes": [
+        { "id": "reversal", "description": "Pivot the argument or tone" },
+        { "id": "resolution", "description": "Resolve tension built in the preceding lines" },
+        { "id": "tension_release", "description": "Release accumulated pressure at the structural turn" }
+      ],
+      "compatibleStructures": ["sonnet", "turn_stanza"],
+      "examples": [
+        {
+          "text": "But thy eternal summer shall not fade",
+          "license": "Public Domain",
+          "source": "William Shakespeare, Sonnet 18 (1609)",
+          "note": "Marks the turn from the beloved's mortality to art's permanence."
+        }
+      ],
+      "relations": [
+        { "targetSlug": "paradox", "relation": "related_device", "strength": 0.35 }
+      ]
+    },
+    {
+      "slug": "refrain",
+      "name": "Refrain",
+      "aliases": ["chorus line", "recurring line"],
+      "definition": "A line or group of lines repeated at intervals, often at the end of stanzas, that anchors a poem or song around a recurring idea or sound.",
+      "definitionsProvenance": [{ "source": "Scholomance craft notes", "license": "Project" }],
+      "detectionSignals": [
+        {
+          "id": "refrain.token_repeat",
+          "kind": "token_repeat",
+          "description": "Detects an identical or near-identical span recurring at stanza boundaries.",
+          "weight": 1,
+          "parameters": { "position": "stanza_end", "minRepeats": 2 },
+          "scope": "document"
+        },
+        {
+          "id": "refrain.line_position",
+          "kind": "line_position",
+          "description": "Confirms the recurring span lands at the same structural position each time.",
+          "weight": 0.5,
+          "parameters": { "anchor": "recurring" },
+          "scope": "document"
+        }
+      ],
+      "purposes": [
+        { "id": "unity", "description": "Anchor the piece around a recurring idea" },
+        { "id": "emphasis", "description": "Reinforce a phrase through repetition" },
+        { "id": "musicality", "description": "Create rhythmic and sonic return" }
+      ],
+      "compatibleStructures": ["chorus", "stanza_break", "villanelle"],
+      "examples": [
+        {
+          "text": "Quoth the Raven, 'Nevermore.'",
+          "license": "Public Domain",
+          "source": "Edgar Allan Poe, The Raven (1845)"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "slug": "personification",
+      "name": "Personification",
+      "aliases": ["anthropomorphism", "personified imagery"],
+      "definition": "A figure that attributes human qualities, actions, or agency to a nonhuman entity, object, or abstraction.",
+      "definitionsProvenance": [{ "source": "Scholomance craft notes", "license": "Project" }],
+      "detectionSignals": [
+        {
+          "id": "personification.semantic_incongruity",
+          "kind": "semantic_incongruity",
+          "description": "Flags a human attribute or action predicated of a nonhuman subject.",
+          "weight": 1,
+          "parameters": { "requireHumanAttributeOnNonhuman": true },
+          "scope": "line"
+        },
+        {
+          "id": "personification.custom",
+          "kind": "custom",
+          "description": "Flags an agency verb (act, think, choose) governed by an inanimate subject.",
+          "weight": 0.5,
+          "parameters": { "agencyVerbOnInanimate": true },
+          "scope": "line"
+        }
+      ],
+      "purposes": [
+        { "id": "vividness", "description": "Make the nonhuman vivid through human behavior" },
+        { "id": "emotional_projection", "description": "Project felt emotion onto the world" },
+        { "id": "animacy", "description": "Grant agency to what has none" }
+      ],
+      "compatibleStructures": ["apostrophe", "noun_phrase", "extended_conceit"],
+      "examples": [
+        {
+          "text": "The fog comes on little cat feet.",
+          "license": "Public Domain",
+          "source": "Carl Sandburg, Fog, Chicago Poems (1916)"
+        }
+      ],
+      "relations": []
+    }
+  ]
+}

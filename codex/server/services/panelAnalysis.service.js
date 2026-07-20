@@ -6,6 +6,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { WORD_REGEX_GLOBAL } from '../../core/constants/regex.js';
 import { analyzeText } from '../../core/analysis.pipeline.js';
+import { computeSongStats } from '../../core/song-stats/index.js';
 import { createDefaultScoringEngine } from '../../core/scoring.defaults.js';
 import { buildPlsPhoneticFeatures } from '../../core/rhyme-astrology/scoring.js';
 import { PhonemeEngine } from '../../core/phonology/phoneme.engine.js';
@@ -237,6 +238,7 @@ function createEmptyPanelPayload() {
     genreProfile: null,
     emotion: 'Neutral',
     scoreData: null,
+    songStats: null,
     rhymeAstrology: null,
     narrativeAMP: null,
     oracle: null,
@@ -841,6 +843,20 @@ export async function createPanelAnalysisService(options = {}) {
       }
 
       const analyzedDoc = analyzeText(text);
+
+      // CODEx Song Stats — computed straight off the same AnalyzedDocument
+      // used for the rest of this pipeline. Kept non-fatal (like the multis
+      // pass below): a Song Stats failure must never take the whole panel
+      // analysis down with it. The client's stale-result guard decides
+      // whether to keep showing a prior result or fall back to an empty
+      // state when this comes back null.
+      let songStats = null;
+      try {
+        songStats = computeSongStats(analyzedDoc);
+      } catch (error) {
+        log?.warn?.({ err: error?.message || String(error) }, '[PanelAnalysisService] songStats computation failed; continuing without songStats');
+      }
+
       const syntaxLayerForEmotion = buildSyntaxLayer(analyzedDoc);
       const syntaxLayer = enableSyntaxRhymeLayer ? syntaxLayerForEmotion : null;
       const hhmSignals = syntaxLayerForEmotion?.enabled
@@ -849,8 +865,8 @@ export async function createPanelAnalysisService(options = {}) {
       const deepAnalysis = await deepRhymeEngine.analyzeDocument(
         text,
         syntaxLayer
-          ? { syntaxLayer, authorityMode: 'background' }
-          : { authorityMode: 'background' }
+          ? { syntaxLayer, authorityMode: 'background', dictionaryAPI }
+          : { authorityMode: 'background', dictionaryAPI }
       );
 
       // Authoritative rhyme-family pass: if the Scholomance Dictionary API
@@ -958,6 +974,7 @@ export async function createPanelAnalysisService(options = {}) {
         literaryDevices,
         emotion,
         scoreData: scoreDataWithPlsFeatures,
+        songStats,
         rhymeAstrology,
         narrativeAMP,
         oracle: isEditorProfile ? null : toLegacyOraclePayload(narrativeAMP),

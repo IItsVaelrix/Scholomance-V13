@@ -1,7 +1,10 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { memo, useEffect, useMemo, useRef, useState, Fragment, type CSSProperties } from 'react';
 import { useLyricAlignment } from '../../kits/scholomance-visualizer-kit/hooks/useLyricAlignment';
 import { lineAtTime, wordAtTime } from '../../kits/scholomance-visualizer-kit/utils/lyricAlignment';
 import { wordTruesight } from './truesightColor';
+import { computeFingerprint } from './bytecodeFingerprint';
+import { useKaraokeMotion } from './karaoke/useKaraokeMotion';
+import { applyKaraokePlayhead } from './karaoke/karaokePlayhead';
 import type { ResolvedAlbumTrack } from './hooks/useAlbumResolver';
 import type { PlaybackStatus } from './hooks/useAlbumAudioEngine';
 import type { TrackPacing } from './tracks/types';
@@ -64,6 +67,49 @@ function lyricLineAt(progress: number, duration: number, lineBeats: number[], pa
   return lineBeats.length - 1;
 }
 
+type ColoredTok = {
+  word: string;
+  color: string | null;
+  school: string | null;
+  padLeft?: string;
+};
+
+/** Static token DOM — whitespace is never a token (padLeft text only). */
+const AlbumLyricLine = memo(function AlbumLyricLine({
+  lineIndex,
+  tokens,
+}: {
+  lineIndex: number;
+  tokens: ColoredTok[];
+}) {
+  let w = -1;
+  return (
+    <li className="alb-lyrics__line" data-k-line={lineIndex}>
+      <span className="alb-lyrics__num">{String(lineIndex + 1).padStart(2, '0')}</span>
+      <span className="alb-lyrics__text">
+        {tokens.map((tok, j) => {
+          const isWord = /[A-Za-z]/.test(tok.word);
+          const pad = tok.padLeft || '';
+          if (!isWord) return <Fragment key={j}>{pad}{tok.word}</Fragment>;
+          w += 1;
+          return (
+            <Fragment key={j}>
+              {pad}
+              <span
+                className={tok.color ? 'alb-lyrics__word' : undefined}
+                style={tok.color ? ({ '--w': tok.color } as CSSProperties) : undefined}
+                data-k-word={w}
+              >
+                {tok.word}
+              </span>
+            </Fragment>
+          );
+        })}
+      </span>
+    </li>
+  );
+});
+
 export function AlbumLyrics({ track, currentTime, status, reducedMotion }: AlbumLyricsProps) {
   const alignment = useLyricAlignment(track.grimoireTrack?.id ?? '');
   const lineBeats = useMemo(() => computeLineBeats(track), [track]);
@@ -73,15 +119,54 @@ export function AlbumLyrics({ track, currentTime, status, reducedMotion }: Album
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   const coloredLyrics = useMemo(() =>
-    track.lyrics.map(line =>
-      line.split(/(\s+)/).map(tok => {
-        if (!/\S/.test(tok)) return { word: tok, color: null, school: null };
-        const ts = wordTruesight(tok);
-        return { word: tok, color: ts?.color ?? null, school: ts?.school ?? null };
-      })
-    ),
+    track.lyrics.map((line) => {
+      const parts = String(line).match(/([A-Za-z]+(?:['-][A-Za-z]+)*|\s+|[^A-Za-z\s]+)/g) || [];
+      const out: ColoredTok[] = [];
+      let pad = '';
+      for (const part of parts) {
+        if (/^\s+$/.test(part)) {
+          pad += part;
+          continue;
+        }
+        if (!/[A-Za-z]/.test(part)) {
+          out.push({ word: part, color: null, school: null, padLeft: pad });
+          pad = '';
+          continue;
+        }
+        const ts = wordTruesight(part);
+        out.push({
+          word: part,
+          color: ts?.color ?? null,
+          school: ts?.school ?? null,
+          padLeft: pad,
+        });
+        pad = '';
+      }
+      return out;
+    }),
     [track]
   );
+
+  const karaokeSeed = useMemo(() => {
+    const gt = track.grimoireTrack;
+    const key = gt
+      ? String((gt.meta.find(([k]) => k.toLowerCase() === 'key') || ['', 'Am'])[1] || 'Am')
+      : 'Am';
+    return computeFingerprint({
+      title: track.title,
+      bpm: pacing.bpm,
+      key,
+      trackId: gt?.id ?? track.title,
+    }).hash;
+  }, [track, pacing.bpm]);
+
+  useKaraokeMotion({
+    seed: karaokeSeed,
+    bpm: pacing.bpm,
+    timeSeconds: status === 'playing' ? currentTime : undefined,
+    reducedMotion,
+    rootRef: lyricsRef,
+  });
 
   const alignedPos = alignment ? lineAtTime(alignment.lines, currentTime) : -1;
   const activeLine = alignment
@@ -92,8 +177,19 @@ export function AlbumLyrics({ track, currentTime, status, reducedMotion }: Album
   const sungWord = alignment && sungIdx >= 0 ? alignment.words[sungIdx] : null;
 
   useEffect(() => {
+    const root = lyricsRef.current;
+    if (!root) return;
+    applyKaraokePlayhead(root, {
+      line: activeLine,
+      word: sungWord && sungWord.line === activeLine ? sungWord.word : -1,
+      backing: Boolean(sungWord?.backing),
+      estimated: Boolean(sungWord?.interpolated),
+    });
+  }, [activeLine, sungWord]);
+
+  useEffect(() => {
     if (status !== 'playing' || activeLine < 0 || userScrolled) return;
-    const el = lyricsRef.current?.children[activeLine] as HTMLElement | undefined;
+    const el = lyricsRef.current?.querySelector(`[data-k-line="${activeLine}"]`) as HTMLElement | undefined;
     el?.scrollIntoView({ block: 'nearest', behavior: reducedMotion ? 'auto' : 'smooth' });
   }, [activeLine, status, userScrolled, reducedMotion]);
 
@@ -123,35 +219,8 @@ export function AlbumLyrics({ track, currentTime, status, reducedMotion }: Album
       onScroll={handleScroll}
       aria-label="Lyrics"
     >
-      {track.lyrics.map((line, i) => (
-        <li
-          key={i}
-          className={i === activeLine ? 'alb-lyrics__line is-active' : 'alb-lyrics__line'}
-          aria-current={i === activeLine ? 'true' : undefined}
-        >
-          <span className="alb-lyrics__num">{String(i + 1).padStart(2, '0')}</span>
-          <span className="alb-lyrics__text">
-            {coloredLyrics[i].map((tok, j) => {
-              const isWord = /[A-Za-z]/.test(tok.word);
-              const sung = isWord && sungWord !== null && sungWord.line === i && sungWord.text === tok.word;
-              return (
-                <span
-                  key={j}
-                  className={tok.color ? 'alb-lyrics__word' : undefined}
-                  style={tok.color ? ({ '--w': tok.color } as CSSProperties) : undefined}
-                  data-sung={sung ? 'true' : undefined}
-                  // Timing confidence is orthogonal to which word is sung, so it
-                  // rides its own attribute: an interpolated span is a guess the
-                  // aligner drew between confident neighbours, and must not wear
-                  // the same certainty as a measured one.
-                  data-timing={sung && sungWord.interpolated ? 'estimated' : undefined}
-                >
-                  {tok.word}
-                </span>
-              );
-            })}
-          </span>
-        </li>
+      {track.lyrics.map((_, i) => (
+        <AlbumLyricLine key={i} lineIndex={i} tokens={coloredLyrics[i]} />
       ))}
     </ol>
   );

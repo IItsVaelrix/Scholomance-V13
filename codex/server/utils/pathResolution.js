@@ -4,37 +4,44 @@ import { existsSync } from 'node:fs';
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 /**
- * Robustly resolves a database path, especially in production environments like Render.
- * 
- * Logic:
- * 1. If path is already absolute and exists, use it.
- * 2. If in production and path looks like a local dev path (e.g. /home/deck/...), 
- *    try to find the file in /var/data or /app.
- * 3. Fallback to /var/data if available and file exists there.
- * 4. Finally, return the original resolved path (calling code will handle existence checks).
+ * Resolve a SQLite database path for adapters.
+ *
+ * Priority:
+ * 1. Explicit absolute path that exists on disk (honors SCHOLOMANCE_DICT_PATH=/app/data/...).
+ * 2. In production, fall back to /var/data/<basename> then /app/<basename> when the
+ *    configured path is missing (legacy Render/Fly volume layouts).
+ * 3. Otherwise return the resolved configured path (caller handles missing files).
+ *
+ * Never override an existing explicit path with a stale volume copy — that made
+ * Leximancy read a thin /var/data dict while lemma_form lived on the rich /app/data bake-in.
  */
 export function resolveDatabasePath(rawPath, defaultBasename) {
   if (!rawPath && !defaultBasename) return null;
-  
+
   const resolved = rawPath ? path.resolve(String(rawPath).trim()) : null;
-  
+
+  // Honor an explicit path that is already present (dev + prod bake-in).
+  if (resolved && existsSync(resolved)) {
+    return resolved;
+  }
+
   if (IS_PRODUCTION) {
     const basename = resolved ? path.basename(resolved) : defaultBasename;
-    
-    // Try /var/data first (persistent disk)
+
     const varDataPath = path.join('/var/data', basename);
     if (existsSync(varDataPath)) return varDataPath;
-    
-    // Try /app (project root in container)
+
+    const appDataPath = path.join('/app/data', basename);
+    if (existsSync(appDataPath)) return appDataPath;
+
     const appPath = path.join('/app', basename);
     if (existsSync(appPath)) return appPath;
-    
-    // If it's an absolute path that doesn't exist, it might be a synced local path.
-    // Return the /var/data path even if it doesn't exist yet (ritual will create it).
-    if (resolved && path.isAbsolute(resolved) && !existsSync(resolved)) {
+
+    // Absolute configured path missing — prefer the volume path for ritual seeding.
+    if (resolved && path.isAbsolute(resolved)) {
       return varDataPath;
     }
   }
-  
+
   return resolved ?? path.resolve(defaultBasename);
 }

@@ -6,17 +6,18 @@
  */
 
 import { synthesizeVerse } from '../../shared/truesight/compiler/VerseSynthesis.js';
-import { PhonemeEngine } from '../../phonology/phoneme.engine.js';
 import { WORD_REGEX_GLOBAL } from '../../constants/regex.js';
+import { runDictPrimeAuthority } from '../dict/primeAuthority.js';
 
 /**
  * Synthesizes a verse into a structured artifact.
  * 
  * @param {Object} payload - { text, options }
- * @param {Object} _context
+ * @param {Object} context
  * @returns {Promise<Object>} The synthesis artifact
  */
 export async function runSynthesis(payload, _context) {
+  const context = _context || {};
   const { text, options = {} } = payload;
   
   if (!text) {
@@ -24,14 +25,9 @@ export async function runSynthesis(payload, _context) {
   }
 
   const uniqueWords = [...new Set(String(text).match(WORD_REGEX_GLOBAL) || [])];
-  if (typeof PhonemeEngine.primeAuthorityBatch === 'function') {
-    await PhonemeEngine.primeAuthorityBatch(uniqueWords);
-    if (typeof PhonemeEngine.primeG2PBatch === 'function') {
-      await PhonemeEngine.primeG2PBatch(uniqueWords);
-    }
-  } else if (typeof PhonemeEngine.ensureAuthorityBatch === 'function') {
-    await PhonemeEngine.ensureAuthorityBatch(uniqueWords);
-  }
+  // Always prime through dict.primeAuthority so Node gets self-sqlite and
+  // browser keeps fetch — never call primeAuthorityBatch() bare in Node.
+  await runDictPrimeAuthority({ words: uniqueWords }, context);
 
   // Execute the pure compiler logic after the canonical PhonemeEngine authority
   // cache has been hydrated. compileVerseToIR remains the single synchronous

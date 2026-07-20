@@ -60,7 +60,7 @@ export function PixelBrainGrammarGlossary({ onClose }: { onClose: () => void }) 
               <ul style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <li><strong style={{ color: '#fff' }}>1. Bytecode Is Truth:</strong> Whenever state crosses a boundary, it is encoded as structured bytecode. Renders are projections, not sources.</li>
                 <li><strong style={{ color: '#fff' }}>2. Lattice Is Law:</strong> Visual geometry lives on an integer-cell grid. Canonical state is coordinates (x, y, color, partId).</li>
-                <li><strong style={{ color: '#fff' }}>3. Symmetry Is Automatic:</strong> Symmetries (radial, axial, diagonal) are first-class values. If missing, the blueprint hasn't been analyzed.</li>
+                <li><strong style={{ color: '#fff' }}>3. Symmetry Is Automatic:</strong> Symmetries (radial, axial, diagonal) are first-class values. If missing, the blueprint hasn&apos;t been analyzed.</li>
                 <li><strong style={{ color: '#fff' }}>4. Errors Are Bytecode:</strong> Every failure mode has a canonical bytecode shape (PB-ERR-v1). Stack traces are decorative.</li>
                 <li><strong style={{ color: '#fff' }}>5. Determinism Is Non-Negotiable:</strong> Same input → same output. No Math.random(). Allowed: coordinate-hashed noise, FNV-1a.</li>{/* EXEMPT: glossary prose stating the determinism law, not a call site */}
                 <li><strong style={{ color: '#fff' }}>6. Checksum Integrity Is Required:</strong> Every bytecode carries an 8-digit FNV-1a hex checksum.</li>
@@ -211,7 +211,7 @@ export function PixelBrainGrammarGlossary({ onClose }: { onClose: () => void }) 
               <ul style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <li><strong>Screenshot as Source:</strong> Never treat a canvas snapshot as the canonical asset. The lattice coordinates are the source.</li>
                 <li><strong>Shader Invents Geometry:</strong> Shaders consume masks to add VFX; they must never invent geometry where the mask is empty.</li>
-                <li><strong>Silent Missing Materials:</strong> Do not silently fall back to '#000000'. Required materials must fail loudly.</li>
+                <li><strong>Silent Missing Materials:</strong> Do not silently fall back to &apos;#000000&apos;. Required materials must fail loudly.</li>
                 <li><strong>UI Becomes Authority:</strong> The DOM state is never canonical geometry. Always map back to Template Grid state.</li>
               </ul>
 

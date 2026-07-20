@@ -25,8 +25,8 @@ const SCHOOL_DEFINITIONS = {
 export const SpectrumCanvas: React.FC<SpectrumCanvasProps> = ({
   isPlaying,
   getByteFrequencyData,
-  currentSchoolId,
-  signalLevel,
+  currentSchoolId: _currentSchoolId,
+  signalLevel: _signalLevel,
   eqNodes,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -41,16 +41,28 @@ export const SpectrumCanvas: React.FC<SpectrumCanvasProps> = ({
   // source of the visible animation stalling.
   const liveRef = useRef({ isPlaying, getByteFrequencyData, eqNodes });
   liveRef.current = { isPlaying, getByteFrequencyData, eqNodes };
+  const visibleRef = useRef(true);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: false });
     if (!ctx) return;
 
-    const render = () => {
+    const io = new IntersectionObserver(
+      ([entry]) => { visibleRef.current = entry.isIntersecting; },
+      { threshold: 0 },
+    );
+    io.observe(canvas);
+
+    function render() {
+      rafIdRef.current = 0;
       if (!canvas || !ctx) return;
-      const { isPlaying, getByteFrequencyData, eqNodes } = liveRef.current;
+      const liveInputs = liveRef.current;
+      const playing = liveInputs.isPlaying;
+      const readFrequency = liveInputs.getByteFrequencyData;
+      const liveEqNodes = liveInputs.eqNodes;
+      const live = playing && visibleRef.current && !document.hidden;
 
       // Sync internal resolution with display size
       if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
@@ -82,8 +94,8 @@ export const SpectrumCanvas: React.FC<SpectrumCanvasProps> = ({
       ctx.stroke();
       ctx.setLineDash([]);
 
-      if (isPlaying) {
-        getByteFrequencyData(dataArrayRef.current);
+      if (live) {
+        readFrequency(dataArrayRef.current);
         const data = dataArrayRef.current;
         const bufferLength = data.length;
 
@@ -117,11 +129,9 @@ export const SpectrumCanvas: React.FC<SpectrumCanvasProps> = ({
         ctx.lineTo(W, H);
         ctx.fill();
 
-        // 4. Render Sharp Output Waveform
+        // 4. Render Sharp Output Waveform (no canvas shadowBlur — fill-rate killer)
         ctx.strokeStyle = '#c9a227';
         ctx.lineWidth = 2;
-        ctx.shadowBlur = 12;
-        ctx.shadowColor = '#c9a227';
         ctx.beginPath();
         for (let i = 0; i < bufferLength; i++) {
           const x = getLogX(i);
@@ -131,7 +141,6 @@ export const SpectrumCanvas: React.FC<SpectrumCanvasProps> = ({
           else ctx.lineTo(x, y);
         }
         ctx.stroke();
-        ctx.shadowBlur = 0;
 
         // 5. Dynamic School Detection Curves
         let maxEnergy = 0;
@@ -173,7 +182,7 @@ export const SpectrumCanvas: React.FC<SpectrumCanvasProps> = ({
       }
 
       // 6. Draw Combined EQ Response Curve
-      if (eqNodes && eqNodes.length > 0) {
+      if (liveEqNodes && liveEqNodes.length > 0) {
         const numSteps = W;
         const frequencyHz = new Float32Array(numSteps);
         for (let i = 0; i < numSteps; i++) {
@@ -187,7 +196,7 @@ export const SpectrumCanvas: React.FC<SpectrumCanvasProps> = ({
         const magResponse = new Float32Array(numSteps);
         const phaseResponse = new Float32Array(numSteps);
         
-        for (const node of eqNodes) {
+        for (const node of liveEqNodes) {
           if (typeof node.getFrequencyResponse === 'function') {
             node.getFrequencyResponse(frequencyHz, magResponse, phaseResponse);
             for (let i = 0; i < numSteps; i++) {
@@ -222,15 +231,31 @@ export const SpectrumCanvas: React.FC<SpectrumCanvasProps> = ({
         ctx.fill();
       }
 
-      rafIdRef.current = requestAnimationFrame(render);
-    };
+      // Keep 60fps only while playing and visible; otherwise park after this frame.
+      if (liveRef.current.isPlaying && visibleRef.current && !document.hidden) {
+        rafIdRef.current = requestAnimationFrame(render);
+      }
+    }
 
-    render();
+    const kick = () => {
+      if (!rafIdRef.current) rafIdRef.current = requestAnimationFrame(render);
+    };
+    document.addEventListener('visibilitychange', kick);
+
+    rafIdRef.current = requestAnimationFrame(render);
+    // Resume when play flips on while the loop is parked.
+    const playPoll = setInterval(() => {
+      if (liveRef.current.isPlaying && visibleRef.current && !document.hidden) kick();
+    }, 250);
+
     return () => {
       if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = 0;
+      clearInterval(playPoll);
+      io.disconnect();
+      document.removeEventListener('visibilitychange', kick);
     };
     // Set up the RAF loop exactly once; live inputs are read from liveRef.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

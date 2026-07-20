@@ -101,4 +101,18 @@ describe('Spellchecker Accuracy & Edge Cases', () => {
     expect(mockSuggest).toHaveBeenCalled();
     expect(suggestions).toContain('extraordinary');
   });
+
+  it('suggestDetailed returns ranked scores instead of bare words', () => {
+    const ranked = spellchecker.suggestDetailed('stel', 5, 'to');
+    expect(ranked.length).toBeGreaterThan(0);
+    expect(ranked[0]).toEqual(expect.objectContaining({
+      word: 'steal',
+      score: expect.any(Number),
+    }));
+    expect(ranked[0].score).toBeGreaterThan(0);
+    const steal = ranked.find((entry) => entry.word === 'steal');
+    const steel = ranked.find((entry) => entry.word === 'steel');
+    expect(steal.score).toBeGreaterThan(steel.score);
+  });
 });
+

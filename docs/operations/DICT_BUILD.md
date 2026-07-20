@@ -100,3 +100,12 @@ JOIN entry e ON e.id = f.rowid
 WHERE entry_fts MATCH 'unit NEAR/3 time'
 LIMIT 25;
 ```
+
+## Lexical graph overlay (Analyze / Leximancy foundation)
+
+```bash
+npm run lexical-graph -- migrate --db scholomance_dict.sqlite --timestamp 2026-07-18T00:00:00.000Z
+npm run lexical-graph -- all --db scholomance_dict.sqlite --timestamp 2026-07-18T00:00:00.000Z
+```
+
+Does not replace Oracle `entry` tables. The Docker image build runs `lexical-graph all` after the OEWN dict/corpus steps so production Leximancy has `lexical_entry_fts`, devices, and `lemma_form`. See `docs/superpowers/specs/2026-07-18-lexical-graph-foundation-design.md`.

@@ -13,6 +13,7 @@ export const EffectMutatorRegistry = {
       id: makeId('eff'),
       effectId: type,
       enabled: true,
+      order: 0,
       params: { ...def.defaultParams, ...overrides },
     };
   },

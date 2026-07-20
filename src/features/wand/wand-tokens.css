@@ -1,0 +1,11 @@
+/* src/features/wand/wand-tokens.css */
+:root {
+  --wand-amethyst-rgb: 150 103 255;
+  --wand-arc-blue-rgb: 77 190 255;
+  --wand-gold-rgb: 228 190 104;
+  --wand-title-glow:
+    0 0 12px rgb(var(--wand-amethyst-rgb) / 0.34),
+    0 0 26px rgb(var(--wand-arc-blue-rgb) / 0.15);
+  --wand-quiet-text: rgb(213 214 231 / 0.68);
+  --wand-summary-text: rgb(226 226 239 / 0.82);
+}

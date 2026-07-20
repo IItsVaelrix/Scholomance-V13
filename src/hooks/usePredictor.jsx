@@ -335,12 +335,19 @@ export function PredictorProvider({ children }) {
   }, [model, spellchecker]);
 
   const getDemocraticChoice = useCallback((suggestions, syntaxContext = null) => {
-    const candidates = suggestions.map((s) => ({
-      word: s.token || s,
-      layer: s.reason === 'phonetic' ? 'PHONEME'
-        : s.reason === 'edit' ? 'SPELLCHECK' : 'PREDICTOR',
-      confidence: s.score ? s.score / 2 : 0.8
-    }));
+    const candidates = suggestions.map((s) => {
+      const rawScore = Number(s.score);
+      // Preserve 0-1 ranker scores; legacy >1 scores compress into the unit interval.
+      const confidence = Number.isFinite(rawScore) && rawScore > 0
+        ? Math.max(0.05, Math.min(1, rawScore > 1 ? rawScore / 2 : rawScore))
+        : 0.8;
+      return {
+        word: s.token || s,
+        layer: s.reason === 'phonetic' ? 'PHONEME'
+          : s.reason === 'edit' ? 'SPELLCHECK' : 'PREDICTOR',
+        confidence,
+      };
+    });
     return judiciary.vote(candidates, syntaxContext);
   }, [judiciary]);
 

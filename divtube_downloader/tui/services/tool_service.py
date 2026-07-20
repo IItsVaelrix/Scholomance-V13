@@ -4,16 +4,49 @@ import os
 import subprocess
 
 from tui.services.exec_session_service import get_exec_session
+from tui.services import harness_tools
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 BRIDGE_SCRIPT = os.path.join(PROJECT_ROOT, "divtube_downloader", "scripts", "scholomance-bridge.mjs")
 
+# Ensure nvm node/npm are visible for the whole TUI process (bash_session,
+# run_command, bridge). Desktop launches often skip ~/.bashrc.
+_node_bin_dir = harness_tools.resolve_node_bin_dir()
+if _node_bin_dir:
+    os.environ["PATH"] = _node_bin_dir + os.pathsep + os.environ.get("PATH", "")
+
 
 def _node_bin():
-    n = "/home/deck/.nvm/versions/node/v20.20.2/bin/node"
-    if os.path.exists(n):
-        return n
+    bin_dir = harness_tools.resolve_node_bin_dir()
+    if bin_dir:
+        n = os.path.join(bin_dir, "node")
+        if os.path.exists(n):
+            return n
     return "node"
+
+
+def _extract_bridge_json(text):
+    """Parse JSON from bridge stdout/stderr, tolerating leading log noise."""
+    if not text:
+        return None
+    raw = text.strip()
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        pass
+    # Prefer the last successfully decoded JSON value. Immunity used to print
+    # a pseudo-object log line before the real payload; taking the first '{'
+    # would fail. Walk candidates from the end.
+    decoder = json.JSONDecoder()
+    for opener in ("{", "["):
+        idx = raw.rfind(opener)
+        while idx >= 0:
+            try:
+                value, _ = decoder.raw_decode(raw, idx)
+                return value
+            except json.JSONDecodeError:
+                idx = raw.rfind(opener, 0, idx)
+    return None
 
 
 def _run_bridge(command, *args, timeout=30, stdin=None):
@@ -21,15 +54,27 @@ def _run_bridge(command, *args, timeout=30, stdin=None):
     cmd = [node, BRIDGE_SCRIPT, command] + list(args)
     try:
         proc = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=timeout, cwd=PROJECT_ROOT, input=stdin
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            cwd=PROJECT_ROOT,
+            input=stdin,
+            env=harness_tools.node_env(),
         )
+        payload = _extract_bridge_json(proc.stdout)
+        if payload is None:
+            payload = _extract_bridge_json(proc.stderr)
         if proc.returncode != 0:
-            return {"error": proc.stderr.strip() or f"exit code {proc.returncode}"}
-        return json.loads(proc.stdout)
+            if isinstance(payload, dict) and payload.get("error"):
+                return payload
+            err = (proc.stderr or proc.stdout or "").strip() or f"exit code {proc.returncode}"
+            return {"error": err}
+        if payload is None:
+            return {"error": "Failed to parse bridge output"}
+        return payload
     except subprocess.TimeoutExpired:
         return {"error": "Command timed out"}
-    except json.JSONDecodeError:
-        return {"error": "Failed to parse bridge output"}
     except Exception as e:
         return {"error": str(e)}
 
@@ -357,6 +402,173 @@ class ToolService:
             },
             {
                 "type": "function",
+                "is_coding_action": True,
+                "function": {
+                    "name": "file_create",
+                    "description": "Create a new file with the given content (creates parent dirs). Fails if the file exists unless overwrite=true. Prefer this over bash heredocs.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "path": {"type": "string", "description": "Relative path to create"},
+                            "content": {"type": "string", "description": "Full file contents"},
+                            "overwrite": {
+                                "type": "boolean",
+                                "description": "Replace an existing file (default false)"
+                            }
+                        },
+                        "required": ["path", "content"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "is_coding_action": True,
+                "function": {
+                    "name": "test_run",
+                    "description": "Run tests and return structured pass/fail/skip counts. Use runner=vitest (default) or runner=npm with suite=script name.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "runner": {
+                                "type": "string",
+                                "enum": ["vitest", "npm"],
+                                "description": "Test runner (default vitest)"
+                            },
+                            "target": {
+                                "type": "string",
+                                "description": "Optional file/dir filter passed to the runner"
+                            },
+                            "suite": {
+                                "type": "string",
+                                "description": "npm script name when runner=npm (default: test)"
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "is_coding_action": True,
+                "function": {
+                    "name": "git_history",
+                    "description": "Structured git log --follow or git blame for a file (no shell scraping).",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "path": {"type": "string", "description": "Relative file path"},
+                            "mode": {
+                                "type": "string",
+                                "enum": ["log", "blame"],
+                                "description": "log (default) or blame"
+                            },
+                            "limit": {
+                                "type": "integer",
+                                "description": "Max log entries (default 20)"
+                            }
+                        },
+                        "required": ["path"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "is_coding_action": True,
+                "function": {
+                    "name": "typecheck",
+                    "description": "Run TypeScript typecheck and return structured errors (file, line, column, code, message).",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "project": {
+                                "type": "string",
+                                "description": "Optional tsconfig path for `tsc -p`. Omit to run `npm run typecheck`."
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "is_coding_action": True,
+                "function": {
+                    "name": "scholo_gate",
+                    "description": "Shadow-only Semantic Calculus gate (scripts/scholo-gate.mjs). Maps an intent to npm-script candidates / kind / law — never executes commands.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "intent": {
+                                "type": "string",
+                                "description": "Natural language intent, e.g. 'run the tests'"
+                            },
+                            "derived": {
+                                "type": "boolean",
+                                "description": "Treat as model-proposed utterance (--derived)"
+                            },
+                            "taint": {
+                                "type": "string",
+                                "description": "Optional untrusted source marker (--taint=...)"
+                            },
+                            "log": {
+                                "type": "boolean",
+                                "description": "Append to semantic-calculus corpus (--log)"
+                            }
+                        },
+                        "required": ["intent"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "browser_inspect",
+                    "description": "Headless Playwright inspect of a LOCAL app URL (localhost/127.0.0.1 only). Returns title, headings/buttons/links/inputs, console errors, optional screenshot under the repo.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "url": {
+                                "type": "string",
+                                "description": "Local URL, e.g. http://127.0.0.1:5173/"
+                            },
+                            "selector": {
+                                "type": "string",
+                                "description": "Optional CSS selector to wait for"
+                            },
+                            "wait_ms": {
+                                "type": "integer",
+                                "description": "Extra wait after DOMContentLoaded (ms)"
+                            },
+                            "screenshot": {
+                                "type": "string",
+                                "description": "Optional relative path to write a full-page PNG"
+                            }
+                        },
+                        "required": ["url"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "dependency_graph",
+                    "description": "Build a module dependency graph from an entry file (madge). Returns nodes/edges truncated by depth.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "entry": {
+                                "type": "string",
+                                "description": "Repo-relative entry file, e.g. 'src/pages/Combat/CombatPage.jsx'"
+                            },
+                            "depth": {
+                                "type": "integer",
+                                "description": "BFS depth from entry (default 2, max 8)"
+                            }
+                        },
+                        "required": ["entry"]
+                    }
+                }
+            },
+            {
+                "type": "function",
                 "function": {
                     "name": "search_code",
                     "description": "Grep the codebase for a pattern. Searches file contents recursively.",
@@ -496,45 +708,30 @@ class ToolService:
                     }
                 }
             },
-            {
-                "type": "function",
-                "function": {
-                    "name": "cleri_scan",
-                    "description": "Scan a symptom description against the Clerical RAID pattern corpus. Returns the best-matching bug pattern, confidence score, verdict, and fix path.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "symptoms": {
-                                "type": "string",
-                                "description": "Natural-language symptom description (e.g. 'null pointer in combat update loop')"
-                            }
-                        },
-                        "required": ["symptoms"]
-                    }
-                }
-            },
-            {
-                "type": "function",
-                "function": {
-                    "name": "cleri_stats",
-                    "description": "Get Clerical RAID engine statistics: total pattern count, query/confirm/deny counts, memory footprint.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {}
-                    }
-                }
-            },
+
             {
                 "type": "function",
                 "function": {
                     "name": "cleri_probe",
-                    "description": "Run a structural prion scan against the codebase. Walks source files looking for code-level structural misfolds matching a hypothesis.",
+                    "description": "Evidence-first Cleri Probe investigation (scripts/cleri-probe.js investigate). Maps a hypothesis to pathology classes, verifies findings, returns structured JSON.",
                     "parameters": {
                         "type": "object",
                         "properties": {
                             "hypothesis": {
                                 "type": "string",
                                 "description": "Code smell or structural hypothesis (e.g. 'unseeded Math.random in combat logic')"
+                            },
+                            "scope": {
+                                "type": "string",
+                                "description": "Optional repo-relative path/glob to scope (comma-separated for multiple)"
+                            },
+                            "plan_only": {
+                                "type": "boolean",
+                                "description": "If true, return the investigation plan without verifying findings"
+                            },
+                            "include_tests": {
+                                "type": "boolean",
+                                "description": "Analyze test paths as product code"
                             }
                         },
                         "required": ["hypothesis"]
@@ -737,7 +934,7 @@ class ToolService:
                 "type": "function",
                 "function": {
                     "name": "diagnostic_scan",
-                    "description": "Run a full codebase diagnostic scan. Executes all diagnostic cells (innate, adaptive, bridge, fixture, coverage) against the entire codebase and persists the report.",
+                    "description": "Run a full codebase diagnostic scan. Executes all diagnostic cells (innate, adaptive, bridge, fixture, coverage) against the entire codebase and persists the report. Oversized asset JSON is skipped automatically.",
                     "parameters": {
                         "type": "object",
                         "properties": {
@@ -745,6 +942,10 @@ class ToolService:
                                 "type": "string",
                                 "description": "Trigger source identifier (default 'mcp')",
                                 "default": "mcp"
+                            },
+                            "max_file_bytes": {
+                                "type": "integer",
+                                "description": "Optional per-file byte cap (default 1000000; oversized files are skipped)"
                             }
                         }
                     }
@@ -845,20 +1046,21 @@ class ToolService:
                     }
                 }
             },
+
             {
                 "type": "function",
                 "function": {
                     "name": "immunity_scan",
-                    "description": "Scan a source file through the Scholomance immune system. Checks Innate Layer (fixed rules) and Adaptive Layer (pathogen registry) for violations.",
+                    "description": "Scan a single source file through the immune system (innate/adaptive/protocol/checkpoint). Path is relative to project root.",
                     "parameters": {
                         "type": "object",
                         "properties": {
-                            "file_path": {
+                            "path": {
                                 "type": "string",
                                 "description": "Relative file path to scan (e.g. 'src/pages/Combat/CombatPage.jsx')"
                             }
                         },
-                        "required": ["file_path"]
+                        "required": ["path"]
                     }
                 }
             },
@@ -1159,6 +1361,10 @@ class ToolService:
                             "target_file": {
                                 "type": "string",
                                 "description": "Target file for the patch (relative to project root)"
+                            },
+                            "dry_run": {
+                                "type": "boolean",
+                                "description": "If true, diagnose and preview the patch without writing files or running verification."
                             }
                         },
                         "required": ["symptoms"]
@@ -1265,14 +1471,25 @@ class ToolService:
             return self._tui_inspect(kwargs, callback)
         elif tool_name == "git_diff":
             return self._git_diff(kwargs, callback)
+        elif tool_name == "file_create":
+            return self._file_create(kwargs, callback)
+        elif tool_name == "test_run":
+            return self._test_run(kwargs, callback)
+        elif tool_name == "git_history":
+            return self._git_history(kwargs, callback)
+        elif tool_name == "typecheck":
+            return self._typecheck(kwargs, callback)
+        elif tool_name == "scholo_gate":
+            return self._scholo_gate(kwargs, callback)
+        elif tool_name == "browser_inspect":
+            return self._browser_inspect(kwargs, callback)
+        elif tool_name == "dependency_graph":
+            return self._dependency_graph(kwargs, callback)
         elif tool_name == "replace_file_content":
             return self._replace_file_content(kwargs, callback)
         elif tool_name == "search_youtube":
             return self._search_youtube(kwargs, callback)
-        elif tool_name == "cleri_scan":
-            return self._cleri_scan(kwargs, callback)
-        elif tool_name == "cleri_stats":
-            return self._cleri_stats(kwargs, callback)
+
         elif tool_name == "cleri_probe":
             return self._cleri_probe(kwargs, callback)
         elif tool_name == "health_emit":
@@ -1303,6 +1520,7 @@ class ToolService:
             return self._diagnostic_health(kwargs, callback)
         elif tool_name == "diagnostic_hints":
             return self._diagnostic_hints(kwargs, callback)
+
         elif tool_name == "immunity_scan":
             return self._immunity_scan(kwargs, callback)
         elif tool_name == "immunity_status":
@@ -1618,7 +1836,7 @@ class ToolService:
         try:
             result = subprocess.run(
                 cmd_str, capture_output=True, text=True, timeout=15,
-                shell=True, cwd=PROJECT_ROOT
+                shell=True, cwd=PROJECT_ROOT, env=harness_tools.node_env(),
             )
             out = result.stdout.strip()
             err = result.stderr.strip()
@@ -1728,22 +1946,33 @@ class ToolService:
         except Exception as e:
             return f"Format error: {e}"
 
-    def _cleri_scan(self, kwargs, callback):
-        text = kwargs.get("symptoms", "")
-        if not text:
-            return "Error: No symptom text provided."
-        result = _run_bridge("scan", text)
-        return self._fmt_bridge("cleri_scan", result, callback)
 
-    def _cleri_stats(self, kwargs, callback):
-        result = _run_bridge("stats")
-        return self._fmt_bridge("cleri_stats", result, callback)
 
     def _cleri_probe(self, kwargs, callback):
-        text = kwargs.get("hypothesis", "")
+        text = kwargs.get("hypothesis") or kwargs.get("text") or ""
         if not text:
             return "Error: No hypothesis provided."
-        result = _run_bridge("probe", text, "--mode=prion")
+        args = [text]
+        scope = kwargs.get("scope") or kwargs.get("scopes")
+        if scope:
+            if isinstance(scope, (list, tuple)):
+                scope = ",".join(str(s) for s in scope if s)
+            args.extend(["--scope", str(scope)])
+        if kwargs.get("plan_only"):
+            args.append("--plan-only")
+        if kwargs.get("include_tests"):
+            args.append("--include-tests")
+        # Investigation can walk large trees; give it room.
+        result = _run_bridge("probe", *args, timeout=180)
+        if isinstance(result, dict) and "error" not in result:
+            findings = result.get("findings") or []
+            status = result.get("status") or result.get("contract") or "ok"
+            if callback:
+                callback(
+                    f"  [#7CFF8B]✓[/] cleri_probe: {status} "
+                    f"({len(findings)} findings)"
+                )
+            return json.dumps(result, indent=2, default=str)[:6000]
         return self._fmt_bridge("cleri_probe", result, callback)
 
     def _health_emit(self, kwargs, callback):
@@ -1956,16 +2185,26 @@ class ToolService:
 
     def _diagnostic_scan(self, kwargs, callback):
         trigger = kwargs.get("trigger", "mcp")
-        result = _run_bridge("diagnostic-scan", "--trigger", trigger)
+        args = ["--trigger", str(trigger)]
+        max_file_bytes = kwargs.get("max_file_bytes")
+        if max_file_bytes is not None:
+            args.extend(["--max-file-bytes", str(int(max_file_bytes))])
+        # Full scans are heavy; keep the bridge alive long enough.
+        result = _run_bridge("diagnostic-scan", *args, timeout=600)
         if isinstance(result, dict) and "error" not in result:
             violations = result.get("violations", [])
+            summary = result.get("summary") or {}
             if callback:
-                callback(f"  [#7CFF8B]✓[/] diagnostic_scan: {len(violations)} violations")
+                callback(
+                    f"  [#7CFF8B]✓[/] diagnostic_scan: "
+                    f"{len(violations) or summary.get('totalErrors', '?')} violations"
+                )
             return (
                 f"--- Diagnostic Scan Complete ---\n"
                 f"  Report: {result.get('reportId', 'N/A')}\n"
                 f"  Cells: {result.get('cells', [])}\n"
                 f"  Violations: {len(violations)}\n"
+                f"  Summary: {json.dumps(summary, default=str)[:500]}\n"
                 f"  Checksum: {result.get('checksum', 'N/A')}"
             )
         return self._fmt_bridge("diagnostic_scan", result, callback)
@@ -2002,17 +2241,20 @@ class ToolService:
         result = _run_bridge("diagnostic-violations", *args)
         if isinstance(result, dict) and "error" not in result:
             violations = result.get("violations", [])
+            normalized = [harness_tools.normalize_violation(v) for v in violations]
             if callback:
-                callback(f"  [#7CFF8B]✓[/] diagnostic_violations: {len(violations)} matches")
-            if not violations:
+                callback(f"  [#7CFF8B]✓[/] diagnostic_violations: {len(normalized)} matches")
+            if not normalized:
                 return "No violations match the given filters."
-            lines = [f"--- Violations ({result.get('count', len(violations))} total) ---"]
-            for v in violations[:20]:
-                ctx = v.get("context", {})
-                lines.append(f"  [{v.get('severity', '?')}] {ctx.get('ruleId', v.get('cell', '?'))} - {v.get('message', v.get('checkId', ''))}")
-            if len(violations) > 20:
-                lines.append(f"  ... and {len(violations) - 20} more")
-            return "\n".join(lines)
+            payload = {
+                "reportId": result.get("reportId"),
+                "count": result.get("count", len(normalized)),
+                "violations": normalized,
+            }
+            text = harness_tools.format_violations_text(
+                violations, total=payload["count"]
+            )
+            return text + "\n\n" + json.dumps(payload, indent=2, default=str)[:4000]
         return self._fmt_bridge("diagnostic_violations", result, callback)
 
     def _diagnostic_health(self, kwargs, callback):
@@ -2052,25 +2294,37 @@ class ToolService:
             return json.dumps(result, indent=2, default=str)[:2000]
         return self._fmt_bridge("diagnostic_hints", result, callback)
 
+
+
     def _immunity_scan(self, kwargs, callback):
-        file_path = kwargs.get("file_path", "")
-        if not file_path:
-            return "Error: file_path is required."
-        result = _run_bridge("immunity-scan", file_path)
+        path = kwargs.get("path") or kwargs.get("file_path") or ""
+        if not path:
+            return "Error: path is required."
+        result = _run_bridge("immunity-scan", path, timeout=60)
         if isinstance(result, dict) and "error" not in result:
-            status = result.get("status", "UNKNOWN")
-            report = result.get("report", "")
+            total = result.get("totalViolations", len(result.get("innate") or []))
+            blocked = result.get("blocked", False)
             if callback:
-                callback(f"  [#7CFF8B]✓[/] immunity_scan({file_path}): {status}")
-            return report or json.dumps(result, indent=2, default=str)[:3000]
+                mark = "#FF5C7A" if blocked or total else "#7CFF8B"
+                callback(f"  [{mark}]✓[/] immunity_scan({path}): {total} violations")
+            return json.dumps(result, indent=2, default=str)[:6000]
         return self._fmt_bridge("immunity_scan", result, callback)
 
     def _immunity_status(self, kwargs, callback):
+        # Get immunity system status
         result = _run_bridge("immunity-status")
+        
+        # Also get RAID stats (since cleri_stats was retired)
+        raid_stats = _run_bridge("stats")
+        
         if isinstance(result, dict) and "error" not in result:
+            # Merge RAID stats into the response
+            if isinstance(raid_stats, dict) and "error" not in raid_stats:
+                result["raid"] = raid_stats
+            
             if callback:
-                callback("  [#7CFF8B]✓[/] immunity_status")
-            return json.dumps(result, indent=2, default=str)[:2000]
+                callback("  [#7CFF8B]✓[/] immunity_status (includes RAID stats)")
+            return json.dumps(result, indent=2, default=str)[:3000]
         return self._fmt_bridge("immunity_status", result, callback)
 
     def _raid_query(self, kwargs, callback):
@@ -2247,6 +2501,167 @@ class ToolService:
             return f"Memory set: key='{key}'"
         return self._fmt_bridge("memory_set", result, callback)
 
+    def _file_create(self, kwargs, callback):
+        path = kwargs.get("path", "")
+        content = kwargs.get("content", "")
+        overwrite = bool(kwargs.get("overwrite", False))
+        result = harness_tools.file_create(PROJECT_ROOT, path, content, overwrite=overwrite)
+        if callback:
+            if result.get("ok"):
+                callback(f"  [#7CFF8B]✓[/] file_create({path})")
+            else:
+                callback(f"  [#FF5C7A]✗[/] file_create: {result.get('error', 'failed')}")
+        return json.dumps(result, indent=2)
+
+    def _resolve_test_panel(self, callback):
+        app = getattr(callback, "__self__", None)
+        if app is None:
+            return None, None
+        try:
+            return app, app.query_one("#test-run")
+        except Exception:
+            return app, None
+
+    def _test_run(self, kwargs, callback):
+        runner = kwargs.get("runner") or "vitest"
+        target = kwargs.get("target")
+        suite = kwargs.get("suite")
+        if callback:
+            callback(f"  [bold #FFD700]⚡[/] test_run({runner})")
+
+        app, panel = self._resolve_test_panel(callback)
+
+        def ui(fn, *args, **kw):
+            if app is None or panel is None:
+                return
+            try:
+                app.call_from_thread(fn, *args, **kw)
+            except Exception:
+                try:
+                    fn(*args, **kw)
+                except Exception:
+                    pass
+
+        if panel is not None:
+            ui(panel.begin_run, runner, target, suite)
+
+        def on_line(line, fraction):
+            ui(panel.on_progress, fraction, line) if panel is not None else None
+
+        panel_done = False
+        try:
+            result = harness_tools.run_tests(
+                PROJECT_ROOT,
+                runner=runner,
+                target=target,
+                suite=suite,
+                on_line=on_line if panel is not None else None,
+            )
+        except subprocess.TimeoutExpired:
+            result = {"ok": False, "error": "test_run timed out", "tests": []}
+            if panel is not None:
+                ui(panel.fail, "test_run timed out")
+                panel_done = True
+        except Exception as e:
+            result = {"ok": False, "error": str(e), "tests": []}
+            if panel is not None:
+                ui(panel.fail, str(e))
+                panel_done = True
+
+        if panel is not None and not panel_done:
+            if result.get("error") and not result.get("tests"):
+                ui(panel.fail, result.get("error", "failed"))
+            else:
+                ui(
+                    panel.play_results,
+                    result.get("tests") or [],
+                    result.get("passed", 0),
+                    result.get("failed", 0),
+                    result.get("skipped", 0),
+                    result.get("ok", False),
+                )
+
+        if callback:
+            mark = "#7CFF8B" if result.get("ok") else "#FF5C7A"
+            callback(
+                f"  [{mark}]✓[/] test_run: passed={result.get('passed')} "
+                f"failed={result.get('failed')} exit={result.get('exit_code')}"
+            )
+        return json.dumps(result, indent=2, default=str)[:6000]
+
+    def _git_history(self, kwargs, callback):
+        path = kwargs.get("path", "")
+        mode = kwargs.get("mode") or "log"
+        limit = int(kwargs.get("limit") or 20)
+        result = harness_tools.git_history(PROJECT_ROOT, path, mode=mode, limit=limit)
+        if callback:
+            n = len(result.get("entries") or [])
+            callback(f"  [#7CFF8B]✓[/] git_history({mode}, {path}): {n} entries")
+        return json.dumps(result, indent=2, default=str)[:6000]
+
+    def _typecheck(self, kwargs, callback):
+        if callback:
+            callback("  [bold #FFD700]⚡[/] typecheck")
+        try:
+            result = harness_tools.run_typecheck(PROJECT_ROOT, project=kwargs.get("project"))
+        except subprocess.TimeoutExpired:
+            result = {"ok": False, "error": "typecheck timed out", "errors": []}
+        if callback:
+            mark = "#7CFF8B" if result.get("ok") else "#FF5C7A"
+            callback(f"  [{mark}]✓[/] typecheck: {len(result.get('errors') or [])} errors")
+        return json.dumps(result, indent=2, default=str)[:6000]
+
+    def _scholo_gate(self, kwargs, callback):
+        intent = kwargs.get("intent", "")
+        if callback:
+            callback(f"  [bold #FFD700]⚡[/] scholo_gate('{intent[:50]}')")
+        result = harness_tools.scholo_gate(
+            PROJECT_ROOT,
+            intent,
+            derived=bool(kwargs.get("derived")),
+            taint=kwargs.get("taint"),
+            log=bool(kwargs.get("log")),
+        )
+        if callback:
+            kind = result.get("kind", "?")
+            callback(f"  [#7CFF8B]✓[/] scholo_gate: kind={kind}")
+        return json.dumps(result, indent=2, default=str)[:6000]
+
+    def _browser_inspect(self, kwargs, callback):
+        url = kwargs.get("url", "")
+        if not url:
+            return "Error: url is required (localhost only)."
+        if callback:
+            callback(f"  [bold #FFD700]⚡[/] browser_inspect({url[:80]})")
+        result = harness_tools.browser_inspect(
+            PROJECT_ROOT,
+            url,
+            selector=kwargs.get("selector"),
+            wait_ms=int(kwargs.get("wait_ms") or 0),
+            screenshot=kwargs.get("screenshot"),
+        )
+        if callback:
+            mark = "#7CFF8B" if result.get("ok") else "#FF5C7A"
+            title = result.get("title") or result.get("error") or "?"
+            callback(f"  [{mark}]✓[/] browser_inspect: {title}")
+        return json.dumps(result, indent=2, default=str)[:6000]
+
+    def _dependency_graph(self, kwargs, callback):
+        entry = kwargs.get("entry") or kwargs.get("path") or ""
+        if not entry:
+            return "Error: entry path is required."
+        depth = int(kwargs.get("depth") or 2)
+        if callback:
+            callback(f"  [bold #FFD700]⚡[/] dependency_graph({entry})")
+        result = harness_tools.dependency_graph(PROJECT_ROOT, entry, depth=depth)
+        if callback:
+            mark = "#7CFF8B" if result.get("ok") else "#FF5C7A"
+            callback(
+                f"  [{mark}]✓[/] dependency_graph: "
+                f"{result.get('node_count', 0)} nodes / {result.get('edge_count', 0)} edges"
+            )
+        return json.dumps(result, indent=2, default=str)[:6000]
+
     def _heal(self, kwargs, callback):
         symptoms = kwargs.get("symptoms", [])
         if not symptoms:
@@ -2267,15 +2682,25 @@ class ToolService:
             args.extend(["--patch", kwargs["patch_content"]])
         if kwargs.get("target_file"):
             args.extend(["--target-file", kwargs["target_file"]])
+        if kwargs.get("dry_run"):
+            args.append("--dry-run")
         result = _run_bridge("heal", *args, timeout=600)
         if isinstance(result, dict) and "error" not in result:
             status = result.get("status", "?")
             iters = result.get("iterations", "?")
             verdict = result.get("verdict", "?")
-            pattern_name = result.get("pattern", {}).get("name", "none")
+            pattern_name = (result.get("pattern") or {}).get("name", "none")
             if callback:
-                callback(f"  [#7CFF8B]✓[/] Heal complete: {status} ({iters} iters, verdict={verdict}, pattern={pattern_name})")
-            return f"Heal result: status={status}, iterations={iters}, verdict={verdict}, pattern={pattern_name}\n" + json.dumps(result, indent=2, default=str)
+                prefix = "Heal dry-run" if result.get("dry_run") else "Heal complete"
+                callback(
+                    f"  [#7CFF8B]✓[/] {prefix}: {status} "
+                    f"({iters} iters, verdict={verdict}, pattern={pattern_name})"
+                )
+            return (
+                f"Heal result: status={status}, iterations={iters}, "
+                f"verdict={verdict}, pattern={pattern_name}\n"
+                + json.dumps(result, indent=2, default=str)
+            )
         return self._fmt_bridge("heal", result, callback)
 
     def _apply_patch(self, kwargs, callback):

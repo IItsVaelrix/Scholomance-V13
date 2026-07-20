@@ -9,9 +9,8 @@ export interface EffectsPanelProps {
 }
 
 export function EffectsPanel({ activeClip, updateProject }: EffectsPanelProps) {
-  if (!activeClip) return null;
-
   const effectMutator = useEffectMutator(updateProject);
+  if (!activeClip) return null;
 
   function addEffectToClipLocal(clipId: string, effectId: string) {
     effectMutator.addEffect(clipId, effectId);
@@ -49,8 +48,9 @@ export function EffectsPanel({ activeClip, updateProject }: EffectsPanelProps) {
 
       {(activeClip.effects || []).some((e: any) => e.effectId === 'chroma-key') && (
         <div style={{ marginTop: 4 }}>
-          <label style={{ fontSize: 10 }}>Key Color: </label>
+          <label htmlFor="videoforge-key-color" style={{ fontSize: 10 }}>Key Color: </label>
           <input
+            id="videoforge-key-color"
             type="color"
             defaultValue="#00ff00"
             onChange={(e) => {

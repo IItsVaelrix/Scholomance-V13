@@ -3,7 +3,7 @@
  * ══════════════════════════════════════════════════════════════════════════════
  */
 
-import { getBytecodeAMP, AMP_CHANNELS, getRotationAtTime } from '../../../lib/ambient/bytecodeAMP';
+import { getBytecodeAMP, AMP_CHANNELS } from '../../../lib/ambient/bytecodeAMP';
 
 const REF = { W: 1920, H: 1080 };
 const CONSOLE = { x: 960, y: 560, w: 1160, h: 640, cr: 16 };
@@ -60,19 +60,7 @@ export function buildSignalChamberScene(Phaser) {
 
     this._drawConsoleShell(); this._drawPanelLeft(); this._drawPanelRight();
     this._drawRadarStatic(); this._drawGaugeFaces(); this._drawControlStrip();
-    this._applyRadarMask(); this._bakeRadarTextures(); this._setupPersistentRadarSprites();
-
-    this._programs = {
-      SONIC: this._drawSonic.bind(this), PSYCHIC: this._drawPsychic.bind(this),
-      VOID: this._drawVoid.bind(this), WILL: this._drawWill.bind(this), ALCHEMY: this._drawAlchemy.bind(this),
-    };
-    this._genericProgram = this._drawGeneric.bind(this);
-
-    const rcx = RADAR.x * this._sx, rcy = RADAR.y * this._sy, rr = RADAR.r * this._ms;
-    this._voidStars = Array.from({ length: 75 }, (_, i) => ({
-      x: rcx + Math.sin(i * 137.508) * rr * 0.9, y: rcy + Math.cos(i * 137.508 * 1.618) * rr * 0.9,
-      size: (Math.sin(i * 29.3) * 0.5 + 0.5) * 1.4 + 0.2, phase: i * 0.7, speed: (Math.sin(i * 11.7) * 0.5 + 0.5) * 0.0015 + 0.0005,
-    }));
+    this._applyRadarMask();
 
     this._wireInput(); this._redrawPlayButton(); this._redrawVolSlider(); this._redrawSignalSlider();
     // Interaction + console chrome live here. Full-scene atmosphere is
@@ -152,109 +140,6 @@ export function buildSignalChamberScene(Phaser) {
     });
   }
 
-  _bakeRadarTextures() {
-    if (this.textures.exists('radar_sacred_hex')) return;
-    const r = RADAR.r * this._ms, size = r * 2;
-    const bake = (key, drawFn) => {
-      const g = this.make.graphics({ x: 0, y: 0, add: false });
-      drawFn(g, r, r, size); g.generateTexture(key, size, size); g.destroy();
-    };
-    bake('radar_sacred_hex', (g, cx, cy) => {
-      g.lineStyle(2, 0xffffff, 1); g.beginPath();
-      for (let i = 0; i <= 6; i++) {
-        const a = (i / 6) * Math.PI * 2, px = cx + Math.cos(a) * (r * 0.85), py = cy + Math.sin(a) * (r * 0.85);
-        if (i === 0) g.moveTo(px, py); else g.lineTo(px, py);
-      }
-      g.strokePath();
-    });
-    bake('radar_sacred_star', (g, cx, cy) => {
-      g.lineStyle(3, 0xffffff, 1);
-      for (let tri = 0; tri < 2; tri++) {
-        const rot = tri * Math.PI; g.beginPath();
-        for (let i = 0; i <= 3; i++) {
-          const a = (i / 3) * Math.PI * 2 + rot, px = cx + Math.cos(a) * (r * 0.62), py = cy + Math.sin(a) * (r * 0.62);
-          if (i === 0) g.moveTo(px, py); else g.lineTo(px, py);
-        }
-        g.strokePath();
-      }
-    });
-    bake('radar_flower_of_life', (g, cx, cy) => {
-      g.lineStyle(1.5, 0xffffff, 1); const orbitR = r * 0.38;
-      for (let i = 0; i < 6; i++) {
-        const a = (i / 6) * Math.PI * 2; g.strokeCircle(cx + Math.cos(a) * orbitR, cy + Math.sin(a) * orbitR, orbitR);
-      }
-      g.strokeCircle(cx, cy, orbitR);
-    });
-    bake('radar_metatron', (g, cx, cy) => {
-      g.lineStyle(1, 0xffffff, 1);
-      for (let h = 0; h < 3; h++) {
-        const hexR = r * (0.85 - h * 0.25); g.beginPath();
-        for (let i = 0; i <= 6; i++) {
-          const a = (i / 6) * Math.PI * 2, px = cx + Math.cos(a) * hexR, py = cy + Math.sin(a) * hexR;
-          if (i === 0) g.moveTo(px, py); else g.lineTo(px, py);
-        }
-        g.strokePath();
-      }
-    });
-    bake('radar_specular_glint', (g, cx, cy) => {
-      g.fillStyle(0xffffff, 0.4); g.fillEllipse(cx - r * 0.35, cy - r * 0.35, r * 0.25, r * 0.15);
-      g.fillStyle(0xffffff, 0.15); g.fillEllipse(cx + r * 0.2, cy + r * 0.2, r * 0.4, r * 0.3);
-    });
-  }
-
-  _setupPersistentRadarSprites() {
-    const cx = this._radarCX, cy = this._radarCY;
-    this._sprites.hex1 = this.add.sprite(cx, cy, 'radar_sacred_hex').setAlpha(0).setDepth(41).setBlendMode('SCREEN');
-    this._sprites.hex2 = this.add.sprite(cx, cy, 'radar_sacred_hex').setAlpha(0).setDepth(41).setScale(0.7).setBlendMode('SCREEN');
-    this._sprites.star = this.add.sprite(cx, cy, 'radar_sacred_star').setAlpha(0).setDepth(41).setBlendMode('SCREEN');
-    this._sprites.flower = this.add.sprite(cx, cy, 'radar_flower_of_life').setAlpha(0).setDepth(41).setScale(1.2).setBlendMode('SCREEN');
-    this._sprites.metatron = this.add.sprite(cx, cy, 'radar_metatron').setAlpha(0).setDepth(41).setBlendMode('SCREEN');
-    this._sprites.glint = this.add.sprite(cx, cy, 'radar_specular_glint').setAlpha(0).setDepth(46).setBlendMode('ADD');
-  }
-
-  _drawSonic(g, cx, cy, r, t, sig, col) {
-    const amp = (14 + sig * 38) * this._ms; g.lineStyle(1.5, col, 0.45 + sig * 0.35); g.beginPath();
-    const startX = cx - r * 0.84;
-    const endX = cx + r * 0.84;
-    const range = endX - startX;
-    for (let x = startX; x <= endX; x += 4) {
-      const nx = (x - startX) / range;
-      const w = Math.sin(nx * Math.PI * 7 + t * 0.0028) * amp;
-      if (x === startX) g.moveTo(x, cy + w); else g.lineTo(x, cy + w);
-    }
-    g.strokePath();
-  }
-
-  _drawPsychic(g, cx, cy, r, t, sig, col) {
-    g.lineStyle(1, col, 0.25 + sig * 0.2);
-    for (let arm = 0; arm < 3; arm++) {
-      const off = (arm / 3) * Math.PI * 2; g.beginPath();
-      for (let p = 0; p < 48; p++) {
-        const th = (p / 48) * Math.PI * 3.2 + off + t * 0.0004, sr = (p / 48) * r * 0.82;
-        const px = cx + Math.cos(th) * sr, py = cy + Math.sin(th) * sr;
-        if (p === 0) g.moveTo(px, py); else g.lineTo(px, py);
-      }
-      g.strokePath();
-    }
-  }
-
-  _drawVoid(g, cx, cy, _r, t, sig, _col) {
-    for (const s of this._voidStars) {
-      const tw = 0.25 + Math.sin(t * s.speed * 1000 + s.phase) * 0.35;
-      g.fillStyle(0xffffff, tw * (0.35 + sig * 0.35)); g.fillCircle(s.x, s.y, s.size * this._ms);
-    }
-  }
-
-  _drawWill(g, cx, cy, r, t, sig, col) {
-    g.lineStyle(1.5, col, 0.25 + sig * 0.45);
-    for (let i = 0; i < 12; i++) {
-      const ang = (i / 12) * Math.PI * 2 + t * 0.00015; g.lineBetween(cx, cy, cx + Math.cos(ang) * r * 0.8, cy + Math.sin(ang) * r * 0.8);
-    }
-  }
-
-  _drawAlchemy(g, cx, cy, r, _t, sig, col) { g.lineStyle(1.5, col, 0.3 + sig * 0.2); g.strokeCircle(cx, cy, r * 0.66); }
-  _drawGeneric(g, cx, cy, r, _t, sig, col) { g.lineStyle(1.5, col, 0.35 + sig * 0.45); g.strokeCircle(cx, cy, r * 0.5); }
-  _drawSacredGeometry(_g, _cx, _cy, _r, _t, _sig, _col) {}
 
   _drawGaugeFaces() {
     const col = this._col || PAL.dimGold;
@@ -328,40 +213,22 @@ export function buildSignalChamberScene(Phaser) {
 
   update(time, _delta) {
     if (!this._isCreated) return;
-    
-    // Use AMP motion if available, fallback to legacy bytecode
+
+    // The rotating sacred-geometry layer (hex/star/flower/metatron/glint sprites
+    // + the _rdPattern school program) was removed — it was the source of the
+    // beat-synced rotation stutter. The dial, core, chrome and gauges remain; a
+    // new backdrop can be composed behind the orb later.
     const flicker = getBytecodeAMP(time, AMP_CHANNELS.FLICKER);
-    const glow = this._orbMotion?.glow !== undefined ? this._orbMotion.glow : getBytecodeAMP(time, AMP_CHANNELS.GLOW);
-    const scale = this._orbMotion?.scale !== undefined ? this._orbMotion.scale : 1.0;
-    
-    const cx = this._radarCX, cy = this._radarCY, r = this._radarR, col = this._col, sig = this._sig, _ms = this._ms, bpm = this._bpm;
-    
-    // Absolute time transition
+    const col = this._col, sig = this._sig;
+
+    // School-change fade — drives the console glow ramp.
     let ta = 1;
     if (this._schoolChanged) {
       const elapsed = performance.now() - (this._lastSwitchTime || 0);
-      ta = Math.min(1, elapsed / 350); 
+      ta = Math.min(1, elapsed / 350);
       if (ta >= 1) this._schoolChanged = false;
     }
-    
-    // Modulate standby alpha with AMP glow
-    const standbyAlpha = (this._isPlaying ? 0.6 : 0.25) * Math.max(0.1, glow) * ta;
-    
-    // Apply AMP scale to radar elements
-    const currentR = r * scale;
-    
-    // BPM-synced clock-like rotation: smooth, continuous, no wobble
-    this._sprites.hex1.setAlpha(standbyAlpha).setRotation(getRotationAtTime(time, bpm, 90)).setTint(col).setScale(scale);
-    this._sprites.hex2.setAlpha(standbyAlpha * 0.7).setRotation(getRotationAtTime(time, bpm, -45)).setTint(col).setScale(0.7 * scale);
-    this._sprites.star.setAlpha(standbyAlpha * 1.4).setRotation(getRotationAtTime(time, bpm, -180)).setTint(col).setScale(scale);
-    this._sprites.flower.setAlpha(standbyAlpha * 0.6).setRotation(getRotationAtTime(time, bpm, 45)).setTint(col).setScale(1.2 * scale);
-    this._sprites.metatron.setAlpha(standbyAlpha * 0.8).setRotation(getRotationAtTime(time, bpm, -90)).setTint(col).setScale(scale);
-    this._sprites.glint.setAlpha((0.15 + sig * 0.2) * ta * (0.8 + flicker * 0.2)).setRotation(getRotationAtTime(time, bpm, 22.5)).setScale(scale);
-    
-    this._rdPattern.clear(); 
-    this._rdPattern.setAlpha(ta); 
-    (this._programs[this._schoolId] || this._genericProgram)(this._rdPattern, cx, cy, currentR, time, sig, col);
-    
+
     // Console glow driven by consoleMotion
     const consoleGlow = this._consoleMotion?.glow !== undefined ? this._consoleMotion.glow : (0.035 + sig * 0.1);
     const consoleOpacity = this._consoleMotion?.opacity !== undefined ? this._consoleMotion.opacity : 1.0;

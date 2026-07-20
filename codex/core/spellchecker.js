@@ -123,7 +123,7 @@ export class Spellchecker {
 
     if (!this.asyncOfflineAnnounced) {
       this.asyncOfflineAnnounced = true;
-      const message = '[Spellcheck] Dictionary API unreachable — running in offline mode';
+      const message = '[Spellcheck] Dictionary API unreachable ï¿½ running in offline mode';
       console.warn(`${message} (${source})`, error);
       try {
         this.asyncOnOffline?.({ error, source, message });
@@ -133,19 +133,28 @@ export class Spellchecker {
     }
   }
 
-  init(words) {
+  init(words, resetOrOptions = false) {
     if (!Array.isArray(words)) return;
-    
+
+    const reset = typeof resetOrOptions === 'boolean'
+      ? resetOrOptions
+      : Boolean(resetOrOptions?.reset);
+
+    if (reset) {
+      this.dictionary.clear();
+      this.phoneticMap.clear();
+      this.bigramMap.clear();
+      this.validationCache.clear();
+    }
+
     words.forEach((w) => {
       const lower = this.normalizeWord(w);
       if (!lower) return;
       this.remember(lower, 1);
     });
 
-    for (let i = 0; i < words.length - 1; i++) {
-      this.rememberSequence(words[i], words[i + 1], 1);
-    }
-    
+    // Sequence bigrams come from corpus rememberSequence calls ï¿½ not from
+    // arbitrary dictionary adjacency, which polluted contextual ranking.
     this.isLoaded = true;
   }
 
@@ -192,11 +201,13 @@ export class Spellchecker {
   }
 
   /**
-   * Suggests corrections using a blend of Edit Distance, Phonetics, and Frequency.
-   * @param {string} word 
-   * @param {string} contextPrevWord - Optional previous word for Bigram context
+   * Suggests corrections with rank scores (edit distance, phonetics, frequency, bigrams).
+   * @param {string} word
+   * @param {number} [limit=5]
+   * @param {string|null} [contextPrevWord=null]
+   * @returns {Array<{ word: string, score: number, distance: number, contextScore: number, frequency: number, phonetic: boolean }>}
    */
-  suggest(word, limit = 5, contextPrevWord = null) {
+  suggestDetailed(word, limit = 5, contextPrevWord = null) {
     if (!word) return [];
     const target = this.normalizeWord(word);
     if (!target) return [];
@@ -227,7 +238,7 @@ export class Spellchecker {
     // 1. Phonetic neighborhood
     const phoneticKey = phoneticMatcher.encode(target);
     const soundAlikes = this.phoneticMap.get(phoneticKey) || [];
-    
+
     soundAlikes.forEach((candidateWord) => {
       upsertCandidate(candidateWord, { phonetic: true });
     });
@@ -243,9 +254,16 @@ export class Spellchecker {
       }
     }
 
-    // 3. Rank candidates with composite scoring
-    return this.rankCandidates(target, [...candidateMap.values()], limit, contextPrevWord)
-      .map((entry) => entry.word);
+    return this.rankCandidates(target, [...candidateMap.values()], limit, contextPrevWord);
+  }
+
+  /**
+   * Suggests corrections using a blend of Edit Distance, Phonetics, and Frequency.
+   * @param {string} word
+   * @param {string} contextPrevWord - Optional previous word for Bigram context
+   */
+  suggest(word, limit = 5, contextPrevWord = null) {
+    return this.suggestDetailed(word, limit, contextPrevWord).map((entry) => entry.word);
   }
 
   getMaxEditDistance(wordLength) {
@@ -438,18 +456,13 @@ export class Spellchecker {
     return merged;
   }
 
-  async suggestAsync(word, limit = 5, contextPrevWord = null) {
+  async suggestDetailedAsync(word, limit = 5, contextPrevWord = null) {
     const normalized = this.normalizeWord(word);
     if (!normalized) return [];
     if (this.dictionary.has(normalized)) return [];
 
     const queryLimit = Math.max(limit * 4, 20);
-    const localRanked = this.rankCandidates(
-      normalized,
-      this.suggest(normalized, queryLimit, contextPrevWord).map((candidateWord) => ({ word: candidateWord })),
-      queryLimit,
-      contextPrevWord
-    );
+    const localRanked = this.suggestDetailed(normalized, queryLimit, contextPrevWord);
 
     const candidateMap = new Map();
     localRanked.forEach((entry) => {
@@ -471,14 +484,17 @@ export class Spellchecker {
       }
     });
 
-    const reranked = this.rankCandidates(
+    return this.rankCandidates(
       normalized,
       [...candidateMap.values()],
-      queryLimit,
+      limit,
       contextPrevWord
     );
+  }
 
-    return reranked.slice(0, limit).map((entry) => entry.word);
+  async suggestAsync(word, limit = 5, contextPrevWord = null) {
+    const ranked = await this.suggestDetailedAsync(word, limit, contextPrevWord);
+    return ranked.map((entry) => entry.word);
   }
 
   levenshtein(a, b) {

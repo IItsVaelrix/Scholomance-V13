@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import type { ResolvedAlbumTrack } from './useAlbumResolver';
+import { degradeWithFallback } from '../recovery';
 
 export type PlaybackStatus =
   | "idle"
@@ -72,8 +73,9 @@ export function useAlbumAudioEngine({
       analyserRef.current = analyser;
       sourceRef.current = source;
       setAnalysisAvailability('available');
-    } catch {
+    } catch (error) {
       setAnalysisAvailability('unsupported');
+      degradeWithFallback(error, 'web-audio-graph-unsupported');
     }
   }, [audioRef]);
 
@@ -93,7 +95,7 @@ export function useAlbumAudioEngine({
     } else {
       setStatus('idle');
     }
-  }, [activeTrack.audioUrl, activeTrack.duration]);
+  }, [activeTrack.audioUrl, activeTrack.duration, audioRef]);
 
   useEffect(() => {
     const el = audioRef.current;
@@ -141,7 +143,7 @@ export function useAlbumAudioEngine({
       el.removeEventListener('durationchange', onDurationChange);
       el.removeEventListener('timeupdate', onTimeUpdate);
     };
-  }, []);
+  }, [audioRef]);
 
   /**
    * The karaoke clock.
@@ -180,6 +182,7 @@ export function useAlbumAudioEngine({
     } catch (err: unknown) {
       setStatus('error');
       setError(err instanceof Error ? err.message : 'Playback blocked');
+      degradeWithFallback(err, 'playback-blocked');
     }
   }, [audioRef, ensureGraph]);
 

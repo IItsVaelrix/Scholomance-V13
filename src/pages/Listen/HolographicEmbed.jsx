@@ -9,9 +9,17 @@
  * - Music-reactive signal core (is-live class drives glow animation in CSS)
  */
 
-import { useState, useEffect } from 'react';
-import { freshRng } from '../../lib/math/seededRng.js';
 import { motion } from 'framer-motion';
+import {
+  Pause,
+  Play,
+  RotateCcw,
+  RotateCw,
+  SkipBack,
+  SkipForward,
+  Volume1,
+  Volume2,
+} from 'lucide-react';
 import { getTrackEmbedConfig } from "../../lib/musicEmbeds";
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -182,33 +190,6 @@ export default function HolographicEmbed({
   onIgnite,
   sinkId = '',
 }) {
-  /* Aetheric current overflow twitch - non-deterministic interval, purely visual */
-  const [isTwitching, setIsTwitching] = useState(false);
-
-  useEffect(() => {
-    let timeout;
-    let twitchResetTimeout;
-    // Crypto-seeded per mount via the sanctioned RNG bridge - varies per
-    // page-load, no raw host RNG (QUANT-0101 / VAELRIX_LAW §6). Purely visual.
-    const random = freshRng();
-
-    const scheduleNextTwitch = () => {
-      // Randomize between 8 and 38 seconds.
-      const delay = 8000 + random() * 30000;
-      timeout = setTimeout(() => {
-        setIsTwitching(true);
-        // Twitch resolves in 500ms - matches CSS animation duration
-        twitchResetTimeout = setTimeout(() => setIsTwitching(false), 500);
-        scheduleNextTwitch();
-      }, delay);
-    };
-    scheduleNextTwitch();
-    return () => {
-      clearTimeout(timeout);
-      clearTimeout(twitchResetTimeout);
-    };
-  }, []);
-
   /* Resolve props */
   const resolvedTrackUrl = trackUrl || trackId || '';
   const embed = getTrackEmbedConfig(resolvedTrackUrl);
@@ -306,113 +287,112 @@ export default function HolographicEmbed({
         <span className="listen-console__plate-glyph" aria-hidden="true">✦</span>
       </div>
 
-      {/* ── TransportConsole - holographic touch surface ──────────────── */}
+      {/* ── TransportConsole - compact command deck ───────────────────── */}
       <div
-        className={[
-          'transport-console',
-          isTwitching ? 'is-twitching' : '',
-        ].filter(Boolean).join(' ')}
+        className="transport-console"
         role="group"
         aria-label={`${displayTitle} transport controls`}
       >
-        {/* Holographic scanline surface */}
-        <div className="transport-console__screen" aria-hidden="true" />
-
-        {/* Station navigation row */}
-        <div className="transport-console__row transport-console__row--station">
-          <button
-            type="button"
-            className="transport-console__btn transport-console__btn--station"
-            onClick={makeHandler(onPrevTrack, 'station', sinkId)}
-            disabled={controlsDisabled}
-            aria-label="Previous station"
-          >
-            ⟨ RETRACE
-          </button>
-          <button
-            type="button"
-            className="transport-console__btn transport-console__btn--station"
-            onClick={makeHandler(onNextTrack, 'station', sinkId)}
-            disabled={controlsDisabled}
-            aria-label="Next station"
-          >
-            ADVANCE ⟩
-          </button>
-        </div>
-
-        {/* Primary transport row */}
-        <div className="transport-console__row transport-console__row--primary">
-          <button
-            type="button"
-            className="transport-console__btn"
-            onClick={makeHandler(onRewind, 'tap', sinkId)}
-            disabled={controlsDisabled}
-            aria-label="Rewind 10 seconds"
-          >
-            ↩ RETRACT
-          </button>
-          <button
-            type="button"
-            className="transport-console__btn transport-console__btn--play"
-            onClick={makeHandler(onPlay, 'play', sinkId)}
-            disabled={controlsDisabled}
-            aria-label="Play transmission"
-          >
-            ⊳ FLOW
-          </button>
-          <button
-            type="button"
-            className="transport-console__btn"
-            onClick={makeHandler(onPause, 'tap', sinkId)}
-            disabled={controlsDisabled}
-            aria-label="Pause transmission"
-          >
-            ⊟ STASIS
-          </button>
-          <button
-            type="button"
-            className="transport-console__btn"
-            onClick={makeHandler(onFastForward, 'tap', sinkId)}
-            disabled={controlsDisabled}
-            aria-label="Fast forward 10 seconds"
-          >
-            SURGE ↪
-          </button>
-        </div>
-
-        {/* Secondary transport row */}
-        <div className="transport-console__row transport-console__row--secondary">
-          <button
-            type="button"
-            className="transport-console__btn"
-            onClick={makeHandler(onVolumeDown, 'volume', sinkId)}
-            disabled={controlsDisabled}
-            aria-label="Decrease volume by 5 percent"
-          >
-            VOL −
-          </button>
-          <div
-            className="transport-console__volume-readout"
-            aria-live="polite"
-            aria-label={`Volume ${volumePercent} percent`}
-          >
-            ◈ {volumePercent}%
+        <div className="transport-console__header">
+          <div className="transport-console__identity">
+            <span className="transport-console__status-dot" aria-hidden="true" />
+            <span className="transport-console__kicker">Transmission</span>
+            <span className="transport-console__state">{signalStatusValue}</span>
           </div>
-          <button
-            type="button"
-            className="transport-console__btn"
-            onClick={makeHandler(onVolumeUp, 'volume', sinkId)}
-            disabled={controlsDisabled}
-            aria-label="Increase volume by 5 percent"
-          >
-            VOL +
-          </button>
+          <div className="transport-console__telemetry" aria-hidden="true">
+            <span>{providerLabel}</span>
+            <span>VOL {volumePercent}</span>
+          </div>
         </div>
 
-        {/* Console meta row */}
-        <div className="transport-console__meta" aria-hidden="true">
-          <span>TRANSMISSION CORE</span>
-          <span>{providerLabel}</span>
+        <div className="transport-console__command-deck">
+          <div className="transport-console__cluster" role="group" aria-label="Station and playback controls">
+            <button
+              type="button"
+              className="transport-console__btn"
+              onClick={makeHandler(onPrevTrack, 'station', sinkId)}
+              disabled={controlsDisabled}
+              aria-label="Previous station"
+              title="Previous station"
+            >
+              <SkipBack size={16} strokeWidth={1.8} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className="transport-console__btn"
+              onClick={makeHandler(onRewind, 'tap', sinkId)}
+              disabled={controlsDisabled}
+              aria-label="Rewind 10 seconds"
+              title="Rewind 10 seconds"
+            >
+              <RotateCcw size={16} strokeWidth={1.8} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className="transport-console__btn transport-console__btn--play"
+              onClick={makeHandler(isPlaying ? onPause : onPlay, isPlaying ? 'tap' : 'play', sinkId)}
+              disabled={controlsDisabled}
+              aria-label={isPlaying ? 'Pause transmission' : 'Play transmission'}
+              aria-pressed={isPlaying}
+              title={isPlaying ? 'Pause transmission' : 'Play transmission'}
+            >
+              {isPlaying
+                ? <Pause size={19} strokeWidth={1.9} aria-hidden="true" />
+                : <Play size={19} strokeWidth={1.9} aria-hidden="true" />}
+            </button>
+            <button
+              type="button"
+              className="transport-console__btn"
+              onClick={makeHandler(onFastForward, 'tap', sinkId)}
+              disabled={controlsDisabled}
+              aria-label="Fast forward 10 seconds"
+              title="Fast forward 10 seconds"
+            >
+              <RotateCw size={16} strokeWidth={1.8} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className="transport-console__btn"
+              onClick={makeHandler(onNextTrack, 'station', sinkId)}
+              disabled={controlsDisabled}
+              aria-label="Next station"
+              title="Next station"
+            >
+              <SkipForward size={16} strokeWidth={1.8} aria-hidden="true" />
+            </button>
+          </div>
+
+          <span className="transport-console__separator" aria-hidden="true" />
+
+          <div className="transport-console__cluster transport-console__cluster--volume" role="group" aria-label="Volume controls">
+            <button
+              type="button"
+              className="transport-console__btn"
+              onClick={makeHandler(onVolumeDown, 'volume', sinkId)}
+              disabled={controlsDisabled}
+              aria-label="Decrease volume by 5 percent"
+              title="Decrease volume"
+            >
+              <Volume1 size={16} strokeWidth={1.8} aria-hidden="true" />
+            </button>
+            <div
+              className="transport-console__volume-readout"
+              aria-live="polite"
+              aria-label={`Volume ${volumePercent} percent`}
+            >
+              {volumePercent}
+            </div>
+            <button
+              type="button"
+              className="transport-console__btn"
+              onClick={makeHandler(onVolumeUp, 'volume', sinkId)}
+              disabled={controlsDisabled}
+              aria-label="Increase volume by 5 percent"
+              title="Increase volume"
+            >
+              <Volume2 size={16} strokeWidth={1.8} aria-hidden="true" />
+            </button>
+          </div>
         </div>
       </div>
 

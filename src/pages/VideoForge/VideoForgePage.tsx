@@ -65,7 +65,7 @@ function frameToTime(frame: number, fps = DEFAULT_FPS) {
 }
 
 function makeId(prefix: string) {
-  return `${prefix}-${Math.random().toString(36).slice(2, 10)}`; // EXEMPT
+  return `${prefix}-${crypto.randomUUID()}`;
 }
 
 function makeDefaultTransform() {
@@ -418,10 +418,7 @@ export default function VideoForgePage() {
     const tmpl = getTemplate(templateId);
     if (!tmpl) return;
     
-    // Non-interactive quick apply
-    const resolved = TemplateResolver.resolveTemplateAssets(tmpl, normalized);
-
-    const newP = tmpl.apply(resolved, normalized);
+    const newP = TemplateResolver.applyTemplate(tmpl, normalized);
     setProject(newP);
     setStatus(`Applied ${tmpl.name}`);
   }
@@ -465,7 +462,10 @@ export default function VideoForgePage() {
       if ((playerContainer as any).captureStream) {
         stream = (playerContainer as any).captureStream(30);
       } else if ((playerContainer as HTMLElement).tagName === 'VIDEO') {
-        stream = (playerContainer as HTMLVideoElement).captureStream();
+        const video = playerContainer as HTMLVideoElement & {
+          captureStream?: () => MediaStream;
+        };
+        stream = video.captureStream?.() ?? null;
       }
     } catch {
       // Capture support varies by browser and player container.

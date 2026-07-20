@@ -1,15 +1,26 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState, Fragment, type CSSProperties, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
-import { BytecodeVisualiser } from './BytecodeVisualiser';
+import { StageArt } from './StageArt';
+import { computeFingerprint } from './bytecodeFingerprint';
+import { useKaraokeMotion } from './karaoke/useKaraokeMotion';
+import { applyKaraokePlayhead } from './karaoke/karaokePlayhead';
 import { DiscographyNav } from './DiscographyNav';
-import { computeFingerprint, semanticTokens } from './bytecodeFingerprint';
+import {
+  DeliveryPressureChart,
+  IdentityStrip,
+  PhonemicDensityChart,
+  SchoolShareChart,
+  SpectralStrip,
+} from './charts';
+import { buildTrackScore } from './songScore';
+import { useVisualizerTruesight } from './hooks/useVisualizerTruesight';
 import { PhonemeEngine, generateSchoolColor } from '../../lib/engine.adapter.js';
 import { alignPhonemes } from '../../lib/phonology/phonemeAlignment.js';
 import { useLyricAlignment } from '../../kits/scholomance-visualizer-kit/hooks/useLyricAlignment';
 import { lineAtTime, wordAtTime } from '../../kits/scholomance-visualizer-kit/utils/lyricAlignment';
 import { GRIMOIRE_TRACKS, DEFAULT_PACING, type GrimoireTrack, type TrackPacing } from './tracks';
-import { wordTruesight } from './truesightColor';
+import { degradeWithFallback } from './recovery';
 import './BytecodeVisualiser.css';
 
 interface PhonemeEngineAPI {
@@ -77,26 +88,6 @@ function lyricLineAt(progress: number, duration: number, lineBeats: number[], pa
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
-/** Extract an HSL hue (0..360) from a hex/hsl colour string. */
-function colorToHue(color: string | undefined, fallback = 286): number {
-  if (!color) return fallback;
-  const m = color.match(/hsl\(\s*([\d.]+)/i);
-  if (m) return parseFloat(m[1]);
-  const hex = color.replace('#', '');
-  if (!/^[0-9a-fA-F]{6}$/.test(hex)) return fallback;
-  const r = parseInt(hex.slice(0, 2), 16) / 255;
-  const g = parseInt(hex.slice(2, 4), 16) / 255;
-  const b = parseInt(hex.slice(4, 6), 16) / 255;
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const d = max - min;
-  if (d === 0) return fallback;
-  let h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
-  h *= 60;
-  if (h < 0) h += 360;
-  return Math.round(h);
-}
-
 /** Monoline transport glyph - crisp currentColor strokes, no emoji glyphs. */
 function TransportGlyph({ d, filled = false }: { d: string; filled?: boolean }) {
   return (
@@ -126,42 +117,103 @@ const GLYPHS = {
   repeat: 'm17 2 4 4-4 4M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v1a4 4 0 0 1-4 4H3',
 };
 
-/** A small animated synthetic waveform line (one spectral band). */
-function MiniWave({ hue, phase, reducedMotion }: { hue: number; phase: number; reducedMotion: boolean }) {
-  const ref = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    const c = ref.current;
-    if (!c) return;
-    const ctx = c.getContext('2d');
-    if (!ctx) return;
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    const resize = () => { const r = c.getBoundingClientRect(); c.width = Math.round(r.width * dpr); c.height = Math.round(r.height * dpr); };
-    resize();
-    let raf = 0;
-    const draw = (tMs: number) => {
-      const t = tMs / 1000;
-      const W = c.width, H = c.height;
-      ctx.clearRect(0, 0, W, H);
-      ctx.beginPath();
-      for (let x = 0; x <= W; x += 2) {
-        const n = x / W;
-        const y = H / 2 + Math.sin(n * 22 + t * 3 + phase) * Math.sin(n * 6 - t * 1.5) * (H * 0.34);
-        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-      }
-      ctx.strokeStyle = `hsla(${hue}, 90%, 64%, 0.85)`;
-      ctx.lineWidth = 1.4 * dpr;
-      ctx.shadowBlur = 8; ctx.shadowColor = `hsla(${hue}, 90%, 64%, 0.6)`;
-      ctx.stroke();
-      if (!reducedMotion) raf = requestAnimationFrame(draw);
-    };
-    if (reducedMotion) draw(0); else raf = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(raf);
-  }, [hue, phase, reducedMotion]);
-  return <canvas ref={ref} className="bcv-miniwave" aria-hidden="true" />;
-}
+type ColoredTok = {
+  word: string;
+  color: string | null;
+  school: string | null;
+  analysis: unknown;
+  padLeft?: string;
+};
+
+/** Static token DOM — whitespace is never a token (padLeft text only). */
+const LyricLineRow = memo(function LyricLineRow({
+  lineIndex,
+  plainLine,
+  tokens,
+  onWordEnter,
+  onWordLeave,
+}: {
+  lineIndex: number;
+  plainLine: string;
+  tokens: ColoredTok[] | null;
+  onWordEnter: (payload: { word: string; color: string; school: string; line: number; analysis: unknown }) => void;
+  onWordLeave: () => void;
+}) {
+  return (
+    <li data-k-line={lineIndex}>
+      <span className="bcv-lyric-n">{String(lineIndex + 1).padStart(2, '0')}</span>
+      <span className="bcv-lyric-text">
+        {tokens
+          ? (() => {
+              let w = -1;
+              return tokens.map((tok, j) => {
+                const isWord = /[A-Za-z]/.test(tok.word);
+                const pad = tok.padLeft || '';
+                if (!isWord) {
+                  return <Fragment key={j}>{pad}{tok.word}</Fragment>;
+                }
+                w += 1;
+                return (
+                  <Fragment key={j}>
+                    {pad}
+                    <span
+                      className={tok.color ? 'bcv-tsword' : undefined}
+                      style={tok.color ? ({ '--w': tok.color } as CSSProperties) : undefined}
+                      data-k-word={w}
+                      onMouseEnter={tok.color
+                        ? () => onWordEnter({
+                            word: tok.word,
+                            color: tok.color!,
+                            school: tok.school!,
+                            line: lineIndex,
+                            analysis: tok.analysis,
+                          })
+                        : undefined}
+                      onMouseLeave={tok.color ? onWordLeave : undefined}
+                    >{tok.word}</span>
+                  </Fragment>
+                );
+              });
+            })()
+          : (() => {
+              let w = -1;
+              let pad = '';
+              const nodes: ReactNode[] = [];
+              for (const [j, part] of plainLine.split(/(\s+)/).entries()) {
+                if (/^\s+$/.test(part)) {
+                  pad += part;
+                  continue;
+                }
+                const isWord = /[A-Za-z]/.test(part);
+                if (!isWord) {
+                  nodes.push(<Fragment key={j}>{pad}{part}</Fragment>);
+                  pad = '';
+                  continue;
+                }
+                w += 1;
+                nodes.push(
+                  <Fragment key={j}>
+                    {pad}
+                    <span data-k-word={w}>{part}</span>
+                  </Fragment>,
+                );
+                pad = '';
+              }
+              return nodes;
+            })()}
+      </span>
+    </li>
+  );
+});
 
 export default function BytecodeVisualiserPage() {
   const reducedMotion = usePrefersReducedMotion();
+  /** Steam Deck / coarse pointer: kill every live visual path during playback. */
+  const deckSafe = useMemo(
+    () => typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches,
+    [],
+  );
+  const freezeVisuals = reducedMotion || deckSafe;
 
   // Active grimoire track - deep-linkable: ?track=<id>.
   const [activeTrack, setActiveTrack] = useState<GrimoireTrack>(() => {
@@ -204,19 +256,13 @@ export default function BytecodeVisualiserPage() {
   // Sync duration when track changes.
   useEffect(() => { setDuration(activeTrack.duration); }, [activeTrack]);
 
-  // Fingerprint seeded only from real track facts: id, title, duration, model version.
-  const fp = useMemo(() => computeFingerprint({
-    title: activeTrack.title,
-    bpm: activeTrack.duration,
-    key: activeTrack.modelVersion,
-    trackId: activeTrack.id,
-  }), [activeTrack]);
-  const tokens = useMemo(() => semanticTokens(`${activeTrack.title} ${activeTrack.lyrics.join(' ')}`, 8), [activeTrack]);
-
-  /** Web Audio graph built on first user gesture (autoplay policy). */
+  /** Web Audio graph built on first user gesture (autoplay policy).
+   *  Skip on coarse pointers (Deck) — SpectralStrip FFT + AudioContext was a
+   *  remaining play-only crash path after mandala/karaoke bytecode landed. */
   const ensureAnalyser = () => {
     const el = audioRef.current;
     if (!el || analyserRef.current) return;
+    if (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches) return;
     try {
       const ctx = new AudioContext();
       const source = ctx.createMediaElementSource(el);
@@ -228,8 +274,9 @@ export default function BytecodeVisualiserPage() {
       audioCtxRef.current = ctx;
       analyserRef.current = analyser;
       setFftReady(true);
-    } catch {
-      /* graceful: mandala keeps its deterministic synthetic spectrum */
+    } catch (error) {
+      // Mandala keeps deterministic synthetic spectrum when Web Audio fails.
+      degradeWithFallback(error, 'audio-context-unsupported');
     }
   };
 
@@ -274,57 +321,42 @@ export default function BytecodeVisualiserPage() {
   // exists for this track. Null -> every consumer below keeps the heuristic.
   const alignment = useLyricAlignment(activeTrack.id);
 
-  // timeupdate fires ~4 Hz - too coarse for word-level highlight (words run
-  // ~0.2-0.5 s). While playing with alignment data, refine at ~8 Hz; the
-  // mandala survives this re-render rate by design (stable readFFT identity).
-  useEffect(() => {
-    if (!playing || !audioOk || !alignment) return;
-    const id = window.setInterval(() => {
-      const el = audioRef.current;
-      if (el) setProgress(el.currentTime);
-    }, 120);
-    return () => window.clearInterval(id);
-  }, [playing, audioOk, alignment]);
+  // Gated Truesight via amp.visualizer.truesight + baked artifact (Approach B).
+  // Deck-safe: do not fetch/apply the artifact at all (hundreds of KB in React state).
+  const truesightAmp = useVisualizerTruesight(
+    deckSafe ? '' : activeTrack.id,
+    deckSafe ? [] : activeTrack.lyrics,
+  );
 
-  // Truesight: phoneme-coloured lyrics, computed once after the engine inits.
-  // Deterministic (same word -> same vowel family -> same school colour); if the
-  // engine fails to init, lyrics stay plain (graceful).
-  const [coloredLyrics, setColoredLyrics] = useState<{ word: string; color: string | null; school: string | null; analysis: any }[][] | null>(null);
+  // Pacing only — colour comes from the gated AMP, never ungated client paint.
+  // Deck: skip PhonemeEngine couplet pass — it walks every lyric word with
+  // analyzeDeep and was stacking memory on a machine already Aw Snapping.
   const [hoveredWord, setHoveredWord] = useState<{ word: string; color: string; school: string; line: number; analysis: any } | null>(null);
-  const [dominantSchool, setDominantSchool] = useState<string>('SONIC');
+  const onWordEnter = useCallback((payload: { word: string; color: string; school: string; line: number; analysis: unknown }) => {
+    setHoveredWord(payload as { word: string; color: string; school: string; line: number; analysis: any });
+  }, []);
+  const onWordLeave = useCallback(() => setHoveredWord(null), []);
   const [lineBeats, setLineBeats] = useState<number[]>(() => heuristicLineBeats(activeTrack, pacing));
   useEffect(() => {
-    // Reset colours/beats immediately when track changes so the old track never
-    // paints the new track's display.
-    setColoredLyrics(null);
     setLineBeats(heuristicLineBeats(activeTrack, pacing));
+    if (deckSafe) return;
     let cancelled = false;
     (async () => {
       try {
         const initEngine = PhonemeEngine as PhonemeEngineAPI;
         await initEngine.init?.();
-      } catch {
-        /* graceful: lyrics render plain, pacing keeps the heuristic beats */
+      } catch (error) {
+        // Pacing keeps heuristic beats when PhonemeEngine init fails.
+        degradeWithFallback(error, 'phoneme-engine-init-failed');
       }
       if (cancelled) return;
-      const counts: Record<string, number> = {};
-      const computed = activeTrack.lyrics.map((line) =>
-        line.split(/(\s+)/).map((tok) => {
-          const ts = /\S/.test(tok) ? wordTruesight(tok) : null;
-          if (ts) counts[ts.school] = (counts[ts.school] || 0) + 1;
-          return { word: tok, color: ts?.color ?? null, school: ts?.school ?? null, analysis: ts?.analysis ?? null };
-        }),
-      );
-      const dom = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'SONIC';
 
-      // Engine-backed pacing: syllabifier counts (every word, function words
-      // included) + concatenated ARPAbet sequence per line for couplet checks.
       const engine = PhonemeEngine as PhonemeEngineAPI;
       const lines = activeTrack.lyrics.map((line, i) => {
         let syl = 0;
         const phonemes: string[] = [];
         for (const tok of line.split(/\s+/)) {
-          const clean = tok.replace(/[^A-Za-z]/g, '');
+          const clean = tok.replace(/[^A-Za-z']/g, '');
           if (!clean) continue;
           const a = engine.analyzeDeep?.(clean) ?? null;
           syl += (a?.syllableCount || syllableCountHeuristic(clean)) + melismaBonus(tok);
@@ -333,10 +365,8 @@ export default function BytecodeVisualiserPage() {
         return { beats: beatsFromSyllables(syl, i, pacing), phonemes };
       });
 
-      // Couplet symmetry: adjacent lines whose feature-aware alignment cost is
-      // low (rhymed / anaphoric pairs) share the longer bar length.
       for (let i = 0; i + 1 < lines.length; i += 1) {
-        if (pacing.chorusStartLine !== undefined && i + 1 === pacing.chorusStartLine) continue; // never pair across sections
+        if (pacing.chorusStartLine !== undefined && i + 1 === pacing.chorusStartLine) continue;
         const a = lines[i].phonemes;
         const b = lines[i + 1].phonemes;
         if (a.length < 4 || b.length < 4) continue;
@@ -348,35 +378,130 @@ export default function BytecodeVisualiserPage() {
         }
       }
 
-      if (!cancelled) {
-        setColoredLyrics(computed);
-        setDominantSchool(dom);
-        setLineBeats(lines.map((l) => l.beats));
-      }
+      if (!cancelled) setLineBeats(lines.map((l) => l.beats));
     })();
     return () => { cancelled = true; };
-  }, [activeTrack, pacing]);
+  }, [activeTrack, pacing, deckSafe]);
+
+  const coloredLyrics = truesightAmp?.syncMode === 'gated' ? truesightAmp.lines : null;
+  const dominantSchool = truesightAmp?.syncMode === 'gated'
+    ? truesightAmp.dominantSchool
+    : 'SONIC';
 
   // The track's "world" - themed to its dominant phonemic school.
   const worldColor = generateSchoolColor(dominantSchool);
-  const worldHue = colorToHue(worldColor);
 
-  // Beat-sync: forced-aligned line spans when the artifact exists; the
-  // syllable-rate estimate is the unchanged fallback path.
-  const alignedPos = alignment ? lineAtTime(alignment.lines, progress) : -1;
-  const activeLine = alignment
-    ? (alignedPos < 0 ? -1 : alignment.lines[alignedPos].index)
-    : lyricLineAt(progress, duration, lineBeats, pacing);
-  const sungIdx = alignment ? wordAtTime(alignment.words, progress) : -1;
-  const sungWord = alignment && sungIdx >= 0 ? alignment.words[sungIdx] : null;
-
-  // Follow the words: keep the active line in view while playing.
+  // Playhead line for charts/scroll — setState ONLY when the LINE changes.
+  // Progress bar + sung-word markers update via DOM in the clock (no full-tree
+  // reconcile every tick — that was dying around PANDA / ~62s of play).
+  const [activeLine, setActiveLine] = useState(-1);
+  const activeLineRef = useRef(-1);
   const lyricsRef = useRef<HTMLOListElement>(null);
+  const progressFillRef = useRef<HTMLDivElement>(null);
+  const timeLabelRef = useRef<HTMLSpanElement>(null);
+  const clockRef = useRef(0);
+  const alignmentRef = useRef(alignment);
+  alignmentRef.current = alignment;
+  const lineBeatsRef = useRef(lineBeats);
+  lineBeatsRef.current = lineBeats;
+  const pacingRef = useRef(pacing);
+  pacingRef.current = pacing;
+  const durationRef = useRef(duration);
+  durationRef.current = duration;
+
+  const getAudioTime = useCallback(() => {
+    const el = audioRef.current;
+    if (el && audioOk) return el.currentTime;
+    return clockRef.current;
+  }, [audioOk]);
+
   useEffect(() => {
-    if (!playing || activeLine < 0) return;
-    const el = lyricsRef.current?.children[activeLine] as HTMLElement | undefined;
-    el?.scrollIntoView({ block: 'nearest', behavior: reducedMotion ? 'auto' : 'smooth' });
-  }, [activeLine, playing, reducedMotion]);
+    if (!playing || !audioOk) return;
+    // Deck: progress bar only. No playhead DOM walks, no scrollIntoView, no
+    // karaoke attribute thrash — those were still crashing and getting worse.
+    const id = window.setInterval(() => {
+      const t = audioRef.current?.currentTime ?? 0;
+      clockRef.current = t;
+
+      const dur = durationRef.current || 1;
+      if (progressFillRef.current) {
+        progressFillRef.current.style.width = `${(t / dur) * 100}%`;
+      }
+      if (timeLabelRef.current) {
+        timeLabelRef.current.textContent = fmt(t);
+      }
+
+      if (deckSafe) return;
+
+      const align = alignmentRef.current;
+      const alignedPos = align ? lineAtTime(align.lines, t) : -1;
+      const line = align
+        ? (alignedPos < 0 ? -1 : align.lines[alignedPos].index)
+        : lyricLineAt(t, durationRef.current, lineBeatsRef.current, pacingRef.current);
+      const sungIdx = align ? wordAtTime(align.words, t) : -1;
+      const sung = align && sungIdx >= 0 ? align.words[sungIdx] : null;
+
+      const root = lyricsRef.current;
+      if (root) {
+        applyKaraokePlayhead(root, {
+          line,
+          word: sung && sung.line === line ? sung.word : -1,
+          backing: Boolean(sung?.backing),
+          estimated: Boolean(sung?.interpolated),
+        });
+      }
+
+      if (line !== activeLineRef.current) {
+        activeLineRef.current = line;
+        if (line >= 0 && root) {
+          const el = root.querySelector(`[data-k-line="${line}"]`) as HTMLElement | null;
+          el?.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+        }
+        const lineReadout = document.getElementById('bcv-playhead-line');
+        if (lineReadout) {
+          lineReadout.textContent = line >= 0 ? String(line + 1).padStart(2, '0') : '—';
+        }
+      }
+    }, deckSafe ? 500 : 200);
+    return () => window.clearInterval(id);
+  }, [playing, audioOk, deckSafe]);
+
+  // Sync React progress + activeLine when pausing so charts catch up once.
+  useEffect(() => {
+    if (playing) return;
+    const t = audioRef.current?.currentTime ?? clockRef.current;
+    clockRef.current = t;
+    setProgress(t);
+    setActiveLine(activeLineRef.current);
+  }, [playing]);
+
+  useEffect(() => {
+    activeLineRef.current = -1;
+    setActiveLine(-1);
+    clockRef.current = 0;
+  }, [activeTrack.id]);
+
+  const visibleColoredLyrics = (!deckSafe && coloredLyrics?.length === activeTrack.lyrics.length)
+    ? coloredLyrics
+    : null;
+
+  const karaokeSeed = useMemo(
+    () => computeFingerprint({
+      title: activeTrack.title,
+      bpm: pacing.bpm,
+      key: String((activeTrack.meta.find(([k]) => k.toLowerCase() === 'key') || ['', 'Am'])[1] || 'Am'),
+      trackId: activeTrack.id,
+    }).hash,
+    [activeTrack.title, activeTrack.id, activeTrack.meta, pacing.bpm],
+  );
+
+  useKaraokeMotion({
+    seed: karaokeSeed,
+    bpm: pacing.bpm,
+    getTimeSeconds: !freezeVisuals && playing && audioOk ? getAudioTime : undefined,
+    reducedMotion: freezeVisuals,
+    rootRef: lyricsRef,
+  });
 
   // Live FFT once the Web Audio graph exists; deterministic synthetic before
   // that. Stable identity (useCallback) is load-bearing: a fresh function per
@@ -386,14 +511,32 @@ export default function BytecodeVisualiserPage() {
     analyserRef.current?.getByteFrequencyData(a as Uint8Array<ArrayBuffer>);
   }, []);
   const getFFT = fftReady ? readFFT : undefined;
-  const visibleColoredLyrics = coloredLyrics?.length === activeTrack.lyrics.length ? coloredLyrics : null;
+
+  const trackScore = useMemo(
+    () => buildTrackScore({
+      coloredLyrics: visibleColoredLyrics,
+      lineBeats,
+      bpm: pacing.bpm,
+      syncMode: alignment ? 'aligned' : 'estimated',
+      lyricLines: activeTrack.lyrics,
+    }),
+    [visibleColoredLyrics, lineBeats, pacing.bpm, alignment, activeTrack.lyrics],
+  );
+  const activeLineSchools = activeLine >= 0 ? trackScore.lines[activeLine]?.schools ?? null : null;
+  const activePressure = activeLine >= 0 ? trackScore.lines[activeLine]?.pressure : null;
 
   return (
     <main
       className="bcv-page bcv-reader"
       aria-label="Grimoire reader"
       data-school={dominantSchool}
-      style={{ '--bcv-world': worldColor } as CSSProperties}
+      style={{
+        '--bcv-world': worldColor,
+        '--grim-color': worldColor,
+        '--grim-color-muted': worldColor,
+        '--grim-border': `1px solid color-mix(in oklab, ${worldColor} 55%, transparent)`,
+        '--grim-transition': '360ms ease-in-out',
+      } as CSSProperties}
     >
       {/* eslint-disable-next-line jsx-a11y/media-has-caption -- no VTT exists for
           this track; the left page renders the full lyrics with aria-current
@@ -408,7 +551,6 @@ export default function BytecodeVisualiserPage() {
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
         onEnded={() => setPlaying(false)}
-        onTimeUpdate={(e) => setProgress(e.currentTarget.currentTime)}
         onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || activeTrack.duration)}
         onError={() => setAudioOk(false)}
       />
@@ -434,6 +576,7 @@ export default function BytecodeVisualiserPage() {
               {/* Provenance comes from the artifact itself, never hardcoded  - 
                   a non-aligned artifact must not be presented as aligned. */}
               <div className="bcv-meta__row"><dt>Sync</dt><dd>{alignment ? `aligned · ${alignment.source.aligner}` : 'estimated'}</dd></div>
+              <div className="bcv-meta__row"><dt>Truesight</dt><dd>{truesightAmp?.syncMode ?? 'loading'}{truesightAmp?.gateSize ? ` · ${truesightAmp.gateSize} gated` : ''}</dd></div>
             </dl>
           </div>
 
@@ -448,44 +591,14 @@ export default function BytecodeVisualiserPage() {
 
           <ol ref={lyricsRef} className={`bcv-lyrics ${visibleColoredLyrics ? 'is-truesight' : ''}`}>
             {activeTrack.lyrics.map((line, i) => (
-              <li
+              <LyricLineRow
                 key={i}
-                className={i === activeLine ? 'is-highlight' : undefined}
-                aria-current={i === activeLine ? 'true' : undefined}
-              >
-                <span className="bcv-lyric-n">{String(i + 1).padStart(2, '0')}</span>
-                <span className="bcv-lyric-text">
-                  {visibleColoredLyrics
-                    ? (() => {
-                        let w = -1;
-                        return visibleColoredLyrics[i].map((tok, j) => {
-                          const isWord = /[A-Za-z]/.test(tok.word);
-                          if (isWord) w += 1;
-                          // Text equality guards against registry lyrics drifting from
-                          // the lyrics the artifact was aligned against - a stale
-                          // artifact must not highlight the wrong word.
-                          const sung = isWord && sungWord !== null && sungWord.line === i
-                            && sungWord.word === w && sungWord.text === tok.word;
-                          return (
-                            <span
-                              key={j}
-                              className={tok.color ? 'bcv-tsword' : undefined}
-                              style={tok.color ? ({ '--w': tok.color } as CSSProperties) : undefined}
-                              data-sung={sung ? (sungWord?.backing ? 'backing' : 'true') : undefined}
-                              // Orthogonal to data-sung's vocal kind: this marks how
-                              // much the *timing* can be trusted. An interpolated span
-                              // was guessed between confident neighbours, so it may not
-                              // wear a measured word's spotlight.
-                              data-timing={sung && sungWord?.interpolated ? 'estimated' : undefined}
-                              onMouseEnter={tok.color ? () => setHoveredWord({ word: tok.word, color: tok.color!, school: tok.school!, line: i, analysis: tok.analysis }) : undefined}
-                              onMouseLeave={tok.color ? () => setHoveredWord(null) : undefined}
-                            >{tok.word}</span>
-                          );
-                        });
-                      })()
-                    : line}
-                </span>
-              </li>
+                lineIndex={i}
+                plainLine={line}
+                tokens={visibleColoredLyrics ? visibleColoredLyrics[i] as ColoredTok[] : null}
+                onWordEnter={onWordEnter}
+                onWordLeave={onWordLeave}
+              />
             ))}
           </ol>
 
@@ -525,7 +638,7 @@ export default function BytecodeVisualiserPage() {
                   </motion.div>
                 )}
                 
-                {hoveredWord && activeTrack.annotations.filter(a => a.n === hoveredWord.line).map((a, idx) => (
+                {hoveredWord && activeTrack.annotations.filter(a => a.n === hoveredWord.line).map((a, _idx) => (
                   <motion.div
                     key={a.n}
                     className="bcv-panel bcv-panel--annotation"
@@ -558,9 +671,13 @@ export default function BytecodeVisualiserPage() {
 
           {/* Player transport - every control state-driven (architect law). */}
           <div className="bcv-player">
-            <span className="bcv-time">{fmt(progress)}</span>
+            <span className="bcv-time" ref={timeLabelRef}>{fmt(progress)}</span>
             <div className="bcv-progress" role="presentation">
-              <div className="bcv-progress__fill" style={{ width: `${(progress / duration) * 100}%` }} />
+              <div
+                ref={progressFillRef}
+                className="bcv-progress__fill"
+                style={{ width: `${(progress / duration) * 100}%` }}
+              />
             </div>
             <span className="bcv-time">{fmt(duration)}</span>
           </div>
@@ -581,79 +698,85 @@ export default function BytecodeVisualiserPage() {
           </div>
         </section>
 
-        {/* ── RIGHT PAGE: the bytecode visualiser ────────────────────────── */}
+        {/* ── RIGHT PAGE: song score instruments ─────────────────────────── */}
         <section className="bcv-rightpage" aria-label="Bytecode visualiser">
           <header className="bcv-head">
-            <h1>
-              Bytecode Visualiser
-              <span className="bcv-vtag">GlyphCore 2.7.1</span>
-            </h1>
+            <h1>Bytecode Visualiser</h1>
             <p>
               <span className={`bcv-beacon${playing ? ' is-live' : ''}`} aria-hidden="true" />
-              Deterministic Visual Experience · {dominantSchool} world · {playing ? 'ritual live' : 'standby'}
+              Song score · {dominantSchool} world · {playing ? 'ritual live' : 'standby'}
             </p>
           </header>
 
           <div className="bcv-grid">
-            <section className="bcv-panel" aria-label="Song fingerprint">
-              <h2>Song Fingerprint</h2>
-              <p className="bcv-fp">{fp.fingerprint}</p>
-              <p className="bcv-dim">{'// 256-bit checksum'}</p>
-              {fp.checksumLines.map((line) => (<p className="bcv-hex" key={line}>{line}</p>))}
-              <p className="bcv-seed">Bytecode Seed</p>
-              <p className="bcv-fp bcv-fp--sm">{fp.seed}</p>
+            <section className="bcv-panel bcv-panel--grim" aria-label="Track identity">
+              <h2>Track Identity</h2>
+              <IdentityStrip
+                score={trackScore}
+                model={activeTrack.model}
+                modelVersion={activeTrack.modelVersion}
+              />
             </section>
 
-            <section className="bcv-panel" aria-label="Spectral analysis">
+            <section className="bcv-panel bcv-panel--grim" aria-label="Spectral analysis">
               <h2>Spectral Analysis</h2>
-              <MiniWave hue={26} phase={0} reducedMotion={reducedMotion} />
-              <MiniWave hue={312} phase={2} reducedMotion={reducedMotion} />
-              <MiniWave hue={196} phase={4} reducedMotion={reducedMotion} />
+              <SpectralStrip
+                getByteFrequencyData={deckSafe ? undefined : getFFT}
+                reducedMotion={freezeVisuals}
+              />
+              <p className="bcv-dim">{deckSafe ? 'deck-safe · spectrum off' : (fftReady ? 'live FFT' : 'standby · connect audio to wake')}</p>
             </section>
 
-            <section className="bcv-panel" aria-label="Coordinates">
-              <h2>Coordinates</h2>
-              <p className="bcv-coord"><span>X</span> {fp.coordinates.x.toFixed(4)}</p>
-              <p className="bcv-coord"><span>Y</span> {fp.coordinates.y.toFixed(4)}</p>
-              <p className="bcv-coord"><span>Z</span> {fp.coordinates.z.toFixed(4)}</p>
+            <section className="bcv-panel bcv-panel--grim" aria-label="Phonemic density">
+              <h2>Phonemic Density</h2>
+              <PhonemicDensityChart
+                lines={trackScore.lines}
+                activeLine={activeLine}
+                reducedMotion={freezeVisuals}
+              />
             </section>
 
             <div className="bcv-stage">
-              <BytecodeVisualiser
-                bpm={pacing.bpm}
-                hue={worldHue}
-                reducedMotion={reducedMotion}
-                getByteFrequencyData={getFFT}
+              <StageArt
+                stageArtUrl={activeTrack.stageArtUrl}
+                coverUrl={activeTrack.coverUrl}
+                title={activeTrack.title}
               />
               <div className="bcv-stage__scanlines" aria-hidden="true" />
             </div>
 
-            <section className="bcv-panel bcv-panel--right" aria-label="Semantic map">
-              <h2>Semantic Map</h2>
-              <ul className="bcv-semantic">
-                {tokens.map((tok) => (<li key={tok}><span aria-hidden="true">◈</span>{tok}</li>))}
-              </ul>
+            <section className="bcv-panel bcv-panel--right bcv-panel--grim" aria-label="School association">
+              <h2>School Association</h2>
+              <SchoolShareChart
+                shares={trackScore.schoolShares}
+                activeSchools={activeLineSchools}
+              />
             </section>
 
-            <section className="bcv-panel bcv-panel--right" aria-label="Energy matrix">
-              <h2>Energy Matrix</h2>
-              <svg className="bcv-matrix" viewBox="0 0 120 90" aria-hidden="true">
-                {Array.from({ length: 5 }).flatMap((_, r) =>
-                  Array.from({ length: 7 }).map((__, c) => {
-                    const x = 12 + c * 16 + (r % 2) * 8;
-                    const y = 12 + r * 16;
-                    const on = (fp.hash >> (r * 7 + c)) & 1;
-                    return <circle key={`${r}-${c}`} cx={x} cy={y} r={on ? 3.2 : 1.6} fill={on ? `hsl(${worldHue} 90% 62%)` : `hsl(${worldHue} 32% 15%)`} />;
-                  })
-                )}
-              </svg>
+            <section className="bcv-panel bcv-panel--right bcv-panel--grim" aria-label="Delivery pressure">
+              <h2>Delivery Pressure</h2>
+              <DeliveryPressureChart
+                lines={trackScore.lines}
+                activeLine={activeLine}
+              />
             </section>
 
-            <section className="bcv-panel bcv-panel--right" aria-label="Ritual sync">
-              <h2>Ritual Sync</h2>
-              <p className="bcv-coord"><span>PHASE</span> {fp.ritualSync.phase.toFixed(3)} φ</p>
-              <p className="bcv-coord"><span>CYCLE</span> {fp.ritualSync.cycle}</p>
-              <p className="bcv-coord"><span>MODEL</span> {activeTrack.model} · {activeTrack.modelVersion}</p>
+            <section className="bcv-panel bcv-panel--right bcv-panel--grim" aria-label="Playhead">
+              <h2>Playhead</h2>
+              <p className="bcv-coord">
+                <span>LINE</span>
+                <span id="bcv-playhead-line">
+                  {activeLine >= 0 ? String(activeLine + 1).padStart(2, '0') : '—'}
+                </span>
+              </p>
+              <p className="bcv-coord">
+                <span>PRESSURE</span>
+                {activePressure != null ? activePressure.toFixed(2) : '—'}
+              </p>
+              <p className="bcv-coord">
+                <span>SYL</span>
+                {activeLine >= 0 ? trackScore.lines[activeLine]?.syllables ?? '—' : '—'}
+              </p>
             </section>
           </div>
 

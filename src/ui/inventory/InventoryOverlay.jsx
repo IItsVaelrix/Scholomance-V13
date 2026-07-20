@@ -188,11 +188,11 @@ export function InventoryOverlay() {
                     </svg>
 
                     <img src={CHARACTER_IMAGE_URL} alt="Character Model" className={styles.characterModelBase} />
-                    {equipped.chest && <img src={equipped.chest.sprite} className={styles.characterModelLayer} />}
-                    {equipped.legs && <img src={equipped.legs.sprite} className={styles.characterModelLayer} />}
-                    {equipped.boots && <img src={equipped.boots.sprite} className={styles.characterModelLayer} />}
-                    {equipped.head && <img src={equipped.head.sprite} className={styles.characterModelLayer} />}
-                    {equipped.weapon && <img src={equipped.weapon.sprite} className={styles.characterModelLayer} />}
+                    {equipped.chest && <img src={equipped.chest.sprite} alt="" className={styles.characterModelLayer} />}
+                    {equipped.legs && <img src={equipped.legs.sprite} alt="" className={styles.characterModelLayer} />}
+                    {equipped.boots && <img src={equipped.boots.sprite} alt="" className={styles.characterModelLayer} />}
+                    {equipped.head && <img src={equipped.head.sprite} alt="" className={styles.characterModelLayer} />}
+                    {equipped.weapon && <img src={equipped.weapon.sprite} alt="" className={styles.characterModelLayer} />}
                   </div>
                   
                   {/* Render Equipment Slots around the character */}

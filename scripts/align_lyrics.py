@@ -386,23 +386,44 @@ def write_review(path, audio_src, lines, entries):
         body.append(f"<p>{spans or html.escape(text)}</p>")
     page = f"""<!doctype html><meta charset="utf-8"><title>alignment review</title>
 <style>
- body{{background:#111;color:#aaa;font:16px/1.7 serif;max-width:48rem;margin:2rem auto}}
- audio{{width:100%;position:sticky;top:0}}
+ body{{background:#111;color:#aaa;font:16px/1.7 serif;max-width:48rem;margin:0 auto 2rem;padding:0 1rem}}
+ .hdr{{position:sticky;top:0;background:#111;padding:1rem 0 .7rem;z-index:1}}
+ audio{{width:100%;display:block}}
+ #bar{{position:relative;height:8px;margin-top:.55rem;background:#242424;border-radius:4px;cursor:pointer;overflow:hidden}}
+ #fill{{position:absolute;inset:0 auto 0 0;width:0;background:#fff;box-shadow:0 0 10px #fff;transition:width .08s linear}}
+ #time{{display:flex;justify-content:space-between;font:12px/1.4 monospace;color:#777;margin-top:.3rem}}
  span.on{{color:#fff;text-shadow:0 0 10px #fff}}
  span.flag{{border-bottom:1px dotted #c66}}
 </style>
-<audio controls src="{html.escape(str(audio_src))}"></audio>
+<div class="hdr">
+ <audio controls src="{html.escape(str(audio_src))}"></audio>
+ <div id="bar"><div id="fill"></div></div>
+ <div id="time"><span id="cur">0:00</span><span id="dur">0:00</span></div>
+</div>
 {''.join(body)}
 <script>
 const W = {json.dumps([{"s": e["startS"], "e": e["endS"]} for e in entries])};
 const a = document.querySelector('audio');
+const fill = document.getElementById('fill');
+const bar = document.getElementById('bar');
+const curEl = document.getElementById('cur');
+const durEl = document.getElementById('dur');
+const fmt = s => (s === s ? Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0') : '0:00');
+a.addEventListener('loadedmetadata', () => {{ durEl.textContent = fmt(a.duration); }});
 a.ontimeupdate = () => {{
   const t = a.currentTime;
+  const d = a.duration || 0;
+  fill.style.width = (d ? (t/d)*100 : 0) + '%';
+  curEl.textContent = fmt(t);
   document.querySelectorAll('span[data-i]').forEach(el => {{
     const w = W[+el.dataset.i];
     el.classList.toggle('on', w.s !== null && t >= w.s && t < w.e);
   }});
 }};
+bar.addEventListener('click', e => {{
+  const r = bar.getBoundingClientRect();
+  if (a.duration) a.currentTime = ((e.clientX - r.left) / r.width) * a.duration;
+}});
 </script>"""
     path.write_text(page, encoding="utf-8")
     print(f"review page: {path}")

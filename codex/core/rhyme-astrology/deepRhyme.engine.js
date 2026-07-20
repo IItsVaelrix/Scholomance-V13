@@ -276,10 +276,13 @@ export class DeepRhymeEngine {
     }
 
     const allUniqueWords = [...new Set(text.match(createWordRegex()) || [])];
+    // Prefer an explicit dictionaryAPI (self-sqlite in Node / bake) so a bare
+    // primeAuthorityBatch() default fetch cannot wipe a successful sqlite prime.
+    const dictionaryAPI = options?.dictionaryAPI || options?.scholomanceDictionaryAPI;
     if (typeof this.engine.ensureAuthorityBatch === 'function') {
       const authorityPromise = typeof this.engine.primeAuthorityBatch === 'function'
-        ? this.engine.primeAuthorityBatch(allUniqueWords)
-        : this.engine.ensureAuthorityBatch(allUniqueWords);
+        ? this.engine.primeAuthorityBatch(allUniqueWords, dictionaryAPI)
+        : this.engine.ensureAuthorityBatch(allUniqueWords, dictionaryAPI);
       if (resolveAuthorityMode(options) === 'blocking') {
         await authorityPromise;
       } else if (authorityPromise?.catch) {

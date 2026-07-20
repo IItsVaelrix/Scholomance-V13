@@ -82,7 +82,9 @@ export function SDFShapeAMP(context = {}, options = {}) {
         annotations: semResult.annotations || [],
         sourceKind: semResult.sourceKind || 'sdf',
       };
-    } catch (_) {}
+    } catch (_) {
+      // Authoring annotations are optional; geometry remains canonical without them.
+    }
   }
 
   // Enrich cells with resolved semantic role / part

@@ -15,6 +15,19 @@ function getErrorSummary(error) {
     message.toLowerCase().includes("importing a module script failed");
 
   if (dynamicImportFailure) {
+    const isLocalDevFetch =
+      import.meta.env.DEV &&
+      /localhost:\d+|127\.0\.0\.1:\d+/i.test(message);
+
+    if (isLocalDevFetch) {
+      return {
+        title: "Dev module failed to load",
+        message:
+          "Vite could not fetch a lazy route. Common causes: (1) `npm run dev` is down — restart it; (2) an extension blocked the request (console shows net::ERR_BLOCKED_BY_CLIENT) — disable ad blockers / privacy shields for localhost; (3) a stuck retry — clear sessionStorage keys starting with scholomance:lazy-reload: then hard-refresh.",
+        detail: message,
+      };
+    }
+
     return {
       title: "App Updated",
       message: "A new deployment is available. Reload to sync your browser with the latest assets.",

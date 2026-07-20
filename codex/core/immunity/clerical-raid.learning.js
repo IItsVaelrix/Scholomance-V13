@@ -112,8 +112,8 @@ export function merlinReportToPattern(raw) {
 
 /**
  * Query then train when the library has no strong match (Merlin auto-train pipeline).
- * Trains on NOVEL and, by default, on NEEDS_MERLIN so ambiguous reports still become memory.
- * Skips CONFIRMED / DENIED to avoid duplicating known or rejected weak matches.
+ * Trains on NOVEL, and by default on NEEDS_MERLIN / DENIED so weak or ambiguous
+ * reports still become memory. Skips CONFIRMED to avoid duplicating known matches.
  * @param {import('./clerical-raid.core.js').ClericalRAID} raid
  * @param {Record<string, unknown>} raw
  * @param {{ train?: boolean, trainNeedsMerlin?: boolean }} [options]
@@ -127,7 +127,8 @@ export function autoTrainFromMerlinReport(raid, raw, options = {}) {
   const v = queryResult.verdict;
   const shouldTrain =
     train &&
-    (v === 'NOVEL' || (trainNeedsMerlin && v === 'NEEDS_MERLIN'));
+    (v === 'NOVEL' ||
+      (trainNeedsMerlin && (v === 'NEEDS_MERLIN' || v === 'DENIED')));
   if (shouldTrain) {
     const pattern = merlinReportToPattern(raw);
     trained = raid.train(pattern);

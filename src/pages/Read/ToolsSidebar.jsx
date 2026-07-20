@@ -162,7 +162,7 @@ export default function ToolsSidebar({
           onClick={() => onModeChange(ANALYSIS_MODES.ANALYZE)}
         >
           <span className="tool-icon"><AnalyzeIcon /></span>
-          <span className="tool-label">Analyze</span>
+          <span className="tool-label">Leximancy</span>
         </button>
       </div>
 

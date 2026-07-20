@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import styles from './SpellweaveCompendiumOverlay.module.css';
-import { COMPENDIUM_ENTRIES } from '../../../codex/core/spellweave-compendium/compendium.registry.js';
+import { COMPENDIUM_ENTRIES } from '../../lib/combat/spellweaveCompendium.adapter.js';
 
 export default function SpellweaveCompendiumOverlay({
   ledger,

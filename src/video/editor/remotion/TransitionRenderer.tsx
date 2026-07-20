@@ -1,14 +1,28 @@
 import { AbsoluteFill } from 'remotion';
-import type { TimelineClip, ClipTransitionBinding } from '../core/video-project-packet';
+import type {
+  TimelineClip,
+  ClipTransitionBinding,
+  LegacyClipTransitionBinding,
+} from '../core/video-project-packet';
 
 interface TransitionRendererProps {
   fromClip: TimelineClip;
   toClip: TimelineClip;
-  transition: ClipTransitionBinding;
+  transition: ClipTransitionBinding | LegacyClipTransitionBinding;
   frame: number;
   overlapStart: number;
   overlapEnd: number;
   durationFrames: number;
+}
+
+function deterministicJitter(transitionId: string, frame: number, salt: string) {
+  const input = `${transitionId}:${frame}:${salt}`;
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < input.length; index += 1) {
+    hash ^= input.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (((hash >>> 0) / 0xffffffff) - 0.5) * 80;
 }
 
 export function TransitionRenderer({
@@ -41,10 +55,10 @@ export function TransitionRenderer({
     }
     case 'glitch': {
       const opacity = t < 0.5 ? t * 2 : 2 - t * 2;
-      const x1 = (Math.random() - 0.5) * 80; // EXEMPT
-      const y1 = (Math.random() - 0.5) * 80; // EXEMPT
-      const x2 = (Math.random() - 0.5) * 80; // EXEMPT
-      const y2 = (Math.random() - 0.5) * 80; // EXEMPT
+      const x1 = deterministicJitter(transition.id, frame, 'x1');
+      const y1 = deterministicJitter(transition.id, frame, 'y1');
+      const x2 = deterministicJitter(transition.id, frame, 'x2');
+      const y2 = deterministicJitter(transition.id, frame, 'y2');
       return (
         <AbsoluteFill style={{ zIndex: 50, pointerEvents: 'none', opacity, mixBlendMode: 'difference' }}>
           <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'cyan', transform: `translate3d(${x1}px, ${y1}px, 0)` }} />

@@ -8,7 +8,7 @@ function LatticeGeometry({ timeOverride }: { timeOverride: number }) {
   return (
     <mesh rotation={[timeOverride, timeOverride, 0]}>
       <boxGeometry args={[2, 2, 2]} />
-      <meshStandardMaterial color="hotpink" />
+      <meshStandardMaterial args={[{ color: 'hotpink' }]} />
     </mesh>
   );
 }

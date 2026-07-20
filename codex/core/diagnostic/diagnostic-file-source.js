@@ -25,6 +25,19 @@ export const DEFAULT_SKIP_DIRS = Object.freeze([
   'ARCHIVE REFERENCE DOCS',
   'docs',
   'public',
+  // Large binary/asset trees — readableExt matches *.json so these abort scans
+  // when a single Phaser/tile JSON exceeds maxFileBytes.
+  'assets',
+  'generated-assets',
+  'output',
+  'media',
+  'nlp_chatbot',
+  '.venv',
+  '.venv-align',
+  'venv',
+  'target',
+  'squashfs-root',
+  '.worktrees',
 ]);
 
 export const DEFAULT_READABLE_EXT = /\.(m?[jt]sx?|cjs|json)$/;
@@ -91,14 +104,20 @@ export function createFilesystemFileSource({
       let totalBytes = 0;
 
       for await (const listed of walkReadableFiles(rootDir, '', skipSet, readableExt)) {
-        count += 1;
-        totalBytes += listed.sizeBytes;
-        assertWithinScanLimits({
-          count,
-          totalBytes,
-          sizeBytes: listed.sizeBytes,
-          limits: normalizedLimits,
-        });
+        // Soft-skip oversized files so a single asset JSON cannot abort the scan.
+        if (listed.sizeBytes > normalizedLimits.maxFileBytes) {
+          continue;
+        }
+        const nextCount = count + 1;
+        const nextTotal = totalBytes + listed.sizeBytes;
+        if (nextCount > normalizedLimits.maxFiles) {
+          break;
+        }
+        if (nextTotal > normalizedLimits.maxTotalBytes) {
+          break;
+        }
+        count = nextCount;
+        totalBytes = nextTotal;
         yield listed;
       }
     },

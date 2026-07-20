@@ -18,3 +18,16 @@ python scripts/build_scholomance_dict.py \
   --db scholomance_dict.sqlite \
   --overwrite
 ```
+
+## Additive OEWN antonym ingest
+
+After building the dictionary, ingest OEWN antonyms without rebuilding the
+existing dictionary tables. The caller must provide an audit timestamp:
+
+```bash
+TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+npm run dict:ingest-antonyms -- --timestamp "$TS" --download
+```
+
+The script accepts only its pinned OEWN release when `--download` is used and
+aborts before writing if the parsed release does not match the expected release.

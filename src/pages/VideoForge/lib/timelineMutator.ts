@@ -1,43 +1,19 @@
+import type {
+  AssetRecord,
+  EffectInstance,
+  LegacyClipTransitionBinding,
+  TimelineClip as CanonicalTimelineClip,
+  TimelineTrack as CanonicalTimelineTrack,
+  VideoAssetRecord,
+  VideoProjectPacketV1,
+} from '../../../video/editor/core/video-project-packet';
+
 export type ClipId = string;
 export type EffectId = string;
-
-export interface ClipEffect {
-  id: EffectId;
-  effectId: string;
-  params?: Record<string, unknown>;
-  enabled?: boolean;
-  order?: number;
-}
-
-export interface ClipTransform {
-  position: { x: any; y: any };
-  scale: { x: any; y: any };
-  rotation: any;
-  anchor?: { x: number; y: number };
-}
-
-export interface TimelineClip {
-  id: ClipId;
-  effects?: ClipEffect[];
-  transform?: Partial<ClipTransform> | any;
-  transitions?: unknown[];
-  opacity?: any;
-  [key: string]: unknown;
-}
-
-export interface TimelineTrack {
-  id: string;
-  clips: TimelineClip[];
-  [key: string]: unknown;
-}
-
-export interface VideoProjectPacketV1Like {
-  timeline: {
-    tracks: TimelineTrack[];
-    [key: string]: unknown;
-  };
-  [key: string]: unknown;
-}
+export type ClipEffect = EffectInstance;
+export type TimelineClip = CanonicalTimelineClip;
+export type TimelineTrack = CanonicalTimelineTrack;
+export type VideoProjectPacketV1Like = VideoProjectPacketV1;
 
 export type ClipMutator = (clip: TimelineClip) => TimelineClip;
 
@@ -133,7 +109,7 @@ export function splitClip<TProject extends VideoProjectPacketV1Like>(
 
 export function addAsset<TProject extends VideoProjectPacketV1Like>(
   project: TProject,
-  asset: any
+  asset: AssetRecord | VideoAssetRecord
 ): TProject {
   return { ...project, assets: [...(project.assets || []), asset] };
 }
@@ -239,7 +215,7 @@ export function updateEffectParam<TProject extends VideoProjectPacketV1Like>(
 export function addLegacyTransition<TProject extends VideoProjectPacketV1Like>(
   project: TProject,
   clipId: ClipId,
-  transition: unknown
+  transition: LegacyClipTransitionBinding
 ): TProject {
   return mutateClip(project, clipId, (clip) => ({
     ...clip,

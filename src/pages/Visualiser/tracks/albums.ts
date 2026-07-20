@@ -8,6 +8,8 @@ import { DAYDREAMING_NIGHTMARES } from './daydreaming-nightmares';
 import { SCHOLOMANCER } from './scholomancer';
 import { SONIC_THAUMATURGY } from './sonic-thaumaturgy';
 import { REGRET } from './regret';
+import { BOTTLED_MESSAGE } from './bottled-message';
+import { BROWN_DWARF } from './brown-dwarf';
 
 export const GRIMOIRE_ALBUMS: GrimoireAlbum[] = [
   {
@@ -37,11 +39,13 @@ export const GRIMOIRE_ALBUMS: GrimoireAlbum[] = [
     description: 'Dense internal rhyme over a custom Suno model.',
     releaseDate: '2026-07-15',
     status: 'released',
-    genres: ['Hip-Hop', 'Rap'],
+    genres: ['Hip-Hop', 'Rap', 'Hyperpop', 'Emo'],
     tracks: [
       { trackId: SCHOLOMANCER.id, trackNumber: 1 },
       { trackId: SONIC_THAUMATURGY.id, trackNumber: 2 },
       { trackId: REGRET.id, trackNumber: 3 },
+      { trackId: BOTTLED_MESSAGE.id, trackNumber: 4 },
+      { trackId: BROWN_DWARF.id, trackNumber: 5 },
     ],
   },
 ];

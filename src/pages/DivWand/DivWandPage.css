@@ -1,5 +1,6 @@
 /* ── DIV WAND SANDBOX ─────────────────────────────────────────────────────── */
 /* Consumes tokens from src/lib/css/generated/school-styles.css + src/index.css */
+@import "../../features/divwand/divwand-shared.css";
 
 .dw-container {
   display: flex;
@@ -399,110 +400,7 @@
   font-size: var(--text-xs);
 }
 
-/* ── LAYOUT NODE ELEMENTS ────────────────────────────────────────────────── */
-
-.div-node {
-  box-sizing: border-box;
-}
-
-.div-elem-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.div-elem-title {
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: var(--divination-primary, var(--chrome-gold, #c9a227));
-}
-
-.div-elem-subtitle {
-  font-size: 0.72rem;
-  color: rgba(226, 232, 240, 0.5);
-}
-
-.div-elem-badge {
-  font-size: 0.68rem;
-  padding: 2px 7px;
-  border-radius: 3px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-family: var(--font-mono);
-  color: inherit;
-}
-
-.div-elem-button {
-  background: transparent;
-  border: none;
-  color: inherit;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
-  font-family: var(--font-sans);
-  font-size: 0.8rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.div-elem-glow-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  color: var(--school-color, var(--divination-primary, var(--chrome-gold, #c9a227)));
-}
-
-/* ── STYLE VARIANTS ──────────────────────────────────────────────────────── */
-
-.variant-glassmorphic {
-  background: rgba(10, 15, 25, 0.75) !important;
-  backdrop-filter: blur(14px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-.variant-neonBorder {
-  border: 1px solid var(--school-color, var(--divination-primary, var(--chrome-gold, #c9a227))) !important;
-  box-shadow: 0 0 14px var(--school-glow, rgba(201, 162, 39, 0.25)) !important;
-}
-
-.variant-obsidianPanel {
-  background: linear-gradient(160deg, #080b12, #03050a) !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
-}
-
-.variant-solid {
-  background: #07090e !important;
-  border: 1px solid rgba(201, 162, 39, 0.12) !important;
-}
-
-.variant-transparent {
-  background: transparent !important;
-  border: none !important;
-}
-
-/* ── SCHOOL GLOW BINDINGS ────────────────────────────────────────────────── */
-
-.div-glow-sonic    { --school-color: var(--sonic-primary);    --school-glow: var(--sonic-primary-glow); }
-.div-glow-psychic  { --school-color: var(--psychic-primary);  --school-glow: var(--psychic-primary-glow); }
-.div-glow-void     { --school-color: var(--void-primary);     --school-glow: var(--void-primary-glow); }
-.div-glow-alchemy  { --school-color: var(--alchemy-primary);  --school-glow: var(--alchemy-primary-glow); }
-.div-glow-will     { --school-color: var(--will-primary);     --school-glow: var(--will-primary-glow); }
-
-/* ── INTERACTIVE ─────────────────────────────────────────────────────────── */
-
-.div-interactive {
-  cursor: pointer;
-  transition: transform 0.22s cubic-bezier(0.23, 1, 0.32, 1), filter 0.22s;
-}
-
-.div-interactive:hover {
-  transform: translateY(-2px) scale(1.015);
-  filter: brightness(1.12);
-}
+/* Layout node chrome / variants live in src/features/divwand/divwand-shared.css */
 
 /* ── INSPECTOR HIGHLIGHT ─────────────────────────────────────────────────── */
 

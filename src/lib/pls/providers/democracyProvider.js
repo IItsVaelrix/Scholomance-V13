@@ -3,6 +3,12 @@ import { resolvePlsVerseIRState } from '../verseIRBridge.js';
 
 const pipelineJudiciary = createJudiciaryEngine();
 
+function clamp01(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return 0;
+  return Math.max(0, Math.min(1, numeric));
+}
+
 function buildCandidateRhymeKeys(candidateAnalysis) {
   const keys = new Set();
 
@@ -37,15 +43,33 @@ export async function democracyProvider(context, engines, candidates) {
     ? new Set((trie.predictNext(prevWord, 30) || []).map((token) => String(token).toLowerCase()))
     : new Set();
 
-  let spellSuggestions = new Set();
+  const spellSuggestionScores = new Map();
   if (spellchecker && prefix) {
-    const spellingCandidates = typeof spellchecker.suggestAsync === 'function'
-      ? await spellchecker.suggestAsync(prefix, 15, prevWord)
-      : spellchecker.suggest(prefix, 15, prevWord);
-    spellSuggestions = new Set(
-      (Array.isArray(spellingCandidates) ? spellingCandidates : [])
-        .map((token) => String(token).toLowerCase())
-    );
+    let ranked = [];
+    if (typeof spellchecker.suggestDetailedAsync === 'function') {
+      ranked = await spellchecker.suggestDetailedAsync(prefix, 15, prevWord);
+    } else if (typeof spellchecker.suggestDetailed === 'function') {
+      ranked = spellchecker.suggestDetailed(prefix, 15, prevWord);
+    } else {
+      const spellingCandidates = typeof spellchecker.suggestAsync === 'function'
+        ? await spellchecker.suggestAsync(prefix, 15, prevWord)
+        : (typeof spellchecker.suggest === 'function'
+          ? spellchecker.suggest(prefix, 15, prevWord)
+          : []);
+      ranked = (Array.isArray(spellingCandidates) ? spellingCandidates : []).map((token, index, list) => ({
+        word: token,
+        // Legacy bare-word APIs: preserve relative order without flattening everyone to 0.7.
+        score: list.length <= 1 ? 0.7 : 0.55 + (0.35 * (1 - (index / (list.length - 1)))),
+      }));
+    }
+
+    (Array.isArray(ranked) ? ranked : []).forEach((entry) => {
+      const word = String(entry?.word || entry || '').toLowerCase();
+      if (!word) return;
+      const score = clamp01(entry?.score);
+      const previous = spellSuggestionScores.get(word);
+      spellSuggestionScores.set(word, previous == null ? score : Math.max(previous, score));
+    });
   }
 
   let dictionaryValidWords = new Set();
@@ -85,14 +109,16 @@ export async function democracyProvider(context, engines, candidates) {
       });
     }
 
-    const isSuggestedBySpellchecker = spellSuggestions.has(normalizedWord);
+    const rankedSpellScore = spellSuggestionScores.has(normalizedWord)
+      ? spellSuggestionScores.get(normalizedWord)
+      : null;
     const isValidatedByDictionary = dictionaryValidWords.has(normalizedWord);
     const isKnownLocally = spellchecker && typeof spellchecker.check === 'function'
       ? spellchecker.check(normalizedWord)
       : false;
 
     let spellcheckConfidence = null;
-    if (isSuggestedBySpellchecker) spellcheckConfidence = 0.7;
+    if (rankedSpellScore != null) spellcheckConfidence = Math.max(0.2, rankedSpellScore);
     if (isKnownLocally) spellcheckConfidence = Math.max(spellcheckConfidence || 0, 0.78);
     if (isValidatedByDictionary) spellcheckConfidence = Math.max(spellcheckConfidence || 0, 0.9);
 
@@ -100,7 +126,7 @@ export async function democracyProvider(context, engines, candidates) {
       judiciaryCandidates.push({
         word,
         layer: 'SPELLCHECK',
-        confidence: spellcheckConfidence,
+        confidence: clamp01(spellcheckConfidence),
       });
     }
 

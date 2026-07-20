@@ -121,16 +121,17 @@
   padding: 0.95rem 1.05rem;
   border: 1px solid rgba(212, 175, 55, 0.16);
   border-radius: 8px;
-  background: linear-gradient(135deg, rgba(18, 18, 34, 0.82), rgba(10, 10, 20, 0.88));
+  /* Opaque fill — backdrop-filter over a live stage re-blurs every frame. */
+  background: linear-gradient(135deg, rgba(18, 18, 34, 0.96), rgba(10, 10, 20, 0.98));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 10px 30px rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(4px);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  contain: layout paint style;
 }
 
 .bcv-panel:hover {
   border-color: rgba(212, 175, 55, 0.5);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 0 14px rgba(212, 175, 55, 0.12), 0 12px 32px rgba(0, 0, 0, 0.5);
-  transform: translateY(-1px);
+  /* No translateY during playback — avoids promoting glass panels beside the stage */
 }
 
 .bcv-panel--right { text-align: right; }
@@ -190,26 +191,261 @@
 }
 .bcv-semantic span { color: var(--bcv-magenta); text-shadow: 0 0 8px rgba(214, 91, 255, 0.5); }
 
-.bcv-matrix { width: 100%; height: auto; filter: drop-shadow(0 0 6px rgba(46, 230, 255, 0.3)); }
+.bcv-matrix { width: 100%; height: auto; }
 
-.bcv-miniwave { display: block; width: 100%; height: 38px; margin: 0.3rem 0; }
+.bcv-miniwave {
+  display: block;
+  width: 100%;
+  height: 38px;
+  margin: 0.3rem 0;
+  /* No CSS filter on canvas — drop-shadow + live RAF killed GPU (Aw Snap 15). */
+}
 
-/* ── Central mandala stage ──────────────────────────────────────────────── */
+/* ── Song-score instrument charts (GrimDesign craft) ────────────────────── */
+
+.bcv-panel--grim {
+  border: var(--grim-border, 1px solid rgba(212, 175, 55, 0.22));
+  /* No multi-panel blur glow — 6× large box-shadow blurs + dual canvas RAF
+     was crashing Chrome renderer (Aw Snap / exit 15) on Deck GPUs. */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 10px 30px rgba(0, 0, 0, 0.45);
+  transition:
+    border-color var(--grim-transition, 360ms ease-in-out),
+    box-shadow var(--grim-transition, 360ms ease-in-out);
+  padding: 1.05rem 1.15rem;
+}
+
+.bcv-chart-empty {
+  margin: 0.4rem 0 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bcv-dim);
+}
+
+.bcv-identity {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.bcv-identity__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding-bottom: 0.28rem;
+  border-bottom: 1px dotted color-mix(in oklab, var(--grim-color, var(--bcv-gold)) 22%, transparent);
+}
+
+.bcv-identity__row:last-child { border-bottom: none; padding-bottom: 0; }
+
+.bcv-identity__row dt {
+  margin: 0;
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--bcv-dim);
+}
+
+.bcv-identity__row dd {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--bcv-ink);
+  text-align: right;
+}
+
+.bcv-identity__school {
+  color: var(--grim-color, var(--bcv-world));
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-shadow: 0 0 12px color-mix(in oklab, var(--grim-color, var(--bcv-world)) 40%, transparent);
+}
+
+.bcv-identity__pct {
+  margin-left: 0.45rem;
+  font-size: 0.68rem;
+  color: var(--bcv-dim);
+}
+
+.bcv-spectral {
+  display: block;
+  width: 100%;
+  height: 72px;
+  margin: 0.2rem 0 0.35rem;
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.25), transparent);
+  /* Never animate filter on this canvas — compositor + RAF = GPU kill. */
+}
+
+.bcv-spectral.is-live {
+  outline: 1px solid color-mix(in oklab, var(--grim-color, var(--bcv-world)) 35%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bcv-density__bar--playhead,
+  .bcv-pressure__dot {
+    animation: bcv-grim-pulse 800ms ease-in-out infinite;
+  }
+}
+
+/* Opacity pulse only — never animate `filter` (Chrome Aw Snap / GPU exit 15). */
+@keyframes bcv-grim-pulse {
+  0%, 100% { opacity: 0.82; }
+  50% { opacity: 1; }
+}
+
+.bcv-schoolshare__bar {
+  display: flex;
+  height: 14px;
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--grim-color, var(--bcv-gold)) 28%, transparent);
+  margin-bottom: 0.65rem;
+}
+
+.bcv-schoolshare__seg {
+  min-width: 3px;
+  transition: opacity var(--grim-transition, 360ms ease-in-out);
+  opacity: 0.72;
+}
+
+.bcv-schoolshare__seg.is-active {
+  opacity: 1;
+  outline: 1px solid color-mix(in oklab, #fff 35%, transparent);
+  outline-offset: -1px;
+  z-index: 1;
+}
+
+.bcv-schoolshare__legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+}
+
+.bcv-schoolshare__legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--bcv-ink);
+  opacity: 0.72;
+  transition: opacity var(--grim-transition, 360ms ease-in-out);
+}
+
+.bcv-schoolshare__legend li.is-active {
+  opacity: 1;
+  text-shadow: 0 0 10px color-mix(in oklab, var(--grim-color, var(--bcv-world)) 30%, transparent);
+}
+
+.bcv-schoolshare__swatch {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.bcv-schoolshare__name {
+  flex: 1;
+  text-align: left;
+  letter-spacing: 0.14em;
+}
+
+.bcv-panel--right .bcv-schoolshare__name { text-align: right; }
+
+.bcv-schoolshare__pct {
+  color: var(--bcv-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.bcv-density,
+.bcv-pressure {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.bcv-density__track {
+  fill: color-mix(in oklab, var(--grim-color, var(--bcv-world)) 8%, transparent);
+}
+
+.bcv-density__bar {
+  fill: color-mix(in oklab, var(--grim-color, var(--bcv-world)) 55%, #888);
+  transition: fill var(--grim-transition, 360ms ease-in-out);
+}
+
+.bcv-density__bar--playhead {
+  fill: var(--grim-color, var(--bcv-world));
+}
+
+.bcv-density__cursor {
+  fill: var(--bcv-gold-hot, #f0d78c);
+}
+
+.bcv-density__label {
+  fill: var(--bcv-dim);
+  font-family: inherit;
+  letter-spacing: 0.06em;
+}
+
+.bcv-pressure__line {
+  stroke: var(--grim-color, var(--bcv-world));
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.bcv-pressure__cursor {
+  stroke: var(--bcv-gold-hot, #f0d78c);
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+  opacity: 0.7;
+}
+
+.bcv-pressure__dot {
+  fill: var(--bcv-gold-hot, #f0d78c);
+}
+
+.bcv-pressure__meta {
+  fill: var(--bcv-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ── Central stage (static art) ─────────────────────────────────────────── */
 
 .bcv-stage {
   position: relative;
-  aspect-ratio: 1;
-  max-height: 78vh;
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
-  border-radius: 50%;
-  overflow: hidden;
+  border-radius: 8px;
+  /* visible so tall art is never clipped by the frame */
+  overflow: visible;
   border: 1px solid rgba(212, 175, 55, 0.22); /* gold instrument rim */
-  /* Holographic screen edge */
+  isolation: isolate;
+  background: rgba(4, 4, 12, 0.92);
   box-shadow:
-    inset 0 0 80px color-mix(in oklab, var(--bcv-world) 18%, transparent),
-    inset 0 0 4px rgba(46, 230, 255, 0.4),
-    0 0 60px color-mix(in oklab, var(--bcv-world) 16%, transparent);
-  background: radial-gradient(circle, rgba(12, 10, 28, 0.5), rgba(4, 4, 12, 0.2));
+    inset 0 0 4px rgba(46, 230, 255, 0.35),
+    0 0 24px color-mix(in oklab, var(--bcv-world) 12%, transparent);
+}
+
+.bcv-stage::after {
+  content: '';
+  position: absolute;
+  inset: -12%;
+  z-index: -1;
+  border-radius: 12px;
+  pointer-events: none;
+  background: radial-gradient(circle, color-mix(in oklab, var(--bcv-world) 18%, transparent), transparent 70%);
 }
 
 .bcv-canvas { display: block; width: 100%; height: 100%; }
@@ -217,11 +453,11 @@
 .bcv-stage__scanlines {
   position: absolute;
   inset: 0;
+  z-index: 2;
   pointer-events: none;
-  border-radius: 50%;
-  opacity: 0.28;
+  border-radius: 8px;
+  opacity: 0.18;
   background: repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0, 0, 0, 0.45) 2px 3px);
-  mix-blend-mode: overlay;
 }
 
 .bcv-foot {
@@ -246,7 +482,6 @@
   .bcv-panel--right h2 { padding-left: 8px; padding-right: 0; border-left: 2px solid var(--bcv-gold); border-right: none; }
   .bcv-panel--right .bcv-coord { flex-direction: row; }
   .bcv-semantic li { justify-content: flex-start; }
-  .bcv-stage { max-height: 60vh; }
 }
 
 /* ── Two-page grimoire spread ───────────────────────────────────────────── */
@@ -338,21 +573,29 @@
 .bcv-prov-tools { margin: 0; font-size: 0.74rem; color: var(--bcv-magenta); }
 
 .bcv-lyrics { margin: 0 0 1.2rem; padding: 0; list-style: none; columns: 2; column-gap: 1.6rem; }
+
+/* Deck / coarse: multicolumn lyric reflow is crash-class expensive. */
+@media (pointer: coarse) {
+  .bcv-lyrics { columns: 1; }
+}
 .bcv-lyrics li { display: flex; gap: 0.5rem; break-inside: avoid; font-family: var(--bcv-scroll); font-size: 0.95rem; line-height: 1.75; color: var(--bcv-ink); opacity: 0.8; }
 .bcv-lyrics.is-truesight li { opacity: 0.72; }   /* inactive lines stay quiet */
 .bcv-lyric-text { flex: 1; }
-/* Inactive content words: muted tint (30% school, 70% ivory) — a gentle hue, not neon. */
-.bcv-tsword { color: color-mix(in oklab, var(--w, currentColor) 30%, var(--bcv-ink)); transition: color 0.5s ease, text-shadow 0.5s ease; }
+/* Inactive content words: muted tint — color only, no text-shadow (Deck GPU). */
+.bcv-tsword {
+  color: color-mix(in oklab, var(--w, currentColor) 30%, var(--bcv-ink));
+  transition: color 0.35s ease;
+}
 .bcv-lyrics li.is-highlight {
-  opacity: 1;
+  opacity: calc(0.88 + 0.12 * var(--k-line-pulse, 1));
   background: linear-gradient(90deg, rgba(212, 175, 55, 0.16), transparent);
   border-radius: 4px;
   box-shadow: inset 2px 0 0 var(--bcv-gold); /* gilt rubric bar, no layout shift */
 }
-/* The active (playing) line blooms into full school colour — colour as a spotlight. */
-.bcv-lyrics li.is-highlight .bcv-tsword { color: var(--w); text-shadow: 0 0 8px var(--w); }
+/* Active line: full school colour without per-word glow blur. */
+.bcv-lyrics li.is-highlight .bcv-tsword { color: var(--w); }
 .bcv-lyrics li.is-highlight .bcv-lyric-n { color: var(--bcv-gold); }
-.bcv-lyrics:not(.is-truesight) li.is-highlight .bcv-lyric-text { color: var(--bcv-gold-hot); text-shadow: 0 0 14px rgba(212, 175, 55, 0.4); }
+.bcv-lyrics:not(.is-truesight) li.is-highlight .bcv-lyric-text { color: var(--bcv-gold-hot); }
 .bcv-lyric-n { color: var(--bcv-dim); font-family: var(--bcv-mono); font-size: 0.58rem; padding-top: 0.42rem; }
 
 .bcv-annotations-layer { margin-bottom: 2rem; }
@@ -569,25 +812,25 @@
 }
 
 /* ── Karaoke (forced alignment) ────────────────────────────────────────────
-   The word being sung gets a luminance lift only — hue stays the school's.
-   Colour marks meaning, brightness marks time (colour hygiene). */
+   Sung word: luminance + bytecode scale/glow intensity. No text-shadow. */
 .bcv-lyrics .bcv-lyric-text span[data-sung='true'] {
-  filter: brightness(1.45);
-  text-shadow: 0 0 14px currentColor;
+  color: color-mix(
+    in oklab,
+    currentColor calc(100% - 45% * var(--k-word-glow, 0.5)),
+    white
+  );
+  opacity: calc(0.85 + 0.15 * var(--k-word-glow, 0.5));
+  font-weight: 600;
+  /* No transform:scale — compositor layers per sung word were Deck crash fuel. */
 }
-/* Backing vocals (parentheticals) sing softer: a haze, not a spotlight. */
+/* Backing vocals (parentheticals) sing softer: italic, not a glow. */
 .bcv-lyrics .bcv-lyric-text span[data-sung='backing'] {
-  filter: brightness(1.2);
-  text-shadow: 0 0 8px currentColor;
+  opacity: 0.88;
   font-style: italic;
 }
-/* The aligner guessed this word's span between confident neighbours. Brightness
-   marks time, so an uncertain time gets an uncertain edge: the glow diffuses
-   instead of striking. Orthogonal to the vocal kind above — a backing word that
-   was also interpolated keeps its italic and merely loses its hard edge. */
+/* Interpolated timing: slightly dimmer — no diffuse glow. */
 .bcv-lyrics .bcv-lyric-text span[data-timing='estimated'] {
-  text-shadow: 0 0 18px currentColor;
-  opacity: 0.85;
+  opacity: 0.82;
 }
 
 /* ── Library shelf ─────────────────────────────────────────────────────── */

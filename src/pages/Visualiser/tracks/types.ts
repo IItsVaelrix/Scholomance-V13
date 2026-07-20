@@ -24,6 +24,8 @@ export interface GrimoireTrack {
   sunoUrl: string;
   audioUrl: string;
   coverUrl: string;
+  /** Optional static stage art for the visualiser orb. Falls back to coverUrl. */
+  stageArtUrl?: string;
   meta: [string, string][];
   provenance: { statement: string; tools: string[]; assistance: string };
   lyrics: string[];

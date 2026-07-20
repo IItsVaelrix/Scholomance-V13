@@ -7,7 +7,7 @@ const ANALYSIS_MODE_LIST = [
   { id: ANALYSIS_MODES.NONE,      label: 'None'      },
   { id: ANALYSIS_MODES.ASTROLOGY, label: 'Astrology' },
   { id: ANALYSIS_MODES.RHYME,     label: 'Rhyme'     },
-  { id: ANALYSIS_MODES.ANALYZE,   label: 'Analyze'   },
+  { id: ANALYSIS_MODES.ANALYZE,   label: 'Leximancy' },
   { id: ANALYSIS_MODES.VOWEL,     label: 'Vowel'     },
 ];
 

@@ -21,6 +21,7 @@
   --portal-gold-soft: rgba(212, 175, 55, 0.45);
   --portal-phoneme: hsl(173, 82%, 54%);
   --portal-phoneme-soft: hsla(173, 82%, 74%, 0.5);
+  --landing-gate-width: min(28rem, 42vmin);
 
   cursor: none;
   position: fixed;
@@ -35,20 +36,86 @@
     radial-gradient(ellipse 90% 70% at 50% 44%, #0b0d16 0%, #07070e 52%, #020205 100%);
 }
 
-/* Damp stone vignette + chamber floor */
+/* Twin-gate: portal left, ledger right — above vignette so scrollbar stays clickable */
+.landing-gates {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  grid-template-columns:
+    minmax(0, var(--landing-gate-width))
+    minmax(0, var(--landing-gate-width));
+  align-items: center;
+  justify-content: center;
+  gap: clamp(2rem, 7vw, 8rem);
+  width: min(100% - 3rem, 100rem);
+  margin-inline: auto;
+}
+
+.landing-gate {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  min-height: min(58vh, 34rem);
+}
+
+.landing-gate--portal {
+  display: grid;
+  place-items: center;
+}
+
+.landing-gate--ledger {
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  /* Cap height so the chronicle scrollports instead of growing with entries */
+  height: min(58vh, 34rem);
+  max-height: min(58vh, 34rem);
+  min-height: 0;
+  /* Scene uses cursor:none for the orb; restore a real pointer for ledger chrome */
+  cursor: auto;
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+}
+
+@media (max-width: 900px) {
+  .portal-scene {
+    align-items: flex-start;
+    overflow: auto;
+  }
+
+  .landing-gates {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1.5rem, 5vh, 3rem);
+    width: min(100% - 2rem, 42rem);
+    padding-block: 2rem 3rem;
+  }
+
+  .landing-gate--portal {
+    min-height: min(58vh, 34rem);
+  }
+
+  .landing-gate--ledger {
+    height: min(42vh, 24rem);
+    max-height: min(42vh, 24rem);
+    min-height: 0;
+  }
+}
+
+/* Damp stone vignette + chamber floor — below interactive gates (not over the ledger) */
 .portal-scene::before {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 3;
+  z-index: 1;
   background:
     radial-gradient(ellipse 65% 55% at 50% 46%, transparent 52%, rgba(2, 2, 6, 0.72) 100%);
   mix-blend-mode: multiply;
 }
 
-/* Cracked plinth glow beneath the orb */
-.portal-scene::after {
+/* Cracked plinth glow beneath the orb — anchored to portal gate column */
+.landing-gate--portal::after {
   content: "";
   position: absolute;
   left: 50%;
@@ -168,9 +235,9 @@
   animation-delay: -2s;
 }
 
-/* ── Ambient halo behind the gate ─────────────────────────────────────────── */
+/* ── Ambient halo behind the gate — scoped to portal gate footprint ───────── */
 
-.portal-halo {
+.landing-gate--portal .portal-halo {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -186,22 +253,31 @@
   );
   filter: blur(12px);
   pointer-events: none;
-  z-index: 1;
+  z-index: 0;
   animation: portal-breathe 7s ease-in-out infinite;
 }
 
-/* ── The orb (clickable) ──────────────────────────────────────────────────── */
+/* ── The orb (clickable) — centered in left gate footprint ────────────────── */
+
+.landing-gate--portal > div {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+}
 
 .portal-gate {
   position: relative;
   display: grid;
   place-items: center;
   width: clamp(260px, 44vmin, 440px);
+  max-width: 100%;
   aspect-ratio: 1;
   border-radius: 50%;
   cursor: none;
   user-select: none;
   z-index: 2;
+  margin-inline: auto;
   transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 

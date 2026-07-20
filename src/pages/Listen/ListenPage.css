@@ -7,10 +7,9 @@
 
 /* ─── GPU ACCELERATION ────────────────────────────────────── */
 
+/* Demote blanket root promotion — hot hosts promote themselves */
 .listen-chamber {
   contain: layout paint style;
-  transform: translateZ(0);
-  backface-visibility: hidden;
 }
 
 /* Holographic embed — GPU accelerated canvas */
@@ -209,7 +208,8 @@
 }
 
 .listen-chamber {
-  --hud-bg: rgba(18, 20, 21, 0.4);
+  /* Near-opaque HUD fill — glass blur over live Phaser re-samples every frame. */
+  --hud-bg: rgba(12, 14, 16, 0.94);
   --hud-border: rgba(45, 219, 222, 0.15);
   --hud-accent: #2ddbde;
   --hud-text: #e2e2e3;
@@ -227,9 +227,14 @@
 
 /* -- Background FX ----------------------------------------------- */
 
+/* CRT stripes scoped to the cockpit only — not under the sidebars (avoids a
+   full-viewport translucent blend over Phaser + spectrum). */
 .chamber-scanlines {
   position: absolute;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  left: 18rem;
+  right: 18rem;
   background: repeating-linear-gradient(
     0deg,
     rgba(0, 0, 0, 0.1) 0px,
@@ -239,7 +244,15 @@
   );
   pointer-events: none;
   z-index: 1;
-  opacity: 0.3;
+  opacity: 0.28;
+  contain: strict;
+}
+
+@media (max-width: 1100px) {
+  .chamber-scanlines {
+    left: 0;
+    right: 0;
+  }
 }
 
 .hud-noise {
@@ -259,7 +272,7 @@
   bottom: 0;
   width: 18rem;
   background: var(--hud-bg);
-  backdrop-filter: blur(12px);
+  /* No backdrop-filter: sampling live WebGL every frame is a compositor tax. */
   z-index: 40;
   display: flex;
   flex-direction: column;
@@ -271,6 +284,7 @@
   min-height: 0;
   overscroll-behavior: contain;
   scrollbar-width: thin;
+  contain: layout paint style;
 }
 
 .hud-sidebar--left {
@@ -442,6 +456,9 @@
      ±24 dB gain range vertically, which was unusable at the old 80px. */
   height: clamp(150px, 22vh, 200px);
   background: rgba(0, 0, 0, 0.3);
+  contain: strict;
+  content-visibility: auto;
+  transform: translateZ(0);
   border: 1px solid rgba(0, 207, 200, 0.2);
   border-radius: 4px;
   overflow: hidden;
@@ -669,11 +686,14 @@
   background: #010305;
 }
 
-/* Phaser canvas - fades in when loaded */
+/* Phaser canvas - fades in when loaded; promote only this host, not the whole HUD */
 .alchemical-lab-phaser {
   position: absolute;
   inset: 0;
   z-index: 1;
+  contain: strict;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 @media (max-width: 1024px) {
@@ -739,20 +759,29 @@
   pointer-events: none;
 }
 
-/* Live spectral mandala overlay — reactive audio layer composited over the orb. */
+/* Live spectral mandala — additive glow lives in the canvas ('lighter'), not in
+   CSS mix-blend-mode (which re-blends against full-scene Phaser every frame). */
 .signal-chamber-fft {
   position: absolute;
   left: 50%;
   top: 47.685185%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) translateZ(0);
   width: min(30rem, 42vw);
   aspect-ratio: 1;
   z-index: 12; /* above Phaser canvas (1-10), below the player overlay (25) */
   pointer-events: none;
   border-radius: 50%;
   overflow: hidden;
-  mix-blend-mode: screen;
-  opacity: 0.92;
+  opacity: 0.95;
+  isolation: isolate;
+  contain: paint;
+  will-change: contents;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signal-chamber-fft {
+    will-change: auto;
+  }
 }
 
 /* Invisible click surface for the Orb — interaction layer (below video player) */
@@ -3116,6 +3145,263 @@
   text-shadow:
     0  1px 0   rgba(0,   0,   0,   0.95),
     0  0   4px rgba(80,  38,  220, 0.30);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   COMPACT COMMAND DECK
+   DivWand density + Wand obsidian/gold tooling, with school color reserved
+   for live state. This intentionally replaces the old cyan nebula buttons.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.transport-console {
+  width: min(500px, 94vw);
+  padding: 4px 8px;
+  gap: 5px;
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(14, 15, 24, 0.98), rgba(6, 7, 12, 0.99));
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.48),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.transport-console::before {
+  border-radius: 8px;
+  box-shadow:
+    inset 0 1px 0 rgba(212, 175, 55, 0.09),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.52);
+}
+
+.transport-console__header,
+.transport-console__command-deck {
+  position: relative;
+  z-index: 1;
+}
+
+.transport-console__header {
+  min-height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 2px 4px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.11);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+}
+
+.transport-console__identity,
+.transport-console__telemetry {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.transport-console__identity {
+  gap: 7px;
+}
+
+.transport-console__status-dot {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.48);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.06);
+}
+
+.listen-console--playing .transport-console__status-dot,
+.listen-console--loading .transport-console__status-dot {
+  background: var(--active-school-color);
+  box-shadow: 0 0 9px color-mix(in srgb, var(--active-school-color) 48%, transparent);
+}
+
+.transport-console__kicker {
+  color: rgba(212, 175, 55, 0.78);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+}
+
+.transport-console__state {
+  max-width: 10rem;
+  overflow: hidden;
+  color: rgba(226, 232, 240, 0.42);
+  font-size: 0.56rem;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.transport-console__telemetry {
+  flex: 0 0 auto;
+  gap: 5px;
+}
+
+.transport-console__telemetry span {
+  padding: 2px 5px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.025);
+  color: rgba(226, 232, 240, 0.4);
+  font-size: 0.54rem;
+  letter-spacing: 0.07em;
+}
+
+.transport-console__command-deck {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.24);
+}
+
+.transport-console__cluster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.transport-console__separator {
+  width: 1px;
+  height: 22px;
+  flex: 0 0 auto;
+  background: rgba(212, 175, 55, 0.15);
+}
+
+.transport-console__btn {
+  position: relative;
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(19, 20, 31, 0.98), rgba(9, 10, 17, 0.99));
+  color: rgba(226, 232, 240, 0.62);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+  text-shadow: none;
+  letter-spacing: 0;
+  animation: none;
+  transition:
+    transform 150ms ease,
+    color 150ms ease,
+    border-color 150ms ease,
+    background 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.transport-console__btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(212, 175, 55, 0.46);
+  background: linear-gradient(180deg, rgba(27, 27, 40, 0.99), rgba(11, 12, 20, 0.99));
+  color: rgba(244, 237, 218, 0.92);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  animation: none;
+}
+
+.transport-console__btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--active-school-color) 68%, #ffffff 12%);
+  outline-offset: 2px;
+}
+
+.transport-console__btn:active:not(:disabled) {
+  transform: translateY(0);
+  background: rgba(4, 5, 9, 0.98);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.48);
+  text-shadow: none;
+}
+
+.transport-console__btn:disabled {
+  opacity: 0.3;
+}
+
+.transport-console__btn--play {
+  width: 42px;
+  min-width: 42px;
+  border-color: color-mix(in srgb, var(--active-school-color) 52%, rgba(212, 175, 55, 0.2));
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--active-school-color) 13%, rgba(22, 23, 34, 0.99)),
+      rgba(8, 9, 15, 0.99));
+  color: color-mix(in srgb, var(--active-school-color) 74%, #ffffff 18%);
+  box-shadow:
+    0 0 12px color-mix(in srgb, var(--active-school-color) 13%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.listen-console--playing .transport-console__btn--play {
+  border-color: color-mix(in srgb, var(--active-school-color) 68%, #ffffff 8%);
+  color: color-mix(in srgb, var(--active-school-color) 82%, #ffffff 18%);
+  box-shadow:
+    0 0 15px color-mix(in srgb, var(--active-school-color) 20%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.transport-console__volume-readout {
+  width: 32px;
+  min-width: 32px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: rgba(212, 175, 55, 0.72);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+  box-shadow: none;
+}
+
+@media (max-width: 420px) {
+  .transport-console {
+    width: 92vw;
+  }
+
+  .transport-console__header {
+    gap: 6px;
+  }
+
+  .transport-console__state,
+  .transport-console__telemetry span:first-child {
+    display: none;
+  }
+
+  .transport-console__command-deck {
+    height: auto;
+    min-height: 44px;
+    flex-wrap: wrap;
+  }
+
+  .transport-console__separator {
+    display: none;
+  }
+
+  .transport-console__cluster--volume {
+    padding-left: 7px;
+    border-left: 1px solid rgba(212, 175, 55, 0.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transport-console__btn {
+    transition: none;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

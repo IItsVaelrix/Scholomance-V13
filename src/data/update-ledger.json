@@ -1,0 +1,182 @@
+[
+  {
+    "id": "2026-07-19-update-ledger-twin-gate",
+    "date": "2026-07-19",
+    "title": "Scholomance Update Ledger opens on Landing",
+    "summary": "The entry chamber now carries a twin-gate: Enter on the left, a curated Update Ledger chronicle on the right with DivWand glass and Wand voice."
+  },
+  {
+    "id": "2026-07-19-ledger-add-cli",
+    "date": "2026-07-19",
+    "title": "Atomic ledger:add ritual",
+    "summary": "New entries prepend through npm run ledger:add with fail-closed validation and a temporary-file rename so the chronicle never half-writes."
+  },
+  {
+    "id": "2026-07-19-wand-voice-tokens",
+    "date": "2026-07-19",
+    "title": "Shared Wand voice tokens",
+    "summary": "Extracted reusable Wand voice tokens so Update Ledger and other surfaces share one styling source without importing WandPage.css."
+  },
+  {
+    "id": "2026-07-19-div-layout-renderer",
+    "date": "2026-07-19",
+    "title": "DivLayoutRenderer extraction",
+    "summary": "Moved DivWand layout rendering into a shared module so Landing, Combat, and DivWand can share one glass tree without page CSS leakage."
+  },
+  {
+    "id": "2026-07-18-song-stats-metrics",
+    "date": "2026-07-18",
+    "title": "CODEx Metrics meet Song Stats",
+    "summary": "The Read page Metrics panel now draws from the Song Stats engine so lexical density and flow read as one chronicle."
+  },
+  {
+    "id": "2026-07-18-song-stats-flow",
+    "date": "2026-07-18",
+    "title": "Estimated and aligned Flow",
+    "summary": "Song Stats gained estimated bar-per-line flow plus aligned syncopation versus deviation, with provisional labeling when alignment is thin."
+  },
+  {
+    "id": "2026-07-18-song-stats-rhyme",
+    "date": "2026-07-18",
+    "title": "Malmi and CODEx rhyme density",
+    "summary": "Rhyme Density now reports both Malmi RD_M and CODEx RD_C so repetition and span contribute honestly to the score."
+  },
+  {
+    "id": "2026-07-18-song-stats-vocab",
+    "date": "2026-07-18",
+    "title": "CODEx lexical diversity",
+    "summary": "Unique vocabulary now tracks lemma-level diversity with short-sample warnings so thin verses do not pretend to be encyclopedias."
+  },
+  {
+    "id": "2026-07-18-song-stats-composite",
+    "date": "2026-07-18",
+    "title": "Technical Density composite",
+    "summary": "Song Stats ships a Technical Density band with explicit ceilings and a tooltip that denies artistic-quality claims."
+  },
+  {
+    "id": "2026-07-18-analyze-pos-buckets",
+    "date": "2026-07-18",
+    "title": "Analyze POS buckets and Leximancy",
+    "summary": "Lexical Analyze groups related words by part of speech and surfaces Leximancy craft actions from the live dictionary graph."
+  },
+  {
+    "id": "2026-07-18-oewn-antonyms",
+    "date": "2026-07-18",
+    "title": "OEWN antonym ingest",
+    "summary": "English WordNet antonyms landed in the Scholomance dictionary so oppositional relations resolve in Analyze and the graph."
+  },
+  {
+    "id": "2026-07-18-lexical-graph",
+    "date": "2026-07-18",
+    "title": "Lexical graph foundation",
+    "summary": "SQLite-backed lexical graph routes and retrieval give Analyze a durable neighborhood of synonyms, hypernyms, and kin."
+  },
+  {
+    "id": "2026-07-18-analyze-retrieval",
+    "date": "2026-07-18",
+    "title": "Analyze UI retrieval panel",
+    "summary": "The Analyze surface now retrieves related words live, with loading guards and craft pins so writers can harvest without losing place."
+  },
+  {
+    "id": "2026-07-17-visualiser-truesight",
+    "date": "2026-07-17",
+    "title": "Visualizer Truesight amp",
+    "summary": "Bytecode Visualiser gained Truesight amplification so school color and fidelity ride the stage without inventing a second authority."
+  },
+  {
+    "id": "2026-07-17-mandala-motion",
+    "date": "2026-07-17",
+    "title": "Mandala bytecode motion",
+    "summary": "Mandala stage motion now follows deterministic bytecode channels instead of free-running decorative loops."
+  },
+  {
+    "id": "2026-07-17-karaoke-motion",
+    "date": "2026-07-17",
+    "title": "Karaoke bytecode motion",
+    "summary": "Lyric karaoke highlight timing locks to bytecode motion so the voice and the glyph advance as one rite."
+  },
+  {
+    "id": "2026-07-17-ritual-card",
+    "date": "2026-07-17",
+    "title": "Ritual card redesign",
+    "summary": "Ritual cards were rebuilt for clearer provenance, commerce, and bytecode fingerprints on release surfaces."
+  },
+  {
+    "id": "2026-07-17-tool-substrate",
+    "date": "2026-07-17",
+    "title": "Tool substrate contract",
+    "summary": "A shared tool substrate clarifies how Wand, DivWand, and PixelBrain tools declare capabilities without drifting schemas."
+  },
+  {
+    "id": "2026-07-16-discography-nav",
+    "date": "2026-07-16",
+    "title": "Discography albums navigation",
+    "summary": "Album shelves and discography nav make the Visualiser catalog feel like a living library instead of a flat track list."
+  },
+  {
+    "id": "2026-07-16-album-page",
+    "date": "2026-07-16",
+    "title": "Album page stage",
+    "summary": "Dedicated album pages host art, lyrics, and transport so each release can be entered as a room."
+  },
+  {
+    "id": "2026-07-15-pb-amp-compositor",
+    "date": "2026-07-15",
+    "title": "PixelBrain AMP compositor",
+    "summary": "AMP compositing landed so PixelBrain layers can be stacked and inspected with provenance-preserving transforms."
+  },
+  {
+    "id": "2026-07-13-chroma-phosphorylation",
+    "date": "2026-07-13",
+    "title": "Chroma phosphorylation",
+    "summary": "Chroma phosphorylation routes school color through a controlled gate so glow follows law instead of whim."
+  },
+  {
+    "id": "2026-07-12-resonance-signature",
+    "date": "2026-07-12",
+    "title": "Resonance signature contract",
+    "summary": "Resonance signatures gained a stable contract so Listen, Visualiser, and gear systems share one identity fingerprint."
+  },
+  {
+    "id": "2026-07-10-game-dev-skill",
+    "date": "2026-07-10",
+    "title": "Scholomance game-development skill",
+    "summary": "Agents now route game asset work through SCDL, PixelBrain, Wand, and DivWand under one repository-native skill contract."
+  },
+  {
+    "id": "2026-07-09-cochlear-manifold",
+    "date": "2026-07-09",
+    "title": "Cochlear manifold core",
+    "summary": "The cochlear manifold core landed so Listen can treat spectral space as a navigable chamber rather than a flat EQ strip."
+  },
+  {
+    "id": "2026-07-05-polaris-forest",
+    "date": "2026-07-05",
+    "title": "Polaris sonic forest",
+    "summary": "Polaris Forest gained a sonic walkthrough so the grove answers with light and tone when the path is taken."
+  },
+  {
+    "id": "2026-07-05-portal-warden",
+    "date": "2026-07-05",
+    "title": "Portal Warden",
+    "summary": "Portal Warden watches chamber transitions so entry rites stay coherent across Landing, Read, and the outer gates."
+  },
+  {
+    "id": "2026-07-04-enemy-ai-council",
+    "date": "2026-07-04",
+    "title": "Enemy AI council",
+    "summary": "Combat enemies now deliberate through an AI council so threats choose with purpose instead of pure random aggression."
+  },
+  {
+    "id": "2026-07-03-syntactical-combat",
+    "date": "2026-07-03",
+    "title": "Syntactical combat weave",
+    "summary": "Spellweave combat ties verse integrity to cast strength so grammar and rhythm become the weapon itself."
+  },
+  {
+    "id": "2026-07-02-picturebookmud-hud",
+    "date": "2026-07-02",
+    "title": "PicturebookMud HUD fidelity",
+    "summary": "The PicturebookMud HUD was brought into fidelity with chamber chrome so mud rites match the rest of Scholomance."
+  }
+]

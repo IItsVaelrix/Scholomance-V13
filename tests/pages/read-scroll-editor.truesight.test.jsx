@@ -120,6 +120,25 @@ describe("ScrollEditor Truesight overlay", () => {
     expect(view.getByLabelText("Scroll content: Untitled").value).toBe("");
   });
 
+  it("reports explicit textarea selections and clears collapsed selections", () => {
+    const onSelectionTextChange = vi.fn();
+    const view = renderWithProviders(
+      <ScrollEditor
+        title="Selection bridge"
+        content="river bank"
+        isEditable={true}
+        onSelectionTextChange={onSelectionTextChange}
+      />
+    );
+    const textarea = view.getByLabelText("Scroll content: Selection bridge");
+
+    fireEvent.select(textarea, { target: { selectionStart: 0, selectionEnd: 5 } });
+    expect(onSelectionTextChange).toHaveBeenLastCalledWith("river");
+
+    fireEvent.select(textarea, { target: { selectionStart: 5, selectionEnd: 5 } });
+    expect(onSelectionTextChange).toHaveBeenLastCalledWith("");
+  });
+
   it("colors content words even when no rhyme connections are active", () => {
     const content = "Alpha beta";
     const analyzedWords = new Map([

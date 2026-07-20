@@ -158,7 +158,11 @@ function callDirectBrain(action, args = {}) {
         const stdout = err.stdout ? String(err.stdout) : '';
         const stderr = err.stderr ? String(err.stderr) : '';
         let parsed = null;
-        try { parsed = stdout ? JSON.parse(stdout) : null; } catch {}
+        try {
+            parsed = stdout ? JSON.parse(stdout) : null;
+        } catch {
+            // Preserve raw stdout below when the subprocess did not emit JSON.
+        }
         return {
             error: err.message || 'direct_brain execution failed',
             stdout: stdout.slice(0, 2000),

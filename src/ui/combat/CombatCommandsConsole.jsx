@@ -134,9 +134,10 @@ export default function CombatCommandsConsole({
           <span>INJECTION LINE</span>
           <span className="combat-commands-console__input-id">IN-01</span>
         </div>
-        <label className="combat-commands-console__input-wrap">
+        <label className="combat-commands-console__input-wrap" htmlFor="combat-command-input">
           <span className="combat-commands-console__chevron" aria-hidden="true">&gt;</span>
           <input
+            id="combat-command-input"
             ref={inputRef}
             className="combat-commands-console__input"
             value={commandInput}

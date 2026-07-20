@@ -1,0 +1,75 @@
+.bcv-mandala {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  --m-hue: 286;
+  --m-ring-rot-0: 0deg;
+  --m-ring-rot-1: 0deg;
+  --m-ring-rot-2: 0deg;
+  --m-ring-scale-0: 1;
+  --m-ring-scale-1: 1;
+  --m-ring-scale-2: 1;
+  --m-poly-rot-0: 0deg;
+  --m-poly-rot-1: 0deg;
+  --m-poly-scale-0: 0.42;
+  --m-poly-scale-1: 0.42;
+  --m-core-scale: 1;
+}
+
+.bcv-mandala__svg {
+  width: min(92%, 520px);
+  height: min(92%, 520px);
+  overflow: visible;
+}
+
+.bcv-mandala__ring,
+.bcv-mandala__poly,
+.bcv-mandala__core {
+  transform-box: view-box;
+  transform-origin: center;
+}
+
+.bcv-mandala__ring--0 {
+  transform: rotate(var(--m-ring-rot-0)) scale(var(--m-ring-scale-0));
+}
+.bcv-mandala__ring--1 {
+  transform: rotate(var(--m-ring-rot-1)) scale(var(--m-ring-scale-1));
+}
+.bcv-mandala__ring--2 {
+  transform: rotate(var(--m-ring-rot-2)) scale(var(--m-ring-scale-2));
+}
+
+.bcv-mandala__poly--0 {
+  transform: rotate(var(--m-poly-rot-0)) scale(var(--m-poly-scale-0));
+}
+.bcv-mandala__poly--1 {
+  transform: rotate(var(--m-poly-rot-1)) scale(var(--m-poly-scale-1));
+}
+
+.bcv-mandala__core {
+  transform: scale(var(--m-core-scale));
+}
+
+.bcv-mandala__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* When thin canvas is on, keep SVG as the structural read; canvas is accent only. */
+.bcv-mandala.has-thin-canvas .bcv-mandala__svg {
+  opacity: 0.92;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bcv-mandala__ring,
+  .bcv-mandala__poly,
+  .bcv-mandala__core {
+    transition: none;
+  }
+}

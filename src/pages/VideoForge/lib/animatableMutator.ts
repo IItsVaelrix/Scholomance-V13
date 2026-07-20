@@ -1,4 +1,5 @@
 import { ClipId, TimelineClip, VideoProjectPacketV1Like, mutateClip } from './timelineMutator';
+import type { AnimatableNumber, Keyframe } from '../../../video/editor/core/video-project-packet';
 
 export type AnimatableTargetRef =
   | { kind: 'clip'; clipId: ClipId }
@@ -6,16 +7,8 @@ export type AnimatableTargetRef =
   | { kind: 'transition'; clipId: ClipId; transitionId?: string }
   | { kind: 'shader'; clipId: ClipId; shaderId: string };
 
-export interface KeyframeData {
-  frame: number;
-  value: number;
-  easing?: any;
-}
-
-export interface AnimatableProperty {
-  defaultValue: number;
-  keyframes?: KeyframeData[];
-}
+export type KeyframeData = Keyframe;
+export type AnimatableProperty = AnimatableNumber;
 
 export const AnimatableMutator = {
   getAnimatableTarget(clip: TimelineClip, targetRef: AnimatableTargetRef): any {

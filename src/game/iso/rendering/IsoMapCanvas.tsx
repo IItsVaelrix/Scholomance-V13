@@ -208,8 +208,8 @@ export function IsoMapCanvas({ scene, width: propWidth = 800, height: propHeight
     // Draw targeting valid tiles (green highlights on the iso grid)
     if (validTiles && validTiles.length > 0) {
       for (const t of validTiles) {
-        const c = t.x ?? t.col;
-        const r = t.y ?? t.row;
+        const c = t.x;
+        const r = t.y;
         const { x: vx, y: vy } = isoPoint(c, r);
 
         ctx.save();
@@ -270,7 +270,7 @@ export function IsoMapCanvas({ scene, width: propWidth = 800, height: propHeight
       }
     }
 
-  }, [scene, width, height, imgVersion, hoveredCell]);
+  }, [scene, width, height, imgVersion, hoveredCell, validTiles]);
 
   // Shared math helpers (must stay in sync with draw loop)
   const getIsoCell = useCallback((screenX: number, screenY: number) => {

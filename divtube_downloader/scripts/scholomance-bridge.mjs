@@ -36,7 +36,14 @@ async function importDiagnosticMcp() {
 
 async function createImmunityService() {
   const mod = await import(path.join(PROJECT_ROOT, 'codex/server/services/immunity.service.js'));
-  return mod.createImmunityService({ log: console });
+  // Keep stdout JSON-pure for the DivTube bridge: never log on console.log.
+  const bridgeLog = {
+    info: (...args) => console.error(...args),
+    warn: (...args) => console.error(...args),
+    error: (...args) => console.error(...args),
+    debug: () => {},
+  };
+  return mod.createImmunityService({ log: bridgeLog });
 }
 
 let _collabPersistence = null;
@@ -238,23 +245,60 @@ async function cmdRebuildIndex() {
 
 // ─── Cleri Probe ──────────────────────────────────────────────────────
 
-async function cmdProbe(text, mode = 'prion', minResonance = 0.75, limit = 20) {
+async function cmdProbe(text, {
+  scopes = [],
+  planOnly = false,
+  includeTests = false,
+  format = 'json',
+  timeoutMs = 120000,
+} = {}) {
+  // cleri-probe was rewritten as an evidence-first investigation CLI
+  // (investigate/explain/verify…). The old --mode=prion argv is invalid.
   const probeScript = path.join(PROJECT_ROOT, 'scripts/cleri-probe.js');
   if (!fs.existsSync(probeScript)) {
     return { error: 'cleri-probe.js not found at ' + probeScript };
   }
-  const { execSync } = await import('node:child_process');
-  const nodeBin = process.execPath;
-  const args = [probeScript, text, '--mode=' + mode, '--min-resonance=' + minResonance, '--limit=' + limit];
+  if (!text || !String(text).trim()) {
+    return { error: 'hypothesis text is required' };
+  }
+  const { spawnSync } = await import('node:child_process');
+  const args = [probeScript, 'investigate', String(text).trim(), '--format', format, '--no-color'];
+  for (const scope of scopes) {
+    if (scope) args.push('--scope', String(scope));
+  }
+  if (planOnly) args.push('--plan-only');
+  if (includeTests) args.push('--include-tests');
+  const proc = spawnSync(process.execPath, args, {
+    cwd: PROJECT_ROOT,
+    encoding: 'utf8',
+    timeout: timeoutMs,
+    maxBuffer: 8 * 1024 * 1024,
+  });
+  const stdout = (proc.stdout || '').trim();
+  const stderr = (proc.stderr || '').trim();
+  if (proc.error) {
+    return { error: proc.error.message, stderr };
+  }
+  if (!stdout) {
+    return {
+      error: stderr || `cleri-probe exited ${proc.status}`,
+      stderr,
+      exit_code: proc.status,
+    };
+  }
   try {
-    const output = execSync(nodeBin + ' ' + args.map(a => JSON.stringify(a)).join(' '), {
-      cwd: PROJECT_ROOT,
-      encoding: 'utf8',
-      timeout: 30000
-    });
-    return { raw: output.trim() };
-  } catch (e) {
-    return { error: e.message, stderr: e.stderr?.toString() };
+    const parsed = JSON.parse(stdout);
+    if (proc.status && proc.status !== 0 && !parsed.error) {
+      parsed.exit_code = proc.status;
+    }
+    return parsed;
+  } catch {
+    return {
+      error: 'Failed to parse cleri-probe JSON',
+      raw: stdout.slice(0, 4000),
+      stderr,
+      exit_code: proc.status,
+    };
   }
 }
 
@@ -523,9 +567,25 @@ async function cmdLawDebug(anomalyName, symptoms, targetFiles, mode = 'B', addit
 
 // ─── MCP: Diagnostic ──────────────────────────────────────────────────
 
-async function cmdDiagnosticScan({ trigger = 'mcp', writeMemory = true, memoryMax = 32, memoryIncludeHealth = false }) {
+async function cmdDiagnosticScan({
+  trigger = 'mcp',
+  writeMemory = true,
+  memoryMax = 32,
+  memoryIncludeHealth = false,
+  maxFileBytes,
+  maxFiles,
+  maxTotalBytes,
+} = {}) {
   const diag = await importDiagnosticMcp();
-  return diag.triggerFullScan({ trigger, writeMemory, memoryMax, memoryIncludeHealth });
+  return diag.triggerFullScan({
+    trigger,
+    writeMemory,
+    memoryMax,
+    memoryIncludeHealth,
+    maxFileBytes,
+    maxFiles,
+    maxTotalBytes,
+  });
 }
 
 async function cmdDiagnosticSummary() {
@@ -750,6 +810,7 @@ async function cmdHeal(opts = {}) {
     maxIterations: parseInt(opts.maxIterations) || 3,
     patchContent: opts.patch || null,
     targetFile: opts.targetFile || null,
+    dryRun: Boolean(opts.dryRun),
   });
 }
 
@@ -772,7 +833,8 @@ Commands:
   rebuild-index              Re-quantize pattern index
 
   # Cleri Probe
-  probe <text> [--mode M] [--min-resonance R]  Cleri probe scan
+  probe <hypothesis> [--scope path] [--plan-only] [--include-tests]
+                             Cleri Probe investigate (JSON)
 
   # BytecodeHealth
   health <cellId> <checkId>  Create BytecodeHealth signal
@@ -955,14 +1017,27 @@ async function main() {
     case 'rebuild-index':
       result = await cmdRebuildIndex();
       break;
-    case 'probe':
-      result = await cmdProbe(
-        rest._.join(' ').trim(),
-        rest.flags.mode || 'prion',
-        parseFloat(rest.flags['min-resonance'] || rest.flags.minResonance) || 0.75,
-        parseInt(rest.flags.limit) || 20
-      );
+    case 'probe': {
+      const scopeRaw = rest.flags.scope || rest.flags.scopes || '';
+      const scopes = Array.isArray(scopeRaw)
+        ? scopeRaw
+        : String(scopeRaw || '')
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean);
+      // Positional: probe <hypothesis...>  OR  probe investigate <hypothesis...>
+      let hypothesis = rest._.join(' ').trim();
+      if (rest._[0] === 'investigate') {
+        hypothesis = rest._.slice(1).join(' ').trim();
+      }
+      result = await cmdProbe(hypothesis, {
+        scopes,
+        planOnly: rest.flags['plan-only'] === true || rest.flags.planOnly === true,
+        includeTests: rest.flags['include-tests'] === true || rest.flags.includeTests === true,
+        format: rest.flags.format || 'json',
+      });
       break;
+    }
     case 'health':
       result = await cmdCreateHealth(
         rest._[0],
@@ -1010,6 +1085,15 @@ async function main() {
         writeMemory: rest.flags['write-memory'] !== 'false',
         memoryMax: parseInt(rest.flags['memory-max'] || rest.flags.memoryMax) || 32,
         memoryIncludeHealth: rest.flags['memory-include-health'] === 'true',
+        maxFileBytes: rest.flags['max-file-bytes']
+          ? parseInt(rest.flags['max-file-bytes'], 10)
+          : undefined,
+        maxFiles: rest.flags['max-files']
+          ? parseInt(rest.flags['max-files'], 10)
+          : undefined,
+        maxTotalBytes: rest.flags['max-total-bytes']
+          ? parseInt(rest.flags['max-total-bytes'], 10)
+          : undefined,
       });
       break;
     case 'diagnostic-summary':
@@ -1202,6 +1286,7 @@ async function main() {
         maxIterations: rest.flags['max-iterations'] || 3,
         patch: rest.flags.patch || null,
         targetFile: rest.flags['target-file'] || null,
+        dryRun: rest.flags['dry-run'] === true || rest.flags['dry-run'] === 'true' || rest.flags['dry-run'] === '',
       });
       break;
 

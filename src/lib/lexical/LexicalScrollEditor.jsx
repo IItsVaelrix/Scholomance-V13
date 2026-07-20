@@ -5,7 +5,7 @@ import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $getRoot, $createParagraphNode, $createTextNode, $getNodeByKey, $getSelection, COMMAND_PRIORITY_LOW, CLICK_COMMAND, KEY_MODIFIER_COMMAND, COMMAND_PRIORITY_NORMAL, $isParagraphNode, $isTextNode, $isRangeSelection, $createRangeSelection, $setSelection } from 'lexical';
+import { $getRoot, $createParagraphNode, $createTextNode, $getNodeByKey, $getSelection, COMMAND_PRIORITY_LOW, CLICK_COMMAND, KEY_MODIFIER_COMMAND, COMMAND_PRIORITY_NORMAL, SELECTION_CHANGE_COMMAND, $isParagraphNode, $isTextNode, $isRangeSelection, $createRangeSelection, $setSelection } from 'lexical';
 import { motion, AnimatePresence } from "framer-motion";
 
 import { TruesightWordNode, $isTruesightWordNode } from './TruesightNode';
@@ -18,6 +18,7 @@ import RitualPredictionTooltip from '../../components/RitualPredictionTooltip.js
 import { buildRitualPrediction } from '../../lib/ritualPredictionTooltip.js';
 import { evaluateSCD64CircuitBreaker } from '../../core/scd64/circuitBreaker';
 import { resolveTokenLineIndex } from './charStart.js';
+import { extractPreviousWord } from '../../../codex/core/spellcheckContext.js';
 
 const lexicalTheme = {
   paragraph: 'editor-paragraph',
@@ -60,6 +61,38 @@ function ExternalContentSyncPlugin({ content }) {
       }
     });
   }, [editor, content]);
+
+  return null;
+}
+
+function SelectionTextPlugin({ onSelectionTextChange }) {
+  const [editor] = useLexicalComposerContext();
+  const lastSelectionTextRef = useRef('');
+
+  useEffect(() => {
+    if (typeof onSelectionTextChange !== 'function') return undefined;
+
+    const publishSelection = (activeEditor) => {
+      activeEditor.getEditorState().read(() => {
+        const selection = $getSelection();
+        const text = $isRangeSelection(selection) && !selection.isCollapsed()
+          ? selection.getTextContent()
+          : '';
+        if (text !== lastSelectionTextRef.current) {
+          lastSelectionTextRef.current = text;
+          onSelectionTextChange(text);
+        }
+      });
+      return false;
+    };
+
+    onSelectionTextChange('');
+    return editor.registerCommand(
+      SELECTION_CHANGE_COMMAND,
+      (_payload, activeEditor) => publishSelection(activeEditor),
+      COMMAND_PRIORITY_LOW,
+    );
+  }, [editor, onSelectionTextChange]);
 
   return null;
 }
@@ -346,6 +379,7 @@ const LexicalScrollEditor = forwardRef(({
   onSave,
   title,
   onCursorChange,
+  onSelectionTextChange,
   isLatticeGrid = false,
   mirrored = false,
   checkSpelling,
@@ -472,9 +506,13 @@ const LexicalScrollEditor = forwardRef(({
     get clientHeight() { 
       return editorContainerRef.current?.clientHeight || 0; 
     },
-    get scrollHeight() { 
-      return editorContainerRef.current?.scrollHeight || 0; 
+    get scrollHeight() {
+      return editorContainerRef.current?.scrollHeight || 0;
     },
+    // Exposes the underlying Lexical editor instance for callers that need
+    // direct editor.update()/$getSelection() access (e.g. Analyze panel
+    // craft actions). Returns null until the editor has mounted.
+    getEditor: () => lexicalEditorRef.current,
   }));
 
   const initialConfig = {
@@ -510,7 +548,8 @@ const LexicalScrollEditor = forwardRef(({
       try {
         const valid = await checkSpelling(prefix);
         if (!valid) {
-          const corrections = await getSpellingSuggestions(prefix, null, 3);
+          const prevWord = extractPreviousWord(textBeforeCursor, prefix);
+          const corrections = await getSpellingSuggestions(prefix, prevWord, 3);
           if (corrections && corrections.length) {
             suggestionsList = corrections.map((word) => ({
               token: word, type: 'correction', isRhyme: false, badges: ['spelling'],
@@ -715,6 +754,7 @@ const LexicalScrollEditor = forwardRef(({
             <LexicalComposer initialConfig={initialConfig}>
               <EditablePlugin isEditable={isEditable} />
               <ExternalContentSyncPlugin content={content} />
+              <SelectionTextPlugin onSelectionTextChange={onSelectionTextChange} />
               <PlainTextPlugin
                 contentEditable={<ContentEditable className="editor-textarea lexical-content-editable" style={{ outline: 'none', whiteSpace: 'pre-wrap', zIndex: 10 }} />}
                 placeholder={<div className="editor-placeholder">Inscribe thy verses...</div>}

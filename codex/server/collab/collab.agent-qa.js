@@ -147,7 +147,13 @@ export async function runAgentQaScan({ autoResolve = true } = {}) {
     const resolutions = [];
 
     // ── 1. Duplicate agent groups ──────────────────────────────────────────────
-    const dupeGroups = findDuplicateGroups(agents);
+    // Only LIVE agents can be duplicates. evictAgent() sets status=offline but
+    // (by design) never deletes the row, and getAllRaw() returns offline rows —
+    // so scanning raw would re-detect an already-evicted duplicate on every
+    // sweep, forever (the [AGENT_DUPE:name::role] loop). Offline rows are audit
+    // history; they collide with nothing.
+    const liveAgents = agents.filter(a => a.status !== 'offline');
+    const dupeGroups = findDuplicateGroups(liveAgents);
 
     for (const [key, members] of dupeGroups) {
         const survivor = pickSurvivor(members);

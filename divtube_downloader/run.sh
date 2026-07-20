@@ -40,6 +40,26 @@ if ! python3 -c "import textual, yt_dlp, PIL, anthropic, openai" &> /dev/null; t
     python3 -m pip install textual rich yt-dlp Pillow anthropic openai
 fi
 
+# Desktop / konsole launches often skip ~/.bashrc, so nvm's npm/node are missing.
+# Prepend a resolved Node bin so agent tools (npm, npx, vitest, scholo_gate) work.
+if [ -n "$NVM_BIN" ] && [ -x "$NVM_BIN/node" ]; then
+    export PATH="$NVM_BIN:$PATH"
+elif [ -x "$HOME/.nvm/versions/node/v20.20.2/bin/node" ]; then
+    export PATH="$HOME/.nvm/versions/node/v20.20.2/bin:$PATH"
+else
+    # Newest installed nvm node, if any
+    for candidate in "$HOME"/.nvm/versions/node/*/bin; do
+        if [ -x "$candidate/node" ]; then
+            export PATH="$candidate:$PATH"
+            break
+        fi
+    done
+fi
+if ! command -v npm &> /dev/null; then
+    echo "WARNING: npm not on PATH — DivTube agent tools that need Node will fail."
+    echo "         Install nvm/node or set PATH before launching."
+fi
+
 # Resolve a JDK dynamically — hard-coding the VSCode-extension path breaks every
 # time the Java extension auto-updates (e.g. 1.54.0 -> 1.55.0). Pick the newest
 # bundled/system JDK, falling back to whatever java is already on PATH.

@@ -15,6 +15,7 @@ function TagList({ tags = [] }) {
           <span
             key={tag}
             className={`${styles.tag} ${styles.glossaryTerm}`}
+            role="button"
             tabIndex={0}
             aria-label={`${tag}: ${glossary.body}`}
           >

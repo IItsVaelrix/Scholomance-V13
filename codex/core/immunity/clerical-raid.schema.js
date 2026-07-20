@@ -158,15 +158,28 @@ export const VECTOR_DIMENSIONS = 128;
 
 /**
  * CONFIDENCE THRESHOLDS
- * 
+ *
  * These thresholds determine the verdict. They are tunable, but defaults
  * are calibrated for the Scholomance immune response.
+ *
+ * Bands (best-neighbor cosine similarity, clamped to [0,1]):
+ *   ≥ CONFIRMED                 → CONFIRMED (auto-fix eligible)
+ *   ≥ NEEDS_MERLIN              → NEEDS_MERLIN (name a candidate pattern)
+ *   ≥ DENIED and < NEEDS_MERLIN → DENIED (weak signal; pattern hint only)
+ *   ≥ NOVEL and < DENIED        → DENIED (very weak; still escalate)
+ *   < NOVEL                     → NOVEL (no library match)
+ *
+ * 2026-07-19: NEEDS_MERLIN floor raised from 0.20 → 0.55 so weak bag-of-words
+ * cosine hits (e.g. "audit smoke" → "Production Env Missing") no longer claim
+ * a Merlin candidate. DENIED/NOVEL floors raised with it.
  */
 export const VERDICT_THRESHOLDS = Object.freeze({
   CONFIRMED:     0.95,  // ≥95% match → agent can auto-fix
-  NEEDS_MERLIN:  0.20,  // 20–95% → full Merlin protocol
-  DENIED:        0.20,  // 10–20% → weak signal, escalate without deep match
-  NOVEL:         0.10   // <10% to best pattern → novel / no library match
+  NEEDS_MERLIN:  0.55,  // ≥55% → name a Merlin candidate pattern
+  DENIED:        0.40,  // 40–55% → weak signal; pattern hint only (no fixPath)
+  NOVEL:         0.15,  // <15% → novel / no library match
+  /** Min gap between #1 and #2 neighbors before trusting a named match. */
+  TOP_MARGIN:    0.04,
 });
 
 /**

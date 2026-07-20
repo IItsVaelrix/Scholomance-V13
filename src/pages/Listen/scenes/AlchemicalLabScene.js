@@ -5,7 +5,7 @@
  * to eliminate runtime texture generation delays.
  */
 
-import { getBytecodeAMP, AMP_CHANNELS, getRotationAtTime } from '../../../lib/ambient/bytecodeAMP';
+import { getBytecodeAMP, AMP_CHANNELS } from '../../../lib/ambient/bytecodeAMP';
 import { freshRng } from '../../../lib/math/seededRng.js';
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -76,7 +76,8 @@ export function buildAlchemicalLabScene(Phaser) {
     // Build 2D elements
     this._drawBackground(W, H);
     this._drawArchStatic(W, H);
-    this._createArchRotatingSprite(W, H); // GPU PENTAGRAM
+    // Pentagram removed (performance): keep only the radius the particles need.
+    this._archHexR = (Math.max(W, H) * 0.45) * 0.53;
     this._buildParticles(W, H);
     this._drawVignette(W, H);
 
@@ -91,47 +92,6 @@ export function buildAlchemicalLabScene(Phaser) {
     } catch { /* tolerate filter API drift */ }
 
     this._isCreated = true;
-  }
-
-  _createArchRotatingSprite(W, H) {
-    const cx = W * 0.5;
-    const cy = H * 0.50;
-    this._archHexR = (Math.max(W, H) * 0.45) * 0.53;
-    const texSize = Math.ceil(this._archHexR * 2.2);
-    const textureKey = `archRot_penta_v2_${Math.round(texSize)}`;
-    
-    if (!this.textures.exists(textureKey)) {
-      const g = this.make.graphics({ x: 0, y: 0, add: false });
-      const pR = this._archHexR;
-      const center = texSize / 2;
-      const points = [];
-      
-      for (let i = 0; i < 5; i++) {
-        const ang = Phaser.Math.DegToRad(-90 + i * 72);
-        points.push({ x: center + Math.cos(ang) * pR, y: center + Math.sin(ang) * pR });
-      }
-      
-      // The Sharp Magical Sigil (Pentagram)
-      g.lineStyle(2.5, 0xffffff, 1); 
-      g.beginPath();
-      g.moveTo(points[0].x, points[0].y);
-      g.lineTo(points[2].x, points[2].y);
-      g.lineTo(points[4].x, points[4].y);
-      g.lineTo(points[1].x, points[1].y);
-      g.lineTo(points[3].x, points[3].y);
-      g.lineTo(points[0].x, points[0].y);
-      g.strokePath();
-
-      // Faint magical aura circle
-      g.lineStyle(1, 0x2ddbde, 0.2);
-      g.strokeCircle(center, center, pR);
-
-      g.generateTexture(textureKey, texSize, texSize);
-      g.destroy();
-    }
-
-    this._sprites.archRot = this.add.sprite(cx, cy, textureKey);
-    this._sprites.archRot.setOrigin(0.5).setBlendMode(Phaser.BlendModes.SCREEN).setAlpha(0.8);
   }
 
   _drawBackground(W, H) {
@@ -210,29 +170,19 @@ export function buildAlchemicalLabScene(Phaser) {
     // ── Update Synchronized Bytecode AMP Signals ──
     const flicker = getBytecodeAMP(time, AMP_CHANNELS.FLICKER);
     const glow    = getBytecodeAMP(time, AMP_CHANNELS.GLOW);
-    const bpm     = this._bpm;
 
     const cx = this.scale.width * 0.5, cy = this.scale.height * 0.50;
 
-    if (this._sprites.archRot) {
-      // Pure clock-like rotation - identical to orb, perfectly smooth
-      const rotation = getRotationAtTime(time, bpm || 90, 90);
+    // Phonemic Pips (Yellow Lights in Bezel Sockets)
+    if (this._bezelR) {
       const alpha = (0.65 + flicker * 0.2) * glow;
-      const tint = 0x2ddbde;
-
-      // Pentagram rotation (clock-smooth)
-      this._sprites.archRot.setRotation(rotation).setAlpha(alpha).setTint(tint);
-
-      // Phonemic Pips (Yellow Lights in Bezel Sockets)
-      if (this._bezelR) {
-        for (let i = 0; i < 8; i++) {
-          const ang = (i / 8) * Math.PI * 2, px = cx + Math.cos(ang) * this._bezelR, py = cy + Math.sin(ang) * this._bezelR;
-          let pipAlpha = alpha * 0.9;
-          if (flicker > 0.92) pipAlpha = 1.0;
-          this._glowGfx.fillStyle(0xffcc44, pipAlpha); this._glowGfx.fillCircle(px, py, 3.5);
-          this._glowGfx.fillStyle(0xffaa00, pipAlpha * 0.4); this._glowGfx.fillCircle(px, py, 8);
-          this._glowGfx.fillStyle(0xff8800, pipAlpha * 0.15); this._glowGfx.fillCircle(px, py, 14);
-        }
+      for (let i = 0; i < 8; i++) {
+        const ang = (i / 8) * Math.PI * 2, px = cx + Math.cos(ang) * this._bezelR, py = cy + Math.sin(ang) * this._bezelR;
+        let pipAlpha = alpha * 0.9;
+        if (flicker > 0.92) pipAlpha = 1.0;
+        this._glowGfx.fillStyle(0xffcc44, pipAlpha); this._glowGfx.fillCircle(px, py, 3.5);
+        this._glowGfx.fillStyle(0xffaa00, pipAlpha * 0.4); this._glowGfx.fillCircle(px, py, 8);
+        this._glowGfx.fillStyle(0xff8800, pipAlpha * 0.15); this._glowGfx.fillCircle(px, py, 14);
       }
     }
   }

@@ -94,10 +94,14 @@ export const INNATE_RULES = [
       // Skip if content contains the explicit allow annotation
       if (content.includes('IMMUNE_ALLOW: math-random')) return false;
 
+      const executable = stripCommentsAndStrings(content);
       const regex = /Math\.random\(\)/g;
-      const match = regex.test(content);
-      if (!match) return false;
-      return { matched: true, context: { pattern: 'Math.random()', filePath } }; // EXEMPT
+      let match;
+      while ((match = regex.exec(executable)) !== null) {
+        if (isLikelyJsxText(executable, match.index)) continue;
+        return { matched: true, context: { pattern: 'Math.random()', filePath } }; // EXEMPT
+      }
+      return false;
     },
   },
   {
@@ -278,7 +282,12 @@ export const INNATE_RULES = [
     repairKey: 'repair.handshake.centralized-csrf',
     detector: (content, filePath) => {
       // Look for getCsrfToken calls outside of useAuth.jsx
-      if (filePath.endsWith('useAuth.jsx') || filePath.includes('test') || filePath.includes('scripts')) return false;
+      if (
+        filePath.endsWith('useAuth.jsx')
+        || filePath.endsWith('AuthContext.jsx')
+        || filePath.includes('test')
+        || filePath.includes('scripts')
+      ) return false;
       if (content.includes('// IMMUNE_ALLOW: redundant-csrf')) return false;
       const regex = /await\s+getCsrfToken\(\)/;
       if (regex.test(content)) {
@@ -494,11 +503,14 @@ function detectStrayCharacters(content) {
     };
   }
 
-  // 2. Stray typographic unicode (smart quotes, em-dashes, etc.)
-  //    These are copy-paste artifacts from LLMs / word processors.
+  // 2. Stray typographic unicode in executable tokens. Typography inside
+  //    comments, quoted copy, template copy, and JSX text is valid source and
+  //    cannot break the parser.
+  const executable = stripCommentsAndStrings(content);
   let stray;
   STRAY_UNICODE_RE.lastIndex = 0;
-  while ((stray = STRAY_UNICODE_RE.exec(content)) !== null) {
+  while ((stray = STRAY_UNICODE_RE.exec(executable)) !== null) {
+    if (isLikelyJsxText(executable, stray.index)) continue;
     const char = stray[0];
     return {
       matched: true,
@@ -513,5 +525,90 @@ function detectStrayCharacters(content) {
     };
   }
 
+  return false;
+}
+
+function stripCommentsAndStrings(content) {
+  const chars = [...content];
+  let state = 'code';
+
+  for (let index = 0; index < chars.length; index += 1) {
+    const char = chars[index];
+    const next = chars[index + 1];
+
+    if (state === 'code') {
+      if (char === '/' && next === '/') {
+        chars[index] = ' ';
+        chars[index + 1] = ' ';
+        index += 1;
+        state = 'line-comment';
+      } else if (char === '/' && next === '*') {
+        chars[index] = ' ';
+        chars[index + 1] = ' ';
+        index += 1;
+        state = 'block-comment';
+      } else if (char === "'" || char === '"' || char === '`') {
+        chars[index] = ' ';
+        state = char === "'" ? 'single-quote' : char === '"' ? 'double-quote' : 'template';
+      }
+      continue;
+    }
+
+    if (state === 'line-comment') {
+      if (char === '\n') state = 'code';
+      else chars[index] = ' ';
+      continue;
+    }
+
+    if (state === 'block-comment') {
+      if (char === '*' && next === '/') {
+        chars[index] = ' ';
+        chars[index + 1] = ' ';
+        index += 1;
+        state = 'code';
+      } else if (char !== '\n') {
+        chars[index] = ' ';
+      }
+      continue;
+    }
+
+    const closing = state === 'single-quote' ? "'" : state === 'double-quote' ? '"' : '`';
+    if (char === '\\') {
+      chars[index] = ' ';
+      if (next !== undefined && next !== '\n') {
+        chars[index + 1] = ' ';
+        index += 1;
+      }
+    } else if (char === closing) {
+      chars[index] = ' ';
+      state = 'code';
+    } else if (char !== '\n') {
+      chars[index] = ' ';
+    }
+  }
+
+  return chars.join('');
+}
+
+function isLikelyJsxText(content, position) {
+  let braceDepth = 0;
+  for (let index = position - 1; index >= 0; index -= 1) {
+    const char = content[index];
+    if (/\s/.test(char)) continue;
+    if (char === '}') {
+      braceDepth += 1;
+      continue;
+    }
+    if (char === '{') {
+      if (braceDepth > 0) {
+        braceDepth -= 1;
+        continue;
+      }
+      return false;
+    }
+    if (braceDepth > 0) continue;
+    if (char === '>') return true;
+    if (char === '<') return false;
+  }
   return false;
 }

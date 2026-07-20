@@ -176,7 +176,7 @@ export function ClipRenderer({ clip, project, frame: _frame }: ClipRendererProps
                  background: 'repeating-linear-gradient(0deg, transparent, transparent 10px, #00ff0033 11px), repeating-linear-gradient(90deg, transparent, transparent 20px, #00ff0033 21px)',
                  transform: 'perspective(200px) rotateX(60deg)',
                }} />
-               <h2 style={{ zIndex: 1, textShadow: '0 0 10px #00ff00' }}>{clip.metadata?.text || 'PLAYING...'}</h2>
+               <h2 style={{ zIndex: 1, textShadow: '0 0 10px #00ff00' }}>{String(clip.metadata?.text || 'PLAYING...')}</h2>
             </div>
             
             {/* Fake Controls */}

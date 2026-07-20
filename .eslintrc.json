@@ -136,7 +136,12 @@
         "codex/server/db/sqliteWriteQueue.js",
         "codex/server/collab/collab.persistence.js",
         "codex/server/user.persistence.js",
-        "codex/server/catalog/catalog.schema.js"
+        "codex/server/catalog/catalog.schema.js",
+        "codex/core/lexical-graph/migrate.js",
+        "codex/core/lexical-graph/mirror.js",
+        "codex/core/lexical-graph/seedDevices.js",
+        "codex/core/lexical-graph/embedDevices.js",
+        "codex/core/lexical-graph/ftsSync.js"
       ],
       "rules": {
         "no-restricted-syntax": [

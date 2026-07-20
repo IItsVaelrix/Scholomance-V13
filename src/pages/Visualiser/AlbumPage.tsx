@@ -1,10 +1,9 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { useAlbumResolver } from './hooks/useAlbumResolver';
 import { useAlbumAudioEngine } from './hooks/useAlbumAudioEngine';
 import { AlbumSidebar } from './AlbumSidebar';
-import { WmpSpectrum } from './WmpSpectrum';
 import { AlbumLyrics } from './AlbumLyrics';
 import { AlbumTransport } from './AlbumTransport';
 import type { ResolvedAlbumTrack } from './hooks/useAlbumResolver';
@@ -46,6 +45,12 @@ export default function AlbumPage() {
     return -1;
   }, [resolver]);
 
+  const setTrackQuery = useCallback((trackId: string) => {
+    const next = new URLSearchParams(searchParams);
+    next.set('track', trackId);
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams]);
+
   const switchTrack = useCallback((index: number, shouldPlay: boolean) => {
     setActiveIndex(index);
     const track = resolver.tracks[index];
@@ -58,13 +63,7 @@ export default function AlbumPage() {
         audioRef.current?.play().catch(() => {});
       }, 100);
     }
-  }, [resolver.tracks]);
-
-  const setTrackQuery = useCallback((trackId: string) => {
-    const next = new URLSearchParams(searchParams);
-    next.set('track', trackId);
-    setSearchParams(next, { replace: true });
-  }, [searchParams, setSearchParams]);
+  }, [resolver.tracks, setTrackQuery]);
 
   const onEnded = useCallback(() => {
     const next = findNextPlayable(activeIndex, 1);
@@ -98,7 +97,7 @@ export default function AlbumPage() {
       const wasPlaying = engine.status === 'playing';
       switchTrack(prev, wasPlaying);
     }
-  }, [activeIndex, engine, findNextPlayable]);
+  }, [activeIndex, engine, findNextPlayable, switchTrack]);
 
   const handleNext = useCallback(() => {
     const next = findNextPlayable(activeIndex, 1);
@@ -106,7 +105,33 @@ export default function AlbumPage() {
       const wasPlaying = engine.status === 'playing';
       switchTrack(next, wasPlaying);
     }
-  }, [activeIndex, engine.status, findNextPlayable]);
+  }, [activeIndex, engine.status, findNextPlayable, switchTrack]);
+
+  const togglePlay = useCallback(() => {
+    if (engine.status === 'playing') {
+      engine.pause();
+    } else {
+      engine.play().catch(() => {});
+    }
+  }, [engine]);
+
+  // Space bar toggles play/pause — unless the user is typing or a real button
+  // has focus (let that button's own Space activation stand).
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.code !== 'Space' || e.ctrlKey || e.metaKey || e.altKey) return;
+      const t = e.target as HTMLElement | null;
+      const tag = t?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'BUTTON' ||
+          tag === 'SELECT' || t?.isContentEditable) {
+        return;
+      }
+      e.preventDefault(); // stop the page from scrolling
+      togglePlay();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [togglePlay]);
 
   const canPrev = findNextPlayable(activeIndex, -1) >= 0;
   const canNext = findNextPlayable(activeIndex, 1) >= 0;
@@ -149,12 +174,12 @@ export default function AlbumPage() {
         />
 
         <section className="alb-experience" aria-label="Track experience">
-          <div className="alb-experience__spectrum">
-            <WmpSpectrum
-              analyser={engine.analyser}
-              analysisAvailability={engine.analysisAvailability}
-              bpm={activeTrack?.pacing?.bpm ?? 120}
-              reducedMotion={reducedMotion}
+          <div className="alb-experience__banner">
+            <img
+              src={`${import.meta.env.BASE_URL}media/album-banner.png`}
+              alt={`${resolver.album?.title ?? 'Album'} ritual banner`}
+              loading="eager"
+              decoding="async"
             />
           </div>
 

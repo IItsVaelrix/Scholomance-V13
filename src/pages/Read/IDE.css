@@ -5,7 +5,7 @@
   --read-text: var(--text-secondary, #cdc5a8);
   --read-text-muted: var(--text-tertiary, #a89d80);
   --read-text-faint: var(--text-muted, #7a6f55);
-  --editor-content-font-size: clamp(1.02rem, 1.2vw, 1.12rem);
+  --editor-content-font-size: calc(clamp(1.02rem, 1.2vw, 1.12rem) * var(--ide-font-scale, 1));
   --editor-content-line-height: 1.9;
   --editor-content-padding-y: var(--space-4, 1rem);
   --editor-content-padding-x: var(--space-5, 1.25rem);
@@ -1008,6 +1008,108 @@
   box-shadow:
     0 0 0 1px rgba(126, 231, 255, 0.18),
     0 0 0 3px rgba(126, 231, 255, 0.08);
+}
+
+/* ── Oracle neon-glass control layer ──────────────────────────────────────────
+   Brings RESOLVE / reset and the WORD·CORPUS·QUERY toggles into the same
+   DivWand neon-glass language as the Control Console (obsidian glass, school
+   neon border + glow, springy lift, one-shot conjure sweep). Uses the Oracle's
+   own --oracle-accent so it stays cohesive with the panel. Reduced-motion safe.
+   ---------------------------------------------------------------------------- */
+.oracle-query-submit,
+.oracle-query-clear {
+  --oracle-glow: color-mix(in srgb, var(--oracle-accent) 55%, transparent);
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(160deg,
+    color-mix(in srgb, var(--oracle-school-color, #0b0b16) 12%, #0a0f19),
+    #04060c);
+  transition: transform 0.22s cubic-bezier(0.23, 1, 0.32, 1), filter 0.2s ease,
+    border-color 0.18s ease, box-shadow 0.22s ease, color 0.16s ease;
+  will-change: transform;
+}
+.oracle-query-submit {
+  border: 1px solid color-mix(in srgb, var(--oracle-accent) 55%, transparent);
+  color: color-mix(in srgb, var(--oracle-accent) 88%, #fff);
+  box-shadow: 0 0 12px -4px var(--oracle-glow), inset 0 0 10px -7px var(--oracle-glow);
+  text-shadow: 0 0 10px var(--oracle-glow);
+}
+.oracle-query-clear {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(180, 196, 214, 0.6);
+}
+.oracle-query-submit::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 30%,
+    color-mix(in srgb, var(--oracle-glow) 70%, transparent) 50%, transparent 70%);
+  transform: translateX(-130%);
+  opacity: 0;
+}
+.oracle-query-submit:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.12);
+  border-color: color-mix(in srgb, var(--oracle-accent) 85%, transparent);
+  box-shadow: 0 8px 18px -8px #000, 0 0 18px -3px var(--oracle-glow);
+}
+.oracle-query-submit:hover::after {
+  animation: new-scroll-sweep 0.7s cubic-bezier(0.23, 1, 0.32, 1) 1;
+}
+.oracle-query-clear:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--oracle-accent) 40%, transparent);
+  color: rgba(228, 240, 252, 0.85);
+}
+.oracle-query-submit:active,
+.oracle-query-clear:active { transform: translateY(0) scale(0.99); }
+.oracle-query-submit:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--oracle-accent), 0 0 16px var(--oracle-glow);
+}
+
+/* Mode toggle → recessed track with neon-glass active segment */
+.oracle-mode-toggle {
+  background: color-mix(in srgb, #000 55%, transparent);
+  border: 1px solid color-mix(in srgb, var(--oracle-accent) 14%, transparent);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+.oracle-mode-btn {
+  transition: background 0.14s ease, color 0.14s ease, box-shadow 0.18s ease, transform 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.oracle-mode-btn:hover:not(.oracle-mode-btn--active) { transform: translateY(-1px); }
+.oracle-mode-btn--active {
+  background: color-mix(in srgb, var(--oracle-accent) 24%, #04060c);
+  color: color-mix(in srgb, var(--oracle-accent) 90%, #fff);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--oracle-accent) 60%, transparent),
+    0 0 10px -3px color-mix(in srgb, var(--oracle-accent) 55%, transparent);
+  animation: oracle-seg-pop 0.32s cubic-bezier(0.23, 1, 0.32, 1) 1;
+}
+
+@keyframes oracle-seg-pop {
+  0% { transform: scale(0.94); }
+  60% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+.ide-layout-wrapper[data-reduced-motion="true"] .oracle-query-submit,
+.ide-layout-wrapper[data-reduced-motion="true"] .oracle-query-clear,
+.ide-layout-wrapper[data-reduced-motion="true"] .oracle-mode-btn,
+.ide-layout-wrapper[data-reduced-motion="true"] .oracle-query-submit:hover,
+.ide-layout-wrapper[data-reduced-motion="true"] .oracle-query-clear:hover,
+.ide-layout-wrapper[data-reduced-motion="true"] .oracle-mode-btn:hover {
+  transform: none !important;
+  transition: none !important;
+}
+.ide-layout-wrapper[data-reduced-motion="true"] .oracle-query-submit:hover::after,
+.ide-layout-wrapper[data-reduced-motion="true"] .oracle-mode-btn--active {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .oracle-query-submit, .oracle-query-clear, .oracle-mode-btn,
+  .oracle-query-submit:hover, .oracle-query-clear:hover, .oracle-mode-btn:hover { transform: none !important; }
+  .oracle-query-submit:hover::after, .oracle-mode-btn--active { animation: none !important; }
 }
 
 .oracle-signal-strip,
@@ -3054,7 +3156,13 @@
   font-weight: 700;
 }
 
+/* Bespoke neon-glass action button — DivWand vocabulary (variant-neonBorder /
+   div-interactive): obsidian-glass fill, school-color neon border + glow, a
+   springy lift, and a one-shot "conjure" light sweep on hover. GPU-cheap
+   (transform/opacity/box-shadow only); disabled under reduced motion. */
 .ide-layout-wrapper .new-scroll-btn {
+  position: relative;
+  overflow: hidden;
   width: calc(100% - var(--space-6, 1.5rem));
   margin: var(--space-3, 0.75rem);
   height: 40px;
@@ -3062,16 +3170,81 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2, 0.5rem);
-  border: 0;
+  border: 1px solid color-mix(in srgb, var(--read-accent) 60%, transparent);
   border-radius: var(--radius-lg, 0.75rem);
-  background: linear-gradient(135deg, var(--read-accent) 0%, var(--school-psychic, #4470b8) 100%);
-  color: #fff;
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--ritual-abyss, #0b0b16) 66%, #0a0f19),
+    color-mix(in srgb, var(--ritual-abyss, #0b0b16) 90%, #03050a)
+  );
+  color: var(--read-text-strong, #ede8d4);
   font-family: var(--font-mono, "JetBrains Mono", monospace);
   font-size: var(--text-sm, 0.875rem);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
+  box-shadow: 0 0 14px -4px var(--ritual-glow, rgba(150, 120, 255, 0.4)),
+    inset 0 0 12px -8px var(--ritual-glow, rgba(150, 120, 255, 0.4));
+  transition: transform 0.22s cubic-bezier(0.23, 1, 0.32, 1), filter 0.2s ease,
+    border-color 0.18s ease, box-shadow 0.22s ease;
+  will-change: transform;
+}
+.ide-layout-wrapper .new-scroll-btn > span {
+  filter: drop-shadow(0 0 4px var(--ritual-glow, rgba(150, 120, 255, 0.5)));
+}
+/* Conjure sweep — a light band glints across the slab on hover. */
+.ide-layout-wrapper .new-scroll-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    color-mix(in srgb, var(--ritual-glow, rgba(160, 130, 255, 0.6)) 60%, transparent) 50%,
+    transparent 70%
+  );
+  transform: translateX(-130%);
+  opacity: 0;
+}
+.ide-layout-wrapper .new-scroll-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.12);
+  border-color: color-mix(in srgb, var(--read-accent) 85%, transparent);
+  box-shadow: 0 8px 20px -8px #000,
+    0 0 20px -3px var(--ritual-glow, rgba(150, 120, 255, 0.5));
+}
+.ide-layout-wrapper .new-scroll-btn:hover::after {
+  animation: new-scroll-sweep 0.7s cubic-bezier(0.23, 1, 0.32, 1) 1;
+}
+.ide-layout-wrapper .new-scroll-btn:active {
+  transform: translateY(0) scale(0.99);
+}
+.ide-layout-wrapper .new-scroll-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--read-accent),
+    0 0 16px var(--ritual-glow, rgba(150, 120, 255, 0.5));
+}
+
+@keyframes new-scroll-sweep {
+  0% { transform: translateX(-130%); opacity: 0; }
+  25% { opacity: 1; }
+  100% { transform: translateX(130%); opacity: 0; }
+}
+
+.ide-layout-wrapper[data-reduced-motion="true"] .new-scroll-btn,
+.ide-layout-wrapper[data-reduced-motion="true"] .new-scroll-btn:hover {
+  transform: none !important;
+  transition: none !important;
+}
+.ide-layout-wrapper[data-reduced-motion="true"] .new-scroll-btn:hover::after {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ide-layout-wrapper .new-scroll-btn,
+  .ide-layout-wrapper .new-scroll-btn:hover { transform: none !important; }
+  .ide-layout-wrapper .new-scroll-btn:hover::after { animation: none !important; }
 }
 
 .ide-layout-wrapper .scroll-list-body {
@@ -3079,27 +3252,98 @@
   min-height: 0;
   overflow-y: auto;
   padding: var(--space-2, 0.5rem);
+  /* Recessed channel so the raised cards read as sitting inside a well. */
+  background: linear-gradient(180deg, color-mix(in srgb, var(--ritual-abyss, #0b0b16) 32%, transparent), transparent 44px);
+  box-shadow: inset 0 7px 10px -9px #000;
 }
 
+/* Raised glass cards — obsidian-glass fill, layered drop shadow + inset
+   highlight for real depth, springy lift + neon on hover (matches the
+   Control Console / action buttons). */
 .ide-layout-wrapper .scroll-item {
+  position: relative;
   display: flex;
   align-items: stretch;
   min-height: calc(var(--scroll-list-row-height) - var(--space-2, 0.5rem));
   margin-bottom: var(--space-2, 0.5rem);
   border-radius: var(--radius-lg, 0.75rem);
-  border: 1px solid transparent;
-  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid color-mix(in srgb, var(--chrome-gold, #c9a227) 12%, transparent);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--ritual-panel, #16162a) 55%, #0a0f19),
+    color-mix(in srgb, var(--ritual-abyss, #0b0b16) 88%, #03050a)
+  );
+  box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.55),
+    0 8px 18px -12px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: transform 0.22s cubic-bezier(0.23, 1, 0.32, 1),
+    box-shadow 0.22s ease, border-color 0.18s ease, background 0.18s ease;
+  will-change: transform;
+}
+/* Top energy hairline, in the active school color. */
+.ide-layout-wrapper .scroll-item::before {
+  content: "";
+  position: absolute;
+  inset: 0 14% auto;
+  top: -1px;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--ritual-glow, rgba(150, 120, 255, 0.4)) 55%, transparent),
+    transparent
+  );
+  opacity: 0.5;
 }
 
 .ide-layout-wrapper .scroll-item:hover {
-  border-color: var(--border-color);
-  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--read-accent) 45%, transparent);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--ritual-panel, #16162a) 62%, #0b1220),
+    color-mix(in srgb, var(--ritual-abyss, #0b0b16) 85%, #03050a)
+  );
+  box-shadow: 0 6px 14px -4px rgba(0, 0, 0, 0.6),
+    0 14px 28px -14px rgba(0, 0, 0, 0.75),
+    0 0 16px -6px var(--ritual-glow, rgba(150, 120, 255, 0.5)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
 .ide-layout-wrapper .scroll-item--active {
-  border-color: color-mix(in srgb, var(--read-accent) 40%, hsla(43, 48%, 48%, 0.15));
-  background: color-mix(in srgb, var(--read-accent) 14%, hsla(43, 48%, 48%, 0.04));
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--read-accent) 22%, transparent);
+  border-color: color-mix(in srgb, var(--read-accent) 70%, transparent);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--read-accent) 16%, #0a0f19),
+    color-mix(in srgb, var(--ritual-abyss, #0b0b16) 84%, #03050a)
+  );
+  box-shadow: 0 6px 16px -6px rgba(0, 0, 0, 0.6),
+    0 0 18px -4px var(--ritual-glow, rgba(150, 120, 255, 0.55)),
+    inset 0 0 14px -8px var(--ritual-glow, rgba(150, 120, 255, 0.5)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+/* Left "engaged" energy bar on the active scroll. */
+.ide-layout-wrapper .scroll-item--active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 18%;
+  bottom: 18%;
+  width: 3px;
+  border-radius: var(--radius-full);
+  background: var(--read-accent);
+  box-shadow: 0 0 8px 1px var(--ritual-glow, rgba(150, 120, 255, 0.6));
+}
+
+.ide-layout-wrapper[data-reduced-motion="true"] .scroll-item,
+.ide-layout-wrapper[data-reduced-motion="true"] .scroll-item:hover {
+  transform: none !important;
+  transition: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ide-layout-wrapper .scroll-item,
+  .ide-layout-wrapper .scroll-item:hover { transform: none !important; }
 }
 
 .ide-layout-wrapper .scroll-item-main {
@@ -3253,15 +3497,20 @@
 }
 
 .ide-layout-wrapper .scroll-empty {
-  margin-top: var(--space-6, 1.5rem);
+  margin: var(--space-6, 1.5rem) var(--space-2, 0.5rem) 0;
   text-align: center;
-  padding: 0 var(--space-3, 0.75rem);
+  padding: var(--space-6, 1.5rem) var(--space-3, 0.75rem);
+  border-radius: var(--radius-lg, 0.75rem);
+  border: 1px dashed color-mix(in srgb, var(--chrome-gold, #c9a227) 18%, transparent);
+  background: color-mix(in srgb, var(--ritual-abyss, #0b0b16) 40%, transparent);
+  box-shadow: inset 0 2px 14px -6px #000;
 }
 
 .ide-layout-wrapper .empty-sigil {
   font-size: 1.5rem;
-  opacity: 0.65;
+  opacity: 0.8;
   margin-bottom: var(--space-2, 0.5rem);
+  filter: drop-shadow(0 0 8px var(--ritual-glow, rgba(150, 120, 255, 0.5)));
 }
 
 .ide-layout-wrapper .scroll-empty p {
@@ -3302,6 +3551,82 @@
   margin-bottom: var(--space-1);
   flex-shrink: 0;
   white-space: nowrap;
+}
+
+/* Bespoke neon-glass treatment (matches .new-scroll-btn / the Control Console).
+   Scoped above the global .btn-primary gradient so only this button changes. */
+.ide-layout-wrapper .btn.save-scroll-btn {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--read-accent) 60%, transparent);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--ritual-abyss, #0b0b16) 66%, #0a0f19),
+    color-mix(in srgb, var(--ritual-abyss, #0b0b16) 90%, #03050a)
+  );
+  color: var(--read-text-strong, #ede8d4);
+  text-shadow: 0 0 12px var(--ritual-glow, rgba(150, 120, 255, 0.4));
+  box-shadow: 0 0 14px -4px var(--ritual-glow, rgba(150, 120, 255, 0.4)),
+    inset 0 0 12px -8px var(--ritual-glow, rgba(150, 120, 255, 0.4));
+  transition: transform 0.22s cubic-bezier(0.23, 1, 0.32, 1), filter 0.2s ease,
+    border-color 0.18s ease, box-shadow 0.22s ease;
+  will-change: transform;
+}
+.ide-layout-wrapper .btn.save-scroll-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    color-mix(in srgb, var(--ritual-glow, rgba(160, 130, 255, 0.6)) 60%, transparent) 50%,
+    transparent 70%
+  );
+  transform: translateX(-130%);
+  opacity: 0;
+}
+.ide-layout-wrapper .btn.save-scroll-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.12);
+  color: var(--read-text-strong, #ede8d4);
+  border-color: color-mix(in srgb, var(--read-accent) 85%, transparent);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--ritual-abyss, #0b0b16) 60%, #0b1220),
+    color-mix(in srgb, var(--ritual-abyss, #0b0b16) 86%, #03050a)
+  );
+  box-shadow: 0 8px 20px -8px #000,
+    0 0 20px -3px var(--ritual-glow, rgba(150, 120, 255, 0.5));
+  text-shadow: 0 0 14px var(--ritual-glow, rgba(150, 120, 255, 0.6));
+}
+.ide-layout-wrapper .btn.save-scroll-btn:hover:not(:disabled)::after {
+  animation: new-scroll-sweep 0.7s cubic-bezier(0.23, 1, 0.32, 1) 1;
+}
+.ide-layout-wrapper .btn.save-scroll-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.99);
+}
+.ide-layout-wrapper .btn.save-scroll-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--read-accent),
+    0 0 16px var(--ritual-glow, rgba(150, 120, 255, 0.5));
+}
+.ide-layout-wrapper .btn.save-scroll-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.ide-layout-wrapper[data-reduced-motion="true"] .btn.save-scroll-btn,
+.ide-layout-wrapper[data-reduced-motion="true"] .btn.save-scroll-btn:hover {
+  transform: none !important;
+  transition: none !important;
+}
+.ide-layout-wrapper[data-reduced-motion="true"] .btn.save-scroll-btn:hover::after {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ide-layout-wrapper .btn.save-scroll-btn,
+  .ide-layout-wrapper .btn.save-scroll-btn:hover { transform: none !important; }
+  .ide-layout-wrapper .btn.save-scroll-btn:hover::after { animation: none !important; }
 }
 
 .scroll-top-btn {
@@ -5247,7 +5572,7 @@
 
 @media (max-width: 640px) {
   .ide-layout-wrapper {
-    --editor-content-font-size: clamp(1rem, 4vw, 1.1rem);
+    --editor-content-font-size: calc(clamp(1rem, 4vw, 1.1rem) * var(--ide-font-scale, 1));
     --editor-content-padding-x: var(--space-3, 0.75rem);
     --editor-content-padding-y: var(--space-3, 0.75rem);
   }

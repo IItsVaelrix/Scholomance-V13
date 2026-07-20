@@ -68,6 +68,7 @@ export type ScholomanceGraphNodeV1 = {
     | "divwand.lattice"
     | "turboquant.semanticNormalize"
     | "pixelbrain.compile"
+    | "pixelbrain.geometryKernel"
     | "pixelbrain.symmetryAmp"
     | "pixelbrain.colorResolve"
     | "scdl.vectorOps"
@@ -147,6 +148,7 @@ export type ScholomanceSocketTypeV1 =
   | "export.artifact"
   | "math.scalar"
   | "math.vector2"
+  | "math.expression"
   ;
 
 export type ScholomanceGraphDiagnosticV1 = {

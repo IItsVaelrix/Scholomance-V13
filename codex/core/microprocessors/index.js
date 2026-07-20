@@ -46,6 +46,12 @@ verseIRMicroprocessors.register('pls.index', async (payload, context) => {
   return buildPlsIndex(payload);
 });
 
+// --- Dictionary authority (Scholomance dict → PhonemeEngine) ---
+verseIRMicroprocessors.register('dict.primeAuthority', async (payload, context) => {
+  const { runDictPrimeAuthority } = await import('./dict/primeAuthority.js');
+  return runDictPrimeAuthority(payload, context);
+});
+
 // --- Color Microprocessors (Lazy) ---
 verseIRMicroprocessors.register('color.resolve', async (payload, context) => {
   const { resolveKnownColor } = await import('./color/ColorResolver.js');
@@ -157,6 +163,11 @@ verseIRMicroprocessors.register('amp.coord-symmetry', async (payload, context) =
 verseIRMicroprocessors.register('amp.shadow-perception', async (payload, _context) => {
   const { runShadowPerceptionAmp } = await import('../pixelbrain/shadow-perception-amp.js');
   return runShadowPerceptionAmp(payload);
+});
+
+verseIRMicroprocessors.register('amp.visualizer.truesight', async (payload, context) => {
+  const { runVisualizerTruesightAmp } = await import('../../../src/lib/truesight/visualizerTruesightAmp.js');
+  return runVisualizerTruesightAmp(payload, context);
 });
 
 // --- Photonic Retina Microprocessors (Lazy) ---

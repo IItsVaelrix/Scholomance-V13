@@ -105,7 +105,7 @@ export interface EffectInstance {
   effectId: string;
   enabled: boolean;
   order: number;
-  params: Record<string, AnimatableNumber | string | boolean | number>;
+  params: Record<string, unknown>;
 }
 
 export interface EffectKeyframe {
@@ -177,9 +177,18 @@ export interface KeyframeTrack {
   keyframes: Keyframe[];
 }
 
+export interface AudioAnalysisSummary {
+  bpm?: number;
+  beats: number[];
+  rms: number[];
+  windowSize: number;
+  duration: number;
+}
+
 export interface VideoAssetRecord {
   id: string;
   kind: 'video' | 'audio' | 'image' | 'pixelbrain';
+  name?: string;
   url: string;
   originalUrl?: string;
   proxyUrl?: string;
@@ -191,6 +200,8 @@ export interface VideoAssetRecord {
   fps?: number;
   aspectRatio?: string;
   analysisId?: string;
+  pixelBrainPacket?: unknown;
+  audioAnalysis?: AudioAnalysisSummary;
   diagnostics?: string[];
 }
 
@@ -224,13 +235,22 @@ export interface VideoTemplateDefinition {
   id: string;
   name: string;
   description: string;
-  requiredAssets: Array<{
+  requiredAssets?: Array<{
     id: string;
     kind: 'video' | 'audio' | 'image' | 'pixelbrain';
     label: string;
     required: boolean;
   }>;
-  createProjectPacket(input: Record<string, VideoAssetRecord>): VideoProjectPacketV1;
+  createProjectPacket?(input: Record<string, VideoAssetRecord>): VideoProjectPacketV1;
+  placeholders?: Array<{
+    id: string;
+    label: string;
+    type: 'audio' | 'video' | 'image' | 'lines' | 'color' | 'string';
+  }>;
+  apply?(
+    input: Record<string, unknown>,
+    project: VideoProjectPacketV1,
+  ): VideoProjectPacketV1;
 }
 
 export interface AssetRecord {
@@ -245,13 +265,7 @@ export interface AssetRecord {
   height?: number;
   metadata?: Record<string, unknown>;
   // Audio analysis for Phase 8 reactivity
-  audioAnalysis?: {
-    bpm?: number;
-    beats: number[];           // frame indices where beats occur
-    rms: number[];             // RMS volume per window (0-1), length ~ durationFrames / window
-    windowSize: number;        // frames per rms sample
-    duration: number;          // seconds
-  };
+  audioAnalysis?: AudioAnalysisSummary;
 }
 
 export interface AppliedTemplateRecord {
@@ -305,11 +319,13 @@ export interface VideoProjectPacketV1 {
   diagnostics: VideoDiagnostic[];
 }
 
+export type VideoProjectPacketV1Like = VideoProjectPacketV1;
+
 export function createEmptyProject(title = 'Untitled Project'): VideoProjectPacketV1 {
   const now = new Date().toISOString();
   return {
     schema: VIDEO_PROJECT_SCHEMA,
-    projectId: `vproj-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`, // EXEMPT
+    projectId: `vproj-${crypto.randomUUID()}`,
     title,
     canvas: {
       width: 1920,

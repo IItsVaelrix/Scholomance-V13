@@ -1,0 +1,557 @@
+/* ============================================================================
+   Technical Control Console — technomancer command surface for the Scribe.
+   Depth via light, one energy accent (school color) over gold structural chrome.
+   All motion is state-driven and gated by [data-reduced-motion].
+   Tokens only: --ritual-*, --chrome-gold*, --space-*, --radius-*, --text-*.
+   ============================================================================ */
+
+.control-console {
+  /* Console-local system tokens (defined centrally, consumed everywhere). */
+  --console-gap: var(--space-4);
+  --console-pad: var(--space-4);
+  --console-bank-gap: var(--space-2);
+  --console-accent: var(--ritual-primary, #6548b8);
+  --console-glow: var(--ritual-glow, hsla(265, 80%, 75%, 0.5));
+  --console-chrome: var(--chrome-gold, hsl(43, 48%, 48%));
+  --console-chrome-dim: var(--chrome-gold-dim, hsl(43, 38%, 32%));
+  --console-abyss: var(--ritual-abyss, #0b0b16);
+  --console-panel: color-mix(in srgb, var(--ritual-panel, #16162a) 82%, #000 18%);
+  --console-hairline: color-mix(in srgb, var(--console-chrome) 26%, transparent);
+  --console-ok: hsl(158, 55%, 55%);
+  --console-warn: hsl(38, 90%, 60%);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--console-gap);
+  padding: var(--console-pad);
+  min-height: 100%;
+  color: var(--text-secondary, #cdc5a8);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--console-abyss) 88%, transparent), var(--console-abyss)),
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--console-chrome) 4%, transparent) 0 1px, transparent 1px 6px);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--console-chrome) 12%, transparent);
+}
+
+/* ── Masthead ─────────────────────────────────────────────────────────────── */
+.console-masthead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--console-hairline);
+}
+.console-masthead-glyph {
+  color: var(--console-chrome);
+  font-size: var(--text-base);
+  line-height: 1;
+  filter: drop-shadow(0 0 4px var(--console-glow));
+}
+.console-masthead-title {
+  flex: 1;
+  font-family: var(--font-sans, sans-serif);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--chrome-gold-text, #d8c79a);
+}
+.console-masthead-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background: var(--console-chrome-dim);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--console-chrome) 30%, transparent);
+}
+.console-masthead-pulse.is-active {
+  background: var(--console-accent);
+  box-shadow: 0 0 8px 1px var(--console-glow);
+  animation: console-pulse 1.4s ease-in-out infinite;
+}
+
+/* ── Bank (raised sub-plane w/ rune-corner brackets) ──────────────────────── */
+.console-bank {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--console-bank-gap);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--console-panel);
+  border: 1px solid color-mix(in srgb, var(--ritual-border, #2a2a44) 80%, transparent);
+  box-shadow: var(--shadow-depth-1, 0 2px 6px rgba(0, 0, 0, 0.35)), inset 0 1px 0 color-mix(in srgb, #fff 4%, transparent);
+}
+/* Top energy hairline in the active school color. */
+.console-bank::before {
+  content: "";
+  position: absolute;
+  inset: 0 var(--space-4) auto;
+  top: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--console-glow), transparent);
+  opacity: 0.7;
+}
+.console-bank-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-1);
+  font-family: var(--font-sans, sans-serif);
+  font-size: var(--text-2xs, 0.625rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--chrome-gold-text, #d8c79a);
+}
+.console-bank-glyph {
+  color: var(--console-chrome);
+  font-size: var(--text-sm);
+  line-height: 1;
+}
+.console-bank-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* ── Toggle ───────────────────────────────────────────────────────────────── */
+.console-toggle {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--console-abyss) 55%, transparent);
+  color: var(--text-secondary, #cdc5a8);
+  font-family: var(--font-sans, sans-serif);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast, 150ms ease), border-color var(--transition-fast, 150ms ease), box-shadow var(--transition-fast, 150ms ease);
+}
+.console-toggle::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 2px;
+  border-radius: var(--radius-full);
+  background: transparent;
+  transition: background var(--transition-fast, 150ms ease), box-shadow var(--transition-fast, 150ms ease);
+}
+.console-toggle:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--console-accent) 45%, transparent);
+  background: color-mix(in srgb, var(--console-abyss) 30%, transparent);
+}
+.console-toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--console-accent), 0 0 12px var(--console-glow);
+}
+.console-toggle.is-on {
+  border-color: color-mix(in srgb, var(--console-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--console-accent) 14%, transparent);
+  color: var(--text-primary, #ede8d4);
+}
+.console-toggle.is-on::before {
+  background: var(--console-accent);
+  box-shadow: 0 0 8px 1px var(--console-glow);
+}
+.console-toggle:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+.console-toggle-icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  color: var(--console-chrome-dim);
+  background: color-mix(in srgb, var(--console-abyss) 60%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--console-chrome) 16%, transparent);
+}
+.console-toggle-icon svg { width: 16px; height: 16px; }
+.console-toggle.is-on .console-toggle-icon {
+  color: var(--console-glow);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--console-accent) 50%, transparent), 0 0 10px -2px var(--console-glow);
+}
+.console-toggle-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.console-toggle-label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.2;
+}
+.console-toggle-hint {
+  font-size: var(--text-2xs, 0.625rem);
+  color: var(--text-muted, #7a6f55);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.console-led {
+  width: 9px;
+  height: 9px;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--console-abyss) 20%, #000);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--console-chrome) 24%, transparent);
+}
+.console-led.is-on {
+  background: var(--console-accent);
+  box-shadow: 0 0 8px 1px var(--console-glow), inset 0 0 0 1px color-mix(in srgb, #fff 30%, transparent);
+}
+
+/* ── Rows (segmented / school) ────────────────────────────────────────────── */
+.console-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-1) var(--space-2);
+}
+.console-row-label {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-2xs, 0.625rem);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary, #a89d80);
+}
+
+/* Segmented control */
+.console-segmented {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--console-abyss) 40%, #000);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--console-chrome) 14%, transparent);
+}
+.console-seg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-1);
+  border: none;
+  border-radius: calc(var(--radius-sm) - 1px);
+  background: transparent;
+  color: var(--text-tertiary, #a89d80);
+  font-family: var(--font-sans, sans-serif);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background var(--transition-fast, 150ms ease), color var(--transition-fast, 150ms ease);
+}
+.console-seg:hover:not(.is-active) {
+  background: color-mix(in srgb, var(--console-accent) 12%, transparent);
+  color: var(--text-secondary, #cdc5a8);
+}
+.console-seg:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--console-accent);
+}
+.console-seg.is-active {
+  background: color-mix(in srgb, var(--console-accent) 26%, transparent);
+  color: var(--text-primary, #ede8d4);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--console-accent) 60%, transparent), 0 0 10px -3px var(--console-glow);
+}
+.console-seg-icon { display: grid; place-items: center; }
+.console-seg-icon svg { width: 13px; height: 13px; }
+
+/* School selector */
+.console-school-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-left: var(--space-2);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--console-abyss) 40%, #000);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--console-chrome) 14%, transparent);
+}
+.console-school-orb {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+  background: radial-gradient(circle at 30% 30%, var(--console-glow), var(--console-accent) 70%);
+  box-shadow: 0 0 8px -1px var(--console-glow);
+  flex-shrink: 0;
+}
+.console-school-select {
+  flex: 1;
+  padding: var(--space-2) var(--space-2) var(--space-2) 0;
+  border: none;
+  background: transparent;
+  color: var(--text-primary, #ede8d4);
+  font-family: var(--font-sans, sans-serif);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  appearance: none;
+}
+.console-school-select:focus-visible { outline: none; }
+.console-school-field:focus-within {
+  box-shadow: inset 0 0 0 1px var(--console-accent), 0 0 12px -4px var(--console-glow);
+}
+.console-school-select option {
+  background: var(--bg-elevated, #1c1c38);
+  color: var(--text-primary, #ede8d4);
+}
+
+/* ── Readouts (telemetry chips inside banks) ──────────────────────────────── */
+.console-readout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--console-abyss) 45%, transparent);
+  font-family: var(--font-mono, monospace);
+}
+.console-readout-label {
+  font-size: var(--text-2xs, 0.625rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted, #7a6f55);
+}
+.console-readout-value {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-secondary, #cdc5a8);
+}
+.console-readout--ok .console-readout-value { color: var(--console-ok); }
+.console-readout--warn .console-readout-value { color: var(--console-warn); }
+.console-readout--active .console-readout-value { color: var(--console-glow); }
+.console-readout-live {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background: var(--console-glow);
+  box-shadow: 0 0 6px 1px var(--console-glow);
+  animation: console-pulse 1.2s ease-in-out infinite;
+}
+
+/* ── Telemetry footer ─────────────────────────────────────────────────────── */
+.console-telemetry {
+  margin-top: auto;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--console-hairline);
+}
+.console-telemetry-title {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-2xs, 0.625rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--console-chrome-dim);
+}
+.console-telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 6rem), 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+.console-telemetry-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--console-abyss) 50%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--console-chrome) 12%, transparent);
+}
+.console-telemetry-cell dt {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-2xs, 0.625rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted, #7a6f55);
+}
+.console-telemetry-cell dd {
+  margin: 0;
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--chrome-gold-text, #d8c79a);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Compact density ──────────────────────────────────────────────────────── */
+.ide-layout-wrapper--compact .control-console {
+  --console-gap: var(--space-2);
+  --console-pad: var(--space-2);
+  --console-bank-gap: var(--space-1);
+}
+.ide-layout-wrapper--compact .console-toggle { padding: var(--space-1) var(--space-2); }
+.ide-layout-wrapper--compact .console-toggle-hint { display: none; }
+
+/* ── Motion ───────────────────────────────────────────────────────────────── */
+@keyframes console-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.ide-layout-wrapper[data-reduced-motion="true"] .control-console .console-masthead-pulse.is-active,
+.ide-layout-wrapper[data-reduced-motion="true"] .control-console .console-readout-live {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .control-console .console-masthead-pulse.is-active,
+  .control-console .console-readout-live { animation: none !important; }
+}
+
+/* ============================================================================
+   DivWand bespoke button layer.
+   Vocabulary borrowed from src/pages/DivWand (variant-neonBorder /
+   div-interactive): neon-glass slabs, springy lift, and one-shot "conjure"
+   animations that fire when a control gains its .is-on / .is-active state.
+   One-shot + hover only (no idle loops); fully disabled under reduced motion.
+   ============================================================================ */
+
+.control-console {
+  --dw-lift: cubic-bezier(0.23, 1, 0.32, 1);
+  --dw-glass: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--console-abyss) 70%, #0a0f19),
+    color-mix(in srgb, var(--console-abyss) 92%, #03050a)
+  );
+}
+
+/* ── Toggle → neon-glass slab with springy lift ───────────────────────────── */
+.control-console .console-toggle {
+  overflow: hidden; /* clip the conjure sweep */
+  background: var(--dw-glass);
+  transition:
+    transform 0.22s var(--dw-lift),
+    filter 0.2s ease,
+    border-color 0.18s ease,
+    box-shadow 0.22s ease,
+    background 0.18s ease;
+  will-change: transform;
+}
+.control-console .console-toggle:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+  border-color: color-mix(in srgb, var(--console-accent) 60%, transparent);
+  box-shadow: 0 6px 18px -8px #000, 0 0 14px -3px var(--console-glow);
+}
+.control-console .console-toggle:active:not(:disabled) {
+  transform: translateY(0) scale(0.99);
+}
+.control-console .console-toggle.is-on {
+  border-color: color-mix(in srgb, var(--console-accent) 72%, transparent);
+  box-shadow: 0 0 16px -3px var(--console-glow), inset 0 0 14px -7px var(--console-glow);
+}
+
+/* Conjure sweep — a light band crosses once when the button becomes active. */
+.control-console .console-toggle::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    color-mix(in srgb, var(--console-glow) 55%, transparent) 50%,
+    transparent 70%
+  );
+  transform: translateX(-120%);
+  opacity: 0;
+}
+.control-console .console-toggle.is-on::after {
+  animation: console-conjure-sweep 0.62s var(--dw-lift) 1;
+}
+.control-console .console-toggle.is-on .console-toggle-icon {
+  animation: console-icon-flare 0.5s var(--dw-lift) 1;
+}
+
+/* LED ignition ring. */
+.control-console .console-led { position: relative; }
+.control-console .console-led.is-on::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--console-glow);
+  opacity: 0;
+  animation: console-led-ring 0.6s ease-out 1;
+}
+
+/* ── Segmented → neon pop + springy hover ─────────────────────────────────── */
+.control-console .console-seg {
+  transition: background var(--transition-fast, 150ms ease), color var(--transition-fast, 150ms ease), transform 0.2s var(--dw-lift);
+}
+.control-console .console-seg:hover:not(.is-active) {
+  transform: translateY(-1px);
+}
+.control-console .console-seg.is-active {
+  animation: console-seg-pop 0.32s var(--dw-lift) 1;
+}
+
+/* ── School orb → charge ripple on hover ──────────────────────────────────── */
+.control-console .console-school-field:hover .console-school-orb {
+  animation: console-orb-charge 0.8s ease-out 1;
+}
+
+@keyframes console-conjure-sweep {
+  0%   { transform: translateX(-120%); opacity: 0; }
+  28%  { opacity: 1; }
+  100% { transform: translateX(120%); opacity: 0; }
+}
+@keyframes console-icon-flare {
+  0%   { transform: scale(0.82); filter: brightness(0.85); }
+  55%  { transform: scale(1.18); filter: brightness(1.6) drop-shadow(0 0 6px var(--console-glow)); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+@keyframes console-led-ring {
+  0%   { opacity: 0.9; transform: scale(0.5); }
+  100% { opacity: 0; transform: scale(1.9); }
+}
+@keyframes console-seg-pop {
+  0%   { transform: scale(0.94); }
+  60%  { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+@keyframes console-orb-charge {
+  0%   { box-shadow: 0 0 0 0 var(--console-glow); }
+  100% { box-shadow: 0 0 12px 3px transparent; }
+}
+
+/* ── Reduced motion — instant state, no lift, no one-shots ─────────────────── */
+.ide-layout-wrapper[data-reduced-motion="true"] .control-console .console-toggle,
+.ide-layout-wrapper[data-reduced-motion="true"] .control-console .console-toggle:hover,
+.ide-layout-wrapper[data-reduced-motion="true"] .control-console .console-seg,
+.ide-layout-wrapper[data-reduced-motion="true"] .control-console .console-seg:hover {
+  transform: none !important;
+  transition: none !important;
+}
+.ide-layout-wrapper[data-reduced-motion="true"] .control-console .console-toggle.is-on::after,
+.ide-layout-wrapper[data-reduced-motion="true"] .control-console .console-toggle.is-on .console-toggle-icon,
+.ide-layout-wrapper[data-reduced-motion="true"] .control-console .console-led.is-on::after,
+.ide-layout-wrapper[data-reduced-motion="true"] .control-console .console-seg.is-active,
+.ide-layout-wrapper[data-reduced-motion="true"] .control-console .console-school-field:hover .console-school-orb {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .control-console .console-toggle,
+  .control-console .console-toggle:hover,
+  .control-console .console-seg:hover { transform: none !important; }
+  .control-console .console-toggle.is-on::after,
+  .control-console .console-toggle.is-on .console-toggle-icon,
+  .control-console .console-led.is-on::after,
+  .control-console .console-seg.is-active,
+  .control-console .console-school-field:hover .console-school-orb { animation: none !important; }
+}

@@ -69,6 +69,18 @@ import {
 
 const BYTECODE_MOD = MODULE_IDS.SHARED;
 import { createLexiconAdapter } from './adapters/lexicon.sqlite.adapter.js';
+import { createLexicalGraphAdapter } from './adapters/lexicalGraph.sqlite.adapter.js';
+import { createLemmaAdapter } from './adapters/lemma.sqlite.adapter.js';
+import { createLexicalAnalyzeService } from './services/lexicalAnalyze.service.js';
+import { lexicalAnalyzeRoutes } from './routes/lexicalAnalyze.routes.js';
+import {
+  DEVICE_EMBEDDING_DIMENSIONS,
+  DEVICE_EMBEDDING_KIND,
+  DEVICE_EMBEDDING_VERSION,
+  LEMMA_RANK_FORMULA_VERSION,
+  LEXICAL_GRAPH_SCHEMA_VERSION,
+  MORPHOLOGY_VERSION,
+} from '../core/lexical-graph/types.js';
 import { createCorpusAdapter } from './adapters/corpus.sqlite.adapter.js';
 import { createCorpusService } from './services/corpus.service.js';
 import { ScholomanceDictionaryAPI } from '../core/shared/scholomanceDictionary.api.js';
@@ -221,6 +233,22 @@ fastify.decorate('featureFlags', Object.freeze({
   rhymeAstrology: ENABLE_RHYME_ASTROLOGY,
 }));
 const lexiconAdapter = createLexiconAdapter(SCHOLOMANCE_DICT_PATH, { log: fastify.log });
+const lexicalGraphAdapter = createLexicalGraphAdapter(SCHOLOMANCE_DICT_PATH, { log: fastify.log });
+const lemmaAdapter = createLemmaAdapter(SCHOLOMANCE_DICT_PATH, { log: fastify.log });
+const lexicalAnalyzeService = createLexicalAnalyzeService({
+  lexiconAdapter,
+  lexicalGraphAdapter,
+  lemmaAdapter,
+});
+const lexicalAnalyzeVersions = Object.freeze({
+  morphologyVersion: MORPHOLOGY_VERSION,
+  lexiconVersion: LEXICAL_GRAPH_SCHEMA_VERSION,
+  embeddingKind: DEVICE_EMBEDDING_KIND,
+  embeddingVersion: DEVICE_EMBEDDING_VERSION,
+  embeddingDimensions: DEVICE_EMBEDDING_DIMENSIONS,
+  latticeMapVersion: 'CANDIDATE_LATTICE_v1',
+  rankingFormulaVersion: LEMMA_RANK_FORMULA_VERSION,
+});
 const corpusAdapter = createCorpusAdapter(SCHOLOMANCE_CORPUS_PATH, { log: fastify.log });
 const corpusService = createCorpusService({ dbPath: SCHOLOMANCE_CORPUS_PATH, log: fastify.log });
 
@@ -1134,6 +1162,11 @@ fastify.addHook('onSend', async (request, _reply, payload) => {
 
 fastify.register(wordLookupRoutes);
 fastify.register(oracleRoutes, { prefix: '/api/oracle' });
+fastify.register(lexicalAnalyzeRoutes, {
+    prefix: '/api/lexical',
+    service: lexicalAnalyzeService,
+    versions: lexicalAnalyzeVersions,
+});
 fastify.register(grimdesignRoutes);
 await fastify.register(panelAnalysisRoutes, {
     enableRhymeAstrology: fastify.featureFlags?.rhymeAstrology,
@@ -1305,6 +1338,12 @@ function closePersistenceConnections() {
         }));
     } catch (error) {
         fastify.log.warn({ err: error }, '[DB:lexicon] Failed to close cleanly.');
+    }
+    try {
+        lemmaAdapter.close?.();
+        shutdownHealth.push(encodeModuleHealth('lemma', 'LIFECYCLE', 'LEMMA_DB_CLOSED', {}));
+    } catch (error) {
+        fastify.log.warn({ err: error }, '[DB:lemma] Failed to close cleanly.');
     }
     try {
         corpusAdapter.close?.();

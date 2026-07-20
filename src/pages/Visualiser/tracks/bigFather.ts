@@ -16,6 +16,7 @@ export const BIG_FATHER: GrimoireTrack = {
   sunoUrl: 'https://suno.com/song/eaba93dc-bf75-4319-a67e-ddcedafc1c43',
   audioUrl: 'https://cdn1.suno.ai/eaba93dc-bf75-4319-a67e-ddcedafc1c43.mp3',
   coverUrl: 'https://cdn2.suno.ai/image_eaba93dc-bf75-4319-a67e-ddcedafc1c43.jpeg',
+  stageArtUrl: `${import.meta.env.BASE_URL}media/big-father-stage.png`,
   meta: [
     ['Duration', '3:27'],
     ['Model', 'chirp-fenix · v5.5'],

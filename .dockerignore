@@ -27,6 +27,11 @@ godot_project/
 *.sqlite-wal
 *.sqlite-shm
 *.sqlite.bak*
+# Seed DBs for Dockerfile fallback when OEWN rebuild fails (network/OOM).
+# Without these exceptions, `*.sqlite` makes the documented cp fallback a no-op
+# and the build dies later at build:rhyme-astrology:index.
+!scholomance_dict.sqlite
+!scholomance_corpus.sqlite
 *.png
 *.bmp
 *.jpg

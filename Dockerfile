@@ -1,38 +1,65 @@
 FROM node:20-bookworm-slim AS build
 WORKDIR /app
 
-# Install Python 3 and curl for data build (needed before npm ci for dictionary build)
+# Python (dict/corpus builders) + native-addon toolchain (better-sqlite3, bcrypt).
+# curl + yt-dlp system binary so youtube-dl-exec skips its own download.
 RUN apt-get update && apt-get install -y \
     python3 \
+    build-essential \
     curl \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+RUN curl -fL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp \
+    && chmod a+rx /usr/local/bin/yt-dlp
 
 COPY package.json package-lock.json ./
-RUN npm ci
+# --ignore-scripts skips better-sqlite3/bcrypt install scripts, which is how the
+# .node bindings get downloaded (prebuild) or compiled. Rebuild only those two
+# so we keep install-scripts off for everything else.
+RUN npm ci --ignore-scripts \
+ && npm rebuild better-sqlite3 bcrypt \
+ && node -e "require('better-sqlite3'); require('bcrypt'); console.log('native addons ok')"
 
 COPY . .
 
 # --- Build dictionary and corpus at image-build time ---
-# Attempts to download OEWN and build fresh DBs. If this fails (network
-# issues, GitHub rate limits), we fall back to pre-existing local DBs.
+# Prefer the hand-enriched local DBs when present in the build context so
+# production Leximancy matches the superior local substrate (devices, antonyms,
+# lemma_form, rhyme corrections). Only rebuild from OEWN when no seed dict ships.
 RUN mkdir -p /app/data
 
-RUN ( \
-    curl -fL "https://github.com/globalwordnet/english-wordnet/releases/download/2025-edition/english-wordnet-2025.xml.gz" -o /app/english-wordnet-2025.xml.gz \
-    && python3 scripts/build_scholomance_dict.py --db /app/data/scholomance_dict.sqlite --oewn_path /app/english-wordnet-2025.xml.gz --overwrite \
-    && python3 scripts/build_super_corpus.py --db /app/data/scholomance_corpus.sqlite --dict /app/data/scholomance_dict.sqlite --overwrite \
-    && rm -f /app/english-wordnet-2025.xml.gz \
-) || echo "Dictionary build failed — will fall back to pre-existing local DBs"
+RUN if [ -f /app/scholomance_dict.sqlite ]; then \
+      cp /app/scholomance_dict.sqlite /app/data/scholomance_dict.sqlite \
+      && echo "Using local enriched scholomance_dict.sqlite (dev parity)"; \
+    fi
+RUN if [ -f /app/scholomance_corpus.sqlite ]; then \
+      cp /app/scholomance_corpus.sqlite /app/data/scholomance_corpus.sqlite \
+      && echo "Using local scholomance_corpus.sqlite (dev parity)"; \
+    fi
 
-# Fallback: if Docker build produced no DBs (curl failed, etc.), use the
-# pre-built local copies if they exist in the repo.
-RUN test -s /app/data/scholomance_dict.sqlite || (test -f /app/scholomance_dict.sqlite && cp /app/scholomance_dict.sqlite /app/data/scholomance_dict.sqlite) || true
-RUN test -s /app/data/scholomance_corpus.sqlite || (test -f /app/scholomance_corpus.sqlite && cp /app/scholomance_corpus.sqlite /app/data/scholomance_corpus.sqlite) || true
+RUN if [ ! -s /app/data/scholomance_dict.sqlite ]; then \
+      ( \
+        curl -fL "https://github.com/globalwordnet/english-wordnet/releases/download/2025-edition/english-wordnet-2025.xml.gz" -o /app/english-wordnet-2025.xml.gz \
+        && python3 scripts/build_scholomance_dict.py --db /app/data/scholomance_dict.sqlite --oewn_path /app/english-wordnet-2025.xml.gz --overwrite \
+        && python3 scripts/build_super_corpus.py --db /app/data/scholomance_corpus.sqlite --dict /app/data/scholomance_dict.sqlite --overwrite \
+        && rm -f /app/english-wordnet-2025.xml.gz \
+      ) || echo "Dictionary build failed — no seed DB and OEWN rebuild failed"; \
+    fi
 
-# Verify DBs exist (Warn but don't fail, as Turso handles live DBs)
-RUN (test -s /app/data/scholomance_dict.sqlite && test -s /app/data/scholomance_corpus.sqlite) \
-    || echo "WARNING: No local dictionary/corpus DBs available. Ensure Turso is configured."
+# Corpus-only fallback if dict arrived via seed but corpus did not.
+RUN if [ -s /app/data/scholomance_dict.sqlite ] && [ ! -s /app/data/scholomance_corpus.sqlite ]; then \
+      ( \
+        curl -fL "https://github.com/globalwordnet/english-wordnet/releases/download/2025-edition/english-wordnet-2025.xml.gz" -o /app/english-wordnet-2025.xml.gz \
+        && python3 scripts/build_super_corpus.py --db /app/data/scholomance_corpus.sqlite --dict /app/data/scholomance_dict.sqlite --overwrite \
+        && rm -f /app/english-wordnet-2025.xml.gz \
+      ) || echo "Corpus build failed"; \
+    fi
+
+# DBs are mandatory for rhyme-astrology + runtime COPY --from=build.
+RUN test -s /app/data/scholomance_dict.sqlite \
+    || (echo "ERROR: /app/data/scholomance_dict.sqlite missing after seed copy + OEWN build. Ship scholomance_dict.sqlite in the build context (see .dockerignore exceptions) or ensure OEWN download/build succeeds." >&2; exit 1)
+RUN test -s /app/data/scholomance_corpus.sqlite \
+    || (echo "ERROR: /app/data/scholomance_corpus.sqlite missing after seed copy + OEWN build. Ship scholomance_corpus.sqlite in the build context (see .dockerignore exceptions) or ensure OEWN download/build succeeds." >&2; exit 1)
 
 # --- Rhyme correctness pass (MUST run after the Python build) ---
 # build_scholomance_dict.py writes rhyme_index.rhyme_key from a simplified
@@ -56,18 +83,40 @@ RUN (test -s /app/data/scholomance_dict.sqlite && test -s /app/data/scholomance_
          node scripts/backfill_rhyme_corpus_freq.js \
     ) || echo "WARNING: rhyme index not rebuilt; rhymes fall back to the lossy legacy keys."
 
+# --- Lexical-graph overlay (required for Leximancy / POST /api/lexical/analyze) ---
+# Idempotent when the seed DB already carries a complete overlay.
+ARG LEXICAL_GRAPH_TIMESTAMP=2026-07-18T00:00:00.000Z
+RUN node scripts/lexical-graph.mjs all \
+      --db /app/data/scholomance_dict.sqlite \
+      --timestamp "${LEXICAL_GRAPH_TIMESTAMP}"
+
+# Antonym ingest for Leximancy Oppositions — skip when already present (dev seed).
+RUN node -e "const D=require('better-sqlite3');const db=new D('/app/data/scholomance_dict.sqlite',{readonly:true});const n=db.prepare(\"select count(*) c from wordnet_rel where rel='antonym'\").get().c;db.close();if(n>0){console.log('antonyms already present:',n);process.exit(0);}process.exit(2)" \
+ || ( \
+      mkdir -p /app/dict_data \
+      && curl -fL "https://en-word.net/static/english-wordnet-2024.xml.gz" -o /app/dict_data/english-wordnet-2024.xml.gz \
+      && python3 scripts/ingest_oewn_antonyms.py \
+           --db /app/data/scholomance_dict.sqlite \
+           --oewn_path /app/dict_data/english-wordnet-2024.xml.gz \
+           --expected-release 2024 \
+           --timestamp "${LEXICAL_GRAPH_TIMESTAMP}" \
+      && rm -f /app/dict_data/english-wordnet-2024.xml.gz \
+    )
+
+RUN node -e "const D=require('better-sqlite3');const db=new D('/app/data/scholomance_dict.sqlite',{readonly:true});const need=['lexical_entry','lexical_entry_fts','lexical_entry_fts_map','literary_device','lemma_form'];for (const n of need){if(!db.prepare('select 1 from sqlite_master where name=?').get(n)){console.error('missing overlay table:',n);process.exit(1);}}const st=db.prepare(\"select value from meta where key='lemma_form_status'\").get();if(!st||st.value!=='complete'){console.error('lemma_form_status not complete:',st);process.exit(1);}const devices=db.prepare('select count(*) c from literary_device').get().c;const ants=db.prepare(\"select count(*) c from wordnet_rel where rel='antonym'\").get().c;if(devices<1){console.error('literary_device empty');process.exit(1);}if(ants<1){console.error('antonyms empty');process.exit(1);}console.log('lexical-graph overlay verified',{devices,ants});"
+
 # --- App build ---
 ENV SCHOLOMANCE_DICT_PATH=/app/data/scholomance_dict.sqlite
 ENV SCHOLOMANCE_CORPUS_PATH=/app/data/scholomance_corpus.sqlite
 ENV RHYME_ASTROLOGY_OUTPUT_DIR=/app/data/rhyme-astrology
 ENV RHYME_ASTROLOGY_HOT_EDGE_WORD_LIMIT=7500
 
-# Inject TurboQuant embeddings into the substrate BEFORE indexing
-# We run this on the newly built dictionary to ensure it's production-ready
-RUN node scripts/build_vector_artifacts.js
-
 # Build Rhyme Astrology Index using the enriched substrate
 RUN npm run build:rhyme-astrology:index
+
+# Inject TurboQuant embeddings into the substrate AFTER indexing
+# We run this on the newly built dictionary to ensure it's production-ready
+RUN node scripts/build_vector_artifacts.js
 
 RUN npm run build
 RUN npm prune --omit=dev

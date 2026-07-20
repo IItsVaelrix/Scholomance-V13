@@ -41,7 +41,7 @@ export default function TacticalTileTooltip({
     if (y < 8) y = 8;
 
     setAdjustedPosition({ x, y });
-  }, [visible, mousePosition, tile]);
+  }, [visible, mousePosition, tile, inline]);
 
   if (!visible || !tile) return null;
 

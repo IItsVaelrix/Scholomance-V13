@@ -34,7 +34,7 @@ function extractPaletteBlock(text) {
 // Find each top-level `part <name> ... { ... }` block; returns {name, start, end, body}.
 function findParts(text) {
   const parts = [];
-  const re = /part\s+(\w+)[^\{]*\{/g;
+  const re = /part\s+(\w+)[^{]*\{/g;
   let m;
   while ((m = re.exec(text))) {
     const braceStart = text.indexOf('{', m.index);

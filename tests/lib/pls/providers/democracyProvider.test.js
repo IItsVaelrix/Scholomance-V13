@@ -88,4 +88,29 @@ describe('democracyProvider', () => {
     expect(dictionaryAPI.validateBatch).toHaveBeenCalled();
     expect(results[0].scores.democracy).toBeGreaterThan(0);
   });
+
+  it('propagates ranked spellcheck scores so context winners beat near-misses', async () => {
+    const spellchecker = {
+      suggestDetailedAsync: vi.fn(async () => [
+        { word: 'steal', score: 0.72 },
+        { word: 'steel', score: 0.51 },
+      ]),
+      check: () => false,
+    };
+    const candidates = [
+      { token: 'steal', scores: {} },
+      { token: 'steel', scores: {} },
+    ];
+
+    const results = await democracyProvider(
+      { prefix: 'stel', prevWord: 'to', prevLineEndWord: null },
+      { spellchecker, trie: null, phonemeEngine: null },
+      candidates,
+    );
+
+    const steal = results.find((entry) => entry.token === 'steal');
+    const steel = results.find((entry) => entry.token === 'steel');
+    expect(spellchecker.suggestDetailedAsync).toHaveBeenCalledWith('stel', 15, 'to');
+    expect(steal.scores.democracy).toBeGreaterThan(steel.scores.democracy);
+  });
 });

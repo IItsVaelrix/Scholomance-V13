@@ -148,21 +148,42 @@ export class ClericalRAID {
         matchedPattern: null,
         fixPath: null,
         owner: 'Unknown',
-        escalationRequired: true
+        escalationRequired: true,
+        margin: 0,
       };
     }
 
     const best = neighbors[0];
+    const second = neighbors.length > 1 ? neighbors[1] : null;
     const confidence = Math.min(1, Math.max(0, best.distance));
+    const margin = second
+      ? Math.max(0, best.distance - second.distance)
+      : 1;
+    const marginOk = margin >= (VERDICT_THRESHOLDS.TOP_MARGIN ?? 0);
 
-    if (confidence >= VERDICT_THRESHOLDS.CONFIRMED) {
+    if (confidence >= VERDICT_THRESHOLDS.CONFIRMED && marginOk) {
       return {
         verdict: 'CONFIRMED',
         confidence,
         matchedPattern: best.pattern,
         fixPath: best.pattern.fixPath,
         owner: AGENT_NAMES[best.pattern.owner] || 'Unknown',
-        escalationRequired: false
+        escalationRequired: false,
+        margin,
+      };
+    }
+
+    // Exact-ish hit but ambiguous top-2 → still escalate for human/Merlin review.
+    if (confidence >= VERDICT_THRESHOLDS.CONFIRMED && !marginOk) {
+      return {
+        verdict: 'NEEDS_MERLIN',
+        confidence,
+        matchedPattern: best.pattern,
+        fixPath: null,
+        owner: AGENT_NAMES[best.pattern.owner] || 'Unknown',
+        escalationRequired: true,
+        margin,
+        reason: 'ambiguous_top_neighbors',
       };
     }
 
@@ -173,18 +194,24 @@ export class ClericalRAID {
         matchedPattern: null,
         fixPath: null,
         owner: 'Unknown',
-        escalationRequired: true
+        escalationRequired: true,
+        margin,
       };
     }
 
-    if (confidence < VERDICT_THRESHOLDS.DENIED) {
+    if (confidence < VERDICT_THRESHOLDS.NEEDS_MERLIN || !marginOk) {
+      // Weak or ambiguous — keep a hint pattern but never a fixPath.
       return {
         verdict: 'DENIED',
         confidence,
-        matchedPattern: best.pattern,
+        matchedPattern: confidence >= VERDICT_THRESHOLDS.DENIED ? best.pattern : null,
         fixPath: null,
-        owner: AGENT_NAMES[best.pattern.owner] || 'Unknown',
-        escalationRequired: true
+        owner: confidence >= VERDICT_THRESHOLDS.DENIED
+          ? (AGENT_NAMES[best.pattern.owner] || 'Unknown')
+          : 'Unknown',
+        escalationRequired: true,
+        margin,
+        reason: marginOk ? 'below_merlin_floor' : 'ambiguous_top_neighbors',
       };
     }
 
@@ -194,7 +221,8 @@ export class ClericalRAID {
       matchedPattern: best.pattern,
       fixPath: best.pattern.fixPath,
       owner: AGENT_NAMES[best.pattern.owner] || 'Unknown',
-      escalationRequired: true
+      escalationRequired: true,
+      margin,
     };
   }
 
