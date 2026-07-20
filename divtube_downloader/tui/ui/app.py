@@ -1248,6 +1248,7 @@ class DivTubeAgentApp(App):
 
         self.setup_turbo_commands()
         self.setup_daemon_commands()
+        self.setup_collab_commands()
         self.setup_lab_commands()
 
     def setup_daemon_commands(self):
@@ -1321,6 +1322,148 @@ class DivTubeAgentApp(App):
             threading.Thread(target=run, daemon=True).start()
 
         r("/vaelrix", handle_vaelrix, "Ask Vaelrix (SteamDeck brain)", "/vaelrix <question>")
+
+    def setup_collab_commands(self):
+        """Scholomance-collab bridge commands.
+
+        Exposes the full Vaelrix ForceField and the collab control plane
+        through HTTP Streamable MCP. Canonical replacement for the
+        brain-daemon /vaelrix path (which still works for legacy users).
+        """
+        r = self.registry.register
+
+        def _err(ui, msg):
+            ui.log_msg(f"[#FF5C7A]{msg}[/]")
+
+        def _ok(ui, msg):
+            ui.log_msg(f"[#7CFF8B]{msg}[/]")
+
+        def _wrap(ui, label, method_name, *args):
+            """Lazy-import the service and dispatch a typed method."""
+            from tui.services.collab_bridge_service import CollabBridgeService, render_result
+
+            def run():
+                svc = CollabBridgeService()
+                err = svc.auth_error()
+                if err:
+                    _err(ui, err)
+                    return
+                if not svc.is_available():
+                    _err(ui, "Collab server unreachable. Start it: npm run dev:server")
+                    return
+                captured: list[str] = []
+                # The service serialises the result; the renderer is keyed by the
+                # full MCP tool name, which we recover via _TOOL_NAME_FOR below.
+                method = getattr(svc, method_name, None)
+                if method is None:
+                    _err(ui, f"No such method: {method_name}")
+                    return
+
+                def cb(raw):
+                    captured.append(raw)
+                    def write():
+                        rendered = render_result(_TOOL_NAME_FOR.get(method_name, ""), raw)
+                        if rendered:
+                            ui.log_msg(rendered)
+                    ui.call_from_thread(write)
+
+                method(*args, cb)
+
+            threading.Thread(target=run, daemon=True).start()
+
+        # ── 12 commands ───────────────────────────────────────────────────
+
+        def handle_collab_status(ui, args):
+            _wrap(ui, "status", "status_get")
+
+        def handle_collab_forcefield(ui, args):
+            query = " ".join(args).strip()
+            if not query:
+                _err(ui, "Usage: /collab-forcefield <query>")
+                return
+            _wrap(ui, "forcefield", "forcefield_ask", query, False, True)
+
+        def handle_collab_brains(ui, args):
+            _wrap(ui, "brains", "list_brains")
+
+        def handle_collab_brain(ui, args):
+            if len(args) < 2:
+                _err(ui, "Usage: /collab-brain <brain_id> <query>")
+                return
+            brain_id, query = args[0], " ".join(args[1:])
+            _wrap(ui, f"brain:{brain_id}", "run_brain", brain_id, query)
+
+        def handle_collab_genes(ui, args):
+            domain = args[0] if args else "all"
+            _wrap(ui, f"genes:{domain}", "get_scdna_genes", domain)
+
+        def handle_collab_tasks(ui, args):
+            status = args[0] if args else None
+            _wrap(ui, "tasks", "task_list", status, 50)
+
+        def handle_collab_task(ui, args):
+            if not args:
+                _err(ui, "Usage: /collab-task <id> [note…]")
+                return
+            task_id = args[0]
+            note = " ".join(args[1:]).strip() if len(args) > 1 else ""
+            if note:
+                _wrap(ui, f"task-update:{task_id}", "task_update", task_id, note)
+            else:
+                _wrap(ui, f"task:{task_id}", "task_get", task_id)
+
+        def handle_collab_agents(ui, args):
+            _wrap(ui, "agents", "agent_list")
+
+        def handle_collab_locks(ui, args):
+            _wrap(ui, "locks", "lock_list")
+
+        def handle_collab_grep(ui, args):
+            if not args:
+                _err(ui, "Usage: /collab-grep <pattern> [--regex]")
+                return
+            is_regex = "--regex" in args
+            query = next((a for a in args if a != "--regex"), "")
+            if not query:
+                _err(ui, "Usage: /collab-grep <pattern> [--regex]")
+                return
+            _wrap(ui, "grep", "forensic_search", query, is_regex, False, None, None, 75)
+
+        def handle_collab_feedback(ui, args):
+            if len(args) < 2:
+                _err(ui, "Usage: /collab-feedback <A-H> <subject>")
+                return
+            mode, subject = args[0], " ".join(args[1:])
+            _wrap(ui, f"feedback:{mode}", "scholomance_feedback", subject, mode, None)
+
+        def handle_collab_knowledge(ui, args):
+            _wrap(ui, "knowledge", "scholomance_knowledge")
+
+        r("/collab-status",      handle_collab_status,
+          "Collab plane status",  "/collab-status")
+        r("/collab-forcefield",  handle_collab_forcefield,
+          "Run full Vaelrix ForceField (canonical replacement for /vaelrix)",
+          "/collab-forcefield <query>")
+        r("/collab-brains",      handle_collab_brains,
+          "List available brains",  "/collab-brains")
+        r("/collab-brain",       handle_collab_brain,
+          "Run a single brain",     "/collab-brain <id> <query>")
+        r("/collab-genes",       handle_collab_genes,
+          "List active SCDNA genes","/collab-genes [domain]")
+        r("/collab-tasks",       handle_collab_tasks,
+          "List collab tasks",      "/collab-tasks [status]")
+        r("/collab-task",        handle_collab_task,
+          "Get or annotate a task","/collab-task <id> [note…]")
+        r("/collab-agents",      handle_collab_agents,
+          "List collab agents",     "/collab-agents")
+        r("/collab-locks",       handle_collab_locks,
+          "List active file locks","/collab-locks")
+        r("/collab-grep",        handle_collab_grep,
+          "Literal/regex forensic search", "/collab-grep <pattern> [--regex]")
+        r("/collab-feedback",    handle_collab_feedback,
+          "Run scholomance feedback (A–H)", "/collab-feedback <A-H> <subject>")
+        r("/collab-knowledge",   handle_collab_knowledge,
+          "Dump scholomance knowledge base", "/collab-knowledge")
 
     def setup_lab_commands(self):
         """Intel Lab (full YouTube intel report) + Niche registry commands.
@@ -2040,6 +2183,27 @@ def _persist_crash(header, exc_text):
         sys.stderr.flush()
     except Exception:
         pass
+
+
+# Mapping from service method name → MCP tool name. Used by _wrap (in
+# setup_collab_commands) to look up the right renderer. Lives at module
+# scope so the closure can read it without a `self.` hop.
+_TOOL_NAME_FOR = {
+    "forcefield_ask":   "mcp_scholomance_collab_brain_forcefield_ask",
+    "list_brains":      "mcp_scholomance_collab_brain_list",
+    "run_brain":        "mcp_scholomance_collab_brain_run",
+    "get_scdna_genes":  "mcp_scholomance_collab_brain_scdna_genes",
+    "scholomance_feedback": "mcp_scholomance_collab_skill_scholomance_feedback",
+    "scholomance_knowledge": "mcp_scholomance_collab_skill_scholomance_knowledge",
+    "status_get":       "mcp_scholomance_collab_status_get",
+    "task_list":        "mcp_scholomance_collab_task_list",
+    "task_get":         "mcp_scholomance_collab_task_get",
+    "task_update":      "mcp_scholomance_collab_task_update",
+    "lock_list":        "mcp_scholomance_collab_lock_list",
+    "agent_list":       "mcp_scholomance_collab_agent_list",
+    "forensic_search":  "mcp_scholomance_collab_forensic_search",
+    "immunity_scan_file": "mcp_scholomance_collab_immunity_scan_file",
+}
 
 
 if __name__ == "__main__":
