@@ -374,6 +374,17 @@ class TestControlMethods(unittest.TestCase):
             {"id": "t-42", "note": "Refactored useProgression hook"},
         )
 
+    def test_task_update_short_circuits_on_empty_note(self):
+        svc = CollabBridgeService(base_url="http://127.0.0.1:1", key="k")
+        captured = []
+        svc.task_update("t-1", "", None, None, lambda r: captured.append(r))
+        # No thread, no HTTP — should be synchronous.
+        import time
+        time.sleep(0.1)
+        self.assertEqual(len(captured), 1)
+        self.assertIn("note is required", captured[0])
+        self.assertIn("Rule 12", captured[0])
+
     def test_lock_list(self):
         svc = CollabBridgeService(base_url="http://127.0.0.1:1", key="k")
         body = self._capture(svc, "lock_list", lambda r: None)
@@ -392,17 +403,15 @@ class TestControlMethods(unittest.TestCase):
             svc, "forensic_search", "vaelrix", True, False, "*.py", None, 50, lambda r: None
         )
         self.assertEqual(body["params"]["name"], "mcp_scholomance_collab_forensic_search")
-        self.assertEqual(
-            body["params"]["arguments"],
-            {
-                "query": "vaelrix",
-                "isRegex": True,
-                "caseSensitive": False,
-                "includePattern": "*.py",
-                "excludePattern": None,
-                "limit": 50,
-            },
-        )
+        args = body["params"]["arguments"]
+        self.assertEqual(args["query"], "vaelrix")
+        self.assertEqual(args["isRegex"], True)
+        self.assertEqual(args["caseSensitive"], False)
+        self.assertEqual(args["includePattern"], "*.py")
+        # Both pattern args were None except includePattern; excludePattern
+        # must be omitted (Zod's .optional() rejects null).
+        self.assertNotIn("excludePattern", args)
+        self.assertEqual(args["limit"], 50)
 
     def test_immunity_scan_file(self):
         svc = CollabBridgeService(base_url="http://127.0.0.1:1", key="k")

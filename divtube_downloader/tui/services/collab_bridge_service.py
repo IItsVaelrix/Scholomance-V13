@@ -365,7 +365,8 @@ class CollabBridgeService:
         }
         if include_pattern is not None:
             args["includePattern"] = include_pattern
-        args["excludePattern"] = exclude_pattern
+        if exclude_pattern is not None:
+            args["excludePattern"] = exclude_pattern
         self.call_tool("mcp_scholomance_collab_forensic_search", args, callback)
 
     def immunity_scan_file(
