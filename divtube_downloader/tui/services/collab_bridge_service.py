@@ -226,3 +226,64 @@ class CollabBridgeService:
             pass
         self._session_id = None
         self._server_info = None
+
+    # ── Forcefield surface ────────────────────────────────────────────────
+
+    def forcefield_ask(
+        self,
+        query: str,
+        callback: Callable[[str], None] = lambda r: None,
+        *,
+        show_context: bool = False,
+        deterministic: bool = True,
+    ) -> None:
+        self.call_tool(
+            "mcp_scholomance_collab_brain_forcefield_ask",
+            {"query": query},
+            callback,
+        )
+
+    def list_brains(self, callback: Callable[[str], None] = lambda r: None) -> None:
+        self.call_tool("mcp_scholomance_collab_brain_list", {}, callback)
+
+    def run_brain(
+        self,
+        brain_id: str,
+        query: str,
+        callback: Callable[[str], None] = lambda r: None,
+    ) -> None:
+        self.call_tool(
+            "mcp_scholomance_collab_brain_run",
+            {"name": brain_id, "query": query},
+            callback,
+        )
+
+    def get_scdna_genes(
+        self,
+        domain: str = "all",
+        callback: Callable[[str], None] = lambda r: None,
+    ) -> None:
+        self.call_tool(
+            "mcp_scholomance_collab_brain_scdna_genes",
+            {"domain": domain},
+            callback,
+        )
+
+    def scholomance_feedback(
+        self,
+        subject: str,
+        mode: str = "A",
+        context: str | None = None,
+        callback: Callable[[str], None] = lambda r: None,
+    ) -> None:
+        args: dict[str, Any] = {"subject": subject, "mode": mode}
+        if context is not None:
+            args["context"] = context
+        self.call_tool(
+            "mcp_scholomance_collab_skill_scholomance_feedback", args, callback
+        )
+
+    def scholomance_knowledge(
+        self, callback: Callable[[str], None] = lambda r: None
+    ) -> None:
+        self.call_tool("mcp_scholomance_collab_skill_scholomance_knowledge", {}, callback)

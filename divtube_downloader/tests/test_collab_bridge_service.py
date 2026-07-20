@@ -254,5 +254,71 @@ class TestSessionLifecycle(unittest.TestCase):
             shutdown()
 
 
+class TestForcefieldMethods(unittest.TestCase):
+    """Assert each typed method builds the correct ``tools/call`` payload."""
+
+    def _capture(self, svc, method_name, *args, **kwargs):
+        """Run a typed method, return the captured JSON body of the POST."""
+        port, recorder, shutdown = _start_mock_server()
+        try:
+            _RecorderHandler.response_body = json.dumps({
+                "jsonrpc": "2.0", "id": 1, "result": {"serverInfo": {"name": "x"}},
+            }).encode()
+            _RecorderHandler.response_headers = {"Mcp-Session-Id": "sess-X"}
+            svc.base_url = f"http://127.0.0.1:{port}"
+            method = getattr(svc, method_name)
+            method(*args, **kwargs)
+            import time
+            for _ in range(50):
+                if len(recorder) >= 2:
+                    break
+                time.sleep(0.05)
+            tools_call = [r for r in recorder if r["method"] == "POST"][1]
+            return json.loads(tools_call["body"])
+        finally:
+            shutdown()
+
+    def test_forcefield_ask(self):
+        svc = CollabBridgeService(base_url="http://127.0.0.1:1", key="k")
+        body = self._capture(svc, "forcefield_ask", "explain X", lambda r: None)
+        self.assertEqual(body["params"]["name"], "mcp_scholomance_collab_brain_forcefield_ask")
+        self.assertEqual(body["params"]["arguments"], {"query": "explain X"})
+
+    def test_list_brains(self):
+        svc = CollabBridgeService(base_url="http://127.0.0.1:1", key="k")
+        body = self._capture(svc, "list_brains", lambda r: None)
+        self.assertEqual(body["params"]["name"], "mcp_scholomance_collab_brain_list")
+        self.assertEqual(body["params"]["arguments"], {})
+
+    def test_run_brain(self):
+        svc = CollabBridgeService(base_url="http://127.0.0.1:1", key="k")
+        body = self._capture(svc, "run_brain", "CODE_BRAIN", "find the bug", lambda r: None)
+        self.assertEqual(body["params"]["name"], "mcp_scholomance_collab_brain_run")
+        self.assertEqual(body["params"]["arguments"], {"name": "CODE_BRAIN", "query": "find the bug"})
+
+    def test_get_scdna_genes(self):
+        svc = CollabBridgeService(base_url="http://127.0.0.1:1", key="k")
+        body = self._capture(svc, "get_scdna_genes", "code", lambda r: None)
+        self.assertEqual(body["params"]["name"], "mcp_scholomance_collab_brain_scdna_genes")
+        self.assertEqual(body["params"]["arguments"], {"domain": "code"})
+
+    def test_scholomance_feedback(self):
+        svc = CollabBridgeService(base_url="http://127.0.0.1:1", key="k")
+        body = self._capture(
+            svc, "scholomance_feedback", "spec X", "B", "some context", lambda r: None
+        )
+        self.assertEqual(body["params"]["name"], "mcp_scholomance_collab_skill_scholomance_feedback")
+        self.assertEqual(
+            body["params"]["arguments"],
+            {"subject": "spec X", "mode": "B", "context": "some context"},
+        )
+
+    def test_scholomance_knowledge(self):
+        svc = CollabBridgeService(base_url="http://127.0.0.1:1", key="k")
+        body = self._capture(svc, "scholomance_knowledge", lambda r: None)
+        self.assertEqual(body["params"]["name"], "mcp_scholomance_collab_skill_scholomance_knowledge")
+        self.assertEqual(body["params"]["arguments"], {})
+
+
 if __name__ == "__main__":
     unittest.main()
