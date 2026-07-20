@@ -160,6 +160,7 @@ public/assets/*
 # Purged oversized artifacts — never commit DB backups or downloaded media (GitHub 100MB limit)
 *.sqlite.bak.*
 divtube_downloader/downloads/
+divtube_downloader/subtlety-spool/
 
 # Electron/AppImage extract (~531 MB) — keep local only
 squashfs-root/

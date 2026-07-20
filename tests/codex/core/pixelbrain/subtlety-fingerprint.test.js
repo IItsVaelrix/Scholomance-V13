@@ -5,6 +5,7 @@ import {
   compareFingerprints,
   identityKeysMatch,
   diffPaths,
+  verifyFingerprintPacket,
 } from '../../../../codex/core/pixelbrain/subtlety-fingerprint.js';
 import { canonicalForms, shapeOf, defaultCanonConfig } from '../../../../codex/core/pixelbrain/subtlety-canonicalizer.js';
 import { detectDrift } from '../../../../codex/core/pixelbrain/subtlety-drift.js';
@@ -150,15 +151,42 @@ describe('Comparison model (§3.1)', () => {
     expect(compareFingerprints(a, b).status).toBe('unexpected-change');
   });
 
-  it('approved-change: behavior moved but implementationVersion moved with it', () => {
-    const a = fingerprintOutput(baseIdentity, { cells: [1, 2, 3] });
-    const b = fingerprintOutput({ ...baseIdentity, implementationVersion: 'impl-2' }, { cells: [9, 9, 9] });
-    expect(compareFingerprints(a, b).status).toBe('approved-change');
+  it('approved-change: version moved only when baselineApproval authorizes it', () => {
+    const baseline = fingerprintOutput(baseIdentity, { cells: [1, 2, 3] });
+    const current = fingerprintOutput(
+      { ...baseIdentity, implementationVersion: 'impl-2' },
+      { cells: [9, 9, 9] },
+    );
+    const cmp = compareFingerprints(current, baseline, {
+      baselineApproval: { implementationVersion: 'impl-2', contractVersion: 'v1' },
+    });
+    expect(cmp.status).toBe('approved-change');
+  });
+
+  it('version bump without baselineApproval is unexpected-change (not trust-by-string)', () => {
+    const baseline = fingerprintOutput(baseIdentity, { cells: [1, 2, 3] });
+    const current = fingerprintOutput(
+      { ...baseIdentity, implementationVersion: 'impl-2' },
+      { cells: [9, 9, 9] },
+    );
+    const cmp = compareFingerprints(current, baseline);
+    expect(cmp.status).toBe('unexpected-change');
+    expect(cmp.reason).toBe('unapproved-version-move');
   });
 
   it('incomparable: identity keys do not match (different corpus)', () => {
     const a = fingerprintOutput(baseIdentity, out);
     const b = fingerprintOutput({ ...baseIdentity, canonicalCorpusId: 'corpus-2' }, out);
+    expect(identityKeysMatch(a, b)).toBe(false);
+    expect(compareFingerprints(a, b).status).toBe('incomparable');
+  });
+
+  it('incomparable: runtimeProfile mismatch on execution (identity-key bugfix)', () => {
+    const a = fingerprintOutput(baseIdentity, out);
+    const b = fingerprintOutput({ ...baseIdentity, runtimeProfile: 'browser-prod' }, out);
+    expect(a.execution.runtimeProfile).toBe('node-test');
+    expect(b.execution.runtimeProfile).toBe('browser-prod');
+    expect(a.identity.runtimeProfile).toBe('node-test');
     expect(identityKeysMatch(a, b)).toBe(false);
     expect(compareFingerprints(a, b).status).toBe('incomparable');
   });
@@ -169,8 +197,23 @@ describe('Comparison model (§3.1)', () => {
     expect(compareFingerprints(a, b).status).toBe('unexpected-change');
   });
 
-  it('diffPaths reports the top-level paths that changed', () => {
+  it('diffPaths reports nested dotted paths that changed', () => {
     expect(diffPaths({ a: 1, b: 2 }, { a: 1, b: 3 })).toEqual(['b']);
+    expect(diffPaths(
+      { meta: { generatedAt: 1, keep: true }, cells: [{ x: 1 }] },
+      { meta: { generatedAt: 9, keep: true }, cells: [{ x: 2 }] },
+    )).toEqual(['cells.0.x', 'meta.generatedAt']);
+  });
+
+  it('packet is sealed with a self-checksum; probe reseals after status mutation', () => {
+    const fp = fingerprintOutput(baseIdentity, out);
+    expect(fp.checksum).toMatch(/^[0-9a-f]{64}$/);
+    expect(fp.readings).toBeUndefined();
+    expect(verifyFingerprintPacket(fp).ok).toBe(true);
+
+    const probe = probeUnit(baseIdentity, () => out, { seed: 1, iterations: 3 });
+    expect(probe.comparison.status).toBe('stable');
+    expect(verifyFingerprintPacket(probe).ok).toBe(true);
   });
 });
 

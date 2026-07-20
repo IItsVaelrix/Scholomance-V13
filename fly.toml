@@ -1,5 +1,5 @@
-app = "scholomance-v13"
-primary_region = "ord"
+app = "scholomance-v12"
+primary_region = "iad"
 
 [build]
   dockerfile = "Dockerfile"
@@ -31,6 +31,8 @@ primary_region = "ord"
 
   # Mutable output still belongs on the volume.
   RHYME_ASTROLOGY_OUTPUT_DIR = "/var/data/rhyme-astrology"
+  # Subtlety APM resonance ledger (set SUBTLETY_INGEST_TOKEN via `fly secrets`).
+  SUBTLETY_RESONANCE_PATH = "/var/data/subtlety-resonance.jsonl"
   ENABLE_TURBOQUANT = "true"
 
 [http_service]
@@ -41,7 +43,7 @@ primary_region = "ord"
   min_machines_running = 1
 
   [[http_service.checks]]
-    grace_period = "30s"
+    grace_period = "90s"
     interval = "30s"
     method = "GET"
     path = "/health/live"

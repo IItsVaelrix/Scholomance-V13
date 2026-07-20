@@ -90,6 +90,9 @@ import { resolveRhymeAstrologyArtifactPaths } from './utils/rhymeAstrologyPaths.
 import { imageAnalysisRoutes } from './routes/imageAnalysis.routes.js';
 import { registerSchoolStylesRoutes } from './routes/schoolStyles.routes.js';
 import { catalogRoutes } from './routes/catalog.routes.js';
+import { buildSubtletyAlertRecord, drainSubtletySpool, subtletyRoutes } from './routes/subtlety.routes.js';
+import { installSubtletyNodeAdapters } from './subtlety-node-adapter.js';
+import { getSubtletyRuntime } from '../core/pixelbrain/subtlety-runtime.js';
 import { studioRoutes } from './routes/studio.routes.js';
 import { createMailQueueWorker, createMailerService } from './services/mailer.service.js';
 import { R2AudioAdapter } from './services/r2Audio.adapter.js';
@@ -1183,6 +1186,54 @@ fastify.register(nlCompileRoutes);
 fastify.register(semanticShadowRoutes);
 fastify.register(registerSchoolStylesRoutes, { prefix: '/api/styles' });
 fastify.register(catalogRoutes);
+
+let subtletyAnchorMessageId = null;
+async function ensureSubtletyAnchorMessage() {
+    if (subtletyAnchorMessageId) return subtletyAnchorMessageId;
+    try {
+        const msg = await collabPersistence.messages.create({
+            sender_id: 'subtlety-runtime',
+            target_id: 'subtlety-monitor',
+            glyph: '⚡',
+            text: '[subtlety-fingerprint-apm] crash ingest anchor',
+            metadata: { source: 'subtlety-fingerprint-apm', anchor: true },
+        });
+        subtletyAnchorMessageId = msg.id;
+        return subtletyAnchorMessageId;
+    } catch (err) {
+        fastify.log?.warn?.({ err }, '[subtlety] anchor message create failed');
+        return null;
+    }
+}
+fastify.decorate('subtletyCreateAlert', async (payload) => {
+    try {
+        const messageId = await ensureSubtletyAnchorMessage();
+        if (!messageId) return;
+        const row = buildSubtletyAlertRecord(payload, { messageId });
+        await collabPersistence.alerts.create(row);
+    } catch (err) {
+        fastify.log?.warn?.({ err }, '[subtlety] collab alert persist failed');
+    }
+});
+// Eager hub init so route sampling / adapters cannot race a no-op alertFn singleton.
+getSubtletyRuntime({ alertFn: fastify.subtletyCreateAlert });
+fastify.register(subtletyRoutes);
+installSubtletyNodeAdapters({ fastify });
+
+const defaultSubtletySpoolDir = path.join(PROJECT_ROOT, 'divtube_downloader', 'subtlety-spool');
+const subtletySpoolDir = process.env.SUBTLETY_SPOOL_DIR
+    || (existsSync(defaultSubtletySpoolDir) ? defaultSubtletySpoolDir : null);
+if (subtletySpoolDir && !IS_TEST_RUNTIME) {
+    void drainSubtletySpool(subtletySpoolDir, {
+        ingestCrash: (event) => getSubtletyRuntime().ingestCrash(event),
+        logger: fastify.log,
+    }).then(({ drained, failed }) => {
+        if (drained || failed) {
+            fastify.log.info({ drained, failed, spoolDir: subtletySpoolDir }, '[subtlety] spool drain complete');
+        }
+    });
+}
+
 fastify.register(studioRoutes, { localAudioAdapter });
 if (ENABLE_RHYME_ASTROLOGY) {
     if (RHYME_ASTROLOGY_PATHS.usedExistingArtifactsFallback || RHYME_ASTROLOGY_PATHS.usedProductionPersistentFallback) {

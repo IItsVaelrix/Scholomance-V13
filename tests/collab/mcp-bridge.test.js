@@ -19,6 +19,20 @@ vi.mock('../../codex/server/collab/collab.service.js', () => ({
     collabService: {},
 }));
 
+const subtletyHoisted = vi.hoisted(() => ({
+    getStatus: vi.fn(() => ({
+        storePath: '/tmp/subtlety-resonance.jsonl',
+        recent: [],
+        dedupSize: 0,
+    })),
+}));
+
+vi.mock('../../codex/core/pixelbrain/subtlety-runtime.js', () => ({
+    getSubtletyRuntime: vi.fn(() => ({
+        getStatus: subtletyHoisted.getStatus,
+    })),
+}));
+
 import { registerCollabMcpBridge } from '../../codex/server/collab/mcp-bridge.js';
 
 function createFakeServer() {
@@ -110,6 +124,8 @@ describe('collab MCP bridge parity', () => {
                 'diagnostic_hints',
                 'codebase_neighbors',
                 'immunity_status',
+                'mcp_scholomance_collab_subtlety_status',
+                'subtlety_status',
                 'raid_query',
                 'law_audit',
             ]),
@@ -137,6 +153,7 @@ describe('collab MCP bridge parity', () => {
             'codebase_neighbors',
             'immunity_scan',
             'immunity_status',
+            'subtlety_status',
             'raid_query',
             'raid_merlin_ingest',
             'raid_feedback',
@@ -210,5 +227,26 @@ describe('collab MCP bridge parity', () => {
                 agent_id: 'agent-ui',
             },
         });
+    });
+
+    it('subtlety_status returns runtime status from getSubtletyRuntime', async () => {
+        const tool = fakeServer.tools.get('mcp_scholomance_collab_subtlety_status');
+        expect(tool).toBeTruthy();
+
+        const alias = fakeServer.tools.get('subtlety_status');
+        expect(alias).toBeTruthy();
+
+        const toolPayload = await tool.handler({});
+        expect(toolPayload.isError).toBeFalsy();
+
+        const parsed = JSON.parse(toolPayload.content[0].text);
+        expect(parsed.ok).toBe(true);
+        expect(parsed.tool).toBe('mcp_scholomance_collab_subtlety_status');
+        expect(parsed.result).toEqual({
+            storePath: '/tmp/subtlety-resonance.jsonl',
+            recent: [],
+            dedupSize: 0,
+        });
+        expect(subtletyHoisted.getStatus).toHaveBeenCalled();
     });
 });

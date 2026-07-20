@@ -8,7 +8,7 @@
 import crypto from 'node:crypto';
 import path from 'path';
 import fs from 'node:fs';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
 import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
@@ -28,6 +28,7 @@ import { resolveDesignDecisions } from '../../core/grimdesign/decisionEngine.js'
 const MOD = MODULE_IDS.SHARED;
 import { CollabServiceError, collabService } from './collab.service.js';
 import { collabDiagnostic } from './collab.diagnostic.js';
+import { getSubtletyRuntime } from '../../core/pixelbrain/subtlety-runtime.js';
 import {
   getLatestReport as diagnosticGetLatestReport,
   getReportById as diagnosticGetReportById,
@@ -203,6 +204,7 @@ const TOOL_ALIASES = new Map(Object.entries({
     mcp_scholomance_collab_codebase_get_neighbors: ['codebase_neighbors'],
     mcp_scholomance_collab_immunity_scan_file: ['immunity_scan'],
     mcp_scholomance_collab_immunity_get_status: ['immunity_status'],
+    mcp_scholomance_collab_subtlety_status: ['subtlety_status'],
     mcp_scholomance_collab_clerical_raid_query: ['raid_query'],
     mcp_scholomance_collab_clerical_raid_merlin_ingest: ['raid_merlin_ingest'],
     mcp_scholomance_collab_clerical_raid_feedback: ['raid_feedback'],
@@ -968,6 +970,8 @@ export function registerCollabMcpBridge(server, service = collabService) {
     });
 
     registerTool(server, 'mcp_scholomance_collab_immunity_get_status', {}, () => service.getImmunityStatus());
+
+    registerTool(server, 'mcp_scholomance_collab_subtlety_status', {}, () => getSubtletyRuntime().getStatus());
 
     // ========================
     //  CLERICAL RAID (Phase 3–4)

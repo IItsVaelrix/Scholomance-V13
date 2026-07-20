@@ -2185,6 +2185,11 @@ def _persist_crash(header, exc_text):
         sys.stderr.flush()
     except Exception:
         pass
+    try:
+        from tui.services.subtlety_crash_forward import forward_crash
+        forward_crash(header, exc_text)
+    except Exception:
+        pass
 
 
 # Mapping from service method name → MCP tool name. Used by _wrap (in

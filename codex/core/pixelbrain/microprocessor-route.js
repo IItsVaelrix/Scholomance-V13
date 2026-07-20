@@ -1,4 +1,18 @@
 import { validateSeam, validateRequiredOutputs } from './seam-contract.js';
+import { getSubtletyRuntime } from './subtlety-runtime.js';
+
+function maybeSampleObservedRoute(routeDefinition, results) {
+  if (process.env.SUBTLETY_SAMPLE_ROUTES !== '1') return;
+  try {
+    getSubtletyRuntime().recordObserved?.(
+      { unitId: `route.${routeDefinition.name}` },
+      results,
+      { mode: 'observed', seam: { id: routeDefinition.name } },
+    );
+  } catch {
+    // sampling must never disturb route execution
+  }
+}
 
 function requiredOutputEmissionKeys(requiredOutput) {
   if (!requiredOutput) return [];
@@ -135,6 +149,10 @@ function runRoute(routeDefinition, context, { execute }) {
         seam: routeDefinition.requiredOutputSeams?.[f.requiredOutput] || null,
       })));
     }
+  }
+
+  if (execute && results.diagnostics.ok) {
+    maybeSampleObservedRoute(routeDefinition, results);
   }
 
   return results;
