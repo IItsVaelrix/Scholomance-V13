@@ -98,6 +98,7 @@ class CollabBridgeService:
         data = json.dumps(body).encode("utf-8") if body is not None else None
         req = urllib.request.Request(url, data=data, method=method)
         req.add_header("Content-Type", "application/json")
+        # TODO: handle text/event-stream if the bridge ever streams (spec currently excludes SSE)
         req.add_header("Accept", "application/json, text/event-stream")
         if self.key:
             req.add_header("Authorization", f"Bearer {self.key}")
@@ -232,11 +233,18 @@ class CollabBridgeService:
     def forcefield_ask(
         self,
         query: str,
-        callback: Callable[[str], None] = lambda r: None,
-        *,
         show_context: bool = False,
         deterministic: bool = True,
+        callback: Callable[[str], None] = lambda r: None,
     ) -> None:
+        """Dispatch a Vaelrix ForceField ask via the collab bridge.
+
+        NOTE: the real Zod schema on the server only accepts ``query`` at the
+        moment. ``show_context`` and ``deterministic`` are accepted here for
+        signature compatibility with the ``_wrap`` call site (so the 4-positional
+        bind does not raise TypeError) and are reserved for future schema
+        relaxation — they are not forwarded over the wire.
+        """
         self.call_tool(
             "mcp_scholomance_collab_brain_forcefield_ask",
             {"query": query},
@@ -422,7 +430,7 @@ def _render_default(data: dict) -> str:
 
 
 def _render_list_brains(data: dict) -> str:
-    brains = data.get("brains") or data.get("result", {}).get("brains") or []
+    brains = data.get("brains") or []
     if not brains:
         return f"[{MUTED}]No brains registered.[/]"
     lines = [f"[bold {PURPLE}]Brains ({len(brains)})[/]"]
@@ -531,9 +539,9 @@ def _render_scdna_genes(data: dict) -> str:
 
 
 def _render_scholomance_feedback(data: dict) -> str:
-    verdict = data.get("verdict") or data.get("result", {}).get("verdict") or "?"
-    findings = data.get("findings") or data.get("result", {}).get("findings") or []
-    rec = data.get("recommendation") or data.get("result", {}).get("recommendation") or ""
+    verdict = data.get("verdict") or "?"
+    findings = data.get("findings") or []
+    rec = data.get("recommendation") or ""
     lines = [f"[bold {GOLD}]Scholomance feedback: {verdict}[/]"]
     for f in findings[:8]:
         lines.append(f"  - {f}")

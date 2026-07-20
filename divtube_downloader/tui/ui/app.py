@@ -1331,17 +1331,21 @@ class DivTubeAgentApp(App):
         brain-daemon /vaelrix path (which still works for legacy users).
         """
         r = self.registry.register
+        from tui.services.collab_bridge_service import (
+            CollabBridgeService,
+            render_result,
+            ERROR,
+            SUCCESS,
+        )
 
         def _err(ui, msg):
-            ui.log_msg(f"[#FF5C7A]{msg}[/]")
+            ui.log_msg(f"[{ERROR}]{msg}[/]")
 
         def _ok(ui, msg):
-            ui.log_msg(f"[#7CFF8B]{msg}[/]")
+            ui.log_msg(f"[{SUCCESS}]{msg}[/]")
 
-        def _wrap(ui, label, method_name, *args):
+        def _wrap(ui, method_name, *args):
             """Lazy-import the service and dispatch a typed method."""
-            from tui.services.collab_bridge_service import CollabBridgeService, render_result
-
             def run():
                 svc = CollabBridgeService()
                 err = svc.auth_error()
@@ -1351,7 +1355,6 @@ class DivTubeAgentApp(App):
                 if not svc.is_available():
                     _err(ui, "Collab server unreachable. Start it: npm run dev:server")
                     return
-                captured: list[str] = []
                 # The service serialises the result; the renderer is keyed by the
                 # full MCP tool name, which we recover via _TOOL_NAME_FOR below.
                 method = getattr(svc, method_name, None)
@@ -1360,7 +1363,6 @@ class DivTubeAgentApp(App):
                     return
 
                 def cb(raw):
-                    captured.append(raw)
                     def write():
                         rendered = render_result(_TOOL_NAME_FOR.get(method_name, ""), raw)
                         if rendered:
@@ -1374,32 +1376,32 @@ class DivTubeAgentApp(App):
         # ── 12 commands ───────────────────────────────────────────────────
 
         def handle_collab_status(ui, args):
-            _wrap(ui, "status", "status_get")
+            _wrap(ui, "status_get")
 
         def handle_collab_forcefield(ui, args):
             query = " ".join(args).strip()
             if not query:
                 _err(ui, "Usage: /collab-forcefield <query>")
                 return
-            _wrap(ui, "forcefield", "forcefield_ask", query, False, True)
+            _wrap(ui, "forcefield_ask", query, False, True)
 
         def handle_collab_brains(ui, args):
-            _wrap(ui, "brains", "list_brains")
+            _wrap(ui, "list_brains")
 
         def handle_collab_brain(ui, args):
             if len(args) < 2:
                 _err(ui, "Usage: /collab-brain <brain_id> <query>")
                 return
             brain_id, query = args[0], " ".join(args[1:])
-            _wrap(ui, f"brain:{brain_id}", "run_brain", brain_id, query)
+            _wrap(ui, "run_brain", brain_id, query)
 
         def handle_collab_genes(ui, args):
             domain = args[0] if args else "all"
-            _wrap(ui, f"genes:{domain}", "get_scdna_genes", domain)
+            _wrap(ui, "get_scdna_genes", domain)
 
         def handle_collab_tasks(ui, args):
             status = args[0] if args else None
-            _wrap(ui, "tasks", "task_list", status, 50)
+            _wrap(ui, "task_list", status, 50)
 
         def handle_collab_task(ui, args):
             if not args:
@@ -1408,15 +1410,15 @@ class DivTubeAgentApp(App):
             task_id = args[0]
             note = " ".join(args[1:]).strip() if len(args) > 1 else ""
             if note:
-                _wrap(ui, f"task-update:{task_id}", "task_update", task_id, note)
+                _wrap(ui, "task_update", task_id, note)
             else:
-                _wrap(ui, f"task:{task_id}", "task_get", task_id)
+                _wrap(ui, "task_get", task_id)
 
         def handle_collab_agents(ui, args):
-            _wrap(ui, "agents", "agent_list")
+            _wrap(ui, "agent_list")
 
         def handle_collab_locks(ui, args):
-            _wrap(ui, "locks", "lock_list")
+            _wrap(ui, "lock_list")
 
         def handle_collab_grep(ui, args):
             if not args:
@@ -1427,17 +1429,17 @@ class DivTubeAgentApp(App):
             if not query:
                 _err(ui, "Usage: /collab-grep <pattern> [--regex]")
                 return
-            _wrap(ui, "grep", "forensic_search", query, is_regex, False, None, None, 75)
+            _wrap(ui, "forensic_search", query, is_regex, False, None, None, 75)
 
         def handle_collab_feedback(ui, args):
             if len(args) < 2:
                 _err(ui, "Usage: /collab-feedback <A-H> <subject>")
                 return
             mode, subject = args[0], " ".join(args[1:])
-            _wrap(ui, f"feedback:{mode}", "scholomance_feedback", subject, mode, None)
+            _wrap(ui, "scholomance_feedback", subject, mode, None)
 
         def handle_collab_knowledge(ui, args):
-            _wrap(ui, "knowledge", "scholomance_knowledge")
+            _wrap(ui, "scholomance_knowledge")
 
         r("/collab-status",      handle_collab_status,
           "Collab plane status",  "/collab-status")

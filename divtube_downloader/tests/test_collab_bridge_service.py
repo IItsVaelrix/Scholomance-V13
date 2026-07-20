@@ -320,6 +320,17 @@ class TestForcefieldMethods(unittest.TestCase):
         self.assertEqual(body["params"]["arguments"], {})
 
 
+class TestForcefieldAskSignature(unittest.TestCase):
+    def test_call_with_4_positional_args_no_typeerror(self):
+        """Regression test: /collab-forcefield's _wrap expansion passes 4
+        positional args. The signature must accept them without TypeError."""
+        svc = CollabBridgeService(base_url="http://127.0.0.1:1", key="k")
+        captured = []
+        # If the signature doesn't accept 4 positional args, this raises TypeError.
+        svc.forcefield_ask("explain X", False, True, lambda r: captured.append(r))
+        # No assertion on the call result — just on the signature.
+
+
 class TestControlMethods(unittest.TestCase):
     def _capture(self, svc, method_name, *args, **kwargs):
         port, recorder, shutdown = _start_mock_server()
