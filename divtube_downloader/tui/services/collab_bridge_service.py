@@ -380,3 +380,217 @@ class CollabBridgeService:
             {"content": content, "filePath": file_path},
             callback,
         )
+
+
+# ── Renderers ─────────────────────────────────────────────────────────────
+#
+# Each collab tool returns a JSON-RPC result that ``call_tool`` serialises to
+# a string. The renderers below turn that string into a Rich-markup log line
+# suitable for ``ui.log_msg``. New tools fall through to pretty-printed JSON
+# so the service never crashes on an unfamiliar shape.
+
+
+def _parse(raw: str) -> dict | None:
+    try:
+        parsed = json.loads(raw)
+    except (json.JSONDecodeError, TypeError):
+        return None
+    if isinstance(parsed, dict):
+        # MCP wraps content under "structuredContent" or "content[*].text".
+        if "structuredContent" in parsed and isinstance(parsed["structuredContent"], dict):
+            return parsed["structuredContent"]
+        return parsed
+    return None
+
+
+def _kv(label: str, value, color: str = GOLD) -> str:
+    return f"[{color}]{label}:[/] {value}"
+
+
+def render_result(tool_name: str, raw_json: str) -> str:
+    """Render a tool's JSON-RPC result into Rich markup for the TUI log."""
+    data = _parse(raw_json)
+    if data is None:
+        return str(raw_json)
+
+    r = _RENDERERS.get(tool_name, _render_default)
+    return r(data)
+
+
+def _render_default(data: dict) -> str:
+    return json.dumps(data, indent=2, default=str)
+
+
+def _render_list_brains(data: dict) -> str:
+    brains = data.get("brains") or data.get("result", {}).get("brains") or []
+    if not brains:
+        return f"[{MUTED}]No brains registered.[/]"
+    lines = [f"[bold {PURPLE}]Brains ({len(brains)})[/]"]
+    for b in brains:
+        bid = b.get("id") or b.get("brainId") or "?"
+        desc = b.get("description") or ""
+        lines.append(f"  [{GOLD}]{bid}[/]  [{MUTED}]{desc}[/]")
+    return "\n".join(lines)
+
+
+def _render_status_get(data: dict) -> str:
+    agents = data.get("agents") or {}
+    tasks = data.get("tasks") or {}
+    locks = data.get("locks") or 0
+    pipelines = data.get("pipelines") or {}
+    lines = [f"[bold {GOLD}]Collab plane[/]"]
+    if isinstance(agents, dict):
+        online = len(agents.get("online") or [])
+        busy = len(agents.get("busy") or [])
+        lines.append(f"  agents  online={online}  busy={busy}")
+    if isinstance(tasks, dict):
+        bits = "  ".join(f"{k}={v}" for k, v in tasks.items() if isinstance(v, int))
+        if bits:
+            lines.append(f"  tasks   {bits}")
+    lines.append(f"  locks   {locks}")
+    if isinstance(pipelines, dict) and pipelines:
+        bits = "  ".join(f"{k}={v}" for k, v in pipelines.items() if isinstance(v, int))
+        if bits:
+            lines.append(f"  pipelines {bits}")
+    return "\n".join(lines)
+
+
+def _render_task_list(data: dict) -> str:
+    tasks = data.get("tasks") or data.get("items") or []
+    if not tasks:
+        return f"[{MUTED}]No tasks.[/]"
+    lines = [f"[bold {PURPLE}]Tasks ({len(tasks)})[/]"]
+    for t in tasks:
+        tid = t.get("id") or "?"
+        title = (t.get("title") or "")[:60]
+        status = t.get("status") or "?"
+        prio = t.get("priority")
+        prio_s = f"  P{prio}" if prio is not None else ""
+        lines.append(
+            f"  [{GOLD}]{tid}[/]  [{status}]{status}[/]{prio_s}  {title}"
+        )
+    return "\n".join(lines)
+
+
+def _render_task_get(data: dict) -> str:
+    return _render_default(data)
+
+
+def _render_lock_list(data: dict) -> str:
+    locks = data.get("locks") or []
+    if not locks:
+        return f"[{MUTED}]No active locks.[/]"
+    lines = [f"[bold {PURPLE}]Locks ({len(locks)})[/]"]
+    for l in locks:
+        path = l.get("filePath") or l.get("path") or "?"
+        agent = l.get("agentId") or l.get("agent_id") or "?"
+        when = l.get("acquiredAt") or l.get("acquired_at") or ""
+        lines.append(f"  [{GOLD}]{path}[/]  [{MUTED}]{agent}  {when}[/]")
+    return "\n".join(lines)
+
+
+def _render_agent_list(data: dict) -> str:
+    agents = data.get("agents") or []
+    if not agents:
+        return f"[{MUTED}]No agents.[/]"
+    lines = [f"[bold {PURPLE}]Agents ({len(agents)})[/]"]
+    for a in agents:
+        aid = a.get("id") or "?"
+        role = a.get("role") or "?"
+        status = a.get("status") or "?"
+        task = a.get("currentTaskId") or ""
+        task_s = f"  task={task}" if task else ""
+        lines.append(f"  [{GOLD}]{aid}[/]  [{status}]{status}[/]  role={role}{task_s}")
+    return "\n".join(lines)
+
+
+def _render_forensic_search(data: dict) -> str:
+    hits = data.get("hits") or []
+    if not hits:
+        return f"[{MUTED}]No matches.[/]"
+    lines = [f"[bold {PURPLE}]Matches ({len(hits)})[/]"]
+    for h in hits[:50]:
+        file = h.get("file") or h.get("path") or "?"
+        line_no = h.get("line") or 0
+        snippet = (h.get("snippet") or h.get("text") or "")[:120]
+        lines.append(f"  [{GOLD}]{file}:{line_no}[/]  {snippet}")
+    return "\n".join(lines)
+
+
+def _render_scdna_genes(data: dict) -> str:
+    genes = data.get("genes") or []
+    if not genes:
+        return f"[{MUTED}]No genes active for this domain.[/]"
+    lines = [f"[bold {PURPLE}]SCDNA genes ({len(genes)})[/]"]
+    for g in genes:
+        gid = g.get("id") or "?"
+        dom = g.get("domain_primary") or g.get("domain") or "?"
+        imp = (g.get("imperative") or "")[:80]
+        lines.append(f"  [{GOLD}]{gid}[/]  [{MUTED}]{dom}[/]  {imp}")
+    return "\n".join(lines)
+
+
+def _render_scholomance_feedback(data: dict) -> str:
+    verdict = data.get("verdict") or data.get("result", {}).get("verdict") or "?"
+    findings = data.get("findings") or data.get("result", {}).get("findings") or []
+    rec = data.get("recommendation") or data.get("result", {}).get("recommendation") or ""
+    lines = [f"[bold {GOLD}]Scholomance feedback: {verdict}[/]"]
+    for f in findings[:8]:
+        lines.append(f"  - {f}")
+    if rec:
+        lines.append(f"  [{PURPLE}]recommendation:[/] {rec}")
+    return "\n".join(lines)
+
+
+def _render_immunity_scan_file(data: dict) -> str:
+    violations = data.get("violations") or []
+    if not violations:
+        return f"[{SUCCESS}]Immunity scan: clean.[/]"
+    lines = [f"[bold {ERROR}]Immunity violations ({len(violations)})[/]"]
+    for v in violations:
+        sev = v.get("severity") or "?"
+        rule = v.get("ruleId") or v.get("rule") or "?"
+        msg = v.get("message") or v.get("msg") or ""
+        lines.append(f"  [{sev}]{sev}[/]  [{GOLD}]{rule}[/]  {msg}")
+    return "\n".join(lines)
+
+
+def _render_forcefield_ask(data: dict) -> str:
+    """The full forcefield payload — render answer + key fields."""
+    answer = data.get("answer")
+    if isinstance(answer, dict):
+        summary = answer.get("summary") or answer.get("direct") or ""
+        kf = answer.get("key_findings") or []
+        lines = [f"[bold {GOLD}]ForceField[/]  [{MUTED}]{summary}[/]"]
+        for f in kf[:8]:
+            lines.append(f"  - {f}")
+    else:
+        lines = [f"[bold {GOLD}]ForceField[/]  {answer or ''}"]
+    next_action = data.get("next_action")
+    if next_action:
+        lines.append(f"  [{PURPLE}]next:[/] {next_action}")
+    scdna_genes = data.get("scdna_genes") or []
+    if scdna_genes:
+        lines.append(f"  [{MUTED}]scdna genes: {len(scdna_genes)}[/]")
+    health = data.get("health_signals") or data.get("scdna_health_signals") or []
+    if health:
+        lines.append(f"  [{MUTED}]health signals: {len(health)}[/]")
+    return "\n".join(lines)
+
+
+_RENDERERS: dict[str, Callable[[dict], str]] = {
+    "mcp_scholomance_collab_brain_forcefield_ask": _render_forcefield_ask,
+    "mcp_scholomance_collab_brain_list": _render_list_brains,
+    "mcp_scholomance_collab_brain_run": _render_default,
+    "mcp_scholomance_collab_brain_scdna_genes": _render_scdna_genes,
+    "mcp_scholomance_collab_skill_scholomance_feedback": _render_scholomance_feedback,
+    "mcp_scholomance_collab_skill_scholomance_knowledge": _render_default,
+    "mcp_scholomance_collab_status_get": _render_status_get,
+    "mcp_scholomance_collab_task_list": _render_task_list,
+    "mcp_scholomance_collab_task_get": _render_task_get,
+    "mcp_scholomance_collab_task_update": _render_default,
+    "mcp_scholomance_collab_lock_list": _render_lock_list,
+    "mcp_scholomance_collab_agent_list": _render_agent_list,
+    "mcp_scholomance_collab_forensic_search": _render_forensic_search,
+    "mcp_scholomance_collab_immunity_scan_file": _render_immunity_scan_file,
+}

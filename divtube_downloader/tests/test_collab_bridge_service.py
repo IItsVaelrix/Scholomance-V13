@@ -6,7 +6,7 @@ import unittest
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from unittest import mock
 
-from tui.services.collab_bridge_service import CollabBridgeService
+from tui.services.collab_bridge_service import CollabBridgeService, render_result
 
 
 # Reusable test fixtures ---------------------------------------------------
@@ -420,6 +420,58 @@ class TestControlMethods(unittest.TestCase):
         )
         self.assertEqual(body["params"]["name"], "mcp_scholomance_collab_immunity_scan_file")
         self.assertEqual(body["params"]["arguments"], {"content": "import os", "filePath": "x.py"})
+
+
+class TestRenderers(unittest.TestCase):
+    def test_render_list_brains(self):
+        raw = json.dumps({
+            "structuredContent": {
+                "brains": [
+                    {"id": "CODE_BRAIN", "description": "Code analysis"},
+                    {"id": "LORE_BRAIN", "description": "Lore knowledge"},
+                ]
+            }
+        })
+        out = render_result("mcp_scholomance_collab_brain_list", raw)
+        self.assertIn("CODE_BRAIN", out)
+        self.assertIn("LORE_BRAIN", out)
+        self.assertIn("Code analysis", out)
+
+    def test_render_status_get(self):
+        raw = json.dumps({
+            "structuredContent": {
+                "agents": {"online": ["a", "b"], "busy": ["c"]},
+                "tasks": {"in_progress": 3, "backlog": 5},
+                "locks": 1,
+            }
+        })
+        out = render_result("mcp_scholomance_collab_status_get", raw)
+        self.assertIn("online=2", out)
+        self.assertIn("in_progress=3", out)
+        self.assertIn("locks=1", out)
+
+    def test_render_forensic_search(self):
+        raw = json.dumps({
+            "structuredContent": {
+                "hits": [
+                    {"file": "a.py", "line": 12, "snippet": "vaelrix = 1"},
+                    {"file": "b.py", "line": 7, "snippet": "import vaelrix"},
+                ]
+            }
+        })
+        out = render_result("mcp_scholomance_collab_forensic_search", raw)
+        self.assertIn("a.py:12", out)
+        self.assertIn("b.py:7", out)
+
+    def test_render_unknown_tool_returns_pretty_json(self):
+        raw = json.dumps({"hello": "world"})
+        out = render_result("mcp_scholomance_collab_anything", raw)
+        self.assertIn("hello", out)
+        self.assertIn("world", out)
+
+    def test_render_invalid_json_returns_verbatim(self):
+        out = render_result("mcp_scholomance_collab_anything", "not json")
+        self.assertEqual(out, "not json")
 
 
 if __name__ == "__main__":
