@@ -447,7 +447,7 @@ def _render_status_get(data: dict) -> str:
         bits = "  ".join(f"{k}={v}" for k, v in tasks.items() if isinstance(v, int))
         if bits:
             lines.append(f"  tasks   {bits}")
-    lines.append(f"  locks   {locks}")
+    lines.append(f"  locks={locks}")
     if isinstance(pipelines, dict) and pipelines:
         bits = "  ".join(f"{k}={v}" for k, v in pipelines.items() if isinstance(v, int))
         if bits:
