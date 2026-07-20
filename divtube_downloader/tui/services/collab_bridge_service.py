@@ -287,3 +287,95 @@ class CollabBridgeService:
         self, callback: Callable[[str], None] = lambda r: None
     ) -> None:
         self.call_tool("mcp_scholomance_collab_skill_scholomance_knowledge", {}, callback)
+
+    # ── Collab control surface ────────────────────────────────────────────
+
+    def status_get(self, callback: Callable[[str], None] = lambda r: None) -> None:
+        self.call_tool("mcp_scholomance_collab_status_get", {}, callback)
+
+    def task_list(
+        self,
+        status: str | None = None,
+        limit: int = 50,
+        callback: Callable[[str], None] = lambda r: None,
+    ) -> None:
+        args: dict[str, Any] = {"limit": limit}
+        if status is not None:
+            args["status"] = status
+        self.call_tool("mcp_scholomance_collab_task_list", args, callback)
+
+    def task_get(
+        self,
+        task_id: str,
+        callback: Callable[[str], None] = lambda r: None,
+    ) -> None:
+        self.call_tool(
+            "mcp_scholomance_collab_task_get", {"id": task_id}, callback
+        )
+
+    def task_update(
+        self,
+        task_id: str,
+        note: str,
+        status: str | None = None,
+        priority: int | None = None,
+        callback: Callable[[str], None] = lambda r: None,
+    ) -> None:
+        if not note:
+            callback(f"[{ERROR}]task_update: note is required (Rule 12)[/]")
+            return
+        args: dict[str, Any] = {"id": task_id, "note": note}
+        if status is not None:
+            args["status"] = status
+        if priority is not None:
+            args["priority"] = priority
+        self.call_tool("mcp_scholomance_collab_task_update", args, callback)
+
+    def lock_list(self, callback: Callable[[str], None] = lambda r: None) -> None:
+        self.call_tool("mcp_scholomance_collab_lock_list", {}, callback)
+
+    def agent_list(
+        self,
+        role: str | None = None,
+        status: str | None = None,
+        callback: Callable[[str], None] = lambda r: None,
+    ) -> None:
+        args: dict[str, Any] = {}
+        if role is not None:
+            args["role"] = role
+        if status is not None:
+            args["status"] = status
+        self.call_tool("mcp_scholomance_collab_agent_list", args, callback)
+
+    def forensic_search(
+        self,
+        query: str,
+        is_regex: bool = False,
+        case_sensitive: bool = False,
+        include_pattern: str | None = None,
+        exclude_pattern: str | None = None,
+        limit: int = 75,
+        callback: Callable[[str], None] = lambda r: None,
+    ) -> None:
+        args: dict[str, Any] = {
+            "query": query,
+            "isRegex": is_regex,
+            "caseSensitive": case_sensitive,
+            "limit": limit,
+        }
+        if include_pattern is not None:
+            args["includePattern"] = include_pattern
+        args["excludePattern"] = exclude_pattern
+        self.call_tool("mcp_scholomance_collab_forensic_search", args, callback)
+
+    def immunity_scan_file(
+        self,
+        content: str,
+        file_path: str,
+        callback: Callable[[str], None] = lambda r: None,
+    ) -> None:
+        self.call_tool(
+            "mcp_scholomance_collab_immunity_scan_file",
+            {"content": content, "filePath": file_path},
+            callback,
+        )

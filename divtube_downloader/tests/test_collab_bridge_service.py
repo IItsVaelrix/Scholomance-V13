@@ -320,5 +320,98 @@ class TestForcefieldMethods(unittest.TestCase):
         self.assertEqual(body["params"]["arguments"], {})
 
 
+class TestControlMethods(unittest.TestCase):
+    def _capture(self, svc, method_name, *args, **kwargs):
+        port, recorder, shutdown = _start_mock_server()
+        try:
+            _RecorderHandler.response_body = json.dumps({
+                "jsonrpc": "2.0", "id": 1, "result": {"serverInfo": {"name": "x"}},
+            }).encode()
+            _RecorderHandler.response_headers = {"Mcp-Session-Id": "sess-Y"}
+            svc.base_url = f"http://127.0.0.1:{port}"
+            getattr(svc, method_name)(*args, **kwargs)
+            import time
+            for _ in range(50):
+                if len(recorder) >= 2:
+                    break
+                time.sleep(0.05)
+            tools_call = [r for r in recorder if r["method"] == "POST"][1]
+            return json.loads(tools_call["body"])
+        finally:
+            shutdown()
+
+    def test_status_get(self):
+        svc = CollabBridgeService(base_url="http://127.0.0.1:1", key="k")
+        body = self._capture(svc, "status_get", lambda r: None)
+        self.assertEqual(body["params"]["name"], "mcp_scholomance_collab_status_get")
+        self.assertEqual(body["params"]["arguments"], {})
+
+    def test_task_list_with_filter(self):
+        svc = CollabBridgeService(base_url="http://127.0.0.1:1", key="k")
+        body = self._capture(svc, "task_list", "in_progress", 25, lambda r: None)
+        self.assertEqual(body["params"]["name"], "mcp_scholomance_collab_task_list")
+        self.assertEqual(body["params"]["arguments"], {"status": "in_progress", "limit": 25})
+
+    def test_task_list_omits_none(self):
+        svc = CollabBridgeService(base_url="http://127.0.0.1:1", key="k")
+        body = self._capture(svc, "task_list", None, 50, lambda r: None)
+        self.assertEqual(body["params"]["arguments"], {"limit": 50})
+
+    def test_task_get(self):
+        svc = CollabBridgeService(base_url="http://127.0.0.1:1", key="k")
+        body = self._capture(svc, "task_get", "t-42", lambda r: None)
+        self.assertEqual(body["params"]["name"], "mcp_scholomance_collab_task_get")
+        self.assertEqual(body["params"]["arguments"], {"id": "t-42"})
+
+    def test_task_update_requires_note(self):
+        svc = CollabBridgeService(base_url="http://127.0.0.1:1", key="k")
+        body = self._capture(
+            svc, "task_update", "t-42", "Refactored useProgression hook", None, None, lambda r: None
+        )
+        self.assertEqual(body["params"]["name"], "mcp_scholomance_collab_task_update")
+        self.assertEqual(
+            body["params"]["arguments"],
+            {"id": "t-42", "note": "Refactored useProgression hook"},
+        )
+
+    def test_lock_list(self):
+        svc = CollabBridgeService(base_url="http://127.0.0.1:1", key="k")
+        body = self._capture(svc, "lock_list", lambda r: None)
+        self.assertEqual(body["params"]["name"], "mcp_scholomance_collab_lock_list")
+        self.assertEqual(body["params"]["arguments"], {})
+
+    def test_agent_list_with_filters(self):
+        svc = CollabBridgeService(base_url="http://127.0.0.1:1", key="k")
+        body = self._capture(svc, "agent_list", "ui", "online", lambda r: None)
+        self.assertEqual(body["params"]["name"], "mcp_scholomance_collab_agent_list")
+        self.assertEqual(body["params"]["arguments"], {"role": "ui", "status": "online"})
+
+    def test_forensic_search_camel_case(self):
+        svc = CollabBridgeService(base_url="http://127.0.0.1:1", key="k")
+        body = self._capture(
+            svc, "forensic_search", "vaelrix", True, False, "*.py", None, 50, lambda r: None
+        )
+        self.assertEqual(body["params"]["name"], "mcp_scholomance_collab_forensic_search")
+        self.assertEqual(
+            body["params"]["arguments"],
+            {
+                "query": "vaelrix",
+                "isRegex": True,
+                "caseSensitive": False,
+                "includePattern": "*.py",
+                "excludePattern": None,
+                "limit": 50,
+            },
+        )
+
+    def test_immunity_scan_file(self):
+        svc = CollabBridgeService(base_url="http://127.0.0.1:1", key="k")
+        body = self._capture(
+            svc, "immunity_scan_file", "import os", "x.py", lambda r: None
+        )
+        self.assertEqual(body["params"]["name"], "mcp_scholomance_collab_immunity_scan_file")
+        self.assertEqual(body["params"]["arguments"], {"content": "import os", "filePath": "x.py"})
+
+
 if __name__ == "__main__":
     unittest.main()
