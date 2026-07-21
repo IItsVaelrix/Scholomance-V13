@@ -1,0 +1,1978 @@
+{
+  "contract": "PB-UI-SCENE-v1",
+  "definitions": {
+    "aperture-option": {
+      "accessibility": {
+        "nativeElement": "button",
+        "nativeStrategy": "native",
+        "obligations": [
+          "button-name",
+          "selected-state-announced"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "id": "icon",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "label",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "description",
+            "required": false,
+            "role": "group"
+          }
+        ],
+        "rootRole": "group"
+      },
+      "capabilities": [],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": "layout://listen/aperture-option/v1",
+      "defaultVisuals": [
+        "visual://listen/focus-ring/v1"
+      ],
+      "description": "One selectable analysis lens.",
+      "events": [
+        {
+          "payload": {
+            "apertureId": "string"
+          },
+          "type": "LISTEN.APERTURE.SELECT"
+        }
+      ],
+      "kind": "aperture-option",
+      "provenance": {
+        "source": "listen-signal-chamber-ui-kit",
+        "system": "Scholomance Compose",
+        "version": "1.0.0"
+      },
+      "states": [
+        {
+          "default": false,
+          "id": "selected",
+          "type": "boolean"
+        },
+        {
+          "default": false,
+          "id": "disabled",
+          "type": "boolean"
+        }
+      ],
+      "version": "1.0.0"
+    },
+    "aperture-rail": {
+      "accessibility": {
+        "keyboard": [
+          "ArrowUp",
+          "ArrowDown",
+          "Home",
+          "End",
+          "Enter",
+          "Space"
+        ],
+        "labelSource": "props.ariaLabel",
+        "landmark": "navigation",
+        "nativeStrategy": "composite",
+        "obligations": [
+          "single-selection",
+          "visible-focus",
+          "selected-state-announced"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "id": "heading",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "options",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "presets",
+            "required": false,
+            "role": "group"
+          }
+        ],
+        "rootRole": "container",
+        "slots": [
+          {
+            "accepts": [
+              "aperture-option"
+            ],
+            "id": "options",
+            "min": 1
+          },
+          {
+            "accepts": [
+              "rune-preset"
+            ],
+            "id": "presets",
+            "min": 0
+          }
+        ]
+      },
+      "capabilities": [],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": "layout://listen/rail-stack/v1",
+      "defaultVisuals": [
+        "visual://listen/glass-panel/v1"
+      ],
+      "description": "Selectable analysis-lens rail.",
+      "events": [
+        {
+          "payload": {
+            "apertureId": "string"
+          },
+          "type": "LISTEN.APERTURE.SELECT"
+        },
+        {
+          "payload": {
+            "presetId": "string"
+          },
+          "type": "LISTEN.PRESET.SELECT"
+        }
+      ],
+      "kind": "aperture-rail",
+      "provenance": {
+        "source": "listen-signal-chamber-ui-kit",
+        "system": "Scholomance Compose",
+        "version": "1.0.0"
+      },
+      "states": [
+        {
+          "default": true,
+          "id": "enabled",
+          "type": "boolean"
+        },
+        {
+          "default": "null-void",
+          "id": "selectedId",
+          "type": "string"
+        }
+      ],
+      "version": "1.0.0"
+    },
+    "metric-bar": {
+      "accessibility": {
+        "nativeElement": "meter",
+        "nativeStrategy": "native",
+        "obligations": [
+          "meter-label",
+          "meter-min-max-now"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "id": "label",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "value",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "track",
+            "required": true,
+            "role": "container"
+          }
+        ],
+        "rootRole": "group"
+      },
+      "capabilities": [],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": "layout://listen/metric-bar/v1",
+      "defaultVisuals": [
+        "visual://listen/meter-track/v1"
+      ],
+      "description": "Labelled runtime-bound meter.",
+      "events": [],
+      "kind": "metric-bar",
+      "provenance": {
+        "source": "listen-signal-chamber-ui-kit",
+        "system": "Scholomance Compose",
+        "version": "1.0.0"
+      },
+      "states": [],
+      "version": "1.0.0"
+    },
+    "metric-dial": {
+      "accessibility": {
+        "nativeStrategy": "hybrid",
+        "obligations": [
+          "meter-label",
+          "meter-min-max-now"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "id": "dial",
+            "required": true,
+            "role": "container"
+          },
+          {
+            "id": "label",
+            "required": true,
+            "role": "group"
+          }
+        ],
+        "rootRole": "group"
+      },
+      "capabilities": [],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": "layout://listen/metric-dial/v1",
+      "defaultVisuals": [
+        "visual://listen/radial-meter/v1"
+      ],
+      "description": "Compact radial meter bound to runtime signal state.",
+      "events": [],
+      "kind": "metric-dial",
+      "provenance": {
+        "source": "listen-signal-chamber-ui-kit",
+        "system": "Scholomance Compose",
+        "version": "1.0.0"
+      },
+      "states": [],
+      "version": "1.0.0"
+    },
+    "parameter-rail": {
+      "accessibility": {
+        "labelSource": "props.ariaLabel",
+        "landmark": "region",
+        "nativeStrategy": "hybrid",
+        "obligations": [
+          "form-controls-labelled",
+          "meter-values-announced"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "id": "heading",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "scope",
+            "required": true,
+            "role": "container"
+          },
+          {
+            "id": "metrics",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "output",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "density",
+            "required": false,
+            "role": "group"
+          }
+        ],
+        "rootRole": "container",
+        "slots": [
+          {
+            "accepts": [
+              "waveform-scope"
+            ],
+            "id": "scope",
+            "max": 1,
+            "min": 1
+          },
+          {
+            "accepts": [
+              "metric-bar",
+              "signal-field"
+            ],
+            "id": "metrics",
+            "min": 1
+          },
+          {
+            "accepts": [
+              "signal-field"
+            ],
+            "id": "output",
+            "min": 1
+          },
+          {
+            "accepts": [
+              "segment-meter"
+            ],
+            "id": "density",
+            "max": 1,
+            "min": 0
+          }
+        ]
+      },
+      "capabilities": [],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": "layout://listen/rail-stack/v1",
+      "defaultVisuals": [
+        "visual://listen/glass-panel/v1"
+      ],
+      "description": "Runtime-bound signal parameters, scope, and output routing.",
+      "events": [],
+      "kind": "parameter-rail",
+      "provenance": {
+        "source": "listen-signal-chamber-ui-kit",
+        "system": "Scholomance Compose",
+        "version": "1.0.0"
+      },
+      "states": [],
+      "version": "1.0.0"
+    },
+    "resonance-core": {
+      "accessibility": {
+        "labelSource": "props.ariaLabel",
+        "nativeStrategy": "hybrid",
+        "obligations": [
+          "decorative-geometry-hidden",
+          "operable-core-control"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "id": "dial",
+            "required": true,
+            "role": "container"
+          },
+          {
+            "id": "sigil",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "sideMeters",
+            "required": false,
+            "role": "group"
+          },
+          {
+            "id": "nameplate",
+            "required": true,
+            "role": "group"
+          }
+        ],
+        "rootRole": "container",
+        "slots": [
+          {
+            "accepts": [
+              "metric-dial"
+            ],
+            "id": "sideMeters",
+            "max": 2,
+            "min": 0
+          }
+        ]
+      },
+      "capabilities": [
+        {
+          "fallback": "native-dom-core",
+          "id": "wand",
+          "required": false
+        },
+        {
+          "id": "reduced-motion",
+          "required": true
+        }
+      ],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": "layout://listen/resonance-core/v1",
+      "defaultVisuals": [
+        "visual://listen/radial-instrument/v1",
+        "visual://listen/harmonic-seam/v1"
+      ],
+      "description": "Central circular resonance instrument with static geometry and runtime bindings.",
+      "events": [
+        {
+          "payload": {},
+          "type": "LISTEN.CORE.ACTIVATE"
+        },
+        {
+          "payload": {
+            "normalizedPosition": "number"
+          },
+          "type": "LISTEN.CORE.SEEK"
+        }
+      ],
+      "kind": "resonance-core",
+      "provenance": {
+        "source": "listen-signal-chamber-ui-kit",
+        "system": "Scholomance Compose",
+        "version": "1.0.0"
+      },
+      "states": [],
+      "version": "1.0.0"
+    },
+    "rune-preset": {
+      "accessibility": {
+        "nativeElement": "button",
+        "nativeStrategy": "native",
+        "obligations": [
+          "button-name",
+          "selected-state-announced"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "id": "glyph",
+            "required": true,
+            "role": "group"
+          }
+        ],
+        "rootRole": "group"
+      },
+      "capabilities": [],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": "layout://listen/rune-preset/v1",
+      "defaultVisuals": [
+        "visual://listen/rune-badge/v1"
+      ],
+      "description": "Small selectable preset glyph.",
+      "events": [
+        {
+          "payload": {
+            "presetId": "string"
+          },
+          "type": "LISTEN.PRESET.SELECT"
+        }
+      ],
+      "kind": "rune-preset",
+      "provenance": {
+        "source": "listen-signal-chamber-ui-kit",
+        "system": "Scholomance Compose",
+        "version": "1.0.0"
+      },
+      "states": [
+        {
+          "default": false,
+          "id": "selected",
+          "type": "boolean"
+        }
+      ],
+      "version": "1.0.0"
+    },
+    "segment-meter": {
+      "accessibility": {
+        "nativeStrategy": "hybrid",
+        "obligations": [
+          "progress-name",
+          "progress-value"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "id": "label",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "segments",
+            "required": true,
+            "role": "container"
+          }
+        ],
+        "rootRole": "group"
+      },
+      "capabilities": [],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": "layout://listen/segment-meter/v1",
+      "defaultVisuals": [
+        "visual://listen/segment-glow/v1"
+      ],
+      "description": "Discrete phoneme-density or signal-density indicator.",
+      "events": [],
+      "kind": "segment-meter",
+      "provenance": {
+        "source": "listen-signal-chamber-ui-kit",
+        "system": "Scholomance Compose",
+        "version": "1.0.0"
+      },
+      "states": [],
+      "version": "1.0.0"
+    },
+    "signal-chamber-shell": {
+      "accessibility": {
+        "labelSource": "props.ariaLabel",
+        "landmark": "main",
+        "nativeStrategy": "hybrid",
+        "obligations": [
+          "single-main-landmark",
+          "labelled-regions",
+          "reduced-motion"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "id": "heading",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "apertureRail",
+            "required": true,
+            "role": "container"
+          },
+          {
+            "id": "core",
+            "required": true,
+            "role": "container"
+          },
+          {
+            "id": "parameterRail",
+            "required": true,
+            "role": "container"
+          },
+          {
+            "id": "transport",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "footer",
+            "required": false,
+            "role": "group"
+          }
+        ],
+        "rootRole": "container",
+        "slots": [
+          {
+            "accepts": [
+              "signal-lock-plate"
+            ],
+            "id": "heading",
+            "max": 1,
+            "min": 1
+          },
+          {
+            "accepts": [
+              "aperture-rail"
+            ],
+            "id": "apertureRail",
+            "max": 1,
+            "min": 1
+          },
+          {
+            "accepts": [
+              "resonance-core"
+            ],
+            "id": "core",
+            "max": 1,
+            "min": 1
+          },
+          {
+            "accepts": [
+              "parameter-rail"
+            ],
+            "id": "parameterRail",
+            "max": 1,
+            "min": 1
+          },
+          {
+            "accepts": [
+              "transport-deck"
+            ],
+            "id": "transport",
+            "max": 1,
+            "min": 1
+          },
+          {
+            "accepts": [
+              "signal-status-line"
+            ],
+            "id": "footer",
+            "max": 1,
+            "min": 0
+          }
+        ]
+      },
+      "capabilities": [],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": "layout://listen/signal-chamber-shell/v1",
+      "defaultVisuals": [
+        "visual://listen/chamber-skin/v1",
+        "visual://listen/chamber-frame/v1"
+      ],
+      "description": "Three-region Listen workspace with a central resonance instrument and transport deck.",
+      "events": [],
+      "kind": "signal-chamber-shell",
+      "provenance": {
+        "source": "listen-signal-chamber-ui-kit",
+        "system": "Scholomance Compose",
+        "version": "1.0.0"
+      },
+      "states": [],
+      "version": "1.0.0"
+    },
+    "signal-field": {
+      "accessibility": {
+        "nativeStrategy": "native",
+        "obligations": [
+          "control-label-association",
+          "error-description"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "id": "label",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "control",
+            "required": true,
+            "role": "group"
+          }
+        ],
+        "rootRole": "group"
+      },
+      "capabilities": [],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": "layout://listen/signal-field/v1",
+      "defaultVisuals": [
+        "visual://listen/focus-ring/v1"
+      ],
+      "description": "Labelled select, text, or read-only value field.",
+      "events": [
+        {
+          "payload": {
+            "fieldId": "string",
+            "value": "json"
+          },
+          "type": "LISTEN.FIELD.CHANGE"
+        }
+      ],
+      "kind": "signal-field",
+      "provenance": {
+        "source": "listen-signal-chamber-ui-kit",
+        "system": "Scholomance Compose",
+        "version": "1.0.0"
+      },
+      "states": [],
+      "version": "1.0.0"
+    },
+    "signal-lock-plate": {
+      "accessibility": {
+        "labelSource": "props.title",
+        "nativeStrategy": "native",
+        "obligations": [
+          "heading-order"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "id": "eyebrow",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "title",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "frequency",
+            "required": true,
+            "role": "group"
+          }
+        ],
+        "rootRole": "group"
+      },
+      "capabilities": [],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": "layout://listen/lock-plate/v1",
+      "defaultVisuals": [
+        "visual://listen/glass-panel/v1",
+        "visual://listen/pulse-dot/v1"
+      ],
+      "description": "Stable title plate for the current resonance target.",
+      "events": [],
+      "kind": "signal-lock-plate",
+      "provenance": {
+        "source": "listen-signal-chamber-ui-kit",
+        "system": "Scholomance Compose",
+        "version": "1.0.0"
+      },
+      "states": [],
+      "version": "1.0.0"
+    },
+    "signal-status-line": {
+      "accessibility": {
+        "landmark": "contentinfo",
+        "live": "polite",
+        "nativeStrategy": "native",
+        "obligations": [
+          "status-not-color-only"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "id": "signal",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "protocol",
+            "required": true,
+            "role": "group"
+          }
+        ],
+        "rootRole": "group"
+      },
+      "capabilities": [],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": "layout://listen/status-line/v1",
+      "defaultVisuals": [],
+      "description": "Low-emphasis current-signal and protocol status.",
+      "events": [],
+      "kind": "signal-status-line",
+      "provenance": {
+        "source": "listen-signal-chamber-ui-kit",
+        "system": "Scholomance Compose",
+        "version": "1.0.0"
+      },
+      "states": [],
+      "version": "1.0.0"
+    },
+    "transport-control": {
+      "accessibility": {
+        "nativeElement": "button",
+        "nativeStrategy": "native",
+        "obligations": [
+          "button-name",
+          "visible-focus"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "id": "icon",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "label",
+            "required": false,
+            "role": "group"
+          }
+        ],
+        "rootRole": "group"
+      },
+      "capabilities": [],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": "layout://listen/transport-control/v1",
+      "defaultVisuals": [
+        "visual://listen/focus-ring/v1"
+      ],
+      "description": "Native transport button with stable event identity.",
+      "events": [],
+      "kind": "transport-control",
+      "provenance": {
+        "source": "listen-signal-chamber-ui-kit",
+        "system": "Scholomance Compose",
+        "version": "1.0.0"
+      },
+      "states": [],
+      "version": "1.0.0"
+    },
+    "transport-deck": {
+      "accessibility": {
+        "keyboard": [
+          "Tab",
+          "Enter",
+          "Space",
+          "ArrowLeft",
+          "ArrowRight"
+        ],
+        "labelSource": "props.ariaLabel",
+        "nativeStrategy": "composite",
+        "obligations": [
+          "button-names",
+          "pressed-state-announced",
+          "live-playback-status"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "id": "signalLamp",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "primaryControls",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "secondaryControls",
+            "required": false,
+            "role": "group"
+          },
+          {
+            "id": "time",
+            "required": false,
+            "role": "group"
+          }
+        ],
+        "rootRole": "group",
+        "slots": [
+          {
+            "accepts": [
+              "transport-control"
+            ],
+            "id": "primaryControls",
+            "min": 1
+          },
+          {
+            "accepts": [
+              "transport-control",
+              "metric-bar"
+            ],
+            "id": "secondaryControls",
+            "min": 0
+          }
+        ]
+      },
+      "capabilities": [],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": "layout://listen/transport-deck/v1",
+      "defaultVisuals": [
+        "visual://listen/elevated-deck/v1",
+        "visual://listen/harmonic-seam/v1"
+      ],
+      "description": "Playback transport with one dominant toggle and secondary controls.",
+      "events": [
+        {
+          "payload": {},
+          "type": "LISTEN.TRANSPORT.PREVIOUS"
+        },
+        {
+          "payload": {},
+          "type": "LISTEN.TRANSPORT.TOGGLE"
+        },
+        {
+          "payload": {},
+          "type": "LISTEN.TRANSPORT.NEXT"
+        },
+        {
+          "payload": {},
+          "type": "LISTEN.TRANSPORT.RESTART"
+        },
+        {
+          "payload": {
+            "enabled": "boolean"
+          },
+          "type": "LISTEN.TRANSPORT.LOOP"
+        },
+        {
+          "payload": {
+            "normalizedValue": "number"
+          },
+          "type": "LISTEN.TRANSPORT.VOLUME"
+        }
+      ],
+      "kind": "transport-deck",
+      "provenance": {
+        "source": "listen-signal-chamber-ui-kit",
+        "system": "Scholomance Compose",
+        "version": "1.0.0"
+      },
+      "states": [
+        {
+          "default": "standby",
+          "id": "mode",
+          "type": "enum",
+          "values": [
+            "standby",
+            "loading",
+            "playing",
+            "paused",
+            "seeking",
+            "error"
+          ]
+        }
+      ],
+      "version": "1.0.0"
+    },
+    "waveform-scope": {
+      "accessibility": {
+        "labelSource": "props.ariaLabel",
+        "nativeStrategy": "hybrid",
+        "obligations": [
+          "canvas-text-alternative",
+          "decorative-grid-hidden"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "id": "toolbar",
+            "required": true,
+            "role": "group"
+          },
+          {
+            "id": "plot",
+            "required": true,
+            "role": "container"
+          },
+          {
+            "id": "readout",
+            "required": false,
+            "role": "group"
+          }
+        ],
+        "rootRole": "container"
+      },
+      "capabilities": [
+        {
+          "fallback": "static-waveform",
+          "id": "canvas",
+          "required": false
+        }
+      ],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": "layout://listen/waveform-scope/v1",
+      "defaultVisuals": [
+        "visual://listen/waveform-lattice/v1"
+      ],
+      "description": "Read-only signal visualization surface.",
+      "events": [],
+      "kind": "waveform-scope",
+      "provenance": {
+        "source": "listen-signal-chamber-ui-kit",
+        "system": "Scholomance Compose",
+        "version": "1.0.0"
+      },
+      "states": [],
+      "version": "1.0.0"
+    }
+  },
+  "id": "listen-signal-chamber-ui-kit",
+  "layouts": {
+    "layout://listen/aperture-option/v1": {
+      "contract": "PB-LAYOUT-v1",
+      "grid": {
+        "areas": [
+          [
+            "icon",
+            "label"
+          ],
+          [
+            "icon",
+            "description"
+          ]
+        ],
+        "columns": [
+          "24px",
+          "minmax(0, 1fr)"
+        ],
+        "gap": "4px 12px",
+        "rows": [
+          "auto",
+          "auto"
+        ]
+      },
+      "id": "layout://listen/aperture-option/v1",
+      "mode": "grid",
+      "version": "1.0.0"
+    },
+    "layout://listen/lock-plate/v1": {
+      "common": {
+        "marginInline": "auto",
+        "maxWidth": "360px"
+      },
+      "contract": "PB-LAYOUT-v1",
+      "flow": {
+        "align": "center",
+        "direction": "column",
+        "gap": "8px",
+        "justify": "center"
+      },
+      "id": "layout://listen/lock-plate/v1",
+      "mode": "flow",
+      "version": "1.0.0"
+    },
+    "layout://listen/metric-bar/v1": {
+      "contract": "PB-LAYOUT-v1",
+      "grid": {
+        "areas": [
+          [
+            "label",
+            "value"
+          ],
+          [
+            "track",
+            "track"
+          ]
+        ],
+        "columns": [
+          "1fr",
+          "auto"
+        ],
+        "gap": "8px",
+        "rows": [
+          "auto",
+          "6px"
+        ]
+      },
+      "id": "layout://listen/metric-bar/v1",
+      "mode": "grid",
+      "version": "1.0.0"
+    },
+    "layout://listen/metric-dial/v1": {
+      "contract": "PB-LAYOUT-v1",
+      "flow": {
+        "align": "center",
+        "direction": "column",
+        "gap": "6px"
+      },
+      "id": "layout://listen/metric-dial/v1",
+      "mode": "flow",
+      "version": "1.0.0"
+    },
+    "layout://listen/rail-stack/v1": {
+      "common": {
+        "minWidth": 0,
+        "overflowX": "hidden",
+        "overflowY": "auto"
+      },
+      "contract": "PB-LAYOUT-v1",
+      "flow": {
+        "direction": "column",
+        "gap": "14px"
+      },
+      "id": "layout://listen/rail-stack/v1",
+      "mode": "flow",
+      "version": "1.0.0"
+    },
+    "layout://listen/resonance-core/v1": {
+      "common": {
+        "aspectRatio": "1 / 1",
+        "marginInline": "auto",
+        "maxHeight": "min(72vh, 820px)"
+      },
+      "contract": "PB-LAYOUT-v1",
+      "id": "layout://listen/resonance-core/v1",
+      "mode": "overlay",
+      "overlay": {
+        "anchors": {
+          "dial": "center",
+          "nameplate": "bottom-center",
+          "sideMeters": "stretch",
+          "sigil": "center"
+        },
+        "layers": [
+          "dial",
+          "sigil",
+          "sideMeters",
+          "nameplate"
+        ]
+      },
+      "version": "1.0.0"
+    },
+    "layout://listen/rune-preset/v1": {
+      "common": {
+        "aspectRatio": "1 / 1"
+      },
+      "contract": "PB-LAYOUT-v1",
+      "flow": {
+        "align": "center",
+        "direction": "row",
+        "justify": "center"
+      },
+      "id": "layout://listen/rune-preset/v1",
+      "mode": "flow",
+      "version": "1.0.0"
+    },
+    "layout://listen/segment-meter/v1": {
+      "contract": "PB-LAYOUT-v1",
+      "flow": {
+        "direction": "column",
+        "gap": "8px"
+      },
+      "id": "layout://listen/segment-meter/v1",
+      "mode": "flow",
+      "version": "1.0.0"
+    },
+    "layout://listen/signal-chamber-shell/v1": {
+      "common": {
+        "minHeight": "100%",
+        "overflow": "hidden",
+        "width": "100%"
+      },
+      "contract": "PB-LAYOUT-v1",
+      "grid": {
+        "areas": [
+          [
+            "heading",
+            "heading",
+            "heading"
+          ],
+          [
+            "apertureRail",
+            "core",
+            "parameterRail"
+          ],
+          [
+            "apertureRail",
+            "transport",
+            "parameterRail"
+          ],
+          [
+            "footer",
+            "footer",
+            "footer"
+          ]
+        ],
+        "columns": [
+          "minmax(248px, 0.78fr)",
+          "minmax(560px, 3.8fr)",
+          "minmax(248px, 0.78fr)"
+        ],
+        "gap": "0px",
+        "rows": [
+          "auto",
+          "minmax(0, 1fr)",
+          "auto",
+          "auto"
+        ]
+      },
+      "id": "layout://listen/signal-chamber-shell/v1",
+      "mode": "grid",
+      "responsive": [
+        {
+          "flow": {
+            "direction": "column",
+            "gap": "12px"
+          },
+          "mode": "flow",
+          "order": [
+            "heading",
+            "core",
+            "transport",
+            "apertureRail",
+            "parameterRail",
+            "footer"
+          ],
+          "when": {
+            "maxWidthPx": 1023
+          }
+        }
+      ],
+      "version": "1.0.0"
+    },
+    "layout://listen/signal-field/v1": {
+      "contract": "PB-LAYOUT-v1",
+      "flow": {
+        "direction": "column",
+        "gap": "7px"
+      },
+      "id": "layout://listen/signal-field/v1",
+      "mode": "flow",
+      "version": "1.0.0"
+    },
+    "layout://listen/status-line/v1": {
+      "contract": "PB-LAYOUT-v1",
+      "flow": {
+        "align": "center",
+        "direction": "row",
+        "gap": "14px",
+        "justify": "center",
+        "wrap": true
+      },
+      "id": "layout://listen/status-line/v1",
+      "mode": "flow",
+      "version": "1.0.0"
+    },
+    "layout://listen/transport-control/v1": {
+      "contract": "PB-LAYOUT-v1",
+      "flow": {
+        "align": "center",
+        "direction": "row",
+        "gap": "6px",
+        "justify": "center"
+      },
+      "id": "layout://listen/transport-control/v1",
+      "mode": "flow",
+      "version": "1.0.0"
+    },
+    "layout://listen/transport-deck/v1": {
+      "contract": "PB-LAYOUT-v1",
+      "grid": {
+        "align": "center",
+        "areas": [
+          [
+            "signalLamp",
+            "primaryControls",
+            "time"
+          ]
+        ],
+        "columns": [
+          "minmax(150px, 0.8fr)",
+          "minmax(320px, 2fr)",
+          "minmax(180px, 1fr)"
+        ],
+        "gap": "16px",
+        "rows": [
+          "auto"
+        ]
+      },
+      "id": "layout://listen/transport-deck/v1",
+      "mode": "grid",
+      "responsive": [
+        {
+          "flow": {
+            "align": "stretch",
+            "direction": "column",
+            "gap": "12px"
+          },
+          "mode": "flow",
+          "when": {
+            "maxWidthPx": 720
+          }
+        }
+      ],
+      "version": "1.0.0"
+    },
+    "layout://listen/waveform-scope/v1": {
+      "contract": "PB-LAYOUT-v1",
+      "grid": {
+        "areas": [
+          [
+            "toolbar"
+          ],
+          [
+            "plot"
+          ],
+          [
+            "readout"
+          ]
+        ],
+        "columns": [
+          "1fr"
+        ],
+        "gap": "8px",
+        "rows": [
+          "auto",
+          "minmax(150px, 1fr)",
+          "auto"
+        ]
+      },
+      "id": "layout://listen/waveform-scope/v1",
+      "mode": "grid",
+      "version": "1.0.0"
+    }
+  },
+  "metadata": {
+    "kitId": "scholomance-listen-signal-chamber",
+    "kitVersion": "1.0.0",
+    "runtimeOwnership": [
+      "playback-time",
+      "transport-mode",
+      "waveform-samples",
+      "meter-values",
+      "device-list",
+      "active-school"
+    ]
+  },
+  "root": {
+    "id": "listen-signal-chamber",
+    "kind": "signal-chamber-shell",
+    "layoutRef": "layout://listen/signal-chamber-shell/v1",
+    "props": {
+      "ariaLabel": "Scholomance Signal Chamber",
+      "authoredSchoolFallback": "nullVoid",
+      "schoolTokenBinding": "listen.school.active"
+    },
+    "role": "container",
+    "slots": {
+      "apertureRail": [
+        {
+          "id": "aperture-rail",
+          "kind": "aperture-rail",
+          "layoutRef": "layout://listen/rail-stack/v1",
+          "props": {
+            "ariaLabel": "Aperture analysis modes",
+            "heading": "APERTURE"
+          },
+          "role": "container",
+          "slots": {
+            "options": [
+              {
+                "id": "aperture-oscilloscope",
+                "kind": "aperture-option",
+                "layoutRef": "layout://listen/aperture-option/v1",
+                "props": {
+                  "apertureId": "oscilloscope",
+                  "description": "Waveform View",
+                  "eventType": "LISTEN.APERTURE.SELECT",
+                  "glyph": "≈",
+                  "label": "OSCILLOSCOPE"
+                },
+                "role": "group",
+                "state": {
+                  "disabled": false,
+                  "selected": false
+                },
+                "visualRefs": [
+                  "visual://listen/focus-ring/v1"
+                ]
+              },
+              {
+                "id": "aperture-alchemical",
+                "kind": "aperture-option",
+                "layoutRef": "layout://listen/aperture-option/v1",
+                "props": {
+                  "apertureId": "alchemical",
+                  "description": "Harmonic Analysis",
+                  "eventType": "LISTEN.APERTURE.SELECT",
+                  "glyph": "△",
+                  "label": "ALCHEMICAL"
+                },
+                "role": "group",
+                "state": {
+                  "disabled": false,
+                  "selected": false
+                },
+                "visualRefs": [
+                  "visual://listen/focus-ring/v1"
+                ]
+              },
+              {
+                "id": "aperture-resonance",
+                "kind": "aperture-option",
+                "layoutRef": "layout://listen/aperture-option/v1",
+                "props": {
+                  "apertureId": "resonance",
+                  "description": "Frequency Mapping",
+                  "eventType": "LISTEN.APERTURE.SELECT",
+                  "glyph": "✣",
+                  "label": "RESONANCE"
+                },
+                "role": "group",
+                "state": {
+                  "disabled": false,
+                  "selected": false
+                },
+                "visualRefs": [
+                  "visual://listen/focus-ring/v1"
+                ]
+              },
+              {
+                "id": "aperture-vortex",
+                "kind": "aperture-option",
+                "layoutRef": "layout://listen/aperture-option/v1",
+                "props": {
+                  "apertureId": "vortex",
+                  "description": "Phase Topology",
+                  "eventType": "LISTEN.APERTURE.SELECT",
+                  "glyph": "◉",
+                  "label": "VORTEX"
+                },
+                "role": "group",
+                "state": {
+                  "disabled": false,
+                  "selected": false
+                },
+                "visualRefs": [
+                  "visual://listen/focus-ring/v1"
+                ]
+              },
+              {
+                "id": "aperture-null-void",
+                "kind": "aperture-option",
+                "layoutRef": "layout://listen/aperture-option/v1",
+                "props": {
+                  "apertureId": "null-void",
+                  "description": "Signal Chamber",
+                  "eventType": "LISTEN.APERTURE.SELECT",
+                  "glyph": "⟡",
+                  "label": "NULL VOID"
+                },
+                "role": "group",
+                "state": {
+                  "disabled": false,
+                  "selected": true
+                },
+                "visualRefs": [
+                  "visual://listen/focus-ring/v1"
+                ]
+              }
+            ],
+            "presets": [
+              {
+                "id": "preset-void-a",
+                "kind": "rune-preset",
+                "layoutRef": "layout://listen/rune-preset/v1",
+                "props": {
+                  "eventType": "LISTEN.PRESET.SELECT",
+                  "glyph": "◇",
+                  "label": "Void lattice A",
+                  "presetId": "void-a"
+                },
+                "role": "group",
+                "state": {
+                  "selected": false
+                },
+                "visualRefs": [
+                  "visual://listen/rune-badge/v1",
+                  "visual://listen/focus-ring/v1"
+                ]
+              },
+              {
+                "id": "preset-void-b",
+                "kind": "rune-preset",
+                "layoutRef": "layout://listen/rune-preset/v1",
+                "props": {
+                  "eventType": "LISTEN.PRESET.SELECT",
+                  "glyph": "⬡",
+                  "label": "Void lattice B",
+                  "presetId": "void-b"
+                },
+                "role": "group",
+                "state": {
+                  "selected": false
+                },
+                "visualRefs": [
+                  "visual://listen/rune-badge/v1",
+                  "visual://listen/focus-ring/v1"
+                ]
+              },
+              {
+                "id": "preset-void-c",
+                "kind": "rune-preset",
+                "layoutRef": "layout://listen/rune-preset/v1",
+                "props": {
+                  "eventType": "LISTEN.PRESET.SELECT",
+                  "glyph": "✦",
+                  "label": "Void lattice C",
+                  "presetId": "void-c"
+                },
+                "role": "group",
+                "state": {
+                  "selected": false
+                },
+                "visualRefs": [
+                  "visual://listen/rune-badge/v1",
+                  "visual://listen/focus-ring/v1"
+                ]
+              },
+              {
+                "id": "preset-void-d",
+                "kind": "rune-preset",
+                "layoutRef": "layout://listen/rune-preset/v1",
+                "props": {
+                  "eventType": "LISTEN.PRESET.SELECT",
+                  "glyph": "◈",
+                  "label": "Void lattice D",
+                  "presetId": "void-d"
+                },
+                "role": "group",
+                "state": {
+                  "selected": false
+                },
+                "visualRefs": [
+                  "visual://listen/rune-badge/v1",
+                  "visual://listen/focus-ring/v1"
+                ]
+              }
+            ]
+          },
+          "state": {
+            "enabled": true,
+            "selectedId": "null-void"
+          },
+          "visualRefs": [
+            "visual://listen/glass-panel/v1"
+          ]
+        }
+      ],
+      "core": [
+        {
+          "id": "resonance-core",
+          "kind": "resonance-core",
+          "layoutRef": "layout://listen/resonance-core/v1",
+          "props": {
+            "activationEvent": "LISTEN.CORE.ACTIVATE",
+            "ariaLabel": "THE VOID resonance instrument",
+            "seekEvent": "LISTEN.CORE.SEEK",
+            "signalGeometryBinding": "listen.signal.geometry",
+            "signalTitle": "THE VOID"
+          },
+          "role": "container",
+          "slots": {
+            "sideMeters": [
+              {
+                "id": "metric-dial-left",
+                "kind": "metric-dial",
+                "layoutRef": "layout://listen/metric-dial/v1",
+                "props": {
+                  "binding": "listen.signal.phase",
+                  "label": "PHASE"
+                },
+                "role": "group",
+                "visualRefs": [
+                  "visual://listen/radial-meter/v1"
+                ]
+              },
+              {
+                "id": "metric-dial-right",
+                "kind": "metric-dial",
+                "layoutRef": "layout://listen/metric-dial/v1",
+                "props": {
+                  "binding": "listen.signal.gain",
+                  "label": "GAIN"
+                },
+                "role": "group",
+                "visualRefs": [
+                  "visual://listen/radial-meter/v1"
+                ]
+              }
+            ]
+          },
+          "visualRefs": [
+            "visual://listen/radial-instrument/v1",
+            "visual://listen/harmonic-seam/v1"
+          ]
+        }
+      ],
+      "footer": [
+        {
+          "id": "signal-status-line",
+          "kind": "signal-status-line",
+          "layoutRef": "layout://listen/status-line/v1",
+          "props": {
+            "protocolLabel": "Scholomance v11.3",
+            "signalStateBinding": "listen.transport.mode"
+          },
+          "role": "group",
+          "visualRefs": []
+        }
+      ],
+      "heading": [
+        {
+          "id": "signal-lock-plate",
+          "kind": "signal-lock-plate",
+          "layoutRef": "layout://listen/lock-plate/v1",
+          "props": {
+            "eyebrow": "RESONANCE_LOCKED",
+            "frequencyLabel": "85.00 Hz",
+            "title": "THE VOID"
+          },
+          "role": "group",
+          "visualRefs": [
+            "visual://listen/glass-panel/v1",
+            "visual://listen/pulse-dot/v1"
+          ]
+        }
+      ],
+      "parameterRail": [
+        {
+          "id": "parameter-rail",
+          "kind": "parameter-rail",
+          "layoutRef": "layout://listen/rail-stack/v1",
+          "props": {
+            "ariaLabel": "Signal parameters",
+            "heading": "PARAMETERS"
+          },
+          "role": "container",
+          "slots": {
+            "density": [
+              {
+                "id": "phoneme-density",
+                "kind": "segment-meter",
+                "layoutRef": "layout://listen/segment-meter/v1",
+                "props": {
+                  "binding": "listen.signal.phonemeDensity",
+                  "label": "PHONEME DENSITY",
+                  "segmentCount": 16
+                },
+                "role": "group",
+                "visualRefs": [
+                  "visual://listen/segment-glow/v1"
+                ]
+              }
+            ],
+            "metrics": [
+              {
+                "id": "metric-vibration",
+                "kind": "metric-bar",
+                "layoutRef": "layout://listen/metric-bar/v1",
+                "props": {
+                  "binding": "listen.signal.vibration",
+                  "fieldId": "vibration",
+                  "format": "percent",
+                  "label": "VIBRATION",
+                  "max": 1,
+                  "min": 0,
+                  "readOnly": true
+                },
+                "role": "group",
+                "visualRefs": [
+                  "visual://listen/meter-track/v1"
+                ]
+              },
+              {
+                "id": "metric-aura-node",
+                "kind": "signal-field",
+                "layoutRef": "layout://listen/signal-field/v1",
+                "props": {
+                  "binding": "listen.signal.auraNode",
+                  "fieldId": "aura-node",
+                  "format": "text",
+                  "label": "AURA NODE",
+                  "readOnly": true
+                },
+                "role": "group",
+                "visualRefs": [
+                  "visual://listen/focus-ring/v1"
+                ]
+              },
+              {
+                "id": "metric-entropy",
+                "kind": "metric-bar",
+                "layoutRef": "layout://listen/metric-bar/v1",
+                "props": {
+                  "binding": "listen.signal.entropy",
+                  "fieldId": "entropy",
+                  "format": "percent",
+                  "label": "ENTROPY",
+                  "max": 1,
+                  "min": 0,
+                  "readOnly": true
+                },
+                "role": "group",
+                "visualRefs": [
+                  "visual://listen/meter-track/v1"
+                ]
+              }
+            ],
+            "output": [
+              {
+                "id": "signal-output-field",
+                "kind": "signal-field",
+                "layoutRef": "layout://listen/signal-field/v1",
+                "props": {
+                  "binding": "listen.output.deviceId",
+                  "controlType": "select",
+                  "eventType": "LISTEN.FIELD.CHANGE",
+                  "fieldId": "signal-output",
+                  "label": "SIGNAL OUTPUT",
+                  "optionsBinding": "listen.output.devices"
+                },
+                "role": "group",
+                "visualRefs": [
+                  "visual://listen/focus-ring/v1"
+                ]
+              }
+            ],
+            "scope": [
+              {
+                "id": "waveform-scope",
+                "kind": "waveform-scope",
+                "layoutRef": "layout://listen/waveform-scope/v1",
+                "props": {
+                  "analysisModeBinding": "listen.signal.analysisMode",
+                  "ariaLabel": "Waveform analysis",
+                  "readoutBinding": "listen.signal.waveformReadout",
+                  "waveformBinding": "listen.signal.waveform"
+                },
+                "role": "container",
+                "visualRefs": [
+                  "visual://listen/waveform-lattice/v1"
+                ]
+              }
+            ]
+          },
+          "visualRefs": [
+            "visual://listen/glass-panel/v1"
+          ]
+        }
+      ],
+      "transport": [
+        {
+          "id": "transport-deck",
+          "kind": "transport-deck",
+          "layoutRef": "layout://listen/transport-deck/v1",
+          "props": {
+            "ariaLabel": "Signal transport",
+            "loopBinding": "listen.transport.loop",
+            "modeBinding": "listen.transport.mode",
+            "timeBinding": "listen.transport.timeLabel",
+            "volumeBinding": "listen.transport.volume"
+          },
+          "role": "group",
+          "slots": {
+            "primaryControls": [
+              {
+                "id": "transport-previous",
+                "kind": "transport-control",
+                "layoutRef": "layout://listen/transport-control/v1",
+                "props": {
+                  "controlId": "previous",
+                  "dominant": false,
+                  "eventType": "LISTEN.TRANSPORT.PREVIOUS",
+                  "icon": "skip-back",
+                  "label": "Previous signal"
+                },
+                "role": "group",
+                "visualRefs": [
+                  "visual://listen/focus-ring/v1"
+                ]
+              },
+              {
+                "id": "transport-restart",
+                "kind": "transport-control",
+                "layoutRef": "layout://listen/transport-control/v1",
+                "props": {
+                  "controlId": "restart",
+                  "dominant": false,
+                  "eventType": "LISTEN.TRANSPORT.RESTART",
+                  "icon": "restart",
+                  "label": "Restart signal"
+                },
+                "role": "group",
+                "visualRefs": [
+                  "visual://listen/focus-ring/v1"
+                ]
+              },
+              {
+                "id": "transport-toggle",
+                "kind": "transport-control",
+                "layoutRef": "layout://listen/transport-control/v1",
+                "props": {
+                  "controlId": "toggle",
+                  "dominant": true,
+                  "eventType": "LISTEN.TRANSPORT.TOGGLE",
+                  "iconBinding": "listen.transport.toggleIcon",
+                  "label": "Play or pause signal"
+                },
+                "role": "group",
+                "visualRefs": [
+                  "visual://listen/focus-ring/v1"
+                ]
+              },
+              {
+                "id": "transport-next",
+                "kind": "transport-control",
+                "layoutRef": "layout://listen/transport-control/v1",
+                "props": {
+                  "controlId": "next",
+                  "dominant": false,
+                  "eventType": "LISTEN.TRANSPORT.NEXT",
+                  "icon": "skip-forward",
+                  "label": "Next signal"
+                },
+                "role": "group",
+                "visualRefs": [
+                  "visual://listen/focus-ring/v1"
+                ]
+              },
+              {
+                "id": "transport-loop",
+                "kind": "transport-control",
+                "layoutRef": "layout://listen/transport-control/v1",
+                "props": {
+                  "controlId": "loop",
+                  "dominant": false,
+                  "eventType": "LISTEN.TRANSPORT.LOOP",
+                  "icon": "loop",
+                  "label": "Toggle loop",
+                  "pressedBinding": "listen.transport.loop"
+                },
+                "role": "group",
+                "visualRefs": [
+                  "visual://listen/focus-ring/v1"
+                ]
+              }
+            ],
+            "secondaryControls": [
+              {
+                "id": "transport-volume",
+                "kind": "metric-bar",
+                "layoutRef": "layout://listen/metric-bar/v1",
+                "props": {
+                  "binding": "listen.transport.volume",
+                  "eventType": "LISTEN.TRANSPORT.VOLUME",
+                  "interactive": true,
+                  "label": "VOLUME",
+                  "max": 1,
+                  "min": 0
+                },
+                "role": "group",
+                "visualRefs": [
+                  "visual://listen/meter-track/v1",
+                  "visual://listen/focus-ring/v1"
+                ]
+              }
+            ]
+          },
+          "visualRefs": [
+            "visual://listen/elevated-deck/v1",
+            "visual://listen/harmonic-seam/v1"
+          ]
+        }
+      ]
+    },
+    "visualRefs": [
+      "visual://listen/chamber-skin/v1",
+      "visual://listen/chamber-frame/v1"
+    ]
+  },
+  "sourceChecksum": "fnv1a-d75f5455",
+  "version": "1.0.0",
+  "visuals": {
+    "visual://listen/chamber-frame/v1": {
+      "fallback": "native-dom-frame",
+      "formulaId": "wand://formula/chamber-concentric-frame/v1",
+      "kind": "wand",
+      "placementSlot": "background",
+      "removable": true,
+      "role": "structural-ornament"
+    },
+    "visual://listen/chamber-skin/v1": {
+      "kind": "token",
+      "placementSlot": "root",
+      "removable": false,
+      "role": "skin",
+      "tokenSetId": "listen-signal-chamber-theme"
+    },
+    "visual://listen/elevated-deck/v1": {
+      "kind": "native-dom",
+      "placementSlot": "root",
+      "props": {
+        "elevation": 4,
+        "surface": "raised-metal"
+      },
+      "removable": true,
+      "role": "surface"
+    },
+    "visual://listen/focus-ring/v1": {
+      "kind": "native-dom",
+      "placementSlot": "root",
+      "props": {
+        "colorFromToken": "glow",
+        "offsetPx": 3,
+        "widthPx": 2
+      },
+      "removable": false,
+      "role": "focus-indicator"
+    },
+    "visual://listen/glass-panel/v1": {
+      "kind": "native-dom",
+      "placementSlot": "root",
+      "props": {
+        "backdropBlurPx": 8,
+        "borderToken": "metal",
+        "elevation": 2,
+        "surface": "glass"
+      },
+      "removable": true,
+      "role": "surface"
+    },
+    "visual://listen/harmonic-seam/v1": {
+      "kind": "native-dom",
+      "placementSlot": "after",
+      "props": {
+        "breatheMs": 1600,
+        "className": "compose-harmonic-seam",
+        "colorFromToken": "auroraStart",
+        "colorToToken": "auroraEnd",
+        "glowFromToken": "glow",
+        "glowRadiusPx": 12,
+        "phase": "shared",
+        "transitionMs": 360
+      },
+      "removable": true,
+      "role": "ornamentation"
+    },
+    "visual://listen/meter-track/v1": {
+      "kind": "native-dom",
+      "placementSlot": "track",
+      "props": {
+        "fillFromToken": "glow",
+        "transitionMs": 360
+      },
+      "removable": true,
+      "role": "data-visualization"
+    },
+    "visual://listen/pulse-dot/v1": {
+      "kind": "native-dom",
+      "placementSlot": "eyebrow",
+      "props": {
+        "breatheMs": 1600,
+        "className": "compose-pulse-dot",
+        "glowFromToken": "glow",
+        "phase": "shared"
+      },
+      "removable": true,
+      "role": "status-indicator"
+    },
+    "visual://listen/radial-instrument/v1": {
+      "fallback": "native-dom-concentric-rings",
+      "formulaId": "wand://formula/radial-resonance-instrument/v1",
+      "kind": "wand",
+      "placementSlot": "dial",
+      "removable": true,
+      "role": "instrument-geometry"
+    },
+    "visual://listen/radial-meter/v1": {
+      "fallback": "native-meter",
+      "formulaId": "wand://formula/radial-meter/v1",
+      "kind": "wand",
+      "placementSlot": "dial",
+      "removable": true,
+      "role": "data-visualization"
+    },
+    "visual://listen/rune-badge/v1": {
+      "fallback": "native-text-glyph",
+      "kind": "scdl-asset",
+      "packetId": "scdl://asset/signal-rune-badge/v1",
+      "placementSlot": "glyph",
+      "removable": true,
+      "role": "iconography"
+    },
+    "visual://listen/segment-glow/v1": {
+      "kind": "native-dom",
+      "placementSlot": "segments",
+      "props": {
+        "activeOpacity": 1,
+        "fillFromToken": "glow",
+        "inactiveOpacity": 0.18
+      },
+      "removable": true,
+      "role": "data-visualization"
+    },
+    "visual://listen/waveform-lattice/v1": {
+      "fallback": "native-dom-static-waveform",
+      "formulaId": "wand://formula/waveform-lattice/v1",
+      "kind": "wand",
+      "placementSlot": "plot",
+      "removable": true,
+      "role": "data-visualization"
+    }
+  }
+}
