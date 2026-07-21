@@ -14,6 +14,22 @@ function loadTheme(name: 'dark' | 'light'): DTCGDictionary {
   return JSON.parse(readFileSync(themePath, 'utf8')) as DTCGDictionary;
 }
 
+function luminance(hex: string): number {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)!;
+  const ch = [m[1], m[2], m[3]].map((v) => {
+    const c = parseInt(v, 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2];
+}
+
+function contrast(a: string, b: string): number {
+  const L1 = luminance(a);
+  const L2 = luminance(b);
+  const [hi, lo] = L1 > L2 ? [L1, L2] : [L2, L1];
+  return (hi + 0.05) / (lo + 0.05);
+}
+
 describe('Compose theme suite parity', () => {
   it('dark and light suites expose identical token paths', () => {
     const dark = loadTheme('dark');
@@ -35,6 +51,15 @@ describe('Compose theme suite parity', () => {
     for (const value of surfaces) {
       expect(['#ffffff', '#fafafa']).toContain(String(value).toLowerCase());
     }
+  });
+
+  it('light primary text on surface.bg meets 4.5:1', () => {
+    const light = loadTheme('light');
+    const ratio = contrast(
+      String(light.color.text.primary.$value),
+      String(light.color.surface.bg.$value),
+    );
+    expect(ratio).toBeGreaterThanOrEqual(4.5);
   });
 });
 

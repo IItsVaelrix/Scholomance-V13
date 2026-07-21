@@ -318,6 +318,16 @@ service.subscribe((state) => {
 service.send({ type: 'NAVIGATE', payload: { route: '/about' } });
 ```
 
+### Theme suites
+
+Dark and light Compose palettes live as DTCG JSON under `tokens/compose/themes/` (`dark.json`, `light.json`). Regenerate checked-in CSS after editing either file:
+
+```bash
+npm run generate:compose-themes
+```
+
+Output: `src/lib/css/generated/compose-themes.css` (`[data-theme='dark']` / `[data-theme='light']` blocks plus public aliases like `--bg-void`). `ThemeProvider` (`src/hooks/useTheme.jsx`) sets `document.documentElement` `data-theme`; `ThemeToggle` in the nav rail switches between suites.
+
 ### 6. Design Tokens Layer (`src/core/compose/tokens/`)
 
 Cross-platform token interchange using DTCG format with Style Dictionary-compatible output.

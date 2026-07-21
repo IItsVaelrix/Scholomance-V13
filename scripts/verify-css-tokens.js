@@ -55,4 +55,21 @@ for (const token of TOKEN_MAP) {
   console.log(`OK   [${token.label}] = ${jsMatch[1]}px`);
 }
 
+const composeThemesPath = join(root, 'src/lib/css/generated/compose-themes.css');
+try {
+  const composeThemes = readFileSync(composeThemesPath, 'utf8');
+  if (!composeThemes.includes("[data-theme='light']")) {
+    console.error(`FAIL [compose-themes.css]: missing [data-theme='light'] in ${composeThemesPath}`);
+    failed = true;
+  } else if (!composeThemes.includes('--compose-color-surface-bg')) {
+    console.error(`FAIL [compose-themes.css]: missing --compose-color-surface-bg in ${composeThemesPath}`);
+    failed = true;
+  } else {
+    console.log('OK   [compose-themes.css] light selector + surface-bg present');
+  }
+} catch (err) {
+  console.error(`FAIL [compose-themes.css]: unable to read ${composeThemesPath} (${err.message})`);
+  failed = true;
+}
+
 process.exit(failed ? 1 : 0);
