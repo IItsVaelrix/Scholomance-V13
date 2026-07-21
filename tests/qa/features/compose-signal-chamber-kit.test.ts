@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest';
+import { renderToStaticMarkup } from 'react-dom/server';
+import React from 'react';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
@@ -6,6 +8,7 @@ import {
   SIGNAL_CHAMBER_DEFINITIONS,
   canonicalStringify,
 } from '../../../src/core/compose/kits/signalChamber.compose.js';
+import ComposeSignalChamberAdapter from '../../../src/pages/Listen/ComposeSignalChamberAdapter';
 
 const FIXTURE_PATH = join(
   process.cwd(),
@@ -27,3 +30,28 @@ describe('Signal Chamber UI Kit Canonical Scene', () => {
     expect(canonicalStringify(scene)).toBe(canonicalStringify(golden));
   });
 });
+
+describe('Compose Signal Chamber Adapter', () => {
+  it('renders Signal Chamber HUD shell with runtime attributes', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(ComposeSignalChamberAdapter, {
+        currentSchoolId: 'SONIC',
+        isPlaying: false,
+        isTuning: false,
+        signalLevel: 0.5,
+        volume: 0.8,
+        entropyLevel: 20,
+        outputDevices: [],
+        sinkId: '',
+        onTogglePlayPause: () => {},
+        onTuneToSchool: () => {},
+        onSetVolume: () => {},
+        onSetOutputDevice: () => {},
+        onOrbClick: () => {},
+      })
+    );
+    expect(html).toContain('data-compose-kind="signal-chamber-shell"');
+    expect(html).toContain('data-compose-school="SONIC"');
+  });
+});
+
