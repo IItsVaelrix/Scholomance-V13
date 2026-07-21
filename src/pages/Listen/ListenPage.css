@@ -3720,3 +3720,128 @@
     width: 260px;
   }
 }
+
+/* Studio Dynamics Compressor Console */
+.compressor-console {
+  background: var(--ritual-surface-raised, rgba(20, 24, 33, 0.85));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.compressor-console--warn {
+  border-color: var(--ritual-danger, #ff4444);
+  box-shadow: 0 0 12px rgba(255, 68, 68, 0.25);
+}
+
+.compressor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.compressor-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ritual-text-muted, #858fa7);
+}
+
+.compressor-ratio-badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ritual-text, #ffffff);
+}
+
+.compressor-ratio-badge--limiting {
+  background: var(--ritual-danger, #ff4444);
+  color: #ffffff;
+  animation: pulse-limiter 1s infinite alternate;
+}
+
+@keyframes pulse-limiter {
+  from { opacity: 0.85; }
+  to { opacity: 1; box-shadow: 0 0 8px var(--ritual-danger, #ff4444); }
+}
+
+.compressor-meter-bridge {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.meter-lane {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.meter-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--ritual-text-muted, #858fa7);
+}
+
+.meter-track {
+  height: 6px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.meter-fill--in {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50, #ffeb3b);
+  transition: width 0.15s ease-out;
+}
+
+.meter-fill--gr {
+  height: 100%;
+  background: linear-gradient(90deg, #ff9800, #f44336);
+  transition: width 0.15s ease-out;
+}
+
+.compressor-transfer-graph {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  height: 60px;
+  overflow: hidden;
+}
+
+.transfer-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.compressor-params-grid {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--ritual-text-muted, #858fa7);
+  background: rgba(0, 0, 0, 0.2);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.compressor-limiter-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 68, 68, 0.15);
+  border: 1px solid var(--ritual-danger, #ff4444);
+  color: #ff6666;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+

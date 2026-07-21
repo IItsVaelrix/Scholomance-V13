@@ -80,6 +80,24 @@ export function ComposeSignalChamberAdapter({
     }
   }, [signalLevel]);
 
+  // Calculate dynamic compressor values
+  const gainReductionDb = useMemo(() => {
+    if (signalLevel <= 0.75) return 0;
+    return -((signalLevel - 0.75) * 40);
+  }, [signalLevel]);
+
+  const compressorRatio = useMemo(() => {
+    if (signalLevel >= 0.75) return '∞:1 HARD LIMIT';
+    if (signalLevel >= 0.50) return '4:1 COMPRESSING';
+    return '1:1 LINEAR';
+  }, [signalLevel]);
+
+  const compressorStatus = useMemo(() => {
+    if (signalLevel >= 0.75) return 'LIMITING';
+    if (signalLevel >= 0.50) return 'ATTENUATING';
+    return 'NORMAL';
+  }, [signalLevel]);
+
   const sidebarProps = {
     initial: { opacity: 0, x: 30 },
     animate: { opacity: 1, x: 0 },
@@ -314,35 +332,104 @@ export function ComposeSignalChamberAdapter({
           </div>
         </div>
 
-        {/* Analytics / Phoneme Density */}
-        <div className="analytics-block" data-compose-kind="segment-meter">
-          <div className={`vfa-header ${phonemeWarning ? 'vfa-header--warn' : ''}`}>
-            PHONEME_DENSITY
-            {phonemeWarning && (
-              <span className="vfa-warn-badge" aria-label="Anti-exploit threshold reached">
-                ⚠
-              </span>
-            )}
+        {/* Studio Dynamics Audio Compressor UI */}
+        <div
+          className={`analytics-block compressor-console ${phonemeWarning ? 'compressor-console--warn' : ''}`}
+          data-compose-kind="phoneme-compressor-unit"
+          data-compose-part="compressorConsole"
+          data-compose-status={compressorStatus}
+          data-compose-warning={phonemeWarning}
+        >
+          <div className="compressor-header">
+            <div className="compressor-eyebrow">
+              <span className="material-symbols-outlined">tune</span>
+              <span>PHONEME_DYNAMICS_C1</span>
+            </div>
+            <span
+              className={`compressor-ratio-badge compressor-ratio-badge--${compressorStatus.toLowerCase()}`}
+            >
+              {compressorRatio}
+            </span>
           </div>
-          <div className={`vfa-viz ${phonemeWarning ? 'vfa-viz--warn' : ''}`}>
-            {[...Array(16)].map((_, i) => (
-              <div
-                key={i}
-                className={`vfa-bar ${phonemeWarning && i >= 11 ? 'vfa-bar--warn' : ''}`}
-                style={{ '--bar-index': i } as React.CSSProperties}
+
+          {/* Meter Bridge: IN & GR */}
+          <div className="compressor-meter-bridge">
+            <div className="meter-lane">
+              <div className="meter-label">
+                <span>IN</span>
+                <span className="meter-val">{Math.round(signalLevel * 100)}%</span>
+              </div>
+              <div className="meter-track">
+                <div
+                  className="meter-fill meter-fill--in"
+                  style={{ width: `${Math.min(100, signalLevel * 100)}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="meter-lane">
+              <div className="meter-label">
+                <span>GR</span>
+                <span className="meter-val gr-meter-val">
+                  {gainReductionDb < 0 ? `${gainReductionDb.toFixed(1)} dB` : '0.0 dB'}
+                </span>
+              </div>
+              <div className="meter-track meter-track--gr">
+                <div
+                  className="meter-fill meter-fill--gr"
+                  style={{
+                    width: `${Math.min(100, (Math.abs(gainReductionDb) / 18) * 100)}%`,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Transfer Curve Micro SVG */}
+          <div className="compressor-transfer-graph" data-compose-part="transferCurve">
+            <svg viewBox="0 0 100 60" className="transfer-svg" aria-hidden="true">
+              <line x1="10" y1="50" x2="90" y2="50" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+              <line x1="10" y1="10" x2="10" y2="50" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+              {/* Threshold indicator line at x=70 */}
+              <line x1="70" y1="10" x2="70" y2="50" stroke="rgba(255,255,255,0.2)" strokeDasharray="2 2" strokeWidth="1" />
+              {/* Knee response path */}
+              <path
+                d="M 10 50 L 70 20 L 90 20"
+                fill="none"
+                stroke={phonemeWarning ? 'var(--ritual-danger, #ff4444)' : 'var(--ritual-glow, #858fa7)'}
+                strokeWidth="2"
               />
-            ))}
-            <div
-              className={`phoneme-threshold-line ${phonemeWarning ? 'is-visible' : ''}`}
-              aria-hidden="true"
-            />
+              {/* Current operating point dot */}
+              <circle
+                cx={10 + Math.min(80, signalLevel * 80)}
+                cy={50 - Math.min(30, signalLevel * 30 + (gainReductionDb < 0 ? Math.abs(gainReductionDb) * 0.5 : 0))}
+                r="3"
+                fill={phonemeWarning ? 'var(--ritual-danger, #ff4444)' : '#ffffff'}
+              />
+            </svg>
           </div>
-          <div
-            className={`phoneme-exploit-label ${phonemeWarning ? 'is-visible' : ''}`}
-            aria-live="assertive"
-          >
-            HEURISTIC LIMIT - RETURNS DECAY
+
+          {/* Parameter Readouts */}
+          <div className="compressor-params-grid">
+            <div className="param-tag">
+              <span className="lbl">THRESH</span>
+              <span className="val">-12.0 dB</span>
+            </div>
+            <div className="param-tag">
+              <span className="lbl">ATT/REL</span>
+              <span className="val">12ms / 150ms</span>
+            </div>
           </div>
+
+          {/* Alert Banner */}
+          {phonemeWarning && (
+            <div className="compressor-limiter-banner" aria-live="assertive">
+              <span className="material-symbols-outlined">warning</span>
+              <span>HEURISTIC LIMITER ACTIVE - RETURNS DECAY</span>
+            </div>
+          )}
+
+          {/* Phase Filter Controls */}
           <div className="phase-controls">
             <button className="phase-btn">CONSONANT</button>
             <button className="phase-btn">VOWEL</button>
