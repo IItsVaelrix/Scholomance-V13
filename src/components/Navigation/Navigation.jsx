@@ -17,6 +17,8 @@ import { useAuth } from "../../hooks/useAuth.jsx";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion.js";
 import { preloadRoute } from "../../lib/routes.js";
 import { triggerHapticPulse, UI_HAPTICS } from "../../lib/platform/haptics.js";
+import { ThemeToggle } from "./ThemeToggle.jsx";
+
 
 const PRODUCTION_NAV_IDS = Object.freeze(["watch", "listen", "read", "visualiser", "blog"]);
 
@@ -233,6 +235,7 @@ export default function Navigation() {
         </div>
 
         <div className="rail-right">
+          <ThemeToggle />
           {showAccountNavigation && user && (
             <button
               className="rail-link rail-link--user rail-link--logout"
@@ -293,6 +296,10 @@ export default function Navigation() {
                 <p className="nav-mobile-copy">
                   Move between chambers without dropping the ritual thread or losing your place.
                 </p>
+              </div>
+
+              <div className="nav-mobile-theme-row">
+                <ThemeToggle showLabel={true} className="nav-mobile-theme-btn" />
               </div>
 
               <div className="nav-mobile-links">
