@@ -207,7 +207,13 @@ export default function AnalyzePanel({
   };
 
   return (
-    <div className="az-panel" data-reduced-motion={reducedMotion ? 'true' : 'false'}>
+    <aside
+      className="analyze-panel az-panel"
+      role="region"
+      data-compose-kind="leximancy-panel"
+      data-compose-version="1.0.0"
+      data-reduced-motion={reducedMotion ? 'true' : 'false'}
+    >
       <form className="az-query" onSubmit={onSubmit}>
         <div className="az-search">
           <input
@@ -373,7 +379,7 @@ export default function AnalyzePanel({
           </div>
         </div>
       )}
-    </div>
+    </aside>
   );
 }
 
