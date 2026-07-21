@@ -109,10 +109,6 @@ describe('Compose Signal Chamber Adapter', () => {
     const svg = traceA?.closest('svg');
     expect(svg?.getAttribute('viewBox')).toBe('0 0 160 70');
 
-    const limiterBanner = container.querySelector('.compressor-limiter-banner');
-    expect(limiterBanner).not.toBeNull();
-    expect(limiterBanner?.getAttribute('data-compose-active')).toBe('false');
-
     rerender(
       React.createElement(ComposeSignalChamberAdapter, {
         currentSchoolId: 'SONIC',
@@ -121,9 +117,8 @@ describe('Compose Signal Chamber Adapter', () => {
       })
     );
 
-    const limiterBannerActive = container.querySelector('.compressor-limiter-banner');
-    expect(limiterBannerActive).not.toBeNull();
-    expect(limiterBannerActive?.getAttribute('data-compose-active')).toBe('true');
+    const suppressionFill = container.querySelector('.spectral-suppression-fill');
+    expect(suppressionFill).not.toBeNull();
   });
 });
 

@@ -548,16 +548,6 @@ export function ComposeSignalChamberAdapter({
             </div>
           </div>
 
-          {/* Alert Banner */}
-          <div
-            className="compressor-limiter-banner"
-            data-compose-active={phonemeWarning ? 'true' : 'false'}
-            aria-live="off"
-          >
-            <span className="material-symbols-outlined">warning</span>
-            <span>HEURISTIC LIMITER ACTIVE - RETURNS DECAY</span>
-          </div>
-
           {/* Phase Filter Controls */}
           <div className="phase-controls">
             <button className="phase-btn">CONSONANT</button>
