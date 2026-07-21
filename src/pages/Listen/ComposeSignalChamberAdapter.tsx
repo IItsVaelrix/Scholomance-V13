@@ -399,42 +399,6 @@ export function ComposeSignalChamberAdapter({
               color={activeStation.color}
             />
           </div>
-
-          {/* Entropy Meter */}
-          <div className="param-node" data-compose-kind="metric-bar">
-            <div className="param-label">
-              <span>ENTROPY</span>
-              <span
-                className={`val ${
-                  entropyLevel >= 80
-                    ? 'val--critical'
-                    : entropyLevel >= 40
-                    ? 'val--warn'
-                    : ''
-                }`}
-              >
-                {entropyLevel}%
-              </span>
-            </div>
-            <div className="param-track param-track--entropy">
-              <motion.div
-                className={`param-fill param-fill--entropy ${
-                  entropyLevel >= 80
-                    ? 'is-critical'
-                    : entropyLevel >= 40
-                    ? 'is-warn'
-                    : ''
-                }`}
-                animate={{ width: `${entropyLevel}%` }}
-                transition={{ duration: 1.8, ease: 'easeOut' }}
-              />
-            </div>
-            {entropyLevel >= 40 && (
-              <div className="entropy-warning-label" aria-live="polite">
-                {entropyLevel >= 80 ? '⚠ DIMINISHING RETURNS' : '↑ PATTERN DETECTED'}
-              </div>
-            )}
-          </div>
         </div>
 
         {/* Pure Studio Dynamics Audio Compressor Effect */}
