@@ -373,3 +373,5 @@ export function createDefaultTokenResolver(): TokenResolver {
 }
 
 export { collectTokenPaths, assertThemeParity } from './theme-parity';
+export { applyDerivedTransforms } from './theme-transforms';
+export { generateThemeCSS, PUBLIC_THEME_ALIASES } from './theme-css';
