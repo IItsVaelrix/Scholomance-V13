@@ -90,6 +90,41 @@ describe('Compose Signal Chamber Adapter', () => {
     const grReadout = container.querySelector('.gr-meter-val');
     expect(grReadout?.textContent).toMatch(/-4\.\d dB/);
   });
+
+  test('renders Dual-Trace FFT Spectral Dynamics Console and permanent limiter banner', () => {
+    const { container, rerender } = render(
+      React.createElement(ComposeSignalChamberAdapter, {
+        currentSchoolId: 'SONIC',
+        isPlaying: true,
+        signalLevel: 0.4,
+      })
+    );
+
+    const traceA = container.querySelector('.spectral-trace-a');
+    expect(traceA).not.toBeNull();
+
+    const traceB = container.querySelector('.spectral-trace-b');
+    expect(traceB).not.toBeNull();
+
+    const svg = traceA?.closest('svg');
+    expect(svg?.getAttribute('viewBox')).toBe('0 0 160 70');
+
+    const limiterBanner = container.querySelector('.compressor-limiter-banner');
+    expect(limiterBanner).not.toBeNull();
+    expect(limiterBanner?.getAttribute('data-compose-active')).toBe('false');
+
+    rerender(
+      React.createElement(ComposeSignalChamberAdapter, {
+        currentSchoolId: 'SONIC',
+        isPlaying: true,
+        signalLevel: 0.85,
+      })
+    );
+
+    const limiterBannerActive = container.querySelector('.compressor-limiter-banner');
+    expect(limiterBannerActive).not.toBeNull();
+    expect(limiterBannerActive?.getAttribute('data-compose-active')).toBe('true');
+  });
 });
 
 describe('ListenPage UI Kit Integration', () => {
