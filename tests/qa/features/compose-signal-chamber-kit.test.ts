@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, test, expect } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { render } from '@testing-library/react';
 import React from 'react';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -54,6 +55,41 @@ describe('Compose Signal Chamber Adapter', () => {
     expect(html).toContain('data-compose-kind="signal-chamber-shell"');
     expect(html).toContain('data-compose-school="SONIC"');
   });
+
+  test('renders Phoneme Dynamics Compressor UI with gain reduction and transfer curve', () => {
+    const { container, rerender } = render(
+      React.createElement(ComposeSignalChamberAdapter, {
+        currentSchoolId: 'SONIC',
+        isPlaying: true,
+        signalLevel: 0.4,
+      })
+    );
+
+    const compressorUnit = container.querySelector('[data-compose-kind="phoneme-compressor-unit"]');
+    expect(compressorUnit).not.toBeNull();
+    expect(compressorUnit?.getAttribute('data-compose-status')).toBe('NORMAL');
+
+    const transferCurve = container.querySelector('[data-compose-part="transferCurve"]');
+    expect(transferCurve).not.toBeNull();
+
+    const ratioBadge = container.querySelector('.compressor-ratio-badge');
+    expect(ratioBadge?.textContent).toContain('1:1 LINEAR');
+
+    // Test attenuation state (> 0.75 signal level)
+    rerender(
+      React.createElement(ComposeSignalChamberAdapter, {
+        currentSchoolId: 'SONIC',
+        isPlaying: true,
+        signalLevel: 0.85,
+      })
+    );
+
+    expect(compressorUnit?.getAttribute('data-compose-status')).toBe('LIMITING');
+    expect(container.querySelector('.compressor-ratio-badge')?.textContent).toContain('∞:1 HARD LIMIT');
+
+    const grReadout = container.querySelector('.gr-meter-val');
+    expect(grReadout?.textContent).toMatch(/-4\.\d dB/);
+  });
 });
 
 describe('ListenPage UI Kit Integration', () => {
@@ -62,4 +98,5 @@ describe('ListenPage UI Kit Integration', () => {
     expect(html).toContain('data-compose-kind="signal-chamber-shell"');
   });
 });
+
 
