@@ -1,0 +1,47 @@
+{
+  "scrollbar": {
+    "thumb": {
+      "default": {
+        "$value": "var(--school-primary, rgba(196, 164, 92, 0.45))",
+        "$type": "color",
+        "$description": "Scrollbar thumb color tied to current school theme"
+      },
+      "hover": {
+        "$value": "var(--school-primary-glow, rgba(226, 201, 126, 0.75))",
+        "$type": "color",
+        "$description": "Scrollbar thumb hover color tied to school primary glow"
+      },
+      "active": {
+        "$value": "var(--gold-bright, #f5e4b3)",
+        "$type": "color",
+        "$description": "Scrollbar thumb active color"
+      }
+    },
+    "track": {
+      "default": {
+        "$value": "transparent",
+        "$type": "color",
+        "$description": "Scrollbar track background"
+      }
+    },
+    "width": {
+      "thin": {
+        "$value": "6px",
+        "$type": "dimension",
+        "$description": "Thin scrollbar width"
+      },
+      "normal": {
+        "$value": "8px",
+        "$type": "dimension",
+        "$description": "Standard scrollbar width"
+      }
+    },
+    "radius": {
+      "sm": {
+        "$value": "3px",
+        "$type": "borderRadius",
+        "$description": "Scrollbar thumb border radius"
+      }
+    }
+  }
+}
