@@ -89,27 +89,21 @@
 [data-theme='light'] {
   color-scheme: light;
 
-  --cz-bg: hsl(42 30% 96%);
-  --cz-bg-soft: hsl(42 28% 93%);
-  --cz-surface: hsl(42 34% 99%);
-  --cz-surface-2: hsl(42 22% 91%);
-  --cz-surface-glass: hsl(42 34% 99% / 0.82);
-  --cz-border: hsl(250 16% 76%);
-  --cz-border-strong: hsl(262 45% 50%);
+  --cz-bg: var(--compose-color-surface-bg);
+  --cz-bg-soft: var(--compose-color-surface-bg-soft);
+  --cz-surface: var(--compose-color-surface-default);
+  --cz-surface-2: var(--compose-color-surface-elevated);
+  --cz-surface-glass: color-mix(in srgb, var(--compose-color-surface-default) 82%, transparent);
+  --cz-border: var(--compose-color-border-soft);
+  --cz-border-strong: var(--compose-color-border-bold);
 
-  --cz-text: hsl(242 24% 12%);
-  --cz-text-muted: hsl(245 12% 36%);
-  --cz-text-dim: hsl(246 10% 52%);
-  --cz-indigo: hsl(254 62% 44%);
-  --cz-violet: hsl(274 62% 46%);
-  --cz-cyan: hsl(190 80% 36%);
-  --cz-amber: hsl(35 88% 45%);
-  --cz-orange: hsl(6 78% 44%);
-  --cz-crimson: hsl(348 76% 40%);
+  --cz-text: var(--compose-color-text-primary);
+  --cz-text-muted: var(--compose-color-text-secondary);
+  --cz-text-dim: var(--compose-color-text-muted);
 
-  --cz-shadow-soft: 0 16px 42px hsl(244 28% 18% / 0.12);
-  --cz-shadow-panel: 0 24px 70px hsl(244 28% 18% / 0.16);
-  --cz-glow-violet: 0 0 26px hsl(274 62% 46% / 0.16);
-  --cz-glow-cyan: 0 0 26px hsl(190 80% 36% / 0.13);
-  --cz-glow-amber: 0 0 22px hsl(35 88% 45% / 0.14);
+  --cz-shadow-soft: var(--compose-shadow-md);
+  --cz-shadow-panel: var(--compose-shadow-panel);
+  --cz-glow-violet: var(--compose-derived-glow-accent);
+  --cz-glow-cyan: var(--compose-derived-glow-accent);
+  --cz-glow-amber: var(--compose-derived-glow-accent);
 }

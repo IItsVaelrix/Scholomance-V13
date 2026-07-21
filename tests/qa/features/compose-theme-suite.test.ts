@@ -72,3 +72,17 @@ describe('Compose theme transforms and CSS emit', () => {
     expect(readFileSync(path, 'utf8').trim()).toBe(expected.trim());
   });
 });
+
+describe('Channel Zero light theme contract', () => {
+  it('channel-zero light theme aliases Compose surfaces (no cream hsl(42…))', () => {
+    const css = readFileSync(
+      resolve(process.cwd(), 'src/kits/channel-zero-ui-kit/tokens/channel-zero.tokens.css'),
+      'utf8',
+    );
+    const lightIdx = css.indexOf("[data-theme='light']");
+    expect(lightIdx).toBeGreaterThan(-1);
+    const lightBlock = css.slice(lightIdx, lightIdx + 800);
+    expect(lightBlock).not.toMatch(/hsl\(42\s/);
+    expect(lightBlock).toMatch(/--cz-bg:\s*var\(--compose-color-surface-bg|--bg-void\)/);
+  });
+});
