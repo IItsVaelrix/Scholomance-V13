@@ -3763,6 +3763,17 @@
   font-size: 10px;
   background: rgba(255, 255, 255, 0.08);
   color: var(--ritual-text, #ffffff);
+  min-width: 115px;
+  display: inline-block;
+  text-align: center;
+  box-sizing: border-box;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.compressor-ratio-badge--attenuating {
+  background: rgba(255, 152, 0, 0.2);
+  color: #ffb74d;
+  border: 1px solid rgba(255, 152, 0, 0.4);
 }
 
 .compressor-ratio-badge--limiting {

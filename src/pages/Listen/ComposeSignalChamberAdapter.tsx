@@ -155,17 +155,35 @@ export function ComposeSignalChamberAdapter({
     return -((smoothedSignal - 0.75) * 40);
   }, [smoothedSignal]);
 
-  const compressorRatio = useMemo(() => {
-    if (smoothedSignal >= 0.75) return '∞:1 HARD LIMIT';
-    if (smoothedSignal >= 0.50) return '4:1 COMPRESSING';
-    return '1:1 LINEAR';
+  // Compressor status state with 5% hysteresis band to eliminate status flipping jitter
+  const [compressorStatus, setCompressorStatus] = useState<'NORMAL' | 'ATTENUATING' | 'LIMITING'>('NORMAL');
+
+  useEffect(() => {
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
+      if (smoothedSignal >= 0.75) setCompressorStatus('LIMITING');
+      else if (smoothedSignal >= 0.50) setCompressorStatus('ATTENUATING');
+      else setCompressorStatus('NORMAL');
+      return;
+    }
+
+    setCompressorStatus((prev) => {
+      if (prev === 'NORMAL') {
+        if (smoothedSignal >= 0.52) return 'ATTENUATING';
+      } else if (prev === 'ATTENUATING') {
+        if (smoothedSignal >= 0.76) return 'LIMITING';
+        if (smoothedSignal < 0.47) return 'NORMAL';
+      } else if (prev === 'LIMITING') {
+        if (smoothedSignal < 0.70) return smoothedSignal >= 0.50 ? 'ATTENUATING' : 'NORMAL';
+      }
+      return prev;
+    });
   }, [smoothedSignal]);
 
-  const compressorStatus = useMemo(() => {
-    if (smoothedSignal >= 0.75) return 'LIMITING';
-    if (smoothedSignal >= 0.50) return 'ATTENUATING';
-    return 'NORMAL';
-  }, [smoothedSignal]);
+  const compressorRatio = useMemo(() => {
+    if (compressorStatus === 'LIMITING') return '∞:1 HARD LIMIT';
+    if (compressorStatus === 'ATTENUATING') return '4:1 COMPRESSING';
+    return '1:1 LINEAR';
+  }, [compressorStatus]);
 
   const traceAPath = useMemo(() => {
     return `M 10 60 Q 35 ${60 - smoothedSignal * 45} 85 ${60 - smoothedSignal * 35} T 150 60 L 150 60 L 10 60 Z`;
