@@ -70,33 +70,66 @@ export function ComposeSignalChamberAdapter({
     return { ...school, id, color: generateSchoolColor(id) };
   }, [currentSchoolId]);
 
+  // Exponential Moving Average (EMA) smoothing for jitter-free visual rendering
+  const [smoothedSignal, setSmoothedSignal] = useState(signalLevel);
+
+  useEffect(() => {
+    let animationFrameId: number;
+    let current = smoothedSignal;
+
+    const smoothStep = () => {
+      // Smooth 12% interpolation factor per frame for silky dynamics without jitter
+      const diff = signalLevel - current;
+      if (Math.abs(diff) > 0.001) {
+        current = current + diff * 0.12;
+        setSmoothedSignal(current);
+      }
+      animationFrameId = requestAnimationFrame(smoothStep);
+    };
+
+    animationFrameId = requestAnimationFrame(smoothStep);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [signalLevel]);
+
+  // Safe wrapper around WebAudio getByteFrequencyData to prevent playback runtime errors
+  const safeGetByteFrequencyData = useMemo(() => {
+    if (!getByteFrequencyData) return undefined;
+    return (array: Uint8Array) => {
+      try {
+        getByteFrequencyData(array);
+      } catch {
+        // Suppress transient audio context recovery errors
+      }
+    };
+  }, [getByteFrequencyData]);
+
   // Phoneme density warning with hysteresis to prevent flickering
   const [phonemeWarning, setPhonemeWarning] = useState(false);
   useEffect(() => {
-    if (signalLevel > 0.75) {
+    if (smoothedSignal > 0.75) {
       setPhonemeWarning(true);
-    } else if (signalLevel < 0.68) {
+    } else if (smoothedSignal < 0.68) {
       setPhonemeWarning(false);
     }
-  }, [signalLevel]);
+  }, [smoothedSignal]);
 
-  // Calculate dynamic compressor values
+  // Calculate dynamic compressor values using smoothed signal level
   const gainReductionDb = useMemo(() => {
-    if (signalLevel <= 0.75) return 0;
-    return -((signalLevel - 0.75) * 40);
-  }, [signalLevel]);
+    if (smoothedSignal <= 0.75) return 0;
+    return -((smoothedSignal - 0.75) * 40);
+  }, [smoothedSignal]);
 
   const compressorRatio = useMemo(() => {
-    if (signalLevel >= 0.75) return '∞:1 HARD LIMIT';
-    if (signalLevel >= 0.50) return '4:1 COMPRESSING';
+    if (smoothedSignal >= 0.75) return '∞:1 HARD LIMIT';
+    if (smoothedSignal >= 0.50) return '4:1 COMPRESSING';
     return '1:1 LINEAR';
-  }, [signalLevel]);
+  }, [smoothedSignal]);
 
   const compressorStatus = useMemo(() => {
-    if (signalLevel >= 0.75) return 'LIMITING';
-    if (signalLevel >= 0.50) return 'ATTENUATING';
+    if (smoothedSignal >= 0.75) return 'LIMITING';
+    if (smoothedSignal >= 0.50) return 'ATTENUATING';
     return 'NORMAL';
-  }, [signalLevel]);
+  }, [smoothedSignal]);
 
   const sidebarProps = {
     initial: { opacity: 0, x: 30 },
@@ -217,13 +250,13 @@ export function ComposeSignalChamberAdapter({
               <span className="val">{isPlaying ? 'ACTIVE' : 'STANDBY'}</span>
             </div>
             <div className="spectrum-canvas">
-              {getByteFrequencyData ? (
+              {safeGetByteFrequencyData ? (
                 <ScholoCandy
                   isPlaying={isPlaying}
-                  getByteFrequencyData={getByteFrequencyData}
+                  getByteFrequencyData={safeGetByteFrequencyData}
                   currentSchoolId={currentSchoolId}
                   detectedSchoolId={detectedSchoolId}
-                  signalLevel={signalLevel}
+                  signalLevel={smoothedSignal}
                   eqNodes={getEqNodes?.() ?? []}
                   onBandsChanged={setEqBands}
                 />
@@ -357,12 +390,12 @@ export function ComposeSignalChamberAdapter({
             <div className="meter-lane">
               <div className="meter-label">
                 <span>IN</span>
-                <span className="meter-val">{Math.round(signalLevel * 100)}%</span>
+                <span className="meter-val">{Math.round(smoothedSignal * 100)}%</span>
               </div>
               <div className="meter-track">
                 <div
                   className="meter-fill meter-fill--in"
-                  style={{ width: `${Math.min(100, signalLevel * 100)}%` }}
+                  style={{ width: `${Math.min(100, smoothedSignal * 100)}%` }}
                 />
               </div>
             </div>
@@ -401,8 +434,8 @@ export function ComposeSignalChamberAdapter({
               />
               {/* Current operating point dot */}
               <circle
-                cx={10 + Math.min(80, signalLevel * 80)}
-                cy={50 - Math.min(30, signalLevel * 30 + (gainReductionDb < 0 ? Math.abs(gainReductionDb) * 0.5 : 0))}
+                cx={10 + Math.min(80, smoothedSignal * 80)}
+                cy={50 - Math.min(30, smoothedSignal * 30 + (gainReductionDb < 0 ? Math.abs(gainReductionDb) * 0.5 : 0))}
                 r="3"
                 fill={phonemeWarning ? 'var(--ritual-danger, #ff4444)' : '#ffffff'}
               />
