@@ -26,11 +26,51 @@
 .az-scope:has(input:disabled) { opacity: 0.38; cursor: not-allowed; }
 .az-scope--active { color: #e8dcff; border-color: #695092; background: #251d37; }
 .az-scope-note { margin: 0; min-height: 1.2em; color: #77758a; font-size: 0.68rem; line-height: 1.35; }
+.az-ambiguity-margin-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 1.25rem;
+  background: #11111a;
+  border: 1px solid #29283a;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.az-ambiguity-margin-bar__fill {
+  height: 100%;
+  transition: width 0.3s ease, background 0.3s ease;
+  box-shadow: 0 0 8px var(--margin-color, #91d7be);
+}
+.az-ambiguity-margin-bar__label {
+  position: absolute;
+  right: 0.5rem;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: #f1ead8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
 .az-pins { display: flex; flex-wrap: wrap; gap: 0.3rem; flex-shrink: 0; }
 .az-pin { display: inline-flex; align-items: center; gap: 0.25rem; background: #16161f; color: #d6c8f0; border: 1px solid #2a2a3a; border-radius: 999px; padding: 0.15rem 0.4rem; font-size: 0.75rem; }
 .az-pin button { background: none; border: none; color: #8a8fae; cursor: pointer; padding: 0 0.1rem; font-size: 0.8rem; line-height: 1; }
 .az-pin button:hover { color: #d6b8ff; }
-.az-result-shell { display: flex; flex: 1; min-height: 0; flex-direction: column; gap: 0.55rem; overflow-y: auto; padding-right: 0.15rem; scrollbar-width: thin; scrollbar-color: hsla(43, 48%, 48%, 0.2) transparent; }
+.az-result-shell {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  gap: 0.55rem;
+  overflow-y: auto;
+  padding-right: 0.15rem;
+  --scrollbar-thumb: var(--compose-scrollbar-thumb-default, var(--school-primary, hsla(43, 48%, 48%, 0.45)));
+  --scrollbar-thumb-hover: var(--compose-scrollbar-thumb-hover, var(--school-primary-glow, hsla(43, 48%, 60%, 0.75)));
+  --scrollbar-track: var(--compose-scrollbar-track-default, transparent);
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
 .az-resolution { display: flex; align-items: baseline; justify-content: space-between; gap: 0.6rem; flex-shrink: 0; padding: 0.42rem 0.5rem; border: 1px solid #37334a; border-radius: 5px; background: #13131c; }
 .az-resolution strong { color: #e2d5f7; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; }
 .az-resolution span { color: #85839a; font-size: 0.66rem; text-align: right; }
@@ -41,7 +81,17 @@
 .az-resolution--unbound strong { color: #ef8ea0; }
 .az-degradation { padding: 0.38rem 0.5rem; border-left: 2px solid #d19b48; background: rgba(107, 76, 29, 0.18); color: #dfbd81; font-size: 0.7rem; line-height: 1.4; }
 .az-degradation-list { margin: -0.25rem 0 0; padding-left: 1rem; color: #9f96af; font-size: 0.65rem; }
-.az-candidates { display: flex; gap: 0.3rem; flex-shrink: 0; overflow-x: auto; padding-bottom: 0.1rem; scrollbar-width: thin; }
+.az-candidates {
+  display: flex;
+  gap: 0.3rem;
+  flex-shrink: 0;
+  overflow-x: auto;
+  padding-bottom: 0.1rem;
+  --scrollbar-thumb: var(--compose-scrollbar-thumb-default, var(--school-primary, hsla(43, 48%, 48%, 0.45)));
+  --scrollbar-track: var(--compose-scrollbar-track-default, transparent);
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
 .az-candidate { display: grid; grid-template-columns: auto auto; grid-template-areas: "rank lemma" "score pos"; column-gap: 0.3rem; row-gap: 0.08rem; flex: 0 0 auto; min-width: 7.2rem; padding: 0.38rem 0.48rem; color: #8f8aa0; border: 1px solid #2b293b; border-radius: 5px; background: #11111a; cursor: pointer; text-align: left; }
 .az-candidate:hover { border-color: #51436b; }
 .az-candidate:focus-visible { outline: 2px solid #b68cff; outline-offset: 2px; }
@@ -70,14 +120,35 @@
   flex: 0 0 auto;
   min-height: min-content;
   overflow: visible;
+  --scrollbar-thumb: var(--compose-scrollbar-thumb-default, var(--school-primary, hsla(43, 48%, 48%, 0.45)));
+  --scrollbar-thumb-hover: var(--compose-scrollbar-thumb-hover, var(--school-primary-glow, hsla(43, 48%, 60%, 0.75)));
+  --scrollbar-track: var(--compose-scrollbar-track-default, transparent);
   scrollbar-width: thin;
-  scrollbar-color: hsla(43, 48%, 48%, 0.2) transparent;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
-.az-groups::-webkit-scrollbar { width: 4px; }
-.az-groups::-webkit-scrollbar-track { background: transparent; }
-.az-groups::-webkit-scrollbar-thumb {
-  background: hsla(43, 48%, 48%, 0.2);
-  border-radius: 2px;
+@supports not (scrollbar-color: auto) {
+  .az-result-shell::-webkit-scrollbar,
+  .az-candidates::-webkit-scrollbar,
+  .az-groups::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  .az-result-shell::-webkit-scrollbar-track,
+  .az-candidates::-webkit-scrollbar-track,
+  .az-groups::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+  .az-result-shell::-webkit-scrollbar-thumb,
+  .az-candidates::-webkit-scrollbar-thumb,
+  .az-groups::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: var(--compose-scrollbar-radius-sm, 2px);
+  }
+  .az-result-shell::-webkit-scrollbar-thumb:hover,
+  .az-candidates::-webkit-scrollbar-thumb:hover,
+  .az-groups::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+  }
 }
 .az-group__title { font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase; color: #c9a840; margin: 0.3rem 0; }
 .az-group__count { color: #6b6b80; }

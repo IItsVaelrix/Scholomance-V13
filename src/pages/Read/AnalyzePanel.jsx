@@ -155,6 +155,7 @@ export default function AnalyzePanel({
   const candidate = result?.resolution?.candidates?.find((entry) => entry.id === activeCandidateId)
     || result?.resolution?.candidates?.[0]
     || null;
+  const resolutionInfo = result?.resolution ? { score: result.resolution.margin, status: result.resolution.status } : null;
   const candidateResult = result?.candidateResults?.find((entry) => entry.candidateId === candidate?.id);
   const candidateGroups = candidateResult?.groups || [];
   const sharedGroups = result?.sharedGroups || [];
@@ -260,6 +261,19 @@ export default function AnalyzePanel({
           </p>
         )}
       </form>
+
+      <div
+        className="az-ambiguity-margin-bar"
+        data-compose-layout="constraint"
+        data-compose-region="leximancy-margin-region"
+        style={{
+          '--margin-width': `${Math.min(100, Math.max(10, (resolutionInfo?.score || 0.7) * 100))}%`,
+          '--margin-color': resolutionInfo?.status === 'clear' ? '#91d7be' : resolutionInfo?.status === 'ambiguous' ? '#e4c36b' : '#ef8ea0',
+        }}
+      >
+        <div className="az-ambiguity-margin-bar__fill" style={{ width: 'var(--margin-width)', background: 'var(--margin-color)' }} />
+        <span className="az-ambiguity-margin-bar__label">{resolutionInfo?.status || 'clear'} ({Math.round((resolutionInfo?.score || 0.7) * 100)}%)</span>
+      </div>
 
       {(contextError || error) && <div className="az-error" role="alert">{contextError || error}</div>}
       {loading && <div className="az-loading" role="status">Ranking the closed morphology lattice…</div>}

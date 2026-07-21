@@ -17,4 +17,17 @@ describe('Compose Leximancy Panel Architecture', () => {
     expect(html).toContain('data-compose-version="1.0.0"');
     expect(html).toContain('role="region"');
   });
+
+  it('renders dynamic ambiguity margin bar with constraint solver attributes', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(AnalyzePanel, {
+        activeScroll: null,
+        editorTitle: 'Test',
+        editorContent: 'Test content',
+        onCraftAction: () => {},
+      })
+    );
+    expect(html).toContain('az-ambiguity-margin-bar');
+    expect(html).toContain('data-compose-layout="constraint"');
+  });
 });
