@@ -547,12 +547,6 @@ export function ComposeSignalChamberAdapter({
               <span className="val">12ms / 150ms</span>
             </div>
           </div>
-
-          {/* Phase Filter Controls */}
-          <div className="phase-controls">
-            <button className="phase-btn">CONSONANT</button>
-            <button className="phase-btn">VOWEL</button>
-          </div>
         </div>
       </motion.aside>
 
