@@ -29,7 +29,8 @@
 | `src/core/compose/tokens/theme-transforms.ts` | Derived transform registry |
 | `src/core/compose/tokens/theme-css.ts` | Dual-suite CSS emit + public aliases |
 | `src/core/compose/tokens/index.ts` | Re-exports |
-| `scripts/generate-compose-themes.mjs` | Write generated CSS to disk |
+| `scripts/generate-compose-themes.mjs` | Load theme JSON; call TS `generateThemeCSS` via `tsx`; write CSS |
+| `scripts/build-tokens.mjs` | Keep building base/scrollbar → `dist/tokens/`; do **not** merge theme files into flat `:root` (themes own `compose-themes.css`) |
 | `src/lib/css/generated/compose-themes.css` | Generated output |
 | `src/index.css` | Import generated themes; rebind base colors to aliases |
 | `src/kits/channel-zero-ui-kit/tokens/channel-zero.tokens.css` | CZ light → Compose aliases |
@@ -460,17 +461,15 @@ EOF
 **Files:**
 - Create: `scripts/generate-compose-themes.mjs`
 - Create: `src/lib/css/generated/compose-themes.css` (via script)
-- Modify: `package.json` (add script; optionally prepend to `build`)
+- Modify: `package.json` (`generate:compose-themes`; call it from `build` next to `build:tokens`)
+- Modify: `scripts/build-tokens.mjs` (skip `themes/` when globbing flat token merge — only `*.json` in `tokens/compose/` root)
 - Modify: `src/index.css` (import + stop hardcoding theme surfaces)
 
 **Interfaces:**
-- Consumes: `generateThemeCSS` (via dynamic import of built TS **or** duplicate thin JSON→CSS in mjs using the same logic)
-- Preferred: Vitest-friendly TS module; script uses `node --experimental-strip-types` or `tsx` if already in repo — check `package.json` for `tsx` / `ts-node`. If none, implement `scripts/lib/compose-theme-css.mjs` that mirrors `generateThemeCSS` by importing compiled path, OR run generation from a small vitest/node entry.
+- Consumes: `generateThemeCSS` from `src/core/compose/tokens/theme-css.ts` via existing `tsx` (same as `build:tokens`)
+- Produces: `src/lib/css/generated/compose-themes.css`
 
-**Practical approach for this repo (JS-first server):** put a pure JS emitter at `scripts/lib/compose-theme-css.mjs` that:
-
-1. Reads both JSON files
-2. Implements the same parity + CSS walk + aliases (keep in sync with `theme-css.ts` — unit test asserts script output matches `generateThemeCSS`)
+Repo already has `"build:tokens": "tsx scripts/build-tokens.mjs"` and `tsx` in devDependencies. Theme generation uses the **same** TS emitter tested in Task 2 — no duplicate MJS port.
 
 - [ ] **Step 1: Add test that generated file matches emitter**
 
@@ -496,54 +495,52 @@ it('checked-in compose-themes.css matches generateThemeCSS output', () => {
 `scripts/generate-compose-themes.mjs`:
 
 ```js
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+#!/usr/bin/env node
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { generateThemeCSS } from '../src/core/compose/tokens/theme-css.ts';
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const outPath = resolve(root, 'src/lib/css/generated/compose-themes.css');
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const outPath = path.join(ROOT, 'src/lib/css/generated/compose-themes.css');
 
-// Import TS emitter through Vitest-compatible path: prefer spawning
-// `npx vitest run` helper OR use dynamic import of a .mjs mirror.
-// Canonical: write CSS by importing from src via vite-node if available.
-import { createRequire } from 'node:module';
+const dark = JSON.parse(
+  fs.readFileSync(path.join(ROOT, 'tokens/compose/themes/dark.json'), 'utf8'),
+);
+const light = JSON.parse(
+  fs.readFileSync(path.join(ROOT, 'tokens/compose/themes/light.json'), 'utf8'),
+);
 
-async function main() {
-  const { generateThemeCSS } = await import(
-    pathToFileURL(resolve(root, 'scripts/lib/compose-theme-css.mjs')).href
-  );
-  const dark = JSON.parse(readFileSync(resolve(root, 'tokens/compose/themes/dark.json'), 'utf8'));
-  const light = JSON.parse(readFileSync(resolve(root, 'tokens/compose/themes/light.json'), 'utf8'));
-  const css = generateThemeCSS(dark, light);
-  mkdirSync(dirname(outPath), { recursive: true });
-  writeFileSync(outPath, css, 'utf8');
-  console.log(`Wrote ${outPath}`);
-}
-
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+const css = generateThemeCSS(dark, light);
+fs.mkdirSync(path.dirname(outPath), { recursive: true });
+fs.writeFileSync(outPath, css, 'utf8');
+console.log(`Wrote ${outPath}`);
 ```
 
-Create `scripts/lib/compose-theme-css.mjs` as a JS port of `theme-parity` + `theme-transforms` + `theme-css` (same PUBLIC_THEME_ALIASES keys/values and selector strings). Keep the Vitest suite as source of truth for TypeScript API; add one test:
+In `scripts/build-tokens.mjs` `loadTokens()`, keep `readdirSync` on `tokens/compose` **files only** (already `*.json` at root — `themes/` is a subdirectory and is skipped). Add an explicit comment:
 
-```ts
-it('mjs emitter matches TS generateThemeCSS', async () => {
-  const mjs = await import('../../../scripts/lib/compose-theme-css.mjs');
-  const dark = loadTheme('dark');
-  const light = loadTheme('light');
-  expect(mjs.generateThemeCSS(dark, light).trim()).toBe(generateThemeCSS(dark, light).trim());
-});
+```js
+// Theme suites live in tokens/compose/themes/ and are emitted by
+// scripts/generate-compose-themes.mjs — do not merge them into dist/tokens.
 ```
 
 Add to `package.json` scripts:
 
 ```json
-"generate:compose-themes": "node scripts/generate-compose-themes.mjs"
+"generate:compose-themes": "tsx scripts/generate-compose-themes.mjs"
 ```
 
-Prepend `npm run generate:compose-themes &&` to the existing `build` script (or to `verify:css-tokens` chain if that is the gate — match how `generate-school-styles` is wired).
+Update `build` from:
+
+```json
+"build": "npm run build:tokens && node scripts/verify-css-tokens.js && ..."
+```
+
+to:
+
+```json
+"build": "npm run build:tokens && npm run generate:compose-themes && node scripts/verify-css-tokens.js && ..."
+```
 
 - [ ] **Step 4: Run generator + tests**
 
@@ -562,7 +559,7 @@ At top of `src/index.css` (after school-styles import):
 @import './lib/css/generated/compose-themes.css';
 ```
 
-In the `/* === BASE COLORS - UNIFIED SYSTEM === */` `:root` block, **replace literal assignments** for bridged tokens with comments that ownership moved to compose-themes, e.g. remove:
+In the `/* === BASE COLORS - UNIFIED SYSTEM === */` `:root` block, **remove literal assignments** for bridged tokens (ownership moves to compose-themes):
 
 ```css
 --bg-void: #090916;
@@ -581,24 +578,26 @@ In the `/* === BASE COLORS - UNIFIED SYSTEM === */` `:root` block, **replace lit
 
 Those now come from `compose-themes.css` aliases. Keep void-arena and school-gradient tokens that are not in the suite.
 
-Ensure `body` / app shell backgrounds use `var(--bg-void)` / `var(--bg-surface)` (already true in many places — fix any remaining `#090916` literals in `index.css` nav chrome that should follow theme).
+Ensure `body` / app shell backgrounds use `var(--bg-void)` / `var(--bg-surface)`. Fix remaining `#090916` literals in `index.css` nav chrome that should follow theme.
 
-Add light chrome density consumers on html/body if needed:
+Add chrome density bridges:
 
 ```css
 html {
   --chrome-pad: var(--compose-layout-chrome-pad);
-  --chrome-topbar-height: var(--compose-layout-topbar-height);
-  --chrome-panel-gap: var(--compose-layout-panel-gap);
-  --chrome-radius: var(--compose-layout-radius-chrome);
+  --chrome-topbar-height: var(--compose-layout-chrome-topbar-height);
+  --chrome-panel-gap: var(--compose-layout-chrome-panel-gap);
+  --chrome-radius: var(--compose-layout-chrome-radius);
   --chrome-ornament-opacity: var(--compose-layout-chrome-ornament-opacity);
 }
 ```
 
+Note: `generateCSS` kebab-cases path segments, so `layout.chrome.topbar-height` → `--compose-layout-chrome-topbar-height`.
+
 - [ ] **Step 6: Commit**
 
 ```bash
-git add scripts/generate-compose-themes.mjs scripts/lib/compose-theme-css.mjs \
+git add scripts/generate-compose-themes.mjs scripts/build-tokens.mjs \
   src/lib/css/generated/compose-themes.css package.json src/index.css \
   tests/qa/features/compose-theme-suite.test.ts
 git commit -m "$(cat <<'EOF'
@@ -882,5 +881,5 @@ EOF
 ## Plan self-review notes
 
 - Alias map locked in `PUBLIC_THEME_ALIASES` (Task 2); expand only with parity + tests.
-- MJS emitter mirrors TS — Task 3 includes equality test to prevent drift.
+- Theme CSS is emitted from the same TS `generateThemeCSS` via `tsx` (no duplicate MJS port); checked-in file must match emitter output.
 - Full literal sweep of every CSS file is YAGNI for v1; Tasks 3–5 cover the high-traffic shells. Remaining dark literals are follow-ups once suites land.
