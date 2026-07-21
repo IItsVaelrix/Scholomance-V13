@@ -315,7 +315,7 @@ body::before {
 
   /* Page Layout */
   --page-gutter: clamp(1rem, 3vw, 2rem);
-  --nav-rail-height: 48px;
+  --nav-rail-height: var(--chrome-topbar-height);
 
   /* Border Radius */
   --radius-sm: 0.25rem;
@@ -611,7 +611,7 @@ a:focus-visible {
   background:
     radial-gradient(ellipse 80vw 60vh at 50% 80%,
       hsla(calc(var(--active-school-h) + 30), var(--active-school-s), var(--active-school-l),
-           calc((0.25 + var(--active-signal-level) * 0.1) * var(--active-aurora-intensity))) 0%, transparent 50%);
+           calc((0.25 + var(--active-signal-level) * 0.1) * var(--active-aurora-intensity) * var(--chrome-ornament-opacity, 1))) 0%, transparent 50%);
   background-size: 200% 200%;
   animation: aurora-near 14s ease-in-out infinite alternate;
 }
@@ -624,7 +624,7 @@ a:focus-visible {
   background:
     radial-gradient(ellipse 80vw 60vh at 20% 30%,
       hsla(var(--active-school-h), var(--active-school-s), var(--active-school-l),
-           calc((0.4 + var(--active-signal-level) * 0.15) * var(--active-aurora-intensity))) 0%, transparent 50%);
+           calc((0.4 + var(--active-signal-level) * 0.15) * var(--active-aurora-intensity) * var(--chrome-ornament-opacity, 1))) 0%, transparent 50%);
   background-size: 200% 200%;
   transform: translateZ(-200px);
   animation: aurora-deep 30s ease-in-out infinite alternate;
@@ -638,7 +638,7 @@ a:focus-visible {
   background:
     radial-gradient(ellipse 80vw 60vh at 80% 40%,
       hsla(var(--active-school-h), calc(var(--active-school-s) * 0.7), calc(var(--active-school-l) * 1.2),
-           calc((0.3 + var(--active-signal-level) * 0.12) * var(--active-aurora-intensity))) 0%, transparent 50%);
+           calc((0.3 + var(--active-signal-level) * 0.12) * var(--active-aurora-intensity) * var(--chrome-ornament-opacity, 1))) 0%, transparent 50%);
   background-size: 200% 200%;
   transform: translateZ(-100px);
   animation: aurora-mid 20s ease-in-out infinite alternate;
@@ -650,7 +650,7 @@ a:focus-visible {
   inset: 0;
   /* Static gradient — opacity controls strength; opacity transition is compositor-only (no repaint) */
   background: radial-gradient(ellipse at center, transparent 40%, #030308 100%);
-  opacity: var(--active-vignette-strength);
+  opacity: calc(var(--active-vignette-strength, 1) * var(--chrome-ornament-opacity, 1));
   transition: opacity 1.5s ease;
   will-change: opacity;
   contain: paint;
@@ -1515,15 +1515,25 @@ h6 { font-size: var(--text-base); }
 
 /* High Contrast */
 @media (prefers-contrast: more) {
-  :root {
+  :root:not([data-theme='light']),
+  [data-theme='dark'] {
     --text-primary: #ffffff;
     --text-secondary: #f0f0f0;
     --border-subtle: rgba(255, 255, 255, 0.3);
     --border-soft: rgba(255, 255, 255, 0.5);
     --border-bold: rgba(255, 255, 255, 0.7);
   }
-  
-  .card {
+
+  [data-theme='light'] {
+    --text-primary: #0f172a;
+    --text-secondary: #1e293b;
+    --border-subtle: rgba(15, 23, 42, 0.24);
+    --border-soft: rgba(15, 23, 42, 0.36);
+    --border-bold: rgba(15, 23, 42, 0.52);
+  }
+
+  :root:not([data-theme='light']) .card,
+  [data-theme='dark'] .card {
     background: #000;
   }
   

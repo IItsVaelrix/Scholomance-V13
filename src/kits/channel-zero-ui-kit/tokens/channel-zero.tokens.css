@@ -100,6 +100,12 @@
   --cz-text: var(--compose-color-text-primary);
   --cz-text-muted: var(--compose-color-text-secondary);
   --cz-text-dim: var(--compose-color-text-muted);
+  --cz-indigo: hsl(254 62% 44%);
+  --cz-violet: hsl(274 62% 46%);
+  --cz-cyan: hsl(190 80% 36%);
+  --cz-amber: hsl(35 88% 45%);
+  --cz-orange: hsl(6 78% 44%);
+  --cz-crimson: hsl(348 76% 40%);
 
   --cz-shadow-soft: var(--compose-shadow-md);
   --cz-shadow-panel: var(--compose-shadow-panel);
