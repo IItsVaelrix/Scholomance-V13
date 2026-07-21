@@ -371,3 +371,5 @@ export const DEFAULT_TOKENS_DTCG: DTCGDictionary = {
 export function createDefaultTokenResolver(): TokenResolver {
   return new TokenResolver(DEFAULT_TOKENS_DTCG);
 }
+
+export { collectTokenPaths, assertThemeParity } from './theme-parity';

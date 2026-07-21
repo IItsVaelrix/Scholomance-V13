@@ -1,0 +1,70 @@
+{
+  "color": {
+    "surface": {
+      "bg": { "$value": "#090916", "$type": "color", "$description": "App void background" },
+      "bg-soft": { "$value": "#0d0d20", "$type": "color", "$description": "Soft deep background" },
+      "default": { "$value": "#131328", "$type": "color", "$description": "Default surface" },
+      "elevated": { "$value": "#1c1c38", "$type": "color", "$description": "Elevated surface" },
+      "canvas": { "$value": "#090916", "$type": "color", "$description": "Editor/canvas abyss" }
+    },
+    "text": {
+      "primary": { "$value": "#ede8d4", "$type": "color" },
+      "secondary": { "$value": "#cdc5a8", "$type": "color" },
+      "tertiary": { "$value": "#a89d80", "$type": "color" },
+      "muted": { "$value": "#7a6f55", "$type": "color" },
+      "inverse": { "$value": "#ffffff", "$type": "color" }
+    },
+    "border": {
+      "subtle": { "$value": "rgba(100, 90, 160, 0.20)", "$type": "color" },
+      "soft": { "$value": "rgba(100, 90, 160, 0.32)", "$type": "color" },
+      "bold": { "$value": "rgba(100, 90, 160, 0.50)", "$type": "color" },
+      "strong": { "$value": "hsla(43, 48%, 48%, 0.35)", "$type": "color" }
+    },
+    "accent": {
+      "primary": { "$value": "#3b82f6", "$type": "color" },
+      "success": { "$value": "#22c55e", "$type": "color" },
+      "warning": { "$value": "#f59e0b", "$type": "color" },
+      "danger": { "$value": "#ef4444", "$type": "color" }
+    },
+    "glow": {
+      "accent-opacity": { "$value": 0.3, "$type": "opacity" },
+      "focus-opacity": { "$value": 0.35, "$type": "opacity" }
+    }
+  },
+  "shadow": {
+    "sm": { "$value": "0 1px 2px rgba(0,0,0,0.35)", "$type": "shadow" },
+    "md": { "$value": "0 4px 6px rgba(0,0,0,0.45)", "$type": "shadow" },
+    "lg": { "$value": "0 10px 15px rgba(0,0,0,0.55)", "$type": "shadow" },
+    "panel": { "$value": "0 24px 80px rgba(0,0,0,0.56)", "$type": "shadow" }
+  },
+  "layout": {
+    "chrome": {
+      "pad": { "$value": "12px", "$type": "dimension" },
+      "topbar-height": { "$value": "48px", "$type": "dimension" },
+      "panel-gap": { "$value": "8px", "$type": "dimension" },
+      "radius": { "$value": "8px", "$type": "borderRadius" },
+      "ornament-opacity": { "$value": 1, "$type": "opacity" }
+    }
+  },
+  "scrollbar": {
+    "thumb": {
+      "default": { "$value": "rgba(255,255,255,0.08)", "$type": "color" },
+      "hover": { "$value": "rgba(255,255,255,0.15)", "$type": "color" }
+    },
+    "track": {
+      "default": { "$value": "transparent", "$type": "color" }
+    }
+  },
+  "derived": {
+    "glow-accent": {
+      "$value": "{color.accent.primary}",
+      "$type": "color",
+      "$extensions": { "compose.transform": "glow-from-accent" }
+    },
+    "focus-ring-color": {
+      "$value": "{color.accent.primary}",
+      "$type": "color",
+      "$extensions": { "compose.transform": "focus-ring" }
+    }
+  }
+}

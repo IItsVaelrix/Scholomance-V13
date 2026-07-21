@@ -1,0 +1,70 @@
+{
+  "color": {
+    "surface": {
+      "bg": { "$value": "#ffffff", "$type": "color", "$description": "App void background" },
+      "bg-soft": { "$value": "#fafafa", "$type": "color", "$description": "Soft deep background" },
+      "default": { "$value": "#ffffff", "$type": "color", "$description": "Default surface" },
+      "elevated": { "$value": "#fafafa", "$type": "color", "$description": "Elevated surface" },
+      "canvas": { "$value": "#ffffff", "$type": "color", "$description": "Editor/canvas abyss" }
+    },
+    "text": {
+      "primary": { "$value": "#0f172a", "$type": "color" },
+      "secondary": { "$value": "#334155", "$type": "color" },
+      "tertiary": { "$value": "#64748b", "$type": "color" },
+      "muted": { "$value": "#94a3b8", "$type": "color" },
+      "inverse": { "$value": "#ffffff", "$type": "color" }
+    },
+    "border": {
+      "subtle": { "$value": "rgba(15,23,42,0.08)", "$type": "color" },
+      "soft": { "$value": "rgba(15,23,42,0.12)", "$type": "color" },
+      "bold": { "$value": "rgba(15,23,42,0.18)", "$type": "color" },
+      "strong": { "$value": "hsla(215, 16%, 47%, 0.35)", "$type": "color" }
+    },
+    "accent": {
+      "primary": { "$value": "#2563eb", "$type": "color" },
+      "success": { "$value": "#16a34a", "$type": "color" },
+      "warning": { "$value": "#d97706", "$type": "color" },
+      "danger": { "$value": "#dc2626", "$type": "color" }
+    },
+    "glow": {
+      "accent-opacity": { "$value": 0.12, "$type": "opacity" },
+      "focus-opacity": { "$value": 0.2, "$type": "opacity" }
+    }
+  },
+  "shadow": {
+    "sm": { "$value": "0 1px 2px rgba(15,23,42,0.05)", "$type": "shadow" },
+    "md": { "$value": "0 4px 6px rgba(15,23,42,0.08)", "$type": "shadow" },
+    "lg": { "$value": "0 10px 15px rgba(15,23,42,0.10)", "$type": "shadow" },
+    "panel": { "$value": "0 24px 80px rgba(15,23,42,0.12)", "$type": "shadow" }
+  },
+  "layout": {
+    "chrome": {
+      "pad": { "$value": "16px", "$type": "dimension" },
+      "topbar-height": { "$value": "56px", "$type": "dimension" },
+      "panel-gap": { "$value": "12px", "$type": "dimension" },
+      "radius": { "$value": "12px", "$type": "borderRadius" },
+      "ornament-opacity": { "$value": 0, "$type": "opacity" }
+    }
+  },
+  "scrollbar": {
+    "thumb": {
+      "default": { "$value": "rgba(15,23,42,0.18)", "$type": "color" },
+      "hover": { "$value": "rgba(15,23,42,0.28)", "$type": "color" }
+    },
+    "track": {
+      "default": { "$value": "#ffffff", "$type": "color" }
+    }
+  },
+  "derived": {
+    "glow-accent": {
+      "$value": "{color.accent.primary}",
+      "$type": "color",
+      "$extensions": { "compose.transform": "glow-from-accent" }
+    },
+    "focus-ring-color": {
+      "$value": "{color.accent.primary}",
+      "$type": "color",
+      "$extensions": { "compose.transform": "focus-ring" }
+    }
+  }
+}
