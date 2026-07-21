@@ -9,6 +9,7 @@ import {
   canonicalStringify,
 } from '../../../src/core/compose/kits/signalChamber.compose.js';
 import ComposeSignalChamberAdapter from '../../../src/pages/Listen/ComposeSignalChamberAdapter';
+import ListenPage from '../../../src/pages/Listen/ListenPage';
 
 const FIXTURE_PATH = join(
   process.cwd(),
@@ -52,6 +53,13 @@ describe('Compose Signal Chamber Adapter', () => {
     );
     expect(html).toContain('data-compose-kind="signal-chamber-shell"');
     expect(html).toContain('data-compose-school="SONIC"');
+  });
+});
+
+describe('ListenPage UI Kit Integration', () => {
+  it('renders ComposeSignalChamberAdapter inside ListenPage', () => {
+    const html = renderToStaticMarkup(React.createElement(ListenPage));
+    expect(html).toContain('data-compose-kind="signal-chamber-shell"');
   });
 });
 
