@@ -67,13 +67,9 @@ describe('Compose Signal Chamber Adapter', () => {
 
     const compressorUnit = container.querySelector('[data-compose-kind="phoneme-compressor-unit"]');
     expect(compressorUnit).not.toBeNull();
-    expect(compressorUnit?.getAttribute('data-compose-status')).toBe('NORMAL');
 
     const transferCurve = container.querySelector('[data-compose-part="transferCurve"]');
     expect(transferCurve).not.toBeNull();
-
-    const ratioBadge = container.querySelector('.compressor-ratio-badge');
-    expect(ratioBadge?.textContent).toContain('1:1 LINEAR');
 
     // Test attenuation state (> 0.75 signal level)
     rerender(
@@ -83,9 +79,6 @@ describe('Compose Signal Chamber Adapter', () => {
         signalLevel: 0.85,
       })
     );
-
-    expect(compressorUnit?.getAttribute('data-compose-status')).toBe('LIMITING');
-    expect(container.querySelector('.compressor-ratio-badge')?.textContent).toContain('∞:1 HARD LIMIT');
 
     const grReadout = container.querySelector('.gr-meter-val');
     expect(grReadout?.textContent).toMatch(/-4\.\d dB/);

@@ -437,26 +437,12 @@ export function ComposeSignalChamberAdapter({
           </div>
         </div>
 
-        {/* Studio Dynamics Audio Compressor UI */}
+        {/* Pure Studio Dynamics Audio Compressor Effect */}
         <div
-          className={`analytics-block compressor-console ${phonemeWarning ? 'compressor-console--warn' : ''}`}
+          className="analytics-block compressor-console"
           data-compose-kind="phoneme-compressor-unit"
           data-compose-part="compressorConsole"
-          data-compose-status={compressorStatus}
-          data-compose-warning={phonemeWarning}
         >
-          <div className="compressor-header">
-            <div className="compressor-eyebrow">
-              <span className="material-symbols-outlined">tune</span>
-              <span>PHONEME_DYNAMICS_C1</span>
-            </div>
-            <span
-              className={`compressor-ratio-badge compressor-ratio-badge--${compressorStatus.toLowerCase()}`}
-            >
-              {compressorRatio}
-            </span>
-          </div>
-
           {/* Meter Bridge: IN & GR */}
           <div className="compressor-meter-bridge">
             <div className="meter-lane">
@@ -534,18 +520,6 @@ export function ComposeSignalChamberAdapter({
               <text x="85" y="66" fill="rgba(255, 255, 255, 0.4)" fontSize="8" textAnchor="middle" fontFamily="var(--font-mono)">1kHz</text>
               <text x="135" y="66" fill="rgba(255, 255, 255, 0.4)" fontSize="8" textAnchor="middle" fontFamily="var(--font-mono)">10kHz</text>
             </svg>
-          </div>
-
-          {/* Parameter Readouts */}
-          <div className="compressor-params-grid">
-            <div className="param-tag">
-              <span className="lbl">THRESH</span>
-              <span className="val">-12.0 dB</span>
-            </div>
-            <div className="param-tag">
-              <span className="lbl">ATT/REL</span>
-              <span className="val">12ms / 150ms</span>
-            </div>
           </div>
         </div>
       </motion.aside>

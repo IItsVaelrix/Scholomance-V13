@@ -3730,56 +3730,9 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  height: 160px;
+  height: 125px;
   flex-shrink: 0;
   overflow: hidden;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.compressor-console--warn {
-  border-color: var(--ritual-danger, #ff4444);
-  box-shadow: 0 0 12px rgba(255, 68, 68, 0.25);
-}
-
-.compressor-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-
-.compressor-eyebrow {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--ritual-text-muted, #858fa7);
-}
-
-.compressor-ratio-badge {
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 10px;
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--ritual-text, #ffffff);
-  min-width: 115px;
-  display: inline-block;
-  text-align: center;
-  box-sizing: border-box;
-  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.compressor-ratio-badge--attenuating {
-  background: rgba(255, 152, 0, 0.2);
-  color: #ffb74d;
-  border: 1px solid rgba(255, 152, 0, 0.4);
-}
-
-.compressor-ratio-badge--limiting {
-  background: rgba(255, 68, 68, 0.2);
-  color: #ff6666;
-  border: 1px solid rgba(255, 68, 68, 0.4);
 }
 
 .compressor-meter-bridge {
