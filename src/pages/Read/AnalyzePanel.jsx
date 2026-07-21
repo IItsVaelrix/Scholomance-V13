@@ -232,7 +232,35 @@ export default function AnalyzePanel({
 
         <fieldset className="az-scopes">
           <legend>Evidence scope</legend>
-          <div className="az-scope-grid">
+          <div
+            className="az-scope-grid"
+            data-compose-focus="roving"
+            onKeyDown={(event) => {
+              const enabledScopes = SCOPES.map(([val]) => val).filter((val) => !scopeUnavailable[val]);
+              if (enabledScopes.length === 0) return;
+              const currentIndex = enabledScopes.indexOf(scope);
+              let nextIndex = currentIndex;
+              if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+                nextIndex = currentIndex === enabledScopes.length - 1 ? 0 : currentIndex + 1;
+              } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+                nextIndex = currentIndex <= 0 ? enabledScopes.length - 1 : currentIndex - 1;
+              } else if (event.key === 'Home') {
+                nextIndex = 0;
+              } else if (event.key === 'End') {
+                nextIndex = enabledScopes.length - 1;
+              } else {
+                return;
+              }
+              event.preventDefault();
+              const nextScope = enabledScopes[nextIndex];
+              if (nextScope) {
+                setScope(nextScope);
+                requestAnimationFrame(() => {
+                  document.getElementById(`az-scope-${nextScope}`)?.focus();
+                });
+              }
+            }}
+          >
             {SCOPES.map(([value, label]) => (
               <label key={value} htmlFor={`az-scope-${value}`} className={`az-scope${scope === value ? ' az-scope--active' : ''}`}>
                 <input
@@ -243,6 +271,7 @@ export default function AnalyzePanel({
                   aria-label={label}
                   checked={scope === value}
                   disabled={scopeUnavailable[value]}
+                  tabIndex={scope === value ? 0 : -1}
                   onChange={() => setScope(value)}
                 />
                 <span>{label}</span>
@@ -313,7 +342,7 @@ export default function AnalyzePanel({
           )}
 
           {result.resolution.candidates.length > 0 && (
-            <div className="az-candidates" role="tablist" aria-label="Lemma candidates">
+            <div className="az-candidates" role="tablist" aria-label="Lemma candidates" data-compose-focus="roving">
               {result.resolution.candidates.map((entry) => {
                 const selected = entry.id === candidate?.id;
                 const tabId = `az-candidate-tab-${safeId(entry.id)}`;

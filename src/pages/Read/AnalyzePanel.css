@@ -22,7 +22,7 @@
 .az-scope { position: relative; display: flex; align-items: center; justify-content: center; gap: 0.2rem; min-width: 0; padding: 0.3rem 0.15rem; border: 1px solid #29283a; border-radius: 4px; color: #85839a; background: #11111a; cursor: pointer; font-size: 0.65rem; }
 .az-scope input { position: absolute; opacity: 0; pointer-events: none; }
 .az-scope small { color: #c9a840; font-size: 0.58rem; }
-.az-scope:has(input:focus-visible) { outline: 2px solid #b68cff; outline-offset: 2px; }
+.az-scope:has(input:focus-visible) { outline: 2px solid var(--compose-color-primary-500, #b68cff); outline-offset: 2px; }
 .az-scope:has(input:disabled) { opacity: 0.38; cursor: not-allowed; }
 .az-scope--active { color: #e8dcff; border-color: #695092; background: #251d37; }
 .az-scope-note { margin: 0; min-height: 1.2em; color: #77758a; font-size: 0.68rem; line-height: 1.35; }
@@ -94,7 +94,7 @@
 }
 .az-candidate { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "rank lemma sigil" "score pos sigil"; column-gap: 0.3rem; row-gap: 0.08rem; align-items: center; flex: 0 0 auto; min-width: 7.2rem; padding: 0.38rem 0.48rem; color: #8f8aa0; border: 1px solid #2b293b; border-radius: 5px; background: #11111a; cursor: pointer; text-align: left; }
 .az-candidate:hover { border-color: #51436b; }
-.az-candidate:focus-visible { outline: 2px solid #b68cff; outline-offset: 2px; }
+.az-candidate:focus-visible { outline: 2px solid var(--compose-color-primary-500, #b68cff); outline-offset: 2px; }
 .az-candidate--active { border-color: #71569d; background: #211a31; color: #d8c7ef; }
 .az-candidate__rank { grid-area: rank; color: #69657a; font-size: 0.6rem; }
 .az-candidate strong { grid-area: lemma; color: #eee5fb; font-size: 0.76rem; }

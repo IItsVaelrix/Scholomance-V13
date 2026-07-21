@@ -65,5 +65,18 @@ describe('Compose Leximancy Panel Architecture', () => {
     );
     expect(html).toContain('az-candidate__sigil');
   });
+
+  it('supports roving focus keyboard navigation attributes and token variables', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(AnalyzePanel, {
+        activeScroll: null,
+        editorTitle: 'Test',
+        editorContent: 'Test content',
+        onCraftAction: () => {},
+      })
+    );
+    expect(html).toContain('data-compose-focus="roving"');
+  });
 });
+
 
