@@ -3777,14 +3777,9 @@
 }
 
 .compressor-ratio-badge--limiting {
-  background: var(--ritual-danger, #ff4444);
-  color: #ffffff;
-  animation: pulse-limiter 1s infinite alternate;
-}
-
-@keyframes pulse-limiter {
-  from { opacity: 0.85; }
-  to { opacity: 1; box-shadow: 0 0 8px var(--ritual-danger, #ff4444); }
+  background: rgba(255, 68, 68, 0.2);
+  color: #ff6666;
+  border: 1px solid rgba(255, 68, 68, 0.4);
 }
 
 .compressor-meter-bridge {
