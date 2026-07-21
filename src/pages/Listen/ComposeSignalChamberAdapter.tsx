@@ -133,6 +133,24 @@ export function ComposeSignalChamberAdapter({
     return 'NORMAL';
   }, [smoothedSignal]);
 
+  const traceAPath = useMemo(() => {
+    return `M 10 60 Q 35 ${60 - smoothedSignal * 45} 85 ${60 - smoothedSignal * 35} T 150 60 L 150 60 L 10 60 Z`;
+  }, [smoothedSignal]);
+
+  const traceBPath = useMemo(() => {
+    if (smoothedSignal > 0.75) {
+      return `M 10 22 Q 35 ${22 + (smoothedSignal - 0.75) * 40} 85 ${22 + (smoothedSignal - 0.75) * 30} T 150 22`;
+    }
+    return 'M 10 22 L 150 22';
+  }, [smoothedSignal]);
+
+  const suppressionFillPath = useMemo(() => {
+    if (gainReductionDb < 0) {
+      return `M 10 22 Q 35 ${60 - smoothedSignal * 45} 85 ${60 - smoothedSignal * 35} T 150 22 Z`;
+    }
+    return '';
+  }, [gainReductionDb, smoothedSignal]);
+
   const sidebarProps = {
     initial: { opacity: 0, x: 30 },
     animate: { opacity: 1, x: 0 },
@@ -422,25 +440,47 @@ export function ComposeSignalChamberAdapter({
 
           {/* Transfer Curve Micro SVG */}
           <div className="compressor-transfer-graph" data-compose-part="transferCurve">
-            <svg viewBox="0 0 100 60" className="transfer-svg" aria-hidden="true">
-              <line x1="10" y1="50" x2="90" y2="50" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-              <line x1="10" y1="10" x2="10" y2="50" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-              {/* Threshold indicator line at x=70 */}
-              <line x1="70" y1="10" x2="70" y2="50" stroke="rgba(255,255,255,0.2)" strokeDasharray="2 2" strokeWidth="1" />
-              {/* Knee response path */}
+            <svg viewBox="0 0 160 70" className="transfer-svg" aria-hidden="true">
+              <defs>
+                <linearGradient id="spectralGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="rgba(0, 207, 200, 0.4)" />
+                  <stop offset="100%" stopColor="rgba(0, 207, 200, 0.0)" />
+                </linearGradient>
+              </defs>
+              {/* Logarithmic grid lines */}
+              <line x1="35" y1="10" x2="35" y2="55" stroke="rgba(255, 255, 255, 0.08)" strokeDasharray="2 2" strokeWidth="1" />
+              <line x1="85" y1="10" x2="85" y2="55" stroke="rgba(255, 255, 255, 0.08)" strokeDasharray="2 2" strokeWidth="1" />
+              <line x1="135" y1="10" x2="135" y2="55" stroke="rgba(255, 255, 255, 0.08)" strokeDasharray="2 2" strokeWidth="1" />
+              {/* Threshold line at y=22 */}
+              <line x1="10" y1="22" x2="150" y2="22" stroke="rgba(255, 255, 255, 0.15)" strokeDasharray="2 2" strokeWidth="1" />
+              {/* Trace A: Spectral energy curve */}
               <path
-                d="M 10 50 L 70 20 L 90 20"
+                className="spectral-trace-a"
+                d={traceAPath}
+                fill="url(#spectralGradient)"
+                stroke="rgba(0, 207, 200, 0.8)"
+                strokeWidth="1.5"
+              />
+              {/* Trace B: Dynamic ceiling threshold */}
+              <path
+                className="spectral-trace-b"
+                d={traceBPath}
                 fill="none"
                 stroke={phonemeWarning ? 'var(--ritual-danger, #ff4444)' : 'var(--ritual-glow, #858fa7)'}
-                strokeWidth="2"
+                strokeWidth="1.5"
               />
-              {/* Current operating point dot */}
-              <circle
-                cx={10 + Math.min(80, smoothedSignal * 80)}
-                cy={50 - Math.min(30, smoothedSignal * 30 + (gainReductionDb < 0 ? Math.abs(gainReductionDb) * 0.5 : 0))}
-                r="3"
-                fill={phonemeWarning ? 'var(--ritual-danger, #ff4444)' : '#ffffff'}
-              />
+              {/* Suppression fill when limiting/attenuating */}
+              {gainReductionDb < 0 && suppressionFillPath && (
+                <path
+                  className="spectral-suppression-fill"
+                  d={suppressionFillPath}
+                  fill="rgba(255, 68, 68, 0.45)"
+                />
+              )}
+              {/* Frequency text markers */}
+              <text x="35" y="66" fill="rgba(255, 255, 255, 0.4)" fontSize="8" textAnchor="middle" fontFamily="var(--font-mono)">100Hz</text>
+              <text x="85" y="66" fill="rgba(255, 255, 255, 0.4)" fontSize="8" textAnchor="middle" fontFamily="var(--font-mono)">1kHz</text>
+              <text x="135" y="66" fill="rgba(255, 255, 255, 0.4)" fontSize="8" textAnchor="middle" fontFamily="var(--font-mono)">10kHz</text>
             </svg>
           </div>
 

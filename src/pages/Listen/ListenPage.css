@@ -3829,6 +3829,18 @@
   transition: cx 0.18s cubic-bezier(0, 0, 0.2, 1), cy 0.18s cubic-bezier(0, 0, 0.2, 1), fill 0.2s ease;
 }
 
+.spectral-trace-a {
+  transition: d 0.18s cubic-bezier(0, 0, 0.2, 1), fill 0.2s ease, stroke 0.2s ease;
+}
+
+.spectral-trace-b {
+  transition: d 0.18s cubic-bezier(0, 0, 0.2, 1), stroke 0.2s ease;
+}
+
+.spectral-suppression-fill {
+  transition: d 0.18s cubic-bezier(0, 0, 0.2, 1), fill 0.2s ease, opacity 0.2s ease;
+}
+
 .compressor-params-grid {
   display: flex;
   justify-content: space-between;
