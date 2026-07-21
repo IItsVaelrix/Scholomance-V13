@@ -92,14 +92,35 @@
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
-.az-candidate { display: grid; grid-template-columns: auto auto; grid-template-areas: "rank lemma" "score pos"; column-gap: 0.3rem; row-gap: 0.08rem; flex: 0 0 auto; min-width: 7.2rem; padding: 0.38rem 0.48rem; color: #8f8aa0; border: 1px solid #2b293b; border-radius: 5px; background: #11111a; cursor: pointer; text-align: left; }
+.az-candidate { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "rank lemma sigil" "score pos sigil"; column-gap: 0.3rem; row-gap: 0.08rem; align-items: center; flex: 0 0 auto; min-width: 7.2rem; padding: 0.38rem 0.48rem; color: #8f8aa0; border: 1px solid #2b293b; border-radius: 5px; background: #11111a; cursor: pointer; text-align: left; }
 .az-candidate:hover { border-color: #51436b; }
 .az-candidate:focus-visible { outline: 2px solid #b68cff; outline-offset: 2px; }
 .az-candidate--active { border-color: #71569d; background: #211a31; color: #d8c7ef; }
 .az-candidate__rank { grid-area: rank; color: #69657a; font-size: 0.6rem; }
 .az-candidate strong { grid-area: lemma; color: #eee5fb; font-size: 0.76rem; }
-.az-candidate > span:not(.az-candidate__rank) { grid-area: pos; font-size: 0.62rem; }
+.az-candidate > span:not(.az-candidate__rank):not(.az-candidate__sigil) { grid-area: pos; font-size: 0.62rem; }
 .az-candidate b { grid-area: score; color: #c9a840; font-size: 0.64rem; font-weight: 600; }
+.az-candidate__sigil {
+  grid-area: sigil;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.2rem;
+  color: var(--wand-glow-color, #91d7be);
+  animation: wand-pulse var(--wand-pulse-duration, 2000ms) infinite ease-in-out;
+}
+@keyframes wand-pulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(0.92);
+    filter: drop-shadow(0 0 1px var(--wand-glow-color, #91d7be));
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 4px var(--wand-glow-color, #91d7be));
+  }
+}
 .az-candidate-detail { flex-shrink: 0; }
 .az-evidence { border: 1px solid #282637; border-radius: 4px; background: #101018; font-size: 0.68rem; }
 .az-evidence__toggle { display: block; width: 100%; padding: 0.35rem 0.45rem; color: #a8a1b8; border: 0; background: transparent; cursor: pointer; text-align: left; font: inherit; }

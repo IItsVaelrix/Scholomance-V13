@@ -348,6 +348,19 @@ export default function AnalyzePanel({
                     <strong>{entry.lemma}</strong>
                     <span>{entry.pos}</span>
                     <b>{Math.round(entry.score * 100)}%</b>
+                    <span
+                      className="az-candidate__sigil"
+                      title={`Confidence: ${Math.round((entry.score || 0.8) * 100)}%`}
+                      style={{
+                        '--wand-pulse-duration': `${3000 - Math.round((entry.score || 0.8) * 2000)}ms`,
+                        '--wand-glow-color': (entry.score || 0.8) > 0.85 ? '#91d7be' : (entry.score || 0.8) > 0.6 ? '#e4c36b' : '#ef8ea0',
+                      }}
+                    >
+                      <svg viewBox="0 0 16 16" width="12" height="12">
+                        <circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                        <circle cx="8" cy="8" r="2" fill="currentColor" />
+                      </svg>
+                    </span>
                   </button>
                 );
               })}
