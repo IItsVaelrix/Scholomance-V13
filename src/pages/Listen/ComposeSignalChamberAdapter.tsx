@@ -74,8 +74,10 @@ export function ComposeSignalChamberAdapter({
   const [smoothedSignal, setSmoothedSignal] = useState(signalLevel);
 
   useEffect(() => {
+    setSmoothedSignal(signalLevel);
+
     let animationFrameId: number;
-    let current = smoothedSignal;
+    let current = signalLevel;
 
     const smoothStep = () => {
       // Smooth 12% interpolation factor per frame for silky dynamics without jitter
@@ -83,8 +85,8 @@ export function ComposeSignalChamberAdapter({
       if (Math.abs(diff) > 0.001) {
         current = current + diff * 0.12;
         setSmoothedSignal(current);
+        animationFrameId = requestAnimationFrame(smoothStep);
       }
-      animationFrameId = requestAnimationFrame(smoothStep);
     };
 
     animationFrameId = requestAnimationFrame(smoothStep);
