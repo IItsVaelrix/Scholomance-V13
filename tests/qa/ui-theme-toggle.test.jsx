@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
@@ -15,6 +15,11 @@ const mockAuthValue = {
 
 
 describe('ThemeToggle component', () => {
+  beforeEach(() => {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    localStorage.removeItem('scholomance-theme');
+  });
+
   it('renders switch to light mode when theme is dark', () => {
     render(
       <ThemeProvider>
@@ -40,6 +45,17 @@ describe('ThemeToggle component', () => {
 
     const darkButton = screen.getByRole('button', { name: /switch to dark mode/i });
     expect(darkButton).toBeInTheDocument();
+  });
+
+  it('sets data-theme light so Compose light suite can apply', () => {
+    render(
+      <ThemeProvider>
+        <ThemeToggle />
+      </ThemeProvider>
+    );
+    fireEvent.click(screen.getByRole('button', { name: /switch to light mode/i }));
+    expect(document.documentElement.getAttribute('data-theme')).toBe('light');
+    expect(document.documentElement.getAttribute('data-theme')).not.toBe('dark');
   });
 
   it('renders ThemeToggle inside Navigation header rail', () => {
