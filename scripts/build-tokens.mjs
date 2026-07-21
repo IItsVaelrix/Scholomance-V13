@@ -37,6 +37,8 @@ function loadTokens() {
     return tokens;
   }
 
+  // Theme suites live in tokens/compose/themes/ and are emitted by
+  // scripts/generate-compose-themes.mjs — do not merge them into dist/tokens.
   const files = fs.readdirSync(TOKENS_DIR).filter(f => f.endsWith('.json'));
 
   for (const file of files) {

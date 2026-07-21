@@ -2,7 +2,7 @@
  * @vitest-environment node
  */
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { assertThemeParity, collectTokenPaths } from '../../../src/core/compose/tokens/theme-parity';
 import { applyDerivedTransforms } from '../../../src/core/compose/tokens/theme-transforms';
@@ -61,5 +61,14 @@ describe('Compose theme transforms and CSS emit', () => {
     const css = generateThemeCSS(loadTheme('dark'), loadTheme('light'));
     const lightBlock = css.split("[data-theme='light']")[1];
     expect(lightBlock).toMatch(/--compose-color-surface-bg:\s*#ffffff/i);
+  });
+
+  it('checked-in compose-themes.css matches generateThemeCSS output', () => {
+    const dark = loadTheme('dark');
+    const light = loadTheme('light');
+    const expected = generateThemeCSS(dark, light);
+    const path = resolve(process.cwd(), 'src/lib/css/generated/compose-themes.css');
+    expect(existsSync(path)).toBe(true);
+    expect(readFileSync(path, 'utf8').trim()).toBe(expected.trim());
   });
 });

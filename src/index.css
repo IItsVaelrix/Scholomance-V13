@@ -1,4 +1,5 @@
 @import './lib/css/generated/school-styles.css';
+@import './lib/css/generated/compose-themes.css';
 @import './kits/scholomance-visualizer-kit/tokens/scholomance-visualizer.tokens.css';
 @import './kits/scholomance-visualizer-kit/styles/scholomance-visualizer.base.css';
 @import './animations.css';
@@ -223,6 +224,11 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --chrome-pad: var(--compose-layout-chrome-pad);
+  --chrome-topbar-height: var(--compose-layout-chrome-topbar-height);
+  --chrome-panel-gap: var(--compose-layout-chrome-panel-gap);
+  --chrome-radius: var(--compose-layout-chrome-radius);
+  --chrome-ornament-opacity: var(--compose-layout-chrome-ornament-opacity);
 }
 
 html:focus-within {
@@ -372,24 +378,6 @@ body::before {
 
 /* === BASE COLORS - UNIFIED SYSTEM === */
 :root {
-  /* Deep Background — indigo-void scale */
-  --bg-void: #090916;
-  --bg-deep: #0d0d20;
-  --bg-surface: #131328;
-  --bg-elevated: #1c1c38;
-
-  /* Text — warm parchment for legibility */
-  --text-primary: #ede8d4;
-  --text-secondary: #cdc5a8;
-  --text-tertiary: #a89d80;
-  --text-muted: #7a6f55;
-
-  /* Borders — indigo-tinted (replaces near-invisible rgba white) */
-  --border-subtle: rgba(100, 90, 160, 0.20);
-  --border-soft: rgba(100, 90, 160, 0.32);
-  --border-bold: rgba(100, 90, 160, 0.50);
-  --border-glow: hsla(43, 48%, 48%, 0.35);
-
   /* Chrome gold — antique gold stability anchor (constant across schools) */
   --chrome-gold: hsl(43, 48%, 48%);
   --chrome-gold-dim: hsl(43, 38%, 32%);
@@ -717,7 +705,7 @@ body::after {
   justify-content: space-between;
   height: var(--nav-rail-height);
   padding: 0 var(--space-4);
-  background: rgba(9, 9, 22, 0.72);
+  background: color-mix(in srgb, var(--bg-void) 72%, transparent);
   backdrop-filter: blur(18px) saturate(180%);
   -webkit-backdrop-filter: blur(18px) saturate(180%);
   border-bottom: 1px solid var(--border-subtle);
