@@ -1392,8 +1392,12 @@ const MUTATIONS: Record<string, Record<string, string | number>> = {
   stacking: { z: 100 },
   // panel -> surface (area ratio well past 0.3 at 1280x720).
   size: { w: 900, h: 700 },
-  // ember (hue 40) -> abyss (hue ~264), luminance held near-constant.
-  chromaticity: { fg: "#3a1fd6" },
+  // ember (hue 40.0) -> verdant (hue 136.0). ISOLUMINANT BY CONSTRUCTION:
+  // #009400 has relative luminance 0.2118 against #ff0000's 0.2126 (L* 53.15
+  // vs 53.23), so this mutation must NOT move the luminance block. Any other
+  // blue/violet is a trap — #3a1fd6, for instance, has luminance 0.067 and
+  // would report a false `chromaticity -> luminance` coupling.
+  chromaticity: { fg: "#009400" },
   // rect -> pill.
   shape: { radius: 50 },
   // 0.2 -> 0.9: measured -> packed.
@@ -1556,12 +1560,15 @@ If `coupled` is non-empty, the failure names the pair. Diagnose against the isol
 
 | Reported pair | Likely cause | Fix |
 |---|---|---|
-| `shape -> density` | density denominator is the bounding box | use `clippedRegionArea` (Task 4) |
 | `size -> density` | ink is a fixed px height, not a fraction | harness `ink` must scale with height (Task 6) |
 | `stacking -> luminance` | contrast read from screenshot pixels | read the computed fg/bg pair (Task 2) |
-| `chromaticity -> luminance` | palette swap changed lightness | pick an isoluminant mutation colour |
-| `luminance -> chromaticity` | chromaticity keyed on a\*/b\* | key on the LCh hue angle (Task 2) |
+| `chromaticity -> luminance` | mutation colour is not isoluminant | the mutation is `#009400` by construction — check it was not changed |
+| `luminance -> chromaticity` | chromaticity keyed on the a-star/b-star pair | key on the LCh hue angle (Task 2) |
 | `density -> shape` | shape reads painted extent | shape must read border-radius only (Task 3) |
+
+**`shape -> density` deserves its own note, because the naive diagnosis is backwards.** A bounding-box denominator would make density *more* invariant under a shape change, not less — with a fixed-size ink bar, bbox keeps the ratio identical while `clippedRegionArea` moves it by roughly 12% on a 200×100 pill. The clipped denominator is still correct: it is what makes a *fully inked* circle read `packed` rather than being diluted to 0.785 by corners that can never hold ink. The matrix tolerates the 12% shift only because the baseline sits mid-tier (0.2, with boundaries at 0.1/0.35/0.7).
+
+So a `shape -> density` failure means the baseline drifted toward a tier boundary, not that the denominator is wrong. **Do not "fix" it by switching to the bounding box.** The denominator's correctness is proven by the `clippedRegionArea` unit tests in Task 4, not by this matrix.
 
 **Do not widen the assertion, add an exemption list, or mark a pair expected.** Per spec §7 trap 10, a coupled pair that gets rationalised is the failure mode this matrix exists to prevent.
 
