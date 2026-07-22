@@ -1,182 +1,194 @@
 [
   {
-    "id": "2026-07-19-update-ledger-twin-gate",
+    "id": "2026-07-22-light-and-dark-modes-for-scribe",
+    "date": "2026-07-22",
+    "title": "Light and dark modes for Scribe",
+    "summary": "The Scribe writing studio can now switch between a bright light look and the familiar dark look using the sun and moon button. Only that workspace changes — the rest of the site stays dark. Colored word highlights still work in both."
+  },
+  {
+    "id": "2026-07-20-compose-a-new-way-to-build-components",
+    "date": "2026-07-20",
+    "title": "Compose: a new way to build components",
+    "summary": "Compose makes it faster to build and update interface components without rebuilding their behavior, appearance, and accessibility from scratch. Scholomance's existing creative tools can now work behind one shared system, and pages can be upgraded gradually without disrupting the rest of the site."
+  },
+  {
+    "id": "2026-07-19-recent-updates-list-opens-on-the-homepage",
     "date": "2026-07-19",
-    "title": "Scholomance Update Ledger opens on Landing",
-    "summary": "The entry chamber now carries a twin-gate: Enter on the left, a curated Update Ledger chronicle on the right with DivWand glass and Wand voice."
+    "title": "Recent updates list opens on the homepage",
+    "summary": "A new section on the homepage now shows recent updates alongside the Enter button, in its own panel with the same look as the rest of the site."
   },
   {
-    "id": "2026-07-19-ledger-add-cli",
+    "id": "2026-07-19-safe-add-update-command",
     "date": "2026-07-19",
-    "title": "Atomic ledger:add ritual",
-    "summary": "New entries prepend through npm run ledger:add with fail-closed validation and a temporary-file rename so the chronicle never half-writes."
+    "title": "Safe add-update command",
+    "summary": "Updates can be added with a single command. The system validates the file first so a bad edit can never overwrite the updates list."
   },
   {
-    "id": "2026-07-19-wand-voice-tokens",
+    "id": "2026-07-19-consistent-styling-across-the-site",
     "date": "2026-07-19",
-    "title": "Shared Wand voice tokens",
-    "summary": "Extracted reusable Wand voice tokens so Update Ledger and other surfaces share one styling source without importing WandPage.css."
+    "title": "Consistent styling across the site",
+    "summary": "The styling for the updates section is now shared, so other parts of the site can use the same look without duplicating the stylesheet."
   },
   {
-    "id": "2026-07-19-div-layout-renderer",
+    "id": "2026-07-19-pages-now-share-one-stable-layout",
     "date": "2026-07-19",
-    "title": "DivLayoutRenderer extraction",
-    "summary": "Moved DivWand layout rendering into a shared module so Landing, Combat, and DivWand can share one glass tree without page CSS leakage."
+    "title": "Pages now share one stable layout",
+    "summary": "The layout code was moved to a shared file so the homepage, the combat page, and the DivWand pages all use the same structure."
   },
   {
-    "id": "2026-07-18-song-stats-metrics",
+    "id": "2026-07-18-unified-metrics-on-read-page",
     "date": "2026-07-18",
-    "title": "CODEx Metrics meet Song Stats",
-    "summary": "The Read page Metrics panel now draws from the Song Stats engine so lexical density and flow read as one chronicle."
+    "title": "Unified metrics on the Read page",
+    "summary": "The stats panel on the Read page now matches the Song Stats engine, so word density and rhythm appear as one consistent set of measurements."
   },
   {
-    "id": "2026-07-18-song-stats-flow",
+    "id": "2026-07-18-flow-and-alignment-scores",
     "date": "2026-07-18",
-    "title": "Estimated and aligned Flow",
-    "summary": "Song Stats gained estimated bar-per-line flow plus aligned syncopation versus deviation, with provisional labeling when alignment is thin."
+    "title": "Flow and alignment scores",
+    "summary": "Song Stats now shows an estimated flow (how each line lands relative to the beat) and an alignment score. When there is not enough info, the score is labeled provisional."
   },
   {
-    "id": "2026-07-18-song-stats-rhyme",
+    "id": "2026-07-18-two-rhyme-density-scores",
     "date": "2026-07-18",
-    "title": "Malmi and CODEx rhyme density",
-    "summary": "Rhyme Density now reports both Malmi RD_M and CODEx RD_C so repetition and span contribute honestly to the score."
+    "title": "Two rhyme density scores",
+    "summary": "Rhyme Density now reports two numbers: one for how often rhymes repeat and one for how far apart they are."
   },
   {
-    "id": "2026-07-18-song-stats-vocab",
+    "id": "2026-07-18-word-variety-with-sample-warning",
     "date": "2026-07-18",
-    "title": "CODEx lexical diversity",
-    "summary": "Unique vocabulary now tracks lemma-level diversity with short-sample warnings so thin verses do not pretend to be encyclopedias."
+    "title": "Word variety with sample warning",
+    "summary": "Word variety now counts unique base words and warns when a sample is too short to give a reliable score."
   },
   {
-    "id": "2026-07-18-song-stats-composite",
+    "id": "2026-07-18-technical-density-range",
     "date": "2026-07-18",
-    "title": "Technical Density composite",
-    "summary": "Song Stats ships a Technical Density band with explicit ceilings and a tooltip that denies artistic-quality claims."
+    "title": "Technical Density range",
+    "summary": "Song Stats now includes a Technical Density range with clear upper limits and a note that the score does not measure artistic quality."
   },
   {
-    "id": "2026-07-18-analyze-pos-buckets",
+    "id": "2026-07-18-leximancy-part-of-speech-grouping",
     "date": "2026-07-18",
-    "title": "Analyze POS buckets and Leximancy",
-    "summary": "Lexical Analyze groups related words by part of speech and surfaces Leximancy craft actions from the live dictionary graph."
+    "title": "Leximancy part-of-speech grouping",
+    "summary": "The Leximancy view now groups words by part of speech and suggests writing techniques based on live dictionary data."
   },
   {
-    "id": "2026-07-18-oewn-antonyms",
+    "id": "2026-07-18-antonym-relations-added",
     "date": "2026-07-18",
-    "title": "OEWN antonym ingest",
-    "summary": "English WordNet antonyms landed in the Scholomance dictionary so oppositional relations resolve in Analyze and the graph."
+    "title": "Antonym relations added",
+    "summary": "Opposite-word relations from the English WordNet are now in the Scholomance dictionary, so Leximancy can find opposites in the word graph."
   },
   {
-    "id": "2026-07-18-lexical-graph",
+    "id": "2026-07-18-persistent-word-graph",
     "date": "2026-07-18",
-    "title": "Lexical graph foundation",
-    "summary": "SQLite-backed lexical graph routes and retrieval give Analyze a durable neighborhood of synonyms, hypernyms, and kin."
+    "title": "Persistent word graph",
+    "summary": "A persistent word graph is now the backbone of Leximancy, giving fast access to synonyms, broader terms, and related words."
   },
   {
-    "id": "2026-07-18-analyze-retrieval",
+    "id": "2026-07-18-live-related-words-panel",
     "date": "2026-07-18",
-    "title": "Analyze UI retrieval panel",
-    "summary": "The Analyze surface now retrieves related words live, with loading guards and craft pins so writers can harvest without losing place."
+    "title": "Live related-words panel",
+    "summary": "The Leximancy screen now fetches related words live, with loading indicators and a way to pin suggestions so you do not lose your place."
   },
   {
-    "id": "2026-07-17-visualiser-truesight",
+    "id": "2026-07-17-truesight-drives-visualizer-colors",
     "date": "2026-07-17",
-    "title": "Visualizer Truesight amp",
-    "summary": "Bytecode Visualiser gained Truesight amplification so school color and fidelity ride the stage without inventing a second authority."
+    "title": "Truesight drives visualizer colors",
+    "summary": "The visualizer now uses Truesight to control school colors and detail, keeping its appearance consistent across the experience."
   },
   {
-    "id": "2026-07-17-mandala-motion",
+    "id": "2026-07-17-smoother-more-consistent-mandala-motion",
     "date": "2026-07-17",
-    "title": "Mandala bytecode motion",
-    "summary": "Mandala stage motion now follows deterministic bytecode channels instead of free-running decorative loops."
+    "title": "Smoother, more consistent mandala motion",
+    "summary": "Mandala stage motion is now driven by consistent timing instead of free-running decorative loops."
   },
   {
-    "id": "2026-07-17-karaoke-motion",
+    "id": "2026-07-17-lyrics-and-visuals-now-stay-in-sync",
     "date": "2026-07-17",
-    "title": "Karaoke bytecode motion",
-    "summary": "Lyric karaoke highlight timing locks to bytecode motion so the voice and the glyph advance as one rite."
+    "title": "Lyrics and visuals now stay in sync",
+    "summary": "Karaoke highlights now follow the same timing as the visual motion, so lyrics and effects advance together."
   },
   {
-    "id": "2026-07-17-ritual-card",
+    "id": "2026-07-17-clearer-release-cards",
     "date": "2026-07-17",
-    "title": "Ritual card redesign",
-    "summary": "Ritual cards were rebuilt for clearer provenance, commerce, and bytecode fingerprints on release surfaces."
+    "title": "Clearer release cards",
+    "summary": "Release cards were rebuilt so it is clearer where each release came from, what it costs, and how to tell it apart."
   },
   {
-    "id": "2026-07-17-tool-substrate",
+    "id": "2026-07-17-creative-tools-now-work-together-consistently",
     "date": "2026-07-17",
-    "title": "Tool substrate contract",
-    "summary": "A shared tool substrate clarifies how Wand, DivWand, and PixelBrain tools declare capabilities without drifting schemas."
+    "title": "Creative tools now work together consistently",
+    "summary": "Wand, DivWand, and PixelBrain now share one way of describing their abilities, keeping the creative tools consistent as they evolve."
   },
   {
-    "id": "2026-07-16-discography-nav",
+    "id": "2026-07-16-album-library-navigation",
     "date": "2026-07-16",
-    "title": "Discography albums navigation",
-    "summary": "Album shelves and discography nav make the Visualiser catalog feel like a living library instead of a flat track list."
+    "title": "Album library navigation",
+    "summary": "The visualizer album list and navigation make the catalog feel like a library you can browse, not a flat list of tracks."
   },
   {
-    "id": "2026-07-16-album-page",
+    "id": "2026-07-16-per-album-pages",
     "date": "2026-07-16",
-    "title": "Album page stage",
-    "summary": "Dedicated album pages host art, lyrics, and transport so each release can be entered as a room."
+    "title": "Per-album pages",
+    "summary": "Each album now has its own page with art, lyrics, and playback controls, so it feels like its own room."
   },
   {
-    "id": "2026-07-15-pb-amp-compositor",
+    "id": "2026-07-15-stacked-pixelbrain-layers",
     "date": "2026-07-15",
-    "title": "PixelBrain AMP compositor",
-    "summary": "AMP compositing landed so PixelBrain layers can be stacked and inspected with provenance-preserving transforms."
+    "title": "Stacked PixelBrain layers",
+    "summary": "PixelBrain layers can now be stacked and inspected together, keeping a record of where each layer came from."
   },
   {
-    "id": "2026-07-13-chroma-phosphorylation",
+    "id": "2026-07-13-school-colors-now-stay-consistent",
     "date": "2026-07-13",
-    "title": "Chroma phosphorylation",
-    "summary": "Chroma phosphorylation routes school color through a controlled gate so glow follows law instead of whim."
+    "title": "School colors now stay consistent",
+    "summary": "School colors now follow consistent rules, so the glow stays coherent instead of freeform."
   },
   {
-    "id": "2026-07-12-resonance-signature",
+    "id": "2026-07-12-sound-signatures-now-remain-consistent",
     "date": "2026-07-12",
-    "title": "Resonance signature contract",
-    "summary": "Resonance signatures gained a stable contract so Listen, Visualiser, and gear systems share one identity fingerprint."
+    "title": "Sound signatures now remain consistent",
+    "summary": "The same sound signature now follows each track through Listen, the visualizer, and the gear systems, so every part of the site recognizes it consistently."
   },
   {
-    "id": "2026-07-10-game-dev-skill",
+    "id": "2026-07-10-one-workflow-for-creating-game-assets",
     "date": "2026-07-10",
-    "title": "Scholomance game-development skill",
-    "summary": "Agents now route game asset work through SCDL, PixelBrain, Wand, and DivWand under one repository-native skill contract."
+    "title": "One workflow for creating game assets",
+    "summary": "Game asset work now flows through one workflow that sends each task to the right tool (SCDL, PixelBrain, Wand, or DivWand)."
   },
   {
-    "id": "2026-07-09-cochlear-manifold",
+    "id": "2026-07-09-explore-music-through-its-sound-spectrum",
     "date": "2026-07-09",
-    "title": "Cochlear manifold core",
-    "summary": "The cochlear manifold core landed so Listen can treat spectral space as a navigable chamber rather than a flat EQ strip."
+    "title": "Explore music through its sound spectrum",
+    "summary": "The core of the Listen feature now lets you explore music through its sound spectrum, not just a flat equalizer strip."
   },
   {
-    "id": "2026-07-05-polaris-forest",
+    "id": "2026-07-05-polaris-forest-sound-walk",
     "date": "2026-07-05",
-    "title": "Polaris sonic forest",
-    "summary": "Polaris Forest gained a sonic walkthrough so the grove answers with light and tone when the path is taken."
+    "title": "Polaris Forest sound walk",
+    "summary": "The Polaris Forest now has a sound walkthrough that responds with light and tone as you walk the path."
   },
   {
-    "id": "2026-07-05-portal-warden",
+    "id": "2026-07-05-smoother-transitions-between-screens",
     "date": "2026-07-05",
-    "title": "Portal Warden",
-    "summary": "Portal Warden watches chamber transitions so entry rites stay coherent across Landing, Read, and the outer gates."
+    "title": "Smoother transitions between screens",
+    "summary": "A new system coordinates transitions between screens, keeping the journey from the homepage into the rest of Scholomance visually coherent."
   },
   {
-    "id": "2026-07-04-enemy-ai-council",
+    "id": "2026-07-04-deliberate-enemy-ai",
     "date": "2026-07-04",
-    "title": "Enemy AI council",
-    "summary": "Combat enemies now deliberate through an AI council so threats choose with purpose instead of pure random aggression."
+    "title": "Deliberate enemy AI",
+    "summary": "Combat enemies now decide through a council-style process, so they act with purpose instead of just random aggression."
   },
   {
-    "id": "2026-07-03-syntactical-combat",
+    "id": "2026-07-03-verse-drives-combat-power",
     "date": "2026-07-03",
-    "title": "Syntactical combat weave",
-    "summary": "Spellweave combat ties verse integrity to cast strength so grammar and rhythm become the weapon itself."
+    "title": "Verse drives combat power",
+    "summary": "Combat now ties how well a verse holds together to how strong the spell is, so grammar and rhythm become the weapon."
   },
   {
-    "id": "2026-07-02-picturebookmud-hud",
+    "id": "2026-07-02-picturebookmud-display-upgrade",
     "date": "2026-07-02",
-    "title": "PicturebookMud HUD fidelity",
-    "summary": "The PicturebookMud HUD was brought into fidelity with chamber chrome so mud rites match the rest of Scholomance."
+    "title": "PicturebookMud display upgrade",
+    "summary": "The PicturebookMud on-screen display was upgraded to match the look of the rest of the Scholomance screens."
   }
 ]
