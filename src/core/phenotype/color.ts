@@ -54,9 +54,9 @@ export function contrastRatio(fg: Rgb, bg: Rgb): number {
 }
 
 // D65 reference white.
-const XN = 0.9505;
+const XN = 0.95047;
 const YN = 1.0;
-const ZN = 1.0890;
+const ZN = 1.08883;
 const DELTA = 6 / 29;
 
 function pivot(t: number): number {
@@ -68,9 +68,9 @@ export function rgbToLab(rgb: Rgb): Lab {
   const g = srgbToLinear(rgb.g);
   const b = srgbToLinear(rgb.b);
 
-  const x = 0.4124 * r + 0.3576 * g + 0.1805 * b;
-  const y = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  const z = 0.0193 * r + 0.1192 * g + 0.9505 * b;
+  const x = 0.4124564 * r + 0.3575761 * g + 0.1804375 * b;
+  const y = 0.2126729 * r + 0.7151522 * g + 0.0721750 * b;
+  const z = 0.0193339 * r + 0.1191920 * g + 0.9503041 * b;
 
   const fx = pivot(x / XN);
   const fy = pivot(y / YN);
