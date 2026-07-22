@@ -27,7 +27,7 @@ const DEFAULT_INK_THRESHOLD = 8;
 
 /**
  * Area of a rounded rectangle: the bounding box less the four corner offcuts.
- * Each corner removes (1 - pi/4) (4 - pi) * r^2.
+ * Each corner removes (1 - pi/4) r^2, so four corners remove (4 - pi) r^2.
  * Exact for the circle case, where r = min(w, h) / 2.
  */
 export function clippedRegionArea(input: {
