@@ -1,11 +1,9 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
-import { TriePredictor } from '../../codex/core/trie.js';
-import { Spellchecker } from '../../codex/core/spellchecker.js';
-import { createJudiciaryEngine } from '../../codex/core/judiciary.js';
+import { TriePredictor, Spellchecker, PhonemeEngine } from '../lib/codex/textAnalysis.js';
+import { createJudiciaryEngine } from '../lib/codex/judiciary.js';
 import { createTokenGraphSemanticRepo } from '../../codex/services/token-graph/semantic.repo.js';
 import { createTokenGraphSequenceRepo } from '../../codex/services/token-graph/sequence.repo.js';
-import { createRitualPredictionEngine } from '../../codex/core/ritual-prediction/run.js';
-import { PhonemeEngine } from '../../codex/core/phonology/phoneme.engine.js';
+import { createRitualPredictionEngine } from '../lib/codex/ritualPrediction.js';
 import { PoeticLanguageServer } from '../lib/poeticLanguageServer.js';
 import { ScholomanceDictionaryAPI } from '../lib/scholomanceDictionary.api.js';
 

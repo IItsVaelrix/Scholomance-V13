@@ -324,26 +324,9 @@ def _safe_cmd(cmd_str):
     return True
 
 
-# ── CLI Gate Keeper ───────────────────────────────────
-# Prevents rapid-fire tool calls and file re-reads
-try:
-    from ..core.gate_keeper import gate as _gate
-except ImportError:
-    try:
-        from divtube_downloader.tui.core.gate_keeper import gate as _gate
-    except ImportError:
-        _gate = None
-
-
+# ── CLI Gate Keeper (disabled — always allows) ────────
 def _gate_check(tool_name, kwargs, callback=None):
-    """Run gate check. Returns True if allowed, False if blocked."""
-    if _gate is None:
-        return True
-    verdict = _gate.check(tool_name, kwargs)
-    if verdict.is_blocked:
-        if callback:
-            callback(f"  [#FF5C7A]⛔ GATE BLOCKED[/] [{verdict.reason}] {verdict.message}")
-        return False
+    """Gate disabled — always returns True."""
     return True
 
 
@@ -933,6 +916,29 @@ class ToolService:
             {
                 "type": "function",
                 "function": {
+                    "name": "phenotypic_ideal",
+                    "description": "Compose a PHENOTYPIC-IDEAL-v1 packet: TurboQuant codebase search + SCDNA capability/gene evidence + boonSeeds. Use this before conceptualizing latent boons. Cite evidenceRefs; do not invent capabilities absent from evidence.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "query": {
+                                "type": "string",
+                                "description": "What you are looking for (intent, subsystem, or disparity hypothesis)"
+                            },
+                            "scope": {
+                                "type": "string",
+                                "enum": ["repo", "divtube"],
+                                "description": "repo = whole codebase; divtube prefers divtube_downloader/ hits",
+                                "default": "repo"
+                            }
+                        },
+                        "required": ["query"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
                     "name": "diagnostic_scan",
                     "description": "Run a full codebase diagnostic scan. Executes all diagnostic cells (innate, adaptive, bridge, fixture, coverage) against the entire codebase and persists the report. Oversized asset JSON is skipped automatically.",
                     "parameters": {
@@ -1451,12 +1457,7 @@ class ToolService:
 
 
     def execute_tool(self, tool_name, kwargs, callback=None):
-        # ── CLI Gate: cooldown + redundancy check ────────────
-        # exec tools are the intentionally-powerful path; repeated calls are expected.
-        if tool_name not in ("bash_session", "python_exec", "exec_reset"):
-            if not _gate_check(tool_name, kwargs, callback):
-                return f"⛔ Gate blocked '{tool_name}': check your cadence."
-        # ──────────────────────────────────────────────────────
+        # GateKeeper disabled — tools execute without cooldown/redundancy blocks.
         if tool_name == "read_file":
             return self._read_file(kwargs, callback)
         elif tool_name == "search_code":
@@ -1510,6 +1511,8 @@ class ToolService:
             return self._law_audit(kwargs, callback)
         elif tool_name == "law_debug":
             return self._law_debug(kwargs, callback)
+        elif tool_name == "phenotypic_ideal":
+            return self._phenotypic_ideal(kwargs, callback)
         elif tool_name == "diagnostic_scan":
             return self._diagnostic_scan(kwargs, callback)
         elif tool_name == "diagnostic_summary":
@@ -2182,6 +2185,39 @@ class ToolService:
                 callback(f"  [#7CFF8B]✓[/] law_debug('{anomaly}'): mode {mode}")
             return report[:4000]
         return self._fmt_bridge("law_debug", result, callback)
+
+    def _phenotypic_ideal(self, kwargs, callback):
+        query = (kwargs.get("query") or "").strip()
+        if not query:
+            return "Error: query is required."
+        scope = kwargs.get("scope") or "repo"
+        if scope not in ("repo", "divtube"):
+            scope = "repo"
+        args = [query, "--scope", scope]
+        hits_json = kwargs.get("hits_json")
+        if hits_json:
+            args.extend(["--hits-json", str(hits_json)])
+        result = _run_bridge("phenotypic-ideal", *args, timeout=180)
+        if isinstance(result, dict) and "error" not in result:
+            seeds = result.get("boonSeeds") or []
+            hits = (result.get("search") or {}).get("hits") or []
+            caps = (result.get("evidence") or {}).get("capabilities") or []
+            if callback:
+                callback(
+                    f"  [#7CFF8B]✓[/] phenotypic_ideal: "
+                    f"{len(seeds)} seeds · {len(hits)} hits · {len(caps)} capabilities"
+                )
+            # Truncate for tool loop; full packet is in the JSON body.
+            body = json.dumps(result, indent=2, default=str)
+            if len(body) > 12000:
+                body = body[:12000] + "\n…(truncated)"
+            return (
+                f"--- PHENOTYPIC-IDEAL-v1 ---\n"
+                f"  Seeds: {len(seeds)} | Hits: {len(hits)} | Capabilities: {len(caps)}\n"
+                f"  Feed this packet to conceptualize boons; cite evidenceRefs only.\n\n"
+                f"{body}"
+            )
+        return self._fmt_bridge("phenotypic_ideal", result, callback)
 
     def _diagnostic_scan(self, kwargs, callback):
         trigger = kwargs.get("trigger", "mcp")

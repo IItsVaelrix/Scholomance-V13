@@ -20,6 +20,10 @@ RUN npm ci --ignore-scripts \
  && npm rebuild better-sqlite3 bcrypt \
  && node -e "require('better-sqlite3'); require('bcrypt'); console.log('native addons ok')"
 
+# Bust COPY/build cache when SPA must be rebuilt (fly deploy --build-arg DEPLOY_CACHEBUST=…)
+ARG DEPLOY_CACHEBUST=0
+RUN echo "DEPLOY_CACHEBUST=${DEPLOY_CACHEBUST}"
+
 COPY . .
 
 # --- Build dictionary and corpus at image-build time ---

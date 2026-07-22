@@ -1,107 +1,173 @@
-# Task 7 Report: Playwright twin-gate verification
+# Task 7 Report — The Directed Orthogonality Matrix
 
-**Status:** COMPLETE  
-**Branch:** `feat/update-ledger`  
-**Date:** 2026-07-19
+## File created
 
-## Summary
+`tests/visual/phenotype-orthogonality.spec.ts` — written verbatim from the brief's
+Step 1 code block (`.superpowers/sdd/task-7-brief.md`), no modifications to the
+spec logic, assertions, baseline, or mutation table.
 
-Added Playwright e2e coverage for Landing twin-gate geometry, responsive stack, ledger focus isolation, and portal Enter → `/read`. Geometry assertions passed without CSS layout changes. Focus test required a small production fix: `tabIndex={0}` on the Update Ledger region (plus shared `:focus-visible` styling).
+## Command 1
 
-## Commits
-
-| SHA | Message |
-|-----|---------|
-| `90bbd183` | `fix(landing): make Update Ledger region keyboard-focusable` |
-| `97f70e52` | `test(e2e): verify landing twin-gate geometry and enter path` |
-
-## Files
-
-### Created
-- `tests/qa/e2e/landing-twin-gate.spec.js` — three chromium e2e cases from brief
-
-### Modified (necessary for e2e PASS)
-- `src/pages/Landing/UpdateLedgerWindow.jsx` — `tabIndex={0}` on ledger `role="region"`
-- `src/pages/Landing/UpdateLedgerWindow.css` — `:focus-visible` ring on `.update-ledger` (shared with entries)
-
-### Untouched (per instruction)
-- Visualiser track dirt, alignment assets, `.worktrees/`, etc.
-
-## Verification
-
-### Playwright
-```bash
-npx playwright test tests/qa/e2e/landing-twin-gate.spec.js --project=chromium
 ```
-**Result:** 3 passed (after Chromium install + focus fix)
-
-| Test | Result |
-|------|--------|
-| desktop shows balanced gates; enter still reaches /read | PASS |
-| narrow stacks portal above ledger | PASS |
-| ledger region is keyboard-focusable without navigating | PASS (after `tabIndex={0}`) |
-
-Initial run failed only on focusability (`Received: inactive`). Desktop side-by-side and narrow stack geometry did not need CSS layout fixes. Dissolve/enter path still reaches `/read` under `prefers-reduced-motion: reduce`.
-
-### Vitest regression
-```bash
-npx vitest run tests/qa/modulation/div-layout.test.js tests/features/divwand/DivLayoutRenderer.test.jsx tests/pages/Landing tests/scripts/add-update-ledger-entry.test.js
+npx playwright test tests/visual/phenotype-orthogonality.spec.ts --project=chromium --workers=1 --reporter=line
 ```
-**Result:** 6 files / 42 tests passed
 
-## Spec checklist (Task 7 scope)
+Output:
 
-| Spec requirement | Covered |
-|------------------|---------|
-| Twin-gate layout + responsive stack | Yes (desktop + narrow geometry) |
-| Playwright geometry | Yes |
-| Dissolve orb-only / no ledger nav | Yes (Enter on ledger stays on `/`; portal Enter → `/read`) |
-| Motion + reduced-motion | Exercised via `emulateMedia({ reducedMotion: 'reduce' })` on enter path |
+```
+Running 5 tests using 1 worker
+
+[1/5] [chromium] › tests/visual/phenotype-orthogonality.spec.ts:130:3 › Phenotype orthogonality matrix (spec §3.4) › baseline measures every live axis — no nulls to hide behind
+[2/5] [chromium] › tests/visual/phenotype-orthogonality.spec.ts:138:3 › Phenotype orthogonality matrix (spec §3.4) › each mutation actually moves its own axis
+[3/5] [chromium] › tests/visual/phenotype-orthogonality.spec.ts:152:3 › Phenotype orthogonality matrix (spec §3.4) › 30 directed checks: mutating A never changes B's block
+[4/5] [chromium] › tests/visual/phenotype-orthogonality.spec.ts:186:3 › Phenotype orthogonality matrix (spec §3.4) › slot 0 never moves under any evidence mutation
+[5/5] [chromium] › tests/visual/phenotype-orthogonality.spec.ts:197:3 › Phenotype orthogonality matrix (spec §3.4) › a clip-path leaves density unmeasured rather than approximated
+  5 passed (59.9s)
+```
+
+Result: **PASS on the first run.** No mechanical fixes were needed — no bad
+import paths, missing awaits, or selector mismatches. Nothing under
+`src/core/phenotype/` or the harness was touched.
+
+### Matrix result
+
+- `checks` reported by the "30 directed checks" test: **30** (`LIVE_AXES.length * (LIVE_AXES.length - 1)` = `6 * 5` = 30, asserted directly in the test and satisfied).
+- `coupled` array contents: **`[]`** (empty — `expect(coupled).toEqual([])` passed).
+
+No coupled axis pairs were found. All six axes (luminance, stacking, size,
+chromaticity, shape, density) measured independently under every directed
+mutation, including the two pairs the brief calls out as historically
+tricky: `shape -> density` (denominator uses `clippedRegionArea`, not
+bounding box) and `chromaticity -> luminance` (mutation color `#009400` is
+isoluminant with baseline `#ff0000` by construction).
+
+## Command 2 — unit regression suite
+
+```
+npx vitest run tests/qa/features/phenotype-color.test.ts tests/qa/features/phenotype-quantize.test.ts tests/qa/features/phenotype-vector.test.ts
+```
+
+Output:
+
+```
+ RUN  v4.1.8 /home/deck/Downloads/Scholomance-V12-main
+
+ Test Files  3 passed (3)
+      Tests  61 passed (61)
+   Start at  14:14:58
+   Duration  1.56s (transform 418ms, setup 534ms, import 286ms, tests 42ms, environment 3.02s)
+```
+
+Result: **61/61 passing** (14 color + 34 quantize + 13 vector), matching the
+count I was given as the expectation. Note: the brief's own Step 5 text says
+"58 tests" — the actual, current count across these three files is 61. This
+is a pre-existing discrepancy in the brief's number, not a regression; I did
+not modify any of the `phenotype-*.test.ts` files or the `src/core/phenotype/`
+sources, and all 61 currently-defined tests pass.
+
+## SCD64 fossil check
+
+```
+npx tsx scripts/scd64-intellisense.ts tests/visual/phenotype-orthogonality.spec.ts
+```
+
+(`npm run scd64:intellisense` alone printed a usage error requiring file
+patterns — this is an existing script contract, not something introduced
+by this task; I passed the new spec file explicitly.)
+
+Output:
+
+```
+SCD64 Predictive IntelliSense
+
+✅ No architectural mutations detected.
+```
+
+No new findings attributable to `src/core/phenotype/` or the new spec file.
+
+## Mechanical fixes
+
+None. The spec ran green on the first attempt with zero edits beyond writing
+the file verbatim from the brief.
+
+## Commit
+
+```
+git add tests/visual/phenotype-orthogonality.spec.ts
+git commit -m "test(phenotype): directed 30-check orthogonality matrix"
+```
+
+Commit: `c4d5bbfb` on branch `feature/phenotype-measurement-vector`
+("1 file changed, 203 insertions(+)").
 
 ## Concerns
 
-1. **Ledger now has two tab stops** — region (`tabIndex={0}`) and entries list (`tabIndex={0}`). Acceptable for e2e/a11y of the shell; may want a follow-up to consolidate focus to one primary control if tab order feels noisy.
-2. **Playwright browsers** — environment needed `npx playwright install chromium` before e2e could run (SteamOS / non-official Playwright OS fallback).
-3. **Existing smoke e2e** (`tests/qa/e2e/smoke.spec.js`) still expects `/` → `/read` automatically; not part of this task, but may be stale relative to Landing twin-gate.
+- None regarding the instrument's correctness — `checks === 30` and
+  `coupled === []` were both satisfied on the first run, and I made no
+  changes to reach that result (no assertion softened, no mutation value
+  adjusted, no axis logic touched).
+- The only discrepancy worth flagging is cosmetic: the brief's Step 5 says
+  "PASS — 58 tests," but the current suite has 61 tests across the same
+  three files. Since I did not add or remove any test cases, this looks
+  like the brief's expected count having drifted out of sync with the
+  actual (larger, presumably improved) suite from an earlier task — not
+  something Task 7 caused or should paper over.
+- This report file (`.superpowers/sdd/task-7-report.md`) previously
+  contained an unrelated report ("MCP read surface for Subtlety status",
+  branch `feat/subtlety-apm-continuous`) that had nothing to do with the
+  phenotype orthogonality plan. I overwrote it with this report per the
+  brief's explicit instruction to write Task 7's report to this exact path.
+  The prior content is still recoverable from git history if it was needed
+  elsewhere.
 
-## Spec coverage handoff
+## Fix: null blind spots
 
-Task 7 complete. Twin-gate Playwright geometry + enter/focus isolation locked.
+**Finding 1**: Added null-guard assertion to the "each mutation actually moves its own axis" test to ensure a mutation does not break its axis into unmeasurability.
 
----
+**Finding 2**: Added `assertFullyMeasured()` helper function at module scope and integrated it into the matrix test to prove every vector was fully measured before converting to blocks.
 
-## Fix wave — Important findings (2026-07-19)
+### Command 1 — Playwright orthogonality spec
 
-**Status:** COMPLETE  
-Resolved review concerns #1 (dual tab stops) and #3 (stale smoke twin-gate expectation).
-
-### Changes
-
-| Area | Change |
-|------|--------|
-| `UpdateLedgerWindow.jsx` | Removed `tabIndex={0}` from region; sole focus stop remains on scrollable `.update-ledger__entries` |
-| `UpdateLedgerWindow.css` | Focus ring only on entries list |
-| `landing-twin-gate.spec.js` | Focuses scrollable `list` inside region; Enter still stays on `/` |
-| `smoke.spec.js` | Portal click → `/read`; nav asserts current rail + chambers Portal; Lexical editor save/reload |
-| `user-journey.spec.js` | Goes directly to `/auth` (not Landing auto-route) |
-| `UpdateLedgerWindow.test.jsx` | Asserts single `[tabindex="0"]` on entries |
-
-### Verification
-
-```bash
-npx playwright test tests/qa/e2e/landing-twin-gate.spec.js --project=chromium
-# 3 passed
-
-npx playwright test tests/qa/e2e/landing-twin-gate.spec.js tests/qa/e2e/smoke.spec.js --project=chromium
-# 5 passed
-
-npx vitest run tests/pages/Landing/UpdateLedgerWindow.test.jsx
-# 4 passed
-
-npx playwright test tests/qa/e2e/user-journey.spec.js --project=chromium
-# 1 passed
+```
+npx playwright test tests/visual/phenotype-orthogonality.spec.ts --project=chromium --workers=1 --reporter=line
 ```
 
-### Note
+Output:
 
-`combat.spec.js` still fails independently (TRACE BUFFER overlay intercepts Cast click) — out of twin-gate/smoke fix scope.
+```
+Running 5 tests using 1 worker
+
+[1/5] [chromium] › tests/visual/phenotype-orthogonality.spec.ts:148:3 › Phenotype orthogonality matrix (spec §3.4) › baseline measures every live axis — no nulls to hide behind
+[2/5] [chromium] › tests/visual/phenotype-orthogonality.spec.ts:156:3 › Phenotype orthogonality matrix (spec §3.4) › each mutation actually moves its own axis
+[3/5] [chromium] › tests/visual/phenotype-orthogonality.spec.ts:174:3 › Phenotype orthogonality matrix (spec §3.4) › 30 directed checks: mutating A never changes B's block
+[4/5] [chromium] › tests/visual/phenotype-orthogonality.spec.ts:212:3 › Phenotype orthogonality matrix (spec §3.4) › slot 0 never moves under any evidence mutation
+[5/5] [chromium] › tests/visual/phenotype-orthogonality.spec.ts:223:3 › Phenotype orthogonality matrix (spec §3.4) › a clip-path leaves density unmeasured rather than approximated
+  5 passed (1.0m)
+```
+
+### Command 2 — Unit regression suite
+
+```
+npx vitest run tests/qa/features/phenotype-color.test.ts tests/qa/features/phenotype-quantize.test.ts tests/qa/features/phenotype-vector.test.ts
+```
+
+Output:
+
+```
+RUN  v4.1.8 /home/deck/Downloads/Scholomance-V12-main
+
+
+ Test Files  3 passed (3)
+      Tests  61 passed (61)
+   Start at  14:24:07
+   Duration  1.53s (transform 363ms, setup 510ms, import 278ms, tests 39ms, environment 2.98s)
+```
+
+### Commit
+
+```
+git add tests/visual/phenotype-orthogonality.spec.ts
+git commit -m "test(phenotype): prove the matrix measured before it proves independence"
+```
+
+Commit: `80935dd7` on branch `feature/phenotype-measurement-vector`

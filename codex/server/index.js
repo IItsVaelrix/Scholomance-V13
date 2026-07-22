@@ -1220,11 +1220,13 @@ getSubtletyRuntime({ alertFn: fastify.subtletyCreateAlert });
 fastify.register(subtletyRoutes);
 installSubtletyNodeAdapters({ fastify });
 
-const defaultSubtletySpoolDir = path.join(PROJECT_ROOT, 'divtube_downloader', 'subtlety-spool');
+// Drain unconditionally: drainSubtletySpool treats a missing dir as empty, and
+// the TUI creates the dir on its FIRST offline crash — gating on existsSync at
+// boot left every spooled crash stranded until an unrelated restart.
 const subtletySpoolDir = process.env.SUBTLETY_SPOOL_DIR
-    || (existsSync(defaultSubtletySpoolDir) ? defaultSubtletySpoolDir : null);
-if (subtletySpoolDir && !IS_TEST_RUNTIME) {
-    void drainSubtletySpool(subtletySpoolDir, {
+    || path.join(PROJECT_ROOT, 'divtube_downloader', 'subtlety-spool');
+if (!IS_TEST_RUNTIME) {
+    const drainSpoolOnce = () => drainSubtletySpool(subtletySpoolDir, {
         ingestCrash: (event) => getSubtletyRuntime().ingestCrash(event),
         logger: fastify.log,
     }).then(({ drained, failed }) => {
@@ -1232,6 +1234,11 @@ if (subtletySpoolDir && !IS_TEST_RUNTIME) {
             fastify.log.info({ drained, failed, spoolDir: subtletySpoolDir }, '[subtlety] spool drain complete');
         }
     });
+    void drainSpoolOnce();
+    const spoolDrainMs = Number(process.env.SUBTLETY_SPOOL_DRAIN_MS ?? 60_000);
+    if (Number.isFinite(spoolDrainMs) && spoolDrainMs > 0) {
+        setInterval(drainSpoolOnce, spoolDrainMs).unref();
+    }
 }
 
 fastify.register(studioRoutes, { localAudioAdapter });

@@ -164,7 +164,9 @@ function evaluateLegacyPatterns(
     if (m) fixHits += m.length;
   }
 
-  if (legacyHits > 0) {
+  // Fix patterns suppress: a file that already contains the canonical repair
+  // must not keep firing the legacy alarm (Set→Map gate migration, etc.).
+  if (legacyHits > 0 && fixHits === 0) {
     // If we have legacy hits, find the first occurrence to anchor the diagnostic
     let targetNode: Node | null = null;
     const firstMatch = text.match(legacyPatterns[0]);
@@ -243,6 +245,41 @@ RuleRegistry.register({
       legacy: VOWELFAMILY_LEGACY_PATTERNS,
       fix: VOWELFAMILY_FIX_PATTERNS,
       remediation: VOWELFAMILY_REMEDIATION,
+    });
+  }
+});
+
+// gene BUGPATTERN_COLOR_DRAGON_FRONTEND_FALLBACK — a gated painter that still
+// calls wordTruesight invents vowel-family truth when backend resonance exists.
+// resolveGatedTruesightPaint is the only legal gated paint entrypoint.
+const FRONTEND_FALLBACK_LEGACY: RegExp[] = [
+  /\bwordTruesight\s*\(/,
+];
+const FRONTEND_FALLBACK_FIX: RegExp[] = [
+  /\bresolveGatedTruesightPaint\b/,
+];
+const FRONTEND_FALLBACK_REMEDIATION: string[] = [
+  "[INSPECT] Gated TrueSight must paint only from backend token fields via resolveGatedTruesightPaint.",
+  "[FIX] Replace wordTruesight(...) in gated Lexical/Scribe paths with resolveGatedTruesightPaint({ resonantCharStarts, charStart, tokenData, word }).",
+  "[AVOID] Do not call tokenTruesight with a synthetic `{ token: word }` shell — that reopens analyzeDeep inventing hue (COLOR_DRAGON).",
+];
+
+RuleRegistry.register({
+  id: "SCD64.COLOR_DRAGON.FRONTEND_FALLBACK",
+  family: "COLOR_DRAGON",
+  evaluate(sourceFile: SourceFile): SCD64DiagnosticMatch[] {
+    const text = sourceFile.getFullText();
+    // Only fire on files that participate in the resonance gate — otherwise
+    // Visualiser/ungated preview helpers that legitimately use wordTruesight
+    // would false-positive.
+    if (!/\bresonantCharStarts\b/.test(text) && !/\bbuildResonanceGate\b/.test(text)) {
+      return [];
+    }
+    return evaluateLegacyPatterns(sourceFile, "COLOR_DRAGON", {
+      ruleId: "SCD64.COLOR_DRAGON.FRONTEND_FALLBACK",
+      legacy: FRONTEND_FALLBACK_LEGACY,
+      fix: FRONTEND_FALLBACK_FIX,
+      remediation: FRONTEND_FALLBACK_REMEDIATION,
     });
   }
 });

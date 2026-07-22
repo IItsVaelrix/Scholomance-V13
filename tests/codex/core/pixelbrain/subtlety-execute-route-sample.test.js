@@ -48,17 +48,18 @@ describe('executeRoute observed sampling (SUBTLETY_SAMPLE_ROUTES)', () => {
     else process.env.SUBTLETY_SAMPLE_ROUTES = originalFlag;
   });
 
-  it('does not record when the sampling flag is off', () => {
+  it('does not record when the sampling flag is off', async () => {
     const { route, getExecuteCalls } = buildSampleRoute();
     const results = executeRoute(route, { spec: { parts: [{ id: 'blade' }] } });
 
     expect(results.diagnostics.ok).toBe(true);
     expect(getExecuteCalls()).toBe(1);
+    await Promise.resolve();
     expect(subtletyHoisted.getSubtletyRuntime).not.toHaveBeenCalled();
     expect(subtletyHoisted.recordObserved).not.toHaveBeenCalled();
   });
 
-  it('records once after successful execution when the flag is on', () => {
+  it('records once after successful execution when the flag is on', async () => {
     process.env.SUBTLETY_SAMPLE_ROUTES = '1';
     const { route, getExecuteCalls } = buildSampleRoute();
     const context = { spec: { parts: [{ id: 'blade' }] } };
@@ -66,8 +67,10 @@ describe('executeRoute observed sampling (SUBTLETY_SAMPLE_ROUTES)', () => {
 
     expect(results.diagnostics.ok).toBe(true);
     expect(getExecuteCalls()).toBe(1);
-    expect(subtletyHoisted.getSubtletyRuntime).toHaveBeenCalledTimes(1);
-    expect(subtletyHoisted.recordObserved).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => {
+      expect(subtletyHoisted.getSubtletyRuntime).toHaveBeenCalledTimes(1);
+      expect(subtletyHoisted.recordObserved).toHaveBeenCalledTimes(1);
+    });
     expect(subtletyHoisted.recordObserved).toHaveBeenCalledWith(
       { unitId: 'route.sample-route' },
       results,
@@ -75,7 +78,7 @@ describe('executeRoute observed sampling (SUBTLETY_SAMPLE_ROUTES)', () => {
     );
   });
 
-  it('does not record when route execution fails', () => {
+  it('does not record when route execution fails', async () => {
     process.env.SUBTLETY_SAMPLE_ROUTES = '1';
     const route = {
       name: 'failing-route',
@@ -92,10 +95,11 @@ describe('executeRoute observed sampling (SUBTLETY_SAMPLE_ROUTES)', () => {
 
     const results = executeRoute(route, {});
     expect(results.diagnostics.ok).toBe(false);
+    await Promise.resolve();
     expect(subtletyHoisted.recordObserved).not.toHaveBeenCalled();
   });
 
-  it('does not throw when recordObserved fails', () => {
+  it('does not throw when recordObserved fails', async () => {
     process.env.SUBTLETY_SAMPLE_ROUTES = '1';
     subtletyHoisted.recordObserved.mockImplementation(() => {
       throw new Error('store unavailable');
@@ -105,6 +109,9 @@ describe('executeRoute observed sampling (SUBTLETY_SAMPLE_ROUTES)', () => {
     const results = executeRoute(route, {});
     expect(results.diagnostics.ok).toBe(true);
     expect(getExecuteCalls()).toBe(1);
-    expect(subtletyHoisted.recordObserved).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => {
+      expect(subtletyHoisted.recordObserved).toHaveBeenCalledTimes(1);
+    });
+    expect(results.diagnostics.ok).toBe(true);
   });
 });

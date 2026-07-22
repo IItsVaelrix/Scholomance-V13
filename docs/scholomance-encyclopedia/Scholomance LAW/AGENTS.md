@@ -372,6 +372,7 @@ cwd = "/home/deck/Desktop/Scholomance-V12-main"
 | `mcp_scholomance_collab_diagnostic_scan` | Run the collab diagnostic scan |
 | `mcp_scholomance_collab_search_codebase` | Search indexed codebase context |
 | `mcp_scholomance_collab_forensic_search` | Search literal or regex codebase evidence |
+| `mcp_scholomance_collab_phenotypic_ideal` | Compose PHENOTYPIC-IDEAL-v1 boon-seed packet (aliases: `phenotypic_ideal`, `phenotypic`) |
 | `mcp_scholomance_collab_immunity_scan_file` | Scan a file for known structural violations |
 | `mcp_scholomance_collab_message_send` | Send a collab-plane message |
 | `mcp_scholomance_collab_alerts_pull` | Pull pending agent alerts |

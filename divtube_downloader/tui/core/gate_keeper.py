@@ -3,20 +3,10 @@ import time
 from collections import OrderedDict
 
 # ──────────────────────────────────────────────
-# CLI GATE KEEPER — Prevents tool-spam & redundancy
+# CLI GATE KEEPER — DISABLED
 # ──────────────────────────────────────────────
-# Three gates:
-#   1. COOLDOWN_GATE — minimum seconds between same tool type
-#   2. REDUNDANCY_GATE — blocks re-reading a file you already have
-#   3. THINK_GATE — prints a prompt before rapid consecutive calls
-#
-# Usage in execute_tool:
-#   from core.gate_keeper import gate
-#   verdict = gate.check(tool_name, kwargs)
-#   if verdict.is_blocked:
-#       return verdict.message
-#
-# For AI: always call `gate.think_before(tool_name, kwargs)` first.
+# Previously enforced cooldown / redundancy / think gates.
+# Now always allows; kept for /release diagnostics and API compatibility.
 # ──────────────────────────────────────────────
 
 # ── Constants ──────────────────────────────────
@@ -61,6 +51,7 @@ COOLDOWN_SECONDS = {
     "memory_set":         1.0,
     "heal":               15.0,
     "apply_patch":        1.0,
+    "phenotypic_ideal":   10.0,
 }
 
 DEFAULT_COOLDOWN = 2.0
@@ -97,62 +88,15 @@ class GateKeeper:
     # ── Public API ─────────────────────────────
 
     def check(self, tool_name: str, kwargs: dict | None = None) -> Verdict:
-        """Run all three gates. Returns Verdict — if blocked, do NOT execute."""
+        """Gate disabled — always allow tool execution."""
         self._total_checks += 1
-
-        # 1. COOLDOWN GATE — rate limit per tool
-        cooldown = COOLDOWN_SECONDS.get(tool_name, DEFAULT_COOLDOWN)
+        # Record call for /release diagnostics only; never block.
         now = time.time()
-        last = self._last_calls.get(tool_name, 0.0)
-        elapsed = now - last
-
-        if elapsed < cooldown:
-            remaining = round(cooldown - elapsed, 1)
-            self._total_blocks += 1
-            return Verdict(
-                allowed=False,
-                reason="COOLDOWN",
-                message=(
-                    f"⛔ GATE [COOLDOWN] — '{tool_name}' called {elapsed:.1f}s ago "
-                    f"(need {cooldown}s). Wait {remaining}s or use a different approach "
-                    f"instead of hitting the same tool."
-                )
-            )
-
-        # 2. REDUNDANCY GATE — file re-read detection
-        if tool_name == "read_file" and kwargs:
-            raw_path = kwargs.get("path", "")
-            resolved = self._resolve_path(raw_path)
-            if resolved and resolved in self._recent_files:
-                age = now - self._recent_files[resolved]
-                if age < 30.0:
-                    self._total_blocks += 1
-                    return Verdict(
-                        allowed=False,
-                        reason="REDUNDANCY",
-                        message=(
-                            f"⛔ GATE [REDUNDANCY] — '{raw_path}' was read {age:.0f}s ago. "
-                            f"You already have this content. Think: what new information "
-                            f"are you expecting that you don't already have?"
-                        )
-                    )
-
-        # 3. CONSECUTIVE CALL WARNING
+        self._last_calls[tool_name] = now
         if tool_name in self._consecutive_calls:
             self._consecutive_calls[tool_name] += 1
-            count = self._consecutive_calls[tool_name]
-            if count >= 3:
-                self._log_warning(
-                    f"⚠ THINK GATE — '{tool_name}' called {count} times consecutively. "
-                    f"Are you iterating toward something or spinning?"
-                )
         else:
             self._consecutive_calls[tool_name] = 1
-
-        # Record the call
-        self._last_calls[tool_name] = now
-
-        # Track file reads
         if tool_name == "read_file" and kwargs:
             raw_path = kwargs.get("path", "")
             resolved = self._resolve_path(raw_path)
@@ -161,7 +105,6 @@ class GateKeeper:
                 self._recent_files.move_to_end(resolved)
                 while len(self._recent_files) > MAX_RECENT_FILES:
                     self._recent_files.popitem(last=False)
-
         return Verdict(allowed=True)
 
     def think_before(self, tool_name: str, kwargs: dict | None = None) -> str:

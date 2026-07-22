@@ -10,15 +10,15 @@
     "text": {
       "primary": { "$value": "#0f172a", "$type": "color" },
       "secondary": { "$value": "#334155", "$type": "color" },
-      "tertiary": { "$value": "#64748b", "$type": "color" },
-      "muted": { "$value": "#94a3b8", "$type": "color" },
+      "tertiary": { "$value": "#475569", "$type": "color" },
+      "muted": { "$value": "#64748b", "$type": "color" },
       "inverse": { "$value": "#ffffff", "$type": "color" }
     },
     "border": {
       "subtle": { "$value": "rgba(15,23,42,0.08)", "$type": "color" },
-      "soft": { "$value": "rgba(15,23,42,0.12)", "$type": "color" },
-      "bold": { "$value": "rgba(15,23,42,0.18)", "$type": "color" },
-      "strong": { "$value": "hsla(215, 16%, 47%, 0.35)", "$type": "color" }
+      "soft": { "$value": "rgba(15,23,42,0.14)", "$type": "color" },
+      "bold": { "$value": "rgba(15,23,42,0.22)", "$type": "color" },
+      "strong": { "$value": "rgba(15,23,42,0.36)", "$type": "color" }
     },
     "accent": {
       "primary": { "$value": "#2563eb", "$type": "color" },
@@ -32,10 +32,10 @@
     }
   },
   "shadow": {
-    "sm": { "$value": "0 1px 2px rgba(15,23,42,0.05)", "$type": "shadow" },
-    "md": { "$value": "0 4px 6px rgba(15,23,42,0.08)", "$type": "shadow" },
-    "lg": { "$value": "0 10px 15px rgba(15,23,42,0.10)", "$type": "shadow" },
-    "panel": { "$value": "0 24px 80px rgba(15,23,42,0.12)", "$type": "shadow" }
+    "sm": { "$value": "0 1px 3px rgba(15,23,42,0.06)", "$type": "shadow" },
+    "md": { "$value": "0 4px 12px rgba(15,23,42,0.08), 0 1px 2px rgba(15,23,42,0.04)", "$type": "shadow" },
+    "lg": { "$value": "0 10px 28px rgba(15,23,42,0.12), 0 2px 6px rgba(15,23,42,0.06)", "$type": "shadow" },
+    "panel": { "$value": "0 20px 60px rgba(15,23,42,0.16)", "$type": "shadow" }
   },
   "layout": {
     "chrome": {

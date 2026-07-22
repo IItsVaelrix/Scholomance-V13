@@ -7,6 +7,7 @@
 ## Table of Contents
 
 1. [Overview](#1-overview)
+1a. [Phenotypic Idealism](#1a-phenotypic-idealism)
 2. [Clerical RAID Commands](#2-clerical-raid-commands)
    - [/cleri-scan](#cleri-scan-text)
    - [/cleri-diagnose](#cleri-diagnose-filejson)
@@ -44,6 +45,42 @@ The Scholomance integration embeds three systems from the Scholomance determinis
 | **BytecodeHealth** | Green-path diagnostic signal system. Produces deterministic, checksummed health payloads (`PB-OK-v1-*`) that AI agents can consume to verify system integrity. |
 
 All three are accessed via a **Node.js bridge** (`scripts/scholomance-bridge.mjs`) that imports the Scholomance codex modules directly — no external server required.
+
+---
+
+## 1a. Phenotypic Idealism
+
+Force multiplier: compose a `PHENOTYPIC-IDEAL-v1` packet (TurboQuant neighbors + SCDNA capability/gene evidence + `boonSeeds`). The AI conceptualizes ranked boons from the packet — it must cite `evidenceRefs` and must not invent capabilities.
+
+### Headless
+
+```bash
+npm run phenotypic:ideal -- "phoneme duration"
+npm run phenotypic:ideal -- "cockpit tools" --scope divtube
+# offline / CI:
+npm run phenotypic:ideal -- "phoneme duration" --hits-json tests/qa/features/fixtures/phenotypic-hits.json
+```
+
+### Cockpit
+
+| Command | Behavior |
+|---------|----------|
+| `/phenotypic <query>` | Compose packet; print ranked seed table |
+| `/phenotypic last` | Re-show last packet in session |
+| `/phenotypic <query> --scope divtube` | Prefer `divtube_downloader/` hits |
+
+Agent tool (Cockpit): `phenotypic_ideal` · skill: `tui/skills/phenotypic_idealism.md`  
+MCP (stdio + HTTP `/mcp`): `mcp_scholomance_collab_phenotypic_ideal`  
+Aliases: `phenotypic_ideal`, `phenotypic`  
+
+| MCP arg | Meaning |
+|---------|---------|
+| `query` | Intent / disparity hypothesis (required) |
+| `scope` | `repo` \| `divtube` (default `repo`) |
+| `hits_json` | Optional path to injected hits (offline/CI) |
+| `allow_empty_index` | Allow compose when TurboQuant index is empty |
+
+Design: `docs/superpowers/specs/2026-07-19-phenotypic-idealism-design.md`
 
 ---
 

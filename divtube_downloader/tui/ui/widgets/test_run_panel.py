@@ -89,7 +89,7 @@ class TestRunPanel(Static):
         self._error = ""
         self._spin_i = 0
         self._spin_timer = self._safe_interval(0.12, self._tick_spin)
-        self._render()
+        self._paint()
 
     def on_progress(self, fraction: float | None = None, line: str | None = None):
         if self._state != "running":
@@ -98,7 +98,7 @@ class TestRunPanel(Static):
             self._fraction = max(self._fraction, min(0.95, float(fraction)))
         if line is not None:
             self._line = str(line).strip()[:48]
-        self._render()
+        self._paint()
 
     def play_results(
         self,
@@ -123,7 +123,7 @@ class TestRunPanel(Static):
                 "status": "pass" if ok else "fail",
             }]
         self._revealed = 0
-        self._render()
+        self._paint()
 
         def tick():
             if gen != self._run_gen:
@@ -132,28 +132,33 @@ class TestRunPanel(Static):
             if self._revealed >= len(self._tests):
                 self._cancel_timers()
                 self._state = "done"
-            self._render()
+            self._paint()
 
         self._timer = self._safe_interval(0.055, tick)
         if self._timer is None:
             # Off-app / no event loop (unit tests): reveal all immediately.
             self._revealed = len(self._tests)
             self._state = "done"
-            self._render()
+            self._paint()
 
     def fail(self, message: str):
         self._cancel_timers()
         self._state = "error"
         self._error = (message or "test_run failed")[:120]
-        self._render()
+        self._paint()
 
     def _tick_spin(self):
         if self._state != "running":
             return
         self._spin_i = (self._spin_i + 1) % 4
-        self._render()
+        self._paint()
 
-    def _render(self):
+    def _paint(self):
+        """Push board markup into Static content.
+
+        Must NOT be named ``_render`` — that shadows Textual Widget._render()
+        and crashes the compositor with a None visual.
+        """
         if self._state == "idle":
             self.update(_IDLE)
             return

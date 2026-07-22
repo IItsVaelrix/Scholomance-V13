@@ -898,6 +898,12 @@ Commands:
     --exclude <glob>         File exclude pattern
     --limit N                Max results (default 75)
 
+  # Phenotypic Idealism
+  phenotypic-ideal <query>   Compose PHENOTYPIC-IDEAL-v1 boon-seed packet
+    --scope repo|divtube     Search/display scope (default repo)
+    --hits-json <file>       Inject hits (offline / tests)
+    --allow-empty-index      Allow empty TurboQuant index
+
   # MCP: Bug Reports (requires collab server DB)
   bug-create <title> <source_type>  Create bug report
     --summary <text>         Detailed summary
@@ -1289,6 +1295,55 @@ async function main() {
         dryRun: rest.flags['dry-run'] === true || rest.flags['dry-run'] === 'true' || rest.flags['dry-run'] === '',
       });
       break;
+
+    // ── Phenotypic Idealism ────────────────────────
+    case 'phenotypic-ideal': {
+      const query = rest._.join(' ').trim();
+      if (!query) {
+        result = { error: 'Usage: phenotypic-ideal <query> [--scope repo|divtube]' };
+        break;
+      }
+      const script = path.join(PROJECT_ROOT, 'scripts/phenotypic-ideal.mjs');
+      const args = [script, query];
+      const scope = rest.flags.scope || 'repo';
+      args.push('--scope', String(scope));
+      if (rest.flags['hits-json']) {
+        args.push('--hits-json', String(rest.flags['hits-json']));
+      }
+      if (rest.flags['allow-empty-index'] === true || rest.flags['allow-empty-index'] === '') {
+        args.push('--allow-empty-index');
+      }
+      const { spawnSync } = await import('node:child_process');
+      const proc = spawnSync(process.execPath, args, {
+        cwd: PROJECT_ROOT,
+        encoding: 'utf8',
+        maxBuffer: 16 * 1024 * 1024,
+        env: process.env,
+      });
+      const stdout = (proc.stdout || '').trim();
+      const stderr = (proc.stderr || '').trim();
+      if (stdout) {
+        try {
+          result = JSON.parse(stdout);
+          break;
+        } catch {
+          /* fall through */
+        }
+      }
+      if (stderr) {
+        try {
+          result = JSON.parse(stderr.split('\n').filter(Boolean).pop());
+          break;
+        } catch {
+          /* fall through */
+        }
+      }
+      result = {
+        error: stderr || stdout || `phenotypic-ideal exited ${proc.status}`,
+        exit_code: proc.status,
+      };
+      break;
+    }
 
     // ── Osmosis: Memory Cell Substrate Scan ────────
     case 'osmosis-scan': {

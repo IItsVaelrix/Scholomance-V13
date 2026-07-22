@@ -9,7 +9,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-DEFAULT_HUB_URL = "http://127.0.0.1:3000"
+DEFAULT_HUB_URL = "http://127.0.0.1:8080"
 POST_TIMEOUT_S = 0.5
 _RUNTIME = "divtube-tui"
 _DEFAULT_UNIT_ID = "crash.divtube.tui.unspecified"
@@ -24,8 +24,24 @@ def _default_spool_dir() -> Path:
     return _divtube_root() / "subtlety-spool"
 
 
+def _env_file_value(key: str) -> str | None:
+    """The TUI never loads .env into os.environ; read divtube .env directly."""
+    try:
+        for line in (_divtube_root() / ".env").read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line.startswith(f"{key}="):
+                return line.split("=", 1)[1].strip() or None
+    except OSError:
+        pass
+    return None
+
+
+def _resolve_env(key: str) -> str | None:
+    return os.environ.get(key) or _env_file_value(key)
+
+
 def _resolve_base_url(base_url: str | None) -> str:
-    return (base_url or os.environ.get("SUBTLETY_HUB_URL") or DEFAULT_HUB_URL).rstrip("/")
+    return (base_url or _resolve_env("SUBTLETY_HUB_URL") or DEFAULT_HUB_URL).rstrip("/")
 
 
 def _parse_thread(header: str) -> str | None:
@@ -59,7 +75,7 @@ def _build_event(header: str, exc_text: str) -> dict:
 def _post_crash(base_url: str, event: dict) -> None:
     payload = json.dumps(event).encode("utf-8")
     headers = {"Content-Type": "application/json"}
-    token = (os.environ.get("SUBTLETY_INGEST_TOKEN") or "").strip()
+    token = (_resolve_env("SUBTLETY_INGEST_TOKEN") or "").strip()
     if token:
         headers["x-subtlety-token"] = token
     req = urllib.request.Request(

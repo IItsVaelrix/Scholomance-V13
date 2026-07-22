@@ -7,7 +7,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 import { collabPersistence } from './collab.persistence.js';
 import * as schemas from './collab.schemas.js';
 import { 

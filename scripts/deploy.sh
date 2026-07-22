@@ -2,12 +2,15 @@
 #
 # One-command deploy for Scholomance.
 #
-# Builds the production bundle, then ships:
-#   • the SPA  → Cloudflare Pages   (serves ./dist)
-#   • the API  → Fly.io             (Docker; Fly runs its own build inside the image)
+# Builds the production bundle, then ships to apex https://scholomance.live:
+#   • Cloudflare Pages project scholomance-v12 (Production / master) — SPA mirror
+#   • Fly.io app scholomance-v12 — owns scholomance.live certs; serves SPA+API
+#
+# NOTE: scholomance-v13 is staging/preview only (main.scholomance-v13.pages.dev /
+# scholomance-v13.fly.dev). Override FLY_APP / CF_PROJECT to target it.
 #
 # The local `npm run build` is what Cloudflare Pages uploads. Fly rebuilds from the
-# Dockerfile independently, so this script's build is primarily for the Pages deploy.
+# Dockerfile independently (pass DEPLOY_CACHEBUST so the SPA layer is not stale).
 #
 # Usage:
 #   scripts/deploy.sh                 # build, then deploy Cloudflare + Fly
@@ -17,17 +20,22 @@
 #   scripts/deploy.sh --help
 #
 # Config (override via env):
-#   CF_PROJECT  (default: scholomance-v13)
-#   CF_BRANCH   (default: main)
-#   FLY_APP     (default: scholomance-v13)
+#   CF_PROJECT  (default: scholomance-v12)  — apex Pages Production project
+#   CF_BRANCH   (default: master)           — Pages Production branch
+#   FLY_APP     (default: scholomance-v12)  — owns certs for scholomance.live
 #   DIST_DIR    (default: ./dist)
+#   DEPLOY_CACHEBUST (default: unix time)   — busts Docker SPA layer cache
+#
+# Staging / preview (does NOT update apex):
+#   CF_PROJECT=scholomance-v13 CF_BRANCH=main FLY_APP=scholomance-v13 scripts/deploy.sh
 #
 set -euo pipefail
 
-CF_PROJECT="${CF_PROJECT:-scholomance-v13}"
-CF_BRANCH="${CF_BRANCH:-main}"
-FLY_APP="${FLY_APP:-scholomance-v13}"
+CF_PROJECT="${CF_PROJECT:-scholomance-v12}"
+CF_BRANCH="${CF_BRANCH:-master}"
+FLY_APP="${FLY_APP:-scholomance-v12}"
 DIST_DIR="${DIST_DIR:-./dist}"
+DEPLOY_CACHEBUST="${DEPLOY_CACHEBUST:-$(date +%s)}"
 
 # Always operate from the repo root (this script lives in scripts/).
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -43,7 +51,7 @@ ok()  { printf '\033[1;32m✓ %s\033[0m\n' "$*"; }
 die() { printf '\n\033[1;31m✗ %s\033[0m\n' "$*" >&2; exit 1; }
 
 usage() {
-  sed -n '2,33p' "$0" | sed 's/^#\{0,1\} \{0,1\}//'
+  sed -n '2,45p' "$0" | sed 's/^#\{0,1\} \{0,1\}//'
   exit 0
 }
 
@@ -83,8 +91,9 @@ fi
 # ── Fly.io (API) ─────────────────────────────────────────────────────────────
 if [ "$DO_FLY" -eq 1 ]; then
   command -v flyctl >/dev/null 2>&1 || die "flyctl not found in PATH."
-  log "Deploying API → Fly (app: ${FLY_APP})… (this builds the Docker image; can take several minutes)"
+  log "Deploying API+SPA → Fly (app: ${FLY_APP}, cachebust: ${DEPLOY_CACHEBUST})… (Docker build; can take several minutes)"
   flyctl deploy --remote-only --app "${FLY_APP}" \
+    --build-arg "DEPLOY_CACHEBUST=${DEPLOY_CACHEBUST}" \
     || die "Fly deploy failed. Check:  flyctl auth whoami   and   flyctl status --app ${FLY_APP}"
   ok "Fly deployed → https://scholomance.live/"
 fi

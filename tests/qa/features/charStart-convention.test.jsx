@@ -314,7 +314,9 @@ describe('Truesight charStart convention - source-level invariants', () => {
     ];
     for (const producerPath of producers) {
       const src = readFileSync(producerPath, 'utf8');
-      expect(src, `${producerPath} must import the canonical buildIdentityKey`).toMatch(/import\s*\{[^}]*buildIdentityKey[^}]*\}\s*from\s*['"][^'"]*charStart\.js['"]/);
+      // Producers may import from charStart.js (which re-exports) or directly
+      // from the canonical identityKey.js — both resolve to the same function.
+      expect(src, `${producerPath} must import the canonical buildIdentityKey`).toMatch(/import\s*\{[^}]*buildIdentityKey[^}]*\}\s*from\s*['"][^'"]*(?:charStart\.js|identityKey\.js)['"]/);
       // The dash key must be set ON the identity map (not just imported).
       expect(src, `${producerPath} must set tokenByIdentity via buildIdentityKey`).toMatch(/tokenByIdentity[\s\S]{0,160}buildIdentityKey\(/);
     }
@@ -380,6 +382,14 @@ describe('Truesight charStart convention - Prion #3 NaN/poisoned-family guard', 
       expect(r1.school).not.toMatch(/nan/i);
       expect(typeof r1.color).toBe('string');
     }
+  });
+
+  it('COLOR_DRAGON: allowFrontendFallback:false refuses to invent hue from client G2P', () => {
+    // gene BUGPATTERN_COLOR_DRAGON_FRONTEND_FALLBACK — gated painters pass this
+    // so a missing backend family stays VOID instead of a confident wrong school.
+    const r = tokenTruesight({ vowelFamily: NaN }, 'love', { allowFrontendFallback: false });
+    expect(r).not.toBeNull();
+    expect(r.school).toBe('VOID');
   });
 });
 

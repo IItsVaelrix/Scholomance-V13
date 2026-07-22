@@ -7,7 +7,14 @@ import AlbumIndexPage from "./pages/Visualiser/AlbumIndexPage.tsx";
 import AlbumPage from "./pages/Visualiser/AlbumPage.tsx";
 import ResonanceCardPage from "./pages/Visualiser/ResonanceCard.tsx";
 import "./lib/config/zod.config.js";
+import { installBrowserCrashSensor } from "./lib/subtlety/browserCrashSensor.js";
 import App from "./App.jsx";
+
+// Subtlety APM browser lane — dev-only: the Vite proxy injects the ingest
+// token server-side; the token must never ship in a client bundle.
+if (import.meta.env.DEV) {
+  installBrowserCrashSensor();
+}
 import "./index.css";
 import "./kits/channel-zero-ui-kit/tokens/channel-zero.tokens.css";
 import "./kits/channel-zero-ui-kit/styles/channel-zero.css";

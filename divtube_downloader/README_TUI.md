@@ -60,8 +60,11 @@ GloVe-built pack while Turbovec is active).
 
 **Scholomance Commands**
 - `/cleri-scan`, `/raid-query`, `/law-audit`
+- `/phenotypic <query>` — Phenotypic Idealism (TurboQuant + SCDNA → boon-seed packet)
 - Memory & archive commands (`memory_get`, `memory_set`, `archive_search`)
 - SCD64 checksum commands (`scd64_decode`, `scd64_scan`)
+
+Headless: `npm run phenotypic:ideal -- "<query>"` (see `SCHOLOMANCE_COMMANDS.md` §1a).
 
 Registry writes are atomic (temp + rename) so a power loss never corrupts
 your Golden Curves. Run the round-trip harness with:

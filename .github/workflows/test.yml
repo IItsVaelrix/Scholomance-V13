@@ -66,6 +66,15 @@ jobs:
     - name: Run QA Backend Tests
       run: npm run test:qa:backend
 
+    - name: Compose UI a11y (Phase 11 vitest + Playwright)
+      run: npm run ui:a11y:test
+
+    - name: Compose UI contracts / layout / render
+      run: |
+        npm run ui:contracts:test
+        npm run ui:layout:test
+        npm run ui:render:test
+
     - name: Run E2E Tests
       run: npm run test:e2e
 

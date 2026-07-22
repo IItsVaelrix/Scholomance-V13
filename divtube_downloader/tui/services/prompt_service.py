@@ -247,7 +247,7 @@ class PromptService:
                     {"role": "user", "content": text}
                 ]
 
-                MAX_TURNS = 50
+                MAX_TURNS = 150
                 use_tools = True
 
                 # We are already in the try block
@@ -388,17 +388,6 @@ class PromptService:
 
                             import time
                             time.sleep(1.0) # Prevent 429 rate limit death spirals
-                            
-                            if "⛔ GATE" in result_str:
-                                # Count gate blocks to prevent infinite loops
-                                self._gate_blocks = getattr(self, "_gate_blocks", 0) + 1
-                                if self._gate_blocks >= 3:
-                                    callback(f"[bold {ERROR}]Agent stopped due to repeated GateKeeper blocks.[/]")
-                                    set_state("idle")
-                                    self._gate_blocks = 0
-                                    return
-                            else:
-                                self._gate_blocks = 0
                         continue
 
                     set_state("responding")

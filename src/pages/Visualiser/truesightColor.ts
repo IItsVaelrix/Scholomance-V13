@@ -88,7 +88,20 @@ export function wordTruesight(word: string): { color: string; school: string; an
   return { color: generateSchoolColor(school), school, analysis };
 }
 
-export function tokenTruesight(tokenData: any, fallbackWord: string): { color: string; school: string; analysis: any } | null {
+export type TokenTruesightOptions = {
+  /**
+   * When false (COLOR_DRAGON / gated Scribe+Visualiser path), refuse to invent
+   * a vowel family via client G2P. Missing/malformed backend fields → VOID.
+   * Default true preserves the Prion #3 safety net for ungated callers.
+   */
+  allowFrontendFallback?: boolean;
+};
+
+export function tokenTruesight(
+  tokenData: any,
+  fallbackWord: string,
+  opts: TokenTruesightOptions = {},
+): { color: string; school: string; analysis: any } | null {
   const clean = cleanVisualiserWord(fallbackWord);
   if (!clean) return null;
   // Let the backend decide what gets colored based on resonantCharStarts;
@@ -104,18 +117,22 @@ export function tokenTruesight(tokenData: any, fallbackWord: string): { color: s
   // is only a last resort, for a token whose rhyme could not be resolved at all.
   //
   // The safe-guard chain is critical: if the upstream fields are malformed we
-  // fall through to the live engine, and if that also fails we land on VOID. We
-  // never let a misfire become a NaN/Infinity-poisoned color.
+  // fall through to the live engine (unless allowFrontendFallback:false — gene
+  // BUGPATTERN_COLOR_DRAGON_FRONTEND_FALLBACK), and if that also fails we land
+  // on VOID. We never let a misfire become a NaN/Infinity-poisoned color.
   //
   // The live G2P pass is LAZY: in the common server-analyzed case the backend
   // family is present and usable, so we never run analyzeDeep at all. Computing
   // it eagerly (and discarding it) was a full G2P pass wasted per resonant word.
+  const allowFrontendFallback = opts.allowFrontendFallback !== false;
   const backendFamily = safeVowelFamily(tokenData?.rhymeFamily)
     || familyFromRhymeKey(tokenData?.rhymeKey)
     || safeVowelFamily(tokenData?.vowelFamily);
-  const family = backendFamily
-    || familyFromRhymeKey(engine.analyzeDeep?.(clean)?.rhymeKey)
-    || safeVowelFamily(engine.analyzeDeep?.(clean)?.vowelFamily);
+  let family = backendFamily;
+  if (!family && allowFrontendFallback) {
+    family = familyFromRhymeKey(engine.analyzeDeep?.(clean)?.rhymeKey)
+      || safeVowelFamily(engine.analyzeDeep?.(clean)?.vowelFamily);
+  }
   const school = safeSchoolForFamily(engine, family);
   return { color: generateSchoolColor(school), school, analysis: tokenData || null };
 }

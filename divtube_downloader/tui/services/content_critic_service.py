@@ -202,7 +202,7 @@ class ContentCriticService:
                 return res_json
 
             try:
-                MAX_TURNS = 3
+                MAX_TURNS = 50
                 use_tools = True
                 for turn in range(MAX_TURNS):
                     try:
@@ -286,7 +286,7 @@ class ContentCriticService:
                         callback("[red]Error: Invalid response format from OpenCode.[/]", success=False, is_final=True)
                         return
                 
-                callback("[red]Error: Exceeded maximum tool iterations (3 turns).[/]", success=False, is_final=True)
+                callback(f"[red]Error: Exceeded maximum tool iterations ({MAX_TURNS} turns).[/]", success=False, is_final=True)
             except urllib.error.HTTPError as e:
                 err_msg = e.read().decode('utf-8').replace('[', '\\[')
                 if e.code == 429:

@@ -1,972 +1,4 @@
 {
-  "0556B9403FC62C2E406E44A96C0400729018E39D4ECBF7AB57B24D49E8606C87": {
-    "quantized": {
-      "data": [
-        152,
-        135,
-        119,
-        120,
-        135,
-        119,
-        121,
-        136,
-        103,
-        120,
-        136,
-        152,
-        120,
-        120,
-        119,
-        135,
-        136,
-        136,
-        121,
-        119,
-        135,
-        120,
-        137,
-        120,
-        119,
-        120,
-        153,
-        119,
-        120,
-        119,
-        135,
-        114
-      ],
-      "norm": 1.0000000102279876
-    },
-    "scdFull": {
-      "schema": "SCD64_DIAGNOSTIC",
-      "schemaVersion": 1,
-      "domain": "SCORING",
-      "bugFamily": "SCORE_DRIFT",
-      "diagnosticMode": "DIAGNOSE_ONLY",
-      "checksum64": "0556B9403FC62C2E406E44A96C0400729018E39D4ECBF7AB57B24D49E8606C87",
-      "slots": [
-        {
-          "index": 0,
-          "name": "BUGCLASS",
-          "hex": "0556B940",
-          "glossaryKey": "0556B940",
-          "family": "SCORE_DRIFT"
-        },
-        {
-          "index": 1,
-          "name": "COORDSYS",
-          "hex": "3FC62C2E",
-          "glossaryKey": "3FC62C2E",
-          "family": "SCORE_DRIFT"
-        },
-        {
-          "index": 2,
-          "name": "INVARIANT",
-          "hex": "406E44A9",
-          "glossaryKey": "406E44A9",
-          "family": "SCORE_DRIFT"
-        },
-        {
-          "index": 3,
-          "name": "MAGNITUDE",
-          "hex": "6C040072",
-          "glossaryKey": "6C040072",
-          "family": "SCORE_DRIFT"
-        },
-        {
-          "index": 4,
-          "name": "MASKING",
-          "hex": "9018E39D",
-          "glossaryKey": "9018E39D",
-          "family": "SCORE_DRIFT"
-        },
-        {
-          "index": 5,
-          "name": "GATE",
-          "hex": "4ECBF7AB",
-          "glossaryKey": "4ECBF7AB",
-          "family": "SCORE_DRIFT"
-        },
-        {
-          "index": 6,
-          "name": "PROPAGATE",
-          "hex": "57B24D49",
-          "glossaryKey": "57B24D49",
-          "family": "SCORE_DRIFT"
-        },
-        {
-          "index": 7,
-          "name": "VERDICT",
-          "hex": "E8606C87",
-          "glossaryKey": "E8606C87",
-          "family": "SCORE_DRIFT"
-        }
-      ],
-      "equations": [
-        {
-          "name": "Reference Token Weight",
-          "symbol": "RTW",
-          "formula": "RTW(w) = clamp01(idfProxy*(1+syllableSalience)*positionalFactor + rarity*0.3)"
-        },
-        {
-          "name": "Score Deviation",
-          "symbol": "SDV",
-          "formula": "SDV(w) = rankerScore(w) - referenceWeight(w); |SDV| > deviationThreshold => drift"
-        }
-      ],
-      "runtimeEvidence": {
-        "note": "No default evidence for family SCORE_DRIFT"
-      },
-      "raid": {
-        "completed": false,
-        "queryId": "unknown",
-        "verdictText": "Backend computed resonance connections, but the gate Set was never constructed — frontend shows no coloring."
-      },
-      "qbitField": {
-        "finalAggregation": true,
-        "collapseVerdict": "GHOST_GATE_EMPTY",
-        "energyAtMismatch": 0.79,
-        "gradientMagnitude": 0.65
-      },
-      "bytecodehealth": {
-        "spatialDiagnosticChecksum": "0556B9403FC62C2E406E44A96C0400729018E39D4ECBF7AB57B24D49E8606C87"
-      },
-      "glossary": [
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "SCORE_DRIFT",
-          "slotIndex": 0,
-          "slotName": "BUGCLASS",
-          "hexCode": "0556B940",
-          "versionByte": "05",
-          "category": "SCORE_DRIFT",
-          "canonicalMeaning": "SCORE_DRIFT:ranker-score-diverges-from-reference-token-weight",
-          "canonicalDerivationString": "BUGCLASS:SCORE_DRIFT:ranker-score-diverges-from-reference-token-weight",
-          "humanMeaning": "Ranker score diverges from the transparent reference token weight.",
-          "jsonFormulaTemplate": {
-            "name": "bugclass"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "875952C1F00C7BAE"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "SCORE_DRIFT",
-          "slotIndex": 1,
-          "slotName": "COORDSYS",
-          "hexCode": "3FC62C2E",
-          "category": "SCORE_DRIFT",
-          "canonicalMeaning": "reference-weight-tfidf-syllable-position-vs-ranker-aggregate-of-8-providers",
-          "canonicalDerivationString": "COORDSYS:reference-weight-tfidf-syllable-position-vs-ranker-aggregate-of-8-providers",
-          "humanMeaning": "Ranker score diverges from the transparent reference token weight.",
-          "jsonFormulaTemplate": {
-            "name": "coordsys"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "1AAAE82E213FE27E"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "SCORE_DRIFT",
-          "slotIndex": 2,
-          "slotName": "INVARIANT",
-          "hexCode": "406E44A9",
-          "category": "SCORE_DRIFT",
-          "canonicalMeaning": "abs-rankerScore-minus-referenceWeight-within-deviationThreshold-for-auditable-tokens",
-          "canonicalDerivationString": "INVARIANT:abs-rankerScore-minus-referenceWeight-within-deviationThreshold-for-auditable-tokens",
-          "humanMeaning": "Ranker score diverges from the transparent reference token weight.",
-          "jsonFormulaTemplate": {
-            "name": "invariant"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "46B64EC739CBCBC5"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "SCORE_DRIFT",
-          "slotIndex": 3,
-          "slotName": "MAGNITUDE",
-          "hexCode": "6C040072",
-          "category": "SCORE_DRIFT",
-          "canonicalMeaning": "abs-deviation>0.25+meanAbsoluteDeviation+worstTokenDelta",
-          "canonicalDerivationString": "MAGNITUDE:abs-deviation>0.25+meanAbsoluteDeviation+worstTokenDelta",
-          "humanMeaning": "Ranker score diverges from the transparent reference token weight.",
-          "jsonFormulaTemplate": {
-            "name": "magnitude"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "D8E225F023F5B61A"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "SCORE_DRIFT",
-          "slotIndex": 4,
-          "slotName": "MASKING",
-          "hexCode": "9018E39D",
-          "category": "SCORE_DRIFT",
-          "canonicalMeaning": "provider-level-weights-conceal-per-token-miscalibration-until-final-list",
-          "canonicalDerivationString": "MASKING:provider-level-weights-conceal-per-token-miscalibration-until-final-list",
-          "humanMeaning": "Ranker score diverges from the transparent reference token weight.",
-          "jsonFormulaTemplate": {
-            "name": "masking"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "AA18EF06E5F4EE6E"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "SCORE_DRIFT",
-          "slotIndex": 5,
-          "slotName": "GATE",
-          "hexCode": "4ECBF7AB",
-          "category": "SCORE_DRIFT",
-          "canonicalMeaning": "referenceWeight>=MIN_AUDITABLE_WEIGHT-0.05+token-was-ranked",
-          "canonicalDerivationString": "GATE:referenceWeight>=MIN_AUDITABLE_WEIGHT-0.05+token-was-ranked",
-          "humanMeaning": "Ranker score diverges from the transparent reference token weight.",
-          "jsonFormulaTemplate": {
-            "name": "gate"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "75B597F6C50D0139"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "SCORE_DRIFT",
-          "slotIndex": 6,
-          "slotName": "PROPAGATE",
-          "hexCode": "57B24D49",
-          "category": "SCORE_DRIFT",
-          "canonicalMeaning": "provider-scoring-to-ranker-DEFAULT_WEIGHTS-to-ranked-list-to-output",
-          "canonicalDerivationString": "PROPAGATE:provider-scoring-to-ranker-DEFAULT_WEIGHTS-to-ranked-list-to-output",
-          "humanMeaning": "Ranker score diverges from the transparent reference token weight.",
-          "jsonFormulaTemplate": {
-            "name": "propagate"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "51A764F3B8646176"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "SCORE_DRIFT",
-          "slotIndex": 7,
-          "slotName": "VERDICT",
-          "hexCode": "E8606C87",
-          "category": "SCORE_DRIFT",
-          "canonicalMeaning": "diagnose-only+over-or-under-weighted+inspect-provider-vs-DEFAULT_WEIGHTS",
-          "canonicalDerivationString": "VERDICT:diagnose-only+over-or-under-weighted+inspect-provider-vs-DEFAULT_WEIGHTS",
-          "humanMeaning": "Ranker score diverges from the transparent reference token weight.",
-          "jsonFormulaTemplate": {
-            "name": "verdict"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "2E96D2C8622DA893"
-        }
-      ],
-      "mcpIndexes": [
-        "checksum64",
-        "slots[].hex",
-        "bugFamily",
-        "glossary[].hexCode"
-      ]
-    },
-    "meta": {
-      "source": "generateSCD64"
-    },
-    "timestamp": 1784409577502
-  },
-  "027A31419CB4CC0B9F1F902A538FF6984A434E89A48D72BE9F705917B9342193": {
-    "quantized": {
-      "data": [
-        150,
-        117,
-        120,
-        120,
-        134,
-        134,
-        119,
-        120,
-        119,
-        136,
-        135,
-        119,
-        119,
-        135,
-        135,
-        119,
-        136,
-        119,
-        119,
-        119,
-        119,
-        119,
-        136,
-        135,
-        120,
-        120,
-        150,
-        134,
-        136,
-        104,
-        150,
-        115
-      ],
-      "norm": 0.9999999989757026
-    },
-    "scdFull": {
-      "schema": "SCD64_DIAGNOSTIC",
-      "schemaVersion": 1,
-      "domain": "COLOR",
-      "bugFamily": "RESONANCE_GHOST",
-      "diagnosticMode": "DIAGNOSE_ONLY",
-      "checksum64": "027A31419CB4CC0B9F1F902A538FF6984A434E89A48D72BE9F705917B9342193",
-      "slots": [
-        {
-          "index": 0,
-          "name": "BUGCLASS",
-          "hex": "027A3141",
-          "glossaryKey": "027A3141",
-          "family": "RESONANCE_GHOST"
-        },
-        {
-          "index": 1,
-          "name": "COORDSYS",
-          "hex": "9CB4CC0B",
-          "glossaryKey": "9CB4CC0B",
-          "family": "RESONANCE_GHOST"
-        },
-        {
-          "index": 2,
-          "name": "INVARIANT",
-          "hex": "9F1F902A",
-          "glossaryKey": "9F1F902A",
-          "family": "RESONANCE_GHOST"
-        },
-        {
-          "index": 3,
-          "name": "MAGNITUDE",
-          "hex": "538FF698",
-          "glossaryKey": "538FF698",
-          "family": "RESONANCE_GHOST"
-        },
-        {
-          "index": 4,
-          "name": "MASKING",
-          "hex": "4A434E89",
-          "glossaryKey": "4A434E89",
-          "family": "RESONANCE_GHOST"
-        },
-        {
-          "index": 5,
-          "name": "GATE",
-          "hex": "A48D72BE",
-          "glossaryKey": "A48D72BE",
-          "family": "RESONANCE_GHOST"
-        },
-        {
-          "index": 6,
-          "name": "PROPAGATE",
-          "hex": "9F705917",
-          "glossaryKey": "9F705917",
-          "family": "RESONANCE_GHOST"
-        },
-        {
-          "index": 7,
-          "name": "VERDICT",
-          "hex": "B9342193",
-          "glossaryKey": "B9342193",
-          "family": "RESONANCE_GHOST"
-        }
-      ],
-      "equations": [
-        {
-          "name": "Gate Set Cardinality",
-          "symbol": "GSC",
-          "formula": "GSC = |resonantCharStarts| vs |allConnections|"
-        },
-        {
-          "name": "Ghost Coloring Rate",
-          "symbol": "GCR",
-          "formula": "GCR(w) = (coloredWords == 0) && (|resonantCharStarts| == 0)"
-        }
-      ],
-      "runtimeEvidence": {
-        "gateSetConstructionPresent": true,
-        "gateSetEmptyPatternPresent": false,
-        "fixInstalled": true,
-        "legacyHits": 0,
-        "fixHits": 1,
-        "zeroColoredWords": false,
-        "resonanceScorePresent": true,
-        "inventory": {
-          "family": "RESONANCE_GHOST",
-          "present": false,
-          "fixInstalled": true,
-          "legacyHits": 0,
-          "fixHits": 1,
-          "perFile": [
-            {
-              "file": "src/pages/Read/ReadPage.jsx",
-              "legacyMatches": 0,
-              "fixMatches": 1,
-              "lines": 1839
-            },
-            {
-              "file": "src/lib/truesight/compiler/compileVerseToIR.js",
-              "legacyMatches": 0,
-              "fixMatches": 0,
-              "lines": 5
-            },
-            {
-              "file": "codex/core/phonology/phoneme.engine.js",
-              "legacyMatches": 0,
-              "fixMatches": 0,
-              "lines": 1198
-            }
-          ],
-          "summary": {
-            "gateSetConstructionPresent": true,
-            "gateSetEmptyPatternPresent": false,
-            "fixInstalled": true,
-            "legacyHits": 0,
-            "fixHits": 1,
-            "zeroColoredWords": false,
-            "resonanceScorePresent": true
-          }
-        }
-      },
-      "raid": {
-        "completed": true,
-        "queryId": "TRUESIGHT-FULL-SWEEP-RESONANCE-GHOST",
-        "verdictText": "Real evidence: gate Set construction present, no ghost pattern. Fix installed.",
-        "matchedSubsystems": [
-          "src/pages/Read/ReadPage.jsx",
-          "src/lib/truesight/compiler/compileVerseToIR.js",
-          "codex/core/phonology/phoneme.engine.js"
-        ],
-        "realEvidence": {
-          "family": "RESONANCE_GHOST",
-          "present": false,
-          "fixInstalled": true,
-          "legacyHits": 0,
-          "fixHits": 1,
-          "perFile": [
-            {
-              "file": "src/pages/Read/ReadPage.jsx",
-              "legacyMatches": 0,
-              "fixMatches": 1,
-              "lines": 1839
-            },
-            {
-              "file": "src/lib/truesight/compiler/compileVerseToIR.js",
-              "legacyMatches": 0,
-              "fixMatches": 0,
-              "lines": 5
-            },
-            {
-              "file": "codex/core/phonology/phoneme.engine.js",
-              "legacyMatches": 0,
-              "fixMatches": 0,
-              "lines": 1198
-            }
-          ],
-          "summary": {
-            "gateSetConstructionPresent": true,
-            "gateSetEmptyPatternPresent": false,
-            "fixInstalled": true,
-            "legacyHits": 0,
-            "fixHits": 1,
-            "zeroColoredWords": false,
-            "resonanceScorePresent": true
-          }
-        }
-      },
-      "qbitField": {
-        "finalAggregation": true,
-        "collapseVerdict": "GATE_OK",
-        "energyAtMismatch": 0.05,
-        "gradientMagnitude": 0.03,
-        "realEvidenceInventory": {
-          "family": "RESONANCE_GHOST",
-          "present": false,
-          "fixInstalled": true,
-          "legacyHits": 0,
-          "fixHits": 1,
-          "perFile": [
-            {
-              "file": "src/pages/Read/ReadPage.jsx",
-              "legacyMatches": 0,
-              "fixMatches": 1,
-              "lines": 1839
-            },
-            {
-              "file": "src/lib/truesight/compiler/compileVerseToIR.js",
-              "legacyMatches": 0,
-              "fixMatches": 0,
-              "lines": 5
-            },
-            {
-              "file": "codex/core/phonology/phoneme.engine.js",
-              "legacyMatches": 0,
-              "fixMatches": 0,
-              "lines": 1198
-            }
-          ],
-          "summary": {
-            "gateSetConstructionPresent": true,
-            "gateSetEmptyPatternPresent": false,
-            "fixInstalled": true,
-            "legacyHits": 0,
-            "fixHits": 1,
-            "zeroColoredWords": false,
-            "resonanceScorePresent": true
-          }
-        }
-      },
-      "bytecodehealth": {
-        "spatialDiagnosticChecksum": "027A31419CB4CC0B9F1F902A538FF6984A434E89A48D72BE9F705917B9342193"
-      },
-      "glossary": [
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "RESONANCE_GHOST",
-          "slotIndex": 0,
-          "slotName": "BUGCLASS",
-          "hexCode": "027A3141",
-          "versionByte": "02",
-          "category": "RESONANCE_GHOST",
-          "canonicalMeaning": "RESONANCE_GHOST:gate-Set-construction-failure",
-          "canonicalDerivationString": "BUGCLASS:RESONANCE_GHOST:gate-Set-construction-failure",
-          "humanMeaning": "Resonance gate Set construction failure: gate Set is empty when it should be populated, so the resonance-coloring never fires.",
-          "jsonFormulaTemplate": {
-            "name": "bugclass"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "A3C4AAC3ABB7FC5A"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "RESONANCE_GHOST",
-          "slotIndex": 1,
-          "slotName": "COORDSYS",
-          "hexCode": "9CB4CC0B",
-          "category": "RESONANCE_GHOST",
-          "canonicalMeaning": "gate-Set-from-allConnections+frontend-receives-empty-Set",
-          "canonicalDerivationString": "COORDSYS:gate-Set-from-allConnections+frontend-receives-empty-Set",
-          "humanMeaning": "Resonance gate Set construction failure: gate Set is empty when it should be populated, so the resonance-coloring never fires.",
-          "jsonFormulaTemplate": {
-            "name": "coordsys"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "8F13FB1DCC9B5564"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "RESONANCE_GHOST",
-          "slotIndex": 2,
-          "slotName": "INVARIANT",
-          "hexCode": "9F1F902A",
-          "category": "RESONANCE_GHOST",
-          "canonicalMeaning": "resonantCharStarts-Set-size-mismatch-with-IR-connections",
-          "canonicalDerivationString": "INVARIANT:resonantCharStarts-Set-size-mismatch-with-IR-connections",
-          "humanMeaning": "Resonance gate Set construction failure: gate Set is empty when it should be populated, so the resonance-coloring never fires.",
-          "jsonFormulaTemplate": {
-            "name": "invariant"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "494D5A7DC9E7F024"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "RESONANCE_GHOST",
-          "slotIndex": 3,
-          "slotName": "MAGNITUDE",
-          "hexCode": "538FF698",
-          "category": "RESONANCE_GHOST",
-          "canonicalMeaning": "emptySetRate>=0.80+zeroColoredWords+gateSetSize=0",
-          "canonicalDerivationString": "MAGNITUDE:emptySetRate>=0.80+zeroColoredWords+gateSetSize=0",
-          "humanMeaning": "Resonance gate Set construction failure: gate Set is empty when it should be populated, so the resonance-coloring never fires.",
-          "jsonFormulaTemplate": {
-            "name": "magnitude"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "97AB7DFF4F88407A"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "RESONANCE_GHOST",
-          "slotIndex": 4,
-          "slotName": "MASKING",
-          "hexCode": "4A434E89",
-          "category": "RESONANCE_GHOST",
-          "canonicalMeaning": "gate-Set-quiet-empty+frontend-defaults-to-everything-or-nothing",
-          "canonicalDerivationString": "MASKING:gate-Set-quiet-empty+frontend-defaults-to-everything-or-nothing",
-          "humanMeaning": "Resonance gate Set construction failure: gate Set is empty when it should be populated, so the resonance-coloring never fires.",
-          "jsonFormulaTemplate": {
-            "name": "masking"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "15DDA66A31B49FD9"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "RESONANCE_GHOST",
-          "slotIndex": 5,
-          "slotName": "GATE",
-          "hexCode": "A48D72BE",
-          "category": "RESONANCE_GHOST",
-          "canonicalMeaning": "resonanceGate>=0.95+Set-construction-bug+frontend-shows-grey",
-          "canonicalDerivationString": "GATE:resonanceGate>=0.95+Set-construction-bug+frontend-shows-grey",
-          "humanMeaning": "Resonance gate Set construction failure: gate Set is empty when it should be populated, so the resonance-coloring never fires.",
-          "jsonFormulaTemplate": {
-            "name": "gate"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "CFF09041C298028A"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "RESONANCE_GHOST",
-          "slotIndex": 6,
-          "slotName": "PROPAGATE",
-          "hexCode": "9F705917",
-          "category": "RESONANCE_GHOST",
-          "canonicalMeaning": "deepRhymeEngine-to-syntaxLayer-Set-construction-divergence",
-          "canonicalDerivationString": "PROPAGATE:deepRhymeEngine-to-syntaxLayer-Set-construction-divergence",
-          "humanMeaning": "Resonance gate Set construction failure: gate Set is empty when it should be populated, so the resonance-coloring never fires.",
-          "jsonFormulaTemplate": {
-            "name": "propagate"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "A9ACB051F713E585"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "RESONANCE_GHOST",
-          "slotIndex": 7,
-          "slotName": "VERDICT",
-          "hexCode": "B9342193",
-          "category": "RESONANCE_GHOST",
-          "canonicalMeaning": "diagnose-only+gate-Set-construction-broken+frontend-shows-nothing",
-          "canonicalDerivationString": "VERDICT:diagnose-only+gate-Set-construction-broken+frontend-shows-nothing",
-          "humanMeaning": "Resonance gate Set construction failure: gate Set is empty when it should be populated, so the resonance-coloring never fires.",
-          "jsonFormulaTemplate": {
-            "name": "verdict"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "02E52FB94BEC0D19"
-        }
-      ],
-      "mcpIndexes": [
-        "checksum64",
-        "slots[].hex",
-        "bugFamily",
-        "glossary[].hexCode"
-      ]
-    },
-    "meta": {
-      "source": "generateSCD64"
-    },
-    "timestamp": 1784409521253
-  },
-  "03030742C01B6AC16D9C5B00CF603CFBD906A4D5F91679A661F84A3B19C5CB5A": {
-    "quantized": {
-      "data": [
-        118,
-        119,
-        119,
-        120,
-        136,
-        135,
-        136,
-        120,
-        120,
-        120,
-        135,
-        135,
-        119,
-        136,
-        119,
-        150,
-        120,
-        136,
-        121,
-        120,
-        136,
-        120,
-        136,
-        105,
-        135,
-        121,
-        151,
-        120,
-        120,
-        118,
-        152,
-        130
-      ],
-      "norm": 1.0000000147441315
-    },
-    "scdFull": {
-      "schema": "SCD64_DIAGNOSTIC",
-      "schemaVersion": 1,
-      "domain": "COLOR",
-      "bugFamily": "GATE_DATA_ABSENT",
-      "diagnosticMode": "DIAGNOSE_ONLY",
-      "checksum64": "03030742C01B6AC16D9C5B00CF603CFBD906A4D5F91679A661F84A3B19C5CB5A",
-      "slots": [
-        {
-          "index": 0,
-          "name": "BUGCLASS",
-          "hex": "03030742",
-          "glossaryKey": "03030742",
-          "family": "GATE_DATA_ABSENT"
-        },
-        {
-          "index": 1,
-          "name": "COORDSYS",
-          "hex": "C01B6AC1",
-          "glossaryKey": "C01B6AC1",
-          "family": "GATE_DATA_ABSENT"
-        },
-        {
-          "index": 2,
-          "name": "INVARIANT",
-          "hex": "6D9C5B00",
-          "glossaryKey": "6D9C5B00",
-          "family": "GATE_DATA_ABSENT"
-        },
-        {
-          "index": 3,
-          "name": "MAGNITUDE",
-          "hex": "CF603CFB",
-          "glossaryKey": "CF603CFB",
-          "family": "GATE_DATA_ABSENT"
-        },
-        {
-          "index": 4,
-          "name": "MASKING",
-          "hex": "D906A4D5",
-          "glossaryKey": "D906A4D5",
-          "family": "GATE_DATA_ABSENT"
-        },
-        {
-          "index": 5,
-          "name": "GATE",
-          "hex": "F91679A6",
-          "glossaryKey": "F91679A6",
-          "family": "GATE_DATA_ABSENT"
-        },
-        {
-          "index": 6,
-          "name": "PROPAGATE",
-          "hex": "61F84A3B",
-          "glossaryKey": "61F84A3B",
-          "family": "GATE_DATA_ABSENT"
-        },
-        {
-          "index": 7,
-          "name": "VERDICT",
-          "hex": "19C5CB5A",
-          "glossaryKey": "19C5CB5A",
-          "family": "GATE_DATA_ABSENT"
-        }
-      ],
-      "equations": [
-        {
-          "name": "Connection Source Presence",
-          "symbol": "CSP",
-          "formula": "CSP = exists(syntaxLayer.allConnections) || exists(analysis.allConnections) || exists(verseIR.connections)"
-        },
-        {
-          "name": "Starved Gate Rate",
-          "symbol": "SGR",
-          "formula": "SGR = (|resonantCharStarts| == 0) && (CSP == false)"
-        }
-      ],
-      "runtimeEvidence": {
-        "note": "No default evidence for family GATE_DATA_ABSENT"
-      },
-      "raid": {
-        "completed": false,
-        "queryId": "unknown",
-        "verdictText": "Backend computed resonance connections, but the gate Set was never constructed — frontend shows no coloring."
-      },
-      "qbitField": {
-        "finalAggregation": true,
-        "collapseVerdict": "GHOST_GATE_EMPTY",
-        "energyAtMismatch": 0.79,
-        "gradientMagnitude": 0.65
-      },
-      "bytecodehealth": {
-        "spatialDiagnosticChecksum": "03030742C01B6AC16D9C5B00CF603CFBD906A4D5F91679A661F84A3B19C5CB5A"
-      },
-      "glossary": [
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "GATE_DATA_ABSENT",
-          "slotIndex": 0,
-          "slotName": "BUGCLASS",
-          "hexCode": "03030742",
-          "versionByte": "03",
-          "category": "GATE_DATA_ABSENT",
-          "canonicalMeaning": "GATE_DATA_ABSENT:fallback-synthesis-omits-connections+gate-reads-server-only-key",
-          "canonicalDerivationString": "BUGCLASS:GATE_DATA_ABSENT:fallback-synthesis-omits-connections+gate-reads-server-only-key",
-          "humanMeaning": "Resonance gate starved of input: rhyme connections exist only on the server synthesis path.",
-          "jsonFormulaTemplate": {
-            "name": "bugclass"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "DA8C9999AF5C5C6E"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "GATE_DATA_ABSENT",
-          "slotIndex": 1,
-          "slotName": "COORDSYS",
-          "hexCode": "C01B6AC1",
-          "category": "GATE_DATA_ABSENT",
-          "canonicalMeaning": "server-only-syntaxLayer.allConnections+fallback-buildSyntaxLayer-emits-no-connections",
-          "canonicalDerivationString": "COORDSYS:server-only-syntaxLayer.allConnections+fallback-buildSyntaxLayer-emits-no-connections",
-          "humanMeaning": "Resonance gate starved of input: rhyme connections exist only on the server synthesis path.",
-          "jsonFormulaTemplate": {
-            "name": "coordsys"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "BD04AADF2D724953"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "GATE_DATA_ABSENT",
-          "slotIndex": 2,
-          "slotName": "INVARIANT",
-          "hexCode": "6D9C5B00",
-          "category": "GATE_DATA_ABSENT",
-          "canonicalMeaning": "gate-connection-source-must-exist-on-every-synthesis-path",
-          "canonicalDerivationString": "INVARIANT:gate-connection-source-must-exist-on-every-synthesis-path",
-          "humanMeaning": "Resonance gate starved of input: rhyme connections exist only on the server synthesis path.",
-          "jsonFormulaTemplate": {
-            "name": "invariant"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "B3C528EA51EC5CE1"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "GATE_DATA_ABSENT",
-          "slotIndex": 3,
-          "slotName": "MAGNITUDE",
-          "hexCode": "CF603CFB",
-          "category": "GATE_DATA_ABSENT",
-          "canonicalMeaning": "fallbackPathSelected=1.0+gateSetSize=0+zeroColoredWords-when-server-unreachable",
-          "canonicalDerivationString": "MAGNITUDE:fallbackPathSelected=1.0+gateSetSize=0+zeroColoredWords-when-server-unreachable",
-          "humanMeaning": "Resonance gate starved of input: rhyme connections exist only on the server synthesis path.",
-          "jsonFormulaTemplate": {
-            "name": "magnitude"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "A3EF2A7778BF7410"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "GATE_DATA_ABSENT",
-          "slotIndex": 4,
-          "slotName": "MASKING",
-          "hexCode": "D906A4D5",
-          "category": "GATE_DATA_ABSENT",
-          "canonicalMeaning": "isEnabled-false-silent-backoff-fallthrough+activeConnections-has-verseIR-fallback-resonanceGate-does-not",
-          "canonicalDerivationString": "MASKING:isEnabled-false-silent-backoff-fallthrough+activeConnections-has-verseIR-fallback-resonanceGate-does-not",
-          "humanMeaning": "Resonance gate starved of input: rhyme connections exist only on the server synthesis path.",
-          "jsonFormulaTemplate": {
-            "name": "masking"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "CF97F9D9A2CE22BC"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "GATE_DATA_ABSENT",
-          "slotIndex": 5,
-          "slotName": "GATE",
-          "hexCode": "F91679A6",
-          "category": "GATE_DATA_ABSENT",
-          "canonicalMeaning": "resonanceGate-always-consulted+input-allConnections-undefined-on-fallback-path",
-          "canonicalDerivationString": "GATE:resonanceGate-always-consulted+input-allConnections-undefined-on-fallback-path",
-          "humanMeaning": "Resonance gate starved of input: rhyme connections exist only on the server synthesis path.",
-          "jsonFormulaTemplate": {
-            "name": "gate"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "B6C6BBAFE5CB673B"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "GATE_DATA_ABSENT",
-          "slotIndex": 6,
-          "slotName": "PROPAGATE",
-          "hexCode": "61F84A3B",
-          "category": "GATE_DATA_ABSENT",
-          "canonicalMeaning": "server-unreachable-to-isEnabled-false-to-synthesizeVerse-to-empty-syntaxLayer-to-empty-gate-Set",
-          "canonicalDerivationString": "PROPAGATE:server-unreachable-to-isEnabled-false-to-synthesizeVerse-to-empty-syntaxLayer-to-empty-gate-Set",
-          "humanMeaning": "Resonance gate starved of input: rhyme connections exist only on the server synthesis path.",
-          "jsonFormulaTemplate": {
-            "name": "propagate"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "F9014964F0223EA7"
-        },
-        {
-          "schema": "SCD64_GLOSSARY_ENTRY",
-          "schemaVersion": 1,
-          "family": "GATE_DATA_ABSENT",
-          "slotIndex": 7,
-          "slotName": "VERDICT",
-          "hexCode": "19C5CB5A",
-          "category": "GATE_DATA_ABSENT",
-          "canonicalMeaning": "diagnose-only+wire-connections-into-fallback-synthesis-or-add-gate-degraded-mode",
-          "canonicalDerivationString": "VERDICT:diagnose-only+wire-connections-into-fallback-synthesis-or-add-gate-degraded-mode",
-          "humanMeaning": "Resonance gate starved of input: rhyme connections exist only on the server synthesis path.",
-          "jsonFormulaTemplate": {
-            "name": "verdict"
-          },
-          "fixedForever": true,
-          "categoryChecksum": "8C9F0D7FF16B134E"
-        }
-      ],
-      "mcpIndexes": [
-        "checksum64",
-        "slots[].hex",
-        "bugFamily",
-        "glossary[].hexCode"
-      ]
-    },
-    "meta": {
-      "source": "generateSCD64"
-    },
-    "timestamp": 1784409518968
-  },
   "01861DF4C31AC92C24D4754DD1043D244908E4B3317B90735048A13A0AB2B33C": {
     "quantized": {
       "data": [
@@ -1273,6 +305,974 @@
     "meta": {
       "source": "generateSCD64"
     },
-    "timestamp": 1784409521266
+    "timestamp": 1784708825955
+  },
+  "027A31419CB4CC0B9F1F902A538FF6984A434E89A48D72BE9F705917B9342193": {
+    "quantized": {
+      "data": [
+        150,
+        117,
+        120,
+        120,
+        134,
+        134,
+        119,
+        104,
+        119,
+        136,
+        135,
+        119,
+        119,
+        135,
+        135,
+        119,
+        136,
+        119,
+        119,
+        119,
+        119,
+        119,
+        136,
+        135,
+        120,
+        120,
+        150,
+        134,
+        136,
+        104,
+        150,
+        115
+      ],
+      "norm": 1.000000008220386
+    },
+    "scdFull": {
+      "schema": "SCD64_DIAGNOSTIC",
+      "schemaVersion": 1,
+      "domain": "COLOR",
+      "bugFamily": "RESONANCE_GHOST",
+      "diagnosticMode": "DIAGNOSE_ONLY",
+      "checksum64": "027A31419CB4CC0B9F1F902A538FF6984A434E89A48D72BE9F705917B9342193",
+      "slots": [
+        {
+          "index": 0,
+          "name": "BUGCLASS",
+          "hex": "027A3141",
+          "glossaryKey": "027A3141",
+          "family": "RESONANCE_GHOST"
+        },
+        {
+          "index": 1,
+          "name": "COORDSYS",
+          "hex": "9CB4CC0B",
+          "glossaryKey": "9CB4CC0B",
+          "family": "RESONANCE_GHOST"
+        },
+        {
+          "index": 2,
+          "name": "INVARIANT",
+          "hex": "9F1F902A",
+          "glossaryKey": "9F1F902A",
+          "family": "RESONANCE_GHOST"
+        },
+        {
+          "index": 3,
+          "name": "MAGNITUDE",
+          "hex": "538FF698",
+          "glossaryKey": "538FF698",
+          "family": "RESONANCE_GHOST"
+        },
+        {
+          "index": 4,
+          "name": "MASKING",
+          "hex": "4A434E89",
+          "glossaryKey": "4A434E89",
+          "family": "RESONANCE_GHOST"
+        },
+        {
+          "index": 5,
+          "name": "GATE",
+          "hex": "A48D72BE",
+          "glossaryKey": "A48D72BE",
+          "family": "RESONANCE_GHOST"
+        },
+        {
+          "index": 6,
+          "name": "PROPAGATE",
+          "hex": "9F705917",
+          "glossaryKey": "9F705917",
+          "family": "RESONANCE_GHOST"
+        },
+        {
+          "index": 7,
+          "name": "VERDICT",
+          "hex": "B9342193",
+          "glossaryKey": "B9342193",
+          "family": "RESONANCE_GHOST"
+        }
+      ],
+      "equations": [
+        {
+          "name": "Gate Set Cardinality",
+          "symbol": "GSC",
+          "formula": "GSC = |resonantCharStarts| vs |allConnections|"
+        },
+        {
+          "name": "Ghost Coloring Rate",
+          "symbol": "GCR",
+          "formula": "GCR(w) = (coloredWords == 0) && (|resonantCharStarts| == 0)"
+        }
+      ],
+      "runtimeEvidence": {
+        "gateSetConstructionPresent": true,
+        "gateSetEmptyPatternPresent": false,
+        "fixInstalled": true,
+        "legacyHits": 0,
+        "fixHits": 1,
+        "zeroColoredWords": false,
+        "resonanceScorePresent": true,
+        "inventory": {
+          "family": "RESONANCE_GHOST",
+          "present": false,
+          "fixInstalled": true,
+          "legacyHits": 0,
+          "fixHits": 1,
+          "perFile": [
+            {
+              "file": "src/pages/Read/ReadPage.jsx",
+              "legacyMatches": 0,
+              "fixMatches": 1,
+              "lines": 1842
+            },
+            {
+              "file": "src/lib/truesight/compiler/compileVerseToIR.js",
+              "legacyMatches": 0,
+              "fixMatches": 0,
+              "lines": 5
+            },
+            {
+              "file": "codex/core/phonology/phoneme.engine.js",
+              "legacyMatches": 0,
+              "fixMatches": 0,
+              "lines": 1198
+            }
+          ],
+          "summary": {
+            "gateSetConstructionPresent": true,
+            "gateSetEmptyPatternPresent": false,
+            "fixInstalled": true,
+            "legacyHits": 0,
+            "fixHits": 1,
+            "zeroColoredWords": false,
+            "resonanceScorePresent": true
+          }
+        }
+      },
+      "raid": {
+        "completed": true,
+        "queryId": "TRUESIGHT-FULL-SWEEP-RESONANCE-GHOST",
+        "verdictText": "Real evidence: gate Set construction present, no ghost pattern. Fix installed.",
+        "matchedSubsystems": [
+          "src/pages/Read/ReadPage.jsx",
+          "src/lib/truesight/compiler/compileVerseToIR.js",
+          "codex/core/phonology/phoneme.engine.js"
+        ],
+        "realEvidence": {
+          "family": "RESONANCE_GHOST",
+          "present": false,
+          "fixInstalled": true,
+          "legacyHits": 0,
+          "fixHits": 1,
+          "perFile": [
+            {
+              "file": "src/pages/Read/ReadPage.jsx",
+              "legacyMatches": 0,
+              "fixMatches": 1,
+              "lines": 1842
+            },
+            {
+              "file": "src/lib/truesight/compiler/compileVerseToIR.js",
+              "legacyMatches": 0,
+              "fixMatches": 0,
+              "lines": 5
+            },
+            {
+              "file": "codex/core/phonology/phoneme.engine.js",
+              "legacyMatches": 0,
+              "fixMatches": 0,
+              "lines": 1198
+            }
+          ],
+          "summary": {
+            "gateSetConstructionPresent": true,
+            "gateSetEmptyPatternPresent": false,
+            "fixInstalled": true,
+            "legacyHits": 0,
+            "fixHits": 1,
+            "zeroColoredWords": false,
+            "resonanceScorePresent": true
+          }
+        }
+      },
+      "qbitField": {
+        "finalAggregation": true,
+        "collapseVerdict": "GATE_OK",
+        "energyAtMismatch": 0.05,
+        "gradientMagnitude": 0.03,
+        "realEvidenceInventory": {
+          "family": "RESONANCE_GHOST",
+          "present": false,
+          "fixInstalled": true,
+          "legacyHits": 0,
+          "fixHits": 1,
+          "perFile": [
+            {
+              "file": "src/pages/Read/ReadPage.jsx",
+              "legacyMatches": 0,
+              "fixMatches": 1,
+              "lines": 1842
+            },
+            {
+              "file": "src/lib/truesight/compiler/compileVerseToIR.js",
+              "legacyMatches": 0,
+              "fixMatches": 0,
+              "lines": 5
+            },
+            {
+              "file": "codex/core/phonology/phoneme.engine.js",
+              "legacyMatches": 0,
+              "fixMatches": 0,
+              "lines": 1198
+            }
+          ],
+          "summary": {
+            "gateSetConstructionPresent": true,
+            "gateSetEmptyPatternPresent": false,
+            "fixInstalled": true,
+            "legacyHits": 0,
+            "fixHits": 1,
+            "zeroColoredWords": false,
+            "resonanceScorePresent": true
+          }
+        }
+      },
+      "bytecodehealth": {
+        "spatialDiagnosticChecksum": "027A31419CB4CC0B9F1F902A538FF6984A434E89A48D72BE9F705917B9342193"
+      },
+      "glossary": [
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "RESONANCE_GHOST",
+          "slotIndex": 0,
+          "slotName": "BUGCLASS",
+          "hexCode": "027A3141",
+          "versionByte": "02",
+          "category": "RESONANCE_GHOST",
+          "canonicalMeaning": "RESONANCE_GHOST:gate-Set-construction-failure",
+          "canonicalDerivationString": "BUGCLASS:RESONANCE_GHOST:gate-Set-construction-failure",
+          "humanMeaning": "Resonance gate Set construction failure: gate Set is empty when it should be populated, so the resonance-coloring never fires.",
+          "jsonFormulaTemplate": {
+            "name": "bugclass"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "A3C4AAC3ABB7FC5A"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "RESONANCE_GHOST",
+          "slotIndex": 1,
+          "slotName": "COORDSYS",
+          "hexCode": "9CB4CC0B",
+          "category": "RESONANCE_GHOST",
+          "canonicalMeaning": "gate-Set-from-allConnections+frontend-receives-empty-Set",
+          "canonicalDerivationString": "COORDSYS:gate-Set-from-allConnections+frontend-receives-empty-Set",
+          "humanMeaning": "Resonance gate Set construction failure: gate Set is empty when it should be populated, so the resonance-coloring never fires.",
+          "jsonFormulaTemplate": {
+            "name": "coordsys"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "8F13FB1DCC9B5564"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "RESONANCE_GHOST",
+          "slotIndex": 2,
+          "slotName": "INVARIANT",
+          "hexCode": "9F1F902A",
+          "category": "RESONANCE_GHOST",
+          "canonicalMeaning": "resonantCharStarts-Set-size-mismatch-with-IR-connections",
+          "canonicalDerivationString": "INVARIANT:resonantCharStarts-Set-size-mismatch-with-IR-connections",
+          "humanMeaning": "Resonance gate Set construction failure: gate Set is empty when it should be populated, so the resonance-coloring never fires.",
+          "jsonFormulaTemplate": {
+            "name": "invariant"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "494D5A7DC9E7F024"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "RESONANCE_GHOST",
+          "slotIndex": 3,
+          "slotName": "MAGNITUDE",
+          "hexCode": "538FF698",
+          "category": "RESONANCE_GHOST",
+          "canonicalMeaning": "emptySetRate>=0.80+zeroColoredWords+gateSetSize=0",
+          "canonicalDerivationString": "MAGNITUDE:emptySetRate>=0.80+zeroColoredWords+gateSetSize=0",
+          "humanMeaning": "Resonance gate Set construction failure: gate Set is empty when it should be populated, so the resonance-coloring never fires.",
+          "jsonFormulaTemplate": {
+            "name": "magnitude"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "97AB7DFF4F88407A"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "RESONANCE_GHOST",
+          "slotIndex": 4,
+          "slotName": "MASKING",
+          "hexCode": "4A434E89",
+          "category": "RESONANCE_GHOST",
+          "canonicalMeaning": "gate-Set-quiet-empty+frontend-defaults-to-everything-or-nothing",
+          "canonicalDerivationString": "MASKING:gate-Set-quiet-empty+frontend-defaults-to-everything-or-nothing",
+          "humanMeaning": "Resonance gate Set construction failure: gate Set is empty when it should be populated, so the resonance-coloring never fires.",
+          "jsonFormulaTemplate": {
+            "name": "masking"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "15DDA66A31B49FD9"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "RESONANCE_GHOST",
+          "slotIndex": 5,
+          "slotName": "GATE",
+          "hexCode": "A48D72BE",
+          "category": "RESONANCE_GHOST",
+          "canonicalMeaning": "resonanceGate>=0.95+Set-construction-bug+frontend-shows-grey",
+          "canonicalDerivationString": "GATE:resonanceGate>=0.95+Set-construction-bug+frontend-shows-grey",
+          "humanMeaning": "Resonance gate Set construction failure: gate Set is empty when it should be populated, so the resonance-coloring never fires.",
+          "jsonFormulaTemplate": {
+            "name": "gate"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "CFF09041C298028A"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "RESONANCE_GHOST",
+          "slotIndex": 6,
+          "slotName": "PROPAGATE",
+          "hexCode": "9F705917",
+          "category": "RESONANCE_GHOST",
+          "canonicalMeaning": "deepRhymeEngine-to-syntaxLayer-Set-construction-divergence",
+          "canonicalDerivationString": "PROPAGATE:deepRhymeEngine-to-syntaxLayer-Set-construction-divergence",
+          "humanMeaning": "Resonance gate Set construction failure: gate Set is empty when it should be populated, so the resonance-coloring never fires.",
+          "jsonFormulaTemplate": {
+            "name": "propagate"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "A9ACB051F713E585"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "RESONANCE_GHOST",
+          "slotIndex": 7,
+          "slotName": "VERDICT",
+          "hexCode": "B9342193",
+          "category": "RESONANCE_GHOST",
+          "canonicalMeaning": "diagnose-only+gate-Set-construction-broken+frontend-shows-nothing",
+          "canonicalDerivationString": "VERDICT:diagnose-only+gate-Set-construction-broken+frontend-shows-nothing",
+          "humanMeaning": "Resonance gate Set construction failure: gate Set is empty when it should be populated, so the resonance-coloring never fires.",
+          "jsonFormulaTemplate": {
+            "name": "verdict"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "02E52FB94BEC0D19"
+        }
+      ],
+      "mcpIndexes": [
+        "checksum64",
+        "slots[].hex",
+        "bugFamily",
+        "glossary[].hexCode"
+      ]
+    },
+    "meta": {
+      "source": "generateSCD64"
+    },
+    "timestamp": 1784708825934
+  },
+  "03030742C01B6AC16D9C5B00CF603CFBD906A4D5F91679A661F84A3B19C5CB5A": {
+    "quantized": {
+      "data": [
+        118,
+        119,
+        119,
+        120,
+        136,
+        135,
+        136,
+        120,
+        120,
+        120,
+        135,
+        135,
+        119,
+        136,
+        119,
+        150,
+        120,
+        136,
+        121,
+        120,
+        136,
+        120,
+        136,
+        105,
+        135,
+        121,
+        151,
+        120,
+        120,
+        118,
+        152,
+        130
+      ],
+      "norm": 1.0000000147441315
+    },
+    "scdFull": {
+      "schema": "SCD64_DIAGNOSTIC",
+      "schemaVersion": 1,
+      "domain": "COLOR",
+      "bugFamily": "GATE_DATA_ABSENT",
+      "diagnosticMode": "DIAGNOSE_ONLY",
+      "checksum64": "03030742C01B6AC16D9C5B00CF603CFBD906A4D5F91679A661F84A3B19C5CB5A",
+      "slots": [
+        {
+          "index": 0,
+          "name": "BUGCLASS",
+          "hex": "03030742",
+          "glossaryKey": "03030742",
+          "family": "GATE_DATA_ABSENT"
+        },
+        {
+          "index": 1,
+          "name": "COORDSYS",
+          "hex": "C01B6AC1",
+          "glossaryKey": "C01B6AC1",
+          "family": "GATE_DATA_ABSENT"
+        },
+        {
+          "index": 2,
+          "name": "INVARIANT",
+          "hex": "6D9C5B00",
+          "glossaryKey": "6D9C5B00",
+          "family": "GATE_DATA_ABSENT"
+        },
+        {
+          "index": 3,
+          "name": "MAGNITUDE",
+          "hex": "CF603CFB",
+          "glossaryKey": "CF603CFB",
+          "family": "GATE_DATA_ABSENT"
+        },
+        {
+          "index": 4,
+          "name": "MASKING",
+          "hex": "D906A4D5",
+          "glossaryKey": "D906A4D5",
+          "family": "GATE_DATA_ABSENT"
+        },
+        {
+          "index": 5,
+          "name": "GATE",
+          "hex": "F91679A6",
+          "glossaryKey": "F91679A6",
+          "family": "GATE_DATA_ABSENT"
+        },
+        {
+          "index": 6,
+          "name": "PROPAGATE",
+          "hex": "61F84A3B",
+          "glossaryKey": "61F84A3B",
+          "family": "GATE_DATA_ABSENT"
+        },
+        {
+          "index": 7,
+          "name": "VERDICT",
+          "hex": "19C5CB5A",
+          "glossaryKey": "19C5CB5A",
+          "family": "GATE_DATA_ABSENT"
+        }
+      ],
+      "equations": [
+        {
+          "name": "Connection Source Presence",
+          "symbol": "CSP",
+          "formula": "CSP = exists(syntaxLayer.allConnections) || exists(analysis.allConnections) || exists(verseIR.connections)"
+        },
+        {
+          "name": "Starved Gate Rate",
+          "symbol": "SGR",
+          "formula": "SGR = (|resonantCharStarts| == 0) && (CSP == false)"
+        }
+      ],
+      "runtimeEvidence": {
+        "note": "No default evidence for family GATE_DATA_ABSENT"
+      },
+      "raid": {
+        "completed": false,
+        "queryId": "unknown",
+        "verdictText": "Backend computed resonance connections, but the gate Set was never constructed — frontend shows no coloring."
+      },
+      "qbitField": {
+        "finalAggregation": true,
+        "collapseVerdict": "GHOST_GATE_EMPTY",
+        "energyAtMismatch": 0.79,
+        "gradientMagnitude": 0.65
+      },
+      "bytecodehealth": {
+        "spatialDiagnosticChecksum": "03030742C01B6AC16D9C5B00CF603CFBD906A4D5F91679A661F84A3B19C5CB5A"
+      },
+      "glossary": [
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "GATE_DATA_ABSENT",
+          "slotIndex": 0,
+          "slotName": "BUGCLASS",
+          "hexCode": "03030742",
+          "versionByte": "03",
+          "category": "GATE_DATA_ABSENT",
+          "canonicalMeaning": "GATE_DATA_ABSENT:fallback-synthesis-omits-connections+gate-reads-server-only-key",
+          "canonicalDerivationString": "BUGCLASS:GATE_DATA_ABSENT:fallback-synthesis-omits-connections+gate-reads-server-only-key",
+          "humanMeaning": "Resonance gate starved of input: rhyme connections exist only on the server synthesis path.",
+          "jsonFormulaTemplate": {
+            "name": "bugclass"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "DA8C9999AF5C5C6E"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "GATE_DATA_ABSENT",
+          "slotIndex": 1,
+          "slotName": "COORDSYS",
+          "hexCode": "C01B6AC1",
+          "category": "GATE_DATA_ABSENT",
+          "canonicalMeaning": "server-only-syntaxLayer.allConnections+fallback-buildSyntaxLayer-emits-no-connections",
+          "canonicalDerivationString": "COORDSYS:server-only-syntaxLayer.allConnections+fallback-buildSyntaxLayer-emits-no-connections",
+          "humanMeaning": "Resonance gate starved of input: rhyme connections exist only on the server synthesis path.",
+          "jsonFormulaTemplate": {
+            "name": "coordsys"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "BD04AADF2D724953"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "GATE_DATA_ABSENT",
+          "slotIndex": 2,
+          "slotName": "INVARIANT",
+          "hexCode": "6D9C5B00",
+          "category": "GATE_DATA_ABSENT",
+          "canonicalMeaning": "gate-connection-source-must-exist-on-every-synthesis-path",
+          "canonicalDerivationString": "INVARIANT:gate-connection-source-must-exist-on-every-synthesis-path",
+          "humanMeaning": "Resonance gate starved of input: rhyme connections exist only on the server synthesis path.",
+          "jsonFormulaTemplate": {
+            "name": "invariant"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "B3C528EA51EC5CE1"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "GATE_DATA_ABSENT",
+          "slotIndex": 3,
+          "slotName": "MAGNITUDE",
+          "hexCode": "CF603CFB",
+          "category": "GATE_DATA_ABSENT",
+          "canonicalMeaning": "fallbackPathSelected=1.0+gateSetSize=0+zeroColoredWords-when-server-unreachable",
+          "canonicalDerivationString": "MAGNITUDE:fallbackPathSelected=1.0+gateSetSize=0+zeroColoredWords-when-server-unreachable",
+          "humanMeaning": "Resonance gate starved of input: rhyme connections exist only on the server synthesis path.",
+          "jsonFormulaTemplate": {
+            "name": "magnitude"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "A3EF2A7778BF7410"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "GATE_DATA_ABSENT",
+          "slotIndex": 4,
+          "slotName": "MASKING",
+          "hexCode": "D906A4D5",
+          "category": "GATE_DATA_ABSENT",
+          "canonicalMeaning": "isEnabled-false-silent-backoff-fallthrough+activeConnections-has-verseIR-fallback-resonanceGate-does-not",
+          "canonicalDerivationString": "MASKING:isEnabled-false-silent-backoff-fallthrough+activeConnections-has-verseIR-fallback-resonanceGate-does-not",
+          "humanMeaning": "Resonance gate starved of input: rhyme connections exist only on the server synthesis path.",
+          "jsonFormulaTemplate": {
+            "name": "masking"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "CF97F9D9A2CE22BC"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "GATE_DATA_ABSENT",
+          "slotIndex": 5,
+          "slotName": "GATE",
+          "hexCode": "F91679A6",
+          "category": "GATE_DATA_ABSENT",
+          "canonicalMeaning": "resonanceGate-always-consulted+input-allConnections-undefined-on-fallback-path",
+          "canonicalDerivationString": "GATE:resonanceGate-always-consulted+input-allConnections-undefined-on-fallback-path",
+          "humanMeaning": "Resonance gate starved of input: rhyme connections exist only on the server synthesis path.",
+          "jsonFormulaTemplate": {
+            "name": "gate"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "B6C6BBAFE5CB673B"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "GATE_DATA_ABSENT",
+          "slotIndex": 6,
+          "slotName": "PROPAGATE",
+          "hexCode": "61F84A3B",
+          "category": "GATE_DATA_ABSENT",
+          "canonicalMeaning": "server-unreachable-to-isEnabled-false-to-synthesizeVerse-to-empty-syntaxLayer-to-empty-gate-Set",
+          "canonicalDerivationString": "PROPAGATE:server-unreachable-to-isEnabled-false-to-synthesizeVerse-to-empty-syntaxLayer-to-empty-gate-Set",
+          "humanMeaning": "Resonance gate starved of input: rhyme connections exist only on the server synthesis path.",
+          "jsonFormulaTemplate": {
+            "name": "propagate"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "F9014964F0223EA7"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "GATE_DATA_ABSENT",
+          "slotIndex": 7,
+          "slotName": "VERDICT",
+          "hexCode": "19C5CB5A",
+          "category": "GATE_DATA_ABSENT",
+          "canonicalMeaning": "diagnose-only+wire-connections-into-fallback-synthesis-or-add-gate-degraded-mode",
+          "canonicalDerivationString": "VERDICT:diagnose-only+wire-connections-into-fallback-synthesis-or-add-gate-degraded-mode",
+          "humanMeaning": "Resonance gate starved of input: rhyme connections exist only on the server synthesis path.",
+          "jsonFormulaTemplate": {
+            "name": "verdict"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "8C9F0D7FF16B134E"
+        }
+      ],
+      "mcpIndexes": [
+        "checksum64",
+        "slots[].hex",
+        "bugFamily",
+        "glossary[].hexCode"
+      ]
+    },
+    "meta": {
+      "source": "generateSCD64"
+    },
+    "timestamp": 1784708824185
+  },
+  "0556B9403FC62C2E406E44A96C0400729018E39D4ECBF7AB57B24D49E8606C87": {
+    "quantized": {
+      "data": [
+        152,
+        135,
+        119,
+        120,
+        135,
+        119,
+        121,
+        136,
+        103,
+        120,
+        136,
+        152,
+        120,
+        120,
+        119,
+        135,
+        136,
+        136,
+        121,
+        119,
+        135,
+        120,
+        137,
+        120,
+        119,
+        120,
+        153,
+        119,
+        120,
+        119,
+        135,
+        114
+      ],
+      "norm": 1.0000000102279876
+    },
+    "scdFull": {
+      "schema": "SCD64_DIAGNOSTIC",
+      "schemaVersion": 1,
+      "domain": "SCORING",
+      "bugFamily": "SCORE_DRIFT",
+      "diagnosticMode": "DIAGNOSE_ONLY",
+      "checksum64": "0556B9403FC62C2E406E44A96C0400729018E39D4ECBF7AB57B24D49E8606C87",
+      "slots": [
+        {
+          "index": 0,
+          "name": "BUGCLASS",
+          "hex": "0556B940",
+          "glossaryKey": "0556B940",
+          "family": "SCORE_DRIFT"
+        },
+        {
+          "index": 1,
+          "name": "COORDSYS",
+          "hex": "3FC62C2E",
+          "glossaryKey": "3FC62C2E",
+          "family": "SCORE_DRIFT"
+        },
+        {
+          "index": 2,
+          "name": "INVARIANT",
+          "hex": "406E44A9",
+          "glossaryKey": "406E44A9",
+          "family": "SCORE_DRIFT"
+        },
+        {
+          "index": 3,
+          "name": "MAGNITUDE",
+          "hex": "6C040072",
+          "glossaryKey": "6C040072",
+          "family": "SCORE_DRIFT"
+        },
+        {
+          "index": 4,
+          "name": "MASKING",
+          "hex": "9018E39D",
+          "glossaryKey": "9018E39D",
+          "family": "SCORE_DRIFT"
+        },
+        {
+          "index": 5,
+          "name": "GATE",
+          "hex": "4ECBF7AB",
+          "glossaryKey": "4ECBF7AB",
+          "family": "SCORE_DRIFT"
+        },
+        {
+          "index": 6,
+          "name": "PROPAGATE",
+          "hex": "57B24D49",
+          "glossaryKey": "57B24D49",
+          "family": "SCORE_DRIFT"
+        },
+        {
+          "index": 7,
+          "name": "VERDICT",
+          "hex": "E8606C87",
+          "glossaryKey": "E8606C87",
+          "family": "SCORE_DRIFT"
+        }
+      ],
+      "equations": [
+        {
+          "name": "Reference Token Weight",
+          "symbol": "RTW",
+          "formula": "RTW(w) = clamp01(idfProxy*(1+syllableSalience)*positionalFactor + rarity*0.3)"
+        },
+        {
+          "name": "Score Deviation",
+          "symbol": "SDV",
+          "formula": "SDV(w) = rankerScore(w) - referenceWeight(w); |SDV| > deviationThreshold => drift"
+        }
+      ],
+      "runtimeEvidence": {
+        "note": "No default evidence for family SCORE_DRIFT"
+      },
+      "raid": {
+        "completed": false,
+        "queryId": "unknown",
+        "verdictText": "Backend computed resonance connections, but the gate Set was never constructed — frontend shows no coloring."
+      },
+      "qbitField": {
+        "finalAggregation": true,
+        "collapseVerdict": "GHOST_GATE_EMPTY",
+        "energyAtMismatch": 0.79,
+        "gradientMagnitude": 0.65
+      },
+      "bytecodehealth": {
+        "spatialDiagnosticChecksum": "0556B9403FC62C2E406E44A96C0400729018E39D4ECBF7AB57B24D49E8606C87"
+      },
+      "glossary": [
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "SCORE_DRIFT",
+          "slotIndex": 0,
+          "slotName": "BUGCLASS",
+          "hexCode": "0556B940",
+          "versionByte": "05",
+          "category": "SCORE_DRIFT",
+          "canonicalMeaning": "SCORE_DRIFT:ranker-score-diverges-from-reference-token-weight",
+          "canonicalDerivationString": "BUGCLASS:SCORE_DRIFT:ranker-score-diverges-from-reference-token-weight",
+          "humanMeaning": "Ranker score diverges from the transparent reference token weight.",
+          "jsonFormulaTemplate": {
+            "name": "bugclass"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "875952C1F00C7BAE"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "SCORE_DRIFT",
+          "slotIndex": 1,
+          "slotName": "COORDSYS",
+          "hexCode": "3FC62C2E",
+          "category": "SCORE_DRIFT",
+          "canonicalMeaning": "reference-weight-tfidf-syllable-position-vs-ranker-aggregate-of-8-providers",
+          "canonicalDerivationString": "COORDSYS:reference-weight-tfidf-syllable-position-vs-ranker-aggregate-of-8-providers",
+          "humanMeaning": "Ranker score diverges from the transparent reference token weight.",
+          "jsonFormulaTemplate": {
+            "name": "coordsys"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "1AAAE82E213FE27E"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "SCORE_DRIFT",
+          "slotIndex": 2,
+          "slotName": "INVARIANT",
+          "hexCode": "406E44A9",
+          "category": "SCORE_DRIFT",
+          "canonicalMeaning": "abs-rankerScore-minus-referenceWeight-within-deviationThreshold-for-auditable-tokens",
+          "canonicalDerivationString": "INVARIANT:abs-rankerScore-minus-referenceWeight-within-deviationThreshold-for-auditable-tokens",
+          "humanMeaning": "Ranker score diverges from the transparent reference token weight.",
+          "jsonFormulaTemplate": {
+            "name": "invariant"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "46B64EC739CBCBC5"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "SCORE_DRIFT",
+          "slotIndex": 3,
+          "slotName": "MAGNITUDE",
+          "hexCode": "6C040072",
+          "category": "SCORE_DRIFT",
+          "canonicalMeaning": "abs-deviation>0.25+meanAbsoluteDeviation+worstTokenDelta",
+          "canonicalDerivationString": "MAGNITUDE:abs-deviation>0.25+meanAbsoluteDeviation+worstTokenDelta",
+          "humanMeaning": "Ranker score diverges from the transparent reference token weight.",
+          "jsonFormulaTemplate": {
+            "name": "magnitude"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "D8E225F023F5B61A"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "SCORE_DRIFT",
+          "slotIndex": 4,
+          "slotName": "MASKING",
+          "hexCode": "9018E39D",
+          "category": "SCORE_DRIFT",
+          "canonicalMeaning": "provider-level-weights-conceal-per-token-miscalibration-until-final-list",
+          "canonicalDerivationString": "MASKING:provider-level-weights-conceal-per-token-miscalibration-until-final-list",
+          "humanMeaning": "Ranker score diverges from the transparent reference token weight.",
+          "jsonFormulaTemplate": {
+            "name": "masking"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "AA18EF06E5F4EE6E"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "SCORE_DRIFT",
+          "slotIndex": 5,
+          "slotName": "GATE",
+          "hexCode": "4ECBF7AB",
+          "category": "SCORE_DRIFT",
+          "canonicalMeaning": "referenceWeight>=MIN_AUDITABLE_WEIGHT-0.05+token-was-ranked",
+          "canonicalDerivationString": "GATE:referenceWeight>=MIN_AUDITABLE_WEIGHT-0.05+token-was-ranked",
+          "humanMeaning": "Ranker score diverges from the transparent reference token weight.",
+          "jsonFormulaTemplate": {
+            "name": "gate"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "75B597F6C50D0139"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "SCORE_DRIFT",
+          "slotIndex": 6,
+          "slotName": "PROPAGATE",
+          "hexCode": "57B24D49",
+          "category": "SCORE_DRIFT",
+          "canonicalMeaning": "provider-scoring-to-ranker-DEFAULT_WEIGHTS-to-ranked-list-to-output",
+          "canonicalDerivationString": "PROPAGATE:provider-scoring-to-ranker-DEFAULT_WEIGHTS-to-ranked-list-to-output",
+          "humanMeaning": "Ranker score diverges from the transparent reference token weight.",
+          "jsonFormulaTemplate": {
+            "name": "propagate"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "51A764F3B8646176"
+        },
+        {
+          "schema": "SCD64_GLOSSARY_ENTRY",
+          "schemaVersion": 1,
+          "family": "SCORE_DRIFT",
+          "slotIndex": 7,
+          "slotName": "VERDICT",
+          "hexCode": "E8606C87",
+          "category": "SCORE_DRIFT",
+          "canonicalMeaning": "diagnose-only+over-or-under-weighted+inspect-provider-vs-DEFAULT_WEIGHTS",
+          "canonicalDerivationString": "VERDICT:diagnose-only+over-or-under-weighted+inspect-provider-vs-DEFAULT_WEIGHTS",
+          "humanMeaning": "Ranker score diverges from the transparent reference token weight.",
+          "jsonFormulaTemplate": {
+            "name": "verdict"
+          },
+          "fixedForever": true,
+          "categoryChecksum": "2E96D2C8622DA893"
+        }
+      ],
+      "mcpIndexes": [
+        "checksum64",
+        "slots[].hex",
+        "bugFamily",
+        "glossary[].hexCode"
+      ]
+    },
+    "meta": {
+      "source": "generateSCD64"
+    },
+    "timestamp": 1784708855640
   }
 }

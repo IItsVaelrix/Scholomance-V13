@@ -141,19 +141,14 @@ function lookupKey(container, key) {
   return container[key];
 }
 
-/**
- * Build the canonical identity key for a word at a position.
- * The format `${text.toLowerCase()}-${charStart}` is what the upstream
- * analysis produces and what consumers expect. Kept as a separate export
- * so callers can build keys consistently.
- *
- * @param {string} text - The word text.
- * @param {number} charStart - The canonical charStart.
- * @returns {string} The identity key.
- */
-export function buildIdentityKey(text, charStart) {
-  return `${String(text || '').toLowerCase()}-${charStart}`;
-}
+// Import + re-export buildIdentityKey from the canonical codex/core authority.
+// The implementation was moved to codex/core/shared/truesight/compiler/identityKey.js
+// to eliminate the forbidden codex/core → src/ import (LING-0F03).
+// We need a local import (not just a re-export) because resolveTokenDataAtPosition
+// calls buildIdentityKey directly — a bare `export { x } from '...'` does NOT
+// bind x into the local scope.
+import { buildIdentityKey } from '../../../codex/core/shared/truesight/compiler/identityKey.js';
+export { buildIdentityKey };
 
 /**
  * The line a token sits on, whichever analysis produced it.
