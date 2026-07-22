@@ -1,16 +1,55 @@
 import { validateSeam, validateRequiredOutputs } from './seam-contract.js';
-import { getSubtletyRuntime } from './subtlety-runtime.js';
 
-function maybeSampleObservedRoute(routeDefinition, results) {
-  if (process.env.SUBTLETY_SAMPLE_ROUTES !== '1') return;
+/**
+ * Observed-mode fingerprint sample after a successful executeRoute.
+ * Must never pull Node-only APM (fs-backed resonance store) into the Vite
+ * browser graph — hence no top-level static import of subtlety-runtime.
+ *
+ * The runtime is warmed with ONE eager dynamic import (Node + flag only) and
+ * samples queue until it resolves: the live callers are short-lived forge
+ * CLIs, and a per-sample dynamic import loses the race against process exit —
+ * the pending import keeps the event loop alive, then the queue flushes
+ * synchronously (appendFileSync) so samples land before the CLI exits.
+ */
+const samplingEnabled = typeof process !== 'undefined'
+  && process.env?.SUBTLETY_SAMPLE_ROUTES === '1'
+  && typeof process.versions?.node === 'string';
+
+let subtletyRuntimeModule = null;
+const pendingRouteSamples = [];
+
+function recordRouteSample({ routeDefinition, results }) {
   try {
-    getSubtletyRuntime().recordObserved?.(
+    subtletyRuntimeModule.getSubtletyRuntime().recordObserved?.(
       { unitId: `route.${routeDefinition.name}` },
       results,
       { mode: 'observed', seam: { id: routeDefinition.name } },
     );
   } catch {
     // sampling must never disturb route execution
+  }
+}
+
+if (samplingEnabled) {
+  // Opaque to Vite/Rollup — a literal import() here still enters the browser
+  // graph and pulls node:fs via subtlety-resonance-store. Forge CLIs only.
+  const loadSubtletyRuntime = (specifier) => Function('s', 'return import(s)')(specifier);
+  void loadSubtletyRuntime('./subtlety-runtime.js')
+    .then((mod) => {
+      subtletyRuntimeModule = mod;
+      while (pendingRouteSamples.length) recordRouteSample(pendingRouteSamples.shift());
+    })
+    .catch(() => {
+      pendingRouteSamples.length = 0;
+    });
+}
+
+function maybeSampleObservedRoute(routeDefinition, results) {
+  if (!samplingEnabled) return;
+  if (subtletyRuntimeModule) {
+    recordRouteSample({ routeDefinition, results });
+  } else {
+    pendingRouteSamples.push({ routeDefinition, results });
   }
 }
 
