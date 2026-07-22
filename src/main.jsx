@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import LandingPage from "./pages/Landing/LandingPage.jsx";
 import BytecodeVisualiserPage from "./pages/Visualiser/BytecodeVisualiserPage.tsx";
 import AlbumIndexPage from "./pages/Visualiser/AlbumIndexPage.tsx";
@@ -30,7 +30,7 @@ import {
   CollabPage,
   ProfilePage,
   CombatPage,
-  NexusPage,
+  ConstellationPage,
   PixelBrainPage,
   CareerPage,
   WandPage,
@@ -130,7 +130,8 @@ const router = createBrowserRouter([
           { path: "auth", element: <AuthPage /> },
           { path: "profile", element: <ProfilePage /> },
           { path: "combat", element: <CombatPage /> },
-          { path: "nexus", element: <NexusPage /> },
+          { path: "constellation", element: <ConstellationPage /> },
+          { path: "nexus", element: <Navigate to="/constellation" replace /> },
           { path: "collab", element: <AdminRoute><CollabPage /></AdminRoute> },
           { path: "pixelbrain", element: <AdminRoute><PixelBrainPage /></AdminRoute> },
           { path: "career", element: <AdminRoute><CareerPage /></AdminRoute> },

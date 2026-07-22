@@ -11,6 +11,7 @@ import {
   User,
   LogOut,
   Newspaper,
+  Sparkles,
 } from "lucide-react";
 import { LINKS, INTERNAL_MODULES } from "../../data/library";
 import { useAuth } from "../../hooks/useAuth.jsx";
@@ -19,7 +20,9 @@ import { preloadRoute } from "../../lib/routes.js";
 import { triggerHapticPulse, UI_HAPTICS } from "../../lib/platform/haptics.js";
 
 
-const PRODUCTION_NAV_IDS = Object.freeze(["watch", "listen", "read", "visualiser", "blog"]);
+const PRODUCTION_NAV_IDS = Object.freeze([
+  "watch", "listen", "read", "visualiser", "blog", "constellation",
+]);
 
 const ICON_MAP = {
   watch: Eye,
@@ -27,6 +30,7 @@ const ICON_MAP = {
   read: BookOpen,
   visualiser: Activity,
   blog: Newspaper,
+  constellation: Sparkles,
 };
 
 const ROUTE_COPY = {
@@ -36,6 +40,7 @@ const ROUTE_COPY = {
   visualiser: "Kinetic lyric visualizer - phoneme school colors, beat sync.",
   oracle: "Consult the Oracle for Lyrical Analysis.",
   blog: "Read transmissions, skills, verdicts, and whitepapers.",
+  constellation: "Search the literary sky — meaning, sound, and constellation.",
   pixelbrain: "Neural network visualization and metadata mapping.",
   career: "Transmute professional experience into high-acuity sigils.",
   collab: "Coordinate agent work and active pipelines.",

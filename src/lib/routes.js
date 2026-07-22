@@ -9,7 +9,10 @@ export const AuthPage = lazyWithRetry(() => import("../pages/Auth/AuthPage.jsx")
 export const CollabPage = lazyWithRetry(() => import("../pages/Collab/CollabPage.jsx"), "collab-page");
 export const ProfilePage = lazyWithRetry(() => import("../pages/Profile/ProfilePage.jsx"), "profile-page");
 export const CombatPage = lazyWithRetry(() => import("../pages/Combat/CombatPage.jsx"), "combat-page");
-export const NexusPage = lazyWithRetry(() => import("../pages/Nexus/NexusPage.jsx"), "nexus-page");
+export const ConstellationPage = lazyWithRetry(
+  () => import("../pages/Constellation/ConstellationPage.jsx"),
+  "constellation-page",
+);
 export const PixelBrainPage = lazyWithRetry(() => import("../pages/PixelBrain/PixelBrainPage.jsx"), "pixelbrain-page");
 export const CareerPage = lazyWithRetry(() => import("../pages/Career/CareerPage"), "career-page");
 export const WandPage = lazyWithRetry(() => import("../pages/Wand/WandPage.jsx"), "wand-page");
@@ -41,7 +44,7 @@ export const ALL_COMPONENTS = {
   "/collab": CollabPage,
   "/profile": ProfilePage,
   "/combat": CombatPage,
-  "/nexus": NexusPage,
+  "/constellation": ConstellationPage,
   "/pixelbrain": PixelBrainPage,
   "/career": CareerPage,
   "/wand": WandPage,

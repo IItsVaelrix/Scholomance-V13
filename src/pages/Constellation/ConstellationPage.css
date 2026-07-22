@@ -1,0 +1,12 @@
+.constellation-stage {
+  --cos-amethyst: #7b6cff;
+  --cos-arc: #bfe3ff;
+  --cos-gold: #d4af37;
+  min-height: 100vh;
+  color: var(--cos-arc);
+  background: #07070e;
+}
+.constellation-brand {
+  font-family: "Cinzel", "Palatino Linotype", Palatino, serif;
+  letter-spacing: 0.08em;
+}
