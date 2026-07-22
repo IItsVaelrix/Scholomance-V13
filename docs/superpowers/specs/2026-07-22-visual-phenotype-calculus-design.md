@@ -78,7 +78,7 @@ The SCD64 is a **pure measurement fingerprint of the rendered surface**. It carr
 | 1 | Luminance relationship | computed fg/bg pair → L* ratio | `fail` / `ui` / `body` / `high` | WCAG 3.0 / 4.5 / 7.0 |
 | 2 | Stacking | computed z-index + stacking-context ancestry | `base` / `above` / `overlay` / `system` | `src/data/stacking_tiers.js` |
 | 3 | Size | `getBoundingClientRect` area ÷ viewport | `glyph` / `control` / `panel` / `region` / `surface` | log-spaced |
-| 4 | Chromaticity | computed colour → (a*, b*) → nearest palette role | palette role name, or `off-palette` | palette table + ΔE cap |
+| 4 | Chromaticity | computed colour → LCh **hue angle** → nearest palette role | palette role name, `neutral`, or `off-palette` | palette table + hue tolerance |
 | 5 | Shape | border-radius ÷ min(w,h), aspect, clip-path | `rect` / `round` / `pill` / `circle` / `notched` | ratio thresholds |
 | 6 | Density | ink ratio: non-background px ÷ bbox area | `sparse` / `measured` / `dense` / `packed` | ratio thresholds |
 | 7 | Motion | displacement + opacity Δ per second, sampled | `still` / `breath` / `pulse` / `drive` | ratio thresholds |
@@ -104,7 +104,7 @@ The full profile digest is therefore carried in three places alongside the compa
 
 Contrast and stacking need no invention: WCAG thresholds are a published standard, and `stacking_tiers.js` is already Law 10.
 
-**Chromaticity snaps to the nearest palette role only within a ΔE cap** — measured in (a*, b*) alone, so luminance differences never pull a hue toward the wrong role. Past the cap the term is `off-palette`, which is itself the drift signal. Silent snapping would launder the exact mistake this system exists to catch.
+**Chromaticity snaps to the nearest palette role only within a hue tolerance** — measured on the LCh hue angle alone, so lightness differences never pull a hue toward the wrong role (§3.3). Below the chroma floor the term is `neutral`; past the tolerance it is `off-palette`, which is itself the drift signal. Silent snapping would launder the exact mistake this system exists to catch.
 
 **Hashing destroys distance, permanently.** `sha256(canonical).slice(0,8)` makes `size=panel` vs `size=region` differ exactly as violently as `panel` vs `glyph`. Do not attempt to encode distance inside the hash — it breaks the format and every existing SCD64 tool. The SCD64 is the fingerprint; per-block ordinal distance travels alongside in BytecodeHealth `context`.
 
@@ -132,10 +132,14 @@ The couplings fall into three kinds, and only two of them yield to isolation.
 
 The escape is decomposition, not isolation. The colour space is split along its own orthogonal axes:
 
-- **slot 4 — chromaticity**: hue and chroma (a*, b*), mapped to nearest palette role
-- **slot 1 — luminance relationship**: L* ratio against the resolved background
+- **slot 4 — chromaticity**: the LCh **hue angle** h° = atan2(b\*, a\*), mapped to nearest palette role within a hue tolerance
+- **slot 1 — luminance relationship**: WCAG contrast ratio against the resolved background
 
-An isoluminant palette swap moves slot 4 and not slot 1; a tint or shade of the same role moves slot 1 and not slot 4. This is the standard LAB decomposition and it is the only construction under which "colour" and "contrast" coexist as coordinates rather than one being a projection of the other.
+An isoluminant palette swap moves slot 4 and not slot 1; a tint or shade of the same role moves slot 1 and not slot 4.
+
+**Hue angle, not (a\*, b\*).** Raw a\* and b\* are *not* invariant under lightness change — `#FF0000` is (a\*,b\*) = (80.1, 67.2) while `#800000`, the same hue, is (48.0, 38.1). Keying chromaticity on a\*/b\* would couple slot 4 to every tint and shade, i.e. to slot 1, which is precisely the coupling this decomposition exists to remove. Hue angle is near-stable across that same pair (40.0° vs 38.4°), so it is the component that isolates.
+
+**Chroma floor.** Hue angle is undefined and numerically unstable as chroma approaches zero, so a surface with C\* below the floor quantizes to `neutral` rather than to a noisy hue role. Without the floor, two visually identical greys could land in different palette roles from floating-point noise alone — a spurious drift signal, and a Law 6 determinism violation.
 
 Each axis's decompiler entry declares `{ source, normalization, pausedState }` explicitly. An axis without a declared isolation contract cannot be sealed into a profile.
 
