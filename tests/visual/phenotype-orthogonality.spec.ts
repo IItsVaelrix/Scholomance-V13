@@ -121,6 +121,24 @@ async function measure(page: import("@playwright/test").Page) {
   };
 }
 
+/**
+ * A null axis encodes as the shared unmeasured sentinel, and two sentinels
+ * compare equal — so an axis that silently stopped measuring would look
+ * "not coupled" with everything and pass the matrix while measuring nothing.
+ * The matrix must therefore prove it measured before it proves independence.
+ */
+function assertFullyMeasured(
+  vector: Record<string, string | null>,
+  label: string,
+): void {
+  for (const axis of LIVE_AXES) {
+    expect(
+      vector[axis],
+      `${label}: axis "${axis}" was unmeasurable, so this run proves nothing about coupling`,
+    ).not.toBeNull();
+  }
+}
+
 test.describe("Phenotype orthogonality matrix (spec §3.4)", () => {
   test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
@@ -144,6 +162,10 @@ test.describe("Phenotype orthogonality matrix (spec §3.4)", () => {
       const mutated = await measure(page);
       expect(
         mutated[axis],
+        `mutation for ${axis} made its own axis unmeasurable instead of moving it`,
+      ).not.toBeNull();
+      expect(
+        mutated[axis],
         `mutation for ${axis} did not change its own term — the fixture is inert`,
       ).not.toBe(baseline[axis]);
     }
@@ -151,14 +173,18 @@ test.describe("Phenotype orthogonality matrix (spec §3.4)", () => {
 
   test("30 directed checks: mutating A never changes B's block", async ({ page }) => {
     await page.goto(buildUrl({}));
-    const baselineBlocks = vectorToBlocks(await measure(page), PROFILE);
+    const baselineVector = await measure(page);
+    assertFullyMeasured(baselineVector, "baseline");
+    const baselineBlocks = vectorToBlocks(baselineVector, PROFILE);
 
     const coupled = [];
     let checks = 0;
 
     for (const mutatedAxis of LIVE_AXES) {
       await page.goto(buildUrl(MUTATIONS[mutatedAxis]));
-      const blocks = vectorToBlocks(await measure(page), PROFILE);
+      const mutatedVector = await measure(page);
+      assertFullyMeasured(mutatedVector, `mutation:${mutatedAxis}`);
+      const blocks = vectorToBlocks(mutatedVector, PROFILE);
 
       for (const observedAxis of LIVE_AXES) {
         if (observedAxis === mutatedAxis) continue;
