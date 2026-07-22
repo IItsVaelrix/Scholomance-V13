@@ -19,7 +19,13 @@ export default function ConstellationPage() {
   return (
     <div
       id="constellation-stage"
-      className={`constellation-stage${mode === 'submitted' ? ' constellation-stage--submitted' : ''}`}
+      className={[
+        'constellation-stage',
+        mode === 'submitted' ? 'constellation-stage--submitted' : '',
+        !reducedMotion ? 'constellation-stage--animate' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
       data-mode={mode}
     >
       <ConstellationBackdrop reducedMotion={reducedMotion} />

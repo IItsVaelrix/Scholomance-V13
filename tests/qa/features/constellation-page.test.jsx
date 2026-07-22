@@ -81,4 +81,15 @@ describe('ConstellationPage chamber', () => {
     fireEvent.keyDown(field, { key: 'Enter', code: 'Enter' });
     expect(screen.getByText(/awaiting engine — rhyme astrology/i)).toBeInTheDocument();
   });
+
+  it('disables morph animation class when reduced motion is preferred', () => {
+    render(
+      <MemoryRouter>
+        <ConstellationPage />
+      </MemoryRouter>,
+    );
+    expect(
+      document.getElementById('constellation-stage').classList.contains('constellation-stage--animate'),
+    ).toBe(false);
+  });
 });

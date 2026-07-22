@@ -52,11 +52,20 @@
 .constellation-foreground {
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1.5rem;
+  text-align: center;
 }
 
 .constellation-brand {
   font-family: "Cinzel", "Palatino Linotype", Palatino, serif;
   letter-spacing: 0.08em;
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin: 0 0 0.5rem;
 }
 
 .constellation-invitation {
@@ -133,15 +142,36 @@
   color: rgba(212, 175, 55, 0.85);
 }
 
+.constellation-stage--submitted {
+  overflow-y: auto;
+}
+
+.constellation-stage--submitted .constellation-foreground {
+  justify-content: flex-start;
+  align-items: stretch;
+  min-height: auto;
+  padding: 0;
+  text-align: left;
+}
+
 .constellation-stage--submitted .constellation-brand {
+  position: sticky;
+  top: 0;
+  z-index: 3;
   font-size: clamp(1.1rem, 2.5vw, 1.5rem);
-  margin-bottom: 0.25rem;
+  margin: 0;
+  padding: 0.65rem 1.5rem 0;
+  background: linear-gradient(180deg, rgba(7, 7, 14, 0.94) 72%, transparent);
 }
 
 .constellation-stage--submitted .constellation-search {
+  position: sticky;
+  top: 2.25rem;
+  z-index: 2;
   max-width: none;
   margin: 0;
   padding: 0 1.5rem 0.75rem;
+  background: linear-gradient(180deg, rgba(7, 7, 14, 0.9) 78%, transparent);
 }
 
 .constellation-stage--submitted .constellation-search__field {
@@ -149,14 +179,45 @@
   max-height: 4rem;
 }
 
+.constellation-stage--animate .constellation-brand,
+.constellation-stage--animate .constellation-invitation,
+.constellation-stage--animate .constellation-search,
+.constellation-stage--animate .constellation-search__field,
+.constellation-stage--animate .constellation-result-shell {
+  transition: transform 320ms ease-in-out, opacity 320ms ease-in-out;
+}
+
+@keyframes constellation-result-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.constellation-stage--animate.constellation-stage--submitted .constellation-result-shell {
+  animation: constellation-result-rise 320ms ease-in-out;
+}
+
 .constellation-result-shell {
   padding: 1.5rem;
   max-width: 48rem;
   margin: 0 auto;
+  width: 100%;
 }
 
 .constellation-result-section {
   margin-bottom: 2rem;
+  padding-bottom: 2rem;
+}
+
+.constellation-result-section + .constellation-result-section {
+  border-top: 1px solid rgba(123, 108, 255, 0.15);
+  padding-top: 2rem;
 }
 
 .constellation-result-section h2 {
