@@ -64,6 +64,9 @@ if (import.meta.env.DEV) {
   const GrimMonstersHarness = React.lazy(() =>
     import("./pages/_dev/GrimMonstersHarness.jsx")
   );
+  const PhenotypeHarness = React.lazy(() =>
+    import("./pages/_dev/PhenotypeHarness.jsx")
+  );
   devSpikeRoutes = [
     {
       // TrueSight Immune Probe harness (SPATIAL-IMMUNE-DIAGNOSTICS.md).
@@ -80,6 +83,15 @@ if (import.meta.env.DEV) {
       element: (
         <React.Suspense fallback={null}>
           <LexicalHarness />
+        </React.Suspense>
+      ),
+    },
+    {
+      // Visual Phenotype Calculus controlled-mutation harness (spec §3.4).
+      path: "__immune/phenotype",
+      element: (
+        <React.Suspense fallback={null}>
+          <PhenotypeHarness />
         </React.Suspense>
       ),
     },
