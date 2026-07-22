@@ -149,16 +149,143 @@
   max-height: 4rem;
 }
 
-#constellation-result-shell {
+.constellation-result-shell {
   padding: 1.5rem;
   max-width: 48rem;
   margin: 0 auto;
 }
 
-#constellation-result-shell h2 {
+.constellation-result-section {
+  margin-bottom: 2rem;
+}
+
+.constellation-result-section h2 {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1.25rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   color: var(--cos-arc);
+  margin: 0 0 0.75rem;
+}
+
+.constellation-result-dl {
+  display: grid;
+  gap: 0.5rem 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  margin: 0;
+}
+
+.constellation-result-dl dt {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(191, 227, 255, 0.55);
+}
+
+.constellation-result-dl dd {
+  margin: 0.15rem 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  color: var(--cos-arc);
+}
+
+.constellation-result-mono {
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+  font-size: 0.85rem;
+  color: rgba(191, 227, 255, 0.78);
+}
+
+.constellation-result-versions {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: rgba(191, 227, 255, 0.65);
+}
+
+.constellation-result-interpretations {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.constellation-result-interpretations li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(123, 108, 255, 0.15);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.constellation-result-gloss {
+  color: var(--cos-arc);
+}
+
+.constellation-result-confidence {
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+  font-size: 0.85rem;
+  color: rgba(212, 175, 55, 0.85);
+}
+
+.constellation-result-warnings {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: rgba(212, 175, 55, 0.85);
+}
+
+.constellation-result-awaiting {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  color: rgba(191, 227, 255, 0.5);
+}
+
+.constellation-result-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.95rem;
+}
+
+.constellation-result-table th {
+  text-align: left;
+  padding: 0.35rem 0.75rem 0.35rem 0;
+  font-weight: 600;
+  color: rgba(191, 227, 255, 0.65);
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.constellation-result-table td {
+  padding: 0.35rem 0;
+  color: var(--cos-arc);
+}
+
+.constellation-result-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.constellation-result-rhyme-chart {
+  display: block;
+  width: 100%;
+  max-width: 24rem;
+  height: 1.5rem;
+  margin-top: 0.75rem;
+}
+
+.constellation-result-rhyme-node {
+  fill: var(--cos-amethyst);
+  opacity: 0.75;
 }

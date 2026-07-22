@@ -55,4 +55,30 @@ describe('ConstellationPage chamber', () => {
     expect(document.getElementById('constellation-result-shell')).toBeTruthy();
     expect(screen.getByRole('heading', { name: /phrase identity/i })).toBeInTheDocument();
   });
+
+  it('renders ambiguous interpretations for the bright-wound fixture', () => {
+    render(
+      <MemoryRouter>
+        <ConstellationPage />
+      </MemoryRouter>,
+    );
+    const field = screen.getByLabelText(/search the literary sky/i);
+    fireEvent.change(field, { target: { value: 'the bright wound of morning' } });
+    fireEvent.keyDown(field, { key: 'Enter', code: 'Enter' });
+    expect(screen.getByText(/injury \/ opening in flesh/i)).toBeInTheDocument();
+    expect(screen.getByText(/past tense of wind/i)).toBeInTheDocument();
+    expect(screen.getByText(/ambiguity is data|margin below/i)).toBeInTheDocument();
+  });
+
+  it('shows awaiting state for unwired rhyme on unknown queries', () => {
+    render(
+      <MemoryRouter>
+        <ConstellationPage />
+      </MemoryRouter>,
+    );
+    const field = screen.getByLabelText(/search the literary sky/i);
+    fireEvent.change(field, { target: { value: 'gravity' } });
+    fireEvent.keyDown(field, { key: 'Enter', code: 'Enter' });
+    expect(screen.getByText(/awaiting engine — rhyme astrology/i)).toBeInTheDocument();
+  });
 });

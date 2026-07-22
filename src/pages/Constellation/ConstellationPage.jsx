@@ -2,11 +2,14 @@ import { useState } from 'react';
 import './ConstellationPage.css';
 import ConstellationBackdrop from './ConstellationBackdrop.jsx';
 import ConstellationSearch from './ConstellationSearch.jsx';
+import ConstellationResultShell from './ConstellationResultShell.jsx';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js';
+import { useConstellationPage } from '../../hooks/useConstellationPage.js';
 
 export default function ConstellationPage() {
   const reducedMotion = usePrefersReducedMotion();
   const [submittedQuery, setSubmittedQuery] = useState(null);
+  const { packet } = useConstellationPage(submittedQuery);
   const mode = submittedQuery != null ? 'submitted' : 'idle';
 
   const handleSubmit = (query) => {
@@ -31,11 +34,7 @@ export default function ConstellationPage() {
           defaultValue={submittedQuery ?? ''}
           reducedMotion={reducedMotion}
         />
-        {submittedQuery != null ? (
-          <div id="constellation-result-shell">
-            <h2>Phrase Identity</h2>
-          </div>
-        ) : null}
+        {packet != null ? <ConstellationResultShell packet={packet} /> : null}
       </div>
     </div>
   );
