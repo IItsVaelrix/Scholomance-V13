@@ -65,6 +65,9 @@ export default function App() {
   const isBattlePage = location.pathname === '/combat' || location.pathname.startsWith('/combat/');
   // Listen owns its own atmosphere via Phaser (AlchemicalLabBackground); suppress the global decorative layers there.
   const isListenPage = location.pathname === '/listen' || location.pathname.startsWith('/listen/');
+  // Read/Scribe IDE owns porcelain/parchment materials — global vignette/aurora lighting
+  // sits at z-999+ and paints a concentric center oval over the workstation in both themes.
+  const isReadPage = location.pathname === '/read' || location.pathname.startsWith('/read/');
 
   useEffect(() => {
     const main = document.getElementById("main-content");
@@ -86,8 +89,8 @@ export default function App() {
               <GameBackgroundMusicSync />
               <GameAudioForgeSync />
               <GameObeliskElectricSync />
-              {/* Hide global decorative layers on battle page so only the pure grid is visible; Listen renders its own Phaser atmosphere */}
-              {!isBattlePage && !isListenPage && (
+              {/* Hide global decorative lighting on battle / listen / read — those surfaces own their atmosphere */}
+              {!isBattlePage && !isListenPage && !isReadPage && (
                 <>
                   <div className="aurora-background" aria-hidden="true" />
                   <div className="vignette" aria-hidden="true" />

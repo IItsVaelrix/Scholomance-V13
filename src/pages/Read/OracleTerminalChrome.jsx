@@ -18,9 +18,6 @@ const OracleTerminalChrome = memo(function OracleTerminalChrome({
       data-loading={isLoading ? 'true' : 'false'}
       data-motion={reducedMotion ? 'reduced' : 'full'}
     >
-      <div className="oracle-crt-convex-overlay" />
-      <div className="oracle-arcane-reflection" />
-
       <div className="oracle-aetherlink-grid">
         <div className="oracle-link-beacon" />
         <div className="oracle-link-meter">

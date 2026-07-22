@@ -1,140 +1,29 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js';
-import { freshRng } from '../../lib/math/seededRng.js';
+import { COMPOSE_FLAGS, useFeatureFlag } from '../../core/compose/flags';
+import { ComposeScrollEditorToolbar } from '../../core/compose/migrated/ComposeScrollEditorToolbar';
+import {
+  ComposeReadTopBar,
+  ComposeReadStatusBar,
+} from '../../core/compose/migrated/ComposeReadChrome';
+import { registerReadChromeMigration } from '../../core/compose/migrated/ReadChrome';
+import DigitalRainText from '../../components/DigitalRainText.jsx';
 import './IDE.css';
+import './IDE.light-manuscript.css';
 import FocusModeButton from './FocusModeButton.jsx';
+import { ThemeToggle } from '../../components/Navigation/ThemeToggle.jsx';
+
+registerReadChromeMigration();
 
 // ─── MatrixTitle ──────────────────────────────────────────────────────────────
 
-const MATRIX_CHARS = '001101011010|/\\#+=~';
-const GLOW_VARIANTS = ['glow-cyan', 'glow-gold', 'glow-iridescent', 'glow-spark', 'glow-ethereal', 'glow-ember'];
-const GLOW_DURATIONS = {
-  'glow-cyan': 1200,
-  'glow-gold': 1800,
-  'glow-iridescent': 2400,
-  'glow-spark': 700,
-  'glow-ethereal': 2000,
-  'glow-ember': 1600,
-};
-
-function randMatrixChar() {
-  const rng = freshRng();
-  return MATRIX_CHARS[Math.floor(rng() * MATRIX_CHARS.length)];
-}
-
 function MatrixTitle({ title }) {
-  const reduceMotion = usePrefersReducedMotion();
-  // null = render plain text; array = render animated slots
-  const [slots, setSlots] = useState(null);
-  const [glowClass, setGlowClass] = useState('');
-
-  const prevTitleRef = useRef(String(title || ''));
-  const isInitialRef = useRef(true);
-  const cycleIds = useRef([]);
-  const settleIds = useRef([]);
-  const fullSettleId = useRef(null);
-  const glowTimer = useRef(null);
-  const glowClear = useRef(null);
-
-  const scheduleGlow = useCallback(() => {
-    const rng = freshRng();
-    const delay = 15000 + rng() * 30000;
-    glowTimer.current = setTimeout(() => {
-      const variant = GLOW_VARIANTS[Math.floor(rng() * GLOW_VARIANTS.length)];
-      setGlowClass(`ide-title--${variant}`);
-      glowClear.current = setTimeout(() => {
-        setGlowClass('');
-        scheduleGlow();
-      }, GLOW_DURATIONS[variant] + 120);
-    }, delay);
-  }, []);
-
-  useEffect(() => {
-    if (!reduceMotion) scheduleGlow();
-    return () => {
-      clearTimeout(glowTimer.current);
-      clearTimeout(glowClear.current);
-    };
-  }, [scheduleGlow, reduceMotion]);
-
-  useEffect(() => {
-    const str = String(title || '');
-
-    if (isInitialRef.current) {
-      isInitialRef.current = false;
-      prevTitleRef.current = str;
-      setSlots(null);
-      return;
-    }
-
-    if (str === prevTitleRef.current) return;
-    prevTitleRef.current = str;
-
-    cycleIds.current.forEach(clearInterval);
-    settleIds.current.forEach(clearTimeout);
-    clearTimeout(fullSettleId.current);
-    cycleIds.current = [];
-    settleIds.current = [];
-
-    if (!str || reduceMotion) {
-      setSlots(null);
-      return;
-    }
-
-    const chars = str.split('');
-    setSlots(chars.map(() => ({ char: randMatrixChar(), state: 'cycling' })));
-
-    chars.forEach((targetChar, i) => {
-      const cId = setInterval(() => {
-        setSlots(prev => {
-          if (!Array.isArray(prev) || !prev[i] || prev[i].state !== 'cycling') return prev;
-          const copy = [...prev];
-          copy[i] = { char: randMatrixChar(), state: 'cycling' };
-          return copy;
-        });
-      }, 45);
-      cycleIds.current[i] = cId;
-
-      const rng = freshRng();
-      const delay = 80 + i * 55 + rng() * 20;
-      const sId = setTimeout(() => {
-        clearInterval(cycleIds.current[i]);
-        setSlots(prev => {
-          if (!Array.isArray(prev)) return prev;
-          const copy = [...prev];
-          if (copy[i]) copy[i] = { char: targetChar === ' ' ? ' ' : targetChar, state: 'settled' };
-          return copy;
-        });
-      }, delay);
-      settleIds.current[i] = sId;
-    });
-
-    // Switch back to plain text after last char settles + settle animation plays out
-    const lastSettleAt = 80 + (chars.length - 1) * 55 + 20;
-    fullSettleId.current = setTimeout(() => setSlots(null), lastSettleAt + 620);
-
-    return () => {
-      cycleIds.current.forEach(clearInterval);
-      settleIds.current.forEach(clearTimeout);
-      clearTimeout(fullSettleId.current);
-    };
-  }, [title, reduceMotion]);
-
-  const str = String(title || '');
-
   return (
-    <h1
-      className={`ide-title${glowClass ? ` ${glowClass}` : ''}`}
-      aria-label={str}
-    >
-      {slots !== null
-        ? slots.map((slot, i) => (
-            <span key={i} className={`ide-title-char ide-title-char--${slot.state}`} aria-hidden="true">
-              {slot.char}
-            </span>
-          ))
-        : (str || null)}
-    </h1>
+    <DigitalRainText
+      text={title}
+      as="h1"
+      className="ide-title"
+      enableGlow
+      animateOnMount={false}
+    />
   );
 }
 
@@ -203,17 +92,12 @@ function SearchIcon() {
 }
 
 function GearIcon() {
+  // Proper cog silhouette — the previous icon was a hub + radial rays (reads as a sun),
+  // which collided with ThemeToggle's sun/moon affordance.
   return (
     <Svg>
-      <circle cx="7.5" cy="7.5" r="2.2" />
-      <line x1="7.5"  y1="1.5"  x2="7.5"  y2="3.2"  />
-      <line x1="7.5"  y1="11.8" x2="7.5"  y2="13.5" />
-      <line x1="1.5"  y1="7.5"  x2="3.2"  y2="7.5"  />
-      <line x1="11.8" y1="7.5"  x2="13.5" y2="7.5"  />
-      <line x1="3.3"  y1="3.3"  x2="4.4"  y2="4.4"  />
-      <line x1="10.6" y1="10.6" x2="11.7" y2="11.7" />
-      <line x1="11.7" y1="3.3"  x2="10.6" y2="4.4"  />
-      <line x1="4.4"  y1="10.6" x2="3.3"  y2="11.7" />
+      <path d="M6.05 1.35h2.9l.28 1.28c.42.12.81.32 1.16.57l1.22-.48 1.45 2.51-1.02.88c.12.4.18.82.18 1.24s-.06.84-.18 1.24l1.02.88-1.45 2.51-1.22-.48a3.9 3.9 0 0 1-1.16.57l-.28 1.28H6.05l-.28-1.28a3.9 3.9 0 0 1-1.16-.57l-1.22.48-1.45-2.51 1.02-.88A3.9 3.9 0 0 1 2.78 7.5c0-.42.06-.84.18-1.24l-1.02-.88 1.45-2.51 1.22.48c.35-.25.74-.45 1.16-.57l.28-1.28Z" />
+      <circle cx="7.5" cy="7.5" r="2.15" />
     </Svg>
   );
 }
@@ -241,15 +125,18 @@ export function TopBar({
   showMinimapControl = true,
   showSettingsControl = true,
 }) {
-  return (
-    <div className="ide-topbar">
-      <div className="ide-topbar-left">
-        <span className="ide-logo"><ScrollIcon /></span>
-        <MatrixTitle title={title} />
-      </div>
+  const useComposeToolbar = useFeatureFlag(COMPOSE_FLAGS.MIGRATE_TOOLBAR);
 
-      <div className="ide-topbar-center">
-        {progression && (
+  return (
+    <ComposeReadTopBar
+      identity={
+        <>
+          <span className="ide-logo"><ScrollIcon /></span>
+          <MatrixTitle title={title} />
+        </>
+      }
+      progression={
+        progression && (
           <div className="topbar-progression">
             <span className="progression-label">
               Level {Math.floor(progression.xp / 1000) + 1}
@@ -262,57 +149,77 @@ export function TopBar({
             </div>
             <span className="progression-xp">{progression.xp} XP</span>
           </div>
-        )}
-      </div>
-
-      <div className="ide-topbar-right">
-        {!isEditable && onEdit && (
-          <button className="ide-icon-btn" title="Edit Scroll" onClick={onEdit} aria-label="Edit Scroll">
-            <EditIcon />
-          </button>
-        )}
-        {!isEditable && onNewScroll && (
-          <button className="ide-icon-btn" title="New Scroll" onClick={onNewScroll} aria-label="New Scroll">
-            <NewIcon />
-          </button>
-        )}
-        {showMinimapControl && (
-          <button
-            className={`ide-icon-btn ${showMinimap ? 'active' : ''}`}
-            title="Toggle Lexicon Oracle"
-            aria-label="Toggle Lexicon Oracle"
-            onClick={onToggleMinimap}
-          >
-            <MapIcon />
-          </button>
-        )}
-        <button
-          className="ide-icon-btn"
-          title="Open Oracle Search (Ctrl+F)"
-          aria-label="Open Oracle Search"
-          onClick={onOpenSearch}
-        >
-          <SearchIcon />
-        </button>
-        {onCycleAuroraLevel && (
-          <button
-            className={`ide-icon-btn ide-atmos-btn ide-atmos-btn--level-${auroraLevel}`}
-            title={AURORA_TITLES[auroraLevel]}
-            aria-label={AURORA_TITLES[auroraLevel]}
-            aria-pressed={auroraLevel > 0}
-            onClick={onCycleAuroraLevel}
-          >
-            {AURORA_LABELS[auroraLevel]}
-          </button>
-        )}
-        <FocusModeButton variant="bar" active={focusMode} onToggle={onToggleFocus} />
-        {showSettingsControl && (
-          <button className="ide-icon-btn" title="Settings" aria-label="Settings" onClick={onSettingsClick}>
-            <GearIcon />
-          </button>
-        )}
-      </div>
-    </div>
+        )
+      }
+      actions={
+        <>
+          {useComposeToolbar ? (
+            <ComposeScrollEditorToolbar
+              includeWandOrnament={false}
+              isEditable={isEditable}
+              showMinimapControl={showMinimapControl}
+              showSettingsControl={showSettingsControl}
+              onEdit={onEdit}
+              onNewScroll={onNewScroll}
+              onToggleMinimap={onToggleMinimap}
+              onOpenSearch={onOpenSearch}
+              onCycleAuroraLevel={onCycleAuroraLevel}
+              onToggleFocus={onToggleFocus}
+              onSettingsClick={onSettingsClick}
+            />
+          ) : (
+            <>
+              {!isEditable && onEdit && (
+                <button className="ide-icon-btn" title="Edit Scroll" onClick={onEdit} aria-label="Edit Scroll">
+                  <EditIcon />
+                </button>
+              )}
+              {!isEditable && onNewScroll && (
+                <button className="ide-icon-btn" title="New Scroll" onClick={onNewScroll} aria-label="New Scroll">
+                  <NewIcon />
+                </button>
+              )}
+              {showMinimapControl && (
+                <button
+                  className={`ide-icon-btn ${showMinimap ? 'active' : ''}`}
+                  title="Toggle Lexicon Oracle"
+                  aria-label="Toggle Lexicon Oracle"
+                  onClick={onToggleMinimap}
+                >
+                  <MapIcon />
+                </button>
+              )}
+              <button
+                className="ide-icon-btn"
+                title="Open Oracle Search (Ctrl+F)"
+                aria-label="Open Oracle Search"
+                onClick={onOpenSearch}
+              >
+                <SearchIcon />
+              </button>
+              {onCycleAuroraLevel && (
+                <button
+                  className={`ide-icon-btn ide-atmos-btn ide-atmos-btn--level-${auroraLevel}`}
+                  title={AURORA_TITLES[auroraLevel]}
+                  aria-label={AURORA_TITLES[auroraLevel]}
+                  aria-pressed={auroraLevel > 0}
+                  onClick={onCycleAuroraLevel}
+                >
+                  {AURORA_LABELS[auroraLevel]}
+                </button>
+              )}
+              <FocusModeButton variant="bar" active={focusMode} onToggle={onToggleFocus} />
+              {showSettingsControl && (
+                <button className="ide-icon-btn" title="Settings" aria-label="Settings" onClick={onSettingsClick}>
+                  <GearIcon />
+                </button>
+              )}
+            </>
+          )}
+          <ThemeToggle className="ide-icon-btn" />
+        </>
+      }
+    />
   );
 }
 
@@ -320,28 +227,32 @@ export function TopBar({
 
 export function StatusBar({ line, col, language, syllableCount, analysisError, serverAnalysisActive }) {
   return (
-    <div className="ide-statusbar">
-      <div className="ide-statusbar-left">
-        <span className={`status-item${analysisError ? ' status-item--offline' : ''}`}>
-          <span className="status-ready-dot" aria-hidden="true" />
-          {analysisError ? 'Analysis Offline' : 'Ready'}
-        </span>
-        {serverAnalysisActive && (
-          <span className="status-item status-item--server">
-            Server Synthesis
+    <ComposeReadStatusBar
+      vitals={
+        <>
+          <span className={`status-item${analysisError ? ' status-item--offline' : ''}`}>
+            <span className="status-ready-dot" aria-hidden="true" />
+            {analysisError ? 'Analysis Offline' : 'Ready'}
           </span>
-        )}
-        {syllableCount !== undefined && (
-          <span className="status-item syllable-status">
-            Syllables: <span className="syllable-count-value">{syllableCount}</span>
-          </span>
-        )}
-      </div>
-      <div className="ide-statusbar-right">
-        <span className="status-item">{`Ln ${line}, Col ${col}`}</span>
-        <span className="status-item">UTF-8</span>
-        <span className="status-item">{language}</span>
-      </div>
-    </div>
+          {serverAnalysisActive && (
+            <span className="status-item status-item--server">
+              Server Synthesis
+            </span>
+          )}
+          {syllableCount !== undefined && (
+            <span className="status-item syllable-status">
+              Syllables: <span className="syllable-count-value">{syllableCount}</span>
+            </span>
+          )}
+        </>
+      }
+      position={
+        <>
+          <span className="status-item">{`Ln ${line}, Col ${col}`}</span>
+          <span className="status-item">UTF-8</span>
+          <span className="status-item">{language}</span>
+        </>
+      }
+    />
   );
 }

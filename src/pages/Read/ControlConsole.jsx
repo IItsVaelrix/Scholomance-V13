@@ -12,7 +12,6 @@ import {
   LayersIcon,
   ZapIcon,
 } from '../../components/Icons.jsx';
-import GrimDesignPanel from './GrimDesignPanel.jsx';
 import './IDE.css';
 import './ControlConsole.css';
 
@@ -200,8 +199,6 @@ export default function ControlConsole(props) {
           ))}
         </dl>
       </footer>
-
-      {import.meta.env.DEV && <GrimDesignPanel />}
     </section>
   );
 }

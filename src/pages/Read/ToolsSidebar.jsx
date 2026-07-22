@@ -1,7 +1,6 @@
 // @ts-check
 import { ANALYSIS_MODES } from '../../lib/truesight/compiler/analysisModes';
 import { EyeIcon, SparkleIcon, MetricsIcon, AnalyzeIcon, AstrologyIcon } from '../../components/Icons.jsx';
-import GrimDesignPanel from './GrimDesignPanel.jsx';
 import './IDE.css';
 
 /**
@@ -174,12 +173,6 @@ export default function ToolsSidebar({
           </div>
         </div>
       )}
-
-      {/* ── GrimDesign — dev-only ──
-          A design/authoring surface, not a reader feature. `import.meta.env.DEV` is
-          statically false in a production build, so this branch and the panel's import
-          are dropped there rather than shipped hidden. */}
-      {import.meta.env.DEV && <GrimDesignPanel />}
 
     </div>
   );

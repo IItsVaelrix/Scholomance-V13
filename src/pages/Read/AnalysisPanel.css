@@ -9,21 +9,31 @@
   color: var(--text-color, #e2d9c8);
   height: 100%;
   overflow-y: auto;
+  --scrollbar-thumb: var(--compose-scrollbar-thumb-default, var(--school-primary, hsla(43, 48%, 48%, 0.45)));
+  --scrollbar-thumb-hover: var(--compose-scrollbar-thumb-hover, var(--school-primary-glow, hsla(43, 48%, 60%, 0.75)));
+  --scrollbar-track: var(--compose-scrollbar-track-default, transparent);
+
   scrollbar-width: thin;
-  scrollbar-color: hsla(43, 48%, 48%, 0.2) transparent;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 
-.analyze-panel::-webkit-scrollbar {
-  width: 4px;
-}
+@supports not (scrollbar-color: auto) {
+  .analyze-panel::-webkit-scrollbar {
+    width: 4px;
+  }
 
-.analyze-panel::-webkit-scrollbar-track {
-  background: transparent;
-}
+  .analyze-panel::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
 
-.analyze-panel::-webkit-scrollbar-thumb {
-  background: hsla(43, 48%, 48%, 0.2);
-  border-radius: 2px;
+  .analyze-panel::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: var(--compose-scrollbar-radius-sm, 2px);
+  }
+
+  .analyze-panel::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+  }
 }
 
 .analyze-panel--astrology {
@@ -1145,3 +1155,49 @@
   line-height: 1.55;
   color: rgba(232, 224, 214, 0.85);
 }
+
+/* ── Light Mode Polish — Google Professional High-Contrast Surface Balance ── */
+.ide-layout-wrapper[data-theme='light'] .analyze-panel {
+  color: #0f172a;
+  background: #f4f7f6;
+}
+
+.ide-layout-wrapper[data-theme='light'] .analyze-score-badge {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+}
+
+.ide-layout-wrapper[data-theme='light'] .analyze-score-value {
+  color: #0f172a;
+}
+
+.ide-layout-wrapper[data-theme='light'] .analyze-score-label {
+  color: #475569;
+}
+
+.ide-layout-wrapper[data-theme='light'] .analyze-section {
+  border-bottom: 1px solid rgba(15, 23, 42, 0.10);
+}
+
+.ide-layout-wrapper[data-theme='light'] .analyze-section-title {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.ide-layout-wrapper[data-theme='light'] .analyze-section--astrology-focus {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+}
+
+.ide-layout-wrapper[data-theme='light'] .analyze-ml-commentary {
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+}
+
+.ide-layout-wrapper[data-theme='light'] .analyze-ml-commentary p {
+  color: #334155;
+}
+

@@ -84,6 +84,9 @@ export class TruesightWordNode extends TextNode {
     if (this.__color) {
       dom.style.color = this.__color;
       dom.style.setProperty('--w', this.__color);
+      // Explicit fill — parent .editor-textarea sets -webkit-text-fill-color, and
+      // some engines inherit the computed ink instead of re-resolving currentColor.
+      dom.style.setProperty('-webkit-text-fill-color', this.__color);
     }
 
     applyDecoded(dom, this.__decodedStyle);
@@ -111,9 +114,11 @@ export class TruesightWordNode extends TextNode {
       if (this.__color) {
         dom.style.color = this.__color;
         dom.style.setProperty('--w', this.__color);
+        dom.style.setProperty('-webkit-text-fill-color', this.__color);
       } else {
         dom.style.color = '';
         dom.style.removeProperty('--w');
+        dom.style.removeProperty('-webkit-text-fill-color');
       }
     }
 

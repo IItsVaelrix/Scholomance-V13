@@ -24,7 +24,9 @@
   flex-direction: column;
   gap: var(--console-gap);
   padding: var(--console-pad);
-  min-height: 100%;
+  /* Grow with content so .sidebar-tools can scroll the full Hex Tools stack */
+  flex: 0 0 auto;
+  min-height: min-content;
   color: var(--text-secondary, #cdc5a8);
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--console-abyss) 88%, transparent), var(--console-abyss)),
@@ -555,3 +557,66 @@
   .control-console .console-seg.is-active,
   .control-console .console-school-field:hover .console-school-orb { animation: none !important; }
 }
+
+/* ── Light Mode Polish — Google Professional High-Contrast Surface Balance ── */
+.ide-layout-wrapper[data-theme='light'] .control-console {
+  --console-abyss: #f4f7f6;
+  --console-panel: #ffffff;
+  --console-hairline: rgba(15, 23, 42, 0.14);
+  color: #0f172a;
+  background: #f4f7f6;
+  box-shadow: none;
+}
+
+.ide-layout-wrapper[data-theme='light'] .console-masthead-title {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.ide-layout-wrapper[data-theme='light'] .console-bank {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+}
+
+.ide-layout-wrapper[data-theme='light'] .console-bank-title {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.ide-layout-wrapper[data-theme='light'] .console-toggle {
+  background: #f1f5f9;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  color: #334155;
+}
+
+.ide-layout-wrapper[data-theme='light'] .console-toggle:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.ide-layout-wrapper[data-theme='light'] .console-toggle.is-on {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
+}
+
+.ide-layout-wrapper[data-theme='light'] .console-seg {
+  background: #f1f5f9;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  color: #475569;
+}
+
+.ide-layout-wrapper[data-theme='light'] .console-seg:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.ide-layout-wrapper[data-theme='light'] .console-seg.is-active {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
+}
+

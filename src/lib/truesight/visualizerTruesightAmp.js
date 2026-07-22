@@ -216,7 +216,8 @@ export async function applyVisualizerTruesight(payload = {}) {
         continue;
       }
 
-      const ts = tokenTruesight(tokenData, tok.word);
+      // COLOR_DRAGON: backend fields only — never invent hue via client G2P.
+      const ts = tokenTruesight(tokenData, tok.word, { allowFrontendFallback: false });
       if (ts?.school) schoolCounts[ts.school] = (schoolCounts[ts.school] || 0) + 1;
       row.push({
         word: tok.word,

@@ -12,6 +12,10 @@ import { getCachedWord, setCachedWord } from '../../lib/platform/wordCache.js';
 import OracleSubmitAnimation from './OracleSubmitAnimation.jsx';
 import { getOracleSchoolTheme } from './OracleSchoolTheme.jsx';
 import OracleTerminalChrome from './OracleTerminalChrome.jsx';
+import { ComposeOracleTerminal } from '../../core/compose/migrated/ComposeOracleTerminal';
+import { registerOracleTerminalMigration } from '../../core/compose/migrated/OracleTerminal';
+
+registerOracleTerminalMigration();
 import {
   AstrologyTrace,
   CapabilityTruth,
@@ -160,6 +164,7 @@ function SearchPanelInner({
   contextLookup = null,
   onJumpToLine = null,
   variant = 'sidebar',
+  theme = 'dark',
 }) {
   const prefersReducedMotion = usePrefersReducedMotion();
   const inputIdRef = useRef(`oracle-query-${_searchPanelIdCounter++}`);
@@ -525,32 +530,37 @@ function SearchPanelInner({
       data-school={schoolTheme.id}
       data-oracle-scanline={schoolTheme.scanline}
       data-status={currentStatusTone}
+      data-ide-theme={theme === 'light' ? 'light' : 'dark'}
     >
-      <div
+      <ComposeOracleTerminal
+        instance={variant}
+        instanceId={inputIdRef.current}
         className={[
-          'oracle-shell',
           `oracle-school-${schoolTheme.id?.toLowerCase?.() || 'void'}`,
           isLoadingChamber ? 'oracle-shell-loading' : '',
         ].filter(Boolean).join(' ')}
-        data-school={schoolTheme.id || 'VOID'}
-        data-loading={isLoadingChamber ? 'true' : 'false'}
+        dataProps={{
+          'data-school': schoolTheme.id || 'VOID',
+          'data-loading': isLoadingChamber ? 'true' : 'false',
+        }}
+        terminalChrome={
+          <OracleTerminalChrome
+            schoolId={schoolTheme.id || 'VOID'}
+            isLoading={isLoadingChamber}
+            linkStrength={oracleLinkStrength}
+            reducedMotion={prefersReducedMotion}
+          />
+        }
       >
-        <OracleTerminalChrome
-          schoolId={schoolTheme.id || 'VOID'}
-          isLoading={isLoadingChamber}
-          linkStrength={oracleLinkStrength}
-          reducedMotion={prefersReducedMotion}
-        />
 
-        <div className="oracle-core-panel">
-
-        {/* Chrome bar - mode toggle + label */}
-        <div className="oracle-chrome">
-          <span className="oracle-chrome-dot oracle-chrome-dot--hot" aria-hidden="true" />
-          <span className="oracle-chrome-dot oracle-chrome-dot--warm" aria-hidden="true" />
-          <span className="oracle-chrome-dot oracle-chrome-dot--cool" aria-hidden="true" />
+        {/* Session line - TTY identity + mode tabs */}
+        <div className="oracle-chrome" data-compose-part="session">
+          <span className="oracle-session-id">
+            <span className="oracle-session-prompt" aria-hidden="true">❯</span>
+            {' '}ORACLE//TTY
+          </span>
           <span className="oracle-chrome-label">
-            <span aria-hidden="true">{schoolTheme.glyph}</span> SCHOLOMANCE LEXICON ORACLE
+            <span aria-hidden="true">{schoolTheme.glyph}</span> LEXICON ORACLE
           </span>
           <div className="oracle-mode-toggle" role="group" aria-label="Oracle mode">
             <button
@@ -559,7 +569,7 @@ function SearchPanelInner({
               onClick={() => handleSwitchMode('WORD')}
               aria-pressed={mode === 'WORD'}
             >
-              WORD
+              <span className="oracle-mode-index" aria-hidden="true">1:</span>WORD
             </button>
             <button
               type="button"
@@ -567,7 +577,7 @@ function SearchPanelInner({
               onClick={() => handleSwitchMode('CORPUS')}
               aria-pressed={mode === 'CORPUS'}
             >
-              CORPUS
+              <span className="oracle-mode-index" aria-hidden="true">2:</span>CORPUS
             </button>
             <button
               type="button"
@@ -575,13 +585,13 @@ function SearchPanelInner({
               onClick={() => handleSwitchMode('QUERY')}
               aria-pressed={mode === 'QUERY'}
             >
-              QUERY
+              <span className="oracle-mode-index" aria-hidden="true">3:</span>QUERY
             </button>
           </div>
         </div>
 
         {/* Query form */}
-        <form className="oracle-query-form" onSubmit={handleSubmit}>
+        <form className="oracle-query-form" data-compose-part="prompt" onSubmit={handleSubmit}>
           <label className="oracle-query-prefix" htmlFor={inputIdRef.current}>
             {mode === 'CORPUS' ? 'corpus://' : 'archive://'}
           </label>
@@ -645,7 +655,7 @@ function SearchPanelInner({
         </AnimatePresence>
 
         {/* Signal strip */}
-        <div className="oracle-signal-strip" aria-label="Oracle status">
+        <div className="oracle-signal-strip" data-compose-part="signal" aria-label="Oracle status">
           {mode === 'WORD' ? (
             <>
               <span className="oracle-signal-pill">{statusTone}</span>
@@ -733,7 +743,7 @@ function SearchPanelInner({
         )}
 
         {/* Main feed */}
-        <div className="oracle-feed" role="region" aria-live="polite" aria-label={`Lexicon terminal output - ${inputIdRef.current}`}>
+        <div className="oracle-feed" data-compose-part="feed" role="region" aria-live="polite" aria-label={`Lexicon terminal output - ${inputIdRef.current}`}>
           <AnimatePresence mode="wait">
 
             {/* ═══ QUERY MODE ═══ */}
@@ -1121,8 +1131,7 @@ function SearchPanelInner({
           selectedSchool={schoolTheme.id}
           prefersReducedMotion={prefersReducedMotion}
         />
-        </div>
-      </div>
+      </ComposeOracleTerminal>
     </div>
   );
 }

@@ -13,7 +13,7 @@ import { resolvePlsVerseIRState } from "../../lib/pls/verseIRBridge.js";
 import { BytecodeError, ERROR_CATEGORIES, ERROR_SEVERITY, ERROR_CODES, MODULE_IDS } from "../../lib/pixelbrain.adapter.js";
 import { AnimatedSurface } from "../../components/AnimatedSurface";
 import { resolveOverlayPlacement } from "../../lib/truesight/overlay-placement.js";
-import { extractPreviousWord } from "../../../codex/core/spellcheckContext.js";
+import { extractPreviousWord } from "../../lib/codex/textAnalysis.js";
 
 
 const MAX_CONTENT_LENGTH = 50000;

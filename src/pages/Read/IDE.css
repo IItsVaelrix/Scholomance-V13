@@ -262,7 +262,7 @@
   padding: var(--space-1) var(--space-3);
   background: hsla(43, 48%, 48%, 0.04);
   border: 1px solid hsla(43, 48%, 48%, 0.14);
-  border-radius: var(--radius-full, 999px);
+  border-radius: var(--radius-md, 6px);
   pointer-events: auto;
 }
 
@@ -301,6 +301,46 @@
   align-items: center;
   justify-content: flex-end;
   gap: var(--space-2, 0.5rem);
+}
+
+/* Phase 9 — compose toolbar action cluster inside TopBar */
+.compose-scroll-editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.compose-scroll-editor-toolbar [role='toolbar'] {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+}
+
+.compose-scroll-editor-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 var(--space-2, 0.5rem);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md, 0.5rem);
+  /* WCAG AA on .ide-topbar (~#0c1212): ≥4.5:1 */
+  color: hsl(43, 42%, 72%);
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-2xs);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.compose-scroll-editor-toolbar button:hover {
+  background: hsla(43, 48%, 48%, 0.07);
+  border-color: hsla(43, 48%, 48%, 0.22);
+  color: hsl(43, 48%, 82%);
 }
 
 .toast-container {
@@ -449,6 +489,7 @@
 
 /* Full-bleed ambient background: motes, bloom, corner arcs */
 .ide-ambient-canvas {
+  display: none !important;
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -733,10 +774,7 @@
   overflow: hidden;
   border: 1px solid var(--oracle-border);
   border-radius: 14px;
-  background:
-    linear-gradient(180deg, rgba(5, 7, 18, 0.99), rgba(3, 4, 12, 0.98)),
-    radial-gradient(ellipse at top left, color-mix(in srgb, var(--oracle-accent) 16%, transparent), transparent 52%),
-    radial-gradient(ellipse at bottom right, hsla(43, 68%, 38%, 0.06), transparent 48%);
+  background: linear-gradient(180deg, rgba(5, 7, 18, 0.99), rgba(3, 4, 12, 0.98));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.04),
     inset 0 0 0 1px rgba(126, 231, 255, 0.03),
@@ -2660,10 +2698,7 @@
   place-items: center;
   overflow: hidden;
   pointer-events: none;
-  background:
-    radial-gradient(circle at 50% 48%, color-mix(in srgb, var(--oracle-school-color) 22%, transparent), transparent 36%),
-    radial-gradient(circle at 50% 48%, rgba(255, 220, 128, 0.08), transparent 56%),
-    rgba(1, 2, 8, 0.42);
+  background: rgba(1, 2, 8, 0.42);
   -webkit-backdrop-filter: blur(1.5px);
   backdrop-filter: blur(1.5px);
 }
@@ -2796,7 +2831,30 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+}
+
+.sidebar-leximancy {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+}
+
+.sidebar-leximancy .az-panel {
+  min-height: min-content;
+  height: auto;
+  max-height: none;
+  overflow: visible;
 }
 
 .sidebar-sub-panel {
@@ -3967,35 +4025,54 @@
 .ide-layout-wrapper .oracle-feed,
 .ide-layout-wrapper .sidebar-tools,
 .ide-layout-wrapper .rhyme-connections-list {
+  --scrollbar-thumb: var(--compose-scrollbar-thumb-default, var(--school-primary, rgba(196, 164, 92, 0.45)));
+  --scrollbar-thumb-hover: var(--compose-scrollbar-thumb-hover, var(--school-primary-glow, rgba(226, 201, 126, 0.75)));
+  --scrollbar-track: var(--compose-scrollbar-track-default, transparent);
+
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.05) transparent;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   scrollbar-gutter: stable;
 }
 
-.ide-layout-wrapper .editor-textarea::-webkit-scrollbar,
-.ide-layout-wrapper .sidebar-content::-webkit-scrollbar,
-.ide-layout-wrapper .oracle-feed::-webkit-scrollbar,
-.ide-layout-wrapper .sidebar-tools::-webkit-scrollbar,
-.ide-layout-wrapper .rhyme-connections-list::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+@supports not (scrollbar-color: auto) {
+  .ide-layout-wrapper .editor-textarea::-webkit-scrollbar,
+  .ide-layout-wrapper .sidebar-content::-webkit-scrollbar,
+  .ide-layout-wrapper .oracle-feed::-webkit-scrollbar,
+  .ide-layout-wrapper .sidebar-tools::-webkit-scrollbar,
+  .ide-layout-wrapper .sidebar-leximancy::-webkit-scrollbar,
+  .ide-layout-wrapper .rhyme-connections-list::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
 
-.ide-layout-wrapper .editor-textarea::-webkit-scrollbar-thumb,
-.ide-layout-wrapper .sidebar-content::-webkit-scrollbar-thumb,
-.ide-layout-wrapper .oracle-feed::-webkit-scrollbar-thumb,
-.ide-layout-wrapper .sidebar-tools::-webkit-scrollbar-thumb,
-.ide-layout-wrapper .rhyme-connections-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 3px;
-}
+  .ide-layout-wrapper .editor-textarea::-webkit-scrollbar-track,
+  .ide-layout-wrapper .sidebar-content::-webkit-scrollbar-track,
+  .ide-layout-wrapper .oracle-feed::-webkit-scrollbar-track,
+  .ide-layout-wrapper .sidebar-tools::-webkit-scrollbar-track,
+  .ide-layout-wrapper .sidebar-leximancy::-webkit-scrollbar-track,
+  .ide-layout-wrapper .rhyme-connections-list::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
 
-.ide-layout-wrapper .editor-textarea::-webkit-scrollbar-thumb:hover,
-.ide-layout-wrapper .sidebar-content::-webkit-scrollbar-thumb:hover,
-.ide-layout-wrapper .oracle-feed::-webkit-scrollbar-thumb:hover,
-.ide-layout-wrapper .sidebar-tools::-webkit-scrollbar-thumb:hover,
-.ide-layout-wrapper .rhyme-connections-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.1);
+  .ide-layout-wrapper .editor-textarea::-webkit-scrollbar-thumb,
+  .ide-layout-wrapper .sidebar-content::-webkit-scrollbar-thumb,
+  .ide-layout-wrapper .oracle-feed::-webkit-scrollbar-thumb,
+  .ide-layout-wrapper .sidebar-tools::-webkit-scrollbar-thumb,
+  .ide-layout-wrapper .sidebar-leximancy::-webkit-scrollbar-thumb,
+  .ide-layout-wrapper .rhyme-connections-list::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: var(--compose-scrollbar-radius-sm, 3px);
+  }
+
+  .ide-layout-wrapper .editor-textarea::-webkit-scrollbar-thumb:hover,
+  .ide-layout-wrapper .sidebar-content::-webkit-scrollbar-thumb:hover,
+  .ide-layout-wrapper .oracle-feed::-webkit-scrollbar-thumb:hover,
+  .ide-layout-wrapper .sidebar-tools::-webkit-scrollbar-thumb:hover,
+  .ide-layout-wrapper .sidebar-leximancy::-webkit-scrollbar-thumb:hover,
+  .ide-layout-wrapper .rhyme-connections-list::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+    box-shadow: 0 0 6px var(--scrollbar-thumb-hover);
+  }
 }
 
 /* ─── Textarea & Overlay — Bytecode-driven typography ─────────────────────
@@ -4303,6 +4380,9 @@
   user-select: text;
   pointer-events: auto;
   transition: color 0.2s ease;
+  /* Lexical ContentEditable shares .editor-textarea's -webkit-text-fill-color.
+     Re-resolve on the word so school hues are not locked to parchment/abyss ink. */
+  -webkit-text-fill-color: currentColor;
 }
 
 .ide-layout-wrapper .grimoire-word--interactive {
@@ -5279,9 +5359,7 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .ide-layout-wrapper--mobile {
-  background:
-    radial-gradient(circle at top, color-mix(in srgb, var(--read-accent) 12%, transparent), transparent 52%),
-    linear-gradient(180deg, rgba(10, 10, 24, 0.98), rgba(5, 4, 16, 1));
+  background: linear-gradient(180deg, rgba(10, 10, 24, 0.98), rgba(5, 4, 16, 1));
 }
 
 .ide-layout-wrapper--mobile .ide-topbar {
@@ -5786,7 +5864,6 @@
   inset: 0;
   border-radius: inherit;
   background:
-    radial-gradient(circle at 50% 18%, hsl(165 80% 74% / 0.13), transparent 34%),
     linear-gradient(90deg, hsl(190 100% 65% / 0.08), transparent 18%, transparent 82%, hsl(290 100% 70% / 0.08)),
     repeating-linear-gradient(
       0deg,
@@ -5922,7 +5999,6 @@
 
   .oracle-crt-convex-overlay {
     background:
-      radial-gradient(circle at 50% 18%, hsl(165 80% 74% / 0.08), transparent 34%),
       repeating-linear-gradient(
         0deg,
         hsl(0 0% 100% / 0.025) 0px,
@@ -6132,4 +6208,311 @@
 
 @media (prefers-reduced-motion: reduce) {
   .focus-mode-btn { transition: none; }
+}
+
+/* ── Compose Read chrome — GrimDesign harmonic seam ─────────────────────────
+   Signal: WILL / HARMONIC via computeBlendedHsl (local-codex).
+   Decisions consumed: glow 12px, transition 360ms, breathe 1600ms.
+   World-law: matching resonance frequencies create harmonic interference —
+   both chrome seams and the Ready dot breathe at the same 1600ms period.
+   Colors resolve through school theme variables, never hardcoded palettes. */
+
+.ide-topbar--compose,
+.ide-statusbar--compose {
+  position: relative;
+  --grim-transition: 360ms;
+  --grim-breathe-period: 1600ms;
+  --grim-glow-color: var(--ritual-glow, hsla(330, 84%, 72%, 0.5));
+}
+
+.grim-harmonic-seam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--ritual-aurora-start, hsla(330, 84%, 67%, 0.55)) 18%,
+    var(--ritual-aurora-end, hsla(43, 48%, 60%, 0.55)) 82%,
+    transparent 100%
+  );
+  box-shadow: 0 0 12px var(--grim-glow-color);
+  opacity: 0.5;
+  transition: opacity var(--grim-transition) ease-in-out;
+}
+
+.grim-harmonic-seam--bottom { bottom: -1px; }
+.grim-harmonic-seam--top { top: -1px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .grim-harmonic-seam,
+  .ide-statusbar--compose .status-ready-dot {
+    animation: grim-harmonic-breathe var(--grim-breathe-period) ease-in-out infinite;
+  }
+
+  /* No resonance when analysis is offline — the dead signal holds steady */
+  .ide-statusbar--compose .status-item--offline .status-ready-dot {
+    animation: none;
+  }
+}
+
+@keyframes grim-harmonic-breathe {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.95; }
+}
+
+/* App-level reduced-motion setting stills the seam as well */
+[data-reduced-motion="true"] .grim-harmonic-seam,
+[data-reduced-motion="true"] .status-ready-dot {
+  animation: none;
+}
+
+/* ── Compose Oracle Terminal — arcane phosphor skin ─────────────────────────
+   GrimDesign: WILL / HARMONIC, complexity 4 (session/prompt/signal/feed),
+   glow 12px, transition 360ms, harmonic period 1600ms (shared with the
+   Read chrome seams — one resonance frequency across the surface).
+   Doctrine: gold is chrome, school color is phosphor. No glass: no white
+   sheen, no reflection streak, no rounded floating card, no macOS dots.
+   Scoped to .oracle-shell--compose so the legacy fallback keeps its skin. */
+
+.oracle-shell--compose {
+  --oracle-phosphor: var(--oracle-accent);
+  --oracle-chrome-line: color-mix(in srgb, var(--oracle-gold) 52%, transparent);
+  --oracle-chrome-line-dim: color-mix(in srgb, var(--oracle-gold) 26%, transparent);
+  border-radius: 0;
+  border: 1px solid var(--oracle-chrome-line);
+  background: #05060d;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.65);
+  animation: none;
+}
+
+/* The scanline atmosphere renders only while its attachment node is mounted */
+.oracle-shell--compose:not(:has(.oracle-scanline-atmosphere))::before {
+  content: none;
+}
+
+/* Base scanline without the glass top-sheen; school variants still override */
+.oracle-shell--compose::before {
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.025) 0,
+    rgba(255, 255, 255, 0.025) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+.oracle-scanline-atmosphere {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Session line: TTY identity replaces the traffic-light dots */
+.oracle-shell--compose .oracle-chrome {
+  background: transparent;
+  border-bottom: 1px solid var(--oracle-chrome-line-dim);
+  color: var(--oracle-gold);
+  flex-wrap: wrap;
+  row-gap: 0.3rem;
+}
+
+.oracle-shell--compose .oracle-chrome-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.oracle-shell--compose .oracle-mode-toggle {
+  margin-left: auto;
+}
+
+.oracle-session-id {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--oracle-gold);
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  flex-shrink: 0;
+}
+
+.oracle-session-prompt {
+  color: var(--oracle-phosphor);
+  font-weight: 700;
+}
+
+.oracle-shell--compose .oracle-chrome-label {
+  margin-left: 0;
+  margin-right: auto;
+  opacity: 0.6;
+}
+
+/* Mode tabs: tmux window list — numbered, inverse video when active */
+.oracle-shell--compose .oracle-mode-toggle {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.oracle-shell--compose .oracle-mode-btn {
+  border-radius: 0;
+  padding: 0.18rem 0.44rem;
+}
+
+.oracle-mode-index {
+  opacity: 0.55;
+  margin-right: 1px;
+}
+
+.oracle-shell--compose .oracle-mode-btn:hover:not(.oracle-mode-btn--active) {
+  transform: none;
+  background: color-mix(in srgb, var(--oracle-phosphor) 10%, transparent);
+}
+
+.oracle-shell--compose .oracle-mode-btn--active {
+  background: color-mix(in srgb, var(--oracle-phosphor) 85%, #fff);
+  color: #04060c;
+  box-shadow: none;
+  animation: none;
+}
+
+.oracle-shell--compose .oracle-mode-btn--active .oracle-mode-index {
+  opacity: 0.7;
+}
+
+/* Prompt line: the whole row is the input — no box-in-box */
+.oracle-shell--compose .oracle-query-form {
+  background: transparent;
+  border-bottom: 1px solid var(--oracle-chrome-line-dim);
+}
+
+.oracle-shell--compose .oracle-query-input {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  caret-color: var(--oracle-phosphor);
+  padding: 0.48rem 0.2rem;
+}
+
+.oracle-shell--compose .oracle-query-input:focus {
+  border: 0;
+  box-shadow: inset 0 -1px 0 var(--oracle-phosphor);
+}
+
+/* Flat command buttons — no neon-glass lift, sweep, or glow bloom */
+.oracle-shell--compose .oracle-query-submit,
+.oracle-shell--compose .oracle-query-clear {
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  text-shadow: none;
+  will-change: auto;
+}
+
+.oracle-shell--compose .oracle-query-submit {
+  border: 1px solid color-mix(in srgb, var(--oracle-phosphor) 55%, transparent);
+  color: color-mix(in srgb, var(--oracle-phosphor) 88%, #fff);
+  background: color-mix(in srgb, var(--oracle-phosphor) 12%, transparent);
+}
+
+.oracle-shell--compose .oracle-query-clear {
+  border: 1px solid var(--oracle-chrome-line-dim);
+  color: color-mix(in srgb, var(--oracle-gold) 70%, transparent);
+}
+
+.oracle-shell--compose .oracle-query-submit::after {
+  content: none;
+}
+
+.oracle-shell--compose .oracle-query-submit:hover,
+.oracle-shell--compose .oracle-query-clear:hover {
+  transform: none;
+  filter: none;
+  box-shadow: none;
+}
+
+.oracle-shell--compose .oracle-query-submit:hover {
+  background: color-mix(in srgb, var(--oracle-phosphor) 24%, transparent);
+}
+
+.oracle-shell--compose .oracle-query-clear:hover {
+  color: var(--oracle-gold);
+  border-color: var(--oracle-chrome-line);
+}
+
+.oracle-shell--compose .oracle-query-submit:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--oracle-phosphor);
+}
+
+/* Signal strip → statusline: bracketed key::value fields, no pill chrome */
+.oracle-shell--compose .oracle-signal-strip {
+  gap: 0.55rem;
+  padding: 0.34rem 0.8rem;
+  border-bottom: 1px solid var(--oracle-chrome-line-dim);
+}
+
+.oracle-shell--compose .oracle-signal-pill {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  min-height: auto;
+  padding: 0;
+}
+
+.oracle-shell--compose .oracle-signal-pill::before {
+  content: "[";
+  opacity: 0.4;
+  margin-right: 1px;
+}
+
+.oracle-shell--compose .oracle-signal-pill::after {
+  content: "]";
+  opacity: 0.4;
+  margin-left: 1px;
+}
+
+/* Terminal hardware: beacon + link meter + rune registers in chrome/phosphor */
+.oracle-shell--compose .oracle-link-beacon {
+  border-radius: 0;
+  width: 0.45rem;
+  height: 0.45rem;
+  background: var(--oracle-phosphor);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--oracle-phosphor) 55%, transparent);
+}
+
+.oracle-shell--compose .oracle-link-meter {
+  border-radius: 0;
+  background: color-mix(in srgb, var(--oracle-phosphor) 14%, transparent);
+}
+
+.oracle-shell--compose .oracle-link-meter span {
+  background: linear-gradient(90deg, var(--oracle-phosphor), var(--oracle-gold));
+  box-shadow: none;
+}
+
+.oracle-shell--compose .oracle-glyph-chamber {
+  border-radius: 0;
+  border-color: var(--oracle-chrome-line-dim);
+  color: var(--oracle-gold);
+  background: transparent;
+  text-shadow: 0 0 6px color-mix(in srgb, var(--oracle-gold) 45%, transparent);
+  animation: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The beacon shares the harmonic frequency with the Read chrome seams */
+  .oracle-shell--compose .oracle-link-beacon {
+    animation: grim-harmonic-breathe 1600ms ease-in-out infinite;
+  }
+}
+
+[data-reduced-motion="true"] .oracle-shell--compose .oracle-link-beacon {
+  animation: none;
 }

@@ -644,7 +644,8 @@ a:focus-visible {
   animation: aurora-mid 20s ease-in-out infinite alternate;
 }
 
-/* Vignette */
+/* Vignette — global center lighting (z-999). Soft radial banding reads as
+   concentric ovals (~20px steps). IDE / battle / listen suppress this layer. */
 .vignette {
   position: fixed;
   inset: 0;
@@ -656,6 +657,18 @@ a:focus-visible {
   contain: paint;
   pointer-events: none;
   z-index: 999;
+}
+
+/* Belt: if the Read IDE mounts while global lighting is still in the DOM, kill it.
+   These are lighting overlays (not layout) — they sit above page content. */
+body:has(.ide-layout-wrapper) .vignette,
+body:has(.ide-layout-wrapper) .aurora-background,
+body:has(.ide-layout-wrapper) .scanlines {
+  display: none !important;
+}
+
+body:has(.ide-layout-wrapper)::after {
+  opacity: 0 !important;
 }
 
 /* Scanlines Overlay */
@@ -1955,6 +1968,22 @@ h6 { font-size: var(--text-base); }
   z-index: 1;
   flex: 1;
   min-height: 0;
+}
+
+/* Read IDE: lock the page shell to the viewport so the editor can fill
+   the remaining space under the nav without 100dvh double-counting. */
+body:has(.ide-layout-wrapper) .page-container {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+body:has(.ide-layout-wrapper) .page-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* Transition Wrapper */

@@ -4,7 +4,8 @@ import { Sun, Moon } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme.jsx';
 import { triggerHapticPulse, UI_HAPTICS } from '../../lib/platform/haptics.js';
 
-export function ThemeToggle({ className = '', showLabel = false }) {
+/** IDE-only sun/moon control. Prefer mounting inside Read TopBar, not global nav. */
+export function ThemeToggle({ className = 'ide-icon-btn', showLabel = false }) {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === 'dark';
 
@@ -13,12 +14,12 @@ export function ThemeToggle({ className = '', showLabel = false }) {
     toggleTheme();
   }, [toggleTheme]);
 
-  const label = isDark ? 'Switch to light mode' : 'Switch to dark mode';
+  const label = isDark ? 'Switch IDE to light mode' : 'Switch IDE to dark mode';
 
   return (
     <motion.button
       type="button"
-      className={`rail-link theme-toggle-btn ${className}`}
+      className={`theme-toggle-btn ${className}`.trim()}
       onClick={handleClick}
       aria-label={label}
       title={label}
@@ -32,7 +33,7 @@ export function ThemeToggle({ className = '', showLabel = false }) {
       )}
       {showLabel && (
         <span className="theme-toggle-label">
-          {isDark ? 'Light Mode' : 'Dark Mode'}
+          {isDark ? 'IDE Light' : 'IDE Dark'}
         </span>
       )}
     </motion.button>

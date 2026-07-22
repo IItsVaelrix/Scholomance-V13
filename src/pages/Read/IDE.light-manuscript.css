@@ -1,0 +1,682 @@
+/**
+ * Illuminated Manuscript Workstation — Google Professional Light Mode Architecture.
+ * Scoped to `.ide-layout-wrapper[data-theme='light']`.
+ *
+ * Balance: Porcelain workspace shell · Parchment manuscript editor · Obsidian structural anchors.
+ * Principles: Google Material Pro elevation, multi-tiered surface hierarchy, high-contrast dark accents.
+ */
+
+.ide-layout-wrapper[data-theme='light'] {
+  color-scheme: light;
+  background: var(--app-bg, #eaeaea);
+  color: var(--text-primary, #0f172a);
+
+  --border-color: var(--border-soft, rgba(15, 23, 42, 0.14));
+  --read-accent: var(--ritual-primary, #079b9b);
+  --read-text-strong: #0f172a;
+  --read-text: #334155;
+  --read-text-muted: #64748b;
+  --shadow-card:
+    0 1px 3px rgba(15, 23, 42, 0.06),
+    0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+/* ── Workspace TopBar Chrome: Porcelain header with dark obsidian accents ── */
+
+.ide-layout-wrapper[data-theme='light'] .ide-topbar {
+  background: var(--toolbar-bg, #f4f7f6);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.16);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+.ide-layout-wrapper[data-theme='light'] .ide-title {
+  color: #0f172a;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.ide-layout-wrapper[data-theme='light'] .progression-label,
+.ide-layout-wrapper[data-theme='light'] .progression-xp {
+  color: #334155;
+  font-weight: 500;
+}
+
+.ide-layout-wrapper[data-theme='light'] .ide-logo {
+  color: var(--accent-gold, #946800);
+}
+
+.ide-layout-wrapper[data-theme='light'] .ide-icon-btn {
+  color: #475569;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.ide-layout-wrapper[data-theme='light'] .ide-icon-btn:hover {
+  color: #0f172a;
+  background: rgba(15, 23, 42, 0.06);
+  box-shadow: none;
+}
+
+/* High-contrast active obsidian pill */
+.ide-layout-wrapper[data-theme='light'] .ide-icon-btn.active {
+  color: #ffffff;
+  background: #0f172a;
+  border-color: #0f172a;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
+}
+
+.ide-layout-wrapper[data-theme='light'] .ide-icon-btn:focus-visible {
+  outline: 2px solid #0f172a;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.15);
+}
+
+.ide-layout-wrapper[data-theme='light'] .progression-fill-mini {
+  background: var(--accent-gold, #946800);
+  box-shadow: none;
+}
+
+/* Primary Topbar Action Buttons (Save / Edit / Truesight) */
+.ide-layout-wrapper[data-theme='light'] .ide-topbar button.topbar-action-btn,
+.ide-layout-wrapper[data-theme='light'] .ide-topbar-right button:not(.ide-icon-btn) {
+  background: #0f172a;
+  color: #ffffff;
+  border: 1px solid #0f172a;
+  font-weight: 600;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15);
+  transition: all 0.15s ease;
+}
+
+.ide-layout-wrapper[data-theme='light'] .ide-topbar button.topbar-action-btn:hover,
+.ide-layout-wrapper[data-theme='light'] .ide-topbar-right button:not(.ide-icon-btn):hover {
+  background: #1e293b;
+  border-color: #000;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.25);
+  transform: translateY(-1px);
+}
+
+/* ── Technical Status Bar: Obsidian anchor framing the viewport bottom ── */
+
+.ide-layout-wrapper[data-theme='light'] .ide-statusbar {
+  background: #0f172a;
+  border-top: 1px solid #1e293b;
+  color: #cbd5e1;
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.ide-layout-wrapper[data-theme='light'] .status-item {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.ide-layout-wrapper[data-theme='light'] .status-item strong,
+.ide-layout-wrapper[data-theme='light'] .status-item span {
+  color: #f8fafc;
+}
+
+.ide-layout-wrapper[data-theme='light'] .status-ready-dot {
+  background: #00e5ff;
+  box-shadow: 0 0 6px rgba(0, 229, 255, 0.6);
+}
+
+/* ── Left Activity Bar & Explorer ── */
+
+.ide-layout-wrapper[data-theme='light'] .ide-sidebar,
+.ide-layout-wrapper[data-theme='light'] .sidebar-combined-content {
+  background: var(--panel-bg, #f4f7f6);
+  border-right: 1px solid rgba(15, 23, 42, 0.15);
+  box-shadow: none;
+}
+
+.ide-layout-wrapper[data-theme='light'] .ide-activity-bar {
+  background: #dce4e3;
+  border-right: 1px solid rgba(15, 23, 42, 0.15);
+}
+
+.ide-layout-wrapper[data-theme='light'] .activity-item {
+  color: #64748b;
+  border-left-color: transparent;
+  transition: all 0.15s ease;
+}
+
+.ide-layout-wrapper[data-theme='light'] .activity-item:hover {
+  color: #0f172a;
+  background: rgba(15, 23, 42, 0.06);
+}
+
+.ide-layout-wrapper[data-theme='light'] .activity-item.active {
+  color: #ffffff;
+  background: #0f172a;
+  border-left-color: var(--accent-cyan, #079b9b);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
+}
+
+/* New Scroll CTA: High-contrast Obsidian button */
+.ide-layout-wrapper[data-theme='light'] .new-scroll-btn {
+  background: #0f172a;
+  border: 1px solid #0f172a;
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
+  transition: all 0.15s ease;
+  filter: none;
+}
+
+.ide-layout-wrapper[data-theme='light'] .new-scroll-btn::after {
+  display: none;
+}
+
+.ide-layout-wrapper[data-theme='light'] .new-scroll-btn:hover {
+  background: #1e293b;
+  border-color: #000000;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+  transform: translateY(-1px);
+}
+
+.ide-layout-wrapper[data-theme='light'] .new-scroll-btn:focus-visible {
+  outline: 2px solid #0f172a;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.2);
+}
+
+.ide-layout-wrapper[data-theme='light'] .scroll-empty {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.ide-layout-wrapper[data-theme='light'] .scroll-empty p {
+  color: #334155;
+}
+
+.ide-layout-wrapper[data-theme='light'] .scroll-empty span {
+  color: #64748b;
+}
+
+/* ── Sidebar Scroll Cards: Google Professional High-Contrast Cards ── */
+.ide-layout-wrapper[data-theme='light'] .scroll-item {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 4px 12px rgba(15, 23, 42, 0.03);
+  transition: transform 0.18s cubic-bezier(0.2, 0, 0, 1),
+              box-shadow 0.18s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.ide-layout-wrapper[data-theme='light'] .scroll-item::before {
+  background: linear-gradient(90deg, transparent, rgba(15, 23, 42, 0.15), transparent);
+  opacity: 0.6;
+}
+
+.ide-layout-wrapper[data-theme='light'] .scroll-item:hover {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.28);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.10), 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+/* Active Scroll Card: High-contrast Obsidian Anchor */
+.ide-layout-wrapper[data-theme='light'] .scroll-item.active,
+.ide-layout-wrapper[data-theme='light'] .scroll-item--active {
+  background: #0f172a;
+  border-color: #0f172a;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.22);
+}
+
+.ide-layout-wrapper[data-theme='light'] .scroll-item.active::after,
+.ide-layout-wrapper[data-theme='light'] .scroll-item--active::after {
+  background: #00e5ff;
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.8);
+}
+
+/* Pinned Scroll Cards */
+.ide-layout-wrapper[data-theme='light'] .scroll-item--pinned {
+  background: #fcfbf7;
+  border-color: rgba(148, 104, 0, 0.35);
+  box-shadow: 0 2px 8px rgba(148, 104, 0, 0.08);
+}
+
+.ide-layout-wrapper[data-theme='light'] .scroll-item--pinned.active,
+.ide-layout-wrapper[data-theme='light'] .scroll-item--pinned--active {
+  background: #0f172a;
+  border-color: #946800;
+}
+
+/* Scroll Card Typography & Inner Content */
+.ide-layout-wrapper[data-theme='light'] .scroll-item-title {
+  color: #0f172a;
+  font-weight: 700;
+  font-size: var(--text-sm, 0.875rem);
+}
+
+.ide-layout-wrapper[data-theme='light'] .scroll-item.active .scroll-item-title,
+.ide-layout-wrapper[data-theme='light'] .scroll-item--active .scroll-item-title {
+  color: #ffffff;
+}
+
+.ide-layout-wrapper[data-theme='light'] .scroll-item-preview {
+  color: #475569;
+  font-size: var(--text-xs, 0.75rem);
+  line-height: 1.45;
+}
+
+.ide-layout-wrapper[data-theme='light'] .scroll-item.active .scroll-item-preview,
+.ide-layout-wrapper[data-theme='light'] .scroll-item--active .scroll-item-preview {
+  color: #cbd5e1;
+}
+
+.ide-layout-wrapper[data-theme='light'] .scroll-item-meta {
+  color: #64748b;
+}
+
+.ide-layout-wrapper[data-theme='light'] .scroll-word-count,
+.ide-layout-wrapper[data-theme='light'] .scroll-char-count,
+.ide-layout-wrapper[data-theme='light'] .scroll-date {
+  background: rgba(15, 23, 42, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #475569;
+  font-weight: 500;
+}
+
+.ide-layout-wrapper[data-theme='light'] .scroll-item.active .scroll-word-count,
+.ide-layout-wrapper[data-theme='light'] .scroll-item.active .scroll-char-count,
+.ide-layout-wrapper[data-theme='light'] .scroll-item.active .scroll-date,
+.ide-layout-wrapper[data-theme='light'] .scroll-item--active .scroll-word-count,
+.ide-layout-wrapper[data-theme='light'] .scroll-item--active .scroll-char-count,
+.ide-layout-wrapper[data-theme='light'] .scroll-item--active .scroll-date {
+  background: rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+}
+
+/* Scroll Card Action Buttons */
+.ide-layout-wrapper[data-theme='light'] .scroll-action-btn {
+  color: #64748b;
+  border-radius: 4px;
+  transition: all 0.12s ease;
+}
+
+.ide-layout-wrapper[data-theme='light'] .scroll-action-btn:hover {
+  color: #0f172a;
+  background: rgba(15, 23, 42, 0.08);
+}
+
+.ide-layout-wrapper[data-theme='light'] .scroll-item.active .scroll-action-btn,
+.ide-layout-wrapper[data-theme='light'] .scroll-item--active .scroll-action-btn {
+  color: #94a3b8;
+}
+
+.ide-layout-wrapper[data-theme='light'] .scroll-item.active .scroll-action-btn:hover,
+.ide-layout-wrapper[data-theme='light'] .scroll-item--active .scroll-action-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.ide-layout-wrapper[data-theme='light'] .scroll-action-pin--active {
+  color: #946800;
+}
+
+.ide-layout-wrapper[data-theme='light'] .scroll-item.active .scroll-action-pin--active,
+.ide-layout-wrapper[data-theme='light'] .scroll-item--active .scroll-action-pin--active {
+  color: #ffd700;
+}
+
+/* Tabs / Secondary Navigation */
+.ide-layout-wrapper[data-theme='light'] .sidebar-tab,
+.ide-layout-wrapper[data-theme='light'] .ide-tab {
+  color: #64748b;
+  font-weight: 500;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.ide-layout-wrapper[data-theme='light'] .sidebar-tab.active,
+.ide-layout-wrapper[data-theme='light'] .ide-tab.active {
+  color: #0f172a;
+  font-weight: 700;
+  border-bottom: 2px solid #0f172a;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Sidebar Tools Section & Mode Buttons (Leximancy / Rhyme Astrology) */
+.ide-layout-wrapper[data-theme='light'] .sidebar-section-title {
+  color: #0f172a;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.ide-layout-wrapper[data-theme='light'] .sidebar-section-glyph {
+  color: var(--accent-gold, #946800);
+}
+
+.ide-layout-wrapper[data-theme='light'] .sidebar-tool-btn {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  color: #334155;
+  font-weight: 500;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  transition: all 0.15s ease;
+}
+
+.ide-layout-wrapper[data-theme='light'] .sidebar-tool-btn:hover:not(:disabled) {
+  background: rgba(15, 23, 42, 0.05);
+  color: #0f172a;
+  border-color: rgba(15, 23, 42, 0.25);
+  transform: translateY(-1px);
+}
+
+.ide-layout-wrapper[data-theme='light'] .sidebar-tool-btn.active {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2);
+}
+
+.ide-layout-wrapper[data-theme='light'] .sidebar-tool-btn.active .tool-label {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.ide-layout-wrapper[data-theme='light'] .sidebar-tool-btn.active .tool-icon {
+  color: #00e5ff;
+}
+
+.ide-layout-wrapper[data-theme='light'] .school-dropdown-sidebar {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.20);
+  color: #0f172a;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+/* ── Editor: Warm Parchment Canvas ── */
+
+.ide-layout-wrapper[data-theme='light'] .scroll-editor,
+.ide-layout-wrapper[data-theme='light'] .editor-body {
+  background: #fdfbf8;
+  border-color: rgba(15, 23, 42, 0.14);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.04);
+  border-radius: 8px;
+}
+
+.ide-layout-wrapper[data-theme='light'] .editor-textarea-wrapper {
+  background: #fdfbf8;
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+
+/* No focus inset bar — it reads as a hard seam against the gutter in light mode. */
+.ide-layout-wrapper[data-theme='light'] .editor-textarea-wrapper:focus-within {
+  box-shadow: none;
+  outline: none;
+}
+
+.ide-layout-wrapper[data-theme='light'] .editor-textarea,
+.ide-layout-wrapper[data-theme='light'] .editor-textarea-wrapper .ContentEditable__root,
+.ide-layout-wrapper[data-theme='light'] .editor-title-input,
+.ide-layout-wrapper[data-theme='light'] .editor-title-display {
+  color: #0f172a;
+  background: transparent;
+  caret-color: #0f172a;
+}
+
+/* TrueSight paint must survive parchment ink + inherited -webkit-text-fill. */
+.ide-layout-wrapper[data-theme='light'] .grimoire-word,
+.ide-layout-wrapper[data-theme='light'] .truesight-word {
+  -webkit-text-fill-color: currentColor;
+}
+
+.ide-layout-wrapper[data-theme='light'] .grimoire-word--active,
+.ide-layout-wrapper[data-theme='light'] .grimoire-word--assonant {
+  /* Soft edge so school hues stay distinct on warm parchment. */
+  text-shadow: 0 0 0.55px color-mix(in srgb, currentColor 50%, transparent);
+}
+
+.ide-layout-wrapper[data-theme='light'] .grimoire-word--grey {
+  color: var(--read-text-strong, #0f172a);
+  -webkit-text-fill-color: currentColor;
+}
+
+.ide-layout-wrapper[data-theme='light'] .grimoire-word:hover,
+.ide-layout-wrapper[data-theme='light'] .truesight-word:hover {
+  background: rgba(15, 23, 42, 0.06);
+}
+
+.ide-layout-wrapper[data-theme='light'] .grimoire-word--grey.grimoire-word--interactive:hover {
+  color: #0f172a;
+  background: rgba(15, 23, 42, 0.08);
+}
+
+.ide-layout-wrapper[data-theme='light'] .editor-title-input::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+.ide-layout-wrapper[data-theme='light'] .editor-gutter {
+  background: #e4eae9;
+  border-right: 1px solid rgba(15, 23, 42, 0.14);
+  color: #475569;
+}
+
+.ide-layout-wrapper[data-theme='light'] .line-number {
+  color: #64748b;
+  font-family: var(--font-mono, monospace);
+}
+
+.ide-layout-wrapper[data-theme='light'] .gutter-row--current {
+  /* Keep current-line cue on number/tick only — a filled row band reads as a
+     horizontal rule glued to the gutter when the typing area is focused. */
+  background: transparent;
+}
+
+.ide-layout-wrapper[data-theme='light'] .gutter-row--current .line-number,
+.ide-layout-wrapper[data-theme='light'] .gutter-row--current .gutter-tick {
+  color: #079b9b;
+  font-weight: 700;
+}
+
+.ide-layout-wrapper[data-theme='light'] .gutter-tick {
+  background: rgba(15, 23, 42, 0.18);
+}
+
+.ide-layout-wrapper[data-theme='light'] .gutter-row--current .gutter-tick {
+  background: #079b9b;
+}
+
+/* Kill outlines / glow on editor frame */
+.ide-layout-wrapper[data-theme='light'] .scroll-editor,
+.ide-layout-wrapper[data-theme='light'] .editor-textarea-wrapper,
+.ide-layout-wrapper[data-theme='light'] .editor-body {
+  outline: none;
+  filter: none;
+}
+
+/* ── Right Rail: Obsidian Instrument Console ── */
+
+.ide-layout-wrapper[data-theme='light'] .ide-right-panel {
+  background: #1e293b;
+  border-left: 1px solid #334155;
+  box-shadow:
+    inset 3px 0 0 0 var(--accent-gold, #946800),
+    -1px 0 0 rgba(15, 23, 42, 0.15);
+  color: #f8fafc;
+}
+
+.ide-layout-wrapper[data-theme='light'] .right-panel-container,
+.ide-layout-wrapper[data-theme='light'] .right-panel-scroll {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  gap: 0;
+}
+
+.ide-layout-wrapper[data-theme='light'] .right-panel-section:not(.right-panel-section--oracle) {
+  margin: 12px;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  background: #0f172a;
+}
+
+.ide-layout-wrapper[data-theme='light'] .right-panel-section-title,
+.ide-layout-wrapper[data-theme='light'] .right-panel-empty p {
+  color: #f1f5f9;
+}
+
+.ide-layout-wrapper[data-theme='light'] .right-panel-close {
+  color: #94a3b8;
+}
+
+.ide-layout-wrapper[data-theme='light'] .right-panel-close:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Oracle section = flush instrument bay */
+.ide-layout-wrapper[data-theme='light'] .right-panel-section--oracle {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+.ide-layout-wrapper[data-theme='light'] .right-panel-section-header--oracle {
+  background: #0f172a;
+  border-bottom: 1px solid #334155;
+  padding: 0.55rem 0.85rem;
+}
+
+.ide-layout-wrapper[data-theme='light'] .right-panel-section-header--oracle .right-panel-section-title {
+  color: #e2e8f0;
+  letter-spacing: 0.14em;
+}
+
+.ide-layout-wrapper[data-theme='light'] .right-panel-section--oracle .search-panel--oracle,
+.ide-layout-wrapper[data-theme='light'] .right-panel-section--oracle .search-panel--rail {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.ide-layout-wrapper[data-theme='light'] .right-panel-section--oracle .oracle-shell,
+.ide-layout-wrapper[data-theme='light'] .right-panel-section--oracle .oracle-shell--compose,
+.ide-layout-wrapper[data-theme='light'] .search-panel--oracle[data-ide-theme='light'] .oracle-shell,
+.ide-layout-wrapper[data-theme='light'] .search-panel--oracle[data-ide-theme='light'] .oracle-shell--compose {
+  flex: 1;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  animation: none;
+  background: linear-gradient(180deg, #1e293b, #0f172a);
+  box-shadow: none;
+}
+
+.ide-layout-wrapper[data-theme='light'] .search-panel--oracle[data-ide-theme='light'] .oracle-chrome {
+  background: #0f172a;
+  border-bottom: 1px solid #334155;
+  color: #e2e8f0;
+}
+
+.ide-layout-wrapper[data-theme='light'] .search-panel--oracle[data-ide-theme='light'] .oracle-mode-btn--active {
+  color: #00e5ff;
+  box-shadow: inset 0 -2px 0 0 #00e5ff;
+  background: transparent;
+}
+
+.ide-layout-wrapper[data-theme='light'] .search-panel--oracle[data-ide-theme='light'] .oracle-query-input {
+  color: #f8fafc;
+  caret-color: #00e5ff;
+}
+
+.ide-layout-wrapper[data-theme='light'] .search-panel--oracle[data-ide-theme='light'] .oracle-query-input::placeholder {
+  color: #94a3b8;
+  opacity: 1;
+}
+
+.ide-layout-wrapper[data-theme='light'] .search-panel--oracle[data-ide-theme='light'] .oracle-signal-strip {
+  border-color: #334155;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Sidebar / mobile Oracle */
+.ide-layout-wrapper[data-theme='light'] .search-panel--oracle[data-ide-theme='light'].search-panel--sidebar,
+.ide-layout-wrapper[data-theme='light'] .ide-mobile-panel-stage .search-panel--oracle[data-ide-theme='light'] {
+  border: 1px solid #334155;
+  border-radius: 10px;
+  background: #1e293b;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+/* Floating Panels in Light Mode (Rhyme Diagram / Metrics / InfoBeam) */
+.ide-layout-wrapper[data-theme='light'] .floating-panel {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  border-radius: 10px;
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.16);
+  color: #0f172a;
+}
+
+.ide-layout-wrapper[data-theme='light'] .floating-panel-header {
+  background: #0f172a;
+  color: #ffffff;
+  border-bottom: 1px solid #1e293b;
+}
+
+.ide-layout-wrapper[data-theme='light'] .floating-panel-title {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.ide-layout-wrapper[data-theme='light'] .floating-panel-close {
+  color: #94a3b8;
+}
+
+.ide-layout-wrapper[data-theme='light'] .floating-panel-close:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Disabled controls */
+.ide-layout-wrapper[data-theme='light'] button:disabled,
+.ide-layout-wrapper[data-theme='light'] .ide-icon-btn:disabled {
+  color: #94a3b8 !important;
+  opacity: 0.6;
+  box-shadow: none !important;
+}
+
+/* Gold Accents */
+.ide-layout-wrapper[data-theme='light'] .chrome-gold,
+.ide-layout-wrapper[data-theme='light'] [data-chrome-gold] {
+  color: var(--accent-gold, #946800);
+}
+
+.ide-layout-wrapper[data-theme='light'] .theme-toggle-btn {
+  color: #0f172a;
+}
+
+.ide-layout-wrapper[data-theme='light'] .theme-toggle-btn:hover {
+  background: rgba(15, 23, 42, 0.08);
+  color: #0f172a;
+}

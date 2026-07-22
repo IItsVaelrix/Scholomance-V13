@@ -1,6 +1,6 @@
 import {
   FolderIcon,
-  SearchIcon,
+  AnalyzeIcon,
   ToolsIcon,
   SettingsIcon,
 } from "../../components/Icons.jsx";
@@ -20,7 +20,7 @@ import { useScrolls } from "../../hooks/useScrolls.jsx";
 import { useProgression } from "../../hooks/useProgression.jsx";
 import { useVerseSynthesis } from "../../hooks/useVerseSynthesis.js";
 import { usePredictor } from "../../hooks/usePredictor.jsx";
-import { getRitualPalette } from "../../data/schoolPalettes.js";
+import { getRitualPalette, ritualPaletteToCssVars } from "../../data/schoolPalettes.js";
 import { SCHOOLS, VOWEL_FAMILY_TO_SCHOOL, getSchoolsByUnlock } from "../../data/schools.js";
 import { normalizeVowelFamily } from "../../lib/phonology/vowelFamily.js";
 import { parseBooleanEnvFlag } from "../../hooks/useCODExPipeline.jsx";
@@ -190,20 +190,24 @@ export default function ReadPage() {
   const [pinnedLines, setPinnedLines] = useState([]);
 
   const handleIdeFocus = useCallback(() => {
-    if (isTruesight && !isEditable && !isEditing) {
+    // TrueSight needs live synthesis while typing. The old "EDIT while drafting"
+    // branch paused useVerseSynthesis (paused: ideMode === "EDIT"), which left
+    // the resonance gate stale — words stayed parchment-ink grey in both themes,
+    // and light mode made that look like TrueSight was fully broken.
+    if (isTruesight) {
       setIdeMode("TRUESIGHT");
       return;
     }
     setIdeMode("EDIT");
-  }, [isEditable, isEditing, isTruesight]);
+  }, [isTruesight]);
 
   const handleIdeBlur = useCallback(() => {
-    if (isTruesight && !isEditable && !isEditing) {
+    if (isTruesight) {
       setIdeMode("TRUESIGHT");
       return;
     }
     setIdeMode("NEUTRAL");
-  }, [isEditable, isEditing, isTruesight]);
+  }, [isTruesight]);
   
   const activeScroll = activeScrollId ? getScrollById(activeScrollId) : null;
 
@@ -324,7 +328,8 @@ export default function ReadPage() {
   } = useVerseSynthesis(truesightContent, {
     mode: analysisMode,
     school: selectedSchool,
-    paused: ideMode === "EDIT"
+    // Keep analyzing under TrueSight even if focus briefly flips to EDIT.
+    paused: ideMode === "EDIT" && !isTruesight,
   });
 
   // Fallbacks for legacy fields moving to AMP
@@ -338,7 +343,8 @@ export default function ReadPage() {
     computeFailed: songStatsComputeFailed,
   } = useSongStats(truesightContent, deepAnalysis);
 
-  // Word colour authority is wordTruesight (school colour) inside ScrollEditor;
+  // Word colour authority is resolveGatedTruesightPaint (backend resonance
+  // indices + token fields only) inside Lexical TruesightPlugin;
   // the adaptive palette only feeds the ambient blended-HSL animation intent.
   const {
     blendedHsl,
@@ -366,9 +372,11 @@ export default function ReadPage() {
       const next = !prev;
       updateSettings({ truesightEnabled: next });
       setHighlightedLines([]);
+      // Enabling TrueSight must leave EDIT — synthesis is paused in EDIT, so
+      // keeping that mode silently killed phonemic paint (esp. visible in light).
       setIdeMode((currMode) => {
-        if (currMode === "EDIT") return currMode;
-        return next ? "TRUESIGHT" : "NEUTRAL";
+        if (next) return "TRUESIGHT";
+        return currMode === "EDIT" ? "EDIT" : "NEUTRAL";
       });
       return next;
     });
@@ -501,7 +509,16 @@ export default function ReadPage() {
     ? `${scoreData.totalScore} Power`
     : `Ln ${cursorPos.line} · Col ${cursorPos.col}`;
 
-  const ritualPalette = getRitualPalette(selectedSchool);
+  // Same mechanism as Visual Skin: rebuild --ritual-* slots and inject on the
+  // layout wrapper so the WHOLE Read surface rethemes. School owns hue; sun/moon
+  // ThemeToggle owns dark/light polarity.
+  const ritualCssVars = useMemo(
+    () => ({
+      ...ritualPaletteToCssVars(getRitualPalette(selectedSchool, theme), theme),
+      '--ide-font-scale': fontScale,
+    }),
+    [selectedSchool, theme, fontScale],
+  );
   const activeSchoolLabel = SCHOOLS[selectedSchool]?.name || "Universal";
   const mobileVisionLabel = isTruesight ? "Truesight active" : "Ink view";
   const issueEditorDocumentIdentity = useCallback((label = "new") => {
@@ -930,7 +947,7 @@ export default function ReadPage() {
 
   const MobileTabIcon = ({ tabId }) => {
     if (tabId === "FILES") return <FolderIcon />;
-    if (tabId === "SEARCH") return <SearchIcon />;
+    if (tabId === "SEARCH") return <AnalyzeIcon />;
     if (tabId === "TOOLS") return <ToolsIcon />;
     if (tabId === "STATS") return <SettingsIcon />;
     return <span className="material-symbols-outlined">edit_note</span>;
@@ -1002,7 +1019,7 @@ export default function ReadPage() {
 
   const activeMobilePanel = mobileActiveTab === "EDITOR" ? null :
     mobileActiveTab === "FILES" ? <ScrollList scrolls={scrolls} activeScrollId={activeScrollId} onSelect={(id) => { handleSelectScroll(id); setMobileActiveTab("EDITOR"); }} onNewScroll={handleNewScroll} /> :
-    mobileActiveTab === "SEARCH" ? <SearchPanel seedWord={lexiconSeedWord} selectedSchool={selectedSchool} contextLookup={resolveLexiconContext} onJumpToLine={(line) => { editorRef.current?.jumpToLine?.(line); setMobileActiveTab("EDITOR"); }} /> :
+    mobileActiveTab === "SEARCH" ? <SearchPanel theme={theme} seedWord={lexiconSeedWord} selectedSchool={selectedSchool} contextLookup={resolveLexiconContext} onJumpToLine={(line) => { editorRef.current?.jumpToLine?.(line); setMobileActiveTab("EDITOR"); }} /> :
     mobileActiveTab === "TOOLS" ? <div className="ide-mobile-panel">{toolsBlock}</div> :
     <div className="ide-mobile-panel">{scoreBlock}</div>;
 
@@ -1126,7 +1143,11 @@ export default function ReadPage() {
   /* ── MOBILE RENDER ── */
   if (isMobileViewport) {
     return (
-      <div className="ide-layout-wrapper ide-layout-wrapper--mobile">
+      <div
+        className="ide-layout-wrapper ide-layout-wrapper--mobile"
+        data-theme={theme}
+        style={ritualCssVars}
+      >
         <TopBar
           title={mobileSurfaceTitle}
           onOpenSearch={() => setMobileActiveTab('ORACLE')}
@@ -1221,6 +1242,7 @@ export default function ReadPage() {
               transition={{ duration: 0.12, ease: 'easeOut' }}
             >
               <SearchPanel
+                theme={theme}
                 seedWord={lexiconSeedWord}
                 selectedSchool={selectedSchool}
                 contextLookup={resolveLexiconContext}
@@ -1293,22 +1315,9 @@ export default function ReadPage() {
   return (
     <div
       className={`ide-layout-wrapper${focusMode ? ' ide-layout-wrapper--focus' : ''}${compactMode ? ' ide-layout-wrapper--compact' : ''}`}
+      data-theme={theme}
       data-reduced-motion={reducedMotionActive ? 'true' : 'false'}
-      style={{
-        '--ritual-abyss': ritualPalette.abyss,
-        '--ritual-panel': ritualPalette.panel,
-        '--ritual-parchment': ritualPalette.parchment,
-        '--ritual-ink': ritualPalette.ink,
-        '--ritual-primary': ritualPalette.primary,
-        '--ritual-secondary': ritualPalette.secondary,
-        '--ritual-tertiary': ritualPalette.tertiary,
-        '--ritual-border': ritualPalette.border,
-        '--ritual-glow': ritualPalette.glow,
-        '--ritual-aurora-start': ritualPalette.aurora_start,
-        '--ritual-aurora-end': ritualPalette.aurora_end,
-        '--active-school-glow': ritualPalette.glow_40,
-        '--ide-font-scale': fontScale,
-      }}
+      style={ritualCssVars}
     >
       <TopBar
         title={activeScroll?.title || (isEditable ? "New Scroll" : "Scholomance IDE")}
@@ -1341,13 +1350,15 @@ export default function ReadPage() {
           >
             <div className="activity-bar-content">
               {['FILES', 'SEARCH', 'TOOLS'].map((tab) => {
-                const Icon = tab === 'FILES' ? FolderIcon : tab === 'SEARCH' ? SearchIcon : ToolsIcon;
+                const Icon = tab === 'FILES' ? FolderIcon : tab === 'SEARCH' ? AnalyzeIcon : ToolsIcon;
+                const title = tab === 'FILES' ? 'Explorer' : tab === 'SEARCH' ? 'Leximancy' : 'Hex Tools';
                 return (
                   <button
                     key={tab}
                     className={`activity-item icon-only ${sidebarTab === tab ? 'active' : ''}`}
                     onClick={() => setSidebarTab(tab)}
-                    title={tab}
+                    title={title}
+                    aria-label={title}
                   >
                     <Icon size={28} />
                   </button>
@@ -1377,7 +1388,7 @@ export default function ReadPage() {
             <div className="sidebar-combined-content">
               {/* Header labels area */}
               <div className="sidebar-labels-header">
-                {['EXPLORER', 'ORACLE', 'HEX TOOLS'].map((label, i) => {
+                {['EXPLORER', 'LEXIMANCY', 'HEX TOOLS'].map((label, i) => {
                   const tabs = ['FILES', 'SEARCH', 'TOOLS'];
                   return (
                     <button
@@ -1404,15 +1415,17 @@ export default function ReadPage() {
                   />
                 )}
                 {sidebarTab === 'SEARCH' && (
-                  <SearchPanel
-                    seedWord={lexiconSeedWord}
-                    selectedSchool={selectedSchool}
-                    contextLookup={resolveLexiconContext}
-                    onJumpToLine={(line) => {
-                      editorRef.current?.jumpToLine?.(line);
-                    }}
-                    variant="sidebar"
-                  />
+                  <div className="sidebar-leximancy">
+                    <AnalyzePanel
+                      initialQuery={currentLineText?.split(/\s+/)[0] || ''}
+                      onCraftAction={handleAnalyzeCraft}
+                      selection={editorSelectionText}
+                      currentLineText={currentLineText}
+                      scrollLines={scrollLines}
+                      currentLineIndex={Math.max(0, cursorPos.line - 1)}
+                      documentContext={truesightContent}
+                    />
+                  </div>
                 )}
                 {sidebarTab === 'TOOLS' && (
                   <div className="sidebar-tools">
@@ -1596,8 +1609,8 @@ export default function ReadPage() {
                     )}
 
                     {showOraclePanel && (
-                      <div className="right-panel-section">
-                        <div className="right-panel-section-header">
+                      <div className="right-panel-section right-panel-section--oracle">
+                        <div className="right-panel-section-header right-panel-section-header--oracle">
                           <span className="right-panel-section-title">Lexicon Oracle</span>
                           <button
                             type="button"
@@ -1607,6 +1620,7 @@ export default function ReadPage() {
                           >×</button>
                         </div>
                         <SearchPanel
+                          theme={theme}
                           seedWord={lexiconSeedWord}
                           selectedSchool={selectedSchool}
                           contextLookup={resolveLexiconContext}
@@ -1727,6 +1741,7 @@ export default function ReadPage() {
           className="oracle-floating-panel"
         >
           <SearchPanel
+            theme={theme}
             seedWord={lexiconSeedWord}
             selectedSchool={selectedSchool}
             contextLookup={resolveLexiconContext}

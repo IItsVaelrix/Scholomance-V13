@@ -4,7 +4,7 @@ import { TextNode, $isTextNode, $createTextNode, $getRoot, $nodesOfType } from '
 import { $createTruesightWordNode, $isTruesightWordNode, TruesightWordNode } from './TruesightNode';
 import { WORD_TOKEN_REGEX, WORD_PATTERN } from '../../lib/wordTokenization.js';
 import { computeCharStartFromLexical, resolveTokenDataAtPosition } from './charStart.js';
-import { wordTruesight, tokenTruesight } from '../../pages/Visualiser/truesightColor';
+import { resolveGatedTruesightPaint } from '../truesight/resolveGatedTruesightPaint.js';
 import { decodeBytecode } from '../../lib/truesight/bytecodeRenderer.js';
 
 // WORD_TOKEN_REGEX is anchored (^...$) - correct for "is this node exactly one
@@ -18,15 +18,6 @@ import { decodeBytecode } from '../../lib/truesight/bytecodeRenderer.js';
 // fresh here rather than shared: a global regex carries lastIndex, and a shared
 // one would skip words between calls.
 const WORD_MATCH_REGEX_GLOBAL = new RegExp(WORD_PATTERN, 'g');
-
-// The tiered resonance gate is a Map<charStart, 'rhyme' | 'assonance'>.
-// 'rhyme' = full school color + glow (the historical active tier).
-// 'assonance' = soft school tint, no glow (the quiet vowel-echo tier).
-// Build the per-word class for a resolved tier.
-function tierColorClass(school, tier) {
-  const tierClass = tier === 'assonance' ? 'grimoire-word--assonant' : 'grimoire-word--active';
-  return `grimoire-word--${school} ${tierClass}`;
-}
 
 /**
  * Above this many moved positions the per-node range scan is more expensive than
@@ -138,31 +129,16 @@ export default function TruesightPlugin({ analyzedDocument: _analyzedDocument, i
 
           const tokenData = lookupTokenData(textNode, textContent);
 
-          const isGated = resonantCharStarts instanceof Map;
-          const tier = isGated ? (resonantCharStarts.get(globalCharStart) || null) : 'rhyme';
-
-          // Compute only the analysis we actually use. wordTruesight and
-          // tokenTruesight each run a G2P pass; the previous code ran BOTH per
-          // word and discarded one. Gated+resonant uses the token analysis;
-          // every other case uses the word analysis.
-          let truesight;
-          let shouldColor;
-          if (isGated) {
-            shouldColor = tier !== null;
-            truesight = shouldColor ? tokenTruesight(tokenData || { token: textContent }, textContent) : wordTruesight(textContent);
-          } else {
-            truesight = wordTruesight(textContent);
-            shouldColor = Boolean(truesight);
-          }
-
-          const color = (!isQuarantined && shouldColor && truesight?.color) ? truesight.color : null;
-
-          let truesightClass = '';
-          if (shouldColor) {
-            truesightClass = tierColorClass(truesight.school, tier);
-          } else if (truesight) {
-            truesightClass = 'grimoire-word--grey';
-          }
+          // COLOR_DRAGON: backend resonance indices only — never client G2P /
+          // frontend vowel-family invent when the gate is authoritative.
+          const paint = resolveGatedTruesightPaint({
+            resonantCharStarts,
+            charStart: globalCharStart,
+            tokenData,
+            word: textContent,
+            isQuarantined,
+          });
+          const { shouldColor, tier, color, truesightClass } = paint;
 
           if (textNode.__color !== color || textNode.__truesightClass !== truesightClass) {
             const bytecode = tokenData?.bytecode;
@@ -217,43 +193,22 @@ export default function TruesightPlugin({ analyzedDocument: _analyzedDocument, i
         return WORD_TOKEN_REGEX.test(piece.getTextContent());
       });
 
-      const gateIsActive = resonantCharStarts instanceof Map;
-
       for (const piece of wordPieces) {
         const word = piece.getTextContent();
         const globalCharStart = computeCharStartFromLexical(piece);
         const tokenData = lookupTokenData(piece, word);
-        const tier = gateIsActive ? (resonantCharStarts.get(globalCharStart) || null) : 'rhyme';
 
-        // Compute only the analysis we actually use (see the active branch).
-        let truesight;
-        let shouldColor;
-        if (gateIsActive) {
-          shouldColor = tier !== null;
-          truesight = shouldColor ? tokenTruesight(tokenData || { token: word }, word) : wordTruesight(word);
-        } else {
-          truesight = wordTruesight(word);
-          shouldColor = Boolean(truesight);
-        }
-
-        const color = (!isQuarantined && shouldColor && truesight?.color) ? truesight.color : null;
-
-        // Class must match the active branch's classification so the freshly
-        // created TruesightWordNode is visually correct WITHOUT requiring the
-        // active branch to re-fire on it. Lexical's `replace` does not
-        // auto-mark the new node dirty, so the active branch is not guaranteed
-        // to run after a split. The "annotation per line instead of per word"
-        // regression was non-resonant words rendering with only the base
-        // `grimoire-word` class (no --grey, no --active) because the regular
-        // branch omitted the --grey fallback. This guard makes the regular
-        // branch self-sufficient. See tests/qa/features/annotation-per-line-probe.test.jsx
-        // and tests/qa/features/charStart-convention.test.jsx for the guards.
-        let truesightClass = '';
-        if (shouldColor) {
-          truesightClass = tierColorClass(truesight.school, tier);
-        } else if (truesight) {
-          truesightClass = 'grimoire-word--grey';
-        }
+        // COLOR_DRAGON: same paint authority as the active branch / Visualiser.
+        // Class is self-sufficient so a split does not need the active branch
+        // to re-fire (annotation-per-line / charStart-convention guards).
+        const paint = resolveGatedTruesightPaint({
+          resonantCharStarts,
+          charStart: globalCharStart,
+          tokenData,
+          word,
+          isQuarantined,
+        });
+        const { shouldColor, tier, color, truesightClass } = paint;
 
         const bytecode = tokenData?.bytecode;
         // The animated glow is the rhyme tier's signal; the assonance tier shows
