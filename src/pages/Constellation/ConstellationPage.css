@@ -58,3 +58,107 @@
   font-family: "Cinzel", "Palatino Linotype", Palatino, serif;
   letter-spacing: 0.08em;
 }
+
+.constellation-invitation {
+  margin: 0.75rem 0 1.5rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.05rem;
+  font-style: italic;
+  color: rgba(191, 227, 255, 0.82);
+}
+
+.constellation-search {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.constellation-search__label {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  color: var(--cos-arc);
+}
+
+.constellation-search__field {
+  width: 100%;
+  min-height: 5.5rem;
+  max-height: 9rem;
+  padding: 0.85rem 1rem;
+  resize: vertical;
+  border: 1px solid rgba(123, 108, 255, 0.35);
+  border-radius: 0.35rem;
+  background: rgba(7, 7, 14, 0.72);
+  color: var(--cos-arc);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.constellation-search__field::placeholder {
+  color: rgba(191, 227, 255, 0.45);
+  font-style: italic;
+}
+
+.constellation-search__field:focus {
+  outline: 1px solid rgba(123, 108, 255, 0.55);
+  outline-offset: 2px;
+}
+
+.constellation-search__submit {
+  align-self: flex-end;
+  padding: 0.45rem 1.1rem;
+  border: 1px solid rgba(123, 108, 255, 0.4);
+  border-radius: 0.25rem;
+  background: rgba(123, 108, 255, 0.12);
+  color: rgba(191, 227, 255, 0.78);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.constellation-search__submit:hover {
+  background: rgba(123, 108, 255, 0.22);
+  color: var(--cos-arc);
+}
+
+.constellation-search__refusal {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: rgba(212, 175, 55, 0.85);
+}
+
+.constellation-stage--submitted .constellation-brand {
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  margin-bottom: 0.25rem;
+}
+
+.constellation-stage--submitted .constellation-search {
+  max-width: none;
+  margin: 0;
+  padding: 0 1.5rem 0.75rem;
+}
+
+.constellation-stage--submitted .constellation-search__field {
+  min-height: 2.5rem;
+  max-height: 4rem;
+}
+
+#constellation-result-shell {
+  padding: 1.5rem;
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+#constellation-result-shell h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--cos-arc);
+}
