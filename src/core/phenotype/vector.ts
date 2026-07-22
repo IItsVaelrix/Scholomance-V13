@@ -40,7 +40,7 @@ export function vectorToBlocks(
   confirmed = true,
 ): string[] {
   const versionByte = confirmed ? CONFIRMED_VERSION_BYTE : PREDICTED_VERSION_BYTE;
-  const blocks: string[] = new Array(BLOCK_COUNT);
+  const blocks: string[] = new Array(BLOCK_COUNT).fill(UNMEASURED_BLOCK);
 
   blocks[0] = `${versionByte}${profileId.toUpperCase()}`;
 
@@ -48,9 +48,6 @@ export function vectorToBlocks(
     const term = vector[axis];
     blocks[AXIS_SLOTS[axis]] = term === null || term === undefined ? UNMEASURED_BLOCK : blockFor(term);
   }
-
-  // Fill slot 7 (motion, reserved for future) with UNMEASURED_BLOCK in v1
-  blocks[7] = UNMEASURED_BLOCK;
 
   return blocks;
 }
@@ -61,9 +58,10 @@ export function vectorToSCD64(
   confirmed = true,
 ): string {
   const blocks = vectorToBlocks(vector, profileId, confirmed);
-  // Ensure exactly 8 blocks for 64-character SCD64
-  while (blocks.length < BLOCK_COUNT) {
-    blocks.push(UNMEASURED_BLOCK);
+  if (blocks.length !== BLOCK_COUNT) {
+    throw new Error(
+      `[phenotype] vectorToBlocks returned ${blocks.length} blocks, expected ${BLOCK_COUNT}`,
+    );
   }
   return blocks.join('');
 }

@@ -101,4 +101,24 @@ describe('vectorToBlocks', () => {
   it('reserves slot 7 for motion and leaves it unmeasured in v1', () => {
     expect(vectorToBlocks(FULL, PROFILE)[7]).toBe(UNMEASURED_BLOCK);
   });
+
+  it('no real term in the live vocabulary collides with the sentinel or with another term', () => {
+    const VOCABULARY = [
+      'fail', 'ui', 'body', 'high',
+      'base', 'above', 'overlay', 'system',
+      'glyph', 'control', 'panel', 'region', 'surface',
+      'neutral', 'off-palette', 'ember', 'verdant', 'abyss',
+      'rect', 'round', 'pill', 'circle', 'notched',
+      'sparse', 'measured', 'dense', 'packed',
+    ];
+
+    const blocks = VOCABULARY.map(
+      (term) => vectorToBlocks({ ...FULL, luminance: term }, PROFILE)[1],
+    );
+
+    // Every term must produce a distinct block...
+    expect(new Set(blocks).size).toBe(VOCABULARY.length);
+    // ...and none may collide with the unmeasured sentinel.
+    expect(blocks).not.toContain(UNMEASURED_BLOCK);
+  });
 });
