@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ISOLATION, LIVE_AXES } from '../../../src/core/phenotype/isolation';
+import { AXIS_SLOTS, ISOLATION, LIVE_AXES } from '../../../src/core/phenotype/isolation';
 import {
   UNMEASURED_BLOCK,
   vectorToBlocks,
@@ -89,8 +89,13 @@ describe('vectorToBlocks', () => {
   });
 
   it('gives a different block to the unmeasured sentinel than to any real term', () => {
-    const measured = vectorToBlocks(FULL, PROFILE);
-    expect(measured).not.toContain(UNMEASURED_BLOCK);
+    // Scoped to the LIVE axes only. Slot 7 (motion) is legitimately unmeasured
+    // in v1, so asserting over the whole array would contradict the next test.
+    // The property under test is that no real term COLLIDES with the sentinel.
+    const blocks = vectorToBlocks(FULL, PROFILE);
+    const liveBlocks = LIVE_AXES.map((axis) => blocks[AXIS_SLOTS[axis]]);
+    expect(liveBlocks).toHaveLength(6);
+    expect(liveBlocks).not.toContain(UNMEASURED_BLOCK);
   });
 
   it('reserves slot 7 for motion and leaves it unmeasured in v1', () => {
