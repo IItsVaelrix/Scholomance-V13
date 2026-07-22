@@ -142,3 +142,74 @@ describe('quantizeShape', () => {
     expect(quantizeShape({ width: 0, height: 100, borderRadiusPx: 0, clipPath: 'none' })).toBeNull();
   });
 });
+
+import {
+  clippedRegionArea,
+  countInkPixels,
+  quantizeDensity,
+} from '../../../src/core/phenotype/quantize/density';
+
+describe('clippedRegionArea — the denominator that decouples density from shape', () => {
+  it('is width*height for a square-cornered rect', () => {
+    expect(clippedRegionArea({ width: 200, height: 100, borderRadiusPx: 0 })).toBeCloseTo(20000, 6);
+  });
+
+  it('gives pi*r^2 for a full circle', () => {
+    // 100x100 with radius 50 is a circle: area = pi * 50^2 = 7853.98
+    expect(clippedRegionArea({ width: 100, height: 100, borderRadiusPx: 50 })).toBeCloseTo(
+      Math.PI * 2500,
+      3,
+    );
+  });
+
+  it('removes exactly the four corner offcuts for a rounded rect', () => {
+    // w*h - (4 - pi) * r^2
+    const expected = 200 * 100 - (4 - Math.PI) * 20 * 20;
+    expect(clippedRegionArea({ width: 200, height: 100, borderRadiusPx: 20 })).toBeCloseTo(expected, 6);
+  });
+
+  it('clamps a radius larger than half the short side', () => {
+    // Radius 400 on a 100-tall element cannot exceed 50.
+    expect(clippedRegionArea({ width: 100, height: 100, borderRadiusPx: 400 })).toBeCloseTo(
+      Math.PI * 2500,
+      3,
+    );
+  });
+});
+
+describe('countInkPixels', () => {
+  const BG = { r: 0, g: 0, b: 0 };
+
+  it('counts pixels differing from the background beyond the threshold', () => {
+    // 4 RGB pixels: black, black, white, white.
+    const raw = Buffer.from([0, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255]);
+    expect(countInkPixels(raw, 3, BG)).toBe(2);
+  });
+
+  it('ignores sub-threshold noise so anti-aliasing does not inflate density', () => {
+    const raw = Buffer.from([2, 2, 2, 0, 0, 0]);
+    expect(countInkPixels(raw, 3, BG)).toBe(0);
+  });
+
+  it('handles a 4-channel RGBA buffer by skipping alpha', () => {
+    const raw = Buffer.from([255, 255, 255, 255, 0, 0, 0, 255]);
+    expect(countInkPixels(raw, 4, BG)).toBe(1);
+  });
+});
+
+describe('quantizeDensity', () => {
+  it('tiers by ink ratio', () => {
+    expect(quantizeDensity(50, 10000)).toBe('sparse');    // 0.005
+    expect(quantizeDensity(1500, 10000)).toBe('measured'); // 0.15
+    expect(quantizeDensity(4500, 10000)).toBe('dense');    // 0.45
+    expect(quantizeDensity(9000, 10000)).toBe('packed');   // 0.90
+  });
+
+  it('is scale-invariant — same ratio at 4x the area gives the same tier', () => {
+    expect(quantizeDensity(1500, 10000)).toBe(quantizeDensity(6000, 40000));
+  });
+
+  it('returns null for a zero clipped area rather than dividing by zero', () => {
+    expect(quantizeDensity(10, 0)).toBeNull();
+  });
+});
