@@ -181,9 +181,12 @@ Create `src/core/phenotype/color.ts`:
  * short and the project has no colour library.
  *
  * Slot 1 (luminance) and slot 4 (chromaticity) must be orthogonal, which is
- * why chromaticity is keyed on the LCh HUE ANGLE and not on raw a*/b*: a* and
- * b* both move substantially under a tint or shade of the same hue, which
- * would couple slot 4 to slot 1. See spec §3.3.
+ * why chromaticity is keyed on the LCh HUE ANGLE and not on the raw a-star and
+ * b-star components: both move substantially under a tint or shade of the same
+ * hue, which would couple slot 4 to slot 1. See spec §3.3.
+ *
+ * (Written "a-star" deliberately — the literal sequence would close this
+ * comment block early.)
  */
 
 export type Rgb = { r: number; g: number; b: number };
@@ -421,8 +424,9 @@ Create `src/core/phenotype/quantize/chromaticity.ts`:
  *   normalization: nearest palette role within a hue tolerance
  *   pausedState:   n/a (static property)
  *
- * Hue angle, not a*/b*: a* and b* both move substantially under a tint or
- * shade of the same hue, which would couple this axis to slot 1. Below the
+ * Hue angle, not the raw a-star and b-star components: both move substantially
+ * under a tint or shade of the same hue, which would couple this axis to
+ * slot 1 (the literal sequence would close this comment block early). Below the
  * chroma floor the hue angle is numerically unstable, so greys quantize to
  * `neutral` rather than to a noise-selected role (Law 6). See spec §3.3.
  */
@@ -1142,7 +1146,7 @@ function blockFor(term: string): string {
  * because no term is ever this string — unmeasured must never be mistakable
  * for measured-and-passing (spec §5.5).
  */
-export const UNMEASURED_BLOCK = blockFor(' phenotype:unmeasured');
+export const UNMEASURED_BLOCK = blockFor('__phenotype:unmeasured__');
 
 /** Eight blocks: slot 0 is `versionByte + profileId`, slots 1..7 are axis terms. */
 export function vectorToBlocks(
