@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest';
 import { raritySpectral } from '../../../src/pages/Constellation/skyChart.js';
 import { heroFigure } from '../../../src/pages/Constellation/skyChart.js';
 import { heroStarGlyph } from '../../../src/pages/Constellation/skyChart.js';
+import { SPARK_PATH } from '../../../src/pages/Constellation/skyChart.js';
 
 describe('raritySpectral — OBAFGKM ramp keyed to the backend rarity band', () => {
   it('maps a rare (high-band) word to a hot blue class and a common one to cool red', () => {
@@ -150,6 +151,9 @@ describe('heroStarGlyph — SCDL vector vocabulary with SPARK_PATH fallback', ()
       expect(Array.isArray(glyph.fills)).toBe(true);
       expect(glyph.fills.length).toBeGreaterThan(0);
       expect(typeof glyph.fills[0].d).toBe('string'); // a real SVG path, not a raster blit
+      expect(glyph.fills[0].d.length).toBeGreaterThan(0);
+      expect(glyph.fills[0].d).not.toBe(SPARK_PATH); // proves the REAL compiled path is surfaced, not the fallback
+      expect(glyph.fills[0].d.trim().startsWith('M')).toBe(true); // a real SVG path command
     } else {
       expect(glyph).toBeNull(); // callers fall back to SPARK_PATH
     }
