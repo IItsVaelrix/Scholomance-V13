@@ -57,5 +57,13 @@ export {
   ORACLE_TERMINAL_KIND,
   registerOracleTerminalMigration,
 } from './migrated/OracleTerminal';
+export {
+  createConstellationResultScene,
+  createConstellationResultDefinition,
+  CONSTELLATION_RESULT_ID,
+  CONSTELLATION_RESULT_KIND,
+  CONSTELLATION_RESULT_VERSION,
+  RESULT_PARTS,
+} from './migrated/ConstellationResult';
 export { validateComposeScene } from './validate/scene';
 export { renderSceneToDomSpec, type DomNodeSpec } from './render/dom-adapter';

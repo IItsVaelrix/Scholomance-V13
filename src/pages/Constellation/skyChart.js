@@ -137,3 +137,59 @@ export function twinkleFor(seed, index) {
 export function lodestarIndex(seed) {
   return seed % ANCHOR_STARS.length;
 }
+
+/* ─── Result-plate charts (Compose result scene) ────────────────────────
+   The answer plate draws two of its own figures. Both are pure functions of
+   the packet — no seed, no clock — so the same answer always draws the same
+   figure (Law 6). They live here because this module is the chamber's home
+   for deterministic chart geometry. */
+
+/**
+ * Lay a word's phonemes out as a shallow sky-arc: the sound of the query drawn
+ * as a constellation figure. Nodes sit on a sine arch in a 0..100 × 0..34 box;
+ * consecutive phonemes are edged so the arc reads as one figure, not a scatter.
+ *
+ * ARPAbet vowels carry a stress digit (`AY1`, `UW1`, `AH0`); a trailing 1 or 2
+ * marks primary/secondary stress, so stressed nodes become gold sparks and the
+ * unstressed remain quiet amethyst dots. Consonants never carry a digit and are
+ * always dots. Pure + deterministic.
+ *
+ * @param {string[]} phonemes
+ * @returns {{ nodes: Array<{ x: number, y: number, phoneme: string, stressed: boolean }>, edges: Array<[number, number]> }}
+ */
+export function phonemeArc(phonemes) {
+  const list = Array.isArray(phonemes) ? phonemes : [];
+  const n = list.length;
+  const nodes = list.map((phoneme, i) => {
+    const t = n === 1 ? 0.5 : i / (n - 1);
+    return {
+      x: 6 + t * 88,
+      y: 26 - Math.sin(Math.PI * t) * 15,
+      phoneme: String(phoneme),
+      stressed: /[12]$/.test(String(phoneme)),
+    };
+  });
+  const edges = [];
+  for (let i = 0; i + 1 < n; i += 1) edges.push([i, i + 1]);
+  return { nodes, edges };
+}
+
+/**
+ * Per-plate reveal timing for the composed answer plate. The delay is derived
+ * from the page bytecode (never a clock), so the same answer always rises the
+ * same way — and plates enter in a gentle cascade rather than all at once.
+ * Returns plain seconds; the caller gates on reduced motion.
+ *
+ * @param {string} bytecode
+ * @param {number} plateIndex
+ * @returns {{ delaySec: string }}
+ */
+export function plateRevealFor(bytecode, plateIndex) {
+  const seed = fnv1a32(bytecode || 'COS-RESULT-v1');
+  // Base step (0.35s) dominates the jitter band ([0, 0.15s)) so the cascade is
+  // PROVABLY strictly increasing in plate order — plates can never enter out of
+  // sequence regardless of the seed. Deterministic per bytecode (Law 6).
+  const jitter = seededUnit(seed, plateIndex + 401) * 0.15;
+  const delay = plateIndex * 0.35 + jitter;
+  return { delaySec: delay.toFixed(2) };
+}

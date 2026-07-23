@@ -43,7 +43,7 @@ export default function ConstellationPage() {
           defaultValue={submittedQuery ?? ''}
           reducedMotion={reducedMotion}
         />
-        {packet != null ? <ConstellationResultShell packet={packet} /> : null}
+        {packet != null ? <ConstellationResultShell packet={packet} reducedMotion={reducedMotion} /> : null}
       </div>
     </div>
   );

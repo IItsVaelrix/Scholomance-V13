@@ -550,7 +550,8 @@
   .constellation-search--breathe .constellation-search__ring,
   .constellation-sky--animate .constellation-sky__star,
   .constellation-sky--animate .constellation-sky__nebula,
-  .constellation-sky--animate .constellation-sky__dust {
+  .constellation-sky--animate .constellation-sky__dust,
+  .constellation-stage--animate .constellation-result-shell--composed .constellation-result-plate {
     animation: none;
   }
 }
@@ -644,4 +645,156 @@
   font-size: 0.78rem;
   opacity: 0.75;
   font-style: italic;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   Composed answer plate (ConstellationResult scene)
+   The plate is the Compose-gated presentation: each channel is a named plate
+   tagged with its anatomy part. The layout below mirrors the scene's declared
+   intents — a single column that opens into a two-field spread (meaning +
+   sound) on wide viewports, exactly as `result-field-grid` specifies.
+   Gold is still the rare "answer": it appears only on the lodestar spark, the
+   evidenced verdict, and the seal. Everything else is amethyst hairline + ink.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.constellation-result-shell--composed {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  column-gap: 2.5rem;
+}
+/* Everything spans the full width except the two analysis fields… */
+.constellation-result-shell--composed > * { grid-column: 1 / -1; }
+/* …which flow into the declared field grid (side by side when there's room). */
+.constellation-result-shell--composed > [data-compose-part="meaning-field"],
+.constellation-result-shell--composed > [data-compose-part="sound-field"] { grid-column: auto; }
+
+.constellation-result-plate { padding: 2rem 0 1.5rem; }
+.constellation-result-plate + .constellation-result-plate { border-top: 1px solid var(--cos-hair); }
+
+/* Overline headings: small-caps identity with a gold roman-numeral counter.
+   The counter is reset on the shell (counter-reset: cos-sec), same as the
+   plain sections, so numbering continues across whichever shell renders. */
+.constellation-result-plate__overline {
+  counter-increment: cos-sec;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  margin: 0 0 1rem;
+  font-family: var(--cos-body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--cos-ink-dim);
+}
+.constellation-result-plate__overline::before {
+  content: counter(cos-sec, upper-roman);
+  font-family: var(--cos-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: var(--cos-gold);
+  border: 1px solid rgba(232, 201, 106, 0.35);
+  border-radius: 999px;
+  padding: 0.05rem 0.55rem;
+  line-height: 1.4;
+}
+
+/* ── Masthead: the query as asked ── */
+.constellation-result-masthead-query {
+  margin: 0.35rem 0 0.9rem;
+  font-family: var(--cos-display);
+  font-weight: 600;
+  font-size: clamp(2rem, 5.5vw, 3.4rem);
+  line-height: 1.06;
+  letter-spacing: 0.01em;
+  color: #f2f5ff;
+  text-shadow: 0 0 22px rgba(139, 124, 255, 0.3), 0 0 2px rgba(207, 230, 255, 0.45);
+}
+.constellation-result-masthead-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.25rem;
+}
+.constellation-result-masthead-chip {
+  font-family: var(--cos-body);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--cos-hair);
+  background: rgba(139, 124, 255, 0.07);
+  color: var(--cos-ink-dim);
+}
+.constellation-result-masthead-chip--intent {
+  border-color: rgba(232, 201, 106, 0.3);
+  background: rgba(232, 201, 106, 0.06);
+  color: rgba(232, 201, 106, 0.9);
+}
+
+/* ── Phoneme arc: the sound of the query drawn as a constellation figure ── */
+.constellation-result-arc {
+  display: block;
+  width: 100%;
+  max-width: 30rem;
+  height: 5.5rem;
+  margin: 1rem 0 0.25rem;
+}
+.constellation-result-arc__edge {
+  stroke: var(--cos-amethyst);
+  stroke-opacity: 0.28;
+  stroke-width: 0.3;
+  stroke-linecap: round;
+}
+.constellation-result-arc__node { fill: var(--cos-amethyst); opacity: 0.85; }
+.constellation-result-arc__spark {
+  fill: var(--cos-gold);
+  filter: drop-shadow(0 0 1.5px rgba(232, 201, 106, 0.8));
+}
+
+/* ── Verdict: the one line that says whether the pick was earned ── */
+.constellation-result-verdict-line {
+  margin: 0;
+  font-family: var(--cos-body);
+  font-size: 1.05rem;
+  color: var(--cos-ink);
+}
+.constellation-result-verdict-mark {
+  color: var(--cos-gold);
+  text-shadow: 0 0 8px rgba(232, 201, 106, 0.7);
+  margin-right: 0.35rem;
+}
+.constellation-result-verdict-sub {
+  margin: 0.4rem 0 0;
+  font-family: var(--cos-body);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--cos-ink-dim);
+}
+
+/* ── Provenance seal ── */
+.constellation-result-seal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.75rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid rgba(232, 201, 106, 0.3);
+  border-radius: 0.4rem;
+  background: rgba(232, 201, 106, 0.05);
+}
+.constellation-result-seal__glyph { color: var(--cos-gold); }
+
+/* ── Bytecode-seeded reveal cascade (Law 6: delays come from the page
+      bytecode via plateRevealFor, never a clock). Runs only when the stage
+      is animating; reduced motion disables it below. ── */
+@keyframes cos-plate-reveal {
+  from { opacity: 0; transform: translateY(0.8rem); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.constellation-stage--animate .constellation-result-shell--composed .constellation-result-plate {
+  animation: cos-plate-reveal 480ms ease-out both;
 }
