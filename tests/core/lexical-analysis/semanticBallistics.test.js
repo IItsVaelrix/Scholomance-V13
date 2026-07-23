@@ -21,8 +21,8 @@ describe('semantic ballistics', () => {
     expect(first.senses[0].semanticScore).toBeGreaterThan(0.5);
     expect(first.senses[0].bucketIds).toHaveLength(4);
     expect(first.embedding).toMatchObject({
-      kind: 'phonosemantic_mock',
-      version: 'tq-js-v1',
+      kind: 'phonotopographic',
+      version: 'tq-phoneme-v1',
       dimensions: 256,
     });
   });
@@ -42,5 +42,13 @@ describe('semantic ballistics', () => {
       { ...createBallisticSignature('a cutting tool'), version: 'unknown' },
     );
     expect(unknown.degradation.code).toBe('embedding_metadata_mismatch');
+  });
+
+  it('produces phonotopographic signatures (not character-level mock)', () => {
+    const sig = createBallisticSignature('the bright wound of morning');
+    expect(sig.kind).toBe('phonotopographic');
+    expect(sig.version).toBe('tq-phoneme-v1');
+    expect(sig.data).toBeInstanceOf(Uint8Array);
+    expect(sig.data.length).toBe(128); // 256 dims / 2 (4-bit packing)
   });
 });
