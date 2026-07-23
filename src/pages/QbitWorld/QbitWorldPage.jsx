@@ -7,7 +7,7 @@ import {
   harvestFaceResource,
   QBIT_WORLD_PRESETS,
   MATERIAL_NAMES,
-} from '../../../codex/core/pixelbrain/qbit-world-game-loop.js';
+} from '../../lib/codex/pixelbrain.js';
 import './QbitWorldPage.css';
 
 const MATERIAL_COLORS = {

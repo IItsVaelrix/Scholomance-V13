@@ -23,10 +23,10 @@ import { CHROMA_CHEFS } from "../color/chroma.bytecode.js";
 import { auditTokenWeights } from "../../../tokenization/tokenWeightError.js";
 import { combineTokenWeights } from "../../../tokenization/tokenWeightSchema.js";
 // The canonical position-bound text identity used by the Lexical editor's
-// resolver (resolveTokenDataAtPosition). charStart.js is framework-agnostic
-// (no react/lexical imports), so importing the format keeps producer and
-// consumer on ONE definition instead of a drifting duplicate string.
-import { buildIdentityKey } from "../../../../../src/lib/lexical/charStart.js";
+// resolver (resolveTokenDataAtPosition). Lives in codex/core so the vacuum
+// layer contract is preserved (no src/ imports from codex/core — LING-0F03).
+// src/lib/lexical/charStart.js re-exports from here.
+import { buildIdentityKey } from "./identityKey.js";
 
 /**
  * Executes a total linguistic synthesis of the given text.

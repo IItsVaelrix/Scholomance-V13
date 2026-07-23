@@ -76,6 +76,8 @@
   position: relative;
   z-index: 1;
   isolation: isolate;
+  /* Expand 200px to the right of the grid cell; left edge stays anchored */
+  width: calc(100% + 200px);
 }
 
 @media (max-width: 900px) {
@@ -99,6 +101,8 @@
     height: min(56vh, 32rem);
     max-height: min(56vh, 32rem);
     min-height: 0;
+    /* Desktop widens 200px to the right; on mobile (single-column) reset to cell width */
+    width: 100%;
   }
 }
 
@@ -190,16 +194,41 @@
   }
 }
 
-/* Static moon: a cold witness above the scrying chamber */
-.portal-moon {
+/* Static moon: a cold witness above the scrying chamber.
+   Positioning lives on the wrap; the pulsing glow is a separate compositor-only
+   layer (.portal-moon-glow). The body itself never repaints — its old
+   box-shadow keyframe animation was a per-frame repaint tax on every frame
+   the page renders. */
+.portal-moon-wrap {
   position: absolute;
   top: clamp(24px, 6vh, 68px);
   right: clamp(24px, 7vw, 96px);
   width: clamp(82px, 12vmin, 148px);
   aspect-ratio: 1;
-  border-radius: 50%;
   pointer-events: none;
   z-index: 1;
+}
+
+/* Pre-rendered glow (static box-shadow, rasterized once) pulsed with
+   opacity/transform only — mirrors the old moonlight-break cadence
+   (peaks at 28%/70%, trough at 58%) without any repaint. */
+.portal-moon-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow:
+    0 0 48px rgba(218, 238, 255, 0.42),
+    0 0 128px rgba(191, 227, 255, 0.3),
+    0 0 210px rgba(123, 108, 255, 0.18);
+  opacity: 0.55;
+  animation: portal-moonglow-breathe 13s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+.portal-moon {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
   background:
     radial-gradient(circle at 31% 24%, rgba(255, 255, 255, 0.86) 0 5%, transparent 6%),
     radial-gradient(circle at 56% 57%, rgba(74, 78, 92, 0.32) 0 10%, transparent 11%),
@@ -208,14 +237,11 @@
     radial-gradient(circle at 27% 48%, rgba(78, 72, 66, 0.2) 0 4%, transparent 5%),
     radial-gradient(circle at 50% 45%, #eee6cf 0%, #c8c1ad 48%, #8f98aa 100%);
   box-shadow:
-    0 0 32px rgba(218, 238, 255, 0.34),
-    0 0 92px rgba(191, 227, 255, 0.22),
-    0 0 146px rgba(123, 108, 255, 0.14),
+    0 0 32px rgba(218, 238, 255, 0.3),
     inset -12px -10px 22px rgba(41, 45, 60, 0.34),
     inset 10px 8px 18px rgba(255, 251, 228, 0.36);
   opacity: 0.88;
   overflow: hidden;
-  animation: portal-moonlight-break 13s ease-in-out infinite;
   isolation: isolate;
 }
 
@@ -327,9 +353,10 @@
   margin-inline: auto;
   contain: layout paint;
   transform: translateZ(0);
-  transition:
-    transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1),
-    filter 0.28s ease;
+  /* Transform only — hover feedback must stay compositor-driven. Paint-property
+     transitions here (box-shadow/text-shadow/filter) invalidated the whole gate
+     layer every frame mid-scale and caused hover micro-stutter. */
+  transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 .portal-gate:hover,
@@ -462,7 +489,23 @@
     inset 0 0 34px rgba(123, 108, 255, 0.06);
   pointer-events: none;
   z-index: 0;
-  transition: box-shadow 0.5s ease;
+  /* Own layer so the hover crossfade below never invalidates the gate texture */
+  transform: translateZ(0);
+}
+
+/* Hover glow is a pre-rendered overlay crossfaded with opacity — a box-shadow
+   transition here repainted the full gate layer every frame (micro-stutter). */
+.portal-aperture::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 44px rgba(123, 108, 255, 0.1),
+    0 0 44px rgba(123, 108, 255, 0.2);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
 }
 
 /* Glass specular shell over the vision */
@@ -475,12 +518,9 @@
   box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
 }
 
-.portal-gate:hover .portal-aperture,
-.portal-gate:focus-visible .portal-aperture {
-  box-shadow:
-    inset 0 0 70px rgba(0, 0, 0, 0.85),
-    inset 0 0 44px rgba(123, 108, 255, 0.16),
-    0 0 44px rgba(123, 108, 255, 0.2);
+.portal-gate:hover .portal-aperture::after,
+.portal-gate:focus-visible .portal-aperture::after {
+  opacity: 1;
 }
 
 /* Living phoneme fragments pulled into the scrying surface */
@@ -498,10 +538,12 @@
     0 0 8px var(--portal-phoneme-soft),
     0 0 18px rgba(191, 227, 255, 0.18);
   transform: scale(1);
+  /* text-shadow deliberately NOT transitioned: animating it repainted the gate
+     layer every frame. It snaps on hover, masked by the opacity/transform fade
+     (the glyphs dim to 0.18 anyway). */
   transition:
     opacity 400ms ease,
-    transform 400ms ease,
-    text-shadow 400ms ease;
+    transform 400ms ease;
 }
 
 .portal-phoneme-ring::before,
@@ -666,15 +708,35 @@
   background-clip: text;
   color: transparent;
   filter: drop-shadow(0 0 16px rgba(123, 108, 255, 0.4));
-  transition: filter 0.4s ease;
   animation: wind-blow 7s infinite ease-in-out;
   transform-origin: center bottom;
   display: inline-block;
+  position: relative;
 }
 
-.portal-gate:hover .grimoire-title,
-.portal-gate:focus-visible .grimoire-title {
-  filter: drop-shadow(0 0 22px rgba(123, 108, 255, 0.55)) drop-shadow(0 0 38px rgba(191, 227, 255, 0.3));
+/* Hover bloom is a pre-rendered glow crossfaded with opacity — animating
+   drop-shadow (1 → 2 functions) on gradient-clipped text repainted the gate
+   layer every frame for 400ms. */
+.grimoire-title::after {
+  content: "";
+  position: absolute;
+  inset: -70% -28%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at 50% 55%,
+    rgba(123, 108, 255, 0.34) 0%,
+    rgba(191, 227, 255, 0.12) 46%,
+    transparent 72%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.portal-gate:hover .grimoire-title::after,
+.portal-gate:focus-visible .grimoire-title::after {
+  opacity: 1;
 }
 
 .portal-tagline {
@@ -740,33 +802,20 @@
   50%      { opacity: 1;   transform: translate(-50%, -50%) scale(1.06); }
 }
 
-@keyframes portal-moonlight-break {
+/* Moonlight break — same 13s dramatic cadence as the old box-shadow keyframes,
+   but on a pre-rendered glow layer using opacity/transform only (compositor). */
+@keyframes portal-moonglow-breathe {
   0%, 18%, 42%, 100% {
-    box-shadow:
-      0 0 30px rgba(218, 238, 255, 0.28),
-      0 0 74px rgba(191, 227, 255, 0.16),
-      0 0 112px rgba(123, 108, 255, 0.1),
-      inset -12px -10px 22px rgba(41, 45, 60, 0.38),
-      inset 10px 8px 18px rgba(255, 251, 228, 0.28);
-    opacity: 0.8;
+    opacity: 0.55;
+    transform: scale(1);
   }
   28%, 70% {
-    box-shadow:
-      0 0 48px rgba(238, 248, 255, 0.52),
-      0 0 128px rgba(191, 227, 255, 0.38),
-      0 0 210px rgba(123, 108, 255, 0.22),
-      inset -10px -8px 18px rgba(41, 45, 60, 0.28),
-      inset 12px 10px 22px rgba(255, 251, 228, 0.45);
-    opacity: 0.96;
+    opacity: 1;
+    transform: scale(1.1);
   }
   58% {
-    box-shadow:
-      0 0 24px rgba(218, 238, 255, 0.18),
-      0 0 58px rgba(191, 227, 255, 0.1),
-      0 0 92px rgba(123, 108, 255, 0.08),
-      inset -16px -12px 26px rgba(24, 28, 42, 0.5),
-      inset 8px 6px 14px rgba(255, 251, 228, 0.22);
-    opacity: 0.72;
+    opacity: 0.32;
+    transform: scale(0.96);
   }
 }
 
@@ -825,6 +874,7 @@
 @media (prefers-reduced-motion: reduce) {
   .portal-halo,
   .portal-moon,
+  .portal-moon-glow,
   .portal-moon-cloud,
   .portal-ring--energy,
   .portal-phoneme-ring::before,
@@ -833,5 +883,9 @@
   .portal-hint-beacon,
   .grimoire-title {
     animation: none;
+  }
+
+  .portal-moon-glow {
+    will-change: auto;
   }
 }

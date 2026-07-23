@@ -995,40 +995,40 @@
   "0556B9403FC62C2E406E44A96C0400729018E39D4ECBF7AB57B24D49E8606C87": {
     "quantized": {
       "data": [
-        152,
-        135,
-        119,
+        167,
+        150,
         120,
+        104,
         135,
-        119,
+        118,
         121,
         136,
-        103,
         120,
-        136,
-        152,
-        120,
-        120,
-        119,
-        135,
-        136,
-        136,
         121,
-        119,
+        136,
         135,
         120,
-        137,
         120,
-        119,
-        120,
-        153,
-        119,
+        135,
+        151,
+        151,
+        151,
         120,
         119,
         135,
-        114
+        135,
+        104,
+        120,
+        120,
+        121,
+        136,
+        136,
+        120,
+        136,
+        150,
+        115
       ],
-      "norm": 1.0000000102279876
+      "norm": 1.0000000027108762
     },
     "scdFull": {
       "schema": "SCD64_DIAGNOSTIC",
@@ -1108,18 +1108,35 @@
         }
       ],
       "runtimeEvidence": {
-        "note": "No default evidence for family SCORE_DRIFT"
+        "backend": {
+          "source": "reference-weight-formula",
+          "referenceWeight": 0.5,
+          "idfProxy": 0.5,
+          "syllableCount": 1,
+          "termFrequency": 1
+        },
+        "frontend": {
+          "source": "ranker",
+          "rankerScore": 0.9
+        },
+        "comparison": {
+          "deviation": 0.4,
+          "deviationThreshold": 0.25,
+          "meanAbsoluteDeviation": 0.4,
+          "worstToken": "cat",
+          "worstDeviation": 0.4
+        }
       },
       "raid": {
-        "completed": false,
-        "queryId": "unknown",
-        "verdictText": "Backend computed resonance connections, but the gate Set was never constructed — frontend shows no coloring."
+        "completed": true,
+        "queryId": "tokenweight:cat",
+        "verdictText": "\"cat\" is over-weighted. Reference: 0.500, Ranker: 0.900, Deviation: +0.400 (threshold ±0.25)."
       },
       "qbitField": {
         "finalAggregation": true,
-        "collapseVerdict": "GHOST_GATE_EMPTY",
-        "energyAtMismatch": 0.79,
-        "gradientMagnitude": 0.65
+        "collapseVerdict": "SCORE_DRIFT_OVER_WEIGHTED",
+        "energyAtMismatch": 0.4,
+        "gradientMagnitude": 0.4
       },
       "bytecodehealth": {
         "spatialDiagnosticChecksum": "0556B9403FC62C2E406E44A96C0400729018E39D4ECBF7AB57B24D49E8606C87"
@@ -1273,6 +1290,6 @@
     "meta": {
       "source": "generateSCD64"
     },
-    "timestamp": 1784708855640
+    "timestamp": 1784787933928
   }
 }

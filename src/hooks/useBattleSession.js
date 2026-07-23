@@ -10,34 +10,28 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import {
   createEmptyGrid,
   INITIAL_GRID_SIZE,
-} from '../../codex/core/battle.schemas.js';
-import {
   createCombatOpponent,
   generateOpponentSpell,
-} from '../../codex/core/opponent.engine.js';
-import { analyzeText } from '../../codex/core/analysis.pipeline.js';
-import { createCombatScoringEngine } from '../../codex/core/scoring.defaults.js';
-import { normalizeCombatScore } from '../../codex/core/combat.scoring.js';
-import { evaluateSyntacticalChess } from '../../codex/core/combat.syntax-chess.js';
-import {
+  createCombatScoringEngine,
+  normalizeCombatScore,
+  evaluateSyntacticalChess,
   OPPONENT_MAX_HP,
   PLAYER_MAX_HP,
   splitCombatLines,
   upsertStatusEffect as mergeStatusEffects,
   tickStatusEffects,
   getStatusMagnitude,
-} from '../../codex/core/combat.session.js';
-import { scoreCombatScroll } from '../lib/combatApi.js';
-import {
   BASE_MP_REGEN,
   computeCombatManaRegen,
-} from '../../codex/core/combat.balance.js';
+} from '../lib/codex/battle.js';
+import { analyzeText } from '../lib/codex/textAnalysis.js';
+import { scoreCombatScroll } from '../lib/combatApi.js';
 import {
   generateBattleLeylines,
   scoreExtraction,
   getLeylinePhase,
   computeLinguisticCoherence,
-} from '../../codex/core/leyline.engine.js';
+} from '../lib/codex/leyline.js';
 
 import { useProgression } from './useProgression.jsx';
 

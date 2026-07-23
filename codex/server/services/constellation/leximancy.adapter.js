@@ -1,6 +1,6 @@
 import { corpusFreqToRarity } from '../../../core/constellation/rarity.js';
 
-export const LEXIMANCY_ADAPTER_VERSION = 'lex-adapter-3';
+export const LEXIMANCY_ADAPTER_VERSION = 'lex-adapter-4';
 
 const MAX_ENTRIES = 5;
 /** Upper bound on rendered senses so a hyper-polysemous word does not flood the panel. */
@@ -44,8 +44,11 @@ function sortRelation(lemmas, freqMap) {
 /**
  * @param {object} lexiconAdapter
  * @param {string|null} contentToken
+ * @param {{ compounds?: string[], intent?: string }} [phraseContext] - optional
+ *   phrase-level context from analyzePhraseStructure. When a compound is present,
+ *   the adapter attempts a compound lookup first, falling back to the head token.
  */
-export function analyzeLeximancy(lexiconAdapter, contentToken) {
+export function analyzeLeximancy(lexiconAdapter, contentToken, phraseContext) {
   const empty = {
     status: 'unsupported',
     selectedInterpretationId: null,
@@ -58,11 +61,41 @@ export function analyzeLeximancy(lexiconAdapter, contentToken) {
     ipa: null,
     rarity: null,
     relations: { broader: [], narrower: [], akin: [] },
+    phraseContext: phraseContext || null,
   };
   if (!contentToken) return empty;
 
-  const entries = (lexiconAdapter.lookupWord(contentToken, MAX_ENTRIES) || []).slice(0, MAX_ENTRIES);
+  // When a compound is detected (e.g. "bright wound"), try looking up the
+  // compound's head noun first for richer sense data, then fall back to the
+  // primary content token.
+  const compounds = phraseContext?.compounds || [];
+  let lookupToken = contentToken;
+  let compoundUsed = null;
+  if (compounds.length > 0) {
+    // Use the last compound's second word (the noun head) as a richer anchor
+    const lastCompound = compounds[compounds.length - 1];
+    const parts = lastCompound.split(/\s+/);
+    const compoundNoun = parts[parts.length - 1];
+    if (compoundNoun && compoundNoun !== contentToken) {
+      const compoundEntries = lexiconAdapter.lookupWord(compoundNoun, 1) || [];
+      if (compoundEntries.length > 0) {
+        lookupToken = compoundNoun;
+        compoundUsed = lastCompound;
+      }
+    }
+  }
+
+  const entries = (lexiconAdapter.lookupWord(lookupToken, MAX_ENTRIES) || []).slice(0, MAX_ENTRIES);
   if (entries.length === 0) {
+    // Fall back to the original content token if compound lookup failed
+    if (lookupToken !== contentToken) {
+      const fallback = (lexiconAdapter.lookupWord(contentToken, MAX_ENTRIES) || []).slice(0, MAX_ENTRIES);
+      if (fallback.length > 0) {
+        lookupToken = contentToken;
+        compoundUsed = null;
+        return analyzeLeximancy(lexiconAdapter, contentToken, { ...phraseContext, compounds: [] });
+      }
+    }
     return { ...empty, warnings: [`No lexicon entry for "${contentToken}"`] };
   }
 
@@ -86,20 +119,20 @@ export function analyzeLeximancy(lexiconAdapter, contentToken) {
   kept = kept.slice(0, MAX_INTERPRETATIONS);
 
   const interpretations = kept.map((r, i) => ({
-    id: `${contentToken}.${r.pos || 'x'}.${i}`,
+    id: `${lookupToken}.${r.pos || 'x'}.${i}`,
     gloss: r.gloss,
     confidence: rankConfidence(i, kept.length),
     pos: r.pos,
     examples: r.examples,
   }));
 
-  const nearKin = (lexiconAdapter.lookupSynonyms?.(contentToken, 20) || []).map((e) => e.lemma);
-  const counterfield = (lexiconAdapter.lookupAntonyms?.(contentToken, 20) || []).map((e) => e.lemma);
+  const nearKin = (lexiconAdapter.lookupSynonyms?.(lookupToken, 20) || []).map((e) => e.lemma);
+  const counterfield = (lexiconAdapter.lookupAntonyms?.(lookupToken, 20) || []).map((e) => e.lemma);
 
   let related = { broader: [], narrower: [], akin: [] };
   let relationsFailed = false;
   try {
-    related = lexiconAdapter.lookupRelated?.(contentToken, 20) || related;
+    related = lexiconAdapter.lookupRelated?.(lookupToken, 20) || related;
   } catch {
     relationsFailed = true;
   }
@@ -108,9 +141,9 @@ export function analyzeLeximancy(lexiconAdapter, contentToken) {
   const relAkin = (related.akin || []).map((e) => e.lemma).filter(Boolean);
 
   // One batched frequency call powers both rarity (head word) and relation ordering.
-  const freqWords = [contentToken, ...relBroader, ...relNarrower, ...relAkin];
+  const freqWords = [lookupToken, ...relBroader, ...relNarrower, ...relAkin];
   const freqMap = lexiconAdapter.getCorpusFrequencies?.(freqWords) || new Map();
-  const rarity = freqMap.size > 0 ? corpusFreqToRarity(freqMap.get(contentToken) || 0) : null;
+  const rarity = freqMap.size > 0 ? corpusFreqToRarity(freqMap.get(lookupToken) || 0) : null;
 
   const relations = {
     broader: sortRelation(relBroader, freqMap),
@@ -145,10 +178,13 @@ export function analyzeLeximancy(lexiconAdapter, contentToken) {
     counterfield,
     warnings,
     anchor: contentToken,
+    lookupToken,
+    compoundUsed,
     etymology: originItem.etymology ?? null,
     ipa: originItem.ipa ?? null,
     rarity,
     relations,
     relationsFailed,
+    phraseContext: phraseContext || null,
   };
 }

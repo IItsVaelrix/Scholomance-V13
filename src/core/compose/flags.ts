@@ -62,6 +62,8 @@ export const COMPOSE_FLAGS = {
   MIGRATE_TOOLBAR: 'compose:migrate:toolbar',
   MIGRATE_LEDGER: 'compose:migrate:ledger',
   MIGRATE_GALAXY: 'compose:migrate:galaxy',
+  MIGRATE_READ_CHROME: 'compose:migrate:read-chrome',
+  MIGRATE_ORACLE: 'compose:migrate:oracle',
 } as const;
 
 export type FeatureFlagName = typeof COMPOSE_FLAGS[keyof typeof COMPOSE_FLAGS];
@@ -92,6 +94,8 @@ const DEFAULT_FLAGS: Record<string, FeatureFlag> = {
   [COMPOSE_FLAGS.MIGRATE_TOOLBAR]: { id: COMPOSE_FLAGS.MIGRATE_TOOLBAR, name: 'Migrate Toolbar', value: false, enabled: false, description: 'Migrate scroll editor toolbar' },
   [COMPOSE_FLAGS.MIGRATE_LEDGER]: { id: COMPOSE_FLAGS.MIGRATE_LEDGER, name: 'Migrate Ledger', value: false, enabled: false, description: 'Migrate update ledger window' },
   [COMPOSE_FLAGS.MIGRATE_GALAXY]: { id: COMPOSE_FLAGS.MIGRATE_GALAXY, name: 'Migrate Galaxy', value: false, enabled: false, description: 'Migrate galaxy backdrop' },
+  [COMPOSE_FLAGS.MIGRATE_READ_CHROME]: { id: COMPOSE_FLAGS.MIGRATE_READ_CHROME, name: 'Migrate Read Chrome', value: false, enabled: false, description: 'Migrate Read IDE top/status chrome' },
+  [COMPOSE_FLAGS.MIGRATE_ORACLE]: { id: COMPOSE_FLAGS.MIGRATE_ORACLE, name: 'Migrate Oracle', value: false, enabled: false, description: 'Migrate Lexicon Oracle terminal' },
 };
 
 /**
@@ -244,6 +248,8 @@ export class FeatureFlagManager {
       COMPOSE_FLAGS.MIGRATE_TOOLBAR,
       COMPOSE_FLAGS.MIGRATE_LEDGER,
       COMPOSE_FLAGS.MIGRATE_GALAXY,
+      COMPOSE_FLAGS.MIGRATE_READ_CHROME,
+      COMPOSE_FLAGS.MIGRATE_ORACLE,
     ];
     const migrated = migrationFlags.filter(f => this.isEnabled(f)).length;
     return { migrated, total: migrationFlags.length };

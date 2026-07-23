@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import './ConstellationPage.css';
-import ConstellationBackdrop from './ConstellationBackdrop.jsx';
+import ComposeConstellationSky from './ComposeConstellationSky.jsx';
 import ConstellationSearch from './ConstellationSearch.jsx';
 import ConstellationResultShell from './ConstellationResultShell.jsx';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js';
@@ -11,6 +11,9 @@ export default function ConstellationPage() {
   const [submittedQuery, setSubmittedQuery] = useState(null);
   const { packet } = useConstellationPage(submittedQuery);
   const mode = submittedQuery != null ? 'submitted' : 'idle';
+  // The sky's deterministic animation is seeded by the resolved page bytecode,
+  // so each answered query lights its own lodestar (PDR §7.7). Idle → constant.
+  const skyBytecode = packet?.pageBytecode ?? null;
 
   const handleSubmit = (query) => {
     setSubmittedQuery(query);
@@ -28,7 +31,7 @@ export default function ConstellationPage() {
         .join(' ')}
       data-mode={mode}
     >
-      <ConstellationBackdrop reducedMotion={reducedMotion} />
+      <ComposeConstellationSky reducedMotion={reducedMotion} bytecode={skyBytecode} />
       <div className="constellation-foreground">
         <h1 className="constellation-brand">ConstellationOS</h1>
         {mode === 'idle' ? (

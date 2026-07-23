@@ -1,14 +1,14 @@
-import { generatePhonosemanticVector } from '../semantic/vector.utils.js';
+import { generatePhonotopographicVector, PHONOTOPOGRAPHIC_EMBEDDING } from '../semantic/phonotopography.js';
 import {
   estimateInnerProduct,
   quantizeVectorJS,
 } from '../quantization/turboquant.js';
 
 export const BALLISTIC_EMBEDDING = Object.freeze({
-  kind: 'phonosemantic_mock',
-  version: 'tq-js-v1',
-  dimensions: 256,
-  seed: 42,
+  kind: PHONOTOPOGRAPHIC_EMBEDDING.kind,
+  version: PHONOTOPOGRAPHIC_EMBEDDING.version,
+  dimensions: PHONOTOPOGRAPHIC_EMBEDDING.dimensions,
+  seed: PHONOTOPOGRAPHIC_EMBEDDING.seed,
 });
 
 function fnv1a(bytes) {
@@ -30,7 +30,7 @@ function traceBuckets(data) {
 }
 
 export function createBallisticSignature(text) {
-  const vector = generatePhonosemanticVector(text, BALLISTIC_EMBEDDING.dimensions);
+  const vector = generatePhonotopographicVector(text, BALLISTIC_EMBEDDING.dimensions);
   const { data, norm } = quantizeVectorJS(vector, BALLISTIC_EMBEDDING.seed);
   return Object.freeze({
     ...BALLISTIC_EMBEDDING,

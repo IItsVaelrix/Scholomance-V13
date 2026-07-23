@@ -18,7 +18,7 @@ describe('analyzeGenome', () => {
   it('flags alliteration when content tokens share a first letter', () => {
     const id = resolveQueryIdentity('silent silver sea');
     const g = analyzeGenome({ phonemes: [], dominantVowelFamily: null }, id);
-    expect(g.devicesHint).toContain('alliteration-candidate');
+    expect(g.devicesHint).toContain('alliteration');
   });
 
   it('returns a null school when there is no vowel family', () => {

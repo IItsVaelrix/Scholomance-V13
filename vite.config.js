@@ -1,9 +1,11 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+const env = loadEnv(mode, process.cwd(), '')
+return {
   plugins: [react()],
   resolve: {
     // Prevent multiple React copies (common with Rete.js, Three Fiber, Lexical, etc.)
@@ -36,6 +38,14 @@ export default defineConfig({
       '/api': 'http://localhost:8080',
       '^/auth/.*': { target: 'http://localhost:8080' },
       '^/collab/.*': { target: 'http://localhost:8080' },
+      // Subtlety APM browser crash lane: inject the ingest token server-side
+      // so the client sensor can post without a secret in the bundle.
+      '^/subtlety/.*': {
+        target: 'http://localhost:8080',
+        ...(env.SUBTLETY_INGEST_TOKEN
+          ? { headers: { 'x-subtlety-token': env.SUBTLETY_INGEST_TOKEN } }
+          : {}),
+      },
       // Backend owns uploaded archive tracks under /audio/*, but static files
       // in public/audio/ (ambience, scholosound) must be served by Vite.
       '/audio': {
@@ -65,4 +75,5 @@ export default defineConfig({
       exclude: ['tests/**'],
     },
   },
+}
 })

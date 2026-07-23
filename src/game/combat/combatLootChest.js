@@ -7,6 +7,7 @@ import {
   getLootChestTexturePath,
 } from '../../../codex/core/pixelbrain/loot-chest-shared.js';
 import { rollCombatLoot } from './combatLootDrops.js';
+import { freshRng } from '../../../codex/core/shared/math/seededRng.js';
 
 export {
   LOOT_CHEST_PNG_SCALE,
@@ -46,7 +47,7 @@ export function getLootChestLabel(tier) {
  * Plan a chest spawn for a defeated enemy.
  * Always returns a chest tier; loot may be null when the roll misses.
  */
-export function planCombatChestDrop(enemyId, rng = Math.random) {
+export function planCombatChestDrop(enemyId, rng = freshRng()) {
   const loot = rollCombatLoot(enemyId, rng);
   const tier = loot
     ? chestTierFromItemRarity(ITEM_DATABASE[loot.itemId]?.rarity)

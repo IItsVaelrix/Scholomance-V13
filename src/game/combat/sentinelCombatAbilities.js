@@ -3,6 +3,7 @@
  */
 
 import { SYNTACTIC_ARCHETYPE_PROFILES } from '../../../codex/core/combat.syntax-chess.js';
+import { freshRng } from '../../../codex/core/shared/math/seededRng.js';
 import {
   buildSentinelAbilityReasoning,
   computeAlertProcChance,
@@ -143,7 +144,7 @@ export function planSentinelAttack({
   stats = null,
   intelligence = null,
   stance = 'AGGRESSIVE',
-  rng = Math.random,
+  rng = freshRng(),
 } = {}) {
   const abilities = record?.abilities || createSentinelAbilityState();
   const entity = stats?.getEntity?.(record?.id);

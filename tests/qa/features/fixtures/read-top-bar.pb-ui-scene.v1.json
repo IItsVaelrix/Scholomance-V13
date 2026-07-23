@@ -1,0 +1,166 @@
+{
+  "contract": "PB-UI-SCENE-v1",
+  "definitions": {
+    "read-top-bar": {
+      "accessibility": {
+        "ariaRole": "region",
+        "focusRetention": "none",
+        "keyboard": [
+          "Tab: reaches action cluster controls"
+        ],
+        "nameFrom": "author",
+        "requiredAttributes": [
+          "aria-label"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "children": [
+              {
+                "id": "identity",
+                "interactive": false,
+                "label": "Scroll identity",
+                "role": "group",
+                "visible": true
+              },
+              {
+                "id": "progression",
+                "interactive": false,
+                "label": "Progression",
+                "role": "group",
+                "visible": true
+              },
+              {
+                "id": "actions",
+                "interactive": true,
+                "label": "Editor actions",
+                "role": "group",
+                "visible": true
+              }
+            ],
+            "id": "root",
+            "interactive": false,
+            "role": "region",
+            "visible": true
+          }
+        ],
+        "rootRole": "region",
+        "slots": [
+          {
+            "accepts": [
+              "native-dom",
+              "wand",
+              "token"
+            ],
+            "maxChildren": 1,
+            "name": "seam",
+            "required": false
+          }
+        ]
+      },
+      "capabilities": [
+        {
+          "id": "focusable-controls",
+          "required": true
+        },
+        {
+          "id": "semantic-text",
+          "required": true
+        },
+        {
+          "id": "procedural-glow",
+          "required": false
+        }
+      ],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": {
+        "layoutId": "read-topbar-flow"
+      },
+      "defaultVisuals": [
+        {
+          "visualId": "harmonic-seam"
+        }
+      ],
+      "description": "Read IDE top chrome — scroll identity, progression, action cluster",
+      "events": [],
+      "kind": "read-top-bar",
+      "provenance": {
+        "author": "compose-read-chrome",
+        "contentHash": "scd64:read-top-bar-v1",
+        "establishedAt": "2026-07-20T00:00:00.000Z",
+        "sourceKind": "migrated",
+        "sourcePath": "src/pages/Read/IDEChrome.jsx"
+      },
+      "states": [],
+      "version": "1.0.0"
+    }
+  },
+  "id": "scene:read-top-bar",
+  "layouts": {
+    "read-topbar-flow": {
+      "contract": "PB-LAYOUT-v1",
+      "flow": {
+        "align": "center",
+        "direction": "row",
+        "gapPx": 12,
+        "justify": "space-between",
+        "wrap": false
+      },
+      "mode": "flow",
+      "version": "1.0.0"
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "id": "read-top-bar.identity",
+        "kind": "container",
+        "props": {
+          "label": "Scroll identity",
+          "part": "identity"
+        }
+      },
+      {
+        "id": "read-top-bar.progression",
+        "kind": "container",
+        "props": {
+          "label": "Progression",
+          "part": "progression"
+        }
+      },
+      {
+        "id": "read-top-bar.actions",
+        "kind": "container",
+        "props": {
+          "label": "Editor actions",
+          "part": "actions"
+        }
+      }
+    ],
+    "id": "read-top-bar",
+    "kind": "read-top-bar",
+    "layoutRef": "read-topbar-flow",
+    "props": {
+      "aria-label": "Scroll editor chrome"
+    },
+    "role": "region",
+    "visualRefs": [
+      "harmonic-seam"
+    ]
+  },
+  "sourceChecksum": "scd64:1958c18c73cb675e",
+  "version": "1.0.0",
+  "visuals": {
+    "harmonic-seam": {
+      "className": "grim-harmonic-seam",
+      "kind": "native-dom",
+      "placementSlot": "seam",
+      "styleTokens": [
+        "ritual-aurora-start",
+        "ritual-aurora-end",
+        "ritual-glow"
+      ]
+    }
+  }
+}

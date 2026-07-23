@@ -91,6 +91,49 @@ const scene = createGalaxyBackdropScene();
 
 Public host: `LandingPage.jsx` → `ComposeGalaxyBackdrop`. WatercolorDissolve + twin gates stay outside the packet.
 
+## Read Chrome Pilot: ✅ Always-on Compose
+
+The Read IDE TopBar/StatusBar chrome is the fifth Compose pilot — **always-on** (no render flag), GrimDesign-beautified.
+
+- ✅ `createReadTopBarScene()` / `createReadStatusBarScene()` → `PB-UI-SCENE-v1` (`kind: read-top-bar` / `read-status-bar`)
+- ✅ Anatomy: top bar `identity` / `progression` / `actions`; status bar `vitals` / `position` — both labelled `region` landmarks (banner/contentinfo are unlawful nested in the app shell)
+- ✅ React shells: `ComposeReadChrome.tsx` — region content stays in UI-owned `IDEChrome.jsx`; legacy markup fallback only when `validateComposeScene` fails
+- ✅ GrimDesign harmonic seam: `native-dom` visual attachment (`grim-harmonic-seam`), WILL/HARMONIC signal — 1600ms opacity breathe shared by both seams and the Ready dot, colors via `--ritual-*` school variables, reduced-motion stilled
+- ✅ Volatile text (title, XP, Ln/Col, syllables) is runtime React content — packets stay static and golden-stable
+- ✅ Goldens: `tests/qa/features/fixtures/read-top-bar.pb-ui-scene.v1.json`, `read-status-bar.pb-ui-scene.v1.json`
+
+```ts
+import {
+  createReadTopBarScene,
+  createReadStatusBarScene,
+  registerReadChromeMigration,
+} from 'src/core/compose/packets';
+```
+
+Public host: `src/pages/Read/IDEChrome.jsx` → `ComposeReadTopBar` / `ComposeReadStatusBar`. The flag-gated `compose:migrate:toolbar` action-cluster swap still lives inside the `actions` region. `COMPOSE_FLAGS.MIGRATE_READ_CHROME` exists for registry tracking only, not rollout.
+
+## Oracle Terminal Pilot: ✅ Always-on Compose
+
+The Lexicon Oracle (SearchPanel) is the sixth Compose pilot — **always-on**, and the vehicle for the Arcane Terminal redesign (Oracle is a terminal; Leximancy is the search engine).
+
+- ✅ `createOracleTerminalScene()` → `PB-UI-SCENE-v1` (`kind: oracle-terminal`)
+- ✅ Anatomy: `session` (TTY line + tmux-style numbered mode tabs) / `prompt` (borderless command line) / `signal` (bracketed statusline) / `feed` — complexity 4 per GrimDesign signal
+- ✅ Shell: `ComposeOracleTerminal.tsx` — SearchPanel keeps logic/markup, regions tagged `data-compose-part`; legacy glass skin is the validation-failure fallback
+- ✅ Multi-instance safe: packet ids never become DOM ids; landmark label suffixed with the per-mount input id (`landmark-unique` clean with two instances)
+- ✅ De-glassed: CRT convex overlay, arcane reflection streak, and macOS traffic-light dots removed; square opaque frame, gold=chrome / school=phosphor
+- ✅ Scanline atmosphere is a removable `native-dom` attachment — `:has()` gates the `::before` scanlines on the attachment node; school scanline variants unchanged
+- ✅ Beacon breathes at the shared 1600ms harmonic (same frequency as the Read chrome seams)
+- ✅ Golden: `tests/qa/features/fixtures/oracle-terminal.pb-ui-scene.v1.json`
+
+```ts
+import {
+  createOracleTerminalScene,
+  registerOracleTerminalMigration,
+} from 'src/core/compose/packets';
+```
+
+Public host: `src/pages/Read/SearchPanel.jsx`. `COMPOSE_FLAGS.MIGRATE_ORACLE` exists for registry tracking only, not rollout.
+
 ## Phase 9 Status: ✅ Production Integration
 
 - ✅ React wrappers (`ComposeScrollEditorToolbar`, `ComposeButton`)

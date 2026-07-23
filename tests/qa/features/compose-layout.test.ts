@@ -177,8 +177,9 @@ describe('Compose Layout Layer', () => {
 
       const result = solver.solve(root, constraints);
       
-      // Simplified implementation always succeeds
-      expect(result.success).toBe(true);
+      // Invalid required constraint fails layout and reports violation
+      expect(result.success).toBe(false);
+      expect(result.violations.length).toBeGreaterThan(0);
     });
   });
 

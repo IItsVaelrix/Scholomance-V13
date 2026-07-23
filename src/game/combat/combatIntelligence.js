@@ -5,6 +5,7 @@
 
 import { findPath } from './combatPathfinding.js';
 import { readScholomanceStat } from './scholomanceStats.js';
+import { freshRng } from '../../../codex/core/shared/math/seededRng.js';
 
 const SENTINEL_MATRIX_BURN_CHAIN = 'sentinel_matrix_burn';
 
@@ -265,7 +266,7 @@ export function selectSentinelAbilityByIntelligence({
   mentalLinkActive,
   intelligence,
   playerHpRatio = 1,
-  rng = Math.random,
+  rng = freshRng(),
 } = {}) {
   const int = clampIntelligence(intelligence);
   const tier = getIntelligenceTier(int);

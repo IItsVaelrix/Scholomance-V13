@@ -49,6 +49,8 @@ export const PHONOLOGICAL_FEATURES_V1 = Object.freeze({
   'OY': { height: 1, contour: 2, place: 2, length: 1, voicing: 1, nasality: 0, manner: 0, affrication: 0, sibilance: 0, cPlace: 1 },
   'UH': { height: 2, contour: 1, place: 2, length: 0, voicing: 1, nasality: 0, manner: 0, affrication: 0, sibilance: 0, cPlace: 1 },
   'UW': { height: 2, contour: 1, place: 2, length: 1, voicing: 1, nasality: 0, manner: 0, affrication: 0, sibilance: 0, cPlace: 1 },
+  'AX': { height: 1, contour: 1, place: 1, length: 0, voicing: 1, nasality: 0, manner: 0, affrication: 0, sibilance: 0, cPlace: 1 },
+  'UR': { height: 1, contour: 1, place: 1, length: 0, voicing: 1, nasality: 0, manner: 0, affrication: 0, sibilance: 0, cPlace: 1 },
 
   // Consonants
   'B':  { nasality: 0, manner: 0, voicing: 1, affrication: 0, sibilance: 0, place: 0, height: 1, contour: 1, vPlace: 1, length: 0 },

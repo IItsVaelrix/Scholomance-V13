@@ -10,6 +10,8 @@ import { SONIC_THAUMATURGY } from './sonic-thaumaturgy';
 import { REGRET } from './regret';
 import { BOTTLED_MESSAGE } from './bottled-message';
 import { BROWN_DWARF } from './brown-dwarf';
+import { DRY_MOUTH } from './dry-mouth';
+import { SAIYAN_BLOOD } from './saiyan-blood';
 
 export const GRIMOIRE_ALBUMS: GrimoireAlbum[] = [
   {
@@ -46,6 +48,8 @@ export const GRIMOIRE_ALBUMS: GrimoireAlbum[] = [
       { trackId: REGRET.id, trackNumber: 3 },
       { trackId: BOTTLED_MESSAGE.id, trackNumber: 4 },
       { trackId: BROWN_DWARF.id, trackNumber: 5 },
+      { trackId: DRY_MOUTH.id, trackNumber: 6 },
+      { trackId: SAIYAN_BLOOD.id, trackNumber: 7 },
     ],
   },
 ];

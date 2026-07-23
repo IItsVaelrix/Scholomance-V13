@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import datetime
+import hashlib
 import json
 import os
 import re
@@ -99,11 +100,67 @@ def _post_crash(base_url: str, event: dict) -> None:
                 raise RuntimeError("hub rejected crash ingest")
 
 
-def _spool_crash(spool_dir: Path, event: dict) -> None:
+# Boon 4: the same crash used to spool a fresh {stamp}-{pid}.json every time,
+# leaving dozens of byte-identical files (measured: 4x1121 B + 3x4484 B dupes).
+# Dedup by content hash so a recurring crash bumps a counter, and rotate so the
+# spool stays bounded instead of growing without limit.
+_SPOLDED_FIELDS = ("runtime", "unitId", "errorType", "message", "stack", "thread")
+DEFAULT_SPOOL_KEEP = 50
+
+
+def _crash_signature(event: dict) -> str:
+    """Stable content hash over the volatile-free event fields.
+
+    The spool event carries no timestamp, so two occurrences of the same crash
+    serialize identically and hash to the same signature — that is what lets us
+    dedup byte-identical crashes to a single spool file.
+    """
+    canonical = json.dumps(
+        {key: event.get(key) for key in _SPOLDED_FIELDS},
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    )
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _rotate_spool(spool_dir: Path, *, keep: int) -> None:
+    """Keep only the `keep` most-recently-modified spool files."""
+    if keep <= 0:
+        return
+    files = sorted(
+        spool_dir.glob("*.json"),
+        key=lambda p: p.stat().st_mtime,
+        reverse=True,
+    )
+    for stale in files[keep:]:
+        try:
+            stale.unlink()
+        except OSError:
+            pass
+
+
+def _spool_crash(spool_dir: Path, event: dict, *, keep: int = DEFAULT_SPOOL_KEEP) -> None:
     spool_dir.mkdir(parents=True, exist_ok=True)
-    stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    path = spool_dir / f"{stamp}-{os.getpid()}.json"
-    path.write_text(json.dumps(event), encoding="utf-8")
+    signature = _crash_signature(event)[:16]
+    path = spool_dir / f"{signature}.json"
+    now = datetime.datetime.now().isoformat(timespec="seconds")
+    if path.exists():
+        # Same crash already spooled — record the recurrence, not a duplicate file.
+        try:
+            record = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            record = dict(event)
+        record["count"] = int(record.get("count", 1)) + 1
+        record["last_seen"] = now
+        path.write_text(json.dumps(record), encoding="utf-8")
+    else:
+        record = dict(event)
+        record["count"] = 1
+        record["first_seen"] = now
+        record["last_seen"] = now
+        path.write_text(json.dumps(record), encoding="utf-8")
+    _rotate_spool(spool_dir, keep=keep)
 
 
 def forward_crash(

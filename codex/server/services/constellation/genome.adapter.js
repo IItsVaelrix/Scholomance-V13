@@ -1,19 +1,12 @@
 import { VOWEL_FAMILY_TO_SCHOOL } from '../../../core/constants/schools.js';
-import { STOPWORDS } from '../../../core/constellation/stopwords.js';
+import { detectPhraseDevices } from '../../../core/constellation/phraseAnalysis.js';
 
-export const GENOME_ADAPTER_VERSION = 'genome-adapter-1';
+export const GENOME_ADAPTER_VERSION = 'genome-adapter-2';
 
 /** ARPABET vowels carry a stress digit (0|1|2); one per syllable. */
 export function syllablesFromPhonemes(phonemes) {
   if (!Array.isArray(phonemes)) return 0;
   return phonemes.filter((p) => /[0-2]$/.test(String(p))).length;
-}
-
-function alliterationHint(tokens) {
-  const content = tokens.filter((t) => !STOPWORDS.has(t) && t.length > 0);
-  const firsts = content.map((t) => t[0]);
-  const hasRepeat = firsts.some((c, i) => firsts.indexOf(c) !== i);
-  return hasRepeat ? ['alliteration-candidate'] : [];
 }
 
 /**
@@ -23,9 +16,15 @@ function alliterationHint(tokens) {
 export function analyzeGenome(rhyme, identity) {
   const phonemes = rhyme?.phonemes || [];
   const family = rhyme?.dominantVowelFamily || null;
+
+  // Use the core phrase-analysis device detector (alliteration, assonance,
+  // consonance, sibilance, imagery-candidate) instead of the old
+  // alliteration-only inline check.
+  const devicesHint = detectPhraseDevices(identity);
+
   return {
     syllables: syllablesFromPhonemes(phonemes),
-    devicesHint: alliterationHint(identity.tokens || []),
+    devicesHint,
     schoolHint: (family && VOWEL_FAMILY_TO_SCHOOL[family]) || null,
   };
 }

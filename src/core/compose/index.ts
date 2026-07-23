@@ -12,6 +12,7 @@
  */
 
 // Schema layer
+import { registerVocabulary } from './vocabulary';
 export type {
   ComponentRole,
   ComponentState,
@@ -112,10 +113,8 @@ export type {
 } from './tokens';
 
 export {
-  defaultTokens,
-  tokenResolver,
-  getToken,
-  getAllTokens
+  DEFAULT_TOKENS_DTCG,
+  createDefaultTokenResolver
 } from './tokens';
 
 // Scene layer
@@ -206,7 +205,6 @@ export {
   createScrollEditorToolbarScene,
   createScrollEditorToolbarDefinition,
   validateComposeScene,
-  renderSceneToDomSpec,
   lowerFlowToCss,
 } from './packets';
 
@@ -351,6 +349,5 @@ export function initCompose(): void {
   }
   
   // Register vocabulary schemas
-  const { registerVocabulary } = require('./vocabulary');
   registerVocabulary();
 }

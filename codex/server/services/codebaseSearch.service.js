@@ -185,14 +185,25 @@ export async function forensicSearch(query, options = {}) {
  * Perform an instant semantic search over the indexed codebase.
  * Query and index share one lens/seed via the Vector AMP.
  */
-export async function searchCodebase(query) {
+export async function searchCodebase(query, options = {}) {
     const start = performance.now();
 
     // 1. Embed the query into the shared float lens (unit vector).
     const q = embedFloat(query);
 
     // 2. Load all embeddings from persistence.
-    const index = await collabPersistence.codebase.getAll();
+    let index = await collabPersistence.codebase.getAll();
+
+    // 2b. Optional scope bias: restrict the candidate set to a path prefix
+    // BEFORE scoring, so in-scope chunks compete among themselves for the top-N
+    // slice. Post-filtering the top-N cannot recover in-scope hits that scored
+    // below the cutoff (the "all 10 hits were collab docs" failure). Backward
+    // compatible: callers passing no options are unaffected. Used by Phenotypic
+    // Idealism scope=divtube.
+    if (options && typeof options.pathPrefix === 'string' && options.pathPrefix) {
+        const prefix = options.pathPrefix;
+        index = index.filter((entry) => String(entry.file_path || '').startsWith(prefix));
+    }
 
     // 3. Exact cosine against every indexed chunk.
     const results = q.ok ? scoreEmbeddings(index, q.vector) : [];

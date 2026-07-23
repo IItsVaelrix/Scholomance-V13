@@ -165,3 +165,8 @@ divtube_downloader/subtlety-spool/
 
 # Electron/AppImage extract (~531 MB) — keep local only
 squashfs-root/
+
+# Scratch/probe output. A production ingest token was committed from here on
+# 2026-07-23; nothing under .tmp/ is source. (33 pre-existing .tmp/ files stay
+# tracked — .gitignore does not untrack, and removing them is a separate call.)
+.tmp/

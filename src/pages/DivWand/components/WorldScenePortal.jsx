@@ -14,11 +14,13 @@
 
 import { useMemo } from 'react';
 
-import { createChunkedWorldVolume, getOrLoadChunk, generateWorldChunk, chunkKey, parseChunkKey, applyMaterialBoundaryAlignment, collectWorldSeeds } from '../../../../codex/core/pixelbrain/chunked-world-volume.js';
-import { collectFaces, project, makeFace } from '../../../../codex/core/pixelbrain/iso-projector.js';
-import { renderFacesToSVG } from '../../../../codex/core/pixelbrain/voxel-svg-renderer.js';
-import { worldRenderOptions, seedsToLightPoints } from '../../../../codex/core/pixelbrain/world-render-options.js';
-import { runBiomeCoherenceAMPWorld } from '../../../../codex/core/pixelbrain/biome-coherence-amp.js';
+import {
+  createChunkedWorldVolume, getOrLoadChunk, generateWorldChunk, chunkKey, parseChunkKey, applyMaterialBoundaryAlignment, collectWorldSeeds,
+  collectFaces, project, makeFace,
+  renderFacesToSVG,
+  worldRenderOptions, seedsToLightPoints,
+  runBiomeCoherenceAMPWorld,
+} from '../../../lib/codex/pixelbrain.js';
 
 /**
  * Build the set of all visible faces for a fully-loaded world. Iterates

@@ -180,7 +180,7 @@ const LayoutNode = memo(function LayoutNode({
 
 export function DivLayoutRenderer({
   proposal,
-  slots = null,
+  slots = /** @type {{ title?: import('react').ReactNode, content?: import('react').ReactNode } | null} */ (null),
   isInspectorActive = false,
   hoveredId = null,
   onHover = () => {},

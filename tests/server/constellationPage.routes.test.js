@@ -35,7 +35,7 @@ describe('GET /api/constellation/page', () => {
     const res = await app.inject({ method: 'GET', url: '/api/constellation/page?query=morning' });
     expect(res.statusCode).toBe(200);
     const body = res.json();
-    expect(body.schema_id).toBe('scholomance/constellation-os-page-phase1');
+    expect(body.schema_id).toBe('scholomance/constellation-os-page-phase2');
     expect(body.rhymeAstrology.phonemes.length).toBeGreaterThan(0);
     expect(body.phraseGenome.syllables).toBe(2);
   });

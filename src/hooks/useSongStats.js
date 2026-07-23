@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { analyzeText } from '../../codex/core/analysis.pipeline.js';
-import { computeSongStats } from '../../codex/core/song-stats/index.js';
-import { buildSourceFingerprint } from '../../codex/core/song-stats/fingerprint.js';
-import { DEFAULT_BEATS_PER_LINE, DEFAULT_BPM, DEFAULT_RHYME_WINDOW } from '../../codex/core/song-stats/constants.js';
-import { resolveSongStatsDisplay } from '../../codex/core/song-stats/staleGuard.js';
+import { analyzeText } from '../lib/codex/textAnalysis.js';
+import {
+  computeSongStats,
+  buildSourceFingerprint,
+  DEFAULT_BEATS_PER_LINE,
+  DEFAULT_BPM,
+  DEFAULT_RHYME_WINDOW,
+  resolveSongStatsDisplay,
+} from '../lib/codex/songStats.js';
 
 /**
  * Bridges the server-attached `songStats` field (computed server-side from
