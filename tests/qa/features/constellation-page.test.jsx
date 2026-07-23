@@ -42,7 +42,7 @@ describe('ConstellationPage chamber', () => {
     expect(document.getElementById('constellation-result-shell')).toBeNull();
   });
 
-  it('submits a query and mounts the result shell', () => {
+  it('submits a query and mounts the result shell', async () => {
     render(
       <MemoryRouter>
         <ConstellationPage />
@@ -52,11 +52,12 @@ describe('ConstellationPage chamber', () => {
     fireEvent.change(field, { target: { value: 'the bright wound of morning' } });
     fireEvent.keyDown(field, { key: 'Enter', code: 'Enter' });
     expect(document.getElementById('constellation-stage').dataset.mode).toBe('submitted');
+    // The hook fetches live, then falls back to the fixture asynchronously (no server in jsdom).
+    expect(await screen.findByRole('heading', { name: /phrase identity/i })).toBeInTheDocument();
     expect(document.getElementById('constellation-result-shell')).toBeTruthy();
-    expect(screen.getByRole('heading', { name: /phrase identity/i })).toBeInTheDocument();
   });
 
-  it('renders ambiguous interpretations for the bright-wound fixture', () => {
+  it('renders ambiguous interpretations for the bright-wound fixture', async () => {
     render(
       <MemoryRouter>
         <ConstellationPage />
@@ -65,12 +66,12 @@ describe('ConstellationPage chamber', () => {
     const field = screen.getByLabelText(/search the literary sky/i);
     fireEvent.change(field, { target: { value: 'the bright wound of morning' } });
     fireEvent.keyDown(field, { key: 'Enter', code: 'Enter' });
-    expect(screen.getByText(/injury \/ opening in flesh/i)).toBeInTheDocument();
+    expect(await screen.findByText(/injury \/ opening in flesh/i)).toBeInTheDocument();
     expect(screen.getByText(/past tense of wind/i)).toBeInTheDocument();
     expect(screen.getByText(/ambiguity is data|margin below/i)).toBeInTheDocument();
   });
 
-  it('shows awaiting state for unwired rhyme on unknown queries', () => {
+  it('shows awaiting state for unwired rhyme on unknown queries', async () => {
     render(
       <MemoryRouter>
         <ConstellationPage />
@@ -79,7 +80,7 @@ describe('ConstellationPage chamber', () => {
     const field = screen.getByLabelText(/search the literary sky/i);
     fireEvent.change(field, { target: { value: 'gravity' } });
     fireEvent.keyDown(field, { key: 'Enter', code: 'Enter' });
-    expect(screen.getByText(/awaiting engine — rhyme astrology/i)).toBeInTheDocument();
+    expect(await screen.findByText(/awaiting engine — rhyme astrology/i)).toBeInTheDocument();
   });
 
   it('disables morph animation class when reduced motion is preferred', () => {

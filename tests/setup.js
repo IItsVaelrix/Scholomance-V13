@@ -261,6 +261,17 @@ global.fetch = vi.fn().mockImplementation((url) => {
     });
   }
 
+  if (href.includes('/api/constellation/page')) {
+    // No live backend under jsdom; simulate an undeployed route so
+    // useConstellationPage falls back to the deterministic fixture (PDR §7.8).
+    // Individual tests can still vi.stubGlobal('fetch', ...) to override this.
+    return Promise.resolve({
+      ok: false,
+      status: 404,
+      json: () => Promise.resolve({}),
+    });
+  }
+
   // Generic fallback
   return Promise.resolve({
     ok: true,
