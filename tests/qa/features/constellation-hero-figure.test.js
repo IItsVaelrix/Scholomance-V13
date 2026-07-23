@@ -88,6 +88,29 @@ describe('heroFigure — the generation law (reaction)', () => {
     expect(b.nodes.filter((n) => n.isLodestar)).toHaveLength(1);
   });
 
+  it('the seed actually chooses among multiple stressed candidates', () => {
+    const twoStress = { ...basePacket, phraseGenome: { ...basePacket.phraseGenome, syllables: 2 },
+      rhymeAstrology: { ...basePacket.rhymeAstrology, phonemes: ['B','R','AY1','T','W','UW1','N','D'] } };
+    // Sanity-check the fixture: exactly two stressed candidates (AY1, UW1) so
+    // the lodestar pick is genuinely contested — not a pool.length===1 no-op.
+    const stressedCount = heroFigure(twoStress).nodes.filter((n) => n.stressed).length;
+    expect(stressedCount).toBe(2);
+    const ids = new Set();
+    for (const bc of ['s-a','s-b','s-c','s-d','s-e','s-f','s-g','s-h']) {
+      const fig = heroFigure({ ...twoStress, pageBytecode: bc });
+      expect(fig.nodes.filter((n) => n.isLodestar)).toHaveLength(1);
+      ids.add(fig.lodestarNodeId);
+    }
+    expect(ids.size).toBeGreaterThan(1); // the seed moves the lodestar, not a constant pick
+  });
+
+  it('cadence selects the rosette symmetry operator', () => {
+    const radial = heroFigure({ ...basePacket, rhymeAstrology: { ...basePacket.rhymeAstrology, cadenceFamily: 'dactylic' } });
+    const spiral = heroFigure({ ...basePacket, rhymeAstrology: { ...basePacket.rhymeAstrology, cadenceFamily: 'free-verse' } });
+    expect(radial.rosettes[0].symmetry).toBe('radial');
+    expect(spiral.rosettes[0].symmetry).toBe('spiral');
+  });
+
   it('regenerates a figure from graphemes when the rhyme channel is degraded', () => {
     const degraded = { ...basePacket, rhymeAstrology: null };
     const fig = heroFigure(degraded);
@@ -95,6 +118,9 @@ describe('heroFigure — the generation law (reaction)', () => {
     expect(fig.nodes.length).toBe(degraded.query.graphemeCount); // 5 generic atoms
     // Rarity truth is still read from leximancy, never recomputed.
     expect(fig.spectralClass).toBe('O');
+    // Synthetic atoms (`g0`, `g1`, …) must never be flagged vowel/stressed —
+    // their trailing digit is an index, not phonological truth.
+    expect(fig.nodes.every((n) => !n.isVowel && !n.stressed)).toBe(true);
   });
 
   it('reads stress from the packet digit and never re-derives it (backend-truth)', () => {

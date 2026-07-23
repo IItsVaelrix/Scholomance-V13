@@ -322,8 +322,11 @@ export function heroFigure(packet) {
     const local = placeRosette(r.center, r.nodeIndices.length, symmetry);
     r.nodeIndices.forEach((globalIdx, j) => {
       const ph = phonemes[globalIdx];
-      const isVowel = /[012]$/.test(ph); // ARPAbet vowels carry a stress digit; degraded atoms never do
-      const stressed = /[12]$/.test(ph);
+      // ARPAbet vowels carry a stress digit; degraded (`g0`, `g1`, …) atoms are
+      // synthetic placeholders whose trailing digit is an index, not phonology —
+      // gate on !degraded so the fallback path never invents stress/vowel truth.
+      const isVowel = !degraded && /[012]$/.test(ph);
+      const stressed = !degraded && /[12]$/.test(ph);
       const magnitude = stressed ? 1.5 : isVowel ? 1.0 : 0.6;
       const p = local[j];
       nodes.push({
