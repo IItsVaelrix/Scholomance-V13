@@ -161,11 +161,12 @@ const HYPOTHESES = Object.freeze([
           '(/W AW1 N D/) beside "an injury to living tissue" (/W UW1 N D/); choosing among ' +
           'them is not disambiguation, it is picking a word at random and calling the ' +
           'result a sense. Nothing can be evidenced until the word itself is settled — ' +
-          'which needs a syntactic frame this query may not have. Pronunciation is the ' +
-          'test, NOT part-of-speech count: bank n/v and crane n/v are each one word. ' +
-          'A missing count reads inconclusive — never as proof of one word.',
+          'which needs a syntactic frame. `the wound healed` and `he wound the clock` ' +
+          'resolve; a bare `wound` does not, and refusing there is correct. ' +
+          'Pronunciation is the test, NOT part-of-speech count: bank n/v and crane n/v ' +
+          'are each one word. A missing count reads inconclusive, never as proof.',
         observationId: 'obs.lex.lexical_entries',
-        predicate: Object.freeze({ op: 'gt', path: 'distinctPronunciations', value: 1 }),
+        predicate: Object.freeze({ op: 'gt', path: 'viableWordCount', value: 1 }),
       }),
       Object.freeze({
         id: 'f_homophone_capture',

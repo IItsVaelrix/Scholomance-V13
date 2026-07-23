@@ -180,6 +180,59 @@ describe('heteronyms are split, not chosen between', () => {
   });
 });
 
+describe('a syntactic frame settles the word (step B)', () => {
+  const woundGroups = [
+    { pos: 'a', senses: [{ synsetId: 'oewn-02325885-s', gloss: 'put in a coil', examples: [] }] },
+    { pos: 'n', senses: [
+      { synsetId: 'oewn-14322317-n', gloss: 'an injury to living tissue', examples: [] },
+      { synsetId: 'oewn-07354849-n', gloss: 'a casualty to military personnel from combat', examples: [] },
+    ] },
+    { pos: 'v', senses: [{ synsetId: 'oewn-00069650-v', gloss: 'cause injuries or bodily harm to', examples: [] }] },
+  ];
+  const woundAdapter2 = () => ({
+    lookupWord: () => [{ pos: 'a', headword: 'wound', senses: woundGroups.flatMap((g) => g.senses.map((x) => ({ gloss: x.gloss }))) }],
+    extractGloss: (s) => { const x = s?.[0]; return typeof x === 'string' ? x : (x && x.gloss) || null; },
+    lookupSynonyms: () => [], lookupAntonyms: () => [],
+    lookupRelated: () => ({ broader: [], narrower: [], akin: [] }),
+    lookupLexicalEntries: () => woundGroups,
+    // 'wound' must win head-token selection for the frame to apply to it.
+    getCorpusFrequencies: (ws) => new Map(ws.map((w) => [w, w === 'wound' ? 1 : 900])),
+  });
+
+  it('a bare heteronym stays unresolved and keeps every word in play', async () => {
+    const p = await buildConstellationPage('wound', depsWith(woundAdapter2()));
+    expect(p.semanticInquiry.framePos).toBeNull();
+    expect(p.semanticInquiry.viableWordCount).toBe(3);
+    expect(p.semanticInquiry.selection.reason).toBe('heteronym_unresolved');
+    // All four senses are still candidates: nothing has been ruled out.
+    expect(p.semanticInquiry.evidence.candidateCount).toBe(4);
+  });
+
+  it('a determiner settles it to the noun and restricts candidates to that word', async () => {
+    const p = await buildConstellationPage('the wound bled', depsWith(woundAdapter2()));
+    expect(p.semanticInquiry.framePos).toBe('n');
+    expect(p.semanticInquiry.frameCue).toBe('determiner:the');
+    expect(p.semanticInquiry.viableWordCount).toBe(1);
+    // Only the NOUN group's senses survive — not the adjective or verb.
+    expect(p.semanticInquiry.evidence.candidateCount).toBe(2);
+  });
+
+  it('a subject pronoun settles it to the verb', async () => {
+    const p = await buildConstellationPage('he wound it', depsWith(woundAdapter2()));
+    expect(p.semanticInquiry.framePos).toBe('v');
+    expect(p.semanticInquiry.viableWordCount).toBe(1);
+    expect(p.semanticInquiry.evidence.candidateCount).toBe(1);
+  });
+
+  it('never labels a settled word heteronym_unresolved', async () => {
+    // Reading isHeteronym (a property of the WORD) to explain the failure
+    // reported heteronym_unresolved for queries the frame had already settled.
+    const p = await buildConstellationPage('the wound bled', depsWith(woundAdapter2()));
+    expect(p.semanticInquiry.isHeteronym).toBe(true);
+    expect(p.semanticInquiry.selection.reason).not.toBe('heteronym_unresolved');
+  });
+});
+
 describe('degradation', () => {
   it('a thrown lexicon lookup degrades the channel without failing the page', async () => {
     const broken = craneAdapter({

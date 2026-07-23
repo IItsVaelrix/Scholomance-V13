@@ -43,6 +43,10 @@ function notBound(reason) {
     lexicalEntries: [],
     isHeteronym: false,
     distinctPronunciations: null,
+    headToken: null,
+    framePos: null,
+    frameCue: null,
+    viableWordCount: null,
   };
 }
 
@@ -96,6 +100,9 @@ export async function analyzeSemanticInquiry(lexiconAdapter, identity, leximancy
    * `distinctPronunciations` is absent when CMU could not answer — absent is not 1.
    */
   const distinctPronunciations = entriesDraft?.result?.distinctPronunciations ?? null;
+  const framePos = entriesDraft?.result?.framePos ?? null;
+  const frameCue = entriesDraft?.result?.frameCue ?? null;
+  const viableWordCount = entriesDraft?.result?.viableWordCount ?? null;
   const isHeteronym = typeof distinctPronunciations === 'number' && distinctPronunciations > 1;
 
   const hypotheses = {
@@ -114,12 +121,21 @@ export async function analyzeSemanticInquiry(lexiconAdapter, identity, leximancy
     lexicalEntries,
     isHeteronym,
     distinctPronunciations,
+    headToken,
+    framePos,
+    frameCue,
+    viableWordCount,
   };
 
   if (!evaluation.supported.includes(SENSE_HYPOTHESIS)) {
-    // Name the heteronym case specifically. "eliminated" is true but useless to a
-    // reader: the query was not weak evidence, it was a question about two words.
-    const reason = isHeteronym && evaluation.eliminated.includes(SENSE_HYPOTHESIS)
+    /**
+     * Label from what actually killed it, not from a property of the word.
+     * Reading `isHeteronym` here reported "heteronym_unresolved" for queries the
+     * frame had already settled (viableWordCount 1) and which then died of thin
+     * gloss overlap — an accurate-sounding reason that was simply not the cause.
+     */
+    const unsettled = typeof viableWordCount === 'number' && viableWordCount > 1;
+    const reason = unsettled && evaluation.eliminated.includes(SENSE_HYPOTHESIS)
       ? 'heteronym_unresolved'
       : evaluation.eliminated.includes(SENSE_HYPOTHESIS)
       ? 'eliminated'

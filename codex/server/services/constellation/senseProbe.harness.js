@@ -21,6 +21,10 @@ import { sameWordPronunciation } from '../../../core/phonology/phonologicalProce
 import {
   CONSTELLATION_SENSE_PROBE,
 } from '../../../core/constellation/semanticInquiry.js';
+import {
+  resolveSyntacticFrame,
+  viableWordCount,
+} from '../../../core/constellation/syntacticFrame.js';
 
 /**
  * CMU must be LOADED before we ask it anything, not merely told to load.
@@ -96,13 +100,39 @@ function isConnected(lexiconAdapter) {
  * @param {string} headToken
  * @param {string[]} queryTokens
  */
-function observeSenseCandidates(lexiconAdapter, headToken, queryTokens) {
+function observeSenseCandidates(lexiconAdapter, headToken, queryTokens, resolvedGroup) {
   if (!isConnected(lexiconAdapter)) {
     return draft('obs.lex.sense_candidates', null, 'error');
   }
 
-  const entries = lexiconAdapter.lookupWord?.(headToken, MAX_CANDIDATES) || [];
   const candidates = [];
+
+  /**
+   * WHEN THE FRAME SETTLED THE WORD, ONLY THAT WORD'S SENSES ARE CANDIDATES.
+   *
+   * This is the whole point of Step B. Without it, "the wound healed" still
+   * scores gloss overlap across all seven senses — four belonging to the injury
+   * noun, one to the coiled adjective, two to the verb — and a selection among
+   * them is a selection across two different words.
+   *
+   * These senses come from wordnet_synset via wordnet_lemma, which carries the
+   * POS and the synset id, rather than from the conflated entry.senses_json.
+   */
+  if (resolvedGroup && Array.isArray(resolvedGroup.senses)) {
+    for (const sense of resolvedGroup.senses) {
+      const gloss = String(sense?.gloss || '').trim();
+      if (!gloss) continue;
+      candidates.push({
+        senseId: sense.synsetId || `${headToken}.${resolvedGroup.pos}.${candidates.length}`,
+        lemma: headToken,
+        pos: resolvedGroup.pos,
+        gloss,
+      });
+      if (candidates.length >= MAX_CANDIDATES) break;
+    }
+  }
+
+  const entries = candidates.length > 0 ? [] : (lexiconAdapter.lookupWord?.(headToken, MAX_CANDIDATES) || []);
   for (const entry of entries) {
     const senses = Array.isArray(entry?.senses) ? entry.senses : [];
     for (const sense of senses) {
@@ -201,7 +231,7 @@ function observeRelationPaths(lexiconAdapter, headToken) {
  *
  * The groups are reported whole, never merged. Merging is the defect.
  */
-async function observeLexicalEntries(lexiconAdapter, headToken, phonology) {
+async function observeLexicalEntries(lexiconAdapter, headToken, phonology, queryTokens) {
   if (!isConnected(lexiconAdapter)) {
     return draft('obs.lex.lexical_entries', null, 'error');
   }
@@ -247,11 +277,23 @@ async function observeLexicalEntries(lexiconAdapter, headToken, phonology) {
     }
   }
 
+  /**
+   * The syntactic frame runs on the FULL token list, head token included: the
+   * cue is the token's NEIGHBOUR, so removing the head would destroy the very
+   * adjacency being read. (Gloss overlap excludes it; that is a different
+   * question asked of a different observation.)
+   */
+  const frame = resolveSyntacticFrame(queryTokens, headToken);
+  const viable = viableWordCount(distinctPronunciations, groups, frame.pos);
+
   const result = {
     entryCount: groups.length,
     entries: groups.map((g) => ({ pos: g.pos, senseCount: g.senses.length, senses: g.senses })),
+    framePos: frame.pos,
+    frameCue: frame.cue,
   };
   if (distinctPronunciations !== null) result.distinctPronunciations = distinctPronunciations;
+  if (viable !== null) result.viableWordCount = viable;
 
   return draft('obs.lex.lexical_entries', result, 'observed');
 }
@@ -337,9 +379,22 @@ export async function collectSenseProbeDrafts({ lexiconAdapter, headToken, query
     );
   }
 
-  const senseDraft = observeSenseCandidates(lexiconAdapter, token, tokens);
+  // Entries + frame first: they decide WHICH word's senses are candidates.
+  const entriesDraft = await observeLexicalEntries(lexiconAdapter, token, phonology, tokens);
+
+  const framePos = entriesDraft.result?.framePos ?? null;
+  const groups = entriesDraft.result?.entries ?? [];
+  const viable = entriesDraft.result?.viableWordCount ?? null;
+  /**
+   * Restrict only when the word is actually SETTLED (one viable word) AND the
+   * frame picked the group. A single viable word with no frame means the
+   * spelling was never ambiguous, so there is nothing to restrict to.
+   */
+  const resolvedGroup =
+    viable === 1 && framePos ? groups.find((g) => g.pos === framePos) || null : null;
+
+  const senseDraft = observeSenseCandidates(lexiconAdapter, token, tokens, resolvedGroup);
   const relationDraft = observeRelationPaths(lexiconAdapter, token);
-  const entriesDraft = await observeLexicalEntries(lexiconAdapter, token, phonology);
   const candidates = senseDraft.result?.candidates ?? [];
   const phoneticDraft = observePhoneticNeighbour(token, candidates);
 

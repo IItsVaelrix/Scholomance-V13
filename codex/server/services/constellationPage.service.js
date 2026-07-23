@@ -188,6 +188,15 @@ export async function buildConstellationPage(rawQuery, deps) {
           isHeteronym: semanticInquiry.isHeteronym,
           // null when CMU could not answer. Absent is not "one pronunciation".
           distinctPronunciations: semanticInquiry.distinctPronunciations,
+          /**
+           * The syntactic frame that settled the word, and how many words remain
+           * viable after it. `the wound healed` -> framePos n; a bare `wound` ->
+           * null, and refusing there is the correct answer, not a shortfall.
+           */
+          headToken: semanticInquiry.headToken,
+          framePos: semanticInquiry.framePos,
+          frameCue: semanticInquiry.frameCue,
+          viableWordCount: semanticInquiry.viableWordCount,
           lexicalEntries: semanticInquiry.lexicalEntries,
         }
       : null,
