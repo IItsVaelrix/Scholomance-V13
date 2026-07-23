@@ -2,10 +2,14 @@ import { describe, it, expect } from 'vitest';
 import { buildConstellationPage } from '../../../codex/server/services/constellationPage.service.js';
 
 const lexiconAdapter = {
-  lookupWord: (w) => (w === 'morning' ? [{ pos: 'noun', senses: ['dawn'], source: 's' }] : []),
-  extractGloss: (s) => s?.[0] || null,
+  lookupWord: (w) => (w === 'morning'
+    ? [{ pos: 'noun', senses: [{ gloss: 'dawn', examples: ['early in the morning'] }], etymology: 'OE morgen', pronunciation: '/ˈmɔːnɪŋ/', source: 's' }]
+    : []),
+  extractGloss: (s) => { const x = s?.[0]; return typeof x === 'string' ? x : (x && x.gloss) || null; },
   lookupSynonyms: () => [{ lemma: 'dawn' }],
   lookupAntonyms: () => [{ lemma: 'dusk' }],
+  lookupRelated: () => ({ broader: [{ lemma: 'time' }], narrower: [{ lemma: 'sunrise' }], akin: [{ lemma: 'daybreak' }] }),
+  getCorpusFrequencies: (words) => new Map(words.map((w) => [w, w === 'morning' ? 300 : 10])),
 };
 const rhymeQueryEngine = {
   async query() {
@@ -43,5 +47,25 @@ describe('buildConstellationPage', () => {
     const a = await buildConstellationPage('morning', deps);
     const b = await buildConstellationPage('morning', deps);
     expect(a.pageBytecode).toBe(b.pageBytecode);
+  });
+
+  it('threads etymology, rarity, relations, examples, and IPA onto the packet', async () => {
+    const p = await buildConstellationPage('morning', deps);
+    expect(p.leximancy.etymology).toBe('OE morgen');
+    expect(p.leximancy.rarity).toEqual({ band: 5, max: 9, label: 'uncommon' });
+    expect(p.leximancy.relations.broader).toEqual(['time']);
+    expect(p.leximancy.interpretations[0].examples).toEqual(['early in the morning']);
+    expect(p.rhymeAstrology.ipa).toBe('/ˈmɔːnɪŋ/');
+  });
+
+  it('records a granular degraded channel when relations lookup throws', async () => {
+    const brokenLex = {
+      ...lexiconAdapter,
+      lookupRelated: () => { throw new Error('wordnet offline'); },
+    };
+    const p = await buildConstellationPage('morning', { ...deps, lexiconAdapter: brokenLex });
+    expect(p.leximancy.relations).toEqual({ broader: [], narrower: [], akin: [] });
+    expect(p.diagnostics.degradedChannels).toContain('leximancy.relations');
+    expect(p.leximancy.etymology).toBe('OE morgen'); // other sub-fields intact
   });
 });

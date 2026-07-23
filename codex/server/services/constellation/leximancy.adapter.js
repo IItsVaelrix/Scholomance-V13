@@ -96,7 +96,13 @@ export function analyzeLeximancy(lexiconAdapter, contentToken) {
   const nearKin = (lexiconAdapter.lookupSynonyms?.(contentToken, 20) || []).map((e) => e.lemma);
   const counterfield = (lexiconAdapter.lookupAntonyms?.(contentToken, 20) || []).map((e) => e.lemma);
 
-  const related = lexiconAdapter.lookupRelated?.(contentToken, 20) || { broader: [], narrower: [], akin: [] };
+  let related = { broader: [], narrower: [], akin: [] };
+  let relationsFailed = false;
+  try {
+    related = lexiconAdapter.lookupRelated?.(contentToken, 20) || related;
+  } catch {
+    relationsFailed = true;
+  }
   const relBroader = (related.broader || []).map((e) => e.lemma).filter(Boolean);
   const relNarrower = (related.narrower || []).map((e) => e.lemma).filter(Boolean);
   const relAkin = (related.akin || []).map((e) => e.lemma).filter(Boolean);
@@ -143,5 +149,6 @@ export function analyzeLeximancy(lexiconAdapter, contentToken) {
     ipa: originItem.ipa ?? null,
     rarity,
     relations,
+    relationsFailed,
   };
 }

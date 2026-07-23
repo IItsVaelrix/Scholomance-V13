@@ -4,7 +4,7 @@ import { analyzeLeximancy, LEXIMANCY_ADAPTER_VERSION } from './constellation/lex
 import { analyzeRhyme, RHYME_ADAPTER_VERSION } from './constellation/rhymeAstrology.adapter.js';
 import { analyzeGenome, GENOME_ADAPTER_VERSION } from './constellation/genome.adapter.js';
 
-const CONSTELLATION_OS_VERSION = 'phase1-live-1';
+const CONSTELLATION_OS_VERSION = 'phase1-live-2';
 
 function emptyLeximancy() {
   return { status: 'unsupported', selectedInterpretationId: null, interpretations: [], nearKin: [], counterfield: [], warnings: [], anchor: null };
@@ -26,6 +26,11 @@ export async function buildConstellationPage(rawQuery, deps) {
   } catch (err) {
     degradedChannels.push('leximancy');
     warnings.push(`leximancy channel failed: ${err.message}`);
+  }
+
+  if (leximancy.relationsFailed) {
+    degradedChannels.push('leximancy.relations');
+    warnings.push('leximancy relations lookup failed');
   }
 
   let rhyme = null;
@@ -75,6 +80,9 @@ export async function buildConstellationPage(rawQuery, deps) {
       warnings: leximancy.warnings,
       nearKin: leximancy.nearKin,
       counterfield: leximancy.counterfield,
+      etymology: leximancy.etymology ?? null,
+      rarity: leximancy.rarity ?? null,
+      relations: leximancy.relations ?? { broader: [], narrower: [], akin: [] },
     },
     rhymeAstrology: rhyme
       ? {
@@ -84,6 +92,7 @@ export async function buildConstellationPage(rawQuery, deps) {
           exactRhymes: rhyme.exactRhymes,
           slantRhymes: rhyme.slantRhymes,
           dominantVowelFamily: rhyme.dominantVowelFamily,
+          ipa: leximancy.ipa ?? null,
         }
       : null,
     phraseGenome: {
