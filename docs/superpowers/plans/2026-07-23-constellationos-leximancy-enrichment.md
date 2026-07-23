@@ -14,7 +14,7 @@
 - **Local degradation (PDR §7.8):** a failed sub-lookup sets *only its own* field to empty/null and appends a **granular** `diagnostics.degradedChannels` entry (`leximancy.relations`, `leximancy.rarity`, `leximancy.etymology`, `rhyme.ipa`). The page never collapses.
 - **Empty vs null is contractual:** present-but-empty array = "looked up, found nothing" (UI hides silently). `null` = "no value / degraded". Never conflated.
 - **Caps:** `examples` ≤3 per interpretation, each ≤20 words; `relations.broader/narrower/akin` ≤10 each. Enriched packet stays within +15% of the Phase-1 baseline size.
-- **Version bumps reflect what actually changed:** `LEXIMANCY_ADAPTER_VERSION` `lex-adapter-2` → `lex-adapter-3`; `CONSTELLATION_OS_VERSION` `phase1-live-1` → `phase1-live-2`. `RHYME_ADAPTER_VERSION` is **unchanged** (that adapter's logic did not change).
+- **Version bumps reflect what actually changed:** `LEXIMANCY_ADAPTER_VERSION` `lex-adapter-2` → `lex-adapter-3`; `CONSTELLATION_OS_VERSION` `phase1-live-1` → `phase1-live-2`. `RHYME_ADAPTER_VERSION` is **deliberately unchanged** (that adapter's logic did not change — IPA is leximancy-sourced and only *placed* on `rhymeAstrology` by the service). This intentionally supersedes spec §5's `ra-adapter-2`: the page still re-keys lawfully because `pageBytecode` hashes the whole `engineVersions` map and `leximancy` bumped. Do not read the unbumped rhyme version as an oversight. *(Confirmed sound by the final whole-branch review, 2026-07-23.)*
 - **No mutation, XP, persistence, or engine/DB migration.** No `embeddings_tq`, no `lookupSymbolsLoose` this pass.
 - **Spec:** `docs/superpowers/specs/2026-07-23-constellationos-leximancy-enrichment-design.md`.
 
