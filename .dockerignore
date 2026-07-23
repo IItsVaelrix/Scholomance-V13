@@ -99,3 +99,6 @@ scholomance_user.sqlite-wal
 scholomance_user.sqlite-shm
 _leftleaf.png
 _combat-1440.png
+
+# Scratch/probe output — never part of a build context.
+.tmp/
