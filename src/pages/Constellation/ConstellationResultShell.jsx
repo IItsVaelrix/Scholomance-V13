@@ -1,9 +1,33 @@
 /**
+ * @param {{ items: string[], label: string, tone?: 'kin'|'counter'|'rhyme'|'slant' }} props
+ */
+function Chips({ items, label, tone = 'kin' }) {
+  if (!items || items.length === 0) return null;
+  return (
+    <div className="constellation-result-chipset">
+      <span className="constellation-result-chipset__label">
+        {label} <span className="constellation-result-chipset__count">{items.length}</span>
+      </span>
+      <ul className={`constellation-result-chips constellation-result-chips--${tone}`}>
+        {items.map((item) => (
+          <li key={item} className="constellation-result-chip">
+            {item}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/**
  * @param {{ packet: import('./types.js').ConstellationPhase1Packet }} props
  */
 export default function ConstellationResultShell({ packet }) {
-  const { query, leximancy, rhymeAstrology, phraseGenome, pageBytecode, provenance } = packet;
+  const { query, leximancy, rhymeAstrology, phraseGenome, pageBytecode, provenance, diagnostics } = packet;
   const engineVersions = provenance?.engineVersions ?? {};
+  const degraded = diagnostics?.degradedChannels ?? [];
+  const nearKin = leximancy.nearKin ?? [];
+  const counterfield = leximancy.counterfield ?? [];
   const hasLeximancy = leximancy.interpretations.length > 0;
   const hasRhyme = rhymeAstrology != null;
   const hasGenome =
@@ -13,6 +37,12 @@ export default function ConstellationResultShell({ packet }) {
 
   return (
     <div id="constellation-result-shell" className="constellation-result-shell">
+      {degraded.length > 0 ? (
+        <p className="constellation-result-degraded" role="status">
+          Partial sky — {degraded.join(', ')} unavailable. Other channels are shown in full.
+        </p>
+      ) : null}
+
       <section className="constellation-result-section" aria-labelledby="cos-phrase-identity">
         <h2 id="cos-phrase-identity">Phrase Identity</h2>
         <dl className="constellation-result-dl">
@@ -37,6 +67,16 @@ export default function ConstellationResultShell({ packet }) {
             <dd>{query.graphemeCount}</dd>
           </div>
           <div>
+            <dt>Meaning status</dt>
+            <dd>{leximancy.status}</dd>
+          </div>
+          {phraseGenome.schoolHint ? (
+            <div>
+              <dt>Dominant school</dt>
+              <dd className="constellation-result-school">{phraseGenome.schoolHint}</dd>
+            </div>
+          ) : null}
+          <div>
             <dt>Page bytecode</dt>
             <dd className="constellation-result-mono">{pageBytecode}</dd>
           </div>
@@ -54,16 +94,32 @@ export default function ConstellationResultShell({ packet }) {
         <h2 id="cos-leximancy">Leximancy Meaning Field</h2>
         {hasLeximancy ? (
           <>
-            <ul className="constellation-result-interpretations">
-              {leximancy.interpretations.map((item) => (
-                <li key={item.id}>
-                  <span className="constellation-result-gloss">{item.gloss}</span>
-                  <span className="constellation-result-confidence">
-                    {(item.confidence * 100).toFixed(0)}%
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <p className="constellation-result-panel-note">
+              {leximancy.status === 'ambiguous'
+                ? `${leximancy.interpretations.length} readings — no single meaning selected`
+                : `${leximancy.interpretations.length} sense${leximancy.interpretations.length === 1 ? '' : 's'}`}
+            </p>
+            <ol className="constellation-result-interpretations">
+              {leximancy.interpretations.map((item) => {
+                const selected = item.id === leximancy.selectedInterpretationId;
+                return (
+                  <li
+                    key={item.id}
+                    className={selected ? 'is-selected' : undefined}
+                    aria-current={selected ? 'true' : undefined}
+                  >
+                    {item.pos ? <span className="constellation-result-pos">{item.pos}</span> : null}
+                    <span className="constellation-result-gloss">{item.gloss}</span>
+                    {selected ? <span className="constellation-result-selected-mark">selected</span> : null}
+                    <span className="constellation-result-confidence">
+                      {(item.confidence * 100).toFixed(0)}%
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+            <Chips items={nearKin} label="Near kin" tone="kin" />
+            <Chips items={counterfield} label="Counterfield" tone="counter" />
             {leximancy.warnings.length > 0 ? (
               <ul className="constellation-result-warnings">
                 {leximancy.warnings.map((warning) => (
@@ -96,14 +152,12 @@ export default function ConstellationResultShell({ packet }) {
                   <th scope="row">Cadence</th>
                   <td>{rhymeAstrology.cadenceFamily}</td>
                 </tr>
-                <tr>
-                  <th scope="row">Exact rhymes</th>
-                  <td>{rhymeAstrology.exactRhymes.join(', ')}</td>
-                </tr>
-                <tr>
-                  <th scope="row">Slant rhymes</th>
-                  <td>{rhymeAstrology.slantRhymes.join(', ')}</td>
-                </tr>
+                {rhymeAstrology.dominantVowelFamily ? (
+                  <tr>
+                    <th scope="row">Vowel family</th>
+                    <td>{rhymeAstrology.dominantVowelFamily}</td>
+                  </tr>
+                ) : null}
               </tbody>
             </table>
             <svg
@@ -127,6 +181,8 @@ export default function ConstellationResultShell({ packet }) {
                 );
               })}
             </svg>
+            <Chips items={rhymeAstrology.exactRhymes} label="Exact rhymes" tone="rhyme" />
+            <Chips items={rhymeAstrology.slantRhymes} label="Slant rhymes" tone="slant" />
           </>
         ) : (
           <p className="constellation-result-awaiting">Awaiting engine — Rhyme Astrology</p>
@@ -149,8 +205,8 @@ export default function ConstellationResultShell({ packet }) {
             ) : null}
             {phraseGenome.schoolHint ? (
               <div>
-                <dt>School hint</dt>
-                <dd>{phraseGenome.schoolHint}</dd>
+                <dt>School</dt>
+                <dd className="constellation-result-school">{phraseGenome.schoolHint}</dd>
               </div>
             ) : null}
           </dl>

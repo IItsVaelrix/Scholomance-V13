@@ -83,6 +83,7 @@ export async function buildConstellationPage(rawQuery, deps) {
           cadenceFamily: rhyme.cadenceFamily,
           exactRhymes: rhyme.exactRhymes,
           slantRhymes: rhyme.slantRhymes,
+          dominantVowelFamily: rhyme.dominantVowelFamily,
         }
       : null,
     phraseGenome: {

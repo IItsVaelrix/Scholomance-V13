@@ -32,6 +32,30 @@ describe('analyzeLeximancy', () => {
     expect(r.selectedInterpretationId).toBe(r.interpretations[0].id);
   });
 
+  it('expands an entry with multiple senses into multiple interpretations', () => {
+    const adapter = fakeAdapter({
+      bank: [{
+        pos: 'noun',
+        senses: [
+          'sloping land beside water',
+          'a financial institution',
+          'a long ridge or pile',
+        ],
+        source: 's',
+      }],
+    });
+    const r = analyzeLeximancy(adapter, 'bank');
+    expect(r.interpretations).toHaveLength(3);
+    expect(r.interpretations.map((i) => i.gloss)).toEqual([
+      'sloping land beside water',
+      'a financial institution',
+      'a long ridge or pile',
+    ]);
+    // All the same POS → resolved, first sense selected (dominant rank).
+    expect(r.status).toBe('resolved');
+    expect(r.selectedInterpretationId).toBe(r.interpretations[0].id);
+  });
+
   it('reports unsupported when the word is unknown', () => {
     const r = analyzeLeximancy(fakeAdapter({}), 'zzzq');
     expect(r.status).toBe('unsupported');

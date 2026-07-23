@@ -1,18 +1,35 @@
+/* ============================================================
+   ConstellationOS — the Observatory Chamber
+   Display voice: Bodoni Moda (--font-display). Body: Crimson Pro.
+   Palette: deep galaxy void, amethyst + arc nebula, gold as the rare "answer".
+   ============================================================ */
+
 .constellation-stage {
-  --cos-amethyst: #7b6cff;
-  --cos-arc: #bfe3ff;
-  --cos-gold: #d4af37;
+  --cos-void: #05060f;
+  --cos-abyss: #0a0a1a;
+  --cos-amethyst: #8b7cff;
+  --cos-arc: #cfe6ff;
+  --cos-gold: #e8c96a;
+  --cos-ink: rgba(207, 230, 255, 0.92);
+  --cos-ink-dim: rgba(207, 230, 255, 0.58);
+  --cos-hair: rgba(139, 124, 255, 0.22);
+  --cos-display: var(--font-display, 'Bodoni Moda', Didot, serif);
+  --cos-body: var(--font-scroll, 'Crimson Pro', Georgia, serif);
+  --cos-harmonic: 1600ms;
+
   position: relative;
   min-height: 100vh;
   overflow: hidden;
-  color: var(--cos-arc);
+  color: var(--cos-ink);
   background:
-    radial-gradient(ellipse 70% 50% at 50% 30%, rgba(40, 36, 70, 0.45) 0%, transparent 60%),
-    radial-gradient(ellipse 120% 80% at 50% 120%, rgba(20, 18, 30, 0.9) 0%, transparent 55%),
-    radial-gradient(ellipse 90% 70% at 50% 44%, #0b0d16 0%, #07070e 52%, #020205 100%);
+    radial-gradient(ellipse 80% 55% at 50% 22%, rgba(40, 34, 78, 0.5) 0%, transparent 62%),
+    radial-gradient(ellipse 120% 90% at 50% 128%, rgba(14, 12, 26, 0.95) 0%, transparent 55%),
+    radial-gradient(ellipse 100% 80% at 50% 46%, #0b0d1a 0%, var(--cos-void) 54%, #020208 100%);
 }
 
-.constellation-backdrop {
+/* ---------- Sky ---------- */
+
+.constellation-sky {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -21,33 +38,61 @@
   z-index: 0;
 }
 
-.constellation-backdrop--drift {
-  animation: constellation-drift 120s linear infinite;
+.constellation-sky__dust-star {
+  fill: rgba(207, 230, 255, 0.55);
 }
 
-@keyframes constellation-drift {
-  from {
-    transform: translate3d(0, 0, 0) scale(1.02);
-  }
-  50% {
-    transform: translate3d(-1.5%, -0.8%, 0) scale(1.04);
-  }
-  to {
-    transform: translate3d(0, 0, 0) scale(1.02);
-  }
-}
-
-.constellation-backdrop__star {
-  fill: var(--cos-arc);
-  opacity: 0.72;
-  filter: drop-shadow(0 0 2px rgba(191, 227, 255, 0.55));
-}
-
-.constellation-backdrop__edge {
+.constellation-sky__edge {
   stroke: var(--cos-amethyst);
-  stroke-opacity: 0.15;
-  stroke-width: 0.15;
+  stroke-opacity: 0.2;
+  stroke-width: 0.12;
+  stroke-linecap: round;
 }
+
+.constellation-sky__star--lode {
+  filter: drop-shadow(0 0 0.5px rgba(232, 201, 106, 0.9));
+}
+
+/* Bytecode-seeded twinkle — per-star delay/duration set inline (skyChart.js).
+   OPACITY ONLY: the spark stars are positioned with a `transform` attribute, and
+   a CSS `transform` keyframe would override it and collapse them to the origin.
+   So the twinkle never touches transform. */
+.constellation-sky--animate .constellation-sky__star {
+  animation-name: cos-twinkle;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-timing-function: ease-in-out;
+  will-change: opacity;
+}
+
+.constellation-sky--animate .constellation-sky__nebula {
+  transform-origin: 52% 48%;
+  animation: cos-nebula-drift 150s ease-in-out infinite;
+}
+
+.constellation-sky--animate .constellation-sky__dust {
+  transform-origin: 48% 52%;
+  animation: cos-nebula-drift 210s ease-in-out infinite reverse;
+}
+
+@keyframes cos-twinkle {
+  from { opacity: 0.4; }
+  to   { opacity: 1; }
+}
+
+@keyframes cos-nebula-drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1.03); }
+  50%  { transform: translate3d(-1.4%, -1%, 0) scale(1.06); }
+  100% { transform: translate3d(0, 0, 0) scale(1.03); }
+}
+
+/* Fallback plain star field (ConstellationBackdrop) */
+.constellation-backdrop { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+.constellation-backdrop--drift { animation: cos-nebula-drift 150s linear infinite; }
+.constellation-backdrop__star { fill: var(--cos-arc); opacity: 0.72; }
+.constellation-backdrop__edge { stroke: var(--cos-amethyst); stroke-opacity: 0.15; stroke-width: 0.15; }
+
+/* ---------- Foreground ---------- */
 
 .constellation-foreground {
   position: relative;
@@ -62,89 +107,145 @@
 }
 
 .constellation-brand {
-  font-family: "Cinzel", "Palatino Linotype", Palatino, serif;
-  letter-spacing: 0.08em;
-  font-size: clamp(2rem, 5vw, 3rem);
-  margin: 0 0 0.5rem;
+  font-family: var(--cos-display);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  font-size: clamp(2.6rem, 8vw, 5.5rem);
+  line-height: 0.98;
+  margin: 0 0 0.35rem;
+  color: #f2f5ff;
+  text-shadow: 0 0 24px rgba(139, 124, 255, 0.35), 0 0 2px rgba(207, 230, 255, 0.5);
 }
 
 .constellation-invitation {
-  margin: 0.75rem 0 1.5rem;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.05rem;
+  margin: 0.5rem 0 2rem;
+  font-family: var(--cos-display);
   font-style: italic;
-  color: rgba(191, 227, 255, 0.82);
+  font-weight: 400;
+  font-size: clamp(1rem, 2.4vw, 1.35rem);
+  letter-spacing: 0.02em;
+  color: var(--cos-ink-dim);
 }
 
+/* ---------- Search: Google clarity, arcane skin ---------- */
+
 .constellation-search {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  max-width: 42rem;
+  width: 100%;
+  max-width: 40rem;
   margin: 0 auto;
-  padding: 0 1.5rem;
 }
 
 .constellation-search__label {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1rem;
-  letter-spacing: 0.04em;
-  color: var(--cos-arc);
+  font-family: var(--cos-body);
+  font-size: 0.95rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cos-ink-dim);
 }
+
+.constellation-search__field-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0.5rem 0.35rem 1.1rem;
+  border-radius: 2rem;
+  background: linear-gradient(180deg, rgba(12, 14, 28, 0.86), rgba(7, 8, 18, 0.92));
+  border: 1px solid var(--cos-hair);
+  box-shadow: inset 0 1px 0 rgba(207, 230, 255, 0.05), 0 10px 40px rgba(4, 4, 12, 0.6);
+}
+
+/* Breathing halo ring — shares the app's 1600ms harmonic. */
+.constellation-search__ring {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: 0 0 0 1px rgba(139, 124, 255, 0.2), 0 0 22px rgba(139, 124, 255, 0.18);
+  opacity: 0.7;
+}
+
+.constellation-search--breathe .constellation-search__ring {
+  animation: cos-breathe var(--cos-harmonic) ease-in-out infinite;
+}
+
+.constellation-search--focused .constellation-search__field-wrap {
+  border-color: rgba(232, 201, 106, 0.55);
+}
+
+.constellation-search--focused .constellation-search__ring {
+  box-shadow: 0 0 0 1px rgba(232, 201, 106, 0.5), 0 0 30px rgba(232, 201, 106, 0.28);
+  opacity: 1;
+  animation: none;
+}
+
+@keyframes cos-breathe {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 0.95; }
+}
+
+.constellation-search__sigil {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  stroke: rgba(139, 124, 255, 0.7);
+  stroke-width: 1.1;
+  fill: none;
+}
+.constellation-search__sigil circle { fill: rgba(207, 230, 255, 0.85); stroke: none; }
+.constellation-search__sigil-core { fill: var(--cos-amethyst) !important; }
 
 .constellation-search__field {
-  width: 100%;
-  min-height: 5.5rem;
-  max-height: 9rem;
-  padding: 0.85rem 1rem;
-  resize: vertical;
-  border: 1px solid rgba(123, 108, 255, 0.35);
-  border-radius: 0.35rem;
-  background: rgba(7, 7, 14, 0.72);
-  color: var(--cos-arc);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 2.2rem;
+  /* Capped to ~2 rows then scrolls: keeps the field-wrap a true pill. The
+     phenotype harness proved that letting it grow taller flips shape pill→round
+     (radius ÷ min-side), coupling size→shape — so the field never grows tall. */
+  max-height: 3.4rem;
+  padding: 0.5rem 0;
+  resize: none;
+  border: none;
+  background: transparent;
+  color: var(--cos-ink);
+  font-family: var(--cos-body);
+  font-size: 1.15rem;
   line-height: 1.5;
-}
-
-.constellation-search__field::placeholder {
-  color: rgba(191, 227, 255, 0.45);
-  font-style: italic;
-}
-
-.constellation-search__field:focus {
-  outline: 1px solid rgba(123, 108, 255, 0.55);
-  outline-offset: 2px;
-}
-
-.constellation-search__submit {
-  align-self: flex-end;
-  padding: 0.45rem 1.1rem;
-  border: 1px solid rgba(123, 108, 255, 0.4);
-  border-radius: 0.25rem;
-  background: rgba(123, 108, 255, 0.12);
-  color: rgba(191, 227, 255, 0.78);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 0.9rem;
-  letter-spacing: 0.06em;
-  cursor: pointer;
-}
-
-.constellation-search__submit:hover {
-  background: rgba(123, 108, 255, 0.22);
-  color: var(--cos-arc);
-}
-
-.constellation-search__refusal {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 0.95rem;
-  font-style: italic;
-  color: rgba(212, 175, 55, 0.85);
-}
-
-.constellation-stage--submitted {
   overflow-y: auto;
 }
+.constellation-search__field:focus { outline: none; }
+.constellation-search__field::placeholder { color: rgba(207, 230, 255, 0.4); font-style: italic; }
+
+.constellation-search__submit {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: radial-gradient(circle at 50% 40%, rgba(139, 124, 255, 0.32), rgba(139, 124, 255, 0.1));
+  transition: background 200ms ease, transform 200ms ease;
+}
+.constellation-search__submit:hover { background: radial-gradient(circle at 50% 40%, rgba(232, 201, 106, 0.4), rgba(232, 201, 106, 0.12)); transform: scale(1.06); }
+.constellation-search__submit:focus-visible { outline: 2px solid var(--cos-gold); outline-offset: 2px; }
+.constellation-search__submit-glyph { width: 1.3rem; height: 1.3rem; fill: #f2f5ff; }
+
+.constellation-search__refusal {
+  font-family: var(--cos-body);
+  font-size: 1rem;
+  font-style: italic;
+  color: rgba(232, 201, 106, 0.9);
+}
+
+/* ---------- Submitted: compress to a top rail ---------- */
+
+.constellation-stage--submitted { overflow-y: auto; }
 
 .constellation-stage--submitted .constellation-foreground {
   justify-content: flex-start;
@@ -158,195 +259,298 @@
   position: sticky;
   top: 0;
   z-index: 3;
-  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  font-size: clamp(1.3rem, 3vw, 1.9rem);
+  letter-spacing: 0.1em;
   margin: 0;
-  padding: 0.65rem 1.5rem 0;
-  background: linear-gradient(180deg, rgba(7, 7, 14, 0.94) 72%, transparent);
+  padding: 0.7rem 1.5rem 0.2rem;
+  text-shadow: 0 0 14px rgba(139, 124, 255, 0.3);
+  background: linear-gradient(180deg, rgba(5, 6, 15, 0.95) 70%, transparent);
 }
 
 .constellation-stage--submitted .constellation-search {
   position: sticky;
-  top: 2.25rem;
+  top: 2.6rem;
   z-index: 2;
   max-width: none;
   margin: 0;
   padding: 0 1.5rem 0.75rem;
-  background: linear-gradient(180deg, rgba(7, 7, 14, 0.9) 78%, transparent);
+  background: linear-gradient(180deg, rgba(5, 6, 15, 0.92) 78%, transparent);
 }
-
-.constellation-stage--submitted .constellation-search__field {
-  min-height: 2.5rem;
-  max-height: 4rem;
+.constellation-stage--submitted .constellation-search__label {
+  position: absolute;
+  width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
 }
+.constellation-stage--submitted .constellation-search__field { min-height: 1.6rem; font-size: 1rem; }
 
+/* Motion gating for the morph */
 .constellation-stage--animate .constellation-brand,
 .constellation-stage--animate .constellation-invitation,
 .constellation-stage--animate .constellation-search,
-.constellation-stage--animate .constellation-search__field,
 .constellation-stage--animate .constellation-result-shell {
   transition: transform 320ms ease-in-out, opacity 320ms ease-in-out;
 }
 
-@keyframes constellation-result-rise {
-  from {
-    opacity: 0;
-    transform: translateY(1rem);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes cos-result-rise {
+  from { opacity: 0; transform: translateY(1rem); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
 .constellation-stage--animate.constellation-stage--submitted .constellation-result-shell {
-  animation: constellation-result-rise 320ms ease-in-out;
+  animation: cos-result-rise 360ms ease-in-out;
 }
+
+/* ---------- Result shell ---------- */
 
 .constellation-result-shell {
+  counter-reset: cos-sec;
   padding: 1.5rem;
   max-width: 48rem;
   margin: 0 auto;
   width: 100%;
+  /* Whisper-thin scrim: lifts reading text off the star field without hiding the
+     galaxy at the margins. Feathered so the shell still floats in the sky. */
+  background: linear-gradient(
+    180deg,
+    rgba(5, 6, 15, 0) 0%,
+    rgba(5, 6, 15, 0.5) 8%,
+    rgba(5, 6, 15, 0.55) 92%,
+    rgba(5, 6, 15, 0) 100%
+  );
 }
 
 .constellation-result-section {
   margin-bottom: 2rem;
   padding-bottom: 2rem;
 }
-
 .constellation-result-section + .constellation-result-section {
-  border-top: 1px solid rgba(123, 108, 255, 0.15);
+  border-top: 1px solid var(--cos-hair);
   padding-top: 2rem;
 }
 
 .constellation-result-section h2 {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.25rem;
+  counter-increment: cos-sec;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  font-family: var(--cos-display);
+  font-size: 1.5rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--cos-arc);
-  margin: 0 0 0.75rem;
+  letter-spacing: 0.03em;
+  color: #eef3ff;
+  margin: 0 0 1rem;
+}
+.constellation-result-section h2::before {
+  content: counter(cos-sec, upper-roman);
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  color: var(--cos-gold);
+  border: 1px solid rgba(232, 201, 106, 0.35);
+  border-radius: 999px;
+  padding: 0.05rem 0.55rem;
+  line-height: 1.4;
 }
 
 .constellation-result-dl {
   display: grid;
-  gap: 0.5rem 1.5rem;
+  gap: 0.6rem 1.5rem;
   grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
   margin: 0;
 }
-
 .constellation-result-dl dt {
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
+  font-family: var(--cos-body);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(191, 227, 255, 0.55);
+  color: var(--cos-ink-dim);
 }
-
 .constellation-result-dl dd {
   margin: 0.15rem 0 0;
-  font-family: Georgia, "Times New Roman", serif;
-  color: var(--cos-arc);
+  font-family: var(--cos-body);
+  font-size: 1.05rem;
+  color: var(--cos-ink);
 }
 
 .constellation-result-mono {
-  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
-  font-size: 0.85rem;
-  color: rgba(191, 227, 255, 0.78);
+  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace;
+  font-size: 0.82rem;
+  color: rgba(207, 230, 255, 0.75);
 }
 
 .constellation-result-versions {
   list-style: none;
   padding: 0;
-  margin: 0.75rem 0 0;
-  font-size: 0.85rem;
-  color: rgba(191, 227, 255, 0.65);
+  margin: 1rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  font-size: 0.8rem;
+  color: var(--cos-ink-dim);
 }
 
-.constellation-result-interpretations {
+.constellation-result-interpretations { list-style: none; padding: 0; margin: 0; }
+.constellation-result-interpretations li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--cos-hair);
+  font-family: var(--cos-body);
+  font-size: 1.1rem;
+}
+.constellation-result-interpretations li.is-selected {
+  padding-left: 0.7rem;
+  border-left: 2px solid var(--cos-gold);
+  margin-left: -0.7rem;
+}
+.constellation-result-pos {
+  flex: none;
+  align-self: center;
+  font-family: ui-monospace, 'Cascadia Code', Menlo, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cos-amethyst);
+  border: 1px solid rgba(139, 124, 255, 0.35);
+  border-radius: 3px;
+  padding: 0.05rem 0.35rem;
+}
+.constellation-result-gloss { flex: 1 1 auto; color: var(--cos-ink); }
+.constellation-result-selected-mark {
+  flex: none;
+  font-family: var(--cos-body);
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--cos-gold);
+}
+.constellation-result-confidence {
+  flex: none;
+  font-family: ui-monospace, 'Cascadia Code', Menlo, monospace;
+  font-size: 0.85rem;
+  color: var(--cos-gold);
+}
+
+.constellation-result-panel-note {
+  margin: 0 0 0.75rem;
+  font-family: var(--cos-body);
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--cos-ink-dim);
+}
+
+.constellation-result-degraded {
+  margin: 0 0 1.25rem;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid rgba(232, 201, 106, 0.3);
+  border-radius: 0.4rem;
+  background: rgba(232, 201, 106, 0.06);
+  font-family: var(--cos-body);
+  font-style: italic;
+  font-size: 0.92rem;
+  color: rgba(232, 201, 106, 0.9);
+}
+
+.constellation-result-school {
+  font-family: ui-monospace, 'Cascadia Code', Menlo, monospace;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  color: var(--cos-gold);
+}
+
+/* Chip sets — near kin, counterfield, rhyme routes */
+.constellation-result-chipset { margin-top: 1.1rem; }
+.constellation-result-chipset__label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-family: var(--cos-body);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cos-ink-dim);
+}
+.constellation-result-chipset__count {
+  color: var(--cos-gold);
+  font-variant-numeric: tabular-nums;
+}
+.constellation-result-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
   list-style: none;
   padding: 0;
   margin: 0;
 }
-
-.constellation-result-interpretations li {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(123, 108, 255, 0.15);
-  font-family: Georgia, "Times New Roman", serif;
+.constellation-result-chip {
+  font-family: var(--cos-body);
+  font-size: 0.92rem;
+  line-height: 1.2;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--cos-hair);
+  background: rgba(139, 124, 255, 0.07);
+  color: var(--cos-ink);
 }
-
-.constellation-result-gloss {
-  color: var(--cos-arc);
+.constellation-result-chips--counter .constellation-result-chip {
+  border-color: rgba(232, 201, 106, 0.28);
+  background: rgba(232, 201, 106, 0.06);
 }
-
-.constellation-result-confidence {
-  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
-  font-size: 0.85rem;
-  color: rgba(212, 175, 55, 0.85);
+.constellation-result-chips--slant .constellation-result-chip {
+  color: var(--cos-ink-dim);
+  border-style: dashed;
 }
 
 .constellation-result-warnings {
   list-style: none;
   padding: 0;
-  margin: 0.75rem 0 0;
-  font-family: Georgia, "Times New Roman", serif;
+  margin: 0.85rem 0 0;
+  font-family: var(--cos-body);
   font-style: italic;
-  font-size: 0.95rem;
-  color: rgba(212, 175, 55, 0.85);
+  font-size: 1rem;
+  color: rgba(232, 201, 106, 0.9);
 }
 
 .constellation-result-awaiting {
   margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--cos-body);
   font-style: italic;
-  color: rgba(191, 227, 255, 0.5);
+  color: var(--cos-ink-dim);
 }
 
 .constellation-result-table {
   width: 100%;
   border-collapse: collapse;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 0.95rem;
+  font-family: var(--cos-body);
+  font-size: 1.02rem;
 }
-
 .constellation-result-table th {
   text-align: left;
-  padding: 0.35rem 0.75rem 0.35rem 0;
+  padding: 0.4rem 0.75rem 0.4rem 0;
   font-weight: 600;
-  color: rgba(191, 227, 255, 0.65);
+  color: var(--cos-ink-dim);
   vertical-align: top;
   white-space: nowrap;
 }
-
-.constellation-result-table td {
-  padding: 0.35rem 0;
-  color: var(--cos-arc);
-}
+.constellation-result-table td { padding: 0.4rem 0; color: var(--cos-ink); }
 
 .constellation-result-sr-only {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+  width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
 }
 
 .constellation-result-rhyme-chart {
   display: block;
   width: 100%;
-  max-width: 24rem;
-  height: 1.5rem;
-  margin-top: 0.75rem;
+  max-width: 26rem;
+  height: 1.75rem;
+  margin-top: 1rem;
 }
+.constellation-result-rhyme-node { fill: var(--cos-amethyst); opacity: 0.8; }
 
-.constellation-result-rhyme-node {
-  fill: var(--cos-amethyst);
-  opacity: 0.75;
+@media (prefers-reduced-motion: reduce) {
+  .constellation-search--breathe .constellation-search__ring,
+  .constellation-sky--animate .constellation-sky__star,
+  .constellation-sky--animate .constellation-sky__nebula,
+  .constellation-sky--animate .constellation-sky__dust {
+    animation: none;
+  }
 }
