@@ -19,7 +19,7 @@
  * never drift: whatever the composed plate shows, the fallback shows too.
  */
 
-import { useMemo } from 'react';
+import { useMemo, Component } from 'react';
 import {
   createConstellationResultScene,
   CONSTELLATION_RESULT_KIND,
@@ -455,6 +455,16 @@ function HeroFigure({ packet, reducedMotion }) {
   );
 }
 
+/**
+ * Failure stays local (PDR §7.8): a throw anywhere in the generated hero figure
+ * renders nothing there and never takes the rest of the answer down.
+ */
+class HeroFigureBoundary extends Component {
+  constructor(props) { super(props); this.state = { failed: false }; }
+  static getDerivedStateFromError() { return { failed: true }; }
+  render() { return this.state.failed ? null : this.props.children; }
+}
+
 /* ─── The composed presentation ────────────────────────────────────────── */
 
 /**
@@ -509,7 +519,9 @@ function ComposedResultShell({ packet, scene, reducedMotion }) {
         aria-label="Sound-bones constellation figure"
         style={nextReveal()}
       >
-        <HeroFigure packet={packet} reducedMotion={reducedMotion} />
+        <HeroFigureBoundary>
+          <HeroFigure packet={packet} reducedMotion={reducedMotion} />
+        </HeroFigureBoundary>
       </section>
 
       {/* ── Plate I · Masthead: the query as asked ── */}

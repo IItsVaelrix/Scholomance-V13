@@ -220,3 +220,31 @@ describe('compose validation fallback (PDR §7.8)', () => {
     expect(el.textContent).toContain('past tense of wind');
   });
 });
+
+describe('hero figure failure stays local (PDR §7.8)', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    vi.doMock('../../../src/pages/Constellation/skyChart.js', async (importOriginal) => {
+      const actual = await importOriginal<typeof import('../../../src/pages/Constellation/skyChart.js')>();
+      return { ...actual, heroFigure: vi.fn(() => { throw new Error('boom'); }) };
+    });
+  });
+
+  afterEach(() => {
+    vi.doUnmock('../../../src/pages/Constellation/skyChart.js');
+    vi.resetModules();
+    cleanup();
+  });
+
+  it('renders the rest of the answer when the hero figure throws', async () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {}); // error boundaries log; keep output pristine
+    const { default: Shell } = await import('../../../src/pages/Constellation/ConstellationResultShell.jsx');
+    const { container } = render(<Shell packet={basePacket} />);
+    // The hero svg is gone…
+    expect(container.querySelector('.constellation-result-hero')).toBeNull();
+    // …but the composed answer is intact: masthead query + other plates still render.
+    expect(container.querySelector('.constellation-result-masthead-query')?.textContent).toBe('the bright wound of morning');
+    expect(container.querySelector('[data-compose-part="meaning-field"]')).toBeTruthy();
+    spy.mockRestore();
+  });
+});
