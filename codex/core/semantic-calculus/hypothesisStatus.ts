@@ -30,6 +30,79 @@ export interface HypothesisEvaluation {
   byId: Readonly<Record<string, CausalHypothesisStatus>>;
 }
 
+/**
+ * The calculus's own function-word set, deliberately NOT imported from
+ * codex/core/constellation/stopwords.js. The calculus is domain-agnostic
+ * infrastructure; importing a domain module to evaluate a sealed predicate would
+ * let that domain silently change what a falsifier means. The runtime ops above
+ * set the precedent — csp_blocks_host carries its own path names inline.
+ */
+const FUNCTION_WORDS: ReadonlySet<string> = new Set([
+  'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'from', 'in', 'into',
+  'of', 'on', 'or', 'the', 'to', 'with', 'is', 'it', 'its', 'that', 'this',
+  'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had',
+  'do', 'does', 'did', 'will', 'would', 'shall', 'should', 'may', 'might',
+  'can', 'could', 'must', 'not', 'no', 'nor', 'so', 'if', 'then', 'than',
+  'too', 'very', 'just', 'about', 'above', 'after', 'again', 'all', 'also',
+  'am', 'any', 'because', 'before', 'between', 'both', 'each', 'few',
+  'he', 'her', 'here', 'him', 'his', 'how', 'i', 'me', 'more', 'most',
+  'my', 'myself', 'our', 'out', 'over', 'own', 'same', 'she', 'some',
+  'such', 'them', 'there', 'these', 'they', 'those', 'through', 'under',
+  'until', 'up', 'we', 'what', 'when', 'where', 'which', 'while', 'who',
+  'whom', 'why', 'you', 'your',
+]);
+
+/** Content words only. Lowercased, function words dropped, duplicates collapsed. */
+function contentWords(text: string): Set<string> {
+  const found = String(text ?? '').toLowerCase().match(/[a-z']+/g) ?? [];
+  return new Set(found.filter((w) => w.length > 1 && !FUNCTION_WORDS.has(w)));
+}
+
+function overlapCount(gloss: string, queryWords: ReadonlySet<string>): number {
+  let n = 0;
+  for (const w of contentWords(gloss)) if (queryWords.has(w)) n += 1;
+  return n;
+}
+
+/**
+ * Overlap scores for every candidate, descending, or `null` when the harness did
+ * not supply enough to judge. `null` becomes 'inconclusive' at the call site:
+ * a gloss the harness declined to report has not refuted anything.
+ */
+function overlapScores(
+  result: unknown,
+  candidatesPath: string,
+  queryTokensPath: string,
+  glossField: string,
+): number[] | null {
+  const candidates = getPath(result, candidatesPath);
+  const tokens = getPath(result, queryTokensPath);
+  if (!Array.isArray(candidates) || candidates.length === 0) return null;
+  if (!Array.isArray(tokens)) return null;
+
+  const queryWords = contentWords(tokens.join(' '));
+  const scores: number[] = [];
+  for (const c of candidates) {
+    const gloss = c == null ? undefined : (c as Record<string, unknown>)[glossField];
+    // A candidate without gloss text is an unanswered question, not a zero.
+    if (typeof gloss !== 'string') return null;
+    scores.push(overlapCount(gloss, queryWords));
+  }
+  return scores.sort((a, b) => b - a);
+}
+
+/**
+ * Shared guard for the `every_*` ops. An empty array must NEVER satisfy a
+ * universal claim: "every kin names its edge" over zero kin is vacuously true
+ * and would protect the hypothesis on evidence nobody collected — the same
+ * direction of lie evalPredicate's header documents.
+ */
+function elementsOf(result: unknown, path: string): unknown[] | null {
+  const arr = getPath(result, path);
+  if (!Array.isArray(arr) || arr.length === 0) return null;
+  return arr;
+}
+
 function getPath(result: unknown, path: string): unknown {
   if (!path) return result;
   let cur: unknown = result;
@@ -102,6 +175,49 @@ export function evalPredicate(predicate: PredicateSpec, result: unknown): boolea
       const imgSrc = String(getPath(result, 'imgSrc') ?? getPath(result, 'csp') ?? '');
       if (!imgSrc) return 'inconclusive';
       return imgSrc.includes(predicate.host) || imgSrc.includes('*');
+    }
+    case 'gloss_overlap_lt': {
+      const scores = overlapScores(
+        result,
+        predicate.candidatesPath,
+        predicate.queryTokensPath,
+        predicate.glossField ?? 'gloss',
+      );
+      if (scores === null) return 'inconclusive';
+      return scores[0] < predicate.n;
+    }
+    case 'gloss_overlap_margin_lt': {
+      const scores = overlapScores(
+        result,
+        predicate.candidatesPath,
+        predicate.queryTokensPath,
+        predicate.glossField ?? 'gloss',
+      );
+      if (scores === null) return 'inconclusive';
+      // One candidate means nothing was compared. Treating the margin as the
+      // lone score would report a disambiguation that never happened.
+      if (scores.length < 2) return 'inconclusive';
+      return scores[0] - scores[1] < predicate.n;
+    }
+    case 'every_field_in': {
+      const els = elementsOf(result, predicate.path);
+      if (els === null) return 'inconclusive';
+      for (const el of els) {
+        const v = el == null ? undefined : (el as Record<string, unknown>)[predicate.field];
+        if (v === undefined) return 'inconclusive';
+        if (!predicate.values.includes(v)) return false;
+      }
+      return true;
+    }
+    case 'every_field_truthy': {
+      const els = elementsOf(result, predicate.path);
+      if (els === null) return 'inconclusive';
+      for (const el of els) {
+        const v = el == null ? undefined : (el as Record<string, unknown>)[predicate.field];
+        if (v === undefined) return 'inconclusive';
+        if (!v) return false;
+      }
+      return true;
     }
     default:
       return 'inconclusive';

@@ -295,7 +295,44 @@ export type PredicateSpec =
   | { op: 'gte'; path: string; value: number }
   | { op: 'http_status_in'; values: readonly number[] }
   | { op: 'csp_blocks_host'; host: string }
-  | { op: 'csp_allows_host'; host: string };
+  | { op: 'csp_allows_host'; host: string }
+  /**
+   * LEXICAL OPS — the judgement stays in the formula.
+   *
+   * The generic ops above reintroduce the very leak this type warns about, one
+   * level down. A falsifier reading `{ op: 'gte', path: 'margin.overlapDelta' }`
+   * has not judged anything: the harness decided what an overlap is, which words
+   * count, and how to subtract them. The formula only compared someone else's
+   * conclusion, and a sealed body that compares conclusions is not sealed.
+   *
+   * The line: MEASUREMENTS are the harness's (raw glosses, raw tokens, a measured
+   * cosine — `winner.phoneticCosine` is legitimately a generic `gte`).
+   * COMPARISONS AND AGGREGATIONS are the formula's. So these take raw text and
+   * do their own counting.
+   */
+  | {
+      op: 'gloss_overlap_lt';
+      /** Array of candidate senses. */
+      candidatesPath: string;
+      /** Array of raw query tokens. */
+      queryTokensPath: string;
+      /** Field on each candidate holding gloss text. Default 'gloss'. */
+      glossField?: string;
+      /** Fires when the BEST candidate's content-word overlap is below this. */
+      n: number;
+    }
+  | {
+      op: 'gloss_overlap_margin_lt';
+      candidatesPath: string;
+      queryTokensPath: string;
+      glossField?: string;
+      /** Fires when (best - runner-up) overlap is below this. A tie is not a decision. */
+      n: number;
+    }
+  /** Every element's `field` is within `values`. Empty array is inconclusive, not vacuously true. */
+  | { op: 'every_field_in'; path: string; field: string; values: readonly unknown[] }
+  /** Every element's `field` is truthy. Empty array is inconclusive, not vacuously true. */
+  | { op: 'every_field_truthy'; path: string; field: string };
 
 export interface CausalHypothesis {
   id: string;
