@@ -19,7 +19,7 @@ import {
   isPromotable,
   promoteDraft,
 } from '../../codex/core/semantic-calculus/formulaDraft.ts';
-import { evaluateHypotheses } from '../../codex/core/semantic-calculus/hypothesisStatus.ts';
+import { evaluateHypotheses } from '../../codex/core/semantic-calculus/hypothesisStatus.js';
 import { makeReceipt } from '../../codex/core/semantic-calculus/observationReceipt.ts';
 
 const ctx = (over = {}) => ({ ...emptyContext(), ...over });

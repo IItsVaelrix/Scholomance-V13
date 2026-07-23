@@ -4,6 +4,10 @@ import { computePageBytecode } from '../../core/constellation/pageBytecode.js';
 import { analyzeLeximancy, LEXIMANCY_ADAPTER_VERSION } from './constellation/leximancy.adapter.js';
 import { analyzeRhyme, RHYME_ADAPTER_VERSION } from './constellation/rhymeAstrology.adapter.js';
 import { analyzeGenome, GENOME_ADAPTER_VERSION } from './constellation/genome.adapter.js';
+import {
+  analyzeSemanticInquiry,
+  SEMANTIC_ADAPTER_VERSION,
+} from './constellation/semanticInquiry.adapter.js';
 
 const CONSTELLATION_OS_VERSION = 'phase2-phrase-1';
 
@@ -69,11 +73,31 @@ export async function buildConstellationPage(rawQuery, deps) {
     warnings.push(`phraseGenome channel failed: ${err.message}`);
   }
 
+  /**
+   * Semantic inquiry runs AFTER leximancy because it adjudicates leximancy's own
+   * candidate list. It can only ever replace a heuristic sense pick with an
+   * evidenced one — see analyzeSemanticInquiry's gate.
+   */
+  let semanticInquiry = null;
+  try {
+    semanticInquiry = analyzeSemanticInquiry(deps.lexiconAdapter, identity, leximancy);
+  } catch (err) {
+    degradedChannels.push('semanticInquiry');
+    warnings.push(`semanticInquiry channel failed: ${err.message}`);
+  }
+
+  // Apply the probe's selection only when the evidence warranted it. Everything
+  // else — eliminated, underdetermined, unmatched — leaves leximancy untouched.
+  if (semanticInquiry?.selection?.warranted && semanticInquiry.selection.senseId) {
+    leximancy = { ...leximancy, selectedInterpretationId: semanticInquiry.selection.senseId };
+  }
+
   const engineVersions = {
     constellationOS: CONSTELLATION_OS_VERSION,
     leximancy: LEXIMANCY_ADAPTER_VERSION,
     rhymeAstrology: RHYME_ADAPTER_VERSION,
     phraseGenome: GENOME_ADAPTER_VERSION,
+    semanticInquiry: SEMANTIC_ADAPTER_VERSION,
   };
 
   const pageBytecode = computePageBytecode({
@@ -131,6 +155,21 @@ export async function buildConstellationPage(rawQuery, deps) {
       devicesHint: genome.devicesHint,
       schoolHint: genome.schoolHint,
     },
+    /**
+     * The probe's verdict travels WITH the page. A reader can see not just which
+     * sense was chosen but whether the choice was evidenced, and which
+     * hypotheses the evidence killed — PDR §7.3, evidence before explanation.
+     */
+    semanticInquiry: semanticInquiry
+      ? {
+          status: semanticInquiry.status,
+          bound: semanticInquiry.bound,
+          probeId: semanticInquiry.probeId,
+          hypotheses: semanticInquiry.hypotheses,
+          selection: semanticInquiry.selection,
+          evidence: semanticInquiry.evidence,
+        }
+      : null,
     diagnostics: { degradedChannels, warnings },
     provenance: { engineVersions },
   };

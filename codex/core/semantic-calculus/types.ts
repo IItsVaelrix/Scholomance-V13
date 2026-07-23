@@ -306,7 +306,7 @@ export type PredicateSpec =
    * conclusion, and a sealed body that compares conclusions is not sealed.
    *
    * The line: MEASUREMENTS are the harness's (raw glosses, raw tokens, a measured
-   * cosine — `winner.phoneticCosine` is legitimately a generic `gte`).
+   * cosine — `winner.crossLemmaCosine` is legitimately a generic `gte`).
    * COMPARISONS AND AGGREGATIONS are the formula's. So these take raw text and
    * do their own counting.
    */

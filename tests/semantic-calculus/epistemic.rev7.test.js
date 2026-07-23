@@ -9,7 +9,7 @@ import {
 import { assertSealedIntact } from '../../codex/core/semantic-calculus/seal.ts';
 import { emptyContext } from '../../codex/core/semantic-calculus/trustPartition.ts';
 import { deriveEpistemic, assertEpistemicDoesNotAlterKind } from '../../codex/core/semantic-calculus/epistemic.ts';
-import { evaluateHypotheses, evalPredicate } from '../../codex/core/semantic-calculus/hypothesisStatus.ts';
+import { evaluateHypotheses, evalPredicate } from '../../codex/core/semantic-calculus/hypothesisStatus.js';
 import { makeReceipt, receiptDigest } from '../../codex/core/semantic-calculus/observationReceipt.ts';
 import { getProbe, listProbeIds } from '../../codex/core/semantic-calculus/probeRegistry.ts';
 import { SEMANTIC_CALCULUS_ERRORS } from '../../codex/core/semantic-calculus/types.ts';

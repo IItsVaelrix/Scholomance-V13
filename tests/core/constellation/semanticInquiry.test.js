@@ -18,7 +18,7 @@ import {
 } from '../../../codex/core/constellation/semanticInquiry.js';
 import { collectSenseProbeDrafts } from '../../../codex/server/services/constellation/senseProbe.harness.js';
 import { assertFalsifiable } from '../../../codex/core/semantic-calculus/probeRegistry.ts';
-import { evaluateHypotheses } from '../../../codex/core/semantic-calculus/hypothesisStatus.ts';
+import { evaluateHypotheses } from '../../../codex/core/semantic-calculus/hypothesisStatus.js';
 import { makeReceipt } from '../../../codex/core/semantic-calculus/observationReceipt.ts';
 
 /** Seal drafts the way a wired caller would. */
@@ -179,7 +179,7 @@ describe('the falsifiers actually fire', () => {
     const phon = drafts.find((d) => d.observationId === 'obs.phon.neighbours');
     expect(phon.status).toBe('observed');
     // The collision is real, not stipulated by the test.
-    expect(phon.result.winner.phoneticCosine).toBeGreaterThanOrEqual(0.99);
+    expect(phon.result.winner.crossLemmaCosine).toBeGreaterThanOrEqual(0.99);
     expect(evaluate(drafts).eliminated).toContain('h_sense_by_gloss_overlap');
   });
 
@@ -202,7 +202,7 @@ describe('the falsifiers actually fire', () => {
 
     const phon = drafts.find((d) => d.observationId === 'obs.phon.neighbours');
     expect(phon.result.winner.sameLemma).toBe(true);
-    expect(phon.result.winner.phoneticCosine).toBeUndefined();
+    expect(phon.result.winner.crossLemmaCosine).toBe(0);
     expect(evaluate(drafts).eliminated).not.toContain('h_sense_by_gloss_overlap');
   });
 

@@ -20,7 +20,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { evalPredicate } from '../../codex/core/semantic-calculus/hypothesisStatus.ts';
+import { evalPredicate } from '../../codex/core/semantic-calculus/hypothesisStatus.js';
 
 const CANDIDATES = [
   { synsetId: 'oewn-1', gloss: 'a mounted soldier serving under a feudal lord' },
@@ -183,7 +183,7 @@ describe('no declared op may be unimplemented', () => {
       ]),
     );
 
-    const evaluator = strip(readFileSync('codex/core/semantic-calculus/hypothesisStatus.ts', 'utf8'));
+    const evaluator = strip(readFileSync('codex/core/semantic-calculus/hypothesisStatus.js', 'utf8'));
     const implemented = new Set([...evaluator.matchAll(/case\s*'([a-z_]+)'/g)].map((m) => m[1]));
     const missing = declared.filter((op) => !implemented.has(op));
 

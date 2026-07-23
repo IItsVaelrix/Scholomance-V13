@@ -12,9 +12,11 @@
  * imported only by tests today. The JSDoc `import(...)` types below are erased
  * and never evaluated, so this module stays importable from server code.
  *
- * INERT BY DESIGN. Nothing consumes this yet. It is not registered in
- * probeRegistry.ts and constellationPage.service does not call it, so
- * pageBytecode is unchanged. Wiring is a separate, deliberate step.
+ * WIRED. constellationPage.service runs this on every bound query via
+ * semanticInquiry.adapter, and `semanticInquiry` is part of engineVersions, so
+ * it participates in pageBytecode. It is still NOT registered in
+ * probeRegistry.ts — that registry is the agent-authorization surface, and a
+ * literary query has no business appearing there.
  *
  * @typedef {import('../semantic-calculus/types.ts').ProbeFormula} ProbeFormula
  * @typedef {import('../semantic-calculus/types.ts').ObservationRequest} ObservationRequest
@@ -150,7 +152,7 @@ const HYPOTHESES = Object.freeze([
         observationId: 'obs.phon.neighbours',
         // A MEASURED cosine is the harness's to report; the threshold on it is the
         // formula's to decide. That split is why this stays a generic `gte`.
-        predicate: Object.freeze({ op: 'gte', path: 'winner.phoneticCosine', value: 0.99 }),
+        predicate: Object.freeze({ op: 'gte', path: 'winner.crossLemmaCosine', value: 0.99 }),
       }),
     ]),
     citeSeeds: Object.freeze([

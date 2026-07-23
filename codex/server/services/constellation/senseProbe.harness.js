@@ -12,8 +12,7 @@
  * them. A harness that pre-digests evidence moves the judgement out of the
  * formula, which is the leak types.ts:278 warns about.
  *
- * INERT. Nothing calls this yet. constellationPage.service is untouched, so
- * live pages and pageBytecode are unchanged.
+ * CALLED BY semanticInquiry.adapter on the live request path.
  */
 
 import { phonotopographicSimilarity } from '../../../core/semantic/phonotopography.js';
@@ -29,9 +28,11 @@ const MAX_EDGES = 40;
  *
  * Sealing a receipt needs makeReceipt from observationReceipt.ts, and production
  * runs plain `node` with no TS loader (Dockerfile CMD) — a server .js importing
- * a .ts module throws ERR_UNKNOWN_FILE_EXTENSION. So this file stops at the
- * measurement and the caller seals, which also puts the .ts/.js decision at the
- * wiring step where it belongs instead of burying a landmine here.
+ * a .ts module throws ERR_UNKNOWN_FILE_EXTENSION.
+ *
+ * Nothing is lost by stopping here: evaluateHypotheses reads only
+ * observationId / status / result. Receipt hashes exist for sealed replay, not
+ * for evaluation, so the request path evaluates drafts directly.
  *
  * @typedef {{ observationId: string, result: unknown, status: 'observed'|'refused'|'error'|'inconclusive' }} ObservationDraft
  */
@@ -107,7 +108,7 @@ function observeRelationPaths(lexiconAdapter, headToken) {
     related = lexiconAdapter.lookupRelated?.(headToken, 20) || related;
   } catch {
     // A thrown lookup is a tool failure, not a finding. Tool failure never
-    // eliminates a hypothesis (hypothesisStatus.ts header).
+    // eliminates a hypothesis (hypothesisStatus.js header).
     return draft('obs.lex.relation_paths', null, 'error');
   }
 
@@ -164,36 +165,42 @@ function observePhoneticNeighbour(headToken, candidates) {
    * f_homophone_capture on every query and eliminate the hypothesis always — a
    * falsifier that always fires is as useless as one that never does.
    *
-   * Homophone capture is a CROSS-LEMMA failure: it means the winner came from a
-   * different word that merely sounds alike (night for knight, which
-   * tq-phoneme-v2 scores at 1.0). So the cosine is only meaningful when the
-   * lemmas differ. When they do not, the field is omitted and the predicate
-   * reads a missing path as 'inconclusive' — absence has not refuted anything.
+   * Homophone capture is a CROSS-LEMMA failure: the winner came from a DIFFERENT
+   * word that merely sounds alike (night for knight, which tq-phoneme-v2 scores
+   * at 1.0). So the quantity the falsifier tests is `crossLemmaCosine` — the
+   * phonetic similarity of a SUBSTITUTED lemma.
+   *
+   * When no substitution occurred that quantity is determinately 0, not
+   * unmeasured. Omitting it instead made the predicate 'inconclusive' in the
+   * ordinary case, which left the hypothesis permanently `underdetermined` and
+   * meant the sense gate could never fire in production — dead wiring dressed as
+   * caution. Naming the field for what it measures makes 0 honest rather than
+   * invented: there is no substituted lemma, so there is no capture.
    */
   const sameLemma =
     String(winner.lemma || '').trim().toLowerCase() === headToken.trim().toLowerCase();
   if (sameLemma) {
     return draft(
       'obs.phon.neighbours',
-      { winner: { lemma: winner.lemma, senseId: winner.senseId, sameLemma: true } },
+      { winner: { lemma: winner.lemma, senseId: winner.senseId, sameLemma: true, crossLemmaCosine: 0 } },
       'observed',
     );
   }
 
-  let phoneticCosine;
+  let crossLemmaCosine;
   try {
-    phoneticCosine = phonotopographicSimilarity(headToken, winner.lemma);
+    crossLemmaCosine = phonotopographicSimilarity(headToken, winner.lemma);
   } catch {
     return draft('obs.phon.neighbours', null, 'error');
   }
 
-  if (typeof phoneticCosine !== 'number' || Number.isNaN(phoneticCosine)) {
+  if (typeof crossLemmaCosine !== 'number' || Number.isNaN(crossLemmaCosine)) {
     return draft('obs.phon.neighbours', null, 'inconclusive');
   }
 
   return draft(
     'obs.phon.neighbours',
-    { winner: { lemma: winner.lemma, senseId: winner.senseId, sameLemma: false, phoneticCosine } },
+    { winner: { lemma: winner.lemma, senseId: winner.senseId, sameLemma: false, crossLemmaCosine } },
     'observed',
   );
 }

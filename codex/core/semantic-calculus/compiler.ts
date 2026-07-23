@@ -31,7 +31,7 @@ import {
   confirmationsRequired,
   type UtteranceInput,
 } from './utterance.ts';
-import { evaluateHypotheses } from './hypothesisStatus.ts';
+import { evaluateHypotheses } from './hypothesisStatus.js';
 import { validateReceiptsForProbe, receiptDigest } from './observationReceipt.ts';
 import { sealBody, deepFreeze, canonicalize } from './seal.ts';
 import { SEMANTIC_CALCULUS_ERRORS, EXECUTABLE_KIND, SCHEMA_VERSION_V2 } from './types.ts';

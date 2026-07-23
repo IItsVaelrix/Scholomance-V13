@@ -14,7 +14,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { PROBE_FORMULAS, assertFalsifiable } from '../../codex/core/semantic-calculus/probeRegistry.ts';
-import { evaluateHypotheses } from '../../codex/core/semantic-calculus/hypothesisStatus.ts';
+import { evaluateHypotheses } from '../../codex/core/semantic-calculus/hypothesisStatus.js';
 import { makeReceipt } from '../../codex/core/semantic-calculus/observationReceipt.ts';
 import { SEMANTIC_CALCULUS_ERRORS } from '../../codex/core/semantic-calculus/types.ts';
 
