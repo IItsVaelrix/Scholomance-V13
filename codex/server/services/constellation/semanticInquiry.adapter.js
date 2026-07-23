@@ -40,6 +40,9 @@ function notBound(reason) {
     hypotheses: { supported: [], eliminated: [], surviving: [], underdetermined: [] },
     selection: { warranted: false, reason, senseId: null, gloss: null, overlap: null },
     evidence: { candidateCount: 0, edgeCount: 0 },
+    lexicalEntries: [],
+    isHeteronym: false,
+    distinctPronunciations: null,
   };
 }
 
@@ -50,16 +53,17 @@ function notBound(reason) {
  * @param {{kind: string, intent: string, tokenCount: number, tokens: string[], primaryContentToken: string|null}} identity
  * @param {{interpretations?: {id: string, gloss: string}[]}} leximancy
  */
-export function analyzeSemanticInquiry(lexiconAdapter, identity, leximancy) {
+export async function analyzeSemanticInquiry(lexiconAdapter, identity, leximancy, phonology) {
   if (!bindsConstellationInquiry(identity)) return notBound('not_bound');
 
   const headToken = identity.primaryContentToken;
   if (!headToken) return notBound('no_head_token');
 
-  const drafts = collectSenseProbeDrafts({
+  const drafts = await collectSenseProbeDrafts({
     lexiconAdapter,
     headToken,
     queryTokens: identity.tokens || [],
+    ...(phonology ? { phonology } : {}),
   });
 
   /**
@@ -71,8 +75,28 @@ export function analyzeSemanticInquiry(lexiconAdapter, identity, leximancy) {
 
   const senseDraft = drafts.find((d) => d.observationId === 'obs.lex.sense_candidates');
   const relationDraft = drafts.find((d) => d.observationId === 'obs.lex.relation_paths');
+  const entriesDraft = drafts.find((d) => d.observationId === 'obs.lex.lexical_entries');
   const candidates = senseDraft?.result?.candidates ?? [];
   const edges = relationDraft?.result?.edges ?? [];
+
+  /**
+   * Surfaced whether or not a sense is selected. When the spelling is more than one
+   * word, showing BOTH is the answer — for a bare query like "wound" there is no
+   * syntactic frame to disambiguate from, and picking would invent evidence.
+   */
+  const lexicalEntries = (entriesDraft?.result?.entries ?? []).map((e) => ({
+    pos: e.pos,
+    senseCount: e.senseCount,
+    senses: e.senses,
+  }));
+  /**
+   * A heteronym is a spelling with more than one PRONUNCIATION, not more than one
+   * part of speech. bank n/v, light a/n, crane n/v and bark n/v are each ONE word.
+   * Reading this off lexicalEntries.length flagged 15 of 20 real queries.
+   * `distinctPronunciations` is absent when CMU could not answer — absent is not 1.
+   */
+  const distinctPronunciations = entriesDraft?.result?.distinctPronunciations ?? null;
+  const isHeteronym = typeof distinctPronunciations === 'number' && distinctPronunciations > 1;
 
   const hypotheses = {
     supported: [...evaluation.supported],
@@ -87,10 +111,17 @@ export function analyzeSemanticInquiry(lexiconAdapter, identity, leximancy) {
     probeId: CONSTELLATION_SENSE_PROBE.id,
     hypotheses,
     evidence: { candidateCount: candidates.length, edgeCount: edges.length },
+    lexicalEntries,
+    isHeteronym,
+    distinctPronunciations,
   };
 
   if (!evaluation.supported.includes(SENSE_HYPOTHESIS)) {
-    const reason = evaluation.eliminated.includes(SENSE_HYPOTHESIS)
+    // Name the heteronym case specifically. "eliminated" is true but useless to a
+    // reader: the query was not weak evidence, it was a question about two words.
+    const reason = isHeteronym && evaluation.eliminated.includes(SENSE_HYPOTHESIS)
+      ? 'heteronym_unresolved'
+      : evaluation.eliminated.includes(SENSE_HYPOTHESIS)
       ? 'eliminated'
       : evaluation.underdetermined.includes(SENSE_HYPOTHESIS)
         ? 'underdetermined'

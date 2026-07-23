@@ -26,15 +26,34 @@ function craneAdapter(overrides = {}) {
     lookupSynonyms: () => [{ lemma: 'heron' }],
     lookupAntonyms: () => [],
     lookupRelated: () => ({ broader: [{ lemma: 'bird' }], narrower: [], akin: [] }),
+    // Mirrors the real adapter's POS partition. Without it the required
+    // observation is inconclusive and the hypothesis is correctly underdetermined.
+    lookupLexicalEntries: () => [
+      { pos: 'n', senses: CRANE_SENSES.map((s, i) => ({ synsetId: `oewn-c${i}-n`, gloss: s.gloss, examples: [] })) },
+    ],
     // Make 'crane' the rarest token so it wins head-token selection (PDR §3.2).
     getCorpusFrequencies: (words) => new Map(words.map((w) => [w, w === 'crane' ? 5 : 500])),
     ...overrides,
   };
 }
 
+/**
+ * Phonology stub. cmudict does not load under vitest, so the real source reports
+ * "cannot tell" for every word — which correctly leaves every sense hypothesis
+ * underdetermined and would make these tests assert nothing. Injecting it also
+ * lets the heteronym case be exercised deliberately.
+ */
+const phonology = {
+  async ready() { return true; },
+  variants(word) {
+    if (word === 'wound') return [['W', 'AW1', 'N', 'D'], ['W', 'UW1', 'N', 'D']];
+    return [['K', 'R', 'EY1', 'N']];
+  },
+};
+
 const rhymeQueryEngine = { async query() { return { topMatches: [], constellations: [], diagnostics: {} }; } };
 const rhymeLexiconRepo = { lookupNodeByNormalized: () => ({ phonemes: ['K', 'R', 'EY1', 'N'] }) };
-const depsWith = (lexiconAdapter) => ({ lexiconAdapter, rhymeQueryEngine, rhymeLexiconRepo });
+const depsWith = (lexiconAdapter) => ({ lexiconAdapter, rhymeQueryEngine, rhymeLexiconRepo, phonology });
 
 describe('the channel is actually wired', () => {
   it('appears on the packet and in provenance', async () => {
@@ -108,6 +127,56 @@ describe('the gate refuses when evidence does not warrant it', () => {
     const p = await buildConstellationPage('crane wading bird\nsecond line here', depsWith(craneAdapter()));
     expect(p.semanticInquiry.bound).toBe(false);
     expect(p.semanticInquiry.status).toBe('not_bound');
+  });
+});
+
+describe('heteronyms are split, not chosen between', () => {
+  const woundSenses = [
+    { gloss: 'put in a coil', pos: 'a' },
+    { gloss: 'an injury to living tissue', pos: 'n' },
+  ];
+  const woundAdapter = () => ({
+    lookupWord: () => [{ pos: 'a', headword: 'wound', senses: woundSenses }],
+    extractGloss: (s) => { const x = s?.[0]; return typeof x === 'string' ? x : (x && x.gloss) || null; },
+    lookupSynonyms: () => [], lookupAntonyms: () => [],
+    lookupRelated: () => ({ broader: [], narrower: [], akin: [] }),
+    lookupLexicalEntries: () => [
+      { pos: 'a', senses: [{ synsetId: 'oewn-02325885-s', gloss: 'put in a coil', examples: [] }] },
+      { pos: 'n', senses: [{ synsetId: 'oewn-14322317-n', gloss: 'an injury to living tissue', examples: [] }] },
+    ],
+    getCorpusFrequencies: (ws) => new Map(ws.map((w) => [w, 5])),
+  });
+
+  it('refuses to select when the spelling is two words, and surfaces both', async () => {
+    // wound is /W AW1 N D/ (coiled) and /W UW1 N D/ (injury). Choosing between
+    // them is not disambiguation — it is picking a word and calling it a sense.
+    const p = await buildConstellationPage('wound', depsWith(woundAdapter()));
+
+    expect(p.semanticInquiry.distinctPronunciations).toBe(2);
+    expect(p.semanticInquiry.isHeteronym).toBe(true);
+    expect(p.semanticInquiry.selection.warranted).toBe(false);
+    expect(p.semanticInquiry.selection.reason).toBe('heteronym_unresolved');
+    // Both words travel with the page so the reader sees the split.
+    expect(p.semanticInquiry.lexicalEntries.map((e) => e.pos).sort()).toEqual(['a', 'n']);
+  });
+
+  it('multiple parts of speech alone is NOT a heteronym', async () => {
+    // crane is n/v but one pronunciation. The first version of this check read
+    // POS count and flagged 15 of 20 real queries.
+    const p = await buildConstellationPage('crane wading bird legs', depsWith(craneAdapter()));
+    expect(p.semanticInquiry.distinctPronunciations).toBe(1);
+    expect(p.semanticInquiry.isHeteronym).toBe(false);
+  });
+
+  it('says so out loud when phonology cannot answer', async () => {
+    const blind = { async ready() { return false; }, variants() { return []; } };
+    const deps = { ...depsWith(craneAdapter()), phonology: blind };
+    const p = await buildConstellationPage('crane wading bird legs', deps);
+
+    expect(p.semanticInquiry.distinctPronunciations).toBeNull();
+    expect(p.diagnostics.degradedChannels).toContain('semanticInquiry.phonology');
+    // and it must NOT quietly select on evidence it could not fully check
+    expect(p.semanticInquiry.selection.warranted).toBe(false);
   });
 });
 

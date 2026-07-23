@@ -80,10 +80,21 @@ export async function buildConstellationPage(rawQuery, deps) {
    */
   let semanticInquiry = null;
   try {
-    semanticInquiry = analyzeSemanticInquiry(deps.lexiconAdapter, identity, leximancy);
+    semanticInquiry = await analyzeSemanticInquiry(deps.lexiconAdapter, identity, leximancy, deps.phonology);
   } catch (err) {
     degradedChannels.push('semanticInquiry');
     warnings.push(`semanticInquiry channel failed: ${err.message}`);
+  }
+
+  /**
+   * A missing pronunciation count is not a quiet nothing. The heteronym check is
+   * a REQUIRED observation, so when phonology cannot answer, every sense
+   * hypothesis lands underdetermined and the channel silently stops selecting —
+   * healthy-looking and completely inert. Say so out loud.
+   */
+  if (semanticInquiry?.bound && semanticInquiry.distinctPronunciations === null) {
+    degradedChannels.push('semanticInquiry.phonology');
+    warnings.push('phonology unavailable: heteronym check could not run, so no sense can be evidenced');
   }
 
   // Apply the probe's selection only when the evidence warranted it. Everything
@@ -168,6 +179,16 @@ export async function buildConstellationPage(rawQuery, deps) {
           hypotheses: semanticInquiry.hypotheses,
           selection: semanticInquiry.selection,
           evidence: semanticInquiry.evidence,
+          /**
+           * When a spelling is more than one word, showing BOTH is the answer.
+           * `wound` is /wuːnd/ an injury and /waʊnd/ coiled; a bare query carries no
+           * syntactic frame to choose between them, so the honest result is the split,
+           * not a pick.
+           */
+          isHeteronym: semanticInquiry.isHeteronym,
+          // null when CMU could not answer. Absent is not "one pronunciation".
+          distinctPronunciations: semanticInquiry.distinctPronunciations,
+          lexicalEntries: semanticInquiry.lexicalEntries,
         }
       : null,
     diagnostics: { degradedChannels, warnings },

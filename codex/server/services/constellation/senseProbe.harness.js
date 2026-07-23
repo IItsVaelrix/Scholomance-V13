@@ -16,9 +16,41 @@
  */
 
 import { phonotopographicSimilarity } from '../../../core/semantic/phonotopography.js';
+import { CmuPhonemeEngine } from '../../../core/phonology/cmu.phoneme.engine.js';
+import { sameWordPronunciation } from '../../../core/phonology/phonologicalProcesses.js';
 import {
   CONSTELLATION_SENSE_PROBE,
 } from '../../../core/constellation/semanticInquiry.js';
+
+/**
+ * CMU must be LOADED before we ask it anything, not merely told to load.
+ *
+ * Firing init() without awaiting made the answer depend on server uptime: cold,
+ * pronunciationVariants returns [] and every sense hypothesis lands
+ * `underdetermined`; warm, the same query resolves. One query, two answers,
+ * which is exactly the non-determinism the page contract forbids. init() is
+ * idempotent and cached, so awaiting it costs one load for the process.
+ */
+/**
+ * The default phonology source. Injected rather than reached for, because a
+ * hidden global cannot be tested and fails invisibly: under vitest cmudict does
+ * not load at all, so a harness that reads it directly reports "cannot tell" for
+ * every word while looking perfectly healthy.
+ */
+export const cmuPhonologySource = {
+  async ready() {
+    if (CmuPhonemeEngine._available) return true;
+    try {
+      await CmuPhonemeEngine.init();
+    } catch {
+      return false;
+    }
+    return CmuPhonemeEngine._available === true;
+  },
+  variants(word) {
+    return CmuPhonemeEngine.pronunciationVariants(word);
+  },
+};
 
 const MAX_CANDIDATES = 12;
 const MAX_EDGES = 40;
@@ -161,6 +193,70 @@ function observeRelationPaths(lexiconAdapter, headToken) {
 }
 
 /**
+ * How many WORDS this spelling actually is.
+ *
+ * wordnet_lemma retains the POS partition that the `entry` table lost on ingest.
+ * More than one group means the spelling is more than one word — `wound` returns
+ * a/n/v, and "put in a coil" is not a sense of the injury word.
+ *
+ * The groups are reported whole, never merged. Merging is the defect.
+ */
+async function observeLexicalEntries(lexiconAdapter, headToken, phonology) {
+  if (!isConnected(lexiconAdapter)) {
+    return draft('obs.lex.lexical_entries', null, 'error');
+  }
+  if (typeof lexiconAdapter.lookupLexicalEntries !== 'function') {
+    // An adapter without the method has not told us there is one entry — it has
+    // told us nothing. Reporting entryCount:1 here would silently assert that
+    // every word is unambiguous.
+    return draft('obs.lex.lexical_entries', null, 'inconclusive');
+  }
+
+  let groups;
+  try {
+    groups = lexiconAdapter.lookupLexicalEntries(headToken) || [];
+  } catch {
+    return draft('obs.lex.lexical_entries', null, 'error');
+  }
+
+  /**
+   * MULTIPLE PARTS OF SPEECH IS NOT MULTIPLE WORDS.
+   *
+   * The first version of this fired the heteronym falsifier on entryCount > 1 and
+   * flagged 15 of 20 real queries — bank n/v, light a/n, crane n/v, bark n/v are
+   * each ONE word wearing two parts of speech, pronounced identically.
+   *
+   * A heteronym is a spelling with more than one PRONUNCIATION. cmudict records
+   * those as numbered variants, and sameWordPronunciation decides which
+   * differences are allophonic (same word) versus phonemic (different word).
+   *
+   * When CMU has no entry for the word we report null, not 1. Absence must not
+   * assert that a word is unambiguous — the predicate reads a missing path as
+   * inconclusive, which is the honest reading of "we never looked it up".
+   */
+  let distinctPronunciations = null;
+  const phonologyReady = await phonology.ready();
+  if (phonologyReady) {
+    const variants = phonology.variants(headToken) || [];
+    if (variants.length > 0) {
+      const forms = [];
+      for (const v of variants) {
+        if (!forms.some((f) => sameWordPronunciation(f, v))) forms.push(v);
+      }
+      distinctPronunciations = forms.length;
+    }
+  }
+
+  const result = {
+    entryCount: groups.length,
+    entries: groups.map((g) => ({ pos: g.pos, senseCount: g.senses.length, senses: g.senses })),
+  };
+  if (distinctPronunciations !== null) result.distinctPronunciations = distinctPronunciations;
+
+  return draft('obs.lex.lexical_entries', result, 'observed');
+}
+
+/**
  * Phonetic proximity between the head token and the leading candidate lemma.
  *
  * This exists to be ruled OUT. If the winner is a phonetic twin sharing no gloss
@@ -231,7 +327,7 @@ function observePhoneticNeighbour(headToken, candidates) {
  * @param {{ lexiconAdapter: object, headToken: string, queryTokens: string[] }} input
  * @returns {ObservationDraft[]}
  */
-export function collectSenseProbeDrafts({ lexiconAdapter, headToken, queryTokens }) {
+export async function collectSenseProbeDrafts({ lexiconAdapter, headToken, queryTokens, phonology = cmuPhonologySource }) {
   const token = String(headToken || '').trim();
   const tokens = Array.isArray(queryTokens) ? queryTokens : [];
 
@@ -243,8 +339,9 @@ export function collectSenseProbeDrafts({ lexiconAdapter, headToken, queryTokens
 
   const senseDraft = observeSenseCandidates(lexiconAdapter, token, tokens);
   const relationDraft = observeRelationPaths(lexiconAdapter, token);
+  const entriesDraft = await observeLexicalEntries(lexiconAdapter, token, phonology);
   const candidates = senseDraft.result?.candidates ?? [];
   const phoneticDraft = observePhoneticNeighbour(token, candidates);
 
-  return [senseDraft, relationDraft, phoneticDraft];
+  return [senseDraft, relationDraft, entriesDraft, phoneticDraft];
 }

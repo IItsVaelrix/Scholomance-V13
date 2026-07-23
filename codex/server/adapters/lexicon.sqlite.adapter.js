@@ -98,6 +98,7 @@ function createEmptyAdapter(resolvedPath, logger) {
     batchLookupPos() { logWait(); return {}; },
     searchEntries() { logWait(); return []; },
     suggestEntries() { logWait(); return []; },
+    lookupLexicalEntries() { logWait(); return []; },
     lookupSynonyms() { logWait(); return []; },
     lookupAntonyms() { logWait(); return []; },
     lookupRelated() { logWait(); return { broader: [], narrower: [], akin: [] }; },
@@ -121,6 +122,7 @@ export function createLexiconAdapter(dbPath, options = {}) {
   let stmts = null;
   let reconnectCount = 0;
   let hasCorpusFreqColumn = false;
+  let hasWordnetSynset = false;
   let healthLog = [];
   const familyBatchStmtCache = new Map();
   const validateBatchStmtCache = new Map();
@@ -173,6 +175,17 @@ export function createLexiconAdapter(dbPath, options = {}) {
         .prepare("SELECT COUNT(*) AS n FROM pragma_table_info('rhyme_index') WHERE name = 'corpus_freq'")
         .get().n > 0;
       const hasCorpusFreq = hasCorpusFreqColumn;
+
+      /**
+       * Probe, do not assume — same reasoning as corpus_freq above. A dict DB
+       * built before the wordnet_synset ingest is still serviceable for every
+       * other lookup, and preparing a statement against a missing table throws
+       * inside the stmts assignment, which would leave `stmts` null and take
+       * EVERY lexicon operation down with it, not just this one.
+       */
+      hasWordnetSynset = db
+        .prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE type='table' AND name='wordnet_synset'")
+        .get().n > 0;
 
       if (!hasCorpusFreq) {
         logger.warn?.(
@@ -262,6 +275,27 @@ export function createLexiconAdapter(dbPath, options = {}) {
           ORDER BY ${hasCorpusFreq ? 'corpus_freq DESC, ' : ''}LENGTH(word_lower) ASC, word_lower ASC
           LIMIT ?
         `),
+        /**
+         * The POS partition the `entry` table lost.
+         *
+         * `entry` holds ONE row per spelling with ONE pronunciation, so `wound` is a
+         * single row (pos='a', ipa='W AW1 N D') carrying seven senses drawn from two
+         * different words — six of them belonging to /W UW1 N D/, whose pronunciation
+         * the row does not store. senses_json kept only {glosses, examples}; the ids
+         * and POS were dropped on ingest.
+         *
+         * wordnet_lemma kept them. This reads the faithful view: one group per part of
+         * speech, which for a heteronym is one group per WORD.
+         */
+        lookupLexicalEntries: hasWordnetSynset ? db.prepare(`
+          SELECT l.pos AS pos, l.synset_id AS synsetId, l.sense_rank AS senseRank,
+                 s.definition AS gloss, s.examples_json AS examplesJson
+          FROM wordnet_lemma l
+          JOIN wordnet_synset s ON s.id = l.synset_id
+          WHERE l.lemma_lower = ?
+          ORDER BY l.pos ASC, l.sense_rank ASC
+          LIMIT ?
+        `) : null,
         lookupSynonyms: db.prepare(`
           SELECT l2.lemma AS lemma, l2.pos AS pos
           FROM wordnet_lemma l1
@@ -512,6 +546,58 @@ export function createLexiconAdapter(dbPath, options = {}) {
     return out;
   }
 
+  /**
+   * Lexical entries for a spelling, grouped by part of speech.
+   *
+   * A heteronym returns MORE THAN ONE group, and those groups are different WORDS,
+   * not different readings of one word. `wound` returns a/n/v: "put in a coil"
+   * (/W AW1 N D/) is not a sense of the injury word, it is another word entirely.
+   *
+   * Callers must not merge groups. Merging them is the defect this exists to undo.
+   *
+   * @returns {{pos: string, senses: {synsetId: string, gloss: string, examples: string[]}[]}[]}
+   */
+  function lookupLexicalEntries(word, limit = 40) {
+    if (!tryConnect()) return [];
+    const normalized = normalizeWord(word);
+    if (!normalized) return [];
+    const boundedLimit = toBoundedLimit(limit, 80);
+
+    // No wordnet_synset in this DB: we cannot answer, and [] says exactly that.
+    // The harness reads an empty result as "no groups", never as "one word".
+    if (!stmts.lookupLexicalEntries) return [];
+
+    let rows;
+    try {
+      rows = stmts.lookupLexicalEntries.all(normalized, boundedLimit);
+    } catch {
+      return [];
+    }
+
+    const byPos = new Map();
+    for (const row of rows) {
+      const pos = typeof row?.pos === 'string' && row.pos ? row.pos : 'x';
+      const gloss = typeof row?.gloss === 'string' ? row.gloss.trim() : '';
+      // A sense with no definition cannot be evidence for anything.
+      if (!gloss) continue;
+
+      let examples = [];
+      try {
+        const parsed = row.examplesJson ? JSON.parse(row.examplesJson) : [];
+        if (Array.isArray(parsed)) examples = parsed.filter((e) => typeof e === 'string' && e.trim());
+      } catch {
+        examples = [];
+      }
+
+      if (!byPos.has(pos)) byPos.set(pos, []);
+      byPos.get(pos).push({ synsetId: String(row.synsetId || ''), gloss, examples });
+    }
+
+    return [...byPos.entries()]
+      .map(([pos, senses]) => ({ pos, senses }))
+      .filter((g) => g.senses.length > 0);
+  }
+
   function lookupSynonyms(word, limit = 20) {
     if (!tryConnect()) return [];
     const normalized = normalizeWord(word);
@@ -633,6 +719,7 @@ export function createLexiconAdapter(dbPath, options = {}) {
     batchLookupPos,
     searchEntries,
     suggestEntries,
+    lookupLexicalEntries,
     lookupSynonyms,
     lookupAntonyms,
     lookupRelated,

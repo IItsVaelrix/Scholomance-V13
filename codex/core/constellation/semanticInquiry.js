@@ -90,6 +90,14 @@ const OBSERVATIONS = Object.freeze([
     required: true,
   }),
   Object.freeze({
+    id: 'obs.lex.lexical_entries',
+    description:
+      'Lexical entries for the spelling, grouped by part of speech, from wordnet_lemma. ' +
+      'More than one group means more than one WORD, not more than one reading.',
+    harness: 'lexicon.wordnet.lexical_entries',
+    required: true,
+  }),
+  Object.freeze({
     id: 'obs.phon.neighbours',
     description:
       'Phonotopographic similarity (tq-phoneme-v2) between the head token and the ' +
@@ -144,6 +152,20 @@ const HYPOTHESES = Object.freeze([
           queryTokensPath: 'queryTokens',
           n: 1,
         }),
+      }),
+      Object.freeze({
+        id: 'f_heteronym_unresolved',
+        description:
+          'The spelling has more than one PRONUNCIATION, so the candidate senses were ' +
+          'pooled across DIFFERENT WORDS. `wound` is one row carrying "put in a coil" ' +
+          '(/W AW1 N D/) beside "an injury to living tissue" (/W UW1 N D/); choosing among ' +
+          'them is not disambiguation, it is picking a word at random and calling the ' +
+          'result a sense. Nothing can be evidenced until the word itself is settled — ' +
+          'which needs a syntactic frame this query may not have. Pronunciation is the ' +
+          'test, NOT part-of-speech count: bank n/v and crane n/v are each one word. ' +
+          'A missing count reads inconclusive — never as proof of one word.',
+        observationId: 'obs.lex.lexical_entries',
+        predicate: Object.freeze({ op: 'gt', path: 'distinctPronunciations', value: 1 }),
       }),
       Object.freeze({
         id: 'f_homophone_capture',

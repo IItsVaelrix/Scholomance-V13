@@ -152,6 +152,28 @@ export const CmuPhonemeEngine = {
    * @param {string} word
    * @returns {PhonemeAnalysis | null}
    */
+  /**
+   * Every pronunciation CMU records for a spelling, not just the first.
+   *
+   * cmudict stores heteronyms as numbered variants — WOUND / WOUND(1),
+   * BASS / BASS(1), LEAD / LEAD(1) — and the loader already collects them all.
+   * analyzeWord() returns variants[0] only, so a word with two pronunciations was
+   * indistinguishable from a word with one. That difference is the ONLY local
+   * evidence that a spelling is more than one word: multiple parts of speech is
+   * not it (bank n/v, crane n/v and bark n/v are each one word).
+   *
+   * @param {string} word
+   * @returns {string[][]} one phoneme array per recorded variant; [] when unknown
+   */
+  pronunciationVariants(word) {
+    if (!this.isAvailable()) return [];
+    const upper = String(word || '').toUpperCase().replace(/[^A-Z]/g, '');
+    if (!upper) return [];
+    const variants = this._entriesByWord.get(upper);
+    if (!Array.isArray(variants)) return [];
+    return variants.filter((v) => Array.isArray(v) && v.length > 0).map((v) => [...v]);
+  },
+
   analyzeWord(word) {
     if (isBrowser) return null;
 

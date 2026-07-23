@@ -92,11 +92,11 @@ describe('probe lawfulness', () => {
 });
 
 describe('harness collects measurements, not conclusions', () => {
-  it('reports raw glosses and raw tokens', () => {
+  it('reports raw glosses and raw tokens', async () => {
     const adapter = fakeAdapter({
       senses: [{ gloss: 'a mounted soldier serving under a feudal lord', pos: 'n' }],
     });
-    const [sense] = collectSenseProbeDrafts({
+    const [sense] = await collectSenseProbeDrafts({
       lexiconAdapter: adapter,
       headToken: 'knight',
       queryTokens: ['feudal', 'knight'],
@@ -114,8 +114,8 @@ describe('harness collects measurements, not conclusions', () => {
     expect(blob).not.toMatch(/overlapCount|overlapDelta|allKin|score/i);
   });
 
-  it('reports a DB outage as error, never as an empty observation', () => {
-    const drafts = collectSenseProbeDrafts({
+  it('reports a DB outage as error, never as an empty observation', async () => {
+    const drafts = await collectSenseProbeDrafts({
       lexiconAdapter: fakeAdapter({ connected: false }),
       headToken: 'knight',
       queryTokens: ['knight'],
@@ -124,8 +124,8 @@ describe('harness collects measurements, not conclusions', () => {
     expect(drafts[1].status).toBe('error');
   });
 
-  it('always returns one draft per declared observation', () => {
-    const drafts = collectSenseProbeDrafts({ lexiconAdapter: fakeAdapter(), headToken: '', queryTokens: [] });
+  it('always returns one draft per declared observation', async () => {
+    const drafts = await collectSenseProbeDrafts({ lexiconAdapter: fakeAdapter(), headToken: '', queryTokens: [] });
     expect(drafts.map((d) => d.observationId)).toEqual(
       CONSTELLATION_SENSE_PROBE.observations.map((o) => o.id),
     );
@@ -133,11 +133,11 @@ describe('harness collects measurements, not conclusions', () => {
 });
 
 describe('the falsifiers actually fire', () => {
-  it('eliminates the sense hypothesis when no gloss overlaps the query', () => {
+  it('eliminates the sense hypothesis when no gloss overlaps the query', async () => {
     const adapter = fakeAdapter({
       senses: [{ gloss: 'a mounted soldier serving under a feudal lord', pos: 'n' }],
     });
-    const drafts = collectSenseProbeDrafts({
+    const drafts = await collectSenseProbeDrafts({
       lexiconAdapter: adapter,
       headToken: 'knight',
       queryTokens: ['gravity', 'spiritual'], // shares nothing with the gloss
@@ -146,14 +146,14 @@ describe('the falsifiers actually fire', () => {
     expect(evaluate(drafts).eliminated).toContain('h_sense_by_gloss_overlap');
   });
 
-  it('eliminates it on a tie — a tie is not a disambiguation', () => {
+  it('eliminates it on a tie — a tie is not a disambiguation', async () => {
     const adapter = fakeAdapter({
       senses: [
         { gloss: 'darkness and shadow', pos: 'n' },
         { gloss: 'shadow and darkness', pos: 'n' },
       ],
     });
-    const drafts = collectSenseProbeDrafts({
+    const drafts = await collectSenseProbeDrafts({
       lexiconAdapter: adapter,
       headToken: 'night',
       queryTokens: ['darkness', 'shadow'],
@@ -162,7 +162,7 @@ describe('the falsifiers actually fire', () => {
     expect(evaluate(drafts).eliminated).toContain('h_sense_by_gloss_overlap');
   });
 
-  it('KNIGHT/NIGHT: eliminates the hypothesis when the winner is a phonetic twin', () => {
+  it('KNIGHT/NIGHT: eliminates the hypothesis when the winner is a phonetic twin', async () => {
     // The harness measures phonotopographic similarity between headToken and the
     // winning lemma. tq-phoneme-v2 gives knight and night identical vectors, so a
     // sense channel drifting onto sound gets caught here rather than shipping a
@@ -174,7 +174,7 @@ describe('the falsifiers actually fire', () => {
       lookupRelated: () => ({ broader: [], narrower: [], akin: [] }),
       lookupAntonyms: () => [],
     };
-    const drafts = collectSenseProbeDrafts({
+    const drafts = await collectSenseProbeDrafts({
       lexiconAdapter: adapter,
       headToken: 'knight',
       queryTokens: ['darkness', 'hours'],
@@ -187,7 +187,7 @@ describe('the falsifiers actually fire', () => {
     expect(evaluate(drafts).eliminated).toContain('h_sense_by_gloss_overlap');
   });
 
-  it('REGRESSION: self-similarity must not fire the homophone falsifier', () => {
+  it('REGRESSION: self-similarity must not fire the homophone falsifier', async () => {
     /**
      * The winning sense normally belongs to the queried word, so its lemma IS the
      * head token and phonotopographicSimilarity returns 1.0. The first version of
@@ -198,7 +198,7 @@ describe('the falsifiers actually fire', () => {
     const adapter = fakeAdapter({
       senses: [{ gloss: 'a mounted soldier serving under a feudal lord', pos: 'n' }],
     });
-    const drafts = collectSenseProbeDrafts({
+    const drafts = await collectSenseProbeDrafts({
       lexiconAdapter: adapter,
       headToken: 'knight',
       queryTokens: ['feudal', 'mounted', 'lord'],
@@ -210,9 +210,9 @@ describe('the falsifiers actually fire', () => {
     expect(evaluate(drafts).eliminated).not.toContain('h_sense_by_gloss_overlap');
   });
 
-  it('eliminates the near-kin hypothesis when the graph yields no edges', () => {
+  it('eliminates the near-kin hypothesis when the graph yields no edges', async () => {
     const adapter = fakeAdapter({ senses: [{ gloss: 'a mounted soldier', pos: 'n' }] });
-    const drafts = collectSenseProbeDrafts({
+    const drafts = await collectSenseProbeDrafts({
       lexiconAdapter: adapter,
       headToken: 'knight',
       queryTokens: ['mounted', 'soldier'],
@@ -221,7 +221,7 @@ describe('the falsifiers actually fire', () => {
     expect(evaluate(drafts).eliminated).toContain('h_near_kin_by_edge');
   });
 
-  it('supports the sense hypothesis when the evidence genuinely separates', () => {
+  it('supports the sense hypothesis when the evidence genuinely separates', async () => {
     const adapter = fakeAdapter({
       senses: [
         { gloss: 'a mounted soldier serving under a feudal lord', pos: 'n' },
@@ -229,7 +229,7 @@ describe('the falsifiers actually fire', () => {
       ],
       related: { broader: [{ lemma: 'soldier' }], akin: [{ lemma: 'cavalier' }] },
     });
-    const drafts = collectSenseProbeDrafts({
+    const drafts = await collectSenseProbeDrafts({
       lexiconAdapter: adapter,
       headToken: 'knight',
       queryTokens: ['feudal', 'mounted', 'lord'],
@@ -240,8 +240,8 @@ describe('the falsifiers actually fire', () => {
     expect(evaluation.eliminated).not.toContain('h_near_kin_by_edge');
   });
 
-  it('a DB outage never eliminates a hypothesis — tool failure is not refutation', () => {
-    const drafts = collectSenseProbeDrafts({
+  it('a DB outage never eliminates a hypothesis — tool failure is not refutation', async () => {
+    const drafts = await collectSenseProbeDrafts({
       lexiconAdapter: fakeAdapter({ connected: false }),
       headToken: 'knight',
       queryTokens: ['feudal'],

@@ -10,6 +10,10 @@ const lexiconAdapter = {
   lookupAntonyms: () => [{ lemma: 'dusk' }],
   lookupRelated: () => ({ broader: [{ lemma: 'time' }], narrower: [{ lemma: 'sunrise' }], akin: [{ lemma: 'daybreak' }] }),
   getCorpusFrequencies: (words) => new Map(words.map((w) => [w, w === 'morning' ? 10 : 300])),
+  // Mirrors the real adapter: the POS partition wordnet_lemma retains.
+  lookupLexicalEntries: (w) => (w === 'morning'
+    ? [{ pos: 'n', senses: [{ synsetId: 'oewn-morning-n', gloss: 'dawn', examples: [] }] }]
+    : []),
 };
 const rhymeQueryEngine = {
   async query() {
@@ -21,7 +25,13 @@ const rhymeQueryEngine = {
   },
 };
 const rhymeLexiconRepo = { lookupNodeByNormalized: () => ({ phonemes: ['M', 'AO1', 'R', 'N', 'IH0', 'NG'] }) };
-const deps = { lexiconAdapter, rhymeQueryEngine, rhymeLexiconRepo };
+/**
+ * cmudict does not load under vitest, so without an injected source the heteronym
+ * check cannot run and the page reports semanticInquiry.phonology as degraded —
+ * correctly. These fixtures assert a HEALTHY page, so give it a source.
+ */
+const phonology = { async ready() { return true; }, variants: () => [['M', 'AO1', 'R', 'N', 'IH0', 'NG']] };
+const deps = { lexiconAdapter, rhymeQueryEngine, rhymeLexiconRepo, phonology };
 
 describe('buildConstellationPage', () => {
   it('composes all channels for a known phrase', async () => {
