@@ -87,6 +87,10 @@ import { ScholomanceDictionaryAPI } from '../core/shared/scholomanceDictionary.a
 import { corpusRoutes } from './routes/corpus.routes.js';
 import { rhymeAstrologyRoutes } from './routes/rhymeAstrology.routes.js';
 import { resolveRhymeAstrologyArtifactPaths } from './utils/rhymeAstrologyPaths.js';
+import { constellationRoutes } from './routes/constellation.routes.js';
+import { createRhymeAstrologyLexiconRepo } from './services/rhyme-astrology/lexiconRepo.js';
+import { createRhymeAstrologyIndexRepo } from './services/rhyme-astrology/indexRepo.js';
+import { createRhymeAstrologyQueryEngine } from '../runtime/rhyme-astrology/queryEngine.js';
 import { imageAnalysisRoutes } from './routes/imageAnalysis.routes.js';
 import { registerSchoolStylesRoutes } from './routes/schoolStyles.routes.js';
 import { catalogRoutes } from './routes/catalog.routes.js';
@@ -1269,6 +1273,45 @@ if (ENABLE_RHYME_ASTROLOGY) {
 } else {
     fastify.log.info('[RhymeAstrology] API disabled. Set ENABLE_RHYME_ASTROLOGY=true to enable.');
 }
+
+// ConstellationOS Phase-1: shared Rhyme Astrology singletons (built the same way
+// rhymeAstrologyRoutes builds its own internal engine). Guarded so a missing/incomplete
+// artifact bundle logs a warning and degrades the rhyme channel instead of crashing boot.
+let constellationRhymeQueryEngine = null;
+let constellationRhymeLexiconRepo = null;
+if (ENABLE_RHYME_ASTROLOGY) {
+    try {
+        constellationRhymeLexiconRepo = createRhymeAstrologyLexiconRepo(RHYME_ASTROLOGY_PATHS.lexiconDbPath, {
+            log: fastify.log,
+        });
+        const constellationRhymeIndexRepo = createRhymeAstrologyIndexRepo({
+            indexDbPath: RHYME_ASTROLOGY_PATHS.indexDbPath,
+            edgesDbPath: RHYME_ASTROLOGY_PATHS.edgesDbPath,
+            log: fastify.log,
+        });
+        constellationRhymeQueryEngine = createRhymeAstrologyQueryEngine({
+            lexiconRepo: constellationRhymeLexiconRepo,
+            indexRepo: constellationRhymeIndexRepo,
+            phonemeEngine: PhonemeEngine,
+            cacheSize: RHYME_ASTROLOGY_CACHE_SIZE,
+            bucketCandidateCap: RHYME_ASTROLOGY_BUCKET_QUERY_CAP,
+            maxClusters: RHYME_ASTROLOGY_QUERY_MAX_CLUSTERS,
+            log: fastify.log,
+        });
+    } catch (err) {
+        constellationRhymeQueryEngine = null;
+        constellationRhymeLexiconRepo = null;
+        fastify.log.warn({ err }, '[Constellation] rhyme singletons unavailable; rhyme channel will degrade.');
+    }
+} else {
+    fastify.log.info('[Constellation] rhyme channel disabled (ENABLE_RHYME_ASTROLOGY=false); will degrade.');
+}
+
+fastify.register(constellationRoutes, {
+    lexiconAdapter,
+    rhymeQueryEngine: constellationRhymeQueryEngine,
+    rhymeLexiconRepo: constellationRhymeLexiconRepo,
+});
 
 if (ENABLE_COLLAB_API) {
     if (IS_PRODUCTION) {
