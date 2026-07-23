@@ -26,7 +26,7 @@ import {
   CONSTELLATION_RESULT_VERSION,
 } from '../../core/compose/migrated/ConstellationResult.ts';
 import { validateComposeScene } from '../../core/compose/packets.ts';
-import { phonemeArc, plateRevealFor, SPARK_PATH } from './skyChart.js';
+import { phonemeArc, plateRevealFor, heroFigure, twinkleFor, SPARK_PATH } from './skyChart.js';
 
 /* ─── Shared atoms ─────────────────────────────────────────────────────── */
 
@@ -387,6 +387,70 @@ function GenomeBody({ phraseGenome }) {
   );
 }
 
+/* ─── The hero figure: the answer drawn as a living constellation ──────────
+   Pure geometry from `heroFigure(packet)`; the seed touches only the lodestar
+   and per-star twinkle. Gold is reserved for the single lodestar nucleus — every
+   other star takes the rarity temperature color. Reduced motion drops twinkle. */
+function HeroFigure({ packet, reducedMotion }) {
+  const fig = heroFigure(packet);
+  return (
+    <svg
+      className="constellation-result-hero"
+      viewBox={fig.viewBox}
+      role="img"
+      aria-label={`Constellation of the answer — ${fig.nodes.length} stars, spectral class ${fig.spectralClass}${fig.degraded ? ', partial sky' : ''}`}
+      data-degraded={String(fig.degraded)}
+    >
+      {fig.edges.map(([a, b]) => (
+        <line
+          key={`e${a}-${b}`}
+          x1={fig.nodes[a].x} y1={fig.nodes[a].y}
+          x2={fig.nodes[b].x} y2={fig.nodes[b].y}
+          className="constellation-result-hero__edge"
+        />
+      ))}
+      {fig.nodes.map((nd, i) => {
+        const twinkle = reducedMotion
+          ? undefined
+          : (() => {
+              const t = twinkleFor(fig.seed, i);
+              return { animationDelay: `${t.delaySec}s`, animationDuration: `${t.durationSec}s` };
+            })();
+        if (nd.isLodestar) {
+          return (
+            <path
+              key={nd.id}
+              d={SPARK_PATH}
+              transform={`translate(${nd.x} ${nd.y}) scale(${2.4 * nd.magnitude})`}
+              className="constellation-result-hero__spark constellation-result-hero__lodestar"
+              style={twinkle}
+            />
+          );
+        }
+        if (nd.stressed || nd.isVowel) {
+          return (
+            <path
+              key={nd.id}
+              d={SPARK_PATH}
+              transform={`translate(${nd.x} ${nd.y}) scale(${1.4 * nd.magnitude})`}
+              className="constellation-result-hero__spark"
+              style={{ ...twinkle, fill: nd.color }}
+            />
+          );
+        }
+        return (
+          <circle
+            key={nd.id}
+            cx={nd.x} cy={nd.y} r={0.9 + nd.magnitude}
+            className="constellation-result-hero__star"
+            style={{ ...twinkle, fill: nd.color }}
+          />
+        );
+      })}
+    </svg>
+  );
+}
+
 /* ─── The composed presentation ────────────────────────────────────────── */
 
 /**
@@ -429,6 +493,16 @@ function ComposedResultShell({ packet, scene, reducedMotion }) {
           Partial sky — {degraded.join(', ')} unavailable. Other channels are shown in full.
         </p>
       ) : null}
+
+      {/* ── Plate 0 · Hero figure: the answer as a living constellation ── */}
+      <section
+        className="constellation-result-plate constellation-result-plate--hero"
+        data-compose-part="hero-figure"
+        aria-label="Sound-bones constellation figure"
+        style={nextReveal()}
+      >
+        <HeroFigure packet={packet} reducedMotion={reducedMotion} />
+      </section>
 
       {/* ── Plate I · Masthead: the query as asked ── */}
       <section

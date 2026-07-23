@@ -81,6 +81,28 @@ describe('composed answer plate', () => {
     ]);
   });
 
+  it('renders the hero figure first, temperature-colored, with exactly one gold lodestar', () => {
+    const { container } = render(<ConstellationResultShell packet={basePacket} />);
+    const parts = Array.from(container.querySelectorAll('[data-compose-part]')).map((n) =>
+      n.getAttribute('data-compose-part'),
+    );
+    expect(parts[0]).toBe('hero-figure'); // top of the plate
+    const hero = container.querySelector('.constellation-result-hero');
+    expect(hero).toBeTruthy();
+    // 10 phonemes → 10 star nodes; exactly one is the lodestar.
+    expect(hero!.querySelectorAll('.constellation-result-hero__lodestar')).toHaveLength(1);
+    const stars = hero!.querySelectorAll('.constellation-result-hero__star, .constellation-result-hero__spark');
+    expect(stars.length).toBe(10);
+  });
+
+  it('sets no twinkle animation on hero stars under reduced motion', () => {
+    const { container } = render(<ConstellationResultShell packet={basePacket} reducedMotion={true} />);
+    const stars = Array.from(
+      container.querySelectorAll('.constellation-result-hero [style]'),
+    ) as HTMLElement[];
+    expect(stars.every((s) => s.style.animationDuration === '')).toBe(true);
+  });
+
   it('surfaces honest refusals as data-state, not prose', () => {
     // Clean full packet: nothing degraded, no heteronym, no evidenced pick.
     const { container } = render(<ConstellationResultShell packet={basePacket} />);
