@@ -1,0 +1,90 @@
+{
+  "contract": "SCDNA-CAPABILITY-v1",
+  "version": "1.0.0",
+  "domain": "divtube-cockpit",
+  "surfaces": [
+    "divtube_downloader/tui/**",
+    "divtube_downloader/turboquant_plugin.js",
+    "divtube_downloader/turbovec.js",
+    "divtube_downloader/embeddings.js",
+    "divtube_downloader/scd64_plugin.js",
+    "divtube_downloader/turboquant_registry.json",
+    "divtube_downloader/scripts/**"
+  ],
+  "capabilities": [
+    {
+      "need": "semantic SEO / niche match scoring of titles & content (0-100)",
+      "canonical": "TurboQuantService (tui/services/turboquant_service.py) — thin Python client that spawns turboquant_plugin.js ONCE and talks JSON-lines over stdio; scoring stays local and sub-millisecond",
+      "path": "divtube_downloader/tui/services/turboquant_service.py",
+      "evidence": "degrades gracefully (self.available == False) when Node is unavailable so the cockpit still launches; color-codes scores against the shared Scholomance palette",
+      "forbidden": [
+        "re-implementing scoring in Python — the engine is the Node microservice",
+        "spawning a fresh node process per score call — the plugin is long-lived over stdio"
+      ]
+    },
+    {
+      "need": "the TurboQuant scoring engine itself (semantic + lexical)",
+      "canonical": "turboquant_plugin.js — Node stdio microservice, one persistent process",
+      "path": "divtube_downloader/turboquant_plugin.js",
+      "forbidden": [
+        "importing the plugin into the TUI process directly — it is a stdio microservice, not a library"
+      ]
+    },
+    {
+      "need": "text -> vector for semantic scoring (domain-adapted)",
+      "canonical": "turbovec.js — IDF-damped salience weighting (boilerplate damped, nichepack power-words boosted) + synthesized OOV vectors; falls back to the plain GloVe base (embeddings.js)",
+      "path": "divtube_downloader/turbovec.js",
+      "evidence": "embedder ladder turbovec1 -> glove -> hash; when loaded=false the caller drops to the next embedder",
+      "forbidden": [
+        "dropping OOV tokens (artist names, slang) — they are synthesized, not discarded",
+        "mean-pooling raw GloVe without salience weighting when turbovec is loaded"
+      ]
+    },
+    {
+      "need": "base GloVe embeddings (fallback embedder)",
+      "canonical": "embeddings.js — plain GloVe base that turbovec.js imports as its fallback",
+      "path": "divtube_downloader/embeddings.js",
+      "forbidden": [
+        "treating the GloVe base as the primary embedder while turbovec is loaded"
+      ]
+    },
+    {
+      "need": "Golden-Curve registry of scored niche/title artifacts",
+      "canonical": "turboquant_registry.json — atomic registry persisted by the TurboQuant pipeline",
+      "path": "divtube_downloader/turboquant_registry.json",
+      "forbidden": [
+        "non-atomic read-modify-write of the registry (write races corrupt the curve)"
+      ]
+    },
+    {
+      "need": "agent tool dispatch (the cockpit's tool surface)",
+      "canonical": "ToolService.execute_tool (tui/services/tool_service.py) — single if/elif router mapping tool_name -> handler; bridge calls fan out to scripts/scholomance-bridge.mjs via module-level _run_bridge",
+      "path": "divtube_downloader/tui/services/tool_service.py",
+      "evidence": "~2759-line module with ~50 thin handlers off one dispatch; _run_bridge/_extract_bridge_json/_safe_path are module-level helpers reused across handlers",
+      "forbidden": [
+        "adding a second dispatch table — routing lives in execute_tool",
+        "importing render/UI widgets into the tool layer"
+      ]
+    },
+    {
+      "need": "resolve node/npm for the TUI process (NVM on Steam Deck)",
+      "canonical": "harness_tools.resolve_node_bin_dir / node_env (tui/services/harness_tools.py)",
+      "path": "divtube_downloader/tui/services/harness_tools.py",
+      "evidence": "desktop launches skip ~/.bashrc; the resolved node bin dir is prepended to PATH process-wide so bash_session, run_command and the bridge all see node",
+      "forbidden": [
+        "hardcoding a node absolute path in new code — resolve it via harness_tools"
+      ]
+    },
+    {
+      "need": "best-effort crash forwarding (hub POST or local spool)",
+      "canonical": "subtlety_crash_forward.forward_crash (tui/services/subtlety_crash_forward.py)",
+      "path": "divtube_downloader/tui/services/subtlety_crash_forward.py",
+      "evidence": "POSTs crash JSON to the Subtlety hub with a 0.5s timeout; spools a local JSON event when the hub is down or rejects the ingest",
+      "forbidden": [
+        "blocking the crash path on a network call longer than the 0.5s timeout",
+        "spooling byte-identical crashes without dedup/rotation"
+      ]
+    }
+  ],
+  "checksum": "scd64:dc4bf9a829c09c102f33a0d2f73d5d0d704543010d99f2758573d9b99079dbc0"
+}

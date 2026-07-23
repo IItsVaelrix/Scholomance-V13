@@ -106,14 +106,16 @@ const DomTree = memo(function DomTree({
   hybrid: boolean;
   sceneAttachments: ReturnType<typeof collectSceneAttachments>;
 }) {
-  const Tag = node.tag as keyof JSX.IntrinsicElements;
+  // Dynamic tag: the intrinsic-elements union rejects per-tag attrs, so the
+  // spec-driven props go through a permissive element type instead.
+  const Tag = node.tag as unknown as React.FC<Record<string, unknown>>;
   const style = node.style as React.CSSProperties;
   return (
     <Tag
       id={node.id}
       {...node.attrs}
       style={style}
-      type={node.tag === 'button' ? 'button' : undefined}
+      {...(node.tag === 'button' ? { type: 'button' } : {})}
       onClick={() => {
         if (node.tag === 'button' && onEvent) {
           const type = ACTION_EVENTS[node.id];

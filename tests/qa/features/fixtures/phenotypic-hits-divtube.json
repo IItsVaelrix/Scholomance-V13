@@ -1,0 +1,26 @@
+[
+  {
+    "path": "divtube_downloader/tui/services/tool_service.py",
+    "score": 0.9,
+    "preview": "ToolService.execute_tool dispatch",
+    "chunkIndex": 0
+  },
+  {
+    "path": "divtube_downloader/turbovec.js",
+    "score": 0.8,
+    "preview": "domain-adapted vectorizer ladder",
+    "chunkIndex": 0
+  },
+  {
+    "path": "codex/server/collab/oauth.py",
+    "score": 0.7,
+    "preview": "oauth handshake noise",
+    "chunkIndex": 0
+  },
+  {
+    "path": "codex/server/collab/mcp-bridge.js",
+    "score": 0.6,
+    "preview": "mcp bridge noise",
+    "chunkIndex": 0
+  }
+]

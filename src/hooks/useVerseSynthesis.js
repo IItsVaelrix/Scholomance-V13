@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { synthesizeVerse } from "../lib/truesight/compiler/VerseSynthesis.js";
-import { verseIRMicroprocessors } from "../../codex/core/microprocessors/index.js";
+import { verseIRMicroprocessors } from "../lib/codex/textAnalysis.js";
 import { parseBooleanEnvFlag } from "./useCODExPipeline.jsx";
 import { ScholomanceDictionaryAPI } from "../lib/scholomanceDictionary.api.js";
 import { shouldPreserveArtifactOnError } from "../lib/truesight/synthesisErrorPolicy.js";

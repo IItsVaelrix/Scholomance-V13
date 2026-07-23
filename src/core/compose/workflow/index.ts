@@ -52,8 +52,9 @@ export type WorkflowGuard = (ctx: WorkflowContext, event: WorkflowEvent) => bool
  * Workflow transition - defines how the workflow changes state
  */
 export type WorkflowTransition = {
-  /** Event that triggers this transition */
-  event: string;
+  /** Event that triggers this transition (redundant inside `on` records —
+   *  the record key is the event name — so optional there) */
+  event?: string;
   /** Target state */
   target?: string;
   /** Guard condition */
@@ -68,8 +69,9 @@ export type WorkflowTransition = {
  * Workflow state node - a state in the workflow
  */
 export type WorkflowStateNode = {
-  /** State identifier */
-  id: string;
+  /** State identifier (redundant inside `states` records — the record key
+   *  is the state id — so optional there) */
+  id?: string;
   /** Initial child state (for compound states) */
   initial?: string;
   /** Child states */
@@ -216,10 +218,11 @@ export class WorkflowService {
    */
   private executeAction(action: WorkflowAction, event: WorkflowEvent): void {
     switch (action.type) {
-      case 'assign':
+      case 'assign': {
         const updates = action.assign(this.state.context, event);
         this.state.context = { ...this.state.context, ...updates };
         break;
+      }
       case 'send':
         // In a real implementation, this would send to another actor
         console.log('[Workflow] Send event:', action.event, 'to:', action.to);
@@ -322,7 +325,10 @@ export function createFormWorkflow(): WorkflowMachine {
               {
                 type: 'assign',
                 assign: (ctx, event) => ({
-                  values: { ...ctx.values, ...event.payload }
+                  values: {
+                    ...(ctx.values as Record<string, unknown> | undefined),
+                    ...event.payload,
+                  }
                 })
               }
             ]

@@ -70,7 +70,7 @@ import { engraveMotifs, hashMotifs } from './motif-engraver.js';
 import { buildItemEffectShader } from './item-effect-shader.js';
 import { forgePacket } from './semantic-bridge.js';
 import { MATERIAL_PALETTES, resolveMaterialId, SOURCE_MATERIAL } from './material-registry.js';
-import { exportToPhaserPipeline } from '../../../src/lib/exporters/pixelbrainPhaserShaderExport.js';
+import { exportToPhaserPipeline } from './phaser-shader-export.js';
 import { normalizeItemSpec, hashItemSpec, validateItemSpec } from './item-spec.js';
 import { SDFShapeAMP } from './sdf-shape-amp.js';
 import { NoiseFillAMP } from './noise-fill-amp.js';

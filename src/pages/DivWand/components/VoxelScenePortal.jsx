@@ -2,14 +2,16 @@
 // src/pages/DivWand/components/VoxelScenePortal.jsx
 import { memo, useMemo } from 'react';
 
-import { createVoxelVolume, cellIndex, getCellMaterialId, isCellOccupied, setCellMaterial, ENERGY_TYPES } from '../../../../codex/core/pixelbrain/voxel-volume.js';
-import { generateFibonacciSeeds, generateVectorizedTextSeeds } from '../../../../codex/core/pixelbrain/wand-seed-lift.js';
-import { propagate, assignMaterial } from '../../../../codex/core/pixelbrain/qbit-field.js';
-import { applyHollownessAMP } from '../../../../codex/core/pixelbrain/hollowness-amp.js';
-import { runBiomeCoherenceAMP } from '../../../../codex/core/pixelbrain/biome-coherence-amp.js';
-import { collectFaces } from '../../../../codex/core/pixelbrain/iso-projector.js';
-import { renderFacesToSVG } from '../../../../codex/core/pixelbrain/voxel-svg-renderer.js';
-import { worldRenderOptions, seedsToLightPoints } from '../../../../codex/core/pixelbrain/world-render-options.js';
+import {
+  createVoxelVolume, cellIndex, getCellMaterialId, isCellOccupied, setCellMaterial, ENERGY_TYPES,
+  generateFibonacciSeeds, generateVectorizedTextSeeds,
+  propagate, assignMaterial,
+  applyHollownessAMP,
+  runBiomeCoherenceAMP,
+  collectFaces,
+  renderFacesToSVG,
+  worldRenderOptions, seedsToLightPoints,
+} from '../../../lib/codex/pixelbrain.js';
 
 function runVoxelPipeline(volumeSize, seedCfg, text) {
   const SIZE = volumeSize;

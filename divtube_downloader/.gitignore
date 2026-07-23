@@ -25,3 +25,17 @@ niche_database.sqlite
 # Backups
 *.bak
 .blackboxcli/
+*.consolidation-backup
+*.healer.bak
+
+# Editor swap / temp files — never commit
+*.kate-swp
+*.swp
+*~
+
+# Stray crash / bug-report artifacts (screenshots & pasted blobs).
+# `bug` is an unanchored 1920x1080 PNG screenshot, not source.
+/bug
+bug.png
+Screenshot_*.png
+right-or-wrong*.png

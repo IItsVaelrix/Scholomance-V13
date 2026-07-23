@@ -1,7 +1,7 @@
 import { useId } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion.js';
-import { MIN_WORDS_FOR_STATS } from '../../codex/core/song-stats/constants.js';
+import { MIN_WORDS_FOR_STATS } from '../lib/codex/songStats.js';
 import { AnimatedSurface } from './AnimatedSurface';
 import './SongStatsPanel.css';
 

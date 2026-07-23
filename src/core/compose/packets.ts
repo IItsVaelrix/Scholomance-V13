@@ -39,5 +39,23 @@ export {
   GALAXY_BACKDROP_KIND,
   registerGalaxyBackdropMigration,
 } from './migrated/GalaxyBackdrop';
+export {
+  createReadTopBarScene,
+  createReadTopBarDefinition,
+  createReadStatusBarScene,
+  createReadStatusBarDefinition,
+  READ_TOP_BAR_ID,
+  READ_TOP_BAR_KIND,
+  READ_STATUS_BAR_ID,
+  READ_STATUS_BAR_KIND,
+  registerReadChromeMigration,
+} from './migrated/ReadChrome';
+export {
+  createOracleTerminalScene,
+  createOracleTerminalDefinition,
+  ORACLE_TERMINAL_ID,
+  ORACLE_TERMINAL_KIND,
+  registerOracleTerminalMigration,
+} from './migrated/OracleTerminal';
 export { validateComposeScene } from './validate/scene';
 export { renderSceneToDomSpec, type DomNodeSpec } from './render/dom-adapter';

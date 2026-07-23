@@ -55,6 +55,9 @@ export type ComponentRole =
   | 'complementary'
   | 'contentinfo'
   | 'search'
+  | 'presentation'
+  | 'status'
+  | 'tablist'
   | 'custom';
 
 /**
@@ -88,6 +91,9 @@ export type ComponentState = {
   index?: number;
   /** Custom state properties */
   custom?: Record<string, unknown>;
+  /** Additional named states declared by a component definition
+   *  (PDR StateDefinition: boolean | string | number | enum) */
+  [stateName: string]: boolean | string | number | Record<string, unknown> | undefined;
 };
 
 /**

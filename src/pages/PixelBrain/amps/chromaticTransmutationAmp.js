@@ -10,7 +10,7 @@ import {
   transmuteMaterialPalette,
   transmuteMaterialPalettes,
   transmuteMaterialCoordinates,
-} from '../../../../codex/core/pixelbrain/material-registry.js';
+} from '../../../lib/codex/pixelbrain.js';
 
 export {
   SOURCE_MATERIAL,

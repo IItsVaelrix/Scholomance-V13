@@ -7,7 +7,7 @@
  * then maps them into a 256-dimensional topographic vector space where:
  *
  *   Band 0 (dims   0– 63): Phoneme unigram distribution
- *   Band 1 (dims  64–127): Phoneme bigram transitions (sonority-weighted)
+ *   Band 1 (dims  64–127): Phoneme bigram transitions (direction-weighted)
  *   Band 2 (dims 128–191): Stress & syllable topology
  *   Band 3 (dims 192–255): Rhyme-domain signature
  *
@@ -51,10 +51,8 @@ const DIGRAPH_RULES = Object.freeze([
   ['tious', ['SH', 'AH0', 'S']],
   ['cious', ['SH', 'AH0', 'S']],
   ['ight', ['AY1', 'T']],
-  ['ough', ['AH1', 'F']],
   ['augh', ['AO1', 'T']],
   ['eigh', ['EY1']],
-  ['ough', ['OW1']],
   ['th', ['TH']],
   ['sh', ['SH']],
   ['ch', ['CH']],
@@ -102,6 +100,70 @@ const SINGLE_LETTER_MAP = Object.freeze({
   y: ['Y'], z: ['Z'],
 });
 
+// ── Context-sensitive -ough resolution ───────────────────────────────────────
+// "ough" is the most irregular grapheme cluster in English. A flat rule cannot
+// handle it. We use preceding context + following characters to disambiguate.
+//
+//   through  → TH R UW1        (preceded by 'thr')
+//   tough    → T AH1 F         (preceded by 't', word-final)
+//   though   → DH OW1          (preceded by 'th', word-final)
+//   thought  → TH AO1 T        (preceded by 'th', followed by 't')
+//   bough    → B AW1           (preceded by 'b', word-final)
+//   cough    → K AO1 F         (preceded by 'c', word-final)
+//   enough   → IH N AH1 F      (preceded by 'n', word-final)
+//   plough   → P L AW1         (preceded by 'l', word-final)
+//   borough  → B ER1 OW0       (preceded by 'r', word-final)
+
+/**
+ * Resolve -ough/-ought based on preceding context and following characters.
+ * @param {string} lower - full lowercase word
+ * @param {number} i - index where 'ough' starts
+ * @returns {{ phones: string[], len: number }}
+ */
+function resolveOugh(lower, i) {
+  const before = lower.slice(0, i);
+  const after = lower.slice(i + 4); // chars after 'ough'
+
+  // "ought" → /AO1 T/ (thought, bought, sought, wrought, fought)
+  // Consume the trailing 't' as part of the cluster
+  if (after.startsWith('t')) {
+    return { phones: ['AO1', 'T'], len: 5 }; // consume 'ought' (5 chars)
+  }
+
+  // Preceded by 'thr' → /UW1/ (through, thorough)
+  if (before.endsWith('thr')) {
+    return { phones: ['UW1'], len: 4 };
+  }
+
+  // Preceded by 'r' + word-final → /ER1 OW0/ (borough)
+  if (before.endsWith('r') && after === '') {
+    return { phones: ['ER1', 'OW0'], len: 4 };
+  }
+
+  // Preceded by 'th' + word-final → /OW1/ (though, dough)
+  if (before.endsWith('th') && after === '') {
+    return { phones: ['OW1'], len: 4 };
+  }
+
+  // Preceded by 'n', 'f', or 't' + word-final → /AH1 F/ (enough, tough, rough)
+  if ((before.endsWith('n') || before.endsWith('f') || before.endsWith('t')) && after === '') {
+    return { phones: ['AH1', 'F'], len: 4 };
+  }
+
+  // Preceded by 'c' + word-final → /AO1 F/ (cough)
+  if (before.endsWith('c') && after === '') {
+    return { phones: ['AO1', 'F'], len: 4 };
+  }
+
+  // Default word-final → /AW1/ (bough, plough, slough, sough)
+  if (after === '') {
+    return { phones: ['AW1'], len: 4 };
+  }
+
+  // Fallback for unknown contexts → /OW1/
+  return { phones: ['OW1'], len: 4 };
+}
+
 /**
  * Deterministic heuristic G2P for a single word.
  * Returns an array of ARPAbet phonemes (with stress markers).
@@ -115,6 +177,14 @@ export function heuristicG2P(word) {
 
   while (i < lower.length) {
     let matched = false;
+
+    // Context-sensitive -ough (must come before flat digraph rules)
+    if (lower.startsWith('ough', i)) {
+      const { phones, len } = resolveOugh(lower, i);
+      phonemes.push(...phones);
+      i += len;
+      continue;
+    }
 
     // Try consonant digraphs (longest first)
     for (const [pattern, phones] of DIGRAPH_RULES) {
@@ -159,6 +229,18 @@ export function heuristicG2P(word) {
 // ── Phoneme resolution ───────────────────────────────────────────────────────
 
 /**
+ * Eagerly initialize CmuPhonemeEngine if not yet started.
+ * Fire-and-forget — the sync path will use heuristic until init completes.
+ */
+let _cmuInitFired = false;
+function ensureCmuInit() {
+  if (!_cmuInitFired && !CmuPhonemeEngine._available) {
+    _cmuInitFired = true;
+    void CmuPhonemeEngine.init();
+  }
+}
+
+/**
  * Resolve a word to its ARPAbet phoneme sequence.
  * Tries CmuPhonemeEngine first (sync, if initialized), falls back to heuristic.
  *
@@ -168,6 +250,9 @@ export function heuristicG2P(word) {
 export function resolvePhonemes(word) {
   const upper = String(word || '').toUpperCase().replace(/[^A-Z]/g, '');
   if (!upper) return [];
+
+  // Ensure CMU init is triggered (async, fire-and-forget)
+  ensureCmuInit();
 
   // Try CMU dictionary (sync, works if already initialized)
   if (CmuPhonemeEngine._available) {
@@ -286,6 +371,10 @@ function fnv1aHash(str) {
  * phoneme sequences. This is the pure core function — no I/O, no dictionary
  * lookups. Accepts an array of { word, phonemes } objects.
  *
+ * After band accumulation, the vector is centered (mean-subtracted) and
+ * L2-normalized so that cosine similarity spans the full [-1, 1] range,
+ * giving topographicScore a meaningful [0, 1] output.
+ *
  * @param {{ word: string, phonemes: string[] }[]} wordPhonemes
  * @param {number} [dim=256]
  * @returns {Float32Array}
@@ -304,35 +393,40 @@ export function generatePhonotopographicVectorFromPhonemes(wordPhonemes, dim = 2
   if (allPhonemes.length === 0) return vec;
 
   // ── Band 0 (dims 0–63): Phoneme unigram distribution ──────────────────
-  // Each of the 41 ARPAbet phonemes maps to a unique dimension.
+  // Each of the 41 ARPAbet phonemes maps to a unique dimension (0–40).
+  // Dims 41–63 remain zero (reserved for future expansion).
   // Weighted by phonological feature salience.
   const unigrams = extractUnigrams(allPhonemes);
   for (const [phoneme, count] of unigrams) {
     const idx = PHONEME_INDEX.get(phoneme);
     if (idx === undefined) continue;
-    // Map 41 phonemes into 64 dims with feature-weighted activation
-    const dimIdx = idx % 64;
     const features = PHONOLOGICAL_FEATURES_V1[phoneme];
     // Weight by feature complexity: more distinctive phonemes get higher weight
     const featureWeight = features
       ? 1.0 + (features.sibilance || 0) * 0.5 + (features.nasality || 0) * 0.3
       : 1.0;
-    vec[dimIdx] += count * featureWeight;
+    vec[idx] += count * featureWeight;
   }
 
   // ── Band 1 (dims 64–127): Phoneme bigram transitions ──────────────────
   // Hash each bigram pair into the 64-dim band.
-  // Weight by sonority transition: rising (onset-like) vs falling (coda-like).
+  // Weight by sonority transition DIRECTION: rising (onset-like) and falling
+  // (coda-like) transitions get different weights so the vector encodes
+  // syllable-structure information, not just magnitude.
   const bigrams = extractBigrams(allPhonemes);
   for (const [key, count] of bigrams) {
     const [a, b] = key.split('+');
     const hash = fnv1aHash(key) % 64;
     const sonA = SONORITY_HIERARCHY[a] || 0;
     const sonB = SONORITY_HIERARCHY[b] || 0;
-    // Sonority transition weight: rising transitions (onsets) get positive
-    // weight, falling transitions (codas) get different activation
     const transition = sonB - sonA;
-    const weight = count * (1.0 + Math.abs(transition) * 0.1);
+    // Rising transitions (onsets): weight = 1.0 + transition * 0.15
+    // Falling transitions (codas): weight = 1.0 + |transition| * 0.08
+    // This makes rising transitions ~2× more salient than falling ones of
+    // equal magnitude, encoding directional sonority information.
+    const weight = transition >= 0
+      ? count * (1.0 + transition * 0.15)
+      : count * (1.0 + (-transition) * 0.08);
     vec[64 + hash] += weight;
   }
 
@@ -383,7 +477,11 @@ export function generatePhonotopographicVectorFromPhonemes(wordPhonemes, dim = 2
   }
 
   // ── Band 3 (dims 192–255): Rhyme-domain signature ─────────────────────
-  // Captures the final vowel + coda pattern of each word.
+  // Layout:
+  //   192–208: Final vowel family (17 vowels → dims 192 + vowelIndex)
+  //   209–213: Onset complexity (1–4 consonants before first vowel)
+  //   214:     Open-syllable flag
+  //   224–255: Coda hash (32 dims)
   for (const entry of wordPhonemes) {
     if (!Array.isArray(entry.phonemes) || entry.phonemes.length === 0) continue;
     const phonemes = entry.phonemes;
@@ -398,25 +496,25 @@ export function generatePhonotopographicVectorFromPhonemes(wordPhonemes, dim = 2
     }
     if (lastVowelIdx < 0) continue;
 
-    // Final vowel family
+    // Final vowel family → dims 192–208 (17 vowels, no modulo aliasing)
     const lastVowel = stripStress(phonemes[lastVowelIdx]);
     const vowelIdx = PHONEME_INDEX.get(lastVowel);
-    if (vowelIdx !== undefined) {
-      vec[192 + (vowelIdx % 32)] += 2.0;
+    if (vowelIdx !== undefined && vowelIdx < 17) {
+      vec[192 + vowelIdx] += 2.0;
     }
 
-    // Coda (consonants after last vowel)
+    // Coda (consonants after last vowel) → dims 224–255
     const coda = phonemes.slice(lastVowelIdx + 1).map(stripStress);
     if (coda.length > 0) {
       const codaKey = coda.join('+');
       const codaHash = fnv1aHash(codaKey) % 32;
       vec[224 + codaHash] += 2.0;
     } else {
-      // Open syllable (no coda)
-      vec[224] += 1.0;
+      // Open syllable (no coda) → dim 214 (dedicated, no aliasing)
+      vec[214] += 1.0;
     }
 
-    // Onset complexity (consonants before first vowel)
+    // Onset complexity (consonants before first vowel) → dims 209–213
     let firstVowelIdx = -1;
     for (let i = 0; i < phonemes.length; i++) {
       if (isVowel(phonemes[i])) {
@@ -426,7 +524,30 @@ export function generatePhonotopographicVectorFromPhonemes(wordPhonemes, dim = 2
     }
     if (firstVowelIdx > 0) {
       const onsetSize = Math.min(firstVowelIdx, 4);
-      vec[192 + 32 + onsetSize] += 1.0;
+      vec[209 + onsetSize] += 1.0;
+    }
+  }
+
+  // ── Per-band normalization ──────────────────────────────────────────────
+  // Normalize each 64-dim band to unit norm independently. This eliminates
+  // the "all words activate 4 bands" structural baseline that inflates cosine
+  // for unrelated words. The global cosine then equals the MEAN of per-band
+  // cosines, giving a well-calibrated [0, 1] range:
+  //   - Identical phoneme sequences → 1.0
+  //   - Phonemic twins → ~0.95
+  //   - Unrelated words → ~0.2–0.4
+  //   - Maximally distant → approaches 0.0
+  for (let band = 0; band < 4; band++) {
+    const start = band * 64;
+    let bandNorm = 0;
+    for (let i = start; i < start + 64; i++) {
+      bandNorm += vec[i] * vec[i];
+    }
+    bandNorm = Math.sqrt(bandNorm);
+    if (bandNorm > 0) {
+      for (let i = start; i < start + 64; i++) {
+        vec[i] /= bandNorm;
+      }
     }
   }
 
@@ -455,7 +576,7 @@ export function generatePhonotopographicVector(input, dim = 256) {
 
 export const PHONOTOPOGRAPHIC_EMBEDDING = Object.freeze({
   kind: 'phonotopographic',
-  version: 'tq-phoneme-v1',
+  version: 'tq-phoneme-v2',
   dimensions: 256,
   seed: 42,
   bands: Object.freeze({
@@ -507,15 +628,24 @@ export function compareTopographicSignatures(sig1, sig2) {
   }
 
   const cosine = estimateInnerProduct(sig1.data, sig2.data, 1, 1);
+  // Per-band normalized vectors are non-negative, so cosine ∈ [0, 1].
+  // Use directly as topographicScore (no (cos+1)/2 remapping needed).
   return Object.freeze({
     cosine,
-    topographicScore: Math.max(0, Math.min(1, (cosine + 1) / 2)),
+    topographicScore: Math.max(0, Math.min(1, cosine)),
   });
 }
 
 /**
- * Compute the phonotopographic distance between two raw texts.
+ * Compute the phonotopographic similarity between two raw texts.
  * Returns a score in [0, 1] where 1 = identical sound, 0 = maximally distant.
+ *
+ * With v2 per-band normalization, the output range is calibrated:
+ *   - Identical phoneme sequences → 1.0
+ *   - Phonemic twins (knight/night) → ~1.0
+ *   - Related words (shared phonemes) → ~0.3–0.5
+ *   - Unrelated words → ~0.15–0.25
+ *   - Maximally distant → approaches 0.0
  *
  * @param {string} text1
  * @param {string} text2

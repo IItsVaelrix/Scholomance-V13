@@ -28,8 +28,8 @@ export type EquivalenceLogEntry = {
  */
 export class XStateAdapter {
   private customService: WorkflowService;
-  private xstateMachine: ReturnType<typeof createMachine>;
-  private xstateActor: ReturnType<typeof createActor>;
+  private xstateMachine!: ReturnType<typeof createMachine>;
+  private xstateActor!: ReturnType<typeof createActor>;
   private equivalenceLog: EquivalenceLogEntry[] = [];
   private useXState: boolean;
 
@@ -77,7 +77,7 @@ export class XStateAdapter {
             if (t.cond) {
               // Wrap custom guard for XState v5
               const customGuard = t.cond;
-              xstateTransition.guard = ({ context, event: xstateEvent }) => {
+              xstateTransition.guard = ({ context, event: xstateEvent }: { context: WorkflowContext; event: { type: string } }) => {
                 const customEvent = { type: xstateEvent.type, payload: xstateEvent };
                 return customGuard(context, customEvent);
               };
@@ -119,14 +119,14 @@ export class XStateAdapter {
       id: workflow.id,
       initial: workflow.initial,
       context: workflow.context || {},
-      states: {}
+      states: {} as Record<string, unknown>
     };
 
     for (const [name, state] of Object.entries(workflow.states)) {
       machineDef.states[name] = convertState(state);
     }
 
-    return createMachine(machineDef);
+    return createMachine(machineDef as unknown as Parameters<typeof createMachine>[0]);
   }
 
   /**

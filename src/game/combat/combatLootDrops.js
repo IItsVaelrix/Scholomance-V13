@@ -1,5 +1,6 @@
 import { ITEM_DATABASE } from '../../data/itemDatabase.js';
 import { PORTAL_WARDEN_ID } from './portalPhase.js';
+import { freshRng } from '../../../codex/core/shared/math/seededRng.js';
 
 export const ICE_SLIME_STAFF_ITEM_ID = 'item_ice_slime_staff';
 
@@ -25,7 +26,7 @@ const COMBAT_LOOT_TABLES = Object.freeze({
  * @param {() => number} [rng]
  * @returns {{ itemId: string, itemName: string, enemyId: string } | null}
  */
-export function rollCombatLoot(enemyId, rng = Math.random) {
+export function rollCombatLoot(enemyId, rng = freshRng()) {
   const table = COMBAT_LOOT_TABLES[enemyId];
   if (!table?.length) return null;
 

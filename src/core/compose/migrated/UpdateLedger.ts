@@ -7,6 +7,7 @@ import type {
   PbUiSceneV1,
   ScholComponentDefinitionV1,
   WandVisualAttachment,
+  VisualAttachment,
 } from '../schema/packets';
 import type { ComponentSchema } from '../schema/ComponentSchema';
 import { createComponentDefinition } from '../schema/contracts';
@@ -123,7 +124,7 @@ export function createUpdateLedgerScene(
     placementSlot: 'ornament',
   };
 
-  const visuals = includeWand
+  const visuals: Record<string, VisualAttachment> = includeWand
     ? { 'ledger-wand-ornament': wand }
     : {};
 

@@ -1,0 +1,202 @@
+{
+  "contract": "PB-UI-SCENE-v1",
+  "definitions": {
+    "oracle-terminal": {
+      "accessibility": {
+        "ariaRole": "region",
+        "focusRetention": "none",
+        "keyboard": [
+          "Tab: reaches mode tabs, prompt input, and submit",
+          "Enter: submits the prompt"
+        ],
+        "nameFrom": "author",
+        "requiredAttributes": [
+          "aria-label"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "children": [
+              {
+                "id": "session",
+                "interactive": true,
+                "label": "Session line",
+                "role": "group",
+                "visible": true
+              },
+              {
+                "id": "prompt",
+                "interactive": true,
+                "label": "Command prompt",
+                "role": "group",
+                "visible": true
+              },
+              {
+                "id": "signal",
+                "interactive": false,
+                "label": "Status line",
+                "role": "group",
+                "visible": true
+              },
+              {
+                "id": "feed",
+                "interactive": false,
+                "label": "Terminal output",
+                "role": "group",
+                "visible": true
+              }
+            ],
+            "id": "root",
+            "interactive": false,
+            "role": "region",
+            "visible": true
+          }
+        ],
+        "rootRole": "region",
+        "slots": [
+          {
+            "accepts": [
+              "native-dom",
+              "wand",
+              "token"
+            ],
+            "maxChildren": 1,
+            "name": "atmosphere",
+            "required": false
+          }
+        ]
+      },
+      "capabilities": [
+        {
+          "id": "focusable-controls",
+          "required": true
+        },
+        {
+          "id": "semantic-text",
+          "required": true
+        },
+        {
+          "id": "procedural-glow",
+          "required": false
+        }
+      ],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": {
+        "layoutId": "oracle-terminal-flow"
+      },
+      "defaultVisuals": [
+        {
+          "visualId": "phosphor-scanline"
+        }
+      ],
+      "description": "Lexicon Oracle — arcane phosphor terminal: TTY session line, command prompt, statusline, divination feed",
+      "events": [
+        {
+          "type": "ORACLE.RESOLVE"
+        },
+        {
+          "type": "ORACLE.MODE_SWITCH"
+        },
+        {
+          "type": "ORACLE.CLEAR"
+        }
+      ],
+      "kind": "oracle-terminal",
+      "provenance": {
+        "author": "compose-oracle-terminal",
+        "contentHash": "scd64:oracle-terminal-v1",
+        "establishedAt": "2026-07-20T00:00:00.000Z",
+        "sourceKind": "migrated",
+        "sourcePath": "src/pages/Read/SearchPanel.jsx"
+      },
+      "states": [
+        {
+          "default": "WORD",
+          "enumValues": [
+            "WORD",
+            "CORPUS",
+            "QUERY"
+          ],
+          "name": "mode",
+          "type": "enum"
+        }
+      ],
+      "version": "1.0.0"
+    }
+  },
+  "id": "scene:oracle-terminal",
+  "layouts": {
+    "oracle-terminal-flow": {
+      "contract": "PB-LAYOUT-v1",
+      "flow": {
+        "align": "stretch",
+        "direction": "column",
+        "gapPx": 0,
+        "justify": "start",
+        "wrap": false
+      },
+      "mode": "flow",
+      "version": "1.0.0"
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "id": "oracle-terminal.session",
+        "kind": "container",
+        "props": {
+          "label": "Session line",
+          "part": "session"
+        }
+      },
+      {
+        "id": "oracle-terminal.prompt",
+        "kind": "container",
+        "props": {
+          "label": "Command prompt",
+          "part": "prompt"
+        }
+      },
+      {
+        "id": "oracle-terminal.signal",
+        "kind": "container",
+        "props": {
+          "label": "Status line",
+          "part": "signal"
+        }
+      },
+      {
+        "id": "oracle-terminal.feed",
+        "kind": "container",
+        "props": {
+          "label": "Terminal output",
+          "part": "feed"
+        }
+      }
+    ],
+    "id": "oracle-terminal",
+    "kind": "oracle-terminal",
+    "layoutRef": "oracle-terminal-flow",
+    "props": {
+      "aria-label": "Lexicon Oracle terminal"
+    },
+    "role": "region",
+    "visualRefs": [
+      "phosphor-scanline"
+    ]
+  },
+  "sourceChecksum": "scd64:1d57a38f023ecc38",
+  "version": "1.0.0",
+  "visuals": {
+    "phosphor-scanline": {
+      "className": "oracle-scanline-atmosphere",
+      "kind": "native-dom",
+      "placementSlot": "atmosphere",
+      "styleTokens": [
+        "oracle-school-color",
+        "oracle-gold"
+      ]
+    }
+  }
+}

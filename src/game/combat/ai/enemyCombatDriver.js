@@ -2,6 +2,7 @@ import { resolveCombatBestiaryEntry } from '../bestiary/combatBestiary.registry.
 import { buildBlockedSet } from '../combatPathfinding.js';
 import { computeBasicAttackDamage } from '../scholomanceStats.js';
 import { planEnemyTurn } from './enemyTurnPlanner.js';
+import { freshRng } from '../../../../codex/core/shared/math/seededRng.js';
 
 function toBlockedSet(blocked) {
   if (blocked instanceof Set) return blocked;
@@ -14,7 +15,7 @@ function toBlockedSet(blocked) {
  * @returns {object|null} TurnPlan
  */
 export function driveEnemyTurn({
-  entityId, record = null, stats, allies = [], targetId = 'player', blocked = null, rng = Math.random,
+  entityId, record = null, stats, allies = [], targetId = 'player', blocked = null, rng = freshRng(),
 } = {}) {
   const entry = resolveCombatBestiaryEntry({ enemyId: entityId, record });
   const ai = entry?.combatAI;

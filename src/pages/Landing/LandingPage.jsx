@@ -28,9 +28,16 @@ export default function LandingPage() {
     <div className="portal-scene" aria-label="Scholomance - enter the portal">
       <ComposeGalaxyBackdrop className="portal-storm" variant="scene" intensity={1.4} debug={STORM_DEBUG} />
 
-      <span className="portal-moon" aria-hidden="true">
-        <span className="portal-moon-cloud portal-moon-cloud--slow" />
-        <span className="portal-moon-cloud portal-moon-cloud--thin" />
+      <span className="portal-moon-wrap" aria-hidden="true">
+        {/* Glow is a sibling (not a child — the moon is overflow:hidden) and
+            pulses via opacity/transform only. The old box-shadow keyframe
+            animation repainted every frame, forever, taxing the frames that
+            the portal hover transition needs. */}
+        <span className="portal-moon-glow" />
+        <span className="portal-moon">
+          <span className="portal-moon-cloud portal-moon-cloud--slow" />
+          <span className="portal-moon-cloud portal-moon-cloud--thin" />
+        </span>
       </span>
       <div className="landing-gates">
         <div className="landing-gate landing-gate--portal">

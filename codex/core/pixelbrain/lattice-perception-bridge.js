@@ -4,12 +4,7 @@
 // returns a PerceptionFrame plus a snapshot to thread into the next generation.
 // Deterministic; no Date.now / Math.random.
 
-import {
-  buildCellSignatures,
-  diffCellSignatures,
-  diffShadowField,
-  assemblePerceptionFrame,
-} from '../../../src/lib/photonic-retina/index.js';
+import { getPhotonicBridge } from './photonic-bridge-registry.js';
 import { buildCommittedMask } from './qbit-placement-memory.js';
 
 function clamp01(value) {
@@ -19,6 +14,12 @@ function clamp01(value) {
 }
 
 export function buildLatticePerceptionFrame({ lattice, shadowField, cols, rows, previous = null, generation = 0 }) {
+  const bridge = getPhotonicBridge();
+  if (!bridge) {
+    throw new Error('Photonic bridge not registered. Call registerPhotonicBridge() from src/ layer first.');
+  }
+  const { buildCellSignatures, diffCellSignatures, diffShadowField, assemblePerceptionFrame } = bridge;
+
   const total = cols * rows;
   const denseCells = new Array(total).fill(null);
   const evidence = new Array(total).fill(null);

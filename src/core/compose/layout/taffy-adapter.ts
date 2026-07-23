@@ -537,23 +537,23 @@ export class TaffyCSSLoweringEngine {
     if (intent.algorithm === 'flex') {
       if (intent.direction) props.flexDirection = intent.direction;
       if (intent.justify) {
-        const justifyMap: Record<string, string> = {
+        const justifyMap = {
           start: 'flex-start',
           center: 'center',
           end: 'flex-end',
           between: 'space-between',
           around: 'space-around',
           evenly: 'space-evenly',
-        };
+        } as const;
         props.justifyContent = justifyMap[intent.justify] || 'flex-start';
       }
       if (intent.align) {
-        const alignMap: Record<string, string> = {
+        const alignMap = {
           start: 'flex-start',
           center: 'center',
           end: 'flex-end',
           stretch: 'stretch',
-        };
+        } as const;
         props.alignItems = alignMap[intent.align] || 'stretch';
       }
     }

@@ -22,7 +22,7 @@ describe('semantic ballistics', () => {
     expect(first.senses[0].bucketIds).toHaveLength(4);
     expect(first.embedding).toMatchObject({
       kind: 'phonotopographic',
-      version: 'tq-phoneme-v1',
+      version: 'tq-phoneme-v2',
       dimensions: 256,
     });
   });
@@ -47,7 +47,7 @@ describe('semantic ballistics', () => {
   it('produces phonotopographic signatures (not character-level mock)', () => {
     const sig = createBallisticSignature('the bright wound of morning');
     expect(sig.kind).toBe('phonotopographic');
-    expect(sig.version).toBe('tq-phoneme-v1');
+    expect(sig.version).toBe('tq-phoneme-v2');
     expect(sig.data).toBeInstanceOf(Uint8Array);
     expect(sig.data.length).toBe(128); // 256 dims / 2 (4-bit packing)
   });

@@ -171,7 +171,13 @@ export function useZagToggle(props: { pressed?: boolean; onPressedChange?: (pres
  * React hook for using Zag switch machine
  */
 export function useZagSwitch(props: { checked?: boolean; onCheckedChange?: (checked: boolean) => void } = {}) {
-  const service = useMachine(zagSwitch.machine, props);
+  const { onCheckedChange, ...rest } = props;
+  const service = useMachine(zagSwitch.machine, {
+    ...rest,
+    onCheckedChange: onCheckedChange
+      ? (details: { checked: boolean }) => onCheckedChange(details.checked)
+      : undefined,
+  });
   const api = zagSwitch.connect(service, normalizeProps);
   return { service, api };
 }

@@ -9,7 +9,7 @@ const lexiconAdapter = {
   lookupSynonyms: () => [{ lemma: 'dawn' }],
   lookupAntonyms: () => [{ lemma: 'dusk' }],
   lookupRelated: () => ({ broader: [{ lemma: 'time' }], narrower: [{ lemma: 'sunrise' }], akin: [{ lemma: 'daybreak' }] }),
-  getCorpusFrequencies: (words) => new Map(words.map((w) => [w, w === 'morning' ? 300 : 10])),
+  getCorpusFrequencies: (words) => new Map(words.map((w) => [w, w === 'morning' ? 10 : 300])),
 };
 const rhymeQueryEngine = {
   async query() {
@@ -26,13 +26,18 @@ const deps = { lexiconAdapter, rhymeQueryEngine, rhymeLexiconRepo };
 describe('buildConstellationPage', () => {
   it('composes all channels for a known phrase', async () => {
     const p = await buildConstellationPage('the bright wound of morning', deps);
-    expect(p.schema_id).toBe('scholomance/constellation-os-page-phase1');
+    expect(p.schema_id).toBe('scholomance/constellation-os-page-phase2');
     expect(p.query.kind).toBe('phrase');
+    expect(p.query.intent).toBe('literary');
     expect(p.leximancy.status).toBe('resolved');
     expect(p.rhymeAstrology.phonemes.length).toBeGreaterThan(0);
     expect(p.phraseGenome.syllables).toBe(2);
     expect(p.pageBytecode).toMatch(/^COS-PAGE-v1-/);
     expect(p.diagnostics.degradedChannels).toEqual([]);
+    // Phase 2: phrase structure is present
+    expect(p.phraseStructure.intent).toBe('literary');
+    expect(p.phraseStructure.headToken).toBeTruthy();
+    expect(p.phraseStructure.devices.length).toBeGreaterThan(0);
   });
 
   it('degrades only the rhyme channel when its engine throws', async () => {
@@ -52,7 +57,7 @@ describe('buildConstellationPage', () => {
   it('threads etymology, rarity, relations, examples, and IPA onto the packet', async () => {
     const p = await buildConstellationPage('morning', deps);
     expect(p.leximancy.etymology).toBe('OE morgen');
-    expect(p.leximancy.rarity).toEqual({ band: 5, max: 9, label: 'uncommon' });
+    expect(p.leximancy.rarity).toEqual({ band: 2, max: 9, label: 'rare' });
     expect(p.leximancy.relations.broader).toEqual(['time']);
     expect(p.leximancy.interpretations[0].examples).toEqual(['early in the morning']);
     expect(p.rhymeAstrology.ipa).toBe('/ˈmɔːnɪŋ/');

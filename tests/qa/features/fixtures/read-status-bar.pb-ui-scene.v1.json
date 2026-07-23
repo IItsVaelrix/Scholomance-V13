@@ -1,0 +1,145 @@
+{
+  "contract": "PB-UI-SCENE-v1",
+  "definitions": {
+    "read-status-bar": {
+      "accessibility": {
+        "ariaRole": "region",
+        "focusRetention": "none",
+        "keyboard": [],
+        "nameFrom": "author",
+        "requiredAttributes": [
+          "aria-label"
+        ]
+      },
+      "anatomy": {
+        "parts": [
+          {
+            "children": [
+              {
+                "id": "vitals",
+                "interactive": false,
+                "label": "Analysis vitals",
+                "role": "group",
+                "visible": true
+              },
+              {
+                "id": "position",
+                "interactive": false,
+                "label": "Caret position",
+                "role": "group",
+                "visible": true
+              }
+            ],
+            "id": "root",
+            "interactive": false,
+            "role": "region",
+            "visible": true
+          }
+        ],
+        "rootRole": "region",
+        "slots": [
+          {
+            "accepts": [
+              "native-dom",
+              "wand",
+              "token"
+            ],
+            "maxChildren": 1,
+            "name": "seam",
+            "required": false
+          }
+        ]
+      },
+      "capabilities": [
+        {
+          "id": "semantic-text",
+          "required": true
+        },
+        {
+          "id": "procedural-glow",
+          "required": false
+        }
+      ],
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "defaultLayout": {
+        "layoutId": "read-statusbar-flow"
+      },
+      "defaultVisuals": [
+        {
+          "visualId": "harmonic-seam"
+        }
+      ],
+      "description": "Read IDE status chrome — analysis vitals and caret position",
+      "events": [],
+      "kind": "read-status-bar",
+      "provenance": {
+        "author": "compose-read-chrome",
+        "contentHash": "scd64:read-status-bar-v1",
+        "establishedAt": "2026-07-20T00:00:00.000Z",
+        "sourceKind": "migrated",
+        "sourcePath": "src/pages/Read/IDEChrome.jsx"
+      },
+      "states": [],
+      "version": "1.0.0"
+    }
+  },
+  "id": "scene:read-status-bar",
+  "layouts": {
+    "read-statusbar-flow": {
+      "contract": "PB-LAYOUT-v1",
+      "flow": {
+        "align": "center",
+        "direction": "row",
+        "gapPx": 16,
+        "justify": "space-between",
+        "wrap": false
+      },
+      "mode": "flow",
+      "version": "1.0.0"
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "id": "read-status-bar.vitals",
+        "kind": "container",
+        "props": {
+          "label": "Analysis vitals",
+          "part": "vitals"
+        }
+      },
+      {
+        "id": "read-status-bar.position",
+        "kind": "container",
+        "props": {
+          "label": "Caret position",
+          "part": "position"
+        }
+      }
+    ],
+    "id": "read-status-bar",
+    "kind": "read-status-bar",
+    "layoutRef": "read-statusbar-flow",
+    "props": {
+      "aria-label": "Editor status"
+    },
+    "role": "region",
+    "visualRefs": [
+      "harmonic-seam"
+    ]
+  },
+  "sourceChecksum": "scd64:7a1e9d95c9ec2ab9",
+  "version": "1.0.0",
+  "visuals": {
+    "harmonic-seam": {
+      "className": "grim-harmonic-seam",
+      "kind": "native-dom",
+      "placementSlot": "seam",
+      "styleTokens": [
+        "ritual-aurora-start",
+        "ritual-aurora-end",
+        "ritual-glow"
+      ]
+    }
+  }
+}

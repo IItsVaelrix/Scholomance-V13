@@ -152,7 +152,7 @@ export class MigrationRegistry {
   updatePhase(
     schemaId: string,
     phaseName: string,
-    options: { complete?: boolean; completedAt?: string } = {}
+    options: { complete?: boolean; completedAt?: string; notes?: string } = {}
   ): void {
     const migration = this.migrations.get(schemaId);
     if (migration) {
@@ -359,7 +359,7 @@ export function createMigration(
     schemaId = schemaOrId;
     componentName = ownerOrFlag;
     featureFlag = (featureFlagOrMigrated as string) || '';
-    owner = (migratedOrPending as string) || 'claude';
+    owner = (migratedOrPending as unknown as string) || 'claude';
     migratedFiles = [];
     pending = [];
   } else {

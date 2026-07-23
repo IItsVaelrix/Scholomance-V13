@@ -26,6 +26,8 @@ type SharedProps = {
   shadowMode?: boolean;
   /** Callback when shadow mode detects behavioral divergence */
   onShadowDivergence?: (divergence: ShadowDivergence) => void;
+  /** Disabled state (anchors render aria-disabled) */
+  disabled?: boolean;
 };
 
 type AnchorButtonProps = SharedProps & AnchorHTMLAttributes<HTMLAnchorElement> & { href: string };
@@ -65,8 +67,8 @@ export function ComposeButton({
   
   // Zag toggle machine for pressed state
   const service = useMachine(toggle.machine, {
-    onPressedChange: (details: { pressed: boolean }) => {
-      if (details.pressed && onClick) {
+    onPressedChange: (pressed: boolean) => {
+      if (pressed && onClick) {
         (onClick as any)({ type: 'click' });
       }
     }
@@ -132,7 +134,7 @@ export function ComposeButton({
 
     // Check for divergence
     const diff: string[] = [];
-    const commonKeys = ['pressed', 'disabled'];
+    const commonKeys = ['pressed', 'disabled'] as const;
     
     for (const key of commonKeys) {
       if (customState[key] !== zagState[key]) {

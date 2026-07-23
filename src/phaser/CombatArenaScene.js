@@ -1,5 +1,6 @@
 import { generateBattleLeylines } from '../../codex/core/leyline.engine.js';
 import { processorBridge } from '../../codex/core/shared/processor-bridge.js';
+import { freshRng } from '../../codex/core/shared/math/seededRng.js';
 import { ITEM_DATABASE } from '../data/itemDatabase.js';
 import { combat_leylineUri } from '../pages/Combat/assets/generated/combat-leyline.js';
 import { CombatStatController } from '../game/combat/combatStatController.js';
@@ -1263,7 +1264,7 @@ export default function createCombatArenaScene(phaserRuntime) {
         allies,
         targetId: 'player',
         blocked: this.getBlockedTiles?.() || this._blockedTiles,
-        rng: Math.random,
+        rng: freshRng(),
       });
       if (!plan) return;
 
@@ -1512,7 +1513,7 @@ export default function createCombatArenaScene(phaserRuntime) {
         allies: [],
         targetId: 'player',
         blocked: this.getBlockedTiles?.() || this._blockedTiles,
-        rng: Math.random,
+        rng: freshRng(),
       });
       if (!plan) return;
 

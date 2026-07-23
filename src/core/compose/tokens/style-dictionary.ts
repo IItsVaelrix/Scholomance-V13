@@ -11,6 +11,7 @@
  */
 
 import StyleDictionary from 'style-dictionary';
+import type { DesignTokens } from 'style-dictionary/types';
 import type { DTCGDictionary, DTCGToken, DTCGTokenGroup } from './index';
 import { isDTCGToken } from './index';
 
@@ -95,7 +96,7 @@ export const DEFAULT_SD_CONFIG: StyleDictionaryConfig = {
 /**
  * Custom transforms for compose tokens
  */
-export function registerComposeTransforms(sd: typeof StyleDictionary): void {
+export function registerComposeTransforms(sd: StyleDictionary): void {
   // Transform: Convert DTCG $value to Style Dictionary value
   sd.registerTransform({
     name: 'dtcg/value',
@@ -196,21 +197,20 @@ export async function buildTokens(
   dtcgDictionary: DTCGDictionary,
   config: Partial<StyleDictionaryConfig> = {}
 ): Promise<Map<string, string>> {
-  const sd = StyleDictionary.create({
+  // Convert DTCG to Style Dictionary format
+  const sdTokens = dtcgToStyleDictionary(dtcgDictionary);
+
+  // Style Dictionary v4: instance construction replaces v3 create/extend
+  const sd = new StyleDictionary({
     ...DEFAULT_SD_CONFIG,
     ...config,
+    tokens: sdTokens as DesignTokens,
   });
 
   // Register custom transforms
   registerComposeTransforms(sd);
 
-  // Convert DTCG to Style Dictionary format
-  const sdTokens = dtcgToStyleDictionary(dtcgDictionary);
-
-  // Build the dictionary
-  const dictionary = await sd.extend({
-    tokens: sdTokens,
-  }).buildAllPlatforms();
+  await sd.buildAllPlatforms();
 
   // Collect output files
   const files = new Map<string, string>();

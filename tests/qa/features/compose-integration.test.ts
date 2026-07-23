@@ -293,7 +293,7 @@ describe('Compose Integration - Full Pipeline', () => {
       // Check progress
       const progress = flags.getMigrationProgress();
       expect(progress.migrated).toBe(1);
-      expect(progress.total).toBe(9);
+      expect(progress.total).toBe(13);
     });
 
     it('should track migration dependencies', () => {

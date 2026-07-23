@@ -18,11 +18,16 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
 const STEAMDECK = path.join(ROOT, 'steamdeck_brain');
 
-async function searchHits(query) {
+async function searchHits(query, scope = 'repo') {
   const { searchCodebase } = await import(
     path.join(ROOT, 'codex/server/services/codebaseSearch.service.js')
   );
-  const result = await searchCodebase(query);
+  // Boon 2: bias retrieval itself for scope=divtube — restrict the indexed
+  // candidate set to the harness subtree so the top-N is divtube-only instead
+  // of collab-server/OAuth noise. repo scope leaves retrieval unbiased.
+  const searchOptions =
+    scope === 'divtube' ? { pathPrefix: 'divtube_downloader/' } : {};
+  const result = await searchCodebase(query, searchOptions);
   const indexSize = result?.metadata?.index_size ?? 0;
   const hits = (result?.results || []).map((r) => ({
     path: r.file_path,
@@ -114,7 +119,7 @@ export async function composePhenotypicIdeal(opts = {}) {
     engine = 'injected-hits';
   } else {
     try {
-      const searched = await searchHits(query);
+      const searched = await searchHits(query, scope);
       hits = searched.hits;
       engine = searched.engine;
       indexSize = searched.indexSize;
@@ -130,6 +135,17 @@ export async function composePhenotypicIdeal(opts = {}) {
       e.hint = 'Run: node scripts/index_codebase_vectors.js  (or pass hitsJson / allowEmptyIndex)';
       throw e;
     }
+  }
+
+  // Boon 2: scope must bias EVIDENCE, not only the observed phenotype. Filter
+  // hits to the scoped subtree BEFORE attachEvidence so capabilities/genes are
+  // matched against in-scope neighbors — not collab-server/OAuth noise when the
+  // operator asked for scope=divtube. The guard mirrors the assembly-stage
+  // filter: if no in-scope hits exist, fall back to the full neighbor set
+  // rather than emitting an empty archaeology.
+  if (scope === 'divtube') {
+    const scoped = hits.filter((h) => h.path.startsWith('divtube_downloader/'));
+    if (scoped.length) hits = scoped;
   }
 
   const evidence = attachEvidence(query, hits);

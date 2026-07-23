@@ -17,7 +17,7 @@
  * shape to what the bridge expects, and reads the bridge's verdict.
  */
 
-import { routeRetinaPacketToPhotonicBridge } from '../../../src/lib/photonic-retina/retina-bridge.js';
+import { getPhotonicBridge } from './photonic-bridge-registry.js';
 import { encodeEnergyFieldRLE } from './qbit-field-rle.js';
 
 const DEFAULT_QBIT_RETINA_OPTIONS = Object.freeze({
@@ -135,7 +135,12 @@ export function routeQbitFieldToPhotonicBridge(field, options = {}) {
     ...(options.retinaOptions || {}),
   };
 
-  const route = routeRetinaPacketToPhotonicBridge(retinaInput, {
+  const bridge = getPhotonicBridge();
+  if (!bridge || !bridge.routeRetinaPacketToPhotonicBridge) {
+    throw new Error('Photonic bridge not registered. Call registerPhotonicBridge() from src/ layer first.');
+  }
+
+  const route = bridge.routeRetinaPacketToPhotonicBridge(retinaInput, {
     retina: retinaOpts,
     bridge: options.bridgeOptions || {},
     previewLength: options.previewLength,

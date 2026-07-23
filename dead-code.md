@@ -1,6 +1,6 @@
 # Dead Code Report
 
-Generated at: 2026-07-14T12:22:25.668Z
+Generated at: 2026-07-23T06:24:28.736Z
 
 ## Unreachable Files
 Files in `src/` or `codex/` that are not imported by any entry point or reachable file.
@@ -10,8 +10,41 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] src/combat/combat-sfx.events.js
 - [ ] src/combat/combat-sfx.mapping.js
 - [ ] src/components/GodotExportButton/downloadTextFile.js
+- [ ] src/components/HeuristicScorePanel.jsx
 - [ ] src/components/ParaEQ/presets/factoryScrolls.ts
 - [ ] src/components/SigilChamber.jsx
+- [ ] src/core/compose/behavior/ZagAdapter.ts
+- [ ] src/core/compose/behavior/index.ts
+- [ ] src/core/compose/index.ts
+- [ ] src/core/compose/layout/index.ts
+- [ ] src/core/compose/layout/qbit-lattice.ts
+- [ ] src/core/compose/layout/taffy-adapter.ts
+- [ ] src/core/compose/migrated/Button.ts
+- [ ] src/core/compose/migrated/ComposeButton.tsx
+- [ ] src/core/compose/render/index.ts
+- [ ] src/core/compose/render/skia-adapter.ts
+- [ ] src/core/compose/render/vello-adapter.ts
+- [ ] src/core/compose/scene/index.ts
+- [ ] src/core/compose/schema/json-schemas.ts
+- [ ] src/core/compose/tokens/index.ts
+- [ ] src/core/compose/tokens/style-dictionary.ts
+- [ ] src/core/compose/tokens/theme-css.ts
+- [ ] src/core/compose/tokens/theme-parity.ts
+- [ ] src/core/compose/tokens/theme-transforms.ts
+- [ ] src/core/compose/validate/a11y-audit.ts
+- [ ] src/core/compose/validate/index.ts
+- [ ] src/core/compose/vocabulary/index.ts
+- [ ] src/core/compose/workflow/XStateAdapter.ts
+- [ ] src/core/compose/workflow/index.ts
+- [ ] src/core/phenotype/color.ts
+- [ ] src/core/phenotype/isolation.ts
+- [ ] src/core/phenotype/quantize/chromaticity.ts
+- [ ] src/core/phenotype/quantize/density.ts
+- [ ] src/core/phenotype/quantize/luminance.ts
+- [ ] src/core/phenotype/quantize/shape.ts
+- [ ] src/core/phenotype/quantize/size.ts
+- [ ] src/core/phenotype/quantize/stacking.ts
+- [ ] src/core/phenotype/vector.ts
 - [ ] src/core/scd64/RuleRegistry.ts
 - [ ] src/core/scd64/compareSCD64.ts
 - [ ] src/core/scd64/constants.ts
@@ -30,6 +63,7 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] src/diagnostics/scd64/SCD64HoverTooltip.tsx
 - [ ] src/diagnostics/scd64/SCD64LogRenderer.tsx
 - [ ] src/domain/index.ts
+- [ ] src/features/divwand/divProposalSchema.js
 - [ ] src/game/combat/ai/enemyBrainContract.js
 - [ ] src/game/combat/scdlArmSplitter.js
 - [ ] src/game/combat/weaponRigFit.js
@@ -43,23 +77,29 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] src/hooks/useBattleSession.js
 - [ ] src/hooks/useColorCodex.js
 - [ ] src/hooks/useGodotExportFlag.js
+- [ ] src/hooks/useGrimDesign.js
 - [ ] src/kits/channel-zero-ui-kit/components/CodeRuneBlock.tsx
 - [ ] src/kits/channel-zero-ui-kit/components/SkillArticleTemplate.tsx
 - [ ] src/kits/channel-zero-ui-kit/examples/ArticlePage.tsx
 - [ ] src/kits/channel-zero-ui-kit/examples/BlogIndexPage.tsx
 - [ ] src/lib/animation-types.js
+- [ ] src/lib/codex/battle.js
+- [ ] src/lib/codex/leyline.js
 - [ ] src/lib/config/flags.js
 - [ ] src/lib/css/schoolStyles.js
 - [ ] src/lib/literaryClassifier.js
 - [ ] src/lib/literaryDevices.detector.js
 - [ ] src/lib/math/safe.js
+- [ ] src/lib/phonology.adapter.js
 - [ ] src/lib/photonic-quantization/photonic-errors.js
 - [ ] src/lib/photonic-quantization/photonic-types.js
+- [ ] src/lib/pixelbrain/uniforms.bridge.js
 - [ ] src/lib/reference.engine.js
 - [ ] src/lib/render-engine.js
 - [ ] src/lib/rhymeScheme.detector.js
 - [ ] src/lib/syntacticIntegrity.js
 - [ ] src/lib/syntax.layer.js
+- [ ] src/lib/truesight/color/oklch.js
 - [ ] src/lib/truesight/color/rhymeColorRegistry.js
 - [ ] src/lib/truesight/color/visemeMapping.js
 - [ ] src/lib/truesight/compiler/compileVerseToIR.js
@@ -69,6 +109,7 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] src/pages/Combat/assets/generated/combat-torch.js
 - [ ] src/pages/Landing/storm/dbm.js
 - [ ] src/pages/Landing/storm/dbm.worker.js
+- [ ] src/pages/Listen/shaders/atmospherePacket.js
 - [ ] src/pages/PixelBrain/amps/chromaticTransmutationAmp.js
 - [ ] src/pages/PixelBrain/components/AnalysisResults.jsx
 - [ ] src/pages/PixelBrain/components/DuplicatePreviewGrid.jsx
@@ -85,6 +126,10 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] src/pages/PixelBrain/components/UploadSection.jsx
 - [ ] src/pages/PixelBrain/utils/imageAnalysis.client.js
 - [ ] src/pages/PixelBrain/utils/wandFillValidation.js
+- [ ] src/pages/Read/GrimDesignPanel.jsx
+- [ ] src/pages/Read/ToolsSidebar.jsx
+- [ ] src/pages/Visualiser/mandala/MandalaStage.tsx
+- [ ] src/pages/Visualiser/mandala/mandalaBytecode.ts
 - [ ] src/pages/Visualiser/tracks/loadTrackWithAlignment.ts
 - [ ] src/pages/Visualiser/tracks/maze-screensaver.ts
 - [ ] src/pages/Visualiser/tracks/polarity-remix.ts
@@ -122,6 +167,10 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] src/types/lib/rhyme.ts
 - [ ] src/types/runtime/runtime.ts
 - [ ] src/ui/animation/hooks/useAnimationIntent.ts
+- [ ] src/ui/animation/pbstage/PBShaderStage.tsx
+- [ ] src/ui/animation/pbstage/buildRuntimeState.ts
+- [ ] src/ui/animation/pbstage/index.ts
+- [ ] src/ui/animation/pbstage/useDeterministicClock.ts
 - [ ] src/video/DarkStarMirrorVisualizer.tsx
 - [ ] src/video/KineticLine.tsx
 - [ ] src/video/KineticLyricsVideo.tsx
@@ -169,6 +218,7 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/cli/scholo-immune.js
 - [ ] codex/core/animation/amp/amp.worker.ts
 - [ ] codex/core/archive/truesight/color/visemeMapping.ARCHIVED.js
+- [ ] codex/core/candidate-lattice/index.ts
 - [ ] codex/core/combat.exegesis.js
 - [ ] codex/core/combat.session.js
 - [ ] codex/core/diagnostic/QbitProbeEnrichment.js
@@ -210,6 +260,16 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/core/jit/index.js
 - [ ] codex/core/jit/pipeline.js
 - [ ] codex/core/jit/router.js
+- [ ] codex/core/lexical-analysis/types.js
+- [ ] codex/core/lexical-graph/deviceEmbed.js
+- [ ] codex/core/lexical-graph/embedDevices.js
+- [ ] codex/core/lexical-graph/ftsSync.js
+- [ ] codex/core/lexical-graph/legacyEmbedding.js
+- [ ] codex/core/lexical-graph/migrate.js
+- [ ] codex/core/lexical-graph/mirror.js
+- [ ] codex/core/lexical-graph/schema.sql.js
+- [ ] codex/core/lexical-graph/seedDevices.js
+- [ ] codex/core/lexical-graph/seedValidate.js
 - [ ] codex/core/manifold/manifold-wasm/pkg/manifold_wasm.d.ts
 - [ ] codex/core/manifold/manifold-wasm/pkg/manifold_wasm.js
 - [ ] codex/core/manifold/manifold-wasm/pkg/manifold_wasm_bg.wasm.d.ts
@@ -304,12 +364,21 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/core/scholotime/scholotime.export-plan.js
 - [ ] codex/core/scholotime/scholotime.phaser-adapter.js
 - [ ] codex/core/scholotime/scholotime.pixelbrain-adapter.js
+- [ ] codex/core/semantic-calculus/citeResolver.ts
+- [ ] codex/core/semantic-calculus/cliLexicon.ts
+- [ ] codex/core/semantic-calculus/compiler.ts
+- [ ] codex/core/semantic-calculus/contextDigest.ts
+- [ ] codex/core/semantic-calculus/formulaDraft.ts
+- [ ] codex/core/semantic-calculus/hypothesisStatus.ts
+- [ ] codex/core/semantic-calculus/keywordProposer.ts
+- [ ] codex/core/semantic-calculus/observationReceipt.ts
+- [ ] codex/core/semantic-calculus/permission.ts
+- [ ] codex/core/semantic-calculus/proposer.ts
+- [ ] codex/core/semantic-calculus/seal.ts
 - [ ] codex/core/shared/ambient/bytecodeAMP.js
 - [ ] codex/core/shared/workers/microprocessor.worker.js
 - [ ] codex/runtime/cleri-probe/investigation.runtime.js
 - [ ] codex/server/collab/mcp-bridge-entry.js
-- [ ] codex/server/services/rhyme-astrology/indexRepo.js
-- [ ] codex/server/services/rhyme-astrology/lexiconRepo.js
 - [ ] codex/services/adapters/index.js
 - [ ] codex/services/cleri-probe/babel-facts.adapter.js
 - [ ] codex/services/cleri-probe/context.service.js
@@ -340,6 +409,117 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `EqPresetV2` in `src/components/ParaEQ/hooks/useEqPreset.ts`
 - [ ] `FACTORY_SCROLLS` in `src/components/ParaEQ/presets/factoryScrolls.ts`
 - [ ] `getFactoryScrolls` in `src/components/ParaEQ/presets/factoryScrolls.ts`
+- [ ] `ZagAdapterConfig` in `src/core/compose/behavior/ZagAdapter.ts`
+- [ ] `useZagToggle` in `src/core/compose/behavior/ZagAdapter.ts`
+- [ ] `useZagSwitch` in `src/core/compose/behavior/ZagAdapter.ts`
+- [ ] `createZagAdapter` in `src/core/compose/behavior/ZagAdapter.ts`
+- [ ] `EmitPbUiEventInput` in `src/core/compose/behavior/emit-event.ts`
+- [ ] `FeatureFlagManager` in `src/core/compose/flags.ts`
+- [ ] `isComposeEnabled` in `src/core/compose/index.ts`
+- [ ] `enableCompose` in `src/core/compose/index.ts`
+- [ ] `disableCompose` in `src/core/compose/index.ts`
+- [ ] `initCompose` in `src/core/compose/index.ts`
+- [ ] `COMPOSE_CONTRACTS` in `src/core/compose/kits/signalChamber.compose.js`
+- [ ] `SIGNAL_CHAMBER_VERSION` in `src/core/compose/kits/signalChamber.compose.js`
+- [ ] `SIGNAL_CHAMBER_THEME_TOKENS` in `src/core/compose/kits/signalChamber.compose.js`
+- [ ] `SIGNAL_CHAMBER_DEFINITIONS` in `src/core/compose/kits/signalChamber.compose.js`
+- [ ] `SIGNAL_CHAMBER_LAYOUTS` in `src/core/compose/kits/signalChamber.compose.js`
+- [ ] `SIGNAL_CHAMBER_VISUALS` in `src/core/compose/kits/signalChamber.compose.js`
+- [ ] `DEFAULT_SIGNAL_CHAMBER_AUTHORING` in `src/core/compose/kits/signalChamber.compose.js`
+- [ ] `SIGNAL_CHAMBER_UI_KIT` in `src/core/compose/kits/signalChamber.compose.js`
+- [ ] `EmitPbLayoutInput` in `src/core/compose/layout/emit-layout.ts`
+- [ ] `PHASE6_ENTRY_REQUIREMENT_CASES` in `src/core/compose/layout/index.ts`
+- [ ] `CASSOWARY_DEFAULT_MAX_NODES` in `src/core/compose/layout/index.ts`
+- [ ] `CASSOWARY_DEFAULT_MAX_CONSTRAINTS` in `src/core/compose/layout/index.ts`
+- [ ] `benchmarkConstraintSolver` in `src/core/compose/layout/index.ts`
+- [ ] `CSSLoweringEngine` in `src/core/compose/layout/index.ts`
+- [ ] `LATTICE_MATERIAL_THRESHOLDS` in `src/core/compose/layout/qbit-lattice.ts`
+- [ ] `LatticeAttenuation` in `src/core/compose/layout/qbit-lattice.ts`
+- [ ] `TaffyCSSLoweringEngine` in `src/core/compose/layout/taffy-adapter.ts`
+- [ ] `ComposeButtonProps` in `src/core/compose/migrated/ComposeButton.tsx`
+- [ ] `ShadowDivergence` in `src/core/compose/migrated/ComposeButton.tsx`
+- [ ] `ComposeButton` in `src/core/compose/migrated/ComposeButton.tsx`
+- [ ] `getComposeButtonShadowStats` in `src/core/compose/migrated/ComposeButton.tsx`
+- [ ] `ComposeEnterPortalProps` in `src/core/compose/migrated/ComposeEnterPortal.tsx`
+- [ ] `ComposeOracleTerminalProps` in `src/core/compose/migrated/ComposeOracleTerminal.tsx`
+- [ ] `ComposeReadTopBarProps` in `src/core/compose/migrated/ComposeReadChrome.tsx`
+- [ ] `ComposeReadStatusBarProps` in `src/core/compose/migrated/ComposeReadChrome.tsx`
+- [ ] `ComposeScrollEditorToolbarProps` in `src/core/compose/migrated/ComposeScrollEditorToolbar.tsx`
+- [ ] `LedgerEntryData` in `src/core/compose/migrated/ComposeUpdateLedger.tsx`
+- [ ] `ComposeUpdateLedgerProps` in `src/core/compose/migrated/ComposeUpdateLedger.tsx`
+- [ ] `CONSTELLATION_SKY_KIND` in `src/core/compose/migrated/ConstellationSky.ts`
+- [ ] `CONSTELLATION_SKY_ID` in `src/core/compose/migrated/ConstellationSky.ts`
+- [ ] `createConstellationSkyDefinition` in `src/core/compose/migrated/ConstellationSky.ts`
+- [ ] `OracleTerminalSceneOptions` in `src/core/compose/migrated/OracleTerminal.ts`
+- [ ] `ReadChromeSceneOptions` in `src/core/compose/migrated/ReadChrome.ts`
+- [ ] `ToolbarSceneOptions` in `src/core/compose/migrated/ScrollEditorToolbar.ts`
+- [ ] `UpdateLedgerSceneOptions` in `src/core/compose/migrated/UpdateLedger.ts`
+- [ ] `MigrationRegistry` in `src/core/compose/migration.ts`
+- [ ] `MigrationStatusDisplay` in `src/core/compose/migration.ts`
+- [ ] `NegotiateRendererOptions` in `src/core/compose/render/capabilities.ts`
+- [ ] `NegotiateRendererResult` in `src/core/compose/render/capabilities.ts`
+- [ ] `NegotiateSceneResult` in `src/core/compose/render/capabilities.ts`
+- [ ] `GeometryCompareOptions` in `src/core/compose/render/geometry.ts`
+- [ ] `GeometryFieldDiff` in `src/core/compose/render/geometry.ts`
+- [ ] `SkiaProbeResult` in `src/core/compose/render/skia-adapter.ts`
+- [ ] `VelloProbeResult` in `src/core/compose/render/vello-adapter.ts`
+- [ ] `EmitPbUiSceneInput` in `src/core/compose/scene/emit-scene.ts`
+- [ ] `CANONICAL_CONTRACTS` in `src/core/compose/schema/contracts.ts`
+- [ ] `CanonicalContractMap` in `src/core/compose/schema/contracts.ts`
+- [ ] `CanonicalContractName` in `src/core/compose/schema/contracts.ts`
+- [ ] `ContractRegistry` in `src/core/compose/schema/contracts.ts`
+- [ ] `isContractVersion` in `src/core/compose/schema/contracts.ts`
+- [ ] `ComponentPartDefinition` in `src/core/compose/schema/packets.ts`
+- [ ] `SlotDefinition` in `src/core/compose/schema/packets.ts`
+- [ ] `EventDefinition` in `src/core/compose/schema/packets.ts`
+- [ ] `AccessibilityContract` in `src/core/compose/schema/packets.ts`
+- [ ] `CapabilityRequirement` in `src/core/compose/schema/packets.ts`
+- [ ] `LayoutIntentRef` in `src/core/compose/schema/packets.ts`
+- [ ] `VisualAttachmentRef` in `src/core/compose/schema/packets.ts`
+- [ ] `ProvenanceRecord` in `src/core/compose/schema/packets.ts`
+- [ ] `GridLayoutIntent` in `src/core/compose/schema/packets.ts`
+- [ ] `AbsoluteLayoutIntent` in `src/core/compose/schema/packets.ts`
+- [ ] `OverlayLayoutIntent` in `src/core/compose/schema/packets.ts`
+- [ ] `TokenVisualAttachment` in `src/core/compose/schema/packets.ts`
+- [ ] `ScdlAssetAttachment` in `src/core/compose/schema/packets.ts`
+- [ ] `isLegacyToken` in `src/core/compose/tokens/index.ts`
+- [ ] `legacyToDTCG` in `src/core/compose/tokens/index.ts`
+- [ ] `dtcgToLegacy` in `src/core/compose/tokens/index.ts`
+- [ ] `dictionaryToDTCG` in `src/core/compose/tokens/index.ts`
+- [ ] `dtcgToDictionary` in `src/core/compose/tokens/index.ts`
+- [ ] `StyleDictionaryConfig` in `src/core/compose/tokens/style-dictionary.ts`
+- [ ] `DEFAULT_SD_CONFIG` in `src/core/compose/tokens/style-dictionary.ts`
+- [ ] `registerComposeTransforms` in `src/core/compose/tokens/style-dictionary.ts`
+- [ ] `dtcgToStyleDictionary` in `src/core/compose/tokens/style-dictionary.ts`
+- [ ] `generateJS` in `src/core/compose/tokens/style-dictionary.ts`
+- [ ] `generateTSDeclarations` in `src/core/compose/tokens/style-dictionary.ts`
+- [ ] `ValidateComposeSceneResult` in `src/core/compose/validate/scene.ts`
+- [ ] `EquivalenceLogEntry` in `src/core/compose/workflow/XStateAdapter.ts`
+- [ ] `XStateAdapter` in `src/core/compose/workflow/XStateAdapter.ts`
+- [ ] `createXStateAdapter` in `src/core/compose/workflow/XStateAdapter.ts`
+- [ ] `Lch` in `src/core/phenotype/color.ts`
+- [ ] `relativeLuminance` in `src/core/phenotype/color.ts`
+- [ ] `IsolationContract` in `src/core/phenotype/isolation.ts`
+- [ ] `PaletteRole` in `src/core/phenotype/quantize/chromaticity.ts`
+- [ ] `quantizeChromaticity` in `src/core/phenotype/quantize/chromaticity.ts`
+- [ ] `DensityTerm` in `src/core/phenotype/quantize/density.ts`
+- [ ] `clippedRegionArea` in `src/core/phenotype/quantize/density.ts`
+- [ ] `countInkPixels` in `src/core/phenotype/quantize/density.ts`
+- [ ] `quantizeDensity` in `src/core/phenotype/quantize/density.ts`
+- [ ] `LuminanceTerm` in `src/core/phenotype/quantize/luminance.ts`
+- [ ] `quantizeLuminance` in `src/core/phenotype/quantize/luminance.ts`
+- [ ] `ShapeTerm` in `src/core/phenotype/quantize/shape.ts`
+- [ ] `quantizeShape` in `src/core/phenotype/quantize/shape.ts`
+- [ ] `SizeTerm` in `src/core/phenotype/quantize/size.ts`
+- [ ] `quantizeSize` in `src/core/phenotype/quantize/size.ts`
+- [ ] `StackingTerm` in `src/core/phenotype/quantize/stacking.ts`
+- [ ] `quantizeStacking` in `src/core/phenotype/quantize/stacking.ts`
+- [ ] `MeasurementVector` in `src/core/phenotype/vector.ts`
+- [ ] `CONFIRMED_VERSION_BYTE` in `src/core/phenotype/vector.ts`
+- [ ] `PREDICTED_VERSION_BYTE` in `src/core/phenotype/vector.ts`
+- [ ] `UNMEASURED_BLOCK` in `src/core/phenotype/vector.ts`
+- [ ] `vectorToBlocks` in `src/core/phenotype/vector.ts`
+- [ ] `vectorToSCD64` in `src/core/phenotype/vector.ts`
 - [ ] `SCD64DiagnosticMatch` in `src/core/scd64/RuleRegistry.ts`
 - [ ] `SCD64Rule` in `src/core/scd64/RuleRegistry.ts`
 - [ ] `lookupSCD64BlocksInMCP` in `src/core/scd64/decodeSCD64.ts`
@@ -357,8 +537,8 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `tokenWeightDiagnosticToSCD64` in `src/core/tokenization/tokenWeightToSCD64.ts`
 - [ ] `ARM_POSES` in `src/data/armRigConfig.js`
 - [ ] `COMBAT_ELEMENT_DATABASE` in `src/data/combatElementDatabase.js`
-- [ ] `getElement` in `src/data/combatElementDatabase.js`
 - [ ] `XP_SOURCES` in `src/data/progression_constants.js`
+- [ ] `IDE_LIGHT_MANUSCRIPT` in `src/data/schoolPalettes.js`
 - [ ] `getUniversalVowelColors` in `src/data/schoolPalettes.js`
 - [ ] `SCHOOL_PRESENTATION_ORDER` in `src/data/schoolPresentation.js`
 - [ ] `SCHOOL_PRESENTATION` in `src/data/schoolPresentation.js`
@@ -377,7 +557,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `getSchoolBadgeClass` in `src/data/schools.js`
 - [ ] `Z_ABOVE` in `src/data/stacking_tiers.js`
 - [ ] `Z_OVERLAY` in `src/data/stacking_tiers.js`
-- [ ] `STACKING_TIERS` in `src/data/stacking_tiers.js`
 - [ ] `VOID1_BOSS_ID` in `src/data/void1Animations.js`
 - [ ] `VOID1_JOINTS` in `src/data/void1RigConfig.js`
 - [ ] `VOID1_ARM_POSES` in `src/data/void1RigConfig.js`
@@ -388,6 +567,9 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `SCD64LogRenderer` in `src/diagnostics/scd64/SCD64LogRenderer.tsx`
 - [ ] `CombatEncounter` in `src/domain/index.ts`
 - [ ] `AudioTrack` in `src/domain/index.ts`
+- [ ] `DIV_NODE_TYPES` in `src/features/divwand/divProposalSchema.js`
+- [ ] `DIV_ROLES` in `src/features/divwand/divProposalSchema.js`
+- [ ] `DIV_STYLE_VARIANTS` in `src/features/divwand/divProposalSchema.js`
 - [ ] `GraphCompileContext` in `src/features/graph-editor/graphPacketCompiler.ts`
 - [ ] `GraphCompileResult` in `src/features/graph-editor/graphPacketCompiler.ts`
 - [ ] `GraphNodeResolver` in `src/features/graph-editor/graphPacketCompiler.ts`
@@ -582,6 +764,7 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `GODOT_EXPORT_FLAG_CHANGED_EVENT` in `src/hooks/useGodotExportFlag.js`
 - [ ] `GODOT_EXPORT_FLAG_KEY` in `src/hooks/useGodotExportFlag.js`
 - [ ] `HapticPattern` in `src/hooks/useHaptic.ts`
+- [ ] `IDE_THEME_STORAGE_KEY` in `src/hooks/useTheme.jsx`
 - [ ] `ArticleCardProps` in `src/kits/channel-zero-ui-kit/components/ArticleCard.tsx`
 - [ ] `ArticleHeroProps` in `src/kits/channel-zero-ui-kit/components/ArticleHero.tsx`
 - [ ] `ChannelNavItem` in `src/kits/channel-zero-ui-kit/components/ChannelHeader.tsx`
@@ -640,12 +823,13 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `configureZodForCsp` in `src/lib/config/zod.config.js`
 - [ ] `generateLockedSchoolStyles` in `src/lib/css/schoolStyles.js`
 - [ ] `BrowserBytecodeHealth` in `src/lib/diagnostic.adapter.js`
-- [ ] `engineMicroprocessors` in `src/lib/engine.adapter.js`
 - [ ] `padFlatVectorToPowerOfTwo` in `src/lib/engine.adapter.js`
 - [ ] `isLikelyDynamicImportFailure` in `src/lib/lazyWithRetry.js`
 - [ ] `buildTextBeforeCursor` in `src/lib/lexical/CursorAndIntelliSensePlugin.jsx`
 - [ ] `applyDecoded` in `src/lib/lexical/TruesightNode.js`
 - [ ] `removeDecoded` in `src/lib/lexical/TruesightNode.js`
+- [ ] `FULL_SWEEP_THRESHOLD` in `src/lib/lexical/TruesightPlugin.jsx`
+- [ ] `changedCharStarts` in `src/lib/lexical/TruesightPlugin.jsx`
 - [ ] `init_panic_hook` in `src/lib/math/quantization/rust-kernel/pkg/turboquant_bridge.js`
 - [ ] `PATTERN_COLORS` in `src/lib/patternColor.js`
 - [ ] `loadPhaserRuntime` in `src/lib/phaser/phaser-runtime.adapter.js`
@@ -661,6 +845,7 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `getXpForLevel` in `src/lib/progressionUtils.js`
 - [ ] `getSafeContext` in `src/lib/render-engine.js`
 - [ ] `posToRole` in `src/lib/ritualPredictionTooltip.js`
+- [ ] `isPhonemeSourceAuthoritative` in `src/lib/ritualPredictionTooltip.js`
 - [ ] `ALL_COMPONENTS` in `src/lib/routes.js`
 - [ ] `getAvailablePageComponents` in `src/lib/routes.js`
 - [ ] `getSyntacticIntegrity` in `src/lib/syntacticIntegrity.js`
@@ -673,6 +858,9 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `isHttpError` in `src/lib/truesight/synthesisErrorPolicy.js`
 - [ ] `isRateLimitError` in `src/lib/truesight/synthesisErrorPolicy.js`
 - [ ] `artifactHasConnections` in `src/lib/truesight/synthesisErrorPolicy.js`
+- [ ] `AMP_ID` in `src/lib/truesight/visualizerTruesightAmp.js`
+- [ ] `joinLyricLines` in `src/lib/truesight/visualizerTruesightAmp.js`
+- [ ] `tokenizeLyricsWithCharStarts` in `src/lib/truesight/visualizerTruesightAmp.js`
 - [ ] `readWandFill` in `src/lib/wandPixelbrainBridge.js`
 - [ ] `clearWandFill` in `src/lib/wandPixelbrainBridge.js`
 - [ ] `TocEntry` in `src/pages/Blog/MarkdownLite.tsx`
@@ -688,13 +876,22 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `useTacticalOverlays` in `src/pages/Combat/TacticalOverlayControls.jsx`
 - [ ] `combat_tileUri` in `src/pages/Combat/assets/generated/combat-tile.js`
 - [ ] `combat_torchUri` in `src/pages/Combat/assets/generated/combat-torch.js`
+- [ ] `buildAwaitingPacket` in `src/pages/Constellation/fixtures/samplePagePacket.js`
+- [ ] `SAMPLE_BRIGHT_WOUND_PACKET` in `src/pages/Constellation/fixtures/samplePagePacket.js`
+- [ ] `seededUnit` in `src/pages/Constellation/skyChart.js`
 - [ ] `GrimoireView` in `src/pages/Grimoire/GrimoireSpread.tsx`
 - [ ] `GenomeStop` in `src/pages/Grimoire/genomeGeometry.ts`
 - [ ] `GenomeLayer` in `src/pages/Grimoire/genomeGeometry.ts`
 - [ ] `SigilRing` in `src/pages/Grimoire/genomeGeometry.ts`
 - [ ] `SigilSpoke` in `src/pages/Grimoire/genomeGeometry.ts`
 - [ ] `SigilModel` in `src/pages/Grimoire/genomeGeometry.ts`
+- [ ] `drawGalaxy` in `src/pages/Landing/storm/galaxySim.js`
 - [ ] `createPacketNoise` in `src/pages/Landing/storm/photonicBolt.js`
+- [ ] `isValidLedgerEntry` in `src/pages/Landing/updateLedgerModel.js`
+- [ ] `UPDATE_LEDGER_SHELL_PROPOSAL` in `src/pages/Landing/updateLedgerShellProposal.js`
+- [ ] `SAFE_LEDGER_SHELL` in `src/pages/Landing/updateLedgerShellProposal.js`
+- [ ] `ComposeSignalChamberAdapterProps` in `src/pages/Listen/ComposeSignalChamberAdapter.tsx`
+- [ ] `ATMOSPHERE_PACKET` in `src/pages/Listen/shaders/atmospherePacket.js`
 - [ ] `CHROMATIC_MATERIAL_OPTIONS` in `src/pages/PixelBrain/amps/chromaticTransmutationAmp.js`
 - [ ] `transmutePaletteColor` in `src/pages/PixelBrain/amps/chromaticTransmutationAmp.js`
 - [ ] `transmutePixelBrainPalette` in `src/pages/PixelBrain/amps/chromaticTransmutationAmp.js`
@@ -723,9 +920,26 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `TemplateBrowserProps` in `src/pages/VideoForge/TemplateBrowser.tsx`
 - [ ] `TransitionPanelProps` in `src/pages/VideoForge/TransitionPanel.tsx`
 - [ ] `EffectId` in `src/pages/VideoForge/lib/timelineMutator.ts`
-- [ ] `ClipTransform` in `src/pages/VideoForge/lib/timelineMutator.ts`
+- [ ] `StageArtProps` in `src/pages/Visualiser/StageArt.tsx`
 - [ ] `TrackSeed` in `src/pages/Visualiser/bytecodeFingerprint.ts`
+- [ ] `AnalysisAvailability` in `src/pages/Visualiser/hooks/useAlbumAudioEngine.ts`
+- [ ] `AlbumAudioEngineResult` in `src/pages/Visualiser/hooks/useAlbumAudioEngine.ts`
+- [ ] `KARAOKE_SCHEMA` in `src/pages/Visualiser/karaoke/karaokeBytecode.ts`
+- [ ] `KaraokeOp` in `src/pages/Visualiser/karaoke/karaokeBytecode.ts`
+- [ ] `KaraokeProgram` in `src/pages/Visualiser/karaoke/karaokeBytecode.ts`
+- [ ] `KaraokePose` in `src/pages/Visualiser/karaoke/karaokeBytecode.ts`
+- [ ] `KaraokePlayheadTarget` in `src/pages/Visualiser/karaoke/karaokePlayhead.ts`
+- [ ] `UseKaraokeMotionOpts` in `src/pages/Visualiser/karaoke/useKaraokeMotion.ts`
+- [ ] `MandalaStageProps` in `src/pages/Visualiser/mandala/MandalaStage.tsx`
+- [ ] `MandalaStage` in `src/pages/Visualiser/mandala/MandalaStage.tsx`
+- [ ] `MANDALA_SCHEMA` in `src/pages/Visualiser/mandala/mandalaBytecode.ts`
+- [ ] `MandalaOp` in `src/pages/Visualiser/mandala/mandalaBytecode.ts`
+- [ ] `MandalaProgram` in `src/pages/Visualiser/mandala/mandalaBytecode.ts`
+- [ ] `MandalaPose` in `src/pages/Visualiser/mandala/mandalaBytecode.ts`
+- [ ] `ColoredLyricToken` in `src/pages/Visualiser/songScore.ts`
+- [ ] `BuildTrackScoreInput` in `src/pages/Visualiser/songScore.ts`
 - [ ] `VISUALISER_FUNCTION_WORDS` in `src/pages/Visualiser/truesightColor.ts`
+- [ ] `TokenTruesightOptions` in `src/pages/Visualiser/truesightColor.ts`
 - [ ] `createTransitionEvent` in `src/phaser/battle-transition.fx.js`
 - [ ] `getTransitionTimeline` in `src/phaser/battle-transition.fx.js`
 - [ ] `getPhaseProgress` in `src/phaser/battle-transition.fx.js`
@@ -784,7 +998,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `RitualPredictionDiagnostics` in `src/types/core/ritualPredictionTooltip.ts`
 - [ ] `RitualPrediction` in `src/types/core/ritualPredictionTooltip.ts`
 - [ ] `RitualPredictionAnchor` in `src/types/core/ritualPredictionTooltip.ts`
-- [ ] `DiagnosticSeverity` in `src/types/core/scoring.ts`
 - [ ] `ScoringResult` in `src/types/core/scoring.ts`
 - [ ] `ScoringEngine` in `src/types/core/scoring.ts`
 - [ ] `LiteraryDeviceId` in `src/types/lib/literary.ts`
@@ -827,16 +1040,13 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `TimelineMarker` in `src/video/editor/core/video-project-packet.ts`
 - [ ] `TrackType` in `src/video/editor/core/video-project-packet.ts`
 - [ ] `ClipKind` in `src/video/editor/core/video-project-packet.ts`
-- [ ] `AnimatableNumber` in `src/video/editor/core/video-project-packet.ts`
 - [ ] `TransformState` in `src/video/editor/core/video-project-packet.ts`
-- [ ] `EffectInstance` in `src/video/editor/core/video-project-packet.ts`
 - [ ] `EffectKeyframe` in `src/video/editor/core/video-project-packet.ts`
 - [ ] `VideoEffectBinding` in `src/video/editor/core/video-project-packet.ts`
-- [ ] `LegacyClipTransitionBinding` in `src/video/editor/core/video-project-packet.ts`
 - [ ] `KeyframeTrack` in `src/video/editor/core/video-project-packet.ts`
+- [ ] `AudioAnalysisSummary` in `src/video/editor/core/video-project-packet.ts`
 - [ ] `AudioAnalysisRecord` in `src/video/editor/core/video-project-packet.ts`
 - [ ] `PixelBrainLayerClip` in `src/video/editor/core/video-project-packet.ts`
-- [ ] `AssetRecord` in `src/video/editor/core/video-project-packet.ts`
 - [ ] `AppliedTemplateRecord` in `src/video/editor/core/video-project-packet.ts`
 - [ ] `RenderSettings` in `src/video/editor/core/video-project-packet.ts`
 - [ ] `VideoDiagnostic` in `src/video/editor/core/video-project-packet.ts`
@@ -961,6 +1171,8 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `ELECTRIC_SH_MODES` in `codex/core/audio-forge/pb-sfx.schema.js`
 - [ ] `EFFECT_TYPES` in `codex/core/audio-forge/pb-sfx.schema.js`
 - [ ] `TACTICAL_GRID_DEFAULT_SIZE` in `codex/core/battle.schemas.js`
+- [ ] `RankedCandidate` in `codex/core/candidate-lattice/index.ts`
+- [ ] `CandidateMargin` in `codex/core/candidate-lattice/index.ts`
 - [ ] `runAtsHmmPass` in `codex/core/career/ats-hmm/index.js`
 - [ ] `scoreTileForAI` in `codex/core/combat/tactical-board.ai.js`
 - [ ] `selectBestTile` in `codex/core/combat/tactical-board.ai.js`
@@ -998,6 +1210,10 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `MODEL_CORPUS` in `codex/core/commentary/phrase-bank.js`
 - [ ] `getSonicStationTrackPool` in `codex/core/constants/data/sonicStationBuckets.js`
 - [ ] `getDefaultSonicStationTrackUrl` in `codex/core/constants/data/sonicStationBuckets.js`
+- [ ] `CONSTELLATION_CONTRACT_VERSION` in `codex/core/constellation/pageBytecode.js`
+- [ ] `detectCompounds` in `codex/core/constellation/phraseAnalysis.js`
+- [ ] `assignTokenRoles` in `codex/core/constellation/phraseAnalysis.js`
+- [ ] `RARITY_EDGES` in `codex/core/constellation/rarity.js`
 - [ ] `deepFreezeClone` in `codex/core/diagnostic/BytecodeHealth.js`
 - [ ] `SPECTRAL_Z` in `codex/core/diagnostic/chromaticImmuneProbe.js`
 - [ ] `validateColor` in `codex/core/diagnostic/chromaticImmuneProbe.js`
@@ -1125,6 +1341,14 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `runPipeline` in `codex/core/jit/pipeline.js`
 - [ ] `createBuiltinsRouter` in `codex/core/jit/router.js`
 - [ ] `JudiciaryEngine` in `codex/core/judiciary.js`
+- [ ] `canonicalContextBytes` in `codex/core/lexical-analysis/context.js`
+- [ ] `BALLISTIC_EMBEDDING` in `codex/core/lexical-analysis/semanticBallistics.js`
+- [ ] `compareBallisticSignatures` in `codex/core/lexical-analysis/semanticBallistics.js`
+- [ ] `embedDevices` in `codex/core/lexical-graph/embedDevices.js`
+- [ ] `deleteLexicalEntry` in `codex/core/lexical-graph/ftsSync.js`
+- [ ] `migrateLexicalGraph` in `codex/core/lexical-graph/migrate.js`
+- [ ] `mirrorEntries` in `codex/core/lexical-graph/mirror.js`
+- [ ] `seedLiteraryDevices` in `codex/core/lexical-graph/seedDevices.js`
 - [ ] `normalizeAbyssWord` in `codex/core/lexicon.abyss.js`
 - [ ] `diagnoseLinguisticCoherence` in `codex/core/leyline.engine.js`
 - [ ] `scoreLiteraryConstraints` in `codex/core/leyline.engine.js`
@@ -1141,8 +1365,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `getKnownColorProcessorIds` in `codex/core/microprocessors/color/named-color-registry.js`
 - [ ] `createMicroprocessorFactory` in `codex/core/microprocessors/factory.js`
 - [ ] `registerDivLayout` in `codex/core/modulation/planner/div-layout-registrar.js`
-- [ ] `MAX_LAYOUT_DEPTH` in `codex/core/modulation/planner/div-layout-validator.js`
-- [ ] `validateDivLayout` in `codex/core/modulation/planner/div-layout-validator.js`
 - [ ] `canonicalizeFormula` in `codex/core/modulation/planner/formula-registrar.js`
 - [ ] `closeRegistrar` in `codex/core/modulation/planner/formula-registrar.js`
 - [ ] `registerFormulaProposal` in `codex/core/modulation/planner/formula-registrar.js`
@@ -1166,7 +1388,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `serializeDeterministicVerdictForHash` in `codex/core/phonology/g2p/schemas.js`
 - [ ] `verdictHash` in `codex/core/phonology/g2p/schemas.js`
 - [ ] `isValidVerdict` in `codex/core/phonology/g2p/schemas.js`
-- [ ] `ARPABET_CONSONANTS` in `codex/core/phonology/phoneme.constants.js`
 - [ ] `PHONOLOGICAL_PROCESS_RULES` in `codex/core/phonology/phonologicalProcesses.js`
 - [ ] `STRESS_SHIFT_HOMOGRAPHS` in `codex/core/phonology/prosodic-metronome.js`
 - [ ] `isStressShiftHomograph` in `codex/core/phonology/prosodic-metronome.js`
@@ -1211,6 +1432,8 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `CHARACTER_SKELETON_CONTRACT` in `codex/core/pixelbrain/character-construction-skeleton.js`
 - [ ] `getCharacterSkeletonAnchors` in `codex/core/pixelbrain/character-construction-skeleton.js`
 - [ ] `composeFaceFeatures` in `codex/core/pixelbrain/character-face-composer.js`
+- [ ] `characterPartIds` in `codex/core/pixelbrain/character-factory.js`
+- [ ] `stampCharacterCellOwnership` in `codex/core/pixelbrain/character-factory.js`
 - [ ] `rasterizeCells` in `codex/core/pixelbrain/character-foundry.js`
 - [ ] `uint8ToBase64` in `codex/core/pixelbrain/character-foundry.js`
 - [ ] `CHARACTER_SPEC_VERSION` in `codex/core/pixelbrain/character-spec.js`
@@ -1345,7 +1568,9 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `MIRRORED_TRIM_PAIRS` in `codex/core/pixelbrain/mirrored-trim-validator.js`
 - [ ] `validateMirroredTrimPairs` in `codex/core/pixelbrain/mirrored-trim-validator.js`
 - [ ] `resolveMotifColor` in `codex/core/pixelbrain/motif-engraver.js`
-- [ ] `__test__` in `codex/core/pixelbrain/nl-compile.js`
+- [ ] `MIN_BINDING_COVERAGE` in `codex/core/pixelbrain/nl-clarify.js`
+- [ ] `MIN_SEMANTIC_MARGIN` in `codex/core/pixelbrain/nl-clarify.js`
+- [ ] `assessBinding` in `codex/core/pixelbrain/nl-clarify.js`
 - [ ] `NOISE_FILL_AMP_VERSION` in `codex/core/pixelbrain/noise-fill-amp.js`
 - [ ] `profileSupportsSDF` in `codex/core/pixelbrain/part-profile-library.js`
 - [ ] `listPartProfiles` in `codex/core/pixelbrain/part-profile-library.js`
@@ -1355,6 +1580,7 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `computePbrainChecksumFromText` in `codex/core/pixelbrain/pbrain-checksum.js`
 - [ ] `verifyPbrainText` in `codex/core/pixelbrain/pbrain-checksum.js`
 - [ ] `stampPbrainChecksum` in `codex/core/pixelbrain/pbrain-checksum.js`
+- [ ] `hasPhotonicBridge` in `codex/core/pixelbrain/photonic-bridge-registry.js`
 - [ ] `PIPELINE_CORPUS_CONTRACT` in `codex/core/pixelbrain/pipeline-golden-corpus.js`
 - [ ] `PIPELINE_CORPUS_SCHEMA_VERSION` in `codex/core/pixelbrain/pipeline-golden-corpus.js`
 - [ ] `PIPELINE_CORPUS_CASE_IDS` in `codex/core/pixelbrain/pipeline-golden-corpus.js`
@@ -1443,6 +1669,18 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `SQUARE_SHARPNESS_CONTRAST_VERSION` in `codex/core/pixelbrain/square-sharpness-contrast-amp.js`
 - [ ] `STRUCTURAL_ENERGY_VERSION` in `codex/core/pixelbrain/structural-energy.js`
 - [ ] `chamferDistanceField` in `codex/core/pixelbrain/structural-energy.js`
+- [ ] `SUBTLETY_CANON_VERSION` in `codex/core/pixelbrain/subtlety-canonicalizer.js`
+- [ ] `shapeOf` in `codex/core/pixelbrain/subtlety-canonicalizer.js`
+- [ ] `baselineIsApproved` in `codex/core/pixelbrain/subtlety-closed-loop.js`
+- [ ] `SUBTLETY_FINGERPRINT_SCHEMA` in `codex/core/pixelbrain/subtlety-fingerprint.js`
+- [ ] `identityKeyOf` in `codex/core/pixelbrain/subtlety-fingerprint.js`
+- [ ] `packetIdentityKey` in `codex/core/pixelbrain/subtlety-fingerprint.js`
+- [ ] `identityKeysMatch` in `codex/core/pixelbrain/subtlety-fingerprint.js`
+- [ ] `sealFingerprintPacket` in `codex/core/pixelbrain/subtlety-fingerprint.js`
+- [ ] `verifyFingerprintPacket` in `codex/core/pixelbrain/subtlety-fingerprint.js`
+- [ ] `diffPaths` in `codex/core/pixelbrain/subtlety-fingerprint.js`
+- [ ] `compareFingerprints` in `codex/core/pixelbrain/subtlety-fingerprint.js`
+- [ ] `SUBTLETY_RESONANCE_SCHEMA` in `codex/core/pixelbrain/subtlety-resonance-store.js`
 - [ ] `cropToOpaqueRegion` in `codex/core/pixelbrain/symmetry-amp.js`
 - [ ] `emitSymmetryBytecode` in `codex/core/pixelbrain/symmetry-amp.js`
 - [ ] `rotationalBreaker` in `codex/core/pixelbrain/symmetry-amp.js`
@@ -1493,7 +1731,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `FPS_DEFAULT` in `codex/core/pixelbrain/voxel-keyframe.js`
 - [ ] `frameAt` in `codex/core/pixelbrain/voxel-keyframe.js`
 - [ ] `composeTransform` in `codex/core/pixelbrain/voxel-keyframe.js`
-- [ ] `applyTransform` in `codex/core/pixelbrain/voxel-keyframe.js`
 - [ ] `isPivot3D` in `codex/core/pixelbrain/voxel-pivot.js`
 - [ ] `ROTATION_ORDER` in `codex/core/pixelbrain/voxel-rig.js`
 - [ ] `createRig` in `codex/core/pixelbrain/voxel-rig.js`
@@ -1523,6 +1760,7 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `STRONG_LINK` in `codex/core/rhyme-astrology/multiRhyme.engine.js`
 - [ ] `SLANT_EARNS_ABOVE` in `codex/core/rhyme-astrology/multiRhyme.engine.js`
 - [ ] `MAX_LINE_DISTANCE` in `codex/core/rhyme-astrology/multiRhyme.engine.js`
+- [ ] `isGrammarLink` in `codex/core/rhyme-astrology/multiRhyme.engine.js`
 - [ ] `buildSyllableStream` in `codex/core/rhyme-astrology/multiRhyme.engine.js`
 - [ ] `linkScore` in `codex/core/rhyme-astrology/multiRhyme.engine.js`
 - [ ] `chainIsValid` in `codex/core/rhyme-astrology/multiRhyme.engine.js`
@@ -1538,7 +1776,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `RHYME_ASTROLOGY_WEIGHTS` in `codex/core/rhyme-astrology/scoring.js`
 - [ ] `normalizeRhymeAstrologyWeights` in `codex/core/rhyme-astrology/scoring.js`
 - [ ] `buildWeightedScoreBreakdown` in `codex/core/rhyme-astrology/scoring.js`
-- [ ] `isVowelPhoneme` in `codex/core/rhyme-astrology/signatures.js`
 - [ ] `RHYME_ASTROLOGY_TYPES_VERSION` in `codex/core/rhyme-astrology/types.js`
 - [ ] `TURBOQA_MIN_RECALL_OVERLAP` in `codex/core/ritual-prediction/turboqa.js`
 - [ ] `TURBOQA_DEFAULT_TOP_K` in `codex/core/ritual-prediction/turboqa.js`
@@ -1557,6 +1794,16 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `PHONEME_MATERIAL_MAP` in `codex/core/semantic/phonetic-materials.js`
 - [ ] `DEFAULT_MATERIAL_PROPS` in `codex/core/semantic/phonetic-materials.js`
 - [ ] `calculateSurfaceHardness` in `codex/core/semantic/phonetic-materials.js`
+- [ ] `heuristicG2P` in `codex/core/semantic/phonotopography.js`
+- [ ] `resolvePhonemes` in `codex/core/semantic/phonotopography.js`
+- [ ] `resolveTextPhonemes` in `codex/core/semantic/phonotopography.js`
+- [ ] `extractUnigrams` in `codex/core/semantic/phonotopography.js`
+- [ ] `extractBigrams` in `codex/core/semantic/phonotopography.js`
+- [ ] `extractTrigrams` in `codex/core/semantic/phonotopography.js`
+- [ ] `generatePhonotopographicVectorFromPhonemes` in `codex/core/semantic/phonotopography.js`
+- [ ] `createTopographicSignature` in `codex/core/semantic/phonotopography.js`
+- [ ] `compareTopographicSignatures` in `codex/core/semantic/phonotopography.js`
+- [ ] `phonotopographicSimilarity` in `codex/core/semantic/phonotopography.js`
 - [ ] `MOOD_CONSTRAINTS` in `codex/core/semantic/semantic-math-bridge.js`
 - [ ] `MATERIAL_CONSTRAINTS` in `codex/core/semantic/semantic-math-bridge.js`
 - [ ] `STYLE_CONSTRAINTS` in `codex/core/semantic/semantic-math-bridge.js`
@@ -1566,11 +1813,81 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `entitiesToMathConstraints` in `codex/core/semantic/semantic-math-bridge.js`
 - [ ] `constraintsToPixelBrainParams` in `codex/core/semantic/semantic-math-bridge.js`
 - [ ] `getSymbolLibrary` in `codex/core/semantic/semantic-math-bridge.js`
+- [ ] `generatePhonosemanticVectorLegacy` in `codex/core/semantic/vector.utils.js`
 - [ ] `DEFAULT_VISUAL_PARAMS` in `codex/core/semantic/visual-extractor.js`
 - [ ] `applySchoolModifiers` in `codex/core/semantic/visual-extractor.js`
 - [ ] `applySemanticWeight` in `codex/core/semantic/visual-extractor.js`
 - [ ] `extractVerseVisualParameters` in `codex/core/semantic/visual-extractor.js`
 - [ ] `SemanticController` in `codex/core/semantic/visual-extractor.js`
+- [ ] `CiteResolution` in `codex/core/semantic-calculus/citeResolver.ts`
+- [ ] `CITE_RESOLVER_ID` in `codex/core/semantic-calculus/citeResolver.ts`
+- [ ] `MIN_CITE_RELEVANCE` in `codex/core/semantic-calculus/citeResolver.ts`
+- [ ] `SupportPointer` in `codex/core/semantic-calculus/citeResolver.ts`
+- [ ] `resolveCites` in `codex/core/semantic-calculus/citeResolver.ts`
+- [ ] `CliEntry` in `codex/core/semantic-calculus/cliLexicon.ts`
+- [ ] `riskFor` in `codex/core/semantic-calculus/cliLexicon.ts`
+- [ ] `CliLexicon` in `codex/core/semantic-calculus/cliLexicon.ts`
+- [ ] `loadCliLexicon` in `codex/core/semantic-calculus/cliLexicon.ts`
+- [ ] `knownKeys` in `codex/core/semantic-calculus/cliLexicon.ts`
+- [ ] `entryFor` in `codex/core/semantic-calculus/cliLexicon.ts`
+- [ ] `COMPILER_BUILD_ID` in `codex/core/semantic-calculus/compiler.ts`
+- [ ] `SCHEMA_HASH` in `codex/core/semantic-calculus/compiler.ts`
+- [ ] `CompileInput` in `codex/core/semantic-calculus/compiler.ts`
+- [ ] `ProbeReportInput` in `codex/core/semantic-calculus/compiler.ts`
+- [ ] `compileProbeReport` in `codex/core/semantic-calculus/compiler.ts`
+- [ ] `compileProbePlan` in `codex/core/semantic-calculus/compiler.ts`
+- [ ] `maybeCompile` in `codex/core/semantic-calculus/compiler.ts`
+- [ ] `assertReportNotExecutable` in `codex/core/semantic-calculus/compiler.ts`
+- [ ] `looksLikeCommandRequest` in `codex/core/semantic-calculus/epistemic.ts`
+- [ ] `EpistemicInput` in `codex/core/semantic-calculus/epistemic.ts`
+- [ ] `HypothesisDraft` in `codex/core/semantic-calculus/formulaDraft.ts`
+- [ ] `ProbeFormulaDraft` in `codex/core/semantic-calculus/formulaDraft.ts`
+- [ ] `FormulaHole` in `codex/core/semantic-calculus/formulaDraft.ts`
+- [ ] `draftFromDeposit` in `codex/core/semantic-calculus/formulaDraft.ts`
+- [ ] `formulaHoles` in `codex/core/semantic-calculus/formulaDraft.ts`
+- [ ] `isPromotable` in `codex/core/semantic-calculus/formulaDraft.ts`
+- [ ] `promoteDraft` in `codex/core/semantic-calculus/formulaDraft.ts`
+- [ ] `FormationFormula` in `codex/core/semantic-calculus/formulaRegistry.ts`
+- [ ] `MODULATION_FORMULAS` in `codex/core/semantic-calculus/formulaRegistry.ts`
+- [ ] `HypothesisEvaluation` in `codex/core/semantic-calculus/hypothesisStatus.ts`
+- [ ] `evalPredicate` in `codex/core/semantic-calculus/hypothesisStatus.ts`
+- [ ] `MAX_KEYWORDS` in `codex/core/semantic-calculus/keywordProposer.ts`
+- [ ] `composeProposers` in `codex/core/semantic-calculus/keywordProposer.ts`
+- [ ] `stubSemanticKeywordProposer` in `codex/core/semantic-calculus/keywordProposer.ts`
+- [ ] `KindDecision` in `codex/core/semantic-calculus/kind.ts`
+- [ ] `LexiconPattern` in `codex/core/semantic-calculus/lexiconUi.ts`
+- [ ] `normalizeUtterance` in `codex/core/semantic-calculus/lexiconUi.ts`
+- [ ] `ActionLexicon` in `codex/core/semantic-calculus/lexicons.ts`
+- [ ] `SurfaceLexicon` in `codex/core/semantic-calculus/lexicons.ts`
+- [ ] `InquiryLexicon` in `codex/core/semantic-calculus/lexicons.ts`
+- [ ] `SemanticLexicons` in `codex/core/semantic-calculus/lexicons.ts`
+- [ ] `LEXICON_ROLE_ERRORS` in `codex/core/semantic-calculus/lexicons.ts`
+- [ ] `assertLexiconInvariants` in `codex/core/semantic-calculus/lexicons.ts`
+- [ ] `lexiconsVersion` in `codex/core/semantic-calculus/lexicons.ts`
+- [ ] `hashResult` in `codex/core/semantic-calculus/observationReceipt.ts`
+- [ ] `makeReceipt` in `codex/core/semantic-calculus/observationReceipt.ts`
+- [ ] `KIND_RANK` in `codex/core/semantic-calculus/permission.ts`
+- [ ] `PermissionVector` in `codex/core/semantic-calculus/permission.ts`
+- [ ] `ModulatableState` in `codex/core/semantic-calculus/permission.ts`
+- [ ] `permissionLte` in `codex/core/semantic-calculus/permission.ts`
+- [ ] `Modulator` in `codex/core/semantic-calculus/permission.ts`
+- [ ] `PermissionGrantRecord` in `codex/core/semantic-calculus/permission.ts`
+- [ ] `applyModulation` in `codex/core/semantic-calculus/permission.ts`
+- [ ] `CandidateProposer` in `codex/core/semantic-calculus/proposer.ts`
+- [ ] `PROPOSAL_ERRORS` in `codex/core/semantic-calculus/proposer.ts`
+- [ ] `MarginVerdict` in `codex/core/semantic-calculus/proposer.ts`
+- [ ] `SEAL_ALGORITHM` in `codex/core/semantic-calculus/seal.ts`
+- [ ] `assertSealedIntact` in `codex/core/semantic-calculus/seal.ts`
+- [ ] `isSealIntact` in `codex/core/semantic-calculus/seal.ts`
+- [ ] `TrustClass` in `codex/core/semantic-calculus/types.ts`
+- [ ] `TRUSTED_PARTITIONS` in `codex/core/semantic-calculus/types.ts`
+- [ ] `ProbeReportPayload` in `codex/core/semantic-calculus/types.ts`
+- [ ] `Ballistics` in `codex/core/semantic-calculus/types.ts`
+- [ ] `FormulaIds` in `codex/core/semantic-calculus/types.ts`
+- [ ] `UNATTRIBUTED_TAINT` in `codex/core/semantic-calculus/utterance.ts`
+- [ ] `isTainted` in `codex/core/semantic-calculus/utterance.ts`
+- [ ] `ConfirmationPolicy` in `codex/core/semantic-calculus/utterance.ts`
+- [ ] `declaredTrust` in `codex/core/semantic-calculus/utterance.ts`
 - [ ] `WEAVE_INTENTS` in `codex/core/semantics.registry.js`
 - [ ] `LITERARY_DEVICES` in `codex/core/shared/literaryDevices.detector.js`
 - [ ] `isComplexScheme` in `codex/core/shared/rhymeScheme.detector.js`
@@ -1588,6 +1905,7 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `DEFAULT_VIEWPORT_STATE` in `codex/core/shared/truesight/compiler/viewportBytecode.ts`
 - [ ] `encodeViewportBytecode` in `codex/core/shared/truesight/compiler/viewportBytecode.ts`
 - [ ] `createViewportChannel` in `codex/core/shared/truesight/compiler/viewportBytecode.ts`
+- [ ] `MAX_RHYME_SPAN_WORDS` in `codex/core/song-stats/constants.js`
 - [ ] `cadenceClosureWeight` in `codex/core/speaking/prosody.js`
 - [ ] `CHEMICAL_REACTIONS` in `codex/core/spellweave-compendium/chemical-reactions.registry.js`
 - [ ] `getCompendiumEntry` in `codex/core/spellweave-compendium/compendium.registry.js`
@@ -1639,8 +1957,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `getWordLookupRateLimit` in `codex/runtime/wordLookupPipeline.js`
 - [ ] `resetLexiconAdapterForRhyme` in `codex/server/adapters/selfDictionary.authority.js`
 - [ ] `AUDIO_ADMIN_HEADER` in `codex/server/audioAuth.js`
-- [ ] `readHeaderAsString` in `codex/server/audioAuth.js`
-- [ ] `secureTokenEquals` in `codex/server/audioAuth.js`
 - [ ] `formatFingerprintId` in `codex/server/catalog/audio.fingerprint.js`
 - [ ] `TRACK_MUSICAL_META_ALTERS` in `codex/server/catalog/catalog.schema.js`
 - [ ] `TRACK_LYRICS_SQL` in `codex/server/catalog/catalog.schema.js`
@@ -1676,12 +1992,20 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `buildProbeGuidance` in `codex/server/collab/mcp-probe.js`
 - [ ] `formatProbeReport` in `codex/server/collab/mcp-probe.js`
 - [ ] `readSqlitePragmas` in `codex/server/db/sqlite.migrations.js`
+- [ ] `analysisCacheKey` in `codex/server/routes/lexicalAnalyze.routes.js`
+- [ ] `SUBTLETY_TOKEN_HEADER` in `codex/server/routes/subtlety.routes.js`
+- [ ] `authorizeSubtletyRequest` in `codex/server/routes/subtlety.routes.js`
 - [ ] `CaptchaService` in `codex/server/services/captcha.service.js`
+- [ ] `syllablesFromPhonemes` in `codex/server/services/constellation/genome.adapter.js`
+- [ ] `cadenceFamilyFromStress` in `codex/server/services/constellation/rhymeAstrology.adapter.js`
 - [ ] `ConsoleMailerAdapter` in `codex/server/services/mailer.service.js`
 - [ ] `SendGridMailerAdapter` in `codex/server/services/mailer.service.js`
 - [ ] `ResendMailerAdapter` in `codex/server/services/mailer.service.js`
 - [ ] `MailerService` in `codex/server/services/mailer.service.js`
 - [ ] `getPendingCount` in `codex/server/services/wordLookupCoalescer.js`
+- [ ] `mapErrorToCrashEvent` in `codex/server/subtlety-node-adapter.js`
+- [ ] `reportNodeCrash` in `codex/server/subtlety-node-adapter.js`
+- [ ] `handleFatalCrash` in `codex/server/subtlety-node-adapter.js`
 - [ ] `RHYME_ASTROLOGY_ARTIFACT_FILES` in `codex/server/utils/rhymeAstrologyPaths.js`
 - [ ] `hasRhymeAstrologyArtifactBundle` in `codex/server/utils/rhymeAstrologyPaths.js`
 - [ ] `FreeDictionaryAdapter` in `codex/services/adapters/freeDictionary.adapter.js`

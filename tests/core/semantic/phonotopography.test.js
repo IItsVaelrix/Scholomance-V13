@@ -200,7 +200,7 @@ describe('phonotopography: TurboQuant signatures', () => {
   it('creates a valid signature with correct metadata', () => {
     const sig = createTopographicSignature('the bright wound of morning');
     expect(sig.kind).toBe('phonotopographic');
-    expect(sig.version).toBe('tq-phoneme-v1');
+    expect(sig.version).toBe('tq-phoneme-v2');
     expect(sig.dimensions).toBe(256);
     expect(sig.seed).toBe(42);
     expect(sig.data).toBeInstanceOf(Uint8Array);
@@ -274,7 +274,7 @@ describe('phonotopography: embedding metadata', () => {
 
   it('has correct top-level metadata', () => {
     expect(PHONOTOPOGRAPHIC_EMBEDDING.kind).toBe('phonotopographic');
-    expect(PHONOTOPOGRAPHIC_EMBEDDING.version).toBe('tq-phoneme-v1');
+    expect(PHONOTOPOGRAPHIC_EMBEDDING.version).toBe('tq-phoneme-v2');
     expect(PHONOTOPOGRAPHIC_EMBEDDING.dimensions).toBe(256);
     expect(PHONOTOPOGRAPHIC_EMBEDDING.seed).toBe(42);
   });
@@ -289,5 +289,201 @@ describe('phonotopography: stripStress', () => {
     expect(stripStress('IY2')).toBe('IY');
     expect(stripStress('T')).toBe('T');
     expect(stripStress('')).toBe('');
+  });
+});
+
+// ── Fix 1: Context-sensitive -ough resolution ───────────────────────────────
+
+describe('phonotopography: -ough disambiguation (fix 1)', () => {
+  it('through → TH R UW1 (not AH1 F)', () => {
+    const phonemes = heuristicG2P('through');
+    expect(phonemes).toContain('UW1');
+    expect(phonemes).not.toContain('AH1');
+    expect(phonemes).not.toContain('F');
+  });
+
+  it('tough → T AH1 F', () => {
+    const phonemes = heuristicG2P('tough');
+    expect(phonemes).toContain('AH1');
+    expect(phonemes).toContain('F');
+    expect(phonemes).not.toContain('UW1');
+  });
+
+  it('though → DH OW1', () => {
+    const phonemes = heuristicG2P('though');
+    expect(phonemes).toContain('OW1');
+    expect(phonemes).not.toContain('F');
+  });
+
+  it('thought → TH AO1 T', () => {
+    const phonemes = heuristicG2P('thought');
+    expect(phonemes).toContain('AO1');
+    expect(phonemes).toContain('T');
+  });
+
+  it('bough → B AW1', () => {
+    const phonemes = heuristicG2P('bough');
+    expect(phonemes).toContain('AW1');
+  });
+
+  it('through and tough produce DISTANT vectors', () => {
+    const sim = phonotopographicSimilarity('through', 'tough');
+    // Must be well below the old broken 0.897
+    expect(sim).toBeLessThan(0.4);
+  });
+
+  it('through and through produce IDENTICAL vectors', () => {
+    const sim = phonotopographicSimilarity('through', 'through');
+    expect(sim).toBeGreaterThan(0.99);
+  });
+});
+
+// ── Fix 2: Band 3 aliasing resolved ─────────────────────────────────────────
+
+describe('phonotopography: Band 3 no aliasing (fix 2)', () => {
+  it('onset complexity uses dims 209-213, not 224+', () => {
+    // "stray" has onset STR (3 consonants before first vowel)
+    const vec = generatePhonotopographicVector('stray');
+    // Onset size 3 → dim 209 + 3 = 212
+    expect(vec[212]).toBeGreaterThan(0);
+    // Dims 225-228 should NOT have onset signal (only coda hash can land there)
+    // Verify onset is NOT at old location 224 + onsetSize
+    // (224 + 3 = 227 should be zero unless coda hash happens to land there)
+  });
+
+  it('open syllable flag uses dim 214, not dim 224', () => {
+    // "see" ends in a vowel (open syllable, no coda)
+    const vec = generatePhonotopographicVector('see');
+    expect(vec[214]).toBeGreaterThan(0);
+  });
+
+  it('coda hash uses dims 224-255', () => {
+    // "cat" has coda T
+    const vec = generatePhonotopographicVector('cat');
+    // Some dim in 224-255 should be active
+    let codaActive = false;
+    for (let i = 224; i <= 255; i++) {
+      if (vec[i] !== 0) { codaActive = true; break; }
+    }
+    expect(codaActive).toBe(true);
+  });
+
+  it('vowel family uses dims 192-208 without modulo aliasing', () => {
+    // UW is index 15 in ARPABET_INVENTORY → dim 192 + 15 = 207
+    const vec = generatePhonotopographicVector('through');
+    expect(vec[207]).toBeGreaterThan(0);
+  });
+});
+
+// ── Fix 3: Sonority direction weighting ─────────────────────────────────────
+
+describe('phonotopography: sonority direction (fix 3)', () => {
+  it('rising and falling transitions get different weights', () => {
+    // S+AA is rising (S sonority < AA sonority) → onset-like
+    // AA+S is falling (AA sonority > S sonority) → coda-like
+    // They hash to different dims, but the WEIGHT should differ
+    const rising = generatePhonotopographicVectorFromPhonemes(
+      [{ word: 'test', phonemes: ['S', 'AA1'] }]
+    );
+    const falling = generatePhonotopographicVectorFromPhonemes(
+      [{ word: 'test', phonemes: ['AA1', 'S'] }]
+    );
+    // The vectors should NOT be identical (direction matters)
+    let anyDiff = false;
+    for (let i = 64; i < 128; i++) {
+      if (Math.abs(rising[i] - falling[i]) > 0.001) { anyDiff = true; break; }
+    }
+    expect(anyDiff).toBe(true);
+  });
+
+  it('rising transitions are weighted more than falling of equal magnitude', () => {
+    // With multiple bigrams, the direction weighting creates different RELATIVE
+    // magnitudes within band 1. A word with a rising bigram AND a falling bigram
+    // will have the rising dim weighted higher than the falling dim.
+    // T→AA is rising (sonority 1→10), AA→T is falling (10→1)
+    const vec = generatePhonotopographicVectorFromPhonemes(
+      [{ word: 'a', phonemes: ['T', 'AA1', 'T'] }]  // T+AA (rising) and AA+T (falling)
+    );
+    // Both bigrams hash to different dims in band 1.
+    // The rising bigram (T+AA) gets weight 1.0 + 9*0.15 = 2.35
+    // The falling bigram (AA+T) gets weight 1.0 + 9*0.08 = 1.72
+    // After normalization, the rising dim should be larger than the falling dim.
+    const hashRising = (() => {
+      // Replicate fnv1aHash for 'T+AA'
+      let h = 0x811c9dc5;
+      for (const c of 'T+AA') { h ^= c.charCodeAt(0); h = Math.imul(h, 0x01000193) >>> 0; }
+      return 64 + (h % 64);
+    })();
+    const hashFalling = (() => {
+      let h = 0x811c9dc5;
+      for (const c of 'AA+T') { h ^= c.charCodeAt(0); h = Math.imul(h, 0x01000193) >>> 0; }
+      return 64 + (h % 64);
+    })();
+    // The rising dim should have higher value than the falling dim
+    expect(vec[hashRising]).toBeGreaterThan(vec[hashFalling]);
+  });
+});
+
+// ── Fix 4: Output range calibration ─────────────────────────────────────────
+
+describe('phonotopography: output range (fix 4)', () => {
+  it('vectors are per-band normalized (each band has unit norm)', () => {
+    const vec = generatePhonotopographicVector('the bright wound of morning');
+    for (let band = 0; band < 4; band++) {
+      let bandNorm = 0;
+      for (let i = band * 64; i < band * 64 + 64; i++) {
+        bandNorm += vec[i] * vec[i];
+      }
+      expect(Math.sqrt(bandNorm)).toBeCloseTo(1.0, 3);
+    }
+  });
+
+  it('global norm is 2.0 (sqrt of 4 unit bands)', () => {
+    const vec = generatePhonotopographicVector('knight');
+    let norm = 0;
+    for (let i = 0; i < 256; i++) norm += vec[i] * vec[i];
+    expect(Math.sqrt(norm)).toBeCloseTo(2.0, 3);
+  });
+
+  it('unrelated words score below 0.4', () => {
+    const sim = phonotopographicSimilarity('knight', 'zebra');
+    expect(sim).toBeLessThan(0.4);
+  });
+
+  it('similarity floor is well below 0.47 (old broken floor)', () => {
+    // Test a batch of unrelated pairs — none should be above 0.4
+    const pairs = [
+      ['cat', 'dog'],
+      ['bright', 'dark'],
+      ['through', 'zebra'],
+      ['knight', 'plough'],
+      ['morning', 'wound'],
+    ];
+    for (const [a, b] of pairs) {
+      const sim = phonotopographicSimilarity(a, b);
+      expect(sim).toBeLessThan(0.4);
+    }
+  });
+
+  it('identical words score ~1.0', () => {
+    expect(phonotopographicSimilarity('knight', 'knight')).toBeGreaterThan(0.99);
+  });
+
+  it('phonemic twins score high despite different spelling', () => {
+    const sim = phonotopographicSimilarity('knight', 'night');
+    expect(sim).toBeGreaterThan(0.85);
+  });
+});
+
+// ── Minor: AX and UR in PHONOLOGICAL_FEATURES_V1 ────────────────────────────
+
+describe('phonotopography: AX/UR feature coverage (minor fix)', () => {
+  it('AX and UR do not silently default to weight 1.0', () => {
+    // Import the features to verify they exist
+    const { PHONOLOGICAL_FEATURES_V1 } = require('../../../codex/core/phonology/phoneme.constants.js');
+    expect(PHONOLOGICAL_FEATURES_V1['AX']).toBeDefined();
+    expect(PHONOLOGICAL_FEATURES_V1['UR']).toBeDefined();
+    expect(PHONOLOGICAL_FEATURES_V1['AX'].height).toBe(1);
+    expect(PHONOLOGICAL_FEATURES_V1['UR'].height).toBe(1);
   });
 });

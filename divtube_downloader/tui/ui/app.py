@@ -464,6 +464,22 @@ class DivTubeAgentApp(App):
         self._agent_lock = threading.Lock()
         self.setup_commands()
 
+    # ── Shutdown-safe thread→UI bridge ────────────────────────────────
+    # Worker threads (archive search, yt-dlp progress, critic, collab,
+    # typewriter, token meter, tool-service panels) all funnel through
+    # call_from_thread.  Once the Textual app exits, the active_app
+    # ContextVar is cleared and the event loop is closed — any in-flight
+    # thread that calls call_from_thread raises NoActiveAppError or
+    # RuntimeError("Event loop is closed").  Overriding here protects
+    # every call site with a single guard instead of 20+ try/excepts.
+    def call_from_thread(self, callback, *args, **kwargs):
+        try:
+            return super().call_from_thread(callback, *args, **kwargs)
+        except Exception:
+            # App/loop already torn down — silently discard the stale
+            # UI update.  The thread will exit on its own (daemon=True).
+            pass
+
     async def on_mount(self):
         try:
             from tui.services.exec_session_service import get_exec_session
