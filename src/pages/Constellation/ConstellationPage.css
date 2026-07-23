@@ -554,3 +554,57 @@
     animation: none;
   }
 }
+
+.constellation-result-rarity {
+  display: inline-block;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--constellation-chrome, #cfc9ff);
+  opacity: 0.85;
+  margin: 0 0 0.4rem;
+}
+.constellation-result-etymology {
+  font-size: 0.82rem;
+  color: var(--constellation-chrome, #cfc9ff);
+  opacity: 0.9;
+  margin: 0 0 0.6rem;
+}
+.constellation-result-etymology__label {
+  text-transform: uppercase;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  opacity: 0.65;
+}
+.constellation-result-relations {
+  margin-top: 0.6rem;
+}
+.constellation-result-relations__caption {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.6;
+  margin: 0 0 0.3rem;
+}
+.constellation-result-relglyph {
+  opacity: 0.8;
+}
+.constellation-result-chip.is-more {
+  opacity: 0.6;
+  font-style: italic;
+}
+.constellation-result-examples {
+  list-style: none;
+  padding: 0;
+  margin: 0.4rem 0 0;
+}
+.constellation-result-example {
+  font-style: italic;
+  opacity: 0.85;
+  font-size: 0.85rem;
+  margin: 0.15rem 0;
+}
+/* IPA needs a font with phonetic coverage so diacritics do not render as tofu. */
+.constellation-result-ipa {
+  font-family: "Charis SIL", "Gentium Plus", "Doulos SIL", "Noto Sans", serif;
+}

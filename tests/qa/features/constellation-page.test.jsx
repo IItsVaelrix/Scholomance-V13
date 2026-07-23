@@ -83,6 +83,24 @@ describe('ConstellationPage chamber', () => {
     expect(await screen.findByText(/awaiting engine — rhyme astrology/i)).toBeInTheDocument();
   });
 
+  it('renders etymology, rarity, relations, examples, and IPA from the enriched fixture', async () => {
+    render(
+      <MemoryRouter>
+        <ConstellationPage />
+      </MemoryRouter>,
+    );
+    const field = screen.getByLabelText(/search the literary sky/i);
+    fireEvent.change(field, { target: { value: 'the bright wound of morning' } });
+    fireEvent.keyDown(field, { key: 'Enter', code: 'Enter' });
+    // Fixture (Task 5) carries the enrichment; assert each new surface renders.
+    expect(await screen.findByText(/lexical relations/i)).toBeInTheDocument();
+    // Glyphs live in nested aria-hidden spans, so match the label text, not "↑ broader".
+    expect(screen.getByText(/broader/i)).toBeInTheDocument();
+    expect(screen.getByText(/akin/i)).toBeInTheDocument();
+    expect(screen.getByText(/\d\/9/)).toBeInTheDocument();            // rarity "n/9"
+    expect(screen.getByText('IPA')).toBeInTheDocument();
+  });
+
   it('disables morph animation class when reduced motion is preferred', () => {
     render(
       <MemoryRouter>

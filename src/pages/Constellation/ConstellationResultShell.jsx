@@ -19,6 +19,35 @@ function Chips({ items, label, tone = 'kin' }) {
   );
 }
 
+/** First sentence, ≤120 chars, ellipsis if trimmed. Render-side only (PDR §8). */
+function truncateEtymology(text) {
+  if (!text) return '';
+  const firstSentence = String(text).split(/(?<=[.!?])\s/)[0];
+  const clipped = firstSentence.length > 120 ? `${firstSentence.slice(0, 119)}…` : firstSentence;
+  return clipped;
+}
+
+/** A labelled relation bucket with its own glyph; akin is capped with a +N affordance. */
+function RelationChips({ glyph, label, items, cap }) {
+  if (!items || items.length === 0) return null;
+  const shown = cap ? items.slice(0, cap) : items;
+  const extra = cap ? items.length - shown.length : 0;
+  return (
+    <div className="constellation-result-chipset">
+      <span className="constellation-result-chipset__label">
+        <span className="constellation-result-relglyph" aria-hidden="true">{glyph}</span> {label}{' '}
+        <span className="constellation-result-chipset__count">{items.length}</span>
+      </span>
+      <ul className="constellation-result-chips constellation-result-chips--kin">
+        {shown.map((item) => (
+          <li key={item} className="constellation-result-chip">{item}</li>
+        ))}
+        {extra > 0 ? <li className="constellation-result-chip is-more">+{extra} more</li> : null}
+      </ul>
+    </div>
+  );
+}
+
 /**
  * @param {{ packet: import('./types.js').ConstellationPhase1Packet }} props
  */
@@ -28,6 +57,11 @@ export default function ConstellationResultShell({ packet }) {
   const degraded = diagnostics?.degradedChannels ?? [];
   const nearKin = leximancy.nearKin ?? [];
   const counterfield = leximancy.counterfield ?? [];
+  const relations = leximancy.relations ?? { broader: [], narrower: [], akin: [] };
+  const rarity = leximancy.rarity ?? null;
+  const etymology = leximancy.etymology ?? null;
+  const selectedInterpretation =
+    leximancy.interpretations.find((i) => i.id === leximancy.selectedInterpretationId) || null;
   const hasLeximancy = leximancy.interpretations.length > 0;
   const hasRhyme = rhymeAstrology != null;
   const hasGenome =
@@ -92,6 +126,17 @@ export default function ConstellationResultShell({ packet }) {
 
       <section className="constellation-result-section" aria-labelledby="cos-leximancy">
         <h2 id="cos-leximancy">Leximancy Meaning Field</h2>
+        {rarity ? (
+          <p className="constellation-result-rarity" aria-label={`Lexical rarity ${rarity.label}`}>
+            {rarity.label} · {rarity.band}/{rarity.max}
+          </p>
+        ) : null}
+        {etymology ? (
+          <p className="constellation-result-etymology">
+            <span className="constellation-result-etymology__label">Etymology</span>{' '}
+            <span title={etymology}>{truncateEtymology(etymology)}</span>
+          </p>
+        ) : null}
         {hasLeximancy ? (
           <>
             <p className="constellation-result-panel-note">
@@ -118,8 +163,23 @@ export default function ConstellationResultShell({ packet }) {
                 );
               })}
             </ol>
+            {selectedInterpretation && selectedInterpretation.examples && selectedInterpretation.examples.length > 0 ? (
+              <ul className="constellation-result-examples" aria-label="Example usage">
+                {selectedInterpretation.examples.map((ex) => (
+                  <li key={ex} className="constellation-result-example">“{ex}”</li>
+                ))}
+              </ul>
+            ) : null}
             <Chips items={nearKin} label="Near kin" tone="kin" />
             <Chips items={counterfield} label="Counterfield" tone="counter" />
+            {(relations.broader.length || relations.narrower.length || relations.akin.length) ? (
+              <div className="constellation-result-relations">
+                <p className="constellation-result-relations__caption">lexical relations</p>
+                <RelationChips glyph="↑" label="broader" items={relations.broader} />
+                <RelationChips glyph="↓" label="narrower" items={relations.narrower} />
+                <RelationChips glyph="≈" label="akin" items={relations.akin} cap={3} />
+              </div>
+            ) : null}
             {leximancy.warnings.length > 0 ? (
               <ul className="constellation-result-warnings">
                 {leximancy.warnings.map((warning) => (
@@ -144,6 +204,12 @@ export default function ConstellationResultShell({ packet }) {
                   <th scope="row">Phonemes</th>
                   <td>{rhymeAstrology.phonemes.join(' · ')}</td>
                 </tr>
+                {rhymeAstrology.ipa ? (
+                  <tr>
+                    <th scope="row">IPA</th>
+                    <td className="constellation-result-ipa">{rhymeAstrology.ipa}</td>
+                  </tr>
+                ) : null}
                 <tr>
                   <th scope="row">Stress</th>
                   <td>{rhymeAstrology.stress}</td>
