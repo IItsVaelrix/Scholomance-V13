@@ -36,6 +36,11 @@ export function buildAwaitingPacket(rawQuery) {
       selectedInterpretationId: null,
       interpretations: [],
       warnings: ['Leximancy constellation_atlas not wired in v1'],
+      nearKin: [],
+      counterfield: [],
+      etymology: null,
+      rarity: null,
+      relations: { broader: [], narrower: [], akin: [] },
     },
     rhymeAstrology: null,
     phraseGenome: {
@@ -73,10 +78,19 @@ export const SAMPLE_BRIGHT_WOUND_PACKET = Object.freeze({
     status: 'ambiguous',
     selectedInterpretationId: null,
     interpretations: [
-      { id: 'wound.injury', gloss: 'injury / opening in flesh', confidence: 0.52 },
-      { id: 'wound.past', gloss: 'past tense of wind', confidence: 0.41 },
+      { id: 'wound.injury', gloss: 'injury / opening in flesh', confidence: 0.52, pos: 'noun', examples: ['she bound the wound', 'a wound that would not close'] },
+      { id: 'wound.past', gloss: 'past tense of wind', confidence: 0.41, pos: 'verb', examples: [] },
     ],
     warnings: ['Margin below selection threshold — ambiguity is data'],
+    nearKin: ['gash', 'lesion', 'hurt'],
+    counterfield: ['heal', 'mend'],
+    etymology: 'Old English wund "hurt, injury", from Proto-Germanic *wundō.',
+    rarity: { band: 5, max: 9, label: 'uncommon' },
+    relations: {
+      broader: ['injury', 'trauma'],
+      narrower: ['laceration', 'gash', 'gunshot'],
+      akin: ['hurt', 'lesion', 'sore', 'cut'],
+    },
   },
   rhymeAstrology: {
     phonemes: ['DH', 'AH0', 'B', 'R', 'AY1', 'T', 'W', 'UW1', 'N', 'D'],
@@ -84,6 +98,7 @@ export const SAMPLE_BRIGHT_WOUND_PACKET = Object.freeze({
     cadenceFamily: 'iambic-adjacent',
     exactRhymes: ['mooring', 'warning'],
     slantRhymes: ['mourning'],
+    ipa: '/ˈmɔːnɪŋ/',
   },
   phraseGenome: {
     syllables: 7,
