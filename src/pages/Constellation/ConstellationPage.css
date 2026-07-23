@@ -608,3 +608,40 @@
 .constellation-result-ipa {
   font-family: "Charis SIL", "Gentium Plus", "Doulos SIL", "Noto Sans", serif;
 }
+
+/* ── Heteronym split ────────────────────────────────────────────────────────
+   Shown above the sense list because "two words share this spelling" is prior
+   to any reading of one word. Deliberately quiet: it is a clarification, not
+   an error state. */
+.constellation-result-heteronym {
+  margin: 0 0 0.9rem;
+  padding: 0.6rem 0.75rem;
+  border-left: 2px solid var(--cos-accent, #c9a227);
+  background: color-mix(in srgb, var(--cos-accent, #c9a227) 7%, transparent);
+  border-radius: 0 3px 3px 0;
+}
+.constellation-result-heteronym__lede {
+  margin: 0 0 0.45rem;
+  font-size: 0.9rem;
+}
+.constellation-result-heteronym__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.constellation-result-heteronym__list li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+}
+.constellation-result-heteronym__note {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  opacity: 0.75;
+  font-style: italic;
+}

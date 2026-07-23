@@ -127,17 +127,21 @@ const HYPOTHESES = Object.freeze([
       Object.freeze({
         id: 'f_thin_overlap',
         description:
-          'No candidate shares at least two content words with the query context. One ' +
-          'shared word is noise: measured on the real dictionary, every selection that ' +
-          'won on an overlap of exactly 1 was either a self-match or semantically wrong ' +
-          '("light illumination lamp bright" selected the DIVINE sense on a single hit). ' +
-          'Two independent content words is the floor for calling a sense evidenced.',
+          'No candidate shares a content word with the query context — the selection ' +
+          'would be arbitrary (first-listed), not evidenced. ' +
+          'This sat at n:2 while a single shared word was genuinely noise, because the ' +
+          'head token was not excluded from its own gloss and every overlap-of-1 winner ' +
+          'was a self-match. With the head token removed and the tie falsifier catching ' +
+          'ties, an overlap of 1 is a real match against a DIFFERENT word: measured on the ' +
+          'live dictionary, n:1 admits "wading" -> "walking with your feet in shallow ' +
+          'water" and both admitted selections are correct. Evidence base is 20 queries; ' +
+          'raise it again if a wrong single-word match appears.',
         observationId: 'obs.lex.sense_candidates',
         predicate: Object.freeze({
           op: 'gloss_overlap_lt',
           candidatesPath: 'candidates',
           queryTokensPath: 'queryTokens',
-          n: 2,
+          n: 1,
         }),
       }),
       Object.freeze({

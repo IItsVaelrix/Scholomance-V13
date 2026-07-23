@@ -53,6 +53,8 @@ function RelationChips({ glyph, label, items, cap }) {
  */
 export default function ConstellationResultShell({ packet }) {
   const { query, leximancy, rhymeAstrology, phraseGenome, pageBytecode, provenance, diagnostics } = packet;
+  // Older packets predate the channel, so every read below is optional.
+  const semanticInquiry = packet.semanticInquiry ?? null;
   const engineVersions = provenance?.engineVersions ?? {};
   const degraded = diagnostics?.degradedChannels ?? [];
   const nearKin = leximancy.nearKin ?? [];
@@ -137,6 +139,36 @@ export default function ConstellationResultShell({ packet }) {
             <span title={etymology}>{truncateEtymology(etymology)}</span>
           </p>
         ) : null}
+        {/*
+          A heteronym is not an ambiguous word — it is two WORDS sharing a
+          spelling, so it is shown BEFORE the sense list rather than inside it.
+          `wound` is /wuːnd/ an injury and /waʊnd/ coiled; listing their senses
+          together as readings of one word is the error this surfaces.
+        */}
+        {semanticInquiry?.isHeteronym && semanticInquiry.lexicalEntries?.length ? (
+          <div className="constellation-result-heteronym" role="note">
+            <p className="constellation-result-heteronym__lede">
+              <strong>{semanticInquiry.headToken || query.normalized}</strong> is{' '}
+              {semanticInquiry.lexicalEntries.length} words, not one meaning.
+            </p>
+            <ul className="constellation-result-heteronym__list">
+              {semanticInquiry.lexicalEntries.map((entry) => (
+                <li key={entry.synsetId || entry.pos}>
+                  <span className="constellation-result-pos">{entry.pos}</span>
+                  <span className="constellation-result-gloss">{entry.gloss}</span>
+                  <span className="constellation-result-confidence">
+                    {entry.senseCount} sense{entry.senseCount === 1 ? '' : 's'}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p className="constellation-result-heteronym__note">
+              {semanticInquiry.framePos
+                ? `Context settled it (${semanticInquiry.frameCue}).`
+                : 'No context to settle which — add a word before it.'}
+            </p>
+          </div>
+        ) : null}
         {hasLeximancy ? (
           <>
             <p className="constellation-result-panel-note">
@@ -155,7 +187,18 @@ export default function ConstellationResultShell({ packet }) {
                   >
                     {item.pos ? <span className="constellation-result-pos">{item.pos}</span> : null}
                     <span className="constellation-result-gloss">{item.gloss}</span>
-                    {selected ? <span className="constellation-result-selected-mark">selected</span> : null}
+                    {selected ? (
+                      <span
+                        className="constellation-result-selected-mark"
+                        title={
+                          semanticInquiry?.selection?.warranted
+                            ? `Chosen from context — ${semanticInquiry.selection.overlap} shared word${semanticInquiry.selection.overlap === 1 ? '' : 's'}`
+                            : 'Default reading — nothing in the query chose it'
+                        }
+                      >
+                        {semanticInquiry?.selection?.warranted ? 'evidenced' : 'selected'}
+                      </span>
+                    ) : null}
                     <span className="constellation-result-confidence">
                       {(item.confidence * 100).toFixed(0)}%
                     </span>

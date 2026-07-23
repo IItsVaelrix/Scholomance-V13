@@ -88,10 +88,22 @@ export async function analyzeSemanticInquiry(lexiconAdapter, identity, leximancy
    * word, showing BOTH is the answer — for a bare query like "wound" there is no
    * syntactic frame to disambiguate from, and picking would invent evidence.
    */
+  /**
+   * ONE REPRESENTATIVE GLOSS PER WORD, NOT EVERY SENSE.
+   *
+   * Measured: shipping the full senses[] arrays made semanticInquiry 54% of the
+   * page and the arrays alone 45% — on a packet where nothing rendered them.
+   * But dropping them entirely leaves a split that cannot be shown: "wound is
+   * two words" is useless without a word or two saying WHICH two.
+   *
+   * The first sense is wordnet's rank-1, which is the most frequent reading, so
+   * it is the right one to stand for the group.
+   */
   const lexicalEntries = (entriesDraft?.result?.entries ?? []).map((e) => ({
     pos: e.pos,
     senseCount: e.senseCount,
-    senses: e.senses,
+    gloss: e.senses?.[0]?.gloss ?? null,
+    synsetId: e.senses?.[0]?.synsetId ?? null,
   }));
   /**
    * A heteronym is a spelling with more than one PRONUNCIATION, not more than one

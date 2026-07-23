@@ -229,10 +229,21 @@ export function evalPredicate(predicate, result) {
             const scores = overlapScores(result, predicate.candidatesPath, predicate.queryTokensPath, predicate.glossField ?? 'gloss');
             if (scores === null)
                 return 'inconclusive';
-            // One candidate means nothing was compared. Treating the margin as the
-            // lone score would report a disambiguation that never happened.
+            /**
+             * A LONE CANDIDATE IS UNOPPOSED, NOT UNMEASURED.
+             *
+             * This returned 'inconclusive', reasoning that nothing had been
+             * compared. But an inconclusive falsifier leaves the whole hypothesis
+             * underdetermined, so the effect was that NO MONOSEMOUS WORD COULD
+             * EVER BE SELECTED — `crane bird wading water` resolved to its one
+             * correct sense and was refused for want of a second sense to beat.
+             *
+             * There is no tie when there is nothing to tie with. The falsifier
+             * asks "did the winner fail to separate?", and an unopposed winner
+             * has separated maximally. The honest answer is false.
+             */
             if (scores.length < 2)
-                return 'inconclusive';
+                return false;
             return scores[0] - scores[1] < predicate.n;
         }
         case 'every_field_in': {

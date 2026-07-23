@@ -85,9 +85,12 @@ describe('gloss_overlap_margin_lt', () => {
     expect(evalPredicate(spec(1), result)).toBe(false);
   });
 
-  it('is inconclusive with a single candidate — nothing was compared', () => {
+  it('does not fire on a lone candidate — unopposed is not unmeasured', () => {
+    // This returned 'inconclusive', which left the hypothesis underdetermined and
+    // meant no monosemous word could ever be selected. There is no tie when there
+    // is nothing to tie with.
     const result = { candidates: [CANDIDATES[0]], queryTokens: ['soldier'] };
-    expect(evalPredicate(spec(1), result)).toBe('inconclusive');
+    expect(evalPredicate(spec(1), result)).toBe(false);
   });
 });
 
