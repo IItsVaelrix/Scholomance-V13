@@ -25,6 +25,10 @@ import {
   resolveSyntacticFrame,
   viableWordCount,
 } from '../../../core/constellation/syntacticFrame.js';
+import {
+  isStressShiftHomograph,
+  pronounceWithMeter,
+} from '../../../core/phonology/prosodic-metronome.js';
 
 /**
  * CMU must be LOADED before we ask it anything, not merely told to load.
@@ -286,11 +290,43 @@ async function observeLexicalEntries(lexiconAdapter, headToken, phonology, query
   const frame = resolveSyntacticFrame(queryTokens, headToken);
   const viable = viableWordCount(distinctPronunciations, groups, frame.pos);
 
+  /**
+   * STRESS-SHIFT HOMOGRAPHS: a second, independent route to the pronunciation.
+   *
+   * The metronome carries hand-written ARPABET for 12 noun/verb pairs whose only
+   * difference is where primary stress falls (REcord / reCORD). Given the same
+   * frame, it names the pronunciation outright — so for this class we can check
+   * it against cmudict's variants and see whether two independently built
+   * sources agree.
+   *
+   * `meterConflict` is named for what it measures. Outside the stress-shift
+   * class there is no meter pronunciation to conflict with, so false is
+   * determinate rather than invented — the same reasoning as crossLemmaCosine.
+   * A falsifier that went inconclusive for every ordinary word would leave every
+   * hypothesis underdetermined and disable the channel.
+   */
+  let meterPronunciation = null;
+  let meterConflict = false;
+  if (isStressShiftHomograph(headToken) && frame.index >= 0) {
+    const spoken = pronounceWithMeter(headToken, queryTokens, frame.index);
+    if (spoken) {
+      meterPronunciation = spoken;
+      if (phonologyReady) {
+        const variants = phonology.variants(headToken) || [];
+        // Only a conflict if cmudict HAS variants and none of them matches.
+        meterConflict = variants.length > 0 && !variants.some((v) => sameWordPronunciation(v, spoken));
+      }
+    }
+  }
+
   const result = {
     entryCount: groups.length,
     entries: groups.map((g) => ({ pos: g.pos, senseCount: g.senses.length, senses: g.senses })),
     framePos: frame.pos,
     frameCue: frame.cue,
+    isStressShift: isStressShiftHomograph(headToken),
+    meterPronunciation,
+    meterConflict,
   };
   if (distinctPronunciations !== null) result.distinctPronunciations = distinctPronunciations;
   if (viable !== null) result.viableWordCount = viable;

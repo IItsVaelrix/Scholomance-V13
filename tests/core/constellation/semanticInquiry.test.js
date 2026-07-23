@@ -132,6 +132,72 @@ describe('harness collects measurements, not conclusions', () => {
   });
 });
 
+describe('prosodic metronome wiring', () => {
+  const recordAdapter = {
+    __unsafe: { connected: true },
+    lookupWord: () => [{ headword: 'record', pos: 'n', senses: [{ gloss: 'an account preserved in writing', pos: 'n' }] }],
+    extractGloss: ([s]) => s?.gloss || '',
+    lookupRelated: () => ({ broader: [], narrower: [], akin: [] }),
+    lookupAntonyms: () => [],
+    lookupLexicalEntries: () => [
+      { pos: 'n', senses: [{ synsetId: 'oewn-record-n', gloss: 'an account preserved in writing', examples: [] }] },
+      { pos: 'v', senses: [{ synsetId: 'oewn-record-v', gloss: 'make a record of', examples: [] }] },
+    ],
+  };
+  // cmudict's real variants for `record`.
+  const phonology = {
+    async ready() { return true; },
+    variants: () => [
+      ['R', 'EH1', 'K', 'ER0', 'D'],
+      ['R', 'AH0', 'K', 'AO1', 'R', 'D'],
+    ],
+  };
+
+  it('names the pronunciation the metrical frame implies', async () => {
+    const drafts = await collectSenseProbeDrafts({
+      lexiconAdapter: recordAdapter, headToken: 'record',
+      queryTokens: ['a', 'record', 'of', 'it'], phonology,
+    });
+    const e = drafts.find((d) => d.observationId === 'obs.lex.lexical_entries').result;
+    expect(e.isStressShift).toBe(true);
+    expect(e.framePos).toBe('n');
+    // Noun frame -> primary stress on syllable 1.
+    expect(e.meterPronunciation).toEqual(['R', 'EH1', 'K', 'ER0', 'D']);
+  });
+
+  it('reports no conflict when metronome and cmudict agree', async () => {
+    const drafts = await collectSenseProbeDrafts({
+      lexiconAdapter: recordAdapter, headToken: 'record',
+      queryTokens: ['to', 'record', 'it'], phonology,
+    });
+    const e = drafts.find((d) => d.observationId === 'obs.lex.lexical_entries').result;
+    expect(e.meterPronunciation).toEqual(['R', 'AH0', 'K', 'AO1', 'R', 'D']);
+    expect(e.meterConflict).toBe(false);
+  });
+
+  it('FIRES when the two independent sources disagree', async () => {
+    const wrongCmu = { async ready() { return true; }, variants: () => [['Z', 'Z', 'Z']] };
+    const drafts = await collectSenseProbeDrafts({
+      lexiconAdapter: recordAdapter, headToken: 'record',
+      queryTokens: ['a', 'record', 'of', 'it'], phonology: wrongCmu,
+    });
+    const e = drafts.find((d) => d.observationId === 'obs.lex.lexical_entries').result;
+    expect(e.meterConflict).toBe(true);
+    expect(evaluate(drafts).eliminated).toContain('h_sense_by_gloss_overlap');
+  });
+
+  it('reports no conflict for ordinary words — absence of a meter reading is not a conflict', async () => {
+    const drafts = await collectSenseProbeDrafts({
+      lexiconAdapter: recordAdapter, headToken: 'table',
+      queryTokens: ['a', 'table'], phonology,
+    });
+    const e = drafts.find((d) => d.observationId === 'obs.lex.lexical_entries').result;
+    expect(e.isStressShift).toBe(false);
+    expect(e.meterConflict).toBe(false);
+    expect(e.meterPronunciation).toBeNull();
+  });
+});
+
 describe('the falsifiers actually fire', () => {
   it('eliminates the sense hypothesis when no gloss overlaps the query', async () => {
     const adapter = fakeAdapter({

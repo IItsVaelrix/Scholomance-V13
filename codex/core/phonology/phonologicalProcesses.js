@@ -51,7 +51,17 @@ function canonicalPhones(phonemes) {
   return phonemes.map((phone) => {
     const raw = String(phone || '');
     const base = raw.replace(/[0-9]/g, '');
-    const digits = raw.replace(/[^0-9]/g, '');
+    /**
+     * SECONDARY STRESS COLLAPSES INTO UNSTRESSED; PRIMARY DOES NOT.
+     *
+     * Word identity turns on where the PRIMARY stress falls — that is the whole
+     * of REcord vs reCORD. The 1/2 distinction is gradient prosody within one
+     * word, and transcribers disagree about it: cross-checking the metronome's
+     * hand-written tables against cmudict, all three mismatches out of 24 were
+     * this and only this (contract AE0/AE2, permit IH0/IH2, address EH0/EH2).
+     * Treating them as different words would split a word on a notation choice.
+     */
+    const digits = raw.replace(/[^0-9]/g, '').replace(/2/g, '0');
 
     /**
      * Unstressed reduced nuclei neutralise. cmudict writes `gravity` as both

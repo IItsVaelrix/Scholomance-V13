@@ -169,6 +169,17 @@ const HYPOTHESES = Object.freeze([
         predicate: Object.freeze({ op: 'gt', path: 'viableWordCount', value: 1 }),
       }),
       Object.freeze({
+        id: 'f_meter_contradicts_lexicon',
+        description:
+          'For a stress-shift homograph, the pronunciation the metrical frame names is not ' +
+          'among the ones cmudict records. Two independently built sources — a hand-written ' +
+          'noun/verb table and the CMU dictionary — reached different answers for the same ' +
+          'word in the same frame, so one of them is wrong and neither can be trusted here. ' +
+          'They agree 24/24 today, which is what makes a disagreement worth acting on.',
+        observationId: 'obs.lex.lexical_entries',
+        predicate: Object.freeze({ op: 'truthy', path: 'meterConflict' }),
+      }),
+      Object.freeze({
         id: 'f_homophone_capture',
         description:
           'THE KNIGHT/NIGHT KILLER. The winning lemma is a near-perfect phonetic twin of the ' +

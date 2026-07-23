@@ -12,41 +12,18 @@
  * "noun" on no evidence would be inventing the very thing the caller needs
  * evidence for.
  *
- * The frames below are the ones that are decidable from a single neighbouring
- * token. Everything else returns null, which the probe reads as "the word cannot
- * be settled from this query" and refuses on. That is the honest outcome for a
- * bare query like `wound`, where no frame exists at all.
+ * THE CUES LIVE IN PHONOLOGY, NOT HERE. prosodic-metronome.js already read this
+ * exact beat — determiner before -> noun, `to`/modal/subject-pronoun before ->
+ * verb, abstain otherwise — for the stress-shift homograph class. This module
+ * duplicated its tables until they were consolidated; two frame readers with two
+ * cue lists disagree precisely at the edges where a heteronym is decided.
+ *
+ * So this is now an adapter: it locates the token and translates the metronome's
+ * noun/verb verdict into the POS codes wordnet_lemma uses. Constellation may
+ * depend on phonology; phonology must never depend on constellation.
  */
 
-/** A determiner or possessive immediately before a token makes it a noun. */
-const NOUN_CUES_BEFORE = Object.freeze(new Set([
-  'the', 'a', 'an', 'this', 'that', 'these', 'those', 'each', 'every', 'some', 'any',
-  'my', 'your', 'his', 'her', 'its', 'our', 'their', 'no', 'another', 'one',
-]));
-
-/** A preposition before a token makes it (the head of) a noun phrase. */
-const PREPOSITIONS = Object.freeze(new Set([
-  'of', 'in', 'on', 'at', 'from', 'with', 'by', 'for', 'into', 'onto', 'upon',
-  'through', 'across', 'against', 'beneath', 'under', 'over', 'about', 'without',
-]));
-
-/** A subject pronoun or auxiliary before a token makes it a verb. */
-const VERB_CUES_BEFORE = Object.freeze(new Set([
-  'i', 'you', 'he', 'she', 'it', 'we', 'they', 'who',
-  'has', 'have', 'had', 'was', 'were', 'is', 'are', 'am', 'be', 'been', 'being',
-  'will', 'would', 'shall', 'should', 'may', 'might', 'can', 'could', 'must',
-  'did', 'does', 'do', 'to',
-]));
-
-/**
- * An object determiner AFTER a token suggests a transitive verb — "wound the
- * clock". Weaker than the before-cues, so it is only consulted when nothing
- * before the token decided it.
- */
-const OBJECT_CUES_AFTER = Object.freeze(new Set([
-  'the', 'a', 'an', 'this', 'that', 'these', 'those',
-  'my', 'your', 'his', 'her', 'its', 'our', 'their', 'him', 'them', 'me', 'us', 'it',
-]));
+import { resolveFrame } from '../phonology/prosodic-metronome.js';
 
 /**
  * Resolve the part of speech of one token from its immediate neighbours.
@@ -65,22 +42,9 @@ export function resolveSyntacticFrame(tokens, target) {
   const index = list.indexOf(needle);
   if (index === -1) return none;
 
-  const before = index > 0 ? list[index - 1] : null;
-  const after = index < list.length - 1 ? list[index + 1] : null;
-
-  // Before-cues are checked first: they attach directly to the token.
-  if (before) {
-    if (NOUN_CUES_BEFORE.has(before)) return { pos: 'n', cue: `determiner:${before}`, index };
-    if (PREPOSITIONS.has(before)) return { pos: 'n', cue: `preposition:${before}`, index };
-    if (VERB_CUES_BEFORE.has(before)) return { pos: 'v', cue: `subject-or-aux:${before}`, index };
-  }
-
-  // Only consulted when nothing before decided it.
-  if (after && OBJECT_CUES_AFTER.has(after)) {
-    return { pos: 'v', cue: `object-follows:${after}`, index };
-  }
-
-  return { pos: null, cue: null, index };
+  const { frame, cue } = resolveFrame(list, index);
+  if (!frame) return { pos: null, cue: null, index };
+  return { pos: frame === 'noun' ? 'n' : 'v', cue, index };
 }
 
 /**

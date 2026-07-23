@@ -29,16 +29,41 @@ export const STRESS_SHIFT_HOMOGRAPHS = Object.freeze({
   address:  { noun: ['AE1','D','R','EH0','S'],             verb: ['AH0','D','R','EH1','S'] },
 });
 
-// Function-word frame cues (the "beat").
-const NOUN_CUES = new Set([
+/**
+ * Function-word frame cues (the "beat"). THE canonical tables — constellation's
+ * resolveSyntacticFrame imports these rather than keeping its own copy. Two
+ * frame readers with two cue lists disagree at the edges, and the edges are
+ * exactly where a heteronym is decided.
+ */
+export const NOUN_CUES = new Set([
   'a','an','the','this','that','these','those','my','your','his','her','its','our','their',
   'no','every','each','some','any','one','another',
   'new','old','big','small','good','bad','great','strange','final','latest','recent','only',
 ]);
-const VERB_CUES = new Set([
+export const VERB_CUES = new Set([
   'to','will','would','shall','should','can','could','may','might','must','please','let',
   "don't",'dont',"didn't",'didnt',"doesn't","won't","can't",
-  'i','we','you','they','he','she','it',
+  'i','we','you','they','he','she','it','who',
+  'has','have','had','was','were','is','are','am','be','been','being','did','does','do',
+]);
+
+/**
+ * Prepositions introduce a noun phrase, so the token after one takes a noun
+ * beat: "salt in the wound", "blood from wound".
+ */
+export const PREPOSITION_CUES = new Set([
+  'of','in','on','at','from','with','by','for','into','onto','upon',
+  'through','across','against','beneath','under','over','about','without',
+]);
+
+/**
+ * A determiner or object pronoun AFTER the token suggests a transitive verb —
+ * "wound the clock". Weaker than the before-cues, so it is only consulted when
+ * nothing before the token decided it.
+ */
+export const OBJECT_CUES_AFTER = new Set([
+  'the','a','an','this','that','these','those',
+  'my','your','his','her','its','our','their','him','them','me','us','it',
 ]);
 
 function norm(token) {
@@ -54,11 +79,38 @@ export function isStressShiftHomograph(word) {
  * @returns {'noun'|'verb'|null}
  */
 export function readMeter(tokens, targetIndex) {
-  if (!Array.isArray(tokens) || targetIndex <= 0) return null;
-  const prev = norm(tokens[targetIndex - 1]);
-  if (NOUN_CUES.has(prev)) return 'noun';
-  if (VERB_CUES.has(prev)) return 'verb';
-  return null;
+  return resolveFrame(tokens, targetIndex).frame;
+}
+
+/**
+ * THE frame reader. Reads the local beat around one token and names the cue that
+ * decided it, or abstains.
+ *
+ * Abstention is the important behaviour: a reader that guesses "noun" on no
+ * evidence invents the very thing its caller needs evidence for.
+ *
+ * @returns {{frame: 'noun'|'verb'|null, cue: string|null}}
+ */
+export function resolveFrame(tokens, targetIndex) {
+  const none = { frame: null, cue: null };
+  if (!Array.isArray(tokens)) return none;
+  if (!Number.isInteger(targetIndex) || targetIndex < 0 || targetIndex >= tokens.length) return none;
+
+  const prev = targetIndex > 0 ? norm(tokens[targetIndex - 1]) : null;
+  const next = targetIndex < tokens.length - 1 ? norm(tokens[targetIndex + 1]) : null;
+
+  // Before-cues attach directly to the token, so they decide first.
+  if (prev) {
+    if (NOUN_CUES.has(prev)) return { frame: 'noun', cue: `determiner:${prev}` };
+    if (PREPOSITION_CUES.has(prev)) return { frame: 'noun', cue: `preposition:${prev}` };
+    if (VERB_CUES.has(prev)) return { frame: 'verb', cue: `subject-or-aux:${prev}` };
+  }
+
+  if (next && OBJECT_CUES_AFTER.has(next)) {
+    return { frame: 'verb', cue: `object-follows:${next}` };
+  }
+
+  return none;
 }
 
 /**
