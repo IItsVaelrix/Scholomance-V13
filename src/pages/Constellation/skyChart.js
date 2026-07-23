@@ -228,3 +228,144 @@ export function raritySpectral(rarity) {
   const brightness = 0.55 + normalized * 0.45;
   return { spectralClass: band.spectralClass, color: band.color, brightness, normalized };
 }
+
+/* ─── The hero figure — the "reaction" (Living Answer, Phase 1) ───────────
+   Phonemes are atoms; genome + rarity + cadence + vowel family are the reaction
+   conditions, applied BY RULE (WAND_CHEMICAL_STROKE_PROPAGATION: no sampling, no
+   score-and-pick). Geometry is a pure function of the packet — the seed touches
+   ONLY the gold lodestar (twinkle is applied at render time). Backend-truth:
+   stress digits, phonemes, vowel family and rarity band are READ, never
+   recomputed (BUGPATTERN_COLOR_DRAGON). */
+
+const HERO_VIEW_W = 100;
+const HERO_VIEW_H = 60;
+const HERO_MID_Y = 34;          // spine midline
+const ROSETTE_RADIUS = 6.5;
+
+/** Front vowels tighten the arch (taller), back vowels broaden it (flatter). */
+function spineAmplitude(vowelFamily) {
+  const fam = String(vowelFamily || '').toLowerCase();
+  if (fam.includes('front')) return 16;
+  if (fam.includes('back')) return 7;
+  return 11; // central / unknown
+}
+
+/** Cadence picks the rosette symmetry operator (replication catalyst). */
+function cadenceSymmetry(cadenceFamily) {
+  const c = String(cadenceFamily || '').toLowerCase();
+  if (c.includes('anapest') || c.includes('dactyl') || c.includes('tern')) return 'radial';
+  if (c.includes('spiral') || c.includes('free') || c.includes('irregular')) return 'spiral';
+  return 'bilateral'; // iambic/trochaic/binary/default
+}
+
+/** Split a list into `groups` contiguous, as-even-as-possible chunks. */
+function chunkEvenly(list, groups) {
+  const g = Math.max(1, Math.min(groups, list.length || 1));
+  const out = Array.from({ length: g }, () => []);
+  const per = (list.length || 0) / g;
+  for (let i = 0; i < list.length; i += 1) out[Math.min(g - 1, Math.floor(i / per))].push(i);
+  return out;
+}
+
+/** Place k atoms around a center by the symmetry operator. Pure geometry. */
+function placeRosette(center, k, symmetry) {
+  const pts = [];
+  for (let j = 0; j < k; j += 1) {
+    if (symmetry === 'bilateral') {
+      const side = j % 2 === 0 ? -1 : 1;
+      const rank = Math.floor(j / 2) + (k > 1 ? 0.5 : 0);
+      pts.push({ x: center.x + side * (rank / Math.max(1, k)) * ROSETTE_RADIUS * 1.6,
+                 y: center.y + (j % 2 === 0 ? -1 : 1) * (rank * 0.6) });
+    } else if (symmetry === 'radial') {
+      const a = (j / k) * Math.PI * 2 - Math.PI / 2;
+      pts.push({ x: center.x + Math.cos(a) * ROSETTE_RADIUS, y: center.y + Math.sin(a) * ROSETTE_RADIUS });
+    } else { // spiral
+      const a = (j / Math.max(1, k)) * Math.PI * 2.4 - Math.PI / 2;
+      const r = ROSETTE_RADIUS * (0.35 + (j / Math.max(1, k)) * 0.65);
+      pts.push({ x: center.x + Math.cos(a) * r, y: center.y + Math.sin(a) * r });
+    }
+  }
+  return pts;
+}
+
+/**
+ * @param {import('./types.js').ConstellationPhase1Packet} packet
+ */
+export function heroFigure(packet) {
+  const rhyme = packet.rhymeAstrology;
+  const degraded = !rhyme || !Array.isArray(rhyme.phonemes) || rhyme.phonemes.length === 0;
+
+  // Atoms. On the degraded path, regenerate generic (consonant-like) atoms from
+  // the grapheme count so there is always A figure — but NEVER recompute stress
+  // or vowel family, which are phonological truth the backend owns.
+  const phonemes = degraded
+    ? Array.from({ length: Math.max(1, packet.query?.graphemeCount || 1) }, (_, i) => `g${i}`)
+    : rhyme.phonemes.map(String);
+
+  const symmetry = cadenceSymmetry(degraded ? '' : rhyme.cadenceFamily);
+  const amp = spineAmplitude(degraded ? '' : rhyme.dominantVowelFamily);
+  const syllables = Math.max(1, packet.phraseGenome?.syllables || 1);
+  const groups = chunkEvenly(phonemes, syllables);
+  const spectral = raritySpectral(packet.leximancy?.rarity ?? null);
+
+  // Rosette centers on the spine arc.
+  const rosettes = groups.map((nodeIndices, index) => {
+    const t = groups.length === 1 ? 0.5 : index / (groups.length - 1);
+    const x = 12 + t * 76;
+    const y = HERO_MID_Y - Math.sin(Math.PI * t) * amp;
+    return { index, center: { x, y }, symmetry, nodeIndices };
+  });
+
+  // Atoms placed around their rosette center.
+  const nodes = [];
+  rosettes.forEach((r) => {
+    const local = placeRosette(r.center, r.nodeIndices.length, symmetry);
+    r.nodeIndices.forEach((globalIdx, j) => {
+      const ph = phonemes[globalIdx];
+      const isVowel = /[012]$/.test(ph); // ARPAbet vowels carry a stress digit; degraded atoms never do
+      const stressed = /[12]$/.test(ph);
+      const magnitude = stressed ? 1.5 : isVowel ? 1.0 : 0.6;
+      const p = local[j];
+      nodes.push({
+        id: `hf${globalIdx}`,
+        x: Number(p.x.toFixed(3)),
+        y: Number(p.y.toFixed(3)),
+        phoneme: ph,
+        isVowel,
+        stressed,
+        magnitude,
+        color: spectral.color,
+        isLodestar: false,
+      });
+    });
+  });
+
+  // Reorder nodes back into phoneme sequence so edges chain the utterance.
+  nodes.sort((a, b) => Number(a.id.slice(2)) - Number(b.id.slice(2)));
+  const edges = [];
+  for (let i = 0; i + 1 < nodes.length; i += 1) edges.push([i, i + 1]);
+
+  // Lodestar: the seed ignites ONE nucleus gold. Prefer stressed vowels; the seed
+  // chooses among them (or among all nodes when none is stressed). Motion/highlight
+  // only — never a coordinate.
+  const seed = fnv1a32(packet.pageBytecode || 'COS-HERO-v1');
+  const candidates = nodes.map((n, i) => (n.stressed ? i : -1)).filter((i) => i >= 0);
+  const pool = candidates.length ? candidates : nodes.map((_, i) => i);
+  let lodestarNodeId = null;
+  if (pool.length) {
+    const pick = pool[Math.floor(seededUnit(seed, 7) * pool.length) % pool.length];
+    nodes[pick].isLodestar = true;
+    lodestarNodeId = nodes[pick].id;
+  }
+
+  return {
+    viewBox: `0 0 ${HERO_VIEW_W} ${HERO_VIEW_H}`,
+    degraded,
+    spectralClass: spectral.spectralClass,
+    nodes,
+    edges,
+    rosettes,
+    lodestarNodeId,
+    seed,
+  };
+}
