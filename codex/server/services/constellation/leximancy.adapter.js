@@ -33,7 +33,7 @@ export function analyzeLeximancy(lexiconAdapter, contentToken) {
 
   const interpretations = entries.map((entry, i) => ({
     id: `${contentToken}.${entry.pos || 'x'}.${i}`,
-    gloss: lexiconAdapter.extractGloss(entry.senses) || String(entry.senses?.[0] ?? ''),
+    gloss: lexiconAdapter.extractGloss(entry.senses) || '',
     confidence: rankConfidence(i, entries.length),
     pos: entry.pos || '',
   }));

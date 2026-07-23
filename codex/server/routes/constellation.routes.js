@@ -1,7 +1,7 @@
 import { buildConstellationPage } from '../services/constellationPage.service.js';
 
 const MAX_QUERY_GRAPHEMES = 600;
-const CONTROL_CHARS = /[\u0000-\u0008\u000E-\u001F]/;
+const CONTROL_CHARS = /[\u0000-\u0008\u000E-\u001F\u007F-\u009F]/;
 
 /**
  * @param {import('fastify').FastifyInstance} fastify

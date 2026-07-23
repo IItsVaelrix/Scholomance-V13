@@ -9,7 +9,8 @@ const engine = {
       constellations: [{
         dominantVowelFamily: ['AO'],
         dominantStressPattern: 'x / x',
-        members: ['mooring', 'warning'],
+        // Real engine members are node IDs, not words — the adapter must resolve them.
+        members: ['w_1', 'w_2'],
         cohesionScore: 0.5,
         densityScore: 0.4,
       }],
@@ -18,7 +19,11 @@ const engine = {
     };
   },
 };
-const repo = { lookupNodeByNormalized: (t) => (t === 'morning' ? { phonemes: ['M', 'AO1', 'R', 'N', 'IH0', 'NG'] } : null) };
+const NODES_BY_ID = { w_1: { token: 'mooring' }, w_2: { token: 'warning' } };
+const repo = {
+  lookupNodeByNormalized: (t) => (t === 'morning' ? { phonemes: ['M', 'AO1', 'R', 'N', 'IH0', 'NG'] } : null),
+  lookupNodeById: (id) => NODES_BY_ID[id] || null,
+};
 
 describe('analyzeRhyme', () => {
   it('maps engine output to panel fields with backend phonemes', async () => {

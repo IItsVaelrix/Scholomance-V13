@@ -21,7 +21,12 @@ export async function analyzeRhyme(rhymeQueryEngine, rhymeLexiconRepo, identity)
   const constellation = (result.constellations && result.constellations[0]) || null;
   const stress = constellation?.dominantStressPattern || '';
   const dominantVowelFamily = constellation?.dominantVowelFamily?.[0] || null;
-  const exactRhymes = constellation ? [...constellation.members] : [];
+  // Constellation members are engine node IDs (e.g. `w_2033`), not words — resolve
+  // each to its token so the panel shows rhyming words, never internal ids. Optional
+  // chaining lets a repo without lookupNodeById degrade to empty rather than throw.
+  const exactRhymes = (constellation?.members || [])
+    .map((id) => rhymeLexiconRepo.lookupNodeById?.(id)?.token)
+    .filter(Boolean);
   const exactSet = new Set(exactRhymes);
   const slantRhymes = (result.topMatches || [])
     .map((m) => m.token)

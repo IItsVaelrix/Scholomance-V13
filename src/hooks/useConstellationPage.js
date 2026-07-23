@@ -30,7 +30,9 @@ export function useConstellationPage(query) {
         });
         if (!res.ok) throw new Error(`status ${res.status}`);
         const packet = await res.json();
-        if (requestId.current === id) setState({ status: 'ready', packet });
+        if (requestId.current === id && !controller.signal.aborted) {
+          setState({ status: 'ready', packet });
+        }
       } catch (err) {
         if (controller.signal.aborted) return;
         if (requestId.current === id) {
