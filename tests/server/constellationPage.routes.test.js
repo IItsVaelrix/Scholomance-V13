@@ -50,4 +50,9 @@ describe('GET /api/constellation/page', () => {
     const res = await app.inject({ method: 'GET', url: `/api/constellation/page?query=${long}` });
     expect(res.statusCode).toBe(400);
   });
+
+  it('rejects a query containing a control character', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/constellation/page?query=morning%01' });
+    expect(res.statusCode).toBe(400);
+  });
 });

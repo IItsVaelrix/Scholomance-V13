@@ -1246,6 +1246,10 @@ if (!IS_TEST_RUNTIME) {
 }
 
 fastify.register(studioRoutes, { localAudioAdapter });
+
+// Shared across rhymeAstrologyRoutes + constellationRoutes — see the build block below.
+let sharedRhymeAstrologyQueryEngine = null;
+let sharedRhymeAstrologyLexiconRepo = null;
 if (ENABLE_RHYME_ASTROLOGY) {
     if (RHYME_ASTROLOGY_PATHS.usedExistingArtifactsFallback || RHYME_ASTROLOGY_PATHS.usedProductionPersistentFallback) {
         fastify.log.warn({
@@ -1261,7 +1265,45 @@ if (ENABLE_RHYME_ASTROLOGY) {
             edgesDbPath: RHYME_ASTROLOGY_PATHS.edgesDbPath,
         }, '[RhymeAstrology] Artifact bundle is incomplete; runtime will degrade until artifacts are built or mounted.');
     }
+    // Shared Rhyme Astrology singletons — built ONCE here and injected into both
+    // rhymeAstrologyRoutes (via its existing options.queryEngine support, so it does
+    // NOT build a second engine/repo pair against the same DB files) and
+    // constellationRoutes below. Guarded so a missing/incomplete artifact bundle
+    // logs a warning and leaves the shared engine null; both routes then degrade
+    // per PDR §7.8 instead of crashing boot. In practice createRhymeAstrologyLexiconRepo
+    // / createRhymeAstrologyIndexRepo degrade to empty-repo objects rather than
+    // throwing on a missing DB file, so this catch only guards unexpected failures.
+    try {
+        sharedRhymeAstrologyLexiconRepo = createRhymeAstrologyLexiconRepo(RHYME_ASTROLOGY_PATHS.lexiconDbPath, {
+            log: fastify.log,
+        });
+        const sharedRhymeAstrologyIndexRepo = createRhymeAstrologyIndexRepo({
+            indexDbPath: RHYME_ASTROLOGY_PATHS.indexDbPath,
+            edgesDbPath: RHYME_ASTROLOGY_PATHS.edgesDbPath,
+            log: fastify.log,
+        });
+        sharedRhymeAstrologyQueryEngine = createRhymeAstrologyQueryEngine({
+            lexiconRepo: sharedRhymeAstrologyLexiconRepo,
+            indexRepo: sharedRhymeAstrologyIndexRepo,
+            phonemeEngine: PhonemeEngine,
+            cacheSize: RHYME_ASTROLOGY_CACHE_SIZE,
+            bucketCandidateCap: RHYME_ASTROLOGY_BUCKET_QUERY_CAP,
+            maxClusters: RHYME_ASTROLOGY_QUERY_MAX_CLUSTERS,
+            log: fastify.log,
+        });
+    } catch (err) {
+        sharedRhymeAstrologyQueryEngine = null;
+        sharedRhymeAstrologyLexiconRepo = null;
+        fastify.log.warn({ err }, '[RhymeAstrology] shared query engine unavailable; rhyme-astrology and constellation routes will degrade.');
+    }
+
+    // queryEngine: sharedRhymeAstrologyQueryEngine — when non-null, rhymeAstrologyRoutes
+    // reuses it (ownsQueryEngine stays false, its own onClose hook does NOT fire) instead
+    // of building a second engine + SQLite repos against the same DB files. If the shared
+    // build above failed and this is null, the route falls back to building (and owning)
+    // its own, matching the route's pre-existing standalone behavior.
     fastify.register(rhymeAstrologyRoutes, {
+        queryEngine: sharedRhymeAstrologyQueryEngine,
         lexiconDbPath: RHYME_ASTROLOGY_PATHS.lexiconDbPath,
         indexDbPath: RHYME_ASTROLOGY_PATHS.indexDbPath,
         edgesDbPath: RHYME_ASTROLOGY_PATHS.edgesDbPath,
@@ -1274,43 +1316,22 @@ if (ENABLE_RHYME_ASTROLOGY) {
     fastify.log.info('[RhymeAstrology] API disabled. Set ENABLE_RHYME_ASTROLOGY=true to enable.');
 }
 
-// ConstellationOS Phase-1: shared Rhyme Astrology singletons (built the same way
-// rhymeAstrologyRoutes builds its own internal engine). Guarded so a missing/incomplete
-// artifact bundle logs a warning and degrades the rhyme channel instead of crashing boot.
-let constellationRhymeQueryEngine = null;
-let constellationRhymeLexiconRepo = null;
-if (ENABLE_RHYME_ASTROLOGY) {
-    try {
-        constellationRhymeLexiconRepo = createRhymeAstrologyLexiconRepo(RHYME_ASTROLOGY_PATHS.lexiconDbPath, {
-            log: fastify.log,
-        });
-        const constellationRhymeIndexRepo = createRhymeAstrologyIndexRepo({
-            indexDbPath: RHYME_ASTROLOGY_PATHS.indexDbPath,
-            edgesDbPath: RHYME_ASTROLOGY_PATHS.edgesDbPath,
-            log: fastify.log,
-        });
-        constellationRhymeQueryEngine = createRhymeAstrologyQueryEngine({
-            lexiconRepo: constellationRhymeLexiconRepo,
-            indexRepo: constellationRhymeIndexRepo,
-            phonemeEngine: PhonemeEngine,
-            cacheSize: RHYME_ASTROLOGY_CACHE_SIZE,
-            bucketCandidateCap: RHYME_ASTROLOGY_BUCKET_QUERY_CAP,
-            maxClusters: RHYME_ASTROLOGY_QUERY_MAX_CLUSTERS,
-            log: fastify.log,
-        });
-    } catch (err) {
-        constellationRhymeQueryEngine = null;
-        constellationRhymeLexiconRepo = null;
-        fastify.log.warn({ err }, '[Constellation] rhyme singletons unavailable; rhyme channel will degrade.');
-    }
-} else {
-    fastify.log.info('[Constellation] rhyme channel disabled (ENABLE_RHYME_ASTROLOGY=false); will degrade.');
-}
-
 fastify.register(constellationRoutes, {
     lexiconAdapter,
-    rhymeQueryEngine: constellationRhymeQueryEngine,
-    rhymeLexiconRepo: constellationRhymeLexiconRepo,
+    rhymeQueryEngine: sharedRhymeAstrologyQueryEngine,
+    rhymeLexiconRepo: sharedRhymeAstrologyLexiconRepo,
+});
+
+// Lifecycle: close the shared engine EXACTLY ONCE. rhymeAstrologyRoutes only closes
+// it when it built its own (ownsQueryEngine === true, i.e. sharedRhymeAstrologyQueryEngine
+// was null at registration time); when the shared engine was injected, that route's
+// onClose never fires, so this app-level hook is the sole owner of shutdown for it.
+// queryEngine.close() also closes its lexiconRepo/indexRepo internally, so no
+// separate close call is needed for sharedRhymeAstrologyLexiconRepo here.
+fastify.addHook('onClose', async () => {
+    if (sharedRhymeAstrologyQueryEngine) {
+        sharedRhymeAstrologyQueryEngine.close?.();
+    }
 });
 
 if (ENABLE_COLLAB_API) {
