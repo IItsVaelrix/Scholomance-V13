@@ -307,15 +307,9 @@
   max-width: 48rem;
   margin: 0 auto;
   width: 100%;
-  /* Whisper-thin scrim: lifts reading text off the star field without hiding the
-     galaxy at the margins. Feathered so the shell still floats in the sky. */
-  background: linear-gradient(
-    180deg,
-    rgba(5, 6, 15, 0) 0%,
-    rgba(5, 6, 15, 0.5) 8%,
-    rgba(5, 6, 15, 0.55) 92%,
-    rgba(5, 6, 15, 0) 100%
-  );
+  /* De-carded: no scrim panel. Reading text lifts off the star field with a soft
+     per-line shadow instead of a surface. */
+  text-shadow: 0 1px 10px rgba(5, 6, 15, 0.85), 0 0 2px rgba(5, 6, 15, 0.9);
 }
 
 .constellation-result-section {
@@ -551,7 +545,13 @@
   .constellation-sky--animate .constellation-sky__star,
   .constellation-sky--animate .constellation-sky__nebula,
   .constellation-sky--animate .constellation-sky__dust,
-  .constellation-stage--animate .constellation-result-shell--composed .constellation-result-plate {
+  .constellation-stage--animate .constellation-result-shell--composed .constellation-result-plate,
+  .constellation-result-hero__star,
+  .constellation-result-hero__spark,
+  .constellation-result-hero__lodestar,
+  .constellation-result-verdict-mark,
+  .constellation-result-seal__glyph,
+  .constellation-result-chip {
     animation: none;
   }
 }
@@ -668,8 +668,18 @@
 .constellation-result-shell--composed > [data-compose-part="meaning-field"],
 .constellation-result-shell--composed > [data-compose-part="sound-field"] { grid-column: auto; }
 
-.constellation-result-plate { padding: 2rem 0 1.5rem; }
-.constellation-result-plate + .constellation-result-plate { border-top: 1px solid var(--cos-hair); }
+.constellation-result-shell--composed { position: relative; }
+/* One hairline spine wiring the star-anchors into a single figure. */
+.constellation-result-shell--composed::before {
+  content: '';
+  position: absolute;
+  left: 0.35rem; top: 1rem; bottom: 1rem;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, var(--cos-hair) 12%, var(--cos-hair) 88%, transparent);
+  pointer-events: none;
+}
+.constellation-result-plate { padding: 1.75rem 0 1.25rem; }
+.constellation-result-plate + .constellation-result-plate { border-top: none; }
 
 /* Overline headings: small-caps identity with a gold roman-numeral counter.
    The counter is reset on the shell (counter-reset: cos-sec), same as the
@@ -688,15 +698,11 @@
   color: var(--cos-ink-dim);
 }
 .constellation-result-plate__overline::before {
-  content: counter(cos-sec, upper-roman);
-  font-family: var(--cos-display);
-  font-size: 0.85rem;
-  letter-spacing: 0.08em;
-  color: var(--cos-gold);
-  border: 1px solid rgba(232, 201, 106, 0.35);
-  border-radius: 999px;
-  padding: 0.05rem 0.55rem;
-  line-height: 1.4;
+  content: '✦';
+  color: var(--cos-amethyst);
+  font-size: 0.8rem;
+  text-shadow: 0 0 8px rgba(139, 124, 255, 0.6);
+  margin-left: -1.15rem; /* sit the anchor on the spine */
 }
 
 /* ── Masthead: the query as asked ── */
@@ -754,6 +760,41 @@
   fill: var(--cos-gold);
   filter: drop-shadow(0 0 1.5px rgba(232, 201, 106, 0.8));
 }
+
+/* ── Hero figure: the answer drawn as a living constellation ── */
+.constellation-result-plate--hero { padding-top: 0.5rem; }
+.constellation-result-hero {
+  display: block;
+  width: 100%;
+  max-width: 34rem;
+  height: 9rem;
+  margin: 0.5rem auto 0.75rem;
+}
+.constellation-result-hero__edge {
+  stroke: var(--cos-amethyst);
+  stroke-opacity: 0.22;
+  stroke-width: 0.25;
+  stroke-linecap: round;
+}
+/* fill comes inline from the rarity temperature (Task 4). */
+.constellation-result-hero__star { opacity: 0.9; }
+.constellation-result-hero__spark { filter: drop-shadow(0 0 1.2px rgba(255, 255, 255, 0.5)); }
+.constellation-result-hero__lodestar {
+  fill: var(--cos-gold);
+  filter: drop-shadow(0 0 2.5px rgba(232, 201, 106, 0.9));
+}
+/* Seeded breathing — opacity only (never transform: it would clobber SVG coords). */
+.constellation-result-hero__star,
+.constellation-result-hero__spark,
+.constellation-result-hero__lodestar { animation: cos-twinkle var(--cos-harmonic) ease-in-out infinite; }
+
+/* Gold answer moments breathe on a page-seeded phase (delay set inline). */
+.constellation-result-verdict-mark,
+.constellation-result-seal__glyph { animation: cos-twinkle var(--cos-harmonic) ease-in-out infinite; }
+/* Chips become faint star-field pills that twinkle on a deterministic stagger. */
+.constellation-result-chip { animation: cos-twinkle calc(var(--cos-harmonic) * 1.3) ease-in-out infinite; }
+.constellation-result-chip:nth-child(3n) { animation-delay: 0.9s; }
+.constellation-result-chip:nth-child(3n + 1) { animation-delay: 1.7s; }
 
 /* ── Verdict: the one line that says whether the pick was earned ── */
 .constellation-result-verdict-line {

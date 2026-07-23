@@ -93,6 +93,23 @@ describe('composed answer plate', () => {
     expect(hero!.querySelectorAll('.constellation-result-hero__lodestar')).toHaveLength(1);
     const stars = hero!.querySelectorAll('.constellation-result-hero__star, .constellation-result-hero__spark');
     expect(stars.length).toBe(10);
+    // Gold is reserved for the lodestar: it must carry no inline temperature
+    // fill (only the CSS gold applies), while at least one other star does.
+    const lodestar = hero!.querySelector('.constellation-result-hero__lodestar') as HTMLElement;
+    expect(lodestar.style.fill).toBe('');
+    const nonLodestarWithFill = Array.from(stars).some(
+      (el) => !el.classList.contains('constellation-result-hero__lodestar') && (el as HTMLElement).style.fill !== '',
+    );
+    expect(nonLodestarWithFill).toBe(true);
+  });
+
+  it('anchors each section overline with a star, not a numbered pill', () => {
+    // The de-carded body drops the roman-numeral counter; the ✦ anchor is CSS
+    // ::before content, so we assert the class contract the CSS binds to exists
+    // on every plate heading.
+    const { container } = render(<ConstellationResultShell packet={basePacket} />);
+    const overlines = container.querySelectorAll('.constellation-result-plate__overline');
+    expect(overlines.length).toBeGreaterThanOrEqual(6);
   });
 
   it('sets no twinkle animation on hero stars under reduced motion', () => {

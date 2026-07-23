@@ -26,7 +26,7 @@ import {
   CONSTELLATION_RESULT_VERSION,
 } from '../../core/compose/migrated/ConstellationResult.ts';
 import { validateComposeScene } from '../../core/compose/packets.ts';
-import { phonemeArc, plateRevealFor, heroFigure, twinkleFor, SPARK_PATH } from './skyChart.js';
+import { phonemeArc, plateRevealFor, heroFigure, twinkleFor, fnv1a32, SPARK_PATH } from './skyChart.js';
 
 /* ─── Shared atoms ─────────────────────────────────────────────────────── */
 
@@ -472,6 +472,10 @@ function ComposedResultShell({ packet, scene, reducedMotion }) {
   const reveal = (index) =>
     reducedMotion ? undefined : { animationDelay: `${plateRevealFor(pageBytecode, index).delaySec}s` };
 
+  const heroSeed = fnv1a32(pageBytecode || 'COS-HERO-v1');
+  const goldPulse = (i) =>
+    reducedMotion ? undefined : { animationDelay: `${twinkleFor(heroSeed, i).delaySec}s` };
+
   let plateIndex = 0;
   const nextReveal = () => reveal(plateIndex++);
 
@@ -569,7 +573,7 @@ function ComposedResultShell({ packet, scene, reducedMotion }) {
           <p className="constellation-result-verdict-line">
             {isEvidenced ? (
               <>
-                <span className="constellation-result-verdict-mark" aria-hidden="true">✦</span> Sense chosen on evidence —{' '}
+                <span className="constellation-result-verdict-mark" aria-hidden="true" style={goldPulse(101)}>✦</span> Sense chosen on evidence —{' '}
                 {semanticInquiry.selection.overlap} shared word
                 {semanticInquiry.selection.overlap === 1 ? '' : 's'} with the context.
               </>
@@ -598,7 +602,7 @@ function ComposedResultShell({ packet, scene, reducedMotion }) {
       >
         <h2 id="cos-provenance" className="constellation-result-plate__overline">Provenance</h2>
         <p className="constellation-result-seal" aria-label="Page bytecode">
-          <span className="constellation-result-seal__glyph" aria-hidden="true">❖</span>
+          <span className="constellation-result-seal__glyph" aria-hidden="true" style={goldPulse(202)}>❖</span>
           <span className="constellation-result-mono">{pageBytecode}</span>
         </p>
         <VersionsList engineVersions={engineVersions} />
