@@ -193,3 +193,38 @@ export function plateRevealFor(bytecode, plateIndex) {
   const delay = plateIndex * 0.35 + jitter;
   return { delaySec: delay.toFixed(2) };
 }
+
+/* ─── Rarity → stellar spectral temperature (Living Answer, Phase 1) ──────
+   A real OBAFGKM ramp keyed to the BACKEND rarity band: rarer words burn
+   hotter, bluer, and brighter (astronomically faithful — hot blue stars are
+   rare and massive, cool red stars common). Backend-truth: the only inputs are
+   rarity.band / rarity.max; nothing here recomputes rarity. `null` rarity is the
+   honest "unknown" class, not a frontend guess. */
+
+/** Ordered hot→cool. Thresholds are on normalized rarity (1 = rarest/hottest). */
+const SPECTRAL_RAMP = Object.freeze([
+  { min: 0.85, spectralClass: 'O', color: '#9db4ff' }, // blue-white, hot, rare
+  { min: 0.70, spectralClass: 'B', color: '#aec6ff' },
+  { min: 0.55, spectralClass: 'A', color: '#eaf0ff' }, // white
+  { min: 0.40, spectralClass: 'F', color: '#fdf4d8' }, // yellow-white
+  { min: 0.28, spectralClass: 'G', color: '#ffe9a8' }, // yellow
+  { min: 0.15, spectralClass: 'K', color: '#ffc27a' }, // orange
+  { min: 0.00, spectralClass: 'M', color: '#ff9d7a' }, // red, cool, common
+]);
+
+const AMETHYST = '#8b7cff'; // --cos-amethyst — the neutral when rarity is unknown
+
+/**
+ * @param {{ band: number, max: number, label?: string } | null | undefined} rarity
+ * @returns {{ spectralClass: string, color: string, brightness: number, normalized: number }}
+ */
+export function raritySpectral(rarity) {
+  if (!rarity || typeof rarity.band !== 'number' || typeof rarity.max !== 'number' || rarity.max <= 0) {
+    return { spectralClass: 'unknown', color: AMETHYST, brightness: 0.7, normalized: 0.5 };
+  }
+  const normalized = Math.max(0, Math.min(1, rarity.band / rarity.max));
+  const band = SPECTRAL_RAMP.find((b) => normalized >= b.min) || SPECTRAL_RAMP[SPECTRAL_RAMP.length - 1];
+  // Rarer burns brighter: 0.55 (common) … 1.0 (rarest).
+  const brightness = 0.55 + normalized * 0.45;
+  return { spectralClass: band.spectralClass, color: band.color, brightness, normalized };
+}
