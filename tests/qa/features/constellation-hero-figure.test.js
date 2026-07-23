@@ -2,6 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import { raritySpectral } from '../../../src/pages/Constellation/skyChart.js';
 import { heroFigure } from '../../../src/pages/Constellation/skyChart.js';
+import { heroStarGlyph } from '../../../src/pages/Constellation/skyChart.js';
 
 describe('raritySpectral — OBAFGKM ramp keyed to the backend rarity band', () => {
   it('maps a rare (high-band) word to a hot blue class and a common one to cool red', () => {
@@ -139,5 +140,18 @@ describe('heroFigure — the generation law (reaction)', () => {
     const arch = (fig) => Math.min(...fig.rosettes.map((r) => r.center.y));
     // Front vowels tighten (taller arch = smaller min-y) than back vowels.
     expect(arch(front)).toBeLessThan(arch(back));
+  });
+});
+
+describe('heroStarGlyph — SCDL vector vocabulary with SPARK_PATH fallback', () => {
+  it('exposes compiled SCDL fills as vector paths (or null to signal the fallback)', () => {
+    const glyph = heroStarGlyph();
+    if (glyph !== null) {
+      expect(Array.isArray(glyph.fills)).toBe(true);
+      expect(glyph.fills.length).toBeGreaterThan(0);
+      expect(typeof glyph.fills[0].d).toBe('string'); // a real SVG path, not a raster blit
+    } else {
+      expect(glyph).toBeNull(); // callers fall back to SPARK_PATH
+    }
   });
 });

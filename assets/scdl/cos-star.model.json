@@ -1,0 +1,146 @@
+{
+  "kind": "pixelbrain.asset.v1",
+  "id": "pbasset_62fb97c9",
+  "schemaVersion": 1,
+  "source": {
+    "kind": "scdl",
+    "id": "cos_star",
+    "label": "SCDL:cos_star",
+    "importedAt": null
+  },
+  "canvas": {
+    "width": 2,
+    "height": 2,
+    "cellSize": 1,
+    "gridSize": 1,
+    "transparent": true,
+    "background": "#00000000"
+  },
+  "geometry": {
+    "mode": "scene-graph",
+    "bounds": {},
+    "coordinates": [],
+    "cells": [],
+    "sceneGraph": {
+      "contract": "PB-SCENE-GRAPH-v1",
+      "version": "1.0.0",
+      "depthCap": 8,
+      "canvas": {
+        "width": 2,
+        "height": 2
+      },
+      "defs": {},
+      "roots": [
+        {
+          "kind": "group",
+          "id": "root",
+          "transform": {
+            "tx": 0,
+            "ty": 0,
+            "theta": 0,
+            "sx": 1,
+            "sy": 1,
+            "mirror": null
+          },
+          "children": [
+            {
+              "kind": "part",
+              "id": "glyph",
+              "material": "source",
+              "ops": [
+                {
+                  "op": "path",
+                  "d": "M0,-1 L0.28,-0.28 L1,0 L0.28,0.28 L0,1 L-0.28,0.28 L-1,0 L-0.28,-0.28 Z",
+                  "color": "#EAF0FF"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "palette": {
+    "sourcePalette": [
+      {
+        "key": "scdl-source",
+        "colors": [
+          "#EAF0FF"
+        ],
+        "source": "scdl",
+        "weights": [],
+        "byteMap": {
+          "0": "#EAF0FF"
+        }
+      }
+    ],
+    "semanticPalette": [],
+    "materialPalette": [],
+    "byteMap": {
+      "0": "#EAF0FF"
+    },
+    "authority": "scdl.emit-packet.v1"
+  },
+  "formula": null,
+  "bytecode": {
+    "raw": "",
+    "components": {},
+    "authority": "none",
+    "materialStage": "source"
+  },
+  "template": {
+    "id": null,
+    "gridType": null,
+    "symmetryAxes": [],
+    "slots": [],
+    "fillState": {}
+  },
+  "material": {
+    "id": "source",
+    "variant": null,
+    "registryVersion": "0.2.0",
+    "parameters": {}
+  },
+  "chromatic": {
+    "transformId": "source",
+    "diagnostics": []
+  },
+  "photonic": {
+    "routeId": null,
+    "packetId": null,
+    "status": "idle"
+  },
+  "provenance": {
+    "createdBy": "scdl-compiler.v1",
+    "operations": [
+      {
+        "op": "parse",
+        "checksum": "00000000b15174df"
+      },
+      {
+        "op": "semantic-unifier",
+        "schemaVersion": "PB-SEM-v1"
+      },
+      {
+        "op": "scene-graph",
+        "defCount": 0,
+        "rootNodeCount": 2
+      }
+    ]
+  },
+  "metadata": {
+    "tags": [
+      "scdl",
+      "scene-graph",
+      "cos_star"
+    ],
+    "notes": [
+      "SCDL scene-graph asset: cos_star",
+      "Canvas: 2x2",
+      "Defs: (none)"
+    ],
+    "compatibility": {}
+  },
+  "sdfDescriptors": [],
+  "noiseDescriptors": []
+}

@@ -26,7 +26,7 @@ import {
   CONSTELLATION_RESULT_VERSION,
 } from '../../core/compose/migrated/ConstellationResult.ts';
 import { validateComposeScene } from '../../core/compose/packets.ts';
-import { phonemeArc, plateRevealFor, heroFigure, twinkleFor, fnv1a32, SPARK_PATH } from './skyChart.js';
+import { phonemeArc, plateRevealFor, heroFigure, twinkleFor, fnv1a32, SPARK_PATH, heroStarGlyph } from './skyChart.js';
 
 /* ─── Shared atoms ─────────────────────────────────────────────────────── */
 
@@ -393,6 +393,10 @@ function GenomeBody({ phraseGenome }) {
    other star takes the rarity temperature color. Reduced motion drops twinkle. */
 function HeroFigure({ packet, reducedMotion }) {
   const fig = heroFigure(packet);
+  // SCDL owns the invariant star vocabulary; SPARK_PATH is the deterministic
+  // fallback when the compiled glyph is unavailable (see skyChart.js heroStarGlyph()).
+  const glyph = heroStarGlyph();
+  const starPath = glyph?.fills?.[0]?.d ?? SPARK_PATH;
   return (
     <svg
       className="constellation-result-hero"
@@ -420,7 +424,7 @@ function HeroFigure({ packet, reducedMotion }) {
           return (
             <path
               key={nd.id}
-              d={SPARK_PATH}
+              d={starPath}
               transform={`translate(${nd.x} ${nd.y}) scale(${2.4 * nd.magnitude})`}
               className="constellation-result-hero__spark constellation-result-hero__lodestar"
               style={twinkle}
@@ -431,7 +435,7 @@ function HeroFigure({ packet, reducedMotion }) {
           return (
             <path
               key={nd.id}
-              d={SPARK_PATH}
+              d={starPath}
               transform={`translate(${nd.x} ${nd.y}) scale(${1.4 * nd.magnitude})`}
               className="constellation-result-hero__spark"
               style={{ ...twinkle, fill: nd.color }}

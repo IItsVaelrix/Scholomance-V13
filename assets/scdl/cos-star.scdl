@@ -1,0 +1,30 @@
+# cos-star.scdl — canonical 4-point constellation star glyph
+# (ConstellationOS Living Answer vocabulary, Phase 1, SCDL v1.2)
+#
+# Authored in scene-graph mode (the `group` wrapper triggers graphMode — see
+# scdl.grammar.js `graphMode: defs.length > 0 || roots.some(n => n.kind !== 'part')`).
+# Scene-graph assets skip expandVector/expandCells entirely (scdl.compiler.js
+# `_runFramePipeline`), so the compiled packet's geometry.sceneGraph retains
+# the `path` op's literal SVG `d` string untouched — never rasterized to
+# per-pixel cells. That is the one path in this compiler that yields a real
+# vector fill instead of a coordinate lattice; see task-6-report.md.
+#
+# A single filled path: outer tips at N/E/S/W, concave inner points on the
+# diagonals. The `d` string is a STRING literal (opaque to the SCDL tokenizer,
+# see scdl.grammar.js path_op), so it is authored unit-centered on the origin
+# with extent +/-1 — the same convention as skyChart.js's SPARK_PATH — so the
+# compiled fill drops straight into the existing `translate(x y) scale(s)`
+# transform callers already use.
+asset cos_star canvas 2x2
+
+palette {
+  starc = #EAF0FF
+}
+
+group root at 0 0 {
+  part glyph material source {
+    path "M0,-1 L0.28,-0.28 L1,0 L0.28,0.28 L0,1 L-0.28,0.28 L-1,0 L-0.28,-0.28 Z" starc
+  }
+}
+
+export json

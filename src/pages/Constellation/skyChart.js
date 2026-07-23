@@ -10,6 +10,10 @@
  * Coordinates live in a 0..100 square viewBox; the SVG slices to fill.
  */
 
+// Compiled SCDL asset, imported statically at build time (no runtime SCDL
+// parsing ships). See heroStarGlyph() below and assets/scdl/cos-star.scdl.
+import cosStarModel from '../../../assets/scdl/cos-star.model.json';
+
 /**
  * Named literary constellations. Bright anchor stars (`spark`) carry the custom
  * 4-point star glyph; `dot` stars are quieter magnitude. Edges are drawn between
@@ -91,6 +95,47 @@ export const ANCHOR_STARS = Object.freeze(
 /** 4-point sparkle star, unit-ish path centred on (0,0), extent ~±1. */
 export const SPARK_PATH =
   'M0,-1 C0.14,-0.34 0.34,-0.14 1,0 C0.34,0.14 0.14,0.34 0,1 C-0.14,0.34 -0.34,0.14 -1,0 C-0.34,-0.14 -0.14,-0.34 0,-1 Z';
+
+/** Recursively collect `{ d, palette }` from every `path` op in a scene-graph node list. */
+function _collectPathFills(nodes) {
+  const fills = [];
+  for (const node of nodes || []) {
+    if (node.kind === 'part') {
+      for (const op of node.ops || []) {
+        if (op.op === 'path' && typeof op.d === 'string') {
+          fills.push({ d: op.d, palette: op.color });
+        }
+      }
+    } else if (node.kind === 'group') {
+      fills.push(..._collectPathFills(node.children));
+    }
+  }
+  return fills;
+}
+
+/**
+ * The compiled SCDL star glyph (`assets/scdl/cos-star.scdl`) as vector
+ * `fills`, imported statically — no runtime SCDL parsing ships. SCDL owns
+ * the INVARIANT vocabulary; per-query geometry stays formula-driven SVG.
+ *
+ * The compiler's flat `part`/`polygon` mode rasterizes every vector op to a
+ * per-pixel `geometry.coordinates` lattice (see scdl.compiler.js's
+ * expandVector -> expandCells pipeline) — that shape is NOT vector data, so
+ * it is never a candidate here. `cos-star.scdl` is authored in scene-graph
+ * mode instead (a `group` wrapper), which the compiler skips those raster
+ * passes for entirely; its `path` ops keep their literal SVG `d` string in
+ * `geometry.sceneGraph`, read via `_collectPathFills` above. Returns null if
+ * the compiled model is unavailable or shape-unexpected — callers then use
+ * SPARK_PATH, the deterministic fallback.
+ * @returns {{ fills: Array<{ d: string, palette?: string }> } | null}
+ */
+export function heroStarGlyph() {
+  const sceneGraph = cosStarModel?.geometry?.sceneGraph;
+  if (!sceneGraph || !Array.isArray(sceneGraph.roots)) return null;
+  const fills = _collectPathFills(sceneGraph.roots);
+  if (fills.length === 0 || typeof fills[0].d !== 'string') return null;
+  return { fills };
+}
 
 /** FNV-1a 32-bit over a string — matches the repo's deterministic seed convention. */
 export function fnv1a32(input) {
