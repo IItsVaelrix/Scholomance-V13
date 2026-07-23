@@ -117,16 +117,19 @@ const HYPOTHESES = Object.freeze([
     ]),
     falsifiers: Object.freeze([
       Object.freeze({
-        id: 'f_zero_overlap',
+        id: 'f_thin_overlap',
         description:
-          'No candidate shares a content word with the query — the selection was arbitrary ' +
-          '(first-listed), not evidenced.',
+          'No candidate shares at least two content words with the query context. One ' +
+          'shared word is noise: measured on the real dictionary, every selection that ' +
+          'won on an overlap of exactly 1 was either a self-match or semantically wrong ' +
+          '("light illumination lamp bright" selected the DIVINE sense on a single hit). ' +
+          'Two independent content words is the floor for calling a sense evidenced.',
         observationId: 'obs.lex.sense_candidates',
         predicate: Object.freeze({
           op: 'gloss_overlap_lt',
           candidatesPath: 'candidates',
           queryTokensPath: 'queryTokens',
-          n: 1,
+          n: 2,
         }),
       }),
       Object.freeze({

@@ -104,7 +104,11 @@ describe('harness collects measurements, not conclusions', () => {
 
     expect(sense.status).toBe('observed');
     expect(sense.result.candidates[0].gloss).toMatch(/mounted soldier/);
-    expect(sense.result.queryTokens).toEqual(['feudal', 'knight']);
+    // The head token is excluded from its own context: a gloss that repeats its
+    // headword ("the act of inflicting a wound") would otherwise score a match
+    // against the query word itself, which measures the lexicographer, not the query.
+    expect(sense.result.queryTokens).toEqual(['feudal']);
+    expect(sense.result.queryTokens).not.toContain('knight');
     // No pre-computed judgement anywhere in the payload.
     const blob = JSON.stringify(sense.result);
     expect(blob).not.toMatch(/overlapCount|overlapDelta|allKin|score/i);

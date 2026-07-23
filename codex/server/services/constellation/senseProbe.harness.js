@@ -89,7 +89,23 @@ function observeSenseCandidates(lexiconAdapter, headToken, queryTokens) {
     if (candidates.length >= MAX_CANDIDATES) break;
   }
 
-  return draft('obs.lex.sense_candidates', { candidates, queryTokens: [...queryTokens] }, 'observed');
+  /**
+   * CONTEXT EXCLUDES THE WORD BEING DEFINED.
+   *
+   * Measured on the real dictionary: leaving the head token in made it the
+   * dominant signal, because a gloss that happens to be self-referential ("the
+   * act of inflicting a wound") scores a match against the query word itself.
+   * That is not disambiguation — it selects for glosses that repeat their own
+   * headword, which is a property of the lexicographer, not of the query. Three
+   * of the four selections in the 20-query run won this way.
+   *
+   * Scoping the context is a measurement decision and belongs here; the
+   * predicate still does all the counting and comparing.
+   */
+  const head = headToken.trim().toLowerCase();
+  const context = [...queryTokens].filter((t) => String(t).trim().toLowerCase() !== head);
+
+  return draft('obs.lex.sense_candidates', { candidates, queryTokens: context }, 'observed');
 }
 
 /**
