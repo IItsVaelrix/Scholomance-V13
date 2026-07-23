@@ -43,6 +43,13 @@ export const CONSTELLATION_RESULT_VERSION = '1.0.0';
  */
 export const RESULT_PARTS = [
   {
+    id: 'hero-figure',
+    role: 'img',
+    label: 'Sound-bones constellation figure',
+    description:
+      'The answer drawn as a constellation — phoneme atoms in syllable rosettes, rarity temperature, seeded lodestar.',
+  },
+  {
     id: 'masthead',
     role: 'region',
     label: 'Phrase identity plate',
@@ -119,6 +126,18 @@ const RESULT_VISUALS: Record<string, VisualAttachment> = {
     tokenPath: 'surface.scrim',
     cssProperty: 'background',
     placementSlot: 'backdrop',
+  },
+  'star-spectral': {
+    kind: 'token',
+    tokenPath: 'color.spectral',
+    cssProperty: 'fill',
+    placementSlot: 'figure',
+  },
+  'hero-glow': {
+    kind: 'token',
+    tokenPath: 'effect.glow',
+    cssProperty: 'filter',
+    placementSlot: 'figure',
   },
 };
 

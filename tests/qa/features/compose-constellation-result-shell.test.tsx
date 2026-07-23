@@ -61,7 +61,7 @@ describe('composed answer plate', () => {
     expect(el.getAttribute('data-compose-kind')).toBe('constellation-result');
     expect(el.getAttribute('data-compose-version')).toBe('1.0.0');
     // The checksum is the golden value pinned in the packet test.
-    expect(el.getAttribute('data-compose-scene')).toBe('scd64:c05a1427d4252bfc');
+    expect(el.getAttribute('data-compose-scene')).toBe('scd64:672f55146b2753a4');
     expect(el.getAttribute('role')).toBe('article');
   });
 
@@ -71,6 +71,7 @@ describe('composed answer plate', () => {
       n.getAttribute('data-compose-part'),
     );
     expect(parts).toEqual([
+      'hero-figure',
       'masthead',
       'meaning-field',
       'sound-field',

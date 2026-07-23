@@ -24,7 +24,7 @@ import {
  * this value is stable across environments and builds. If you intentionally
  * change the plate anatomy, re-seal by updating this constant (and say why).
  */
-const GOLDEN_CHECKSUM = 'scd64:c05a1427d4252bfc';
+const GOLDEN_CHECKSUM = 'scd64:672f55146b2753a4';
 
 describe('ConstellationResult PB scene (answer plate contract)', () => {
   it('emits a PB-UI-SCENE-v1 whose children are the six declared plates, in order', () => {
@@ -39,6 +39,7 @@ describe('ConstellationResult PB scene (answer plate contract)', () => {
     );
     // Order is load-bearing: identity → meaning → sound → genome → verdict → seal.
     expect(ids).toEqual([
+      'constellation-result.hero-figure',
       'constellation-result.masthead',
       'constellation-result.meaning-field',
       'constellation-result.sound-field',
