@@ -154,9 +154,23 @@ export const AnalysisEvidenceSchema = z.object({
   confidence: z.number(),
 });
 
+export const SuggestionInputSlotSchema = z.object({
+  id: z.string(),
+  placeholder: z.string(),
+  hint: z.string(),
+});
+
 export const ResumeSuggestionSchema = z.object({
   id: z.string(),
-  type: z.enum(['verb', 'keyword', 'acronym', 'format', 'structure']),
+  type: z.enum([
+    'verb',
+    'keyword',
+    'acronym',
+    'format',
+    'structure',
+    'quantify',
+    'tighten',
+  ]),
   target: z
     .object({
       span: TextSpanSchema.optional(),
@@ -174,4 +188,6 @@ export const ResumeSuggestionSchema = z.object({
   risk: z.enum(['low', 'medium', 'high']),
   requiresUserApproval: z.literal(true),
   status: z.enum(['pending', 'accepted', 'rejected', 'edited']),
+  requiresInput: z.boolean().optional(),
+  inputSlots: z.array(SuggestionInputSlotSchema).optional(),
 });

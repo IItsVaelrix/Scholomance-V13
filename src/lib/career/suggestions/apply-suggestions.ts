@@ -1,6 +1,7 @@
 import type { ResumeDocument } from '../parser/types.js';
 import type { ResumeSuggestion, SuggestionApplicationResult } from '../analysis/types.js';
 import { detectSuggestionConflicts } from './detect-conflicts.js';
+import { INPUT_SENTINEL } from '../amplify/data/input-sentinel.js';
 
 interface TextEdit {
   suggestionId: string;
@@ -16,7 +17,13 @@ export function applyAcceptedSuggestions(
   const applied: string[] = [];
   const skipped: Array<{
     suggestionId: string;
-    reason: 'rejected' | 'stale_span' | 'overlap' | 'missing_target' | 'conflict';
+    reason:
+      | 'rejected'
+      | 'stale_span'
+      | 'overlap'
+      | 'missing_target'
+      | 'conflict'
+      | 'unfilled_input';
   }> = [];
 
   const rawText = document?.rawText || '';
@@ -42,6 +49,11 @@ export function applyAcceptedSuggestions(
     if (conflicts.has(s.id)) {
       const reason = (conflicts.get(s.id) as any) || 'overlap';
       skipped.push({ suggestionId: s.id, reason });
+      continue;
+    }
+
+    if (s.requiresInput === true && (s.after ?? '').includes(INPUT_SENTINEL)) {
+      skipped.push({ suggestionId: s.id, reason: 'unfilled_input' });
       continue;
     }
 

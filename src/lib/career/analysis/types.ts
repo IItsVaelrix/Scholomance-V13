@@ -35,9 +35,15 @@ export interface AnalysisEvidence {
   confidence: number;
 }
 
+export interface SuggestionInputSlot {
+  id: string;
+  placeholder: string;
+  hint: string;
+}
+
 export interface ResumeSuggestion {
   id: string;
-  type: 'verb' | 'keyword' | 'acronym' | 'format' | 'structure';
+  type: 'verb' | 'keyword' | 'acronym' | 'format' | 'structure' | 'quantify' | 'tighten';
   target?: {
     span?: TextSpan;
     sectionId?: string;
@@ -51,6 +57,10 @@ export interface ResumeSuggestion {
   risk: 'low' | 'medium' | 'high';
   requiresUserApproval: true;
   status: 'pending' | 'accepted' | 'rejected' | 'edited';
+  /** True when `after` contains one or more U+241F input sentinels the candidate must fill. */
+  requiresInput?: boolean;
+  /** One entry per sentinel in `after`, in left-to-right order. */
+  inputSlots?: SuggestionInputSlot[];
 }
 
 export interface KeywordHitResult {
@@ -106,7 +116,13 @@ export interface SuggestionApplicationResult {
   applied: string[];
   skipped: Array<{
     suggestionId: string;
-    reason: 'rejected' | 'stale_span' | 'overlap' | 'missing_target' | 'conflict';
+    reason:
+      | 'rejected'
+      | 'stale_span'
+      | 'overlap'
+      | 'missing_target'
+      | 'conflict'
+      | 'unfilled_input';
   }>;
 }
 

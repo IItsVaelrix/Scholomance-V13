@@ -309,4 +309,66 @@ describe('Career Suggestions Engine', () => {
       expect(result.text).toContain('TypeScript');
     });
   });
+
+  describe('unfilled input guard', () => {
+    const SENTINEL = '␟';
+
+    const baseDoc: ResumeDocument = {
+      ...dummyDoc,
+      rawText: 'Led the platform migration.',
+    };
+
+    function quantifySuggestion(after: string): ResumeSuggestion {
+      return {
+        id: 'sugg-quantify',
+        type: 'quantify',
+        target: { span: { coordinateSpace: 'raw', start: 0, end: 27 } },
+        before: 'Led the platform migration.',
+        after,
+        reason: 'add a metric',
+        evidence: [],
+        confidence: 0.75,
+        risk: 'low',
+        requiresUserApproval: true,
+        status: 'accepted',
+        requiresInput: true,
+        inputSlots: [{ id: 'slot-0', placeholder: 'headcount', hint: 'how many people' }],
+      };
+    }
+
+    it('never writes a suggestion whose input slot is still unfilled', () => {
+      const result = applyAcceptedSuggestions(baseDoc, [
+        quantifySuggestion(`Led the platform migration, managing a team of ${SENTINEL}`),
+      ]);
+
+      expect(result.applied).toEqual([]);
+      expect(result.skipped).toContainEqual({
+        suggestionId: 'sugg-quantify',
+        reason: 'unfilled_input',
+      });
+      expect(result.text).toBe('Led the platform migration.');
+      expect(result.text).not.toContain(SENTINEL);
+    });
+
+    it('applies the same suggestion once every slot is filled', () => {
+      const result = applyAcceptedSuggestions(baseDoc, [
+        quantifySuggestion('Led the platform migration, managing a team of 6'),
+      ]);
+
+      expect(result.applied).toEqual(['sugg-quantify']);
+      expect(result.text).toBe('Led the platform migration, managing a team of 6');
+    });
+
+    it('ignores the guard for suggestions that do not require input', () => {
+      const plain: ResumeSuggestion = {
+        ...quantifySuggestion('Led the platform migration, managing a team of 6'),
+        id: 'sugg-plain',
+        requiresInput: undefined,
+        inputSlots: undefined,
+      };
+
+      const result = applyAcceptedSuggestions(baseDoc, [plain]);
+      expect(result.applied).toEqual(['sugg-plain']);
+    });
+  });
 });
