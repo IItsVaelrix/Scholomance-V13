@@ -182,9 +182,14 @@ The fix is now the engine's most valuable test — `tests/unit/careerAmplifyAppl
 Launched the mobile app.
 Reduced the deployment pipeline runtime, reducing build time by 40%.
 Led the support team.
+Helped the support team resolve escalations.     ← must survive UNCHANGED
 ```
 
-A green suite that never renders the artifact is a check that cannot fail. Assert the output, not the plan for the output.
+The fourth line is the interesting one: rewriting only its leading verb would produce the ungrammatical `Led the support team resolve escalations.`, so the correct output is no edit at all. Each of the four bullets fails this test if its corresponding fix is reverted — verified by actually reverting each one, not by asserting it.
+
+That verification was not academic. The first version of this test claimed in its own docstring that every bullet tripped its defect, and one of them didn't: the fixture had no catenative clause, so reverting the verb-strength guard left the output byte-identical. **The falsifier had itself become a check that cannot fail** — inside the test written to end that pattern.
+
+A green suite that never renders the artifact proves nothing. Assert the output, not the plan for the output — and prove the assertion can fail by breaking the code on purpose.
 
 ---
 
