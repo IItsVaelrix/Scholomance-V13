@@ -150,6 +150,100 @@ describe('Task 8: UI Parser Preview & Career Workspace State Integration', () =>
     });
   });
 
+  describe('SuggestionReviewPanel input slots', () => {
+    const SENTINEL = '␟';
+
+    function quantifySuggestion(): ResumeSuggestion {
+      return {
+        id: 'sugg-quantify',
+        type: 'quantify',
+        target: { span: { coordinateSpace: 'raw', start: 0, end: 26 } },
+        before: 'Led the billing migration.',
+        after: `Led the billing migration., managing a team of ${SENTINEL}`,
+        reason: 'add a metric',
+        evidence: [],
+        confidence: 0.75,
+        risk: 'low',
+        requiresUserApproval: true,
+        status: 'pending',
+        requiresInput: true,
+        inputSlots: [{ id: 'slot-0', placeholder: 'headcount', hint: 'how many people, e.g. 6' }],
+      };
+    }
+
+    it('renders one input per slot and blocks Accept until every slot is filled', () => {
+      const onAccept = vi.fn();
+      const onEdit = vi.fn();
+
+      render(
+        <SuggestionReviewPanel
+          suggestions={[quantifySuggestion()]}
+          onAccept={onAccept}
+          onReject={vi.fn()}
+          onEdit={onEdit}
+          onAcceptAllLowRisk={vi.fn()}
+        />
+      );
+
+      const slotInput = screen.getByPlaceholderText('how many people, e.g. 6');
+      const acceptButton = screen.getByRole('button', { name: 'Accept' });
+      expect(acceptButton).toBeDisabled();
+
+      fireEvent.change(slotInput, { target: { value: '6' } });
+      expect(acceptButton).not.toBeDisabled();
+
+      fireEvent.click(acceptButton);
+      expect(onEdit).toHaveBeenCalledWith(
+        'sugg-quantify',
+        'Led the billing migration., managing a team of 6'
+      );
+      expect(onAccept).toHaveBeenCalledWith('sugg-quantify');
+    });
+
+    it('never shows the raw sentinel to the user', () => {
+      render(
+        <SuggestionReviewPanel
+          suggestions={[quantifySuggestion()]}
+          onAccept={vi.fn()}
+          onReject={vi.fn()}
+          onEdit={vi.fn()}
+          onAcceptAllLowRisk={vi.fn()}
+        />
+      );
+
+      expect(document.body.textContent).not.toContain(SENTINEL);
+    });
+
+    it('leaves suggestions without slots rendering exactly as before', () => {
+      const plain: ResumeSuggestion = {
+        id: 'sugg-verb',
+        type: 'verb',
+        target: { span: { coordinateSpace: 'raw', start: 0, end: 6 } },
+        before: 'Helped',
+        after: 'Led',
+        reason: 'stronger verb',
+        evidence: [],
+        confidence: 0.85,
+        risk: 'low',
+        requiresUserApproval: true,
+        status: 'pending',
+      };
+
+      render(
+        <SuggestionReviewPanel
+          suggestions={[plain]}
+          onAccept={vi.fn()}
+          onReject={vi.fn()}
+          onEdit={vi.fn()}
+          onAcceptAllLowRisk={vi.fn()}
+        />
+      );
+
+      expect(screen.queryByRole('textbox')).toBeNull();
+      expect(screen.getByRole('button', { name: 'Accept' })).not.toBeDisabled();
+    });
+  });
+
   describe('CareerPage Integration', () => {
     it('executes full workflow: file/paste -> Parse & Inspect Résumé -> ParserPreviewDrawer -> Confirm & Align JD -> ATS Scorecard & Clean Export', async () => {
       render(<CareerPage />);

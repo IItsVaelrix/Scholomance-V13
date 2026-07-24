@@ -209,7 +209,9 @@ export default function CareerPage() {
 
   const handleAcceptAllLowRisk = () => {
     setSuggestions((prev) =>
-      prev.map((s) => (s.risk === 'low' ? { ...s, status: 'accepted' } : s))
+      prev.map((s) =>
+        s.risk === 'low' && s.requiresInput !== true ? { ...s, status: 'accepted' } : s
+      )
     );
   };
 

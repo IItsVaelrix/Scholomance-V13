@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { ResumeSuggestion } from '../../lib/career/analysis/types';
+import { INPUT_SENTINEL } from '../../lib/career/amplify/data/input-sentinel';
 
 export interface SuggestionReviewPanelProps {
   suggestions: ResumeSuggestion[];
@@ -18,6 +19,33 @@ export default function SuggestionReviewPanel({
 }: SuggestionReviewPanelProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState<string>('');
+  const [slotValues, setSlotValues] = useState<Record<string, string>>({});
+
+  const setSlotValue = (slotId: string, value: string) => {
+    setSlotValues((prev) => ({ ...prev, [slotId]: value }));
+  };
+
+  /** Left-to-right substitution of each sentinel by its slot's current value. */
+  const fillSlots = (suggestion: ResumeSuggestion): string => {
+    const segments = (suggestion.after || '').split(INPUT_SENTINEL);
+    return segments
+      .map((segment, index) => {
+        if (index === segments.length - 1) return segment;
+        const slot = suggestion.inputSlots?.[index];
+        return segment + (slot ? slotValues[slot.id] || '' : '');
+      })
+      .join('');
+  };
+
+  const slotsFilled = (suggestion: ResumeSuggestion): boolean =>
+    (suggestion.inputSlots || []).every((slot) => (slotValues[slot.id] || '').trim().length > 0);
+
+  const handleAcceptSuggestion = (suggestion: ResumeSuggestion) => {
+    if (suggestion.requiresInput && onEdit) {
+      onEdit(suggestion.id, fillSlots(suggestion));
+    }
+    onAccept(suggestion.id);
+  };
 
   const handleStartEdit = (suggestion: ResumeSuggestion) => {
     setEditingId(suggestion.id);
@@ -37,7 +65,7 @@ export default function SuggestionReviewPanel({
   };
 
   const lowRiskPendingCount = suggestions.filter(
-    (s) => s.risk === 'low' && s.status !== 'accepted'
+    (s) => s.risk === 'low' && s.status !== 'accepted' && s.requiresInput !== true
   ).length;
 
   return (
@@ -64,6 +92,8 @@ export default function SuggestionReviewPanel({
             const isEditing = editingId === sug.id;
             const isAccepted = sug.status === 'accepted';
             const isRejected = sug.status === 'rejected';
+            const needsInput = sug.requiresInput === true && (sug.inputSlots || []).length > 0;
+            const acceptBlocked = needsInput && !slotsFilled(sug);
 
             return (
               <div
@@ -109,18 +139,40 @@ export default function SuggestionReviewPanel({
                         </button>
                       </div>
                     ) : (
-                      <span className="preview-text preview-text--after">{sug.after || '(None)'}</span>
+                      <span className="preview-text preview-text--after">
+                        {needsInput ? fillSlots(sug) || '(fill in the blanks below)' : sug.after || '(None)'}
+                      </span>
                     )}
                   </div>
                 </div>
+
+                {needsInput && (
+                  <div className="suggestion-slots">
+                    {(sug.inputSlots || []).map((slot) => (
+                      <label key={slot.id} className="suggestion-slot">
+                        <span className="suggestion-slot-label">{slot.placeholder}</span>
+                        <input
+                          type="text"
+                          className="suggestion-slot-input"
+                          placeholder={slot.hint}
+                          value={slotValues[slot.id] || ''}
+                          onChange={(e) => setSlotValue(slot.id, e.target.value)}
+                        />
+                      </label>
+                    ))}
+                    <p className="suggestion-slot-note">
+                      These numbers are yours — nothing is added to your résumé until you fill them in.
+                    </p>
+                  </div>
+                )}
 
                 <p className="suggestion-reason">{sug.reason}</p>
 
                 <div className="suggestion-controls">
                   <button
                     className={`btn btn-control btn-accept ${isAccepted ? 'active' : ''}`}
-                    onClick={() => onAccept(sug.id)}
-                    disabled={isAccepted}
+                    onClick={() => handleAcceptSuggestion(sug)}
+                    disabled={isAccepted || acceptBlocked}
                   >
                     Accept
                   </button>
