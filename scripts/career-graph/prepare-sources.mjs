@@ -119,7 +119,11 @@ async function listFiles(dir) {
  * prefix/substring match). Returns true if the file name contains the pattern.
  */
 function matchesPattern(fileName, pattern) {
-  return fileName.toLowerCase().includes(pattern.toLowerCase());
+  const lower = fileName.toLowerCase();
+  if (pattern.toLowerCase() === 'skill' && (lower.includes('activities') || lower.includes('context'))) {
+    return false;
+  }
+  return lower.includes(pattern.toLowerCase());
 }
 
 /**
