@@ -32,7 +32,7 @@ export default function SuggestionReviewPanel({
       .map((segment, index) => {
         if (index === segments.length - 1) return segment;
         const slot = suggestion.inputSlots?.[index];
-        return segment + (slot ? slotValues[slot.id] || '' : '');
+        return segment + (slot ? (slotValues[slot.id] || '').trim() : '');
       })
       .join('');
   };
@@ -183,7 +183,7 @@ export default function SuggestionReviewPanel({
                   >
                     Reject
                   </button>
-                  {onEdit && !isEditing && (
+                  {onEdit && !isEditing && !needsInput && (
                     <button className="btn btn-control btn-edit" onClick={() => handleStartEdit(sug)}>
                       Edit
                     </button>

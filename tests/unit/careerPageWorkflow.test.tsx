@@ -214,6 +214,65 @@ describe('Task 8: UI Parser Preview & Career Workspace State Integration', () =>
       expect(document.body.textContent).not.toContain(SENTINEL);
     });
 
+    it('maps N > 1 typed slot values into the correct left-to-right sentinel positions', () => {
+      const onAccept = vi.fn();
+      const onEdit = vi.fn();
+
+      const multiSlotSuggestion: ResumeSuggestion = {
+        id: 'sugg-quantify-multi',
+        type: 'quantify',
+        target: { span: { coordinateSpace: 'raw', start: 0, end: 40 } },
+        before: 'Grew trial signups.',
+        after: `Grew trial signups, increasing ${SENTINEL} by ${SENTINEL}% (from ${SENTINEL} to ${SENTINEL})`,
+        reason: 'add a metric',
+        evidence: [],
+        confidence: 0.75,
+        risk: 'low',
+        requiresUserApproval: true,
+        status: 'pending',
+        requiresInput: true,
+        inputSlots: [
+          { id: 'slot-0', placeholder: 'metric', hint: 'what metric, e.g. signups' },
+          { id: 'slot-1', placeholder: 'percent', hint: 'percent increase, e.g. 40' },
+          { id: 'slot-2', placeholder: 'from value', hint: 'starting value, e.g. 100' },
+          { id: 'slot-3', placeholder: 'to value', hint: 'ending value, e.g. 140' },
+        ],
+      };
+
+      render(
+        <SuggestionReviewPanel
+          suggestions={[multiSlotSuggestion]}
+          onAccept={onAccept}
+          onReject={vi.fn()}
+          onEdit={onEdit}
+          onAcceptAllLowRisk={vi.fn()}
+        />
+      );
+
+      const metricInput = screen.getByPlaceholderText('what metric, e.g. signups');
+      const percentInput = screen.getByPlaceholderText('percent increase, e.g. 40');
+      const fromInput = screen.getByPlaceholderText('starting value, e.g. 100');
+      const toInput = screen.getByPlaceholderText('ending value, e.g. 140');
+      const acceptButton = screen.getByRole('button', { name: 'Accept' });
+
+      expect(acceptButton).toBeDisabled();
+
+      fireEvent.change(metricInput, { target: { value: 'signups' } });
+      fireEvent.change(percentInput, { target: { value: '40' } });
+      fireEvent.change(fromInput, { target: { value: '100' } });
+      expect(acceptButton).toBeDisabled();
+
+      fireEvent.change(toInput, { target: { value: '140' } });
+      expect(acceptButton).not.toBeDisabled();
+
+      fireEvent.click(acceptButton);
+      expect(onEdit).toHaveBeenCalledWith(
+        'sugg-quantify-multi',
+        'Grew trial signups, increasing signups by 40% (from 100 to 140)'
+      );
+      expect(onAccept).toHaveBeenCalledWith('sugg-quantify-multi');
+    });
+
     it('leaves suggestions without slots rendering exactly as before', () => {
       const plain: ResumeSuggestion = {
         id: 'sugg-verb',

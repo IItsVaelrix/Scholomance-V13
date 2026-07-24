@@ -1310,6 +1310,10 @@
   flex: 1;
   padding: 0.35rem 0.5rem;
   font: inherit;
+  background: #02040a;
+  border: 1px solid var(--gold-leaf);
+  color: #fff;
+  border-radius: 3px;
 }
 
 .suggestion-slot-note {
