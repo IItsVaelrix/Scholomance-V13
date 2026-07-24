@@ -53,6 +53,17 @@ import {
 import VideoForgePage from "./pages/VideoForge/VideoForgePage.tsx";
 
 import { AdminRoute } from "./components/AdminRoute.jsx";
+import {
+  createSeedCareerGraphClient,
+  isSeedCareerGraphEnabled,
+} from "./lib/career/graph/seed-client";
+
+// Career Graph (seed) is opt-in via feature flag; default stays the proven
+// lexical ATS flow. When enabled, a real CareerGraphClient drives the in-memory
+// seed transport (the same client that will later drive the SQLite-WASM worker).
+const careerGraphClient = isSeedCareerGraphEnabled()
+  ? createSeedCareerGraphClient()
+  : undefined;
 
 // DEV-ONLY de-risking spike (PDR-2026-06-04-GODOT-WASM-COMBAT-SPIKE).
 // The guard `import.meta.env.DEV` is statically false in production, so the route is
@@ -134,7 +145,7 @@ const router = createBrowserRouter([
           { path: "nexus", element: <Navigate to="/constellation" replace /> },
           { path: "collab", element: <AdminRoute><CollabPage /></AdminRoute> },
           { path: "pixelbrain", element: <AdminRoute><PixelBrainPage /></AdminRoute> },
-          { path: "career", element: <AdminRoute><CareerPage /></AdminRoute> },
+          { path: "career", element: <AdminRoute><CareerPage graphClient={careerGraphClient} /></AdminRoute> },
           { path: "wand", element: <AdminRoute><WandPage /></AdminRoute> },
           { path: "wand/graph", element: <AdminRoute><WandGraphPage /></AdminRoute> },
           { path: "div-wand", element: <AdminRoute><DivWandPage /></AdminRoute> },
