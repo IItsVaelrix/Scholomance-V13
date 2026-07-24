@@ -52,7 +52,7 @@ const LEXICON_MULTIPLIER = 1.5;
 // otherwise it is dead config the analyzer can never consult. Hence the hyphenated
 // 'ci-cd' (which normalizeText preserves) rather than the length-2 'ci'/'cd' tokens
 // that tokenize() would drop before the lexicon is reached.
-const DEFAULT_SKILLS_LEXICON = Object.freeze([
+export const DEFAULT_SKILLS_LEXICON = Object.freeze([
   'javascript', 'typescript', 'python', 'java', 'react', 'node', 'sql',
   'aws', 'azure', 'docker', 'kubernetes', 'graphql', 'rest', 'api',
   'ci-cd', 'devops', 'git', 'agile', 'scrum', 'testing', 'design', 'data',
