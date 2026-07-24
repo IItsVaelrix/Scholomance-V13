@@ -6,6 +6,7 @@ import SuggestionReviewPanel from '../../src/pages/Career/SuggestionReviewPanel'
 import CareerPage from '../../src/pages/Career/CareerPage';
 import type { ResumeDocument } from '../../src/lib/career/parser/types';
 import type { ResumeSuggestion } from '../../src/lib/career/analysis/types';
+import { INPUT_SENTINEL } from '../../src/lib/career/amplify/data/input-sentinel';
 
 describe('Task 8: UI Parser Preview & Career Workspace State Integration', () => {
   const mockDoc: ResumeDocument = {
@@ -300,6 +301,56 @@ describe('Task 8: UI Parser Preview & Career Workspace State Integration', () =>
 
       expect(screen.queryByRole('textbox')).toBeNull();
       expect(screen.getByRole('button', { name: 'Accept' })).not.toBeDisabled();
+    });
+
+    it('re-emits the sentinel for a slot the template forgot to declare, instead of a silent gap (data drift: 2 sentinels, 1 slot)', () => {
+      const onAccept = vi.fn();
+      const onEdit = vi.fn();
+
+      // Simulates a metric template whose sentinel count and inputSlots list have
+      // drifted apart: `after` has two blanks, but only one is declared as a slot.
+      const driftedSuggestion: ResumeSuggestion = {
+        id: 'sugg-drift',
+        type: 'quantify',
+        target: { span: { coordinateSpace: 'raw', start: 0, end: 21 } },
+        before: 'Cut support tickets.',
+        after: `Cut support tickets by ${INPUT_SENTINEL}%, saving ${INPUT_SENTINEL} hours weekly`,
+        reason: 'add a metric',
+        evidence: [],
+        confidence: 0.75,
+        risk: 'low',
+        requiresUserApproval: true,
+        status: 'pending',
+        requiresInput: true,
+        inputSlots: [{ id: 'slot-0', placeholder: 'percent', hint: 'percent reduction, e.g. 40' }],
+      };
+
+      render(
+        <SuggestionReviewPanel
+          suggestions={[driftedSuggestion]}
+          onAccept={onAccept}
+          onReject={vi.fn()}
+          onEdit={onEdit}
+          onAcceptAllLowRisk={vi.fn()}
+        />
+      );
+
+      const percentInput = screen.getByPlaceholderText('percent reduction, e.g. 40');
+      fireEvent.change(percentInput, { target: { value: '40' } });
+
+      // slotsFilled only inspects inputSlots, so filling the single declared slot
+      // enables Accept even though a second, undeclared sentinel remains in `after`.
+      // That's the real behavior of this code today — the apply-engine's
+      // unfilled_input guard is what actually stops this suggestion from reaching
+      // the résumé, not this button's disabled state.
+      const acceptButton = screen.getByRole('button', { name: 'Accept' });
+      expect(acceptButton).not.toBeDisabled();
+
+      fireEvent.click(acceptButton);
+      expect(onEdit).toHaveBeenCalledTimes(1);
+      const [, appliedText] = onEdit.mock.calls[0];
+      expect(appliedText).toContain(INPUT_SENTINEL);
+      expect(onAccept).toHaveBeenCalledWith('sugg-drift');
     });
   });
 

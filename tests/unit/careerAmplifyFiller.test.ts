@@ -67,6 +67,27 @@ describe('filler rule', () => {
     }
   });
 
+  it('does not emit overlapping suggestions when a leading-filler extension reaches into a range another pattern already claimed', () => {
+    // "successfully" is a leading filler with an empty replacement, so it extends
+    // through the following word ("a") to avoid lowercasing the bullet. That
+    // extended span ("Successfully a") reaches into "a variety of ", which the
+    // a_variety_of pattern claims first. The overlap check must be run against
+    // the FINAL extended span, not the pre-extension one, or both suggestions
+    // survive and collide.
+    const raw = 'Successfully a variety of improvements were made.';
+    const suggestions = run(raw);
+
+    for (let i = 1; i < suggestions.length; i++) {
+      expect(suggestions[i].target!.span!.start).toBeGreaterThanOrEqual(
+        suggestions[i - 1].target!.span!.end
+      );
+    }
+    for (const sug of suggestions) {
+      const sliced = raw.slice(sug.target!.span!.start, sug.target!.span!.end);
+      expect(sliced).toBe(sug.before);
+    }
+  });
+
   it('stays silent on a clean line', () => {
     expect(run('Reduced build time by 40%.')).toEqual([]);
   });

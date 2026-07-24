@@ -27,9 +27,7 @@ export function fillerRule(ctx: AmplifyContext): ResumeSuggestion[] {
     for (const { rule, pattern, after } of FILLER_PATTERNS) {
       for (const match of line.text.matchAll(pattern)) {
         const start = match.index ?? 0;
-        const end = start + match[0].length;
-        const overlaps = claimed.some((c) => start < c.end && c.start < end);
-        if (overlaps) continue;
+        const matchEnd = start + match[0].length;
 
         let before = match[0];
         let replacement = after;
@@ -38,13 +36,21 @@ export function fillerRule(ctx: AmplifyContext): ResumeSuggestion[] {
         // start of the bullet ("Successfully launched..." -> "launched..."). Extend
         // through the following word and capitalize it instead.
         if (replacement === '' && (start === 0 || start === leadingOffset)) {
-          const following = /^[A-Za-z]+/.exec(line.text.slice(end));
+          const following = /^[A-Za-z]+/.exec(line.text.slice(matchEnd));
           if (!following) continue;
-          before = line.text.slice(start, end + following[0].length);
+          before = line.text.slice(start, matchEnd + following[0].length);
           replacement = capitalizeFirst(following[0]);
         }
 
-        claimed.push({ start, end: start + before.length });
+        // Check the overlap against the FINAL (possibly extended) span, and claim
+        // that same final span — otherwise an extended match can pass the check
+        // against its pre-extension window and then overlap a range an earlier
+        // pattern already claimed.
+        const end = start + before.length;
+        const overlaps = claimed.some((c) => start < c.end && c.start < end);
+        if (overlaps) continue;
+
+        claimed.push({ start, end });
         hits.push({ rule, offset: start, before, after: replacement });
       }
     }
