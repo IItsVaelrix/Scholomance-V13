@@ -211,15 +211,62 @@ export async function extractPdfDocument(
     });
   } else {
     // Detect multi-column layout from x-coordinates
-    const leftColBlocks = blocks.filter((b) => typeof b.bbox?.x === 'number' && b.bbox.x < 250);
-    const rightColBlocks = blocks.filter((b) => typeof b.bbox?.x === 'number' && b.bbox.x >= 250);
+    const blocksWithBbox = blocks.filter((b) => typeof b.bbox?.x === 'number');
+    if (blocksWithBbox.length > 1) {
+      // Cluster x-coordinates within 60pt tolerance
+      const clusters: ExtractedTextBlock[][] = [];
+      for (const block of blocksWithBbox) {
+        const x = block.bbox!.x;
+        const matchedCluster = clusters.find((cluster) =>
+          cluster.some((b) => Math.abs(b.bbox!.x - x) < 60)
+        );
+        if (matchedCluster) {
+          matchedCluster.push(block);
+        } else {
+          clusters.push([block]);
+        }
+      }
 
-    if (leftColBlocks.length >= 2 && rightColBlocks.length >= 2) {
-      diagnostics.push({
-        code: 'MULTI_COLUMN_LAYOUT',
-        severity: 'warning',
-        message: 'Multi-column PDF layout detected; reading order may be fragmented across columns.',
+      // A substantial column has at least 2 blocks at distinct y positions
+      const substantialColumns = clusters.filter((cluster) => {
+        const uniqueYs = new Set(cluster.map((b) => b.bbox?.y));
+        return uniqueYs.size >= 2;
       });
+
+      // Check if any pair of substantial column clusters overlap vertically in y
+      let hasOverlappingColumns = false;
+      for (let i = 0; i < substantialColumns.length; i++) {
+        for (let j = i + 1; j < substantialColumns.length; j++) {
+          const colA = substantialColumns[i];
+          const colB = substantialColumns[j];
+
+          const ysA = colA.map((b) => b.bbox!.y).filter((y): y is number => typeof y === 'number');
+          const ysB = colB.map((b) => b.bbox!.y).filter((y): y is number => typeof y === 'number');
+
+          if (ysA.length === 0 || ysB.length === 0) continue;
+
+          const minYA = Math.min(...ysA);
+          const maxYA = Math.max(...ysA);
+          const minYB = Math.min(...ysB);
+          const maxYB = Math.max(...ysB);
+
+          // Overlap exists if max of mins <= min of maxs + tolerance (20pt)
+          const overlap = Math.max(minYA, minYB) <= Math.min(maxYA, maxYB) + 20;
+          if (overlap) {
+            hasOverlappingColumns = true;
+            break;
+          }
+        }
+        if (hasOverlappingColumns) break;
+      }
+
+      if (hasOverlappingColumns) {
+        diagnostics.push({
+          code: 'MULTI_COLUMN_LAYOUT',
+          severity: 'warning',
+          message: 'Multi-column PDF layout detected; reading order may be fragmented across columns.',
+        });
+      }
     }
   }
 

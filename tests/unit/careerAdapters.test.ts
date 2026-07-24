@@ -278,6 +278,77 @@ endobj
     expect(diag).toBeUndefined();
   });
 
+  it('does NOT emit MULTI_COLUMN_LAYOUT for a single-column body with a multi-line sub-indent', async () => {
+    // Left-aligned body at x=72 with a sub-indented bullet list at x=128 (56pt
+    // in). That is one logical column with hanging indentation, not two columns
+    // — the gap is far narrower than a real résumé gutter.
+    const subIndentPdf = `%PDF-1.4
+1 0 obj
+<< /Type /Page >>
+endobj
+2 0 obj
+<< /Length 400 >>
+stream
+BT /F1 11 Tf 1 0 0 1 72 700 Tm (Led the platform team and shipped) Tj ET
+BT /F1 11 Tf 1 0 0 1 72 680 Tm (Owned the billing rewrite end to end) Tj ET
+BT /F1 11 Tf 1 0 0 1 72 660 Tm (Highlights included:) Tj ET
+BT /F1 11 Tf 1 0 0 1 128 640 Tm (cut latency by forty percent) Tj ET
+BT /F1 11 Tf 1 0 0 1 128 620 Tm (migrated to a new datastore) Tj ET
+endstream
+endobj
+%%EOF`;
+    const result = await extractPdfDocument(new TextEncoder().encode(subIndentPdf), 'sub-indent.pdf');
+    const diag = result.diagnostics.find((d) => d.code === 'MULTI_COLUMN_LAYOUT');
+    expect(diag).toBeUndefined();
+  });
+
+  it('does NOT emit MULTI_COLUMN_LAYOUT for a multi-line centered header above the body', async () => {
+    // A 2-line centered contact block (x=250, high on the page) sitting ABOVE
+    // left-aligned body (x=72). Both form clusters with >=2 lines, but they do
+    // not overlap vertically — a header is not a column. Distance alone cannot
+    // distinguish this from a real column; vertical coexistence can.
+    const centeredHeaderPdf = `%PDF-1.4
+1 0 obj
+<< /Type /Page >>
+endobj
+2 0 obj
+<< /Length 300 >>
+stream
+BT /F1 11 Tf 1 0 0 1 250 720 Tm (123 Main Street, Springfield) Tj ET
+BT /F1 11 Tf 1 0 0 1 250 705 Tm (jane@example.com  555-1212) Tj ET
+BT /F1 11 Tf 1 0 0 1 72 670 Tm (Managed backend services) Tj ET
+BT /F1 11 Tf 1 0 0 1 72 650 Tm (Built REST APIs) Tj ET
+endstream
+endobj
+%%EOF`;
+    const result = await extractPdfDocument(new TextEncoder().encode(centeredHeaderPdf), 'centered.pdf');
+    expect(result.diagnostics.find((d) => d.code === 'MULTI_COLUMN_LAYOUT')).toBeUndefined();
+  });
+
+  it('emits MULTI_COLUMN_LAYOUT for two vertically-overlapping columns left of page center', async () => {
+    // Genuine two-column layout whose columns both sit left of x=250 (skills at
+    // x=60, experience at x=200) and run down the page together. A center-line
+    // heuristic would miss this; vertical overlap catches it.
+    const narrowColumnsPdf = `%PDF-1.4
+1 0 obj
+<< /Type /Page >>
+endobj
+2 0 obj
+<< /Length 300 >>
+stream
+BT /F1 11 Tf 1 0 0 1 60 700 Tm (Skills) Tj ET
+BT /F1 11 Tf 1 0 0 1 60 680 Tm (Python and Rust) Tj ET
+BT /F1 11 Tf 1 0 0 1 200 700 Tm (Experience at Acme Corp) Tj ET
+BT /F1 11 Tf 1 0 0 1 200 680 Tm (Shipped the billing rewrite) Tj ET
+endstream
+endobj
+%%EOF`;
+    const result = await extractPdfDocument(new TextEncoder().encode(narrowColumnsPdf), 'narrow.pdf');
+    const diag = result.diagnostics.find((d) => d.code === 'MULTI_COLUMN_LAYOUT');
+    expect(diag).toBeDefined();
+    expect(diag?.severity).toBe('warning');
+  });
+
   it('records the horizontal position of each text run in block.bbox.x', async () => {
     const result = await extractPdfDocument(new TextEncoder().encode(twoColumnPdf), 'two-col.pdf');
     const leftBlock = result.blocks.find((b) => b.text.includes('Managed backend'));
