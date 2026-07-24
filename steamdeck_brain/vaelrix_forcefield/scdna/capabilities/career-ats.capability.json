@@ -1,0 +1,87 @@
+{
+  "contract": "SCDNA-CAPABILITY-v1",
+  "version": "1.0.0",
+  "domain": "career-ats",
+  "surfaces": [
+    "src/lib/career/**",
+    "codex/core/career/**",
+    "src/pages/Career/**"
+  ],
+  "capabilities": [
+    {
+      "need": "raw file/text -> ResumeDocument (the one ingestion entry point)",
+      "canonical": "parseResumeSource — assembles extraction + normalization + contact + section detection + validation for pdf/docx/txt/paste",
+      "path": "src/lib/career/parser/parse-resume.ts",
+      "evidence": "spec docs/superpowers/specs/2026-07-24-ats-parser-architecture-design.md; adapters live under src/lib/career/parser/adapters/",
+      "forbidden": [
+        "adding an ingestion path outside parser/adapters/",
+        "bypassing normalization so spans lose their offsetMap coordinate space"
+      ]
+    },
+    {
+      "need": "PDF text-layer extraction and image-only refusal",
+      "canonical": "extractPdfDocument — parses BT..ET text runs, inflates FlateDecode streams, emits IMAGE_ONLY_PDF when no machine-readable text layer exists",
+      "path": "src/lib/career/parser/adapters/pdf.ts",
+      "evidence": "bbox + MULTI_COLUMN_LAYOUT detection is CORRECT as of 2026-07-24. Final detector: cluster x-origins within 60pt; a substantial column has >=2 distinct y; fire only when two substantial columns OVERLAP vertically in y (20pt tolerance). This is the key insight — a centered header sits ABOVE the body (disjoint y) so it is NOT a column; real side-by-side columns share a y-range. Distance alone cannot tell them apart; vertical coexistence can. Resolves both the original never-emit (check-that-cannot-fail) AND the over-fire it briefly regressed into. Locked by 6 regression tests in tests/unit/careerAdapters.test.ts (positive two-col, single-col, sub-indent, centered header, narrow columns both left of center, bbox.x).",
+      "forbidden": [
+        "adding OCR — probabilistic glyph text rots the strict MatchKind matcher and masks bad input; the refusal is the correct product behavior",
+        "weakening the detector to an x-distance-only rule — it over-fires on centered headers (distance cannot distinguish a header from a column; vertical y-overlap can)"
+      ]
+    },
+    {
+      "need": "deterministic content-derived IDs for blocks / sections / suggestions",
+      "canonical": "stableHash (DJB2) + makeBlockId / makeSectionId / makeSuggestionId",
+      "path": "src/lib/career/parser/identity-utils.ts",
+      "forbidden": [
+        "Math.random() or Date/timestamp in any career-domain identifier — repeated parses must be byte-identical (gate §6.1)"
+      ]
+    },
+    {
+      "need": "strict phrase-match classification (exact/normalized/alias/component_only/missing)",
+      "canonical": "analyzeKeywordGapStrict — requires a contiguous token run for phrase credit; disconnected components are component_only and contribute 0 to literal keyword coverage",
+      "path": "src/lib/career/analysis/keyword-matcher.ts",
+      "forbidden": [
+        "loose stem co-occurrence / bigram matching (the pre-V2 behavior this replaced)",
+        "crediting a phrase whose tokens are scattered across the resume"
+      ]
+    },
+    {
+      "need": "prose legibility — is a resume line ATS-garbled?",
+      "canonical": "analyzeResumeLegibility — real HMM arbiter (runAtsHmmPass), per-token logProb signals",
+      "path": "codex/core/career/ats-hmm/index.js",
+      "evidence": "REAL, NOT A STUB: codex/core/career/ats-hmm/atsArbiter.model.js is 202 lines of actual HMM; wired at src/lib/career/analysis/analyze-career.ts:14",
+      "forbidden": [
+        "replacing it with a hand-rolled readability heuristic",
+        "a stub that returns a constant legibility score"
+      ]
+    },
+    {
+      "need": "decompressed ATS scorecard (NOT a single uncalibrated 0-100)",
+      "canonical": "computeAtsScorecard — 6 dims (parseQuality, sectionCoverage, literalKeywordCoverage, canonicalSkillCoverage, legibility, formattingRisk); composite omitted until corpus calibration",
+      "path": "src/lib/career/analysis/scorecard.ts",
+      "forbidden": [
+        "reintroducing overallScore before calibration (spec §2.3)",
+        "keying formattingRisk off any diagnostic no adapter emits — the original never-emit trap; every risk input must have a producing code path"
+      ]
+    },
+    {
+      "need": "reviewable suggestions + deterministic application",
+      "canonical": "applyAcceptedSuggestions — applies accepted edits highest-offset-to-lowest, conflict/overlap aware; build-suggestions produces requiresUserApproval:true objects",
+      "path": "src/lib/career/suggestions/apply-suggestions.ts",
+      "forbidden": [
+        "auto-applying any suggestion without user approval",
+        "inventing or injecting skills the resume does not support",
+        "letting a stale-revision suggestion mutate a newer workspace"
+      ]
+    },
+    {
+      "need": "clean resume export (strictly resume content)",
+      "canonical": "buildCleanExport — plain .txt with no Sigil scaffolding",
+      "path": "src/lib/career/export/clean-export.ts",
+      "forbidden": [
+        "SCHOLOMANCE CAREER SIGIL headers/footers, [BINDING COMPLETE], CORE RESONANCE lines, or appended keyword anchor piles"
+      ]
+    }
+  ],
+  "checksum": "scd64:a003820ece57c960698b119f2032f9a65f151c5538ab23ec4f2846e92b84913e"
+}
