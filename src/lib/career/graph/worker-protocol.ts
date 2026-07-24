@@ -27,6 +27,7 @@ export type CareerGraphWorkerResponse =
   | { requestId: string; kind: 'analysis'; artifactId: string; payload: CareerGraphAnalysis }
   | { requestId: string; kind: 'ready'; manifest: CareerGraphManifest }
   | { requestId: string; kind: 'error'; code: string; message: string }
+  | { requestId: string; kind: 'degraded'; code: string; message?: string }
   | { requestId: string; kind: 'cancelled' };
 
 export interface ParsedWorkerResponse {
@@ -88,6 +89,20 @@ export function parseWorkerResponse(raw: unknown): ParsedWorkerResponse {
     }
     case 'cancelled': {
       return { success: true, response: { requestId, kind: 'cancelled' } };
+    }
+    case 'degraded': {
+      if (typeof msg.code !== 'string' || msg.code.length === 0) {
+        return fail('INVALID_DEGRADED');
+      }
+      return {
+        success: true,
+        response: {
+          requestId,
+          kind: 'degraded',
+          code: msg.code,
+          message: typeof msg.message === 'string' ? msg.message : undefined,
+        },
+      };
     }
     default:
       return fail('UNKNOWN_KIND');
