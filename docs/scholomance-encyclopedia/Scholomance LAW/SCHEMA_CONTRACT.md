@@ -2657,6 +2657,75 @@ Backward compatible until: [date or "immediate breaking change"]
 
 ---
 
+## Career Graph Contract (O*NET + ESCO)
+
+Source of truth: `src/lib/career/graph/contracts.ts` (TypeScript), mirrored 1:1 by
+Zod boundary schemas in `src/lib/career/graph/schemas.ts` and frozen policy constants
+in `src/lib/career/graph/policies.ts`. The Career Graph is browser-local: résumé text,
+job-description text, evidence spans, and query vectors never leave the device.
+
+### Identity rules
+
+- O*NET and ESCO identities stay namespaced and distinct. A concept id is
+  `onet:<SOC code>` (e.g. `onet:15-1252.00`) or `esco:<concept URI>`.
+- A crosswalk edge is the predicate `mapped_to`, **never** `same_as`.
+- `career_relation` is the sole Career Graph edge store.
+- Every emitted concept carries provenance: `relationPath` (edge path) and `sources`
+  (contributing source-release ids).
+
+### Law invariants
+
+- An occupation-only skill can never be classified `missing`; posting (job-description)
+  evidence is mandatory for a `missing` classification.
+- No top-level ATS pass probability or `overallScore` is ever produced.
+- IDs, ordering, policy bundles, and build outputs are deterministic; no timestamp or
+  `Math.random()` participates in runtime behavior.
+
+### `CareerPolicyBundle` (frozen, embedded in every result)
+
+| Field | Literal |
+|-------|---------|
+| `occupationInference` | `occupation-inference-v1` |
+| `candidateFrontier` | `career-frontier-v1` |
+| `relationTraversal` | `career-traversal-v1` |
+| `shard` | `career-shard-v1` |
+| `skillClassification` | `career-evidence-v1` |
+| `scorecard` | `career-scorecard-v2` |
+| `thresholdChecksum` | deterministic FNV-1a hex of the frozen thresholds |
+
+### `SkillClassification`
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `conceptId` | `string` | namespaced concept id |
+| `label` | `string` | preferred label |
+| `classification` | `SkillClass` | `demonstrated` \| `adjacent` \| `missing` \| `not_required` \| `ambiguous` |
+| `requirement` | `RequirementKind` | `required` \| `preferred` \| `optional` \| `none` |
+| `relationPath` | `string[]` | edge provenance |
+| `sources` | `string[]` | source-release ids |
+| `jobEvidence` | `TextSpan[]` | posting evidence; mandatory for `missing` |
+| `resumeEvidence` | `TextSpan[]` | résumé evidence |
+| `scores` | `{ job, occupation, resume, semantic }` | `semantic` is `number \| null` |
+
+### `CareerGraphAnalysis`
+
+| Field | Type |
+|-------|------|
+| `artifactId` | `string` (e.g. `career-graph:onet-30.3:esco-1.2.1`) |
+| `policy` | `CareerPolicyBundle` |
+| `occupations` | `OccupationCandidate[]` |
+| `skills` | `SkillClassification[]` |
+| `diagnostics` | `CareerGraphDiagnostic[]` |
+| `mode` | `graph_semantic` \| `graph` \| `lexical` |
+
+`OccupationCandidate` carries `conceptId`, `label`, `namespace` (`onet` \| `esco`),
+optional `socMajorGroup`/`family`, `score` (0–1), `bucket` (`exact` \| `alias` \| `fts`),
+`relationPath`, `sources`, and `jobEvidence`. Ordering is bucket desc, score desc,
+conceptId asc. `CareerGraphManifest` seals a built artifact with `artifactId`, `policy`,
+`sources`, `conceptCount`, `relationCount`, and a deterministic `checksum`.
+
+---
+
 ## Version Log
 
 | Version | Date | Change | Breaking |
@@ -2693,6 +2762,7 @@ Backward compatible until: [date or "immediate breaking change"]
 | 1.29 | 2026-06-20 | Added Memory Cell Osmosis TurboQuant receptor contracts for diagnostic-memory anomaly evaluation | no |
 | 1.30 | 2026-06-29 | Added the internal PixelBrain pipeline golden corpus report contract for mutation and finish-suite corpus execution | no |
 | 1.33 | 2026-07-18 | Added Lexical Graph Foundation overlay schemas (`LexicalEntry`, relations, literary devices, embeddings, FTS cursor) | no |
+| 1.34 | 2026-07-24 | Added Career Graph contracts (`CareerPolicyBundle`, `OccupationCandidate`, `SkillClassification`, `CareerGraphAnalysis`, `CareerGraphManifest`) with namespaced O*NET/ESCO identities, `mapped_to` crosswalk predicate, and the mandatory-posting-evidence missing-skill law | no |
 
 ---
 
