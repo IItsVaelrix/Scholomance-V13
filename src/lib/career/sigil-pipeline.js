@@ -15,6 +15,10 @@ import { transmuteToSigil, transmuteToSigilWithProvenance } from './transmuter.j
 import { assembleDataArchive } from './data-archive.js';
 import { analyzeAcronymCoverage } from './acronyms.js';
 import { analyzeResumeLegibility } from '../../../codex/core/career/ats-hmm/index.js';
+import { analyzeCareerFit } from './analysis/analyze-career.js';
+
+export { analyzeCareerFit };
+
 
 const MAX_RESONANCE_ANCHORS = 6;
 
