@@ -28,6 +28,8 @@ export const CAREER_THRESHOLDS = Object.freeze({
     adjacent: 0.3,
     /** job-description score at/above which a skill is in-scope for the posting. */
     job: 0.5,
+    /** occupation-relevance score at/above which a skill is tied to the target role. */
+    occupation: 0.3,
   }),
   frontier: Object.freeze({
     /** Maximum candidates retained in the lawful frontier before reranking. */
