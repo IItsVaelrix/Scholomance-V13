@@ -1,4 +1,4 @@
-import {
+import type {
   TextSpan,
   ParseDiagnostic,
   ResumeDocument,
@@ -6,6 +6,16 @@ import {
   ResumeSectionKind,
 } from '../parser/types';
 import type { SkillClass } from '../graph/contracts';
+
+// Re-export parser document types so analysis consumers can import them from
+// the analysis barrel without reaching into the parser layer directly.
+export type {
+  TextSpan,
+  ParseDiagnostic,
+  ResumeDocument,
+  ExtractedDocument,
+  ResumeSectionKind,
+};
 
 export type MatchKind =
   | 'exact_phrase'
@@ -87,9 +97,9 @@ export interface KeywordHitResult {
 }
 
 export interface KeywordGapAnalysis {
-  matched: KeywordHitResult[];
-  missing: KeywordHitResult[];
-  jobKeywords: KeywordHitResult[];
+  readonly matched: readonly KeywordHitResult[];
+  readonly missing: readonly KeywordHitResult[];
+  readonly jobKeywords: readonly KeywordHitResult[];
 }
 
 export interface LegibilityAnalysis {

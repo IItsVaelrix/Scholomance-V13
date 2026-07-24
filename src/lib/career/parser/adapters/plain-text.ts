@@ -2,7 +2,7 @@ import { ExtractedDocument, ExtractedTextBlock } from '../types';
 import { makeBlockId } from '../identity-utils';
 
 export function extractPlainText(
-  content: string | Uint8Array,
+  content: string | Uint8Array | ArrayBuffer,
   fileName?: string
 ): ExtractedDocument {
   let strContent: string;
