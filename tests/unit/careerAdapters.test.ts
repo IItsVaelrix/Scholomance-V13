@@ -233,6 +233,60 @@ endobj
   });
 });
 
+describe('PDF Adapter (Multi-Column Layout Detection)', () => {
+  // Two text clusters: left column at x=72, right column at x=330.
+  const twoColumnPdf = `%PDF-1.4
+1 0 obj
+<< /Type /Page >>
+endobj
+2 0 obj
+<< /Length 300 >>
+stream
+BT /F1 11 Tf 1 0 0 1 72 700 Tm (Managed backend services) Tj ET
+BT /F1 11 Tf 1 0 0 1 72 680 Tm (Built REST APIs) Tj ET
+BT /F1 11 Tf 1 0 0 1 330 700 Tm (JavaScript) Tj ET
+BT /F1 11 Tf 1 0 0 1 330 680 Tm (Python) Tj ET
+endstream
+endobj
+%%EOF`;
+
+  // One text cluster: everything at x=72.
+  const singleColumnPdf = `%PDF-1.4
+1 0 obj
+<< /Type /Page >>
+endobj
+2 0 obj
+<< /Length 200 >>
+stream
+BT /F1 11 Tf 1 0 0 1 72 700 Tm (Managed backend services) Tj ET
+BT /F1 11 Tf 1 0 0 1 72 680 Tm (Built REST APIs in JavaScript) Tj ET
+BT /F1 11 Tf 1 0 0 1 72 660 Tm (Wrote Python tooling) Tj ET
+endstream
+endobj
+%%EOF`;
+
+  it('emits MULTI_COLUMN_LAYOUT diagnostic when text forms two x-clusters', async () => {
+    const result = await extractPdfDocument(new TextEncoder().encode(twoColumnPdf), 'two-col.pdf');
+    const diag = result.diagnostics.find((d) => d.code === 'MULTI_COLUMN_LAYOUT');
+    expect(diag).toBeDefined();
+    expect(diag?.severity).toBe('warning');
+  });
+
+  it('does NOT emit MULTI_COLUMN_LAYOUT for a single-column layout', async () => {
+    const result = await extractPdfDocument(new TextEncoder().encode(singleColumnPdf), 'one-col.pdf');
+    const diag = result.diagnostics.find((d) => d.code === 'MULTI_COLUMN_LAYOUT');
+    expect(diag).toBeUndefined();
+  });
+
+  it('records the horizontal position of each text run in block.bbox.x', async () => {
+    const result = await extractPdfDocument(new TextEncoder().encode(twoColumnPdf), 'two-col.pdf');
+    const leftBlock = result.blocks.find((b) => b.text.includes('Managed backend'));
+    const rightBlock = result.blocks.find((b) => b.text.includes('JavaScript'));
+    expect(leftBlock?.bbox?.x).toBe(72);
+    expect(rightBlock?.bbox?.x).toBe(330);
+  });
+});
+
 describe('parseResumeSource Pipeline', () => {
   it('parses pasted text end-to-end into a validated frozen ResumeDocument', async () => {
     const content = `Jane Doe

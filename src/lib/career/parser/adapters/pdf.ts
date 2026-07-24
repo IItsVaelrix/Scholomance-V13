@@ -172,11 +172,28 @@ export async function extractPdfDocument(
       const page = 1;
       const id = makeBlockId(page, sourceOrder, text);
 
+      let bbox: { x: number; y: number; width: number; height: number } | undefined = undefined;
+      // Match Tm operator: 1 0 0 1 x y Tm or 1 0 0 1 x y cm
+      const tmMatch = /(?:1\s+0\s+0\s+1\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(?:Tm|cm))|(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+Td/.exec(btContent);
+      if (tmMatch) {
+        const xStr = tmMatch[1] ?? tmMatch[3];
+        const yStr = tmMatch[2] ?? tmMatch[4];
+        if (xStr !== undefined && yStr !== undefined) {
+          bbox = {
+            x: parseFloat(xStr),
+            y: parseFloat(yStr),
+            width: 0,
+            height: 0,
+          };
+        }
+      }
+
       blocks.push({
         id,
         text,
         page,
         sourceOrder,
+        bbox,
         container: {
           kind: 'paragraph',
         },
@@ -192,6 +209,35 @@ export async function extractPdfDocument(
       severity: 'error',
       message: 'No machine-readable text layer was detected. Upload a text-based PDF, DOCX, TXT, or paste the résumé.',
     });
+  } else {
+    // Detect multi-column layout from x-coordinates
+    const xCoords = blocks
+      .map((b) => b.bbox?.x)
+      .filter((x): x is number => typeof x === 'number');
+
+    if (xCoords.length > 1) {
+      // Cluster x coordinates with 50pt tolerance
+      const clusters: number[][] = [];
+      for (const x of xCoords) {
+        let found = false;
+        for (const cluster of clusters) {
+          if (Math.abs(cluster[0] - x) < 50) {
+            cluster.push(x);
+            found = true;
+            break;
+          }
+        }
+        if (!found) clusters.push([x]);
+      }
+
+      if (clusters.length >= 2) {
+        diagnostics.push({
+          code: 'MULTI_COLUMN_LAYOUT',
+          severity: 'warning',
+          message: 'Multi-column PDF layout detected; reading order may be fragmented across columns.',
+        });
+      }
+    }
   }
 
   return {
@@ -205,3 +251,4 @@ export async function extractPdfDocument(
     diagnostics,
   };
 }
+
