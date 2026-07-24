@@ -44,9 +44,8 @@ describe('weak construction rule', () => {
     expect(run('Worked on the onboarding workflow.')[0].after).toBe('Streamlined');
   });
 
-  it('falls back to "Developed" when "Worked on" has no classifiable object', () => {
-    const [sug] = run('Worked on the quarterly paperwork.');
-    expect(sug.after).toBe('Developed');
+  it('stays silent when "Worked on" has no classifiable object', () => {
+    expect(run('Worked on the quarterly paperwork.')).toEqual([]);
   });
 
   it('stays silent on constructions it has no safe recipe for', () => {

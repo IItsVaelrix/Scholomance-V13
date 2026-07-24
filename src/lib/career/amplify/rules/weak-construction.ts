@@ -31,6 +31,28 @@ const HELPED_TO = new RegExp(`^${BULLET}(helped (?:to )?(\\w+))\\b`, 'i');
 const WORKED_ON = new RegExp(`^${BULLET}(worked on)\\b`, 'i');
 
 /**
+ * Match a gerund prefix pattern and return the corresponding past-tense verb.
+ * Used by responsible-for and duties-included patterns.
+ */
+function matchGerundPrefix(
+  regex: RegExp,
+  rule: string,
+  text: string
+): ConstructionMatch | null {
+  const m = regex.exec(text);
+  if (!m) return null;
+  const past = GERUND_PAST[m[2].toLowerCase()];
+  if (!past) return null;
+  return {
+    rule,
+    offset: text.indexOf(m[1]),
+    before: m[1],
+    after: past,
+    reason: `"${m[1]}" describes a job description. "${past}" describes what you did.`,
+  };
+}
+
+/**
  * Capability 3a — leading passive and prefix constructions.
  * Anchored to the start of the line: a mid-sentence rewrite is exactly the class of
  * damage this engine exists to avoid. First matching recipe wins.
@@ -38,31 +60,11 @@ const WORKED_ON = new RegExp(`^${BULLET}(worked on)\\b`, 'i');
 function matchConstruction(line: AccomplishmentLine): ConstructionMatch | null {
   const text = line.text;
 
-  const responsible = RESPONSIBLE_FOR.exec(text);
-  if (responsible) {
-    const past = GERUND_PAST[responsible[2].toLowerCase()];
-    if (!past) return null;
-    return {
-      rule: 'construction_responsible_for',
-      offset: text.indexOf(responsible[1]),
-      before: responsible[1],
-      after: past,
-      reason: `"${responsible[1]}" describes a job description. "${past}" describes what you did.`,
-    };
-  }
+  const responsible = matchGerundPrefix(RESPONSIBLE_FOR, 'construction_responsible_for', text);
+  if (responsible) return responsible;
 
-  const duties = DUTIES_INCLUDED.exec(text);
-  if (duties) {
-    const past = GERUND_PAST[duties[2].toLowerCase()];
-    if (!past) return null;
-    return {
-      rule: 'construction_duties_included',
-      offset: text.indexOf(duties[1]),
-      before: duties[1],
-      after: past,
-      reason: `"${duties[1]}" describes a job description. "${past}" describes what you did.`,
-    };
-  }
+  const duties = matchGerundPrefix(DUTIES_INCLUDED, 'construction_duties_included', text);
+  if (duties) return duties;
 
   const passive = LEADING_PASSIVE.exec(text);
   if (passive) {
@@ -95,7 +97,8 @@ function matchConstruction(line: AccomplishmentLine): ConstructionMatch | null {
   if (worked) {
     const offset = text.indexOf(worked[1]);
     const classified = classifyObject(line, offset + worked[1].length);
-    const after = classified ? CLASS_STRONG_VERB[classified.objectClass] : 'Developed';
+    if (!classified) return null;
+    const after = CLASS_STRONG_VERB[classified.objectClass];
     return {
       rule: 'construction_worked_on',
       offset,
