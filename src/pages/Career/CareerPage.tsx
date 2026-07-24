@@ -1,66 +1,50 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { triggerHapticPulse, UI_HAPTICS } from '../../lib/platform/haptics';
-import { generateSigilFile, SIGIL_VERSION } from '../../lib/career/transmuter';
-import { buildSigilDataArchive } from '../../lib/career/sigil-pipeline';
-import DataArchiveDrawer, { type DataArchive } from './DataArchiveDrawer';
+import { parseResumeSource, type ResumeSource } from '../../lib/career/parser/parse-resume';
+import { analyzeCareerFit } from '../../lib/career/analysis/analyze-career';
+import { buildCleanExport } from '../../lib/career/export/clean-export';
+import type { ResumeDocument, ResumeSourceType } from '../../lib/career/parser/types';
+import type { CareerAnalysisResult, ResumeSuggestion } from '../../lib/career/analysis/types';
+import ParserPreviewDrawer from './ParserPreviewDrawer';
+import SuggestionReviewPanel from './SuggestionReviewPanel';
+import DataArchiveDrawer from './DataArchiveDrawer';
 import './CareerPage.css';
 
-/**
- * CareerPage - The Career Ignition Chamber.
- *
- * Wires the Resonance Alignment Engine (src/lib/career/keyword-gap.js) into the UI:
- * the user supplies their experience AND a target job description, and the page reports
- * a deterministic 0-100 alignment score, the missing JD keywords, and which terms were
- * preserved literally so the transmuter does not delete the very keywords it measured.
- *
- * The score bar reflects the REAL computed score (no longer a cosmetic timer), and the
- * Sigil download is user-initiated (no silent auto-download).
- */
-
-interface KeywordHit {
-  term: string;
-  kind: 'unigram' | 'bigram';
-  weight: number;
-  matched: boolean;
-  inSkillsLexicon: boolean;
-}
-
-interface TorqueConflict {
-  jobTerm: string;
-  torqueKey: string;
-  wouldReplaceWith: string;
-}
-
-interface KeywordGapReport {
-  score: number;
-  rawScore: number;
-  matched: KeywordHit[];
-  missing: KeywordHit[];
-  jobKeywords: KeywordHit[];
-  torqueConflicts: TorqueConflict[];
-  diagnostics: string[];
-}
-
-interface SigilResult {
-  sigil: string;
-  report: KeywordGapReport;
-  archive: DataArchive;
-}
-
-const MAX_MISSING_CHIPS = 14;
+export type CareerStatus =
+  | 'IDLE'
+  | 'EXTRACTING'
+  | 'PARSING'
+  | 'PARSE_REVIEW'
+  | 'ANALYZING'
+  | 'COMPLETE'
+  | 'ERROR';
 
 export default function CareerPage() {
   const [content, setContent] = useState('');
   const [jobDescription, setJobDescription] = useState('');
-  const [status, setStatus] = useState<'IDLE' | 'TRANSMUTING' | 'COMPLETE'>('IDLE');
-  const [scoreFill, setScoreFill] = useState(0);
-  const [result, setResult] = useState<SigilResult | null>(null);
-  const [archiveOpen, setArchiveOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const fillTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [status, setStatus] = useState<CareerStatus>('IDLE');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // -- Ripple Follower ---------------------------------------------
+  const [sourceFile, setSourceFile] = useState<{
+    type: ResumeSourceType;
+    content: string | Uint8Array | ArrayBuffer;
+    fileName: string;
+  } | null>(null);
+
+  const [parsedDocument, setParsedDocument] = useState<ResumeDocument | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const [analysisResult, setAnalysisResult] = useState<CareerAnalysisResult | null>(null);
+  const [suggestions, setSuggestions] = useState<ResumeSuggestion[]>([]);
+
+  const [archiveOpen, setArchiveOpen] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Mouse ripple follower effect
   useEffect(() => {
     const handleGlobalMouseMove = (e: MouseEvent) => {
       if (!containerRef.current) return;
@@ -75,82 +59,187 @@ export default function CareerPage() {
     return () => window.removeEventListener('mousemove', handleGlobalMouseMove);
   }, []);
 
-  // Clear any in-flight fill animation on unmount.
-  useEffect(() => () => {
-    if (fillTimer.current) clearInterval(fillTimer.current);
-  }, []);
-
-  // High score = green (good), low score = red. Inverse of a depleting health bar:
-  // 0 -> #ef4444, 100 -> #22c55e.
-  const getScoreColor = (p: number) => {
-    const r = Math.round(239 - (239 - 34) * (p / 100));
-    const g = Math.round(68 + (197 - 68) * (p / 100));
-    const b = Math.round(68 + (94 - 68) * (p / 100));
-    return `rgb(${r}, ${g}, ${b})`;
-  };
-
-  // Editing either field after a run invalidates the stale report.
   const resetToIdle = () => {
-    if (status === 'COMPLETE') {
+    if (status === 'COMPLETE' || status === 'ERROR') {
       setStatus('IDLE');
-      setResult(null);
-      setScoreFill(0);
+      setErrorMessage(null);
+      setParsedDocument(null);
+      setAnalysisResult(null);
+      setSuggestions([]);
+      setDrawerOpen(false);
       setArchiveOpen(false);
     }
   };
 
-  // -- Ignition Ritual ---------------------------------------------
-  const finalizeRitual = useCallback(() => {
-    setStatus('COMPLETE');
-    triggerHapticPulse(UI_HAPTICS.SUCCESS);
-  }, []);
+  // Process selected file
+  const processFile = async (file: File) => {
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    let type: ResumeSourceType = 'txt';
+    let fileContent: string | ArrayBuffer = '';
 
-  const handleIgnite = () => {
-    if (!content.trim() || status !== 'IDLE') return;
+    if (ext === 'pdf') {
+      type = 'pdf';
+      fileContent = await file.arrayBuffer();
+    } else if (ext === 'docx') {
+      type = 'docx';
+      fileContent = await file.arrayBuffer();
+    } else {
+      type = 'txt';
+      fileContent = await file.text();
+      setContent(fileContent);
+    }
 
-    // The analysis is synchronous and deterministic. We run it up front, then animate
-    // the score bar filling to the REAL value - the bar measures the result, it does
-    // not fabricate progress.
-    const ignite = buildSigilDataArchive(content, jobDescription) as SigilResult;
-
-    setStatus('TRANSMUTING');
-    setScoreFill(0);
-    setResult(ignite);
-    triggerHapticPulse(UI_HAPTICS.HEAVY);
-
-    const target = ignite.report.score;
-    const duration = 900;
-    const interval = 20;
-    const step = Math.max(1, target / (duration / interval));
-
-    if (fillTimer.current) clearInterval(fillTimer.current);
-    fillTimer.current = setInterval(() => {
-      setScoreFill((prev) => {
-        const next = prev + step;
-        if (next >= target) {
-          if (fillTimer.current) clearInterval(fillTimer.current);
-          finalizeRitual();
-          return target;
-        }
-        return next;
-      });
-    }, interval);
+    setSourceFile({
+      type,
+      content: fileContent,
+      fileName: file.name,
+    });
+    resetToIdle();
   };
 
-  const handleDownload = () => {
-    if (!result) return;
-    generateSigilFile(result.sigil);
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      processFile(e.target.files[0]);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      processFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  // Trigger Resume Parsing -> Moves status to PARSE_REVIEW
+  const handleParseAndInspect = async () => {
+    if (status !== 'IDLE' && status !== 'ERROR' && status !== 'PARSE_REVIEW') return;
+    if (!content.trim() && !sourceFile) return;
+
+    try {
+      setErrorMessage(null);
+      setStatus('EXTRACTING');
+
+      let source: ResumeSource;
+      if (sourceFile) {
+        source = {
+          type: sourceFile.type,
+          content: sourceFile.content,
+          fileName: sourceFile.fileName,
+        };
+      } else {
+        source = {
+          type: 'paste',
+          content,
+        };
+      }
+
+      setStatus('PARSING');
+      triggerHapticPulse(UI_HAPTICS.MEDIUM);
+
+      const doc = await parseResumeSource(source);
+      setParsedDocument(doc);
+      setStatus('PARSE_REVIEW');
+      setDrawerOpen(true);
+    } catch (err: any) {
+      setErrorMessage(err?.message || 'Failed to parse resume');
+      setStatus('ERROR');
+    }
+  };
+
+  // Confirm in drawer -> Run career analysis -> Move to COMPLETE
+  const handleConfirmAndAlign = () => {
+    if (!parsedDocument) return;
+    setDrawerOpen(false);
+    setStatus('ANALYZING');
+
+    try {
+      const result = analyzeCareerFit(parsedDocument, jobDescription);
+      setAnalysisResult(result);
+      setSuggestions(result.suggestions || []);
+      setStatus('COMPLETE');
+      triggerHapticPulse(UI_HAPTICS.SUCCESS);
+    } catch (err: any) {
+      setErrorMessage(err?.message || 'Failed to analyze career fit');
+      setStatus('ERROR');
+    }
+  };
+
+  // Edit Parsed Document inside drawer
+  const handleEditParsedDocument = () => {
+    setDrawerOpen(false);
+    if (parsedDocument) {
+      setContent(parsedDocument.rawText || parsedDocument.normalizedText);
+      setSourceFile(null);
+    }
+    setStatus('IDLE');
+  };
+
+  // Suggestion controls
+  const handleAcceptSuggestion = (id: string) => {
+    setSuggestions((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, status: 'accepted' } : s))
+    );
+  };
+
+  const handleRejectSuggestion = (id: string) => {
+    setSuggestions((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, status: 'rejected' } : s))
+    );
+  };
+
+  const handleEditSuggestion = (id: string, newAfter: string) => {
+    setSuggestions((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, after: newAfter, status: 'edited' } : s))
+    );
+  };
+
+  const handleAcceptAllLowRisk = () => {
+    setSuggestions((prev) =>
+      prev.map((s) => (s.risk === 'low' ? { ...s, status: 'accepted' } : s))
+    );
+  };
+
+  // Download Clean Export without Sigils
+  const handleDownloadCleanExport = () => {
+    if (!parsedDocument) return;
+    const fileName = sourceFile?.fileName
+      ? `clean_${sourceFile.fileName.replace(/\.[^/.]+$/, '')}.txt`
+      : 'resume_export.txt';
+
+    const exportData = buildCleanExport(parsedDocument, suggestions, fileName);
+
+    const blob = new Blob([exportData.plainText], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = exportData.fileName;
+    link.click();
+    URL.revokeObjectURL(url);
+
     triggerHapticPulse(UI_HAPTICS.MEDIUM);
   };
 
-  const hasJd = jobDescription.trim().length > 0;
-  const report = result?.report;
+  const scorecard = analysisResult?.scorecard;
 
   return (
     <div className="career-ignition-chamber">
       <div className="career-bg-noise" />
 
-      {/* -- Page Header ---------------------------------------------- */}
+      {/* Header */}
       <motion.header
         className="career-hud-header"
         initial={{ y: -20, opacity: 0 }}
@@ -158,12 +247,13 @@ export default function CareerPage() {
         transition={{ duration: 0.6, ease: 'easeOut' }}
       >
         <div className="hud-logo">
-          <span className="logo-eyebrow">Linguistic Particle Accelerator</span>
+          <span className="logo-eyebrow">CAREER WORKSPACE & PARSER MATRIX</span>
           <span className="logo-text arcade-glow">PROFESSIONAL SCRIBE MATRIX</span>
-          <span className="logo-ver">{`${SIGIL_VERSION.toUpperCase()} // CAREER_IGNITION_PROTOCOL`}</span>
+          <span className="logo-ver">STATUS: {status}</span>
         </div>
       </motion.header>
 
+      {/* Document Workspace & Input */}
       <motion.div
         className="void-parchment-container"
         initial={{ opacity: 0, scale: 0.9 }}
@@ -172,83 +262,121 @@ export default function CareerPage() {
         ref={containerRef}
       >
         <header className="parchment-header">
-          <span className="parchment-title">Career Ignition Matrix</span>
-          <div className="parchment-status">
-            {status === 'TRANSMUTING' ? '◈ CALIBRATING...' : '◈ READY'}
-          </div>
+          <span className="parchment-title">Résumé & Experience Workspace</span>
+          <div className="parchment-status">STATUS // {status}</div>
         </header>
 
         <div className="parchment-body">
           <div className="parchment-field parchment-field--resume">
             <label className="field-label" htmlFor="resume-input">
-              Your Experience
+              Your Experience / Upload Document
             </label>
+
+            {/* Drop Zone */}
+            {sourceFile ? (
+              <div className="selected-file-info">
+                <span>📄 {sourceFile.fileName} ({sourceFile.type.toUpperCase()})</span>
+                <button
+                  className="remove-file-btn"
+                  onClick={() => {
+                    setSourceFile(null);
+                    resetToIdle();
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+            ) : (
+              <div
+                className={`file-drop-zone ${dragActive ? 'drag-active' : ''}`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept=".pdf,.docx,.txt"
+                  style={{ display: 'none' }}
+                  onChange={handleFileSelect}
+                />
+                <div className="drop-zone-text">
+                  Drag & drop .pdf, .docx, .txt file here, or click to browse
+                </div>
+                <button type="button" className="file-select-btn">Select File</button>
+              </div>
+            )}
+
             <textarea
               id="resume-input"
               className="void-textarea"
-              placeholder="Paste your experience or résumé bullets here..."
+              placeholder="Or paste your raw experience / résumé text here..."
               value={content}
               onChange={(e) => {
                 setContent(e.target.value);
+                if (sourceFile) setSourceFile(null);
                 resetToIdle();
               }}
-              disabled={status === 'TRANSMUTING'}
+              disabled={status === 'EXTRACTING' || status === 'PARSING' || status === 'ANALYZING'}
             />
           </div>
 
           <div className="parchment-field parchment-field--jd">
             <label className="field-label" htmlFor="jd-input">
-              Target Job Description <span className="field-hint"> -  measured against your experience</span>
+              Target Job Description <span className="field-hint"> - measured against experience</span>
             </label>
             <textarea
               id="jd-input"
               className="void-textarea void-textarea--jd"
-              placeholder="Paste the job description you're targeting to measure alignment..."
+              placeholder="Paste target job description to analyze alignment..."
               value={jobDescription}
               onChange={(e) => {
                 setJobDescription(e.target.value);
                 resetToIdle();
               }}
-              disabled={status === 'TRANSMUTING'}
+              disabled={status === 'EXTRACTING' || status === 'PARSING' || status === 'ANALYZING'}
             />
           </div>
         </div>
-        <div className="parchment-ripples" />
       </motion.div>
 
+      {/* Parse & Inspect Button */}
       <div className="ritual-ignitor-container">
-        {status !== 'IDLE' && (
-          <div className="score-strip">
-            <div className="score-readout">
-              <span className="score-value" style={{ color: getScoreColor(scoreFill) }}>
-                {Math.round(scoreFill)}
-              </span>
-              <span className="score-label">Resonance Alignment</span>
-            </div>
-            <div className="pixel-health-bar">
-              <div
-                className="health-fill"
-                style={{
-                  width: `${scoreFill}%`,
-                  backgroundColor: getScoreColor(scoreFill),
-                  boxShadow: `0 0 10px ${getScoreColor(scoreFill)}`,
-                }}
-              />
-            </div>
-          </div>
-        )}
+        {errorMessage && <p className="report-note report-note--warn">{errorMessage}</p>}
 
         <button
           className="ignite-btn"
-          onClick={handleIgnite}
-          disabled={!content.trim() || status !== 'IDLE'}
+          onClick={handleParseAndInspect}
+          disabled={
+            (!content.trim() && !sourceFile) ||
+            status === 'EXTRACTING' ||
+            status === 'PARSING' ||
+            status === 'ANALYZING'
+          }
         >
-          {status === 'TRANSMUTING' ? 'Fusing Syntax...' : 'Ignite Transmutation'}
+          {status === 'EXTRACTING'
+            ? 'Extracting Document...'
+            : status === 'PARSING'
+            ? 'Parsing Résumé...'
+            : status === 'PARSE_REVIEW'
+            ? 'Inspect Parsed Document'
+            : 'Parse & Inspect Résumé'}
         </button>
       </div>
 
+      {/* Parser Preview Drawer */}
+      <ParserPreviewDrawer
+        open={drawerOpen || status === 'PARSE_REVIEW'}
+        document={parsedDocument}
+        onClose={() => setDrawerOpen(false)}
+        onConfirm={handleConfirmAndAlign}
+        onEditParsedDocument={handleEditParsedDocument}
+      />
+
+      {/* Complete View: AtsScorecard & SuggestionReviewPanel */}
       <AnimatePresence>
-        {status === 'COMPLETE' && report && (
+        {status === 'COMPLETE' && scorecard && (
           <motion.div
             className="alignment-report"
             initial={{ opacity: 0, y: 16 }}
@@ -256,72 +384,56 @@ export default function CareerPage() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: 'easeOut' }}
           >
-            {!hasJd && (
-              <p className="report-note report-note--warn">
-                No job description supplied - score reflects nothing measurable. Paste a
-                target JD to see real alignment.
-              </p>
-            )}
-
-            {hasJd && (
-              <>
-                <div className="report-section">
-                  <h3 className="report-heading">
-                    Missing Keywords{' '}
-                    <span className="report-count">({report.missing.length})</span>
-                  </h3>
-                  {report.missing.length === 0 ? (
-                    <p className="report-note report-note--good">
-                      No gaps detected - your experience covers every scored JD keyword.
-                    </p>
-                  ) : (
-                    <div className="kw-chips">
-                      {report.missing.slice(0, MAX_MISSING_CHIPS).map((hit) => (
-                        <span
-                          key={hit.term}
-                          className={`kw-chip${hit.inSkillsLexicon ? ' kw-chip--skill' : ''}`}
-                          title={hit.kind === 'bigram' ? 'multi-word skill' : undefined}
-                        >
-                          {hit.term}
-                        </span>
-                      ))}
-                      {report.missing.length > MAX_MISSING_CHIPS && (
-                        <span className="kw-chip kw-chip--more">
-                          +{report.missing.length - MAX_MISSING_CHIPS} more
-                        </span>
-                      )}
-                    </div>
-                  )}
+            {/* 6-Dimension AtsScorecard - NO overallScore */}
+            <div className="ats-scorecard-container">
+              <h3 className="ats-scorecard-title">ATS Multi-Dimension Scorecard</h3>
+              <div className="ats-scorecard-grid">
+                <div className="score-dimension-card">
+                  <span className="dimension-label">Parse Quality</span>
+                  <span className="dimension-value">
+                    {scorecard.parseQuality !== null ? `${scorecard.parseQuality}%` : 'N/A'}
+                  </span>
                 </div>
+                <div className="score-dimension-card">
+                  <span className="dimension-label">Section Coverage</span>
+                  <span className="dimension-value">{scorecard.sectionCoverage}%</span>
+                </div>
+                <div className="score-dimension-card">
+                  <span className="dimension-label">Literal Keyword Coverage</span>
+                  <span className="dimension-value">{scorecard.literalKeywordCoverage}%</span>
+                </div>
+                <div className="score-dimension-card">
+                  <span className="dimension-label">Canonical Skill Coverage</span>
+                  <span className="dimension-value">{scorecard.canonicalSkillCoverage}%</span>
+                </div>
+                <div className="score-dimension-card">
+                  <span className="dimension-label">Legibility</span>
+                  <span className="dimension-value">{scorecard.legibility}%</span>
+                </div>
+                <div className="score-dimension-card">
+                  <span className="dimension-label">Formatting Risk</span>
+                  <span className={`dimension-value risk-${scorecard.formattingRisk}`}>
+                    {scorecard.formattingRisk.toUpperCase()}
+                  </span>
+                </div>
+              </div>
+            </div>
 
-                {report.torqueConflicts.length > 0 && (
-                  <div className="report-section">
-                    <h3 className="report-heading">
-                      Preserved Literally{' '}
-                      <span className="report-count">({report.torqueConflicts.length})</span>
-                    </h3>
-                    <p className="report-note">
-                      These JD terms were kept verbatim instead of being upgraded, so the
-                      transmuter doesn&apos;t delete keywords the role asks for:
-                    </p>
-                    <div className="kw-chips">
-                      {report.torqueConflicts.map((c) => (
-                        <span key={c.torqueKey} className="kw-chip kw-chip--preserved">
-                          {c.jobTerm}
-                          <span className="kw-chip-strike"> ⇏ {c.wouldReplaceWith}</span>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
+            {/* Suggestions Review Panel */}
+            <SuggestionReviewPanel
+              suggestions={suggestions}
+              onAccept={handleAcceptSuggestion}
+              onReject={handleRejectSuggestion}
+              onEdit={handleEditSuggestion}
+              onAcceptAllLowRisk={handleAcceptAllLowRisk}
+            />
 
+            {/* Download Export Section */}
             <div className="report-section">
               <div className="report-heading-row">
-                <h3 className="report-heading">Optimized Sigil</h3>
+                <h3 className="report-heading">Résumé Clean Export</h3>
                 <div className="report-heading-actions">
-                  {result?.archive && (
+                  {analysisResult?.archive && (
                     <button
                       className="archive-link"
                       onClick={() => {
@@ -332,12 +444,11 @@ export default function CareerPage() {
                       ⌬ Data Archive
                     </button>
                   )}
-                  <button className="download-btn" onClick={handleDownload}>
+                  <button className="download-btn" onClick={handleDownloadCleanExport}>
                     ↓ Download .txt
                   </button>
                 </div>
               </div>
-              <textarea className="sigil-output" value={result?.sigil ?? ''} readOnly />
             </div>
           </motion.div>
         )}
@@ -345,7 +456,7 @@ export default function CareerPage() {
 
       <DataArchiveDrawer
         open={archiveOpen}
-        archive={result?.archive ?? null}
+        archive={analysisResult?.archive ?? null}
         onClose={() => setArchiveOpen(false)}
       />
     </div>
