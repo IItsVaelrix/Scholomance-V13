@@ -118,11 +118,12 @@
     "career:sources:fetch": "node scripts/career-graph/fetch-sources.mjs",
     "career:sources:record": "node scripts/career-graph/fetch-sources.mjs --record",
     "career:sources:verify:offline": "node scripts/career-graph/fetch-sources.mjs --offline",
+    "career:sources:prepare": "node scripts/career-graph/prepare-sources.mjs",
     "career:graph:ingest": "node scripts/career-graph/ingest-sources.mjs data/career-graph/raw data/career-graph/normalized",
     "career:graph:build": "node scripts/career-graph/build-database.mjs data/career-graph/normalized data/career-graph/career_graph.sqlite",
     "career:graph:shards": "node scripts/career-graph/build-shards.mjs data/career-graph/career_graph.sqlite data/career-graph/shards",
     "career:graph:verify": "node scripts/career-graph/verify-shards.mjs data/career-graph/shards",
-    "career:graph:all": "npm run career:graph:ingest && npm run career:graph:build && npm run career:graph:shards && npm run career:graph:verify"
+    "career:graph:all": "npm run career:sources:prepare && npm run career:graph:ingest && npm run career:graph:build && npm run career:graph:shards && npm run career:graph:verify"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
