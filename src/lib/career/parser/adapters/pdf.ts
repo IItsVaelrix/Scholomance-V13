@@ -211,32 +211,15 @@ export async function extractPdfDocument(
     });
   } else {
     // Detect multi-column layout from x-coordinates
-    const xCoords = blocks
-      .map((b) => b.bbox?.x)
-      .filter((x): x is number => typeof x === 'number');
+    const leftColBlocks = blocks.filter((b) => typeof b.bbox?.x === 'number' && b.bbox.x < 250);
+    const rightColBlocks = blocks.filter((b) => typeof b.bbox?.x === 'number' && b.bbox.x >= 250);
 
-    if (xCoords.length > 1) {
-      // Cluster x coordinates with 50pt tolerance
-      const clusters: number[][] = [];
-      for (const x of xCoords) {
-        let found = false;
-        for (const cluster of clusters) {
-          if (Math.abs(cluster[0] - x) < 50) {
-            cluster.push(x);
-            found = true;
-            break;
-          }
-        }
-        if (!found) clusters.push([x]);
-      }
-
-      if (clusters.length >= 2) {
-        diagnostics.push({
-          code: 'MULTI_COLUMN_LAYOUT',
-          severity: 'warning',
-          message: 'Multi-column PDF layout detected; reading order may be fragmented across columns.',
-        });
-      }
+    if (leftColBlocks.length >= 2 && rightColBlocks.length >= 2) {
+      diagnostics.push({
+        code: 'MULTI_COLUMN_LAYOUT',
+        severity: 'warning',
+        message: 'Multi-column PDF layout detected; reading order may be fragmented across columns.',
+      });
     }
   }
 
