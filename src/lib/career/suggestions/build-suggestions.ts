@@ -1,4 +1,4 @@
-import { TORQUE_MAP } from '../transmuter.js';
+import { buildAmplifications } from '../amplify/registry.js';
 import { makeSuggestionId } from '../parser/identity-utils.js';
 import type { ResumeDocument, TextSpan } from '../parser/types.js';
 import type {
@@ -22,57 +22,8 @@ export function buildCareerSuggestions(params: {
   const { document, keywordGap, legibility, acronymCoverage } = params;
   const rawText = document?.rawText || '';
 
-  // 1. Verb Swaps
-  if (rawText && TORQUE_MAP) {
-    for (const [lowVerb, highVerb] of Object.entries(TORQUE_MAP)) {
-      const regex = new RegExp(`\\b${escapeRegExp(lowVerb)}\\b`, 'gi');
-      let match: RegExpExecArray | null;
-      while ((match = regex.exec(rawText)) !== null) {
-        const start = match.index;
-        const end = start + match[0].length;
-        const matchedText = rawText.slice(start, end);
-
-        let replacement = highVerb;
-        if (matchedText === matchedText.toLowerCase()) {
-          replacement = highVerb.toLowerCase();
-        } else if (matchedText === matchedText.toUpperCase()) {
-          replacement = highVerb.toUpperCase();
-        }
-
-        const targetKey = `${start}:${end}`;
-        const evidencePayload = `${matchedText}->${replacement}`;
-        const id = makeSuggestionId('verb', targetKey, evidencePayload);
-
-        suggestions.push({
-          id,
-          type: 'verb',
-          target: {
-            span: {
-              coordinateSpace: 'raw',
-              start,
-              end,
-            },
-          },
-          before: matchedText,
-          after: replacement,
-          reason: `Replace low-torque verb "${matchedText}" with higher-impact verb "${replacement}".`,
-          evidence: [
-            {
-              source: 'resume',
-              rule: 'torque_map',
-              text: matchedText,
-              span: { coordinateSpace: 'raw', start, end },
-              confidence: 0.9,
-            },
-          ],
-          confidence: 0.9,
-          risk: 'low',
-          requiresUserApproval: true,
-          status: 'pending',
-        });
-      }
-    }
-  }
+  // 1. Amplification (quantification, verb strength, tightening, repetition)
+  suggestions.push(...buildAmplifications(document));
 
   // 2. Acronym Single-Forms
   if (acronymCoverage?.singleFormAcronyms) {

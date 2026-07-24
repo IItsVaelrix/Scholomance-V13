@@ -11,19 +11,23 @@ import type {
 } from '../../src/lib/career/analysis/types';
 
 describe('Career Suggestions Engine', () => {
+  const RAW_TEXT =
+    'Led a team and built software systems with AWS.\n' +
+    'Helped the support team resolve escalations.';
+
   const dummyDoc: ResumeDocument = {
     schemaVersion: 1,
     source: { type: 'txt', fileName: 'test.txt' },
-    rawText: 'Led a team and built software systems with AWS.',
-    normalizedText: 'led a team and built software systems with aws.',
+    rawText: RAW_TEXT,
+    normalizedText: RAW_TEXT.toLowerCase(),
     offsetMap: [],
     sections: [
       {
         id: 'sec-1',
         kind: 'experience',
         heading: 'Experience',
-        text: 'Led a team and built software systems with AWS.',
-        span: { coordinateSpace: 'raw', start: 0, end: 47 },
+        text: RAW_TEXT,
+        span: { coordinateSpace: 'raw', start: 0, end: RAW_TEXT.length },
         confidence: 0.9,
         evidence: [],
       },
@@ -81,10 +85,20 @@ describe('Career Suggestions Engine', () => {
 
       const verbSugg = suggestions.find((s) => s.type === 'verb');
       expect(verbSugg).toBeDefined();
+      expect(verbSugg?.before).toBe('Helped');
+      expect(verbSugg?.after).toBe('Led');
       expect(verbSugg?.risk).toBe('low');
       expect(verbSugg?.requiresUserApproval).toBe(true);
       expect(verbSugg?.status).toBe('pending');
       expect(verbSugg?.id).toMatch(/^suggestion:verb:/);
+
+      // The old engine swapped every occurrence anywhere in the document;
+      // amplification only ever rewrites the leading verb of an accomplishment line.
+      expect(suggestions.filter((s) => s.type === 'verb')).toHaveLength(1);
+      expect(suggestions.some((s) => s.before === 'built')).toBe(false);
+
+      const quantifySugg = suggestions.find((s) => s.type === 'quantify');
+      expect(quantifySugg?.requiresInput).toBe(true);
 
       const acronymSugg = suggestions.find((s) => s.type === 'acronym');
       expect(acronymSugg).toBeDefined();
