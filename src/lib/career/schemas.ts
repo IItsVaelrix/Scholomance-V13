@@ -170,6 +170,7 @@ export const ResumeSuggestionSchema = z.object({
     'structure',
     'quantify',
     'tighten',
+    'learning_gap',
   ]),
   target: z
     .object({
@@ -190,4 +191,9 @@ export const ResumeSuggestionSchema = z.object({
   status: z.enum(['pending', 'accepted', 'rejected', 'edited']),
   requiresInput: z.boolean().optional(),
   inputSlots: z.array(SuggestionInputSlotSchema).optional(),
+  conceptId: z.string().optional(),
+  skillClass: z
+    .enum(['demonstrated', 'adjacent', 'missing', 'not_required', 'ambiguous'])
+    .optional(),
+  editable: z.boolean().optional(),
 });

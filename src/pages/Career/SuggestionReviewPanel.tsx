@@ -70,7 +70,11 @@ export default function SuggestionReviewPanel({
   };
 
   const lowRiskPendingCount = suggestions.filter(
-    (s) => s.risk === 'low' && s.status !== 'accepted' && s.requiresInput !== true
+    (s) =>
+      s.risk === 'low' &&
+      s.status !== 'accepted' &&
+      s.requiresInput !== true &&
+      s.editable !== false
   ).length;
 
   return (
@@ -188,7 +192,7 @@ export default function SuggestionReviewPanel({
                   >
                     Reject
                   </button>
-                  {onEdit && !isEditing && !needsInput && (
+                  {onEdit && !isEditing && !needsInput && sug.editable !== false && (
                     <button className="btn btn-control btn-edit" onClick={() => handleStartEdit(sug)}>
                       Edit
                     </button>

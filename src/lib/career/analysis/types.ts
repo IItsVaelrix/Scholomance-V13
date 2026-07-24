@@ -5,6 +5,7 @@ import {
   ExtractedDocument,
   ResumeSectionKind,
 } from '../parser/types';
+import type { SkillClass } from '../graph/contracts';
 
 export type MatchKind =
   | 'exact_phrase'
@@ -43,7 +44,15 @@ export interface SuggestionInputSlot {
 
 export interface ResumeSuggestion {
   id: string;
-  type: 'verb' | 'keyword' | 'acronym' | 'format' | 'structure' | 'quantify' | 'tighten';
+  type:
+    | 'verb'
+    | 'keyword'
+    | 'acronym'
+    | 'format'
+    | 'structure'
+    | 'quantify'
+    | 'tighten'
+    | 'learning_gap';
   target?: {
     span?: TextSpan;
     sectionId?: string;
@@ -61,6 +70,12 @@ export interface ResumeSuggestion {
   requiresInput?: boolean;
   /** One entry per sentinel in `after`, in left-to-right order. */
   inputSlots?: SuggestionInputSlot[];
+  /** Career Graph canonical concept id (present for graph-derived suggestions). */
+  conceptId?: string;
+  /** Career Graph skill classification (present for graph-derived suggestions). */
+  skillClass?: SkillClass;
+  /** False when the suggestion is a non-editable learning/interview gap. */
+  editable?: boolean;
 }
 
 export interface KeywordHitResult {
