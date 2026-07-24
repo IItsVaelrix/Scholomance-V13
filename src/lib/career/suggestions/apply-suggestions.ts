@@ -52,7 +52,7 @@ export function applyAcceptedSuggestions(
       continue;
     }
 
-    if (s.requiresInput === true && (s.after ?? '').includes(INPUT_SENTINEL)) {
+    if ((s.after ?? '').includes(INPUT_SENTINEL)) {
       skipped.push({ suggestionId: s.id, reason: 'unfilled_input' });
       continue;
     }

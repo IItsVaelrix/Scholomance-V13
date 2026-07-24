@@ -19,7 +19,7 @@ describe('quantification rule', () => {
     expect(sug.requiresInput).toBe(true);
     expect(sug.before).toBe(raw);
     expect(sug.after).toBe(
-      `Reduced the deployment pipeline runtime., reducing ${INPUT_SENTINEL} by ${INPUT_SENTINEL}%`
+      `Reduced the deployment pipeline runtime, reducing ${INPUT_SENTINEL} by ${INPUT_SENTINEL}%.`
     );
     expect(sug.inputSlots).toHaveLength(2);
     expect(sug.target?.span).toEqual({ coordinateSpace: 'raw', start: 0, end: raw.length });
@@ -34,7 +34,21 @@ describe('quantification rule', () => {
     expect(suggestions).toHaveLength(1);
     expect(suggestions[0].after).toContain(INPUT_SENTINEL);
     expect(suggestions[0].after).toBe(
-      `Led the billing platform rewrite., managing a team of ${INPUT_SENTINEL}`
+      `Led the billing platform rewrite, managing a team of ${INPUT_SENTINEL}.`
+    );
+  });
+
+  it('moves trailing punctuation to the end of the clause instead of doubling it', () => {
+    const [sug] = run('Reduced the deployment pipeline runtime.');
+    expect(sug.after).not.toMatch(/[.;:!?],/);
+    expect(sug.after?.endsWith('.')).toBe(true);
+  });
+
+  it('appends the clause directly when the line has no trailing punctuation', () => {
+    const raw = 'Reduced the deployment pipeline runtime';
+    const [sug] = run(raw);
+    expect(sug.after).toBe(
+      `Reduced the deployment pipeline runtime, reducing ${INPUT_SENTINEL} by ${INPUT_SENTINEL}%`
     );
   });
 

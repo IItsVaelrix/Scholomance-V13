@@ -30,6 +30,16 @@ describe('amplify primitives', () => {
       expect(getAccomplishmentLines(doc)).toEqual([]);
     });
 
+    it('amplifies an unknown-kind section, since a heading-less résumé parses as one unknown section', () => {
+      const doc = makeResumeDoc('Led the platform team.\nBuilt the billing API.', 'unknown');
+      const lines = getAccomplishmentLines(doc);
+      expect(lines.map((l) => l.text)).toEqual([
+        'Led the platform team.',
+        'Built the billing API.',
+      ]);
+      expect(lines.every((l) => l.sectionKind === 'unknown')).toBe(true);
+    });
+
     it('skips a first line that merely repeats the section heading', () => {
       const doc = makeResumeDoc('EXPERIENCE\nLed the platform team.');
       doc.sections[0].heading = 'EXPERIENCE';

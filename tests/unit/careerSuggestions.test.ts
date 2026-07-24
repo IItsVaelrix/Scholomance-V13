@@ -13,7 +13,7 @@ import type {
 describe('Career Suggestions Engine', () => {
   const RAW_TEXT =
     'Led a team and built software systems with AWS.\n' +
-    'Helped the support team resolve escalations.';
+    'Helped the support team.';
 
   const dummyDoc: ResumeDocument = {
     schemaVersion: 1,
@@ -373,7 +373,7 @@ describe('Career Suggestions Engine', () => {
       expect(result.text).toBe('Led the platform migration, managing a team of 6');
     });
 
-    it('ignores the guard for suggestions that do not require input', () => {
+    it('applies a sentinel-free suggestion normally, whatever requiresInput says', () => {
       const plain: ResumeSuggestion = {
         ...quantifySuggestion('Led the platform migration, managing a team of 6'),
         id: 'sugg-plain',
@@ -383,6 +383,24 @@ describe('Career Suggestions Engine', () => {
 
       const result = applyAcceptedSuggestions(baseDoc, [plain]);
       expect(result.applied).toEqual(['sugg-plain']);
+    });
+
+    it('skips a suggestion whose after still contains a sentinel even when requiresInput is not set', () => {
+      // The guard must not trust the flag: a future rule that forgets to set
+      // requiresInput must still be caught by the sentinel itself.
+      const drifted: ResumeSuggestion = {
+        ...quantifySuggestion(`Led the platform migration, managing a team of ${SENTINEL}`),
+        id: 'sugg-drifted',
+        requiresInput: undefined,
+      };
+
+      const result = applyAcceptedSuggestions(baseDoc, [drifted]);
+      expect(result.applied).toEqual([]);
+      expect(result.skipped).toContainEqual({
+        suggestionId: 'sugg-drifted',
+        reason: 'unfilled_input',
+      });
+      expect(result.text).toBe('Led the platform migration.');
     });
   });
 });

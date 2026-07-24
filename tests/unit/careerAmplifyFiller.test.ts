@@ -9,15 +9,31 @@ function run(raw: string) {
 }
 
 describe('filler rule', () => {
-  it('removes a hedge word and the space after it', () => {
+  it('removes a non-leading hedge word and the space after it', () => {
+    const raw = 'The team successfully launched the mobile app.';
+    const [sug] = run(raw);
+
+    expect(sug.type).toBe('tighten');
+    expect(sug.before).toBe('successfully ');
+    expect(sug.after).toBe('');
+    expect(raw.slice(sug.target!.span!.start, sug.target!.span!.end)).toBe(sug.before);
+    expect(sug.evidence[0].rule).toBe('filler_successfully');
+  });
+
+  it('extends through the following word and capitalizes it when the filler leads the line, instead of lowercasing the bullet', () => {
     const raw = 'Successfully launched the mobile app.';
     const [sug] = run(raw);
 
     expect(sug.type).toBe('tighten');
-    expect(sug.before).toBe('Successfully ');
-    expect(sug.after).toBe('');
+    expect(sug.before).toBe('Successfully launched');
+    expect(sug.after).toBe('Launched');
     expect(raw.slice(sug.target!.span!.start, sug.target!.span!.end)).toBe(sug.before);
     expect(sug.evidence[0].rule).toBe('filler_successfully');
+  });
+
+  it('emits nothing for a leading filler with no following word to capitalize', () => {
+    // "3" isn't a letter, so there is no word for the removal to extend through.
+    expect(run('Successfully 3 releases shipped.')).toEqual([]);
   });
 
   it('shortens "in order to" to "to"', () => {
@@ -34,7 +50,7 @@ describe('filler rule', () => {
   it('emits one suggestion per match, ordered by position', () => {
     const suggestions = run('Successfully shipped various tools in order to help teams.');
     expect(suggestions.map((s) => s.before)).toEqual([
-      'Successfully ',
+      'Successfully shipped',
       'various ',
       'in order to',
     ]);
@@ -65,17 +81,17 @@ describe('filler rule', () => {
     const suggestions = run(raw);
 
     // Should find 4 matches:
-    // 1. "Successfully " on line 1
-    // 2. "several " on line 2
-    // 3. "successfully " on line 2
-    // 4. "Various " on line 3
+    // 1. "Successfully launched" on line 1 (leading filler, extended + capitalized)
+    // 2. "several " on line 2 (non-leading)
+    // 3. "successfully " on line 2 (non-leading)
+    // 4. "Various tools" on line 3 (leading filler, extended + capitalized)
     expect(suggestions.length).toBe(4);
 
     // Verify each suggestion's before value
-    expect(suggestions[0].before).toBe('Successfully ');
+    expect(suggestions[0].before).toBe('Successfully launched');
     expect(suggestions[1].before).toBe('several ');
     expect(suggestions[2].before).toBe('successfully ');
-    expect(suggestions[3].before).toBe('Various ');
+    expect(suggestions[3].before).toBe('Various tools');
 
     // Verify spans are in document order
     const starts = suggestions.map((s) => s.target!.span!.start);

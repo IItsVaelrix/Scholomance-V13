@@ -10,7 +10,7 @@ function run(raw: string) {
 
 describe('verb strength rule', () => {
   it('strengthens a weak leading verb using the object it governs', () => {
-    const raw = 'Helped the support team resolve escalations.';
+    const raw = 'Helped the support team.';
     const [sug] = run(raw);
 
     expect(sug.type).toBe('verb');
@@ -51,8 +51,16 @@ describe('verb strength rule', () => {
     expect(run('Aided the paperwork.')).toEqual([]);
   });
 
+  it('stays silent on a catenative construction ("helped <object> <bare verb>"), which would read ungrammatically if rewritten', () => {
+    expect(run('Helped the support team resolve escalations.')).toEqual([]);
+  });
+
+  it('stays silent when a preposition follows the object, not just the verb', () => {
+    expect(run('Assisted the client with onboarding.')).toEqual([]);
+  });
+
   it('is deterministic', () => {
-    const raw = 'Helped the support team resolve escalations.';
+    const raw = 'Helped the support team.';
     expect(run(raw)).toEqual(run(raw));
   });
 });

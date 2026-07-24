@@ -4,11 +4,12 @@ import type { ResumeSuggestion } from '../../analysis/types.js';
 import {
   leadingVerb,
   classifyObject,
+  classifyObjectEndOffset,
   nextTokenAfter,
   capitalizeFirst,
   type AmplifyContext,
 } from '../primitives.js';
-import { WEAK_VERBS, PREPOSITIONS, CLASS_STRONG_VERB } from '../data/verb-classes.js';
+import { WEAK_VERBS, PREPOSITIONS, STEM_PAST, CLASS_STRONG_VERB } from '../data/verb-classes.js';
 
 const TORQUE: Record<string, string> = TORQUE_MAP as Record<string, string>;
 
@@ -37,6 +38,16 @@ export function verbStrengthRule(ctx: AmplifyContext): ResumeSuggestion[] {
     let rule = 'verb_strength_class';
 
     if (classified) {
+      // Catenative construction — "helped <object> <bare verb>" — or the object is
+      // followed by a preposition. Rewriting only the leading verb would produce
+      // ungrammatical English ("Led the support team resolve escalations."); only the
+      // token immediately after the matched keyword is inspected, not the whole
+      // remainder, so "end to end" past the object doesn't wrongly silence a line.
+      const keywordEnd = classifyObjectEndOffset(line, afterVerb);
+      const afterObject = keywordEnd !== null ? nextTokenAfter(line, keywordEnd) : null;
+      if (afterObject && (PREPOSITIONS.has(afterObject) || afterObject in STEM_PAST)) {
+        continue;
+      }
       replacement = CLASS_STRONG_VERB[classified.objectClass];
     } else if (TORQUE[lower]) {
       replacement = TORQUE[lower];

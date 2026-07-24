@@ -10,11 +10,18 @@ import {
   type ObjectClass,
 } from './data/verb-classes.js';
 
-/** Only these sections contain accomplishments worth amplifying. */
+/**
+ * Only these sections contain accomplishments worth amplifying.
+ * `unknown` is included because a pasted résumé with no recognizable section heading
+ * parses as one `unknown` section spanning the whole document — excluding it meant a
+ * plain-textarea paste (the app's primary input path) got zero suggestions. The rules
+ * are conservative enough that a mis-kinded block simply yields nothing.
+ */
 const AMPLIFY_SECTION_KINDS: ReadonlySet<string> = new Set([
   'experience',
   'projects',
   'summary',
+  'unknown',
 ]);
 
 const BULLET_PREFIX = /^(?:[•·▪◦–—*-]|\d+[.)])\s+/;
@@ -120,6 +127,12 @@ export function leadingVerb(line: AccomplishmentLine): VerbMatch | null {
   };
 }
 
+/** Length of the bullet marker (if any) at the start of `text`, else 0. */
+export function bulletPrefixLength(text: string): number {
+  const bullet = BULLET_PREFIX.exec(text);
+  return bullet ? bullet[0].length : 0;
+}
+
 /**
  * Conservative on purpose: a false positive suppresses a prompt (safe),
  * a false negative prompts for a metric that is already there (noise).
@@ -136,24 +149,50 @@ function singular(token: string): string {
   return token.endsWith('s') && token.length > 3 ? token.slice(0, -1) : token;
 }
 
-/** First curated object-class keyword appearing after `fromOffset` (index into line.text). */
-export function classifyObject(
+function findObjectClassMatch(
   line: AccomplishmentLine,
   fromOffset: number
-): { objectClass: ObjectClass; keyword: string } | null {
-  const tokens = line.text.slice(fromOffset).toLowerCase().match(/[a-z][a-z-]*/g) || [];
+): { objectClass: ObjectClass; keyword: string; endOffset: number } | null {
+  const slice = line.text.slice(fromOffset).toLowerCase();
 
-  for (const token of tokens) {
+  for (const m of slice.matchAll(/[a-z][a-z-]*/g)) {
+    const token = m[0];
     const base = singular(token);
     for (const cls of OBJECT_CLASS_ORDER) {
       const keywords = OBJECT_CLASS_KEYWORDS[cls];
       if (keywords.includes(token) || keywords.includes(base)) {
-        return { objectClass: cls, keyword: token };
+        return {
+          objectClass: cls,
+          keyword: token,
+          endOffset: fromOffset + (m.index ?? 0) + token.length,
+        };
       }
     }
   }
 
   return null;
+}
+
+/** First curated object-class keyword appearing after `fromOffset` (index into line.text). */
+export function classifyObject(
+  line: AccomplishmentLine,
+  fromOffset: number
+): { objectClass: ObjectClass; keyword: string } | null {
+  const found = findObjectClassMatch(line, fromOffset);
+  return found ? { objectClass: found.objectClass, keyword: found.keyword } : null;
+}
+
+/**
+ * Absolute offset (into line.text) immediately after the object-class keyword that
+ * `classifyObject` would return for the same (line, fromOffset), or null if none matches.
+ * Kept separate from `classifyObject` so that function's return shape stays exactly
+ * `{ objectClass, keyword }` for callers that only need the classification.
+ */
+export function classifyObjectEndOffset(
+  line: AccomplishmentLine,
+  fromOffset: number
+): number | null {
+  return findObjectClassMatch(line, fromOffset)?.endOffset ?? null;
 }
 
 export function nextTokenAfter(

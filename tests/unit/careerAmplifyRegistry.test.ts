@@ -6,7 +6,7 @@ import { makeResumeDoc } from './fixtures/career-amplify-doc';
 
 const RESUME = [
   'Responsible for managing the release process.',
-  'Helped the support team resolve escalations.',
+  'Helped the support team.',
   'Successfully launched the mobile app.',
   'Led the billing migration.',
   'Led the support rotation.',

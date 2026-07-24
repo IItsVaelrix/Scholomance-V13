@@ -25,14 +25,19 @@ export default function SuggestionReviewPanel({
     setSlotValues((prev) => ({ ...prev, [slotId]: value }));
   };
 
-  /** Left-to-right substitution of each sentinel by its slot's current value. */
+  /**
+   * Left-to-right substitution of each sentinel by its slot's current value.
+   * If a sentinel has no corresponding slot (a template/slot-list count mismatch),
+   * re-emit the sentinel rather than substituting '' — the apply engine then catches
+   * it as `unfilled_input` instead of writing a silently mangled clause to the résumé.
+   */
   const fillSlots = (suggestion: ResumeSuggestion): string => {
     const segments = (suggestion.after || '').split(INPUT_SENTINEL);
     return segments
       .map((segment, index) => {
         if (index === segments.length - 1) return segment;
         const slot = suggestion.inputSlots?.[index];
-        return segment + (slot ? (slotValues[slot.id] || '').trim() : '');
+        return segment + (slot ? (slotValues[slot.id] || '').trim() : INPUT_SENTINEL);
       })
       .join('');
   };

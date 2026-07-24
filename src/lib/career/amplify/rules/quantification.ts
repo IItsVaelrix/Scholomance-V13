@@ -24,12 +24,19 @@ export function quantificationRule(ctx: AmplifyContext): ResumeSuggestion[] {
     const targetKey = `${line.span.start}:${line.span.end}`;
     const id = makeSuggestionId('quantify', targetKey, `${metricClass}:${line.text}`);
 
+    // Most bullets end in sentence punctuation; appending the clause after it produced
+    // "…runtime., reducing …" (doubled punctuation). Move any trailing punctuation to
+    // the end of the clause instead.
+    const tail = /[.;:!?]+$/.exec(line.text);
+    const stem = tail ? line.text.slice(0, -tail[0].length) : line.text;
+    const after = stem + template.clause + (tail ? tail[0] : '');
+
     suggestions.push({
       id,
       type: 'quantify',
       target: { span: line.span },
       before: line.text,
-      after: line.text + template.clause,
+      after,
       reason:
         'This accomplishment has no measurable result. Fill in each blank with your own ' +
         'numbers — nothing is written to your résumé until every blank is filled.',
