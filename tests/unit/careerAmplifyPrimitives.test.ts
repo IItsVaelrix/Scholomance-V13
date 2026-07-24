@@ -42,6 +42,43 @@ describe('amplify primitives', () => {
       doc.sections[0].span = { coordinateSpace: 'raw', start: 0, end: 9999 };
       expect(getAccomplishmentLines(doc)).toEqual([]);
     });
+
+    it('handles blank lines between accomplishment lines with exact spans', () => {
+      const raw = 'Led the platform team.\n\nBuilt the billing API.\n';
+      const lines = getAccomplishmentLines(makeResumeDoc(raw));
+
+      // Blank line should not be emitted
+      expect(lines.map((l) => l.text)).toEqual([
+        'Led the platform team.',
+        'Built the billing API.',
+      ]);
+
+      // Verify round-trip property: slice matches text for every line
+      for (const line of lines) {
+        expect(raw.slice(line.span.start, line.span.end)).toBe(line.text);
+        expect(line.span.coordinateSpace).toBe('raw');
+      }
+    });
+
+    it('handles CRLF line endings with exact spans', () => {
+      const raw = 'Led the platform team.\r\n  Built the billing API.\r\n';
+      const lines = getAccomplishmentLines(makeResumeDoc(raw));
+
+      // No \r should appear in emitted text
+      expect(lines.map((l) => l.text)).toEqual([
+        'Led the platform team.',
+        'Built the billing API.',
+      ]);
+      for (const line of lines) {
+        expect(line.text).not.toContain('\r');
+      }
+
+      // Verify round-trip property: slice matches text for every line
+      for (const line of lines) {
+        expect(raw.slice(line.span.start, line.span.end)).toBe(line.text);
+        expect(line.span.coordinateSpace).toBe('raw');
+      }
+    });
   });
 
   describe('leadingVerb', () => {
