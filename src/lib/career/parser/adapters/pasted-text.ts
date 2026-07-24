@@ -26,7 +26,7 @@ export function extractPastedText(content: string): ExtractedDocument {
   return {
     source: {
       type: 'paste',
-      fileSize: Buffer.byteLength(safeContent, 'utf-8'),
+      fileSize: new TextEncoder().encode(safeContent).byteLength,
     },
     blocks,
     diagnostics: [],

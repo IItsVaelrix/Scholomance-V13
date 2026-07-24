@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { buildCleanExport } from '../../src/lib/career/export/clean-export';
-import { analyzeCareerFit } from '../../src/lib/career/analysis/analyze-career';
+import { analyzeCareerFit, toPercentConfidence } from '../../src/lib/career/analysis/analyze-career';
 import type { ResumeDocument } from '../../src/lib/career/parser/types';
 import type { ResumeSuggestion } from '../../src/lib/career/analysis/types';
 
@@ -181,5 +181,21 @@ BS Computer Science`,
       expect(typeof pipeline.buildSigilDataArchive).toBe('function');
       expect(typeof pipeline.deriveResonanceAnchors).toBe('function');
     });
+  });
+});
+
+describe('toPercentConfidence canonical helper', () => {
+  it.each([
+    [0.91, 91],
+    [91, 91],
+    [1, 100],
+    [0, 0],
+    [150, 100],
+    [-5, 0],
+    [null, null],
+    [undefined, null],
+    [NaN, null],
+  ])('normalizes confidence %s to %s', (input, expected) => {
+    expect(toPercentConfidence(input as number | null | undefined)).toBe(expected);
   });
 });

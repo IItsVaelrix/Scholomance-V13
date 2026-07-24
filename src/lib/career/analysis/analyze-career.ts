@@ -22,6 +22,23 @@ const EXPECTED_SECTIONS: ResumeSectionKind[] = [
 ];
 
 /**
+ * Canonical confidence normalizer.
+ *
+ * Accepts either a 0–1 fraction or a 0–100 percentage and always returns a
+ * clamped, rounded integer percentage in [0, 100]. Non-numeric inputs
+ * (null / undefined / NaN) normalize to `null`. This is the single source of
+ * truth for confidence arithmetic across the Career module — do not duplicate
+ * the clamp/scale logic elsewhere.
+ */
+export function toPercentConfidence(
+  value: number | null | undefined
+): number | null {
+  if (typeof value !== 'number' || Number.isNaN(value)) return null;
+  const scaled = value >= 0 && value <= 1 ? value * 100 : value;
+  return Math.min(100, Math.max(0, Math.round(scaled)));
+}
+
+/**
  * Master analysis orchestrator for candidate résumé career fit.
  *
  * Runs strict phrase matching, HMM prose legibility audit, acronym coverage analysis,
@@ -40,19 +57,8 @@ export function analyzeCareerFit(
 
   // 2. Prose Legibility Audit (HMM Pass)
   const rawLegibility = analyzeResumeLegibility(resumeText);
-  const legibilityScore100 = Math.min(
-    100,
-    Math.max(
-      0,
-      Math.round(
-        typeof rawLegibility?.legibilityScore === 'number'
-          ? rawLegibility.legibilityScore <= 1
-            ? rawLegibility.legibilityScore * 100
-            : rawLegibility.legibilityScore
-          : 100
-      )
-    )
-  );
+  const legibilityScore100 =
+    toPercentConfidence(rawLegibility?.legibilityScore) ?? 100;
 
   const legibility: LegibilityAnalysis & typeof rawLegibility = {
     ...rawLegibility,

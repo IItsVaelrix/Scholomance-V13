@@ -399,3 +399,23 @@ TypeScript, React, Node.js`;
     expect(doc.contact.email).toBe('john@example.com');
   });
 });
+
+describe('Career graph prerequisites', () => {
+  it('parses pasted text when Buffer is absent (browser-safe byte measurement)', async () => {
+    const original = globalThis.Buffer;
+    // @ts-expect-error browser simulation
+    globalThis.Buffer = undefined;
+    try {
+      await expect(
+        parseResumeSource({ type: 'paste', content: 'Jane Doe\nExperience' })
+      ).resolves.toMatchObject({ source: { type: 'paste' } });
+    } finally {
+      globalThis.Buffer = original;
+    }
+  });
+
+  it('measures pasted byte length via TextEncoder, not Buffer', () => {
+    const result = extractPastedText('Jane Doe');
+    expect(result.source.fileSize).toBe(new TextEncoder().encode('Jane Doe').byteLength);
+  });
+});

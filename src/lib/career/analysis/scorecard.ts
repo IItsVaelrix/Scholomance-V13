@@ -1,5 +1,6 @@
 import { normalizeText, stem } from '../text-utils.js';
 import { STOPWORDS } from '../stopwords.js';
+import { toPercentConfidence } from './analyze-career.js';
 import type {
   ResumeDocument,
   KeywordGapAnalysis,
@@ -38,11 +39,8 @@ export function computeAtsScorecard(params: {
 }): AtsScorecard {
   const { doc, keywordGap, legibility, sectionCoverage } = params;
 
-  // 1. parseQuality: doc.confidence (0-100 or null)
-  const parseQuality =
-    typeof doc?.confidence === 'number' && !Number.isNaN(doc.confidence)
-      ? Math.min(100, Math.max(0, Math.round(doc.confidence)))
-      : null;
+  // 1. parseQuality: doc.confidence normalized to a clamped 0-100 integer (or null)
+  const parseQuality = toPercentConfidence(doc?.confidence);
 
   // 2. sectionCoverage: 0-100
   const sectionCoverageScore = Math.min(
