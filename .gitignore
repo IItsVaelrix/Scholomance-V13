@@ -170,3 +170,10 @@ squashfs-root/
 # 2026-07-23; nothing under .tmp/ is source. (33 pre-existing .tmp/ files stay
 # tracked — .gitignore does not untrack, and removing them is a separate call.)
 .tmp/
+
+# Career Graph: pinned sources are fetched locally and never committed.
+# (config/career-graph-sources.json and tests/fixtures/career-graph ARE committed.)
+data/career-graph/raw/
+data/career-graph/normalized/
+data/career-graph/shards/
+data/career-graph/*.sqlite

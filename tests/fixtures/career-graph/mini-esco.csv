@@ -1,0 +1,4 @@
+record_type,namespace,external_id,kind,preferred_label,description,from_concept_id,predicate,to_concept_id,requirement_kind,importance,level,source_release,source_record_id
+concept,esco,isco-2512,occupation,Software developer,"Designs, develops and maintains software",,,,,,,esco-1.2.1,esco-occ-1
+concept,esco,skill.sql,skill,SQL,"Query and manage relational databases",,,,,,,esco-1.2.1,esco-skill-1
+relation,esco,,,,,esco:isco-2512,requires_skill,esco:skill.sql,essential,0.95,5,esco-1.2.1,esco-rel-1

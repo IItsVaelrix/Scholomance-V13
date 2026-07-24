@@ -1,0 +1,35 @@
+{
+  "onet": {
+    "id": "onet",
+    "version": "30.3",
+    "url": "https://www.onetcenter.org/dl_files/database/db_30_3_text/db_30_3_text.zip",
+    "filename": "db_30_3_text.zip",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "checksumStatus": "placeholder-unverified",
+    "license": "CC-BY-4.0",
+    "attribution": "O*NET 30.3 by the O*NET Resource Center, sponsored by the U.S. Department of Labor, Employment and Training Administration. https://www.onetcenter.org/ — O*NET data is in the public domain / CC-BY.",
+    "notes": "Canonical O*NET text-file database release. Confirm the exact download URL against https://www.onetcenter.org/database.html before pinning."
+  },
+  "esco": {
+    "id": "esco",
+    "version": "1.2.1",
+    "url": "https://esco.ec.europa.eu/sites/default/files/2022-09/esco-1.2.1-csv.zip",
+    "filename": "esco-1.2.1-csv.zip",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "checksumStatus": "placeholder-unverified",
+    "license": "CC-BY-4.0",
+    "attribution": "ESCO 1.2.1 by the European Commission. https://esco.ec.europa.eu/ — ESCO is published under CC-BY-4.0.",
+    "notes": "ESCO CSV bundle (occupations, skills/competences, relations). Confirm the exact download URL against https://esco.ec.europa.eu/en/use-esco/download before pinning."
+  },
+  "crosswalk": {
+    "id": "crosswalk",
+    "version": "2022-1",
+    "url": "https://esco.ec.europa.eu/sites/default/files/2022-09/onet-esco-crosswalk.csv",
+    "filename": "onet-esco-crosswalk.csv",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "checksumStatus": "placeholder-unverified",
+    "license": "CC-BY-4.0",
+    "attribution": "O*NET-SOC <-> ESCO crosswalk, European Commission / Cedefop. https://esco.ec.europa.eu/ — CC-BY-4.0.",
+    "notes": "Official O*NET-SOC to ESCO occupation crosswalk. Crosswalk edges are mapped_to, never same_as. Confirm the exact download URL before pinning."
+  }
+}

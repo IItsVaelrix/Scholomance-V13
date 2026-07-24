@@ -1,0 +1,6 @@
+record_type,namespace,external_id,kind,preferred_label,description,from_concept_id,predicate,to_concept_id,requirement_kind,importance,level,source_release,source_record_id
+concept,onet,15-1252.00,occupation,Software Developers,"Develop, create, and modify general applications software",,,,,,,onet-30.3,onet-occ-1
+concept,onet,skill.sql,skill,SQL,"Structured query language for relational databases",,,,,,,onet-30.3,onet-skill-1
+concept,onet,skill.python,skill,Python,"General-purpose programming language",,,,,,,onet-30.3,onet-skill-2
+relation,onet,,,,,onet:15-1252.00,requires_skill,onet:skill.sql,required,0.9,5,onet-30.3,onet-rel-1
+relation,onet,,,,,onet:15-1252.00,requires_skill,onet:skill.python,preferred,0.6,4,onet-30.3,onet-rel-2

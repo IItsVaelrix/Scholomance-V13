@@ -1,0 +1,2 @@
+record_type,namespace,external_id,kind,preferred_label,description,from_concept_id,predicate,to_concept_id,requirement_kind,importance,level,source_release,source_record_id
+relation,crosswalk,,,,,onet:15-1252.00,mapped_to,esco:isco-2512,,,,xwalk-2022-1,xwalk-1
