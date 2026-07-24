@@ -1322,3 +1322,175 @@
   opacity: 0.7;
 }
 
+
+/* ── Career Graph: Target Role + Skill Evidence panels (Task 17) ─────────── */
+.target-role-panel,
+.skill-evidence-panel {
+  margin: 1rem 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgba(140, 160, 255, 0.22);
+  border-radius: 10px;
+  background: rgba(18, 22, 40, 0.55);
+}
+
+.target-role-heading,
+.skill-evidence-heading {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  color: #cfe0ff;
+}
+
+.target-role-note {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #aab6d8;
+}
+
+.target-role-candidates {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.target-role-candidate-btn {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid rgba(140, 160, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(30, 38, 66, 0.7);
+  color: #e6ecff;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.target-role-candidate-btn:hover,
+.target-role-candidate-btn:focus-visible {
+  border-color: rgba(160, 190, 255, 0.75);
+  background: rgba(44, 54, 92, 0.85);
+  outline: none;
+}
+
+.candidate-label {
+  font-weight: 600;
+}
+
+.candidate-meta,
+.confirmed-meta {
+  font-size: 0.75rem;
+  color: #93a1c8;
+}
+
+.target-role-confirmed {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.confirmed-label {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #e6ecff;
+}
+
+.target-role-empty,
+.skill-evidence-empty {
+  font-size: 0.85rem;
+  color: #93a1c8;
+}
+
+.skill-evidence-summary {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  color: #aab6d8;
+}
+
+.skill-group {
+  margin: 0.75rem 0;
+}
+
+.skill-group-title {
+  margin: 0 0 0.4rem;
+  font-size: 0.9rem;
+  letter-spacing: 0.03em;
+  color: #bcd0ff;
+}
+
+.skill-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.skill-item {
+  padding: 0.6rem 0.8rem;
+  border-left: 3px solid rgba(140, 160, 255, 0.4);
+  border-radius: 6px;
+  background: rgba(24, 30, 52, 0.6);
+}
+
+.skill-item--demonstrated { border-left-color: #4ade80; }
+.skill-item--adjacent { border-left-color: #facc15; }
+.skill-item--missing { border-left-color: #f87171; }
+.skill-item--ambiguous { border-left-color: #a78bfa; }
+.skill-item--not_required { border-left-color: #64748b; }
+
+.skill-item-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.skill-label {
+  font-weight: 600;
+  color: #e6ecff;
+}
+
+.skill-badge,
+.skill-requirement {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: rgba(120, 140, 220, 0.2);
+  color: #cdd8ff;
+}
+
+.skill-note {
+  margin: 0.35rem 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #c2cdec;
+}
+
+.skill-evidence-trail {
+  margin: 0.35rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.75rem;
+  color: #93a1c8;
+  display: grid;
+  gap: 0.1rem;
+}
+
+.skill-evidence-trail code {
+  font-size: 0.72rem;
+  color: #bcd0ff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .target-role-candidate-btn {
+    transition: none;
+  }
+}

@@ -4,12 +4,31 @@ import { triggerHapticPulse, UI_HAPTICS } from '../../lib/platform/haptics';
 import { parseResumeSource, type ResumeSource } from '../../lib/career/parser/parse-resume';
 import { analyzeCareerFit } from '../../lib/career/analysis/analyze-career';
 import { buildCleanExport } from '../../lib/career/export/clean-export';
+import { buildGraphCareerSuggestions } from '../../lib/career/suggestions/build-suggestions';
 import type { ResumeDocument, ResumeSourceType } from '../../lib/career/parser/types';
 import type { CareerAnalysisResult, ResumeSuggestion } from '../../lib/career/analysis/types';
+import type { CareerGraphAnalysis } from '../../lib/career/graph/contracts';
+import type { CareerGraphInput } from '../../lib/career/graph/client';
 import ParserPreviewDrawer from './ParserPreviewDrawer';
 import SuggestionReviewPanel from './SuggestionReviewPanel';
 import DataArchiveDrawer from './DataArchiveDrawer';
+import TargetRolePanel from './TargetRolePanel';
+import SkillEvidencePanel from './SkillEvidencePanel';
 import './CareerPage.css';
+
+/**
+ * Minimal UI-facing Career Graph port. Both the real `CareerGraphClient`
+ * (`analyze(input, options?)`) and the test fixture (`{ analyze }`) satisfy it.
+ * Injected so the page is testable without a real Worker / SQLite WASM.
+ */
+export interface CareerGraphPort {
+  analyze(input: CareerGraphInput): Promise<CareerGraphAnalysis>;
+}
+
+export interface CareerPageProps {
+  /** Optional Career Graph client. When absent, the proven lexical flow runs. */
+  graphClient?: CareerGraphPort;
+}
 
 export type CareerStatus =
   | 'IDLE'
@@ -17,10 +36,28 @@ export type CareerStatus =
   | 'PARSING'
   | 'PARSE_REVIEW'
   | 'ANALYZING'
+  | 'GRAPH_LOADING'
+  | 'OCCUPATION_REVIEW'
+  | 'GRAPH_ANALYZING'
   | 'COMPLETE'
   | 'ERROR';
 
-export default function CareerPage() {
+/** True when the graph asks the candidate to confirm the target occupation. */
+function needsOccupationConfirmation(analysis: CareerGraphAnalysis): boolean {
+  return analysis.diagnostics.some(
+    (d) => d.code === 'OCCUPATION_CONFIRMATION_REQUIRED'
+  );
+}
+
+const BUSY_STATUSES: CareerStatus[] = [
+  'EXTRACTING',
+  'PARSING',
+  'ANALYZING',
+  'GRAPH_LOADING',
+  'GRAPH_ANALYZING',
+];
+
+export default function CareerPage({ graphClient }: CareerPageProps = {}) {
   const [content, setContent] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [status, setStatus] = useState<CareerStatus>('IDLE');
@@ -38,11 +75,17 @@ export default function CareerPage() {
   const [analysisResult, setAnalysisResult] = useState<CareerAnalysisResult | null>(null);
   const [suggestions, setSuggestions] = useState<ResumeSuggestion[]>([]);
 
+  // Career Graph state.
+  const [graphAnalysis, setGraphAnalysis] = useState<CareerGraphAnalysis | null>(null);
+  const [confirmedOccupationId, setConfirmedOccupationId] = useState<string | null>(null);
+
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [dragActive, setDragActive] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const graphClientRef = useRef<CareerGraphPort | undefined>(graphClient);
+  const analysisAbortRef = useRef<AbortController | null>(null);
 
   // Mouse ripple follower effect
   useEffect(() => {
@@ -59,12 +102,22 @@ export default function CareerPage() {
     return () => window.removeEventListener('mousemove', handleGlobalMouseMove);
   }, []);
 
+  // Abort any in-flight graph analysis on unmount.
+  useEffect(() => {
+    return () => {
+      analysisAbortRef.current?.abort();
+    };
+  }, []);
+
   const resetToIdle = () => {
-    if (status === 'COMPLETE' || status === 'ERROR') {
+    if (status === 'COMPLETE' || status === 'ERROR' || status === 'OCCUPATION_REVIEW') {
+      analysisAbortRef.current?.abort();
       setStatus('IDLE');
       setErrorMessage(null);
       setParsedDocument(null);
       setAnalysisResult(null);
+      setGraphAnalysis(null);
+      setConfirmedOccupationId(null);
       setSuggestions([]);
       setDrawerOpen(false);
       setArchiveOpen(false);
@@ -160,20 +213,87 @@ export default function CareerPage() {
     }
   };
 
-  // Confirm in drawer -> Run career analysis -> Move to COMPLETE
-  const handleConfirmAndAlign = () => {
+  const resumeTextFor = (doc: ResumeDocument): string =>
+    doc.rawText || doc.normalizedText || '';
+
+  // Finalize a graph analysis into the COMPLETE view + reviewable suggestions.
+  const finalizeGraphComplete = (result: CareerGraphAnalysis, doc: ResumeDocument) => {
+    setGraphAnalysis(result);
+    setSuggestions(buildGraphCareerSuggestions(result, doc));
+    setStatus('COMPLETE');
+    triggerHapticPulse(UI_HAPTICS.SUCCESS);
+  };
+
+  // Confirm in drawer -> run analysis. Graph flow when a client is injected,
+  // otherwise the proven lexical flow.
+  const handleConfirmAndAlign = async () => {
     if (!parsedDocument) return;
     setDrawerOpen(false);
-    setStatus('ANALYZING');
 
+    const client = graphClientRef.current;
+    if (!client) {
+      // Lexical flow (unchanged).
+      setStatus('ANALYZING');
+      try {
+        const result = analyzeCareerFit(parsedDocument, jobDescription);
+        setAnalysisResult(result);
+        setSuggestions(result.suggestions || []);
+        setStatus('COMPLETE');
+        triggerHapticPulse(UI_HAPTICS.SUCCESS);
+      } catch (err: any) {
+        setErrorMessage(err?.message || 'Failed to analyze career fit');
+        setStatus('ERROR');
+      }
+      return;
+    }
+
+    // Graph flow.
+    analysisAbortRef.current?.abort();
+    const controller = new AbortController();
+    analysisAbortRef.current = controller;
+    setStatus('GRAPH_LOADING');
     try {
-      const result = analyzeCareerFit(parsedDocument, jobDescription);
-      setAnalysisResult(result);
-      setSuggestions(result.suggestions || []);
-      setStatus('COMPLETE');
-      triggerHapticPulse(UI_HAPTICS.SUCCESS);
+      const result = await client.analyze({
+        resumeText: resumeTextFor(parsedDocument),
+        jobDescriptionText: jobDescription,
+      });
+      if (controller.signal.aborted) return;
+      setGraphAnalysis(result);
+      if (needsOccupationConfirmation(result)) {
+        setStatus('OCCUPATION_REVIEW');
+        triggerHapticPulse(UI_HAPTICS.MEDIUM);
+      } else {
+        finalizeGraphComplete(result, parsedDocument);
+      }
     } catch (err: any) {
-      setErrorMessage(err?.message || 'Failed to analyze career fit');
+      if (controller.signal.aborted) return;
+      setErrorMessage(err?.message || 'Career graph analysis failed');
+      setStatus('ERROR');
+    }
+  };
+
+  // Candidate confirmed a target occupation -> re-analyze with the confirmed id.
+  const handleConfirmOccupation = async (conceptId: string) => {
+    if (!parsedDocument) return;
+    const client = graphClientRef.current;
+    if (!client) return;
+
+    setConfirmedOccupationId(conceptId);
+    analysisAbortRef.current?.abort();
+    const controller = new AbortController();
+    analysisAbortRef.current = controller;
+    setStatus('GRAPH_ANALYZING');
+    try {
+      const result = await client.analyze({
+        resumeText: resumeTextFor(parsedDocument),
+        jobDescriptionText: jobDescription,
+        confirmedOccupationId: conceptId,
+      });
+      if (controller.signal.aborted) return;
+      finalizeGraphComplete(result, parsedDocument);
+    } catch (err: any) {
+      if (controller.signal.aborted) return;
+      setErrorMessage(err?.message || 'Career graph analysis failed');
       setStatus('ERROR');
     }
   };
@@ -210,7 +330,9 @@ export default function CareerPage() {
   const handleAcceptAllLowRisk = () => {
     setSuggestions((prev) =>
       prev.map((s) =>
-        s.risk === 'low' && s.requiresInput !== true ? { ...s, status: 'accepted' } : s
+        s.risk === 'low' && s.requiresInput !== true && s.editable !== false
+          ? { ...s, status: 'accepted' }
+          : s
       )
     );
   };
@@ -236,6 +358,7 @@ export default function CareerPage() {
   };
 
   const scorecard = analysisResult?.scorecard;
+  const isBusy = BUSY_STATUSES.includes(status);
 
   return (
     <div className="career-ignition-chamber">
@@ -320,7 +443,7 @@ export default function CareerPage() {
                 if (sourceFile) setSourceFile(null);
                 resetToIdle();
               }}
-              disabled={status === 'EXTRACTING' || status === 'PARSING' || status === 'ANALYZING'}
+              disabled={isBusy}
             />
           </div>
 
@@ -337,7 +460,7 @@ export default function CareerPage() {
                 setJobDescription(e.target.value);
                 resetToIdle();
               }}
-              disabled={status === 'EXTRACTING' || status === 'PARSING' || status === 'ANALYZING'}
+              disabled={isBusy}
             />
           </div>
         </div>
@@ -350,12 +473,7 @@ export default function CareerPage() {
         <button
           className="ignite-btn"
           onClick={handleParseAndInspect}
-          disabled={
-            (!content.trim() && !sourceFile) ||
-            status === 'EXTRACTING' ||
-            status === 'PARSING' ||
-            status === 'ANALYZING'
-          }
+          disabled={(!content.trim() && !sourceFile) || isBusy}
         >
           {status === 'EXTRACTING'
             ? 'Extracting Document...'
@@ -376,9 +494,68 @@ export default function CareerPage() {
         onEditParsedDocument={handleEditParsedDocument}
       />
 
-      {/* Complete View: AtsScorecard & SuggestionReviewPanel */}
+      {/* Graph: Occupation confirmation (missing skills paused) */}
       <AnimatePresence>
-        {status === 'COMPLETE' && scorecard && (
+        {status === 'OCCUPATION_REVIEW' && graphAnalysis && (
+          <motion.div
+            className="alignment-report"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+          >
+            <TargetRolePanel
+              analysis={graphAnalysis}
+              needsConfirmation
+              onConfirmOccupation={handleConfirmOccupation}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Graph: Complete view (target role + skill evidence) */}
+      <AnimatePresence>
+        {status === 'COMPLETE' && graphAnalysis && (
+          <motion.div
+            className="alignment-report"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+          >
+            <TargetRolePanel
+              analysis={graphAnalysis}
+              confirmedOccupationId={confirmedOccupationId}
+            />
+            <SkillEvidencePanel analysis={graphAnalysis} />
+
+            {suggestions.length > 0 && (
+              <SuggestionReviewPanel
+                suggestions={suggestions}
+                onAccept={handleAcceptSuggestion}
+                onReject={handleRejectSuggestion}
+                onEdit={handleEditSuggestion}
+                onAcceptAllLowRisk={handleAcceptAllLowRisk}
+              />
+            )}
+
+            <div className="report-section">
+              <div className="report-heading-row">
+                <h3 className="report-heading">Résumé Clean Export</h3>
+                <div className="report-heading-actions">
+                  <button className="download-btn" onClick={handleDownloadCleanExport}>
+                    ↓ Download .txt
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Lexical: Complete View (AtsScorecard & SuggestionReviewPanel) */}
+      <AnimatePresence>
+        {status === 'COMPLETE' && !graphAnalysis && scorecard && (
           <motion.div
             className="alignment-report"
             initial={{ opacity: 0, y: 16 }}

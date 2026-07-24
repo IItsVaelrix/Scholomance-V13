@@ -8,6 +8,7 @@
 import type { ResumeDocument } from '../../../src/lib/career/parser/types';
 import type {
   CareerGraphAnalysis,
+  OccupationCandidate,
   SkillClassification,
 } from '../../../src/lib/career/graph/contracts';
 import { CAREER_POLICY_BUNDLE } from '../../../src/lib/career/graph/policies';
@@ -82,8 +83,59 @@ export function makeGraphClient(options: { analysis: CareerGraphAnalysis }) {
   return { analyze: async () => options.analysis };
 }
 
+export function makeOccupationCandidate(
+  overrides: Partial<OccupationCandidate> = {}
+): OccupationCandidate {
+  return {
+    conceptId: 'onet:15-1252.00',
+    label: 'Software Developers',
+    namespace: 'onet',
+    socMajorGroup: '15',
+    family: '15',
+    score: 0.9,
+    bucket: 'exact',
+    relationPath: ['onet:15-1252.00'],
+    sources: ['onet-30.3'],
+    jobEvidence: [{ coordinateSpace: 'raw', start: 0, end: 3 }],
+    ...overrides,
+  };
+}
+
+/** Four candidates across families that trigger occupation confirmation. */
+export const ambiguousOccupationCandidates: OccupationCandidate[] = [
+  makeOccupationCandidate({
+    conceptId: 'onet:15-1252.00',
+    label: 'Software Developers',
+    family: '15',
+    score: 0.82,
+  }),
+  makeOccupationCandidate({
+    conceptId: 'onet:15-1252.00-tpm',
+    label: 'Technical Product Manager',
+    family: '15',
+    score: 0.8,
+    bucket: 'alias',
+  }),
+  makeOccupationCandidate({
+    conceptId: 'onet:15-2051.00',
+    label: 'Data Scientists',
+    family: '15',
+    score: 0.74,
+    bucket: 'fts',
+  }),
+  makeOccupationCandidate({
+    conceptId: 'onet:13-1161.00',
+    label: 'Market Research Analysts',
+    socMajorGroup: '13',
+    family: '13',
+    score: 0.61,
+    bucket: 'fts',
+  }),
+];
+
 export function makeAmbiguousOccupationAnalysis(): CareerGraphAnalysis {
   return makeCareerGraphAnalysis({
+    occupations: ambiguousOccupationCandidates,
     diagnostics: [
       {
         code: 'OCCUPATION_CONFIRMATION_REQUIRED',
