@@ -39,25 +39,33 @@ describe('clauseSpanAt', () => {
     expect(clauseSpanAt(text, node, node + 7).text).toBe(clauseAt(text, node, node + 7));
   });
 
-  it('resolves distinct boundaries when the same clause text occurs twice in one JD', () => {
-    // This is the case a text-search re-derivation (`text.indexOf(clauseText, ...)`) can
-    // get wrong: given only the clause's TEXT, a naive re-search has no way to tell the
-    // two occurrences apart and can silently anchor both to the first one. clauseSpanAt
-    // never re-searches — it returns the boundaries the scan already computed.
-    const text = 'Requirements:\n- Experience with SQL\n- Experience with SQL required';
+  it('resolves the boundaries of the occurrence actually containing the offset, not an earlier byte-identical one', () => {
+    // Repro verified by direct execution (see fix-round-2 report): three BYTE-IDENTICAL
+    // clauses in one continuous run of text, split by clause punctuation rather than
+    // newlines. Under the OLD `text.indexOf(clauseText, Math.max(0, start -
+    // clauseText.length))` re-derivation this text is exactly where it breaks — passing
+    // an offset inside the SECOND "SQL basics." clause, the old formula computes
+    // `Math.max(0, 12 - 12) === 0` and `text.indexOf('SQL basics. ', 0)` returns the
+    // FIRST occurrence's start (0), not the second's (12). A fixture built from two
+    // non-identical bullet lines (as an earlier version of this test used) does NOT
+    // reproduce this: the old algorithm handles that shape fine, which is why that
+    // fixture passed identically before and after the fix and proved nothing.
+    const text = 'SQL basics. SQL basics. SQL basics.';
     const first = text.indexOf('SQL');
     const second = text.indexOf('SQL', first + 1);
-    expect(second).toBeGreaterThan(first);
+    const third = text.indexOf('SQL', second + 1);
+    expect([first, second, third]).toEqual([0, 12, 24]);
 
-    const spanA = clauseSpanAt(text, first, first + 3);
-    const spanB = clauseSpanAt(text, second, second + 3);
+    const spanSecond = clauseSpanAt(text, second, second + 3);
+    expect(spanSecond.start).toBe(12);
+    expect(spanSecond.end).toBe(24);
+    expect(text.slice(spanSecond.start, spanSecond.end)).toBe(spanSecond.text);
+    expect(spanSecond.text).toBe('SQL basics. ');
 
-    // Each span's boundaries must slice back to its own clause text...
-    expect(text.slice(spanA.start, spanA.end)).toBe(spanA.text);
-    expect(text.slice(spanB.start, spanB.end)).toBe(spanB.text);
-    // ...and the two occurrences must resolve to DIFFERENT positions, not both collapse
-    // onto the first match.
-    expect(spanA.start).not.toBe(spanB.start);
-    expect(spanB.start).toBeGreaterThan(spanA.end);
+    // The third occurrence too, so this isn't a coincidence of exactly two repeats.
+    const spanThird = clauseSpanAt(text, third, third + 3);
+    expect(spanThird.start).toBe(24);
+    expect(spanThird.end).toBe(35);
+    expect(text.slice(spanThird.start, spanThird.end)).toBe(spanThird.text);
   });
 });
