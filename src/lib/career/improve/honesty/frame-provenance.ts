@@ -9,6 +9,14 @@
  *
  * That makes it mechanically impossible for the tool to introduce a noun that is neither
  * the employer's word nor the candidate's — which is what lets the card be one-step.
+ *
+ * Numeric carve-out (mirrors `token-provenance.ts`'s hardening, see its doc comment): a
+ * `sourceClause` is raw employer text, and JDs routinely state counts and durations
+ * ("5+ years", "team of 10"). Folding those into the general allowed set would let the
+ * employer's requirement numbers flow into the résumé as though the candidate stated
+ * them. So a content token containing a digit is legal ONLY if it appears in one of the
+ * candidate's `slotValues` — never from `sourceClause` or `frame.text`. Every other
+ * content token keeps the three-source rule (clause / frame scaffolding / slot values).
  */
 import { INPUT_SENTINEL } from '../../amplify/data/input-sentinel.js';
 import type { HonestyVerdict } from '../types.js';
@@ -18,12 +26,12 @@ import type { PhraseFrame } from '../jd-phrase-frame.js';
 const CLOSED_CLASS: ReadonlySet<string> = new Set([
   'a', 'an', 'the', 'and', 'or', 'but', 'of', 'to', 'in', 'on', 'for', 'with', 'at',
   'by', 'from', 'as', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'that',
-  'this', 'these', 'those', 'their', 'our', 'my', 'your', 'its', 'into', 'onto',
-  'across', 'through', 'within', 'during', 'toward', 'towards', 'alongside', 'using',
-  'via', 'per', 'each', 'all', 'any', 'some', 'no', 'not', 'than', 'then', 'so',
-  'such', 'including', 'include', 'includes', 'etc', 'percent', 'percentage',
-  'million', 'thousand', 'billion', 'hundred', 'dozen', 'more', 'less', 'fewer',
-  'over', 'under', 'up', 'down', 'out', 'off',
+  'this', 'these', 'those', 'their', 'our', 'my', 'your', 'his', 'her', 'its',
+  'into', 'onto', 'across', 'through', 'within', 'during', 'toward', 'towards',
+  'alongside', 'using', 'via', 'per', 'each', 'all', 'any', 'some', 'no', 'not',
+  'than', 'then', 'so', 'such', 'including', 'include', 'includes', 'etc',
+  'percent', 'percentage', 'million', 'thousand', 'billion', 'hundred', 'dozen',
+  'more', 'less', 'fewer', 'over', 'under', 'up', 'down', 'out', 'off',
 ]);
 
 function contentTokens(text: string): string[] {
@@ -45,12 +53,23 @@ export function assertFrameProvenance(
   const allowed = new Set<string>();
   for (const tok of contentTokens(frame.sourceClause)) allowed.add(tok);
   for (const tok of contentTokens(frame.text)) allowed.add(tok);
+
+  const slotTokens = new Set<string>();
   for (const value of slotValues) {
-    for (const tok of contentTokens(value)) allowed.add(tok);
+    for (const tok of contentTokens(value)) {
+      allowed.add(tok);
+      slotTokens.add(tok);
+    }
   }
 
   for (const tok of contentTokens(text)) {
     if (!tok) continue;
+    // Numeric tokens require provenance from a slot value specifically — a candidate
+    // fact, never the employer's own requirement wording (sourceClause/frame.text).
+    if (/^\d/.test(tok)) {
+      if (slotTokens.has(tok)) continue;
+      return { ok: false, reason: `unprovenanced_frame_number:${tok}` };
+    }
     if (allowed.has(tok)) continue;
     if (CLOSED_CLASS.has(tok)) continue;
     return { ok: false, reason: 'unprovenanced_frame_token' };

@@ -33,4 +33,32 @@ describe('assertFrameProvenance', () => {
     expect(verdict.ok).toBe(false);
     expect(verdict.reason).toBe('unfilled_slot');
   });
+
+  it('refuses a numeric token from the JD clause that the candidate never supplied', () => {
+    // The employer's own requirement count ("5+ years") must not relay into the résumé
+    // as though it were the candidate's stated experience.
+    const exploitFrame: PhraseFrame = {
+      text: 'Used Apache Airflow for orchestration, ␟',
+      slots: [{ placeholder: 'the result', hint: 'the result it produced' }],
+      sourceClause: '5+ years experience with Apache Airflow for orchestration',
+      sourceSpan: { coordinateSpace: 'raw', start: 0, end: 58 },
+    };
+    const after = 'Used Apache Airflow for orchestration, with 5+ years experience';
+    const verdict = assertFrameProvenance(after, exploitFrame, []);
+    expect(verdict.ok).toBe(false);
+    expect(verdict.reason).toBe('unprovenanced_frame_number:5+');
+  });
+
+  it('accepts a numeric token the candidate typed into a slot', () => {
+    const after = 'Used Apache Airflow for orchestration, 5 years';
+    expect(assertFrameProvenance(after, frame, ['5 years']).ok).toBe(true);
+  });
+
+  it('still accepts a non-numeric token that comes only from the source clause', () => {
+    // Proves the numeric carve-out narrowed only the digit-bearing path — a plain word
+    // from sourceClause (here "experience") is still fine on its own.
+    const after = 'Used Apache Airflow for orchestration, drawing on that experience';
+    const verdict = assertFrameProvenance(after, frame, ['drawing on that']);
+    expect(verdict.ok).toBe(true);
+  });
 });
