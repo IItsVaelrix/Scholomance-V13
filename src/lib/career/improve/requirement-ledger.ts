@@ -29,6 +29,7 @@
 import { analyzeKeywordGapStrict } from '../analysis/keyword-matcher.js';
 import { STOPWORDS } from '../stopwords.js';
 import { resolveEvidenceLaw } from './data/skill-evidence-law.js';
+import { clauseAt } from './jd-clause.js';
 import type { CareerGraphQueryPort } from '../graph/reference-query.js';
 import type { CanonicalSkill, Requirement, RequirementModality } from './types.js';
 import type { TextSpan } from '../parser/types.js';
@@ -128,42 +129,6 @@ const SOFT_CUE_RE = SOFT_CUES.map(cueMatcher);
 
 /** Negation markers. Checked BEFORE cues so "not required" can never read as "required". */
 const NEGATOR_RE = /\b(?:not|no|never|nor|without|cannot|excluding)\b|n['’]t\b/i;
-
-/**
- * Clause boundaries inside a line: `,` `;`, a sentence period (a period FOLLOWED BY
- * whitespace, so "Node.js" and "3.5 years" stay intact), and the contrastive conjunctions
- * that flip polarity mid-line.
- */
-const CLAUSE_SPLIT = /[;,]|(?<=\.)\s+|\bbut\b|\bhowever\b/gi;
-
-/**
- * The clause containing `start`, scoped to its line.
- *
- * Cue and negation detection run against this, not the whole line, so
- * "Required: SQL. Nice to have: Kubernetes." reads SQL as required and Kubernetes as
- * preferred instead of blanketing both terms with the first cue on the line.
- */
-function clauseAt(text: string, start: number, end: number): string {
-  const lineStart = text.lastIndexOf('\n', start) + 1;
-  let lineEnd = text.indexOf('\n', end);
-  if (lineEnd === -1) lineEnd = text.length;
-  const line = text.slice(lineStart, lineEnd);
-  const rel = start - lineStart;
-
-  const bounds: number[] = [0];
-  const re = new RegExp(CLAUSE_SPLIT.source, 'gi');
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(line))) {
-    bounds.push(m.index + m[0].length);
-    if (re.lastIndex === m.index) re.lastIndex++;
-  }
-  bounds.push(line.length);
-
-  for (let i = 0; i < bounds.length - 1; i++) {
-    if (rel >= bounds[i] && rel < bounds[i + 1]) return line.slice(bounds[i], bounds[i + 1]);
-  }
-  return line;
-}
 
 /** Modality of a single occurrence, from the clause around it. */
 function occurrenceModality(clause: string): RequirementModality {
