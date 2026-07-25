@@ -78,4 +78,19 @@ describe('buildPhraseFrame', () => {
     const jd = 'Requirements:\n- Experience with Apache Airflow for orchestration';
     expect(frameFor(jd, 'airflow')).toEqual(frameFor(jd, 'airflow'));
   });
+
+  it('folds a leading copula into scaffolding instead of drafting "Was ..."', () => {
+    // toPastTense accepts 'was' verbatim (KNOWN_VERBS), so naively lifting "the first
+    // token that resolves as a verb" would draft "Was responsible for managing vendor
+    // relationships, <sentinel>" — a copula is not a usable résumé opener. LEADING_NOISE
+    // strips the copula AND its usual "responsible for" companion, so the real verb
+    // ("managing") is what gets lifted.
+    const jd = 'Requirements:\n- Was responsible for managing vendor relationships';
+    expect(frameFor(jd, 'vendor')!.text).toBe('Managed vendor relationships, ␟');
+  });
+
+  it('handles the other KNOWN_VERBS copula ("were") the same way', () => {
+    const jd = 'Requirements:\n- Were responsible for managing vendor relationships';
+    expect(frameFor(jd, 'vendor')!.text).toBe('Managed vendor relationships, ␟');
+  });
 });

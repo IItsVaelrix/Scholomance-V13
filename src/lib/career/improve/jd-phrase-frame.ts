@@ -109,6 +109,11 @@ const LEADING_NOISE: ReadonlySet<string> = new Set([
   // noise means a clause like "was responsible for X" falls through past them to the next
   // real content word instead of drafting around the copula.
   'was', 'were', 'is', 'are', 'be', 'been', 'being',
+  // "responsible for" is the copula's usual companion and is scaffolding of the same kind:
+  // it names the SHAPE of an accomplishment ("you owned this"), not its content. Standard
+  // résumé advice is to delete it and lead with the verb it was hiding — "responsible for
+  // managing vendor relationships" and "managed vendor relationships" name the same fact.
+  'responsible', 'responsibility', 'responsibilities',
 ]);
 
 /** Leading list glyphs and duration counts ("5+", "3-5") carry no content. */
