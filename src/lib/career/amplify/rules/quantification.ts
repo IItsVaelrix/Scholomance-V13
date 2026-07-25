@@ -1,7 +1,27 @@
 import { makeSuggestionId } from '../../parser/identity-utils.js';
 import type { ResumeSuggestion } from '../../analysis/types.js';
-import { leadingVerb, isQuantified, type AmplifyContext } from '../primitives.js';
-import { MEASURABLE_VERB_CLASS, METRIC_TEMPLATES } from '../data/verb-classes.js';
+import { leadingVerb, isQuantified, classifyObject, type AmplifyContext } from '../primitives.js';
+import { MEASURABLE_VERB_CLASS, METRIC_TEMPLATES, type MetricTemplate, type MetricClass } from '../data/verb-classes.js';
+
+/**
+ * Resolve the metric template, guarding against frame fabrication (honesty correction).
+ * The `team` template asserts "managing a team of N" — truthful only when the source line
+ * actually references a people object (team/staff/engineers/…). "Managed communications"
+ * or "Led the billing platform rewrite" do NOT state a team, so we downgrade to the generic
+ * `open` outcome slot rather than put a headcount frame in the candidate's mouth. The
+ * number itself still only enters via the candidate-filled sentinel.
+ */
+function resolveTemplate(verb: string, ctx: { text: string; span: any }, verbEndOffset: number): { metricClass: MetricClass; template: MetricTemplate } | null {
+  const metricClass = MEASURABLE_VERB_CLASS[verb.toLowerCase()];
+  if (!metricClass) return null;
+  if (metricClass === 'team') {
+    const obj = classifyObject({ text: ctx.text, span: ctx.span, sectionKind: 'experience' }, verbEndOffset);
+    if (obj?.objectClass !== 'people') {
+      return { metricClass: 'open', template: METRIC_TEMPLATES.open };
+    }
+  }
+  return { metricClass, template: METRIC_TEMPLATES[metricClass] };
+}
 
 /**
  * Capability 1 — prompt the candidate for a metric.
@@ -17,10 +37,10 @@ export function quantificationRule(ctx: AmplifyContext): ResumeSuggestion[] {
     const verb = leadingVerb(line);
     if (!verb) continue;
 
-    const metricClass = MEASURABLE_VERB_CLASS[verb.verb.toLowerCase()];
-    if (!metricClass) continue;
+    const resolved = resolveTemplate(verb.verb, line, verb.offsetInLine + verb.verb.length);
+    if (!resolved) continue;
+    const { metricClass, template } = resolved;
 
-    const template = METRIC_TEMPLATES[metricClass];
     const targetKey = `${line.span.start}:${line.span.end}`;
     const id = makeSuggestionId('quantify', targetKey, `${metricClass}:${line.text}`);
 

@@ -54,16 +54,15 @@ import VideoForgePage from "./pages/VideoForge/VideoForgePage.tsx";
 
 import { AdminRoute } from "./components/AdminRoute.jsx";
 import {
-  createSeedCareerGraphClient,
-  isSeedCareerGraphEnabled,
+  createCareerGraphClientForMode,
+  careerGraphMode,
 } from "./lib/career/graph/seed-client";
 
-// Career Graph (seed) is opt-in via feature flag; default stays the proven
-// lexical ATS flow. When enabled, a real CareerGraphClient drives the in-memory
-// seed transport (the same client that will later drive the SQLite-WASM worker).
-const careerGraphClient = isSeedCareerGraphEnabled()
-  ? createSeedCareerGraphClient()
-  : undefined;
+// Career Graph is opt-in via feature flag; default stays the proven lexical ATS
+// flow. `?careerGraph=live` drives the SQLite-WASM worker over the real
+// O*NET/ESCO corpus shards; `=seed` uses the in-memory demo dataset; `=off`
+// (default) keeps the lexical flow. Same CareerGraphClient class in every mode.
+const careerGraphClient = createCareerGraphClientForMode(careerGraphMode());
 
 // DEV-ONLY de-risking spike (PDR-2026-06-04-GODOT-WASM-COMBAT-SPIKE).
 // The guard `import.meta.env.DEV` is statically false in production, so the route is

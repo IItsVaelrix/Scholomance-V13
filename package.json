@@ -123,7 +123,9 @@
     "career:graph:build": "node scripts/career-graph/build-database.mjs data/career-graph/normalized data/career-graph/career_graph.sqlite",
     "career:graph:shards": "node scripts/career-graph/build-shards.mjs data/career-graph/career_graph.sqlite data/career-graph/shards",
     "career:graph:verify": "node scripts/career-graph/verify-shards.mjs data/career-graph/shards",
-    "career:graph:all": "npm run career:sources:prepare && npm run career:graph:ingest && npm run career:graph:build && npm run career:graph:shards && npm run career:graph:verify"
+    "career:graph:publish": "node scripts/career-graph/publish-shards.mjs data/career-graph/shards public/data/career-graph/shards",
+    "career:graph:all": "npm run career:sources:prepare && npm run career:graph:ingest && npm run career:graph:build && npm run career:graph:shards && npm run career:graph:verify && npm run career:graph:publish",
+    "career:benchmark": "node scripts/career-benchmark.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
@@ -153,6 +155,7 @@
     "@remotion/player": "^4.0.477",
     "@remotion/renderer": "^4.0.477",
     "@remotion/three": "^4.0.484",
+    "@sqlite.org/sqlite-wasm": "^3.53.0-build1",
     "@types/json-schema": "^7.0.15",
     "@vscode/ripgrep": "^1.18.0",
     "@xstate/react": "^5.0.5",
@@ -168,6 +171,7 @@
     "chalk": "^5.4.1",
     "cmudict": "^1.0.2",
     "connect-redis": "^9.0.0",
+    "docx": "^9.7.1",
     "dotenv": "^17.2.4",
     "fastify": "^5.2.1",
     "fflate": "^0.8.3",

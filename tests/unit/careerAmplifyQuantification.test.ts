@@ -30,12 +30,25 @@ describe('quantification rule', () => {
   });
 
   it('never fills a slot itself', () => {
-    const suggestions = run('Led the billing platform rewrite.');
+    const suggestions = run('Led the engineering staff across the region.');
     expect(suggestions).toHaveLength(1);
     expect(suggestions[0].after).toContain(INPUT_SENTINEL);
     expect(suggestions[0].after).toBe(
-      `Led the billing platform rewrite, managing a team of ${INPUT_SENTINEL}.`
+      `Led the engineering staff across the region, managing a team of ${INPUT_SENTINEL}.`
     );
+  });
+
+  it('never fabricates a "managing a team of" frame for a non-people object (honesty)', () => {
+    // "platform" is a system object, not a team — the team frame would be a fabrication.
+    const [sug] = run('Led the billing platform rewrite.');
+    expect(sug.after).not.toContain('managing a team of');
+    expect(sug.after).toBe(`Led the billing platform rewrite, ${INPUT_SENTINEL}.`);
+  });
+
+  it('never fabricates a team frame for "managed communications" (honesty)', () => {
+    const [sug] = run('Managed communications across regions.');
+    expect(sug.after).not.toContain('managing a team of');
+    expect(sug.after).toBe(`Managed communications across regions, ${INPUT_SENTINEL}.`);
   });
 
   it('moves trailing punctuation to the end of the clause instead of doubling it', () => {

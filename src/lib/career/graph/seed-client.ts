@@ -1,38 +1,76 @@
 /**
- * Seed Career Graph client wiring + feature flag.
+ * Career Graph client wiring + feature flag.
  *
- * The full Career Graph UI flow is opt-in via a feature flag so the proven
- * lexical ATS flow remains the default for every user. Enable the seed graph:
+ * The full Career Graph UI flow is opt-in so the proven lexical ATS flow stays
+ * the default for every user. The flag has three modes:
  *
- *   - URL:   /career?careerGraph=seed   (or =off to force-disable)
- *   - Store: localStorage.setItem('careerGraph', 'seed')
+ *   - `seed` — in-memory seed demo dataset (no network, no WASM).
+ *   - `live` — the real O*NET/ESCO corpus via the SQLite-WASM worker + shards.
+ *   - `off`  — force the lexical flow.
  *
- * When enabled, `createSeedCareerGraphClient()` returns a real
- * `CareerGraphClient` driving the in-memory seed transport — the same client
- * class that will later drive the SQLite-WASM worker, so nothing downstream is
- * special-cased.
+ * Selection:
+ *   - URL:   /career?careerGraph=seed | live | off
+ *   - Store: localStorage.setItem('careerGraph', 'seed' | 'live')
+ *
+ * Every mode returns the same `CareerGraphClient` class, so nothing downstream
+ * is special-cased — only the transport differs (seed transport vs real Worker).
  */
-import { CareerGraphClient } from './client';
+import { CareerGraphClient, type CareerGraphTransport } from './client';
 import { InMemoryCareerGraphTransport } from './in-memory-transport';
 
+export type CareerGraphMode = 'seed' | 'live' | 'off';
+
 /** Pure flag reader (testable): URL param wins, then localStorage. */
-export function isSeedCareerGraphEnabled(
+export function careerGraphMode(
   search: string = typeof window !== 'undefined' ? window.location.search : '',
   storage: Pick<Storage, 'getItem'> | undefined = typeof localStorage !== 'undefined'
     ? localStorage
     : undefined
-): boolean {
+): CareerGraphMode {
   const param = new URLSearchParams(search).get('careerGraph');
-  if (param === 'seed') return true;
-  if (param === 'off') return false;
+  if (param === 'seed' || param === 'live') return param;
+  if (param === 'off') return 'off';
   try {
-    return storage?.getItem('careerGraph') === 'seed';
+    const stored = storage?.getItem('careerGraph');
+    if (stored === 'seed' || stored === 'live') return stored;
   } catch {
-    return false;
+    /* storage unavailable */
   }
+  return 'off';
+}
+
+/** Back-compat: true when either graph mode (seed or live) is enabled. */
+export function isSeedCareerGraphEnabled(
+  search?: string,
+  storage?: Pick<Storage, 'getItem'>
+): boolean {
+  return careerGraphMode(search, storage) !== 'off';
 }
 
 /** A real `CareerGraphClient` backed by the in-memory seed transport. */
 export function createSeedCareerGraphClient(): CareerGraphClient {
   return new CareerGraphClient(() => new InMemoryCareerGraphTransport());
+}
+
+/**
+ * A real `CareerGraphClient` driving the SQLite-WASM worker over the corpus
+ * shards. The native `Worker` satisfies `CareerGraphTransport` directly.
+ */
+export function createLiveCareerGraphClient(): CareerGraphClient {
+  return new CareerGraphClient(() => {
+    const worker = new Worker(
+      new URL('../../../workers/career-graph.worker.ts', import.meta.url),
+      { type: 'module' }
+    );
+    return worker as unknown as CareerGraphTransport;
+  });
+}
+
+/** Build the client for the active mode, or `undefined` when disabled. */
+export function createCareerGraphClientForMode(
+  mode: CareerGraphMode = careerGraphMode()
+): CareerGraphClient | undefined {
+  if (mode === 'seed') return createSeedCareerGraphClient();
+  if (mode === 'live') return createLiveCareerGraphClient();
+  return undefined;
 }

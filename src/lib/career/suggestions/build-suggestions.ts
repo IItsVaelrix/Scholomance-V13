@@ -3,6 +3,7 @@ import { makeSuggestionId } from '../parser/identity-utils.js';
 import type { ResumeDocument, TextSpan } from '../parser/types.js';
 import type {
   KeywordGapAnalysis,
+  KeywordHitResult,
   LegibilityAnalysis,
   AcronymCoverageAnalysis,
   ResumeSuggestion,
@@ -11,6 +12,44 @@ import type { CareerGraphAnalysis, SkillClassification } from '../graph/contract
 
 function escapeRegExp(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/** How many missing-keyword gaps a candidate is asked to look at. */
+const MAX_REPORTED_GAPS = 5;
+
+/**
+ * Rank and bound the missing-keyword gap report.
+ *
+ * `keywordGap.missing` is the raw n-gram frontier: it carries real requirements alongside
+ * job-title fragments ("senior", "success manager") and phrases subsumed by longer ones
+ * ("web" under "web application"). Reporting all of them buries the two or three gaps that
+ * actually matter. Ordering: known skills-lexicon terms first, then weight, then the more
+ * specific phrase — deterministic throughout.
+ */
+function rankMissingGaps(missing: readonly KeywordHitResult[]): KeywordHitResult[] {
+  const ordered = [...missing].sort((a, b) => {
+    if (a.inSkillsLexicon !== b.inSkillsLexicon) return a.inSkillsLexicon ? -1 : 1;
+    if (b.weight !== a.weight) return b.weight - a.weight;
+    const words = b.term.split(/\s+/).length - a.term.split(/\s+/).length;
+    if (words !== 0) return words;
+    return a.term < b.term ? -1 : a.term > b.term ? 1 : 0;
+  });
+
+  // Drop any term wholly contained in a higher-ranked one already reported.
+  const kept: KeywordHitResult[] = [];
+  for (const item of ordered) {
+    if (kept.length >= MAX_REPORTED_GAPS) break;
+    const term = item.term.toLowerCase();
+    const subsumed = kept.some((k) => {
+      const other = k.term.toLowerCase();
+      return (
+        other !== term &&
+        new RegExp(`(?:^|\\s)${escapeRegExp(term)}(?:\\s|$)`).test(other)
+      );
+    });
+    if (!subsumed) kept.push(item);
+  }
+  return kept;
 }
 
 export function buildCareerSuggestions(params: {
@@ -81,22 +120,25 @@ export function buildCareerSuggestions(params: {
     }
   }
 
-  // 3. Missing Keywords
+  // 3. Missing Keywords — reported, never inserted.
+  //
+  // These are terms the JD asks for that appear NOWHERE in the résumé. The graph path's
+  // safety law below already says a `missing` skill is never turned into a résumé edit;
+  // the same law binds here. Emitting `after: term` against the Skills section made the
+  // default configuration advise a customer-service candidate to paste "sql" and
+  // "salesforce" into their résumé — a keyword-anchor pile, and a claim they cannot back
+  // up in an interview. The gap is worth telling them about; writing it in is not ours.
   if (keywordGap?.missing) {
-    const skillsSection = document?.sections?.find((s) => s.kind === 'skills');
-    for (const item of keywordGap.missing) {
+    for (const item of rankMissingGaps(keywordGap.missing)) {
       const term = item.term;
-      const id = makeSuggestionId('keyword', term, term);
+      const id = makeSuggestionId('learning_gap', term, `missing:${term}`);
 
       suggestions.push({
         id,
-        type: 'keyword',
-        target: skillsSection
-          ? { sectionId: skillsSection.id, insertionPoint: 'after_section' }
-          : { insertionPoint: 'document_end' },
+        type: 'learning_gap',
         before: undefined,
-        after: term,
-        reason: `Add missing keyword "${term}" to improve job description alignment.`,
+        after: undefined,
+        reason: `The job description asks for "${term}", which does not appear in your résumé. If you have this experience, add it in your own words with a concrete example; if you do not, this is a real gap to close rather than a word to insert.`,
         evidence: [
           {
             source: 'analysis',
@@ -106,9 +148,10 @@ export function buildCareerSuggestions(params: {
           },
         ],
         confidence: 0.8,
-        risk: 'medium',
+        risk: 'low',
         requiresUserApproval: true,
         status: 'pending',
+        editable: false,
       });
     }
   }

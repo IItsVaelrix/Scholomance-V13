@@ -8,6 +8,58 @@ export interface SuggestionReviewPanelProps {
   onReject: (id: string) => void;
   onEdit?: (id: string, newAfter: string) => void;
   onAcceptAllLowRisk: () => void;
+  /** Group suggestions by JD requirement ("SQL — 3 improvements") for legibility (spec §6). */
+  groupByRequirement?: boolean;
+  /**
+   * Record candidate-supplied facts with provenance when a fill-in suggestion is accepted
+   * (honesty correction). A number enters the résumé only through this recorded user-input
+   * event — the page logs it into a UserFactLedger keyed by suggestion + slot.
+   *
+   * `filledAfter` is passed explicitly because the page cannot read it back: the `onEdit`
+   * that substitutes the sentinels is a state update that has not applied yet during this
+   * same event, so a lookup in suggestion state would still see the unfilled template.
+   */
+  onRecordUserFacts?: (
+    suggestionId: string,
+    slotValues: Record<string, string>,
+    filledAfter: string
+  ) => void;
+}
+
+/** The first quoted phrase in a reason — the canonical requirement label, by convention. */
+function quotedLabel(reason: string): string | null {
+  const m = /"([^"]+)"/.exec(reason || '');
+  return m ? m[1] : null;
+}
+
+function requirementGroupKey(s: ResumeSuggestion): string {
+  if (s.conceptId) return `c:${s.conceptId}`;
+  const label = quotedLabel(s.reason);
+  if (label) return `l:${label.toLowerCase()}`;
+  return `t:${s.type}`;
+}
+
+function requirementGroupLabel(s: ResumeSuggestion): string {
+  const label = quotedLabel(s.reason);
+  if (label) return label;
+  if (s.type === 'structure') return 'Structure & Ordering';
+  if (s.type === 'learning_gap') return 'Learning Gaps';
+  return 'General';
+}
+
+/** Bucket suggestions by requirement, preserving first-seen group order. */
+function groupByReq(suggestions: ResumeSuggestion[]): Array<{ label: string; items: ResumeSuggestion[] }> {
+  const order: string[] = [];
+  const buckets = new Map<string, { label: string; items: ResumeSuggestion[] }>();
+  for (const s of suggestions) {
+    const key = requirementGroupKey(s);
+    if (!buckets.has(key)) {
+      order.push(key);
+      buckets.set(key, { label: requirementGroupLabel(s), items: [] });
+    }
+    buckets.get(key)!.items.push(s);
+  }
+  return order.map((k) => buckets.get(k)!);
 }
 
 export default function SuggestionReviewPanel({
@@ -16,6 +68,8 @@ export default function SuggestionReviewPanel({
   onReject,
   onEdit,
   onAcceptAllLowRisk,
+  groupByRequirement = false,
+  onRecordUserFacts,
 }: SuggestionReviewPanelProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState<string>('');
@@ -46,8 +100,14 @@ export default function SuggestionReviewPanel({
     (suggestion.inputSlots || []).every((slot) => (slotValues[slot.id] || '').trim().length > 0);
 
   const handleAcceptSuggestion = (suggestion: ResumeSuggestion) => {
+    const filledAfter = suggestion.requiresInput ? fillSlots(suggestion) : suggestion.after ?? '';
     if (suggestion.requiresInput && onEdit) {
-      onEdit(suggestion.id, fillSlots(suggestion));
+      onEdit(suggestion.id, filledAfter);
+    }
+    // Record candidate-supplied numbers with provenance (honesty correction): a number
+    // enters the résumé only through this recorded user-input event.
+    if (suggestion.requiresInput && onRecordUserFacts) {
+      onRecordUserFacts(suggestion.id, slotValues, filledAfter);
     }
     onAccept(suggestion.id);
   };
@@ -77,6 +137,24 @@ export default function SuggestionReviewPanel({
       s.editable !== false
   ).length;
 
+  // Flat list of rows: optional requirement group-headers interleaved with suggestion cards.
+  type Row =
+    | { kind: 'header'; key: string; label: string; count: number }
+    | { kind: 'card'; sug: ResumeSuggestion };
+  const rows: Row[] = [];
+  if (groupByRequirement) {
+    const groups = groupByReq(suggestions);
+    if (groups.length > 1) {
+      for (const g of groups) {
+        rows.push({ kind: 'header', key: `grp:${g.label}`, label: g.label, count: g.items.length });
+        for (const sug of g.items) rows.push({ kind: 'card', sug });
+      }
+    }
+  }
+  if (rows.length === 0) {
+    for (const sug of suggestions) rows.push({ kind: 'card', sug });
+  }
+
   return (
     <div className="suggestion-review-panel">
       <div className="panel-header">
@@ -97,7 +175,15 @@ export default function SuggestionReviewPanel({
         <p className="empty-suggestions-note">No suggestions generated for this document.</p>
       ) : (
         <div className="suggestions-list">
-          {suggestions.map((sug) => {
+          {rows.map((row) => {
+            if (row.kind === 'header') {
+              return (
+                <h4 key={row.key} className="suggestion-group-header">
+                  {row.label} — {row.count} improvement{row.count === 1 ? '' : 's'}
+                </h4>
+              );
+            }
+            const sug = row.sug;
             const isEditing = editingId === sug.id;
             const isAccepted = sug.status === 'accepted';
             const isRejected = sug.status === 'rejected';

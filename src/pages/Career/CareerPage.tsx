@@ -4,7 +4,11 @@ import { triggerHapticPulse, UI_HAPTICS } from '../../lib/platform/haptics';
 import { parseResumeSource, type ResumeSource } from '../../lib/career/parser/parse-resume';
 import { analyzeCareerFit } from '../../lib/career/analysis/analyze-career';
 import { buildCleanExport } from '../../lib/career/export/clean-export';
+import { buildDocxExport } from '../../lib/career/export/docx-export';
 import { buildGraphCareerSuggestions } from '../../lib/career/suggestions/build-suggestions';
+import { buildImprovements } from '../../lib/career/improve/build-improvements';
+import { applyAcceptedSuggestions } from '../../lib/career/suggestions/apply-suggestions';
+import { UserFactLedger } from '../../lib/career/improve/honesty/user-fact-ledger';
 import type { ResumeDocument, ResumeSourceType } from '../../lib/career/parser/types';
 import type { CareerAnalysisResult, ResumeSuggestion } from '../../lib/career/analysis/types';
 import type { CareerGraphAnalysis } from '../../lib/career/graph/contracts';
@@ -49,6 +53,33 @@ function needsOccupationConfirmation(analysis: CareerGraphAnalysis): boolean {
   );
 }
 
+/**
+ * Merge JD-Advisor improvements into an existing suggestion list (spec §6). Drops an
+ * improvement whose id already exists or whose target span overlaps an existing
+ * suggestion's span, so the panel never shows two cards for the same edit.
+ */
+function mergeImprovements(
+  existing: ResumeSuggestion[],
+  improvements: ResumeSuggestion[]
+): ResumeSuggestion[] {
+  const ids = new Set(existing.map((s) => s.id));
+  const spans = existing
+    .map((s) => s.target?.span)
+    .filter((sp): sp is NonNullable<typeof sp> => !!sp)
+    .map((sp) => ({ start: sp.start, end: sp.end }));
+  const overlaps = (sp?: { start: number; end: number }) =>
+    !!sp && spans.some((e) => e.start < sp.end && sp.start < e.end);
+
+  const merged = [...existing];
+  for (const imp of improvements) {
+    if (ids.has(imp.id)) continue;
+    if (overlaps(imp.target?.span)) continue;
+    merged.push(imp);
+    ids.add(imp.id);
+  }
+  return merged;
+}
+
 const BUSY_STATUSES: CareerStatus[] = [
   'EXTRACTING',
   'PARSING',
@@ -86,6 +117,11 @@ export default function CareerPage({ graphClient }: CareerPageProps = {}) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const graphClientRef = useRef<CareerGraphPort | undefined>(graphClient);
   const analysisAbortRef = useRef<AbortController | null>(null);
+
+  // Provenance ledger for candidate-supplied numbers (honesty correction). A number enters
+  // the résumé only through a recorded user-input event keyed by suggestion + slot.
+  const userFactLedger = useRef(new UserFactLedger());
+  const revisionRef = useRef(0);
 
   // Mouse ripple follower effect
   useEffect(() => {
@@ -219,7 +255,11 @@ export default function CareerPage({ graphClient }: CareerPageProps = {}) {
   // Finalize a graph analysis into the COMPLETE view + reviewable suggestions.
   const finalizeGraphComplete = (result: CareerGraphAnalysis, doc: ResumeDocument) => {
     setGraphAnalysis(result);
-    setSuggestions(buildGraphCareerSuggestions(result, doc));
+    const graphSuggestions = buildGraphCareerSuggestions(result, doc);
+    // Reuse the worker's corpus-resolved skill vocabulary so the advisor's suggestions
+    // carry real concept ids rather than the seeded law's placeholders.
+    const improvements = buildImprovements(jobDescription, doc, undefined, result.skills);
+    setSuggestions(mergeImprovements(graphSuggestions, improvements));
     setStatus('COMPLETE');
     triggerHapticPulse(UI_HAPTICS.SUCCESS);
   };
@@ -237,7 +277,8 @@ export default function CareerPage({ graphClient }: CareerPageProps = {}) {
       try {
         const result = analyzeCareerFit(parsedDocument, jobDescription);
         setAnalysisResult(result);
-        setSuggestions(result.suggestions || []);
+        const improvements = buildImprovements(jobDescription, parsedDocument);
+        setSuggestions(mergeImprovements(result.suggestions || [], improvements));
         setStatus('COMPLETE');
         triggerHapticPulse(UI_HAPTICS.SUCCESS);
       } catch (err: any) {
@@ -322,8 +363,28 @@ export default function CareerPage({ graphClient }: CareerPageProps = {}) {
   };
 
   const handleEditSuggestion = (id: string, newAfter: string) => {
+    revisionRef.current += 1;
     setSuggestions((prev) =>
       prev.map((s) => (s.id === id ? { ...s, after: newAfter, status: 'edited' } : s))
+    );
+  };
+
+  // Record candidate-supplied facts with provenance when a fill-in suggestion is accepted.
+  // The filled text arrives from the panel: the `onEdit` that substituted the sentinels is a
+  // state update that has not applied yet, so reading `suggestions` here would still see the
+  // unfilled template and the ledger would silently record nothing.
+  const handleRecordUserFacts = (
+    suggestionId: string,
+    slotValues: Record<string, string>,
+    filledAfter: string
+  ) => {
+    const suggestion = suggestions.find((s) => s.id === suggestionId);
+    if (!suggestion) return;
+    revisionRef.current += 1;
+    userFactLedger.current.recordFromSuggestion(
+      { ...suggestion, after: filledAfter },
+      slotValues,
+      revisionRef.current
     );
   };
 
@@ -344,7 +405,9 @@ export default function CareerPage({ graphClient }: CareerPageProps = {}) {
       ? `clean_${sourceFile.fileName.replace(/\.[^/.]+$/, '')}.txt`
       : 'resume_export.txt';
 
-    const exportData = buildCleanExport(parsedDocument, suggestions, fileName);
+    const exportData = buildCleanExport(parsedDocument, suggestions, fileName, {
+      userSuppliedValues: userFactLedger.current.values(),
+    });
 
     const blob = new Blob([exportData.plainText], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -355,6 +418,41 @@ export default function CareerPage({ graphClient }: CareerPageProps = {}) {
     URL.revokeObjectURL(url);
 
     triggerHapticPulse(UI_HAPTICS.MEDIUM);
+  };
+
+  // Derive a target-role label for the DOCX file name (confirmed occupation first).
+  const targetRoleLabel = (): string | undefined => {
+    if (!graphAnalysis?.occupations?.length) return undefined;
+    const confirmed = graphAnalysis.occupations.find(
+      (o) => o.conceptId === confirmedOccupationId
+    );
+    return (confirmed ?? graphAnalysis.occupations[0]).label;
+  };
+
+  // Download an ATS-safe .docx reflecting the accepted suggestions (spec §6).
+  const handleDownloadDocxExport = async () => {
+    if (!parsedDocument) return;
+    try {
+      // Apply accepted suggestions, then re-parse so sections/bullets reflect the edits.
+      // The ledger gates numbers: any metric in an accepted edit that the résumé did not
+      // already state and the candidate did not type is refused here.
+      const result = applyAcceptedSuggestions(parsedDocument, suggestions, {
+        userSuppliedValues: userFactLedger.current.values(),
+      });
+      const improvedDoc = await parseResumeSource({ type: 'paste', content: result.text });
+      const { blob, fileName } = await buildDocxExport(improvedDoc, {
+        targetRole: targetRoleLabel(),
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      link.click();
+      URL.revokeObjectURL(url);
+      triggerHapticPulse(UI_HAPTICS.MEDIUM);
+    } catch (err: any) {
+      setErrorMessage(err?.message || 'Failed to build .docx export');
+    }
   };
 
   const scorecard = analysisResult?.scorecard;
@@ -536,6 +634,8 @@ export default function CareerPage({ graphClient }: CareerPageProps = {}) {
                 onReject={handleRejectSuggestion}
                 onEdit={handleEditSuggestion}
                 onAcceptAllLowRisk={handleAcceptAllLowRisk}
+                groupByRequirement
+                onRecordUserFacts={handleRecordUserFacts}
               />
             )}
 
@@ -545,6 +645,9 @@ export default function CareerPage({ graphClient }: CareerPageProps = {}) {
                 <div className="report-heading-actions">
                   <button className="download-btn" onClick={handleDownloadCleanExport}>
                     ↓ Download .txt
+                  </button>
+                  <button className="download-btn" onClick={handleDownloadDocxExport}>
+                    ↓ Download .docx
                   </button>
                 </div>
               </div>
@@ -605,6 +708,8 @@ export default function CareerPage({ graphClient }: CareerPageProps = {}) {
               onReject={handleRejectSuggestion}
               onEdit={handleEditSuggestion}
               onAcceptAllLowRisk={handleAcceptAllLowRisk}
+              groupByRequirement
+              onRecordUserFacts={handleRecordUserFacts}
             />
 
             {/* Download Export Section */}
@@ -625,6 +730,9 @@ export default function CareerPage({ graphClient }: CareerPageProps = {}) {
                   )}
                   <button className="download-btn" onClick={handleDownloadCleanExport}>
                     ↓ Download .txt
+                  </button>
+                  <button className="download-btn" onClick={handleDownloadDocxExport}>
+                    ↓ Download .docx
                   </button>
                 </div>
               </div>

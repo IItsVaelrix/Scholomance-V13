@@ -78,9 +78,32 @@ export function computeShardPartition(graph) {
     if (to && to.kind === 'skill') bridgeSkillIds.add(to.id);
   }
 
-  // --- core: occupation backbone + every relation + referenced skills ---
+  // --- core: the occupation backbone, NOT the whole graph ---
+  //
+  // Core previously carried every relation, which made it a full copy of the
+  // canonical database (7.5MB at 31k relations). That silently voided the
+  // residency law: "at most three family shards resident" cannot bound anything
+  // when the always-pinned shard already holds every edge, and it would have
+  // made the browser download the entire corpus on first paint.
+  //
+  // Core now holds:
+  //   - every occupation concept (so any occupation resolves before a family
+  //     shard is fetched),
+  //   - relations that are NOT occupation→skill (the crosswalk `mapped_to`
+  //     edges that bridge namespaces), and
+  //   - occupation→skill edges for occupations that have no family shard to
+  //     live in (non-SOC ids, e.g. ESCO), which would otherwise be dropped.
+  const familyOf = (conceptIdValue) => {
+    const c = byId.get(conceptIdValue);
+    return c ? socMajorGroup(c.external_id) : null;
+  };
+  const coreRelations = relations.filter(
+    (r) =>
+      !(r.predicate === 'requires_skill' && occupationIds.has(r.from_concept_id)) ||
+      familyOf(r.from_concept_id) === null
+  );
   const coreConceptIds = new Set(occupationIds);
-  for (const r of relations) {
+  for (const r of coreRelations) {
     for (const endpoint of [r.from_concept_id, r.to_concept_id]) {
       const c = byId.get(endpoint);
       if (c) coreConceptIds.add(c.id);
@@ -88,7 +111,7 @@ export function computeShardPartition(graph) {
   }
   const core = {
     concepts: concepts.filter((c) => coreConceptIds.has(c.id)),
-    relations: relations.slice(),
+    relations: coreRelations,
   };
 
   // --- universal: bridge skill concepts only (no relations, no orphans) ---

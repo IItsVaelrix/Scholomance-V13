@@ -6,6 +6,7 @@ import type {
   ResumeSectionKind,
 } from '../parser/types';
 import type { SkillClass } from '../graph/contracts';
+import type { MoveBulletOperation } from '../improve/types';
 
 // Re-export parser document types so analysis consumers can import them from
 // the analysis barrel without reaching into the parser layer directly.
@@ -86,6 +87,12 @@ export interface ResumeSuggestion {
   skillClass?: SkillClass;
   /** False when the suggestion is a non-editable learning/interview gap. */
   editable?: boolean;
+  /**
+   * Additive JD-Advisor extension (spec §4.5): a stable-id bullet move. Present only on
+   * `structure` reorder suggestions. The apply engine resolves it by `bulletId`, so an
+   * earlier accepted text rewrite cannot invalidate the move. Never carries a span.
+   */
+  move?: MoveBulletOperation;
 }
 
 export interface KeywordHitResult {
@@ -147,7 +154,8 @@ export interface SuggestionApplicationResult {
       | 'overlap'
       | 'missing_target'
       | 'conflict'
-      | 'unfilled_input';
+      | 'unfilled_input'
+      | 'unprovenanced_number';
   }>;
 }
 

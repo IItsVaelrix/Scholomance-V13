@@ -16,6 +16,8 @@ import {
   mapFiles,
   prepareSources,
   hasUnzip,
+  matchesPattern,
+  resolvePattern,
 } from '../../scripts/career-graph/prepare-sources.mjs';
 
 describe('prepare-sources', () => {
@@ -47,6 +49,49 @@ describe('prepare-sources', () => {
           expect(m.to).toBeTruthy();
         }
       }
+    });
+  });
+
+  describe('matchesPattern', () => {
+    it('treats a pattern with an extension as an exact basename match', () => {
+      expect(matchesPattern('Essential Skills.txt', 'Essential Skills.txt')).toBe(true);
+      // The regression that shipped a skill-less graph: this neighbour file has
+      // no O*NET-SOC column and must never satisfy the skills target.
+      expect(matchesPattern('Essential Skills to Work Activities.txt', 'Essential Skills.txt')).toBe(false);
+      expect(matchesPattern('Essential Skills to Work Context.txt', 'Essential Skills.txt')).toBe(false);
+    });
+
+    it('treats an extension-less pattern as a substring match', () => {
+      expect(matchesPattern('Occupation Data.txt', 'occupation data')).toBe(true);
+      expect(matchesPattern('Occupation Level Metadata.txt', 'occupation data')).toBe(false);
+    });
+  });
+
+  describe('resolvePattern', () => {
+    it('tries patterns in order and returns the single match', () => {
+      const files = ['Transferable Skills.txt', 'Essential Skills.txt'];
+      expect(resolvePattern(files, ['Essential Skills.txt'])).toEqual({
+        match: 'Essential Skills.txt',
+        ambiguous: null,
+      });
+    });
+
+    it('reports ambiguity instead of picking whichever file came first', () => {
+      const files = ['Essential Skills.txt', 'Software Skills.txt', 'Transferable Skills.txt'];
+      const result = resolvePattern(files, 'skills');
+      expect(result.match).toBeNull();
+      expect(result.ambiguous).toEqual([
+        'Essential Skills.txt',
+        'Software Skills.txt',
+        'Transferable Skills.txt',
+      ]);
+    });
+
+    it('returns no match when nothing matches any pattern', () => {
+      expect(resolvePattern(['unrelated.txt'], ['Essential Skills.txt'])).toEqual({
+        match: null,
+        ambiguous: null,
+      });
     });
   });
 
@@ -102,6 +147,27 @@ describe('prepare-sources', () => {
       expect(result.mapped).toEqual([]);
     });
 
+    it('refuses to copy an ambiguous match and reports the candidates', async () => {
+      const dir = join(tmp, '30.3');
+      await mkdir(dir, { recursive: true });
+      const files = ['Essential Skills.txt', 'Software Skills.txt'];
+      for (const f of files) await writeFile(join(dir, f), 'data\n');
+
+      const sourceMap = {
+        id: 'onet',
+        version: '30.3',
+        expected: [{ from: 'skills', to: 'occupation_skills.tsv' }],
+      };
+
+      const logs: string[] = [];
+      const result = await mapFiles(dir, files, sourceMap, (l: string) => logs.push(l));
+      expect(result.mapped).toEqual([]);
+      expect(result.ambiguous).toEqual([
+        { to: 'occupation_skills.tsv', candidates: ['Essential Skills.txt', 'Software Skills.txt'] },
+      ]);
+      expect(logs.some((l) => l.includes('PREPARE_AMBIGUOUS'))).toBe(true);
+    });
+
     it('is case-insensitive in pattern matching', async () => {
       const dir = join(tmp, '1.2.1');
       await mkdir(dir, { recursive: true });
@@ -142,7 +208,12 @@ describe('prepare-sources', () => {
       await mkdir(xwalkDir, { recursive: true });
 
       await writeFile(join(onetDir, 'Occupation Data.txt'), 'soc\ttitle\n');
-      await writeFile(join(onetDir, 'Skill.txt'), 'skill data\n');
+      await writeFile(join(onetDir, 'Essential Skills.txt'), 'skill data\n');
+      await writeFile(join(onetDir, 'Transferable Skills.txt'), 'skill data\n');
+      await writeFile(join(onetDir, 'Software Skills.txt'), 'tech data\n');
+      // Near-miss neighbours from the real archive: present, never selected.
+      await writeFile(join(onetDir, 'Essential Skills to Work Activities.txt'), 'not skills\n');
+      await writeFile(join(onetDir, 'Essential Skills to Work Context.txt'), 'not skills\n');
       await writeFile(join(escoDir, 'occupations_en.csv'), 'conceptUri\n');
       await writeFile(join(escoDir, 'skills_en.csv'), 'conceptUri\n');
       await writeFile(join(escoDir, 'occupation_skills_en.csv'), 'occ,skill\n');
@@ -156,7 +227,17 @@ describe('prepare-sources', () => {
 
       const onet = result.sources.find((s) => s.id === 'onet');
       expect(onet.ok).toBe(true);
-      expect(onet.mapped.length).toBeGreaterThan(0);
+      expect(onet.mapped).toEqual(
+        expect.arrayContaining([
+          { from: 'Essential Skills.txt', to: 'essential_skills.tsv' },
+          { from: 'Transferable Skills.txt', to: 'transferable_skills.tsv' },
+          { from: 'Software Skills.txt', to: 'technology_skills.tsv' },
+        ])
+      );
+      // The activity/context crosswalks must not have been mapped anywhere.
+      expect(onet.mapped.map((m: any) => m.from)).not.toContain(
+        'Essential Skills to Work Activities.txt'
+      );
 
       const crosswalk = result.sources.find((s) => s.id === 'crosswalk');
       expect(crosswalk.ok).toBe(true);
@@ -171,7 +252,7 @@ describe('prepare-sources', () => {
       await mkdir(xwalkDir, { recursive: true });
 
       await writeFile(join(onetDir, 'Occupation Data.txt'), 'soc\ttitle\n');
-      // Missing: Skill.txt → occupation_skills.tsv
+      // Missing: Essential Skills.txt → essential_skills.tsv
       await writeFile(join(escoDir, 'occupations_en.csv'), 'conceptUri\n');
       await writeFile(join(escoDir, 'skills_en.csv'), 'conceptUri\n');
       await writeFile(join(escoDir, 'occupation_skills_en.csv'), 'occ,skill\n');
@@ -183,7 +264,7 @@ describe('prepare-sources', () => {
       expect(result.ok).toBe(false);
       const onet = result.sources.find((s) => s.id === 'onet');
       expect(onet.ok).toBe(false);
-      expect(onet.missing).toContain('occupation_skills.tsv');
+      expect(onet.missing).toContain('essential_skills.tsv');
       expect(logs.some((l) => l.includes('PREPARE_INCOMPLETE'))).toBe(true);
     });
   });

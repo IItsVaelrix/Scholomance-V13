@@ -1494,3 +1494,18 @@
     transition: none;
   }
 }
+
+/* JD Improvement Advisor — requirement group headers (spec §6) */
+.suggestion-group-header {
+  margin: 1.1rem 0 0.5rem;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent, #7dd3fc);
+  border-left: 3px solid var(--accent, #7dd3fc);
+  background: rgba(125, 211, 252, 0.06);
+}
+.suggestion-group-header:first-child {
+  margin-top: 0;
+}

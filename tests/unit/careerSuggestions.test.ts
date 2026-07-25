@@ -104,9 +104,13 @@ describe('Career Suggestions Engine', () => {
       expect(acronymSugg).toBeDefined();
       expect(acronymSugg?.risk).toBe('low');
 
-      const keywordSugg = suggestions.find((s) => s.type === 'keyword');
-      expect(keywordSugg).toBeDefined();
-      expect(keywordSugg?.risk).toBe('medium');
+      // A JD term absent from the résumé is REPORTED, never written in: it becomes a
+      // non-editable gap note carrying no `after`, matching the graph path's safety law.
+      const gapSugg = suggestions.find((s) => s.type === 'learning_gap');
+      expect(gapSugg).toBeDefined();
+      expect(gapSugg?.after).toBeUndefined();
+      expect(gapSugg?.editable).toBe(false);
+      expect(suggestions.some((s) => s.type === 'keyword' && s.after)).toBe(false);
 
       const structSugg = suggestions.find((s) => s.type === 'structure');
       expect(structSugg).toBeDefined();
@@ -365,9 +369,11 @@ describe('Career Suggestions Engine', () => {
     });
 
     it('applies the same suggestion once every slot is filled', () => {
-      const result = applyAcceptedSuggestions(baseDoc, [
-        quantifySuggestion('Led the platform migration, managing a team of 6'),
-      ]);
+      const result = applyAcceptedSuggestions(
+        baseDoc,
+        [quantifySuggestion('Led the platform migration, managing a team of 6')],
+        { userSuppliedValues: new Set(['6']) }
+      );
 
       expect(result.applied).toEqual(['sugg-quantify']);
       expect(result.text).toBe('Led the platform migration, managing a team of 6');
@@ -381,7 +387,9 @@ describe('Career Suggestions Engine', () => {
         inputSlots: undefined,
       };
 
-      const result = applyAcceptedSuggestions(baseDoc, [plain]);
+      const result = applyAcceptedSuggestions(baseDoc, [plain], {
+        userSuppliedValues: new Set(['6']),
+      });
       expect(result.applied).toEqual(['sugg-plain']);
     });
 

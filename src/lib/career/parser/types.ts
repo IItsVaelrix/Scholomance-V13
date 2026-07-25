@@ -90,6 +90,53 @@ export interface ResumeSection {
   evidence: ParseEvidence[];
 }
 
+/**
+ * A first-class résumé bullet (JD Improvement Advisor prerequisite — spec §4.1).
+ *
+ * `id` is the stable identity that controls movement (reorder rules key on it);
+ * `sourceSpan` is provenance only — it validates staleness (the apply guard compares
+ * `before` against rawText at this span) but never controls placement. This separation
+ * is what lets an accepted rewrite and a later reorder coexist without one invalidating
+ * the other.
+ */
+export interface ResumeBullet {
+  /** Stable identity — `bullet:<sectionId>:<ordinal>:<contentHash>`. Controls movement. */
+  id: string;
+  sectionId: string;
+  /**
+   * The employment entry this bullet belongs to (spec §4.1 entry-aware correction). A
+   * bullet may move ONLY within its own entry — `reorder` and `apply-moves` enforce
+   * `sourceBullet.entryId === targetBullet.entryId`, so achievements can never cross an
+   * employer boundary. Title/date lines are NOT bullets and therefore carry no bullet id.
+   */
+  entryId: string;
+  /** Bullet content text, bullet marker stripped, byte-identical to rawText.slice(sourceSpan). */
+  rawText: string;
+  /** Provenance span in raw coordinate space. Validates staleness, never controls movement. */
+  sourceSpan: TextSpan;
+}
+
+/**
+ * A first-class employment entry inside an experience section (entry-aware correction).
+ *
+ * The flat bullet model treated every nonblank line as a movable bullet, so the reorder
+ * rule promoted strong bullets to the top of the WHOLE section — crossing employer
+ * boundaries and leaving titles/dates behind "like luggage on the wrong carousel". An
+ * entry groups a role title, its optional date line, and ONLY its own bullets. Headings,
+ * role titles, and date lines are structural — they are never emitted as `ResumeBullet`.
+ */
+export interface ResumeExperienceEntry {
+  /** Stable identity — `entry:<sectionId>:<ordinal>:<titleHash>`. */
+  id: string;
+  sectionId: string;
+  /** Role/company title line (date stripped when it was inline). Absent for a headerless entry. */
+  title?: { rawText: string; sourceSpan: TextSpan };
+  /** Date or date range line (e.g. "2019 - 2021", "Jan 2020 – Present"). */
+  date?: { rawText: string; sourceSpan: TextSpan };
+  /** The entry's accomplishment bullets, in document order. */
+  bullets: ResumeBullet[];
+}
+
 export interface ResumeContact {
   name?: string;
   email?: string;

@@ -1,6 +1,6 @@
 import type { ResumeDocument } from '../parser/types.js';
 import type { ResumeSuggestion, ResumeExport } from '../analysis/types.js';
-import { applyAcceptedSuggestions } from '../suggestions/apply-suggestions.js';
+import { applyAcceptedSuggestions, type ApplyOptions } from '../suggestions/apply-suggestions.js';
 
 /**
  * Strips Sigil scaffolding (header, footer, and resonance trailer line) from plain text.
@@ -23,9 +23,10 @@ function stripSigilScaffolding(text: string): string {
 export function buildCleanExport(
   doc: ResumeDocument,
   suggestions: ResumeSuggestion[],
-  fileName?: string
+  fileName?: string,
+  options: ApplyOptions = {}
 ): ResumeExport {
-  const result = applyAcceptedSuggestions(doc, suggestions);
+  const result = applyAcceptedSuggestions(doc, suggestions, options);
   const plainText = stripSigilScaffolding(result.text);
   const finalFileName = fileName && fileName.trim() ? fileName.trim() : 'resume_export.txt';
 

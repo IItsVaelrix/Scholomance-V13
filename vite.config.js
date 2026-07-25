@@ -23,9 +23,13 @@ return {
       },
     },
   },
-  // Exclude Node.js-only packages from browser bundle
+  // Exclude Node.js-only packages from the browser bundle. @sqlite.org/sqlite-wasm
+  // is excluded for a different reason: its glue locates the engine via
+  // `new URL("sqlite3.wasm", import.meta.url)`, which Vite's own asset pipeline
+  // rewrites correctly ONLY when the dep is not pre-bundled by esbuild. Without
+  // this the Career Graph worker's SQLite init 404s on sqlite3.wasm.
   optimizeDeps: {
-    exclude: ['cmudict', 'better-sqlite3', 'bcrypt'],
+    exclude: ['cmudict', 'better-sqlite3', 'bcrypt', '@sqlite.org/sqlite-wasm'],
   },
   build: {
     cssMinify: 'lightningcss',

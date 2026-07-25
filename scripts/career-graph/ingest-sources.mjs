@@ -25,17 +25,38 @@ import { NORMALIZED_COLUMNS, conceptId } from './build-database.mjs';
 export const RAW_LAYOUT = Object.freeze({
   onet: Object.freeze({
     occupationsFile: 'occupations.tsv',
-    occupationSkillsFile: 'occupation_skills.tsv',
+    // O*NET 30.x splits the 35-element skill taxonomy across two files with an
+    // identical schema: Essential Skills (10 basic, 2.A.*) and Transferable
+    // Skills (25 cross-functional, 2.B.*). Both are read and concatenated.
+    occupationSkillsFiles: Object.freeze(['essential_skills.tsv', 'transferable_skills.tsv']),
+    // The concrete tools an occupation uses (O*NET 30.3 ships this as
+    // "Software Skills.txt"). Different schema from the rated skill files: a
+    // categorical list with no Scale/Data Value, keyed on the Workplace Example
+    // (e.g. "Atlassian JIRA") — the layer that actually appears on résumés.
+    technologySkillsFile: 'technology_skills.tsv',
     delimiter: '\t',
     columns: Object.freeze({
       socCode: 'O*NET-SOC Code',
       title: 'Title',
       description: 'Description',
-      skillId: 'Skill ID',
-      skillName: 'Skill Name',
-      importance: 'Importance',
-      level: 'Level',
+      skillId: 'Element ID',
+      skillName: 'Element Name',
+      scaleId: 'Scale ID',
+      dataValue: 'Data Value',
+      recommendSuppress: 'Recommend Suppress',
+      notRelevant: 'Not Relevant',
     }),
+    technologyColumns: Object.freeze({
+      socCode: 'O*NET-SOC Code',
+      example: 'Workplace Example',
+      categoryId: 'Element ID',
+      categoryName: 'Element Name',
+      hotTechnology: 'Hot Technology',
+      inDemand: 'In Demand',
+    }),
+    // The skill files are long-format: one row per occupation × element × scale.
+    // Importance and Level arrive as SEPARATE rows and must be pivoted together.
+    scales: Object.freeze({ importance: 'IM', level: 'LV' }),
   }),
   esco: Object.freeze({
     occupationsFile: 'occupations.csv',
@@ -126,8 +147,58 @@ function relationRow({ namespace, from_concept_id, predicate, to_concept_id, req
   };
 }
 
-/** Normalize O*NET occupation + skill rows into interchange rows. */
-export function normalizeOnet(occupationRows, skillRows, sourceRelease) {
+/** O*NET flags unreliable/inapplicable estimates with a 'Y'. */
+function isFlagged(value) {
+  return String(value || '').trim().toUpperCase() === 'Y';
+}
+
+/**
+ * Pivot O*NET long-format skill ratings into one record per
+ * (occupation, skill element).
+ *
+ * The release ships one row per occupation × element × scale, so Importance
+ * ('IM') and Level ('LV') arrive as separate rows that must be folded together.
+ * Rows flagged `Recommend Suppress` (unreliable estimate) or `Not Relevant`
+ * (scale does not apply to this occupation) are dropped rather than turned into
+ * graph facts.
+ *
+ * @returns {{ pairs: Map<string, object>, readRows: number, usedRows: number }}
+ */
+export function pivotOnetSkillRatings(skillRatingRows) {
+  const cols = RAW_LAYOUT.onet.columns;
+  const { importance: IM, level: LV } = RAW_LAYOUT.onet.scales;
+  const pairs = new Map();
+  let usedRows = 0;
+
+  for (const r of skillRatingRows) {
+    const soc = (r[cols.socCode] || '').trim();
+    const skillId = (r[cols.skillId] || '').trim();
+    const skillName = (r[cols.skillName] || '').trim();
+    if (!soc || !skillId || !skillName) continue;
+    if (isFlagged(r[cols.recommendSuppress]) || isFlagged(r[cols.notRelevant])) continue;
+
+    const value = Number((r[cols.dataValue] ?? '').toString().trim());
+    if (!Number.isFinite(value)) continue;
+
+    const scale = (r[cols.scaleId] || '').trim().toUpperCase();
+    if (scale !== IM && scale !== LV) continue;
+
+    const key = `${soc}\u0000${skillId}`;
+    let entry = pairs.get(key);
+    if (!entry) {
+      entry = { soc, skillId, skillName, importance: null, level: null };
+      pairs.set(key, entry);
+    }
+    if (scale === IM) entry.importance = value;
+    else entry.level = value;
+    usedRows += 1;
+  }
+
+  return { pairs, readRows: skillRatingRows.length, usedRows };
+}
+
+/** Normalize O*NET occupation + skill rating rows into interchange rows. */
+export function normalizeOnet(occupationRows, skillRatingRows, sourceRelease) {
   const cols = RAW_LAYOUT.onet.columns;
   const rows = [];
   const seenSkill = new Set();
@@ -149,11 +220,15 @@ export function normalizeOnet(occupationRows, skillRows, sourceRelease) {
     );
   }
 
-  for (const r of skillRows) {
-    const soc = (r[cols.socCode] || '').trim();
-    const skillId = (r[cols.skillId] || '').trim();
-    const skillName = (r[cols.skillName] || '').trim();
-    if (!soc || !skillId || !skillName) continue;
+  const { pairs, readRows, usedRows } = pivotOnetSkillRatings(skillRatingRows);
+  let relationCount = 0;
+
+  for (const { soc, skillId, skillName, importance, level } of pairs.values()) {
+    // Importance is what grades the edge. A pair carrying only a Level rating
+    // cannot be classified as required/preferred/optional, so it is not emitted
+    // rather than being defaulted into a claim the source does not support.
+    if (importance == null) continue;
+
     const skillExternalId = `skill.${skillId}`;
     if (!seenSkill.has(skillExternalId)) {
       seenSkill.add(skillExternalId);
@@ -169,8 +244,7 @@ export function normalizeOnet(occupationRows, skillRows, sourceRelease) {
         })
       );
     }
-    const importance = r[cols.importance];
-    const level = r[cols.level];
+
     rows.push(
       relationRow({
         namespace: 'onet',
@@ -178,11 +252,132 @@ export function normalizeOnet(occupationRows, skillRows, sourceRelease) {
         predicate: 'requires_skill',
         to_concept_id: conceptId('onet', skillExternalId),
         requirement_kind: onetRequirementFromImportance(importance),
-        importance: importance === '' ? null : Number(importance),
-        level: level === '' ? null : Number(level),
+        importance,
+        level,
         source_release: sourceRelease,
         source_record_id: `onet-rel-${soc}-${skillId}`,
       })
+    );
+    relationCount += 1;
+  }
+
+  // A skill file that parses but yields no edges is the exact failure this
+  // pipeline shipped with: every row was silently skipped on a column-name
+  // mismatch and the build still reported success. Refuse to normalize a
+  // skill-less career graph.
+  if (readRows > 0 && relationCount === 0) {
+    const headers = Object.keys(skillRatingRows[0] || {});
+    throw new Error(
+      `INGEST_NO_SKILL_RELATIONS: read ${readRows} O*NET skill rating rows ` +
+      `(${usedRows} usable) but produced 0 requires_skill relations. ` +
+      `Expected columns [${Object.values(cols).join(', ')}] and scales ` +
+      `[${Object.values(RAW_LAYOUT.onet.scales).join(', ')}]; the file provides ` +
+      `[${headers.join(', ')}]. Check that prepare-sources mapped the right file.`
+    );
+  }
+
+  return rows;
+}
+
+/** Stable, url-safe id fragment for a technology name. */
+export function technologySlug(name) {
+  return String(name || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/**
+ * Grade an occupation→technology edge.
+ *
+ * O*NET does not assert that any technology is *required* for an occupation —
+ * the file lists tools observed in use, flagged for market signal. Nothing here
+ * maps to 'required'; claiming otherwise would put a requirement in the graph
+ * that the source never made.
+ */
+export function onetTechnologyRequirement(row) {
+  const cols = RAW_LAYOUT.onet.technologyColumns;
+  if (isFlagged(row[cols.inDemand]) || isFlagged(row[cols.hotTechnology])) return 'preferred';
+  return 'optional';
+}
+
+/**
+ * Normalize O*NET technology/software rows into tool concepts and
+ * occupation→tool relations.
+ *
+ * Tools are identified by their Workplace Example ("Atlassian JIRA"), with the
+ * O*NET category ("Content workflow software") kept as the description so the
+ * UI can explain a match. Slug collisions between distinct tool names are
+ * disambiguated with a deterministic counter, so a given input file always
+ * produces the same ids.
+ */
+export function normalizeOnetTechnology(technologyRows, sourceRelease) {
+  const cols = RAW_LAYOUT.onet.technologyColumns;
+  const rows = [];
+  const slugByName = new Map(); // tool name -> external id fragment
+  const nameBySlug = new Map(); // external id fragment -> tool name
+  const seenEdge = new Set();
+  let relationCount = 0;
+
+  for (const r of technologyRows) {
+    const soc = (r[cols.socCode] || '').trim();
+    const name = (r[cols.example] || '').trim();
+    if (!soc || !name) continue;
+
+    let slug = slugByName.get(name);
+    if (!slug) {
+      const base = technologySlug(name);
+      if (!base) continue;
+      slug = base;
+      let n = 1;
+      while (nameBySlug.has(slug) && nameBySlug.get(slug) !== name) {
+        n += 1;
+        slug = `${base}-${n}`;
+      }
+      slugByName.set(name, slug);
+      nameBySlug.set(slug, name);
+
+      rows.push(
+        conceptRow({
+          namespace: 'onet',
+          external_id: `tech.${slug}`,
+          kind: 'skill',
+          preferred_label: name,
+          description: (r[cols.categoryName] || '').trim(),
+          source_release: sourceRelease,
+          source_record_id: `onet-tech-${slug}`,
+        })
+      );
+    }
+
+    // The same tool can be listed for one occupation under several categories.
+    const edgeKey = `${soc}|${slug}`;
+    if (seenEdge.has(edgeKey)) continue;
+    seenEdge.add(edgeKey);
+
+    rows.push(
+      relationRow({
+        namespace: 'onet',
+        from_concept_id: conceptId('onet', soc),
+        predicate: 'requires_skill',
+        to_concept_id: conceptId('onet', `tech.${slug}`),
+        requirement_kind: onetTechnologyRequirement(r),
+        importance: null,
+        level: null,
+        source_release: sourceRelease,
+        source_record_id: `onet-techrel-${soc}-${slug}`,
+      })
+    );
+    relationCount += 1;
+  }
+
+  if (technologyRows.length > 0 && relationCount === 0) {
+    const headers = Object.keys(technologyRows[0] || {});
+    throw new Error(
+      `INGEST_NO_TECHNOLOGY_RELATIONS: read ${technologyRows.length} O*NET technology rows ` +
+      `but produced 0 requires_skill relations. Expected columns ` +
+      `[${Object.values(cols).join(', ')}]; the file provides [${headers.join(', ')}].`
     );
   }
 
@@ -298,11 +493,17 @@ export async function ingestSources({ rawRoot, outputDir, manifest }) {
   const escoRelease = `esco-${manifest.esco.version}`;
   const crosswalkRelease = `crosswalk-${manifest.crosswalk.version}`;
 
-  const [onetOcc, onetSkills] = await Promise.all([
+  const [onetOcc, onetTech, ...onetSkillFiles] = await Promise.all([
     readDelimited(join(onetDir, RAW_LAYOUT.onet.occupationsFile), RAW_LAYOUT.onet.delimiter),
-    readDelimited(join(onetDir, RAW_LAYOUT.onet.occupationSkillsFile), RAW_LAYOUT.onet.delimiter),
+    readDelimited(join(onetDir, RAW_LAYOUT.onet.technologySkillsFile), RAW_LAYOUT.onet.delimiter),
+    ...RAW_LAYOUT.onet.occupationSkillsFiles.map((f) =>
+      readDelimited(join(onetDir, f), RAW_LAYOUT.onet.delimiter)
+    ),
   ]);
-  const onetRows = normalizeOnet(onetOcc, onetSkills, onetRelease);
+  const onetRows = [
+    ...normalizeOnet(onetOcc, onetSkillFiles.flat(), onetRelease),
+    ...normalizeOnetTechnology(onetTech, onetRelease),
+  ];
 
   const [escoOcc, escoSkills, escoRels] = await Promise.all([
     readDelimited(join(escoDir, RAW_LAYOUT.esco.occupationsFile), RAW_LAYOUT.esco.delimiter),
@@ -327,6 +528,8 @@ export async function ingestSources({ rawRoot, outputDir, manifest }) {
   await write('esco.normalized.csv', escoRows);
   await write('crosswalk.normalized.csv', crosswalkRows);
 
+  const relationsIn = (rows) => rows.filter((r) => r.record_type === 'relation').length;
+
   return {
     outputDir: outDir,
     files,
@@ -334,6 +537,13 @@ export async function ingestSources({ rawRoot, outputDir, manifest }) {
       onet: onetRows.length,
       esco: escoRows.length,
       crosswalk: crosswalkRows.length,
+    },
+    // Surfaced so an ingest that produces concepts but no edges is visible in
+    // the build log instead of only in the database.
+    relations: {
+      onet: relationsIn(onetRows),
+      esco: relationsIn(escoRows),
+      crosswalk: relationsIn(crosswalkRows),
     },
   };
 }
@@ -358,6 +568,7 @@ if (isMain) {
   );
   const result = await ingestSources({ rawRoot: rawArg, outputDir: outArg, manifest });
   console.log(
-    `CAREER_INGEST_DONE onet=${result.counts.onet} esco=${result.counts.esco} crosswalk=${result.counts.crosswalk}`
+    `CAREER_INGEST_DONE onet=${result.counts.onet} esco=${result.counts.esco} crosswalk=${result.counts.crosswalk} ` +
+    `relations(onet=${result.relations.onet} esco=${result.relations.esco} crosswalk=${result.relations.crosswalk})`
   );
 }

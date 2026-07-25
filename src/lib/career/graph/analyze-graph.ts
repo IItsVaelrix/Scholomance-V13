@@ -53,6 +53,31 @@ export interface AnalyzeGraphInput {
 export interface AnalyzeGraphOptions {
   policy?: CareerPolicyBundle;
   artifactId?: string;
+  /**
+   * Provenance diagnostic prepended to every result. Defaults to the seed-demo
+   * notice so seed runs stay honestly labeled; the live SQLite worker overrides
+   * it with a corpus/manifest notice so a real result is never marked as seed.
+   */
+  provenance?: CareerGraphDiagnostic;
+}
+
+/**
+ * Which occupation `analyzeCareerGraph` will traverse for the skill frontier.
+ *
+ * Exported so the live worker can resolve — and make resident — the target's
+ * family shard BEFORE running the synchronous pipeline, using the exact same
+ * rule the pipeline applies. Returns `undefined` when the target is ambiguous
+ * and unconfirmed (the confirmation-required path, which needs no family shard).
+ */
+export function selectConfirmedOccupation(
+  occupations: readonly OccupationCandidate[],
+  confirmedOccupationId?: string
+): OccupationCandidate | undefined {
+  if (occupations.length === 0) return undefined;
+  if (confirmedOccupationId) {
+    return occupations.find((o) => o.conceptId === confirmedOccupationId) ?? occupations[0];
+  }
+  return occupations.length === 1 ? occupations[0] : undefined;
 }
 
 /** Diagnostic codes emitted by the seed/graph runtime. */
@@ -177,7 +202,7 @@ export function analyzeCareerGraph(
 ): CareerGraphAnalysis {
   const policy = options.policy ?? CAREER_POLICY_BUNDLE;
   const artifactId = options.artifactId ?? SEED_ARTIFACT_ID;
-  const diagnostics: CareerGraphDiagnostic[] = [seedDemoDiagnostic()];
+  const diagnostics: CareerGraphDiagnostic[] = [options.provenance ?? seedDemoDiagnostic()];
 
   const query = input.jobDescriptionText.trim() || input.resumeText.trim();
   const occupations: OccupationCandidate[] = inferOccupations(port, query, { policy });
@@ -194,11 +219,7 @@ export function analyzeCareerGraph(
 
   // Ambiguous target role: pause missing-skill analysis until the candidate
   // confirms. The UI keys off OCCUPATION_CONFIRMATION_REQUIRED.
-  const confirmed = input.confirmedOccupationId
-    ? occupations.find((o) => o.conceptId === input.confirmedOccupationId) ?? occupations[0]
-    : occupations.length === 1
-      ? occupations[0]
-      : undefined;
+  const confirmed = selectConfirmedOccupation(occupations, input.confirmedOccupationId);
 
   if (!confirmed) {
     diagnostics.push({

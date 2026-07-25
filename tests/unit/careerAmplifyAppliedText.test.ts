@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { buildAmplifications } from '../../src/lib/career/amplify/registry';
+import { valueTokens } from '../../src/lib/career/improve/honesty/user-fact-ledger';
 import { applyAcceptedSuggestions } from '../../src/lib/career/suggestions/apply-suggestions';
 import { INPUT_SENTINEL } from '../../src/lib/career/amplify/data/verb-classes';
 import { makeResumeDoc } from './fixtures/career-amplify-doc';
@@ -67,7 +68,11 @@ describe('amplified résumé text (applied, not suggestion objects)', () => {
       return { ...s, status: 'accepted' as const };
     });
 
-    const result = applyAcceptedSuggestions(doc, accepted);
+    // The digits are the candidate's, so they must be recorded as such — the apply-time
+    // provenance guard refuses any number that has no recorded user-input event.
+    const result = applyAcceptedSuggestions(doc, accepted, {
+      userSuppliedValues: new Set(SAMPLE_SLOT_VALUES.flatMap(valueTokens)),
+    });
 
     expect(result.skipped).toEqual([]);
     expect(result.applied.length).toBe(accepted.length);

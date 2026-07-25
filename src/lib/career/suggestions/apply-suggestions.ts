@@ -2,6 +2,18 @@ import type { ResumeDocument } from '../parser/types.js';
 import type { ResumeSuggestion, SuggestionApplicationResult } from '../analysis/types.js';
 import { detectSuggestionConflicts } from './detect-conflicts.js';
 import { INPUT_SENTINEL } from '../amplify/data/input-sentinel.js';
+import { applyMovesAndRewrites } from '../improve/apply-moves.js';
+import { assertNumericProvenance } from '../improve/honesty/token-provenance.js';
+
+export interface ApplyOptions {
+  /**
+   * Value tokens the candidate explicitly typed into input slots, from the UserFactLedger.
+   * A number in an accepted `after` that is neither already in the résumé nor recorded here
+   * is refused as `unprovenanced_number` — this is the guard that makes the ledger
+   * load-bearing rather than a write-only audit trail.
+   */
+  userSuppliedValues?: ReadonlySet<string>;
+}
 
 interface TextEdit {
   suggestionId: string;
@@ -12,8 +24,16 @@ interface TextEdit {
 
 export function applyAcceptedSuggestions(
   document: ResumeDocument,
-  suggestions: ResumeSuggestion[]
+  suggestions: ResumeSuggestion[],
+  options: ApplyOptions = {}
 ): SuggestionApplicationResult {
+  // Additive JD-Advisor path (spec §4.5): when any accepted suggestion carries a
+  // stable-id bullet move, delegate to the move-aware reconstruction so a rewrite and a
+  // reorder coexist (the move resolves by bulletId, unaffected by the edit's span shift).
+  if (suggestions.some((s) => s.status === 'accepted' && s.move)) {
+    return applyMovesAndRewrites(document, suggestions, options);
+  }
+
   const applied: string[] = [];
   const skipped: Array<{
     suggestionId: string;
@@ -23,7 +43,8 @@ export function applyAcceptedSuggestions(
       | 'overlap'
       | 'missing_target'
       | 'conflict'
-      | 'unfilled_input';
+      | 'unfilled_input'
+      | 'unprovenanced_number';
   }> = [];
 
   const rawText = document?.rawText || '';
@@ -54,6 +75,18 @@ export function applyAcceptedSuggestions(
 
     if ((s.after ?? '').includes(INPUT_SENTINEL)) {
       skipped.push({ suggestionId: s.id, reason: 'unfilled_input' });
+      continue;
+    }
+
+    // A number reaches the résumé only if the text it replaces already stated it (or, for
+    // an insertion, the résumé already does) or the candidate recorded it in a slot.
+    const numeric = assertNumericProvenance(
+      s.before ?? rawText,
+      s.after ?? '',
+      options.userSuppliedValues
+    );
+    if (!numeric.ok) {
+      skipped.push({ suggestionId: s.id, reason: 'unprovenanced_number' });
       continue;
     }
 
