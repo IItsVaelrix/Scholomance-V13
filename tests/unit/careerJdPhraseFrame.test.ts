@@ -83,8 +83,9 @@ describe('buildPhraseFrame', () => {
     // toPastTense accepts 'was' verbatim (KNOWN_VERBS), so naively lifting "the first
     // token that resolves as a verb" would draft "Was responsible for managing vendor
     // relationships, <sentinel>" — a copula is not a usable résumé opener. LEADING_NOISE
-    // strips the copula AND its usual "responsible for" companion, so the real verb
-    // ("managing") is what gets lifted.
+    // strips the bare copula, and the "responsible for" idiom that usually follows it is
+    // stripped separately (see the qualifier test below for why it's an idiom match, not
+    // a bare-token one), so the real verb ("managing") is what gets lifted.
     const jd = 'Requirements:\n- Was responsible for managing vendor relationships';
     expect(frameFor(jd, 'vendor')!.text).toBe('Managed vendor relationships, ␟');
   });
@@ -92,5 +93,13 @@ describe('buildPhraseFrame', () => {
   it('handles the other KNOWN_VERBS copula ("were") the same way', () => {
     const jd = 'Requirements:\n- Were responsible for managing vendor relationships';
     expect(frameFor(jd, 'vendor')!.text).toBe('Managed vendor relationships, ␟');
+  });
+
+  it('keeps "responsible" when it qualifies a noun instead of the "responsible for" idiom', () => {
+    // "responsible" is only scaffolding in the "responsible for" idiom (see above). Bare,
+    // it is a genuine qualifier — stripping it unconditionally from the front of every
+    // clause silently deletes the word that WAS the requirement.
+    const jd = 'Requirements:\n- Responsible AI development experience';
+    expect(frameFor(jd, 'development')!.text).toBe('Used Responsible AI development experience, ␟');
   });
 });

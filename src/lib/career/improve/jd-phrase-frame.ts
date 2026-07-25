@@ -72,7 +72,7 @@ export function toPastTense(word: string): string | null {
   return STRONG_VERBS.has(past) || KNOWN_VERBS.has(past) ? past : null;
 }
 
-import { clauseAt } from './jd-clause.js';
+import { clauseSpanAt } from './jd-clause.js';
 import { INPUT_SENTINEL } from '../amplify/data/input-sentinel.js';
 import type { Requirement } from './types.js';
 import type { TextSpan } from '../parser/types.js';
@@ -109,10 +109,20 @@ const LEADING_NOISE: ReadonlySet<string> = new Set([
   // noise means a clause like "was responsible for X" falls through past them to the next
   // real content word instead of drafting around the copula.
   'was', 'were', 'is', 'are', 'be', 'been', 'being',
-  // "responsible for" is the copula's usual companion and is scaffolding of the same kind:
-  // it names the SHAPE of an accomplishment ("you owned this"), not its content. Standard
-  // résumé advice is to delete it and lead with the verb it was hiding — "responsible for
-  // managing vendor relationships" and "managed vendor relationships" name the same fact.
+]);
+
+/**
+ * "responsible for" (and its "responsibility for"/"responsibilities for" variants) is the
+ * copula's usual companion and scaffolding of the same kind: it names the SHAPE of an
+ * accomplishment ("you owned this"), not its content — "responsible for managing vendor
+ * relationships" and "managed vendor relationships" name the same fact.
+ *
+ * This is matched as an IDIOM (the word directly followed by "for"), never as a bare
+ * leading token: "responsible" is also a genuine qualifier — "Responsible AI development
+ * experience" — and a bare-token strip would silently delete the word that WAS the
+ * requirement. Only the "X for" idiom is scaffolding; "responsible" on its own is content.
+ */
+const RESPONSIBLE_WORDS: ReadonlySet<string> = new Set([
   'responsible', 'responsibility', 'responsibilities',
 ]);
 
@@ -122,6 +132,11 @@ function isLeadingNoise(token: string): boolean {
   if (!t) return true;
   if (/^\d+[+-]?\d*$/.test(t)) return true;
   return LEADING_NOISE.has(t);
+}
+
+/** Bare alphabetic lowercase form of a token, for idiom matching. */
+function bareWord(token: string): string {
+  return token.toLowerCase().replace(/[^a-z]/g, '');
 }
 
 const OUTCOME_SLOT = Object.freeze({
@@ -142,16 +157,17 @@ export function buildPhraseFrame(jdText: string, requirement: Requirement): Phra
   if (!span) return null;
 
   const text = String(jdText ?? '');
-  const sourceClause = clauseAt(text, span.start, span.end);
+  const clause = clauseSpanAt(text, span.start, span.end);
+  const sourceClause = clause.text;
   if (!sourceClause.trim()) return null;
 
-  // Locate the clause's own span so the evidence trail points at real JD bytes.
-  const clauseStart = text.indexOf(sourceClause, Math.max(0, span.start - sourceClause.length));
-  if (clauseStart === -1) return null;
+  // The scan that found the clause already knows its absolute boundaries — use those
+  // directly rather than re-deriving them by searching `text` for the clause string, which
+  // can land on the wrong occurrence when the same clause text appears twice in one JD.
   const sourceSpan: TextSpan = {
     coordinateSpace: 'raw',
-    start: clauseStart,
-    end: clauseStart + sourceClause.length,
+    start: clause.start,
+    end: clause.end,
   };
 
   // Tokenize on whitespace, dropping list glyphs and trailing sentence punctuation.
@@ -161,9 +177,25 @@ export function buildPhraseFrame(jdText: string, requirement: Requirement): Phra
     .split(/\s+/)
     .filter(Boolean);
 
-  // Strip leading scaffolding.
+  // Strip leading scaffolding. "responsible"/"responsibility"/"responsibilities" only
+  // count as scaffolding in the "X for" idiom — bare, they are real qualifiers and must
+  // stay in the body (see RESPONSIBLE_WORDS doc comment).
   let i = 0;
-  while (i < tokens.length && isLeadingNoise(tokens[i])) i++;
+  while (i < tokens.length) {
+    const isResponsibleIdiom =
+      RESPONSIBLE_WORDS.has(bareWord(tokens[i])) &&
+      i + 1 < tokens.length &&
+      bareWord(tokens[i + 1]) === 'for';
+    if (isResponsibleIdiom) {
+      i += 2;
+      continue;
+    }
+    if (isLeadingNoise(tokens[i])) {
+      i++;
+      continue;
+    }
+    break;
+  }
   const rest = tokens.slice(i);
   if (rest.length === 0) return null;
 

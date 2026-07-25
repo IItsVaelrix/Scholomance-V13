@@ -14,8 +14,25 @@
  */
 export const CLAUSE_SPLIT = /[;,]|(?<=\.)\s+|\bbut\b|\bhowever\b/gi;
 
-/** The clause containing `start`, scoped to its line. */
-export function clauseAt(text: string, start: number, end: number): string {
+/** A clause's text together with its absolute position in the original `text`. */
+export interface ClauseSpan {
+  text: string;
+  start: number;
+  end: number;
+}
+
+/**
+ * The clause containing `start`, scoped to its line, together with its own absolute
+ * boundaries in `text`.
+ *
+ * Returning the boundaries the scan already computed — rather than making a caller
+ * re-derive them by searching `text` for the returned string — matters because a
+ * text-search re-derivation can silently land on the WRONG occurrence when the same
+ * clause text appears more than once in a JD (two bullets phrased identically). The
+ * boundaries here come from the scan itself, so they can never drift from the text they
+ * describe.
+ */
+export function clauseSpanAt(text: string, start: number, end: number): ClauseSpan {
   const lineStart = text.lastIndexOf('\n', start) + 1;
   let lineEnd = text.indexOf('\n', end);
   if (lineEnd === -1) lineEnd = text.length;
@@ -32,7 +49,18 @@ export function clauseAt(text: string, start: number, end: number): string {
   bounds.push(line.length);
 
   for (let i = 0; i < bounds.length - 1; i++) {
-    if (rel >= bounds[i] && rel < bounds[i + 1]) return line.slice(bounds[i], bounds[i + 1]);
+    if (rel >= bounds[i] && rel < bounds[i + 1]) {
+      return {
+        text: line.slice(bounds[i], bounds[i + 1]),
+        start: lineStart + bounds[i],
+        end: lineStart + bounds[i + 1],
+      };
+    }
   }
-  return line;
+  return { text: line, start: lineStart, end: lineEnd };
+}
+
+/** The clause containing `start`, scoped to its line. */
+export function clauseAt(text: string, start: number, end: number): string {
+  return clauseSpanAt(text, start, end).text;
 }
