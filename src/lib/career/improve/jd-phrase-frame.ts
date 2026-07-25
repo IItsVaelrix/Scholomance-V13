@@ -71,3 +71,110 @@ export function toPastTense(word: string): string | null {
   if (!past) return null;
   return STRONG_VERBS.has(past) || KNOWN_VERBS.has(past) ? past : null;
 }
+
+import { clauseAt } from './jd-clause.js';
+import { INPUT_SENTINEL } from '../amplify/data/input-sentinel.js';
+import type { Requirement } from './types.js';
+import type { TextSpan } from '../parser/types.js';
+
+export interface PhraseFrame {
+  /** Draft text with U+241F sentinels where the candidate must supply a fact. */
+  text: string;
+  /** One slot per sentinel, in left-to-right order. */
+  slots: { placeholder: string; hint: string }[];
+  /** The JD clause the wording came from — the provenance source of record. */
+  sourceClause: string;
+  /** Span of that clause in the JD text. */
+  sourceSpan: TextSpan;
+}
+
+/**
+ * Leading words that describe the SHAPE of a requirement rather than its content, plus the
+ * second-person scaffolding JDs open with. Stripped only from the FRONT of a clause: a
+ * "with" in the middle ("integrated with Stripe") is real content.
+ */
+const LEADING_NOISE: ReadonlySet<string> = new Set([
+  'a', 'an', 'and', 'the', 'or', 'of', 'in', 'with', 'to', 'for',
+  'ability', 'background', 'comfort', 'comfortable', 'deep', 'demonstrated',
+  'excellent', 'experience', 'experienced', 'expertise', 'exposure', 'familiar',
+  'familiarity', 'good', 'great', 'hands', 'knowledge', 'minimum', 'practical',
+  'preferred', 'prior', 'proficiency', 'proficient', 'proven', 'required', 'skill',
+  'skills', 'solid', 'strong', 'successful', 'track', 'record', 'understanding',
+  'willingness', 'year', 'years',
+  // second-person / modal scaffolding
+  'you', 'we', 'they', 'will', 'should', 'must', 'can', 'able',
+  // copulas: `toPastTense` resolves these verbatim (via KNOWN_VERBS, which lists them as
+  // past-tense forms), but a bare copula makes a useless sentence opener on its own — "Was
+  // responsible for X" reads as broken prose, not a résumé bullet. Treating them as leading
+  // noise means a clause like "was responsible for X" falls through past them to the next
+  // real content word instead of drafting around the copula.
+  'was', 'were', 'is', 'are', 'be', 'been', 'being',
+]);
+
+/** Leading list glyphs and duration counts ("5+", "3-5") carry no content. */
+function isLeadingNoise(token: string): boolean {
+  const t = token.toLowerCase().replace(/[^a-z0-9+-]/g, '');
+  if (!t) return true;
+  if (/^\d+[+-]?\d*$/.test(t)) return true;
+  return LEADING_NOISE.has(t);
+}
+
+const OUTCOME_SLOT = Object.freeze({
+  placeholder: 'the result',
+  hint: 'the result it produced — a number, a time saved, an outcome',
+});
+
+/**
+ * Build a drafted sentence frame from the JD's own wording, or null when the clause cannot
+ * be voiced confidently.
+ *
+ * Fail closed: a requirement whose phrasing we cannot rewrite gets no draft, and its card
+ * keeps its existing prose form. An awkward draft in a résumé is worse than an honest
+ * instruction.
+ */
+export function buildPhraseFrame(jdText: string, requirement: Requirement): PhraseFrame | null {
+  const span = requirement.jdEvidence?.[0];
+  if (!span) return null;
+
+  const text = String(jdText ?? '');
+  const sourceClause = clauseAt(text, span.start, span.end);
+  if (!sourceClause.trim()) return null;
+
+  // Locate the clause's own span so the evidence trail points at real JD bytes.
+  const clauseStart = text.indexOf(sourceClause, Math.max(0, span.start - sourceClause.length));
+  if (clauseStart === -1) return null;
+  const sourceSpan: TextSpan = {
+    coordinateSpace: 'raw',
+    start: clauseStart,
+    end: clauseStart + sourceClause.length,
+  };
+
+  // Tokenize on whitespace, dropping list glyphs and trailing sentence punctuation.
+  const tokens = sourceClause
+    .replace(/^[\s•\-*–—]+/, '')
+    .replace(/[.;:!?]+\s*$/, '')
+    .split(/\s+/)
+    .filter(Boolean);
+
+  // Strip leading scaffolding.
+  let i = 0;
+  while (i < tokens.length && isLeadingNoise(tokens[i])) i++;
+  const rest = tokens.slice(i);
+  if (rest.length === 0) return null;
+
+  // First token that resolves as a verb becomes the sentence's verb. Copulas are already
+  // excluded above (folded into LEADING_NOISE), so this never lands on a bare "was"/"were".
+  const past = toPastTense(rest[0]);
+  const body = past ? rest.slice(1).join(' ') : rest.join(' ');
+  if (!body.trim()) return null;
+
+  const verb = past ?? 'used';
+  const opening = verb.charAt(0).toUpperCase() + verb.slice(1);
+
+  return {
+    text: `${opening} ${body}, ${INPUT_SENTINEL}`,
+    slots: [{ ...OUTCOME_SLOT }],
+    sourceClause,
+    sourceSpan,
+  };
+}
