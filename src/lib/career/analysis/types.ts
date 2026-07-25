@@ -68,6 +68,12 @@ export interface ResumeSuggestion {
     span?: TextSpan;
     sectionId?: string;
     insertionPoint?: 'before_section' | 'after_section' | 'document_end';
+    /**
+     * Insert as a new bullet at the END of this employment entry. Set from the candidate's
+     * explicit choice — never defaulted, because placing a drafted bullet under an employer
+     * asserts WHERE the work happened.
+     */
+    entryId?: string;
   };
   before?: string;
   after?: string;
@@ -79,6 +85,8 @@ export interface ResumeSuggestion {
   status: 'pending' | 'accepted' | 'rejected' | 'edited';
   /** True when `after` contains one or more U+241F input sentinels the candidate must fill. */
   requiresInput?: boolean;
+  /** True when the candidate must choose a target entry before Accept unlocks. */
+  requiresEntryChoice?: boolean;
   /** One entry per sentinel in `after`, in left-to-right order. */
   inputSlots?: SuggestionInputSlot[];
   /** Career Graph canonical concept id (present for graph-derived suggestions). */
