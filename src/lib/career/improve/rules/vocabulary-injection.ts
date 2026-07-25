@@ -17,6 +17,7 @@ import type { EvidenceMap, ResumeBullet } from '../types.js';
 import { assertTokenProvenance } from '../honesty/token-provenance.js';
 import { stemToken } from '../skill-phrase-bridge.js';
 import { extractClaim, assertClaimPreserved, PERMITS } from '../honesty/claim-preservation.js';
+import { INPUT_SENTINEL } from '../../amplify/data/input-sentinel.js';
 
 function wordPresent(text: string, term: string): boolean {
   const t = term.toLowerCase().trim();
@@ -169,10 +170,43 @@ export function vocabularyInjectionRule(
       if (incumbent) {
         suggestions.splice(suggestions.indexOf(incumbent.suggestion), 1);
       }
+
+      // Draft a fill-in rewrite when we have an anchor bullet to hang it on. The tool never
+      // names the canonical term itself (that is the escalation the tiered bridge exists to
+      // prevent) — it opens a blank and lets the candidate name what they actually did.
+      const anchorBullet = firstAdjacent ? bulletById.get(firstAdjacent.bulletId) : undefined;
+      let draft: { after: string; slotId: string } | null = null;
+      if (anchorBullet) {
+        const tail = /[.;:!?]+$/.exec(anchorBullet.rawText);
+        const stem = tail ? anchorBullet.rawText.slice(0, -tail[0].length) : anchorBullet.rawText;
+        const after = `${stem} using ${INPUT_SENTINEL}${tail ? tail[0] : ''}`;
+
+        const provenance = assertTokenProvenance(anchorBullet.rawText, after, [canonicalLabel, req.term]);
+        const beforeClaim = extractClaim(anchorBullet.rawText, anchorBullet.sourceSpan);
+        const afterClaim = extractClaim(after, anchorBullet.sourceSpan);
+        if (provenance.ok && beforeClaim && afterClaim) {
+          const claim = assertClaimPreserved(beforeClaim, afterClaim, PERMITS.quantify);
+          if (claim.ok) {
+            draft = { after, slotId: `${makeSuggestionId('learning_gap', req.term, `adjacent:${canonicalLabel}`)}:slot:0` };
+          }
+        }
+      }
+
       const gap: ResumeSuggestion = {
         id: makeSuggestionId('learning_gap', req.term, `adjacent:${canonicalLabel}`),
         type: 'learning_gap',
-        reason: `The JD wants "${canonicalLabel}". Your résumé is adjacent (e.g. "${firstAdjacent?.matchedPhrase ?? 'related work'}") but does not demonstrate it explicitly. Name the specific tool, method, or outcome you personally delivered so this reads as evidence rather than proximity.`,
+        reason: draft
+          ? `The JD wants "${canonicalLabel}". Your bullet is adjacent (e.g. "${firstAdjacent?.matchedPhrase ?? 'related work'}") but does not name it. Fill in what you actually used — nothing is written until the blank is filled.`
+          : `The JD wants "${canonicalLabel}". Your résumé is adjacent (e.g. "${firstAdjacent?.matchedPhrase ?? 'related work'}") but does not demonstrate it explicitly. Name the specific tool, method, or outcome you personally delivered so this reads as evidence rather than proximity.`,
+        target: draft && anchorBullet
+          ? { span: anchorBullet.sourceSpan, sectionId: anchorBullet.sectionId }
+          : undefined,
+        before: draft && anchorBullet ? anchorBullet.rawText : undefined,
+        after: draft ? draft.after : undefined,
+        requiresInput: draft ? true : undefined,
+        inputSlots: draft
+          ? [{ id: draft.slotId, placeholder: 'what you used', hint: `the specific method or tool (e.g. ${canonicalLabel})` }]
+          : undefined,
         evidence: req.jdEvidence[0]
           ? [
               {
@@ -189,7 +223,7 @@ export function vocabularyInjectionRule(
         requiresUserApproval: true,
         status: 'pending',
         conceptId: req.canonicalConceptId,
-        editable: false,
+        editable: draft ? true : false,
       };
       suggestions.push(gap);
       gapByAnchor.set(anchorKey, { weight: req.weight, suggestion: gap });

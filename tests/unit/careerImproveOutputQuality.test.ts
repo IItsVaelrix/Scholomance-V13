@@ -170,3 +170,32 @@ describe('advisor output on a realistic JD (end-to-end)', () => {
     expect(keyword[0].after?.toLowerCase()).toContain('postgres');
   });
 });
+
+describe('adjacent evidence drafts a fill-in rewrite (Case B)', () => {
+  const setup = () =>
+    pipeline(
+      'Requirements:\n- Solid understanding of dimensional modeling',
+      'EXPERIENCE\nPartnered with analysts to model warehouse tables for reporting'
+    );
+
+  it('offers an editable draft with a blank instead of an instruction', () => {
+    const { doc, bullets, map } = setup();
+    const gaps = vocabularyInjectionRule(map, bullets, doc).filter((s) => s.type === 'learning_gap');
+    expect(gaps.length).toBeGreaterThan(0);
+    const gap = gaps[0];
+    expect(gap.editable).toBe(true);
+    expect(gap.requiresInput).toBe(true);
+    expect(gap.after).toContain('␟');
+    expect(gap.inputSlots?.length).toBeGreaterThan(0);
+    // Amplify-only: the original bullet survives intact inside the draft.
+    expect(gap.after).toContain('model warehouse tables for reporting');
+    expect(gap.before).toBe('Partnered with analysts to model warehouse tables for reporting');
+  });
+
+  it('does not rename the adjacent phrase to the canonical term', () => {
+    const { doc, bullets, map } = setup();
+    const gaps = vocabularyInjectionRule(map, bullets, doc).filter((s) => s.type === 'learning_gap');
+    // The escalation guard still holds: the tool never asserts the candidate did it.
+    expect(gaps[0].after).not.toMatch(/dimensional modeling\//);
+  });
+});

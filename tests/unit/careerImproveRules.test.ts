@@ -34,7 +34,7 @@ describe('vocabulary-injection rule (§4.5)', () => {
     expect(kw!.conceptId).toBeTruthy();
   });
 
-  it('does NOT rename an adjacent match — emits a non-editable learning_gap instead', () => {
+  it('does NOT rename an adjacent match — drafts an editable fill-in blank instead', () => {
     const { doc, bullets, map } = pipeline(
       'Required: SQL.',
       'EXPERIENCE\nQueried the database for ad-hoc analysis'
@@ -43,7 +43,11 @@ describe('vocabulary-injection rule (§4.5)', () => {
     expect(sugs.find((s) => s.type === 'keyword')).toBeUndefined();
     const gap = sugs.find((s) => s.type === 'learning_gap');
     expect(gap).toBeTruthy();
-    expect(gap!.editable).toBe(false);
+    // Editable draft with a blank — the escalation guard still holds: never renamed to "SQL".
+    expect(gap!.editable).toBe(true);
+    expect(gap!.requiresInput).toBe(true);
+    expect(gap!.after).toContain(INPUT_SENTINEL);
+    expect(gap!.after).not.toMatch(/SQL\//);
   });
 });
 
