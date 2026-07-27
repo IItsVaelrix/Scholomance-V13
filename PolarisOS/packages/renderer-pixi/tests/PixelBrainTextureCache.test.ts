@@ -148,4 +148,29 @@ describe("PixelBrainTextureCache", () => {
     expect(destroy).toHaveBeenCalledTimes(1);
     expect(lease.texture).not.toBe(before);
   });
+
+  it("retains encoded PNG bytes and decoded upload bytes within the CPU budget", () => {
+    const create = vi.fn((): TextureResource<{ id: number }> => ({
+      texture: { id: 1 },
+    }));
+    const cache = new PixelBrainTextureCache({
+      policy: policy({ maxRetainedRasterBytes: 6 }),
+      create,
+      destroy: vi.fn(),
+    });
+
+    const lease = cache.acquire({
+      cacheKey: "png1:image",
+      retainedBytes: new Uint8Array([1, 2]),
+      uploadBytes: new Uint8Array([10, 20, 30, 40]),
+      width: 1,
+      height: 1,
+    });
+
+    expect(lease).not.toBeNull();
+    expect(cache.stats().retainedRasterBytes).toBe(6);
+    expect(create.mock.calls[0]?.[0].uploadBytes).toEqual(
+      new Uint8Array([10, 20, 30, 40]),
+    );
+  });
 });

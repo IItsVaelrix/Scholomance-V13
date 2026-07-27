@@ -31,20 +31,22 @@ describe("SceneRenderCoordinator", () => {
     const releaseBuildA = deferred<string>();
     const commits: string[] = [];
     const released: string[] = [];
-    const acquiredA = deferred<void>();
+    const discarded: string[] = [];
+    const buildingA = deferred<void>();
 
     const slowA = coordinator.run({
       resolve: async () => "A",
-      acquire: async () => {
-        acquiredA.resolve();
-        return [lease("A", released)];
+      acquire: async () => [lease("A", released)],
+      build: async () => {
+        buildingA.resolve();
+        return releaseBuildA.promise;
       },
-      build: async () => releaseBuildA.promise,
+      discard: (scene) => discarded.push(scene),
       commit: (scene) => {
         commits.push(scene);
       },
     });
-    await acquiredA.promise;
+    await buildingA.promise;
 
     const fastB = coordinator.run({
       resolve: async () => "B",
@@ -61,6 +63,7 @@ describe("SceneRenderCoordinator", () => {
     expect(commits).toEqual(["B"]);
     expect(released).toContain("A");
     expect(released).not.toContain("B");
+    expect(discarded).toEqual(["A"]);
   });
 
   it("releases provisional assets when destroyed during resolution", async () => {

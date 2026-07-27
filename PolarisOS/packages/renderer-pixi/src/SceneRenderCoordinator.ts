@@ -14,6 +14,8 @@ export interface SceneRenderTransaction<TResolved, TBuilt> {
     resolved: TResolved,
     leases: readonly Releasable[],
   ): Promise<TBuilt>;
+  /** Destroys an off-stage build that never became the committed scene. */
+  discard?(built: TBuilt): void;
   /**
    * Atomically installs the built scene and returns resources from the
    * previously committed scene. Those old resources are released only after
@@ -51,6 +53,8 @@ export class SceneRenderCoordinator {
     if (this.destroyed) return "STALE";
     const epoch = this.begin();
     let provisional: readonly Releasable[] = [];
+    let built: TBuilt | undefined;
+    let hasBuilt = false;
 
     try {
       const resolved = await transaction.resolve();
@@ -62,17 +66,22 @@ export class SceneRenderCoordinator {
         return "STALE";
       }
 
-      const built = await transaction.build(resolved, provisional);
+      built = await transaction.build(resolved, provisional);
+      hasBuilt = true;
       if (!this.isCurrent(epoch)) {
+        transaction.discard?.(built);
+        hasBuilt = false;
         releaseAll(provisional);
         return "STALE";
       }
 
       const previous = transaction.commit(built, provisional) ?? [];
+      hasBuilt = false;
       releaseAll(previous);
       transaction.afterCommit?.();
       return "COMMITTED";
     } catch (cause) {
+      if (hasBuilt) transaction.discard?.(built as TBuilt);
       releaseAll(provisional);
       transaction.onFailure?.(cause);
       return "FAILED";

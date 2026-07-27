@@ -15,9 +15,14 @@ Readonly<PixelBrainTextureCachePolicy> = Object.freeze({
 
 export interface TextureCacheInput {
   cacheKey: string;
+  /** Immutable source bytes: straight RGBA for PB, encoded bytes for PNG. */
   retainedBytes: Uint8Array;
+  /** Decoded straight RGBA upload bytes when retainedBytes are encoded PNG. */
+  uploadBytes?: Uint8Array;
   width: number;
   height: number;
+  /** Bytes already selected for the proposed scene transaction. */
+  proposedActiveSceneBytes?: number;
 }
 
 export interface TextureResource<TTexture = unknown> {
@@ -40,6 +45,7 @@ export interface TextureLease<TTexture = unknown> {
 interface TextureEntry<TTexture> {
   cacheKey: string;
   retainedBytes: Uint8Array;
+  uploadBytes: Uint8Array;
   retainedByteLength: number;
   width: number;
   height: number;
@@ -163,13 +169,26 @@ export class PixelBrainTextureCache<TTexture = unknown> {
         existing.width !== input.width
         || existing.height !== input.height
         || !bytesEqual(existing.retainedBytes, input.retainedBytes)
+        || (
+          input.uploadBytes !== undefined
+          && !bytesEqual(existing.uploadBytes, input.uploadBytes)
+        )
       ) {
         throw new Error(`Texture cache identity collision: ${input.cacheKey}`);
       }
+      const proposedActive = input.proposedActiveSceneBytes;
       if (
-        existing.references === 0
-        && this.totals().active + existing.estimatedGpuBytes
-          > this.policy.maxActiveSceneBytes
+        (
+          proposedActive !== undefined
+          && proposedActive + existing.estimatedGpuBytes
+            > this.policy.maxActiveSceneBytes
+        )
+        || (
+          proposedActive === undefined
+          && existing.references === 0
+          && this.totals().active + existing.estimatedGpuBytes
+            > this.policy.maxActiveSceneBytes
+        )
       ) {
         return null;
       }
@@ -179,23 +198,29 @@ export class PixelBrainTextureCache<TTexture = unknown> {
     }
 
     const estimatedGpuBytes = input.width * input.height * 4;
+    const proposedActive = input.proposedActiveSceneBytes
+      ?? this.totals().active;
     if (
       !Number.isSafeInteger(estimatedGpuBytes)
-      || this.totals().active + estimatedGpuBytes
+      || proposedActive + estimatedGpuBytes
         > this.policy.maxActiveSceneBytes
     ) {
       return null;
     }
-    if (!this.evictToPolicy(input.retainedBytes.byteLength, estimatedGpuBytes)) {
+    const additionalRetained = input.retainedBytes.byteLength
+      + (input.uploadBytes?.byteLength ?? 0);
+    if (!this.evictToPolicy(additionalRetained, estimatedGpuBytes)) {
       return null;
     }
 
     const retainedBytes = input.retainedBytes.slice();
-    const createInput = { ...input, retainedBytes };
+    const uploadBytes = input.uploadBytes?.slice() ?? retainedBytes;
+    const createInput = { ...input, retainedBytes, uploadBytes };
     const entry: TextureEntry<TTexture> = {
       cacheKey: input.cacheKey,
       retainedBytes,
-      retainedByteLength: retainedBytes.byteLength,
+      uploadBytes,
+      retainedByteLength: additionalRetained,
       width: input.width,
       height: input.height,
       estimatedGpuBytes,
@@ -234,6 +259,7 @@ export class PixelBrainTextureCache<TTexture = unknown> {
       entry.resource = this.createResource({
         cacheKey: entry.cacheKey,
         retainedBytes: entry.retainedBytes,
+        uploadBytes: entry.uploadBytes,
         width: entry.width,
         height: entry.height,
       });

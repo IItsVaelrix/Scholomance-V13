@@ -9,8 +9,14 @@
  * scenePlan.ts and is safe to import anywhere (no PixiJS, no DOM, no node:crypto).
  */
 
-export { PixiSceneRenderer } from "./PixiSceneRenderer.js";
-export type { RendererConfig } from "./PixiSceneRenderer.js";
+export {
+  PixiSceneRenderer,
+  pixiApplicationOptions,
+} from "./PixiSceneRenderer.js";
+export type {
+  RendererConfig,
+  SceneRenderOutcome,
+} from "./PixiSceneRenderer.js";
 export {
   buildScenePlan,
   SCENE_WIDTH,
@@ -47,6 +53,17 @@ export type {
 export {
   SceneRenderCoordinator,
 } from "./SceneRenderCoordinator.js";
+
+export {
+  computeSceneRenderHash,
+  createRgbaTextureResource,
+  destroyTextureResource,
+  toResolvedAssetLedgerEntry,
+} from "./renderIdentity.js";
+export type {
+  ResolvedAssetLedgerEntry,
+  ResolvedAssetSource,
+} from "./renderIdentity.js";
 export type {
   Releasable,
   SceneRenderTransaction,
