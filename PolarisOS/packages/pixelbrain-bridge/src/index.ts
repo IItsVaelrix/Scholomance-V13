@@ -31,3 +31,21 @@ export {
   createDiagnostic,
   verifyDiagnosticChecksum,
 } from "./diagnostics.js";
+
+export {
+  validatePixelBrainPacket,
+} from "./validatePacket.js";
+export type {
+  PacketValidationResult,
+  ValidatedPixelBrainCoordinate,
+  ValidatedPixelBrainPacket,
+} from "./validatePacket.js";
+
+export {
+  normalizePixelBrainPacket,
+  parsePixelColor,
+  toHexRgba,
+} from "./normalizePacket.js";
+export type {
+  PixelBrainNormalizationResult,
+} from "./normalizePacket.js";
