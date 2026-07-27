@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "rootDir": ".",
+    "types": ["node"],
+    "paths": {
+      "@polaris/contracts": ["./packages/contracts/src/index.ts"],
+      "@polaris/world-kernel": ["./packages/world-kernel/src/index.ts"],
+      "@polaris/world-runtime": ["./packages/world-runtime/src/index.ts"],
+      "@polaris/command-language": ["./packages/command-language/src/index.ts"],
+      "@polaris/narrative-projector": ["./packages/narrative-projector/src/index.ts"],
+      "@polaris/scene-compiler": ["./packages/scene-compiler/src/index.ts"],
+      "@polaris/realtime-protocol": ["./packages/realtime-protocol/src/index.ts"],
+      "@polaris/persistence-sqlite": ["./packages/persistence-sqlite/src/index.ts"],
+      "@polaris/pixelbrain-bridge": ["./packages/pixelbrain-bridge/src/index.ts"],
+      "@polaris/renderer-pixi": ["./packages/renderer-pixi/src/index.ts"],
+      "@polaris/test-harness": ["./packages/test-harness/src/index.ts"]
+    }
+  },
+  "include": [
+    "packages/*/src/**/*.ts",
+    "apps/*/src/**/*.ts",
+    "tests/**/*.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
+}
