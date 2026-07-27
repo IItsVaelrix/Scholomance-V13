@@ -15,6 +15,7 @@
     "build": "npm run build --workspaces --if-present",
     "build:pixelbrain-assets": "tsx scripts/build-pixelbrain-assets.ts",
     "test": "vitest run",
+    "test:browser:pixelbrain": "playwright test --config playwright.pixelbrain.config.ts",
     "test:watch": "vitest",
     "test:kernel": "vitest run packages/world-kernel",
     "test:integration": "vitest run tests/integration",
@@ -25,6 +26,7 @@
     "dev:client": "npm run dev --workspace=apps/client"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.1",
     "@types/node": "^20.11.0",
     "typescript": "^5.4.0",
     "vitest": "^1.6.0",

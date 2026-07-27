@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PixelBrain straight-alpha browser gate</title>
+  </head>
+  <body data-status="loading">
+    <script type="module">
+      import {
+        Application,
+        BufferImageSource,
+        Graphics,
+        Rectangle,
+        Sprite,
+        Texture,
+      } from "pixi.js";
+      import {
+        createRgbaTextureResource,
+        destroyTextureResource,
+      } from "/packages/renderer-pixi/src/renderIdentity.ts";
+
+      try {
+        const app = new Application();
+        await app.init({
+          width: 1,
+          height: 1,
+          antialias: false,
+          roundPixels: true,
+          preference: "webgl",
+          preserveDrawingBuffer: true,
+        });
+
+        const background = new Graphics();
+        background.rect(0, 0, 1, 1).fill({ color: 0x0000ff, alpha: 1 });
+        app.stage.addChild(background);
+
+        const resource = createRgbaTextureResource(
+          { BufferImageSource, Texture },
+          {
+            cacheKey: "pbr1:alpha-browser-gate",
+            retainedBytes: new Uint8Array([255, 0, 0, 128]),
+            width: 1,
+            height: 1,
+          },
+        );
+        const sprite = new Sprite(resource.texture);
+        app.stage.addChild(sprite);
+
+        const extraction = app.renderer.extract.pixels({
+          target: app.stage,
+          frame: new Rectangle(0, 0, 1, 1),
+        });
+        document.body.dataset.pixel = JSON.stringify(
+          Array.from(extraction.pixels.slice(0, 4)),
+        );
+        document.body.dataset.status = "ready";
+
+        destroyTextureResource(resource);
+        app.destroy(true, { children: true });
+      } catch (error) {
+        document.body.dataset.status = "error";
+        document.body.dataset.error =
+          error instanceof Error ? error.message : String(error);
+      }
+    </script>
+  </body>
+</html>

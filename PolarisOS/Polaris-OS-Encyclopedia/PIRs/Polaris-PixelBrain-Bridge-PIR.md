@@ -3,6 +3,7 @@
 **Date:** 2026-07-27  
 **Status:** COMPLETE, with one unrelated workspace-build limitation recorded below  
 **Tests:** 181 passing across 22 files  
+**Browser gate:** 1 passing in headless Chromium
 **Typecheck:** 0 errors  
 **Client production build:** passing  
 **SceneManifest schema and `contractHash`:** unchanged
@@ -265,6 +266,10 @@ npm run typecheck
 npm run build --workspace=apps/client
   736 modules transformed
   production client built successfully
+
+npm run test:browser:pixelbrain
+  1 Chromium test passed
+  straight RGBA over a contrasting background composited without a dark halo
 ```
 
 The test total includes:
@@ -281,11 +286,11 @@ fails in the pre-existing empty `apps/world-studio` workspace because that
 workspace has no `index.html`. No PixelBrain module appears in that failure.
 This review does not add unrelated World Studio files or alter its package.
 
-An actual browser pixel-compositing assertion was not executed in this
-environment because no Playwright browser binary is installed. The automated
-gate verifies the exact Pixi straight-alpha and nearest-neighbor source options;
-the production client bundle compiles successfully. A future browser run should
-retain the planned semi-transparent-pixel-over-contrasting-background check.
+`tests/browser/PixelBrainAlpha.spec.ts` executes the actual Pixi
+`BufferImageSource` path in headless Chromium. It renders a 50%-alpha red texel
+over opaque blue, extracts the composited pixel, and asserts balanced red/blue
+channels with full output alpha. This supplements the unit gate that checks the
+exact no-premultiplication, nearest-neighbor, and no-mipmap source options.
 
 ---
 
