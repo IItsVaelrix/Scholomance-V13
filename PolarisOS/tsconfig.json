@@ -32,6 +32,7 @@
   "include": [
     "packages/*/src/**/*.ts",
     "apps/*/src/**/*.ts",
+    "scripts/**/*.ts",
     "tests/**/*.ts"
   ],
   "exclude": ["node_modules", "dist"]

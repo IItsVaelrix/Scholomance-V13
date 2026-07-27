@@ -1,0 +1,34 @@
+{
+  "name": "polaris-os",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Polaris OS — Picture-Book MUD World Kernel (Codex Vale)",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "build:pixelbrain-assets": "tsx scripts/build-pixelbrain-assets.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:kernel": "vitest run packages/world-kernel",
+    "test:integration": "vitest run tests/integration",
+    "test:persistence": "vitest run tests/persistence",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --quiet",
+    "dev:server": "npm run dev --workspace=apps/server",
+    "dev:client": "npm run dev --workspace=apps/client"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0",
+    "eslint": "^8.57.0",
+    "tsx": "^4.19.0"
+  }
+}

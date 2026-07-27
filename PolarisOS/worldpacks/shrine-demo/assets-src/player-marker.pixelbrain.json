@@ -1,0 +1,47 @@
+{
+  "assetKey": "players/marker_default",
+  "packet": {
+    "kind": "pixelbrain.render.v1",
+    "id": "player-marker-default",
+    "schemaVersion": 1,
+    "canvas": {
+      "width": 12,
+      "height": 16,
+      "cellSize": 2,
+      "transparent": true,
+      "background": "#00000000"
+    },
+    "coordinates": [
+      { "snappedX": 4, "snappedY": 0, "color": "#253348" },
+      { "snappedX": 6, "snappedY": 0, "color": "#253348" },
+      { "snappedX": 2, "snappedY": 2, "color": "#253348" },
+      { "snappedX": 4, "snappedY": 2, "color": "#f1c39c" },
+      { "snappedX": 6, "snappedY": 2, "color": "#f1c39c" },
+      { "snappedX": 8, "snappedY": 2, "color": "#253348" },
+      { "snappedX": 2, "snappedY": 4, "color": "#253348" },
+      { "snappedX": 4, "snappedY": 4, "color": "#f1c39c" },
+      { "snappedX": 6, "snappedY": 4, "color": "#f1c39c" },
+      { "snappedX": 8, "snappedY": 4, "color": "#253348" },
+      { "snappedX": 4, "snappedY": 6, "color": "#253348" },
+      { "snappedX": 6, "snappedY": 6, "color": "#253348" },
+      { "snappedX": 2, "snappedY": 8, "color": "#416c78" },
+      { "snappedX": 4, "snappedY": 8, "color": "#5a98a5" },
+      { "snappedX": 6, "snappedY": 8, "color": "#5a98a5" },
+      { "snappedX": 8, "snappedY": 8, "color": "#416c78" },
+      { "snappedX": 0, "snappedY": 10, "color": "#416c78" },
+      { "snappedX": 2, "snappedY": 10, "color": "#5a98a5" },
+      { "snappedX": 4, "snappedY": 10, "color": "#5a98a5" },
+      { "snappedX": 6, "snappedY": 10, "color": "#5a98a5" },
+      { "snappedX": 8, "snappedY": 10, "color": "#5a98a5" },
+      { "snappedX": 10, "snappedY": 10, "color": "#416c78" },
+      { "snappedX": 2, "snappedY": 12, "color": "#253348" },
+      { "snappedX": 4, "snappedY": 12, "color": "#416c78" },
+      { "snappedX": 6, "snappedY": 12, "color": "#416c78" },
+      { "snappedX": 8, "snappedY": 12, "color": "#253348" },
+      { "snappedX": 2, "snappedY": 14, "color": "#1b2230" },
+      { "snappedX": 4, "snappedY": 14, "color": "#1b2230" },
+      { "snappedX": 6, "snappedY": 14, "color": "#1b2230" },
+      { "snappedX": 8, "snappedY": 14, "color": "#1b2230" }
+    ]
+  }
+}

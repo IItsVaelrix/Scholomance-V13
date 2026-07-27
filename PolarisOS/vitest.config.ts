@@ -22,6 +22,7 @@ export default defineConfig({
     environment: "node",
     include: [
       "packages/*/tests/**/*.test.ts",
+      "scripts/tests/**/*.test.ts",
       "tests/**/*.test.ts",
     ],
   },
