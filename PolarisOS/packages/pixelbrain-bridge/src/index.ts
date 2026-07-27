@@ -49,3 +49,8 @@ export {
 export type {
   PixelBrainNormalizationResult,
 } from "./normalizePacket.js";
+
+export {
+  processPixelBrainPacket,
+  rasterizeNormalizedPacket,
+} from "./rasterizePacket.js";
