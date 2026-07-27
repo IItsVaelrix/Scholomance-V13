@@ -30,6 +30,28 @@ export {
   PixelBrainAssetResolver,
   readBoundedResponseBytes,
 } from "./PixelBrainAssetResolver.js";
+
+export {
+  DEFAULT_PIXELBRAIN_TEXTURE_CACHE_POLICY,
+  PixelBrainTextureCache,
+} from "./PixelBrainTextureCache.js";
+export type {
+  PixelBrainTextureCacheOptions,
+  PixelBrainTextureCachePolicy,
+  PixelBrainTextureCacheStats,
+  TextureCacheInput,
+  TextureLease,
+  TextureResource,
+} from "./PixelBrainTextureCache.js";
+
+export {
+  SceneRenderCoordinator,
+} from "./SceneRenderCoordinator.js";
+export type {
+  Releasable,
+  SceneRenderTransaction,
+  SceneRenderTransactionStatus,
+} from "./SceneRenderCoordinator.js";
 export type {
   AssetFallback,
   AssetResolution,
