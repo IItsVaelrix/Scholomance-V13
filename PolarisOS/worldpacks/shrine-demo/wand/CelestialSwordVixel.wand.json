@@ -1,0 +1,112 @@
+{
+  "asset": "CelestialSwordVixel",
+  "canvas": {
+    "width": 32,
+    "height": 128
+  },
+  "description": "Wand vector formulas for CelestialSwordVixel asset.",
+  "formulas": [
+    {
+      "role": "CelestialSwordVixel.blade_contour",
+      "type": "edge_trace",
+      "description": "Silhouette trace of the celestial blade contour",
+      "formula": {
+        "coordinateFormula": {
+          "type": "edge_trace",
+          "tracePath": [
+            { "x": 16, "y": 0 },
+            { "x": 22, "y": 22 },
+            { "x": 24, "y": 58 },
+            { "x": 20, "y": 88 },
+            { "x": 12, "y": 88 },
+            { "x": 8, "y": 58 },
+            { "x": 10, "y": 22 }
+          ]
+        }
+      },
+      "pressure": 0.95
+    },
+    {
+      "role": "CelestialSwordVixel.guardian_wings",
+      "type": "edge_trace",
+      "description": "Trace of the crossguard wings",
+      "formula": {
+        "coordinateFormula": {
+          "type": "edge_trace",
+          "tracePath": [
+            { "x": 1, "y": 92 },
+            { "x": 14, "y": 96 },
+            { "x": 16, "y": 97 },
+            { "x": 18, "y": 96 },
+            { "x": 31, "y": 92 },
+            { "x": 31, "y": 97 },
+            { "x": 18, "y": 100 },
+            { "x": 16, "y": 101 },
+            { "x": 14, "y": 100 },
+            { "x": 1, "y": 97 }
+          ]
+        }
+      },
+      "pressure": 0.95
+    },
+    {
+      "role": "CelestialSwordVixel.guardian_eye",
+      "type": "edge_trace",
+      "description": "Trace of the guardian eye diamond",
+      "formula": {
+        "coordinateFormula": {
+          "type": "edge_trace",
+          "tracePath": [
+            { "x": 16, "y": 94 },
+            { "x": 19, "y": 96 },
+            { "x": 16, "y": 98 },
+            { "x": 13, "y": 96 }
+          ]
+        }
+      },
+      "pressure": 1.0
+    },
+    {
+      "role": "CelestialSwordVixel.stellar_lattice",
+      "type": "parametric_curve",
+      "description": "Stellar lattice line from origin to target",
+      "formula": {
+        "coordinateFormula": {
+          "type": "parametric_curve",
+          "curveType": "line",
+          "origin": { "x": 16, "y": 4 },
+          "target": { "x": 16, "y": 89 },
+          "parameters": {
+            "origin": { "x": 16, "y": 4 },
+            "target": { "x": 16, "y": 89 },
+            "cx": 16,
+            "cy": 46.5
+          }
+        }
+      },
+      "pressure": 0.9
+    },
+    {
+      "role": "CelestialSwordVixel.pommel_origin_ring",
+      "type": "parametric_curve",
+      "description": "Pommel of origin ring circle",
+      "formula": {
+        "coordinateFormula": {
+          "type": "parametric_curve",
+          "curveType": "circle",
+          "center": { "x": 16, "y": 122 },
+          "radius": 5.0,
+          "parameters": {
+            "cx": 16,
+            "cy": 122,
+            "a": 5.0,
+            "b": 1,
+            "c": 0,
+            "n": 32
+          }
+        }
+      },
+      "pressure": 1.0
+    }
+  ]
+}
