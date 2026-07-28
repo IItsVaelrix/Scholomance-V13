@@ -12,9 +12,17 @@ import {
 } from "../state/selectors.js";
 import type { PolarisUiState } from "../state/PolarisUiState.js";
 
+export interface SceneAltarHosts {
+  altar: HTMLElement;
+  renderHost: HTMLElement;
+  fallbackHost: HTMLElement;
+  statusHost: HTMLElement;
+}
+
 export interface PolarisConsoleView {
   render(state: PolarisUiState): void;
   readonly mounted: MountedPolarisConsole;
+  readonly sceneAltarHosts: SceneAltarHosts;
 }
 
 function clear(el: Element | undefined): void {
@@ -50,6 +58,25 @@ export function createPolarisConsoleView(
   const telemetrySession = byId.get("polaris-telemetry-rail.session");
 
   let renderedChronicleCount = 0;
+
+  // Scene Altar hosts: the Pixi portal mounts into the render host; an explicit
+  // text fallback sibling is created here so the controller can reveal it when
+  // illustration is unavailable (Task 5).
+  const altar = byId.get("polaris-scene-altar");
+  const renderHost = byId.get("polaris-scene-altar.host");
+  const statusHost = byId.get("polaris-scene-altar.status");
+  const fallbackHost = document.createElement("div");
+  fallbackHost.className = "polaris-scene-fallback";
+  fallbackHost.setAttribute("data-region", "fallback");
+  fallbackHost.hidden = true;
+  if (altar) altar.appendChild(fallbackHost);
+
+  const sceneAltarHosts: SceneAltarHosts = {
+    altar: altar ?? target,
+    renderHost: renderHost ?? fallbackHost,
+    fallbackHost,
+    statusHost: statusHost ?? fallbackHost,
+  };
 
   function setComponentState(el: Element | undefined, component: ConsoleComponent, state: PolarisUiState): void {
     if (el) el.setAttribute("data-state", selectComponentState(component, state));
@@ -182,5 +209,5 @@ export function createPolarisConsoleView(
     renderCommand(state);
   }
 
-  return { render, mounted };
+  return { render, mounted, sceneAltarHosts };
 }

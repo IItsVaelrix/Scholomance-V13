@@ -13,9 +13,12 @@
 
 import "./generated/polaris-console.tokens.css";
 import "./styles/polaris-console.css";
+import { PixiSceneRenderer } from "@polaris/renderer-pixi";
 import { polarisConsoleDomPlan } from "./generated/polaris-console.dom-plan.js";
+import { pixelBrainAssetRegistry } from "./generated/pixelbrainAssetRegistry.js";
 import type { DomPlanNode } from "./ui/mountDomPlan.js";
 import { createPolarisConsoleView } from "./ui/PolarisConsoleView.js";
+import { createSceneAltarController } from "./ui/SceneAltarController.js";
 import {
   createInitialPolarisUiState,
   type PolarisUiState,
@@ -26,6 +29,7 @@ import { decodeServerMessage } from "./protocol/decodeServerMessage.js";
 const params = new URLSearchParams(window.location.search);
 const ROOM_ID = params.get("room") ?? "ruined_shrine";
 const WS_URL = params.get("ws") ?? `ws://${window.location.hostname}:3100/ws`;
+const FORCE_TEXT = params.get("mode") === "text";
 
 // Stable identity across reconnects (per browser tab).
 const PLAYER_ID =
@@ -47,11 +51,41 @@ let state: PolarisUiState = createInitialPolarisUiState();
 function dispatch(action: PolarisAction): void {
   state = polarisReducer(state, action);
   view.render(state);
+  void sceneController.render(state.sceneManifest);
   maybeRequestResync();
 }
 
 // Initial paint.
 view.render(state);
+
+// ─── Scene Altar: bounded Pixi portal with text fallback (Task 5) ──────────────
+
+const sceneRenderer = new PixiSceneRenderer({
+  container: view.sceneAltarHosts.renderHost,
+  assetBaseUrl: params.get("assets") ?? "/assets",
+  assetRegistry: pixelBrainAssetRegistry,
+  fallbackMode: FORCE_TEXT,
+  onCommand: (command) => submitCommand(command),
+  onDiagnostic: ({ code, severity }) => {
+    dispatch({
+      type: "protocol-error",
+      diagnostic: { code: `POLARIS_PIXELBRAIN_${code}`, message: severity },
+    });
+  },
+});
+
+const sceneController = createSceneAltarController({
+  renderer: sceneRenderer,
+  renderHost: view.sceneAltarHosts.renderHost,
+  fallbackHost: view.sceneAltarHosts.fallbackHost,
+  statusHost: view.sceneAltarHosts.statusHost,
+  onDiagnostic: (diagnostic) => {
+    dispatch({ type: "protocol-error", diagnostic });
+  },
+});
+
+if (FORCE_TEXT) sceneController.setForcedTextMode(true);
+void sceneRenderer.init();
 
 // ─── Command submission ────────────────────────────────────────────────────────
 
@@ -159,6 +193,7 @@ conduit?.addEventListener("submit", (event) => {
 // ─── Teardown ──────────────────────────────────────────────────────────────────
 
 window.addEventListener("beforeunload", () => {
+  sceneController.destroy();
   ws?.close();
 });
 
