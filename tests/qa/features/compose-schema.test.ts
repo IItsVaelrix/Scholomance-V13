@@ -11,6 +11,9 @@ import {
   validateComponentSchema,
   validateComponentState
 } from '../../../src/core/compose/schema/json-schemas';
+import { validateComposeScene } from '../../../src/core/compose/validate/scene';
+import { CODES } from '../../../src/core/compose/validate/diagnostics';
+import type { PbUiSceneV1 } from '../../../src/core/compose/schema/packets';
 
 describe('Compose Schema Layer', () => {
   beforeEach(() => {
@@ -171,5 +174,70 @@ describe('Compose Schema Layer', () => {
       const result = await validateComponentState(state);
       expect(result.valid).toBe(false);
     });
+  });
+});
+
+describe('Compose scene validation — recursive visual references (Polaris console)', () => {
+  function sceneWithNestedVisualRef(visualRefs: string[]): PbUiSceneV1 {
+    return {
+      contract: 'PB-UI-SCENE-v1',
+      version: '1.0.0',
+      id: 'scene-recursive',
+      sourceChecksum: 'scd64:test',
+      definitions: {},
+      layouts: {},
+      visuals: {
+        'known-visual': {
+          kind: 'scdl-asset',
+          packetId: 'arcane-panel/rest/corners',
+          placementSlot: 'corner-nw',
+        },
+      },
+      root: {
+        id: 'root',
+        kind: 'container',
+        children: [
+          {
+            id: 'nested-panel',
+            kind: 'container',
+            visualRefs,
+            slots: {
+              body: [
+                { id: 'slotted-child', kind: 'container', visualRefs: ['missing-in-slot'] },
+              ],
+            },
+          },
+        ],
+      },
+    };
+  }
+
+  it('accepts a scene whose nested visual references all resolve', () => {
+    const result = validateComposeScene(sceneWithNestedVisualRef(['known-visual']));
+    // the only error should be the deliberately-missing slotted child ref
+    const unknown = result.diagnostics.filter((d) => d.code === CODES.UNKNOWN_SLOT);
+    expect(unknown).toHaveLength(1);
+    expect(unknown[0].sourceNodeId).toBe('slotted-child');
+  });
+
+  it('diagnoses an unknown visual reference on a nested (non-root) node', () => {
+    const result = validateComposeScene(sceneWithNestedVisualRef(['does-not-exist']));
+    expect(result.ok).toBe(false);
+    const unknown = result.diagnostics.filter((d) => d.code === CODES.UNKNOWN_SLOT);
+    const nested = unknown.find((d) => d.sourceNodeId === 'nested-panel');
+    expect(nested).toBeDefined();
+    expect(nested?.message).toContain('does-not-exist');
+  });
+
+  it('diagnoses an unknown custom kind on a nested node', () => {
+    const scene = sceneWithNestedVisualRef([]);
+    (scene.root.children?.[0] as { kind: string }).kind = 'unregistered-arcane-widget';
+    const result = validateComposeScene(scene);
+    expect(result.ok).toBe(false);
+    expect(
+      result.diagnostics.some(
+        (d) => d.code === CODES.UNKNOWN_KIND && d.sourceNodeId === 'nested-panel',
+      ),
+    ).toBe(true);
   });
 });

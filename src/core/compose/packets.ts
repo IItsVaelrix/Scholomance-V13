@@ -9,7 +9,7 @@ export {
   assertNoRuntimeLibraryObjects,
 } from './schema/canonicalize';
 export { emitPbUiScene, rehashScene, sceneToCanonicalJson } from './scene/emit-scene';
-export { emitPbLayout, lowerFlowToCss } from './layout/emit-layout';
+export { emitPbLayout, lowerFlowToCss, lowerCommonToCss, lowerGridToCss } from './layout/emit-layout';
 export { emitPbUiEvent } from './behavior/emit-event';
 export {
   createScrollEditorToolbarScene,

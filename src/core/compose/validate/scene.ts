@@ -24,7 +24,18 @@ export type ValidateComposeSceneResult = {
   diagnostics: ComposeDiagnostic[];
 };
 
-function walkIds(node: UiSceneNode, seen: Set<string>, diagnostics: ComposeDiagnostic[]): void {
+/**
+ * Single recursive walk over both `children` and `slots` that checks
+ * duplicate IDs, custom kinds against definitions, and visual references
+ * against the scene visual registry.
+ */
+function walkNode(
+  node: UiSceneNode,
+  scene: PbUiSceneV1,
+  seen: Set<string>,
+  definedKinds: Set<string>,
+  diagnostics: ComposeDiagnostic[],
+): void {
   if (seen.has(node.id)) {
     diagnostics.push(
       diag(CODES.DUPLICATE_ID, 'ERROR', `Duplicate node ID: ${node.id}`, {
@@ -35,17 +46,32 @@ function walkIds(node: UiSceneNode, seen: Set<string>, diagnostics: ComposeDiagn
   }
   seen.add(node.id);
 
-  if (!KNOWN_KINDS.has(node.kind) && !(node.kind in {})) {
-    // Unknown unless present in definitions — checked by caller
+  if (!KNOWN_KINDS.has(node.kind) && !definedKinds.has(node.kind)) {
+    diagnostics.push(
+      diag(CODES.UNKNOWN_KIND, 'ERROR', `Unknown component kind: ${node.kind}`, {
+        sourceNodeId: node.id,
+        recovery: 'Register a SCHOL-COMPONENT-DEFINITION-v1 for this kind',
+      }),
+    );
+  }
+
+  for (const visualRef of node.visualRefs ?? []) {
+    if (!scene.visuals?.[visualRef]) {
+      diagnostics.push(
+        diag(CODES.UNKNOWN_SLOT, 'ERROR', `Unknown visual attachment: ${visualRef}`, {
+          sourceNodeId: node.id,
+        }),
+      );
+    }
   }
 
   for (const child of node.children ?? []) {
-    walkIds(child, seen, diagnostics);
+    walkNode(child, scene, seen, definedKinds, diagnostics);
   }
   if (node.slots) {
     for (const slotNodes of Object.values(node.slots)) {
       for (const child of slotNodes) {
-        walkIds(child, seen, diagnostics);
+        walkNode(child, scene, seen, definedKinds, diagnostics);
       }
     }
   }
@@ -61,21 +87,9 @@ export function validateComposeScene(scene: PbUiSceneV1): ValidateComposeSceneRe
   }
 
   const definedKinds = new Set(Object.keys(scene.definitions ?? {}));
-  const checkKind = (node: UiSceneNode) => {
-    if (!KNOWN_KINDS.has(node.kind) && !definedKinds.has(node.kind)) {
-      diagnostics.push(
-        diag(CODES.UNKNOWN_KIND, 'ERROR', `Unknown component kind: ${node.kind}`, {
-          sourceNodeId: node.id,
-          recovery: 'Register a SCHOL-COMPONENT-DEFINITION-v1 for this kind',
-        }),
-      );
-    }
-    for (const child of node.children ?? []) checkKind(child);
-  };
 
   if (scene.root) {
-    walkIds(scene.root, new Set(), diagnostics);
-    checkKind(scene.root);
+    walkNode(scene.root, scene, new Set(), definedKinds, diagnostics);
   }
 
   for (const [layoutId, layout] of Object.entries(scene.layouts ?? {})) {
@@ -84,16 +98,6 @@ export function validateComposeScene(scene: PbUiSceneV1): ValidateComposeSceneRe
       diagnostics.push(
         diag(CODES.LAYOUT_MODE, 'ERROR', `Unsupported layout mode: ${layout.mode}`, {
           context: { layoutId },
-        }),
-      );
-    }
-  }
-
-  for (const ref of scene.root?.visualRefs ?? []) {
-    if (!scene.visuals?.[ref]) {
-      diagnostics.push(
-        diag(CODES.UNKNOWN_SLOT, 'ERROR', `Unknown visual attachment: ${ref}`, {
-          sourceNodeId: scene.root?.id,
         }),
       );
     }

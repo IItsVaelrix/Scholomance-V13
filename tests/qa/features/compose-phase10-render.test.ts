@@ -9,6 +9,12 @@ import { featureFlags, COMPOSE_FLAGS } from '../../../src/core/compose/flags';
 import { CODES } from '../../../src/core/compose/validate/diagnostics';
 import { createScrollEditorToolbarScene } from '../../../src/core/compose/packets';
 import {
+  lowerGridToCss,
+  lowerCommonToCss,
+} from '../../../src/core/compose/layout/emit-layout';
+import { renderSceneToDomSpec } from '../../../src/core/compose/render/dom-adapter';
+import type { PbUiSceneV1 } from '../../../src/core/compose/schema/packets';
+import {
   negotiateRenderer,
   negotiateSceneCapabilities,
   listRendererBackends,
@@ -193,5 +199,172 @@ describe('Compose Phase 10 — render flag gating', () => {
     expect(featureFlags.isEnabled(COMPOSE_FLAGS.RENDER)).toBe(false);
     featureFlags.enable(COMPOSE_FLAGS.RENDER);
     expect(featureFlags.isEnabled(COMPOSE_FLAGS.RENDER)).toBe(true);
+  });
+});
+
+describe('Compose console layout lowering (Polaris Stateful Lattice Console)', () => {
+  it('lowers a grid intent to CSS with [row, column] gap mapping', () => {
+    expect(
+      lowerGridToCss({
+        columns: 'minmax(220px, .8fr) minmax(640px, 2.4fr) minmax(260px, 1fr)',
+        rows: '1fr',
+        gapPx: [8, 12],
+        align: 'stretch',
+        justify: 'center',
+      }),
+    ).toEqual({
+      display: 'grid',
+      gridTemplateColumns: 'minmax(220px, .8fr) minmax(640px, 2.4fr) minmax(260px, 1fr)',
+      gridTemplateRows: '1fr',
+      rowGap: '8px',
+      columnGap: '12px',
+      alignItems: 'stretch',
+      justifyContent: 'center',
+    });
+  });
+
+  it('lowers a scalar grid gap to both axes', () => {
+    const css = lowerGridToCss({ columns: '1fr 1fr', gapPx: 6 });
+    expect(css.rowGap).toBe('6px');
+    expect(css.columnGap).toBe('6px');
+  });
+
+  it('lowers common layout intent box arrays in CSS order and only declared constraints', () => {
+    expect(
+      lowerCommonToCss({
+        paddingPx: [4, 8, 12, 16],
+        minWidthPx: 220,
+        maxHeightPx: 900,
+        writingDirection: 'ltr',
+      }),
+    ).toMatchObject({
+      padding: '4px 8px 12px 16px',
+      minWidth: '220px',
+      maxHeight: '900px',
+      direction: 'ltr',
+    });
+  });
+
+  it('serializes one- and two-value box arrays', () => {
+    expect(lowerCommonToCss({ paddingPx: 4 }).padding).toBe('4px');
+    expect(lowerCommonToCss({ marginPx: [4, 8] }).margin).toBe('4px 8px');
+  });
+
+  it('omits undeclared constraints', () => {
+    const css = lowerCommonToCss({ minWidthPx: 100 });
+    expect(css.minWidth).toBe('100px');
+    expect(css).not.toHaveProperty('maxWidth');
+    expect(css).not.toHaveProperty('padding');
+    expect(css).not.toHaveProperty('direction');
+  });
+});
+
+function buildConsoleScene(): PbUiSceneV1 {
+  return {
+    contract: 'PB-UI-SCENE-v1',
+    version: '1.0.0',
+    id: 'console-test',
+    sourceChecksum: 'scd64:test',
+    definitions: {},
+    layouts: {
+      'workspace-grid': {
+        contract: 'PB-LAYOUT-v1',
+        version: '1.0.0',
+        mode: 'grid',
+        common: { paddingPx: [4, 8, 12, 16], minWidthPx: 220 },
+        grid: {
+          columns: 'minmax(220px, .8fr) minmax(640px, 2.4fr) minmax(260px, 1fr)',
+          rows: '1fr',
+          gapPx: [8, 12],
+        },
+      },
+    },
+    visuals: {
+      'corner-ornament': {
+        kind: 'scdl-asset',
+        packetId: 'arcane-panel/rest/corners',
+        placementSlot: 'corner-nw',
+      },
+    },
+    root: {
+      id: 'shell',
+      kind: 'container',
+      role: 'main',
+      layoutRef: 'workspace-grid',
+      visualRefs: ['corner-ornament'],
+      children: [
+        { id: 'rail', kind: 'container', role: 'complementary' },
+        {
+          id: 'conduit',
+          kind: 'container',
+          role: 'form',
+          props: { 'aria-label': 'Command conduit' },
+          children: [
+            {
+              id: 'cmd-input',
+              kind: 'input',
+              props: { 'aria-label': 'Command', placeholder: 'cast …', type: 'text' },
+            },
+            { id: 'cmd-submit', kind: 'button', props: { label: 'Cast' } },
+          ],
+        },
+        { id: 'chronicle', kind: 'container', role: 'log', props: { 'aria-live': 'polite' } },
+      ],
+    },
+  };
+}
+
+describe('Compose console semantic lowering (Polaris Stateful Lattice Console)', () => {
+  it('maps landmark roles to native semantic tags', () => {
+    const spec = renderSceneToDomSpec(buildConsoleScene());
+    expect(spec.tag).toBe('main');
+    const byId = new Map<string, ReturnType<typeof renderSceneToDomSpec>>();
+    const collect = (n: ReturnType<typeof renderSceneToDomSpec>) => {
+      byId.set(n.id, n);
+      n.children.forEach(collect);
+    };
+    collect(spec);
+    expect(byId.get('rail')?.tag).toBe('aside');
+    expect(byId.get('conduit')?.tag).toBe('form');
+    expect(byId.get('cmd-input')?.tag).toBe('input');
+    expect(byId.get('cmd-submit')?.tag).toBe('button');
+    expect(byId.get('chronicle')?.tag).toBe('ol');
+  });
+
+  it('records data-compose-kind for every node', () => {
+    const spec = renderSceneToDomSpec(buildConsoleScene());
+    expect(spec.attrs['data-compose-kind']).toBe('container');
+    const input = spec.children
+      .find((c) => c.id === 'conduit')
+      ?.children.find((c) => c.id === 'cmd-input');
+    expect(input?.attrs['data-compose-kind']).toBe('input');
+  });
+
+  it('merges common layout styles before grid styles', () => {
+    const spec = renderSceneToDomSpec(buildConsoleScene());
+    expect(spec.style.padding).toBe('4px 8px 12px 16px');
+    expect(spec.style.minWidth).toBe('220px');
+    expect(spec.style.display).toBe('grid');
+    expect(spec.style.gridTemplateColumns).toContain('minmax(640px, 2.4fr)');
+  });
+
+  it('preserves scdl-asset packetId on attachment slots', () => {
+    const spec = renderSceneToDomSpec(buildConsoleScene());
+    const slot = spec.attachmentSlots.find((a) => a.visualId === 'corner-ornament');
+    expect(slot?.kind).toBe('scdl-asset');
+    expect(slot?.slot).toBe('corner-nw');
+    expect(slot?.packetId).toBe('arcane-panel/rest/corners');
+  });
+
+  it('passes through the explicit aria/attribute allowlist only', () => {
+    const spec = renderSceneToDomSpec(buildConsoleScene());
+    const conduit = spec.children.find((c) => c.id === 'conduit');
+    expect(conduit?.attrs['aria-label']).toBe('Command conduit');
+    const input = conduit?.children.find((c) => c.id === 'cmd-input');
+    expect(input?.attrs['aria-label']).toBe('Command');
+    expect(input?.attrs.placeholder).toBe('cast …');
+    expect(input?.attrs.type).toBe('text');
+    // arbitrary / executable props must never be serialized
+    expect(input?.attrs).not.toHaveProperty('onClick');
   });
 });

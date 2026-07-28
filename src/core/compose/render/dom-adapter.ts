@@ -3,8 +3,22 @@
  * Does not touch the live document — callers mount as needed.
  */
 
-import type { PbUiSceneV1, UiSceneNode, PbLayoutV1 } from '../schema/packets';
-import { lowerFlowToCss } from '../layout/emit-layout';
+import type {
+  PbUiSceneV1,
+  UiSceneNode,
+  PbLayoutV1,
+  VisualAttachment,
+} from '../schema/packets';
+import { lowerFlowToCss, lowerCommonToCss, lowerGridToCss } from '../layout/emit-layout';
+
+export type DomAttachmentSpec = {
+  slot: string;
+  visualId: string;
+  kind: VisualAttachment['kind'];
+  packetId?: string;
+  tokenPath?: string;
+  className?: string;
+};
 
 export type DomNodeSpec = {
   tag: string;
@@ -15,37 +29,87 @@ export type DomNodeSpec = {
   children: DomNodeSpec[];
   text?: string;
   /** Visual attachment hosts (WAND/SCDL) — empty when none */
-  attachmentSlots: Array<{ slot: string; visualId: string; kind: string }>;
+  attachmentSlots: DomAttachmentSpec[];
 };
 
+/** Landmark roles map to native semantic tags. */
+const ROLE_TAGS: Readonly<Record<string, string>> = {
+  banner: 'header',
+  main: 'main',
+  complementary: 'aside',
+  navigation: 'nav',
+  region: 'section',
+  form: 'form',
+  log: 'ol',
+};
+
+/** Explicit string attribute allowlist passed through from node props. */
+const ATTR_ALLOWLIST = [
+  'aria-label',
+  'aria-live',
+  'aria-atomic',
+  'aria-describedby',
+  'autocomplete',
+  'inputmode',
+  'name',
+  'placeholder',
+  'type',
+] as const;
+
 function tagForKind(kind: string, role?: string): string {
+  // button and input kinds are authoritative over role mapping
   if (kind === 'button' || role === 'button') return 'button';
-  if (kind === 'toolbar' || role === 'toolbar') return 'div';
   if (kind === 'input') return 'input';
+  if (role && ROLE_TAGS[role]) return ROLE_TAGS[role];
+  if (kind === 'toolbar' || role === 'toolbar') return 'div';
   return 'div';
 }
 
-function lowerNode(
-  node: UiSceneNode,
-  scene: PbUiSceneV1,
-): DomNodeSpec {
+function copyAttachmentFields(
+  visualId: string,
+  visual: VisualAttachment,
+): DomAttachmentSpec {
+  const spec: DomAttachmentSpec = {
+    slot: visual.placementSlot,
+    visualId,
+    kind: visual.kind,
+  };
+  if (visual.kind === 'scdl-asset') spec.packetId = visual.packetId;
+  if (visual.kind === 'token') spec.tokenPath = visual.tokenPath;
+  if (visual.kind === 'native-dom' && visual.className) spec.className = visual.className;
+  return spec;
+}
+
+function lowerNode(node: UiSceneNode, scene: PbUiSceneV1): DomNodeSpec {
   const layout: PbLayoutV1 | undefined = node.layoutRef
     ? scene.layouts[node.layoutRef]
     : undefined;
 
-  let style: Record<string, string> = {};
-  if (layout?.mode === 'flow' && layout.flow) {
-    style = lowerFlowToCss(layout.flow);
-  }
+  // Merge common styles first, mode-specific styles second.
+  const common = layout?.common ? lowerCommonToCss(layout.common) : {};
+  const mode =
+    layout?.mode === 'flow' && layout.flow
+      ? lowerFlowToCss(layout.flow)
+      : layout?.mode === 'grid' && layout.grid
+        ? lowerGridToCss(layout.grid)
+        : {};
+  const style: Record<string, string> = { ...common, ...mode };
 
   const attrs: Record<string, string> = {};
   const props = node.props ?? {};
-  if (typeof props['aria-label'] === 'string') attrs['aria-label'] = props['aria-label'];
+
+  // Pass through only the explicit string allowlist.
+  for (const name of ATTR_ALLOWLIST) {
+    const value = props[name];
+    if (typeof value === 'string') attrs[name] = value;
+  }
+
+  // Boolean disabled is normalized separately.
   if (props.disabled === true) attrs.disabled = 'true';
   if (typeof props.orientation === 'string') attrs['aria-orientation'] = props.orientation;
-  if (typeof props.label === 'string' && tagForKind(node.kind, node.role) === 'button') {
-    // label becomes text content
-  }
+
+  // Record the compose kind for runtime hosts / diagnostics.
+  attrs['data-compose-kind'] = node.kind;
 
   const def = scene.definitions[node.kind];
   if (def?.accessibility?.ariaRole) {
@@ -54,22 +118,17 @@ function lowerNode(
     attrs.role = node.role;
   }
 
-  const attachmentSlots: DomNodeSpec['attachmentSlots'] = [];
+  const attachmentSlots: DomAttachmentSpec[] = [];
   for (const visualId of node.visualRefs ?? []) {
     const visual = scene.visuals[visualId];
     if (visual) {
-      attachmentSlots.push({
-        slot: visual.placementSlot,
-        visualId,
-        kind: visual.kind,
-      });
+      attachmentSlots.push(copyAttachmentFields(visualId, visual));
     }
   }
 
   const children = (node.children ?? []).map((c) => lowerNode(c, scene));
 
-  const text =
-    typeof props.label === 'string' ? props.label : undefined;
+  const text = typeof props.label === 'string' ? props.label : undefined;
 
   return {
     tag: tagForKind(node.kind, node.role),
