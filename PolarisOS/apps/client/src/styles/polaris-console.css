@@ -1,0 +1,205 @@
+/*
+ * PolarisOS Stateful Lattice Console — desktop-first layout (Task 4).
+ * Tokens are imported first by the bootstrap; this file consumes --polaris-*.
+ * Layout principles follow DivWand / Wand / PhotonicBridgeLab (no imports).
+ */
+
+.polaris-console,
+[data-compose-kind="polaris-console-shell"] {
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--polaris-surface-void);
+  color: var(--polaris-text-primary);
+  font-family: var(--polaris-font-body);
+}
+
+#polaris-workspace {
+  display: grid;
+  grid-template-columns:
+    minmax(var(--polaris-layout-bearing-min), 0.8fr)
+    minmax(var(--polaris-layout-scene-min), 2.4fr)
+    minmax(var(--polaris-layout-telemetry-min), 1fr);
+  gap: var(--polaris-space-panel-gap);
+  min-height: 0;
+  padding: var(--polaris-space-md);
+}
+
+/* Panels ─────────────────────────────────────────────────────────────────── */
+
+#polaris-bearing-rail,
+#polaris-telemetry-rail,
+#polaris-chronicle,
+#polaris-command-conduit,
+#polaris-scene-altar {
+  background: var(--polaris-surface-panel);
+  border: var(--polaris-border-width) solid var(--polaris-border-color);
+  border-radius: 2px;
+  min-height: 0;
+}
+
+#polaris-center-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--polaris-space-panel-gap);
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Each long panel scrolls internally; the shell owns the viewport. */
+#polaris-bearing-rail,
+#polaris-telemetry-rail,
+#polaris-chronicle-log {
+  overflow-y: auto;
+}
+
+#polaris-scene-altar {
+  flex: 1 1 auto;
+  min-height: var(--polaris-layout-scene-min);
+  position: relative;
+  overflow: hidden;
+}
+
+#polaris-scene-altar [data-attachment-slot],
+#polaris-scene-altar canvas {
+  image-rendering: pixelated;
+}
+
+#polaris-chronicle {
+  flex: 0 1 220px;
+  display: flex;
+  flex-direction: column;
+}
+
+#polaris-chronicle-log {
+  margin: 0;
+  padding: var(--polaris-space-sm);
+  list-style: none;
+  font-family: var(--polaris-font-body);
+}
+
+#polaris-chronicle-log li[data-kind="error"] {
+  color: var(--polaris-state-corrupted);
+}
+#polaris-chronicle-log li[data-kind="success"] {
+  color: var(--polaris-state-success);
+}
+#polaris-chronicle-log li[data-kind="warning"] {
+  color: var(--polaris-state-warning);
+}
+#polaris-chronicle-log li[data-kind="command"] {
+  color: var(--polaris-text-secondary);
+  font-family: var(--polaris-font-mono);
+}
+
+/* Command conduit ────────────────────────────────────────────────────────── */
+
+#polaris-command-conduit {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--polaris-space-sm);
+  padding: var(--polaris-space-sm);
+  align-items: center;
+}
+
+#polaris-command-input {
+  flex: 1 1 240px;
+  min-height: var(--polaris-target-min);
+  background: var(--polaris-surface-inset);
+  color: var(--polaris-text-primary);
+  border: var(--polaris-border-width) solid var(--polaris-border-color);
+  font-family: var(--polaris-font-mono);
+  padding: 0 var(--polaris-space-sm);
+}
+
+/* Action targets meet the minimum target-size token. */
+button {
+  min-height: var(--polaris-target-min);
+  min-width: var(--polaris-target-min);
+  padding: 0 var(--polaris-space-md);
+  background: var(--polaris-surface-raised);
+  color: var(--polaris-text-primary);
+  border: var(--polaris-border-width) solid var(--polaris-border-color);
+  font-family: var(--polaris-font-body);
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Focus is never color-only: visible outline plus state color. */
+:focus-visible {
+  outline: var(--polaris-border-pixel-rim) solid var(--polaris-state-focus);
+  outline-offset: 1px;
+}
+
+/* State is conveyed by data-state, never color alone. */
+[data-state="pending"] {
+  border-color: var(--polaris-state-pending);
+}
+[data-state="success"] {
+  border-color: var(--polaris-state-success);
+}
+[data-state="warning"] {
+  border-color: var(--polaris-state-warning);
+}
+[data-state="corrupted"] {
+  border-color: var(--polaris-state-corrupted);
+}
+[data-state="disconnected"] {
+  border-color: var(--polaris-state-disconnected);
+}
+
+/* Telemetry metric grids (PhotonicBridgeLab-style auto-fit). */
+#polaris-telemetry-rail dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--polaris-space-xs) var(--polaris-space-sm);
+  margin: 0;
+  padding: var(--polaris-space-sm);
+}
+#polaris-telemetry-rail dt {
+  color: var(--polaris-text-muted);
+}
+#polaris-telemetry-rail dd {
+  margin: 0;
+  font-family: var(--polaris-font-numeric);
+  overflow-wrap: anywhere;
+}
+
+/* Decorative attachment hosts never intercept interaction. */
+[data-attachment-slot] {
+  pointer-events: none;
+}
+
+/* Text overflow must not hide action labels. */
+button,
+#polaris-bearing-rail li {
+  overflow-wrap: anywhere;
+}
+
+/* Narrow desktop / Steam Deck ────────────────────────────────────────────── */
+
+@media (max-width: 1280px) {
+  #polaris-workspace {
+    grid-template-columns: minmax(210px, 0.72fr) minmax(0, 2fr);
+  }
+  #polaris-telemetry-rail {
+    position: fixed;
+    inset: auto 0 0 auto;
+    max-width: 320px;
+    max-height: 40dvh;
+    overflow-y: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
