@@ -1,0 +1,1232 @@
+{
+  "contract": "PB-UI-SCENE-v1",
+  "version": "1.0.0",
+  "id": "scene:polaris-console",
+  "root": {
+    "id": "polaris-console",
+    "kind": "polaris-console-shell",
+    "role": "region",
+    "props": {
+      "aria-label": "Polaris console"
+    },
+    "children": [
+      {
+        "id": "polaris-system-header",
+        "kind": "system-header",
+        "role": "banner",
+        "props": {
+          "aria-label": "System header"
+        },
+        "layoutRef": "polaris-header-flow",
+        "visualRefs": [
+          "connection-seal"
+        ],
+        "children": [
+          {
+            "id": "polaris-system-header.title",
+            "kind": "text",
+            "props": {
+              "label": "World"
+            }
+          },
+          {
+            "id": "polaris-system-header.location",
+            "kind": "text",
+            "props": {
+              "label": "Location"
+            }
+          },
+          {
+            "id": "polaris-system-header.seal",
+            "kind": "container",
+            "props": {
+              "aria-label": "Connection seal"
+            }
+          }
+        ]
+      },
+      {
+        "id": "polaris-workspace",
+        "kind": "container",
+        "role": "main",
+        "props": {
+          "aria-label": "Workspace"
+        },
+        "layoutRef": "polaris-workspace-grid",
+        "children": [
+          {
+            "id": "polaris-bearing-rail",
+            "kind": "bearing-rail",
+            "role": "complementary",
+            "props": {
+              "aria-label": "Bearing rail"
+            },
+            "visualRefs": [
+              "arcane-corners",
+              "arcane-divider"
+            ],
+            "children": [
+              {
+                "id": "polaris-bearing-rail.exits",
+                "kind": "container",
+                "role": "navigation",
+                "props": {
+                  "aria-label": "Exits"
+                }
+              },
+              {
+                "id": "polaris-bearing-rail.nearby",
+                "kind": "container",
+                "props": {
+                  "aria-label": "Nearby entities"
+                }
+              },
+              {
+                "id": "polaris-bearing-rail.actions",
+                "kind": "container",
+                "props": {
+                  "aria-label": "Navigation actions"
+                }
+              }
+            ]
+          },
+          {
+            "id": "polaris-center-stack",
+            "kind": "container",
+            "props": {
+              "aria-label": "Center stack"
+            },
+            "layoutRef": "polaris-center-flow",
+            "children": [
+              {
+                "id": "polaris-scene-altar",
+                "kind": "scene-altar",
+                "role": "region",
+                "props": {
+                  "aria-label": "Scene altar"
+                },
+                "visualRefs": [
+                  "arcane-corners",
+                  "arcane-state-glyph"
+                ],
+                "children": [
+                  {
+                    "id": "polaris-scene-altar.title",
+                    "kind": "text",
+                    "props": {
+                      "label": "Scene"
+                    }
+                  },
+                  {
+                    "id": "polaris-scene-altar.host",
+                    "kind": "container",
+                    "props": {
+                      "aria-label": "World render host"
+                    }
+                  },
+                  {
+                    "id": "polaris-scene-altar.status",
+                    "kind": "text",
+                    "props": {
+                      "label": "Scene status"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "polaris-chronicle",
+                "kind": "chronicle",
+                "role": "log",
+                "props": {
+                  "aria-label": "Chronicle",
+                  "aria-live": "polite",
+                  "aria-atomic": "false"
+                },
+                "visualRefs": [
+                  "arcane-corners",
+                  "arcane-divider"
+                ],
+                "children": [
+                  {
+                    "id": "polaris-chronicle-log",
+                    "kind": "container",
+                    "role": "log",
+                    "props": {
+                      "aria-live": "polite"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "polaris-command-conduit",
+                "kind": "command-conduit",
+                "role": "form",
+                "props": {
+                  "aria-label": "Command conduit"
+                },
+                "visualRefs": [
+                  "command-sigil"
+                ],
+                "children": [
+                  {
+                    "id": "polaris-command-input",
+                    "kind": "input",
+                    "props": {
+                      "aria-label": "Command",
+                      "placeholder": "cast a command…",
+                      "type": "text",
+                      "name": "command",
+                      "autocomplete": "off"
+                    }
+                  },
+                  {
+                    "id": "polaris-command-submit",
+                    "kind": "button",
+                    "props": {
+                      "label": "Cast"
+                    }
+                  },
+                  {
+                    "id": "polaris-command-hints",
+                    "kind": "container",
+                    "props": {
+                      "aria-label": "Command hints"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "polaris-telemetry-rail",
+            "kind": "telemetry-rail",
+            "role": "complementary",
+            "props": {
+              "aria-label": "Telemetry rail"
+            },
+            "visualRefs": [
+              "arcane-corners",
+              "arcane-divider"
+            ],
+            "children": [
+              {
+                "id": "polaris-telemetry-rail.selected",
+                "kind": "container",
+                "props": {
+                  "aria-label": "Selected entity"
+                }
+              },
+              {
+                "id": "polaris-telemetry-rail.session",
+                "kind": "container",
+                "props": {
+                  "aria-label": "Session diagnostics"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "definitions": {
+    "polaris-console-shell": {
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "version": "1.0.0",
+      "kind": "polaris-console-shell",
+      "description": "Top-level landmark and state boundary for the arcane terminal.",
+      "anatomy": {
+        "rootRole": "region",
+        "parts": [
+          {
+            "id": "root",
+            "role": "region",
+            "visible": true
+          }
+        ],
+        "slots": [
+          {
+            "name": "corner-nw",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-ne",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-sw",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-se",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "divider",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "seal",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "state-glyph",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          }
+        ]
+      },
+      "states": [
+        {
+          "name": "visualState",
+          "type": "enum",
+          "enumValues": [
+            "rest",
+            "focus",
+            "pending",
+            "success",
+            "warning",
+            "corrupted",
+            "disconnected"
+          ],
+          "default": "rest",
+          "ariaMapping": "data-state"
+        }
+      ],
+      "events": [],
+      "accessibility": {
+        "ariaRole": "region",
+        "keyboard": [],
+        "focusRetention": "none",
+        "nameFrom": "author"
+      },
+      "provenance": {
+        "sourceKind": "typescript",
+        "sourcePath": "src/core/compose/kits/polaris-console.ts",
+        "contentHash": "scd64:polaris-polaris-console-shell",
+        "author": "polaris-console-task2",
+        "establishedAt": "2026-07-28T00:00:00.000Z"
+      }
+    },
+    "system-header": {
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "version": "1.0.0",
+      "kind": "system-header",
+      "description": "World name, location, and connection seal.",
+      "anatomy": {
+        "rootRole": "banner",
+        "parts": [
+          {
+            "id": "root",
+            "role": "banner",
+            "visible": true
+          }
+        ],
+        "slots": [
+          {
+            "name": "corner-nw",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-ne",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-sw",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-se",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "divider",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "seal",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "state-glyph",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          }
+        ]
+      },
+      "states": [
+        {
+          "name": "visualState",
+          "type": "enum",
+          "enumValues": [
+            "rest",
+            "focus",
+            "pending",
+            "success",
+            "warning",
+            "corrupted",
+            "disconnected"
+          ],
+          "default": "rest",
+          "ariaMapping": "data-state"
+        }
+      ],
+      "events": [],
+      "accessibility": {
+        "ariaRole": "banner",
+        "keyboard": [],
+        "focusRetention": "none",
+        "nameFrom": "author"
+      },
+      "provenance": {
+        "sourceKind": "typescript",
+        "sourcePath": "src/core/compose/kits/polaris-console.ts",
+        "contentHash": "scd64:polaris-system-header",
+        "author": "polaris-console-task2",
+        "establishedAt": "2026-07-28T00:00:00.000Z"
+      }
+    },
+    "bearing-rail": {
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "version": "1.0.0",
+      "kind": "bearing-rail",
+      "description": "Exits, nearby entities, and navigation actions.",
+      "anatomy": {
+        "rootRole": "complementary",
+        "parts": [
+          {
+            "id": "root",
+            "role": "complementary",
+            "visible": true
+          }
+        ],
+        "slots": [
+          {
+            "name": "corner-nw",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-ne",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-sw",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-se",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "divider",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "seal",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "state-glyph",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          }
+        ]
+      },
+      "states": [
+        {
+          "name": "visualState",
+          "type": "enum",
+          "enumValues": [
+            "rest",
+            "focus",
+            "pending",
+            "success",
+            "warning",
+            "corrupted",
+            "disconnected"
+          ],
+          "default": "rest",
+          "ariaMapping": "data-state"
+        }
+      ],
+      "events": [],
+      "accessibility": {
+        "ariaRole": "complementary",
+        "keyboard": [
+          "ArrowDown: next action",
+          "ArrowUp: previous action"
+        ],
+        "focusRetention": "none",
+        "nameFrom": "author"
+      },
+      "provenance": {
+        "sourceKind": "typescript",
+        "sourcePath": "src/core/compose/kits/polaris-console.ts",
+        "contentHash": "scd64:polaris-bearing-rail",
+        "author": "polaris-console-task2",
+        "establishedAt": "2026-07-28T00:00:00.000Z"
+      }
+    },
+    "scene-altar": {
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "version": "1.0.0",
+      "kind": "scene-altar",
+      "description": "Contained render portal for the authoritative Pixi world scene.",
+      "anatomy": {
+        "rootRole": "region",
+        "parts": [
+          {
+            "id": "root",
+            "role": "region",
+            "visible": true
+          }
+        ],
+        "slots": [
+          {
+            "name": "corner-nw",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-ne",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-sw",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-se",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "divider",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "seal",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "state-glyph",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          }
+        ]
+      },
+      "states": [
+        {
+          "name": "visualState",
+          "type": "enum",
+          "enumValues": [
+            "rest",
+            "focus",
+            "pending",
+            "success",
+            "warning",
+            "corrupted",
+            "disconnected"
+          ],
+          "default": "rest",
+          "ariaMapping": "data-state"
+        }
+      ],
+      "events": [],
+      "accessibility": {
+        "ariaRole": "region",
+        "keyboard": [],
+        "focusRetention": "none",
+        "nameFrom": "author"
+      },
+      "provenance": {
+        "sourceKind": "typescript",
+        "sourcePath": "src/core/compose/kits/polaris-console.ts",
+        "contentHash": "scd64:polaris-scene-altar",
+        "author": "polaris-console-task2",
+        "establishedAt": "2026-07-28T00:00:00.000Z"
+      }
+    },
+    "chronicle": {
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "version": "1.0.0",
+      "kind": "chronicle",
+      "description": "Scrollable narrative and diagnostic history.",
+      "anatomy": {
+        "rootRole": "log",
+        "parts": [
+          {
+            "id": "root",
+            "role": "log",
+            "visible": true
+          }
+        ],
+        "slots": [
+          {
+            "name": "corner-nw",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-ne",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-sw",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-se",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "divider",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "seal",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "state-glyph",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          }
+        ]
+      },
+      "states": [
+        {
+          "name": "visualState",
+          "type": "enum",
+          "enumValues": [
+            "rest",
+            "focus",
+            "pending",
+            "success",
+            "warning",
+            "corrupted",
+            "disconnected"
+          ],
+          "default": "rest",
+          "ariaMapping": "data-state"
+        }
+      ],
+      "events": [],
+      "accessibility": {
+        "ariaRole": "log",
+        "keyboard": [],
+        "focusRetention": "none",
+        "nameFrom": "author"
+      },
+      "provenance": {
+        "sourceKind": "typescript",
+        "sourcePath": "src/core/compose/kits/polaris-console.ts",
+        "contentHash": "scd64:polaris-chronicle",
+        "author": "polaris-console-task2",
+        "establishedAt": "2026-07-28T00:00:00.000Z"
+      }
+    },
+    "command-conduit": {
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "version": "1.0.0",
+      "kind": "command-conduit",
+      "description": "Persistent command surface: input, suggestions, hints.",
+      "anatomy": {
+        "rootRole": "form",
+        "parts": [
+          {
+            "id": "root",
+            "role": "form",
+            "visible": true
+          }
+        ],
+        "slots": [
+          {
+            "name": "corner-nw",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-ne",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-sw",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-se",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "divider",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "seal",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "state-glyph",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          }
+        ]
+      },
+      "states": [
+        {
+          "name": "visualState",
+          "type": "enum",
+          "enumValues": [
+            "rest",
+            "focus",
+            "pending",
+            "success",
+            "warning",
+            "corrupted",
+            "disconnected"
+          ],
+          "default": "rest",
+          "ariaMapping": "data-state"
+        }
+      ],
+      "events": [],
+      "accessibility": {
+        "ariaRole": "form",
+        "keyboard": [
+          "Enter: submit command",
+          "ArrowUp: previous history",
+          "ArrowDown: next history"
+        ],
+        "focusRetention": "none",
+        "nameFrom": "author"
+      },
+      "provenance": {
+        "sourceKind": "typescript",
+        "sourcePath": "src/core/compose/kits/polaris-console.ts",
+        "contentHash": "scd64:polaris-command-conduit",
+        "author": "polaris-console-task2",
+        "establishedAt": "2026-07-28T00:00:00.000Z"
+      }
+    },
+    "telemetry-rail": {
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "version": "1.0.0",
+      "kind": "telemetry-rail",
+      "description": "Selected-entity and session diagnostics.",
+      "anatomy": {
+        "rootRole": "complementary",
+        "parts": [
+          {
+            "id": "root",
+            "role": "complementary",
+            "visible": true
+          }
+        ],
+        "slots": [
+          {
+            "name": "corner-nw",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-ne",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-sw",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-se",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "divider",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "seal",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "state-glyph",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          }
+        ]
+      },
+      "states": [
+        {
+          "name": "visualState",
+          "type": "enum",
+          "enumValues": [
+            "rest",
+            "focus",
+            "pending",
+            "success",
+            "warning",
+            "corrupted",
+            "disconnected"
+          ],
+          "default": "rest",
+          "ariaMapping": "data-state"
+        }
+      ],
+      "events": [],
+      "accessibility": {
+        "ariaRole": "complementary",
+        "keyboard": [],
+        "focusRetention": "none",
+        "nameFrom": "author"
+      },
+      "provenance": {
+        "sourceKind": "typescript",
+        "sourcePath": "src/core/compose/kits/polaris-console.ts",
+        "contentHash": "scd64:polaris-telemetry-rail",
+        "author": "polaris-console-task2",
+        "establishedAt": "2026-07-28T00:00:00.000Z"
+      }
+    },
+    "arcane-panel": {
+      "contract": "SCHOL-COMPONENT-DEFINITION-v1",
+      "version": "1.0.0",
+      "kind": "arcane-panel",
+      "description": "Shared panel primitive used by rails and the Chronicle.",
+      "anatomy": {
+        "rootRole": "region",
+        "parts": [
+          {
+            "id": "header",
+            "role": "header",
+            "visible": true
+          },
+          {
+            "id": "title",
+            "role": "heading",
+            "visible": true
+          },
+          {
+            "id": "status",
+            "role": "status",
+            "visible": true
+          },
+          {
+            "id": "body",
+            "role": "group",
+            "visible": true
+          },
+          {
+            "id": "footer",
+            "role": "contentinfo",
+            "visible": true
+          }
+        ],
+        "slots": [
+          {
+            "name": "corner-nw",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-ne",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-sw",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "corner-se",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "divider",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "seal",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          },
+          {
+            "name": "state-glyph",
+            "accepts": [
+              "scdl-asset",
+              "native-dom"
+            ],
+            "required": false,
+            "maxChildren": 1
+          }
+        ]
+      },
+      "states": [
+        {
+          "name": "visualState",
+          "type": "enum",
+          "enumValues": [
+            "rest",
+            "focus",
+            "pending",
+            "success",
+            "warning",
+            "corrupted",
+            "disconnected"
+          ],
+          "default": "rest",
+          "ariaMapping": "data-state"
+        }
+      ],
+      "events": [],
+      "accessibility": {
+        "ariaRole": "region",
+        "keyboard": [],
+        "focusRetention": "none",
+        "nameFrom": "author"
+      },
+      "provenance": {
+        "sourceKind": "typescript",
+        "sourcePath": "src/core/compose/kits/polaris-console.ts",
+        "contentHash": "scd64:polaris-arcane-panel",
+        "author": "polaris-console-task2",
+        "establishedAt": "2026-07-28T00:00:00.000Z"
+      }
+    }
+  },
+  "layouts": {
+    "polaris-workspace-grid": {
+      "contract": "PB-LAYOUT-v1",
+      "version": "1.0.0",
+      "mode": "grid",
+      "common": {
+        "paddingPx": 12
+      },
+      "grid": {
+        "columns": "minmax(220px, 0.8fr) minmax(640px, 2.4fr) minmax(260px, 1fr)",
+        "rows": "1fr",
+        "gapPx": [
+          12,
+          12
+        ],
+        "align": "stretch",
+        "justify": "stretch"
+      }
+    },
+    "polaris-center-flow": {
+      "contract": "PB-LAYOUT-v1",
+      "version": "1.0.0",
+      "mode": "flow",
+      "common": {
+        "minWidthPx": 640
+      },
+      "flow": {
+        "direction": "column",
+        "gapPx": 12,
+        "wrap": false,
+        "align": "stretch",
+        "justify": "start"
+      }
+    },
+    "polaris-header-flow": {
+      "contract": "PB-LAYOUT-v1",
+      "version": "1.0.0",
+      "mode": "flow",
+      "flow": {
+        "direction": "row",
+        "gapPx": 12,
+        "wrap": false,
+        "align": "center",
+        "justify": "space-between"
+      }
+    }
+  },
+  "visuals": {
+    "arcane-corners": {
+      "kind": "scdl-asset",
+      "packetId": "arcane-panel/rest/corners",
+      "placementSlot": "corner-nw"
+    },
+    "arcane-divider": {
+      "kind": "scdl-asset",
+      "packetId": "arcane-panel/rest/divider",
+      "placementSlot": "divider"
+    },
+    "connection-seal": {
+      "kind": "scdl-asset",
+      "packetId": "connection/rest/seal",
+      "placementSlot": "seal"
+    },
+    "arcane-state-glyph": {
+      "kind": "scdl-asset",
+      "packetId": "arcane-panel/rest/state-glyph",
+      "placementSlot": "state-glyph"
+    },
+    "command-sigil": {
+      "kind": "scdl-asset",
+      "packetId": "command-conduit/rest/sigil",
+      "placementSlot": "state-glyph"
+    }
+  },
+  "sourceChecksum": "scd64:fe43982de62b3702"
+}

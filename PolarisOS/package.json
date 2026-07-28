@@ -9,10 +9,11 @@
     "apps/*"
   ],
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=20.19.0"
   },
   "scripts": {
     "build": "npm run build --workspaces --if-present",
+    "build:console-ui": "npm --prefix .. run polaris:build-console-ui",
     "build:pixelbrain-assets": "tsx scripts/build-pixelbrain-assets.ts",
     "test": "vitest run",
     "test:browser:pixelbrain": "playwright test --config playwright.pixelbrain.config.ts",
@@ -21,16 +22,20 @@
     "test:integration": "vitest run tests/integration",
     "test:persistence": "vitest run tests/persistence",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --quiet",
+    "lint": "eslint . --report-unused-disable-directives --quiet",
     "dev:server": "npm run dev --workspace=apps/server",
     "dev:client": "npm run dev --workspace=apps/client"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.58.1",
     "@types/node": "^20.11.0",
+    "eslint": "^10.8.0",
+    "globals": "^17.8.0",
+    "tsx": "^4.19.0",
     "typescript": "^5.4.0",
-    "vitest": "^1.6.0",
-    "eslint": "^8.57.0",
-    "tsx": "^4.19.0"
+    "typescript-eslint": "^8.65.0",
+    "vite": "^8.1.5",
+    "vitest": "^4.1.10"
   }
 }

@@ -1,0 +1,74 @@
+{
+  "surface": {
+    "void": { "$type": "color", "$value": "#07090D" },
+    "panel": { "$type": "color", "$value": "#10151C" },
+    "inset": { "$type": "color", "$value": "#080C11" },
+    "raised": { "$type": "color", "$value": "#161D26" }
+  },
+  "text": {
+    "primary": { "$type": "color", "$value": "#E7ECF3" },
+    "secondary": { "$type": "color", "$value": "#AEB9C6" },
+    "muted": { "$type": "color", "$value": "#6C7885" },
+    "inverse": { "$type": "color", "$value": "#07090D" }
+  },
+  "state": {
+    "focus": { "$type": "color", "$value": "#61D9FF" },
+    "pending": { "$type": "color", "$value": "#D8A84D" },
+    "success": { "$type": "color", "$value": "#68D391" },
+    "warning": { "$type": "color", "$value": "#E0A94B" },
+    "corrupted": { "$type": "color", "$value": "#EF5B7A" },
+    "disconnected": { "$type": "color", "$value": "#A57586" }
+  },
+  "space": {
+    "xs": { "$type": "dimension", "$value": "4px" },
+    "sm": { "$type": "dimension", "$value": "8px" },
+    "md": { "$type": "dimension", "$value": "12px" },
+    "lg": { "$type": "dimension", "$value": "16px" },
+    "xl": { "$type": "dimension", "$value": "24px" },
+    "panel-gap": { "$type": "dimension", "$value": "12px" }
+  },
+  "border": {
+    "width": { "$type": "dimension", "$value": "1px" },
+    "pixel-rim": { "$type": "dimension", "$value": "2px" },
+    "color": { "$type": "color", "$value": "#2A333F" }
+  },
+  "font": {
+    "display": {
+      "$type": "fontFamily",
+      "$value": "'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif"
+    },
+    "body": {
+      "$type": "fontFamily",
+      "$value": "system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+    },
+    "mono": {
+      "$type": "fontFamily",
+      "$value": "ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace"
+    },
+    "numeric": {
+      "$type": "fontFamily",
+      "$value": "ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace"
+    }
+  },
+  "target": {
+    "min": { "$type": "dimension", "$value": "44px" },
+    "comfortable": { "$type": "dimension", "$value": "48px" }
+  },
+  "layout": {
+    "bearing-min": { "$type": "dimension", "$value": "220px" },
+    "scene-min": { "$type": "dimension", "$value": "640px" },
+    "telemetry-min": { "$type": "dimension", "$value": "260px" }
+  },
+  "motion": {
+    "fast": { "$type": "duration", "$value": "120ms" },
+    "base": { "$type": "duration", "$value": "220ms" },
+    "slow": { "$type": "duration", "$value": "360ms" }
+  },
+  "layer": {
+    "shell": { "$type": "string", "$value": "shell" },
+    "panel": { "$type": "string", "$value": "panel" },
+    "ornament": { "$type": "string", "$value": "ornament" },
+    "scene": { "$type": "string", "$value": "scene" },
+    "overlay": { "$type": "string", "$value": "overlay" }
+  }
+}
