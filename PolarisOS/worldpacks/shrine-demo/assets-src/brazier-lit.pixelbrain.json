@@ -6,70 +6,4121 @@
     "schemaVersion": 1,
     "canvas": {
       "width": 24,
-      "height": 24,
-      "cellSize": 2,
+      "height": 20,
+      "cellSize": 1,
       "transparent": true,
       "background": "#00000000"
     },
     "coordinates": [
-      { "snappedX": 10, "snappedY": 0, "color": "#fff1a8" },
-      { "snappedX": 8, "snappedY": 2, "color": "#ef8b32" },
-      { "snappedX": 10, "snappedY": 2, "color": "#fff1a8" },
-      { "snappedX": 12, "snappedY": 2, "color": "#ef8b32" },
-      { "snappedX": 6, "snappedY": 4, "color": "#b8462d" },
-      { "snappedX": 8, "snappedY": 4, "color": "#ef8b32" },
-      { "snappedX": 10, "snappedY": 4, "color": "#fff1a8" },
-      { "snappedX": 12, "snappedY": 4, "color": "#fff1a8" },
-      { "snappedX": 14, "snappedY": 4, "color": "#b8462d" },
-      { "snappedX": 4, "snappedY": 6, "color": "#b8462d" },
-      { "snappedX": 6, "snappedY": 6, "color": "#ef8b32" },
-      { "snappedX": 8, "snappedY": 6, "color": "#ffd45f" },
-      { "snappedX": 10, "snappedY": 6, "color": "#fff1a8" },
-      { "snappedX": 12, "snappedY": 6, "color": "#ffd45f" },
-      { "snappedX": 14, "snappedY": 6, "color": "#ef8b32" },
-      { "snappedX": 16, "snappedY": 6, "color": "#b8462d" },
-      { "snappedX": 2, "snappedY": 8, "color": "#332725" },
-      { "snappedX": 4, "snappedY": 8, "color": "#6f5547" },
-      { "snappedX": 6, "snappedY": 8, "color": "#ef8b32" },
-      { "snappedX": 8, "snappedY": 8, "color": "#ffd45f" },
-      { "snappedX": 10, "snappedY": 8, "color": "#fff1a8" },
-      { "snappedX": 12, "snappedY": 8, "color": "#ffd45f" },
-      { "snappedX": 14, "snappedY": 8, "color": "#ef8b32" },
-      { "snappedX": 16, "snappedY": 8, "color": "#6f5547" },
-      { "snappedX": 18, "snappedY": 8, "color": "#332725" },
-      { "snappedX": 4, "snappedY": 10, "color": "#332725" },
-      { "snappedX": 6, "snappedY": 10, "color": "#171414" },
-      { "snappedX": 8, "snappedY": 10, "color": "#251d1b" },
-      { "snappedX": 10, "snappedY": 10, "color": "#171414" },
-      { "snappedX": 12, "snappedY": 10, "color": "#251d1b" },
-      { "snappedX": 14, "snappedY": 10, "color": "#171414" },
-      { "snappedX": 16, "snappedY": 10, "color": "#332725" },
-      { "snappedX": 4, "snappedY": 12, "color": "#332725" },
-      { "snappedX": 6, "snappedY": 12, "color": "#6f5547" },
-      { "snappedX": 8, "snappedY": 12, "color": "#6f5547" },
-      { "snappedX": 10, "snappedY": 12, "color": "#6f5547" },
-      { "snappedX": 12, "snappedY": 12, "color": "#6f5547" },
-      { "snappedX": 14, "snappedY": 12, "color": "#6f5547" },
-      { "snappedX": 16, "snappedY": 12, "color": "#332725" },
-      { "snappedX": 6, "snappedY": 14, "color": "#332725" },
-      { "snappedX": 8, "snappedY": 14, "color": "#8d715d" },
-      { "snappedX": 10, "snappedY": 14, "color": "#8d715d" },
-      { "snappedX": 12, "snappedY": 14, "color": "#8d715d" },
-      { "snappedX": 14, "snappedY": 14, "color": "#332725" },
-      { "snappedX": 10, "snappedY": 16, "color": "#332725" },
-      { "snappedX": 12, "snappedY": 16, "color": "#332725" },
-      { "snappedX": 10, "snappedY": 18, "color": "#6f5547" },
-      { "snappedX": 12, "snappedY": 18, "color": "#6f5547" },
-      { "snappedX": 8, "snappedY": 20, "color": "#332725" },
-      { "snappedX": 10, "snappedY": 20, "color": "#332725" },
-      { "snappedX": 12, "snappedY": 20, "color": "#332725" },
-      { "snappedX": 14, "snappedY": 20, "color": "#332725" },
-      { "snappedX": 6, "snappedY": 22, "color": "#171414" },
-      { "snappedX": 8, "snappedY": 22, "color": "#332725" },
-      { "snappedX": 10, "snappedY": 22, "color": "#332725" },
-      { "snappedX": 12, "snappedY": 22, "color": "#332725" },
-      { "snappedX": 14, "snappedY": 22, "color": "#332725" },
-      { "snappedX": 16, "snappedY": 22, "color": "#171414" }
+      {
+        "snappedX": 11,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 1,
+        "color": "#F59E0B",
+        "material": "holy_fire",
+        "partId": "flame",
+        "role": "explicit",
+        "sourceOpId": "op:flame:0:polygon",
+        "signedDistance": 0,
+        "t": 0.20238423666291558,
+        "tangent": [
+          0.7071067811865475,
+          -0.7071067811865475
+        ],
+        "normal": [
+          0.7071067811865475,
+          0.7071067811865475
+        ],
+        "curvature": 1.5,
+        "arcLength": 15.62511840008253
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 1,
+        "color": "#F59E0B",
+        "material": "holy_fire",
+        "partId": "flame",
+        "role": "explicit",
+        "sourceOpId": "op:flame:0:polygon",
+        "signedDistance": -0.7071067811865475,
+        "t": 0.24763872773818402,
+        "tangent": [
+          0.7071067811865475,
+          -0.7071067811865475
+        ],
+        "normal": [
+          0.7071067811865475,
+          0.7071067811865475
+        ],
+        "curvature": 0,
+        "arcLength": 15.62511840008253
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 2,
+        "color": "#F59E0B",
+        "material": "holy_fire",
+        "partId": "flame",
+        "role": "explicit",
+        "sourceOpId": "op:flame:0:polygon",
+        "signedDistance": 0.6324555320336757,
+        "t": 0.12143054199774933,
+        "tangent": [
+          0.31622776601683794,
+          -0.9486832980505138
+        ],
+        "normal": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 15.62511840008253
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 2,
+        "color": "#FFFBEB",
+        "material": "holy_fire",
+        "partId": "flame_core",
+        "role": "explicit",
+        "sourceOpId": "op:flame_core:0:polygon",
+        "signedDistance": 0.4472135954999583,
+        "t": 0.09999999999999998,
+        "tangent": [
+          0.4472135954999579,
+          -0.8944271909999159
+        ],
+        "normal": [
+          0.8944271909999159,
+          0.4472135954999579
+        ],
+        "curvature": 1.5,
+        "arcLength": 8.94427190999916
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 2,
+        "color": "#FFFBEB",
+        "material": "holy_fire",
+        "partId": "flame_core",
+        "role": "explicit",
+        "sourceOpId": "op:flame_core:0:polygon",
+        "signedDistance": -0.44721359549995815,
+        "t": 0.14999999999999997,
+        "tangent": [
+          0.4472135954999579,
+          -0.8944271909999159
+        ],
+        "normal": [
+          0.8944271909999159,
+          0.4472135954999579
+        ],
+        "curvature": 1.5,
+        "arcLength": 8.94427190999916
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 3,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0.048787657176197374,
+        "t": 0.215197756363468,
+        "tangent": [
+          0.9761870601839527,
+          -0.2169304578186563
+        ],
+        "normal": [
+          -0.2169304578186563,
+          -0.9761870601839527
+        ],
+        "curvature": 0.02644594746579037,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 3,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0.012307808474981474,
+        "t": 0.23238835626136134,
+        "tangent": [
+          0.9938837346736189,
+          -0.1104315260748467
+        ],
+        "normal": [
+          -0.1104315260748467,
+          -0.9938837346736189
+        ],
+        "curvature": 0.02512703172205641,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 3,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0,
+        "t": 0.25,
+        "tangent": [
+          1,
+          6.123233995736766e-17
+        ],
+        "normal": [
+          6.123233995736766e-17,
+          -1
+        ],
+        "curvature": 0.024691358024691357,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 13,
+        "snappedY": 3,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0.012307808474981474,
+        "t": 0.26761164373863866,
+        "tangent": [
+          0.9938837346736189,
+          0.1104315260748466
+        ],
+        "normal": [
+          0.1104315260748466,
+          -0.9938837346736189
+        ],
+        "curvature": 0.02512703172205641,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 4,
+        "color": "#F59E0B",
+        "material": "holy_fire",
+        "partId": "flame",
+        "role": "explicit",
+        "sourceOpId": "op:flame:0:polygon",
+        "signedDistance": 0,
+        "t": 0,
+        "tangent": [
+          0.31622776601683794,
+          -0.9486832980505138
+        ],
+        "normal": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 1.5,
+        "arcLength": 15.62511840008253
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 4,
+        "color": "#F59E0B",
+        "material": "holy_fire",
+        "partId": "flame",
+        "role": "explicit",
+        "sourceOpId": "op:flame:0:polygon",
+        "signedDistance": -0.8944271909999166,
+        "t": 0.9713785467700778,
+        "tangent": [
+          -0.4472135954999579,
+          -0.8944271909999159
+        ],
+        "normal": [
+          0.8944271909999159,
+          -0.4472135954999579
+        ],
+        "curvature": 0,
+        "arcLength": 15.62511840008253
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 4,
+        "color": "#F59E0B",
+        "material": "holy_fire",
+        "partId": "flame",
+        "role": "explicit",
+        "sourceOpId": "op:flame:0:polygon",
+        "signedDistance": -1.7888543819998313,
+        "t": 0.6430293440867492,
+        "tangent": [
+          -0.4472135954999579,
+          0.8944271909999159
+        ],
+        "normal": [
+          -0.8944271909999159,
+          -0.4472135954999579
+        ],
+        "curvature": 0,
+        "arcLength": 15.62511840008253
+      },
+      {
+        "snappedX": 13,
+        "snappedY": 4,
+        "color": "#F59E0B",
+        "material": "holy_fire",
+        "partId": "flame",
+        "role": "explicit",
+        "sourceOpId": "op:flame:0:polygon",
+        "signedDistance": -0.8944271909999166,
+        "t": 0.6144078908568271,
+        "tangent": [
+          -0.4472135954999579,
+          0.8944271909999159
+        ],
+        "normal": [
+          -0.8944271909999159,
+          -0.4472135954999579
+        ],
+        "curvature": 0,
+        "arcLength": 15.62511840008253
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 5,
+        "color": "#92400E",
+        "material": "holy_fire",
+        "partId": "coals",
+        "role": "explicit",
+        "sourceOpId": "op:coals:0:ellipse",
+        "signedDistance": 0.01980390271855703,
+        "t": 0.21858352090549937,
+        "tangent": [
+          0.9805806756909201,
+          -0.1961161351381841
+        ],
+        "normal": [
+          -0.1961161351381841,
+          -0.9805806756909201
+        ],
+        "curvature": 0.04232222838645323,
+        "arcLength": 21.005604259349344,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 5,
+        "color": "#92400E",
+        "material": "holy_fire",
+        "partId": "coals",
+        "role": "explicit",
+        "sourceOpId": "op:coals:0:ellipse",
+        "signedDistance": 0,
+        "t": 0.25,
+        "tangent": [
+          1,
+          6.123233995736766e-17
+        ],
+        "normal": [
+          6.123233995736766e-17,
+          -1
+        ],
+        "curvature": 0.04,
+        "arcLength": 21.005604259349344,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 17,
+        "snappedY": 6,
+        "color": "#92400E",
+        "material": "holy_fire",
+        "partId": "coals",
+        "role": "explicit",
+        "sourceOpId": "op:coals:0:ellipse",
+        "signedDistance": 0,
+        "t": 0.5,
+        "tangent": [
+          0,
+          1
+        ],
+        "normal": [
+          1,
+          0
+        ],
+        "curvature": 5,
+        "arcLength": 21.005604259349344,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 6,
+        "color": "#92400E",
+        "material": "holy_fire",
+        "partId": "coals",
+        "role": "explicit",
+        "sourceOpId": "op:coals:0:ellipse",
+        "signedDistance": -0.19999999999999996,
+        "t": 0.5,
+        "tangent": [
+          0,
+          1
+        ],
+        "normal": [
+          1,
+          0
+        ],
+        "curvature": 5,
+        "arcLength": 21.005604259349344,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 7,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": 0,
+        "t": 0.6989479222723177,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 15,
+        "snappedY": 7,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": 0,
+        "t": 0.7240355954162913,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 14,
+        "snappedY": 7,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": 0,
+        "t": 0.7491232685602648,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 13,
+        "snappedY": 7,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": 0,
+        "t": 0.7742109417042383,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 7,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": 0,
+        "t": 0.7992986148482119,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 7,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": 0,
+        "t": 0.8243862879921853,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 7,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": 0,
+        "t": 0.8494739611361588,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 7,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": 0,
+        "t": 0.8745616342801323,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 7,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": 0,
+        "t": 0.8996493074241059,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 6,
+        "color": "#92400E",
+        "material": "holy_fire",
+        "partId": "coals",
+        "role": "explicit",
+        "sourceOpId": "op:coals:0:ellipse",
+        "signedDistance": -0.19999999999999996,
+        "t": 1,
+        "tangent": [
+          -1.2246467991473532e-16,
+          -1
+        ],
+        "normal": [
+          -1,
+          1.2246467991473532e-16
+        ],
+        "curvature": 5,
+        "arcLength": 21.005604259349344,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 6,
+        "color": "#92400E",
+        "material": "holy_fire",
+        "partId": "coals",
+        "role": "explicit",
+        "sourceOpId": "op:coals:0:ellipse",
+        "signedDistance": 0,
+        "t": 1,
+        "tangent": [
+          -1.2246467991473532e-16,
+          -1
+        ],
+        "normal": [
+          -1,
+          1.2246467991473532e-16
+        ],
+        "curvature": 5,
+        "arcLength": 21.005604259349344,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 5,
+        "color": "#92400E",
+        "material": "holy_fire",
+        "partId": "coals",
+        "role": "explicit",
+        "sourceOpId": "op:coals:0:ellipse",
+        "signedDistance": 0.2806248474865698,
+        "t": 0.1426116437386386,
+        "tangent": [
+          0.7808688094430303,
+          -0.6246950475544244
+        ],
+        "normal": [
+          -0.6246950475544244,
+          -0.7808688094430303
+        ],
+        "curvature": 0.08088327824440764,
+        "arcLength": 21.005604259349344,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 5,
+        "color": "#92400E",
+        "material": "holy_fire",
+        "partId": "coals",
+        "role": "explicit",
+        "sourceOpId": "op:coals:0:ellipse",
+        "signedDistance": 0.16619037896905997,
+        "t": 0.16398956518868468,
+        "tangent": [
+          0.8574929257125443,
+          -0.5144957554275263
+        ],
+        "normal": [
+          -0.5144957554275263,
+          -0.8574929257125443
+        ],
+        "curvature": 0.06209469426264767,
+        "arcLength": 21.005604259349344,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 5,
+        "color": "#92400E",
+        "material": "holy_fire",
+        "partId": "coals",
+        "role": "explicit",
+        "sourceOpId": "op:coals:0:ellipse",
+        "signedDistance": 0.07703296142690097,
+        "t": 0.18944052920457827,
+        "tangent": [
+          0.9284766908852593,
+          -0.3713906763541039
+        ],
+        "normal": [
+          -0.3713906763541039,
+          -0.9284766908852593
+        ],
+        "curvature": 0.04949838542397928,
+        "arcLength": 21.005604259349344,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 13,
+        "snappedY": 5,
+        "color": "#92400E",
+        "material": "holy_fire",
+        "partId": "coals",
+        "role": "explicit",
+        "sourceOpId": "op:coals:0:ellipse",
+        "signedDistance": 0.01980390271855703,
+        "t": 0.28141647909450057,
+        "tangent": [
+          0.9805806756909201,
+          0.196116135138184
+        ],
+        "normal": [
+          0.196116135138184,
+          -0.9805806756909201
+        ],
+        "curvature": 0.04232222838645323,
+        "arcLength": 21.005604259349344,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 14,
+        "snappedY": 5,
+        "color": "#92400E",
+        "material": "holy_fire",
+        "partId": "coals",
+        "role": "explicit",
+        "sourceOpId": "op:coals:0:ellipse",
+        "signedDistance": 0.07703296142690097,
+        "t": 0.3105594707954217,
+        "tangent": [
+          0.9284766908852593,
+          0.3713906763541038
+        ],
+        "normal": [
+          0.3713906763541038,
+          -0.9284766908852593
+        ],
+        "curvature": 0.04949838542397928,
+        "arcLength": 21.005604259349344,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 15,
+        "snappedY": 5,
+        "color": "#92400E",
+        "material": "holy_fire",
+        "partId": "coals",
+        "role": "explicit",
+        "sourceOpId": "op:coals:0:ellipse",
+        "signedDistance": 0.16619037896905997,
+        "t": 0.3360104348113153,
+        "tangent": [
+          0.8574929257125442,
+          0.5144957554275265
+        ],
+        "normal": [
+          0.5144957554275265,
+          -0.8574929257125442
+        ],
+        "curvature": 0.0620946942626477,
+        "arcLength": 21.005604259349344,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 5,
+        "color": "#92400E",
+        "material": "holy_fire",
+        "partId": "coals",
+        "role": "explicit",
+        "sourceOpId": "op:coals:0:ellipse",
+        "signedDistance": 0.2806248474865698,
+        "t": 0.35738835626136134,
+        "tangent": [
+          0.7808688094430303,
+          0.6246950475544243
+        ],
+        "normal": [
+          0.6246950475544243,
+          -0.7808688094430303
+        ],
+        "curvature": 0.08088327824440764,
+        "arcLength": 21.005604259349344,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 21,
+        "snappedY": 5,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0,
+        "t": 0.5,
+        "tangent": [
+          0,
+          1
+        ],
+        "normal": [
+          1,
+          0
+        ],
+        "curvature": 2.25,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 21,
+        "snappedY": 6,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0.2360679774997898,
+        "t": 0.5737918088252166,
+        "tangent": [
+          -0.4472135954999579,
+          0.8944271909999159
+        ],
+        "normal": [
+          0.8944271909999159,
+          0.4472135954999579
+        ],
+        "curvature": 0.21065409704528346,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 20,
+        "snappedY": 6,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0.039728861187313225,
+        "t": 0.5815493153966425,
+        "tangent": [
+          -0.490261239632559,
+          0.8715755371245493
+        ],
+        "normal": [
+          0.8715755371245493,
+          0.490261239632559
+        ],
+        "curvature": 0.16857143300966113,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 19,
+        "snappedY": 6,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": -0.15074255810075132,
+        "t": 0.5909311840891878,
+        "tangent": [
+          -0.5407575913134988,
+          0.8411784753765535
+        ],
+        "normal": [
+          0.8411784753765535,
+          0.5407575913134988
+        ],
+        "curvature": 0.13182702719813333,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 18,
+        "snappedY": 6,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": -0.33333333333333326,
+        "t": 0.6024163823495667,
+        "tangent": [
+          -0.6,
+          0.8
+        ],
+        "normal": [
+          0.8,
+          0.6
+        ],
+        "curvature": 0.10075642210050308,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 18,
+        "snappedY": 7,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": 0,
+        "t": 0.6487725759843707,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 17,
+        "snappedY": 7,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": 0,
+        "t": 0.6738602491283442,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 7,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": 0,
+        "t": 0.9247369805680794,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 7,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": 0,
+        "t": 0.9498246537120529,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 6,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": -0.33333333333333326,
+        "t": 0.8975836176504333,
+        "tangent": [
+          -0.6,
+          -0.8
+        ],
+        "normal": [
+          -0.8,
+          0.6
+        ],
+        "curvature": 0.10075642210050308,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 6,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": -0.15074255810075132,
+        "t": 0.9090688159108122,
+        "tangent": [
+          -0.5407575913134989,
+          -0.8411784753765534
+        ],
+        "normal": [
+          -0.8411784753765534,
+          0.5407575913134989
+        ],
+        "curvature": 0.13182702719813327,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 4,
+        "snappedY": 6,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0.039728861187313225,
+        "t": 0.9184506846033575,
+        "tangent": [
+          -0.49026123963255913,
+          -0.8715755371245493
+        ],
+        "normal": [
+          -0.8715755371245493,
+          0.49026123963255913
+        ],
+        "curvature": 0.16857143300966107,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 3,
+        "snappedY": 6,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0.2360679774997898,
+        "t": 0.9262081911747834,
+        "tangent": [
+          -0.4472135954999581,
+          -0.8944271909999159
+        ],
+        "normal": [
+          -0.8944271909999159,
+          0.4472135954999581
+        ],
+        "curvature": 0.21065409704528326,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 3,
+        "snappedY": 5,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0,
+        "t": 1,
+        "tangent": [
+          -1.2246467991473532e-16,
+          -1
+        ],
+        "normal": [
+          -1,
+          1.2246467991473532e-16
+        ],
+        "curvature": 2.25,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 3,
+        "snappedY": 4,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0.2360679774997898,
+        "t": 0.07379180882521665,
+        "tangent": [
+          0.4472135954999581,
+          -0.8944271909999159
+        ],
+        "normal": [
+          -0.8944271909999159,
+          -0.4472135954999581
+        ],
+        "curvature": 0.21065409704528326,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 4,
+        "snappedY": 4,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0.039728861187313225,
+        "t": 0.08154931539664242,
+        "tangent": [
+          0.49026123963255913,
+          -0.8715755371245493
+        ],
+        "normal": [
+          -0.8715755371245493,
+          -0.49026123963255913
+        ],
+        "curvature": 0.16857143300966107,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 4,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": -0.15074255810075132,
+        "t": 0.09093118408918778,
+        "tangent": [
+          0.5407575913134989,
+          -0.8411784753765534
+        ],
+        "normal": [
+          -0.8411784753765534,
+          -0.5407575913134989
+        ],
+        "curvature": 0.13182702719813327,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 4,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": -0.33333333333333326,
+        "t": 0.10241638234956671,
+        "tangent": [
+          0.6,
+          -0.8
+        ],
+        "normal": [
+          -0.8,
+          -0.6
+        ],
+        "curvature": 0.10075642210050308,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 3,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0.40370085030932623,
+        "t": 0.15641647909450054,
+        "tangent": [
+          0.8320502943378436,
+          -0.5547001962252293
+        ],
+        "normal": [
+          -0.5547001962252293,
+          -0.8320502943378436
+        ],
+        "curvature": 0.04149092570020949,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 3,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0.2879178091082224,
+        "t": 0.16929276639145238,
+        "tangent": [
+          0.8741572761215378,
+          -0.48564293117863194
+        ],
+        "normal": [
+          -0.48564293117863194,
+          -0.8741572761215378
+        ],
+        "curvature": 0.036134508556201074,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 3,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0.18863506706580102,
+        "t": 0.1834375306261717,
+        "tangent": [
+          0.9138115486202572,
+          -0.4061384660534476
+        ],
+        "normal": [
+          -0.4061384660534476,
+          -0.9138115486202572
+        ],
+        "curvature": 0.031889762335232164,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 3,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0.10818510677891968,
+        "t": 0.1987918088252166,
+        "tangent": [
+          0.9486832980505138,
+          -0.31622776601683805
+        ],
+        "normal": [
+          -0.31622776601683805,
+          -0.9486832980505138
+        ],
+        "curvature": 0.028682469678260443,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 14,
+        "snappedY": 3,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0.048787657176197374,
+        "t": 0.28480224363653195,
+        "tangent": [
+          0.9761870601839527,
+          0.2169304578186562
+        ],
+        "normal": [
+          0.2169304578186562,
+          -0.9761870601839527
+        ],
+        "curvature": 0.02644594746579037,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 15,
+        "snappedY": 3,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0.10818510677891968,
+        "t": 0.30120819117478337,
+        "tangent": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "normal": [
+          0.31622776601683794,
+          -0.9486832980505138
+        ],
+        "curvature": 0.028682469678260443,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 3,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0.18863506706580102,
+        "t": 0.31656246937382826,
+        "tangent": [
+          0.9138115486202572,
+          0.40613846605344756
+        ],
+        "normal": [
+          0.40613846605344756,
+          -0.9138115486202572
+        ],
+        "curvature": 0.031889762335232164,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 17,
+        "snappedY": 3,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0.2879178091082224,
+        "t": 0.3307072336085476,
+        "tangent": [
+          0.8741572761215378,
+          0.48564293117863205
+        ],
+        "normal": [
+          0.48564293117863205,
+          -0.8741572761215378
+        ],
+        "curvature": 0.036134508556201074,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 18,
+        "snappedY": 3,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0.40370085030932623,
+        "t": 0.3435835209054994,
+        "tangent": [
+          0.8320502943378436,
+          0.5547001962252291
+        ],
+        "normal": [
+          0.5547001962252291,
+          -0.8320502943378436
+        ],
+        "curvature": 0.04149092570020949,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 18,
+        "snappedY": 4,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": -0.33333333333333326,
+        "t": 0.39758361765043326,
+        "tangent": [
+          0.6,
+          0.8
+        ],
+        "normal": [
+          0.8,
+          -0.6
+        ],
+        "curvature": 0.10075642210050308,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 19,
+        "snappedY": 4,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": -0.15074255810075132,
+        "t": 0.40906881591081223,
+        "tangent": [
+          0.5407575913134988,
+          0.8411784753765535
+        ],
+        "normal": [
+          0.8411784753765535,
+          -0.5407575913134988
+        ],
+        "curvature": 0.13182702719813333,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 20,
+        "snappedY": 4,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0.039728861187313225,
+        "t": 0.41845068460335755,
+        "tangent": [
+          0.490261239632559,
+          0.8715755371245493
+        ],
+        "normal": [
+          0.8715755371245493,
+          -0.490261239632559
+        ],
+        "curvature": 0.16857143300966113,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 21,
+        "snappedY": 4,
+        "color": "#383D55",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:0:ellipse",
+        "signedDistance": 0.2360679774997898,
+        "t": 0.42620819117478337,
+        "tangent": [
+          0.4472135954999579,
+          0.8944271909999159
+        ],
+        "normal": [
+          0.8944271909999159,
+          -0.4472135954999579
+        ],
+        "curvature": 0.21065409704528346,
+        "arcLength": 38.14944779432417,
+        "strokeHalfWidth": 0.5
+      },
+      {
+        "snappedX": 0,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 1,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 2,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 3,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 4,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 13,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 14,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 15,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 17,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 18,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 19,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 20,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 21,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 22,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 23,
+        "snappedY": 0,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "rim",
+        "role": "rim",
+        "sourceOpId": "op:rim:1:rim"
+      },
+      {
+        "snappedX": 4,
+        "snappedY": 7,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": 0,
+        "t": 0,
+        "tangent": [
+          0.31622776601683794,
+          0.9486832980505138
+        ],
+        "normal": [
+          -0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 7,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": 0,
+        "t": 0.9749123268560265,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 19,
+        "snappedY": 7,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": 0,
+        "t": 0.6236849028403971,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 4,
+        "snappedY": 8,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": 0.31622776601683794,
+        "t": 0.023800256498638105,
+        "tangent": [
+          0.31622776601683794,
+          0.9486832980505138
+        ],
+        "normal": [
+          -0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 8,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -0.6324555320336753,
+        "t": 0.031733675331517476,
+        "tangent": [
+          0.31622776601683794,
+          0.9486832980505138
+        ],
+        "normal": [
+          -0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 8,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1,
+        "t": 0.9498246537120529,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 8,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1,
+        "t": 0.9247369805680794,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 8,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1,
+        "t": 0.8996493074241059,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 8,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1,
+        "t": 0.8745616342801323,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 8,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1,
+        "t": 0.8494739611361588,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 8,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1,
+        "t": 0.8243862879921853,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 8,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1,
+        "t": 0.7992986148482119,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 13,
+        "snappedY": 8,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1,
+        "t": 0.7742109417042383,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 14,
+        "snappedY": 8,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1,
+        "t": 0.7491232685602648,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 15,
+        "snappedY": 8,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1,
+        "t": 0.7240355954162913,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 8,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1,
+        "t": 0.6989479222723177,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 17,
+        "snappedY": 8,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1,
+        "t": 0.6738602491283442,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 18,
+        "snappedY": 8,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1,
+        "t": 0.6487725759843707,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 9,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -0.31622776601683766,
+        "t": 0.05553393183015558,
+        "tangent": [
+          0.31622776601683794,
+          0.9486832980505138
+        ],
+        "normal": [
+          -0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 9,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1.2649110640673513,
+        "t": 0.06346735066303495,
+        "tangent": [
+          0.31622776601683794,
+          0.9486832980505138
+        ],
+        "normal": [
+          -0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 9,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -2,
+        "t": 0.9247369805680794,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 9,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -2,
+        "t": 0.8996493074241059,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 9,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -2,
+        "t": 0.8745616342801323,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 9,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -2,
+        "t": 0.8494739611361588,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 9,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -2,
+        "t": 0.8243862879921853,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 9,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -2,
+        "t": 0.7992986148482119,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 13,
+        "snappedY": 9,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -2,
+        "t": 0.7742109417042383,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 14,
+        "snappedY": 9,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -2,
+        "t": 0.7491232685602648,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 15,
+        "snappedY": 9,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -2,
+        "t": 0.7240355954162913,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 9,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -2,
+        "t": 0.6989479222723177,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 17,
+        "snappedY": 9,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -2,
+        "t": 0.6738602491283442,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 18,
+        "snappedY": 9,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1.2649110640673513,
+        "t": 0.5351298790333887,
+        "tangent": [
+          0.31622776601683794,
+          -0.9486832980505138
+        ],
+        "normal": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 10,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": 0,
+        "t": 0.07933418832879367,
+        "tangent": [
+          0.31622776601683794,
+          0.9486832980505138
+        ],
+        "normal": [
+          -0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 10,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -0.8320502943378439,
+        "t": 0.09325032554459023,
+        "tangent": [
+          0.5547001962252291,
+          0.8320502943378437
+        ],
+        "normal": [
+          -0.8320502943378437,
+          0.5547001962252291
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 10,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1.6641005886756879,
+        "t": 0.10716646276038676,
+        "tangent": [
+          0.5547001962252291,
+          0.8320502943378437
+        ],
+        "normal": [
+          -0.8320502943378437,
+          0.5547001962252291
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 10,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -2.4961508830135313,
+        "t": 0.12108259997618329,
+        "tangent": [
+          0.5547001962252291,
+          0.8320502943378437
+        ],
+        "normal": [
+          -0.8320502943378437,
+          0.5547001962252291
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 10,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -3,
+        "t": 0.8745616342801323,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 10,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -3,
+        "t": 0.8494739611361588,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 10,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -3,
+        "t": 0.8243862879921853,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 10,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -3,
+        "t": 0.7992986148482119,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 13,
+        "snappedY": 10,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -3,
+        "t": 0.7742109417042383,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 14,
+        "snappedY": 10,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -3,
+        "t": 0.7491232685602648,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 15,
+        "snappedY": 10,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -3,
+        "t": 0.7240355954162913,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 10,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -2.4961508830135313,
+        "t": 0.4775146297202404,
+        "tangent": [
+          0.5547001962252291,
+          -0.8320502943378437
+        ],
+        "normal": [
+          0.8320502943378437,
+          0.5547001962252291
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 17,
+        "snappedY": 10,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1.6641005886756863,
+        "t": 0.49143076693603693,
+        "tangent": [
+          0.5547001962252291,
+          -0.8320502943378437
+        ],
+        "normal": [
+          0.8320502943378437,
+          0.5547001962252291
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 18,
+        "snappedY": 10,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -0.8320502943378447,
+        "t": 0.5053469041518335,
+        "tangent": [
+          0.5547001962252291,
+          -0.8320502943378437
+        ],
+        "normal": [
+          0.8320502943378437,
+          0.5547001962252291
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 11,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -0.2773500981126143,
+        "t": 0.11412453136828501,
+        "tangent": [
+          0.5547001962252291,
+          0.8320502943378437
+        ],
+        "normal": [
+          -0.8320502943378437,
+          0.5547001962252291
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 11,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1.1094003924504583,
+        "t": 0.12804066858408156,
+        "tangent": [
+          0.5547001962252291,
+          0.8320502943378437
+        ],
+        "normal": [
+          -0.8320502943378437,
+          0.5547001962252291
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 11,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1.9414506867883015,
+        "t": 0.14195680579987807,
+        "tangent": [
+          0.5547001962252291,
+          0.8320502943378437
+        ],
+        "normal": [
+          -0.8320502943378437,
+          0.5547001962252291
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 11,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -2.529822128134704,
+        "t": 0.20152275556298857,
+        "tangent": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "normal": [
+          -0.31622776601683794,
+          0.9486832980505138
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 11,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -2.846049894151541,
+        "t": 0.22532301206162667,
+        "tangent": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "normal": [
+          -0.31622776601683794,
+          0.9486832980505138
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 11,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -3,
+        "t": 0.2742109417042383,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 11,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -3,
+        "t": 0.29929861484821185,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 13,
+        "snappedY": 11,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -3,
+        "t": 0.3243862879921854,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 14,
+        "snappedY": 11,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -2.846049894151541,
+        "t": 0.373274217634797,
+        "tangent": [
+          0.9486832980505138,
+          -0.31622776601683794
+        ],
+        "normal": [
+          0.31622776601683794,
+          0.9486832980505138
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 15,
+        "snappedY": 11,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -2.5298221281347035,
+        "t": 0.39707447413343516,
+        "tangent": [
+          0.9486832980505138,
+          -0.31622776601683794
+        ],
+        "normal": [
+          0.31622776601683794,
+          0.9486832980505138
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 11,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1.9414506867883028,
+        "t": 0.45664042389654563,
+        "tangent": [
+          0.5547001962252291,
+          -0.8320502943378437
+        ],
+        "normal": [
+          0.8320502943378437,
+          0.5547001962252291
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 17,
+        "snappedY": 11,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1.1094003924504583,
+        "t": 0.4705565611123422,
+        "tangent": [
+          0.5547001962252291,
+          -0.8320502943378437
+        ],
+        "normal": [
+          0.8320502943378437,
+          0.5547001962252291
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 12,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -0.5547001962252296,
+        "t": 0.14891487440777634,
+        "tangent": [
+          0.5547001962252291,
+          0.8320502943378437
+        ],
+        "normal": [
+          -0.8320502943378437,
+          0.5547001962252291
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 12,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1.2649110640673513,
+        "t": 0.18565591789722985,
+        "tangent": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "normal": [
+          -0.31622776601683794,
+          0.9486832980505138
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 12,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1.5811388300841898,
+        "t": 0.20945617439586797,
+        "tangent": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "normal": [
+          -0.31622776601683794,
+          0.9486832980505138
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 12,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1.8973665961010286,
+        "t": 0.23325643089450607,
+        "tangent": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "normal": [
+          -0.31622776601683794,
+          0.9486832980505138
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 12,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -2,
+        "t": 0.2742109417042383,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 12,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -2,
+        "t": 0.29929861484821185,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 13,
+        "snappedY": 12,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -2,
+        "t": 0.3243862879921854,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 14,
+        "snappedY": 12,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1.897366596101028,
+        "t": 0.36534079880191767,
+        "tangent": [
+          0.9486832980505138,
+          -0.31622776601683794
+        ],
+        "normal": [
+          0.31622776601683794,
+          0.9486832980505138
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 15,
+        "snappedY": 12,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1.5811388300841898,
+        "t": 0.38914105530055576,
+        "tangent": [
+          0.9486832980505138,
+          -0.31622776601683794
+        ],
+        "normal": [
+          0.31622776601683794,
+          0.9486832980505138
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 12,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1.2649110640673507,
+        "t": 0.4129413117991939,
+        "tangent": [
+          0.9486832980505138,
+          -0.31622776601683794
+        ],
+        "normal": [
+          0.31622776601683794,
+          0.9486832980505138
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 13,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -0.3162277660168388,
+        "t": 0.19358933673010922,
+        "tangent": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "normal": [
+          -0.31622776601683794,
+          0.9486832980505138
+        ],
+        "curvature": 1.5,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 13,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -0.6324555320336759,
+        "t": 0.21738959322874732,
+        "tangent": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "normal": [
+          -0.31622776601683794,
+          0.9486832980505138
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 13,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -0.9486832980505143,
+        "t": 0.24118984972738547,
+        "tangent": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "normal": [
+          -0.31622776601683794,
+          0.9486832980505138
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 13,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1,
+        "t": 0.2742109417042383,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 13,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1,
+        "t": 0.29929861484821185,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 13,
+        "snappedY": 13,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -1,
+        "t": 0.3243862879921854,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 14,
+        "snappedY": 13,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "bowl",
+        "role": "explicit",
+        "sourceOpId": "op:bowl:0:polygon",
+        "signedDistance": -0.9486832980505143,
+        "t": 0.35740737996903826,
+        "tangent": [
+          0.9486832980505138,
+          -0.31622776601683794
+        ],
+        "normal": [
+          0.31622776601683794,
+          0.9486832980505138
+        ],
+        "curvature": 0,
+        "arcLength": 39.86021319160149
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 14,
+        "color": "#05050D",
+        "material": "obsidian",
+        "partId": "stem",
+        "role": "explicit",
+        "sourceOpId": "op:stem:0:rect",
+        "signedDistance": 0,
+        "t": 0,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 2,
+        "arcLength": 14
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 14,
+        "color": "#05050D",
+        "material": "obsidian",
+        "partId": "stem",
+        "role": "explicit",
+        "sourceOpId": "op:stem:0:rect",
+        "signedDistance": 0,
+        "t": 0.07142857142857142,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 14
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 14,
+        "color": "#05050D",
+        "material": "obsidian",
+        "partId": "stem",
+        "role": "explicit",
+        "sourceOpId": "op:stem:0:rect",
+        "signedDistance": 0,
+        "t": 0.14285714285714285,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 14
+      },
+      {
+        "snappedX": 13,
+        "snappedY": 14,
+        "color": "#05050D",
+        "material": "obsidian",
+        "partId": "stem",
+        "role": "explicit",
+        "sourceOpId": "op:stem:0:rect",
+        "signedDistance": 0,
+        "t": 0.21428571428571427,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 14
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 15,
+        "color": "#05050D",
+        "material": "obsidian",
+        "partId": "stem",
+        "role": "explicit",
+        "sourceOpId": "op:stem:0:rect",
+        "signedDistance": 0,
+        "t": 0.9285714285714286,
+        "tangent": [
+          0,
+          -1
+        ],
+        "normal": [
+          -1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 14
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 15,
+        "color": "#05050D",
+        "material": "obsidian",
+        "partId": "stem",
+        "role": "explicit",
+        "sourceOpId": "op:stem:0:rect",
+        "signedDistance": -1,
+        "t": 0.9285714285714286,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 14
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 15,
+        "color": "#05050D",
+        "material": "obsidian",
+        "partId": "stem",
+        "role": "explicit",
+        "sourceOpId": "op:stem:0:rect",
+        "signedDistance": -1,
+        "t": 0.9285714285714286,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 14
+      },
+      {
+        "snappedX": 13,
+        "snappedY": 15,
+        "color": "#05050D",
+        "material": "obsidian",
+        "partId": "stem",
+        "role": "explicit",
+        "sourceOpId": "op:stem:0:rect",
+        "signedDistance": -1,
+        "t": 0.9285714285714286,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 14
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 16,
+        "color": "#05050D",
+        "material": "obsidian",
+        "partId": "stem",
+        "role": "explicit",
+        "sourceOpId": "op:stem:0:rect",
+        "signedDistance": 0,
+        "t": 0.8571428571428571,
+        "tangent": [
+          0,
+          -1
+        ],
+        "normal": [
+          -1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 14
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 16,
+        "color": "#05050D",
+        "material": "obsidian",
+        "partId": "stem",
+        "role": "explicit",
+        "sourceOpId": "op:stem:0:rect",
+        "signedDistance": -1,
+        "t": 0.8571428571428571,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 14
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 16,
+        "color": "#05050D",
+        "material": "obsidian",
+        "partId": "stem",
+        "role": "explicit",
+        "sourceOpId": "op:stem:0:rect",
+        "signedDistance": -1,
+        "t": 0.8571428571428571,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 14
+      },
+      {
+        "snappedX": 13,
+        "snappedY": 16,
+        "color": "#05050D",
+        "material": "obsidian",
+        "partId": "stem",
+        "role": "explicit",
+        "sourceOpId": "op:stem:0:rect",
+        "signedDistance": -1,
+        "t": 0.8571428571428571,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 14
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 17,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:polygon",
+        "signedDistance": 0.7071067811865476,
+        "t": 0.0826804534543284,
+        "tangent": [
+          0.7071067811865475,
+          -0.7071067811865475
+        ],
+        "normal": [
+          0.7071067811865475,
+          0.7071067811865475
+        ],
+        "curvature": 0,
+        "arcLength": 25.65685424949238
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 17,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:polygon",
+        "signedDistance": 0,
+        "t": 0.11024060460577119,
+        "tangent": [
+          0.7071067811865475,
+          -0.7071067811865475
+        ],
+        "normal": [
+          0.7071067811865475,
+          0.7071067811865475
+        ],
+        "curvature": 1.5,
+        "arcLength": 25.65685424949238
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 17,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:polygon",
+        "signedDistance": 0,
+        "t": 0.14921654414519409,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 1.5,
+        "arcLength": 25.65685424949238
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 17,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:polygon",
+        "signedDistance": 0,
+        "t": 0.18819248368461697,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 1.5,
+        "arcLength": 25.65685424949238
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 17,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:polygon",
+        "signedDistance": 0,
+        "t": 0.22716842322403982,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 1.5,
+        "arcLength": 25.65685424949238
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 17,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:polygon",
+        "signedDistance": 0,
+        "t": 0.2661443627634627,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 1.5,
+        "arcLength": 25.65685424949238
+      },
+      {
+        "snappedX": 13,
+        "snappedY": 17,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:polygon",
+        "signedDistance": 0,
+        "t": 0.3051203023028856,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 1.5,
+        "arcLength": 25.65685424949238
+      },
+      {
+        "snappedX": 14,
+        "snappedY": 17,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:polygon",
+        "signedDistance": 0,
+        "t": 0.34409624184230847,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 1.5,
+        "arcLength": 25.65685424949238
+      },
+      {
+        "snappedX": 15,
+        "snappedY": 17,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:polygon",
+        "signedDistance": 0,
+        "t": 0.3830721813817314,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 1.5,
+        "arcLength": 25.65685424949238
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 18,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:polygon",
+        "signedDistance": 0.7071067811865476,
+        "t": 0.027560151151442797,
+        "tangent": [
+          0.7071067811865475,
+          -0.7071067811865475
+        ],
+        "normal": [
+          0.7071067811865475,
+          0.7071067811865475
+        ],
+        "curvature": 0,
+        "arcLength": 25.65685424949238
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 18,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:polygon",
+        "signedDistance": 0,
+        "t": 0.055120302302885595,
+        "tangent": [
+          0.7071067811865475,
+          -0.7071067811865475
+        ],
+        "normal": [
+          0.7071067811865475,
+          0.7071067811865475
+        ],
+        "curvature": 1.5,
+        "arcLength": 25.65685424949238
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 18,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:polygon",
+        "signedDistance": -0.7071067811865476,
+        "t": 0.0826804534543284,
+        "tangent": [
+          0.7071067811865475,
+          -0.7071067811865475
+        ],
+        "normal": [
+          0.7071067811865475,
+          0.7071067811865475
+        ],
+        "curvature": 0,
+        "arcLength": 25.65685424949238
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 18,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:polygon",
+        "signedDistance": -1,
+        "t": 0.14921654414519409,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 25.65685424949238
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 18,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:polygon",
+        "signedDistance": -1,
+        "t": 0.18819248368461697,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 25.65685424949238
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 18,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:polygon",
+        "signedDistance": -1,
+        "t": 0.22716842322403982,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 25.65685424949238
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 18,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:polygon",
+        "signedDistance": -1,
+        "t": 0.2661443627634627,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 25.65685424949238
+      },
+      {
+        "snappedX": 13,
+        "snappedY": 18,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:polygon",
+        "signedDistance": -1,
+        "t": 0.3051203023028856,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 25.65685424949238
+      },
+      {
+        "snappedX": 14,
+        "snappedY": 18,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:polygon",
+        "signedDistance": -1,
+        "t": 0.34409624184230847,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 25.65685424949238
+      },
+      {
+        "snappedX": 15,
+        "snappedY": 18,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:polygon",
+        "signedDistance": -1,
+        "t": 0.3830721813817314,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 25.65685424949238
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 18,
+        "color": "#191C2D",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:polygon",
+        "signedDistance": -0.7071067811865476,
+        "t": 0.44960827207259707,
+        "tangent": [
+          0.7071067811865475,
+          0.7071067811865475
+        ],
+        "normal": [
+          -0.7071067811865475,
+          0.7071067811865475
+        ],
+        "curvature": 0,
+        "arcLength": 25.65685424949238
+      },
+      {
+        "snappedX": 0,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 1,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 2,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 3,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 4,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 13,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 14,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 15,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 17,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 18,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 19,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 20,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 21,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 22,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 23,
+        "snappedY": 19,
+        "color": "#6E7693",
+        "material": "obsidian",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      }
     ]
   }
 }

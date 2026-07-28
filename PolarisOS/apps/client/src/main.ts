@@ -154,7 +154,10 @@ function connect(): void {
     const message = decoded.message;
     dispatch({ type: "server-message", message });
     if (message.type === "connection.ready") {
-      send({ type: "room.join", playerId: PLAYER_ID, roomId: ROOM_ID });
+      // Join the world's authored spawn room unless a ?room= override is given.
+      // The server is authoritative about where new players begin (PDR §3).
+      const joinRoom = params.get("room") ?? message.spawnRoomId ?? ROOM_ID;
+      send({ type: "room.join", playerId: PLAYER_ID, roomId: joinRoom });
     }
   };
 

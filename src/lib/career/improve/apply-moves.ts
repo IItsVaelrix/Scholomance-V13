@@ -49,6 +49,8 @@ interface SectionPlan {
   rewritten: Map<string, string>;
   /** Non-bullet text patches keyed by section (fallback rewrites). */
   textPatches: Array<{ before: string; after: string }>;
+  /** entryId -> new bullet texts appended to the end of that entry (Case A insertion). */
+  inserted: Map<string, string[]>;
 }
 
 /** Apply an entry's moves to its own bullet order. Cross-entry anchors are ignored
@@ -131,6 +133,24 @@ function reconstructSection(plan: SectionPlan, rawText: string): string {
     }
   }
 
+  // Append entry-anchored inserted bullets after each entry's last bullet line, using that
+  // bullet's prefix so the marker/indent matches its neighbours. Collected first and
+  // spliced in DESCENDING line order so earlier insertions do not shift later indices.
+  const pending: Array<{ afterLine: number; texts: string[] }> = [];
+  for (const entry of entries) {
+    const texts = plan.inserted.get(entry.entryId);
+    if (!texts?.length) continue;
+    const slotLineIndices = entry.bullets
+      .map((b) => bulletLineIndex.get(b.id))
+      .filter((n): n is number => typeof n === 'number');
+    if (slotLineIndices.length === 0) continue;
+    const lastLine = Math.max(...slotLineIndices);
+    const prefix = bulletPrefix.get(entry.order[entry.order.length - 1]) ?? '';
+    pending.push({ afterLine: lastLine, texts: texts.map((t) => prefix + t) });
+  }
+  pending.sort((a, b) => b.afterLine - a.afterLine);
+  for (const p of pending) outLines.splice(p.afterLine + 1, 0, ...p.texts);
+
   return outLines.join('\n');
 }
 
@@ -172,7 +192,12 @@ export function applyMovesAndRewrites(
 
   const moveSugs = viable.filter((s) => s.move);
   const rewriteSugs = viable.filter((s) => !s.move && s.target?.span);
-  const insertSugs = viable.filter((s) => !s.move && s.target?.insertionPoint);
+  // Entry-anchored insertions (Case A) take precedence over section-granular ones: once the
+  // candidate has chosen an entry, the bullet belongs there, not at a section boundary.
+  const entryInsertSugs = viable.filter((s) => !s.move && s.target?.entryId);
+  const insertSugs = viable.filter(
+    (s) => !s.move && !s.target?.entryId && s.target?.insertionPoint
+  );
 
   // Build per-section plans (entry-aware).
   const plans: SectionPlan[] = (document.sections || []).map((section) => {
@@ -188,9 +213,28 @@ export function applyMovesAndRewrites(
       bullets: entryPlans.flatMap((e) => e.bullets),
       rewritten: new Map<string, string>(),
       textPatches: [],
+      inserted: new Map<string, string[]>(),
     };
   });
   const planBySectionId = new Map(plans.map((p) => [p.section.id, p]));
+
+  // Entry-anchored insertions: a new bullet at the end of the entry the candidate chose.
+  // An entry that does not exist is REFUSED rather than falling back to a section boundary
+  // — the whole point of the choice is that the bullet's employer is not inferred, so a
+  // bad target must fail closed, not land the claim under the wrong employer.
+  for (const ins of entryInsertSugs) {
+    const entryId = ins.target!.entryId!;
+    const plan = plans.find((p) => p.entries.some((e) => e.entryId === entryId));
+    const text = ins.after ?? '';
+    if (!plan || !text.trim()) {
+      skipped.push({ suggestionId: ins.id, reason: 'missing_target' });
+      continue;
+    }
+    const list = plan.inserted.get(entryId) || [];
+    list.push(text);
+    plan.inserted.set(entryId, list);
+    applied.push(ins.id);
+  }
 
   // Apply bullet rewrites by identity (span + before match).
   for (const r of rewriteSugs) {

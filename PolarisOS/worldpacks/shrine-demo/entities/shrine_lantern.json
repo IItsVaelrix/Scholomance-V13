@@ -1,0 +1,17 @@
+{
+  "entityId": "shrine_lantern",
+  "entityType": "object",
+  "definitionId": "lantern",
+  "displayName": "Brass Lantern",
+  "description": "A tarnished brass lantern with a cracked glass panel. It still holds oil.",
+  "roomId": "ruined_shrine",
+  "portable": true,
+  "flags": {
+    "lit": false
+  },
+  "illustration": {
+    "asset": "entities/lantern",
+    "layerType": "entity",
+    "defaultPosition": { "x": 320, "y": 240 }
+  }
+}

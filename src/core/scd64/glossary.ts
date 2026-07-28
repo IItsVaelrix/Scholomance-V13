@@ -1,8 +1,8 @@
 import crypto from 'node:crypto';
 import type { SCD64RemediationHint } from './types';
-import { SCD64_SLOT_NAMES } from './constants';
+import { SCD64_SLOT_NAMES, ART_SLOT_ALIASES } from './constants';
 
-export { SCD64_SLOT_NAMES };
+export { SCD64_SLOT_NAMES, ART_SLOT_ALIASES };
 
 export const BUG_FAMILIES = Object.freeze({
   COLOR_DRAGON: Object.freeze({
@@ -103,6 +103,61 @@ export const BUG_FAMILIES = Object.freeze({
   }),
 });
 
+// ─── ART Domain Families (PDR Phase 3) ──────────────────────────────────────
+// Art-direction checksum families. Same eight-slot wire contract as bug families
+// but with art-domain interpretation via ART_SLOT_ALIASES.
+
+export const ART_FAMILIES = Object.freeze({
+  ART_GENE_CURATION: Object.freeze({
+    versionByte: 'A1',
+    predictedVersionByte: 'F1',
+    domain: 'ART',
+    description: 'Art-direction gene curated, projected, and committed through the ontological pipeline.',
+    canonicals: Object.freeze([
+      { slot: 'BUGCLASS',  canonical: 'ART_CLASS:ART_GENE_CURATION:human-curated-aesthetic-intent' },
+      { slot: 'COORDSYS',  canonical: 'CANVAS_SYS:asset-canvas+gene-coordinates+projection-context' },
+      { slot: 'INVARIANT', canonical: 'DOCTRINE:gene-checksum+projection-checksum+preview-checksum-bound' },
+      { slot: 'MAGNITUDE', canonical: 'VALUE_RAMP:cell-count+conflict-count+palette-role-coverage' },
+      { slot: 'MASKING',   canonical: 'OCCLUSION:priority-then-geneId-overlap-policy' },
+      { slot: 'GATE',      canonical: 'APPROVAL_GATE:interactive-human-gate+authority-validated' },
+      { slot: 'PROPAGATE', canonical: 'PROJECTION_PATH:gene-to-SCDL-cells-to-SCD64-address-to-ledger' },
+      { slot: 'VERDICT',   canonical: 'CURATOR_VERDICT:approved+committed+durable-memory-persisted' },
+    ]),
+  }),
+  ART_PROJECTION_DRIFT: Object.freeze({
+    versionByte: 'A2',
+    predictedVersionByte: 'F2',
+    domain: 'ART',
+    description: 'Projection identity changed without re-approval: epoch bump, SDF change, or palette mapping version change.',
+    canonicals: Object.freeze([
+      { slot: 'BUGCLASS',  canonical: 'ART_CLASS:ART_PROJECTION_DRIFT:projection-identity-changed-without-reapproval' },
+      { slot: 'COORDSYS',  canonical: 'CANVAS_SYS:projection-context-version-fields' },
+      { slot: 'INVARIANT', canonical: 'DOCTRINE:projection-checksum-must-match-approval-record' },
+      { slot: 'MAGNITUDE', canonical: 'VALUE_RAMP:epoch-delta+sdf-checksum-delta+palette-version-delta' },
+      { slot: 'MASKING',   canonical: 'OCCLUSION:stale-approval-accepted-silently' },
+      { slot: 'GATE',      canonical: 'APPROVAL_GATE:commit-refuses-on-checksum-mismatch' },
+      { slot: 'PROPAGATE', canonical: 'PROJECTION_PATH:epoch-bump-to-checksum-mismatch-to-commit-refusal' },
+      { slot: 'VERDICT',   canonical: 'CURATOR_VERDICT:re-preview-and-re-approve-required' },
+    ]),
+  }),
+  ART_FEEL_WARNING: Object.freeze({
+    versionByte: 'A3',
+    predictedVersionByte: 'F3',
+    domain: 'ART',
+    description: 'Feel evaluation below threshold: structural warning only, no cell mutation.',
+    canonicals: Object.freeze([
+      { slot: 'BUGCLASS',  canonical: 'ART_CLASS:ART_FEEL_WARNING:spatial-awareness-below-threshold' },
+      { slot: 'COORDSYS',  canonical: 'CANVAS_SYS:evaluateFeel-projection-cells' },
+      { slot: 'INVARIANT', canonical: 'DOCTRINE:feel-score-is-warn-only+never-mutates-cells' },
+      { slot: 'MAGNITUDE', canonical: 'VALUE_RAMP:spatialAwareness-score-vs-threshold' },
+      { slot: 'MASKING',   canonical: 'OCCLUSION:none+pure-diagnostic-warning' },
+      { slot: 'GATE',      canonical: 'APPROVAL_GATE:human-aesthetic-approval-required-separately' },
+      { slot: 'PROPAGATE', canonical: 'PROJECTION_PATH:projection-to-feel-eval-to-warning-event-to-ledger' },
+      { slot: 'VERDICT',   canonical: 'CURATOR_VERDICT:warn-only+no-action+REQUIRES_HUMAN' },
+    ]),
+  }),
+});
+
 const SLOT_HUMAN_MEANINGS: Record<string, Record<string, string>> = Object.freeze({
   COLOR_DRAGON: Object.freeze({
     BUGCLASS:  'Color bug caused by coordinate drift concealed by a fallback color path.',
@@ -164,6 +219,37 @@ const SLOT_HUMAN_MEANINGS: Record<string, Record<string, string>> = Object.freez
     PROPAGATE: 'Developer keystroke → wrong identifier → silent logic drift → wrong output, with no error thrown.',
     VERDICT:   'Diagnose-only. Semantic diff required. Surface similarity IS the mask — there is no bug without the resemblance.',
   }),
+  // ─── ART domain human meanings ──────────────────────────────────────────
+  ART_GENE_CURATION: Object.freeze({
+    BUGCLASS:  'Art-direction gene: human-curated aesthetic intent encoded as a checksummed SCDNA packet.',
+    COORDSYS:  'Asset canvas dimensions + gene coordinates + projection context (SDF, palette, versions).',
+    INVARIANT: 'Gene checksum + projection checksum + preview document checksum are all bound in the approval record.',
+    MAGNITUDE: 'Cell count, conflict count, and palette-role coverage quantify the projection scope.',
+    MASKING:   'Overlap resolved by priority-then-geneId policy; later canonical entry wins.',
+    GATE:      'Interactive human gate validates authority before commit; agent-asserted strings are refused.',
+    PROPAGATE: 'Gene → SCDL cells → SCD64 address → durable ledger → capability retrieval.',
+    VERDICT:   'Approved, committed, and persisted to durable memory.',
+  }),
+  ART_PROJECTION_DRIFT: Object.freeze({
+    BUGCLASS:  'Projection identity changed without re-approval (epoch bump, SDF change, palette version change).',
+    COORDSYS:  'Projection context version fields: projectionAlgoVersion, conflictPolicyVersion, paletteRoleMappingVersion.',
+    INVARIANT: 'Projection checksum must match the approval record; mismatch means the approval is stale.',
+    MAGNITUDE: 'Epoch delta, SDF checksum delta, and palette version delta quantify the drift.',
+    MASKING:   'Stale approval accepted silently if checksum binding is not enforced.',
+    GATE:      'Commit refuses on checksum mismatch between projection and approval record.',
+    PROPAGATE: 'Epoch bump → checksum mismatch → commit refusal → re-preview required.',
+    VERDICT:   'Re-preview and re-approve required before commit.',
+  }),
+  ART_FEEL_WARNING: Object.freeze({
+    BUGCLASS:  'Feel evaluation below threshold: structural warning only, no cell mutation.',
+    COORDSYS:  'evaluateFeel invoked on projection cells for the given asset.',
+    INVARIANT: 'Feel score is warn-only; it never mutates cells or blocks projection.',
+    MAGNITUDE: 'spatialAwareness score vs configured threshold.',
+    MASKING:   'No masking; pure diagnostic warning.',
+    GATE:      'Human aesthetic approval is required separately from the Feel score.',
+    PROPAGATE: 'Projection → Feel evaluation → warning event → durable ledger.',
+    VERDICT:   'Warn-only. No action. REQUIRES_HUMAN for aesthetic judgment.',
+  }),
 });
 
 function _humanMeaningForSlot(familyName: string, slotName: string): string {
@@ -175,6 +261,8 @@ function _humanMeaningForSlot(familyName: string, slotName: string): string {
 
 export function buildSCD64Glossary() {
   const out = [];
+
+  // Bug families (existing)
   for (const [familyName, family] of Object.entries(BUG_FAMILIES)) {
     const deriveHex = (canonical: string, isBugClass: boolean, usePredictedPrefix = false) => {
       const hash = crypto.createHash('sha256').update(canonical).digest('hex').toUpperCase();
@@ -184,7 +272,6 @@ export function buildSCD64Glossary() {
       return hash.slice(0, 8);
     };
 
-    // We store the confirmed variants in the glossary. For predicted matches, we can swap the prefix later.
     for (let i = 0; i < family.canonicals.length; i += 1) {
       const entry = family.canonicals[i];
       const isBug = entry.slot === 'BUGCLASS';
@@ -220,6 +307,56 @@ export function buildSCD64Glossary() {
       out.push(Object.freeze(glossaryEntry));
     }
   }
+
+  // ART families (PDR Phase 3) — same wire contract, art-domain interpretation
+  for (const [familyName, family] of Object.entries(ART_FAMILIES)) {
+    const deriveHex = (canonical: string, isArtClass: boolean) => {
+      const hash = crypto.createHash('sha256').update(canonical).digest('hex').toUpperCase();
+      if (isArtClass) {
+        return family.versionByte + hash.slice(0, 6);
+      }
+      return hash.slice(0, 8);
+    };
+
+    for (let i = 0; i < family.canonicals.length; i += 1) {
+      const entry = family.canonicals[i];
+      const isArtClass = entry.slot === 'BUGCLASS'; // ART_CLASS maps to BUGCLASS slot
+      const hex = deriveHex(entry.canonical, isArtClass);
+      const artAlias = ART_SLOT_ALIASES[entry.slot as keyof typeof ART_SLOT_ALIASES] ?? entry.slot;
+
+      const glossaryEntry = {
+        schema: 'SCD64_GLOSSARY_ENTRY',
+        schemaVersion: 1,
+        family: familyName,
+        domain: 'ART' as const,
+        slotIndex: isArtClass ? 0 : i,
+        slotName: entry.slot,
+        artSlotAlias: artAlias,
+        hexCode: hex,
+        versionByte: isArtClass ? family.versionByte : undefined,
+        predictedVersionByte: isArtClass ? family.predictedVersionByte : undefined,
+        category: familyName,
+        canonicalMeaning: entry.canonical.split(':').slice(1).join(':'),
+        canonicalDerivationString: entry.canonical,
+        humanMeaning: _humanMeaningForSlot(familyName, entry.slot),
+        jsonFormulaTemplate: { name: artAlias.toLowerCase() },
+        fixedForever: true,
+        categoryChecksum: ""
+      };
+      glossaryEntry.categoryChecksum = crypto.createHash('sha256')
+        .update(JSON.stringify({
+          family: familyName,
+          slotName: entry.slot,
+          hexCode: hex,
+          canonical: entry.canonical,
+        }))
+        .digest('hex')
+        .slice(0, 16)
+        .toUpperCase();
+      out.push(Object.freeze(glossaryEntry));
+    }
+  }
+
   return Object.freeze(out);
 }
 

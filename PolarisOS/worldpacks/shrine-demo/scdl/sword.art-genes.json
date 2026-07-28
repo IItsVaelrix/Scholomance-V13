@@ -1,0 +1,129 @@
+{
+  "contract": "PB-SCDNA-GENE-v1",
+  "description": "Art-direction genes for the shrine sword. Encodes curated aesthetic intent: left-edge specular highlight (light from upper-left), fuller groove shadow, guard top-edge shine, and pommel gem glint.",
+  "assetId": "sword",
+  "canvas": { "width": 12, "height": 32 },
+  "genes": [
+    {
+      "geneId": "sword-edge-highlight",
+      "geneType": "art-direction",
+      "priority": 10,
+      "projectionMode": "explicit",
+      "role": "edge-highlight",
+      "curator": "human-embryonic-regen",
+      "rationale": "Upper-left light catches the left bevel of the blade. A bright steel highlight (#C8D8E8) rides x=4 from y=4..19, giving the blade its sharpened-edge reading.",
+      "geometryHints": {
+        "lightDir": "upper-left",
+        "contourFollow": false,
+        "occlusionPolicy": "respect-silhouette"
+      },
+      "coordinates": [
+        { "x": 4, "y": 4,  "color": "#C8D8E8", "role": "edge-highlight", "partId": "blade" },
+        { "x": 4, "y": 5,  "color": "#C8D8E8", "role": "edge-highlight", "partId": "blade" },
+        { "x": 4, "y": 6,  "color": "#C8D8E8", "role": "edge-highlight", "partId": "blade" },
+        { "x": 4, "y": 7,  "color": "#C8D8E8", "role": "edge-highlight", "partId": "blade" },
+        { "x": 4, "y": 8,  "color": "#C8D8E8", "role": "edge-highlight", "partId": "blade" },
+        { "x": 4, "y": 9,  "color": "#C8D8E8", "role": "edge-highlight", "partId": "blade" },
+        { "x": 4, "y": 10, "color": "#C8D8E8", "role": "edge-highlight", "partId": "blade" },
+        { "x": 4, "y": 11, "color": "#C8D8E8", "role": "edge-highlight", "partId": "blade" },
+        { "x": 4, "y": 12, "color": "#C8D8E8", "role": "edge-highlight", "partId": "blade" },
+        { "x": 4, "y": 13, "color": "#C8D8E8", "role": "edge-highlight", "partId": "blade" },
+        { "x": 4, "y": 14, "color": "#C8D8E8", "role": "edge-highlight", "partId": "blade" },
+        { "x": 4, "y": 15, "color": "#C8D8E8", "role": "edge-highlight", "partId": "blade" },
+        { "x": 4, "y": 16, "color": "#C8D8E8", "role": "edge-highlight", "partId": "blade" },
+        { "x": 4, "y": 17, "color": "#C8D8E8", "role": "edge-highlight", "partId": "blade" },
+        { "x": 4, "y": 18, "color": "#C8D8E8", "role": "edge-highlight", "partId": "blade" },
+        { "x": 4, "y": 19, "color": "#C8D8E8", "role": "edge-highlight", "partId": "blade" }
+      ]
+    },
+    {
+      "geneId": "sword-fuller-shadow",
+      "geneType": "art-direction",
+      "priority": 5,
+      "projectionMode": "explicit",
+      "role": "fuller-shadow",
+      "curator": "human-embryonic-regen",
+      "rationale": "The fuller (blood groove) casts a dark shadow along its right wall. A deep shadow (#1A2A3C) at x=6 y=4..18 gives the groove dimensional depth.",
+      "geometryHints": {
+        "lightDir": "upper-left",
+        "contourFollow": false,
+        "occlusionPolicy": "respect-silhouette"
+      },
+      "coordinates": [
+        { "x": 6, "y": 4,  "color": "#1A2A3C", "role": "fuller-shadow", "partId": "fuller" },
+        { "x": 6, "y": 5,  "color": "#1A2A3C", "role": "fuller-shadow", "partId": "fuller" },
+        { "x": 6, "y": 6,  "color": "#1A2A3C", "role": "fuller-shadow", "partId": "fuller" },
+        { "x": 6, "y": 7,  "color": "#1A2A3C", "role": "fuller-shadow", "partId": "fuller" },
+        { "x": 6, "y": 8,  "color": "#1A2A3C", "role": "fuller-shadow", "partId": "fuller" },
+        { "x": 6, "y": 9,  "color": "#1A2A3C", "role": "fuller-shadow", "partId": "fuller" },
+        { "x": 6, "y": 10, "color": "#1A2A3C", "role": "fuller-shadow", "partId": "fuller" },
+        { "x": 6, "y": 11, "color": "#1A2A3C", "role": "fuller-shadow", "partId": "fuller" },
+        { "x": 6, "y": 12, "color": "#1A2A3C", "role": "fuller-shadow", "partId": "fuller" },
+        { "x": 6, "y": 13, "color": "#1A2A3C", "role": "fuller-shadow", "partId": "fuller" },
+        { "x": 6, "y": 14, "color": "#1A2A3C", "role": "fuller-shadow", "partId": "fuller" },
+        { "x": 6, "y": 15, "color": "#1A2A3C", "role": "fuller-shadow", "partId": "fuller" },
+        { "x": 6, "y": 16, "color": "#1A2A3C", "role": "fuller-shadow", "partId": "fuller" },
+        { "x": 6, "y": 17, "color": "#1A2A3C", "role": "fuller-shadow", "partId": "fuller" },
+        { "x": 6, "y": 18, "color": "#1A2A3C", "role": "fuller-shadow", "partId": "fuller" }
+      ]
+    },
+    {
+      "geneId": "sword-guard-shine",
+      "geneType": "art-direction",
+      "priority": 10,
+      "projectionMode": "explicit",
+      "role": "guard-shine",
+      "curator": "human-embryonic-regen",
+      "rationale": "Light catches the top edge of the iron crossguard. A bright iron highlight (#7A7A88) along y=20 x=2..9 gives the guard a forged-metal sheen.",
+      "geometryHints": {
+        "lightDir": "upper-left",
+        "contourFollow": false,
+        "occlusionPolicy": "respect-silhouette"
+      },
+      "coordinates": [
+        { "x": 2, "y": 20, "color": "#7A7A88", "role": "guard-shine", "partId": "guard" },
+        { "x": 3, "y": 20, "color": "#7A7A88", "role": "guard-shine", "partId": "guard" },
+        { "x": 4, "y": 20, "color": "#7A7A88", "role": "guard-shine", "partId": "guard" },
+        { "x": 5, "y": 20, "color": "#7A7A88", "role": "guard-shine", "partId": "guard" },
+        { "x": 6, "y": 20, "color": "#7A7A88", "role": "guard-shine", "partId": "guard" },
+        { "x": 7, "y": 20, "color": "#7A7A88", "role": "guard-shine", "partId": "guard" },
+        { "x": 8, "y": 20, "color": "#7A7A88", "role": "guard-shine", "partId": "guard" },
+        { "x": 9, "y": 20, "color": "#7A7A88", "role": "guard-shine", "partId": "guard" }
+      ]
+    },
+    {
+      "geneId": "sword-pommel-glint",
+      "geneType": "art-direction",
+      "priority": 10,
+      "projectionMode": "explicit",
+      "role": "pommel-glint",
+      "curator": "human-embryonic-regen",
+      "rationale": "A single bright glint (#F0D878) at the pommel center sells the gold material. Upper-left catch light on the rounded pommel surface.",
+      "geometryHints": {
+        "lightDir": "upper-left",
+        "contourFollow": false,
+        "occlusionPolicy": "respect-silhouette"
+      },
+      "coordinates": [
+        { "x": 5, "y": 29, "color": "#F0D878", "role": "pommel-glint", "partId": "pommel" },
+        { "x": 6, "y": 29, "color": "#F0D878", "role": "pommel-glint", "partId": "pommel" }
+      ]
+    },
+    {
+      "geneId": "sword-pommel-fill",
+      "geneType": "art-direction",
+      "priority": 3,
+      "projectionMode": "explicit",
+      "role": "pommel-fill",
+      "curator": "human-embryonic-regen",
+      "rationale": "The pommel ellipse op is a stroke (perimeter only). Its interior at (7,29) must be filled with pommel_gold (#B8963C) so the pommel reads as a solid gold sphere rather than a hollow ring.",
+      "geometryHints": {
+        "contourFollow": false,
+        "occlusionPolicy": "respect-silhouette"
+      },
+      "coordinates": [
+        { "x": 7, "y": 29, "color": "#B8963C", "role": "pommel-fill", "partId": "pommel" }
+      ]
+    }
+  ]
+}

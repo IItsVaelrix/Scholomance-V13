@@ -19,6 +19,7 @@ export type {
 } from "./PixiSceneRenderer.js";
 export {
   buildScenePlan,
+  glyphFallbackForAssetKey,
   SCENE_WIDTH,
   SCENE_HEIGHT,
 } from "./scenePlan.js";
@@ -31,6 +32,33 @@ export type {
   GlyphShape,
   BuildPlanOptions,
 } from "./scenePlan.js";
+
+export {
+  buildAtmospherePlan,
+  emitterKindForEffect,
+  moodForLightingState,
+  computeParticleFrame,
+  atmosphereUnit,
+  atmosphereSeed,
+  MAX_PARTICLES,
+  ATMOSPHERE_WIDTH,
+  ATMOSPHERE_HEIGHT,
+  PARTICLE_CYCLE_SECONDS,
+} from "./atmospherePlan.js";
+export type {
+  AtmospherePlan,
+  AtmosphereMood,
+  BackgroundGradient,
+  GradientStop,
+  VignetteSpec,
+  GlowField,
+  ParticleEmitter,
+  EmitterKind,
+  MoonbeamSpec,
+  StarSpec,
+  ParticleFrame,
+  BuildAtmosphereOptions,
+} from "./atmospherePlan.js";
 
 export {
   PixelBrainAssetResolver,
@@ -53,6 +81,15 @@ export type {
 export {
   SceneRenderCoordinator,
 } from "./SceneRenderCoordinator.js";
+
+export {
+  AtmosphereRenderer,
+} from "./AtmosphereRenderer.js";
+export type {
+  AtmosphereLayer,
+  AtmospherePixiApi,
+  AtmosphereTicker,
+} from "./AtmosphereRenderer.js";
 
 export {
   computeSceneRenderHash,

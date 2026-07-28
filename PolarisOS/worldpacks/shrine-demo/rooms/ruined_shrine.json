@@ -1,0 +1,26 @@
+{
+  "roomId": "ruined_shrine",
+  "title": "The Ruined Shrine",
+  "descriptionKey": "ruined_shrine_default",
+  "description": "Stone walls lean against centuries of neglect. A broken altar stands at the center, and beside it, an iron brazier waits in darkness. Something glints on the altar — a lantern, still intact.",
+  "exitIds": ["forest_path", "moonlit_clearing"],
+  "exits": {
+    "forest_path": { "direction": "west", "label": "back to the forest path" },
+    "moonlit_clearing": { "direction": "north", "label": "towards the clearing" }
+  },
+  "flags": {
+    "brazier_lit": false
+  },
+  "illustration": {
+    "backgroundAsset": "rooms/ruined_shrine/background",
+    "ambientEffects": ["dust_motes"],
+    "mutationRules": [
+      {
+        "trigger": "shrine_brazier_lit",
+        "effect": "lighting_warm_firelight",
+        "layer": "lighting",
+        "asset": "rooms/ruined_shrine/lit_overlay"
+      }
+    ]
+  }
+}

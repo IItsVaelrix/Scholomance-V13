@@ -7,7 +7,7 @@
  * is at APPLY time, where the accepted `after` text is known: a number may reach the
  * résumé only if the source bullet already stated it or the candidate recorded it.
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { applyAcceptedSuggestions } from '../../src/lib/career/suggestions/apply-suggestions';
 import { UserFactLedger } from '../../src/lib/career/improve/honesty/user-fact-ledger';
@@ -108,5 +108,76 @@ describe('SuggestionReviewPanel — fact recording contract', () => {
     expect(recorded).toHaveLength(1);
     expect(recorded[0].values[sug.inputSlots![0].id]).toBe('30');
     expect(recorded[0].after).toBe(`${BULLET}, reducing backlog by 30%`);
+  });
+});
+
+describe('SuggestionReviewPanel — entry choice on a drafted (Case A) card', () => {
+  const suggestion: ResumeSuggestion = {
+    id: 'sug:gap:1',
+    type: 'learning_gap',
+    after: 'Used Apache Airflow for orchestration, ␟',
+    reason: 'The job description asks for "Apache Airflow" and your résumé does not mention it.',
+    evidence: [],
+    confidence: 0.6,
+    risk: 'medium',
+    requiresUserApproval: true,
+    status: 'pending',
+    requiresInput: true,
+    requiresEntryChoice: true,
+    inputSlots: [
+      { id: 'sug:gap:1:slot:0', placeholder: 'the result', hint: 'the result it produced' },
+    ],
+    editable: true,
+  };
+  const entries = [
+    { id: 'entry:exp:0', label: 'iQor — Support Lead' },
+    { id: 'entry:exp:1', label: 'GC Services — Agent' },
+  ];
+
+  const renderPanel = (onAccept: ReturnType<typeof vi.fn>) =>
+    render(
+      <SuggestionReviewPanel
+        suggestions={[suggestion]}
+        entries={entries}
+        onAccept={onAccept}
+        onReject={() => {}}
+        onAcceptAllLowRisk={() => {}}
+      />
+    );
+
+  it('blocks Accept until both the blank and the entry are supplied', () => {
+    const onAccept = vi.fn();
+    renderPanel(onAccept);
+
+    expect(screen.getByRole('button', { name: 'Accept' })).toBeDisabled();
+
+    fireEvent.change(screen.getByPlaceholderText('the result it produced'), {
+      target: { value: 'cut runtime 40%' },
+    });
+    // Blank filled but no employer chosen yet — still locked.
+    expect(screen.getByRole('button', { name: 'Accept' })).toBeDisabled();
+
+    fireEvent.change(screen.getByLabelText(/which role/i), {
+      target: { value: 'entry:exp:1' },
+    });
+    expect(screen.getByRole('button', { name: 'Accept' })).toBeEnabled();
+  });
+
+  it('reports the chosen entry on accept', () => {
+    const onAccept = vi.fn();
+    renderPanel(onAccept);
+
+    fireEvent.change(screen.getByPlaceholderText('the result it produced'), {
+      target: { value: 'cut runtime 40%' },
+    });
+    fireEvent.change(screen.getByLabelText(/which role/i), {
+      target: { value: 'entry:exp:1' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Accept' }));
+
+    expect(onAccept).toHaveBeenCalledWith(
+      'sug:gap:1',
+      expect.objectContaining({ entryId: 'entry:exp:1' })
+    );
   });
 });

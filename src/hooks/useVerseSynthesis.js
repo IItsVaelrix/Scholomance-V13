@@ -88,14 +88,17 @@ export function useVerseSynthesis(content, options = {}) {
           result.verseIR = result.analysis?.compiler;
           result.syntaxLayer = result.analysis;
 
-          // The server analysis reports syllables per line and per word but
-          // never a document total, so the status bar read "SYLLABLES: 0" for
-          // every scroll once server analysis became the default. Sum whichever
-          // of the two the payload carries.
-          if (typeof result.totalSyllables !== 'number') {
-            const lineCounts = result.analysis?.lineSyllableCounts;
-            if (Array.isArray(lineCounts)) {
-              result.totalSyllables = lineCounts.reduce((sum, n) => sum + (Number(n) || 0), 0);
+          const lineCounts = result.analysis?.lineSyllableCounts
+            || result.verseIR?.lineSyllableCounts
+            || (Array.isArray(result.analysis?.lines) ? result.analysis.lines.map(l => l.syllableCount) : null);
+          if (Array.isArray(lineCounts)) {
+            result.lineSyllableCounts = lineCounts;
+          }
+
+          // Sum totalSyllables if not provided directly
+          if (typeof result.totalSyllables !== 'number' || result.totalSyllables === 0) {
+            if (Array.isArray(result.lineSyllableCounts) && result.lineSyllableCounts.length > 0) {
+              result.totalSyllables = result.lineSyllableCounts.reduce((sum, n) => sum + (Number(n) || 0), 0);
             } else if (Array.isArray(result.analysis?.wordAnalyses)) {
               result.totalSyllables = result.analysis.wordAnalyses
                 .reduce((sum, w) => sum + (Number(w?.syllableCount) || 0), 0);
@@ -107,6 +110,13 @@ export function useVerseSynthesis(content, options = {}) {
       if (!result) {
         // In V12, we offload this to the VerseSynthesis Microprocessor
         result = await verseIRMicroprocessors.execute('nlu.synthesizeVerse', { text, options: { mode, school } });
+      }
+
+      if (result && !Array.isArray(result.lineSyllableCounts)) {
+        const lineCounts = result.analysis?.lineSyllableCounts
+          || result.verseIR?.lineSyllableCounts
+          || (Array.isArray(result.syntaxLayer?.lines) ? result.syntaxLayer.lines.map(l => l.syllableCount) : null);
+        result.lineSyllableCounts = Array.isArray(lineCounts) ? lineCounts : [];
       }
 
       if (requestId === requestCount.current) {
@@ -216,6 +226,7 @@ export function useVerseSynthesis(content, options = {}) {
     literaryDevices: artifact?.literaryDevices,
     emotion: artifact?.emotion,
     totalSyllables: artifact?.totalSyllables || 0,
+    lineSyllableCounts: artifact?.lineSyllableCounts || artifact?.syntaxLayer?.lineSyllableCounts || [],
     analyzedWords: artifact?.tokenByNormalizedWord || new Map(),
     tokenByIdentity: artifact?.tokenByIdentity || new Map(),
     tokenByCharStart: artifact?.tokenByCharStart || new Map(),

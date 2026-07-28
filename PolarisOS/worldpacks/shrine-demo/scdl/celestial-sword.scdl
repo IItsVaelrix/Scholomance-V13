@@ -1,0 +1,70 @@
+# Celestial Sword — Vixel Concept Art Replication (Frozen Structural Geometry)
+asset celestial_sword canvas 32x128
+
+palette {
+  stardust_white  = #FFF8E7
+  flare_gold      = #E6AA4E
+  bright_gold     = #D4AF37
+  bronze_gold     = #99752A
+  frost_blue      = #9BB8D8
+  cosmic_blue     = #4B6FA8
+  deep_violet     = #2E2954
+  void_black      = #12101F
+  cyan_glow       = #80FFFF
+}
+
+# 1. Golden Outer Bevel & Filigree (Solid 100% Symmetrical Underlay)
+part blade_edge material holy_steel {
+  polygon 16 6 24 28 25 78 21 95 11 95 7 78 8 28 bright_gold
+}
+
+# 2. Outer Blade Core — Solid cosmic blue body (100% Symmetrical)
+part blade_core material void_rune_glow {
+  polygon 16 7 22 28 23 78 19 94 13 94 9 78 10 28 cosmic_blue
+}
+
+# 3. Inner Crystalline Facets — Frost blue inner body
+part blade_inner material void_rune_glow {
+  polygon 16 10 20 30 21 76 17 92 15 92 11 76 12 30 frost_blue
+}
+
+# 4. Stepped Cyan Core & Fuller — Stepped width light channel
+# Tip (y=12..25): 2 cells | Upper (y=26..45): 3 cells | Middle (y=46..70): 4 cells | Lower (y=71..88): 3 cells | Term (y=89..92): 1 cell
+part fuller_glow material void_rune_glow {
+  polygon 16 12 18 35 18 75 16 92 14 75 14 35 stardust_white
+  rect 15 12 2 13 cyan_glow
+  rect 14.5 26 3 20 cyan_glow
+  rect 14 46 4 25 cyan_glow
+  rect 14.5 71 3 18 cyan_glow
+  rect 15.5 89 1 4 cyan_glow
+}
+
+# 5. Ricasso / Socket Mask — Solid transition socket into crossguard
+part ricasso material darksteel {
+  polygon 12 90 20 90 22 96 10 96 deep_violet
+  rect 11 94 10 2 bright_gold
+}
+
+# 6. Guardian Cross — Flared golden wings with extra 1px vertical tip height
+part guard material gold {
+  polygon 1 92 14 96 18 96 31 92 31 97 18 100 14 100 1 97 flare_gold
+  polygon 3 93 14 96 18 96 29 93 28 96 18 98 14 98 4 96 bright_gold
+  ellipse 16 97 radius 4 ry 4 bronze_gold
+  ellipse 16 97 radius 2 ry 2 void_black
+  ellipse 16 97 radius 1 ry 1 stardust_white
+}
+
+# 7. Grip — Wrapped handle
+part grip material darksteel {
+  rect 14 100 4 18 deep_violet
+  rect 15 102 2 3 bright_gold
+  rect 15 107 2 3 bright_gold
+  rect 15 112 2 3 bright_gold
+}
+
+# 8. Pommel of Origin — Ring pommel with floating star orb
+part pommel material moonstone {
+  circle 16 122 radius 5 bright_gold
+  circle 16 122 radius 3 void_black
+  circle 16 122 radius 1.5 stardust_white
+}

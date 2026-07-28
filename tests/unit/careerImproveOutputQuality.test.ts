@@ -127,7 +127,14 @@ describe('advisor output on a realistic JD (end-to-end)', () => {
     // Measured before the ledger fix: the advisor proposed a skills section reading
     // "SQL, solid understanding, Python" and promoted the payments bullet as evidence of
     // the requirement "solid understanding".
+    //
+    // Pure moves are excluded from this check: a Case C demote card carries `before ===
+    // after` (the bullet's EXISTING text, relocated) and authors no new content, so echoing
+    // an irrelevant bullet's own words back as the thing being moved is not the defect this
+    // test guards against. Only cards that WRITE text (a rewrite or a new bullet, where
+    // `after` differs from `before`) are scanned for scaffolding/perk leakage.
     const written = advise()
+      .filter((s) => s.after != null && s.after !== s.before)
       .map((s) => `${s.after ?? ''}\n${s.reason}`)
       .join('\n')
       .toLowerCase();
@@ -197,5 +204,56 @@ describe('adjacent evidence drafts a fill-in rewrite (Case B)', () => {
     const gaps = vocabularyInjectionRule(map, bullets, doc).filter((s) => s.type === 'learning_gap');
     // The escalation guard still holds: the tool never asserts the candidate did it.
     expect(gaps[0].after).not.toMatch(/dimensional modeling\//);
+  });
+});
+
+describe('advisor wiring (Case A reaches the panel)', () => {
+  it('buildImprovements includes a drafted card for a missing requirement', () => {
+    const doc = makeImproveDoc(
+      'EXPERIENCE\nWrote reporting queries against Postgres',
+      'experience',
+      'EXPERIENCE'
+    );
+    const sugs = buildImprovements(
+      'Requirements:\n- Experience with Apache Airflow for orchestration',
+      doc
+    );
+    const airflow = sugs.find((s) => s.reason.toLowerCase().includes('airflow'));
+    expect(airflow).toBeTruthy();
+    expect(airflow!.after).toContain('␟');
+    expect(airflow!.requiresEntryChoice).toBe(true);
+  });
+
+  it('every card carries an operation — none instructs without offering', () => {
+    // The spec §7 integration invariant, asserted over the realistic JD fixture: no card
+    // may tell the candidate what to do without offering a draft, a move, or a fill-in.
+    const doc = makeImproveDoc(
+      [
+        'EXPERIENCE',
+        'Built and maintained nightly ETL jobs moving records into Postgres',
+        'Automated a manual reconciliation process with scheduled Python scripts',
+        'Solid understanding of the payments domain gained over four years',
+      ].join('\n'),
+      'experience',
+      'EXPERIENCE'
+    );
+    const sugs = buildImprovements(
+      [
+        'Requirements:',
+        '- 5+ years of experience building data pipelines in Python',
+        '- Strong SQL skills; experience with PostgreSQL is required',
+        '- Solid understanding of dimensional modeling',
+        '- Experience with Apache Airflow for orchestration',
+      ].join('\n'),
+      doc
+    );
+    expect(sugs.length).toBeGreaterThan(0);
+    for (const s of sugs) {
+      const hasOperation =
+        s.move != null ||
+        (s.inputSlots || []).length > 0 ||
+        (s.after != null && s.after !== s.before);
+      expect(hasOperation, `card ${s.id} (${s.type}) instructs without an operation: ${s.reason}`).toBe(true);
+    }
   });
 });

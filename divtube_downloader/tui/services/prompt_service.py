@@ -1,5 +1,6 @@
 import io
 import json
+import os
 import re
 import threading
 import urllib.error
@@ -23,11 +24,62 @@ MUTED   = "#6A5A6A"
 
 
 class PromptService:
+    # Per-tab conversation memory, persisted so each cockpit tab (DivTube work,
+    # Mother commentary, …) keeps its own thread across restarts. Same cwd
+    # convention as MemoryService's divtube_memory.db.
+    HISTORY_FILE = ".tui_prompt_history.json"
+
     def __init__(self):
         self.active_model = get_model() or "big-pickle"
-        self.history = {}
         self.max_history = 20
         self.tools = ToolService()
+        self._history_lock = threading.Lock()
+        self.history = self._load_history()
+
+    # ── Per-tab history persistence ─────────────────────────────────
+    def _load_history(self):
+        """Read the per-tab history file, dropping malformed entries.
+
+        Never raises: a corrupt or absent file means a fresh start, not a
+        crashed cockpit."""
+        try:
+            with open(self.HISTORY_FILE, "r", encoding="utf-8") as f:
+                raw = json.load(f)
+        except Exception:
+            return {}
+        if not isinstance(raw, dict):
+            return {}
+        clean = {}
+        for agent_id, turns in raw.items():
+            if not isinstance(agent_id, str) or not isinstance(turns, list):
+                continue
+            valid = [
+                t for t in turns
+                if isinstance(t, dict)
+                and t.get("role") in ("user", "assistant")
+                and isinstance(t.get("content"), str)
+            ]
+            if valid:
+                clean[agent_id] = valid[-(self.max_history * 2):]
+        return clean
+
+    def _save_history(self):
+        """Atomically persist per-tab history (tmp + rename — a crash mid-write
+        never leaves a torn file behind)."""
+        tmp = self.HISTORY_FILE + ".tmp"
+        try:
+            with self._history_lock:
+                snapshot = {k: list(v) for k, v in self.history.items()}
+            with open(tmp, "w", encoding="utf-8") as f:
+                json.dump(snapshot, f, ensure_ascii=False)
+            os.replace(tmp, self.HISTORY_FILE)
+        except Exception:
+            # Persistence must never break an agent turn.
+            try:
+                if os.path.exists(tmp):
+                    os.remove(tmp)
+            except Exception:
+                pass
 
     def _mem_read(self, key):
         raw = self.tools.execute_tool("memory_get", {"key": key}, lambda m: None)
@@ -69,21 +121,41 @@ class PromptService:
             + "\n--------------------------------------------------------------\n"
         )
 
-    def _build_system_prompt(self, hint):
+    def _build_system_prompt(self, hint, agent_id="divtube"):
         if hint:
             return hint
         law_ctx = self._build_law_context()
-        base = (
-            "You are an AI coding assistant integrated into the DivTube Cockpit. "
-            "You have direct access to the Scholomance codebase through tools. "
-            "When asked about code, architecture, bugs, or implementation details, "
-            "use the available tools to read files, search the codebase, and run commands. "
-            "Always explore the actual code rather than guessing. "
-            "You have FULL read/write privileges. You can edit files via `replace_file_content` "
-            "and execute arbitrary shell commands via `run_command` (including git, npm, vitest, and bash pipes). "
-            "Do not act as a helpless analyst—if something is broken, fix it. "
-            "Answer concisely and accurately. Cite file paths and line numbers when relevant."
-        )
+        if agent_id == "mother":
+            # Mother is the commentary & Q&A surface: same model, same tool
+            # belt, but her register is conversational witness rather than
+            # code surgeon. She answers questions about what the worker tabs
+            # are doing while they work — she does not take the scalpel
+            # herself unless explicitly asked.
+            base = (
+                "You are Mother — the commentary and question-answering presence in the "
+                "DivTube Cockpit, running on the same model and tools as the worker agent. "
+                "Your tab is a conversation, not a workbench: the user comes to you for "
+                "commentary, explanation, and questions while the DivTube tab does the "
+                "heavy lifting in parallel. "
+                "You may read files and search the codebase with tools to ground your "
+                "answers in reality — always explore actual code rather than guessing. "
+                "Do NOT edit files or run mutating commands unless the user explicitly "
+                "asks you to; if they want changes made, suggest they take it to the "
+                "DivTube tab, or confirm first. "
+                "Answer concisely and accurately. Cite file paths and line numbers when relevant."
+            )
+        else:
+            base = (
+                "You are an AI coding assistant integrated into the DivTube Cockpit. "
+                "You have direct access to the Scholomance codebase through tools. "
+                "When asked about code, architecture, bugs, or implementation details, "
+                "use the available tools to read files, search the codebase, and run commands. "
+                "Always explore the actual code rather than guessing. "
+                "You have FULL read/write privileges. You can edit files via `replace_file_content` "
+                "and execute arbitrary shell commands via `run_command` (including git, npm, vitest, and bash pipes). "
+                "Do not act as a helpless analyst—if something is broken, fix it. "
+                "Answer concisely and accurately. Cite file paths and line numbers when relevant."
+            )
         if law_ctx:
             return base + "\n\n" + law_ctx
         return base
@@ -236,7 +308,7 @@ class PromptService:
                     return
 
                 model_name = model or self.active_model
-                system_prompt = self._build_system_prompt(system_hint)
+                system_prompt = self._build_system_prompt(system_hint, agent_id=agent_id)
 
                 if agent_id not in self.history:
                     self.history[agent_id] = []
@@ -393,10 +465,12 @@ class PromptService:
                     set_state("responding")
                     reply = message.get("content", "")
                     if reply:
-                        self.history[agent_id].append({"role": "user", "content": text})
-                        self.history[agent_id].append({"role": "assistant", "content": reply})
-                        if len(self.history[agent_id]) > self.max_history * 2:
-                            self.history[agent_id] = self.history[agent_id][-(self.max_history * 2):]
+                        with self._history_lock:
+                            self.history[agent_id].append({"role": "user", "content": text})
+                            self.history[agent_id].append({"role": "assistant", "content": reply})
+                            if len(self.history[agent_id]) > self.max_history * 2:
+                                self.history[agent_id] = self.history[agent_id][-(self.max_history * 2):]
+                        self._save_history()
 
                     callback(f"\n[bold {GOLD}]❖ AI RESPONSE ❖[/] [{MUTED}]({model_name})[/]\n")
                     if reply:
@@ -432,10 +506,12 @@ class PromptService:
         self.active_model = model_name
 
     def clear_history(self, agent_id=None):
-        if agent_id and agent_id in self.history:
-            self.history[agent_id].clear()
-        elif not agent_id:
-            self.history.clear()
+        with self._history_lock:
+            if agent_id and agent_id in self.history:
+                self.history[agent_id].clear()
+            elif not agent_id:
+                self.history.clear()
+        self._save_history()
 
 
 def _render_diff_review(callback, write_id):

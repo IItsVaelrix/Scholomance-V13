@@ -1,0 +1,21 @@
+{
+  "entityId": "shrine_brazier",
+  "entityType": "environment",
+  "definitionId": "brazier",
+  "displayName": "Iron Brazier",
+  "description": "A heavy iron brazier bolted to the shrine floor. Cold ash fills its basin. It could be lit.",
+  "roomId": "ruined_shrine",
+  "portable": false,
+  "interactable": true,
+  "activations": ["lit"],
+  "flags": {
+    "activated": false,
+    "activation": null
+  },
+  "illustration": {
+    "asset": "entities/brazier",
+    "layerType": "prop",
+    "defaultPosition": { "x": 400, "y": 280 },
+    "activatedAsset": "entities/brazier_lit"
+  }
+}

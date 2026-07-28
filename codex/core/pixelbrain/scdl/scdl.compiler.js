@@ -29,6 +29,7 @@ import { expandSymmetryPass }   from './passes/expand-symmetry.pass.js';
 import { expandCellsPass }      from './passes/expand-cells.pass.js';
 import { emitPacketPass }       from './passes/emit-packet.pass.js';
 import { emitDiagnosticsPass }  from './passes/emit-diagnostics.pass.js';
+import { projectGenesPass }     from './passes/project-genes.pass.js';
 
 // SemQuant / PB-Semantics (Phase 1 thin slice)
 import { scdlAstToIR } from '../semantic/adapters/scdl-to-ir.adapter.js';
@@ -206,6 +207,16 @@ function _runFramePipeline(frameAst, errors, options) {
 
   ast = _runPass('expandCells', ast, errors, expandCellsPass);
   if (_hasFatal(errors)) return { ast, packet: null, fatal: true };
+
+  // ── Art Gene Projection (PDR: Ontological Art-Direction Pipeline) ────────
+  // Strict no-op when options.artGenes is empty/absent or feature flag is off.
+  // §6.5: existing SCDL and raster output remain byte-identical.
+  if (options.artGenes && options.artGenes.length > 0) {
+    ast = projectGenesPass(ast, errors, {
+      artGenes: options.artGenes,
+      artProjectionContext: options.artProjectionContext,
+    });
+  }
 
   let packet = null;
   try {

@@ -1,0 +1,18 @@
+{
+  "roomId": "moonlit_clearing",
+  "title": "The Moonlit Clearing",
+  "descriptionKey": "moonlit_clearing_default",
+  "description": "Silver light floods this open space. A stone well sits at the center, its water reflecting the moon. Moths swirl in silent orbits around an unseen lantern-glow. Paths lead east and south.",
+  "exitIds": ["forest_path", "ruined_shrine"],
+  "exits": {
+    "forest_path": { "direction": "east", "label": "back to the forest path" },
+    "ruined_shrine": { "direction": "south", "label": "towards the shrine" }
+  },
+  "flags": {
+    "time_of_day": "night"
+  },
+  "illustration": {
+    "backgroundAsset": "rooms/moonlit_clearing/background",
+    "ambientEffects": ["moth_swarm", "moonbeam"]
+  }
+}

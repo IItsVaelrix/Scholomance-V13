@@ -1,0 +1,38 @@
+# Chalice — embryonic geometry skeleton
+# Generated to prove the art-direction pipeline can create NEW assets.
+# All surface detail provided by art-direction genes in chalice.art-genes.json.
+# This file contains ONLY the structural form — zero hand-placed cells.
+asset chalice canvas 24x24
+
+palette {
+  gold_rim   = #FFD700
+  gold_body  = #DAA520
+  gold_dark  = #B8860B
+  wine       = #722F37
+  wine_dark  = #4A1C23
+  obsidian   = #1A1A2E
+}
+
+part cup material obsidian {
+  ellipse 12 6 radius 8 ry 4 gold_body
+}
+
+part wine_surface material source {
+  ellipse 12 5 radius 6 ry 2 wine
+}
+
+part stem material obsidian {
+  rect 10 10 4 8 gold_dark
+}
+
+part knop material obsidian {
+  ellipse 12 14 radius 3 ry 2 gold_body
+}
+
+part base material obsidian {
+  polygon 4 22 20 22 17 19 7 19 gold_body
+}
+
+part base_edge material obsidian {
+  rect 4 22 16 1 gold_dark
+}

@@ -45,6 +45,23 @@ function normalizeWordToken(token) {
   return cleanVisualiserWord(token).toUpperCase();
 }
 
+function estimateSyllables(word) {
+  if (!word) return 0;
+  const clean = String(word).toLowerCase().replace(/[^a-z]/g, '');
+  if (!clean) return 0;
+  if (clean.length <= 3) return 1;
+  const hasCle = /[^aeiouy]le$/.test(clean);
+  const formatted = clean
+    .replace(/(?:[^laeiouy]es|ed|es|e)$/, '')
+    .replace(/^y/, '');
+  const matches = formatted.match(/[aeiouy]{1,2}/g);
+  let count = matches ? matches.length : 1;
+  if (hasCle && !clean.endsWith('ale') && !clean.endsWith('ole') && !clean.endsWith('ile')) {
+    count += 1;
+  }
+  return Math.max(1, count);
+}
+
 function toFiniteInt(value, fallback = -1) {
   const num = Number(value);
   if (!Number.isFinite(num)) return fallback;
@@ -679,15 +696,51 @@ const ScrollEditor = forwardRef(/**
     return { overlayLines: lines, allOverlayTokens: lines.flatMap((l) => l.tokens) };
   }, [contentForOverlay, containerWidth, adaptiveTopology]);
 
+  const syntaxLayer = useMemo(() => analyzedDocument?.syntaxSummary || null, [analyzedDocument]);
+
   const lineSyllableCounts = useMemo(() => {
-    if (propLineSyllableCounts) return propLineSyllableCounts;
-    if (analyzedDocument?.lineSyllableCounts) return analyzedDocument.lineSyllableCounts;
-    return overlayLines.map(() => 0);
-  }, [propLineSyllableCounts, analyzedDocument, overlayLines]);
+    let baseCounts = null;
+    if (Array.isArray(propLineSyllableCounts) && propLineSyllableCounts.length > 0) {
+      baseCounts = propLineSyllableCounts;
+    } else if (Array.isArray(analyzedDocument?.lineSyllableCounts) && analyzedDocument.lineSyllableCounts.length > 0) {
+      baseCounts = analyzedDocument.lineSyllableCounts;
+    }
+
+    const rawLines = content ? content.split('\n') : [];
+    const count = Math.max(rawLines.length, baseCounts ? baseCounts.length : 0);
+    if (count === 0) return [];
+
+    const result = new Array(count);
+    for (let i = 0; i < count; i++) {
+      const lineText = rawLines[i] || '';
+      if (baseCounts && typeof baseCounts[i] === 'number' && baseCounts[i] > 0) {
+        result[i] = baseCounts[i];
+      } else if (lineText.trim()) {
+        const words = lineText.match(/[a-zA-Z']+/g) || [];
+        let total = 0;
+        for (const w of words) {
+          const norm = w.toLowerCase().replace(/'/g, '');
+          if (!norm) continue;
+          let known = 0;
+          if (syntaxLayer?.tokens) {
+            const match = syntaxLayer.tokens.find(
+              (t) => (t.token || t.text || '').toLowerCase() === norm
+            );
+            if (match && typeof match.syllableCount === 'number' && match.syllableCount > 0) {
+              known = match.syllableCount;
+            }
+          }
+          total += known || estimateSyllables(norm);
+        }
+        result[i] = total;
+      } else {
+        result[i] = 0;
+      }
+    }
+    return result;
+  }, [propLineSyllableCounts, analyzedDocument, content, syntaxLayer]);
 
   const contentLineCount = useMemo(() => (content ? content.split('\n').length : 0), [content]);
-
-  const syntaxLayer = useMemo(() => analyzedDocument?.syntaxSummary || null, [analyzedDocument]);
 
   const cursorSync = useMemo(() => {
     if (!adaptiveTopology) return null;

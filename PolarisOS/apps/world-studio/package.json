@@ -1,0 +1,12 @@
+{
+  "name": "@polaris/world-studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@polaris/contracts": "*"
+  },
+  "devDependencies": {
+    "vite": "^8.1.5"
+  }
+}

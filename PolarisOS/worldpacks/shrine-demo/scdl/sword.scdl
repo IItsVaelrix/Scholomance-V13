@@ -1,0 +1,33 @@
+# Sword — embryonic geometry skeleton
+# Generated via the Ontological Art-Direction Pipeline.
+# All surface detail provided by art-direction genes in sword.art-genes.json.
+# This file contains ONLY the structural form — zero hand-placed cells.
+asset sword canvas 12x32
+
+palette {
+  blade_steel = #8A9BB0
+  fuller_dark = #3A4A5C
+  guard_iron  = #4A4A52
+  grip_leather = #5C3A28
+  pommel_gold = #B8963C
+}
+
+part blade material steel {
+  polygon 6 0 8 4 8 20 4 20 4 4 blade_steel
+}
+
+part fuller material steel {
+  rect 5 3 2 16 fuller_dark
+}
+
+part guard material iron {
+  rect 2 20 8 2 guard_iron
+}
+
+part grip material leather {
+  rect 5 22 2 6 grip_leather
+}
+
+part pommel material gold {
+  ellipse 6 29 radius 2 ry 1 pommel_gold
+}

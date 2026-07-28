@@ -1,0 +1,113 @@
+{
+  "contract": "PB-SCDNA-GENE-v1",
+  "description": "Art-direction genes for the shrine brazier. Encodes the curated aesthetic intent: rim highlight arc (upper-left light), rim band structural fill, coal bed interior fill, and base highlight arc. These genes replace the 23 hand-placed cells that were previously embedded in brazier.scdl.",
+  "assetId": "brazier",
+  "canvas": { "width": 24, "height": 20 },
+  "genes": [
+    {
+      "geneId": "brazier-rim-highlight",
+      "geneType": "art-direction",
+      "priority": 10,
+      "projectionMode": "explicit",
+      "role": "rim-highlight",
+      "curator": "human-embryonic-regen",
+      "rationale": "Upper-left light source catches the top arc of the obsidian rim. The rim_light (#6E7693) rides the ellipse boundary at y=3, x=5..18. This is the primary specular highlight that gives the vessel its lit-from-above reading.",
+      "geometryHints": {
+        "lightDir": "upper-left",
+        "contourFollow": false,
+        "occlusionPolicy": "respect-silhouette",
+        "cornerPolicy": "preserve"
+      },
+      "coordinates": [
+        { "x": 5,  "y": 3, "color": "#6E7693", "role": "rim-highlight", "partId": "rim" },
+        { "x": 6,  "y": 3, "color": "#6E7693", "role": "rim-highlight", "partId": "rim" },
+        { "x": 7,  "y": 3, "color": "#6E7693", "role": "rim-highlight", "partId": "rim" },
+        { "x": 8,  "y": 3, "color": "#6E7693", "role": "rim-highlight", "partId": "rim" },
+        { "x": 9,  "y": 3, "color": "#6E7693", "role": "rim-highlight", "partId": "rim" },
+        { "x": 10, "y": 3, "color": "#6E7693", "role": "rim-highlight", "partId": "rim" },
+        { "x": 11, "y": 3, "color": "#6E7693", "role": "rim-highlight", "partId": "rim" },
+        { "x": 12, "y": 3, "color": "#6E7693", "role": "rim-highlight", "partId": "rim" },
+        { "x": 13, "y": 3, "color": "#6E7693", "role": "rim-highlight", "partId": "rim" },
+        { "x": 14, "y": 3, "color": "#6E7693", "role": "rim-highlight", "partId": "rim" },
+        { "x": 15, "y": 3, "color": "#6E7693", "role": "rim-highlight", "partId": "rim" },
+        { "x": 16, "y": 3, "color": "#6E7693", "role": "rim-highlight", "partId": "rim" },
+        { "x": 17, "y": 3, "color": "#6E7693", "role": "rim-highlight", "partId": "rim" },
+        { "x": 18, "y": 3, "color": "#6E7693", "role": "rim-highlight", "partId": "rim" }
+      ]
+    },
+    {
+      "geneId": "brazier-rim-band-fill",
+      "geneType": "art-direction",
+      "priority": 5,
+      "projectionMode": "explicit",
+      "role": "rim-band-fill",
+      "curator": "human-embryonic-regen",
+      "rationale": "The ellipse op is a stroke (perimeter only). The rim band between the outer arc (y=3) and the bowl top (y=7) must be filled with rim_body (#383D55) so the vessel reads as solid stone. These cells fill the enclosed interior of the rim ellipse stroke.",
+      "geometryHints": {
+        "lightDir": "upper-left",
+        "contourFollow": false,
+        "occlusionPolicy": "respect-silhouette"
+      },
+      "coordinates": [
+        { "x": 7,  "y": 4, "color": "#383D55", "role": "rim-band-fill", "partId": "rim" },
+        { "x": 17, "y": 4, "color": "#383D55", "role": "rim-band-fill", "partId": "rim" },
+        { "x": 4,  "y": 5, "color": "#383D55", "role": "rim-band-fill", "partId": "rim" },
+        { "x": 5,  "y": 5, "color": "#383D55", "role": "rim-band-fill", "partId": "rim" },
+        { "x": 6,  "y": 5, "color": "#383D55", "role": "rim-band-fill", "partId": "rim" },
+        { "x": 18, "y": 5, "color": "#383D55", "role": "rim-band-fill", "partId": "rim" },
+        { "x": 19, "y": 5, "color": "#383D55", "role": "rim-band-fill", "partId": "rim" },
+        { "x": 20, "y": 5, "color": "#383D55", "role": "rim-band-fill", "partId": "rim" },
+        { "x": 7,  "y": 6, "color": "#383D55", "role": "rim-band-fill", "partId": "rim" },
+        { "x": 17, "y": 6, "color": "#383D55", "role": "rim-band-fill", "partId": "rim" }
+      ]
+    },
+    {
+      "geneId": "brazier-coal-bed-fill",
+      "geneType": "art-direction",
+      "priority": 5,
+      "projectionMode": "explicit",
+      "role": "coal-bed-fill",
+      "curator": "human-embryonic-regen",
+      "rationale": "The interior ellipse (coal bed) is also a stroke. Its center row at y=5 must be filled with coal_bed (#0E1020) so the vessel interior reads as a solid dark hollow rather than a see-through ring.",
+      "geometryHints": {
+        "contourFollow": false,
+        "occlusionPolicy": "respect-silhouette"
+      },
+      "coordinates": [
+        { "x": 9,  "y": 5, "color": "#0E1020", "role": "coal-bed-fill", "partId": "interior" },
+        { "x": 10, "y": 5, "color": "#0E1020", "role": "coal-bed-fill", "partId": "interior" },
+        { "x": 11, "y": 5, "color": "#0E1020", "role": "coal-bed-fill", "partId": "interior" },
+        { "x": 12, "y": 5, "color": "#0E1020", "role": "coal-bed-fill", "partId": "interior" },
+        { "x": 13, "y": 5, "color": "#0E1020", "role": "coal-bed-fill", "partId": "interior" },
+        { "x": 14, "y": 5, "color": "#0E1020", "role": "coal-bed-fill", "partId": "interior" },
+        { "x": 15, "y": 5, "color": "#0E1020", "role": "coal-bed-fill", "partId": "interior" }
+      ]
+    },
+    {
+      "geneId": "brazier-base-highlight",
+      "geneType": "art-direction",
+      "priority": 10,
+      "projectionMode": "explicit",
+      "role": "base-highlight",
+      "curator": "human-embryonic-regen",
+      "rationale": "Reflected light from the ground plane catches the bottom edge of the base flare. The rim_light (#6E7693) rides the base polygon boundary at y=19, x=8..16. This secondary highlight grounds the vessel and completes the obsidian material reading.",
+      "geometryHints": {
+        "lightDir": "bottom",
+        "contourFollow": false,
+        "occlusionPolicy": "respect-silhouette",
+        "cornerPolicy": "preserve"
+      },
+      "coordinates": [
+        { "x": 8,  "y": 19, "color": "#6E7693", "role": "base-highlight", "partId": "base" },
+        { "x": 9,  "y": 19, "color": "#6E7693", "role": "base-highlight", "partId": "base" },
+        { "x": 10, "y": 19, "color": "#6E7693", "role": "base-highlight", "partId": "base" },
+        { "x": 11, "y": 19, "color": "#6E7693", "role": "base-highlight", "partId": "base" },
+        { "x": 12, "y": 19, "color": "#6E7693", "role": "base-highlight", "partId": "base" },
+        { "x": 13, "y": 19, "color": "#6E7693", "role": "base-highlight", "partId": "base" },
+        { "x": 14, "y": 19, "color": "#6E7693", "role": "base-highlight", "partId": "base" },
+        { "x": 15, "y": 19, "color": "#6E7693", "role": "base-highlight", "partId": "base" },
+        { "x": 16, "y": 19, "color": "#6E7693", "role": "base-highlight", "partId": "base" }
+      ]
+    }
+  ]
+}

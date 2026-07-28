@@ -7,61 +7,2267 @@
     "canvas": {
       "width": 16,
       "height": 24,
-      "cellSize": 2,
+      "cellSize": 1,
       "transparent": true,
       "background": "#00000000"
     },
     "coordinates": [
-      { "snappedX": 6, "snappedY": 0, "color": "#3b2925" },
-      { "snappedX": 8, "snappedY": 0, "color": "#3b2925" },
-      { "snappedX": 4, "snappedY": 2, "color": "#3b2925" },
-      { "snappedX": 10, "snappedY": 2, "color": "#3b2925" },
-      { "snappedX": 4, "snappedY": 4, "color": "#806243" },
-      { "snappedX": 6, "snappedY": 4, "color": "#806243" },
-      { "snappedX": 8, "snappedY": 4, "color": "#806243" },
-      { "snappedX": 10, "snappedY": 4, "color": "#806243" },
-      { "snappedX": 2, "snappedY": 6, "color": "#3b2925" },
-      { "snappedX": 4, "snappedY": 6, "color": "#efb94d" },
-      { "snappedX": 6, "snappedY": 6, "color": "#fff2a6" },
-      { "snappedX": 8, "snappedY": 6, "color": "#fff2a6" },
-      { "snappedX": 10, "snappedY": 6, "color": "#efb94d" },
-      { "snappedX": 12, "snappedY": 6, "color": "#3b2925" },
-      { "snappedX": 2, "snappedY": 8, "color": "#3b2925" },
-      { "snappedX": 4, "snappedY": 8, "color": "#ef8a32" },
-      { "snappedX": 6, "snappedY": 8, "color": "#fff2a6" },
-      { "snappedX": 8, "snappedY": 8, "color": "#fff2a6" },
-      { "snappedX": 10, "snappedY": 8, "color": "#ef8a32" },
-      { "snappedX": 12, "snappedY": 8, "color": "#3b2925" },
-      { "snappedX": 2, "snappedY": 10, "color": "#3b2925" },
-      { "snappedX": 4, "snappedY": 10, "color": "#a7482f" },
-      { "snappedX": 6, "snappedY": 10, "color": "#ef8a32" },
-      { "snappedX": 8, "snappedY": 10, "color": "#ef8a32" },
-      { "snappedX": 10, "snappedY": 10, "color": "#a7482f" },
-      { "snappedX": 12, "snappedY": 10, "color": "#3b2925" },
-      { "snappedX": 2, "snappedY": 12, "color": "#3b2925" },
-      { "snappedX": 4, "snappedY": 12, "color": "#684337" },
-      { "snappedX": 6, "snappedY": 12, "color": "#ef8a32" },
-      { "snappedX": 8, "snappedY": 12, "color": "#ef8a32" },
-      { "snappedX": 10, "snappedY": 12, "color": "#684337" },
-      { "snappedX": 12, "snappedY": 12, "color": "#3b2925" },
-      { "snappedX": 2, "snappedY": 14, "color": "#3b2925" },
-      { "snappedX": 4, "snappedY": 14, "color": "#806243" },
-      { "snappedX": 6, "snappedY": 14, "color": "#806243" },
-      { "snappedX": 8, "snappedY": 14, "color": "#806243" },
-      { "snappedX": 10, "snappedY": 14, "color": "#806243" },
-      { "snappedX": 12, "snappedY": 14, "color": "#3b2925" },
-      { "snappedX": 4, "snappedY": 16, "color": "#3b2925" },
-      { "snappedX": 6, "snappedY": 16, "color": "#806243" },
-      { "snappedX": 8, "snappedY": 16, "color": "#806243" },
-      { "snappedX": 10, "snappedY": 16, "color": "#3b2925" },
-      { "snappedX": 6, "snappedY": 18, "color": "#3b2925" },
-      { "snappedX": 8, "snappedY": 18, "color": "#3b2925" },
-      { "snappedX": 6, "snappedY": 20, "color": "#806243" },
-      { "snappedX": 8, "snappedY": 20, "color": "#806243" },
-      { "snappedX": 4, "snappedY": 22, "color": "#3b2925" },
-      { "snappedX": 6, "snappedY": 22, "color": "#3b2925" },
-      { "snappedX": 8, "snappedY": 22, "color": "#3b2925" },
-      { "snappedX": 10, "snappedY": 22, "color": "#3b2925" }
+      {
+        "snappedX": 6,
+        "snappedY": 4,
+        "color": "#4B4B5E",
+        "material": "darksteel",
+        "partId": "handle",
+        "role": "explicit",
+        "sourceOpId": "op:handle:0:path"
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 4,
+        "color": "#101017",
+        "material": "darksteel",
+        "partId": "cap",
+        "role": "explicit",
+        "sourceOpId": "op:cap:0:polygon",
+        "signedDistance": 0,
+        "t": 0.2135254915624211,
+        "tangent": [
+          0.4472135954999579,
+          -0.8944271909999159
+        ],
+        "normal": [
+          0.8944271909999159,
+          0.4472135954999579
+        ],
+        "curvature": 1.5,
+        "arcLength": 10.47213595499958
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 4,
+        "color": "#101017",
+        "material": "darksteel",
+        "partId": "cap",
+        "role": "explicit",
+        "sourceOpId": "op:cap:0:polygon",
+        "signedDistance": 0,
+        "t": 0.30901699437494745,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 1.5,
+        "arcLength": 10.47213595499958
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 4,
+        "color": "#4B4B5E",
+        "material": "darksteel",
+        "partId": "handle",
+        "role": "explicit",
+        "sourceOpId": "op:handle:0:path"
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 5,
+        "color": "#4B4B5E",
+        "material": "darksteel",
+        "partId": "handle",
+        "role": "explicit",
+        "sourceOpId": "op:handle:0:path"
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 5,
+        "color": "#101017",
+        "material": "darksteel",
+        "partId": "cap",
+        "role": "explicit",
+        "sourceOpId": "op:cap:0:polygon",
+        "signedDistance": 0.4472135954999583,
+        "t": 0.08541019662496845,
+        "tangent": [
+          0.4472135954999579,
+          -0.8944271909999159
+        ],
+        "normal": [
+          0.8944271909999159,
+          0.4472135954999579
+        ],
+        "curvature": 1.5,
+        "arcLength": 10.47213595499958
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 5,
+        "color": "#101017",
+        "material": "darksteel",
+        "partId": "cap",
+        "role": "explicit",
+        "sourceOpId": "op:cap:0:polygon",
+        "signedDistance": -0.4472135954999579,
+        "t": 0.12811529493745266,
+        "tangent": [
+          0.4472135954999579,
+          -0.8944271909999159
+        ],
+        "normal": [
+          0.8944271909999159,
+          0.4472135954999579
+        ],
+        "curvature": 1.5,
+        "arcLength": 10.47213595499958
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 5,
+        "color": "#101017",
+        "material": "darksteel",
+        "partId": "cap",
+        "role": "explicit",
+        "sourceOpId": "op:cap:0:polygon",
+        "signedDistance": -1,
+        "t": 0.30901699437494745,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 10.47213595499958
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 5,
+        "color": "#101017",
+        "material": "darksteel",
+        "partId": "cap",
+        "role": "explicit",
+        "sourceOpId": "op:cap:0:polygon",
+        "signedDistance": -0.4472135954999583,
+        "t": 0.48991869381244213,
+        "tangent": [
+          0.4472135954999579,
+          0.8944271909999159
+        ],
+        "normal": [
+          -0.8944271909999159,
+          0.4472135954999579
+        ],
+        "curvature": 1.5,
+        "arcLength": 10.47213595499958
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 5,
+        "color": "#4B4B5E",
+        "material": "darksteel",
+        "partId": "handle",
+        "role": "explicit",
+        "sourceOpId": "op:handle:0:path"
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 7,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": 0,
+        "t": 0,
+        "tangent": [
+          -0.31622776601683794,
+          0.9486832980505138
+        ],
+        "normal": [
+          -0.9486832980505138,
+          -0.31622776601683794
+        ],
+        "curvature": 1.5,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 7,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": 0,
+        "t": 0.9715272065507151,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 1.5,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 7,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": 0,
+        "t": 0.9430544131014302,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 1.5,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 7,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": 0,
+        "t": 0.9145816196521454,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 1.5,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 7,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": 0,
+        "t": 0.8861088262028604,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 1.5,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 7,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": 0,
+        "t": 0.8576360327535755,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 1.5,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 4,
+        "snappedY": 8,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": 0.6324555320336753,
+        "t": 0.03601555145890486,
+        "tangent": [
+          -0.31622776601683794,
+          0.9486832980505138
+        ],
+        "normal": [
+          -0.9486832980505138,
+          -0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 8,
+        "color": "#343B5A",
+        "material": "void_cloth",
+        "partId": "glass_highlight",
+        "role": "highlight",
+        "sourceOpId": "op:glass_highlight:0:line"
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 8,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1,
+        "t": 0.9715272065507151,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 8,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1,
+        "t": 0.9430544131014302,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 8,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1,
+        "t": 0.9145816196521454,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 8,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1,
+        "t": 0.8861088262028604,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 8,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1,
+        "t": 0.8576360327535755,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 4,
+        "snappedY": 9,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": 0.31622776601683766,
+        "t": 0.0630272150530835,
+        "tangent": [
+          -0.31622776601683794,
+          0.9486832980505138
+        ],
+        "normal": [
+          -0.9486832980505138,
+          -0.31622776601683794
+        ],
+        "curvature": 1.5,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 9,
+        "color": "#343B5A",
+        "material": "void_cloth",
+        "partId": "glass_highlight",
+        "role": "highlight",
+        "sourceOpId": "op:glass_highlight:0:line"
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 9,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1.5811388300841898,
+        "t": 0.04501943932363107,
+        "tangent": [
+          -0.31622776601683794,
+          0.9486832980505138
+        ],
+        "normal": [
+          -0.9486832980505138,
+          -0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 9,
+        "color": "#F59E0B",
+        "material": "holy_fire",
+        "partId": "flame",
+        "role": "explicit",
+        "sourceOpId": "op:flame:0:polygon",
+        "signedDistance": 0.6324555320336759,
+        "t": 0.13021734901736987,
+        "tangent": [
+          0.31622776601683794,
+          -0.9486832980505138
+        ],
+        "normal": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 14.57076657157208
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 9,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -2,
+        "t": 0.9145816196521454,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 9,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -2,
+        "t": 0.8861088262028604,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 9,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1.5811388300841898,
+        "t": 0.7841437999806595,
+        "tangent": [
+          -0.31622776601683794,
+          -0.9486832980505138
+        ],
+        "normal": [
+          0.9486832980505138,
+          -0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 9,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -0.6324555320336753,
+        "t": 0.7751399121159334,
+        "tangent": [
+          -0.31622776601683794,
+          -0.9486832980505138
+        ],
+        "normal": [
+          0.9486832980505138,
+          -0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 4,
+        "snappedY": 10,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": 0,
+        "t": 0.09003887864726214,
+        "tangent": [
+          -0.31622776601683794,
+          0.9486832980505138
+        ],
+        "normal": [
+          -0.9486832980505138,
+          -0.31622776601683794
+        ],
+        "curvature": 1.5,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 10,
+        "color": "#343B5A",
+        "material": "void_cloth",
+        "partId": "glass_highlight",
+        "role": "highlight",
+        "sourceOpId": "op:glass_highlight:0:line"
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 10,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1.8973665961010278,
+        "t": 0.07203110291780972,
+        "tangent": [
+          -0.31622776601683794,
+          0.9486832980505138
+        ],
+        "normal": [
+          -0.9486832980505138,
+          -0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 10,
+        "color": "#F59E0B",
+        "material": "holy_fire",
+        "partId": "flame",
+        "role": "explicit",
+        "sourceOpId": "op:flame:0:polygon",
+        "signedDistance": 0.31622776601683766,
+        "t": 0.06510867450868493,
+        "tangent": [
+          0.31622776601683794,
+          -0.9486832980505138
+        ],
+        "normal": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 1.5,
+        "arcLength": 14.57076657157208
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 10,
+        "color": "#F59E0B",
+        "material": "holy_fire",
+        "partId": "flame",
+        "role": "explicit",
+        "sourceOpId": "op:flame:0:polygon",
+        "signedDistance": -0.6324555320336753,
+        "t": 0.08681156601157991,
+        "tangent": [
+          0.31622776601683794,
+          -0.9486832980505138
+        ],
+        "normal": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 14.57076657157208
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 10,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -2.846049894151541,
+        "t": 0.7661360242512072,
+        "tangent": [
+          -0.31622776601683794,
+          -0.9486832980505138
+        ],
+        "normal": [
+          0.9486832980505138,
+          -0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 10,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1.897366596101028,
+        "t": 0.7571321363864809,
+        "tangent": [
+          -0.31622776601683794,
+          -0.9486832980505138
+        ],
+        "normal": [
+          0.9486832980505138,
+          -0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 10,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -0.9486832980505143,
+        "t": 0.7481282485217546,
+        "tangent": [
+          -0.31622776601683794,
+          -0.9486832980505138
+        ],
+        "normal": [
+          0.9486832980505138,
+          -0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 4,
+        "snappedY": 11,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": 0,
+        "t": 0.11851167209654706,
+        "tangent": [
+          0,
+          1
+        ],
+        "normal": [
+          -1,
+          0
+        ],
+        "curvature": 1.5,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 11,
+        "color": "#343B5A",
+        "material": "void_cloth",
+        "partId": "glass_highlight",
+        "role": "highlight",
+        "sourceOpId": "op:glass_highlight:0:line"
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 11,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -2,
+        "t": 0.11851167209654706,
+        "tangent": [
+          0,
+          1
+        ],
+        "normal": [
+          -1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 11,
+        "color": "#F59E0B",
+        "material": "holy_fire",
+        "partId": "flame",
+        "role": "explicit",
+        "sourceOpId": "op:flame:0:polygon",
+        "signedDistance": 0,
+        "t": 0,
+        "tangent": [
+          0.31622776601683794,
+          -0.9486832980505138
+        ],
+        "normal": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 1.5,
+        "arcLength": 14.57076657157208
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 11,
+        "color": "#F59E0B",
+        "material": "holy_fire",
+        "partId": "flame",
+        "role": "explicit",
+        "sourceOpId": "op:flame:0:polygon",
+        "signedDistance": -0.9486832980505143,
+        "t": 0.021702891502894978,
+        "tangent": [
+          0.31622776601683794,
+          -0.9486832980505138
+        ],
+        "normal": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 14.57076657157208
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 11,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -3,
+        "t": 0.7106515672077436,
+        "tangent": [
+          0,
+          -1
+        ],
+        "normal": [
+          1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 11,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -2,
+        "t": 0.7106515672077436,
+        "tangent": [
+          0,
+          -1
+        ],
+        "normal": [
+          1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 11,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1,
+        "t": 0.7106515672077436,
+        "tangent": [
+          0,
+          -1
+        ],
+        "normal": [
+          1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 4,
+        "snappedY": 12,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": 0,
+        "t": 0.14698446554583194,
+        "tangent": [
+          0,
+          1
+        ],
+        "normal": [
+          -1,
+          0
+        ],
+        "curvature": 1.5,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 12,
+        "color": "#343B5A",
+        "material": "void_cloth",
+        "partId": "glass_highlight",
+        "role": "highlight",
+        "sourceOpId": "op:glass_highlight:0:line"
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 12,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -2,
+        "t": 0.14698446554583194,
+        "tangent": [
+          0,
+          1
+        ],
+        "normal": [
+          -1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 12,
+        "color": "#F59E0B",
+        "material": "holy_fire",
+        "partId": "flame",
+        "role": "explicit",
+        "sourceOpId": "op:flame:0:polygon",
+        "signedDistance": 0.24253562503633297,
+        "t": 0.9334185682421058,
+        "tangent": [
+          -0.24253562503633297,
+          -0.9701425001453319
+        ],
+        "normal": [
+          0.9701425001453319,
+          -0.24253562503633297
+        ],
+        "curvature": 1.5,
+        "arcLength": 14.57076657157208
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 12,
+        "color": "#F59E0B",
+        "material": "holy_fire",
+        "partId": "flame",
+        "role": "explicit",
+        "sourceOpId": "op:flame:0:polygon",
+        "signedDistance": -0.7276068751089981,
+        "t": 0.5172846197552674,
+        "tangent": [
+          -0.24253562503633297,
+          0.9701425001453319
+        ],
+        "normal": [
+          -0.9701425001453319,
+          -0.24253562503633297
+        ],
+        "curvature": 0,
+        "arcLength": 14.57076657157208
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 12,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -3,
+        "t": 0.6821787737584587,
+        "tangent": [
+          0,
+          -1
+        ],
+        "normal": [
+          1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 12,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -2,
+        "t": 0.6821787737584587,
+        "tangent": [
+          0,
+          -1
+        ],
+        "normal": [
+          1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 12,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1,
+        "t": 0.6821787737584587,
+        "tangent": [
+          0,
+          -1
+        ],
+        "normal": [
+          1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 4,
+        "snappedY": 13,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": 0,
+        "t": 0.17545725899511683,
+        "tangent": [
+          0,
+          1
+        ],
+        "normal": [
+          -1,
+          0
+        ],
+        "curvature": 1.5,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 13,
+        "color": "#343B5A",
+        "material": "void_cloth",
+        "partId": "glass_highlight",
+        "role": "highlight",
+        "sourceOpId": "op:glass_highlight:0:line"
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 13,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -2,
+        "t": 0.17545725899511683,
+        "tangent": [
+          0,
+          1
+        ],
+        "normal": [
+          -1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 13,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -3,
+        "t": 0.17545725899511683,
+        "tangent": [
+          0,
+          1
+        ],
+        "normal": [
+          -1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 13,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -4,
+        "t": 0.17545725899511683,
+        "tangent": [
+          0,
+          1
+        ],
+        "normal": [
+          -1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 13,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -3,
+        "t": 0.6537059803091738,
+        "tangent": [
+          0,
+          -1
+        ],
+        "normal": [
+          1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 13,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -2,
+        "t": 0.6537059803091738,
+        "tangent": [
+          0,
+          -1
+        ],
+        "normal": [
+          1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 13,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1,
+        "t": 0.6537059803091738,
+        "tangent": [
+          0,
+          -1
+        ],
+        "normal": [
+          1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 4,
+        "snappedY": 14,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": 0,
+        "t": 0.2039300524444017,
+        "tangent": [
+          0,
+          1
+        ],
+        "normal": [
+          -1,
+          0
+        ],
+        "curvature": 1.5,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 14,
+        "color": "#343B5A",
+        "material": "void_cloth",
+        "partId": "glass_highlight",
+        "role": "highlight",
+        "sourceOpId": "op:glass_highlight:0:line"
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 14,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -2,
+        "t": 0.2039300524444017,
+        "tangent": [
+          0,
+          1
+        ],
+        "normal": [
+          -1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 14,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -3,
+        "t": 0.2039300524444017,
+        "tangent": [
+          0,
+          1
+        ],
+        "normal": [
+          -1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 14,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -4,
+        "t": 0.2039300524444017,
+        "tangent": [
+          0,
+          1
+        ],
+        "normal": [
+          -1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 14,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -3,
+        "t": 0.6252331868598889,
+        "tangent": [
+          0,
+          -1
+        ],
+        "normal": [
+          1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 14,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -2,
+        "t": 0.6252331868598889,
+        "tangent": [
+          0,
+          -1
+        ],
+        "normal": [
+          1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 14,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1,
+        "t": 0.6252331868598889,
+        "tangent": [
+          0,
+          -1
+        ],
+        "normal": [
+          1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 4,
+        "snappedY": 15,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": 0,
+        "t": 0.2324028458936866,
+        "tangent": [
+          0,
+          1
+        ],
+        "normal": [
+          -1,
+          0
+        ],
+        "curvature": 1.5,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 15,
+        "color": "#343B5A",
+        "material": "void_cloth",
+        "partId": "glass_highlight",
+        "role": "highlight",
+        "sourceOpId": "op:glass_highlight:0:line"
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 15,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1.8973665961010273,
+        "t": 0.25041062162313904,
+        "tangent": [
+          0.31622776601683794,
+          0.9486832980505138
+        ],
+        "normal": [
+          -0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 15,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -2.8460498941515415,
+        "t": 0.2594145094878652,
+        "tangent": [
+          0.31622776601683794,
+          0.9486832980505138
+        ],
+        "normal": [
+          -0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 15,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -3.7947331922020546,
+        "t": 0.26841839735259143,
+        "tangent": [
+          0.31622776601683794,
+          0.9486832980505138
+        ],
+        "normal": [
+          -0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 15,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -2.846049894151541,
+        "t": 0.5697487298164254,
+        "tangent": [
+          0.31622776601683794,
+          -0.9486832980505138
+        ],
+        "normal": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 15,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1.8973665961010286,
+        "t": 0.5787526176811517,
+        "tangent": [
+          0.31622776601683794,
+          -0.9486832980505138
+        ],
+        "normal": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 15,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -0.9486832980505143,
+        "t": 0.5877565055458779,
+        "tangent": [
+          0.31622776601683794,
+          -0.9486832980505138
+        ],
+        "normal": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 4,
+        "snappedY": 16,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": 0.31622776601683766,
+        "t": 0.2594145094878652,
+        "tangent": [
+          0.31622776601683794,
+          0.9486832980505138
+        ],
+        "normal": [
+          -0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 1.5,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 16,
+        "color": "#343B5A",
+        "material": "void_cloth",
+        "partId": "glass_highlight",
+        "role": "highlight",
+        "sourceOpId": "op:glass_highlight:0:line"
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 16,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1.5811388300841898,
+        "t": 0.27742228521731765,
+        "tangent": [
+          0.31622776601683794,
+          0.9486832980505138
+        ],
+        "normal": [
+          -0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 16,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -2.529822128134704,
+        "t": 0.2864261730820439,
+        "tangent": [
+          0.31622776601683794,
+          0.9486832980505138
+        ],
+        "normal": [
+          -0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 16,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -3,
+        "t": 0.41458161965214535,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 16,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -2.529822128134704,
+        "t": 0.5427370662222468,
+        "tangent": [
+          0.31622776601683794,
+          -0.9486832980505138
+        ],
+        "normal": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 16,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1.5811388300841898,
+        "t": 0.551740954086973,
+        "tangent": [
+          0.31622776601683794,
+          -0.9486832980505138
+        ],
+        "normal": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 17,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -0.3162277660168382,
+        "t": 0.2954300609467701,
+        "tangent": [
+          0.31622776601683794,
+          0.9486832980505138
+        ],
+        "normal": [
+          -0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 1.5,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 17,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1.2649110640673513,
+        "t": 0.30443394881149627,
+        "tangent": [
+          0.31622776601683794,
+          0.9486832980505138
+        ],
+        "normal": [
+          -0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 17,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1.7888543819998333,
+        "t": 0.3606419855380958,
+        "tangent": [
+          0.8944271909999159,
+          0.4472135954999579
+        ],
+        "normal": [
+          -0.4472135954999579,
+          0.8944271909999159
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 17,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -2,
+        "t": 0.41458161965214535,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 17,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1.7888543819998333,
+        "t": 0.46852125376619497,
+        "tangent": [
+          0.8944271909999159,
+          -0.4472135954999579
+        ],
+        "normal": [
+          0.4472135954999579,
+          0.8944271909999159
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 17,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1.2649110640673507,
+        "t": 0.5247292904927944,
+        "tangent": [
+          0.31622776601683794,
+          -0.9486832980505138
+        ],
+        "normal": [
+          0.9486832980505138,
+          0.31622776601683794
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 18,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -0.44721359549995676,
+        "t": 0.34790856520571345,
+        "tangent": [
+          0.8944271909999159,
+          0.4472135954999579
+        ],
+        "normal": [
+          -0.4472135954999579,
+          0.8944271909999159
+        ],
+        "curvature": 1.5,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 18,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -0.8944271909999166,
+        "t": 0.3733754058704781,
+        "tangent": [
+          0.8944271909999159,
+          0.4472135954999579
+        ],
+        "normal": [
+          -0.4472135954999579,
+          0.8944271909999159
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 18,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -1,
+        "t": 0.41458161965214535,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 18,
+        "color": "#1A2038",
+        "material": "void_cloth",
+        "partId": "glass",
+        "role": "explicit",
+        "sourceOpId": "op:glass:0:polygon",
+        "signedDistance": -0.8944271909999166,
+        "t": 0.4557878334338125,
+        "tangent": [
+          0.8944271909999159,
+          -0.4472135954999579
+        ],
+        "normal": [
+          0.4472135954999579,
+          0.8944271909999159
+        ],
+        "curvature": 0,
+        "arcLength": 35.1212465956731
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 19,
+        "color": "#101017",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:rect",
+        "signedDistance": 0,
+        "t": 0,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 2,
+        "arcLength": 16
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 19,
+        "color": "#101017",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:rect",
+        "signedDistance": 0,
+        "t": 0.0625,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 16
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 19,
+        "color": "#101017",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:rect",
+        "signedDistance": 0,
+        "t": 0.125,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 16
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 19,
+        "color": "#101017",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:rect",
+        "signedDistance": 0,
+        "t": 0.1875,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 16
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 19,
+        "color": "#101017",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:rect",
+        "signedDistance": 0,
+        "t": 0.25,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 16
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 19,
+        "color": "#101017",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:rect",
+        "signedDistance": 0,
+        "t": 0.3125,
+        "tangent": [
+          1,
+          0
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "curvature": 0,
+        "arcLength": 16
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 20,
+        "color": "#101017",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:rect",
+        "signedDistance": 0,
+        "t": 0.9375,
+        "tangent": [
+          0,
+          -1
+        ],
+        "normal": [
+          -1,
+          0
+        ],
+        "curvature": 0,
+        "arcLength": 16
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 20,
+        "color": "#101017",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:rect",
+        "signedDistance": -1,
+        "t": 0.9375,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 16
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 20,
+        "color": "#101017",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:rect",
+        "signedDistance": -1,
+        "t": 0.9375,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 16
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 20,
+        "color": "#101017",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:rect",
+        "signedDistance": -1,
+        "t": 0.9375,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 16
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 20,
+        "color": "#101017",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:rect",
+        "signedDistance": -1,
+        "t": 0.9375,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 16
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 20,
+        "color": "#101017",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "explicit",
+        "sourceOpId": "op:base:0:rect",
+        "signedDistance": -1,
+        "t": 0.9375,
+        "tangent": [
+          -1,
+          0
+        ],
+        "normal": [
+          0,
+          1
+        ],
+        "curvature": 0,
+        "arcLength": 16
+      },
+      {
+        "snappedX": 0,
+        "snappedY": 23,
+        "color": "#4B4B5E",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 1,
+        "snappedY": 23,
+        "color": "#4B4B5E",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 2,
+        "snappedY": 23,
+        "color": "#4B4B5E",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 3,
+        "snappedY": 23,
+        "color": "#4B4B5E",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 4,
+        "snappedY": 23,
+        "color": "#4B4B5E",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 5,
+        "snappedY": 23,
+        "color": "#4B4B5E",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 6,
+        "snappedY": 23,
+        "color": "#4B4B5E",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 7,
+        "snappedY": 23,
+        "color": "#4B4B5E",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 23,
+        "color": "#4B4B5E",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 9,
+        "snappedY": 23,
+        "color": "#4B4B5E",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 10,
+        "snappedY": 23,
+        "color": "#4B4B5E",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 11,
+        "snappedY": 23,
+        "color": "#4B4B5E",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 23,
+        "color": "#4B4B5E",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 13,
+        "snappedY": 23,
+        "color": "#4B4B5E",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 14,
+        "snappedY": 23,
+        "color": "#4B4B5E",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      },
+      {
+        "snappedX": 15,
+        "snappedY": 23,
+        "color": "#4B4B5E",
+        "material": "darksteel",
+        "partId": "base",
+        "role": "rim",
+        "sourceOpId": "op:base:1:rim"
+      }
     ]
   }
 }

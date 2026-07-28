@@ -1,0 +1,68 @@
+# Moonlit Clearing — open grassland under a large moon
+# Wand-forged contours: horizon, moon, grass, stones, moonbeam
+asset clearing_background canvas 50x30
+
+palette {
+  sky_deep    = #040810
+  sky_body    = #080C18
+  moon_core   = #E0E8F0
+  moon_glow   = #90A0C0
+  moon_halo   = #405070
+  hill_far    = #0A100C
+  hill_near   = #0C1210
+  ground_body = #101810
+  ground_lo   = #0C140C
+  grass_hi    = #182018
+  stone_body  = #1A1C24
+  stone_hi    = #282C38
+  beam_body   = #101828
+}
+
+part sky material source {
+  rect 0 0 50 20 sky_body
+}
+
+part sky_zenith material source {
+  rect 0 0 50 8 sky_deep
+}
+
+part moon material source {
+  circle 25 6 radius 4 moon_core
+  glow radius 4
+}
+
+part moon_halo material source {
+  ring 25 6 radius 7 width 3 moon_halo
+}
+
+part hills_far material source {
+  polygon 0 17 6 15 12 16 20 14 28 16 36 14 44 16 50 15 50 20 0 20 hill_far
+}
+
+part hills_near material source {
+  polygon 0 19 8 17 16 18 25 16 34 18 42 17 50 19 50 22 0 22 hill_near
+}
+
+part ground material source {
+  rect 0 20 50 10 ground_body
+}
+
+part ground_shadow material source {
+  rect 0 26 50 4 ground_lo
+}
+
+part moonbeam material source {
+  polygon 22 10 23 20 27 20 28 10 beam_body
+}
+
+part grass_tufts material source {
+  line 8 22 8 20 grass_hi
+  line 15 24 15 22 grass_hi
+  line 35 23 35 21 grass_hi
+  line 42 25 42 23 grass_hi
+}
+
+part stones material source {
+  circle 12 26 radius 1 stone_body
+  circle 38 27 radius 1 stone_body
+}

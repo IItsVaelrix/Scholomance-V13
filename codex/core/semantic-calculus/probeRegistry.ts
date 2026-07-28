@@ -731,6 +731,136 @@ const PAINT_OVERDRAW_PROBE = Object.freeze<ProbeFormula>({
   citeSeeds: ['src/pages/Listen', 'src/ui/animation'],
 });
 
+/**
+ * DivTube Cockpit TUI: each agent tab (DivTube work, Mother commentary, …)
+ * owns a RichLog, and a /prompt turn is dispatched from exactly one tab.
+ * The suspected failure: output routed by FOCUS at write time instead of by
+ * ORIGIN at dispatch time — switch tabs mid-turn and the response lands in
+ * the wrong scrollback — or conversation memory shared globally so one tab's
+ * context bleeds into another's prompts.
+ *
+ * Written after the fix (dispatch-bound _ChatLogger + per-agent history), so
+ * the observations double as a regression net: if anyone reintroduces
+ * write-time focus resolution, the receipts convict it.
+ */
+const TUI_TAB_ISOLATION_PROBE = Object.freeze<ProbeFormula>({
+  id: 'tui.tabs.output_isolation',
+  version: '1.0.0',
+  patterns: [
+    'why do chat tabs cross contaminate',
+    'why is mother output in the divtube log',
+    'why does switching tabs move agent output',
+    'diagnose tui tab isolation',
+    'why does the response land in the wrong tab',
+  ],
+  keywords: [
+    'mother', 'divtube', 'tab', 'chat log', 'cross-contamination',
+    'output routing', 'cockpit', 'tui', 'scrollback', 'focus',
+  ],
+  observations: [
+    {
+      id: 'obs.tui.callback_binding',
+      description:
+        'Read how the /prompt handler constructs the callback handed to PromptService: is the target chat resolved once at dispatch time, or re-resolved from focus on every write?',
+      harness: 'source.read.flow',
+      required: true,
+    },
+    {
+      id: 'obs.tui.focus_at_write',
+      description:
+        'Determine whether log_msg (or any write path the agent loop can reach) queries #agent-tabs.active at write time',
+      harness: 'source.read.flow',
+      required: true,
+    },
+    {
+      id: 'obs.tui.history_keying',
+      description:
+        'Read how PromptService keys conversation history: one global list, or per agent_id?',
+      harness: 'source.read.constant',
+      required: true,
+    },
+  ],
+  hypotheses: [
+    {
+      id: 'h_focus_at_write',
+      claim:
+        'Chat output is routed to whichever tab has focus at write time, so switching tabs mid-turn dumps the response into the wrong scrollback.',
+      predictions: [
+        {
+          id: 'p_focus_resolved_late',
+          description: 'A write path reachable from the agent loop resolves the active tab at write time',
+          required: true,
+          observationId: 'obs.tui.focus_at_write',
+        },
+      ],
+      falsifiers: [
+        {
+          id: 'f_dispatch_bound',
+          description:
+            'The callback is bound to a fixed chat id at dispatch time (e.g. log_msg_to/_ChatLogger), so focus at write time is irrelevant',
+          observationId: 'obs.tui.callback_binding',
+          predicate: { op: 'truthy', path: 'callbackBoundAtDispatch' },
+        },
+      ],
+      citeSeeds: ['divtube_downloader/tui/ui/app.py'],
+    },
+    {
+      id: 'h_shared_history',
+      claim:
+        'Conversation history is global rather than per-tab, so one tab\'s context bleeds into another tab\'s prompts.',
+      predictions: [
+        {
+          id: 'p_single_store',
+          description: 'PromptService keeps one unkeyed history list',
+          required: true,
+          observationId: 'obs.tui.history_keying',
+        },
+      ],
+      falsifiers: [
+        {
+          id: 'f_per_agent_keys',
+          description: 'History is keyed per agent_id (divtube, mother, …) and each tab maps to a distinct key',
+          observationId: 'obs.tui.history_keying',
+          predicate: { op: 'truthy', path: 'historyKeyedPerAgent' },
+        },
+      ],
+      citeSeeds: ['divtube_downloader/tui/services/prompt_service.py'],
+    },
+    {
+      id: 'h_isolated',
+      claim:
+        'No defect: dispatch binds the origin chat for the whole turn and history is per-tab; cross-contamination reports are stale (pre-fix) or from another path.',
+      predictions: [
+        {
+          id: 'p_bound',
+          description: 'The callback is bound at dispatch',
+          required: true,
+          observationId: 'obs.tui.callback_binding',
+          predicate: { op: 'truthy', path: 'callbackBoundAtDispatch' },
+        },
+        {
+          id: 'p_keyed',
+          description: 'History is keyed per agent',
+          required: true,
+          observationId: 'obs.tui.history_keying',
+          predicate: { op: 'truthy', path: 'historyKeyedPerAgent' },
+        },
+      ],
+      falsifiers: [
+        {
+          id: 'f_focus_routed',
+          description: 'Any agent-reachable write path still resolves the focused tab at write time',
+          observationId: 'obs.tui.focus_at_write',
+          predicate: { op: 'truthy', path: 'resolvesFocusAtWriteTime' },
+        },
+      ],
+      citeSeeds: ['divtube_downloader/tui/ui/app.py', 'divtube_downloader/tui/services/prompt_service.py'],
+    },
+  ],
+  maxRisk: 'read_only',
+  citeSeeds: ['divtube_downloader/tui/ui/app.py', 'divtube_downloader/tui/services/prompt_service.py'],
+});
+
 export const PROBE_FORMULAS: readonly ProbeFormula[] = Object.freeze([
   CSP_PROBE,
   CDN_PROBE,
@@ -739,6 +869,7 @@ export const PROBE_FORMULAS: readonly ProbeFormula[] = Object.freeze([
   TRUESIGHT_OOM_PROBE,
   LISTEN_HIDDEN_ANIM_PROBE,
   PAINT_OVERDRAW_PROBE,
+  TUI_TAB_ISOLATION_PROBE,
 ]);
 
 /**

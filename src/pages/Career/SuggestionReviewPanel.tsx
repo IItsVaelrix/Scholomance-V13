@@ -4,7 +4,14 @@ import { INPUT_SENTINEL } from '../../lib/career/amplify/data/input-sentinel';
 
 export interface SuggestionReviewPanelProps {
   suggestions: ResumeSuggestion[];
-  onAccept: (id: string) => void;
+  /**
+   * Employment entries a drafted (Case A) bullet can be placed under. Rendered as a required
+   * select on cards with `requiresEntryChoice`; Accept stays locked until one is chosen, and
+   * the choice is reported back through `onAccept`'s `entryId` so the apply engine inserts
+   * the bullet at the end of THAT entry rather than inferring an employer.
+   */
+  entries?: { id: string; label: string }[];
+  onAccept: (id: string, opts?: { entryId?: string }) => void;
   onReject: (id: string) => void;
   onEdit?: (id: string, newAfter: string) => void;
   onAcceptAllLowRisk: () => void;
@@ -64,6 +71,7 @@ function groupByReq(suggestions: ResumeSuggestion[]): Array<{ label: string; ite
 
 export default function SuggestionReviewPanel({
   suggestions,
+  entries,
   onAccept,
   onReject,
   onEdit,
@@ -74,6 +82,12 @@ export default function SuggestionReviewPanel({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState<string>('');
   const [slotValues, setSlotValues] = useState<Record<string, string>>({});
+  /** suggestionId → the employment entry the candidate chose for a drafted (Case A) bullet. */
+  const [entryChoices, setEntryChoices] = useState<Record<string, string>>({});
+
+  const setEntryChoice = (suggestionId: string, entryId: string) => {
+    setEntryChoices((prev) => ({ ...prev, [suggestionId]: entryId }));
+  };
 
   const setSlotValue = (slotId: string, value: string) => {
     setSlotValues((prev) => ({ ...prev, [slotId]: value }));
@@ -109,7 +123,17 @@ export default function SuggestionReviewPanel({
     if (suggestion.requiresInput && onRecordUserFacts) {
       onRecordUserFacts(suggestion.id, slotValues, filledAfter);
     }
-    onAccept(suggestion.id);
+    // A drafted (Case A) card carries the candidate's chosen employer back to the page,
+    // which stamps it onto `target.entryId` so the apply engine inserts the new bullet at
+    // the end of THAT entry. Acceptance is the candidate's assertion of the claim. Cards
+    // with no entry choice call `onAccept(id)` exactly as before (no second argument), so
+    // existing callers and their `toHaveBeenCalledWith(id)` assertions are unaffected.
+    const chosenEntry = entryChoices[suggestion.id];
+    if (suggestion.requiresEntryChoice && chosenEntry) {
+      onAccept(suggestion.id, { entryId: chosenEntry });
+    } else {
+      onAccept(suggestion.id);
+    }
   };
 
   const handleStartEdit = (suggestion: ResumeSuggestion) => {
@@ -188,7 +212,22 @@ export default function SuggestionReviewPanel({
             const isAccepted = sug.status === 'accepted';
             const isRejected = sug.status === 'rejected';
             const needsInput = sug.requiresInput === true && (sug.inputSlots || []).length > 0;
-            const acceptBlocked = needsInput && !slotsFilled(sug);
+            const needsEntry = sug.requiresEntryChoice === true;
+            const entryChosen = (entryChoices[sug.id] || '').length > 0;
+            // Accept is locked until every blank is filled AND, for a drafted card, an
+            // employer is chosen — the tool never infers where the work happened.
+            const acceptBlocked =
+              (needsInput && !slotsFilled(sug)) || (needsEntry && !entryChosen);
+
+            // Three card SHAPES, not one. Rendering all of them as a before→after text diff
+            // is what made a working suggestion look like an empty one:
+            //   - a MOVE changes position, not words, so the diff renders "X → X";
+            //   - an ADVISORY has no replacement text at all, so it renders "(None) → (None)".
+            // Both then hide the Edit button (correctly — there is no text to edit), which
+            // reads as "it suggested nothing and won't let me fix it".
+            const isMove = Boolean(sug.move);
+            const isAdvisory = !isMove && !sug.after && !needsInput;
+            const isTextEdit = !isMove && !isAdvisory;
 
             return (
               <div
@@ -210,6 +249,29 @@ export default function SuggestionReviewPanel({
                   )}
                 </div>
 
+                {isMove && (
+                  <div className="suggestion-preview suggestion-preview--move">
+                    <div className="preview-move">
+                      <span className="preview-label">Move (wording unchanged):</span>
+                      <span className="preview-text">{sug.before || '(this bullet)'}</span>
+                    </div>
+                  </div>
+                )}
+
+                {isAdvisory && (
+                  <div className="suggestion-preview suggestion-preview--advisory">
+                    <div className="preview-advisory">
+                      <span className="preview-label">No edit drafted:</span>
+                      <span className="preview-text">
+                        {sug.before
+                          ? `This is advice about "${sug.before}" — the tool will not write it for you.`
+                          : 'This is advice, not a change the tool will make for you.'}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {isTextEdit && (
                 <div className="suggestion-preview">
                   <div className="preview-before">
                     <span className="preview-label">Before:</span>
@@ -240,6 +302,7 @@ export default function SuggestionReviewPanel({
                     )}
                   </div>
                 </div>
+                )}
 
                 {needsInput && (
                   <div className="suggestion-slots">
@@ -257,6 +320,30 @@ export default function SuggestionReviewPanel({
                     ))}
                     <p className="suggestion-slot-note">
                       These numbers are yours — nothing is added to your résumé until you fill them in.
+                    </p>
+                  </div>
+                )}
+
+                {needsEntry && (
+                  <div className="suggestion-entry-choice">
+                    <label className="suggestion-entry-label">
+                      <span className="suggestion-slot-label">Which role did you do this under?</span>
+                      <select
+                        className="suggestion-entry-select"
+                        value={entryChoices[sug.id] || ''}
+                        onChange={(e) => setEntryChoice(sug.id, e.target.value)}
+                      >
+                        <option value="">Choose the employer…</option>
+                        {(entries || []).map((entry) => (
+                          <option key={entry.id} value={entry.id}>
+                            {entry.label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <p className="suggestion-slot-note">
+                      ⚠ Only accept if you have actually done this — the bullet is added under the
+                      role you pick, and accepting states it as fact in your own words.
                     </p>
                   </div>
                 )}

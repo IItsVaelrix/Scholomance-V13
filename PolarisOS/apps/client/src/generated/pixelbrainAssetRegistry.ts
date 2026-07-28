@@ -15,24 +15,54 @@ export type PixelBrainAssetRegistry = Readonly<
 >;
 
 export const pixelBrainAssetRegistry = {
+  "entities/altar": {
+    "assetKey": "entities/altar",
+    "pixelBrainUrl": "/assets/generated/altar.pb1-a32cb643a72a84dc7a8af32790ad409f14b10216f35396c1b1f54887932aa6fd.pixelbrain.json",
+    "expectedPacketContentHash": "pb1:a32cb643a72a84dc7a8af32790ad409f14b10216f35396c1b1f54887932aa6fd"
+  },
   "entities/brazier": {
     "assetKey": "entities/brazier",
-    "pixelBrainUrl": "/assets/generated/brazier.pb1-9e5a812172e1a3197e1af70cd38901219509b3c9118db9ecf4c1fcb69c62fc6e.pixelbrain.json",
-    "expectedPacketContentHash": "pb1:9e5a812172e1a3197e1af70cd38901219509b3c9118db9ecf4c1fcb69c62fc6e"
+    "pixelBrainUrl": "/assets/generated/brazier.pb1-497da959aba5307a7714ceb36b8d932fb735650ae1e566110b76b39eeaaf878d.pixelbrain.json",
+    "expectedPacketContentHash": "pb1:497da959aba5307a7714ceb36b8d932fb735650ae1e566110b76b39eeaaf878d"
   },
   "entities/brazier_lit": {
     "assetKey": "entities/brazier_lit",
-    "pixelBrainUrl": "/assets/generated/brazier-lit.pb1-64505b450ab7b9284aae3e535a81a73849e793271138eed5ce4eab03d79bf145.pixelbrain.json",
-    "expectedPacketContentHash": "pb1:64505b450ab7b9284aae3e535a81a73849e793271138eed5ce4eab03d79bf145"
+    "pixelBrainUrl": "/assets/generated/brazier-lit.pb1-5d941188eaa8c7f81d6abc5b38baa3b5b6cb6a87bf7c1bafee92b4f677cd5981.pixelbrain.json",
+    "expectedPacketContentHash": "pb1:5d941188eaa8c7f81d6abc5b38baa3b5b6cb6a87bf7c1bafee92b4f677cd5981"
   },
   "entities/lantern": {
     "assetKey": "entities/lantern",
-    "pixelBrainUrl": "/assets/generated/lantern.pb1-940337ad5552aa514cec6cbd2cec3acd6e532e9e13d0e7793c2d6e37bd55431e.pixelbrain.json",
-    "expectedPacketContentHash": "pb1:940337ad5552aa514cec6cbd2cec3acd6e532e9e13d0e7793c2d6e37bd55431e"
+    "pixelBrainUrl": "/assets/generated/lantern.pb1-80515c2490ff162920b24374fb07e2246e53b77f4b87e0df787745d8078fd744.pixelbrain.json",
+    "expectedPacketContentHash": "pb1:80515c2490ff162920b24374fb07e2246e53b77f4b87e0df787745d8078fd744"
+  },
+  "entities/sign": {
+    "assetKey": "entities/sign",
+    "pixelBrainUrl": "/assets/generated/sign.pb1-5786661e2349d05a6982d25b1557e54e6313ce96a37e929a2573a63a6523af4f.pixelbrain.json",
+    "expectedPacketContentHash": "pb1:5786661e2349d05a6982d25b1557e54e6313ce96a37e929a2573a63a6523af4f"
+  },
+  "entities/well": {
+    "assetKey": "entities/well",
+    "pixelBrainUrl": "/assets/generated/well.pb1-378e34d0b7bcc089465f85fc2d84ce8ab3eca1a54c7596f29bd9d6723b7951e6.pixelbrain.json",
+    "expectedPacketContentHash": "pb1:378e34d0b7bcc089465f85fc2d84ce8ab3eca1a54c7596f29bd9d6723b7951e6"
   },
   "players/marker_default": {
     "assetKey": "players/marker_default",
-    "pixelBrainUrl": "/assets/generated/player-marker.pb1-0e64b2045c4dd4bd12999b5b10b1cd6ba0ca6650fa8489e1bb86891221d3486f.pixelbrain.json",
-    "expectedPacketContentHash": "pb1:0e64b2045c4dd4bd12999b5b10b1cd6ba0ca6650fa8489e1bb86891221d3486f"
+    "pixelBrainUrl": "/assets/generated/player-marker.pb1-6600a2c4e1add265e80f44a54ba3a284904dd9f268c7ee74c75f788ac1b68a39.pixelbrain.json",
+    "expectedPacketContentHash": "pb1:6600a2c4e1add265e80f44a54ba3a284904dd9f268c7ee74c75f788ac1b68a39"
+  },
+  "rooms/forest_path/background": {
+    "assetKey": "rooms/forest_path/background",
+    "pixelBrainUrl": "/assets/generated/forest-background.pb1-7a99f179368abc73a00658607518b55bebfd77d1a7f304830dc7eb4c1298dd5e.pixelbrain.json",
+    "expectedPacketContentHash": "pb1:7a99f179368abc73a00658607518b55bebfd77d1a7f304830dc7eb4c1298dd5e"
+  },
+  "rooms/moonlit_clearing/background": {
+    "assetKey": "rooms/moonlit_clearing/background",
+    "pixelBrainUrl": "/assets/generated/clearing-background.pb1-f759afb60fd418517626ace6019ca1b98e45fc47e74782e5050ca48986042b3c.pixelbrain.json",
+    "expectedPacketContentHash": "pb1:f759afb60fd418517626ace6019ca1b98e45fc47e74782e5050ca48986042b3c"
+  },
+  "rooms/ruined_shrine/background": {
+    "assetKey": "rooms/ruined_shrine/background",
+    "pixelBrainUrl": "/assets/generated/shrine-background.pb1-c65676d24d5863d83a31df2fa3e7fdf0c87770854af61ad59ac6fe6c3c4483a5.pixelbrain.json",
+    "expectedPacketContentHash": "pb1:c65676d24d5863d83a31df2fa3e7fdf0c87770854af61ad59ac6fe6c3c4483a5"
   }
 } as const satisfies PixelBrainAssetRegistry;

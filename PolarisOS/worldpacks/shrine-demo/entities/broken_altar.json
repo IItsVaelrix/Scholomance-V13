@@ -1,0 +1,16 @@
+{
+  "entityId": "broken_altar",
+  "entityType": "environment",
+  "definitionId": "altar",
+  "displayName": "Broken Altar",
+  "description": "A stone altar split down the middle. Faded carvings depict a figure holding a flame aloft.",
+  "roomId": "ruined_shrine",
+  "portable": false,
+  "interactable": false,
+  "flags": {},
+  "illustration": {
+    "asset": "entities/altar",
+    "layerType": "prop",
+    "defaultPosition": { "x": 300, "y": 260 }
+  }
+}

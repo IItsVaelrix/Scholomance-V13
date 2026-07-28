@@ -68,14 +68,9 @@ const Gutter = forwardRef(function Gutter({
 
   const renderSyllables = (n) => {
     if (n <= 0) return null;
-    if (n > MAX_BARS) {
-      return <span className="syllable-count-mini">{n}</span>;
-    }
     return (
-      <span className="syllable-bars" title={`${n} syllables`}>
-        {Array.from({ length: n }, (_, b) => (
-          <span key={b} className="syllable-bar" />
-        ))}
+      <span className="syllable-count-mini" title={`${n} syllable${n === 1 ? '' : 's'}`}>
+        {n}
       </span>
     );
   };

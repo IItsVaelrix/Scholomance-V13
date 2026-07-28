@@ -38,6 +38,12 @@ import {
   type PlanSprite,
   type SceneRenderPlan,
 } from "./scenePlan.js";
+import { buildAtmospherePlan } from "./atmospherePlan.js";
+import {
+  AtmosphereRenderer,
+  type AtmosphereLayer,
+  type AtmosphereTicker,
+} from "./AtmosphereRenderer.js";
 
 export interface RendererConfig {
   container: HTMLElement;
@@ -51,6 +57,17 @@ export interface RendererConfig {
   decodePngDimensions?: (bytes: Uint8Array) => Promise<PngDimensions>;
   width?: number;
   height?: number;
+  /**
+   * Enable the presentation-layer atmosphere pass (glow, particles, gradient
+   * backdrop, vignette). Default true. Set false to strip all atmosphere
+   * ornamentation — the scene remains fully operable (design spec §3 goal 4).
+   */
+  atmosphere?: boolean;
+  /**
+   * Force reduced-motion (one static seeded frame, zero animation). When
+   * undefined, honors the platform `prefers-reduced-motion` media query.
+   */
+  reducedMotion?: boolean;
 }
 
 export interface SceneRenderOutcome {
@@ -70,6 +87,7 @@ interface PixiApp {
   init(options: Record<string, unknown>): Promise<void>;
   stage: PixiContainer;
   canvas: HTMLCanvasElement;
+  ticker?: AtmosphereTicker;
   destroy(removeCanvas?: boolean, options?: Record<string, unknown>): void;
 }
 
@@ -84,6 +102,8 @@ interface BuiltScene {
   root: PixiContainer;
   ledger: ResolvedAssetLedgerEntry[];
   renderHash: `render1:${string}`;
+  /** Presentation-layer atmosphere (null when disabled or in fallback). */
+  atmosphere: AtmosphereLayer | null;
 }
 
 export function pixiApplicationOptions(
@@ -147,6 +167,18 @@ function releaseRoot(root: PixiContainer): Releasable {
   };
 }
 
+/** Honor the platform reduced-motion preference; safe where matchMedia is absent. */
+function detectReducedMotion(): boolean {
+  try {
+    if (typeof window !== "undefined" && typeof window.matchMedia === "function") {
+      return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    }
+  } catch {
+    // fall through to false
+  }
+  return false;
+}
+
 export class PixiSceneRenderer {
   private readonly config: RendererConfig;
   private readonly resolver: PixelBrainAssetResolver;
@@ -162,8 +194,13 @@ export class PixiSceneRenderer {
   private ledger: readonly ResolvedAssetLedgerEntry[] = [];
   private activeRoot: PixiContainer | null = null;
   private activeResources: readonly Releasable[] = [];
+  private activeAtmosphere: AtmosphereLayer | null = null;
+  private atmosphereRenderer: AtmosphereRenderer | null = null;
+  private readonly atmosphereEnabled: boolean;
+  private readonly reducedMotion: boolean;
   private initialized = false;
   private destroyed = false;
+  private initPromise: Promise<void> | null = null;
 
   private readonly onContextLost = (event: Event): void => {
     event.preventDefault();
@@ -189,6 +226,8 @@ export class PixiSceneRenderer {
   constructor(config: RendererConfig) {
     this.config = config;
     this.fallback = config.fallbackMode === true;
+    this.atmosphereEnabled = config.atmosphere !== false;
+    this.reducedMotion = config.reducedMotion ?? detectReducedMotion();
     this.resolver = new PixelBrainAssetResolver({
       registry: config.assetRegistry ?? {},
       ...(config.fetch === undefined ? {} : { fetch: config.fetch }),
@@ -219,7 +258,23 @@ export class PixiSceneRenderer {
     this.config.onDiagnostic?.(diagnostic);
   }
 
-  async init(): Promise<void> {
+  /**
+   * Memoized init promise. renderScene/preload await this so they never observe
+   * a half-initialized renderer (app/pixi still null while the Pixi import and
+   * Application.init are in flight). Without this, a scene manifest that arrives
+   * before init completes would take the text-fallback path, claim its contract
+   * hash, and never retry — leaving the canvas blank until an unrelated mutation
+   * forces a fresh render (Dual-State Art Pass: initial-render race fix).
+   */
+  init(): Promise<void> {
+    if (this.destroyed) return Promise.resolve();
+    if (this.initPromise === null) {
+      this.initPromise = this.performInit();
+    }
+    return this.initPromise;
+  }
+
+  private async performInit(): Promise<void> {
     if (this.initialized || this.destroyed) return;
     this.initialized = true;
     if (this.fallback) {
@@ -252,6 +307,11 @@ export class PixiSceneRenderer {
         create: (input) => createRgbaTextureResource(pixi, input),
         destroy: destroyTextureResource,
       });
+      if (this.atmosphereEnabled) {
+        this.atmosphereRenderer = new AtmosphereRenderer(
+          pixi as unknown as ConstructorParameters<typeof AtmosphereRenderer>[0],
+        );
+      }
     } catch {
       this.fallback = true;
       this.app = null;
@@ -385,7 +445,7 @@ export class PixiSceneRenderer {
   }
 
   async renderScene(manifest: SceneManifest): Promise<SceneRenderOutcome> {
-    if (!this.initialized) await this.init();
+    await this.init();
     const plan = buildScenePlan(manifest, { fallbackMode: this.fallback });
 
     if (this.fallback || this.app === null || this.pixi === null) {
@@ -431,7 +491,10 @@ export class PixiSceneRenderer {
       build: async (resolved, leases) => (
         this.buildSceneRoot(plan, resolved, leases as TextureLease<unknown>[])
       ),
-      discard: (built) => built.root.destroy({ children: true }),
+      discard: (built) => {
+        built.atmosphere?.destroy();
+        built.root.destroy({ children: true });
+      },
       commit: (built, leases) => {
         const previous: Releasable[] = [...this.activeResources];
         this.app!.stage.addChild(built.root);
@@ -444,8 +507,20 @@ export class PixiSceneRenderer {
             throw cause;
           }
         }
+        // Retire the previous atmosphere: stop its ticker and queue destruction
+        // of its per-build textures after the new frame is committed.
+        if (this.activeAtmosphere !== null) {
+          const retired = this.activeAtmosphere;
+          retired.stop();
+          previous.push({ release: () => retired.destroy() });
+        }
         this.activeRoot = built.root;
         this.activeResources = leases;
+        this.activeAtmosphere = built.atmosphere;
+        // Begin animation on the new atmosphere (no-op under reduced motion).
+        if (built.atmosphere !== null && this.app!.ticker !== undefined) {
+          built.atmosphere.start(this.app!.ticker);
+        }
         this.lastPlan = plan;
         this.lastManifest = manifest;
         this.ledger = built.ledger;
@@ -495,15 +570,53 @@ export class PixiSceneRenderer {
       lease.texture,
     ]));
 
-    const background = new pixi.Graphics();
-    background.rect(0, 0, plan.width, plan.height).fill({
+    // Presentation-layer atmosphere (design spec §5). Built first so its
+    // gradient backdrop can replace the flat room fill; its overlay (glow +
+    // particles) and vignette are layered around the authoritative sprites.
+    // Null when the atmosphere pass is disabled or unavailable — the flat
+    // background + lighting tint below keep the scene fully operable.
+    const atmosphere = this.atmosphereRenderer !== null
+      ? this.atmosphereRenderer.build(
+          buildAtmospherePlan(plan, { reducedMotion: this.reducedMotion }),
+          plan.width,
+          plan.height,
+        )
+      : null;
+
+    // Layer 0 — flat room base. Always present; visible only where neither the
+    // atmosphere gradient nor an authored backdrop covers it.
+    const base = new pixi.Graphics();
+    base.rect(0, 0, plan.width, plan.height).fill({
       color: plan.backgroundGlyph.color,
       alpha: 1,
     });
-    root.addChild(background);
+    root.addChild(base);
+
+    // Layer 1 — atmosphere mood gradient + stars + moonbeams (opaque gradient
+    // covers the base; stars/moonbeams read through backdrop openings).
+    if (atmosphere !== null) {
+      root.addChild(atmosphere.backdrop);
+    }
+
+    // Layer 2 — authored room backdrop (walls/floor/opening). Transparent
+    // regions reveal the mood gradient beneath; falls back to the gradient or
+    // base when no backdrop packet resolved.
+    const backdropSprite = this.buildBackgroundSprite(
+      plan,
+      byAsset,
+      byTexture,
+    );
+    if (backdropSprite !== null) {
+      root.addChild(backdropSprite);
+    }
 
     for (const sprite of plan.sprites) {
       root.addChild(this.buildSprite(sprite, byAsset, byTexture));
+    }
+
+    // Additive glow + particles bloom over the world objects.
+    if (atmosphere !== null) {
+      root.addChild(atmosphere.overlay);
     }
 
     const tint = new pixi.Graphics();
@@ -512,6 +625,11 @@ export class PixiSceneRenderer {
       alpha: plan.lightingAlpha,
     });
     root.addChild(tint);
+
+    // Edge vignette sits over the tint but under text so labels stay legible.
+    if (atmosphere !== null) {
+      root.addChild(atmosphere.vignette);
+    }
 
     for (const region of plan.textRegions) {
       if (!region.text) continue;
@@ -563,7 +681,33 @@ export class PixiSceneRenderer {
       root,
       ledger,
       renderHash: computeSceneRenderHash(plan, ledger),
+      atmosphere,
     };
+  }
+
+  private buildBackgroundSprite(
+    plan: SceneRenderPlan,
+    byAsset: ReadonlyMap<string, ResolvedRecord>,
+    byTexture: ReadonlyMap<string, unknown>,
+  ): unknown | null {
+    const record = byAsset.get(plan.backgroundAssetKey);
+    const resolution = record?.resolution;
+    const cacheKey = resolution?.status === "PIXELBRAIN"
+      ? resolution.raster.rasterHash
+      : resolution?.status === "PNG" ? resolution.pngRevision : null;
+    const texture = cacheKey === null ? undefined : byTexture.get(cacheKey);
+    if (texture === undefined) return null;
+
+    const pixi = this.pixi!;
+    const sprite = new pixi.Sprite(texture as never);
+    // Stretch the authored backdrop to fill the logical canvas. Backdrops are
+    // authored at the canvas aspect (parent §10.3 raster law), so this is a
+    // whole-number-friendly fit; nearest-neighbor sampling keeps pixels crisp.
+    sprite.x = 0;
+    sprite.y = 0;
+    sprite.width = plan.width;
+    sprite.height = plan.height;
+    return sprite;
   }
 
   private buildSprite(
@@ -667,7 +811,7 @@ export class PixiSceneRenderer {
   }
 
   async preload(assetKeys: string[]): Promise<void> {
-    if (!this.initialized) await this.init();
+    await this.init();
     if (this.fallback || this.textureCache === null) return;
     const records = await Promise.all([...new Set(assetKeys)].sort().map(
       async (assetKey): Promise<ResolvedRecord> => ({
@@ -740,6 +884,13 @@ export class PixiSceneRenderer {
     this.coordinator.destroy();
     for (const resource of this.activeResources) resource.release();
     this.activeResources = [];
+    if (this.activeAtmosphere !== null) {
+      this.activeAtmosphere.stop();
+      this.activeAtmosphere.destroy();
+      this.activeAtmosphere = null;
+    }
+    this.atmosphereRenderer?.destroy();
+    this.atmosphereRenderer = null;
     if (this.activeRoot !== null) {
       this.app?.stage.removeChild(this.activeRoot);
       releaseRoot(this.activeRoot).release();

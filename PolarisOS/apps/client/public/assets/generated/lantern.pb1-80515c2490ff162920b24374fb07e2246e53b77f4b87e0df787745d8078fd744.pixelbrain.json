@@ -1,0 +1,759 @@
+{
+  "kind": "pixelbrain.render.v1",
+  "id": "shrine-lantern",
+  "schemaVersion": 1,
+  "contentHash": "pb1:80515c2490ff162920b24374fb07e2246e53b77f4b87e0df787745d8078fd744",
+  "canvas": {
+    "width": 16,
+    "height": 24,
+    "cellSize": 1,
+    "transparent": true,
+    "background": "#00000000"
+  },
+  "coordinates": [
+    {
+      "snappedX": 6,
+      "snappedY": 4,
+      "z": 0,
+      "color": "#4b4b5eff"
+    },
+    {
+      "snappedX": 7,
+      "snappedY": 4,
+      "z": 0,
+      "color": "#101017ff"
+    },
+    {
+      "snappedX": 8,
+      "snappedY": 4,
+      "z": 0,
+      "color": "#101017ff"
+    },
+    {
+      "snappedX": 9,
+      "snappedY": 4,
+      "z": 0,
+      "color": "#4b4b5eff"
+    },
+    {
+      "snappedX": 5,
+      "snappedY": 5,
+      "z": 0,
+      "color": "#4b4b5eff"
+    },
+    {
+      "snappedX": 6,
+      "snappedY": 5,
+      "z": 0,
+      "color": "#101017ff"
+    },
+    {
+      "snappedX": 7,
+      "snappedY": 5,
+      "z": 0,
+      "color": "#101017ff"
+    },
+    {
+      "snappedX": 8,
+      "snappedY": 5,
+      "z": 0,
+      "color": "#101017ff"
+    },
+    {
+      "snappedX": 9,
+      "snappedY": 5,
+      "z": 0,
+      "color": "#101017ff"
+    },
+    {
+      "snappedX": 10,
+      "snappedY": 5,
+      "z": 0,
+      "color": "#4b4b5eff"
+    },
+    {
+      "snappedX": 5,
+      "snappedY": 7,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 6,
+      "snappedY": 7,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 7,
+      "snappedY": 7,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 8,
+      "snappedY": 7,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 9,
+      "snappedY": 7,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 10,
+      "snappedY": 7,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 4,
+      "snappedY": 8,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 5,
+      "snappedY": 8,
+      "z": 0,
+      "color": "#343b5aff"
+    },
+    {
+      "snappedX": 6,
+      "snappedY": 8,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 7,
+      "snappedY": 8,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 8,
+      "snappedY": 8,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 9,
+      "snappedY": 8,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 10,
+      "snappedY": 8,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 4,
+      "snappedY": 9,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 5,
+      "snappedY": 9,
+      "z": 0,
+      "color": "#343b5aff"
+    },
+    {
+      "snappedX": 6,
+      "snappedY": 9,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 7,
+      "snappedY": 9,
+      "z": 0,
+      "color": "#f59e0bff"
+    },
+    {
+      "snappedX": 8,
+      "snappedY": 9,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 9,
+      "snappedY": 9,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 10,
+      "snappedY": 9,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 11,
+      "snappedY": 9,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 4,
+      "snappedY": 10,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 5,
+      "snappedY": 10,
+      "z": 0,
+      "color": "#343b5aff"
+    },
+    {
+      "snappedX": 6,
+      "snappedY": 10,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 7,
+      "snappedY": 10,
+      "z": 0,
+      "color": "#f59e0bff"
+    },
+    {
+      "snappedX": 8,
+      "snappedY": 10,
+      "z": 0,
+      "color": "#f59e0bff"
+    },
+    {
+      "snappedX": 9,
+      "snappedY": 10,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 10,
+      "snappedY": 10,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 11,
+      "snappedY": 10,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 4,
+      "snappedY": 11,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 5,
+      "snappedY": 11,
+      "z": 0,
+      "color": "#343b5aff"
+    },
+    {
+      "snappedX": 6,
+      "snappedY": 11,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 7,
+      "snappedY": 11,
+      "z": 0,
+      "color": "#f59e0bff"
+    },
+    {
+      "snappedX": 8,
+      "snappedY": 11,
+      "z": 0,
+      "color": "#f59e0bff"
+    },
+    {
+      "snappedX": 9,
+      "snappedY": 11,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 10,
+      "snappedY": 11,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 11,
+      "snappedY": 11,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 4,
+      "snappedY": 12,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 5,
+      "snappedY": 12,
+      "z": 0,
+      "color": "#343b5aff"
+    },
+    {
+      "snappedX": 6,
+      "snappedY": 12,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 7,
+      "snappedY": 12,
+      "z": 0,
+      "color": "#f59e0bff"
+    },
+    {
+      "snappedX": 8,
+      "snappedY": 12,
+      "z": 0,
+      "color": "#f59e0bff"
+    },
+    {
+      "snappedX": 9,
+      "snappedY": 12,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 10,
+      "snappedY": 12,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 11,
+      "snappedY": 12,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 4,
+      "snappedY": 13,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 5,
+      "snappedY": 13,
+      "z": 0,
+      "color": "#343b5aff"
+    },
+    {
+      "snappedX": 6,
+      "snappedY": 13,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 7,
+      "snappedY": 13,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 8,
+      "snappedY": 13,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 9,
+      "snappedY": 13,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 10,
+      "snappedY": 13,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 11,
+      "snappedY": 13,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 4,
+      "snappedY": 14,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 5,
+      "snappedY": 14,
+      "z": 0,
+      "color": "#343b5aff"
+    },
+    {
+      "snappedX": 6,
+      "snappedY": 14,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 7,
+      "snappedY": 14,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 8,
+      "snappedY": 14,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 9,
+      "snappedY": 14,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 10,
+      "snappedY": 14,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 11,
+      "snappedY": 14,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 4,
+      "snappedY": 15,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 5,
+      "snappedY": 15,
+      "z": 0,
+      "color": "#343b5aff"
+    },
+    {
+      "snappedX": 6,
+      "snappedY": 15,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 7,
+      "snappedY": 15,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 8,
+      "snappedY": 15,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 9,
+      "snappedY": 15,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 10,
+      "snappedY": 15,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 11,
+      "snappedY": 15,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 4,
+      "snappedY": 16,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 5,
+      "snappedY": 16,
+      "z": 0,
+      "color": "#343b5aff"
+    },
+    {
+      "snappedX": 6,
+      "snappedY": 16,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 7,
+      "snappedY": 16,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 8,
+      "snappedY": 16,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 9,
+      "snappedY": 16,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 10,
+      "snappedY": 16,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 5,
+      "snappedY": 17,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 6,
+      "snappedY": 17,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 7,
+      "snappedY": 17,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 8,
+      "snappedY": 17,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 9,
+      "snappedY": 17,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 10,
+      "snappedY": 17,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 6,
+      "snappedY": 18,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 7,
+      "snappedY": 18,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 8,
+      "snappedY": 18,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 9,
+      "snappedY": 18,
+      "z": 0,
+      "color": "#1a2038ff"
+    },
+    {
+      "snappedX": 5,
+      "snappedY": 19,
+      "z": 0,
+      "color": "#101017ff"
+    },
+    {
+      "snappedX": 6,
+      "snappedY": 19,
+      "z": 0,
+      "color": "#101017ff"
+    },
+    {
+      "snappedX": 7,
+      "snappedY": 19,
+      "z": 0,
+      "color": "#101017ff"
+    },
+    {
+      "snappedX": 8,
+      "snappedY": 19,
+      "z": 0,
+      "color": "#101017ff"
+    },
+    {
+      "snappedX": 9,
+      "snappedY": 19,
+      "z": 0,
+      "color": "#101017ff"
+    },
+    {
+      "snappedX": 10,
+      "snappedY": 19,
+      "z": 0,
+      "color": "#101017ff"
+    },
+    {
+      "snappedX": 5,
+      "snappedY": 20,
+      "z": 0,
+      "color": "#101017ff"
+    },
+    {
+      "snappedX": 6,
+      "snappedY": 20,
+      "z": 0,
+      "color": "#101017ff"
+    },
+    {
+      "snappedX": 7,
+      "snappedY": 20,
+      "z": 0,
+      "color": "#101017ff"
+    },
+    {
+      "snappedX": 8,
+      "snappedY": 20,
+      "z": 0,
+      "color": "#101017ff"
+    },
+    {
+      "snappedX": 9,
+      "snappedY": 20,
+      "z": 0,
+      "color": "#101017ff"
+    },
+    {
+      "snappedX": 10,
+      "snappedY": 20,
+      "z": 0,
+      "color": "#101017ff"
+    },
+    {
+      "snappedX": 0,
+      "snappedY": 23,
+      "z": 0,
+      "color": "#4b4b5eff"
+    },
+    {
+      "snappedX": 1,
+      "snappedY": 23,
+      "z": 0,
+      "color": "#4b4b5eff"
+    },
+    {
+      "snappedX": 2,
+      "snappedY": 23,
+      "z": 0,
+      "color": "#4b4b5eff"
+    },
+    {
+      "snappedX": 3,
+      "snappedY": 23,
+      "z": 0,
+      "color": "#4b4b5eff"
+    },
+    {
+      "snappedX": 4,
+      "snappedY": 23,
+      "z": 0,
+      "color": "#4b4b5eff"
+    },
+    {
+      "snappedX": 5,
+      "snappedY": 23,
+      "z": 0,
+      "color": "#4b4b5eff"
+    },
+    {
+      "snappedX": 6,
+      "snappedY": 23,
+      "z": 0,
+      "color": "#4b4b5eff"
+    },
+    {
+      "snappedX": 7,
+      "snappedY": 23,
+      "z": 0,
+      "color": "#4b4b5eff"
+    },
+    {
+      "snappedX": 8,
+      "snappedY": 23,
+      "z": 0,
+      "color": "#4b4b5eff"
+    },
+    {
+      "snappedX": 9,
+      "snappedY": 23,
+      "z": 0,
+      "color": "#4b4b5eff"
+    },
+    {
+      "snappedX": 10,
+      "snappedY": 23,
+      "z": 0,
+      "color": "#4b4b5eff"
+    },
+    {
+      "snappedX": 11,
+      "snappedY": 23,
+      "z": 0,
+      "color": "#4b4b5eff"
+    },
+    {
+      "snappedX": 12,
+      "snappedY": 23,
+      "z": 0,
+      "color": "#4b4b5eff"
+    },
+    {
+      "snappedX": 13,
+      "snappedY": 23,
+      "z": 0,
+      "color": "#4b4b5eff"
+    },
+    {
+      "snappedX": 14,
+      "snappedY": 23,
+      "z": 0,
+      "color": "#4b4b5eff"
+    },
+    {
+      "snappedX": 15,
+      "snappedY": 23,
+      "z": 0,
+      "color": "#4b4b5eff"
+    }
+  ]
+}

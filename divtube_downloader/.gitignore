@@ -22,6 +22,9 @@ niche_database.sqlite
 # Aether reserve state (per-machine spend tracking)
 .aether_meter.json
 
+# Per-tab /prompt conversation memory (DivTube, Mother, …)
+.tui_prompt_history.json
+
 # Backups
 *.bak
 .blackboxcli/

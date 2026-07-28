@@ -88,7 +88,7 @@ export async function readBoundedResponseBytes(
   const chunks: Uint8Array[] = [];
   let total = 0;
   try {
-    while (true) {
+    for (;;) {
       const { done, value } = await reader.read();
       if (done) break;
       if (value === undefined) continue;

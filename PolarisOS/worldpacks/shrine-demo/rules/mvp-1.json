@@ -1,0 +1,30 @@
+{
+  "rulesetVersion": "mvp-1",
+  "actions": {
+    "TAKE": {
+      "requires": ["target_in_room", "target_portable"],
+      "produces": ["ENTITY_TAKEN"]
+    },
+    "DROP": {
+      "requires": ["target_in_inventory"],
+      "produces": ["ENTITY_DROPPED"]
+    },
+    "ACTIVATE": {
+      "requires": ["target_accessible", "target_interactable"],
+      "produces": ["ENTITY_ACTIVATED"]
+    },
+    "MOVE": {
+      "requires": ["exit_exists"],
+      "produces": ["PLAYER_LEFT_ROOM", "PLAYER_ENTERED_ROOM"]
+    },
+    "SAY": {
+      "requires": [],
+      "produces": ["PLAYER_SPOKE"]
+    }
+  },
+  "constraints": {
+    "maxInventorySize": 10,
+    "commandRateLimit": 5,
+    "commandRateWindowMs": 1000
+  }
+}

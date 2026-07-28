@@ -1202,11 +1202,31 @@
   font-size: 0.85rem;
 }
 
-.preview-before, .preview-after {
+.preview-before, .preview-after, .preview-move, .preview-advisory {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+}
+
+/* A move changes position, not wording, and an advisory proposes no text at all. Neither
+   is a red/green diff — colouring their text as "removed" would claim an edit that is not
+   happening. Both get a neutral treatment and an accent that marks the card's shape. */
+.suggestion-preview--move {
+  border-left: 2px solid rgba(96, 165, 250, 0.55);
+}
+
+.suggestion-preview--advisory {
+  border-left: 2px solid rgba(255, 255, 255, 0.18);
+}
+
+.preview-move .preview-text {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.preview-advisory .preview-text {
+  color: rgba(255, 255, 255, 0.55);
+  font-style: italic;
 }
 
 .preview-arrow {

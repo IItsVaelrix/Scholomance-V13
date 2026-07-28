@@ -170,10 +170,14 @@ export function buildPhraseFrame(jdText: string, requirement: Requirement): Phra
     end: clause.end,
   };
 
-  // Tokenize on whitespace, dropping list glyphs and trailing sentence punctuation.
+  // Tokenize on whitespace, dropping list glyphs and trailing sentence punctuation. The
+  // trailing strip includes the comma: clause scoping hands back its boundary delimiter
+  // ("Required: SQL,"), and a comma left on the last token would double up with the outcome
+  // slot's own comma — "Used SQL,, ␟" reads as a typo in a bullet the candidate is meant to
+  // accept verbatim.
   const tokens = sourceClause
     .replace(/^[\s•\-*–—]+/, '')
-    .replace(/[.;:!?]+\s*$/, '')
+    .replace(/[.,;:!?]+\s*$/, '')
     .split(/\s+/)
     .filter(Boolean);
 

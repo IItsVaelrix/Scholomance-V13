@@ -1,0 +1,1287 @@
+{
+  "assetKey": "entities/altar",
+  "packet": {
+    "kind": "pixelbrain.render.v1",
+    "id": "shrine-altar",
+    "schemaVersion": 1,
+    "canvas": {
+      "width": 120,
+      "height": 64,
+      "cellSize": 4,
+      "transparent": true,
+      "background": "#00000000"
+    },
+    "coordinates": [
+      {
+        "snappedX": 4,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 20,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 24,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 28,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 32,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 36,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 40,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 44,
+        "snappedY": 8,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 48,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 52,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 56,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 60,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 64,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 68,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 72,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 76,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 80,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 84,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 88,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 92,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 96,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 100,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 104,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 108,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 112,
+        "snappedY": 8,
+        "color": "#8a8f9a"
+      },
+      {
+        "snappedX": 4,
+        "snappedY": 12,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 12,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 12,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 12,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 20,
+        "snappedY": 12,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 24,
+        "snappedY": 12,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 28,
+        "snappedY": 12,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 32,
+        "snappedY": 12,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 36,
+        "snappedY": 12,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 40,
+        "snappedY": 12,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 44,
+        "snappedY": 12,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 48,
+        "snappedY": 12,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 52,
+        "snappedY": 12,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 56,
+        "snappedY": 12,
+        "color": "#e6c15a"
+      },
+      {
+        "snappedX": 60,
+        "snappedY": 12,
+        "color": "#e6c15a"
+      },
+      {
+        "snappedX": 64,
+        "snappedY": 12,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 68,
+        "snappedY": 12,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 72,
+        "snappedY": 12,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 76,
+        "snappedY": 12,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 80,
+        "snappedY": 12,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 84,
+        "snappedY": 12,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 88,
+        "snappedY": 12,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 92,
+        "snappedY": 12,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 96,
+        "snappedY": 12,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 100,
+        "snappedY": 12,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 104,
+        "snappedY": 12,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 108,
+        "snappedY": 12,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 112,
+        "snappedY": 12,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 4,
+        "snappedY": 16,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 16,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 16,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 16,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 20,
+        "snappedY": 16,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 24,
+        "snappedY": 16,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 28,
+        "snappedY": 16,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 32,
+        "snappedY": 16,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 36,
+        "snappedY": 16,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 40,
+        "snappedY": 16,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 44,
+        "snappedY": 16,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 48,
+        "snappedY": 16,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 52,
+        "snappedY": 16,
+        "color": "#c9a96e"
+      },
+      {
+        "snappedX": 56,
+        "snappedY": 16,
+        "color": "#ffe08a"
+      },
+      {
+        "snappedX": 60,
+        "snappedY": 16,
+        "color": "#ffe08a"
+      },
+      {
+        "snappedX": 64,
+        "snappedY": 16,
+        "color": "#c9a96e"
+      },
+      {
+        "snappedX": 68,
+        "snappedY": 16,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 72,
+        "snappedY": 16,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 76,
+        "snappedY": 16,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 80,
+        "snappedY": 16,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 84,
+        "snappedY": 16,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 88,
+        "snappedY": 16,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 92,
+        "snappedY": 16,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 96,
+        "snappedY": 16,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 100,
+        "snappedY": 16,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 104,
+        "snappedY": 16,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 108,
+        "snappedY": 16,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 112,
+        "snappedY": 16,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 4,
+        "snappedY": 20,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 20,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 20,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 20,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 20,
+        "snappedY": 20,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 24,
+        "snappedY": 20,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 28,
+        "snappedY": 20,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 32,
+        "snappedY": 20,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 36,
+        "snappedY": 20,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 40,
+        "snappedY": 20,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 44,
+        "snappedY": 20,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 48,
+        "snappedY": 20,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 52,
+        "snappedY": 20,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 56,
+        "snappedY": 20,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 60,
+        "snappedY": 20,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 64,
+        "snappedY": 20,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 68,
+        "snappedY": 20,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 72,
+        "snappedY": 20,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 76,
+        "snappedY": 20,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 80,
+        "snappedY": 20,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 84,
+        "snappedY": 20,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 88,
+        "snappedY": 20,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 92,
+        "snappedY": 20,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 96,
+        "snappedY": 20,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 100,
+        "snappedY": 20,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 104,
+        "snappedY": 20,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 108,
+        "snappedY": 20,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 112,
+        "snappedY": 20,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 24,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 20,
+        "snappedY": 24,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 24,
+        "snappedY": 24,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 28,
+        "snappedY": 24,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 32,
+        "snappedY": 24,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 36,
+        "snappedY": 24,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 48,
+        "snappedY": 24,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 80,
+        "snappedY": 24,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 84,
+        "snappedY": 24,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 88,
+        "snappedY": 24,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 92,
+        "snappedY": 24,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 96,
+        "snappedY": 24,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 100,
+        "snappedY": 24,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 28,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 20,
+        "snappedY": 28,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 24,
+        "snappedY": 28,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 28,
+        "snappedY": 28,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 32,
+        "snappedY": 28,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 36,
+        "snappedY": 28,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 52,
+        "snappedY": 28,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 80,
+        "snappedY": 28,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 84,
+        "snappedY": 28,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 88,
+        "snappedY": 28,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 92,
+        "snappedY": 28,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 96,
+        "snappedY": 28,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 100,
+        "snappedY": 28,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 32,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 20,
+        "snappedY": 32,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 24,
+        "snappedY": 32,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 28,
+        "snappedY": 32,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 32,
+        "snappedY": 32,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 36,
+        "snappedY": 32,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 52,
+        "snappedY": 32,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 80,
+        "snappedY": 32,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 84,
+        "snappedY": 32,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 88,
+        "snappedY": 32,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 92,
+        "snappedY": 32,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 96,
+        "snappedY": 32,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 100,
+        "snappedY": 32,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 36,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 20,
+        "snappedY": 36,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 24,
+        "snappedY": 36,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 28,
+        "snappedY": 36,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 32,
+        "snappedY": 36,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 36,
+        "snappedY": 36,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 48,
+        "snappedY": 36,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 80,
+        "snappedY": 36,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 84,
+        "snappedY": 36,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 88,
+        "snappedY": 36,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 92,
+        "snappedY": 36,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 96,
+        "snappedY": 36,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 100,
+        "snappedY": 36,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 40,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 20,
+        "snappedY": 40,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 24,
+        "snappedY": 40,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 28,
+        "snappedY": 40,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 32,
+        "snappedY": 40,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 36,
+        "snappedY": 40,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 48,
+        "snappedY": 40,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 80,
+        "snappedY": 40,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 84,
+        "snappedY": 40,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 88,
+        "snappedY": 40,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 92,
+        "snappedY": 40,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 96,
+        "snappedY": 40,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 100,
+        "snappedY": 40,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 44,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 20,
+        "snappedY": 44,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 24,
+        "snappedY": 44,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 28,
+        "snappedY": 44,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 32,
+        "snappedY": 44,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 36,
+        "snappedY": 44,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 52,
+        "snappedY": 44,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 80,
+        "snappedY": 44,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 84,
+        "snappedY": 44,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 88,
+        "snappedY": 44,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 92,
+        "snappedY": 44,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 96,
+        "snappedY": 44,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 100,
+        "snappedY": 44,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 48,
+        "color": "#6b707c"
+      },
+      {
+        "snappedX": 20,
+        "snappedY": 48,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 24,
+        "snappedY": 48,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 28,
+        "snappedY": 48,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 32,
+        "snappedY": 48,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 36,
+        "snappedY": 48,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 80,
+        "snappedY": 48,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 84,
+        "snappedY": 48,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 88,
+        "snappedY": 48,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 92,
+        "snappedY": 48,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 96,
+        "snappedY": 48,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 100,
+        "snappedY": 48,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 52,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 52,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 52,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 20,
+        "snappedY": 52,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 24,
+        "snappedY": 52,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 28,
+        "snappedY": 52,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 32,
+        "snappedY": 52,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 36,
+        "snappedY": 52,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 40,
+        "snappedY": 52,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 44,
+        "snappedY": 52,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 48,
+        "snappedY": 52,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 52,
+        "snappedY": 52,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 56,
+        "snappedY": 52,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 60,
+        "snappedY": 52,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 64,
+        "snappedY": 52,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 68,
+        "snappedY": 52,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 72,
+        "snappedY": 52,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 76,
+        "snappedY": 52,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 80,
+        "snappedY": 52,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 84,
+        "snappedY": 52,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 88,
+        "snappedY": 52,
+        "color": "#565b66"
+      },
+      {
+        "snappedX": 92,
+        "snappedY": 52,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 96,
+        "snappedY": 52,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 100,
+        "snappedY": 52,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 104,
+        "snappedY": 52,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 108,
+        "snappedY": 52,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 8,
+        "snappedY": 56,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 12,
+        "snappedY": 56,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 16,
+        "snappedY": 56,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 20,
+        "snappedY": 56,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 24,
+        "snappedY": 56,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 28,
+        "snappedY": 56,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 32,
+        "snappedY": 56,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 36,
+        "snappedY": 56,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 40,
+        "snappedY": 56,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 44,
+        "snappedY": 56,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 48,
+        "snappedY": 56,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 52,
+        "snappedY": 56,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 56,
+        "snappedY": 56,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 60,
+        "snappedY": 56,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 64,
+        "snappedY": 56,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 68,
+        "snappedY": 56,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 72,
+        "snappedY": 56,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 76,
+        "snappedY": 56,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 80,
+        "snappedY": 56,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 84,
+        "snappedY": 56,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 88,
+        "snappedY": 56,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 92,
+        "snappedY": 56,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 96,
+        "snappedY": 56,
+        "color": "#41454e"
+      },
+      {
+        "snappedX": 100,
+        "snappedY": 56,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 104,
+        "snappedY": 56,
+        "color": "#2b2e35"
+      },
+      {
+        "snappedX": 108,
+        "snappedY": 56,
+        "color": "#2b2e35"
+      }
+    ]
+  }
+}

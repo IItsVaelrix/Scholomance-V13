@@ -16,6 +16,7 @@ import { parseResumeSource } from '../../src/lib/career/parser/parse-resume';
 import { analyzeCareerFit } from '../../src/lib/career/analysis/analyze-career';
 import { buildImprovements } from '../../src/lib/career/improve/build-improvements';
 import { applyAcceptedSuggestions } from '../../src/lib/career/suggestions/apply-suggestions';
+import { INPUT_SENTINEL } from '../../src/lib/career/amplify/data/input-sentinel';
 import { BENCHMARK_PAIRS } from '../fixtures/career-benchmark/pairs';
 import type { ResumeSuggestion } from '../../src/lib/career/analysis/types';
 import type { ResumeDocument } from '../../src/lib/career/parser/types';
@@ -66,6 +67,14 @@ describe('career benchmark — fabrication', () => {
       for (const sug of run.suggestions) {
         const proposed = sug.after ?? '';
         if (!proposed) continue; // a note with no edit cannot fabricate
+        // A slotted DRAFT (Case A / quantify) still carrying an unfilled U+241F sentinel is
+        // an OFFER, not an assertion: the apply engine refuses any `after` that holds a
+        // sentinel (`unfilled_input`), so the JD term in its frame cannot reach the résumé
+        // until the candidate fills the blank, chooses the employer, and accepts — at which
+        // point the candidate authors the claim, not the tool. The load-bearing guard for
+        // that is the apply-time check below; here we only police FINISHED text the tool
+        // would write on its own.
+        if (proposed.includes(INPUT_SENTINEL)) continue;
         for (const term of run.unsupportedTerms) {
           // Only a term the résumé genuinely lacks can be fabricated by proposing it.
           if (wordPresent(resumeText, term)) continue;

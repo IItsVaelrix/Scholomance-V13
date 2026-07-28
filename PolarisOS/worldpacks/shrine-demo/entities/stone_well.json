@@ -1,0 +1,16 @@
+{
+  "entityId": "stone_well",
+  "entityType": "environment",
+  "definitionId": "well",
+  "displayName": "Stone Well",
+  "description": "An ancient well of fitted stone. The water below is black and still.",
+  "roomId": "moonlit_clearing",
+  "portable": false,
+  "interactable": false,
+  "flags": {},
+  "illustration": {
+    "asset": "entities/well",
+    "layerType": "prop",
+    "defaultPosition": { "x": 350, "y": 250 }
+  }
+}

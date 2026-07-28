@@ -6,6 +6,10 @@
 
 import { mountDomPlan, type DomPlanNode, type MountedPolarisConsole } from "./mountDomPlan.js";
 import {
+  createChromeOrnamentController,
+} from "./chromeOrnaments.js";
+import { polarisChromeRegistry } from "../generated/polaris-chrome.registry.js";
+import {
   selectComponentState,
   selectVisibleEntities,
   type ConsoleComponent,
@@ -40,6 +44,13 @@ export function createPolarisConsoleView(
 ): PolarisConsoleView {
   const mounted = mountDomPlan(document, target, plan);
   const byId = mounted.byId;
+
+  // Decorative SCDL chrome: resolves variant SVGs into the aria-hidden
+  // attachment hosts from each panel's data-state (Dual-State Art Pass §7).
+  const chrome = createChromeOrnamentController(
+    mounted.attachmentHosts,
+    polarisChromeRegistry,
+  );
 
   const shell = byId.get("polaris-console");
   const headerTitle = byId.get("polaris-system-header.title");
@@ -207,6 +218,9 @@ export function createPolarisConsoleView(
     renderChronicle(state);
     renderTelemetry(state);
     renderCommand(state);
+
+    // Resolve chrome ornaments after data-state is set on every panel.
+    chrome.update();
   }
 
   return { render, mounted, sceneAltarHosts };

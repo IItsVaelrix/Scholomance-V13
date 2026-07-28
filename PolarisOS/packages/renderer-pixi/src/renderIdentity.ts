@@ -83,9 +83,7 @@ export function computeSceneRenderHash(
 interface RgbaPixiApi {
   // `any` is intentional at this narrow adapter seam: tests use structural
   // fakes while production passes Pixi's more specific constructor options.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   BufferImageSource: new (options: any) => unknown;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Texture: new (options: any) => {
     destroy(destroySource?: boolean): void;
   };

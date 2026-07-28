@@ -322,6 +322,7 @@ export default function ReadPage() {
     literaryDevices,
     emotion,
     totalSyllables,
+    lineSyllableCounts,
     analyzedWords,
     tokenByIdentity: analyzedWordsByIdentity,
     tokenByCharStart: analyzedWordsByCharStart,
@@ -338,6 +339,14 @@ export default function ReadPage() {
   const narrativeAMP = deepAnalysis?.narrativeAMP || null;
   const oracle = deepAnalysis?.oracle || null;
   const genreProfile = deepAnalysis?.genreProfile || null;
+
+  const effectiveTotalSyllables = useMemo(() => {
+    if (typeof totalSyllables === 'number' && totalSyllables > 0) return totalSyllables;
+    if (Array.isArray(lineSyllableCounts) && lineSyllableCounts.length > 0) {
+      return lineSyllableCounts.reduce((sum, n) => sum + (Number(n) || 0), 0);
+    }
+    return 0;
+  }, [totalSyllables, lineSyllableCounts]);
   const {
     songStats,
     computeFailed: songStatsComputeFailed,
@@ -991,7 +1000,7 @@ export default function ReadPage() {
     telemetry: {
       line: cursorPos.line,
       col: cursorPos.col,
-      syllables: totalSyllables ?? 0,
+      syllables: effectiveTotalSyllables ?? 0,
       lines: lineCount ?? 0,
       power: Math.round(scoreData?.totalScore || 0),
     },
@@ -1200,7 +1209,7 @@ export default function ReadPage() {
                 analyzedWordsByIdentity={analyzedWordsByIdentity}
                 analyzedWordsByCharStart={analyzedWordsByCharStart}
                 resonantCharStarts={resonantCharStarts}
-                lineSyllableCounts={deepAnalysis?.lineSyllableCounts || []}
+                lineSyllableCounts={lineSyllableCounts || deepAnalysis?.lineSyllableCounts || []}
                 highlightedLines={effectiveHighlightedLines}
                 pinnedLines={pinnedLines}
                 syntaxLayer={deepAnalysis?.syntaxSummary}
@@ -1490,7 +1499,7 @@ export default function ReadPage() {
                     analyzedWordsByIdentity={analyzedWordsByIdentity}
                     analyzedWordsByCharStart={analyzedWordsByCharStart}
                     resonantCharStarts={resonantCharStarts}
-                    lineSyllableCounts={deepAnalysis?.lineSyllableCounts || []}
+                    lineSyllableCounts={lineSyllableCounts || deepAnalysis?.lineSyllableCounts || []}
                     highlightedLines={effectiveHighlightedLines}
                     pinnedLines={pinnedLines}
                     syntaxLayer={deepAnalysis?.syntaxSummary}
@@ -1694,7 +1703,7 @@ export default function ReadPage() {
         line={cursorPos.line}
         col={cursorPos.col}
         language="Scroll Language"
-        syllableCount={totalSyllables}
+        syllableCount={effectiveTotalSyllables}
         analysisError={analysisError}
         serverAnalysisActive={USE_SERVER_ANALYSIS}
       />

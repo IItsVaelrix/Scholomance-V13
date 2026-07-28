@@ -200,11 +200,18 @@ describe("PolarisConsoleView", () => {
   it("keeps all semantic content present with zero resolved attachment assets", () => {
     const view = createPolarisConsoleView(document, target, plan);
     view.render(connectedState());
-    // Attachment hosts exist as empty aria-hidden spans; no asset is mounted.
+    // Attachment hosts are aria-hidden decoration hosts. No resolved *world*
+    // asset (raster image or canvas) may be mounted in them. Chrome ornaments
+    // (Dual-State Art Pass §7) inject trusted, build-time SVG into these hosts
+    // by design — that is decoration, not a resolved scene asset — so we assert
+    // on img/canvas and verify any svg present is a chrome-ornament host.
     const hosts = target.querySelectorAll("[data-attachment-slot]");
     expect(hosts.length).toBeGreaterThan(0);
     for (const host of Array.from(hosts)) {
-      expect(host.querySelector("img,canvas,svg")).toBeNull();
+      expect(host.querySelector("img,canvas")).toBeNull();
+      if (host.querySelector("svg") !== null) {
+        expect(host.getAttribute("data-chrome-family")).not.toBeNull();
+      }
     }
     // Semantic content remains fully usable.
     expect(target.querySelector("form#polaris-command-conduit")).not.toBeNull();

@@ -1,0 +1,75 @@
+# Ruined Shrine — stone interior with arch, altar, and rune glow
+# Wand-forged contours: arch, pillars, floor, altar, runes
+asset shrine_background canvas 60x40
+
+palette {
+  wall_deep  = #05050D
+  wall_body  = #0E1020
+  wall_hi    = #191C2D
+  arch_body  = #191C2D
+  arch_hi    = #383D55
+  floor_body = #12141E
+  floor_hi   = #1A1C28
+  altar_body = #383D55
+  altar_hi   = #6E7693
+  rune_glow  = #3920A0
+  rune_hi    = #7463E8
+}
+
+part wall material obsidian {
+  rect 0 0 60 40 wall_body
+}
+
+part wall_shadow material obsidian {
+  rect 0 0 60 8 wall_deep
+}
+
+part arch material obsidian {
+  path "M12 36 L12 14 Q30 4 48 14 L48 36" arch_body
+}
+
+part arch_highlight material obsidian {
+  path "M14 36 L14 15 Q30 6 46 15 L46 36" arch_hi
+}
+
+part pillar_left material obsidian {
+  rect 8 14 4 22 wall_hi
+  rim arch_hi at west
+}
+
+part pillar_right material obsidian {
+  rect 48 14 4 22 wall_hi
+  rim arch_hi at east
+}
+
+part floor material source {
+  rect 0 32 60 8 floor_body
+}
+
+part floor_tiles material source {
+  line 10 32 10 40 floor_hi
+  line 20 32 20 40 floor_hi
+  line 30 32 30 40 floor_hi
+  line 40 32 40 40 floor_hi
+  line 50 32 50 40 floor_hi
+}
+
+part altar material obsidian {
+  rect 24 28 12 4 altar_body
+  rim altar_hi at north
+}
+
+part rune_left material void_rune_glow {
+  line 16 18 16 28 rune_glow
+  glow radius 1
+}
+
+part rune_right material void_rune_glow {
+  line 44 18 44 28 rune_glow
+  glow radius 1
+}
+
+part rune_center material void_rune_glow {
+  circle 30 24 radius 1 rune_hi
+  glow radius 2
+}

@@ -1,0 +1,45 @@
+# Lantern — darksteel frame with holy fire glow
+# Wand-forged contours: handle, cap, body, flame, base
+asset lantern canvas 16x24
+
+palette {
+  handle_hi  = #4B4B5E
+  handle_lo  = #1A1A26
+  cap_body   = #101017
+  glass_body = #1A2038
+  glass_hi   = #343B5A
+  flame_core = #FFFBEB
+  flame_body = #F59E0B
+  flame_deep = #92400E
+  base_body  = #101017
+}
+
+part handle material darksteel {
+  path "M5 6 Q8 1 11 6" handle_hi
+}
+
+part cap material darksteel {
+  polygon 6 6 7 4 9 4 10 6 cap_body
+}
+
+part glass material void_cloth {
+  polygon 5 7 4 10 4 15 5 18 7 19 9 19 11 18 12 15 12 10 11 7 glass_body
+}
+
+part glass_highlight material void_cloth {
+  line 5 8 5 16 glass_hi
+}
+
+part flame material holy_fire {
+  polygon 7 11 8 8 9 11 8 15 flame_body
+  glow radius 2
+}
+
+part flame_core material holy_fire {
+  polygon 7.5 10 8 9 8.5 10 8 13 flame_core
+}
+
+part base material darksteel {
+  rect 5 19 6 2 base_body
+  rim handle_hi at south
+}

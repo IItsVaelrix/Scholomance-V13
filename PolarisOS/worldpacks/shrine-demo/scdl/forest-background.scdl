@@ -1,0 +1,58 @@
+# Forest Path — night forest with moon and winding trail
+# Wand-forged contours: treeline, ground, moon, path
+asset forest_background canvas 50x30
+
+palette {
+  sky_deep   = #060A14
+  sky_body   = #0A0E1A
+  moon_core  = #D0D8E8
+  moon_glow  = #8090B0
+  tree_dark  = #080E14
+  tree_body  = #0D1520
+  tree_hi    = #141E2A
+  ground_lo  = #0A120C
+  ground_mid = #0F1A12
+  path_body  = #1A2418
+  path_hi    = #222E20
+}
+
+part sky material source {
+  rect 0 0 50 18 sky_body
+}
+
+part sky_gradient material source {
+  rect 0 0 50 6 sky_deep
+}
+
+part moon material source {
+  circle 38 5 radius 3 moon_core
+  glow radius 3
+}
+
+part moon_halo material source {
+  ring 38 5 radius 5 width 2 moon_glow
+}
+
+part treeline_far material source {
+  polygon 0 14 4 10 8 13 12 8 16 12 20 7 24 11 28 6 32 10 36 8 40 12 44 9 48 13 50 10 50 18 0 18 tree_dark
+}
+
+part treeline_near material source {
+  polygon 0 16 5 12 10 15 15 10 20 14 25 9 30 13 35 11 40 15 45 12 50 14 50 20 0 20 tree_body
+}
+
+part ground material source {
+  rect 0 18 50 12 ground_mid
+}
+
+part ground_shadow material source {
+  rect 0 24 50 6 ground_lo
+}
+
+part path material source {
+  polygon 22 30 23 26 24 22 25 19 26 18 27 19 28 22 29 26 30 30 path_body
+}
+
+part path_highlight material source {
+  line 25 28 26 20 path_hi
+}

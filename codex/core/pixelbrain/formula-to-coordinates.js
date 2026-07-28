@@ -258,17 +258,61 @@ export function evaluateEdgeTrace(formula, canvasSize, _time = 0) {
     : (formula.tracePath || []);
   if (sourcePath.length === 0) return [];
 
-  const totalPoints = sourcePath.length;
-  const _speed = 0.02;
+  const step = formula.step || 0.25; // Dense sub-cell sampling step (0.25 lattice cells)
+  const densePoints = [];
 
-  return sourcePath.map((p, index) => ({
-    x: roundTo(p.x, 1),
-    y: roundTo(p.y, 1),
+  let totalLen = 0;
+  for (let i = 0; i < sourcePath.length - 1; i++) {
+    const p1 = sourcePath[i];
+    const p2 = sourcePath[i + 1];
+    const dx = p2.x - p1.x;
+    const dy = p2.y - p1.y;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    totalLen += len;
+  }
+
+  let accumulated = 0;
+  for (let i = 0; i < sourcePath.length - 1; i++) {
+    const p1 = sourcePath[i];
+    const p2 = sourcePath[i + 1];
+    const dx = p2.x - p1.x;
+    const dy = p2.y - p1.y;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    if (len === 0) continue;
+
+    const numSubsteps = Math.max(1, Math.ceil(len / step));
+    for (let s = 0; s < numSubsteps; s++) {
+      const frac = s / numSubsteps;
+      const x = p1.x + dx * frac;
+      const y = p1.y + dy * frac;
+      const currentDist = accumulated + len * frac;
+      const t = totalLen > 0 ? currentDist / totalLen : 0;
+
+      densePoints.push({
+        x: roundTo(x, 2),
+        y: roundTo(y, 2),
+        z: 0,
+        emphasis: clamp01(t),
+        source: 'edge_trace',
+        pathIndex: densePoints.length,
+        t,
+      });
+    }
+    accumulated += len;
+  }
+
+  const last = sourcePath[sourcePath.length - 1];
+  densePoints.push({
+    x: roundTo(last.x, 2),
+    y: roundTo(last.y, 2),
     z: 0,
-    emphasis: clamp01(index / totalPoints),
+    emphasis: 1.0,
     source: 'edge_trace',
-    pathIndex: index,
-  }));
+    pathIndex: densePoints.length,
+    t: 1.0,
+  });
+
+  return densePoints;
 }
 
 /**
@@ -709,7 +753,7 @@ export function evaluateVectorizedText(formula, canvasSize, _time = 0) {
  */
 export function evaluateMathematicalStroke(formula, canvasSize, time = 0) {
   const params = formula.parameters || formula;
-  const {
+  let {
     cx = canvasSize.width / 2,
     cy = canvasSize.height / 2,
     length = 180,
@@ -721,6 +765,15 @@ export function evaluateMathematicalStroke(formula, canvasSize, time = 0) {
     bleed = 0.3,            // soft edge bleed factor (for ring-like thickness)
     n = 128,
   } = params;
+
+  if (params.origin && params.target) {
+    cx = (params.origin.x + params.target.x) / 2;
+    cy = (params.origin.y + params.target.y) / 2;
+    const dx = params.target.x - params.origin.x;
+    const dy = params.target.y - params.origin.y;
+    length = Math.sqrt(dx * dx + dy * dy);
+    angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+  }
 
   const coords = [];
   const rad = (angle * Math.PI) / 180;

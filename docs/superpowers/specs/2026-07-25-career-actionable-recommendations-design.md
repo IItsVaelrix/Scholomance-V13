@@ -2,7 +2,20 @@
 
 **Date:** 2026-07-25
 **Branch:** `feature/semantic-calculus-lexical-predicates`
-**Status:** design approved, not implemented
+**Status:** implemented (finalized 2026-07-25)
+
+> **Finalization note.** Every section below is built and covered by tests in `tests/unit/`
+> (`careerJdPhraseFrame`, `careerFrameProvenance`, `careerMissingEvidence`, `careerEntryAware`,
+> `careerImproveRules`, `careerImproveOutputQuality`, `careerMergeImprovements`,
+> `careerApplyProvenance`, `careerBenchmarkInvariants`). Two implementation corrections landed
+> during finalization, both in service of the design as written: (1) the Case C demote flag is
+> emitted independently of whether a reorder is needed — the original `continue` on an
+> unchanged order short-circuited it, so an already-last irrelevant bullet got no card at all;
+> (2) term-level gap suppression matches by content-token coverage, not string equality,
+> because the prose gap names a bare term while the drafted card quotes the whole JD clause.
+> The benchmark's "never proposes a credential" invariant now distinguishes a finished
+> assertion from a slotted draft still carrying an unfilled U+241F sentinel — the apply-time
+> guard (which refuses any `after` holding a sentinel) is the load-bearing honesty check.
 
 ## Problem
 

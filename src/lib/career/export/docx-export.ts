@@ -48,11 +48,18 @@ function sanitizeRole(role: string | undefined): string {
   return cleaned || 'export';
 }
 
-/** One consistent style for EVERY major section heading (uniform hierarchy). */
+/**
+ * One consistent style for EVERY major section heading (uniform hierarchy).
+ *
+ * `keepNext` binds it to the first line beneath it: a heading is never the last thing on a
+ * page with its section starting on the next one.
+ */
 function sectionHeading(text: string): Paragraph {
   return new Paragraph({
     heading: HeadingLevel.HEADING_1,
     spacing: { before: 240, after: 80 },
+    keepNext: true,
+    keepLines: true,
     border: {
       bottom: { color: '444444', space: 2, style: BorderStyle.SINGLE, size: 6 },
     },
@@ -61,22 +68,41 @@ function sectionHeading(text: string): Paragraph {
 }
 
 /** A real bullet paragraph: explicit numbering ref → visible glyph + hanging indent. */
-function bulletParagraph(text: string): Paragraph {
+function bulletParagraph(text: string, keepNext = false): Paragraph {
   return new Paragraph({
     numbering: { reference: BULLET_NUMBERING_REF, level: 0 },
     spacing: { after: 40 },
+    // A bullet never breaks mid-way down a page; `keepNext` additionally holds the FIRST
+    // bullet of an entry to the second, so a role can never open with a lone orphan line.
+    keepLines: true,
+    ...(keepNext ? { keepNext: true } : {}),
     children: [new TextRun({ text, size: 21 })],
   });
 }
 
-/** Render one experience entry: bold title, italic date, then its achievement bullets. */
+/**
+ * Render one experience entry: bold title, italic date, then its achievement bullets.
+ *
+ * Pagination law for a role entry: the title, its date, and its first achievement are ONE
+ * indivisible block. Word honours that with `keepNext` on the title and date (bind to the
+ * paragraph below) plus `keepLines` (never split the paragraph itself). Without it the
+ * title lands alone at the foot of a page and the date + bullets open the next one, which
+ * reads to a recruiter as an entry with no role attached.
+ */
 function renderExperienceEntry(entry: ReturnType<typeof segmentEntries>[number]): Paragraph[] {
   const paragraphs: Paragraph[] = [];
+  const hasFollowingContent = Boolean(entry.date) || entry.bullets.length > 0;
 
-  if (entry.title) {
+  // Route on the parser's classification, never re-derive it here. A role heading is the
+  // one thing this branch may draw in title position; anything else reaching `entry.title`
+  // is a parser fault, and drawing it as ordinary text would hide that fault behind a
+  // plausible-looking résumé line.
+  if (entry.title && entry.title.kind === 'role_heading') {
     paragraphs.push(
       new Paragraph({
         spacing: { before: 140, after: 0 },
+        keepNext: hasFollowingContent,
+        keepLines: true,
         children: [new TextRun({ text: entry.title.rawText, bold: true, size: 22 })],
       })
     );
@@ -85,13 +111,17 @@ function renderExperienceEntry(entry: ReturnType<typeof segmentEntries>[number])
     paragraphs.push(
       new Paragraph({
         spacing: { before: 0, after: 40 },
+        keepNext: entry.bullets.length > 0,
+        keepLines: true,
         children: [new TextRun({ text: entry.date.rawText, italics: true, size: 20, color: '555555' })],
       })
     );
   }
-  for (const bullet of entry.bullets) {
-    paragraphs.push(bulletParagraph(bullet.rawText));
-  }
+  entry.bullets.forEach((bullet, index) => {
+    // Bind the first bullet to the second so the block the title is held to is a real
+    // achievement, not a single stranded line.
+    paragraphs.push(bulletParagraph(bullet.rawText, index === 0 && entry.bullets.length > 1));
+  });
   // A headerless entry with no title/date still renders its bullets (plain list).
   return paragraphs;
 }
@@ -121,6 +151,7 @@ function renderGenericSection(section: ResumeSection): Paragraph[] {
         new Paragraph({
           alignment: AlignmentType.LEFT,
           spacing: { after: 40 },
+          keepLines: true,
           children: [new TextRun({ text: content, size: 21 })],
         })
       );

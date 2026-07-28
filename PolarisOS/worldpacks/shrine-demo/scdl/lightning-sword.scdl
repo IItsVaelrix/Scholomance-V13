@@ -1,0 +1,35 @@
+# Celestial Storm Saber — Vixel Asset Definition
+asset lightning_sword canvas 16x32
+
+palette {
+  blade_darksteel = #2B323D
+  edge_silver     = #99AAB8
+  lightning_cyan  = #4DEEEA
+  guard_gold      = #D4AF37
+  grip_leather    = #3D261D
+  pommel_cyan     = #80FFFF
+}
+
+part blade material darksteel {
+  polygon 7 3 9 4 10 12 9 22 6 22 6 12 blade_darksteel
+}
+
+part edge material holy_steel {
+  polygon 9 4 11 5 11 14 10 22 9 22 edge_silver
+}
+
+part fuller_glow material void_rune_glow {
+  rect 7 8 2 12 lightning_cyan
+}
+
+part guard material gold {
+  polygon 2 22 14 22 13 24 3 24 guard_gold
+}
+
+part grip material oak_bark {
+  rect 7 24 2 5 grip_leather
+}
+
+part pommel material moonstone {
+  ellipse 8 30 radius 2 ry 1 pommel_cyan
+}

@@ -364,3 +364,69 @@ function makeTwoSectionDocForTest(experienceRaw: string): ResumeDocument {
     confidence: 0.9,
   };
 }
+
+describe('entry-anchored insertion (Case A apply path)', () => {
+  // Date lines make segmentEntries recover one entry per employer; without them the whole
+  // section collapses to a single entry and "the chosen entry" is meaningless.
+  const RESUME = [
+    'EXPERIENCE',
+    'iQor — Support Lead',
+    '2021 - Present',
+    'Wrote reporting queries against Postgres',
+    'GC Services — Agent',
+    '2019 - 2021',
+    'Handled inbound customer calls',
+  ].join('\n');
+
+  it('inserts a new bullet at the end of the chosen entry only', () => {
+    const doc = makeImproveDoc(RESUME, 'experience', 'EXPERIENCE');
+    const entries = segmentEntries(doc.sections[0]);
+    const iqor = entries[0];
+
+    const result = applyMovesAndRewrites(doc, [
+      {
+        id: 'sug:insert:1',
+        type: 'learning_gap',
+        target: { entryId: iqor.id, sectionId: doc.sections[0].id },
+        after: 'Used Apache Airflow, saved time',
+        reason: 'test',
+        evidence: [],
+        confidence: 0.6,
+        risk: 'medium',
+        requiresUserApproval: true,
+        status: 'accepted',
+      },
+    ]);
+
+    expect(result.applied).toContain('sug:insert:1');
+    const lines = result.text.split('\n');
+    const inserted = lines.findIndex((l) => l.includes('Apache Airflow'));
+    const gcServices = lines.findIndex((l) => l.includes('GC Services'));
+    // The new bullet lands inside the iQor entry, above the next employer.
+    expect(inserted).toBeGreaterThan(lines.findIndex((l) => l.includes('Postgres')));
+    expect(inserted).toBeLessThan(gcServices);
+    // The other entry is untouched.
+    expect(result.text).toContain('Handled inbound customer calls');
+  });
+
+  it('refuses an insertion naming an entry that does not exist', () => {
+    const doc = makeImproveDoc(RESUME, 'experience', 'EXPERIENCE');
+    const result = applyMovesAndRewrites(doc, [
+      {
+        id: 'sug:insert:2',
+        type: 'learning_gap',
+        target: { entryId: 'entry:does-not-exist', sectionId: doc.sections[0].id },
+        after: 'Used Apache Airflow, saved time',
+        reason: 'test',
+        evidence: [],
+        confidence: 0.6,
+        risk: 'medium',
+        requiresUserApproval: true,
+        status: 'accepted',
+      },
+    ]);
+    expect(result.applied).not.toContain('sug:insert:2');
+    expect(result.skipped.some((s) => s.suggestionId === 'sug:insert:2')).toBe(true);
+    expect(result.text).not.toContain('Apache Airflow');
+  });
+});

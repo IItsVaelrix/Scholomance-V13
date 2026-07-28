@@ -117,6 +117,8 @@ export const ConnectionReadySchema = z.object({
   playerId: z.string(),
   worldId: z.string(),
   serverTime: z.string().datetime(),
+  /** The world's authored spawn room; clients join it unless overridden (PDR §3). */
+  spawnRoomId: z.string().optional(),
 });
 
 export const RoomSnapshotSchema = z.object({

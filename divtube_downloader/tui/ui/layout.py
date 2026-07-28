@@ -25,7 +25,7 @@ def get_layout() -> ComposeResult:
                 with TabPane("DivTube", id="tab-divtube"):
                     yield _make_log("chat-divtube", title("DIVTUBE COCKPIT"))
                 with TabPane("Mother", id="tab-mother"):
-                    yield _make_log("chat-mother", title("MOTHER COCKPIT"))
+                    yield _make_log("chat-mother", title("MOTHER — COMMENTARY & Q&A"))
                 with TabPane("Pixelbrain", id="tab-pixelbrain"):
                     yield _make_log("chat-pixelbrain", title("PIXELBRAIN COCKPIT"))
                 with TabPane("Vaelrix", id="tab-vaelrix"):

@@ -41,14 +41,15 @@ export function resolveColorsPass(ast, errors) {
       return colorRef.value;
     }
 
-    if (colorRef.kind === 'alias') {
-      const resolved = palette[colorRef.value];
+    if (colorRef.kind === 'alias' || colorRef.kind === 'palette') {
+      const name = colorRef.name || colorRef.value;
+      const resolved = palette[name];
       if (!resolved) {
         errors.push(scdlError(
-          `Undefined palette alias '${colorRef.value}'`,
+          `Undefined palette alias '${name}'`,
           SCDL_ERROR_CODES.UNDEFINED_PALETTE_REF,
           loc,
-          { alias: colorRef.value }
+          { alias: name }
         ));
         return '#000000';
       }

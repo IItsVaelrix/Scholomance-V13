@@ -32,8 +32,229 @@ export function pushCell(ops, x, y, color, loc, sourceOp = null) {
     }
     // Also carry any explicit role on the op
     if (sourceOp.role) cell.role = sourceOp.role;
+
+    // Phase 2: Stamp analytic per-cell vector identity at raster time.
+    // signedDistance, t, tangent, normal, curvature — computed from the op's
+    // own geometry, not inferred later. This is the truth, not a nearest-neighbour guess.
+    const vi = computeVectorIdentity(sourceOp, x, y);
+    if (vi) {
+      // The SDF is data, not a verdict. Preserve it exactly as the analytic
+      // geometry computed it. For a stroked op (rim/ring) the rasterized cells
+      // legitimately straddle the centerline — the outer half reads positive,
+      // the inner half negative — and that sign structure IS the silhouette the
+      // renderer antialiases. Clamping here would overwrite the measurement and
+      // hard-edge exactly the boundary the vixel exists to keep smooth.
+      // Coverage decisions belong to the renderer (fill vs band), not the compiler.
+      cell.signedDistance = vi.signedDistance;
+      cell.t = vi.t;
+      cell.tangent = vi.tangent;
+      cell.normal = vi.normal;
+      cell.curvature = vi.curvature;
+      if (vi.arcLength !== undefined) cell.arcLength = vi.arcLength;
+      // Stroke ops carry their half-width so the renderer can apply band coverage
+      // (edge at |sd| = halfWidth) instead of half-space coverage (edge at sd = 0).
+      if (vi.halfWidth !== undefined) cell.strokeHalfWidth = vi.halfWidth;
+    }
   }
   ops.push(cell);
+}
+
+/**
+ * Compute analytic vector identity for a cell at (px, py) relative to its source op.
+ * Returns { signedDistance, t, tangent, normal, curvature } or null if the op type
+ * is not analytically tractable.
+ *
+ * signedDistance: negative inside, positive outside, zero on boundary
+ * t: true arc-length parameter (0..1) along the op's perimeter
+ * tangent: unit tangent vector [tx, ty] at the nearest boundary point
+ * normal: unit outward normal [nx, ny]
+ * curvature: 1/R at the nearest boundary point (0 for flat edges)
+ */
+function computeVectorIdentity(op, px, py) {
+  const type = op.op || op.type;
+
+  if (type === 'circle' || type === 'ellipse') {
+    const cx = op.cx;
+    const cy = op.cy;
+    const rx = op.rx ?? op.radius ?? 1;
+    const ry = op.ry ?? op.radius ?? 1;
+
+    const dx = (px - cx) / rx;
+    const dy = (py - cy) / ry;
+    const dist = Math.sqrt(dx * dx + dy * dy) || 1e-9;
+
+    // Signed distance (negative inside)
+    const signedDistance = (dist - 1) * Math.min(rx, ry);
+
+    // Parametric angle → t
+    const angle = Math.atan2(dy, dx);
+    const t = (angle + Math.PI) / (2 * Math.PI);
+
+    // Tangent (counterclockwise) and outward normal
+    const tangent = [-Math.sin(angle), Math.cos(angle)];
+    const normal = [Math.cos(angle), Math.sin(angle)];
+
+    // Curvature of ellipse: κ = (rx·ry) / (rx²sin²θ + ry²cos²θ)^(3/2)
+    const sinA = Math.sin(angle);
+    const cosA = Math.cos(angle);
+    const denom = Math.pow(rx * rx * sinA * sinA + ry * ry * cosA * cosA, 1.5);
+    const curvature = denom > 0 ? (rx * ry) / denom : 0;
+
+    // Arc length: Ramanujan's approximation for ellipse perimeter
+    const arcLength = Math.PI * (3 * (rx + ry) - Math.sqrt((3 * rx + ry) * (rx + 3 * ry)));
+
+    // The ellipse rasterizer is a STROKE: rasterizeEllipse walks the perimeter in
+    // angular steps and plots round(boundaryPoint) — it does NOT fill the interior.
+    // So `signedDistance` above is a CENTERLINE distance (to the ellipse curve), and
+    // the plotted cells legitimately straddle it (outer half positive, inner half
+    // negative). The renderer must apply band coverage (edge at |sd| = halfWidth),
+    // not half-space coverage. The intrinsic half-thickness is the rasterizer's
+    // rounding radius: a plotted cell center sits within half a cell of the curve.
+    // An authored op.width overrides this for deliberately thicker strokes.
+    const halfWidth = op.width != null ? op.width / 2 : 0.5;
+
+    return { signedDistance, t, tangent, normal, curvature, arcLength, halfWidth };
+  }
+
+  if (type === 'rect') {
+    const { x, y, w, h } = op;
+    const rcx = x + w / 2;
+    const rcy = y + h / 2;
+
+    // SDF for axis-aligned rect
+    const ddx = Math.abs(px - rcx) - w / 2;
+    const ddy = Math.abs(py - rcy) - h / 2;
+    const outside = Math.sqrt(Math.max(ddx, 0) ** 2 + Math.max(ddy, 0) ** 2);
+    const inside = Math.min(Math.max(ddx, ddy), 0);
+    const signedDistance = outside + inside;
+
+    // Normal: direction of steepest SDF ascent
+    let nx = 0, ny = 0;
+    if (ddx > ddy) nx = Math.sign(px - rcx) || 1;
+    else ny = Math.sign(py - rcy) || 1;
+    const len = Math.sqrt(nx * nx + ny * ny) || 1;
+    nx /= len; ny /= len;
+    const normal = [nx, ny];
+    const tangent = [-ny, nx];
+
+    // Curvature: 0 on flat edges, high at corners
+    const atCorner = ddx > -0.5 && ddy > -0.5;
+    const curvature = atCorner ? 2.0 : 0.0;
+
+    // t: parametric position along perimeter (clockwise from top-left)
+    const perim = 2 * (w + h);
+    let t;
+    if (py <= y) t = (px - x) / perim;
+    else if (px >= x + w) t = (w + (py - y)) / perim;
+    else if (py >= y + h) t = (w + h + (x + w - px)) / perim;
+    else t = (w + h + w + (y + h - py)) / perim;
+    t = Math.max(0, Math.min(1, t));
+
+    return { signedDistance, t, tangent, normal, curvature, arcLength: perim };
+  }
+
+  if (type === 'polygon') {
+    const pts = op.points || [];
+    if (pts.length < 3) return null;
+
+    // Point-in-polygon (ray casting)
+    let inside = false;
+    for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+      const [xi, yi] = pts[i];
+      const [xj, yj] = pts[j];
+      if (((yi > py) !== (yj > py)) && (px < (xj - xi) * (py - yi) / ((yj - yi) || 1e-9) + xi)) {
+        inside = !inside;
+      }
+    }
+
+    // Find nearest edge
+    let minDist = Infinity;
+    let bestTangent = [1, 0];
+    let bestNormal = [0, 1];
+    let bestT = 0;
+
+    let totalLen = 0;
+    const edgeLengths = [];
+    for (let i = 0; i < pts.length; i++) {
+      const j = (i + 1) % pts.length;
+      const len = Math.sqrt((pts[j][0] - pts[i][0]) ** 2 + (pts[j][1] - pts[i][1]) ** 2);
+      edgeLengths.push(len);
+      totalLen += len;
+    }
+
+    let accLen = 0;
+    for (let i = 0; i < pts.length; i++) {
+      const j = (i + 1) % pts.length;
+      const [xi, yi] = pts[i];
+      const [xj, yj] = pts[j];
+      const ex = xj - xi, ey = yj - yi;
+      const len = edgeLengths[i];
+      if (len === 0) { accLen += len; continue; }
+
+      const tEdge = Math.max(0, Math.min(1, ((px - xi) * ex + (py - yi) * ey) / (len * len)));
+      const closestX = xi + tEdge * ex;
+      const closestY = yi + tEdge * ey;
+      const dist = Math.sqrt((px - closestX) ** 2 + (py - closestY) ** 2);
+
+      if (dist < minDist) {
+        minDist = dist;
+        bestTangent = [ex / len, ey / len];
+        let nx = -ey / len;
+        let ny = ex / len;
+        
+        // Polygon centroid for outward normal orientation
+        let polyCx = 0, polyCy = 0;
+        for (let k = 0; k < pts.length; k++) { polyCx += pts[k][0]; polyCy += pts[k][1]; }
+        polyCx /= pts.length;
+        polyCy /= pts.length;
+
+        if (nx * (px - polyCx) + ny * (py - polyCy) < 0) {
+          nx = -nx;
+          ny = -ny;
+        }
+        bestNormal = [nx, ny];
+        bestT = (accLen + tEdge * len) / (totalLen || 1);
+      }
+      accLen += len;
+    }
+
+    const signedDistance = inside ? -minDist : minDist;
+    const curvature = minDist < 0.5 ? 1.5 : 0.0;
+
+    return { signedDistance, t: bestT, tangent: bestTangent, normal: bestNormal, curvature, arcLength: totalLen };
+  }
+
+  if (type === 'ring') {
+    const cx = op.cx;
+    const cy = op.cy;
+    const radius = op.radius ?? 1;
+    const width = op.width ?? 1;
+    const inner = Math.max(0, radius - width / 2);
+    const outer = radius + width / 2;
+
+    const dx = px - cx;
+    const dy = py - cy;
+    const dist = Math.sqrt(dx * dx + dy * dy) || 1e-9;
+
+    // SDF for ring (annulus)
+    const midR = (inner + outer) / 2;
+    const halfW = (outer - inner) / 2;
+    const signedDistance = Math.abs(dist - midR) - halfW;
+
+    const angle = Math.atan2(dy, dx);
+    const t = (angle + Math.PI) / (2 * Math.PI);
+    const tangent = [-Math.sin(angle), Math.cos(angle)];
+    const normal = [Math.cos(angle), Math.sin(angle)];
+    const curvature = dist > 0 ? 1 / dist : 0;
+
+    // Arc length: centerline circumference
+    const arcLength = 2 * Math.PI * midR;
+
+    return { signedDistance, t, tangent, normal, curvature, arcLength };
+  }
+
+  // line, path, sphere, symmetry — not analytically tractable for SDF
+  return null;
 }
 
 // SVG-like path sampler. Handles M, L, H, V, Q, T, C, S, A, Z.

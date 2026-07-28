@@ -234,18 +234,17 @@ export class PixelBrainTextureCache<TTexture = unknown> {
 
   private lease(entry: TextureEntry<TTexture>): TextureLease<TTexture> {
     let released = false;
-    const cache = this;
     return {
       cacheKey: entry.cacheKey,
       get texture() {
         return entry.resource.texture;
       },
-      release() {
+      release: () => {
         if (released) return;
         released = true;
-        if (cache.destroyed || entry.references === 0) return;
+        if (this.destroyed || entry.references === 0) return;
         entry.references -= 1;
-        if (entry.references === 0) cache.evictToPolicy();
+        if (entry.references === 0) this.evictToPolicy();
       },
     };
   }

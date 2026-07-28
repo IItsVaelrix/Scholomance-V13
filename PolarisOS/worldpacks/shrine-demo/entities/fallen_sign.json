@@ -1,0 +1,16 @@
+{
+  "entityId": "fallen_sign",
+  "entityType": "environment",
+  "definitionId": "sign",
+  "displayName": "Fallen Sign",
+  "description": "A wooden signpost lies face-down in the mud. The painted text is unreadable.",
+  "roomId": "forest_path",
+  "portable": false,
+  "interactable": false,
+  "flags": {},
+  "illustration": {
+    "asset": "entities/sign",
+    "layerType": "prop",
+    "defaultPosition": { "x": 150, "y": 300 }
+  }
+}

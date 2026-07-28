@@ -1,11 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { triggerHapticPulse, UI_HAPTICS } from '../../lib/platform/haptics';
 import { parseResumeSource, type ResumeSource } from '../../lib/career/parser/parse-resume';
+import { segmentEntries } from '../../lib/career/parser/segment-entries';
 import { analyzeCareerFit } from '../../lib/career/analysis/analyze-career';
 import { buildCleanExport } from '../../lib/career/export/clean-export';
 import { buildDocxExport } from '../../lib/career/export/docx-export';
 import { buildGraphCareerSuggestions } from '../../lib/career/suggestions/build-suggestions';
+import { mergeImprovements } from '../../lib/career/suggestions/merge-improvements';
 import { buildImprovements } from '../../lib/career/improve/build-improvements';
 import { applyAcceptedSuggestions } from '../../lib/career/suggestions/apply-suggestions';
 import { UserFactLedger } from '../../lib/career/improve/honesty/user-fact-ledger';
@@ -53,32 +55,10 @@ function needsOccupationConfirmation(analysis: CareerGraphAnalysis): boolean {
   );
 }
 
-/**
- * Merge JD-Advisor improvements into an existing suggestion list (spec §6). Drops an
- * improvement whose id already exists or whose target span overlaps an existing
- * suggestion's span, so the panel never shows two cards for the same edit.
- */
-function mergeImprovements(
-  existing: ResumeSuggestion[],
-  improvements: ResumeSuggestion[]
-): ResumeSuggestion[] {
-  const ids = new Set(existing.map((s) => s.id));
-  const spans = existing
-    .map((s) => s.target?.span)
-    .filter((sp): sp is NonNullable<typeof sp> => !!sp)
-    .map((sp) => ({ start: sp.start, end: sp.end }));
-  const overlaps = (sp?: { start: number; end: number }) =>
-    !!sp && spans.some((e) => e.start < sp.end && sp.start < e.end);
+// Merging JD-Advisor improvements into the suggestion list (spec §6) lives in
+// `suggestions/merge-improvements.ts` so its id / span-overlap / term-level suppression
+// rules are unit-testable in isolation. See that module for the dedupe semantics.
 
-  const merged = [...existing];
-  for (const imp of improvements) {
-    if (ids.has(imp.id)) continue;
-    if (overlaps(imp.target?.span)) continue;
-    merged.push(imp);
-    ids.add(imp.id);
-  }
-  return merged;
-}
 
 const BUSY_STATUSES: CareerStatus[] = [
   'EXTRACTING',
@@ -349,10 +329,40 @@ export default function CareerPage({ graphClient }: CareerPageProps = {}) {
     setStatus('IDLE');
   };
 
+  // Employment entries a drafted (Case A) bullet can be placed under. Only experience and
+  // projects sections carry employer entries; the candidate picks one on the card, and that
+  // choice — never an inference — decides where the new bullet lands (spec §3).
+  const experienceEntries = useMemo(() => {
+    const list: { id: string; label: string }[] = [];
+    for (const section of parsedDocument?.sections ?? []) {
+      if (section.kind !== 'experience' && section.kind !== 'projects') continue;
+      for (const entry of segmentEntries(section)) {
+        list.push({
+          id: entry.id,
+          label: entry.title?.rawText || entry.date?.rawText || 'Untitled role',
+        });
+      }
+    }
+    return list;
+  }, [parsedDocument]);
+
   // Suggestion controls
-  const handleAcceptSuggestion = (id: string) => {
+  const handleAcceptSuggestion = (id: string, opts?: { entryId?: string }) => {
     setSuggestions((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, status: 'accepted' } : s))
+      prev.map((s) =>
+        s.id === id
+          ? {
+              ...s,
+              status: 'accepted',
+              // A drafted (Case A) card carries the candidate's chosen employer into the
+              // apply engine, which inserts the new bullet at the end of that entry. The
+              // entry is never inferred — it is exactly the role the candidate selected.
+              target: opts?.entryId
+                ? { ...(s.target ?? {}), entryId: opts.entryId }
+                : s.target,
+            }
+          : s
+      )
     );
   };
 
@@ -630,6 +640,7 @@ export default function CareerPage({ graphClient }: CareerPageProps = {}) {
             {suggestions.length > 0 && (
               <SuggestionReviewPanel
                 suggestions={suggestions}
+                entries={experienceEntries}
                 onAccept={handleAcceptSuggestion}
                 onReject={handleRejectSuggestion}
                 onEdit={handleEditSuggestion}
@@ -704,6 +715,7 @@ export default function CareerPage({ graphClient }: CareerPageProps = {}) {
             {/* Suggestions Review Panel */}
             <SuggestionReviewPanel
               suggestions={suggestions}
+              entries={experienceEntries}
               onAccept={handleAcceptSuggestion}
               onReject={handleRejectSuggestion}
               onEdit={handleEditSuggestion}

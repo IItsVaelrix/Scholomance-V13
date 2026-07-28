@@ -1,0 +1,29 @@
+# Player Marker — sapphire compass diamond with diamond core
+# Wand-forged contours: outer diamond, inner core, top sparkle
+asset player_marker canvas 12x12
+
+palette {
+  outer_body  = #0F52BA
+  outer_frost = #3B82F6
+  core_body   = #C9DAE6
+  core_white  = #FFFFFF
+  sparkle     = #93C5FD
+}
+
+part outer material sapphire {
+  polygon 6 1 10 6 6 11 2 6 outer_body
+  rim outer_frost at north
+}
+
+part core material diamond {
+  circle 6 6 radius 2 core_body
+  glow radius 1
+}
+
+part core_center material diamond {
+  circle 6 6 radius 1 core_white
+}
+
+part sparkle material source {
+  line 6 0 6 2 sparkle
+}

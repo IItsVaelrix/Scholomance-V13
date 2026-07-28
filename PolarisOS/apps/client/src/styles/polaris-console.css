@@ -236,6 +236,74 @@ button,
   }
 }
 
+/* Mobile layout (PDR §20.2) — a single scrollable column:
+     Illustrated Room → Narrative Feed → Inventory Drawer → Command Input.
+   The center stack is a non-semantic <div>, so `display: contents` only
+   dissolves its box (not its children) and is accessibility-safe in evergreen
+   browsers; it lets us order every panel directly on the workspace.
+
+   NOTE on !important: the bundled base rules (#polaris-workspace{display:grid},
+   #polaris-center-stack{display:flex}, and the 1280px telemetry{position:fixed})
+   win the cascade against later equal-specificity media overrides in this build,
+   so the three `display`/`position` flips below must be !important to take
+   effect. Order/flex-direction/max-height have no base competitor and need none. */
+@media (max-width: 720px) {
+  .polaris-console,
+  [data-compose-kind="polaris-console-shell"] {
+    overflow: auto; /* the whole page scrolls; panels no longer own the viewport */
+  }
+  #polaris-workspace {
+    display: flex !important;
+    flex-direction: column;
+    gap: var(--polaris-space-sm);
+    padding: var(--polaris-space-sm);
+    min-height: 0;
+  }
+  #polaris-center-stack {
+    display: contents !important;
+  }
+
+  /* PDR §20.2 order. */
+  #polaris-scene-altar {
+    order: 1;
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+  #polaris-chronicle {
+    order: 2;
+    flex: 0 0 auto;
+    max-height: 40dvh;
+  }
+  #polaris-bearing-rail {
+    order: 3;
+    flex: 0 0 auto;
+    max-height: 35dvh;
+  }
+  #polaris-command-conduit {
+    order: 4;
+    flex: 0 0 auto;
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+  }
+  /* Override the 1280px fixed telemetry rail: it flows inline on mobile. */
+  #polaris-telemetry-rail {
+    order: 5;
+    position: static !important;
+    max-width: none;
+    max-height: none;
+  }
+
+  /* The scene portal keeps its 5/3 aspect but is bounded to the column. */
+  #polaris-scene-altar\.host {
+    max-height: 56dvh;
+  }
+  /* The command field takes the full row; hints wrap beneath it. */
+  #polaris-command-input {
+    flex: 1 1 100%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

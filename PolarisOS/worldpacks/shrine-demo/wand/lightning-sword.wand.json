@@ -1,0 +1,62 @@
+{
+  "asset": "lightning-sword",
+  "canvas": { "width": 16, "height": 32 },
+  "description": "Wand vector contours for the Celestial Storm Saber. Fuses curved blade spine, golden guard flourish, and mathematical lightning discharge.",
+  "formulas": [
+    {
+      "role": "lightning-sword.blade_contour",
+      "type": "edge_trace",
+      "description": "Curved saber spine and leading edge contour tapering to a sharp tip at top",
+      "formula": {
+        "coordinateFormula": {
+          "type": "edge_trace",
+          "tracePath": [
+            { "x": 8, "y": 2 },
+            { "x": 10, "y": 5 },
+            { "x": 11, "y": 10 },
+            { "x": 10.5, "y": 16 },
+            { "x": 9, "y": 22 }
+          ]
+        }
+      },
+      "pressure": 0.95
+    },
+    {
+      "role": "lightning-sword.guard_flourish",
+      "type": "parametric_curve",
+      "description": "Sweeping golden crossguard arc wings flared outwards",
+      "formula": {
+        "coordinateFormula": {
+          "type": "parametric_curve",
+          "parameters": { "cx": 8, "cy": 22.5, "a": 6, "b": 0.35, "c": 0, "n": 20 }
+        }
+      },
+      "pressure": 0.85
+    },
+    {
+      "role": "lightning-sword.lightning_arc",
+      "type": "mathematical_stroke",
+      "description": "High-frequency electric discharge stroke wrapping down the blade fuller",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "expression": "sin",
+          "parameters": { "cx": 8, "cy": 13, "amplitude": 1.8, "frequency": 4, "n": 32, "strokeWidth": 1.2 }
+        }
+      },
+      "pressure": 1.0
+    },
+    {
+      "role": "lightning-sword.pommel_gem",
+      "type": "parametric_curve",
+      "description": "Glowing storm gemstone cap at pommel base",
+      "formula": {
+        "coordinateFormula": {
+          "type": "parametric_curve",
+          "parameters": { "cx": 8, "cy": 30, "a": 2, "b": 0.8, "c": 0, "n": 16 }
+        }
+      },
+      "pressure": 0.75
+    }
+  ]
+}

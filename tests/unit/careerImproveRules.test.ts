@@ -223,3 +223,24 @@ describe('buildImprovements — JD divergence (test 8)', () => {
     expect(sqlLabels).not.toBe(k8sLabels);
   });
 });
+
+describe('JD-irrelevant bullets (Case C)', () => {
+  it('offers a demote move rather than prose advice', () => {
+    const doc = makeImproveDoc(
+      'EXPERIENCE\nWrote reporting queries against Postgres\nCoached the office softball team',
+      'experience',
+      'EXPERIENCE'
+    );
+    const bullets = segmentDocumentBullets(doc.sections);
+    const map = mapEvidence(buildRequirementLedger('Requirements:\n- Strong SQL skills are required'), bullets);
+    const flags = reorderRule(map, bullets, doc).filter((s) => s.reason.includes('below'));
+
+    expect(flags.length).toBeGreaterThan(0);
+    const flag = flags[0];
+    expect(flag.move).toBeTruthy();
+    // The move stays inside the bullet's own entry — never across employers.
+    const softball = bullets.find((b) => b.rawText.includes('softball'))!;
+    expect(flag.move!.bulletId).toBe(softball.id);
+    expect(flag.move!.entryId).toBe(softball.entryId);
+  });
+});

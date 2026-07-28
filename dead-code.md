@@ -1,6 +1,6 @@
 # Dead Code Report
 
-Generated at: 2026-07-23T06:24:28.736Z
+Generated at: 2026-07-28T16:26:47.520Z
 
 ## Unreachable Files
 Files in `src/` or `codex/` that are not imported by any entry point or reachable file.
@@ -16,6 +16,7 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] src/core/compose/behavior/ZagAdapter.ts
 - [ ] src/core/compose/behavior/index.ts
 - [ ] src/core/compose/index.ts
+- [ ] src/core/compose/kits/polaris-console.ts
 - [ ] src/core/compose/layout/index.ts
 - [ ] src/core/compose/layout/qbit-lattice.ts
 - [ ] src/core/compose/layout/taffy-adapter.ts
@@ -83,6 +84,41 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] src/kits/channel-zero-ui-kit/examples/ArticlePage.tsx
 - [ ] src/kits/channel-zero-ui-kit/examples/BlogIndexPage.tsx
 - [ ] src/lib/animation-types.js
+- [ ] src/lib/career/amplify/data/verb-classes.ts
+- [ ] src/lib/career/amplify/primitives.ts
+- [ ] src/lib/career/amplify/registry.ts
+- [ ] src/lib/career/amplify/rules/filler.ts
+- [ ] src/lib/career/amplify/rules/quantification.ts
+- [ ] src/lib/career/amplify/rules/repetition.ts
+- [ ] src/lib/career/amplify/rules/verb-strength.ts
+- [ ] src/lib/career/amplify/rules/weak-construction.ts
+- [ ] src/lib/career/analysis/keyword-matcher.ts
+- [ ] src/lib/career/analysis/scorecard.ts
+- [ ] src/lib/career/graph/shard-cache.ts
+- [ ] src/lib/career/graph/shard-residency.ts
+- [ ] src/lib/career/graph/sqlite-graph-port.ts
+- [ ] src/lib/career/graph/wasm-shard-db.ts
+- [ ] src/lib/career/graph/worker-runtime.ts
+- [ ] src/lib/career/improve/apply-moves.ts
+- [ ] src/lib/career/improve/data/skill-evidence-law.ts
+- [ ] src/lib/career/improve/evidence-map.ts
+- [ ] src/lib/career/improve/honesty/claim-preservation.ts
+- [ ] src/lib/career/improve/honesty/frame-provenance.ts
+- [ ] src/lib/career/improve/honesty/token-provenance.ts
+- [ ] src/lib/career/improve/jd-clause.ts
+- [ ] src/lib/career/improve/jd-phrase-frame.ts
+- [ ] src/lib/career/improve/requirement-ledger.ts
+- [ ] src/lib/career/improve/rules/add-section.ts
+- [ ] src/lib/career/improve/rules/missing-evidence.ts
+- [ ] src/lib/career/improve/rules/quantify.ts
+- [ ] src/lib/career/improve/rules/reorder.ts
+- [ ] src/lib/career/improve/rules/vocabulary-injection.ts
+- [ ] src/lib/career/improve/skill-phrase-bridge.ts
+- [ ] src/lib/career/keyword-gap.js
+- [ ] src/lib/career/parser/segment-bullets.ts
+- [ ] src/lib/career/sigil-pipeline.js
+- [ ] src/lib/career/suggestions/detect-conflicts.ts
+- [ ] src/lib/career/transmuter.js
 - [ ] src/lib/codex/battle.js
 - [ ] src/lib/codex/leyline.js
 - [ ] src/lib/config/flags.js
@@ -105,6 +141,10 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] src/lib/truesight/compiler/compileVerseToIR.js
 - [ ] src/lib/truesight/compiler/verseIRSerialization.js
 - [ ] src/lib/truesight/immune/collectTruesightNodes.js
+- [ ] src/lib/vixel-lattice/index.js
+- [ ] src/lib/vixel-lattice/vixel-feel-adapter.js
+- [ ] src/lib/vixel-lattice/vixel-fusion.js
+- [ ] src/lib/vixel-lattice/vixel-schema.js
 - [ ] src/pages/Combat/assets/generated/combat-tile.js
 - [ ] src/pages/Combat/assets/generated/combat-torch.js
 - [ ] src/pages/Landing/storm/dbm.js
@@ -215,6 +255,7 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] src/video/types.ts
 - [ ] src/video/useBeatClock.ts
 - [ ] src/vite-env.d.ts
+- [ ] src/workers/career-graph.worker.ts
 - [ ] codex/cli/scholo-immune.js
 - [ ] codex/core/animation/amp/amp.worker.ts
 - [ ] codex/core/archive/truesight/color/visemeMapping.ARCHIVED.js
@@ -282,7 +323,6 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/core/phonology/dictionary.web-worker.js
 - [ ] codex/core/phonology/dictionary.worker.js
 - [ ] codex/core/phonology/g2p/jurors/index.js
-- [ ] codex/core/phonology/prosodic-metronome.js
 - [ ] codex/core/pixelbrain/amps/noise/deterministic-noise.js
 - [ ] codex/core/pixelbrain/amps/qbit/qbit-snap-profile.js
 - [ ] codex/core/pixelbrain/amps/turboquant/turboquant-layer-snapshot.js
@@ -369,7 +409,6 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/core/semantic-calculus/compiler.ts
 - [ ] codex/core/semantic-calculus/contextDigest.ts
 - [ ] codex/core/semantic-calculus/formulaDraft.ts
-- [ ] codex/core/semantic-calculus/hypothesisStatus.ts
 - [ ] codex/core/semantic-calculus/keywordProposer.ts
 - [ ] codex/core/semantic-calculus/observationReceipt.ts
 - [ ] codex/core/semantic-calculus/permission.ts
@@ -419,6 +458,11 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `enableCompose` in `src/core/compose/index.ts`
 - [ ] `disableCompose` in `src/core/compose/index.ts`
 - [ ] `initCompose` in `src/core/compose/index.ts`
+- [ ] `POLARIS_CONSOLE_ID` in `src/core/compose/kits/polaris-console.ts`
+- [ ] `COMPONENT_KINDS` in `src/core/compose/kits/polaris-console.ts`
+- [ ] `PolarisComponentKind` in `src/core/compose/kits/polaris-console.ts`
+- [ ] `createPolarisConsoleDefinitions` in `src/core/compose/kits/polaris-console.ts`
+- [ ] `createPolarisConsoleScene` in `src/core/compose/kits/polaris-console.ts`
 - [ ] `COMPOSE_CONTRACTS` in `src/core/compose/kits/signalChamber.compose.js`
 - [ ] `SIGNAL_CHAMBER_VERSION` in `src/core/compose/kits/signalChamber.compose.js`
 - [ ] `SIGNAL_CHAMBER_THEME_TOKENS` in `src/core/compose/kits/signalChamber.compose.js`
@@ -447,6 +491,7 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `ComposeScrollEditorToolbarProps` in `src/core/compose/migrated/ComposeScrollEditorToolbar.tsx`
 - [ ] `LedgerEntryData` in `src/core/compose/migrated/ComposeUpdateLedger.tsx`
 - [ ] `ComposeUpdateLedgerProps` in `src/core/compose/migrated/ComposeUpdateLedger.tsx`
+- [ ] `ConstellationResultPartId` in `src/core/compose/migrated/ConstellationResult.ts`
 - [ ] `CONSTELLATION_SKY_KIND` in `src/core/compose/migrated/ConstellationSky.ts`
 - [ ] `CONSTELLATION_SKY_ID` in `src/core/compose/migrated/ConstellationSky.ts`
 - [ ] `createConstellationSkyDefinition` in `src/core/compose/migrated/ConstellationSky.ts`
@@ -459,6 +504,7 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `NegotiateRendererOptions` in `src/core/compose/render/capabilities.ts`
 - [ ] `NegotiateRendererResult` in `src/core/compose/render/capabilities.ts`
 - [ ] `NegotiateSceneResult` in `src/core/compose/render/capabilities.ts`
+- [ ] `DomAttachmentSpec` in `src/core/compose/render/dom-adapter.ts`
 - [ ] `GeometryCompareOptions` in `src/core/compose/render/geometry.ts`
 - [ ] `GeometryFieldDiff` in `src/core/compose/render/geometry.ts`
 - [ ] `SkiaProbeResult` in `src/core/compose/render/skia-adapter.ts`
@@ -477,7 +523,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `LayoutIntentRef` in `src/core/compose/schema/packets.ts`
 - [ ] `VisualAttachmentRef` in `src/core/compose/schema/packets.ts`
 - [ ] `ProvenanceRecord` in `src/core/compose/schema/packets.ts`
-- [ ] `GridLayoutIntent` in `src/core/compose/schema/packets.ts`
 - [ ] `AbsoluteLayoutIntent` in `src/core/compose/schema/packets.ts`
 - [ ] `OverlayLayoutIntent` in `src/core/compose/schema/packets.ts`
 - [ ] `TokenVisualAttachment` in `src/core/compose/schema/packets.ts`
@@ -811,11 +856,85 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `resetGameVictoryServiceForTests` in `src/lib/audio/gameVictory.service.js`
 - [ ] `emitBytecodeError` in `src/lib/bytecode-error.adapter.js`
 - [ ] `emitStasisBytecodeError` in `src/lib/bytecode-error.adapter.js`
-- [ ] `ACRONYM_MAP` in `src/lib/career/acronyms.js`
+- [ ] `CareerWorkspace` in `src/lib/career/analysis/types.ts`
+- [ ] `DocxExportMeta` in `src/lib/career/export/docx-export.ts`
+- [ ] `DocxExportResult` in `src/lib/career/export/docx-export.ts`
+- [ ] `AnalyzeGraphInput` in `src/lib/career/graph/analyze-graph.ts`
+- [ ] `GRAPH_DIAGNOSTIC` in `src/lib/career/graph/analyze-graph.ts`
+- [ ] `AnalyzeOptions` in `src/lib/career/graph/client.ts`
+- [ ] `stableRequestId` in `src/lib/career/graph/client.ts`
+- [ ] `SkillScores` in `src/lib/career/graph/contracts.ts`
+- [ ] `EvidenceThresholds` in `src/lib/career/graph/evidence.ts`
+- [ ] `EvidenceInput` in `src/lib/career/graph/evidence.ts`
+- [ ] `FALLBACK_ARTIFACT_ID` in `src/lib/career/graph/fallback.ts`
+- [ ] `buildSeedManifest` in `src/lib/career/graph/in-memory-transport.ts`
+- [ ] `InferOptions` in `src/lib/career/graph/reference-query.ts`
+- [ ] `compareOccupations` in `src/lib/career/graph/reference-query.ts`
+- [ ] `compareRelations` in `src/lib/career/graph/reference-query.ts`
+- [ ] `SkillClassSchema` in `src/lib/career/graph/schemas.ts`
+- [ ] `RequirementKindSchema` in `src/lib/career/graph/schemas.ts`
+- [ ] `OccupationBucketSchema` in `src/lib/career/graph/schemas.ts`
+- [ ] `CareerGraphModeSchema` in `src/lib/career/graph/schemas.ts`
+- [ ] `CareerPolicyBundleSchema` in `src/lib/career/graph/schemas.ts`
+- [ ] `OccupationCandidateSchema` in `src/lib/career/graph/schemas.ts`
+- [ ] `SkillScoresSchema` in `src/lib/career/graph/schemas.ts`
+- [ ] `SkillClassificationSchema` in `src/lib/career/graph/schemas.ts`
+- [ ] `CareerGraphDiagnosticSchema` in `src/lib/career/graph/schemas.ts`
+- [ ] `isSeedCareerGraphEnabled` in `src/lib/career/graph/seed-client.ts`
+- [ ] `createSeedCareerGraphClient` in `src/lib/career/graph/seed-client.ts`
+- [ ] `createLiveCareerGraphClient` in `src/lib/career/graph/seed-client.ts`
+- [ ] `searchSeedOccupations` in `src/lib/career/graph/seed-graph.ts`
+- [ ] `seedRelatedSkills` in `src/lib/career/graph/seed-graph.ts`
+- [ ] `PinnedShard` in `src/lib/career/graph/shard-cache.ts`
+- [ ] `ShardCacheOptions` in `src/lib/career/graph/shard-cache.ts`
+- [ ] `ShardManifestEntry` in `src/lib/career/graph/shard-residency.ts`
+- [ ] `ShardFetcher` in `src/lib/career/graph/shard-residency.ts`
+- [ ] `buildFtsMatch` in `src/lib/career/graph/sqlite-graph-port.ts`
+- [ ] `SqlGraphPortOptions` in `src/lib/career/graph/sqlite-graph-port.ts`
+- [ ] `ParsedWorkerResponse` in `src/lib/career/graph/worker-protocol.ts`
+- [ ] `createRequestIdGenerator` in `src/lib/career/graph/worker-protocol.ts`
+- [ ] `parseWorkerResponse` in `src/lib/career/graph/worker-protocol.ts`
+- [ ] `WorkerRuntimeOptions` in `src/lib/career/graph/worker-runtime.ts`
+- [ ] `CareerWorkerRuntime` in `src/lib/career/graph/worker-runtime.ts`
+- [ ] `SkillEvidenceLawEntry` in `src/lib/career/improve/data/skill-evidence-law.ts`
+- [ ] `SKILL_EVIDENCE_LAW` in `src/lib/career/improve/data/skill-evidence-law.ts`
+- [ ] `BridgeFn` in `src/lib/career/improve/evidence-map.ts`
+- [ ] `roleOfVerb` in `src/lib/career/improve/honesty/claim-preservation.ts`
+- [ ] `assertFrameProvenance` in `src/lib/career/improve/honesty/frame-provenance.ts`
+- [ ] `valueTokens` in `src/lib/career/improve/honesty/user-fact-ledger.ts`
+- [ ] `CLAUSE_SPLIT` in `src/lib/career/improve/jd-clause.ts`
+- [ ] `ClauseSpan` in `src/lib/career/improve/jd-clause.ts`
+- [ ] `toPastTense` in `src/lib/career/improve/jd-phrase-frame.ts`
+- [ ] `planMoves` in `src/lib/career/improve/rules/reorder.ts`
+- [ ] `bridgeEvidence` in `src/lib/career/improve/skill-phrase-bridge.ts`
+- [ ] `RequirementBulletEvidence` in `src/lib/career/improve/types.ts`
 - [ ] `detectTorqueConflicts` in `src/lib/career/keyword-gap.js`
+- [ ] `segmentBullets` in `src/lib/career/parser/segment-bullets.ts`
+- [ ] `makeEntryId` in `src/lib/career/parser/segment-entries.ts`
+- [ ] `ParseDiagnosticCode` in `src/lib/career/parser/types.ts`
+- [ ] `calculateParseConfidence` in `src/lib/career/parser/validate-parse.ts`
+- [ ] `ResumeSourceTypeSchema` in `src/lib/career/schemas.ts`
+- [ ] `ResumeSourceMetadataSchema` in `src/lib/career/schemas.ts`
+- [ ] `OffsetMappingSchema` in `src/lib/career/schemas.ts`
+- [ ] `ExtractedTextBlockSchema` in `src/lib/career/schemas.ts`
+- [ ] `ParseDiagnosticCodeSchema` in `src/lib/career/schemas.ts`
+- [ ] `ParseDiagnosticSchema` in `src/lib/career/schemas.ts`
+- [ ] `ExtractedDocumentSchema` in `src/lib/career/schemas.ts`
+- [ ] `ResumeSectionKindSchema` in `src/lib/career/schemas.ts`
+- [ ] `ParseEvidenceSchema` in `src/lib/career/schemas.ts`
+- [ ] `ResumeSectionSchema` in `src/lib/career/schemas.ts`
+- [ ] `ResumeContactSchema` in `src/lib/career/schemas.ts`
+- [ ] `ResumeDocumentSchema` in `src/lib/career/schemas.ts`
+- [ ] `AtsScorecardSchema` in `src/lib/career/schemas.ts`
+- [ ] `AnalysisEvidenceSchema` in `src/lib/career/schemas.ts`
+- [ ] `SuggestionInputSlotSchema` in `src/lib/career/schemas.ts`
+- [ ] `ResumeSuggestionSchema` in `src/lib/career/schemas.ts`
 - [ ] `deriveResonanceAnchors` in `src/lib/career/sigil-pipeline.js`
 - [ ] `buildKeywordAwareSigil` in `src/lib/career/sigil-pipeline.js`
+- [ ] `buildSigilDataArchive` in `src/lib/career/sigil-pipeline.js`
+- [ ] `SIGIL_VERSION` in `src/lib/career/transmuter.js`
 - [ ] `canGenerateSigilFile` in `src/lib/career/transmuter.js`
+- [ ] `generateSigilFile` in `src/lib/career/transmuter.js`
 - [ ] `fetchArtist` in `src/lib/catalog.api.js`
 - [ ] `fetchRelease` in `src/lib/catalog.api.js`
 - [ ] `FEATURE_FLAGS` in `src/lib/config/flags.js`
@@ -871,6 +990,12 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `ensureUniqueSlug` in `src/pages/Blog/blogStore.js`
 - [ ] `estimateReadTime` in `src/pages/Blog/blogStore.js`
 - [ ] `getSeedPost` in `src/pages/Blog/seedPosts.js`
+- [ ] `CareerGraphPort` in `src/pages/Career/CareerPage.tsx`
+- [ ] `CareerPageProps` in `src/pages/Career/CareerPage.tsx`
+- [ ] `CareerStatus` in `src/pages/Career/CareerPage.tsx`
+- [ ] `DataArchive` in `src/pages/Career/DataArchiveDrawer.tsx`
+- [ ] `ParserPreviewDrawerProps` in `src/pages/Career/ParserPreviewDrawer.tsx`
+- [ ] `SuggestionReviewPanelProps` in `src/pages/Career/SuggestionReviewPanel.tsx`
 - [ ] `RESOLVED_BUG_STATUSES` in `src/pages/Collab/bug-status.js`
 - [ ] `isBugResolved` in `src/pages/Collab/bug-status.js`
 - [ ] `useTacticalOverlays` in `src/pages/Combat/TacticalOverlayControls.jsx`
@@ -879,6 +1004,7 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `buildAwaitingPacket` in `src/pages/Constellation/fixtures/samplePagePacket.js`
 - [ ] `SAMPLE_BRIGHT_WOUND_PACKET` in `src/pages/Constellation/fixtures/samplePagePacket.js`
 - [ ] `seededUnit` in `src/pages/Constellation/skyChart.js`
+- [ ] `raritySpectral` in `src/pages/Constellation/skyChart.js`
 - [ ] `GrimoireView` in `src/pages/Grimoire/GrimoireSpread.tsx`
 - [ ] `GenomeStop` in `src/pages/Grimoire/genomeGeometry.ts`
 - [ ] `GenomeLayer` in `src/pages/Grimoire/genomeGeometry.ts`
@@ -1214,6 +1340,8 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `detectCompounds` in `codex/core/constellation/phraseAnalysis.js`
 - [ ] `assignTokenRoles` in `codex/core/constellation/phraseAnalysis.js`
 - [ ] `RARITY_EDGES` in `codex/core/constellation/rarity.js`
+- [ ] `CONSTELLATION_INQUIRY_BIND` in `codex/core/constellation/semanticInquiry.js`
+- [ ] `CONSTELLATION_SENSE_OBSERVATION_IDS` in `codex/core/constellation/semanticInquiry.js`
 - [ ] `deepFreezeClone` in `codex/core/diagnostic/BytecodeHealth.js`
 - [ ] `SPECTRAL_Z` in `codex/core/diagnostic/chromaticImmuneProbe.js`
 - [ ] `validateColor` in `codex/core/diagnostic/chromaticImmuneProbe.js`
@@ -1388,11 +1516,14 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `serializeDeterministicVerdictForHash` in `codex/core/phonology/g2p/schemas.js`
 - [ ] `verdictHash` in `codex/core/phonology/g2p/schemas.js`
 - [ ] `isValidVerdict` in `codex/core/phonology/g2p/schemas.js`
+- [ ] `canonicalPronunciation` in `codex/core/phonology/phonologicalProcesses.js`
 - [ ] `PHONOLOGICAL_PROCESS_RULES` in `codex/core/phonology/phonologicalProcesses.js`
 - [ ] `STRESS_SHIFT_HOMOGRAPHS` in `codex/core/phonology/prosodic-metronome.js`
-- [ ] `isStressShiftHomograph` in `codex/core/phonology/prosodic-metronome.js`
+- [ ] `NOUN_CUES` in `codex/core/phonology/prosodic-metronome.js`
+- [ ] `VERB_CUES` in `codex/core/phonology/prosodic-metronome.js`
+- [ ] `PREPOSITION_CUES` in `codex/core/phonology/prosodic-metronome.js`
+- [ ] `OBJECT_CUES_AFTER` in `codex/core/phonology/prosodic-metronome.js`
 - [ ] `readMeter` in `codex/core/phonology/prosodic-metronome.js`
-- [ ] `pronounceWithMeter` in `codex/core/phonology/prosodic-metronome.js`
 - [ ] `findRhymeOnsetIndex` in `codex/core/phonology/rhymeDomain.js`
 - [ ] `substitutableCodas` in `codex/core/phonology/rhymeDomain.js`
 - [ ] `TAIL_MAX_PHONEMES` in `codex/core/phonology/tailEmbedding.js`
@@ -1722,7 +1853,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `VOLUME_LIFT_PROFILES` in `codex/core/pixelbrain/volume-lift-amp.js`
 - [ ] `profileValue` in `codex/core/pixelbrain/volume-lift-amp.js`
 - [ ] `liftCellToDepths` in `codex/core/pixelbrain/volume-lift-amp.js`
-- [ ] `AXES` in `codex/core/pixelbrain/voxel-axes.js`
 - [ ] `UP_AXIS` in `codex/core/pixelbrain/voxel-axes.js`
 - [ ] `HANDEDNESS` in `codex/core/pixelbrain/voxel-axes.js`
 - [ ] `blockBBox` in `codex/core/pixelbrain/voxel-block.js`
@@ -1803,7 +1933,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `generatePhonotopographicVectorFromPhonemes` in `codex/core/semantic/phonotopography.js`
 - [ ] `createTopographicSignature` in `codex/core/semantic/phonotopography.js`
 - [ ] `compareTopographicSignatures` in `codex/core/semantic/phonotopography.js`
-- [ ] `phonotopographicSimilarity` in `codex/core/semantic/phonotopography.js`
 - [ ] `MOOD_CONSTRAINTS` in `codex/core/semantic/semantic-math-bridge.js`
 - [ ] `MATERIAL_CONSTRAINTS` in `codex/core/semantic/semantic-math-bridge.js`
 - [ ] `STYLE_CONSTRAINTS` in `codex/core/semantic/semantic-math-bridge.js`
@@ -1849,8 +1978,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `promoteDraft` in `codex/core/semantic-calculus/formulaDraft.ts`
 - [ ] `FormationFormula` in `codex/core/semantic-calculus/formulaRegistry.ts`
 - [ ] `MODULATION_FORMULAS` in `codex/core/semantic-calculus/formulaRegistry.ts`
-- [ ] `HypothesisEvaluation` in `codex/core/semantic-calculus/hypothesisStatus.ts`
-- [ ] `evalPredicate` in `codex/core/semantic-calculus/hypothesisStatus.ts`
 - [ ] `MAX_KEYWORDS` in `codex/core/semantic-calculus/keywordProposer.ts`
 - [ ] `composeProposers` in `codex/core/semantic-calculus/keywordProposer.ts`
 - [ ] `stubSemanticKeywordProposer` in `codex/core/semantic-calculus/keywordProposer.ts`
@@ -1865,7 +1992,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `assertLexiconInvariants` in `codex/core/semantic-calculus/lexicons.ts`
 - [ ] `lexiconsVersion` in `codex/core/semantic-calculus/lexicons.ts`
 - [ ] `hashResult` in `codex/core/semantic-calculus/observationReceipt.ts`
-- [ ] `makeReceipt` in `codex/core/semantic-calculus/observationReceipt.ts`
 - [ ] `KIND_RANK` in `codex/core/semantic-calculus/permission.ts`
 - [ ] `PermissionVector` in `codex/core/semantic-calculus/permission.ts`
 - [ ] `ModulatableState` in `codex/core/semantic-calculus/permission.ts`
@@ -1998,6 +2124,7 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `CaptchaService` in `codex/server/services/captcha.service.js`
 - [ ] `syllablesFromPhonemes` in `codex/server/services/constellation/genome.adapter.js`
 - [ ] `cadenceFamilyFromStress` in `codex/server/services/constellation/rhymeAstrology.adapter.js`
+- [ ] `cmuPhonologySource` in `codex/server/services/constellation/senseProbe.harness.js`
 - [ ] `ConsoleMailerAdapter` in `codex/server/services/mailer.service.js`
 - [ ] `SendGridMailerAdapter` in `codex/server/services/mailer.service.js`
 - [ ] `ResendMailerAdapter` in `codex/server/services/mailer.service.js`

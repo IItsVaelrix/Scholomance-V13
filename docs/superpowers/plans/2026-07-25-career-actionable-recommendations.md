@@ -1,6 +1,6 @@
 # Actionable Recommendations Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Every advisor card carries an operation the candidate can accept — no card instructs without offering a draft, a move, or a fill-in.
 
@@ -50,7 +50,7 @@ Pure refactor. The frame extractor must use the *same* clause scoping as the led
 - Produces: `clauseAt(text: string, start: number, end: number): string`, `CLAUSE_SPLIT: RegExp`.
 - `requirement-ledger.ts` imports `clauseAt` instead of defining it.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // tests/unit/careerJdClause.test.ts
@@ -81,12 +81,12 @@ describe('clauseAt', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run tests/unit/careerJdClause.test.ts --reporter=dot`
 Expected: FAIL — module `jd-clause` does not exist.
 
-- [ ] **Step 3: Move the code**
+- [x] **Step 3: Move the code**
 
 Cut `CLAUSE_SPLIT` and `clauseAt` out of `src/lib/career/improve/requirement-ledger.ts` and paste them into the new file **unchanged**, adding `export` to both:
 
@@ -138,12 +138,12 @@ Then in `requirement-ledger.ts`, delete both definitions and add to the imports:
 import { clauseAt } from './jd-clause.js';
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `npx vitest run tests/unit/careerJdClause.test.ts tests/unit/careerImproveLedger.test.ts --reporter=dot`
 Expected: PASS — new file's 3 tests plus all 24 existing ledger tests. The ledger tests passing unchanged is the proof this refactor changed no behavior.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/career/improve/jd-clause.ts src/lib/career/improve/requirement-ledger.ts tests/unit/careerJdClause.test.ts
@@ -164,7 +164,7 @@ The frame builder needs to turn the JD's verb form (`building`, `build`, `to bui
 - Consumes: `STRONG_VERBS`, `KNOWN_VERBS` from `../amplify/data/verb-classes.js` (both are sets of PAST-tense forms).
 - Produces: `toPastTense(word: string): string | null`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // tests/unit/careerJdPhraseFrame.test.ts
@@ -202,12 +202,12 @@ describe('toPastTense', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run tests/unit/careerJdPhraseFrame.test.ts --reporter=dot`
 Expected: FAIL — module does not exist.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```ts
 // src/lib/career/improve/jd-phrase-frame.ts
@@ -286,12 +286,12 @@ export function toPastTense(word: string): string | null {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run tests/unit/careerJdPhraseFrame.test.ts --reporter=dot`
 Expected: PASS (5 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/career/improve/jd-phrase-frame.ts tests/unit/careerJdPhraseFrame.test.ts
@@ -320,7 +320,7 @@ export interface PhraseFrame {
 export function buildPhraseFrame(jdText: string, requirement: Requirement): PhraseFrame | null;
 ```
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // append to tests/unit/careerJdPhraseFrame.test.ts
@@ -376,12 +376,12 @@ describe('buildPhraseFrame', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run tests/unit/careerJdPhraseFrame.test.ts --reporter=dot`
 Expected: FAIL — `buildPhraseFrame` is not exported.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 Append to `src/lib/career/improve/jd-phrase-frame.ts`:
 
@@ -487,12 +487,12 @@ export function buildPhraseFrame(jdText: string, requirement: Requirement): Phra
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run tests/unit/careerJdPhraseFrame.test.ts --reporter=dot`
 Expected: PASS (12 tests total).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/career/improve/jd-phrase-frame.ts tests/unit/careerJdPhraseFrame.test.ts
@@ -513,7 +513,7 @@ A Case A draft has no `before`, so `assertClaimPreserved` is structurally inappl
 - Consumes: `HonestyVerdict` from `../types.js`; `PhraseFrame` from `../jd-phrase-frame.js`.
 - Produces: `assertFrameProvenance(after: string, frame: PhraseFrame, slotValues: readonly string[]): HonestyVerdict`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // tests/unit/careerFrameProvenance.test.ts
@@ -555,12 +555,12 @@ describe('assertFrameProvenance', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run tests/unit/careerFrameProvenance.test.ts --reporter=dot`
 Expected: FAIL — module does not exist.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```ts
 // src/lib/career/improve/honesty/frame-provenance.ts
@@ -625,12 +625,12 @@ export function assertFrameProvenance(
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run tests/unit/careerFrameProvenance.test.ts --reporter=dot`
 Expected: PASS (4 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/career/improve/honesty/frame-provenance.ts tests/unit/careerFrameProvenance.test.ts
@@ -649,7 +649,7 @@ git commit -m "feat(career): frame-provenance invariant for drafts with no sourc
 - Consumes: `INPUT_SENTINEL`; the existing `assertTokenProvenance` / `assertClaimPreserved` / `PERMITS`.
 - Produces: adjacent-support suggestions now carry `before`, `after`, `inputSlots`, `requiresInput: true`, `editable: true`, and keep `type: 'learning_gap'`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // append to tests/unit/careerImproveOutputQuality.test.ts
@@ -683,12 +683,12 @@ describe('adjacent evidence drafts a fill-in rewrite (Case B)', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run tests/unit/careerImproveOutputQuality.test.ts --reporter=dot`
 Expected: FAIL — `gap.editable` is `false` and `gap.after` is undefined.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 In `src/lib/career/improve/rules/vocabulary-injection.ts`, add to the imports:
 
@@ -739,12 +739,12 @@ Then replace the `gap` object literal's tail so the draft is attached when it su
         editable: draft ? true : false,
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run tests/unit/careerImproveOutputQuality.test.ts --reporter=dot`
 Expected: PASS — the 2 new tests plus all 8 existing ones. The pre-existing "stays silent about a derived n-gram" test must still pass: that requirement has no `jdEvidence`, so it still returns before reaching the draft.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/career/improve/rules/vocabulary-injection.ts tests/unit/careerImproveOutputQuality.test.ts
@@ -764,7 +764,7 @@ git commit -m "feat(career): adjacent-evidence gaps draft a fill-in rewrite"
 - Consumes: `buildPhraseFrame` (Task 3); `EvidenceMap`, `ResumeBullet` from `../types.js`; `segmentEntries` from `../../parser/segment-entries.js`.
 - Produces: `missingEvidenceRule(map: EvidenceMap, jdText: string, doc: ResumeDocument): ResumeSuggestion[]`; `ResumeSuggestion.target.entryId?: string`; `ResumeSuggestion.requiresEntryChoice?: boolean`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // tests/unit/careerMissingEvidence.test.ts
@@ -827,12 +827,12 @@ describe('missingEvidenceRule (Case A)', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run tests/unit/careerMissingEvidence.test.ts --reporter=dot`
 Expected: FAIL — module does not exist.
 
-- [ ] **Step 3: Add the contract fields**
+- [x] **Step 3: Add the contract fields**
 
 In `src/lib/career/analysis/types.ts`, extend the `target` object and add the new flag:
 
@@ -857,7 +857,7 @@ and alongside `requiresInput`:
   requiresEntryChoice?: boolean;
 ```
 
-- [ ] **Step 4: Write minimal implementation**
+- [x] **Step 4: Write minimal implementation**
 
 ```ts
 // src/lib/career/improve/rules/missing-evidence.ts
@@ -945,12 +945,12 @@ export function missingEvidenceRule(
 }
 ```
 
-- [ ] **Step 5: Run test to verify it passes**
+- [x] **Step 5: Run test to verify it passes**
 
 Run: `npx vitest run tests/unit/careerMissingEvidence.test.ts --reporter=dot`
 Expected: PASS (6 tests).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/lib/career/improve/rules/missing-evidence.ts src/lib/career/analysis/types.ts tests/unit/careerMissingEvidence.test.ts
@@ -971,7 +971,7 @@ Without this, the entry choice on a Case A card is cosmetic — the apply engine
 - Consumes: `target.entryId` (Task 6).
 - Produces: an accepted suggestion with `target.entryId` inserts its `after` as a new bullet at the end of that entry.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // append to tests/unit/careerEntryAware.test.ts
@@ -1046,12 +1046,12 @@ import { segmentEntries } from '../../src/lib/career/parser/segment-entries';
 import { makeImproveDoc } from './fixtures/career-improve-doc';
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run tests/unit/careerEntryAware.test.ts --reporter=dot`
 Expected: FAIL — the suggestion is skipped as `missing_target`; the inserted text is absent.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 In `src/lib/career/improve/apply-moves.ts`:
 
@@ -1127,12 +1127,12 @@ Then after `planBySectionId` is built, add:
   const { section, entries, rewritten } = plan;   // `plan.inserted` used directly below
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run tests/unit/careerEntryAware.test.ts --reporter=dot`
 Expected: PASS — the 2 new tests plus every existing entry-aware test.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/career/improve/apply-moves.ts tests/unit/careerEntryAware.test.ts
@@ -1151,7 +1151,7 @@ git commit -m "feat(career): entry-anchored bullet insertion in the apply engine
 - Consumes: the existing `MoveBulletOperation` shape.
 - Produces: flag suggestions now carry `move` demoting the bullet within its own entry.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // append to tests/unit/careerImproveRules.test.ts
@@ -1177,12 +1177,12 @@ describe('JD-irrelevant bullets (Case C)', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run tests/unit/careerImproveRules.test.ts --reporter=dot`
 Expected: FAIL — `flag.move` is undefined (and the reason still says "consider trimming it").
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 In the flag block of `src/lib/career/improve/rules/reorder.ts`, replace the `reason` and add a `move`. The bullet is demoted after the last relevant bullet of its own entry:
 
@@ -1217,12 +1217,12 @@ In the flag block of `src/lib/career/improve/rules/reorder.ts`, replace the `rea
       }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run tests/unit/careerImproveRules.test.ts --reporter=dot`
 Expected: PASS — the new test plus every existing rule test.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/career/improve/rules/reorder.ts tests/unit/careerImproveRules.test.ts
@@ -1244,7 +1244,7 @@ git commit -m "feat(career): JD-irrelevant bullets offer a demote move, not advi
 - Consumes: `missingEvidenceRule` (Task 6).
 - Produces: `buildImprovements` output includes Case A cards; `mergeImprovements` drops a prose gap whose term an improvement already covers.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // append to tests/unit/careerImproveOutputQuality.test.ts
@@ -1267,12 +1267,12 @@ describe('advisor wiring', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run tests/unit/careerImproveOutputQuality.test.ts --reporter=dot`
 Expected: FAIL — no Airflow suggestion; the rule is not registered.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 In `src/lib/career/improve/build-improvements.ts` add the import and the rule call:
 
@@ -1308,12 +1308,12 @@ In `src/pages/Career/CareerPage.tsx`, add term-level suppression to `mergeImprov
   );
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run tests/unit/careerImproveOutputQuality.test.ts tests/unit/careerPageWorkflow.test.tsx --reporter=dot`
 Expected: PASS — the new test plus the existing page-workflow tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/career/improve/build-improvements.ts src/pages/Career/CareerPage.tsx tests/unit/careerImproveOutputQuality.test.ts
@@ -1335,7 +1335,7 @@ git commit -m "feat(career): register missing-evidence rule and suppress duplica
 
 The panel needs the list of entries. Pass it in as a new optional prop `entries?: { id: string; label: string }[]`, supplied by `CareerPage` from `segmentEntries` over the parsed document's experience sections.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // append to tests/unit/careerApplyProvenance.test.tsx
@@ -1392,12 +1392,12 @@ describe('entry choice on a drafted card', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run tests/unit/careerApplyProvenance.test.tsx --reporter=dot`
 Expected: FAIL — no entry select is rendered; `getByLabelText(/which role/i)` throws.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 Add the prop and per-suggestion entry state to `SuggestionReviewPanel.tsx`:
 
@@ -1460,12 +1460,12 @@ const entryOptions = useMemo(
 
 and extend `handleAccept` to merge `{ entryId }` into the suggestion's `target` before it reaches `applyAcceptedSuggestions`.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run tests/unit/careerApplyProvenance.test.tsx --reporter=dot`
 Expected: PASS (2 new tests plus existing).
 
-- [ ] **Step 5: Write the failing test for the frame-provenance gate**
+- [x] **Step 5: Write the failing test for the frame-provenance gate**
 
 This is the step that makes `assertFrameProvenance` load-bearing. Without it the invariant
 built in Task 4 is never called and silently guards nothing.
@@ -1494,12 +1494,12 @@ describe('accepting a drafted bullet enforces frame provenance', () => {
 });
 ```
 
-- [ ] **Step 6: Run it to verify it fails**
+- [x] **Step 6: Run it to verify it fails**
 
 Run: `npx vitest run tests/unit/careerFrameProvenance.test.ts --reporter=dot`
 Expected: FAIL — module `accept-draft` does not exist.
 
-- [ ] **Step 7: Implement the accept path**
+- [x] **Step 7: Implement the accept path**
 
 ```ts
 // src/lib/career/improve/accept-draft.ts
@@ -1535,12 +1535,12 @@ export function acceptDraftedBullet(
 Call it from `CareerPage.handleAccept` for any suggestion with `requiresEntryChoice`, and
 refuse the accept when it returns `ok: false`.
 
-- [ ] **Step 8: Run tests to verify they pass**
+- [x] **Step 8: Run tests to verify they pass**
 
 Run: `npx vitest run tests/unit/careerFrameProvenance.test.ts tests/unit/careerApplyProvenance.test.tsx --reporter=dot`
 Expected: PASS.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add src/pages/Career/SuggestionReviewPanel.tsx src/pages/Career/CareerPage.tsx src/pages/Career/CareerPage.css src/lib/career/improve/accept-draft.ts tests/unit/careerApplyProvenance.test.tsx tests/unit/careerFrameProvenance.test.ts
@@ -1559,7 +1559,7 @@ The whole point of the feature, asserted once over a realistic fixture.
 **Interfaces:**
 - Consumes: everything above.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // append to tests/unit/careerImproveOutputQuality.test.ts
@@ -1609,17 +1609,17 @@ describe('no card instructs without offering an operation', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run tests/unit/careerImproveOutputQuality.test.ts --reporter=dot`
 Expected: this test should PASS if Tasks 5–9 are complete. If it fails, the assertion message names the offending card — fix that rule rather than weakening the test.
 
-- [ ] **Step 3: Run the full suite**
+- [x] **Step 3: Run the full suite**
 
 Run: `npx vitest run tests/unit --reporter=dot`
 Expected: all career tests pass. `tests/unit/combatSelectors.movement.test.js` fails to resolve an import — that failure is pre-existing and unrelated (the Combat file is absent from HEAD too).
 
-- [ ] **Step 4: Typecheck and self-check**
+- [x] **Step 4: Typecheck and self-check**
 
 ```bash
 npx tsc --noEmit -p tsconfig.json 2>&1 | grep -iE "career|improve"
@@ -1627,7 +1627,7 @@ npm run scd64:intellisense -- 'src/lib/career/improve/**/*.ts'
 ```
 Expected: no career TypeScript errors. Investigate any SCD64 family the checker names — `predicted ≠ confirmed`, but the family is a real hypothesis worth testing against the diff.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add tests/unit/careerImproveOutputQuality.test.ts

@@ -1,0 +1,8 @@
+{
+  "worldId": "codex_vale_mvp",
+  "title": "Codex Vale",
+  "rulesetVersion": "mvp-1",
+  "description": "A small illustrated world proving the Picture-Book MUD causal chain.",
+  "spawnRoomId": "forest_path",
+  "rooms": ["forest_path", "ruined_shrine", "moonlit_clearing"]
+}

@@ -129,8 +129,15 @@ export interface ResumeExperienceEntry {
   /** Stable identity — `entry:<sectionId>:<ordinal>:<titleHash>`. */
   id: string;
   sectionId: string;
-  /** Role/company title line (date stripped when it was inline). Absent for a headerless entry. */
-  title?: { rawText: string; sourceSpan: TextSpan };
+  /**
+   * Role/company title line (date stripped when it was inline). Absent for a headerless entry.
+   *
+   * `kind` is the structural invariant: a title is a ROLE HEADING, never an achievement. It
+   * exists so the export routes on the parser's classification rather than re-deriving it —
+   * a title that reaches the renderer without this tag is not drawn as body text, it is not
+   * drawn at all. Every entry that has a title has `title.kind === 'role_heading'`.
+   */
+  title?: { rawText: string; sourceSpan: TextSpan; kind: 'role_heading' };
   /** Date or date range line (e.g. "2019 - 2021", "Jan 2020 – Present"). */
   date?: { rawText: string; sourceSpan: TextSpan };
   /** The entry's accomplishment bullets, in document order. */

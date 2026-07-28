@@ -1430,17 +1430,43 @@ export const collabService = {
         return await getNeighborsInternal(filePath);
     },
 
-    async scanFileImmunity(content, filePath) {
+    /**
+     * Lazily create the shared immunity service and configure its Layer 3
+     * (protocol) surface exactly once. Without configureProtocolSurface the
+     * protocol scanner has an empty async surface and silently never runs —
+     * layersRun.protocol stays false forever and un-awaited collab calls
+     * ship undetected.
+     */
+    async _getImmunityService() {
         if (!this._immunityService) {
             this._immunityService = await createImmunityService({ log: console });
+            const { fileURLToPath } = await import('node:url');
+            const impl = (rel) => fileURLToPath(new URL(rel, import.meta.url));
+            this._immunityService.configureProtocolSurface({
+                implPaths: [
+                    impl('./collab.persistence.js'),
+                    impl('./collab.service.js'),
+                ],
+                callerPrefixes: ['collabPersistence', 'collabService'],
+            });
         }
-        return await this._immunityService.scanFile(content, filePath);
+        return this._immunityService;
+    },
+
+    /**
+     * Explicit single-file interrogation (MCP immunity_scan_file). Runs ALL
+     * layers: the service-level runAdaptive default is a bulk-scan cost
+     * heuristic (adaptive only escalates when innate flags something), but
+     * an operator asking "scan THIS file" is asking for full depth, so a
+     * clean innate layer must not leave the adaptive layer dark.
+     */
+    async scanFileImmunity(content, filePath) {
+        const svc = await this._getImmunityService();
+        return await svc.scanFile(content, filePath, { runAdaptive: true });
     },
 
     async getImmunityStatus() {
-        if (!this._immunityService) {
-            this._immunityService = await createImmunityService({ log: console });
-        }
-        return await this._immunityService.getStatus();
+        const svc = await this._getImmunityService();
+        return await svc.getStatus();
     },
 };

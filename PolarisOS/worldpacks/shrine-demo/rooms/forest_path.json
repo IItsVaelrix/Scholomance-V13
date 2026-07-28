@@ -1,0 +1,19 @@
+{
+  "roomId": "forest_path",
+  "title": "The Forest Path",
+  "descriptionKey": "forest_path_default",
+  "description": "A narrow path winds between ancient oaks. Rain drips from the canopy above. To the east, a crumbling shrine emerges from the mist. To the west, moonlight pools in a clearing.",
+  "exitIds": ["ruined_shrine", "moonlit_clearing"],
+  "exits": {
+    "ruined_shrine": { "direction": "east", "label": "towards the shrine" },
+    "moonlit_clearing": { "direction": "west", "label": "towards the clearing" }
+  },
+  "flags": {
+    "weather": "rain",
+    "time_of_day": "night"
+  },
+  "illustration": {
+    "backgroundAsset": "rooms/forest_path/background",
+    "ambientEffects": ["rain_drips", "mist_low"]
+  }
+}

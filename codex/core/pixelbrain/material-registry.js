@@ -1036,6 +1036,39 @@ export function clamp01(value) {
   return Math.max(0, Math.min(1, numeric));
 }
 
+// ─── Material Grain (Vixel Phase 4) ─────────────────────────────────────────
+// Grain declarations for the Vixel rasterizer: how each material's texture
+// behaves when sampled in a frame rotated to the cell's tangent.
+//   direction:      base grain angle in radians (0 = along tangent)
+//   frequency:      spatial frequency along tangent (cycles per cell)
+//   crossFrequency: spatial frequency across tangent (perpendicular modulation)
+//   amplitude:      strength of color modulation (0..1)
+// Without this, there is literally nothing for texture to align to.
+
+export const MATERIAL_GRAIN = Object.freeze({
+  obsidian:       Object.freeze({ direction: 0,          frequency: 0.8, crossFrequency: 0.3, amplitude: 0.6 }),
+  darksteel:      Object.freeze({ direction: 0,          frequency: 1.2, crossFrequency: 0.5, amplitude: 0.4 }),
+  holy_fire:      Object.freeze({ direction: Math.PI/2,  frequency: 0.4, crossFrequency: 0.2, amplitude: 0.8 }),
+  holy_steel:     Object.freeze({ direction: 0,          frequency: 1.0, crossFrequency: 0.4, amplitude: 0.45 }),
+  void_cloth:     Object.freeze({ direction: Math.PI/4,  frequency: 2.0, crossFrequency: 0.1, amplitude: 0.2 }),
+  void_rune_glow: Object.freeze({ direction: 0,          frequency: 0.3, crossFrequency: 0.3, amplitude: 0.7 }),
+  oak_bark:       Object.freeze({ direction: 0,          frequency: 1.5, crossFrequency: 0.2, amplitude: 0.5 }),
+  moonstone:      Object.freeze({ direction: 0,          frequency: 0.3, crossFrequency: 0.3, amplitude: 0.3 }),
+  diamond:        Object.freeze({ direction: Math.PI/3,  frequency: 0.6, crossFrequency: 0.6, amplitude: 0.35 }),
+  sapphire:       Object.freeze({ direction: Math.PI/6,  frequency: 0.5, crossFrequency: 0.4, amplitude: 0.4 }),
+  source:         Object.freeze({ direction: 0,          frequency: 0,   crossFrequency: 0,   amplitude: 0 }),
+});
+
+/**
+ * Get grain parameters for a material.
+ * @param {string} materialId
+ * @returns {{ direction: number, frequency: number, crossFrequency: number, amplitude: number } | null}
+ */
+export function getMaterialGrain(materialId) {
+  if (!materialId) return null;
+  return MATERIAL_GRAIN[materialId] || null;
+}
+
 export function resolveMaterialId(material) {
   const key = String(material || SOURCE_MATERIAL).trim();
   return MATERIAL_PALETTES[key] ? key : SOURCE_MATERIAL;

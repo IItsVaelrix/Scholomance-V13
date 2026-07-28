@@ -151,6 +151,18 @@ function glyphFor(layer: SceneLayer): GlyphSpec {
   return GLYPH_BY_TYPE[layer.layerType] ?? GLYPH_BY_TYPE.prop;
 }
 
+/**
+ * The explicit procedural glyph fallback authored for a world asset key, or
+ * null when the key has no dedicated glyph. Used by the registry-completeness
+ * check (Dual-State Art Pass §8.2): every shipped PixelBrain packet must keep a
+ * glyph so the scene stays illustrated when the asset fails to load (PDR §5.4).
+ * Background keys (`rooms/...* /background`) are intentionally null here — they
+ * fall back to the plan's backgroundGlyph instead.
+ */
+export function glyphFallbackForAssetKey(assetKey: string): GlyphSpec | null {
+  return GLYPH_BY_ASSET[assetKey] ?? null;
+}
+
 function labelOf(layer: SceneLayer): string | null {
   const name = layer.flags?.displayName;
   return typeof name === "string" && name.length > 0 ? name : null;

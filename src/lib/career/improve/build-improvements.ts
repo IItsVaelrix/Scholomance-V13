@@ -16,6 +16,7 @@ import { vocabularyInjectionRule } from './rules/vocabulary-injection.js';
 import { reorderRule } from './rules/reorder.js';
 import { quantifyRule } from './rules/quantify.js';
 import { addSectionRule } from './rules/add-section.js';
+import { missingEvidenceRule } from './rules/missing-evidence.js';
 import type { CanonicalSkill, Requirement } from './types.js';
 
 /** Fixed rule priority for overlap dedupe and ordering (lower = preferred). */
@@ -91,6 +92,7 @@ export function buildImprovements(
     ...reorderRule(evidenceMap, bullets, doc),
     ...quantifyRule(evidenceMap, bullets, doc),
     ...addSectionRule(evidenceMap, bullets, doc),
+    ...missingEvidenceRule(evidenceMap, jdText, doc),
   ];
 
   const deduped = dedupeOverlapping(suggestions);

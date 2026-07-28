@@ -15,6 +15,7 @@
     "build": "npm run build --workspaces --if-present",
     "build:console-ui": "npm --prefix .. run polaris:build-console-ui",
     "build:pixelbrain-assets": "tsx scripts/build-pixelbrain-assets.ts",
+    "build:chrome": "tsx scripts/build-polaris-chrome.ts",
     "test": "vitest run",
     "test:browser:pixelbrain": "playwright test --config playwright.pixelbrain.config.ts",
     "test:watch": "vitest",

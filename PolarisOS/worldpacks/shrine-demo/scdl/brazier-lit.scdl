@@ -1,0 +1,44 @@
+# Brazier (lit) — embryonic geometry skeleton
+# Regenerated from scratch via the Ontological Art-Direction Pipeline.
+# Flame and coal glow are structural parts; rim/base highlights come
+# from art-direction genes in brazier.art-genes.json.
+asset brazier_lit canvas 24x20
+
+palette {
+  rim_body   = #383D55
+  bowl_body  = #191C2D
+  stem_dark  = #05050D
+  base_body  = #191C2D
+  flame_core = #FFFBEB
+  flame_body = #F59E0B
+  coal_glow  = #92400E
+}
+
+part flame material holy_fire {
+  polygon 10 4 11 1 12 0 13 1 14 4 13 6 11 6 flame_body
+  glow radius 3
+}
+
+part flame_core material holy_fire {
+  polygon 11 3 12 1 13 3 12 5 flame_core
+}
+
+part coals material holy_fire {
+  ellipse 12 6 radius 5 ry 1 coal_glow
+}
+
+part rim material obsidian {
+  ellipse 12 5 radius 9 ry 2 rim_body
+}
+
+part bowl material obsidian {
+  polygon 4 7 5 10 7 13 10 14 14 14 17 13 19 10 20 7 bowl_body
+}
+
+part stem material obsidian {
+  rect 10 14 4 3 stem_dark
+}
+
+part base material obsidian {
+  polygon 6 19 8 17 16 17 18 19 base_body
+}

@@ -1,0 +1,94 @@
+{
+  "asset": "celestial-sword",
+  "canvas": { "width": 32, "height": 128 },
+  "formulas": [
+    {
+      "role": "celestial-sword.blade_contour",
+      "type": "edge_trace",
+      "description": "100% Symmetrical faceted blade outline tapering from hilt to radiant tip",
+      "formula": {
+        "coordinateFormula": {
+          "type": "edge_trace",
+          "tracePath": [
+            { "x": 16, "y": 6 },
+            { "x": 24, "y": 28 },
+            { "x": 25, "y": 78 },
+            { "x": 21, "y": 95 },
+            { "x": 16, "y": 96 },
+            { "x": 11, "y": 95 },
+            { "x": 7, "y": 78 },
+            { "x": 8, "y": 28 },
+            { "x": 16, "y": 6 }
+          ],
+          "strokeWidth": 0.8
+        }
+      },
+      "pressure": 0.95
+    },
+    {
+      "role": "celestial-sword.guardian_wings",
+      "type": "parametric_curve",
+      "description": "Swept golden crossguard wings matching guard shoulders",
+      "formula": {
+        "coordinateFormula": {
+          "type": "parametric_curve",
+          "curveType": "arc",
+          "center": { "x": 16, "y": 96 },
+          "radiusX": 15,
+          "radiusY": 3,
+          "startAngle": 3.14159,
+          "endAngle": 6.28318,
+          "strokeWidth": 0.9
+        }
+      },
+      "pressure": 0.95
+    },
+    {
+      "role": "celestial-sword.guardian_eye",
+      "type": "parametric_curve",
+      "description": "Central star eye ring at the crossguard",
+      "formula": {
+        "coordinateFormula": {
+          "type": "parametric_curve",
+          "curveType": "circle",
+          "center": { "x": 16, "y": 97 },
+          "radius": 4.5,
+          "strokeWidth": 0.8
+        }
+      },
+      "pressure": 1.0
+    },
+    {
+      "role": "celestial-sword.stellar_lattice",
+      "type": "mathematical_stroke",
+      "description": "Stepped electric cyan lightning beam running down the central fuller",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "strokeType": "sine",
+          "origin": { "x": 16, "y": 12 },
+          "target": { "x": 16, "y": 92 },
+          "amplitude": 0.4,
+          "frequency": 14,
+          "strokeWidth": 0.7
+        }
+      },
+      "pressure": 0.9
+    },
+    {
+      "role": "celestial-sword.pommel_origin_ring",
+      "type": "parametric_curve",
+      "description": "Golden ring pommel of origin",
+      "formula": {
+        "coordinateFormula": {
+          "type": "parametric_curve",
+          "curveType": "circle",
+          "center": { "x": 16, "y": 122 },
+          "radius": 5.0,
+          "strokeWidth": 0.9
+        }
+      },
+      "pressure": 1.0
+    }
+  ]
+}

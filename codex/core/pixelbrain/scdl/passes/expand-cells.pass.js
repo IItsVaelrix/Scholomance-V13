@@ -26,17 +26,22 @@ const COMPASS_EDGES = Object.freeze({
   'south':      (w,  h) => edgeRow(w, h - 1),
   'west':       (w,  h) => edgeCol(0, h),
   'east':       (w,  h) => edgeCol(w - 1, h),
-  'north west': (w, _h) => cornerCells(w, 0),
-  'north east': (w, _h) => cornerCells(w, 0, true),
-  'south west': (w,  h) => cornerCells(w, h - 1),
-  'south east': (w,  h) => cornerCells(w, h - 1, true),
+  'north west': (w,  h) => cornerCells(w, h, 0),
+  'north east': (w,  h) => cornerCells(w, h, 0, true),
+  'south west': (w,  h) => cornerCells(w, h, h - 1, false, true),
+  'south east': (w,  h) => cornerCells(w, h, h - 1, true, true),
 });
 
 function edgeRow(w, y)         { return Array.from({ length: w }, (_, x) => ({ x, y })); }
 function edgeCol(x, h)         { return Array.from({ length: h }, (_, y) => ({ x, y })); }
-function cornerCells(w, y, right = false) {
+function cornerCells(w, h, y, right = false, south = false) {
   const x = right ? w - 1 : 0;
-  return [{ x, y }, { x: right ? x - 1 : x + 1, y }, { x, y: y + 1 }].filter(c => c.x >= 0 && c.x < w);
+  const inwardY = south ? y - 1 : y + 1;
+  return [
+    { x, y },
+    { x: right ? x - 1 : x + 1, y },
+    { x, y: inwardY },
+  ].filter(c => c.x >= 0 && c.x < w && c.y >= 0 && c.y < h);
 }
 
 /**
@@ -93,6 +98,14 @@ export function expandCellsPass(ast, errors) {
               const roleAnn = op.annotations.find(a => a.domain === 'role');
               if (roleAnn) coord.role = roleAnn.canonicalType;
             }
+            // Phase 2: Carry analytic vector identity from raster-core
+            if (op.signedDistance !== undefined) coord.signedDistance = op.signedDistance;
+            if (op.t !== undefined) coord.t = op.t;
+            if (op.tangent) coord.tangent = op.tangent;
+            if (op.normal) coord.normal = op.normal;
+            if (op.curvature !== undefined) coord.curvature = op.curvature;
+            if (op.arcLength !== undefined) coord.arcLength = op.arcLength;
+            if (op.strokeHalfWidth !== undefined) coord.strokeHalfWidth = op.strokeHalfWidth;
             coordinates.push(coord);
           }
           break;

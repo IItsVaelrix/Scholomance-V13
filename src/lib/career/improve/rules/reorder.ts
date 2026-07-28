@@ -82,21 +82,33 @@ function entryKeyOf(bullet: ResumeBullet): string {
 export function reorderRule(
   map: EvidenceMap,
   bullets: ResumeBullet[],
-  _doc: ResumeDocument
+  doc: ResumeDocument
 ): ResumeSuggestion[] {
   const suggestions: ResumeSuggestion[] = [];
+
+  // Only sections whose line ORDER is an argument may be reordered. `segmentDocumentBullets`
+  // flattens every section into `ResumeBullet`s, so without this the rule proposes moving
+  // the candidate's name and email around their own contact block, and shuffling a skills
+  // list into "JD-relevant order" — cards that carry a real operation but mean nothing, and
+  // in the contact case are outright wrong. Ranking by relevance is an argument about
+  // ACHIEVEMENTS; a contact block and a skills list have no such argument to make.
+  const sectionKindById = new Map((doc?.sections || []).map((s) => [s.id, s.kind]));
+  const orderableBullets = bullets.filter((b) => {
+    const kind = sectionKindById.get(b.sectionId);
+    return kind === 'experience' || kind === 'projects';
+  });
 
   // Group bullets by ENTRY (not section), preserving document order. This is the core
   // entry-aware correction: reorder never crosses an employer boundary.
   const byEntry = new Map<string, ResumeBullet[]>();
-  for (const bullet of bullets) {
+  for (const bullet of orderableBullets) {
     const key = entryKeyOf(bullet);
     const list = byEntry.get(key) || [];
     list.push(bullet);
     byEntry.set(key, list);
   }
 
-  const anyRelevant = bullets.some((b) => bulletRelevance(b.id, map) > 0);
+  const anyRelevant = orderableBullets.some((b) => bulletRelevance(b.id, map) > 0);
 
   for (const [entryId, entryBullets] of byEntry) {
     if (entryBullets.length < 2) continue;
@@ -117,56 +129,74 @@ export function reorderRule(
     const irrelevant = entryBullets.filter((b) => (relevance.get(b.id) || 0) === 0);
     const targetOrder = [...relevant.map((b) => b.id), ...irrelevant.map((b) => b.id)];
 
-    if (targetOrder.join('|') === currentOrder.join('|')) continue;
+    // Plan promotion moves only when the order actually changes. The demote flags below are
+    // independent of that: an irrelevant bullet that ALREADY sits at the end still gets a
+    // card that carries an operation. The old `continue` on an unchanged order short-
+    // circuited the flag block, so a bullet that needed no reorder also got no advice —
+    // exactly the "instructs without offering" case this rule now closes (Case C, spec §5).
+    if (targetOrder.join('|') !== currentOrder.join('|')) {
+      const moves = planMoves(currentOrder, targetOrder, entryId);
+      const bulletById = new Map(entryBullets.map((b) => [b.id, b]));
 
-    const moves = planMoves(currentOrder, targetOrder, entryId);
-    const bulletById = new Map(entryBullets.map((b) => [b.id, b]));
+      moves.forEach((move, idx) => {
+        const bullet = bulletById.get(move.bulletId);
+        if (!bullet) return;
+        const rel = relevance.get(move.bulletId) || 0;
+        const label = labelFor(move.bulletId, map);
+        // A move changes POSITION, not text, so the card's before→after diff shows nothing.
+        // The destination has to be stated in words or the card reads as a no-op.
+        const from = currentOrder.indexOf(move.bulletId) + 1;
+        const to = targetOrder.indexOf(move.bulletId) + 1;
+        const where = `Move it from position ${from} to position ${to} of ${currentOrder.length} in this role.`;
+        const reason =
+          rel > 0
+            ? `${where} It demonstrates "${label ?? 'a JD requirement'}" (weight ${rel.toFixed(2)}), so a recruiter should reach it first.`
+            : `${where} This surfaces JD-relevant content first.`;
 
-    moves.forEach((move, idx) => {
-      const bullet = bulletById.get(move.bulletId);
-      if (!bullet) return;
-      const rel = relevance.get(move.bulletId) || 0;
-      const label = labelFor(move.bulletId, map);
-      const reason =
-        rel > 0
-          ? `Promote this bullet — it demonstrates "${label ?? 'a JD requirement'}" (weight ${rel.toFixed(2)}).`
-          : 'Reorder to surface JD-relevant content first.';
-
-      suggestions.push({
-        id: makeSuggestionId('structure', `${entryId}:move:${idx}`, `${move.bulletId}:${targetOrder.join(',')}`),
-        type: 'structure',
-        target: { sectionId },
-        before: bullet.rawText,
-        after: bullet.rawText, // text unchanged — this is a move, not an edit
-        reason,
-        evidence: [
-          {
-            source: 'analysis',
-            rule: 'reorder',
-            span: bullet.sourceSpan,
-            text: label ?? move.bulletId,
-            confidence: 0.7,
-          },
-        ],
-        confidence: 0.7,
-        risk: 'low',
-        requiresUserApproval: true,
-        status: 'pending',
-        editable: false,
-        move,
+        suggestions.push({
+          id: makeSuggestionId('structure', `${entryId}:move:${idx}`, `${move.bulletId}:${targetOrder.join(',')}`),
+          type: 'structure',
+          target: { sectionId },
+          before: bullet.rawText,
+          after: bullet.rawText, // text unchanged — this is a move, not an edit
+          reason,
+          evidence: [
+            {
+              source: 'analysis',
+              rule: 'reorder',
+              span: bullet.sourceSpan,
+              text: label ?? move.bulletId,
+              confidence: 0.7,
+            },
+          ],
+          confidence: 0.7,
+          risk: 'low',
+          requiresUserApproval: true,
+          status: 'pending',
+          editable: false,
+          move,
+        });
       });
-    });
+    }
 
-    // Flag JD-irrelevant bullets (only when the JD actually asks for other things).
+    // Flag JD-irrelevant bullets (only when the JD actually asks for other things) as a
+    // DEMOTE MOVE within their own entry rather than prose advice. Trimming outright is
+    // never offered — deleting a true statement is the candidate's call and carries no ATS
+    // benefit the demote does not. The bullet lands after the last other bullet of its own
+    // entry, so the move can never cross an employer boundary.
     if (anyRelevant) {
+      const entryBulletIds = entryBullets.map((b) => b.id);
       for (const bullet of irrelevant) {
+        const lastOther = [...entryBulletIds].reverse().find((id) => id !== bullet.id);
+        if (!lastOther) continue; // nothing to demote past — silence
         suggestions.push({
           id: makeSuggestionId('structure', `${entryId}:flag`, bullet.id),
           type: 'structure',
           target: { sectionId },
           before: bullet.rawText,
-          after: bullet.rawText,
-          reason: 'The job description never asks about this — consider trimming it or moving it below JD-relevant content.',
+          after: bullet.rawText, // a move, not an edit — text is unchanged
+          reason:
+            'The job description never asks about this. Move it to the end of this role, below your JD-relevant bullets, so a recruiter reaches your strongest evidence first. The wording is not changed.',
           evidence: [
             {
               source: 'analysis',
@@ -181,6 +211,7 @@ export function reorderRule(
           requiresUserApproval: true,
           status: 'pending',
           editable: false,
+          move: { bulletId: bullet.id, entryId, afterBulletId: lastOther },
         });
       }
     }

@@ -81,13 +81,29 @@ function injectCanonical(
   return bulletText.slice(0, idx) + `${canonicalLabel}/${original}` + bulletText.slice(idx + mp.length);
 }
 
+/**
+ * Sections whose lines are ACCOMPLISHMENTS — the only place a "… using ␟" rewrite may hang.
+ *
+ * Every section is flattened into `ResumeBullet`s by `segmentDocumentBullets`, so a skills
+ * or readiness list arrives here shaped exactly like an achievement list. Appending " using
+ * X" to one of those items fuses two facts the résumé listed SEPARATELY into a relationship
+ * it never asserted: a candidate who lists "Consultative Needs Assessment" and "Zoom" on
+ * adjacent lines has not claimed they did the former using the latter. The claim guards
+ * cannot catch it — every token is provenanced, and the candidate types the value — because
+ * the fabrication is the RELATION, not the words. Only the section boundary can.
+ */
+const ACCOMPLISHMENT_SECTION_KINDS: ReadonlySet<string> = new Set(['experience', 'projects']);
+
 export function vocabularyInjectionRule(
   map: EvidenceMap,
   bullets: ResumeBullet[],
-  _doc: ResumeDocument
+  doc: ResumeDocument
 ): ResumeSuggestion[] {
   const suggestions: ResumeSuggestion[] = [];
   const bulletById = new Map(bullets.map((b) => [b.id, b]));
+  const sectionKindById = new Map((doc?.sections || []).map((s) => [s.id, s.kind]));
+  const isAccomplishmentBullet = (bullet: ResumeBullet): boolean =>
+    ACCOMPLISHMENT_SECTION_KINDS.has(sectionKindById.get(bullet.sectionId) ?? '');
   /** Anchor (bullet + matched phrase) → the gap note currently speaking for it. */
   const gapByAnchor = new Map<string, { weight: number; suggestion: ResumeSuggestion }>();
 
@@ -174,7 +190,11 @@ export function vocabularyInjectionRule(
       // Draft a fill-in rewrite when we have an anchor bullet to hang it on. The tool never
       // names the canonical term itself (that is the escalation the tiered bridge exists to
       // prevent) — it opens a blank and lets the candidate name what they actually did.
-      const anchorBullet = firstAdjacent ? bulletById.get(firstAdjacent.bulletId) : undefined;
+      const anchorCandidate = firstAdjacent ? bulletById.get(firstAdjacent.bulletId) : undefined;
+      // A list item is not an accomplishment: only a bullet from an experience/projects
+      // section may take the relationship the draft would assert (see the constant above).
+      const anchorBullet =
+        anchorCandidate && isAccomplishmentBullet(anchorCandidate) ? anchorCandidate : undefined;
       let draft: { after: string; slotId: string } | null = null;
       if (anchorBullet) {
         const tail = /[.;:!?]+$/.exec(anchorBullet.rawText);
@@ -207,17 +227,34 @@ export function vocabularyInjectionRule(
         inputSlots: draft
           ? [{ id: draft.slotId, placeholder: 'what you used', hint: `the specific method or tool (e.g. ${canonicalLabel})` }]
           : undefined,
-        evidence: req.jdEvidence[0]
-          ? [
-              {
-                source: 'job_description',
-                rule: 'vocabulary_injection',
-                span: req.jdEvidence[0],
-                text: canonicalLabel,
-                confidence: 0.6,
-              },
-            ]
-          : [],
+        // Provenance for a DRAFT is two-sided. The JD span says why the card exists; the
+        // résumé span says which existing line the new clause is being welded onto. Without
+        // the second, an accepted draft leaves no record of what the added relationship was
+        // attached to — the reviewer sees a new claim and no trace of its anchor.
+        evidence: [
+          ...(req.jdEvidence[0]
+            ? [
+                {
+                  source: 'job_description' as const,
+                  rule: 'vocabulary_injection',
+                  span: req.jdEvidence[0],
+                  text: canonicalLabel,
+                  confidence: 0.6,
+                },
+              ]
+            : []),
+          ...(draft && anchorBullet
+            ? [
+                {
+                  source: 'resume' as const,
+                  rule: 'vocabulary_injection_anchor',
+                  span: anchorBullet.sourceSpan,
+                  text: anchorBullet.rawText,
+                  confidence: 0.6,
+                },
+              ]
+            : []),
+        ],
         confidence: 0.6,
         risk: 'low',
         requiresUserApproval: true,

@@ -410,6 +410,36 @@ class ModelSelectScreen(ModalScreen[str]):
         if not val.startswith("==="):
             self.dismiss(val)
 
+class _ChatLogger:
+    """Callable bound to one specific chat log (e.g. ``chat-mother``).
+
+    PromptService's agent loop probes ``callback.__self__`` for the optional
+    ``typewriter_log_msg`` / ``show_code`` hooks, so we expose ``__self__``
+    pointing back at ourselves — the hooks forward to the app but re-target
+    the bound chat instead of whichever tab happens to be focused.
+
+    This is what lets a long-running DivTube job and a Mother commentary
+    conversation run in parallel without their outputs cross-contaminating.
+    """
+
+    def __init__(self, app, chat_id: str):
+        self._app = app
+        self._chat_id = chat_id
+        # Bound-method protocol shim: PromptService checks
+        # `hasattr(callback, "__self__")` before reaching for hooks.
+        self.__self__ = self
+
+    def __call__(self, msg):
+        self._app.log_msg_to(self._chat_id, msg)
+
+    def typewriter_log_msg(self, msg, delay: float = 0.005):
+        self._app.typewriter_log_msg_to(self._chat_id, msg, delay=delay)
+
+    def show_code(self, *args, **kwargs):
+        # Code viewer is a shared right-panel widget — not per-tab.
+        self._app.show_code(*args, **kwargs)
+
+
 class DivTubeAgentApp(App):
     # Stylesheet lives in app.tcss (hot-reloadable via `textual run --dev`).
     # All colours there are $tokens resolved from THEME_NAME by
@@ -1230,7 +1260,19 @@ class DivTubeAgentApp(App):
                 agent_id = active_tab.split("-")[1] if active_tab else "divtube"
             except Exception:
                 agent_id = "divtube"
-            ui.prompt.prompt(text, ui.log_msg, state_callback=ui.set_ai_state, controller=ui, agent_id=agent_id)
+            # Pin this turn to the tab it was submitted from. The callback and
+            # the activity marker both target chat-{agent_id} directly, so the
+            # response lands in the originating tab even if the user switches
+            # tabs mid-flight — Mother commentary never bleeds into the
+            # DivTube work log and vice versa.
+            chat_id = f"chat-{agent_id}"
+            ui.prompt.prompt(
+                text,
+                ui.make_chat_logger(chat_id),
+                state_callback=lambda s: ui.set_ai_state_for(chat_id, s),
+                controller=ui,
+                agent_id=agent_id,
+            )
 
         def handle_prompt_model(ui, args):
             model = " ".join(args).strip()
@@ -1889,8 +1931,23 @@ class DivTubeAgentApp(App):
     }
 
     def set_ai_state(self, state):
+        """Legacy: tag the *active* chat's border with the current AI state."""
+        chat = self._get_active_chat()
+        chat_id = getattr(chat, "id", None) or "chat-divtube"
+        self.set_ai_state_for(chat_id, state)
+
+    def set_ai_state_for(self, chat_id: str, state):
+        """Tag a specific chat's border with the current AI state.
+
+        Per-tab variant used when a prompt is bound to a fixed chat (Mother
+        commentary, DivTube worker) so the "THINKING / LOOKING / RESPONDING"
+        marker follows the tab that owns the turn, not the focused one.
+        """
         def _update():
-            chat = self._get_active_chat()
+            try:
+                chat = self.query_one(f"#{chat_id}")
+            except Exception:
+                chat = self._get_active_chat()
             base_title = (str(chat.border_title).split("  [")[0]
                           if chat.border_title else _sigil_title("COCKPIT"))
             marker = self._AI_STATE_MARKERS.get(state)
@@ -1909,12 +1966,24 @@ class DivTubeAgentApp(App):
         self.call_from_thread(_update)
 
     def typewriter_log_msg(self, msg, delay=0.005):
-        """Simulates the AI typing out its response."""
+        """Simulates the AI typing out its response (writes to the active chat)."""
+        chat = self._get_active_chat()
+        chat_id = getattr(chat, "id", None) or "chat-divtube"
+        self.typewriter_log_msg_to(chat_id, msg, delay=delay)
+
+    def typewriter_log_msg_to(self, chat_id: str, msg, delay=0.005):
+        """Typewriter effect bound to a specific chat log.
+
+        The live-typing preview box (``#typewriter-box``) is shared chrome at
+        the bottom of the cockpit — two concurrent agents will interleave
+        there, but the *final* message (the one that becomes scrollback and
+        feeds /copy + history) always lands in the tab that owns the turn.
+        """
         def _task():
             box = self.query_one("#typewriter-box")
             self.call_from_thread(lambda: box.add_class("-active"))
             self.call_from_thread(lambda: setattr(box, "border_title", _sigil_title("AI IS TYPING…")))
-            
+
             from rich.markdown import Markdown
             current_text = ""
             # Chunk the string by words to make it look like fast typing
@@ -1925,12 +1994,12 @@ class DivTubeAgentApp(App):
                 self.call_from_thread(box.update, Markdown(current_text))
                 import time
                 time.sleep(delay)
-                
-            # Once done, push the final message to the rich log and hide the box
+
+            # Once done, push the final message to the bound chat log and hide the box
             self.call_from_thread(lambda: box.remove_class("-active"))
             self.call_from_thread(lambda: box.update(""))
-            self.call_from_thread(lambda: self.log_msg(Markdown(msg)))
-            self.call_from_thread(lambda: self.log_msg("\n"))
+            self.call_from_thread(lambda: self.log_msg_to(chat_id, Markdown(msg)))
+            self.call_from_thread(lambda: self.log_msg_to(chat_id, "\n"))
 
         import threading
         threading.Thread(target=_task, daemon=True).start()
@@ -1946,34 +2015,64 @@ class DivTubeAgentApp(App):
             pass
         return self.query_one("#chat-divtube")
 
-    def log_msg(self, msg):
-        def _write():
-            chat = self._get_active_chat()
-            try:
-                chat.write(msg)
-            except MarkupError:
-                # Malformed Rich markup (stray "[/]"/mismatched tags from raw
-                # user, LLM, file or tool text) must never crash the TUI. Fall
-                # back to writing the text with its markup neutralised.
-                chat.write(_escape_markup(msg) if isinstance(msg, str) else msg)
-            # Keep a plain-text mirror for /copy.
-            try:
-                if isinstance(msg, str):
-                    plain = Text.from_markup(msg).plain
-                elif hasattr(msg, "markup"):
-                    # Rich Markdown objects expose their source markup.
-                    plain = Text.from_markup(msg.markup).plain
-                else:
-                    # Other rich renderables — best-effort stringification.
-                    plain = str(msg)
-            except Exception:
+    def _write_to_chat(self, chat, msg):
+        """Shared body for log_msg / log_msg_to: write + plain-text mirror."""
+        try:
+            chat.write(msg)
+        except MarkupError:
+            # Malformed Rich markup (stray "[/]"/mismatched tags from raw
+            # user, LLM, file or tool text) must never crash the TUI. Fall
+            # back to writing the text with its markup neutralised.
+            chat.write(_escape_markup(msg) if isinstance(msg, str) else msg)
+        # Keep a plain-text mirror for /copy.
+        try:
+            if isinstance(msg, str):
+                plain = Text.from_markup(msg).plain
+            elif hasattr(msg, "markup"):
+                # Rich Markdown objects expose their source markup.
+                plain = Text.from_markup(msg.markup).plain
+            else:
+                # Other rich renderables — best-effort stringification.
                 plain = str(msg)
-            if chat.id:
-                self._chat_text_mirror.setdefault(chat.id, []).append(plain)
+        except Exception:
+            plain = str(msg)
+        if chat.id:
+            self._chat_text_mirror.setdefault(chat.id, []).append(plain)
+
+    def log_msg(self, msg):
+        """Write to whichever chat tab is currently focused (legacy behaviour)."""
+        def _write():
+            self._write_to_chat(self._get_active_chat(), msg)
         if self._thread_id == threading.get_ident():
             _write()
         else:
             self.call_from_thread(_write)
+
+    def log_msg_to(self, chat_id: str, msg):
+        """Write to a specific chat log (``chat-mother``, ``chat-divtube``, …)
+        regardless of which tab the user is currently looking at.
+
+        Falls back to the active chat if the target id is missing so a
+        misconfigured tab name never silently swallows output.
+        """
+        def _write():
+            try:
+                chat = self.query_one(f"#{chat_id}")
+            except Exception:
+                chat = self._get_active_chat()
+            self._write_to_chat(chat, msg)
+        if self._thread_id == threading.get_ident():
+            _write()
+        else:
+            self.call_from_thread(_write)
+
+    def make_chat_logger(self, chat_id: str) -> _ChatLogger:
+        """Bind a callable that routes every PromptService write to *chat_id*.
+
+        Use this when dispatching a /prompt so the response lands in the tab
+        that originated it — even if the user has since switched tabs.
+        """
+        return _ChatLogger(self, chat_id)
 
     def show_code(self, code: str, filename: str = "", language: str = "python"):
         """Render *code* into the dedicated CodeBox panel with syntax highlighting."""
@@ -2014,7 +2113,14 @@ class DivTubeAgentApp(App):
             
         # Escape the raw message: user text may contain Rich markup sequences
         # (e.g. a stray "[/]") that would otherwise break markup rendering.
-        self.log_msg(f"\n[bold #FFD700]▸[/] [bold #FFFFFF]{_escape_markup(val)}[/]")
+        # Echo is pinned to the tab the command was submitted from — the same
+        # tab the (possibly async) response will be routed back to.
+        try:
+            _active = self.query_one("#agent-tabs").active
+            _origin_chat = f"chat-{_active.split('-')[1]}" if _active else "chat-divtube"
+        except Exception:
+            _origin_chat = "chat-divtube"
+        self.log_msg_to(_origin_chat, f"\n[bold #FFD700]▸[/] [bold #FFFFFF]{_escape_markup(val)}[/]")
 
         # ── bare @file reference (no command) ────────────────────────
         if val.startswith("@") and not val.startswith("/"):

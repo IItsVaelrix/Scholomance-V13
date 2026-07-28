@@ -1,0 +1,88 @@
+{
+  "contract": "SCDNA-CAPABILITY-v1",
+  "version": "1.0.0",
+  "domain": "pixel-art-direction",
+  "surfaces": [
+    "codex/core/pixelbrain/scdna-art-gene.js",
+    "codex/core/pixelbrain/scdna-art-gene-compiler.js",
+    "codex/core/pixelbrain/scdna-art-gene-store.js",
+    "codex/core/pixelbrain/scdl/passes/project-genes.pass.js",
+    "codex/core/pixelbrain/scdl/scdl.compiler.js",
+    "PolarisOS/worldpacks/**/*.scdl",
+    "PolarisOS/scripts/scdl-to-polaris.mjs",
+    "PolarisOS/scripts/vixel-rasterize.mjs"
+  ],
+  "capabilities": [
+    {
+      "need": "art-direction gene creation and validation",
+      "canonical": "createArtGenePacket (codex/core/pixelbrain/scdna-art-gene.js) — PB-SCDNA-GENE-v1 with geneType: 'art-direction', mode validation, deep freeze, stable checksum",
+      "path": "codex/core/pixelbrain/scdna-art-gene.js",
+      "coverage": "explicit, derived, and hybrid projection modes; geometry hints validation; palette role normalization",
+      "evidence": "PDR §8.2–8.3 contracts; brazier rim-light gene as reference implementation",
+      "forbidden": [
+        "auto-generating art genes from prose or aesthetic adjectives",
+        "autonomous cell synthesis without human curation",
+        "treating geometryHints.extensions as operational (they are non-operational metadata)"
+      ]
+    },
+    {
+      "need": "deterministic gene projection onto canvas",
+      "canonical": "projectGenes (codex/core/pixelbrain/scdl/passes/project-genes.pass.js) — pure function, canonical ordering, conflict resolution, projection checksum",
+      "path": "codex/core/pixelbrain/scdl/passes/project-genes.pass.js",
+      "coverage": "explicit coordinates + SDF contour-follow; priority-then-geneId overlap policy; per-cell causal provenance",
+      "evidence": "PDR §8.4–8.6, §9 Hop 2; 100-run determinism matrix",
+      "forbidden": [
+        "filesystem reads, timestamps, environment discovery, random values, or mutable global state inside the projection function",
+        "caller gene array order affecting output",
+        "geneId acting as primary layer control (priority controls layering; geneId is tie-breaker only)"
+      ]
+    },
+    {
+      "need": "human-gated commit with preview binding",
+      "canonical": "commitGene (codex/core/pixelbrain/scdna-art-gene-compiler.js) — validates interactive human authority, binds gene + projection + model + document checksums",
+      "path": "codex/core/pixelbrain/scdna-art-gene-compiler.js",
+      "coverage": "authority validation, four-checksum binding, durable ledger persistence",
+      "evidence": "PDR §6.1, §6.3, §10.4; agent-asserted approval strings are refused",
+      "forbidden": [
+        "fabricating authority objects in compiler code",
+        "accepting a nonempty approvedBy string as proof of human authority",
+        "committing without validated interactive-human-gate authority"
+      ]
+    },
+    {
+      "need": "durable art-memory ledger",
+      "canonical": "appendArtMemoryRecord / queryArtMemoryLedger (codex/core/pixelbrain/scdna-art-gene-store.js) — JSONL append-only, idempotent by eventChecksum, composite key query",
+      "path": "codex/core/pixelbrain/scdna-art-gene-store.js",
+      "coverage": "curation, projection, feel-warning, replay event types; queryable by assetId + geneId + geneChecksum + projectionChecksum",
+      "evidence": "PDR §8.8, §10.5, §6.7; records survive process restart",
+      "forbidden": [
+        "treating event emission alone as durable memory (persistence to ledger is required)",
+        "mutating or deleting existing ledger rows"
+      ]
+    },
+    {
+      "need": "SCD64 art-domain addressing",
+      "canonical": "ART_FAMILIES + ART_SLOT_ALIASES (src/core/scd64/glossary.ts, constants.ts) — ART_GENE_CURATION, ART_PROJECTION_DRIFT, ART_FEEL_WARNING families",
+      "path": "src/core/scd64/glossary.ts",
+      "coverage": "three art families with eight-slot wire contract; domain-aware aliases (ART_CLASS, CANVAS_SYS, DOCTRINE, VALUE_RAMP, OCCLUSION, APPROVAL_GATE, PROJECTION_PATH, CURATOR_VERDICT)",
+      "evidence": "PDR Phase 3; existing bug-family output remains byte-identical",
+      "forbidden": [
+        "treating SCD64 hashes as semantic payloads (they are addresses/fingerprints)",
+        "modifying the physical eight-slot wire contract"
+      ]
+    },
+    {
+      "need": "warn-only Feel evaluation after projection",
+      "canonical": "evaluateArtProjection (codex/core/pixelbrain/scdna-art-gene-compiler.js) — structural warning only, never mutates cells",
+      "path": "codex/core/pixelbrain/scdna-art-gene-compiler.js",
+      "coverage": "spatialAwareness threshold check; PB-WARN-v1-ART-FEEL-BELOW-THRESHOLD event; REQUIRES_HUMAN aesthetic approval",
+      "evidence": "PDR §10.7; Feel score is separate from human aesthetic approval",
+      "forbidden": [
+        "automatic mutation in response to a Feel score",
+        "blocking projection based on Feel score"
+      ]
+    }
+  ],
+  "mnemonic": "When editing a .scdl asset or working with pixel art direction: art genes are human-curated (never auto-generated), projection is deterministic (pure function, no I/O), commit requires interactive human approval (agent strings refused), and the durable ledger is the memory (event emission alone is not enough). SCD64 is an address, not a payload. Feel is warn-only.",
+  "retrievalTrigger": "file surface matches *.scdl, scdna-art-gene*, project-genes*, art-gene-ledger*, or pixel-art-direction capability queries"
+}

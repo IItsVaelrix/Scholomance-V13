@@ -28,7 +28,7 @@ export function emitPacketPass(ast, _errors) {
 
   for (const part of ast.parts) {
     for (const coord of (part.coordinates || [])) {
-      allCoordinates.push({
+      const entry = {
         x:        coord.x,
         y:        coord.y,
         color:    coord.color,
@@ -37,7 +37,21 @@ export function emitPacketPass(ast, _errors) {
         role:     coord.role,
         sourceOpId: coord.sourceOpId,
         _fillIntent: coord._fillIntent || false,
-      });
+      };
+      // Phase 2: Carry analytic vector identity into the final packet
+      if (coord.signedDistance !== undefined) entry.signedDistance = coord.signedDistance;
+      if (coord.t !== undefined) entry.t = coord.t;
+      if (coord.tangent) entry.tangent = coord.tangent;
+      if (coord.normal) entry.normal = coord.normal;
+      if (coord.curvature !== undefined) entry.curvature = coord.curvature;
+      if (coord.arcLength !== undefined) entry.arcLength = coord.arcLength;
+      // Stroke ops (ellipse perimeter-walk) carry their half-width so the renderer
+      // can apply band coverage. Without this the field is stripped and the renderer
+      // falls back to half-space coverage, fogging the outer half of every rim.
+      if (coord.strokeHalfWidth !== undefined) entry.strokeHalfWidth = coord.strokeHalfWidth;
+      // Art-gene causal provenance (PDR §6.4)
+      if (coord._gene) entry._gene = coord._gene;
+      allCoordinates.push(entry);
     }
     for (const noise of (part.noiseDescriptors || [])) {
       allNoise.push(noise);

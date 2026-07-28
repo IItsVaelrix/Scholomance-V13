@@ -32,9 +32,15 @@ const BULLET_PREFIX = /^(?:[•·▪◦–—*-]|\d+[.)])\s+/;
 const YEAR_RE = /\b(?:19|20)\d{2}\b/g;
 const MONTH_RE = /\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\b/i;
 const PRESENT_RE = /\b(?:present|current|now)\b/i;
-/** A date range/endpoint: "2019 - 2021", "Jan 2020 – Present", "2018 to 2020". */
+/**
+ * A date range/endpoint: "2019 - 2021", "Jan 2020 – Present", "2018 to 2020".
+ *
+ * The dash alternative consumes the whitespace on BOTH sides. Without the trailing `\s*` the
+ * separator matched " -" and left " 2024" unconsumed, so the optional end-year group could
+ * not reach it and the range truncated to "2022 -" — a mangled date shipped into the export.
+ */
 const DATE_RANGE_RE =
-  /(?:\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+)?(?:19|20)\d{2}\b(?:\s*[-–—]|(?:\s+to\s+)|\s*\/\s*)?(?:(?:19|20)\d{2}\b|(?:present|current|now)\b)?/i;
+  /(?:\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+)?(?:19|20)\d{2}\b(?:\s*[-–—]\s*|(?:\s+to\s+)|\s*\/\s*)?(?:(?:19|20)\d{2}\b|(?:present|current|now)\b)?/i;
 
 /** Common leading accomplishment verbs — a title is a noun phrase, not a verb-led sentence.
  *  Self-contained (no amplify import) so the parser layer stays dependency-free. */
@@ -49,6 +55,13 @@ const LEADING_VERBS: ReadonlySet<string> = new Set([
 
 /** Role/company separators that mark a title line ("Role - Company", "Role | Company"). */
 const TITLE_SEPARATOR_RE = /\s[-–—|·@]\s|\s\bat\b\s|,\s/;
+
+/**
+ * The separators trusted to mark a title when there is NO date to corroborate it. The comma
+ * is deliberately excluded: with a date present "Analyst, Acme | 2019-2021" is plainly a
+ * header, but dateless a comma is just a list ("Salesforce, Zendesk, Excel").
+ */
+const DATELESS_TITLE_SEPARATOR_RE = /\s[-–—|·@]\s|\s\bat\b\s/;
 
 interface LineRec {
   index: number;
@@ -109,9 +122,100 @@ function isInlineDateTitle(rec: LineRec): boolean {
   if (rec.hasBullet || !rec.hasDate || rec.dateOnly) return false;
   const t = rec.trimmed;
   if (/[.!?]$/.test(t)) return false;
-  // Header-ish: has a separator, or is short. A long verb-led sentence with a year is an
-  // achievement ("Increased sales 2019-2021 by 50%"), not a title.
+  // A verb-led line is an achievement whatever else it looks like — "Trained new hires -
+  // including the 2021 cohort" carries both a separator and a year, and the length test
+  // alone let short ones through ("Increased sales 2019-2021 by 50%"). A title is a noun
+  // phrase; the accomplishment verb is the discriminator, not the punctuation.
+  if (LEADING_VERBS.has(firstWord(t))) return false;
+  // Header-ish: has a separator, or is short.
   return TITLE_SEPARATOR_RE.test(t) || t.length <= 60;
+}
+
+/**
+ * Header material: a short, capitalised noun phrase that could be a role or company line.
+ *
+ * This is the shape test ONLY — it says "this line is not an achievement", not "this line
+ * is a title". Position decides the latter (see `isDatelessTitle` and the section-opening
+ * rule), because in the middle of an entry the same shape is a legitimate unmarked bullet.
+ */
+function isHeaderMaterial(rec: LineRec): boolean {
+  if (rec.hasBullet || rec.hasDate || rec.dateOnly) return false;
+  const t = rec.trimmed;
+  if (!t || t.length > 70) return false;
+  if (/[.!?]$/.test(t)) return false;
+  if (!/^[A-Z]/.test(t)) return false;
+  return !LEADING_VERBS.has(firstWord(t));
+}
+
+/**
+ * A role title carrying no date at all — "Founder & Systems Architect - Vaelrix".
+ *
+ * Current roles, self-employment, and freelance entries routinely omit the date line, and
+ * the date-anchored tests above then fall through to `pushBullet`: the role renders as a
+ * bullet while its dated siblings render as bold titles. This path restores it, on a
+ * deliberately narrow signal — an explicit role/company separator on an unpunctuated,
+ * capitalised noun phrase — and only inside a section whose lines are ROLES to begin with
+ * (see `allowsDatelessTitles`). A skills or education list never reaches it.
+ */
+function isDatelessTitle(rec: LineRec): boolean {
+  if (!isHeaderMaterial(rec)) return false;
+  return DATELESS_TITLE_SEPARATOR_RE.test(rec.trimmed);
+}
+
+/**
+ * Function words that mark a line as a CLAUSE rather than a noun phrase.
+ *
+ * This is what `LEADING_VERBS` was approximating and could not reach: that list has to know
+ * every accomplishment verb in English, and it does not ("partnered", "queried"). A title is
+ * a noun phrase — "Social Media Manager / Sales", "Customer Service Representative" — and an
+ * achievement is a clause — "Queried the database for ad-hoc analysis". Articles,
+ * infinitival "to", and clause prepositions appear in the second and never in the first, so
+ * the closed function-word set does the work the open verb set cannot.
+ *
+ * "of", "and", and "&" are deliberately EXCLUDED: "Director of Engineering", "Head of
+ * Customer Success", and "Sales and Marketing Manager" are ordinary job titles.
+ */
+const CLAUSE_MARKERS: ReadonlySet<string> = new Set([
+  'the', 'a', 'an', 'to', 'for', 'with', 'from', 'by', 'on', 'at', 'into', 'onto',
+  'that', 'which', 'per', 'using', 'across', 'through', 'during', 'while', 'when',
+]);
+
+/** A noun phrase — no articles, no infinitival "to", no clause prepositions. */
+function isNounPhrase(text: string): boolean {
+  const words = text.toLowerCase().match(/[a-z']+/g) ?? [];
+  if (words.length === 0 || words.length > MAX_TITLE_WORDS) return false;
+  return !words.some((w) => CLAUSE_MARKERS.has(w));
+}
+
+/** Beyond this a line is prose, not a role heading. */
+const MAX_TITLE_WORDS = 6;
+
+/**
+ * The FIRST content line of an experience section is a role heading.
+ *
+ * The separator test above is a proxy, and it only recognises the separators it lists: a
+ * dateless role written "Social Media Manager / Sales" (slash) or "Social Media Manager"
+ * (no separator at all) falls straight through to `pushBullet` and renders as a bullet
+ * while its dated siblings render as bold headings. Position is the stronger signal and
+ * needs no separator vocabulary: an experience section cannot OPEN with an achievement,
+ * because there would be no employer for it to belong to.
+ *
+ * Position alone is not enough, though — it would eat the only line of a one-line section.
+ * A heading is a noun phrase AND has something underneath it; an entry with no date and no
+ * achievements is not an entry.
+ */
+function isSectionOpeningTitle(
+  rec: LineRec,
+  isFirstContentLine: boolean,
+  hasFollowingContent: boolean
+): boolean {
+  if (!isFirstContentLine || !hasFollowingContent) return false;
+  return isHeaderMaterial(rec) && isNounPhrase(rec.trimmed);
+}
+
+/** Only sections whose content is employment entries may promote a dateless title. */
+function allowsDatelessTitles(section: ResumeSection): boolean {
+  return section.kind === 'experience' || section.kind === 'projects';
 }
 
 function makeSpan(coordinateSpace: TextSpan['coordinateSpace'], base: number, start: number, end: number): TextSpan {
@@ -269,12 +373,34 @@ export function segmentEntries(section: ResumeSection): ResumeExperienceEntry[] 
     // Title-then-date: a title candidate immediately followed by a date-only line.
     const next = recs[i + 1];
     if (isTitleCandidate(rec) && next && next.dateOnly) {
+      // A header block written across lines — "Social Media Manager / Sales" then "Vaelrix"
+      // then "2022 - 2024" — is ONE job. Without this merge the second line opens a second
+      // entry and the role line is stranded above it as a bullet, splitting one employer
+      // into two. An entry that already has a title but no date and no bullets yet is still
+      // inside its own header, so this line continues it rather than starting the next one.
+      if (current?.title && !current.date && current.bullets.length === 0) {
+        const titleStart = current.title.sourceSpan.start;
+        const lineEnd = base + rec.lineStartInText + rec.leadingWs + rec.trimmed.length;
+        current.title = {
+          rawText: `${current.title.rawText} — ${rec.trimmed}`,
+          sourceSpan: { coordinateSpace, start: titleStart, end: lineEnd },
+          kind: 'role_heading',
+        };
+        current.date = {
+          rawText: next.trimmed,
+          sourceSpan: makeSpan(coordinateSpace, base, next.lineStartInText + next.leadingWs, next.lineStartInText + next.leadingWs + next.trimmed.length),
+        };
+        i += 2; // consume the continued header line + its date
+        continue;
+      }
+
       current = {
         id: makeEntryId(section.id, ordinal, rec.trimmed),
         sectionId: section.id,
         title: {
           rawText: rec.trimmed,
           sourceSpan: makeSpan(coordinateSpace, base, rec.lineStartInText + rec.leadingWs, rec.lineStartInText + rec.leadingWs + rec.trimmed.length),
+          kind: 'role_heading',
         },
         date: {
           rawText: next.trimmed,
@@ -296,11 +422,38 @@ export function segmentEntries(section: ResumeSection): ResumeExperienceEntry[] 
         id: makeEntryId(section.id, ordinal, titleText || rec.trimmed),
         sectionId: section.id,
         title: titleText
-          ? { rawText: titleText, sourceSpan: makeSpan(coordinateSpace, base, titleSpanStart, titleSpanStart + rec.trimmed.length) }
+          ? {
+              rawText: titleText,
+              sourceSpan: makeSpan(coordinateSpace, base, titleSpanStart, titleSpanStart + rec.trimmed.length),
+              kind: 'role_heading' as const,
+            }
           : undefined,
         date: dateText
           ? { rawText: dateText, sourceSpan: makeSpan(coordinateSpace, base, titleSpanStart + Math.max(dateStart, 0), titleSpanStart + rec.trimmed.length) }
           : undefined,
+        bullets: [],
+      };
+      ordinal += 1;
+      entries.push(current);
+      i += 1;
+      continue;
+    }
+
+    // A dateless role title starts its own entry, so its achievements stay under it. The
+    // section's OPENING line qualifies on position alone — no separator vocabulary needed.
+    if (
+      allowsDatelessTitles(section) &&
+      (isDatelessTitle(rec) || isSectionOpeningTitle(rec, i === 0, i + 1 < recs.length))
+    ) {
+      const titleSpanStart = rec.lineStartInText + rec.leadingWs;
+      current = {
+        id: makeEntryId(section.id, ordinal, rec.trimmed),
+        sectionId: section.id,
+        title: {
+          rawText: rec.trimmed,
+          sourceSpan: makeSpan(coordinateSpace, base, titleSpanStart, titleSpanStart + rec.trimmed.length),
+          kind: 'role_heading',
+        },
         bullets: [],
       };
       ordinal += 1;
