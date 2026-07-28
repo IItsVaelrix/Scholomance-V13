@@ -1,0 +1,105 @@
+{
+  "asset": "moonlit-shrine-forest",
+  "canvas": {
+    "width": 160,
+    "height": 90
+  },
+  "description": "Wand vector contours for moonlit shrine forest backdrop.",
+  "formulas": [
+    {
+      "role": "moonlit-shrine-forest.tree_left_filigree",
+      "type": "edge_trace",
+      "description": "Left tree trunk and branch filigree contour",
+      "formula": {
+        "coordinateFormula": {
+          "type": "edge_trace",
+          "tracePath": [
+            { "x": 25, "y": 0 },
+            { "x": 28, "y": 50 },
+            { "x": 20, "y": 90 },
+            { "x": 22, "y": 35 },
+            { "x": 52, "y": 15 },
+            { "x": 48, "y": 20 },
+            { "x": 20, "y": 30 }
+          ]
+        }
+      },
+      "pressure": 0.8
+    },
+    {
+      "role": "moonlit-shrine-forest.tree_right_filigree",
+      "type": "edge_trace",
+      "description": "Right tree trunk and branch filigree contour",
+      "formula": {
+        "coordinateFormula": {
+          "type": "edge_trace",
+          "tracePath": [
+            { "x": 135, "y": 0 },
+            { "x": 128, "y": 90 },
+            { "x": 138, "y": 25 },
+            { "x": 115, "y": 15 },
+            { "x": 118, "y": 12 },
+            { "x": 142, "y": 22 }
+          ]
+        }
+      },
+      "pressure": 0.8
+    },
+    {
+      "role": "moonlit-shrine-forest.fallen_fence_structure",
+      "type": "edge_trace",
+      "description": "Fallen fence planks outline",
+      "formula": {
+        "coordinateFormula": {
+          "type": "edge_trace",
+          "tracePath": [
+            { "x": 8, "y": 72 },
+            { "x": 42, "y": 62 },
+            { "x": 44, "y": 67 },
+            { "x": 10, "y": 77 }
+          ]
+        }
+      },
+      "pressure": 0.7
+    },
+    {
+      "role": "moonlit-shrine-forest.torii_gate_contour",
+      "type": "edge_trace",
+      "description": "Torii gate roof beam contour",
+      "formula": {
+        "coordinateFormula": {
+          "type": "edge_trace",
+          "tracePath": [
+            { "x": 96, "y": 26 },
+            { "x": 114, "y": 26 },
+            { "x": 112, "y": 28 },
+            { "x": 98, "y": 28 }
+          ]
+        }
+      },
+      "pressure": 0.85
+    },
+    {
+      "role": "moonlit-shrine-forest.moon_halo_ring",
+      "type": "parametric_curve",
+      "description": "Moon halo ring circle",
+      "formula": {
+        "coordinateFormula": {
+          "type": "parametric_curve",
+          "curveType": "circle",
+          "center": { "x": 105, "y": 18 },
+          "radius": 7.5,
+          "parameters": {
+            "cx": 105,
+            "cy": 18,
+            "a": 7.5,
+            "b": 1,
+            "c": 0,
+            "n": 32
+          }
+        }
+      },
+      "pressure": 0.95
+    }
+  ]
+}
