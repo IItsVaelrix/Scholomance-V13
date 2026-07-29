@@ -13,6 +13,7 @@ import {
 } from './image-to-bytecode-formula.js';
 import { getRotationAtTime } from './gear-glide-amp.js';
 import { perlinNoiseGrid } from './procedural-noise.js';
+import { createConstruction, solve } from './construction/index.js';
 
 const MAX_FRACTAL_ITERATIONS = 6;
 
@@ -68,6 +69,10 @@ export function evaluateFormula(formula, canvasSize, time = 0, options = {}) {
       break;
     case FORMULA_TYPES.MATH_EXPRESSION:
       coordinates = evaluateMathExpression(coordinateFormula, canvasSize, time);
+      break;
+    case FORMULA_TYPES.CONSTRUCTION_REQUEST:
+    case 'construction_request':
+      coordinates = evaluateConstructionRequest(coordinateFormula, canvasSize);
       break;
     default:
       if (strict) {
@@ -971,3 +976,51 @@ export function evaluateMathExpression(formula, canvasSize, time = 0) {
     y: roundTo(p.y, precision),
   }));
 }
+
+/**
+ * Evaluate geometric construction request formula
+ */
+export function evaluateConstructionRequest(formula, canvasSize) {
+  const construction = createConstruction({
+    id: formula.constructionId || 'wand-construction',
+    canvas: canvasSize,
+    anchors: formula.anchors ?? {},
+    parts: formula.parts ?? [],
+    constraints: formula.constraints ?? [],
+    validation: formula.validation ?? {},
+  });
+
+  const result = solve(construction);
+
+  if (result.refused || !result.validationReport?.passed) {
+    throw new Error(`CONSTRUCTION_REFUSED:${JSON.stringify(result.validationReport?.failures ?? [])}`);
+  }
+
+  const coordinates = [];
+  for (const [partId, part] of Object.entries(result.parts)) {
+    const pts = part.closedContour ?? part.spine ?? [];
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i];
+      const px = typeof p === 'object' && !Array.isArray(p) ? p.x : p[0];
+      const py = typeof p === 'object' && !Array.isArray(p) ? p.y : p[1];
+      coordinates.push({
+        x: roundTo(px, 3),
+        y: roundTo(py, 3),
+        z: 0,
+        emphasis: 1.0,
+        source: 'construction',
+        partId,
+        primitiveKind: part.primitiveKind,
+        t: pts.length > 1 ? i / (pts.length - 1) : 0.5,
+        tangent: part.tangents?.[i],
+        normal: part.surfaceNormals?.[i],
+        curvature: part.curvature?.[i],
+        arcLength: part.arcLength,
+        validationPassed: result.validationReport.passed,
+      });
+    }
+  }
+
+  return coordinates;
+}
+

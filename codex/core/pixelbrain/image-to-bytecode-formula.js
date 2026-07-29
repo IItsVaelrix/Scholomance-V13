@@ -28,6 +28,7 @@ export const FORMULA_TYPES = Object.freeze({
   VECTORIZED_TEXT: 'vectorized_text',
   MATHEMATICAL_STROKE: 'mathematical_stroke',  // User's vision: math formula that *simulates* a stroke, not pixel stroking
   MATH_EXPRESSION: 'math_expression',  // General state-free AST for procedural vector math (sin, cos, noise, mod, etc.)
+  CONSTRUCTION_REQUEST: 'construction_request', // PB-GEOMETRY-CONSTRUCTION-v1 solver pipeline
 });
 
 /**
