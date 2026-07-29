@@ -194,6 +194,8 @@ repository pass.
 - `799f16df` - export raster vector identity
 - `90223d2c` - expose lock ownership overrides
 - `db311cba` - complete construction primitive library
+- `d77d79de` - ratify the geometric construction solver documentation
+- `e6189401` - clean the construction verification scope
 
 ## 9. Risk and Rollback
 
@@ -209,7 +211,39 @@ override through the advertised surfaces.
 
 ## 10. Final Verification
 
-Pending the final integrated verification pass.
+The repaired scope is green:
+
+- focused Vitest: 6 files passed, 143 tests passed;
+- targeted ESLint across construction, Wand, raster, MCP schema/bridge, and
+  their focused tests: zero errors and zero warnings;
+- staged immunity scan: passed;
+- repository-wide immunity scan: passed;
+- semantic drift grep for legacy success/warning bytecode prefixes, removed
+  primitive aliases, and the retired short-digest label in the repaired
+  construction/PDR/PIR scope: no matches;
+- `git diff --check`: passed;
+- all relevant implementation, test, asset, PDR, schema, index, and PIR paths
+  were clean after their checkpoint commits.
+
+The repository-wide gates are not green for reasons outside this repair:
+
+- `npm run typecheck` reports five existing errors in
+  `src/core/compose/kits/polaris-console.ts`,
+  `src/core/compose/migrated/ConstellationSky.ts`,
+  `src/pages/Listen/ComposeSignalChamberAdapter.tsx` (two errors), and
+  `src/pages/Listen/ListenPage.tsx`;
+- the full Vitest run traversed the repository and emitted unrelated failure
+  markers in UI, performance, security-fixture, visualiser, library shelf,
+  subtlety-route, audio-clock, and voxel-pipeline areas, then remained alive
+  without output or a terminal summary for more than ten minutes and was
+  interrupted;
+- the encyclopedia hygiene audit remains at 160 errors and 22 warnings, all
+  outside this PDR/PIR. Before their index entries were added the audit reported
+  161 errors and 22 warnings, so this repair reduced the existing error count
+  by one and introduced no unindexed construction document.
+
+These global failures prevent a repository-wide green claim, but none intersects
+the repaired construction, Wand, raster identity, or MCP lock-schema paths.
 
 ## 11. Known Gaps and Follow-Up
 
@@ -218,8 +252,8 @@ Pending the final integrated verification pass.
   mutation.
 - General nonlinear solving, 3D construction, animation solving, and automatic
   construction authorship remain out of scope.
-- Existing repository-wide hygiene findings unrelated to this feature must be
-  reported separately if the global audit remains non-zero.
+- Existing repository-wide typecheck, full-suite, and encyclopedia hygiene
+  findings remain separate cleanup work.
 
 ## 12. Final Sign-Off
 
@@ -230,4 +264,4 @@ Pending the final integrated verification pass.
 - [x] PB-ERR-v1 public refusal
 - [x] Raster identity export parity
 - [x] MCP lock-override schema parity
-- [ ] Final broad verification recorded
+- [x] Final broad verification recorded
