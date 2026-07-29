@@ -34,6 +34,27 @@ import { createHash } from "crypto";
 /** Compiler version folded into the contractHash (§15.4). */
 export const SCENE_COMPILER_VERSION = "mvp-1-scene-1";
 
+export enum SemanticRole {
+  SKY = 0x01,
+  CANOPY = 0x02,
+  TRUNK = 0x04,
+  GROUND = 0x08,
+  PROP = 0x10,
+}
+
+const ALLOWED_ATTACHMENTS: Record<SemanticRole, number> = {
+  [SemanticRole.SKY]: SemanticRole.SKY,
+  [SemanticRole.CANOPY]: SemanticRole.CANOPY | SemanticRole.TRUNK,
+  [SemanticRole.TRUNK]: SemanticRole.TRUNK | SemanticRole.GROUND | SemanticRole.CANOPY,
+  [SemanticRole.GROUND]: SemanticRole.GROUND | SemanticRole.TRUNK | SemanticRole.PROP,
+  [SemanticRole.PROP]: SemanticRole.PROP | SemanticRole.GROUND,
+};
+
+export function canAttachRoles(roleA: SemanticRole, roleB: SemanticRole): boolean {
+  return (ALLOWED_ATTACHMENTS[roleA] & roleB) !== 0;
+}
+
+
 /** Authored illustration metadata for a single entity (from the worldpack). */
 export interface EntityIllustrationHint {
   asset?: string;
