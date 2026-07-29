@@ -257,9 +257,22 @@ function renderVixel(cells, width, height, scale, nullVector = false, vectorPath
           );
         }
 
-        let r = clamp255(baseColor[0] + grainMod * 35 + specularBoost[0] + lightBoost);
-        let g = clamp255(baseColor[1] + grainMod * 30 + specularBoost[1] + lightBoost * 0.95);
-        let b = clamp255(baseColor[2] + grainMod * 25 + specularBoost[2] + lightBoost * 1.15);
+        let vectorLightBoost = 0;
+        if (!nullVector && vectorPaths.length > 0) {
+          const subX = cx + u;
+          const subY = cy + v;
+          for (const path of vectorPaths) {
+            if (path.role && (path.role.includes('torii') || path.role.includes('moon') || path.role.includes('lantern') || path.role.includes('book') || path.role.includes('rune'))) {
+              const minD = distToPolyline(subX, subY, path.points);
+              const fall = Math.exp(-(minD * minD) / (32 * 32));
+              vectorLightBoost += fall * 28 * (path.pressure || 1);
+            }
+          }
+        }
+
+        let r = clamp255(baseColor[0] + grainMod * 35 + specularBoost[0] + lightBoost + vectorLightBoost);
+        let g = clamp255(baseColor[1] + grainMod * 30 + specularBoost[1] + lightBoost * 0.95 + vectorLightBoost * 0.9);
+        let b = clamp255(baseColor[2] + grainMod * 25 + specularBoost[2] + lightBoost * 1.15 + vectorLightBoost * 1.1);
         let a = baseColor[3] * coverage;
 
         // ── Wand Vector Stroke Superposition ──
