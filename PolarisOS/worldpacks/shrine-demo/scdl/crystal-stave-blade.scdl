@@ -1,0 +1,30 @@
+# Crystal Stave Blade — geometric construction asset
+asset crystal_stave_blade canvas 32x64
+
+palette {
+  crystal_cyan    = #00E5FF
+  crystal_magenta = #FF00E5
+  core_white      = #FFFFFF
+  grip_dark       = #1E1E28
+  pommel_cyan     = #80F5FF
+}
+
+part blade material crystal {
+  polygon 16 4 24 28 21 42 16 42 11 42 8 28 crystal_cyan
+}
+
+part spine material crystal {
+  polygon 16 8 17 42 15 42 core_white
+}
+
+part guard material crystal {
+  ellipse 16 46 radius 8 ry 8 crystal_magenta
+}
+
+part grip material leather {
+  rect 15 46 2 10 grip_dark
+}
+
+part pommel material crystal {
+  polygon 16 56 19 58 16 61 13 58 pommel_cyan
+}
