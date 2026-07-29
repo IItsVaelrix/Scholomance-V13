@@ -54,7 +54,9 @@ export {
   q, qp, dist, lerp, normalize, perp, dot, cross,
   computeDifferentials, buildSolvedPart,
   findSelfIntersections, windingDirection, pointInPolygon,
-  centroid, signedArea, segmentIntersection,
+  centroid, signedArea, segmentIntersection, pointOnSegment,
+  polygonContainsPoint, contoursIntersect, contourCrossesBoundary, minimumContourDistance,
+  nearestPointIndex, hasReflectedCounterpart,
 } from './geometry-utils.js';
 
 // Controlled modifiers (Phase 6)

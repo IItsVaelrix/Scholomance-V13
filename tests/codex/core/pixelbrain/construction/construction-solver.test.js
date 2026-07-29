@@ -59,6 +59,12 @@ import {
   dist, windingDirection, findSelfIntersections, signedArea, centroid,
 } from '../../../../../codex/core/pixelbrain/construction/geometry-utils.js';
 
+function geometricCenter(points) {
+  const hasDuplicateClosure = points.length > 1
+    && dist(points[0], points[points.length - 1]) < 0.01;
+  return centroid(hasDuplicateClosure ? points.slice(0, -1) : points);
+}
+
 // ─── Fixtures ──────────────────────────────────────────────────────────
 
 function brazierSpec() {
@@ -122,6 +128,34 @@ function brazierSpec() {
       minimumCurvatureRadius: 0.1,
       requireConnectedAssembly: false,
     },
+  };
+}
+
+function solvedFixture({
+  id,
+  points,
+  tangents = points.map(() => [1, 0]),
+  namedPoints = {},
+  measurements = {},
+  leftBank,
+  rightBank,
+}) {
+  return {
+    id,
+    primitiveKind: 'fixture',
+    spine: points,
+    closedContour: points,
+    tangents,
+    surfaceNormals: points.map(() => [0, 1]),
+    curvature: points.map(() => 0),
+    arcLength: points.slice(1).reduce(
+      (length, point, index) => length + dist(points[index], point),
+      0,
+    ),
+    namedPoints,
+    measurements,
+    ...(leftBank ? { leftBank } : {}),
+    ...(rightBank ? { rightBank } : {}),
   };
 }
 
@@ -644,8 +678,8 @@ describe('Phase 3: Constraint Solver', () => {
     const parts = { p1: e1, p2: e2 };
     solveConstraints(parts, [{ kind: 'coaxial', parts: ['p1', 'p2'] }]);
 
-    const c1 = centroid(e1.closedContour);
-    const c2 = centroid(e2.closedContour);
+    const c1 = geometricCenter(e1.closedContour);
+    const c2 = geometricCenter(e2.closedContour);
     expect(Math.abs(c1[0] - c2[0])).toBeLessThan(0.01);
   });
 
@@ -667,6 +701,460 @@ describe('Phase 3: Constraint Solver', () => {
       { kind: 'monotonic-taper', part: 'ribbon', direction: 'decreasing' },
     ]);
     expect(failures.length).toBeGreaterThan(0);
+  });
+
+  it('checks tangent vectors nearest the declared named join points', () => {
+    const parts = {
+      a: solvedFixture({
+        id: 'a',
+        points: [[0, 0], [1, 0], [2, 0]],
+        tangents: [[1, 0], [1, 0], [1, 0]],
+        namedPoints: { join: [1, 0] },
+      }),
+      b: solvedFixture({
+        id: 'b',
+        points: [[0, 1], [1, 1], [2, 1]],
+        tangents: [[0, 1], [-1, 0], [-1, 0]],
+        namedPoints: { join: [1, 1] },
+      }),
+    };
+
+    const result = solveConstraints(parts, [{
+      kind: 'tangent',
+      a: { ref: 'a', point: 'join' },
+      b: { ref: 'b', point: 'join' },
+    }]);
+
+    expect(result.failures).toEqual([]);
+  });
+
+  it('rejects an asymmetric contour without deforming it', () => {
+    const parts = {
+      shape: solvedFixture({
+        id: 'shape',
+        points: [[0, 0], [2, 0], [2, 2], [0, 1], [0, 0]],
+      }),
+    };
+    const before = structuredClone(parts);
+
+    const result = solveConstraints(parts, [{
+      kind: 'mirror-symmetry',
+      axis: { anchor: 'axis' },
+      parts: ['shape'],
+    }], { axis: [1, 0] });
+
+    expect(result.failures[0].reason).toContain('reflected counterpart');
+    expect(parts).toEqual(before);
+  });
+
+  it('rejects AABB-only false-positive containment', () => {
+    const parts = {
+      outer: solvedFixture({
+        id: 'outer',
+        points: [[0, 0], [4, 0], [4, 1], [1, 1], [1, 4], [0, 4], [0, 0]],
+      }),
+      inner: solvedFixture({
+        id: 'inner',
+        points: [[2.5, 2.5], [3.5, 2.5], [3.5, 3.5], [2.5, 3.5], [2.5, 2.5]],
+      }),
+    };
+
+    const result = solveConstraints(parts, [{
+      kind: 'contained',
+      inner: 'inner',
+      outer: 'outer',
+    }]);
+
+    expect(result.failures[0].reason).toContain('outside');
+  });
+
+  it('rejects an inner edge that crosses a concave outer boundary', () => {
+    const parts = {
+      outer: solvedFixture({
+        id: 'outer',
+        points: [
+          [0, 0], [4, 0], [4, 4], [3, 4], [3, 1],
+          [1, 1], [1, 4], [0, 4], [0, 0],
+        ],
+      }),
+      inner: solvedFixture({
+        id: 'inner',
+        points: [[0.5, 3], [3.5, 3], [2, 0.5], [0.5, 3]],
+      }),
+    };
+
+    const result = solveConstraints(parts, [{
+      kind: 'contained',
+      inner: 'inner',
+      outer: 'outer',
+    }]);
+
+    expect(result.failures[0].reason).toContain('crosses');
+  });
+
+  it('rejects a violated dotted metric ratio', () => {
+    const parts = {
+      bowl: solvedFixture({
+        id: 'bowl',
+        points: [[0, 0], [0, 5]],
+        measurements: { depth: 5 },
+      }),
+      rim: solvedFixture({
+        id: 'rim',
+        points: [[0, 0], [10, 0]],
+        measurements: { radiusX: 10 },
+      }),
+    };
+
+    const result = solveConstraints(parts, [{
+      kind: 'ratio',
+      a: 'bowl.depth',
+      b: 'rim.radiusX',
+      value: 0.618,
+    }]);
+
+    expect(result.failures[0].reason).toContain('ratio');
+  });
+
+  it('re-verifies earlier constraints after later transforms', () => {
+    const parts = {
+      a: solvedFixture({ id: 'a', points: [[0, 0], [0, 1]] }),
+      b: solvedFixture({ id: 'b', points: [[5, 0], [5, 1]] }),
+      c: solvedFixture({ id: 'c', points: [[10, 0], [10, 1]] }),
+    };
+
+    const result = solveConstraints(parts, [
+      { kind: 'coaxial', parts: ['a', 'b'] },
+      { kind: 'connected', a: 'c', b: 'b' },
+    ]);
+
+    expect(result.failures.some(failure => failure.constraint.kind === 'coaxial'))
+      .toBe(true);
+  });
+
+  const constraintCases = [
+    {
+      kind: 'coaxial',
+      satisfied: () => ({
+        parts: {
+          a: solvedFixture({ id: 'a', points: [[0, 0], [0, 1]] }),
+          b: solvedFixture({ id: 'b', points: [[2, 0], [2, 1]] }),
+        },
+        constraint: { kind: 'coaxial', parts: ['a', 'b'] },
+      }),
+      violated: () => ({
+        parts: { a: solvedFixture({ id: 'a', points: [[0, 0], [0, 1]] }) },
+        constraint: { kind: 'coaxial', parts: ['a', 'ghost'] },
+      }),
+    },
+    {
+      kind: 'tangent',
+      satisfied: () => ({
+        parts: {
+          a: solvedFixture({
+            id: 'a', points: [[0, 0], [1, 0]], namedPoints: { join: [1, 0] },
+          }),
+          b: solvedFixture({
+            id: 'b', points: [[1, 0], [2, 0]], namedPoints: { join: [1, 0] },
+          }),
+        },
+        constraint: {
+          kind: 'tangent',
+          a: { ref: 'a', point: 'join' },
+          b: { ref: 'b', point: 'join' },
+        },
+      }),
+      violated: () => ({
+        parts: {
+          a: solvedFixture({
+            id: 'a',
+            points: [[0, 0], [1, 0]],
+            tangents: [[1, 0], [1, 0]],
+            namedPoints: { join: [1, 0] },
+          }),
+          b: solvedFixture({
+            id: 'b',
+            points: [[1, 0], [1, 1]],
+            tangents: [[0, 1], [0, 1]],
+            namedPoints: { join: [1, 0] },
+          }),
+        },
+        constraint: {
+          kind: 'tangent',
+          a: { ref: 'a', point: 'join' },
+          b: { ref: 'b', point: 'join' },
+        },
+      }),
+    },
+    {
+      kind: 'coincident',
+      satisfied: () => ({
+        parts: {
+          a: solvedFixture({
+            id: 'a', points: [[0, 0], [1, 0]], namedPoints: { join: [0, 0] },
+          }),
+          b: solvedFixture({
+            id: 'b', points: [[5, 0], [6, 0]], namedPoints: { join: [5, 0] },
+          }),
+        },
+        constraint: {
+          kind: 'coincident',
+          a: { ref: 'a', point: 'join' },
+          b: { ref: 'b', point: 'join' },
+        },
+      }),
+      violated: () => ({
+        parts: {
+          a: solvedFixture({
+            id: 'a', points: [[0, 0], [1, 0]], namedPoints: { join: [0, 0] },
+          }),
+          b: solvedFixture({ id: 'b', points: [[5, 0], [6, 0]] }),
+        },
+        constraint: {
+          kind: 'coincident',
+          a: { ref: 'a', point: 'join' },
+          b: { ref: 'b', point: 'ghost' },
+        },
+      }),
+    },
+    {
+      kind: 'connected',
+      satisfied: () => ({
+        parts: {
+          a: solvedFixture({ id: 'a', points: [[0, 0], [1, 0]] }),
+          b: solvedFixture({ id: 'b', points: [[5, 0], [6, 0]] }),
+        },
+        constraint: { kind: 'connected', a: 'a', b: 'b' },
+      }),
+      violated: () => ({
+        parts: { a: solvedFixture({ id: 'a', points: [[0, 0], [1, 0]] }) },
+        constraint: { kind: 'connected', a: 'a', b: 'ghost' },
+      }),
+    },
+    {
+      kind: 'concentric',
+      satisfied: () => ({
+        parts: {
+          a: solvedFixture({ id: 'a', points: [[0, 0], [0, 2]] }),
+          b: solvedFixture({ id: 'b', points: [[5, 0], [5, 2]] }),
+        },
+        constraint: { kind: 'concentric', a: 'a', b: 'b' },
+      }),
+      violated: () => ({
+        parts: { a: solvedFixture({ id: 'a', points: [[0, 0], [0, 2]] }) },
+        constraint: { kind: 'concentric', a: 'a', b: 'ghost' },
+      }),
+    },
+    {
+      kind: 'parallel',
+      satisfied: () => ({
+        parts: {
+          a: solvedFixture({ id: 'a', points: [[0, 0], [1, 0]] }),
+          b: solvedFixture({ id: 'b', points: [[0, 1], [1, 1]] }),
+        },
+        constraint: { kind: 'parallel', a: 'a', b: 'b' },
+      }),
+      violated: () => ({
+        parts: {
+          a: solvedFixture({ id: 'a', points: [[0, 0], [1, 0]] }),
+          b: solvedFixture({
+            id: 'b',
+            points: [[0, 0], [0, 1]],
+            tangents: [[0, 1], [0, 1]],
+          }),
+        },
+        constraint: { kind: 'parallel', a: 'a', b: 'b' },
+      }),
+    },
+    {
+      kind: 'perpendicular',
+      satisfied: () => ({
+        parts: {
+          a: solvedFixture({ id: 'a', points: [[0, 0], [1, 0]] }),
+          b: solvedFixture({
+            id: 'b',
+            points: [[0, 0], [0, 1]],
+            tangents: [[0, 1], [0, 1]],
+          }),
+        },
+        constraint: { kind: 'perpendicular', a: 'a', b: 'b' },
+      }),
+      violated: () => ({
+        parts: {
+          a: solvedFixture({ id: 'a', points: [[0, 0], [1, 0]] }),
+          b: solvedFixture({ id: 'b', points: [[0, 1], [1, 1]] }),
+        },
+        constraint: { kind: 'perpendicular', a: 'a', b: 'b' },
+      }),
+    },
+    ...['symmetric', 'mirror-symmetry'].map(kind => ({
+      kind,
+      satisfied: () => ({
+        parts: {
+          shape: solvedFixture({
+            id: 'shape',
+            points: [[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]],
+          }),
+        },
+        constraint: { kind, axis: { anchor: 'axis' }, parts: ['shape'] },
+        anchors: { axis: [1, 0] },
+      }),
+      violated: () => ({
+        parts: {
+          shape: solvedFixture({
+            id: 'shape',
+            points: [[0, 0], [2, 0], [2, 2], [0, 1], [0, 0]],
+          }),
+        },
+        constraint: { kind, axis: { anchor: 'axis' }, parts: ['shape'] },
+        anchors: { axis: [1, 0] },
+      }),
+    })),
+    {
+      kind: 'contained',
+      satisfied: () => ({
+        parts: {
+          outer: solvedFixture({
+            id: 'outer', points: [[0, 0], [4, 0], [4, 4], [0, 4], [0, 0]],
+          }),
+          inner: solvedFixture({
+            id: 'inner', points: [[1, 1], [2, 1], [2, 2], [1, 2], [1, 1]],
+          }),
+        },
+        constraint: { kind: 'contained', inner: 'inner', outer: 'outer' },
+      }),
+      violated: () => ({
+        parts: {
+          outer: solvedFixture({
+            id: 'outer', points: [[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]],
+          }),
+          inner: solvedFixture({
+            id: 'inner', points: [[2, 2], [3, 2], [3, 3], [2, 3], [2, 2]],
+          }),
+        },
+        constraint: { kind: 'contained', inner: 'inner', outer: 'outer' },
+      }),
+    },
+    {
+      kind: 'equal-length',
+      satisfied: () => ({
+        parts: {
+          a: solvedFixture({ id: 'a', points: [[0, 0], [1, 0]] }),
+          b: solvedFixture({ id: 'b', points: [[0, 1], [1, 1]] }),
+        },
+        constraint: { kind: 'equal-length', a: 'a', b: 'b' },
+      }),
+      violated: () => ({
+        parts: {
+          a: solvedFixture({ id: 'a', points: [[0, 0], [1, 0]] }),
+          b: solvedFixture({ id: 'b', points: [[0, 1], [2, 1]] }),
+        },
+        constraint: { kind: 'equal-length', a: 'a', b: 'b' },
+      }),
+    },
+    {
+      kind: 'ratio',
+      satisfied: () => ({
+        parts: {
+          a: solvedFixture({
+            id: 'a', points: [[0, 0], [1, 0]], measurements: { value: 6.18 },
+          }),
+          b: solvedFixture({
+            id: 'b', points: [[0, 1], [1, 1]], measurements: { value: 10 },
+          }),
+        },
+        constraint: { kind: 'ratio', a: 'a.value', b: 'b.value', value: 0.618 },
+      }),
+      violated: () => ({
+        parts: {
+          a: solvedFixture({
+            id: 'a', points: [[0, 0], [1, 0]], measurements: { value: 5 },
+          }),
+          b: solvedFixture({
+            id: 'b', points: [[0, 1], [1, 1]], measurements: { value: 10 },
+          }),
+        },
+        constraint: { kind: 'ratio', a: 'a.value', b: 'b.value', value: 0.618 },
+      }),
+    },
+    {
+      kind: 'minimum-distance',
+      satisfied: () => ({
+        parts: {
+          a: solvedFixture({ id: 'a', points: [[0, 0], [0, 1]] }),
+          b: solvedFixture({ id: 'b', points: [[2, 0], [2, 1]] }),
+        },
+        constraint: { kind: 'minimum-distance', a: 'a', b: 'b', value: 1 },
+      }),
+      violated: () => ({
+        parts: {
+          a: solvedFixture({ id: 'a', points: [[0, 0], [0, 1]] }),
+          b: solvedFixture({ id: 'b', points: [[0.5, 0], [0.5, 1]] }),
+        },
+        constraint: { kind: 'minimum-distance', a: 'a', b: 'b', value: 1 },
+      }),
+    },
+    {
+      kind: 'maximum-curvature',
+      satisfied: () => {
+        const part = solvedFixture({ id: 'a', points: [[0, 0], [1, 0]] });
+        part.curvature = [0.1, 0.2];
+        return {
+          parts: { a: part },
+          constraint: { kind: 'maximum-curvature', part: 'a', value: 0.2 },
+        };
+      },
+      violated: () => {
+        const part = solvedFixture({ id: 'a', points: [[0, 0], [1, 0]] });
+        part.curvature = [0.1, 0.4];
+        return {
+          parts: { a: part },
+          constraint: { kind: 'maximum-curvature', part: 'a', value: 0.2 },
+        };
+      },
+    },
+    {
+      kind: 'monotonic-taper',
+      satisfied: () => ({
+        parts: {
+          ribbon: solvedFixture({
+            id: 'ribbon',
+            points: [[0, 0], [0, 1]],
+            leftBank: [[-2, 0], [-1, 1]],
+            rightBank: [[2, 0], [1, 1]],
+          }),
+        },
+        constraint: {
+          kind: 'monotonic-taper', part: 'ribbon', direction: 'decreasing',
+        },
+      }),
+      violated: () => ({
+        parts: {
+          ribbon: solvedFixture({
+            id: 'ribbon',
+            points: [[0, 0], [0, 1]],
+            leftBank: [[-1, 0], [-2, 1]],
+            rightBank: [[1, 0], [2, 1]],
+          }),
+        },
+        constraint: {
+          kind: 'monotonic-taper', part: 'ribbon', direction: 'decreasing',
+        },
+      }),
+    },
+  ];
+
+  it.each(constraintCases)('$kind has an explicit satisfaction case', ({ satisfied }) => {
+    const { parts, constraint, anchors = {} } = satisfied();
+    expect(solveConstraints(parts, [constraint], anchors).failures).toEqual([]);
+  });
+
+  it.each(constraintCases)('$kind has an explicit refusal case', ({ violated, kind }) => {
+    const { parts, constraint, anchors = {} } = violated();
+    expect(solveConstraints(parts, [constraint], anchors).failures)
+      .toEqual(expect.arrayContaining([
+        expect.objectContaining({ constraint: expect.objectContaining({ kind }) }),
+      ]));
   });
 });
 
@@ -771,7 +1259,8 @@ describe('Phase 4: Solver Orchestrator', () => {
 
   it('coaxial constraint is satisfied', () => {
     const result = solve(createConstruction(brazierSpec()));
-    const xs = Object.values(result.parts).map(p => centroid(p.closedContour || p.spine)[0]);
+    const xs = Object.values(result.parts)
+      .map(p => geometricCenter(p.closedContour || p.spine)[0]);
     const maxDiff = Math.max(...xs) - Math.min(...xs);
     expect(maxDiff).toBeLessThan(0.01);
   });
