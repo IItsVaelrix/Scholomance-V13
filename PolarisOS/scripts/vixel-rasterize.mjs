@@ -31,8 +31,13 @@ const MATERIAL_GRAIN = {
   void_cloth:     { direction: Math.PI/4,  frequency: 0.30, crossFrequency: 0.05, amplitude: 0.2 },
   void_rune_glow: { direction: 0,          frequency: 0.15, crossFrequency: 0.08, amplitude: 0.7 },
   oak_bark:       { direction: 0,          frequency: 0.25, crossFrequency: 0.06, amplitude: 0.5 },
+  bark:           { direction: 0,          frequency: 0.32, crossFrequency: 0.08, amplitude: 0.85 },
+  pine_needle:    { direction: Math.PI/5,  frequency: 0.35, crossFrequency: 0.09, amplitude: 0.55 },
+  voidbark:       { direction: 0,          frequency: 0.26, crossFrequency: 0.06, amplitude: 0.7 },
+  astralmoss:     { direction: Math.PI/3,  frequency: 0.22, crossFrequency: 0.09, amplitude: 0.45 },
   moonstone:      { direction: 0,          frequency: 0.15, crossFrequency: 0.08, amplitude: 0.3 },
-  diamond:        { direction: Math.PI/3,  frequency: 0.20, crossFrequency: 0.15, amplitude: 0.35 },
+  cyan_glow:      { direction: Math.PI/2,  frequency: 0.12, crossFrequency: 0.06, amplitude: 0.35 },
+  diamond:        { direction: Math.PI/3,  frequency: 0.18, crossFrequency: 0.12, amplitude: 0.25 },
   sapphire:       { direction: Math.PI/6,  frequency: 0.18, crossFrequency: 0.10, amplitude: 0.4 },
   steel:          { direction: 0,          frequency: 0.22, crossFrequency: 0.10, amplitude: 0.45 },
   iron:           { direction: 0,          frequency: 0.28, crossFrequency: 0.14, amplitude: 0.35 },
@@ -112,7 +117,7 @@ function distToPolyline(px, py, points) {
 /**
  * Render a vixel field to RGBA at scale S.
  */
-function renderVixel(cells, width, height, scale, nullVector = false, vectorPaths = []) {
+function renderVixel(cells, width, height, scale, nullVector = false, vectorPaths = [], sceneLight = null) {
   const W = width * scale;
   const H = height * scale;
   const buf = new Uint8Array(W * H * 4);
@@ -140,6 +145,22 @@ function renderVixel(cells, width, height, scale, nullVector = false, vectorPath
         let coverage = 1.0;
         let grainMod = 0;
         let specularBoost = [0, 0, 0];
+        let lightBoost = 0;
+
+        // Scene moon / key light falloff (revalues path, foliage, bark — not a filled disc alone)
+        if (sceneLight) {
+          const dx = (cx + u) - sceneLight.x;
+          const dy = (cy + v) - sceneLight.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const fall = Math.exp(-(dist * dist) / (sceneLight.radius * sceneLight.radius));
+          const mat = cell.material || '';
+          const lit =
+            mat === 'bark' || mat === 'voidbark' || mat === 'pine_needle' ||
+            mat === 'astralmoss' || mat === 'sapphire' || mat === 'cyan_glow' ||
+            (cell.partId && (cell.partId.includes('path') || cell.partId.includes('stair') || cell.partId.includes('foliage')));
+          if (lit) lightBoost = fall * (sceneLight.strength || 28);
+          else if (mat === 'obsidian' || mat === 'diamond') lightBoost = fall * (sceneLight.strength || 28) * 0.35;
+        }
 
         if (!nullVector && sd !== null && sd !== undefined) {
           const localSD = sd + (
@@ -175,7 +196,13 @@ function renderVixel(cells, width, height, scale, nullVector = false, vectorPath
             const d = (sd || 0) + dAcross;
 
             // 1. Native Vixel Texture Engine (Multi-Octave Vector Field Harmonics)
-            grainMod = evaluateVixelTexture(s, d, arcLen, cell.curvature, grain);
+            if (tangent && grain) {
+              const vecAngle = Math.atan2(tangent[1], tangent[0]);
+              const effectiveGrain = { ...grain, direction: vecAngle + (grain.direction || 0) };
+              grainMod = evaluateVixelTexture(s, d, arcLen, cell.curvature, effectiveGrain);
+            } else {
+              grainMod = evaluateVixelTexture(s, d, arcLen, cell.curvature, grain);
+            }
 
             // 2. Symmetrical Metallic Specular & Controlled Gold Aura
             if (isMetal) {
@@ -196,9 +223,12 @@ function renderVixel(cells, width, height, scale, nullVector = false, vectorPath
               // Reduced gold aura by 50% (controlled falloff, hard cell-snapped rim)
               const totalHighlight = specPower * 0.7 + fresnel * 0.4;
 
-              // Enforce 100% central axis symmetry (x=16) for metallic highlights
+              // Sword assets snap metallic highlights to x=16; scenes use soft directional light
+              const useSwordSymmetry = width <= 48;
               const distFromAxis = Math.abs((cx + u) - 16.0);
-              const symFalloff = Math.exp(-(distFromAxis * distFromAxis) / 120.0);
+              const symFalloff = useSwordSymmetry
+                ? Math.exp(-(distFromAxis * distFromAxis) / 120.0)
+                : 0.85;
 
               if (cell.material === 'gold' || (cell.color && cell.color.toLowerCase().includes('d4af37'))) {
                 specularBoost = [ totalHighlight * 75 * symFalloff, totalHighlight * 60 * symFalloff, totalHighlight * 25 * symFalloff ];
@@ -209,18 +239,27 @@ function renderVixel(cells, width, height, scale, nullVector = false, vectorPath
               }
             }
           }
-        } else {
-          if (grain && grain.amplitude > 0) {
-            grainMod = grain.amplitude * Math.sin(
-              (cx + u) * grain.frequency * Math.PI * 2 +
-              grain.direction
-            );
-          }
+        } else if (grain && grain.amplitude > 0) {
+          // No vector manifold — positional material grain (bark texture, etc.)
+          grainMod = grain.amplitude * Math.sin(
+            (cx + u) * grain.frequency * Math.PI * 2 +
+            (cy + v) * (grain.crossFrequency || 0) * Math.PI * 2 +
+            grain.direction
+          );
         }
 
-        let r = clamp255(baseColor[0] + grainMod * 35 + specularBoost[0]);
-        let g = clamp255(baseColor[1] + grainMod * 30 + specularBoost[1]);
-        let b = clamp255(baseColor[2] + grainMod * 25 + specularBoost[2]);
+        // Bark / organic: if vector path had sd but no tangent, still apply material grain
+        if (!nullVector && grain && grain.amplitude > 0 && grainMod === 0) {
+          grainMod = grain.amplitude * Math.sin(
+            (cx + u) * grain.frequency * Math.PI * 2 +
+            (cy + v) * (grain.crossFrequency || 0) * Math.PI * 2 +
+            grain.direction
+          );
+        }
+
+        let r = clamp255(baseColor[0] + grainMod * 35 + specularBoost[0] + lightBoost);
+        let g = clamp255(baseColor[1] + grainMod * 30 + specularBoost[1] + lightBoost * 0.95);
+        let b = clamp255(baseColor[2] + grainMod * 25 + specularBoost[2] + lightBoost * 1.15);
         let a = baseColor[3] * coverage;
 
         // ── Wand Vector Stroke Superposition ──
@@ -230,17 +269,25 @@ function renderVixel(cells, width, height, scale, nullVector = false, vectorPath
           const edge = 0.5 / scale;
 
           for (const path of vectorPaths) {
+            // Invisible grain guides — fusion only, never paint as filigree
+            if (path.role && path.role.startsWith('grain.')) continue;
+
             const minD = distToPolyline(subX, subY, path.points);
             const hw = path.strokeWidth ? path.strokeWidth / 2 : 0.6;
             const strokeCov = smoothstep(edge, -edge, minD - hw);
 
             if (strokeCov > 0) {
-              const alpha = strokeCov * (path.pressure || 1) * 0.85;
-              let sR = 245, sG = 208, sB = 97; // Warm gold vector stroke
-              if (path.role.includes('lightning') || path.role.includes('stellar')) {
-                sR = 128; sG = 255; sB = 255; // Electric cyan star stroke
+              const isFence = path.role.includes('fence');
+              const alpha = strokeCov * (path.pressure || 1) * (isFence ? 0.95 : 0.85);
+              let sR = 212, sG = 175, sB = 55; // Saturated gold (#D4AF37)
+              if (path.role.includes('torii') || path.role.includes('lightning') || path.role.includes('stellar')) {
+                sR = 128; sG = 255; sB = 255; // Cyan shrine / electric stroke
+              } else if (path.role.includes('moon')) {
+                sR = 220; sG = 235; sB = 255; // Pale moon ring
               } else if (path.role.includes('pommel') || path.role.includes('eye')) {
                 sR = 255; sG = 248; sB = 231; // Stardust white star stroke
+              } else if (isFence) {
+                sR = 230; sG = 185; sB = 60;
               }
 
               r = Math.round(r * (1 - alpha) + sR * alpha);
@@ -397,8 +444,13 @@ console.log(`╚═════════════════════�
 const withVI = coords.filter(c => c.signedDistance !== undefined).length;
 console.log(`  Vector identity: ${withVI}/${coords.length} cells (${(withVI/coords.length*100).toFixed(1)}%)`);
 
-const vixel = renderVixel(coords, canvas.width, canvas.height, scale, false, vectorPaths);
-const pixel = renderVixel(coords, canvas.width, canvas.height, scale, true, []);
+// Scene moon light for wide canvases (moonlit shrine grammar)
+const sceneLight = (canvas.width >= 80)
+  ? { x: 118, y: 14, radius: 55, strength: 32 }
+  : null;
+
+const vixel = renderVixel(coords, canvas.width, canvas.height, scale, false, vectorPaths, sceneLight);
+const pixel = renderVixel(coords, canvas.width, canvas.height, scale, true, [], sceneLight);
 
 const diff = pixelDiff(vixel, pixel);
 console.log(`\n  ── Ablation A/B ──`);
@@ -423,7 +475,7 @@ console.log(`\n  ── Output ──`);
 console.log(`  Vixel PNG: ${vixelPath} (${vixelPng.length} bytes)`);
 console.log(`  Pixel PNG: ${pixelPath} (${pixelPng.length} bytes)`);
 
-const vixel2 = renderVixel(coords, canvas.width, canvas.height, scale, false, vectorPaths);
+const vixel2 = renderVixel(coords, canvas.width, canvas.height, scale, false, vectorPaths, sceneLight);
 const deterministic = Buffer.from(vixel.data).equals(Buffer.from(vixel2.data));
 console.log(`\n  Deterministic: ${deterministic ? '✓ PASS' : '✗ FAIL'}`);
 
