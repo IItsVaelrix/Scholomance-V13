@@ -673,3 +673,27 @@ export function computeParticleFrame(
 
 // Re-export for the renderer's per-particle deterministic streams.
 export { unit as atmosphereUnit, fnv1aNum as atmosphereSeed };
+
+export interface LightSource {
+  x: number;
+  y: number;
+  z: number;
+  intensity: number;
+}
+
+export function evaluateSceneLightingField(
+  x: number,
+  y: number,
+  z: number,
+  source: LightSource,
+): number {
+  const dx = x - source.x;
+  const dy = y - source.y;
+  const dz = z - source.z;
+  const distSq = dx * dx + dy * dy + dz * dz;
+  const r0Sq = 120 * 120;
+  const falloff = source.intensity / Math.max(1, distSq / r0Sq);
+  const atmosphericHaze = Math.exp(-0.001 * z);
+  return Math.min(1.0, falloff * atmosphericHaze);
+}
+
