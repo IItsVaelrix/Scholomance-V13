@@ -1,0 +1,207 @@
+{
+  "asset": "scholomance-forest-entrance",
+  "canvas": {
+    "width": 160,
+    "height": 90
+  },
+  "description": "Scholomance Forest Entrance Wand formulas - sign, banners, lantern chain, book, and runes.",
+  "propagation": {
+    "gene": "WAND_CHEMICAL_STROKE_PROPAGATION",
+    "mode": "chemical-reaction",
+    "visibleRoles": [
+      "scholomance.*"
+    ],
+    "invisibleRoles": []
+  },
+  "formulas": [
+    {
+      "role": "scholomance.sign_border",
+      "type": "mathematical_stroke",
+      "description": "scholomance.sign_border",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "parameters": {
+            "origin": {
+              "x": 10,
+              "y": 34
+            },
+            "target": {
+              "x": 36,
+              "y": 34
+            },
+            "baseWidth": 1.2,
+            "widthVariation": 0.2,
+            "frequency": 1.4,
+            "density": 1,
+            "bleed": 0.1,
+            "n": 36
+          }
+        }
+      },
+      "pressure": 0.9
+    },
+    {
+      "role": "scholomance.book_pages",
+      "type": "mathematical_stroke",
+      "description": "scholomance.book_pages",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "parameters": {
+            "origin": {
+              "x": 21,
+              "y": 62
+            },
+            "target": {
+              "x": 33,
+              "y": 62
+            },
+            "baseWidth": 1,
+            "widthVariation": 0.2,
+            "frequency": 1.4,
+            "density": 1,
+            "bleed": 0.1,
+            "n": 36
+          }
+        }
+      },
+      "pressure": 0.95
+    },
+    {
+      "role": "scholomance.banner_left_emblem",
+      "type": "mathematical_stroke",
+      "description": "scholomance.banner_left_emblem",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "parameters": {
+            "origin": {
+              "x": 35,
+              "y": 24
+            },
+            "target": {
+              "x": 35,
+              "y": 32
+            },
+            "baseWidth": 1.1,
+            "widthVariation": 0.2,
+            "frequency": 1.4,
+            "density": 1,
+            "bleed": 0.1,
+            "n": 36
+          }
+        }
+      },
+      "pressure": 0.9
+    },
+    {
+      "role": "scholomance.banner_right_emblem",
+      "type": "mathematical_stroke",
+      "description": "scholomance.banner_right_emblem",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "parameters": {
+            "origin": {
+              "x": 143,
+              "y": 36
+            },
+            "target": {
+              "x": 143,
+              "y": 44
+            },
+            "baseWidth": 1.1,
+            "widthVariation": 0.2,
+            "frequency": 1.4,
+            "density": 1,
+            "bleed": 0.1,
+            "n": 36
+          }
+        }
+      },
+      "pressure": 0.9
+    },
+    {
+      "role": "scholomance.lantern_chain",
+      "type": "mathematical_stroke",
+      "description": "scholomance.lantern_chain",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "parameters": {
+            "origin": {
+              "x": 121,
+              "y": 10
+            },
+            "target": {
+              "x": 121,
+              "y": 20
+            },
+            "baseWidth": 0.8,
+            "widthVariation": 0.2,
+            "frequency": 1.4,
+            "density": 1,
+            "bleed": 0.1,
+            "n": 36
+          }
+        }
+      },
+      "pressure": 0.85
+    },
+    {
+      "role": "scholomance.rune_glyph_l",
+      "type": "mathematical_stroke",
+      "description": "scholomance.rune_glyph_l",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "parameters": {
+            "origin": {
+              "x": 55,
+              "y": 46
+            },
+            "target": {
+              "x": 55,
+              "y": 54
+            },
+            "baseWidth": 1,
+            "widthVariation": 0.2,
+            "frequency": 1.4,
+            "density": 1,
+            "bleed": 0.1,
+            "n": 36
+          }
+        }
+      },
+      "pressure": 0.95
+    },
+    {
+      "role": "scholomance.rune_glyph_r",
+      "type": "mathematical_stroke",
+      "description": "scholomance.rune_glyph_r",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "parameters": {
+            "origin": {
+              "x": 103,
+              "y": 52
+            },
+            "target": {
+              "x": 103,
+              "y": 60
+            },
+            "baseWidth": 1,
+            "widthVariation": 0.2,
+            "frequency": 1.4,
+            "density": 1,
+            "bleed": 0.1,
+            "n": 36
+          }
+        }
+      },
+      "pressure": 0.95
+    }
+  ]
+}
