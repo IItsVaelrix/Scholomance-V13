@@ -330,3 +330,16 @@ export function generateCylindricalBarkSteps(u: number, lightDot: number): numbe
   return Math.min(3, Math.floor(intensity * 4));
 }
 
+export enum DepthBand {
+  BACKGROUND = "background",
+  FOCAL = "focal",
+  FOREGROUND = "foreground",
+}
+
+export function assignDepthBand(zIndex: number): DepthBand {
+  if (zIndex < 5) return DepthBand.BACKGROUND;
+  if (zIndex <= 20) return DepthBand.FOCAL;
+  return DepthBand.FOREGROUND;
+}
+
+
