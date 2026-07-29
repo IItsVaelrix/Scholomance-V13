@@ -77,6 +77,18 @@ export interface SceneRenderOutcome {
   resolvedAssets: readonly ResolvedAssetLedgerEntry[];
 }
 
+export enum RenderQualityMode {
+  DENSE_PIXEL_CRAFT = "MODE_DENSE_PIXEL_CRAFT",
+  SPARSE_ICONIC = "MODE_SPARSE_ICONIC",
+}
+
+export function validateRenderQualityMode(mode: string): boolean {
+  return (
+    mode === RenderQualityMode.DENSE_PIXEL_CRAFT ||
+    mode === RenderQualityMode.SPARSE_ICONIC
+  );
+}
+
 interface PixiContainer {
   addChild(child: unknown): void;
   removeChild(child: unknown): void;
