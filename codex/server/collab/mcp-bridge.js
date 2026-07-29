@@ -342,7 +342,7 @@ ${animKeyframes ? animKeyframes + '\n\n' : ''}.${kebab} {
   animation: ${animLine};
 }`.trim();
 
-    return `## ${name} — GrimDesign Output
+    return `## ${name} -- GrimDesign Output
 
 CLASSIFICATION: new component
 WHY: ${worldLawReason}
@@ -528,6 +528,7 @@ export function registerCollabMcpBridge(server, service = collabService) {
         agent_id: z.string().describe('Agent acquiring the lock'),
         task_id: z.string().optional().describe('Related task, if any'),
         ttl_minutes: z.number().int().min(1).max(480).optional().default(30).describe('Lock duration in minutes'),
+        override: z.boolean().optional().default(false).describe('Bypass ownership checks'),
     }, params => service.acquireLock(params));
 
     registerTool(server, 'mcp_scholomance_collab_lock_release', {
@@ -800,7 +801,7 @@ export function registerCollabMcpBridge(server, service = collabService) {
     registerTool(server, 'mcp_scholomance_collab_diagnostic_scan', {}, () => collabDiagnostic.scan());
 
     // ========================
-    //  DIAGNOSTIC SUBSTRATE — Phase 3 (cells/reports/health/violations)
+    //  DIAGNOSTIC SUBSTRATE -- Phase 3 (cells/reports/health/violations)
     // ========================
 
     registerTool(
@@ -823,7 +824,7 @@ export function registerCollabMcpBridge(server, service = collabService) {
         server,
         'mcp_scholomance_collab_diagnostic_query_violations',
         {
-            cell: z.string().optional().describe('Filter by cellId (or layer name) — e.g. IMMUNITY_SCAN, LAYER_BOUNDARY, bridge'),
+            cell: z.string().optional().describe('Filter by cellId (or layer name) -- e.g. IMMUNITY_SCAN, LAYER_BOUNDARY, bridge'),
             severity: z.enum(['FATAL', 'CRIT', 'WARN', 'INFO']).optional().describe('Filter by severity'),
             layer: z.string().optional().describe('Filter by context.layer (e.g. innate, adaptive, bridge, fixture, coverage)'),
             ruleId: z.string().optional().describe('Filter by context.ruleId (e.g. QUANT-0101, LING-0F03)'),
@@ -1123,7 +1124,7 @@ export function registerCollabMcpBridge(server, service = collabService) {
         const criticalLaws = [
             'No Hierarchy Between Agents', 'Conflict Escalation Is Mandatory', 'Schema Is Sovereign',
             'Server Is Truth', 'Pure Analysis Never Touches Effects', 'Determinism Is Non-Negotiable',
-            'Security Before Features', 'Bytecode Is Priority', 'Scholomance Encyclopedia — Bug Fix Documentation'
+            'Security Before Features', 'Bytecode Is Priority', 'Scholomance Encyclopedia -- Bug Fix Documentation'
         ];
 
         const violations = [];
@@ -1261,7 +1262,7 @@ export function registerCollabMcpBridge(server, service = collabService) {
             grade: {
                 letter: "See VAELRIX_LAW Tribunal section in full report (use law_audit + law_debug for formal grade).",
                 score: 0,
-                reason: "MCP skeleton — agent must complete with evidence and TraceIR.",
+                reason: "MCP skeleton -- agent must complete with evidence and TraceIR.",
                 upgrade_path: "Re-run after fixes + law audit.",
             },
         };
@@ -1472,7 +1473,7 @@ export function registerCollabMcpBridge(server, service = collabService) {
             found_similar: occurrences.length > 0 ? occurrences : null,
             tip: occurrences.length === 0
                 ? 'No similar lines found. Use read_file to copy the exact block.'
-                : 'Similar lines found above — check for whitespace or formatting differences.',
+                : 'Similar lines found above -- check for whitespace or formatting differences.',
         };
     });
 
@@ -1522,7 +1523,7 @@ export function registerCollabMcpBridge(server, service = collabService) {
                 }
             }
 
-            // All succeeded — commit
+            // All succeeded -- commit
             committed = true;
             for (const r of patchResults) {
                 await service.logActivity({
@@ -1815,7 +1816,7 @@ export function registerCollabMcpBridge(server, service = collabService) {
     });
 
     // ── VAELRIX LAW DEBUG ORACLE (High Inquisitor forensic skill) ─────────────
-    // Full ritual from vaelrix_law_debug.md — produces the mandated Debug Report + DebugTraceIR
+    // Full ritual from vaelrix_law_debug.md -- produces the mandated Debug Report + DebugTraceIR
     registerTool(server, 'mcp_scholomance_collab_skill_vaelrix_law_debug', {
         anomaly_name: z.string().min(1).describe('Name of the anomaly or bug (e.g. "Chroma Drift in VerseIR")'),
         symptoms: z.array(z.string()).min(1).describe('Observed symptoms or error messages'),
@@ -1832,7 +1833,7 @@ export function registerCollabMcpBridge(server, service = collabService) {
         let failureChain = symptoms.slice(0, 3);
         let rootCause = 'Requires deeper inspection (see reproduction path).';
         let evidence = symptoms.map(s => `Direct: ${s}`);
-        let blastRadius = 'Unknown — run targeted tests and immunity scan.';
+        let blastRadius = 'Unknown -- run targeted tests and immunity scan.';
         let fixStrategy = 'Minimal targeted patch after root cause confirmation. Prefer bytecode-level or schema fixes.';
         let minimalPatch = '// TODO: Provide precise unified diff after analysis';
         let regressionNet = 'Run: npm test, npm run test:qa, npm run test:visual, immunity scan on changed files.';
@@ -1845,14 +1846,14 @@ export function registerCollabMcpBridge(server, service = collabService) {
         if (/dimension|layout|hierarchy|animation state/.test(joined)) specificAudits.push('Dimension Audit: Hierarchy flattening, orphaned animation state.');
         if (/csrf|session|handshake|guest/.test(joined)) specificAudits.push('Session Audit: CSRF/Guest handshake integrity.');
         if (/recursion|depth|stack/.test(joined)) specificAudits.push('Stasis Threshold: Recursion depth (max 8) or math finite guards may be violated.');
-        if (/math\.random|date\.now|non.?determin/.test(joined)) specificAudits.push('Determinism violation suspected — Law 6.');
+        if (/math\.random|date\.now|non.?determin/.test(joined)) specificAudits.push('Determinism violation suspected -- Law 6.');
 
         if (specificAudits.length) {
             rootCause = `Suspected Scholomance-specific fracture. ${specificAudits.join(' ')}`;
             evidence.push(...specificAudits.map(a => `Inferred: ${a}`));
         }
 
-        const reportTitle = `${anomaly_name} — Debug Report v1 (MCP)`;
+        const reportTitle = `${anomaly_name} -- Debug Report v1 (MCP)`;
         const debugTraceIR = {
             debug_trace_ir_version: "1.0.0",
             bug: {
@@ -1937,7 +1938,7 @@ ${JSON.stringify(debugTraceIR, null, 2)}
 ---
 **Mode**: ${mode} (${mode === 'B' ? 'Patch-Ready' : mode === 'A' ? 'Diagnostic-Only' : 'See vaelrix_law_debug.md for full mode definitions'})
 **Source Skill**: ${debugSkillPath}
-**VAELRIX_LAW Enforcement**: Law 11 — No fix is complete without its story in the Scholomance Encyclopedia.
+**VAELRIX_LAW Enforcement**: Law 11 -- No fix is complete without its story in the Scholomance Encyclopedia.
 `;
 
         return {
@@ -2045,7 +2046,7 @@ export function createCollabMcpServer(service = collabService) {
  * Keep the event loop alive across the gap between process start and the SDK
  * attaching its stdin listener.
  *
- * This timer is NOT unref'd on purpose — an unref'd timer would let the process
+ * This timer is NOT unref'd on purpose -- an unref'd timer would let the process
  * exit during that window. The consequence is that it pins the loop open FOREVER
  * unless something releases it, which is why every exit path below must, and why
  * a stdio client vanishing has to be treated as an exit path (see main).
@@ -2097,7 +2098,7 @@ export async function main() {
     // A stdio server with no client is an orphan: it can never be spoken to
     // again, and it can never be reaped, because holdProcessOpenForStdio pins the
     // event loop open and only SIGINT/SIGTERM released it. A client that dies
-    // WITHOUT signalling — killed, crashed, or simply detached — left the bridge
+    // WITHOUT signalling -- killed, crashed, or simply detached -- left the bridge
     // running forever. They accumulated: 36 live daemons were found in one
     // session, each re-registering its agent, which is what kept the server's
     // 60-second AGENT-QA sweep reporting AGENT_DUPE violations.

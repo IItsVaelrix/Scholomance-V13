@@ -60,6 +60,7 @@ export const AcquireLockSchema = z.object({
     agent_id: z.string().min(1),
     task_id: z.string().optional(),
     ttl_minutes: z.number().int().min(1).max(480).default(30),
+    override: z.boolean().default(false),
 });
 
 // --- Pipeline Schemas ---

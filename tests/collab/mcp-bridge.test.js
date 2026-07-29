@@ -34,6 +34,7 @@ vi.mock('../../codex/core/pixelbrain/subtlety-runtime.js', () => ({
 }));
 
 import { registerCollabMcpBridge } from '../../codex/server/collab/mcp-bridge.js';
+import { AcquireLockSchema } from '../../codex/server/collab/collab.schemas.js';
 
 function createFakeServer() {
     const resources = new Map();
@@ -186,6 +187,27 @@ describe('collab MCP bridge parity', () => {
         expect(parsed.ok).toBe(true);
         expect(parsed.tool).toBe('mcp_scholomance_collab_pipeline_advance');
         expect(parsed.result.pipeline.id).toBe('pipe-created');
+    });
+
+    it('exposes and forwards the ownership override on every lock surface', async () => {
+        const routeInput = AcquireLockSchema.parse({
+            file_path: 'PolarisOS/worldpacks/example.wand.json',
+            agent_id: 'agent-ui',
+            override: true,
+        });
+        expect(routeInput.override).toBe(true);
+
+        const lockTool = fakeServer.tools.get('mcp_scholomance_collab_lock_acquire');
+        expect(lockTool.schema.override).toBeDefined();
+
+        await lockTool.handler({
+            file_path: 'PolarisOS/worldpacks/example.wand.json',
+            agent_id: 'agent-ui',
+            override: true,
+        });
+        expect(service.acquireLock).toHaveBeenCalledWith(expect.objectContaining({
+            override: true,
+        }));
     });
 
     it('supports setting and getting memories through tools', async () => {
