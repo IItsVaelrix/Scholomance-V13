@@ -256,8 +256,7 @@ function toKebab(str) {
         .replace(/-+/g, '-');
 }
 
-function buildAnimKeyframes(animationClass, durationMs) {
-    const dur = durationMs || 2400;
+function buildAnimKeyframes(animationClass, _durationMs) {
     const frames = {
         'grim-pulse': `@keyframes grim-pulse {
   0%, 100% { opacity: 0.8; box-shadow: var(--grim-glow); }
@@ -289,7 +288,7 @@ function buildGrimSpec(intent, signal, decisions, componentName) {
         animationClass, animationDurationMs,
         atmosphereLevel, scanlines,
         componentComplexity, transitionMs,
-        fontSizeRem, fontWeight, worldLawReason, cssVars,
+        worldLawReason, cssVars,
     } = decisions;
 
     const { h, s, l } = signal.blendedHsl;
@@ -1105,10 +1104,9 @@ export function registerCollabMcpBridge(server, service = collabService) {
         const lawPath = path.join(ROOT, 'docs/scholomance-encyclopedia/Scholomance LAW/VAELRIX_LAW.md');
         const preamblePath = path.join(ROOT, 'docs/scholomance-encyclopedia/Scholomance LAW/SHARED_PREAMBLE.md');
         let lawText = '';
-        let preambleText = '';
         try {
             lawText = fs.readFileSync(lawPath, 'utf8');
-            preambleText = fs.readFileSync(preamblePath, 'utf8');
+            fs.readFileSync(preamblePath, 'utf8');
         } catch (e) {
             // fall back gracefully
         }
@@ -1172,10 +1170,9 @@ export function registerCollabMcpBridge(server, service = collabService) {
         const fbSkillPath = path.join(ROOT, 'docs/scholomance-encyclopedia/Scholomance LAW/scholomance-feedback/scholomance-feedback.md');
         const fitPath = path.join(ROOT, 'docs/scholomance-encyclopedia/Scholomance LAW/scholomance-feedback/references/fit-matrix.md');
         let fbSkill = '';
-        let fitMatrix = '';
         try {
             fbSkill = fs.readFileSync(fbSkillPath, 'utf8');
-            fitMatrix = fs.readFileSync(fitPath, 'utf8');
+            fs.readFileSync(fitPath, 'utf8');
         } catch (e) { /* ignore */ }
 
         const detectedMode = mode || (subject.toLowerCase().includes('pdr') || subject.toLowerCase().includes('spec') ? 'D' : 
@@ -2011,7 +2008,7 @@ ${JSON.stringify(debugTraceIR, null, 2)}
     registerTool(server, 'mcp_scholomance_collab_brain_forcefield_ask', {
         query: z.string().min(1).describe('Natural language query or task. Runs the complete brain network + ForceField deterministically.'),
         deterministic: z.boolean().optional().default(true).describe('Return structured findings instead of LLM synthesis (default true)'),
-    }, async ({ query, deterministic }) => {
+    }, async ({ query, deterministic: _deterministic }) => {
         const res = callDirectBrain('forcefield', { query });
         return createToolSuccess('brain_forcefield_ask', res);
     });

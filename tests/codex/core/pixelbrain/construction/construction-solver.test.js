@@ -19,16 +19,12 @@ import { describe, it, expect } from 'vitest';
 import {
   createConstruction,
   validateConstructionSpec,
-  computeConstructionChecksum,
-  CONSTRUCTION_CONTRACT,
   SOLVER_VERSION,
-  quantize,
 } from '../../../../../codex/core/pixelbrain/construction/construction-schema.js';
 
 import {
   resolveProportion,
   resolveRatioSpec,
-  PROPORTION_CONSTANTS,
 } from '../../../../../codex/core/pixelbrain/construction/proportion-laws.js';
 
 // Phase 2

@@ -3,7 +3,7 @@
  * PDR §3: solveCapsule({start, end, radius}, canvas) → closed contour with semicircle caps.
  */
 
-import { q, qp, buildSolvedPart, dist, normalize, perp, lerp } from '../geometry-utils.js';
+import { buildSolvedPart, dist, normalize, perp, lerp } from '../geometry-utils.js';
 
 const CAP_SEGMENTS = 16; // segments per semicircle cap
 

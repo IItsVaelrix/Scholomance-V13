@@ -3,7 +3,7 @@
  * PDR §3: solveConicBowl({topRef, depth}, canvas) → closed profile, tangent join < 5°.
  */
 
-import { q, qp, buildSolvedPart, dist, normalize, perp } from '../geometry-utils.js';
+import { buildSolvedPart } from '../geometry-utils.js';
 import { resolveRatioSpec } from '../proportion-laws.js';
 
 const SEGMENTS = 48;

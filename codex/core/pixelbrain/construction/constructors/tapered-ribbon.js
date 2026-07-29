@@ -4,7 +4,7 @@
  *   → left and right bank polylines with monotonic width taper.
  */
 
-import { q, qp, buildSolvedPart, dist, normalize, perp, lerp } from '../geometry-utils.js';
+import { buildSolvedPart, dist, normalize, perp, lerp } from '../geometry-utils.js';
 
 const SEGMENTS = 32;
 

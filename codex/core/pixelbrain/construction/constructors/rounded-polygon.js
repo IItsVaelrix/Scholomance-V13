@@ -3,7 +3,7 @@
  * PDR §3: { kind:'rounded-polygon', points: AnchorRef[], cornerRadius }
  */
 
-import { q, qp, buildSolvedPart, dist, normalize, lerp } from '../geometry-utils.js';
+import { buildSolvedPart, dist, normalize } from '../geometry-utils.js';
 
 const ARC_SEGMENTS = 8; // segments per corner arc
 

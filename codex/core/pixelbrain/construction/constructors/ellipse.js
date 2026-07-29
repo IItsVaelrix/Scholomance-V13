@@ -3,7 +3,7 @@
  * PDR §3: solveEllipse({center, radiusX, radiusY}, canvas) → closed polyline ≥32 pts.
  */
 
-import { q, qp, buildSolvedPart } from '../geometry-utils.js';
+import { buildSolvedPart } from '../geometry-utils.js';
 
 const MIN_SEGMENTS = 32;
 

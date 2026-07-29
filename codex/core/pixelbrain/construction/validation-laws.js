@@ -3,9 +3,7 @@
  * PDR §3: closure, self-intersection, winding, curvature, connectivity.
  */
 
-import {
-  dist, findSelfIntersections, windingDirection, pointInPolygon, centroid,
-} from './geometry-utils.js';
+import { dist, findSelfIntersections, windingDirection } from './geometry-utils.js';
 
 const TOLERANCE = 0.01;
 

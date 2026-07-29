@@ -36,10 +36,6 @@ export function evaluateFormula(formula, canvasSize, time = 0, options = {}) {
   }
 
   const { strict = false } = options;
-  // Stronger determinism contract: seed + precision from top level or formula
-  const effectiveSeed = formula.seed != null ? (formula.seed >>> 0) : (options.seed != null ? options.seed : 42);
-  const effectivePrecision = formula.precision != null ? formula.precision : (options.precision != null ? options.precision : 3);
-
   let coordinates = [];
 
   switch (coordinateFormula.type) {
@@ -756,6 +752,7 @@ export function evaluateVectorizedText(formula, canvasSize, _time = 0) {
  * This produces clean, deterministic coords that are ideal for SCDL lowering + propagation.
  */
 export function evaluateMathematicalStroke(formula, canvasSize, time = 0) {
+  void time;
   const params = formula.parameters || formula;
   let {
     cx = canvasSize.width / 2,
@@ -867,47 +864,47 @@ export function evaluateMathExpression(formula, canvasSize, time = 0) {
   const height = canvasSize.height || 100;
 
   // Evaluate the AST to a scalar at (ux, uy) in unit domain [0,1]
-  function evalNode(node, ux, uy, ut) {
+  function evalNode(node, ux, uy, sampleTime) {
     if (!node || typeof node !== 'object') return 0;
 
     if (node.op === 'x') return ux;
     if (node.op === 'y') return uy;
-    if (node.op === 't') return ut;
+    if (node.op === 't') return sampleTime;
     if (node.op === 'seed') return seed / 0xffffffff || 0;
 
     if (node.value !== undefined) return Number(node.value);
 
-    if (node.op === 'sin') return Math.sin(evalNode(node.arg, ux, uy, ut) * Math.PI * 2);
-    if (node.op === 'cos') return Math.cos(evalNode(node.arg, ux, uy, ut) * Math.PI * 2);
-    if (node.op === 'abs') return Math.abs(evalNode(node.arg, ux, uy, ut));
-    if (node.op === 'fract') return evalNode(node.arg, ux, uy, ut) % 1;
-    if (node.op === 'floor') return Math.floor(evalNode(node.arg, ux, uy, ut));
-    if (node.op === 'neg') return -evalNode(node.arg, ux, uy, ut);
+    if (node.op === 'sin') return Math.sin(evalNode(node.arg, ux, uy, sampleTime) * Math.PI * 2);
+    if (node.op === 'cos') return Math.cos(evalNode(node.arg, ux, uy, sampleTime) * Math.PI * 2);
+    if (node.op === 'abs') return Math.abs(evalNode(node.arg, ux, uy, sampleTime));
+    if (node.op === 'fract') return evalNode(node.arg, ux, uy, sampleTime) % 1;
+    if (node.op === 'floor') return Math.floor(evalNode(node.arg, ux, uy, sampleTime));
+    if (node.op === 'neg') return -evalNode(node.arg, ux, uy, sampleTime);
 
     if (node.op === 'noise') {
-      const val = evalNode(node.arg, ux, uy, ut);
+      const val = evalNode(node.arg, ux, uy, sampleTime);
       // Use seeded perlin-like from procedural-noise, scaled by arg
       const freq = Math.max(0.1, Math.abs(val) * 4 + 1);
-      const grid = perlinNoiseGrid(2, 2, freq, { seed: (seed + Math.floor(ut * 100)) >>> 0 });
+      const grid = perlinNoiseGrid(2, 2, freq, { seed: (seed + Math.floor(sampleTime * 100)) >>> 0 });
       const n = grid && grid.length ? grid[0] : (pseudoRandom(seed + ux * 1000 + uy * 100) - 0.5) * 2;
       return n;
     }
 
-    if (node.op === 'add') return evalNode(node.left, ux, uy, ut) + evalNode(node.right, ux, uy, ut);
-    if (node.op === 'sub') return evalNode(node.left, ux, uy, ut) - evalNode(node.right, ux, uy, ut);
-    if (node.op === 'mul') return evalNode(node.left, ux, uy, ut) * evalNode(node.right, ux, uy, ut);
+    if (node.op === 'add') return evalNode(node.left, ux, uy, sampleTime) + evalNode(node.right, ux, uy, sampleTime);
+    if (node.op === 'sub') return evalNode(node.left, ux, uy, sampleTime) - evalNode(node.right, ux, uy, sampleTime);
+    if (node.op === 'mul') return evalNode(node.left, ux, uy, sampleTime) * evalNode(node.right, ux, uy, sampleTime);
     if (node.op === 'div') {
-      const r = evalNode(node.right, ux, uy, ut) || 1e-9;
-      return evalNode(node.left, ux, uy, ut) / r;
+      const r = evalNode(node.right, ux, uy, sampleTime) || 1e-9;
+      return evalNode(node.left, ux, uy, sampleTime) / r;
     }
     if (node.op === 'mod') {
-      const l = evalNode(node.left, ux, uy, ut);
-      const r = evalNode(node.right, ux, uy, ut) || 1;
+      const l = evalNode(node.left, ux, uy, sampleTime);
+      const r = evalNode(node.right, ux, uy, sampleTime) || 1;
       return ((l % r) + r) % r;
     }
-    if (node.op === 'pow') return Math.pow(evalNode(node.left, ux, uy, ut), evalNode(node.right, ux, uy, ut));
-    if (node.op === 'min') return Math.min(evalNode(node.left, ux, uy, ut), evalNode(node.right, ux, uy, ut));
-    if (node.op === 'max') return Math.max(evalNode(node.left, ux, uy, ut), evalNode(node.right, ux, uy, ut));
+    if (node.op === 'pow') return Math.pow(evalNode(node.left, ux, uy, sampleTime), evalNode(node.right, ux, uy, sampleTime));
+    if (node.op === 'min') return Math.min(evalNode(node.left, ux, uy, sampleTime), evalNode(node.right, ux, uy, sampleTime));
+    if (node.op === 'max') return Math.max(evalNode(node.left, ux, uy, sampleTime), evalNode(node.right, ux, uy, sampleTime));
 
     return 0;
   }
