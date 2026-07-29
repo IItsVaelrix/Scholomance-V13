@@ -42,4 +42,28 @@ describe('raster-core (unclipped rasterizers)', () => {
     expect(ops[0].role).toBe('trim');
     expect(ops[0]._fromVector).toBe(true);
   });
+
+  it('public vector identity matches the metadata stamped by pushCell', async () => {
+    const { computeVectorIdentity } = await import(
+      '../../../../../codex/core/pixelbrain/scdl/render/raster-core.js'
+    );
+    const source = {
+      op: 'ellipse',
+      cx: 8,
+      cy: 6,
+      rx: 4,
+      ry: 2,
+      width: 2,
+    };
+    const expected = computeVectorIdentity(source, 8, 4);
+    const ops = [];
+
+    pushCell(ops, 8, 4, '#ffffff', {}, source);
+
+    const { halfWidth, ...identity } = expected;
+    expect(ops[0]).toMatchObject({
+      ...identity,
+      strokeHalfWidth: halfWidth,
+    });
+  });
 });

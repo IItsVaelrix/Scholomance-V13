@@ -70,7 +70,7 @@ export function pushCell(ops, x, y, color, loc, sourceOp = null) {
  * normal: unit outward normal [nx, ny]
  * curvature: 1/R at the nearest boundary point (0 for flat edges)
  */
-function computeVectorIdentity(op, px, py) {
+export function computeVectorIdentity(op, px, py) {
   const type = op.op || op.type;
 
   if (type === 'circle' || type === 'ellipse') {
