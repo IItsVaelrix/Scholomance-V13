@@ -173,6 +173,7 @@ Reality after implementation.
 - [`PIR-20260629-PIXELBRAIN-CRAFT-GATE-FINISH.md`](./post-implementation-reports/PIR-20260629-PIXELBRAIN-CRAFT-GATE-FINISH.md)
 - [`PIR-20260629-PIXELBRAIN-PIPELINE-CORPUS.md`](./post-implementation-reports/PIR-20260629-PIXELBRAIN-PIPELINE-CORPUS.md)
 - [`PIR-20260702-SCDL-COMPILER.md`](./post-implementation-reports/PIR-20260702-SCDL-COMPILER.md)
+- [`PIR-20260729-GEOMETRIC-CONSTRUCTION-SOLVER-REPAIR.md`](./post-implementation-reports/PIR-20260729-GEOMETRIC-CONSTRUCTION-SOLVER-REPAIR.md)
 - [`dead-code.md`](./post-implementation-reports/dead-code.md)
 - [`Wand_RAID_UX_Audit_Report.md`](./Wand_RAID_UX_Audit_Report.md)
 - [`UX Report/Scrying_Orb_Landing_UX_Report.md`](./UX%20Report/Scrying_Orb_Landing_UX_Report.md)

@@ -7,11 +7,129 @@
 
 ## Living Document - Owned by Codex, Read by All Agents
 
-**Version: 1.34** | Last updated: 2026-07-18
+**Version: 1.35** | Last updated: 2026-07-29
 
 > Bump the version on every schema change.
 > Notify Claude for UI-consumed field changes.
 > Notify Gemini for fixture, regression-test, and backend implementation changes.
+
+---
+
+## SCHEMA CHANGE NOTICE
+
+- Schema: Geometric Construction Solver
+- Version: 1.34 -> 1.35
+- Date: 2026-07-29
+- Changed fields: registered `PB-GEOMETRY-CONSTRUCTION-v1`, its solved result shape, the canonical nested Wand `construction_request`, construction/result SHA-256 identities, optional canvas containment, and the complete primitive and constraint vocabularies
+- Breaking: no existing formula type changes; construction requests are new and default-off, but pre-contract draft construction shapes are refused
+- Owner: Codex
+- Claude impact: construction previews may render solved parts and validation evidence only after the caller explicitly enables the construction feature
+- Gemini impact: validate the complete graph, preserve canonical hashing/freezing, verify every declared constraint after transforms, and maintain satisfied/refused matrix coverage
+- Error codes: public construction refusal reuses PB-ERR-v1 `VALUE`, `RANGE`, `STATE`, `FORMULA`, and `COORD`
+
+```ts
+type ConstructionPrimitiveKind =
+  | "ellipse"
+  | "conic-bowl"
+  | "tapered-ribbon"
+  | "capsule"
+  | "width-profile-ribbon"
+  | "branch-graph"
+  | "radial-shard-cluster"
+  | "architectural-module-stack"
+  | "offset-contour"
+  | "rounded-polygon"
+  | "bezier-chain";
+
+type ConstructionConstraintKind =
+  | "coaxial"
+  | "tangent"
+  | "coincident"
+  | "connected"
+  | "concentric"
+  | "parallel"
+  | "perpendicular"
+  | "symmetric"
+  | "mirror-symmetry"
+  | "contained"
+  | "equal-length"
+  | "ratio"
+  | "minimum-distance"
+  | "maximum-curvature"
+  | "monotonic-taper";
+
+interface GeometryConstructionSpec {
+  id: string;
+  canvas: { width: number; height: number };
+  anchors: Record<string, [number, number]>;
+  parts: Array<{
+    id: string;
+    primitive: { kind: ConstructionPrimitiveKind; [field: string]: unknown };
+  }>;
+  constraints: Array<{
+    kind: ConstructionConstraintKind;
+    [field: string]: unknown;
+  }>;
+  validation: {
+    closedParts: string[];
+    forbidSelfIntersections: boolean;
+    consistentWinding: "clockwise" | "counterclockwise";
+    minimumCurvatureRadius: number;
+    requireConnectedAssembly: boolean;
+    requireCanvasContainment?: boolean;
+    connectionTolerance?: number;
+  };
+}
+
+interface GeometryConstructionPacket extends GeometryConstructionSpec {
+  contract: "PB-GEOMETRY-CONSTRUCTION-v1";
+  version: "1.0.0";
+  solverVersion: "1.0.0";
+  checksum: `sha256-canonical-v1:${string}`;
+}
+
+interface GeometryConstructionResult {
+  constructionId: string;
+  solverVersion: "1.0.0";
+  parts: Record<string, {
+    id: string;
+    primitiveKind: ConstructionPrimitiveKind;
+    spine: [number, number][];
+    leftBank?: [number, number][];
+    rightBank?: [number, number][];
+    closedContour?: [number, number][];
+    surfaceNormals: [number, number][];
+    tangents: [number, number][];
+    curvature: number[];
+    arcLength: number;
+    namedPoints: Record<string, [number, number]>;
+    measurements: Record<string, number>;
+  }>;
+  validationReport: {
+    passed: boolean;
+    checks: Array<{ law: string; passed: boolean; detail?: string }>;
+    failures: Array<{ constraint: object; reason: string }>;
+  };
+  constructionChecksum: `sha256-canonical-v1:${string}`;
+  resultChecksum: `sha256-canonical-v1:${string}`;
+}
+
+interface WandConstructionFormula {
+  coordinateFormula: {
+    type: "construction_request";
+    construction: Omit<GeometryConstructionSpec, "canvas"> & {
+      canvas?: GeometryConstructionSpec["canvas"];
+    };
+  };
+}
+```
+
+Construction packets and results are defensive clones frozen recursively.
+Canonical identity recursively sorts object keys, preserves array order, and
+refuses unsupported, cyclic, undefined, or non-finite values. Wand evaluation
+requires `geometryConstructionEnabled === true`; absence or false emits
+PB-ERR-v1-FORMULA. Complete semantics and enforcement classes are defined by
+the archived geometric construction solver PDR.
 
 ---
 
@@ -2763,6 +2881,7 @@ conceptId asc. `CareerGraphManifest` seals a built artifact with `artifactId`, `
 | 1.30 | 2026-06-29 | Added the internal PixelBrain pipeline golden corpus report contract for mutation and finish-suite corpus execution | no |
 | 1.33 | 2026-07-18 | Added Lexical Graph Foundation overlay schemas (`LexicalEntry`, relations, literary devices, embeddings, FTS cursor) | no |
 | 1.34 | 2026-07-24 | Added Career Graph contracts (`CareerPolicyBundle`, `OccupationCandidate`, `SkillClassification`, `CareerGraphAnalysis`, `CareerGraphManifest`) with namespaced O*NET/ESCO identities, `mapped_to` crosswalk predicate, and the mandatory-posting-evidence missing-skill law | no |
+| 1.35 | 2026-07-29 | Registered `PB-GEOMETRY-CONSTRUCTION-v1`, canonical nested Wand construction requests, complete primitive/constraint vocabularies, recursive freezing, and SHA-256 construction/result identities | no |
 
 ---
 
