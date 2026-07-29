@@ -17,6 +17,14 @@ export {
 } from './construction-schema.js';
 
 export { constructionError } from './construction-error.js';
+export {
+  CONSTRAINT_KINDS,
+  MAX_CANVAS_DIMENSION,
+  PRIMITIVE_KINDS,
+  assertValidConstructionSpec,
+  collectConstructionIssues,
+  computePartDependencies,
+} from './construction-validation.js';
 
 export {
   resolveProportion,

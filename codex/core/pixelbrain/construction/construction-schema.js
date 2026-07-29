@@ -10,26 +10,14 @@
 import { roundTo } from '../shared.js';
 import { sha256Hex } from '../sha256.js';
 import { constructionError } from './construction-error.js';
+import {
+  assertValidConstructionSpec,
+  validateConstructionSpec as validateConstructionInput,
+} from './construction-validation.js';
 
 export const CONSTRUCTION_CONTRACT = 'PB-GEOMETRY-CONSTRUCTION-v1';
 export const CONSTRUCTION_VERSION = '1.0.0';
 export const SOLVER_VERSION = '1.0.0';
-
-const PRIMITIVE_KINDS = new Set([
-  'ellipse', 'conic-bowl', 'tapered-ribbon', 'capsule',
-  'width-profile-ribbon', 'branch-graph', 'radial-shard-cluster',
-  'architectural-module-stack', 'offset-contour', 'rounded-polygon',
-  'bezier-chain',
-]);
-
-const CONSTRAINT_KINDS = new Set([
-  'coaxial', 'tangent', 'coincident', 'connected', 'concentric',
-  'parallel', 'perpendicular', 'symmetric', 'mirror-symmetry',
-  'contained', 'equal-length', 'ratio', 'minimum-distance',
-  'maximum-curvature', 'monotonic-taper',
-]);
-
-const WINDING_DIRECTIONS = new Set(['clockwise', 'counterclockwise']);
 
 /** Quantize a value to 3 decimal places (PDR §5 assumption). */
 export function quantize(v) {
@@ -118,69 +106,9 @@ export function computeConstructionChecksum(fields) {
   return `sha256-canonical-v1:${sha256Hex(canonical)}`;
 }
 
-/**
- * Validate a construction spec. Returns { valid, errors }.
- */
+/** Validate a construction spec without throwing. */
 export function validateConstructionSpec(spec) {
-  const errors = [];
-
-  if (!spec || typeof spec !== 'object') {
-    return { valid: false, errors: ['spec must be an object'] };
-  }
-  if (typeof spec.id !== 'string' || spec.id.length === 0) {
-    errors.push('id must be a non-empty string');
-  }
-  if (!spec.canvas || typeof spec.canvas.width !== 'number' || typeof spec.canvas.height !== 'number') {
-    errors.push('canvas must have numeric width and height');
-  }
-  if (!spec.anchors || typeof spec.anchors !== 'object') {
-    errors.push('anchors must be an object');
-  } else {
-    for (const [name, pt] of Object.entries(spec.anchors)) {
-      if (!Array.isArray(pt) || pt.length !== 2 || typeof pt[0] !== 'number' || typeof pt[1] !== 'number') {
-        errors.push(`anchor "${name}" must be a [number, number] pair`);
-      }
-    }
-  }
-  if (!Array.isArray(spec.parts)) {
-    errors.push('parts must be an array');
-  } else {
-    const partIds = new Set();
-    for (const part of spec.parts) {
-      if (!part.id || typeof part.id !== 'string') {
-        errors.push('each part must have a string id');
-        continue;
-      }
-      if (partIds.has(part.id)) {
-        errors.push(`duplicate part id "${part.id}"`);
-      }
-      partIds.add(part.id);
-      if (!part.primitive || !PRIMITIVE_KINDS.has(part.primitive.kind)) {
-        errors.push(`part "${part.id}" has unknown primitive kind "${part.primitive?.kind}"`);
-      }
-    }
-  }
-  if (!Array.isArray(spec.constraints)) {
-    errors.push('constraints must be an array');
-  } else {
-    for (const c of spec.constraints) {
-      if (!CONSTRAINT_KINDS.has(c.kind)) {
-        errors.push(`unknown constraint kind "${c.kind}"`);
-      }
-    }
-  }
-  if (!spec.validation || typeof spec.validation !== 'object') {
-    errors.push('validation must be an object');
-  } else {
-    const v = spec.validation;
-    if (!Array.isArray(v.closedParts)) errors.push('validation.closedParts must be an array');
-    if (typeof v.forbidSelfIntersections !== 'boolean') errors.push('validation.forbidSelfIntersections must be boolean');
-    if (!WINDING_DIRECTIONS.has(v.consistentWinding)) errors.push('validation.consistentWinding must be clockwise or counterclockwise');
-    if (typeof v.minimumCurvatureRadius !== 'number') errors.push('validation.minimumCurvatureRadius must be a number');
-    if (typeof v.requireConnectedAssembly !== 'boolean') errors.push('validation.requireConnectedAssembly must be boolean');
-  }
-
-  return { valid: errors.length === 0, errors };
+  return validateConstructionInput(spec);
 }
 
 /**
@@ -192,10 +120,7 @@ export function createConstruction(spec) {
   // projected into the packet, so unsupported extras cannot disappear.
   canonicalConstructionStringify(spec);
 
-  const { valid, errors } = validateConstructionSpec(spec);
-  if (!valid) {
-    throw constructionError('VALUE', 'invalid construction spec', { errors });
-  }
+  assertValidConstructionSpec(spec);
 
   const body = {
     contract: CONSTRUCTION_CONTRACT,

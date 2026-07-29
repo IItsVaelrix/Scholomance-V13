@@ -244,6 +244,50 @@ describe('Phase 1: Construction IR Schema', () => {
   it('throws on createConstruction with invalid spec', () => {
     expect(() => createConstruction({})).toThrow(/^PB-ERR-v1-VALUE-/);
   });
+
+  it.each([
+    ['zero canvas', spec => { spec.canvas.width = 0; }, 'RANGE'],
+    ['oversized canvas', spec => { spec.canvas.height = 257; }, 'RANGE'],
+    ['missing anchor', spec => { spec.parts[0].primitive.center.anchor = 'ghost'; }, 'STATE'],
+    ['missing part', spec => { spec.parts[1].primitive.topRef.ref = 'ghost'; }, 'STATE'],
+    ['illegal named point', spec => { spec.parts[1].primitive.topRef.point = 'ghost'; }, 'STATE'],
+    ['invalid radius', spec => { spec.parts[0].primitive.radiusX = -1; }, 'RANGE'],
+    ['invalid validation part', spec => { spec.validation.closedParts.push('ghost'); }, 'STATE'],
+  ])('refuses %s before solving', (_name, mutate, category) => {
+    const spec = brazierSpec();
+    mutate(spec);
+
+    expect(() => createConstruction(spec))
+      .toThrow(new RegExp(`^PB-ERR-v1-${category}-`));
+  });
+
+  it('refuses dependency cycles during packet creation', () => {
+    const spec = brazierSpec();
+    spec.parts = [
+      {
+        id: 'a',
+        primitive: {
+          kind: 'offset-contour',
+          source: { ref: 'b', point: 'center' },
+          distance: 1,
+          side: 1,
+        },
+      },
+      {
+        id: 'b',
+        primitive: {
+          kind: 'offset-contour',
+          source: { ref: 'a', point: 'center' },
+          distance: 1,
+          side: 1,
+        },
+      },
+    ];
+    spec.constraints = [];
+    spec.validation.closedParts = [];
+
+    expect(() => createConstruction(spec)).toThrow(/^PB-ERR-v1-STATE-/);
+  });
 });
 
 describe('Phase 1: Proportion Laws', () => {
@@ -741,17 +785,7 @@ describe('Phase 4: Solver Orchestrator', () => {
   });
 
   it('trySolve returns error instead of throwing', () => {
-    const badSpec = brazierSpec();
-    badSpec.parts.push({
-      id: 'ghost',
-      primitive: {
-        kind: 'offset-contour',
-        source: { ref: 'nonexistent', point: 'center' },
-        distance: 1,
-        side: 1,
-      },
-    });
-    const { result, error } = trySolve(createConstruction(badSpec));
+    const { result, error } = trySolve(null);
     expect(result).toBeNull();
     expect(error).toBeInstanceOf(Error);
   });
@@ -780,7 +814,7 @@ describe('Phase 4: Solver Orchestrator', () => {
     ];
     spec.constraints = [];
     spec.validation.closedParts = [];
-    expect(() => solve(createConstruction(spec))).toThrow('Circular dependency');
+    expect(() => createConstruction(spec)).toThrow(/^PB-ERR-v1-STATE-/);
   });
 
   it('solves within 100ms for ≤20 parts on 64×64', () => {
