@@ -72,6 +72,18 @@ function evaluateVixelTexture(s, d, arcLen, kappa, grain) {
   return grain.amplitude * rawHarmonic * envelope;
 }
 
+const BAYER_4X4 = [
+  [ 0/16,  8/16,  2/16, 10/16],
+  [12/16,  4/16, 14/16,  6/16],
+  [ 3/16, 11/16,  1/16,  9/16],
+  [15/16,  7/16, 13/16,  5/16],
+];
+
+function applyBayerDither(val, px, py) {
+  const dither = BAYER_4X4[py % 4][px % 4] - 0.5;
+  return Math.max(0, Math.min(1, val + dither * 0.15));
+}
+
 function smoothstep(edge0, edge1, x) {
   const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
   return t * t * (3 - 2 * t);
@@ -290,8 +302,9 @@ function renderVixel(cells, width, height, scale, nullVector = false, vectorPath
             const strokeCov = smoothstep(edge, -edge, minD - hw);
 
             if (strokeCov > 0) {
+              const ditheredCov = applyBayerDither(strokeCov, px, py);
               const isFence = path.role.includes('fence');
-              const alpha = strokeCov * (path.pressure || 1) * (isFence ? 0.95 : 0.85);
+              const alpha = ditheredCov * (path.pressure || 1) * (isFence ? 0.95 : 0.85);
               let sR = 212, sG = 175, sB = 55; // Saturated gold (#D4AF37)
               if (path.role.includes('torii') || path.role.includes('lightning') || path.role.includes('stellar')) {
                 sR = 128; sG = 255; sB = 255; // Cyan shrine / electric stroke
