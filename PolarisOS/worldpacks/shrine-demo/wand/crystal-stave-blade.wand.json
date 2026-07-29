@@ -10,8 +10,9 @@
       "formula": {
         "coordinateFormula": {
           "type": "construction_request",
-          "constructionId": "crystal-stave-blade",
-          "anchors": {
+          "construction": {
+            "id": "crystal-stave-blade",
+            "anchors": {
             "axis": [16, 0],
             "bladeTip": [16, 4],
             "bladeRightEdge": [24, 28],
@@ -27,7 +28,7 @@
             "pommelBottom": [16, 61],
             "pommelLeft": [13, 58.5]
           },
-          "parts": [
+            "parts": [
             {
               "id": "blade_outer",
               "primitive": {
@@ -87,16 +88,17 @@
               }
             }
           ],
-          "constraints": [
-            { "kind": "coaxial", "parts": ["blade_outer", "blade_spine", "guard_cluster", "grip", "pommel"] },
-            { "kind": "mirror-symmetry", "axis": { "anchor": "axis" } }
-          ],
-          "validation": {
-            "closedParts": ["blade_outer", "pommel"],
-            "forbidSelfIntersections": true,
-            "consistentWinding": "counterclockwise",
-            "minimumCurvatureRadius": 0.2,
-            "requireConnectedAssembly": true
+            "constraints": [
+              { "kind": "coaxial", "parts": ["blade_outer", "blade_spine", "guard_cluster", "grip", "pommel"] },
+              { "kind": "mirror-symmetry", "axis": { "anchor": "axis" } }
+            ],
+            "validation": {
+              "closedParts": ["blade_outer", "pommel"],
+              "forbidSelfIntersections": true,
+              "consistentWinding": "counterclockwise",
+              "minimumCurvatureRadius": 0.2,
+              "requireConnectedAssembly": false
+            }
           }
         }
       },

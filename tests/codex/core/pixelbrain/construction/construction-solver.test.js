@@ -619,6 +619,38 @@ describe('Phase 2: Remaining constructors', () => {
     expect(dist(c[0], c[c.length - 1])).toBeLessThan(0.01);
   });
 
+  it('rounded-polygon preserves authored bilateral symmetry', () => {
+    const result = solveRoundedPolygon(
+      {
+        kind: 'rounded-polygon',
+        points: [
+          { anchor: 'tip' },
+          { anchor: 'right' },
+          { anchor: 'base' },
+          { anchor: 'left' },
+        ],
+        cornerRadius: 0.5,
+        _partId: 'symmetric-panel',
+      },
+      {
+        ...baseCtx,
+        anchors: {
+          ...baseCtx.anchors,
+          tip: [5, 0],
+          right: [8, 5],
+          base: [5, 8],
+          left: [2, 5],
+        },
+      },
+    );
+
+    for (const point of result.closedContour) {
+      const reflected = [10 - point[0], point[1]];
+      expect(result.closedContour.some(candidate => dist(candidate, reflected) < 0.01))
+        .toBe(true);
+    }
+  });
+
   it('bezier-chain produces a smooth curve', () => {
     const result = solveBezierChain(
       {
@@ -1368,7 +1400,12 @@ describe('Phase 5: Wand Integration', () => {
         construction: brazierSpec(),
       },
     };
-    const coords = evaluateFormula(formula, { width: 24, height: 20 });
+    const coords = evaluateFormula(
+      formula,
+      { width: 24, height: 20 },
+      0,
+      { geometryConstructionEnabled: true },
+    );
     expect(coords.length).toBeGreaterThan(0);
     expect(coords[0].source).toBe('construction');
     expect(coords[0].constructionId).toBe('scholomance-brazier');
@@ -1382,9 +1419,52 @@ describe('Phase 5: Wand Integration', () => {
         construction: brazierSpec(),
       },
     };
-    const coords = evaluateFormula(formula, { width: 24, height: 20 });
+    const coords = evaluateFormula(
+      formula,
+      { width: 24, height: 20 },
+      0,
+      { geometryConstructionEnabled: true },
+    );
     const withTangent = coords.filter(c => c.tangent);
     expect(withTangent.length).toBeGreaterThan(0);
+  });
+
+  it('keeps construction solving disabled unless explicitly enabled', async () => {
+    const { evaluateFormula } = await import('../../../../../codex/core/pixelbrain/formula-to-coordinates.js');
+    const formula = {
+      coordinateFormula: {
+        type: 'construction_request',
+        construction: brazierSpec(),
+      },
+    };
+
+    expect(() => evaluateFormula(formula, { width: 24, height: 20 }))
+      .toThrow(/^PB-ERR-v1-FORMULA-/);
+    expect(() => evaluateFormula(
+      formula,
+      { width: 24, height: 20 },
+      0,
+      { geometryConstructionEnabled: false },
+    )).toThrow(/^PB-ERR-v1-FORMULA-/);
+  });
+
+  it('rejects the legacy flattened construction dialect', async () => {
+    const { evaluateFormula } = await import('../../../../../codex/core/pixelbrain/formula-to-coordinates.js');
+    const { id: constructionId, canvas: _canvas, ...legacy } = brazierSpec();
+    const formula = {
+      coordinateFormula: {
+        type: 'construction_request',
+        constructionId,
+        ...legacy,
+      },
+    };
+
+    expect(() => evaluateFormula(
+      formula,
+      { width: 24, height: 20 },
+      0,
+      { geometryConstructionEnabled: true },
+    )).toThrow(/^PB-ERR-v1-FORMULA-/);
   });
 
   it('existing formula types still work (backward compat)', async () => {
@@ -1401,8 +1481,15 @@ describe('Phase 5: Wand Integration', () => {
         },
       },
     };
-    const coords = evaluateFormula(formula, { width: 24, height: 20 });
-    expect(coords.length).toBeGreaterThan(0);
+    const withoutFlag = evaluateFormula(formula, { width: 24, height: 20 });
+    const withFlag = evaluateFormula(
+      formula,
+      { width: 24, height: 20 },
+      0,
+      { geometryConstructionEnabled: true },
+    );
+    expect(withoutFlag.length).toBeGreaterThan(0);
+    expect(withFlag).toEqual(withoutFlag);
   });
 });
 

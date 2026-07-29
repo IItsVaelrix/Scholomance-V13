@@ -11,7 +11,12 @@ describe('crystal-stave-blade wand formula integration', () => {
     expect(wandAsset.formulas.length).toBeGreaterThan(0);
     const formulaEntry = wandAsset.formulas[0];
     
-    const coords = evaluateFormula(formulaEntry.formula, wandAsset.canvas);
+    const coords = evaluateFormula(
+      formulaEntry.formula,
+      wandAsset.canvas,
+      0,
+      { geometryConstructionEnabled: true },
+    );
     expect(coords.length).toBeGreaterThan(0);
     
     // Verify coordinate properties emitted by construction_request

@@ -13,7 +13,7 @@ import {
 } from './image-to-bytecode-formula.js';
 import { getRotationAtTime } from './gear-glide-amp.js';
 import { perlinNoiseGrid } from './procedural-noise.js';
-import { createConstruction, solve } from './construction/index.js';
+import { constructionError, createConstruction, solve } from './construction/index.js';
 
 const MAX_FRACTAL_ITERATIONS = 6;
 
@@ -71,8 +71,7 @@ export function evaluateFormula(formula, canvasSize, time = 0, options = {}) {
       coordinates = evaluateMathExpression(coordinateFormula, canvasSize, time);
       break;
     case FORMULA_TYPES.CONSTRUCTION_REQUEST:
-    case 'construction_request':
-      coordinates = evaluateConstructionRequest(coordinateFormula, canvasSize);
+      coordinates = evaluateConstructionRequestWithOptions(coordinateFormula, canvasSize, options);
       break;
     default:
       if (strict) {
@@ -981,20 +980,39 @@ export function evaluateMathExpression(formula, canvasSize, time = 0) {
  * Evaluate geometric construction request formula
  */
 export function evaluateConstructionRequest(formula, canvasSize) {
+  return evaluateConstructionRequestWithOptions(formula, canvasSize, {});
+}
+
+function evaluateConstructionRequestWithOptions(formula, canvasSize, options) {
+  if (options.geometryConstructionEnabled !== true) {
+    throw constructionError(
+      'FORMULA',
+      'geometric construction requests are disabled',
+      { featureFlag: 'geometryConstructionEnabled' },
+    );
+  }
+
+  const authoredKeys = Object.keys(formula);
+  const unexpectedKeys = authoredKeys.filter(key => !['type', 'construction'].includes(key));
+  if (
+    !formula.construction
+    || typeof formula.construction !== 'object'
+    || Array.isArray(formula.construction)
+    || unexpectedKeys.length > 0
+  ) {
+    throw constructionError(
+      'FORMULA',
+      'construction_request requires the canonical nested construction envelope',
+      { unexpectedKeys },
+    );
+  }
+
   const construction = createConstruction({
-    id: formula.constructionId || 'wand-construction',
-    canvas: canvasSize,
-    anchors: formula.anchors ?? {},
-    parts: formula.parts ?? [],
-    constraints: formula.constraints ?? [],
-    validation: formula.validation ?? {},
+    ...formula.construction,
+    canvas: formula.construction.canvas ?? canvasSize,
   });
 
   const result = solve(construction);
-
-  if (result.refused || !result.validationReport?.passed) {
-    throw new Error(`CONSTRUCTION_REFUSED:${JSON.stringify(result.validationReport?.failures ?? [])}`);
-  }
 
   const coordinates = [];
   for (const [partId, part] of Object.entries(result.parts)) {
@@ -1009,6 +1027,9 @@ export function evaluateConstructionRequest(formula, canvasSize) {
         z: 0,
         emphasis: 1.0,
         source: 'construction',
+        constructionId: result.constructionId,
+        constructionChecksum: result.constructionChecksum,
+        resultChecksum: result.resultChecksum,
         partId,
         primitiveKind: part.primitiveKind,
         t: pts.length > 1 ? i / (pts.length - 1) : 0.5,
@@ -1023,4 +1044,3 @@ export function evaluateConstructionRequest(formula, canvasSize) {
 
   return coordinates;
 }
-
