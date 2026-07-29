@@ -123,6 +123,7 @@ export function buildSolvedPart(id, primitiveKind, opts) {
     rightBank,
     closedContour,
     namedPoints = {},
+    measurements = {},
     closed = false,
   } = opts;
 
@@ -139,6 +140,9 @@ export function buildSolvedPart(id, primitiveKind, opts) {
     arcLength: diffs.arcLength,
     namedPoints: Object.fromEntries(
       Object.entries(namedPoints).map(([k, v]) => [k, qp(v)])
+    ),
+    measurements: Object.fromEntries(
+      Object.entries(measurements).map(([key, value]) => [key, q(value)])
     ),
   };
 

@@ -1246,7 +1246,14 @@ describe('Phase 4: Solver Orchestrator', () => {
     expect(result.solverVersion).toBe(SOLVER_VERSION);
     expect(Object.keys(result.parts)).toEqual(['rim', 'bowl', 'stem', 'base']);
     expect(result.validationReport.passed).toBe(true);
-    expect(result.resultChecksum).toMatch(/^scd64:[0-9a-f]{8}$/);
+    expect(result.resultChecksum).toMatch(/^sha256-canonical-v1:[0-9a-f]{64}$/);
+    expect(result.parts.rim.measurements).toEqual({
+      radiusX: 10,
+      radiusY: 1.5,
+      width: 20,
+      height: 3,
+    });
+    expect(result.parts.bowl.measurements.depth).toBe(6.18);
   });
 
   it('all closed parts are actually closed', () => {
@@ -1276,7 +1283,32 @@ describe('Phase 4: Solver Orchestrator', () => {
   it('trySolve returns error instead of throwing', () => {
     const { result, error } = trySolve(null);
     expect(result).toBeNull();
-    expect(error).toBeInstanceOf(Error);
+    expect(error).toMatchObject({
+      name: 'BytecodeError',
+      bytecode: expect.stringMatching(/^PB-ERR-v1-FORMULA-/),
+    });
+  });
+
+  it('deep-freezes the complete solver result graph', () => {
+    const result = solve(createConstruction(brazierSpec()));
+
+    expect(Object.isFrozen(result)).toBe(true);
+    expect(Object.isFrozen(result.parts)).toBe(true);
+    expect(Object.isFrozen(result.parts.rim)).toBe(true);
+    expect(Object.isFrozen(result.parts.rim.closedContour)).toBe(true);
+    expect(Object.isFrozen(result.parts.rim.closedContour[0])).toBe(true);
+    expect(Object.isFrozen(result.parts.rim.measurements)).toBe(true);
+    expect(Object.isFrozen(result.validationReport)).toBe(true);
+    expect(Object.isFrozen(result.validationReport.checks)).toBe(true);
+    expect(Object.isFrozen(result.validationReport.failures)).toBe(true);
+  });
+
+  it('refuses solved geometry outside the canvas when containment is required', () => {
+    const spec = brazierSpec();
+    spec.parts[0].primitive.radiusX = 20;
+    spec.validation.requireCanvasContainment = true;
+
+    expect(() => solve(createConstruction(spec))).toThrow(/^PB-ERR-v1-COORD-/);
   });
 
   it('refuses circular dependencies', () => {
