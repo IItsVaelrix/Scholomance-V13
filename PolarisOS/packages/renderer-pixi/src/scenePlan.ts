@@ -322,3 +322,11 @@ function buildFallbackLines(manifest: SceneManifest, sprites: PlanSprite[], hots
   }
   return lines;
 }
+
+export function generateCylindricalBarkSteps(u: number, lightDot: number): number {
+  const clampedU = Math.max(-1, Math.min(1, u));
+  const normalX = Math.sqrt(1 - clampedU * clampedU);
+  const intensity = normalX * lightDot;
+  return Math.min(3, Math.floor(intensity * 4));
+}
+
