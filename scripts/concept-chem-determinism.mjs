@@ -224,7 +224,15 @@ for (const r of results) {
   const bar = '█'.repeat(Math.round(r.feasibility * 40));
   console.log(`${r.stability.padEnd(12)} ${r.feasibility.toFixed(4)}  ${bar}`);
   console.log(`  ${r.id}  [${r.hazard}]`);
-  console.log(`  bond=${r.bond} ground=${r.grounding} cohere=${r.coherence} law=${r.lawNote}`);
+  // FIX #3: bond sign + magnitude logged on every reaction. Bond is the only
+  // repulsion channel; its sign is the thing to watch, not just its magnitude.
+  const sign = r.bondSign ?? (r.bond > 0 ? '+' : r.bond < 0 ? '-' : '0');
+  const mag = (r.bondMagnitude ?? Math.abs(r.bond)).toFixed(4);
+  // FIX #2: signed corpus PMI (paragraph-window granularity). n/a in hand mode.
+  const pmi = r.corpusPMI
+    ? `pmi=${r.corpusPMI.meanPMI.toFixed(3)}(${r.corpusPMI.signal})`
+    : 'pmi=n/a';
+  console.log(`  bond=${sign}${mag} ground=${r.grounding} cohere=${r.coherence} ${pmi} law=${r.lawNote}`);
   console.log(`  gA=${r.groundingA.toFixed(3)} gB=${r.groundingB.toFixed(3)}  checksum=${r.checksum}`);
   console.log('');
 }
@@ -307,6 +315,29 @@ if (correct === decided.length) {
   console.log('  → the control is a VALID per-run threshold for this question.');
   console.log('    This is the answer to uncalibrated absolute scores: ship a false-friend');
   console.log('    control with every question rather than trusting a global STABLE_MIN.');
+}
+
+// ── LABEL ACCUMULATION (fix #3) ──────────────────────────────────────────────
+// Log bond sign and corpus PMI against the physically-measured truth so future
+// sessions can see whether these channels correlate with CONFIRMED/REFUTED.
+// This is OBSERVATION, not scoring: nothing here feeds back into feasibility.
+// Reweighting bond or wiring in PMI on the strength of ~8 labels would be
+// fitting, not fixing. Accumulate labels first; change weights only when the
+// correlation is stable across many independent question domains.
+console.log('\n═══ LABEL ACCUMULATION: bond sign & PMI vs measured truth ═══\n');
+console.log('  (diagnostic only — NOT a scoring weight. Do not reweight on this.)\n');
+const labelled = results.filter((r) => r.measured !== null).sort((a, b) => b.feasibility - a.feasibility);
+for (const r of labelled) {
+  const sign = r.bondSign ?? (r.bond > 0 ? '+' : r.bond < 0 ? '-' : '0');
+  const mag = (r.bondMagnitude ?? Math.abs(r.bond)).toFixed(4);
+  const pmi = r.corpusPMI ? `${r.corpusPMI.meanPMI.toFixed(3)} ${r.corpusPMI.signal.padEnd(9)}` : 'n/a (hand mode)';
+  console.log(`  ${r.measured.padEnd(9)} bond=${sign}${mag}  pmi=${pmi}  ${r.id}`);
+}
+const repulsedRefuted = labelled.filter((r) => r.corpusPMI && r.corpusPMI.meanPMI < 0 && r.measured === 'REFUTED').length;
+const totalRefuted = labelled.filter((r) => r.measured === 'REFUTED').length;
+if (USE_CORPUS && totalRefuted > 0) {
+  console.log(`\n  corpus-PMI repulsion among REFUTED: ${repulsedRefuted}/${totalRefuted}`);
+  console.log('  (if this ratio climbs toward 1 across many domains, PMI is earning a weight.)');
 }
 
 if (allWinnersClear && confirmed === winners.length) {
