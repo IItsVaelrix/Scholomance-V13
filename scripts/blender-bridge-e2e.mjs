@@ -47,6 +47,20 @@ console.log(`[e2e] Projecting to Python wire (colorPolicy=EXACT)...`);
 const wire = toPythonWire(packet, { colorPolicy: 'EXACT' });
 console.log(`[e2e] Wire: ${wire.coordinateCount} coordinates, checksum=${wire.sourceChecksum}`);
 
+// The seal the consumer must match. It is captured HERE, on the producing side,
+// and travels to Blender inside the generated script — not inside wire.json.
+// Handing Python the wire and then asking it to check the wire against its own
+// sourceChecksum compares the packet to itself and cannot fail for any input.
+const expectedSeal = wire.sourceChecksum;
+if (!expectedSeal) {
+  console.error(
+    `ERROR: packet is unsealed (no sourceChecksum): ${packetPath}\n` +
+      '       An unsealed packet cannot be verified by string equality — it would\n' +
+      '       be admitted by "" == "". Seal the packet before crossing it.',
+  );
+  process.exit(1);
+}
+
 const workDir = mkdtempSync(join(tmpdir(), 'pb-e2e-'));
 const wirePath = join(workDir, 'wire.json');
 writeFileSync(wirePath, serializeWirePacket(packet, { colorPolicy: 'EXACT' }));
@@ -62,14 +76,17 @@ from scholomance_pixelbrain.ingest import ingest_wire
 from scholomance_pixelbrain.render_claim import (
     apply_color_policy, configure_deterministic_render, dump_pixels_f32, emit_claim
 )
+from scholomance_pixelbrain.scene import prepare_render_scene
 
 wire_path = ${JSON.stringify(wirePath)}
 work_dir = ${JSON.stringify(workDir)}
+# Independent seal path: baked in by the producer, not read from wire.json.
+EXPECTED_SEAL = ${JSON.stringify(expectedSeal)}
 
 with open(wire_path) as f:
     wire = decode_wire(f.read())
 
-verify_seal(wire, wire["sourceChecksum"])
+verify_seal(wire, EXPECTED_SEAL)
 print(f"[blender] Seal verified: {wire['sourceChecksum']}")
 
 obj = ingest_wire(wire)
@@ -77,6 +94,13 @@ print(f"[blender] Ingested {wire['coordinateCount']} coordinates as {obj.name}")
 
 import bpy
 scene = bpy.context.scene
+
+# Without this the render is whatever --factory-startup left lying around (a
+# default cube, a camera aimed at the origin) and the receipt describes that
+# instead of the asset.
+prepare_render_scene(obj, scene=scene)
+print(f"[blender] Scene framed on asset bounds")
+
 scene.render.resolution_x = 160
 scene.render.resolution_y = 160
 

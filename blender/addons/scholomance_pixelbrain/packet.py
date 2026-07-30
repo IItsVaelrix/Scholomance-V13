@@ -65,8 +65,23 @@ def decode_wire(raw):
 def verify_seal(wire, expected_checksum):
     """
     Verify the seal by string equality. The consumer never computes a hash.
+
+    An empty seal is refused rather than compared. Without this, an unsealed
+    packet satisfies the check by '' == '' — the comparison still runs, still
+    passes, and admits exactly the packets the seal exists to keep out.
+
+    The caller must supply expected_checksum from a path independent of `wire`.
+    Passing wire["sourceChecksum"] back in compares the packet to itself and
+    cannot fail for any input.
     """
     actual = wire.get("sourceChecksum", "")
+    if not expected_checksum:
+        raise SealMismatchError(
+            "refusing to verify against an empty seal — an unsealed packet "
+            "cannot be admitted by string equality"
+        )
+    if not actual:
+        raise SealMismatchError("wire carries no sourceChecksum — packet is unsealed")
     if actual != expected_checksum:
         raise SealMismatchError(
             f"seal mismatch: expected {expected_checksum!r}, got {actual!r}"

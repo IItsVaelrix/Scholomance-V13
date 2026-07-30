@@ -96,6 +96,25 @@ def t_verify_seal_fail():
     except SealMismatchError:
         pass
 
+def t_verify_seal_rejects_empty_expectation():
+    """An unsealed packet must be refused, not admitted by '' == ''."""
+    unsealed = dict(MINIMAL_WIRE)
+    unsealed["sourceChecksum"] = ""
+    try:
+        verify_seal(unsealed, "")
+        assert False, "an empty seal was accepted — every unsealed packet passes"
+    except SealMismatchError:
+        pass
+
+def t_verify_seal_rejects_missing_checksum():
+    """A wire with no sourceChecksum key at all must be refused."""
+    missing = {k: v for k, v in MINIMAL_WIRE.items() if k != "sourceChecksum"}
+    try:
+        verify_seal(missing, "6DB23A1A")
+        assert False, "a wire with no seal was accepted"
+    except SealMismatchError:
+        pass
+
 
 for n, f in list(globals().items()):
     if n.startswith("t_"):

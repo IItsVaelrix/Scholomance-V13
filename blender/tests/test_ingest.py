@@ -44,15 +44,26 @@ MINIMAL_WIRE = {
 }
 
 
-def t_creates_object_with_correct_vertex_count():
+def t_creates_object_with_correct_point_count():
     obj = ingest_wire(MINIMAL_WIRE)
-    assert len(obj.data.vertices) == 3, f"expected 3 verts, got {len(obj.data.vertices)}"
+    points = obj.data.attributes["position"].data
+    assert len(points) == 3, f"expected 3 points, got {len(points)}"
 
-def test_vertex_positions_match_wire():
+# NOTE: this was named test_* while the collector below only picks up t_*, so it
+# never ran. Renamed to t_* — a test that cannot execute cannot fail.
+def t_point_positions_match_wire():
     obj = ingest_wire(MINIMAL_WIRE)
-    v0 = obj.data.vertices[0].co
-    assert abs(v0[0] - 10.0) < 0.001, f"x mismatch: {v0[0]}"
-    assert abs(v0[1] - 5.0) < 0.001, f"y mismatch: {v0[1]}"
+    p0 = obj.data.attributes["position"].data[0].vector
+    assert abs(p0[0] - 10.0) < 0.001, f"x mismatch: {p0[0]}"
+    assert abs(p0[1] - 5.0) < 0.001, f"y mismatch: {p0[1]}"
+
+def t_points_carry_a_radius():
+    obj = ingest_wire(MINIMAL_WIRE)
+    attrs = obj.data.attributes
+    assert "radius" in attrs, "point cloud has no radius — it renders to nothing"
+    radii = [0.0] * 3
+    attrs["radius"].data.foreach_get("value", radii)
+    assert all(r > 0.0 for r in radii), f"radius must be positive, got {radii}"
 
 def t_has_named_attributes():
     obj = ingest_wire(MINIMAL_WIRE)

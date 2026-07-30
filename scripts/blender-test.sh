@@ -32,12 +32,15 @@ if [ ! -f "$TEST_FILE" ]; then
 fi
 
 echo "Running $TEST_FILE in Blender headless..."
+# `set -e` aborts on a non-zero exit before $? can be read, so the FAIL branch
+# below was unreachable: this harness could only ever print PASS. Guard the run
+# so a failing suite is actually reported as failing.
+EXIT_CODE=0
 "$BLENDER" -b --factory-startup \
     --python-expr "import sys; sys.path.insert(0, '$ADDON_DIR')" \
     --python "$TEST_FILE" \
-    2>&1
+    2>&1 || EXIT_CODE=$?
 
-EXIT_CODE=$?
 if [ $EXIT_CODE -eq 0 ]; then
     echo "PASS: $TEST_FILE"
 else

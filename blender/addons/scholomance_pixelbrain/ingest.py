@@ -7,11 +7,17 @@ Blender attribute field — the same shape Geometry Nodes already processes.
 Identity lives in ID custom properties because datablock names collide-rename
 silently. Lookup is by custom property, never by .name.
 
-NOTE: Blender 5.2 does not have bpy.data.pointclouds. Coordinates are ingested
-as a MESH with only vertices (no faces/edges), carrying named attributes on the
-POINT domain. This preserves the attribute-field semantics without inventing
-topology the packet does not describe.
+Representation: a POINTCLOUD. Its native domain is POINT, so every wire
+attribute lands one-to-one with no invented topology — the same property the
+previous mesh encoding was chosen for, except a point cloud is geometry the
+renderer can actually see. A vertex-only mesh is invisible to Cycles, which
+made every pixel receipt independent of the asset it claimed to be about.
+
+Points are sized by a `radius` attribute. Without it the cloud renders empty
+and the receipt silently goes back to describing nothing.
 """
+
+import json
 
 import bpy
 
@@ -21,46 +27,57 @@ POLICY_KEY = "pb_color_policy"
 SCALES_KEY = "pb_scales"
 INTERN_KEY = "pb_intern_tables"
 
+# Positions are int32 at PIXEL scale, so adjacent coordinates sit one unit
+# apart. A radius of half a unit makes neighbouring points touch without
+# overlapping — the coordinate lattice renders as a contiguous surface.
+POINT_RADIUS = 0.5
+
 
 def ingest_wire(wire):
     """
-    Create a mesh object from wire packet coordinates.
-    Each coordinate becomes a vertex with named attributes.
+    Create a point cloud object from wire packet coordinates.
+    Each coordinate becomes a point with named attributes.
     Returns the created object.
     """
     count = wire["coordinateCount"]
     positions = wire["positions"]
 
-    # Build vertex list from quantized positions
-    # Positions are int32 at PIXEL scale (1:1), so they ARE the coordinates
-    verts = []
-    for i in range(count):
-        x = positions["x"][i]
-        y = positions["y"][i]
-        z = positions["z"][i]
-        verts.append((float(x), float(y), float(z)))
+    pc = bpy.data.pointclouds.new(f"pb_{wire['packetId']}")
+    pc.resize(count)
 
-    # Create mesh with vertices only — no faces, no edges
-    mesh = bpy.data.meshes.new(f"pb_{wire['packetId']}")
-    mesh.from_pydata(verts, [], [])
-    mesh.update()
+    # Positions are int32 at PIXEL scale (1:1), so they ARE the coordinates.
+    flat = []
+    for i in range(count):
+        flat.extend(
+            (
+                float(positions["x"][i]),
+                float(positions["y"][i]),
+                float(positions["z"][i]),
+            )
+        )
+    pc.attributes["position"].data.foreach_set("vector", flat)
+
+    # Radius is what makes the cloud visible. Declared, not inferred.
+    if "radius" not in pc.attributes:
+        pc.attributes.new(name="radius", type="FLOAT", domain="POINT")
+    pc.attributes["radius"].data.foreach_set("value", [POINT_RADIUS] * count)
 
     # Add named attributes for every wire attribute
     for name, values in wire["attributes"].items():
-        attr = mesh.attributes.new(name=name, type="INT", domain="POINT")
+        attr = pc.attributes.new(name=name, type="INT", domain="POINT")
         attr.data.foreach_set("value", list(values))
 
     # Add color attributes
     for name, values in wire["colors"].items():
-        attr = mesh.attributes.new(name=f"pb_color_{name}", type="INT", domain="POINT")
+        attr = pc.attributes.new(name=f"pb_color_{name}", type="INT", domain="POINT")
         attr.data.foreach_set("value", list(values))
 
     # Add energy channel attributes
     for channel, values in wire["energy"].items():
-        attr = mesh.attributes.new(name=f"pb_energy_{channel}", type="INT", domain="POINT")
+        attr = pc.attributes.new(name=f"pb_energy_{channel}", type="INT", domain="POINT")
         attr.data.foreach_set("value", list(values))
 
-    obj = bpy.data.objects.new(f"pb_{wire['packetId']}", mesh)
+    obj = bpy.data.objects.new(f"pb_{wire['packetId']}", pc)
     bpy.context.scene.collection.objects.link(obj)
 
     # Custom properties: float64-exact and int32-capped. Carried, never computed.
@@ -68,7 +85,6 @@ def ingest_wire(wire):
     obj[CHECKSUM_KEY] = wire["sourceChecksum"]
     obj[POLICY_KEY] = wire["colorPolicy"]
     # Store scales and intern tables as JSON strings (custom props can't hold dicts)
-    import json
     obj[SCALES_KEY] = json.dumps(wire["scales"])
     obj[INTERN_KEY] = json.dumps(wire["intern"])
 
