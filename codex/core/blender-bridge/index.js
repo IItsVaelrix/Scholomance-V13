@@ -9,6 +9,8 @@
  * Slice 1: quantize, intern, wire, render-scd64, receipt, energy-bindings.
  * Slice 2: chained-receipt (SIMULATED), cross-engine (Remotion comparison),
  *          palette-wire (school palette serialization).
+ * Slice 3: remotion-canvas-renderer (second consumer), sim-e2e (chained
+ *          receipt orchestrator), palette-e2e (palette pipeline orchestrator).
  */
 
 // Slice 1 — boundary + ingest + determinism
@@ -35,3 +37,17 @@ export {
   SCHOOL_PALETTE, SCHOOL_NAMES, hexToSrgb, srgbToLinear, hexToLinear,
   paletteToWire, allPalettesToWire, validatePaletteWire, PaletteError,
 } from './palette-wire.js';
+
+// Slice 3 — second consumer, simulation E2E, palette E2E
+export {
+  renderWireToPixels, hashCanvasPixels, buildCanvasClaim,
+  crossEngineRender, hexIntToRgb, CanvasRenderError,
+} from './remotion-canvas-renderer.js';
+export {
+  buildSimChain, mintSimReceipts, runSimE2E, compareSimRuns,
+  hashFrameDumps, SimE2EError,
+} from './sim-e2e.js';
+export {
+  preparePalettePayload, runPaletteE2E, comparePaletteRenders,
+  PaletteE2EError,
+} from './palette-e2e.js';
