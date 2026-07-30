@@ -43,13 +43,6 @@ describe('AlbumPage', () => {
     expect(audio?.crossOrigin).toBe('anonymous');
   });
 
-  it('renders spectrum canvas as aria-hidden', () => {
-    renderAlbumPage();
-    const canvas = document.querySelector('.alb-spectrum');
-    expect(canvas).not.toBeNull();
-    expect(canvas?.getAttribute('aria-hidden')).toBe('true');
-  });
-
   it('renders transport controls', () => {
     renderAlbumPage();
     expect(screen.getByLabelText('Play')).toBeInTheDocument();

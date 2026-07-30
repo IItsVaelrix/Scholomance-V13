@@ -217,12 +217,6 @@
   display: block;
 }
 
-.alb-spectrum {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
 .alb-experience__lyrics {
   flex: 1;
   overflow-y: auto;
