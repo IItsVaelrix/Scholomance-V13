@@ -232,10 +232,51 @@ export const ERROR_CODES = Object.freeze({
 
 // ─── Bytecode Error Class ────────────────────────────────────────────────────
 
+/**
+ * Build a message a human can act on.
+ *
+ * `message` used to be the bare bytecode string, so anything that surfaced an
+ * error the ordinary way — a thrown stack, `String(e.message)`, a CLI printing a
+ * refusal — showed only an opaque base64 token. The construction solver suffers
+ * worst: it reports several precise problems at once inside `context.errors`, and
+ * all of them were invisible without hand-decoding the payload.
+ *
+ * The bytecode is appended rather than dropped, so machine consumers and greps
+ * that look for `PB-ERR-v1-…` still find it on `message`, and `.bytecode` remains
+ * the canonical machine field.
+ */
+function _readableMessage(bytecode, context) {
+  const parts = [];
+  if (context?.contract) parts.push(`${context.contract}:`);
+  parts.push(context?.reason ? String(context.reason) : 'refused');
+  if (context?.field) parts.push(`(field: ${context.field})`);
+
+  let text = parts.join(' ');
+
+  // Every problem, not just the first — re-running to discover them one at a time
+  // is what makes a strict schema feel like guesswork. A single issue is already
+  // the reason, so listing it again would just print it twice.
+  if (Array.isArray(context?.errors) && context.errors.length > 0) {
+    const extra = context.errors.filter(e => String(e) !== String(context.reason));
+    if (extra.length > 0) text += extra.map(e => `\n  - ${String(e)}`).join('');
+  }
+
+  // Constraint refusals carry a witness (which constraint, and where it is false).
+  // That witness is the whole value of a refusal and it was buried in the payload.
+  if (Array.isArray(context?.failures) && context.failures.length > 0) {
+    text += context.failures.map((f) => {
+      const kind = f?.constraint?.kind ? `${f.constraint.kind}: ` : '';
+      return `\n  - ${kind}${f?.reason ?? JSON.stringify(f)}`;
+    }).join('');
+  }
+
+  return `${text}\n  ${bytecode}`;
+}
+
 export class BytecodeError extends Error {
   constructor(category, severity, moduleId, errorCode, context = {}) {
     const bytecode = encodeBytecodeError(category, severity, moduleId, errorCode, context);
-    super(bytecode);
+    super(_readableMessage(bytecode, context));
     this.name = 'BytecodeError';
     this.bytecode = bytecode;
     this.category = category;

@@ -5,6 +5,10 @@ import {
   routeQbitFieldToPhotonicBridge,
   QBIT_BRIDGE_DEFAULTS,
 } from '../../codex/core/pixelbrain/qbit-bridge.js';
+// Register the photonic bridge (import individual modules to avoid JSX parse errors).
+import { registerPhotonicBridge } from '../../codex/core/pixelbrain/photonic-bridge-registry.js';
+import { routeRetinaPacketToPhotonicBridge } from '../../src/lib/photonic-retina/retina-bridge.js';
+registerPhotonicBridge({ routeRetinaPacketToPhotonicBridge });
 
 function makeField(size = 8) {
   const seeds = [

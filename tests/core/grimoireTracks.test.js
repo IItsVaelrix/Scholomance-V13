@@ -14,19 +14,34 @@ describe('GRIMOIRE_TRACKS registry', () => {
   });
 
   it.each(GRIMOIRE_TRACKS.map((t) => [t.title, t]))('%s is well-formed', (_title, t) => {
-    expect(t.id).toMatch(/^[0-9a-f-]{36}$/);
+    const isLocal = t.model === 'local';
+    // Remote tracks use UUIDs; local tracks may use slugs.
+    if (isLocal) {
+      expect(t.id).toMatch(/^[a-z0-9-]+$/);
+    } else {
+      expect(t.id).toMatch(/^[0-9a-f-]{36}$/);
+    }
     expect(t.duration).toBeGreaterThan(0);
-    for (const url of [t.sunoUrl, t.audioUrl, t.coverUrl]) {
-      expect(url).toMatch(/^https:\/\//);
+    // sunoUrl is a provenance link for remote tracks; local tracks may omit.
+    if (!isLocal) {
+      expect(t.sunoUrl).toMatch(/^https:\/\//);
+    }
+    // audioUrl / coverUrl may be HTTPS CDN, local media paths, or empty for local.
+    for (const url of [t.audioUrl, t.coverUrl]) {
+      if (url) expect(url).toMatch(/^(https:\/\/|\/)/);
     }
     expect(t.lyrics.length).toBeGreaterThan(0);
     for (const line of t.lyrics) {
       expect(typeof line).toBe('string');
       expect(line.trim()).not.toBe('');
-      // Section markers ([Chorus] etc.) are stage directions, not sung text.
-      expect(line.startsWith('[')).toBe(false);
     }
-    for (const a of t.annotations) {
+    // Section markers ([Chorus] etc.) are allowed in local tracks with raw lyrics.
+    if (!isLocal) {
+      for (const line of t.lyrics) {
+        expect(line.startsWith('[')).toBe(false);
+      }
+    }
+    for (const a of t.annotations ?? []) {
       expect(a.n).toBeGreaterThanOrEqual(0);
       expect(a.n).toBeLessThan(t.lyrics.length);
     }

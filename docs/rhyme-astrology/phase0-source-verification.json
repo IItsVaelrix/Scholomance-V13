@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-03-29T10:07:27.753Z",
+  "generatedAt": "2026-07-30T07:27:34.958Z",
   "targetLexiconSize": 50000,
   "sources": {
-    "dictionary": "C:\\Users\\Vaelrix\\Desktop\\scholomance-V11\\scholomance_dict.sqlite",
-    "corpus": "C:\\Users\\Vaelrix\\Desktop\\scholomance-V11\\scholomance_corpus.sqlite",
+    "dictionary": "/home/deck/Downloads/Scholomance-V12-main/scholomance_dict.sqlite",
+    "corpus": "/home/deck/Downloads/Scholomance-V12-main/scholomance_corpus.sqlite",
     "lexiconSource": "scholomance_dict.sqlite:entry + rhyme_index",
     "frequencySource": "scholomance_corpus.sqlite:sentence text token frequency (fallback floor for uncovered words)"
   },
@@ -18,88 +18,88 @@
     "pronunciationBackedWordCount": 123611
   },
   "corpus": {
-    "sentenceCount": 267688,
-    "tokenCount": 4831096,
-    "uniqueTokenCount": 71361
+    "sentenceCount": 115680,
+    "tokenCount": 1341825,
+    "uniqueTokenCount": 54503
   },
   "candidatePool": {
-    "intersectionCount": 39072,
+    "intersectionCount": 35029,
     "selectedCount": 50000,
-    "selectedFromCorpusCount": 39072,
-    "selectedFromFallbackCount": 10928,
-    "coverageGap": 10928,
+    "selectedFromCorpusCount": 35029,
+    "selectedFromFallbackCount": 14971,
+    "coverageGap": 14971,
     "targetReady": true
   },
   "frequencyPreview": [
     {
       "rank": 1,
       "token": "the",
-      "count": 306716,
+      "count": 80862,
       "source": "corpus",
       "normalizedScore": 1
     },
     {
       "rank": 2,
-      "token": "and",
-      "count": 164293,
+      "token": "of",
+      "count": 38512,
       "source": "corpus",
-      "normalizedScore": 0.950587
+      "normalizedScore": 0.93436
     },
     {
       "rank": 3,
-      "token": "of",
-      "count": 141735,
+      "token": "and",
+      "count": 38379,
       "source": "corpus",
-      "normalizedScore": 0.938897
+      "normalizedScore": 0.934054
     },
     {
       "rank": 4,
       "token": "to",
-      "count": 136600,
+      "count": 33572,
       "source": "corpus",
-      "normalizedScore": 0.935976
+      "normalizedScore": 0.922213
     },
     {
       "rank": 5,
       "token": "in",
-      "count": 79139,
+      "count": 22552,
       "source": "corpus",
-      "normalizedScore": 0.89277
+      "normalizedScore": 0.887006
     },
     {
       "rank": 6,
       "token": "he",
-      "count": 60718,
+      "count": 20784,
       "source": "corpus",
-      "normalizedScore": 0.871798
+      "normalizedScore": 0.879782
     },
     {
       "rank": 7,
-      "token": "his",
-      "count": 59250,
+      "token": "that",
+      "count": 16059,
       "source": "corpus",
-      "normalizedScore": 0.86986
+      "normalizedScore": 0.85696
     },
     {
       "rank": 8,
-      "token": "that",
-      "count": 55305,
+      "token": "was",
+      "count": 15579,
       "source": "corpus",
-      "normalizedScore": 0.864407
+      "normalizedScore": 0.854275
     },
     {
       "rank": 9,
-      "token": "was",
-      "count": 50593,
+      "token": "it",
+      "count": 15528,
       "source": "corpus",
-      "normalizedScore": 0.857358
+      "normalizedScore": 0.853985
     },
     {
       "rank": 10,
-      "token": "her",
-      "count": 49850,
+      "token": "you",
+      "count": 14729,
       "source": "corpus",
-      "normalizedScore": 0.856187
+      "normalizedScore": 0.84931
     }
   ]
 }

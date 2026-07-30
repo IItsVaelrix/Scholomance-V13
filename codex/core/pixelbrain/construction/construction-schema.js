@@ -136,16 +136,23 @@ export function createConstruction(spec) {
       primitive: { ...part.primitive },
     })),
     constraints: spec.constraints.map(constraint => ({ ...constraint })),
+    // Laws are opt-in, so the packet records an explicit "asserts nothing" for
+    // every law the author left out. The defaults are inert by design: a missing
+    // law must never turn into a refusal the author did not ask for. The
+    // constraints above are always verified either way.
     validation: {
-      closedParts: [...spec.validation.closedParts],
-      forbidSelfIntersections: spec.validation.forbidSelfIntersections,
-      consistentWinding: spec.validation.consistentWinding,
-      minimumCurvatureRadius: spec.validation.minimumCurvatureRadius,
-      requireConnectedAssembly: spec.validation.requireConnectedAssembly,
-      ...(spec.validation.requireCanvasContainment === undefined
+      closedParts: [...(spec.validation?.closedParts ?? [])],
+      forbidSelfIntersections: spec.validation?.forbidSelfIntersections ?? false,
+      minimumCurvatureRadius: spec.validation?.minimumCurvatureRadius ?? 0,
+      requireConnectedAssembly: spec.validation?.requireConnectedAssembly ?? false,
+      // Winding has no inert value — omitting it means "do not check winding".
+      ...(spec.validation?.consistentWinding === undefined
+        ? {}
+        : { consistentWinding: spec.validation.consistentWinding }),
+      ...(spec.validation?.requireCanvasContainment === undefined
         ? {}
         : { requireCanvasContainment: spec.validation.requireCanvasContainment }),
-      ...(spec.validation.connectionTolerance === undefined
+      ...(spec.validation?.connectionTolerance === undefined
         ? {}
         : { connectionTolerance: spec.validation.connectionTolerance }),
     },

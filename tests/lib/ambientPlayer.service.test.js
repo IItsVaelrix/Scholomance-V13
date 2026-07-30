@@ -175,7 +175,7 @@ describe("AmbientPlayerService", () => {
     await service.setSchool("SONIC");
     await vi.runAllTimersAsync();
 
-    await service.setSchool("SONIC");
+    await service.setSchool("SONIC", { forceRetune: true });
     await vi.runAllTimersAsync();
 
     expect(controllerFactory).toHaveBeenCalledTimes(2);

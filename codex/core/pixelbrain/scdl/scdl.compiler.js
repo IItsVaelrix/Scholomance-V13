@@ -67,7 +67,11 @@ export function compileSCDL(source, options = {}) {
     if (raw instanceof SCDLError) {
       errors.push(raw);
     } else if (raw?._deferred) {
-      const code = raw.severity === 'ERROR' ? SCDL_ERROR_CODES.UNKNOWN_VERB : SCDL_ERROR_CODES.TRACE_INTENT;
+      // Grammar may name its own code; fall back to the coarse default only
+      // when it does not, so a specific lexer/parser diagnostic is not relabelled
+      // as "unknown verb".
+      const code = raw.code
+        ?? (raw.severity === 'ERROR' ? SCDL_ERROR_CODES.UNKNOWN_VERB : SCDL_ERROR_CODES.TRACE_INTENT);
       errors.push(new SCDLError({
         message:  raw.message,
         code,

@@ -5,13 +5,22 @@
  *   - json     → raw PixelBrainAssetPacket JSON string
  *   - svg      → SVG with one <rect> per coordinate
  *   - phaser   → Phaser texture config JSON
- *   - png      → deterministic RGBA PNG bytes
+ *   - png      → deterministic RGBA PNG bytes, optionally nearest-neighbour
+ *                magnified via `options.scale` (see MAX_PNG_SCALE)
  *   - aseprite → Aseprite binary via aseprite-binary-codec (SCDL v1.1)
  */
 
 import { emitLattice } from './scdl.lattice-emitter.js';
 import { encodeAsepriteBinary } from '../aseprite-binary-codec.js';
 import { renderSceneGraph, framebufferToCoordinates, renderMaterialCoordinateFramebuffer } from '../scene-graph-renderer.js';
+
+/**
+ * Upper bound on PNG magnification. A 256×256 canvas at 32× is a 8192px image;
+ * beyond that a "preview" stops being one. Requests above the cap clamp rather
+ * than refuse, because a preview is a viewing aid and must never be the reason
+ * a compile fails.
+ */
+export const MAX_PNG_SCALE = 32;
 
 /**
  * Export a compiled asset to one or more targets.
@@ -23,12 +32,7 @@ import { renderSceneGraph, framebufferToCoordinates, renderMaterialCoordinateFra
  */
 export function exportSCDL(packet, targets, ast, options = {}) {
   const isGraph = packet?.geometry?.mode === 'scene-graph';
-  const rawLattice = isGraph
-    ? _latticeFromSceneGraph(packet, options)
-    : emitLattice(packet, ast);
-  const lattice = !isGraph && options.shade === 'material'
-    ? _materialShadeLattice(rawLattice, options)
-    : rawLattice;
+  const lattice = _latticeFor(packet, ast, options);
   const includeSemantic = options.includeSemantic || false;
   const results = {};
 
@@ -37,7 +41,7 @@ export function exportSCDL(packet, targets, ast, options = {}) {
       case 'json':   results[target] = exportJSON(packet, includeSemantic ? ast : null);    break;
       case 'svg':    results[target] = exportSVG(lattice, includeSemantic);    break;
       case 'phaser': results[target] = exportPhaser(lattice, includeSemantic); break;
-      case 'png':    results[target] = exportPNG(lattice);    break;
+      case 'png':    results[target] = exportPNG(lattice, options.scale);    break;
       case 'aseprite':
         results[target] = isGraph
           ? { ok: false, output: 'aseprite export for scene-graph assets lands in PR-3', mimeType: 'text/plain' }
@@ -49,6 +53,47 @@ export function exportSCDL(packet, targets, ast, options = {}) {
   }
 
   return results;
+}
+
+/**
+ * Render every frame of a loop into one horizontal filmstrip PNG.
+ *
+ * Reviewing an animation one file at a time is how a frame regression hides —
+ * two frames that should differ look identical only when you can see them side
+ * by side. Frames are laid out left-to-right in loop order at a shared canvas
+ * size, with no gutter: adjacency is the point.
+ *
+ * @param {object[]} packets - one PixelBrainAssetPacket per frame, in loop order
+ * @param {object} [ast] - original SCDL AST, for lattice emission
+ * @param {object} [options] - { scale, shade } as per exportSCDL
+ * @returns {Uint8Array} PNG bytes
+ */
+export function exportFilmstripPNG(packets, ast, options = {}) {
+  const frames = (Array.isArray(packets) ? packets : [packets]).filter(Boolean);
+  if (frames.length === 0) throw new Error('exportFilmstripPNG: no frames supplied');
+
+  const lattices = frames.map(packet => _latticeFor(packet, ast, options));
+  const cw = Math.max(1, Math.round(lattices[0].canvas.width));
+  const ch = Math.max(1, Math.round(lattices[0].canvas.height));
+
+  // Offset each frame's coordinates into its own column of the strip.
+  const merged = [];
+  lattices.forEach((lattice, i) => {
+    for (const c of lattice.geometry.coordinates || []) {
+      merged.push({ ...c, x: Math.round(c?.x ?? c?.snappedX ?? -1) + i * cw });
+    }
+  });
+
+  return renderPngBytes(merged, cw * lattices.length, ch, options.scale);
+}
+
+/** The lattice selection exportSCDL performs, shared with the filmstrip path. */
+function _latticeFor(packet, ast, options) {
+  const isGraph = packet?.geometry?.mode === 'scene-graph';
+  const raw = isGraph ? _latticeFromSceneGraph(packet, options) : emitLattice(packet, ast);
+  return !isGraph && options.shade === 'material'
+    ? _materialShadeLattice(raw, options)
+    : raw;
 }
 
 function _materialShadeLattice(lattice, options = {}) {
@@ -195,10 +240,15 @@ function exportPhaser(lattice) {
 
 // ─── PNG ─────────────────────────────────────────────────────────────────────
 
-function exportPNG(lattice) {
+function exportPNG(lattice, scale = 1) {
   return {
     ok:       true,
-    output:   renderPngBytes(lattice.geometry.coordinates, lattice.canvas.width, lattice.canvas.height),
+    output:   renderPngBytes(
+      lattice.geometry.coordinates,
+      lattice.canvas.width,
+      lattice.canvas.height,
+      scale,
+    ),
     mimeType: 'image/png',
   };
 }
@@ -306,9 +356,10 @@ function _hexToRgb(hex) {
   };
 }
 
-function renderPngBytes(coordinates, width, height) {
+function renderPngBytes(coordinates, width, height, scale = 1) {
   const w = Math.max(1, Math.round(Number(width) || 1));
   const h = Math.max(1, Math.round(Number(height) || 1));
+  const s = _pngScale(scale);
   const rgba = new Uint8Array(w * h * 4);
 
   for (const c of coordinates || []) {
@@ -324,7 +375,41 @@ function renderPngBytes(coordinates, width, height) {
     rgba[off + 3] = 255;
   }
 
-  return encodePng(w, h, rgba);
+  if (s === 1) return encodePng(w, h, rgba);
+  return encodePng(w * s, h * s, _nearestNeighbourUpscale(rgba, w, h, s));
+}
+
+/**
+ * Integer nearest-neighbour upscale — the only lawful magnification for pixel
+ * art. Each source cell becomes an s×s block of identical bytes, so no colour
+ * is invented and the result stays a faithful, deterministic view of the
+ * authored canvas. Non-integer or interpolating scales would blend neighbouring
+ * cells into colours the palette never declared.
+ */
+function _nearestNeighbourUpscale(rgba, w, h, s) {
+  const dw = w * s;
+  const out = new Uint8Array(dw * h * s * 4);
+  for (let y = 0; y < h; y += 1) {
+    for (let x = 0; x < w; x += 1) {
+      const src = (y * w + x) * 4;
+      const r = rgba[src], g = rgba[src + 1], b = rgba[src + 2], a = rgba[src + 3];
+      for (let dy = 0; dy < s; dy += 1) {
+        let dst = ((y * s + dy) * dw + x * s) * 4;
+        for (let dx = 0; dx < s; dx += 1) {
+          out[dst] = r; out[dst + 1] = g; out[dst + 2] = b; out[dst + 3] = a;
+          dst += 4;
+        }
+      }
+    }
+  }
+  return out;
+}
+
+/** Clamp a requested PNG scale to a positive integer in [1, MAX_PNG_SCALE]. */
+function _pngScale(scale) {
+  const n = Math.floor(Number(scale));
+  if (!Number.isFinite(n) || n < 1) return 1;
+  return Math.min(n, MAX_PNG_SCALE);
 }
 
 function encodePng(width, height, rgba) {

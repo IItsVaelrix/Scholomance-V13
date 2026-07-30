@@ -34,6 +34,7 @@ describe('subtlety routes', () => {
     fastify = Fastify({ logger: false });
     await fastify.register(subtletyRoutes, {
       store,
+      authConfig: { token: '', isProduction: false },
       runtimeOpts: {
         now: () => t,
         dedupWindowMs: 60_000,
@@ -93,6 +94,7 @@ describe('subtlety routes', () => {
     await fastify.close();
     fastify = Fastify({ logger: false });
     await fastify.register(subtletyRoutes, {
+      authConfig: { token: '', isProduction: false },
       runtime: {
         ingestCrash: async () => ({ ok: false, error: 'bad-event' }),
         getStatus: () => ({}),
@@ -114,6 +116,7 @@ describe('subtlety routes', () => {
     fastify = Fastify({ logger: false });
     await fastify.register(subtletyRoutes, {
       store,
+      authConfig: { token: '', isProduction: false },
       runtimeOpts: {
         now: () => t,
         dedupWindowMs: 60_000,

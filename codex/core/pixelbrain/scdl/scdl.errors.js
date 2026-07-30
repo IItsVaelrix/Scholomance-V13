@@ -43,6 +43,8 @@ export const SCDL_ERROR_CODES = Object.freeze({
   INVALID_TRANSFORM:     0x1013, // non-finite transform params or scale 0
   DEAD_INSTANCE:         0x1014, // instance fully clipped off-canvas (warn)
   DEAD_DEF:              0x1015, // def declared but never instanced (warn)
+
+  ILLEGAL_CHARACTER:     0x1016, // character legal in no token — was silently dropped
 });
 
 const SCDL_CODE_LABELS = Object.freeze({
@@ -69,6 +71,7 @@ const SCDL_CODE_LABELS = Object.freeze({
   [SCDL_ERROR_CODES.INVALID_TRANSFORM]:     'SCDL-019',
   [SCDL_ERROR_CODES.DEAD_INSTANCE]:         'SCDL-020',
   [SCDL_ERROR_CODES.DEAD_DEF]:              'SCDL-021',
+  [SCDL_ERROR_CODES.ILLEGAL_CHARACTER]:     'SCDL-022',
 });
 
 // ─── SCDLError Class ─────────────────────────────────────────────────────────

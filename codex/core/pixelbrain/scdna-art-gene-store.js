@@ -84,9 +84,20 @@ export function validateArtMemoryRecord(record) {
  * @returns {Readonly<ArtMemoryRecord>}
  */
 export function createArtMemoryRecord(input) {
+  // Deterministic eventId fallback: derive from content hash, never from
+  // wall-clock or PRNG (Vaelrix Law §1 — no Math.random, no Date.now).
+  const contentSeed = checksumStableJSON({
+    t: input.eventType,
+    c: input.code,
+    a: input.assetId,
+    g: input.geneId,
+    gc: input.geneChecksum,
+    pc: input.projectionChecksum,
+  });
+
   const body = {
     contract: 'PB-ART-MEMORY-v1',
-    eventId: input.eventId ?? `evt-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    eventId: input.eventId ?? `evt-${contentSeed}`,
     eventType: input.eventType,
     code: input.code,
     assetId: input.assetId,

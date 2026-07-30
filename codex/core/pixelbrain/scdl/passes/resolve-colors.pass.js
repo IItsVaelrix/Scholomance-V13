@@ -22,7 +22,11 @@ const HEX_RE = /^#[0-9a-fA-F]{6}$/;
  */
 export function resolveColorsPass(ast, errors) {
   const palette = ast.palette || {};
+  const paletteLocations = ast.paletteLocations || {};
   const l = ast.sourceLocation || { line: 1, col: 1 };
+
+  /** Where a palette entry was declared, falling back to the asset header. */
+  const paletteLoc = name => paletteLocations[name] || l;
 
   function resolveRef(colorRef, opLoc) {
     if (!colorRef) return '#000000';
@@ -55,10 +59,11 @@ export function resolveColorsPass(ast, errors) {
       }
       if (!HEX_RE.test(resolved)) {
         errors.push(scdlError(
-          `Palette entry '${colorRef.value}' has invalid hex '${resolved}'`,
+          `Palette entry '${name}' has invalid hex '${resolved}' `
+          + `(declared at line ${paletteLoc(name).line}, used here)`,
           SCDL_ERROR_CODES.INVALID_HEX_COLOR,
           loc,
-          { alias: colorRef.value, color: resolved }
+          { alias: name, color: resolved, declaredAt: paletteLoc(name) }
         ));
         return '#000000';
       }
@@ -74,7 +79,7 @@ export function resolveColorsPass(ast, errors) {
       errors.push(scdlError(
         `Palette entry '${name}' has invalid hex '${hex}'`,
         SCDL_ERROR_CODES.INVALID_HEX_COLOR,
-        l,
+        paletteLoc(name),
         { alias: name, color: hex }
       ));
     }

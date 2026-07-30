@@ -508,16 +508,59 @@ export function rasterizePath(op, accept, ops) {
   rasterizePolygon(polyOp, accept, ops);
 }
 
-// Tier thresholds for the sphere op
-export const SPHERE_THRESHOLDS = Object.freeze([0.999, 0.70, 0.10, -0.40]);
+/**
+ * Tier thresholds for the sphere op: cosθ cuts between the five tone bands,
+ * brightest first.
+ *
+ * Chosen against the measured share of disc area each band receives, so all
+ * five tiers are actually reachable and the highlight stays a highlight. On a
+ * radius-9 sphere lit from `-1 -1` the split is roughly
+ * 7% / 21% / 28% / 21% / 24% — classic five-tone pixel shading — and it holds
+ * at small radii (r=4 gives 6% / 22% / 27% / 27% / 18%).
+ *
+ * The previous values `[0.999, 0.70, 0.10, -0.40]` reserved the brightest tier
+ * for normals within 2.56° of the light, which on a discrete lattice is a
+ * one-pixel sliver or, for a fractional centre, nothing at all.
+ */
+export const SPHERE_THRESHOLDS = Object.freeze([0.95, 0.78, 0.50, 0.18]);
 
+/**
+ * Rasterize a Lambert-shaded sphere.
+ *
+ * The surface normal is the **hemisphere** normal, not the in-plane radial
+ * direction: for a cell at offset (dx, dy) from the centre, the implied point on
+ * the sphere sits at height nz = √(r² − dx² − dy²) above the image plane, giving
+ * the unit normal (dx, dy, nz)/r. Dropping that z term — as this function did
+ * previously — makes brightness a function of *angle around the centre* only,
+ * constant along every ray outward, which renders a pinwheel rather than a
+ * sphere.
+ *
+ * The op supplies only a 2D light direction, so the light is lifted out of the
+ * image plane by the magnitude of its in-plane part: L = ‖(lx, ly, ‖(lx,ly)‖)‖.
+ * That keeps the classic "upper-left, toward the viewer" pixel-art key light,
+ * is invariant to the scale of (lx, ly), and places the specular point about
+ * 71% of the way to the lit edge.
+ *
+ * A zero light vector is refused at the language boundary (SCDL error 4107), so
+ * the head-on fallback below is not a documented authoring mode — it exists only
+ * so a direct call into this exported function cannot divide by zero and emit
+ * NaN-coloured cells.
+ */
 export function rasterizeSphere(op, accept, ops) {
   const { cx, cy, radius, lx, ly, tierColors, loc } = op;
   if (!Array.isArray(tierColors) || tierColors.length < 1) return;
-  const r2 = radius * radius;
-  const lLen = Math.hypot(lx, ly) || 1;
-  const lNormX = lx / lLen;
-  const lNormY = ly / lLen;
+  const r = radius;
+  const r2 = r * r;
+
+  const inPlane = Math.hypot(lx, ly);
+  // Lift the light out of the image plane by its in-plane magnitude; a zero
+  // in-plane vector degenerates to head-on rather than dividing by zero.
+  const lz = inPlane === 0 ? 1 : inPlane;
+  const lLen = Math.hypot(lx, ly, lz) || 1;
+  const lNormX = (inPlane === 0 ? 0 : lx) / lLen;
+  const lNormY = (inPlane === 0 ? 0 : ly) / lLen;
+  const lNormZ = lz / lLen;
+
   const last = tierColors.length - 1;
   for (let y = Math.floor(cy - radius); y <= Math.ceil(cy + radius); y++) {
     for (let x = Math.floor(cx - radius); x <= Math.ceil(cx + radius); x++) {
@@ -525,17 +568,18 @@ export function rasterizeSphere(op, accept, ops) {
       const d2 = dx*dx + dy*dy;
       if (d2 > r2) continue;
       if (!accept(x, y)) continue;
-      const d  = Math.sqrt(d2);
+
+      // Hemisphere normal — well defined at every cell including the centre,
+      // so there is no degenerate 0/0 case to special-case.
+      const nz = Math.sqrt(r2 - d2);
+      const cosTheta = (dx * lNormX + dy * lNormY + nz * lNormZ) / r;
+
       let tierIdx = 4;
-      if (d > 0) {
-        const nx = dx / d;
-        const ny = dy / d;
-        const cosTheta = nx * lNormX + ny * lNormY;
-        if      (cosTheta >= SPHERE_THRESHOLDS[0]) tierIdx = 0;
-        else if (cosTheta >= SPHERE_THRESHOLDS[1]) tierIdx = 1;
-        else if (cosTheta >= SPHERE_THRESHOLDS[2]) tierIdx = 2;
-        else if (cosTheta >= SPHERE_THRESHOLDS[3]) tierIdx = 3;
-      }
+      if      (cosTheta >= SPHERE_THRESHOLDS[0]) tierIdx = 0;
+      else if (cosTheta >= SPHERE_THRESHOLDS[1]) tierIdx = 1;
+      else if (cosTheta >= SPHERE_THRESHOLDS[2]) tierIdx = 2;
+      else if (cosTheta >= SPHERE_THRESHOLDS[3]) tierIdx = 3;
+
       const color = tierColors[Math.min(tierIdx, last)];
       pushCell(ops, x, y, color, loc, op);
     }

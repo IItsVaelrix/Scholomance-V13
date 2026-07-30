@@ -47,15 +47,20 @@ const TRACK = {
   annotations: [],
 };
 
-const mount = (el) =>
-  renderHook(() =>
+const mount = (el) => {
+  // Stable ref object — the hook lists audioRef in useEffect deps, so a new
+  // object identity per render would re-run the "setStatus('idle')" effect
+  // and clobber event-handler state.
+  const audioRef = { current: el };
+  return renderHook(() =>
     useAlbumAudioEngine({
-      audioRef: { current: el },
+      audioRef,
       activeTrack: TRACK,
       autoplayIntent: false,
       onEnded: () => {},
     }),
   );
+};
 
 /** Let at least one animation frame land. */
 const frame = () => act(async () => { await new Promise((r) => requestAnimationFrame(() => r())); });

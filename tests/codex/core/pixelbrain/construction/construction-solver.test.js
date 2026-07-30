@@ -50,6 +50,22 @@ import { solve, trySolve } from '../../../../../codex/core/pixelbrain/constructi
 // Phase 6
 import { applyControlledChaikin, offsetFromCenterline } from '../../../../../codex/core/pixelbrain/construction/modifiers.js';
 
+/**
+ * Assert that `fn` refuses with a PB-ERR-v1 bytecode of the expected category.
+ *
+ * Asserts on `.bytecode` — the canonical machine field — rather than on
+ * `.message`, which leads with a human-readable reason so that a refusal printed
+ * by a CLI or a stack trace can be acted on without decoding base64.
+ */
+function expectRefusal(fn, categoryPattern) {
+  let thrown = null;
+  try { fn(); } catch (e) { thrown = e; }
+  expect(thrown, 'expected a refusal but none was thrown').not.toBeNull();
+  expect(thrown.bytecode).toMatch(categoryPattern);
+  return thrown;
+}
+
+
 // Geometry utils
 import {
   dist, windingDirection, findSelfIntersections, signedArea, centroid,
@@ -223,14 +239,14 @@ describe('Phase 1: Construction IR Schema', () => {
     const input = brazierSpec();
     input.parts[0].primitive.radiusX = value;
 
-    expect(() => createConstruction(input)).toThrow(/^PB-ERR-v1-RANGE-/);
+    expectRefusal(() => createConstruction(input), /^PB-ERR-v1-RANGE-/);
   });
 
   it('rejects unsupported canonical values', () => {
     const input = brazierSpec();
     input.parts[0].primitive.extra = new Map();
 
-    expect(() => createConstruction(input)).toThrow(/^PB-ERR-v1-VALUE-/);
+    expectRefusal(() => createConstruction(input), /^PB-ERR-v1-VALUE-/);
   });
 
   it('rejects malformed specs with structured errors', () => {
@@ -272,7 +288,7 @@ describe('Phase 1: Construction IR Schema', () => {
   });
 
   it('throws on createConstruction with invalid spec', () => {
-    expect(() => createConstruction({})).toThrow(/^PB-ERR-v1-VALUE-/);
+    expectRefusal(() => createConstruction({}), /^PB-ERR-v1-VALUE-/);
   });
 
   it.each([
@@ -287,8 +303,7 @@ describe('Phase 1: Construction IR Schema', () => {
     const spec = brazierSpec();
     mutate(spec);
 
-    expect(() => createConstruction(spec))
-      .toThrow(new RegExp(`^PB-ERR-v1-${category}-`));
+    expectRefusal(() => createConstruction(spec), new RegExp(`^PB-ERR-v1-${category}-`));
   });
 
   it('refuses dependency cycles during packet creation', () => {
@@ -316,7 +331,7 @@ describe('Phase 1: Construction IR Schema', () => {
     spec.constraints = [];
     spec.validation.closedParts = [];
 
-    expect(() => createConstruction(spec)).toThrow(/^PB-ERR-v1-STATE-/);
+    expectRefusal(() => createConstruction(spec), /^PB-ERR-v1-STATE-/);
   });
 });
 
@@ -1336,7 +1351,7 @@ describe('Phase 4: Solver Orchestrator', () => {
     spec.parts[0].primitive.radiusX = 20;
     spec.validation.requireCanvasContainment = true;
 
-    expect(() => solve(createConstruction(spec))).toThrow(/^PB-ERR-v1-COORD-/);
+    expectRefusal(() => solve(createConstruction(spec)), /^PB-ERR-v1-COORD-/);
   });
 
   it('refuses circular dependencies', () => {
@@ -1363,7 +1378,7 @@ describe('Phase 4: Solver Orchestrator', () => {
     ];
     spec.constraints = [];
     spec.validation.closedParts = [];
-    expect(() => createConstruction(spec)).toThrow(/^PB-ERR-v1-STATE-/);
+    expectRefusal(() => createConstruction(spec), /^PB-ERR-v1-STATE-/);
   });
 
   it('solves within 100ms for ≤20 parts on 64×64', () => {
@@ -1434,14 +1449,13 @@ describe('Phase 5: Wand Integration', () => {
       },
     };
 
-    expect(() => evaluateFormula(formula, { width: 24, height: 20 }))
-      .toThrow(/^PB-ERR-v1-FORMULA-/);
-    expect(() => evaluateFormula(
+    expectRefusal(() => evaluateFormula(formula, { width: 24, height: 20 }), /^PB-ERR-v1-FORMULA-/);
+    expectRefusal(() => evaluateFormula(
       formula,
       { width: 24, height: 20 },
       0,
       { geometryConstructionEnabled: false },
-    )).toThrow(/^PB-ERR-v1-FORMULA-/);
+    ), /^PB-ERR-v1-FORMULA-/);
   });
 
   it('rejects the legacy flattened construction dialect', async () => {
@@ -1455,12 +1469,12 @@ describe('Phase 5: Wand Integration', () => {
       },
     };
 
-    expect(() => evaluateFormula(
+    expectRefusal(() => evaluateFormula(
       formula,
       { width: 24, height: 20 },
       0,
       { geometryConstructionEnabled: true },
-    )).toThrow(/^PB-ERR-v1-FORMULA-/);
+    ), /^PB-ERR-v1-FORMULA-/);
   });
 
   it('existing formula types still work (backward compat)', async () => {
@@ -1609,5 +1623,129 @@ describe('raster-core: computeVectorIdentity export', () => {
     expect(vi.signedDistance).toBeDefined();
     expect(vi.tangent).toBeDefined();
     expect(vi.normal).toBeDefined();
+  });
+});
+
+// ─── Authoring ergonomics ────────────────────────────────────────────────────
+
+describe('validation laws are opt-in', () => {
+  const bell = (overrides = {}) => ({
+    id: 'bell-minimal',
+    canvas: { width: 24, height: 24 },
+    anchors: { domeCenter: [11.5, 13], clapperCenter: [11.5, 23] },
+    parts: [
+      { id: 'dome', primitive: { kind: 'ellipse', center: { anchor: 'domeCenter' }, radiusX: 7, radiusY: 7 } },
+      { id: 'mouth', primitive: { kind: 'conic-bowl', topRef: { ref: 'dome', point: 'bottomCenter' }, depth: { ratio: { reference: 14, value: 0.5 } } } },
+      { id: 'clapper', primitive: { kind: 'ellipse', center: { anchor: 'clapperCenter' }, radiusX: 1.5, radiusY: 1.5 } },
+    ],
+    constraints: [
+      { kind: 'coaxial', parts: ['dome', 'mouth'] },
+      { kind: 'contained', inner: 'clapper', outer: 'mouth' },
+    ],
+    ...overrides,
+  });
+
+  it('accepts a spec with no validation block at all', () => {
+    // `validation` used to be mandatory, so a first attempt always refused.
+    expect(() => createConstruction(bell())).not.toThrow();
+  });
+
+  it('accepts a partial validation block without demanding the other laws', () => {
+    // Supplying one law used to cascade into "must be" errors for the other four.
+    expect(() => createConstruction(bell({ validation: { forbidSelfIntersections: true } }))).not.toThrow();
+  });
+
+  it('records an omitted law as explicitly inert rather than leaving it undefined', () => {
+    const packet = createConstruction(bell());
+    expect(packet.validation).toEqual({
+      closedParts: [],
+      forbidSelfIntersections: false,
+      minimumCurvatureRadius: 0,
+      requireConnectedAssembly: false,
+    });
+  });
+
+  it('never turns an omitted law into a refusal', () => {
+    const solved = trySolve(createConstruction(bell()));
+    expect(solved.error).toBeNull();
+  });
+
+  it('still verifies the constraints the author did write', () => {
+    // A clapper too big and too high genuinely escapes the bowl.
+    const escaping = bell({
+      anchors: { domeCenter: [11.5, 13], clapperCenter: [11.5, 21] },
+    });
+    escaping.parts = escaping.parts.map(p => (p.id === 'clapper'
+      ? { ...p, primitive: { ...p.primitive, radiusX: 2, radiusY: 2 } }
+      : p));
+    const solved = trySolve(createConstruction(escaping));
+    expect(solved.error).not.toBeNull();
+  });
+
+  it('rejects a validation block that is not an object', () => {
+    expect(() => createConstruction(bell({ validation: [] }))).toThrow();
+    expect(() => createConstruction(bell({ validation: 'strict' }))).toThrow();
+  });
+
+  it('still type-checks the laws that are supplied', () => {
+    expect(() => createConstruction(bell({ validation: { forbidSelfIntersections: 'yes' } }))).toThrow();
+    expect(() => createConstruction(bell({ validation: { consistentWinding: 'sideways' } }))).toThrow();
+    expect(() => createConstruction(bell({ validation: { minimumCurvatureRadius: -1 } }))).toThrow();
+  });
+});
+
+describe('refusals are legible without decoding the payload', () => {
+  it('puts the failing constraint and its witness point in the message', () => {
+    const spec = {
+      // The bowl's apex sits at the dome's bottomCenter and widens downward, so a
+      // radius-2 ball centred 8 cells below the dome centre pokes out near the apex.
+      id: 'escape', canvas: { width: 24, height: 24 },
+      anchors: { a: [11.5, 13], b: [11.5, 21] },
+      parts: [
+        { id: 'dome', primitive: { kind: 'ellipse', center: { anchor: 'a' }, radiusX: 7, radiusY: 7 } },
+        { id: 'mouth', primitive: { kind: 'conic-bowl', topRef: { ref: 'dome', point: 'bottomCenter' }, depth: { ratio: { reference: 14, value: 0.5 } } } },
+        { id: 'ball', primitive: { kind: 'ellipse', center: { anchor: 'b' }, radiusX: 2, radiusY: 2 } },
+      ],
+      constraints: [{ kind: 'contained', inner: 'ball', outer: 'mouth' }],
+    };
+    const solved = trySolve(createConstruction(spec));
+    expect(solved.error).not.toBeNull();
+    const msg = solved.error.message;
+    expect(msg).toContain('PB-GEOMETRY-CONSTRUCTION-v1');
+    expect(msg).toContain('contained');
+    expect(msg).toMatch(/lies outside/);
+    // the machine-readable form is kept, not replaced
+    expect(msg).toContain('PB-ERR-v1-');
+    expect(solved.error.bytecode).toMatch(/^PB-ERR-v1-/);
+  });
+
+  it('lists every schema problem at once instead of one per attempt', () => {
+    let thrown = null;
+    try {
+      createConstruction({
+        id: 'broken', canvas: { width: 16, height: 16 },
+        anchors: { a: [8, 8] },
+        parts: [{ id: 'bowl', primitive: { kind: 'conic-bowl', topRef: { part: 'x', point: 'y' }, depth: { ratio: 0.5 } } }],
+        constraints: [],
+      });
+    } catch (e) { thrown = e; }
+    expect(thrown).not.toBeNull();
+    expect(thrown.message).toContain('topRef must be a PartPointRef');
+    expect(thrown.message).toContain('depth must be a RatioSpec');
+  });
+
+  it('names the fields a PartPointRef needs', () => {
+    let thrown = null;
+    try {
+      createConstruction({
+        id: 'broken', canvas: { width: 16, height: 16 },
+        anchors: { a: [8, 8] },
+        parts: [{ id: 'bowl', primitive: { kind: 'conic-bowl', topRef: { part: 'x', point: 'y' }, depth: { ratio: { reference: 8, value: 0.5 } } } }],
+        constraints: [],
+      });
+    } catch (e) { thrown = e; }
+    // "must be a PartPointRef" alone gave no way to tell it wanted `ref`, not `part`.
+    expect(thrown.message).toContain('ref:');
+    expect(thrown.message).toContain('point:');
   });
 });

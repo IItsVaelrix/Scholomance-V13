@@ -1,0 +1,17 @@
+[project]
+title = PolarisOS Defold Runtime
+version = 0.1.0
+
+[bootstrap]
+main_collection = /main/main.collection
+
+[display]
+width = 800
+height = 480
+high_dpi = 1
+
+[engine]
+run_while_iconified = 1
+
+[physics]
+type = 2D

@@ -2,6 +2,7 @@ import difflib
 import json
 import os
 import subprocess
+import time
 
 from tui.services.exec_session_service import get_exec_session
 from tui.services import harness_tools
@@ -1378,6 +1379,116 @@ class ToolService:
                         "required": []
                     }
                 }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "substrate_query",
+                    "description": "Semantic search over the Scholomance substrate (~/.substrate/memory.sqlite). Queries the 4-bit quantized vector memory bank seeded from the encyclopedia (LAW, White Papers, PDRs, PIRs, Verdicts, Bug Reports, ARCH docs, Bible, Guide). Returns ranked chunks with similarity scores, metadata tags, and a pre-formatted context block. Use tag_filter to scope to a domain (e.g. 'law', 'pdr', 'whitepaper', 'verdict'). Supports multi-hop retrieval via Cortex when numpy is available.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "query": {
+                                "type": "string",
+                                "description": "Natural-language query (e.g. 'what does the Curation Law say about auto-generated genes?')"
+                            },
+                            "top_k": {
+                                "type": "integer",
+                                "description": "Max results to return (default 5, max 20)",
+                                "default": 5
+                            },
+                            "tag_filter": {
+                                "type": "string",
+                                "description": "Optional metadata tag to scope results (e.g. 'law', 'pdr', 'whitepaper', 'verdict', 'bug', 'architecture', 'bible')"
+                            },
+                            "multi_hop": {
+                                "type": "boolean",
+                                "description": "Enable multi-hop retrieval via Cortex (slower but deeper reasoning). Default false.",
+                                "default": False
+                            }
+                        },
+                        "required": ["query"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "substrate_status",
+                    "description": "Get the health and status of the Scholomance substrate memory bank. Shows DB size, memory count, tag/tier breakdown, Cortex initialization state, and session query count. Use this to verify the substrate is seeded and healthy before querying.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "show_tags": {
+                                "type": "boolean",
+                                "description": "Include tag/tier breakdown from metadata (default false, adds a DB scan)",
+                                "default": False
+                            }
+                        },
+                        "required": []
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "substrate_store",
+                    "description": "Store a discovery, decision, or correction into the Scholomance substrate for persistent cross-session memory. HUMAN-GATED: this tool call IS the approval — the agent proposes, the human invokes. Stored memories are tagged with agent_id, timestamp, and approval metadata. Use this to persist important findings (e.g. 'the golden ratio is imported but never used') so future sessions and other agents can retrieve them.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "text": {
+                                "type": "string",
+                                "description": "The knowledge to store (e.g. 'The Wand has no geometric guardrails — 32 hand-placed waypoints instead of conic sections')"
+                            },
+                            "tag": {
+                                "type": "string",
+                                "description": "Category tag: 'discovery', 'decision', 'correction', 'architecture', 'bug', 'insight'",
+                                "default": "discovery"
+                            },
+                            "agent_id": {
+                                "type": "string",
+                                "description": "Which agent is storing this (e.g. 'mother', 'divtube', 'vaelrix')",
+                                "default": "cockpit"
+                            },
+                            "metadata": {
+                                "type": "object",
+                                "description": "Optional additional metadata (e.g. {\"files\": [\"brazier.wand.json\"], \"severity\": \"high\"})"
+                            }
+                        },
+                        "required": ["text"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "substrate_recent",
+                    "description": "Retrieve recently stored memories from the substrate for cross-agent knowledge sharing. Shows what other agents (or this agent in prior sessions) have stored. Filterable by agent_id, tag, and time window. Use this to discover what the Vaelrix agent or other Cockpit sessions have learned.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "limit": {
+                                "type": "integer",
+                                "description": "Max memories to return (default 10, max 50)",
+                                "default": 10
+                            },
+                            "agent_id": {
+                                "type": "string",
+                                "description": "Filter by storing agent (e.g. 'mother', 'divtube', 'vaelrix')"
+                            },
+                            "tag": {
+                                "type": "string",
+                                "description": "Filter by tag (e.g. 'discovery', 'decision', 'correction')"
+                            },
+                            "since_minutes": {
+                                "type": "integer",
+                                "description": "Only memories from the last N minutes"
+                            }
+                        },
+                        "required": []
+                    }
+                }
             }
         ]
  
@@ -1490,6 +1601,14 @@ class ToolService:
             return self._python_exec(kwargs, callback)
         elif tool_name == "exec_reset":
             return self._exec_reset(kwargs, callback)
+        elif tool_name == "substrate_query":
+            return self._substrate_query(kwargs, callback)
+        elif tool_name == "substrate_status":
+            return self._substrate_status(kwargs, callback)
+        elif tool_name == "substrate_store":
+            return self._substrate_store(kwargs, callback)
+        elif tool_name == "substrate_recent":
+            return self._substrate_recent(kwargs, callback)
         return "Tool not found."
 
     def _read_file(self, kwargs, callback):
@@ -2688,3 +2807,190 @@ class ToolService:
                 callback(f"  [#7CFF8B]✓[/] Applied patch to {file_path}")
             return f"Patch applied to {file_path}: method={result.get('method', '?')}"
         return self._fmt_bridge("apply_patch", result, callback)
+
+    # ── Substrate Bridge (Cockpit → Scholomance memory bank) ────────────
+
+    def _substrate_query(self, kwargs, callback):
+        """Semantic search over the Scholomance substrate (Step 2: Cortex multi-hop)."""
+        query = kwargs.get("query", "")
+        if not query:
+            return "Error: query is required."
+        top_k = kwargs.get("top_k", 5)
+        tag_filter = kwargs.get("tag_filter")
+        multi_hop = kwargs.get("multi_hop", False)
+
+        try:
+            from tui.services.substrate_bridge_service import get_substrate_bridge
+            bridge = get_substrate_bridge()
+            result = bridge.query(
+                text=query,
+                top_k=top_k,
+                tag_filter=tag_filter,
+                multi_hop=multi_hop,
+            )
+        except Exception as e:
+            return f"Error: substrate bridge failed to load: {e}"
+
+        if not result.get("ok"):
+            return f"Substrate error: {result.get('error', 'unknown')}"
+
+        if callback:
+            n = result["stats"]["result_count"]
+            ms = result["stats"]["query_time_ms"]
+            engine = result["stats"].get("engine", "?")
+            scope = f" [{tag_filter}]" if tag_filter else ""
+            hop = " ⟳" if multi_hop else ""
+            callback(f"  [#B388FF]◈[/] substrate{scope}{hop} ({engine}): {n} hits in {ms}ms")
+
+        # Format for the LLM: context block + structured results
+        lines = [result["context_block"], ""]
+        for i, r in enumerate(result["results"], 1):
+            meta = r.get("metadata", {})
+            tag = meta.get("tag", "?")
+            tier = meta.get("tier", "?")
+            src = meta.get("source", "?")
+            title = meta.get("title", "")
+            hop_info = f" hop={r['hop']}" if r.get("hop", 0) > 0 else ""
+            header = f"[{i}] sim={r['similarity']:.3f} | {tag}/{tier} | {src}{hop_info}"
+            if title:
+                header += f" | {title}"
+            lines.append(header)
+            lines.append(r["text"])
+            lines.append("")
+
+        stats = result["stats"]
+        engine_line = f"engine={stats.get('engine', '?')}"
+        lines.append(
+            f"--- {stats['result_count']} results, "
+            f"{stats['query_time_ms']}ms, {engine_line}"
+            + (f", tag={stats['tag_filter']}" if stats.get("tag_filter") else "")
+            + (f", multi_hop" if stats.get("multi_hop") else "")
+        )
+        return "\n".join(lines)
+
+    def _substrate_status(self, kwargs, callback):
+        """Health/status of the Scholomance substrate memory bank."""
+        show_tags = kwargs.get("show_tags", False)
+
+        try:
+            from tui.services.substrate_bridge_service import get_substrate_bridge
+            bridge = get_substrate_bridge()
+            info = bridge.status()
+        except Exception as e:
+            return f"Error: substrate bridge failed to load: {e}"
+
+        if show_tags and info.get("ok"):
+            tag_info = bridge.tags()
+            if tag_info.get("ok"):
+                info["tags"] = tag_info.get("tags", {})
+                info["tiers"] = tag_info.get("tiers", {})
+                info["total_memories"] = tag_info.get("total_memories", 0)
+
+        if callback:
+            if info.get("db_exists"):
+                size = info.get("db_size_mb", 0)
+                total = info.get("total_memories", info.get("cortex_stats", {}).get("L2_substrate", {}).get("total", "?"))
+                engine = info.get("engine", "?")
+                callback(f"  [#B388FF]◈[/] substrate ({engine}): {size}MB, {total} memories")
+            else:
+                callback("  [#FF5C7A]✗[/] substrate: DB not found")
+
+        return json.dumps(info, indent=2, default=str)
+
+    def _substrate_store(self, kwargs, callback):
+        """Store a memory in the substrate (Step 3: human-gated write-back)."""
+        text = kwargs.get("text", "")
+        if not text:
+            return "Error: text is required."
+        tag = kwargs.get("tag", "discovery")
+        agent_id = kwargs.get("agent_id", "cockpit")
+        metadata = kwargs.get("metadata")
+
+        try:
+            from tui.services.substrate_bridge_service import get_substrate_bridge
+            bridge = get_substrate_bridge()
+            result = bridge.store(
+                text=text,
+                tag=tag,
+                agent_id=agent_id,
+                metadata=metadata,
+            )
+        except Exception as e:
+            return f"Error: substrate bridge failed to load: {e}"
+
+        if not result.get("ok"):
+            return f"Substrate store error: {result.get('error', 'unknown')}"
+
+        if callback:
+            mid = result["memory_id"]
+            chk = result["checksum"]
+            callback(f"  [#69F0AE]◈[/] substrate stored: id={mid} chk={chk} [{tag}]")
+
+        lines = [
+            f"✓ Memory stored in substrate",
+            f"  memory_id: {result['memory_id']}",
+            f"  checksum:  {result['checksum']}",
+            f"  tag:       {result['tag']}",
+            f"  agent:     {result['agent_id']}",
+            f"  preview:   {result['text_preview']}",
+            f"  metadata:  {json.dumps(result['metadata'], default=str)}",
+            f"  session stores: {result['session_stores']}",
+        ]
+        return "\n".join(lines)
+
+    def _substrate_recent(self, kwargs, callback):
+        """Retrieve recently stored memories (Step 4: cross-agent sharing)."""
+        limit = kwargs.get("limit", 10)
+        agent_id = kwargs.get("agent_id")
+        tag = kwargs.get("tag")
+        since_minutes = kwargs.get("since_minutes")
+
+        try:
+            from tui.services.substrate_bridge_service import get_substrate_bridge
+            bridge = get_substrate_bridge()
+            result = bridge.recent(
+                limit=limit,
+                agent_id=agent_id,
+                tag=tag,
+                since_minutes=since_minutes,
+            )
+        except Exception as e:
+            return f"Error: substrate bridge failed to load: {e}"
+
+        if not result.get("ok"):
+            return f"Substrate recent error: {result.get('error', 'unknown')}"
+
+        memories = result.get("memories", [])
+        if callback:
+            n = len(memories)
+            scope = f" [{agent_id or 'all'}]" if agent_id else ""
+            callback(f"  [#B388FF]◈[/] substrate recent{scope}: {n} memories")
+
+        if not memories:
+            return "No recent memories found matching the filters."
+
+        lines = [f"Recent substrate memories ({len(memories)}):", ""]
+        for m in memories:
+            age = ""
+            if m.get("created_at"):
+                age_s = time.time() - m["created_at"]
+                if age_s < 60:
+                    age = f"{int(age_s)}s ago"
+                elif age_s < 3600:
+                    age = f"{int(age_s/60)}m ago"
+                else:
+                    age = f"{int(age_s/3600)}h ago"
+            lines.append(
+                f"[{m['id']}] {m['agent']}/{m['tag']} | {age} | {m['source']}"
+            )
+            lines.append(f"  {m['text'][:200]}")
+            lines.append("")
+
+        stats = result["stats"]
+        lines.append(
+            f"--- {stats['count']} memories"
+            + (f", agent={stats['agent_filter']}" if stats.get("agent_filter") else "")
+            + (f", tag={stats['tag_filter']}" if stats.get("tag_filter") else "")
+            + (f", last {stats['since_minutes']}min" if stats.get("since_minutes") else "")
+        )
+        return "\n".join(lines)

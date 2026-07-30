@@ -31,6 +31,32 @@ function stableId(prefix, value) {
   return `${prefix}_${hashString(stableJson(value)).toString(16).padStart(8, '0')}`;
 }
 
+/**
+ * Digest of the cells a packet actually paints.
+ *
+ * Packet identity used to seed on `geometry.coordinates.length` alone, which made
+ * the id blind to *where* those cells were and *what colour* they had. Two frames
+ * with different pixels but an equal cell count received the same id — enough for
+ * a swing-left/swing-right pair to collapse into one frame — and re-shading every
+ * sphere in the repository changed no id at all, so the "frozen packet ids"
+ * invariance suite stayed green through a total recolour.
+ *
+ * Only facts a viewer can see are folded in: position, colour, and the part and
+ * material each cell belongs to. Derived geometry (tangents, curvature, signed
+ * distance, arc length) is deliberately excluded — it is recomputed downstream
+ * and must not be able to re-id an asset whose pixels are identical.
+ *
+ * Order matters: the sequence is painter order, and two packets that paint the
+ * same cells in a different order are not the same asset.
+ */
+function coordinateDigest(coordinates) {
+  const parts = [];
+  for (const c of coordinates) {
+    parts.push(`${c.x}|${c.y}|${c.color}|${c.partId ?? ''}|${c.material ?? ''}`);
+  }
+  return hashString(parts.join(';')).toString(16).padStart(8, '0');
+}
+
 function clonePlain(value) {
   if (value === undefined || value === null) return value;
   return JSON.parse(JSON.stringify(value));
@@ -180,6 +206,7 @@ export function normalizePixelBrainAssetPacket(input = {}) {
     source: input.source || input.sourceKind,
     canvas,
     coordinateCount: geometry.coordinates.length,
+    coordinateDigest: coordinateDigest(geometry.coordinates),
     palette: flattenPaletteColors(sourcePalette),
     bytecode: bytecode.raw,
     material: materialId,

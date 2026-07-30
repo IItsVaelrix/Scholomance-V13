@@ -4,6 +4,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { parseSCDL, tokenize } from '../../../../../codex/core/pixelbrain/scdl/scdl.grammar.js';
+import { compileSCDL } from '../../../../../codex/core/pixelbrain/scdl/scdl.compiler.js';
 
 const BASIC_SOURCE = `
 asset void_chestplate canvas 64x64
@@ -143,5 +144,138 @@ describe('SCDL Parser — parseSCDL', () => {
     const { rawAst, errors } = parseSCDL(src);
     expect(errors.filter(e => e.severity === 'ERROR')).toHaveLength(0);
     expect(rawAst.palette.bad).toBe('#GGGGGG');
+  });
+});
+
+describe('illegal characters are reported, not dropped', () => {
+  const withHyphen = `
+asset shrine-bell canvas 24x24
+palette { a = #112233 }
+part body material bronze { rect 2 2 4 4 a }
+export json
+`.trim();
+
+  it('names the offending character at its own position', () => {
+    const r = compileSCDL(withHyphen);
+    const illegal = r.errors.filter(e => e.label === 'SCDL-022');
+    expect(illegal.length).toBe(1);
+    expect(illegal[0].severity).toBe('ERROR');
+    expect(illegal[0].message).toContain('"-"');
+    // `asset shrine-bell` — the hyphen is column 13 of line 1
+    expect(illegal[0].loc).toEqual({ line: 1, col: 13 });
+  });
+
+  it('reports the root cause before the damage it causes downstream', () => {
+    // The hyphen used to vanish and reappear as "Invalid canvas '0x0'" at col 1.
+    const r = compileSCDL(withHyphen);
+    expect(r.errors[0].label).toBe('SCDL-022');
+  });
+
+  it('does not mistake a negative number for an illegal character', () => {
+    const r = compileSCDL(`
+asset neg canvas 21x21
+palette { a = #FFFFFF b = #CCCCCC c = #777777 d = #333333 e = #000000 }
+part orb material bronze {
+  sphere 10 10 radius 9 light -1 -1 a b c d e
+  line -3 4 6 7 a
+}
+export json
+`.trim());
+    expect(r.ok).toBe(true);
+    expect(r.errors.filter(e => e.label === 'SCDL-022')).toEqual([]);
+  });
+
+  it('collapses a run of illegal characters into one diagnostic', () => {
+    const r = compileSCDL(`
+asset my@@@asset canvas 8x8
+part body material bronze { cell 1 1 #112233 }
+export json
+`.trim());
+    const illegal = r.errors.filter(e => e.label === 'SCDL-022');
+    expect(illegal.length).toBe(1);
+    expect(illegal[0].message).toContain('"@@@"');
+    expect(illegal[0].loc.col).toBe(9);
+  });
+
+  it('reports each distinct run separately', () => {
+    const r = compileSCDL(`
+asset a-b canvas 8x8
+part c-d material bronze { cell 1 1 #112233 }
+export json
+`.trim());
+    const illegal = r.errors.filter(e => e.label === 'SCDL-022');
+    expect(illegal.length).toBe(2);
+    expect(illegal.map(e => e.loc.line)).toEqual([1, 2]);
+  });
+
+  it('carries a decodable PB-ERR-v1 bytecode string', () => {
+    const r = compileSCDL(withHyphen);
+    const illegal = r.errors.find(e => e.label === 'SCDL-022');
+    expect(illegal.bytecodeString).toContain('ARTIFA-1016');
+  });
+});
+
+describe('palette diagnostics point at the palette', () => {
+  const BAD_PALETTE = `
+asset probe canvas 8x8
+
+palette {
+  good = #112233
+  bad  = #C99A4Z
+}
+
+part body material bronze {
+  rect 2 2 4 4 bad
+}
+
+export json
+`.trim();
+
+  it('reports a bad hex at the line the entry is written on', () => {
+    const r = compileSCDL(BAD_PALETTE);
+    const declaration = r.errors.find(e => e.label === 'SCDL-004' && !e.context.declaredAt);
+    // `bad = #C99A4Z` is line 5; previously this reported line 1 (the asset decl)
+    expect(declaration.loc.line).toBe(5);
+    expect(declaration.loc.line).not.toBe(1);
+  });
+
+  it('reports the use site separately and cross-references the declaration', () => {
+    const r = compileSCDL(BAD_PALETTE);
+    const use = r.errors.find(e => e.label === 'SCDL-004' && e.context.declaredAt);
+    expect(use.loc.line).toBe(9);           // `rect 2 2 4 4 bad`
+    expect(use.context.declaredAt.line).toBe(5);
+    expect(use.message).toContain('declared at line 5');
+  });
+
+  it('names the alias that is broken, not the op that used it', () => {
+    const r = compileSCDL(BAD_PALETTE);
+    for (const e of r.errors.filter(x => x.label === 'SCDL-004')) {
+      expect(e.context.alias).toBe('bad');
+    }
+  });
+});
+
+describe('strict mode', () => {
+  const UNKNOWN_MATERIAL = `
+asset badmat canvas 8x8
+palette { a = #112233 }
+part body material totally_not_a_material { rect 2 2 4 4 a }
+export json
+`.trim();
+
+  it('compiles clean by default even though the material silently fell back', () => {
+    const r = compileSCDL(UNKNOWN_MATERIAL);
+    expect(r.ok).toBe(true);
+    expect(r.errors.some(e => e.label === 'SCDL-005')).toBe(true);
+  });
+
+  it('fails the compile when warnings are promoted', () => {
+    const r = compileSCDL(UNKNOWN_MATERIAL, { strict: true });
+    expect(r.ok).toBe(false);
+  });
+
+  it('does not invent failures for a clean source', () => {
+    const clean = UNKNOWN_MATERIAL.replace('totally_not_a_material', 'bronze');
+    expect(compileSCDL(clean, { strict: true }).ok).toBe(true);
   });
 });

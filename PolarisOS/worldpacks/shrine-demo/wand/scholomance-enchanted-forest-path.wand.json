@@ -1,0 +1,342 @@
+{
+  "asset": "scholomance-enchanted-forest-path",
+  "canvas": {
+    "width": 288,
+    "height": 192
+  },
+  "description": "Scholomance Enchanted Forest Path Wand formulas - citadel spires, rune glyphs, stream ripples, and path borders.",
+  "propagation": {
+    "gene": "WAND_CHEMICAL_STROKE_PROPAGATION",
+    "mode": "chemical-reaction",
+    "visibleRoles": [
+      "scholomance.*"
+    ],
+    "invisibleRoles": []
+  },
+  "formulas": [
+    {
+      "role": "scholomance.citadel_spire_l",
+      "type": "mathematical_stroke",
+      "description": "scholomance.citadel_spire_l",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "parameters": {
+            "origin": {
+              "x": 138,
+              "y": 15
+            },
+            "target": {
+              "x": 138,
+              "y": 35
+            },
+            "baseWidth": 1.1,
+            "widthVariation": 0.2,
+            "frequency": 1.4,
+            "density": 1,
+            "bleed": 0.1,
+            "n": 36
+          }
+        }
+      },
+      "pressure": 0.9
+    },
+    {
+      "role": "scholomance.citadel_spire_r",
+      "type": "mathematical_stroke",
+      "description": "scholomance.citadel_spire_r",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "parameters": {
+            "origin": {
+              "x": 150,
+              "y": 15
+            },
+            "target": {
+              "x": 150,
+              "y": 35
+            },
+            "baseWidth": 1.1,
+            "widthVariation": 0.2,
+            "frequency": 1.4,
+            "density": 1,
+            "bleed": 0.1,
+            "n": 36
+          }
+        }
+      },
+      "pressure": 0.9
+    },
+    {
+      "role": "scholomance.citadel_cross",
+      "type": "mathematical_stroke",
+      "description": "scholomance.citadel_cross",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "parameters": {
+            "origin": {
+              "x": 136,
+              "y": 30
+            },
+            "target": {
+              "x": 152,
+              "y": 30
+            },
+            "baseWidth": 1,
+            "widthVariation": 0.2,
+            "frequency": 1.4,
+            "density": 1,
+            "bleed": 0.1,
+            "n": 36
+          }
+        }
+      },
+      "pressure": 0.85
+    },
+    {
+      "role": "scholomance.rune_glyph_1",
+      "type": "mathematical_stroke",
+      "description": "scholomance.rune_glyph_1",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "parameters": {
+            "origin": {
+              "x": 72,
+              "y": 104
+            },
+            "target": {
+              "x": 72,
+              "y": 116
+            },
+            "baseWidth": 1,
+            "widthVariation": 0.2,
+            "frequency": 1.4,
+            "density": 1,
+            "bleed": 0.1,
+            "n": 36
+          }
+        }
+      },
+      "pressure": 0.95
+    },
+    {
+      "role": "scholomance.rune_glyph_2",
+      "type": "mathematical_stroke",
+      "description": "scholomance.rune_glyph_2",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "parameters": {
+            "origin": {
+              "x": 172,
+              "y": 108
+            },
+            "target": {
+              "x": 172,
+              "y": 120
+            },
+            "baseWidth": 1,
+            "widthVariation": 0.2,
+            "frequency": 1.4,
+            "density": 1,
+            "bleed": 0.1,
+            "n": 36
+          }
+        }
+      },
+      "pressure": 0.95
+    },
+    {
+      "role": "scholomance.rune_glyph_3",
+      "type": "mathematical_stroke",
+      "description": "scholomance.rune_glyph_3",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "parameters": {
+            "origin": {
+              "x": 248,
+              "y": 124
+            },
+            "target": {
+              "x": 248,
+              "y": 136
+            },
+            "baseWidth": 1,
+            "widthVariation": 0.2,
+            "frequency": 1.4,
+            "density": 1,
+            "bleed": 0.1,
+            "n": 36
+          }
+        }
+      },
+      "pressure": 0.95
+    },
+    {
+      "role": "scholomance.rune_glyph_4",
+      "type": "mathematical_stroke",
+      "description": "scholomance.rune_glyph_4",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "parameters": {
+            "origin": {
+              "x": 232,
+              "y": 150
+            },
+            "target": {
+              "x": 232,
+              "y": 164
+            },
+            "baseWidth": 1.2,
+            "widthVariation": 0.2,
+            "frequency": 1.4,
+            "density": 1,
+            "bleed": 0.1,
+            "n": 36
+          }
+        }
+      },
+      "pressure": 0.95
+    },
+    {
+      "role": "scholomance.stream_ripple_1",
+      "type": "mathematical_stroke",
+      "description": "scholomance.stream_ripple_1",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "parameters": {
+            "origin": {
+              "x": 220,
+              "y": 100
+            },
+            "target": {
+              "x": 220,
+              "y": 110
+            },
+            "baseWidth": 0.9,
+            "widthVariation": 0.2,
+            "frequency": 1.4,
+            "density": 1,
+            "bleed": 0.1,
+            "n": 36
+          }
+        }
+      },
+      "pressure": 0.9
+    },
+    {
+      "role": "scholomance.stream_ripple_2",
+      "type": "mathematical_stroke",
+      "description": "scholomance.stream_ripple_2",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "parameters": {
+            "origin": {
+              "x": 200,
+              "y": 125
+            },
+            "target": {
+              "x": 215,
+              "y": 125
+            },
+            "baseWidth": 0.9,
+            "widthVariation": 0.2,
+            "frequency": 1.4,
+            "density": 1,
+            "bleed": 0.1,
+            "n": 36
+          }
+        }
+      },
+      "pressure": 0.9
+    },
+    {
+      "role": "scholomance.stream_ripple_3",
+      "type": "mathematical_stroke",
+      "description": "scholomance.stream_ripple_3",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "parameters": {
+            "origin": {
+              "x": 200,
+              "y": 160
+            },
+            "target": {
+              "x": 225,
+              "y": 160
+            },
+            "baseWidth": 1,
+            "widthVariation": 0.2,
+            "frequency": 1.4,
+            "density": 1,
+            "bleed": 0.1,
+            "n": 36
+          }
+        }
+      },
+      "pressure": 0.9
+    },
+    {
+      "role": "scholomance.path_border_l",
+      "type": "mathematical_stroke",
+      "description": "scholomance.path_border_l",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "parameters": {
+            "origin": {
+              "x": 144,
+              "y": 92
+            },
+            "target": {
+              "x": 80,
+              "y": 192
+            },
+            "baseWidth": 1.1,
+            "widthVariation": 0.2,
+            "frequency": 1.4,
+            "density": 1,
+            "bleed": 0.1,
+            "n": 36
+          }
+        }
+      },
+      "pressure": 0.85
+    },
+    {
+      "role": "scholomance.path_border_r",
+      "type": "mathematical_stroke",
+      "description": "scholomance.path_border_r",
+      "formula": {
+        "coordinateFormula": {
+          "type": "mathematical_stroke",
+          "parameters": {
+            "origin": {
+              "x": 144,
+              "y": 92
+            },
+            "target": {
+              "x": 188,
+              "y": 192
+            },
+            "baseWidth": 1.1,
+            "widthVariation": 0.2,
+            "frequency": 1.4,
+            "density": 1,
+            "bleed": 0.1,
+            "n": 36
+          }
+        }
+      },
+      "pressure": 0.85
+    }
+  ]
+}

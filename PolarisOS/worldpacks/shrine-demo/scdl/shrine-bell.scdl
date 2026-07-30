@@ -1,0 +1,65 @@
+# Shrine Bell — hanging bronze bell on an oak yoke
+# Playtest asset: exercises sphere (Lambert 5-tier), symmetry, and a 2-frame swing.
+asset shrine_bell canvas 24x24
+
+palette {
+  yoke_hi    = #6B4A2A
+  yoke_lo    = #3A2614
+  bronze_hi  = #F2D08A
+  bronze_lit = #C99A4A
+  bronze_mid = #9A6B2F
+  bronze_low = #5E3F1B
+  bronze_dk  = #2E1E0C
+  lip_hi     = #E8C378
+  clapper    = #241708
+}
+
+part yoke material oak_bark {
+  rect 4 2 16 2 yoke_lo
+  line 4 2 19 2 yoke_hi
+}
+
+part strap material bronze {
+  line 11 4 11 6 bronze_mid
+  line 12 4 12 6 bronze_hi
+}
+
+part dome material bronze {
+  sphere 11.5 13 radius 7 light -1 -1 bronze_hi bronze_lit bronze_mid bronze_low bronze_dk
+}
+
+part mouth material bronze {
+  polygon 4 16 19 16 21 20 2 20 bronze_mid
+  line 4 16 2 20 bronze_low
+}
+
+part lip material bronze {
+  rect 2 20 20 2 bronze_low
+  line 2 20 21 20 lip_hi
+}
+
+part clapper material iron {
+  circle 11.5 21 radius 2 clapper
+}
+
+loop swing duration 900
+
+frame 1 "swing-left" {
+  part dome material bronze {
+    sphere 10.5 13 radius 7 light -1 -1 bronze_hi bronze_lit bronze_mid bronze_low bronze_dk
+  }
+  part clapper material iron {
+    circle 9 21 radius 2 clapper
+  }
+}
+
+frame 2 "swing-right" {
+  part dome material bronze {
+    sphere 12.5 13 radius 7 light -1 -1 bronze_hi bronze_lit bronze_mid bronze_low bronze_dk
+  }
+  part clapper material iron {
+    circle 14 21 radius 2 clapper
+  }
+}
+
+export json png

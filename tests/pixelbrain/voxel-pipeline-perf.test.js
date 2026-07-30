@@ -45,6 +45,10 @@ import { collectFaces } from '../../codex/core/pixelbrain/iso-projector.js';
 import { renderFacesToSVG } from '../../codex/core/pixelbrain/voxel-svg-renderer.js';
 import { getCellMaterialId } from '../../codex/core/pixelbrain/voxel-volume.js';
 import { routeQbitFieldToPhotonicBridge } from '../../codex/core/pixelbrain/qbit-bridge.js';
+// Register photonic bridge for routeQbitFieldToPhotonicBridge.
+import { registerPhotonicBridge } from '../../codex/core/pixelbrain/photonic-bridge-registry.js';
+import { routeRetinaPacketToPhotonicBridge } from '../../src/lib/photonic-retina/retina-bridge.js';
+registerPhotonicBridge({ routeRetinaPacketToPhotonicBridge });
 
 const SIZE = 64;
 const WARMUP_RUNS = 1;

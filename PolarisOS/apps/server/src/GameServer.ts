@@ -54,6 +54,7 @@ import { buildRoomSnapshot, buildSceneHints, collectVisibleEntities, type Snapsh
 import { DiagnosticLogger, nullDiagnosticSink, type DiagnosticSink } from "./DiagnosticLogger.js";
 import { RateLimiter } from "./RateLimiter.js";
 import { sanitizeChat } from "./sanitize.js";
+import { buildSealedPacket } from "@polaris/scene-packet";
 
 /** Generous default: 30 commands / second per connection stops floods, not play. */
 const DEFAULT_RATE_LIMIT = { maxRequests: 30, windowMs: 1000 };
@@ -113,6 +114,8 @@ export class GameServer {
   private snapshotDeps!: SnapshotDeps;
   private opCounter = 0;
   private requestCounter = 0;
+  /** Per-server monotonic sequence for sealed packet delivery ordering. */
+  private sealSequenceCounter = 0;
 
   // Milestone 6 hardening state.
   private logger: DiagnosticLogger;
@@ -724,6 +727,24 @@ export class GameServer {
           entityInfo: this.snapshotDeps.entityCatalog,
         }),
       );
+
+      // Defold Bridge Design §"Runtime Flow" step 4: the server is the ONE
+      // seal producer. Build and emit scene.sealed alongside scene.patch
+      // (scene.patch remains during transition so the PixiJS lab keeps working).
+      if (sceneManifest) {
+        this.sealSequenceCounter += 1;
+        const sealedPacket = buildSealedPacket(sceneManifest, {
+          sequence: this.sealSequenceCounter,
+        });
+        this.registry.sendToRoom(
+          roomId,
+          JSON.stringify({
+            type: "scene.sealed",
+            envelope,
+            packet: sealedPacket,
+          }),
+        );
+      }
     }
   }
 

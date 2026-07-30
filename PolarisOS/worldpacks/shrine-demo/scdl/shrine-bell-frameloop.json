@@ -1,0 +1,31 @@
+{
+  "contract": "SCDL-FRAME-LOOP-v1",
+  "asset": "shrine_bell",
+  "loop": "swing",
+  "canvas": {
+    "width": 24,
+    "height": 24
+  },
+  "defaultDurationMs": 900,
+  "sourceChecksum": "00000000eb097b0f",
+  "frames": [
+    {
+      "index": 0,
+      "label": "rest",
+      "durationMs": 900,
+      "packet": "pbasset_2df81867"
+    },
+    {
+      "index": 1,
+      "label": "swing-left",
+      "durationMs": 900,
+      "packet": "pbasset_65ca14c2"
+    },
+    {
+      "index": 2,
+      "label": "swing-right",
+      "durationMs": 900,
+      "packet": "pbasset_1b5543de"
+    }
+  ]
+}

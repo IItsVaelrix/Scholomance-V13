@@ -1,0 +1,333 @@
+{
+  "contract": "PB-SCDNA-GENE-v1",
+  "description": "Reference-derived art-direction genes for the shrine sword. Extracted from 0cd89f9a-b8d7-495d-aafd-6d4ca3140205.png (1402x1122, 184885 unique colors). Encodes: dual-temperature lighting (warm gold key + cool indigo shadow), steel-blue blade body, atmospheric bloom, directional metal grain, and dramatic contrast grading.",
+  "assetId": "sword",
+  "referenceImage": "PolarisOS/evidence/0cd89f9a-b8d7-495d-aafd-6d4ca3140205.png",
+  "referenceAnalysis": {
+    "dimensions": [1402, 1122],
+    "litPixelRatio": 0.203,
+    "uniqueColors": 184885,
+    "dominantBackground": "#08090A",
+    "highlightAvg": "#D0BEB7",
+    "midtoneAvg": "#5C4D55",
+    "saturatedWarmAvg": "#A88867",
+    "saturatedCoolAvg": "#4C4D7B",
+    "keyPalette": {
+      "warmGold": ["#F5EAD6", "#CB944E", "#CEA354", "#CDA253"],
+      "coolIndigo": ["#2F2B62", "#3A2B53", "#302C63", "#392B52"],
+      "steelBlue": ["#8498B7", "#8397B6", "#8599B8"],
+      "deepShadow": ["#08090A", "#07090A", "#000101"]
+    }
+  },
+  "canvas": { "width": 12, "height": 32 },
+  "genes": [
+    {
+      "geneId": "sword-ref-dual-temp-lighting",
+      "geneType": "art-direction",
+      "priority": 20,
+      "projectionMode": "explicit",
+      "role": "lighting-direction",
+      "curator": "reference-extraction",
+      "rationale": "The reference has a strong dual-temperature split: warm gold/cream highlights (avg #D0BEB7) from an upper-left key light, and cool indigo-purple shadows (#2F2B62) on the opposite face. This is the single most important aesthetic signature of the image.",
+      "geometryHints": {
+        "lightDir": "upper-left",
+        "contourFollow": false,
+        "occlusionPolicy": "respect-silhouette"
+      },
+      "bindings": [
+        {
+          "channel": "lighting",
+          "operation": "increase-rim",
+          "amount": 0.35,
+          "targets": { "materials": ["steel", "iron", "gold"], "color": "#8498B7" }
+        },
+        {
+          "channel": "lighting",
+          "operation": "add-glow",
+          "amount": 0.25,
+          "targets": { "position": [3, 4], "color": "#F5EAD6", "radius": 8, "materials": ["steel"] }
+        },
+        {
+          "channel": "atmosphere",
+          "operation": "increase-bloom",
+          "amount": 0.4,
+          "targets": { "threshold": 0.6, "radius": 4 }
+        },
+        {
+          "channel": "atmosphere",
+          "operation": "grade-warm",
+          "amount": 0.6
+        }
+      ],
+      "coordinates": [
+        { "x": 4, "y": 3,  "color": "#F5EAD6", "role": "key-highlight", "partId": "blade" },
+        { "x": 4, "y": 4,  "color": "#F0E4CC", "role": "key-highlight", "partId": "blade" },
+        { "x": 4, "y": 5,  "color": "#E8DCC0", "role": "key-highlight", "partId": "blade" },
+        { "x": 4, "y": 6,  "color": "#CB944E", "role": "gold-specular", "partId": "blade" },
+        { "x": 4, "y": 7,  "color": "#CB944E", "role": "gold-specular", "partId": "blade" },
+        { "x": 4, "y": 8,  "color": "#CEA354", "role": "gold-specular", "partId": "blade" },
+        { "x": 4, "y": 9,  "color": "#CDA253", "role": "gold-specular", "partId": "blade" },
+        { "x": 4, "y": 10, "color": "#CB944E", "role": "gold-specular", "partId": "blade" },
+        { "x": 4, "y": 11, "color": "#C49050", "role": "gold-specular", "partId": "blade" },
+        { "x": 4, "y": 12, "color": "#CB944E", "role": "gold-specular", "partId": "blade" },
+        { "x": 4, "y": 13, "color": "#CEA354", "role": "gold-specular", "partId": "blade" },
+        { "x": 4, "y": 14, "color": "#CDA253", "role": "gold-specular", "partId": "blade" },
+        { "x": 4, "y": 15, "color": "#CB944E", "role": "gold-specular", "partId": "blade" },
+        { "x": 4, "y": 16, "color": "#C49050", "role": "gold-specular", "partId": "blade" },
+        { "x": 4, "y": 17, "color": "#CB944E", "role": "gold-specular", "partId": "blade" },
+        { "x": 4, "y": 18, "color": "#B8864A", "role": "gold-specular", "partId": "blade" },
+        { "x": 4, "y": 19, "color": "#A87840", "role": "gold-specular", "partId": "blade" }
+      ]
+    },
+    {
+      "geneId": "sword-ref-indigo-shadow",
+      "geneType": "art-direction",
+      "priority": 15,
+      "projectionMode": "explicit",
+      "role": "shadow-plane",
+      "curator": "reference-extraction",
+      "rationale": "The reference's shadow side is NOT black — it's rich indigo-purple (#2F2B62, #3A2B53). This gives the sword a supernatural, void-touched quality. The right face of the blade and the underside of the guard carry this color.",
+      "geometryHints": {
+        "lightDir": "upper-left",
+        "contourFollow": false,
+        "occlusionPolicy": "respect-silhouette"
+      },
+      "coordinates": [
+        { "x": 7, "y": 4,  "color": "#2F2B62", "role": "indigo-shadow", "partId": "blade" },
+        { "x": 7, "y": 5,  "color": "#302C63", "role": "indigo-shadow", "partId": "blade" },
+        { "x": 7, "y": 6,  "color": "#3A2B53", "role": "indigo-shadow", "partId": "blade" },
+        { "x": 7, "y": 7,  "color": "#2F2B62", "role": "indigo-shadow", "partId": "blade" },
+        { "x": 7, "y": 8,  "color": "#302B63", "role": "indigo-shadow", "partId": "blade" },
+        { "x": 7, "y": 9,  "color": "#392B52", "role": "indigo-shadow", "partId": "blade" },
+        { "x": 7, "y": 10, "color": "#2F2B62", "role": "indigo-shadow", "partId": "blade" },
+        { "x": 7, "y": 11, "color": "#302C63", "role": "indigo-shadow", "partId": "blade" },
+        { "x": 7, "y": 12, "color": "#3A2B53", "role": "indigo-shadow", "partId": "blade" },
+        { "x": 7, "y": 13, "color": "#2F2B62", "role": "indigo-shadow", "partId": "blade" },
+        { "x": 7, "y": 14, "color": "#302B63", "role": "indigo-shadow", "partId": "blade" },
+        { "x": 7, "y": 15, "color": "#392B52", "role": "indigo-shadow", "partId": "blade" },
+        { "x": 7, "y": 16, "color": "#2F2B62", "role": "indigo-shadow", "partId": "blade" },
+        { "x": 7, "y": 17, "color": "#302C63", "role": "indigo-shadow", "partId": "blade" },
+        { "x": 7, "y": 18, "color": "#2A2555", "role": "indigo-shadow", "partId": "blade" },
+        { "x": 7, "y": 19, "color": "#252050", "role": "indigo-shadow", "partId": "blade" },
+        { "x": 8, "y": 20, "color": "#2F2B62", "role": "indigo-shadow", "partId": "guard" },
+        { "x": 9, "y": 20, "color": "#3A2B53", "role": "indigo-shadow", "partId": "guard" }
+      ]
+    },
+    {
+      "geneId": "sword-ref-steel-body",
+      "geneType": "art-direction",
+      "priority": 10,
+      "projectionMode": "explicit",
+      "role": "body-tone",
+      "curator": "reference-extraction",
+      "rationale": "The blade's central body is steel-blue (#8498B7, #8397B6) — cooler than the gold edge but warmer than the indigo shadow. This mid-tone gives the blade its metallic reading. The reference shows this as the dominant blade color between highlight and shadow.",
+      "geometryHints": {
+        "lightDir": "upper-left",
+        "contourFollow": false,
+        "occlusionPolicy": "respect-silhouette"
+      },
+      "coordinates": [
+        { "x": 5, "y": 4,  "color": "#8498B7", "role": "steel-body", "partId": "blade" },
+        { "x": 6, "y": 4,  "color": "#7A8EAD", "role": "steel-body", "partId": "blade" },
+        { "x": 5, "y": 5,  "color": "#8397B6", "role": "steel-body", "partId": "blade" },
+        { "x": 6, "y": 5,  "color": "#7A8EAD", "role": "steel-body", "partId": "blade" },
+        { "x": 5, "y": 6,  "color": "#8599B8", "role": "steel-body", "partId": "blade" },
+        { "x": 6, "y": 6,  "color": "#7C90AF", "role": "steel-body", "partId": "blade" },
+        { "x": 5, "y": 7,  "color": "#8498B7", "role": "steel-body", "partId": "blade" },
+        { "x": 6, "y": 7,  "color": "#7A8EAD", "role": "steel-body", "partId": "blade" },
+        { "x": 5, "y": 8,  "color": "#8397B6", "role": "steel-body", "partId": "blade" },
+        { "x": 6, "y": 8,  "color": "#7C90AF", "role": "steel-body", "partId": "blade" },
+        { "x": 5, "y": 9,  "color": "#8599B8", "role": "steel-body", "partId": "blade" },
+        { "x": 6, "y": 9,  "color": "#7A8EAD", "role": "steel-body", "partId": "blade" },
+        { "x": 5, "y": 10, "color": "#8498B7", "role": "steel-body", "partId": "blade" },
+        { "x": 6, "y": 10, "color": "#7C90AF", "role": "steel-body", "partId": "blade" },
+        { "x": 5, "y": 11, "color": "#8397B6", "role": "steel-body", "partId": "blade" },
+        { "x": 6, "y": 11, "color": "#7A8EAD", "role": "steel-body", "partId": "blade" },
+        { "x": 5, "y": 12, "color": "#8599B8", "role": "steel-body", "partId": "blade" },
+        { "x": 6, "y": 12, "color": "#7C90AF", "role": "steel-body", "partId": "blade" },
+        { "x": 5, "y": 13, "color": "#8498B7", "role": "steel-body", "partId": "blade" },
+        { "x": 6, "y": 13, "color": "#7A8EAD", "role": "steel-body", "partId": "blade" },
+        { "x": 5, "y": 14, "color": "#8397B6", "role": "steel-body", "partId": "blade" },
+        { "x": 6, "y": 14, "color": "#7C90AF", "role": "steel-body", "partId": "blade" },
+        { "x": 5, "y": 15, "color": "#8599B8", "role": "steel-body", "partId": "blade" },
+        { "x": 6, "y": 15, "color": "#7A8EAD", "role": "steel-body", "partId": "blade" },
+        { "x": 5, "y": 16, "color": "#8498B7", "role": "steel-body", "partId": "blade" },
+        { "x": 6, "y": 16, "color": "#7C90AF", "role": "steel-body", "partId": "blade" },
+        { "x": 5, "y": 17, "color": "#8397B6", "role": "steel-body", "partId": "blade" },
+        { "x": 6, "y": 17, "color": "#7A8EAD", "role": "steel-body", "partId": "blade" },
+        { "x": 5, "y": 18, "color": "#7A8EAD", "role": "steel-body", "partId": "blade" },
+        { "x": 6, "y": 18, "color": "#6E82A1", "role": "steel-body", "partId": "blade" },
+        { "x": 5, "y": 19, "color": "#6E82A1", "role": "steel-body", "partId": "blade" },
+        { "x": 6, "y": 19, "color": "#627695", "role": "steel-body", "partId": "blade" }
+      ]
+    },
+    {
+      "geneId": "sword-ref-guard-gold",
+      "geneType": "art-direction",
+      "priority": 12,
+      "projectionMode": "explicit",
+      "role": "guard-accent",
+      "curator": "reference-extraction",
+      "rationale": "The crossguard in the reference carries warm gold (#CEA354, #CB944E) on its upper face catching the key light, with indigo shadow underneath. This gold-on-dark contrast is a signature element.",
+      "geometryHints": {
+        "lightDir": "upper-left",
+        "contourFollow": false,
+        "occlusionPolicy": "respect-silhouette"
+      },
+      "coordinates": [
+        { "x": 2, "y": 20, "color": "#CEA354", "role": "guard-gold", "partId": "guard" },
+        { "x": 3, "y": 20, "color": "#CB944E", "role": "guard-gold", "partId": "guard" },
+        { "x": 4, "y": 20, "color": "#F5EAD6", "role": "guard-highlight", "partId": "guard" },
+        { "x": 5, "y": 20, "color": "#CEA354", "role": "guard-gold", "partId": "guard" },
+        { "x": 6, "y": 20, "color": "#CB944E", "role": "guard-gold", "partId": "guard" },
+        { "x": 7, "y": 20, "color": "#8498B7", "role": "guard-steel", "partId": "guard" },
+        { "x": 3, "y": 21, "color": "#3A2B53", "role": "guard-shadow", "partId": "guard" },
+        { "x": 4, "y": 21, "color": "#2F2B62", "role": "guard-shadow", "partId": "guard" },
+        { "x": 5, "y": 21, "color": "#3A2B53", "role": "guard-shadow", "partId": "guard" },
+        { "x": 6, "y": 21, "color": "#2F2B62", "role": "guard-shadow", "partId": "guard" },
+        { "x": 7, "y": 21, "color": "#252050", "role": "guard-shadow", "partId": "guard" },
+        { "x": 8, "y": 21, "color": "#2F2B62", "role": "guard-shadow", "partId": "guard" }
+      ]
+    },
+    {
+      "geneId": "sword-ref-grip-leather",
+      "geneType": "art-direction",
+      "priority": 8,
+      "projectionMode": "explicit",
+      "role": "grip-texture",
+      "curator": "reference-extraction",
+      "rationale": "The grip in the reference is dark leather with warm edge-light catching the key. The wrap pattern creates alternating light/dark bands. Mid-tone is warm brown-grey (#5C4D55).",
+      "geometryHints": {
+        "lightDir": "upper-left",
+        "contourFollow": false,
+        "occlusionPolicy": "respect-silhouette"
+      },
+      "coordinates": [
+        { "x": 5, "y": 22, "color": "#5C4D55", "role": "grip-body", "partId": "grip" },
+        { "x": 6, "y": 22, "color": "#4A3D45", "role": "grip-shadow", "partId": "grip" },
+        { "x": 5, "y": 23, "color": "#6B5A50", "role": "grip-highlight", "partId": "grip" },
+        { "x": 6, "y": 23, "color": "#5C4D55", "role": "grip-body", "partId": "grip" },
+        { "x": 5, "y": 24, "color": "#5C4D55", "role": "grip-body", "partId": "grip" },
+        { "x": 6, "y": 24, "color": "#4A3D45", "role": "grip-shadow", "partId": "grip" },
+        { "x": 5, "y": 25, "color": "#6B5A50", "role": "grip-highlight", "partId": "grip" },
+        { "x": 6, "y": 25, "color": "#5C4D55", "role": "grip-body", "partId": "grip" },
+        { "x": 5, "y": 26, "color": "#5C4D55", "role": "grip-body", "partId": "grip" },
+        { "x": 6, "y": 26, "color": "#4A3D45", "role": "grip-shadow", "partId": "grip" },
+        { "x": 5, "y": 27, "color": "#6B5A50", "role": "grip-highlight", "partId": "grip" },
+        { "x": 6, "y": 27, "color": "#5C4D55", "role": "grip-body", "partId": "grip" }
+      ]
+    },
+    {
+      "geneId": "sword-ref-pommel-gold",
+      "geneType": "art-direction",
+      "priority": 12,
+      "projectionMode": "explicit",
+      "role": "pommel-accent",
+      "curator": "reference-extraction",
+      "rationale": "The pommel catches the strongest warm specular in the lower region — a bright gold/cream glint (#F5EAD6) with gold body (#CEA354). In the reference this is one of the brightest points in the lower third.",
+      "geometryHints": {
+        "lightDir": "upper-left",
+        "contourFollow": false,
+        "occlusionPolicy": "respect-silhouette"
+      },
+      "bindings": [
+        {
+          "channel": "lighting",
+          "operation": "add-glow",
+          "amount": 0.3,
+          "targets": { "position": [5, 29], "color": "#F5EAD6", "radius": 4, "materials": ["gold"] }
+        }
+      ],
+      "coordinates": [
+        { "x": 5, "y": 28, "color": "#CEA354", "role": "pommel-gold", "partId": "pommel" },
+        { "x": 6, "y": 28, "color": "#CB944E", "role": "pommel-gold", "partId": "pommel" },
+        { "x": 5, "y": 29, "color": "#F5EAD6", "role": "pommel-glint", "partId": "pommel" },
+        { "x": 6, "y": 29, "color": "#CEA354", "role": "pommel-gold", "partId": "pommel" },
+        { "x": 5, "y": 30, "color": "#CB944E", "role": "pommel-gold", "partId": "pommel" },
+        { "x": 6, "y": 30, "color": "#A87840", "role": "pommel-shadow", "partId": "pommel" },
+        { "x": 5, "y": 31, "color": "#3A2B53", "role": "pommel-shadow", "partId": "pommel" },
+        { "x": 6, "y": 31, "color": "#2F2B62", "role": "pommel-shadow", "partId": "pommel" }
+      ]
+    },
+    {
+      "geneId": "sword-ref-atmosphere",
+      "geneType": "art-direction",
+      "priority": 5,
+      "projectionMode": "derived",
+      "role": "atmospheric-direction",
+      "curator": "reference-extraction",
+      "rationale": "The reference is 80% dark background with atmospheric scatter. The sword emerges from near-black (#08090A) with bloom halos around highlights. Fog is indigo-tinted (#1A1A2E). This gene carries no explicit cells — it directs the renderer's atmosphere and grading passes only.",
+      "geometryHints": {
+        "contourFollow": true,
+        "contourPartId": "blade",
+        "occlusionPolicy": "respect-silhouette"
+      },
+      "bindings": [
+        {
+          "channel": "atmosphere",
+          "operation": "add-fog",
+          "amount": 0.3,
+          "targets": { "color": "#1A1A2E", "near": 24, "far": 32 }
+        },
+        {
+          "channel": "atmosphere",
+          "operation": "increase-bloom",
+          "amount": 0.5,
+          "targets": { "threshold": 0.55, "radius": 5 }
+        },
+        {
+          "channel": "atmosphere",
+          "operation": "grade-warm",
+          "amount": 0.4
+        },
+        {
+          "channel": "palette",
+          "operation": "shift-hue",
+          "amount": 0.15,
+          "targets": { "toward": "#2F2B62", "affects": "shadows" }
+        },
+        {
+          "channel": "contour",
+          "operation": "sharpen",
+          "amount": 0.3
+        }
+      ],
+      "coordinates": []
+    },
+    {
+      "geneId": "sword-ref-metal-grain",
+      "geneType": "art-direction",
+      "priority": 7,
+      "projectionMode": "derived",
+      "role": "texture-direction",
+      "curator": "reference-extraction",
+      "rationale": "The reference shows directional brushed-metal grain on the blade (freq ~0.22, strong amplitude) and a coarser forged texture on the guard. The grain follows the blade's long axis. This gene boosts the VRI texture field parameters for steel and iron materials.",
+      "geometryHints": {
+        "contourFollow": true,
+        "contourPartId": "blade",
+        "occlusionPolicy": "respect-silhouette"
+      },
+      "bindings": [
+        {
+          "channel": "texture",
+          "operation": "increase-grain",
+          "amount": 0.6,
+          "targets": { "materials": ["steel", "holy_steel", "darksteel"] }
+        },
+        {
+          "channel": "texture",
+          "operation": "increase-grain",
+          "amount": 0.3,
+          "targets": { "materials": ["iron", "gold"] }
+        },
+        {
+          "channel": "density",
+          "operation": "increase-mark-density",
+          "amount": 0.4,
+          "targets": { "materials": ["steel"] }
+        }
+      ],
+      "coordinates": []
+    }
+  ]
+}

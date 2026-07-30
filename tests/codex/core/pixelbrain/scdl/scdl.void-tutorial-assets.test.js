@@ -94,7 +94,11 @@ describe('VOID tutorial island modular SCDL assets', () => {
     }).png.output;
 
     expect(sha256(shaded)).toBe(sha256(exportSCDL(result.packet, ['png'], result.ast, { shade: 'material' }).png.output));
-    expect(sha256(shaded)).toBe('4b5e66cb642866287457c2946af64cbf69fa95e9c99a5bd3253a089ac9128bbe');
+    // Re-frozen when `sphere` began shading from a true hemisphere normal
+    // instead of the in-plane radial direction: this fixture's anchor crystal is
+    // a `sphere ... light -1 -1`, so its tone bands moved. Previous value:
+    // 4b5e66cb642866287457c2946af64cbf69fa95e9c99a5bd3253a089ac9128bbe
+    expect(sha256(shaded)).toBe('e6a5195ce2f0420524c3b9f353dec2ac72719887722298691eb1bd484ea59b1b');
     expect(sha256(shaded)).not.toBe(sha256(flat));
     expect(sha256(shaded)).not.toBe(sha256(noAa));
   });

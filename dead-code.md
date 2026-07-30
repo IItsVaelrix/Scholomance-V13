@@ -1,6 +1,6 @@
 # Dead Code Report
 
-Generated at: 2026-07-28T16:26:47.520Z
+Generated at: 2026-07-30T08:32:32.157Z
 
 ## Unreachable Files
 Files in `src/` or `codex/` that are not imported by any entry point or reachable file.
@@ -142,9 +142,6 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] src/lib/truesight/compiler/verseIRSerialization.js
 - [ ] src/lib/truesight/immune/collectTruesightNodes.js
 - [ ] src/lib/vixel-lattice/index.js
-- [ ] src/lib/vixel-lattice/vixel-feel-adapter.js
-- [ ] src/lib/vixel-lattice/vixel-fusion.js
-- [ ] src/lib/vixel-lattice/vixel-schema.js
 - [ ] src/pages/Combat/assets/generated/combat-tile.js
 - [ ] src/pages/Combat/assets/generated/combat-torch.js
 - [ ] src/pages/Landing/storm/dbm.js
@@ -326,9 +323,12 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/core/pixelbrain/amps/noise/deterministic-noise.js
 - [ ] codex/core/pixelbrain/amps/qbit/qbit-snap-profile.js
 - [ ] codex/core/pixelbrain/amps/turboquant/turboquant-layer-snapshot.js
+- [ ] codex/core/pixelbrain/asset-pipeline.js
 - [ ] codex/core/pixelbrain/bytecode-to-scdl-bridge.js
 - [ ] codex/core/pixelbrain/character-face-composer.js
 - [ ] codex/core/pixelbrain/color-codec.js
+- [ ] codex/core/pixelbrain/compile-asset.js
+- [ ] codex/core/pixelbrain/construction-to-coords.js
 - [ ] codex/core/pixelbrain/geometry/bounds.js
 - [ ] codex/core/pixelbrain/geometry/cell-key.js
 - [ ] codex/core/pixelbrain/geometry/cell-set.js
@@ -354,6 +354,7 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/core/pixelbrain/inject-hair.js
 - [ ] codex/core/pixelbrain/loot-chest-composition.js
 - [ ] codex/core/pixelbrain/loot-chest-forge.js
+- [ ] codex/core/pixelbrain/material-validator.js
 - [ ] codex/core/pixelbrain/mining-patch.js
 - [ ] codex/core/pixelbrain/neighbor-extrapolation-amp.js
 - [ ] codex/core/pixelbrain/palette-role-quantizer.js
@@ -373,6 +374,7 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/core/pixelbrain/scdl/passes/expand-symmetry.pass.js
 - [ ] codex/core/pixelbrain/scdl/passes/expand-vector.pass.js
 - [ ] codex/core/pixelbrain/scdl/passes/lower-booleans.js
+- [ ] codex/core/pixelbrain/scdl/passes/project-genes.pass.js
 - [ ] codex/core/pixelbrain/scdl/passes/resolve-colors.pass.js
 - [ ] codex/core/pixelbrain/scdl/passes/resolve-materials.pass.js
 - [ ] codex/core/pixelbrain/scdl/passes/validate.pass.js
@@ -386,6 +388,9 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/core/pixelbrain/scdl/scdl.grammar.js
 - [ ] codex/core/pixelbrain/scdl/scdl.lattice-emitter.js
 - [ ] codex/core/pixelbrain/scdl-raster-emitter.js
+- [ ] codex/core/pixelbrain/scdna-art-gene-compiler.js
+- [ ] codex/core/pixelbrain/scdna-art-gene-store.js
+- [ ] codex/core/pixelbrain/scdna-art-gene.js
 - [ ] codex/core/pixelbrain/scdna-gene-packet.js
 - [ ] codex/core/pixelbrain/scene-graph-renderer.js
 - [ ] codex/core/pixelbrain/silhouette-scan.js
@@ -395,6 +400,10 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/core/pixelbrain/tile-forge/tile-forge.scorer.js
 - [ ] codex/core/pixelbrain/tile-forge/tile-forge.snap-validator.js
 - [ ] codex/core/pixelbrain/tile-forge/tile-forge.validator.js
+- [ ] codex/core/pixelbrain/vixel/index.js
+- [ ] codex/core/pixelbrain/vixel/vri-compiler.js
+- [ ] codex/core/pixelbrain/vixel/vri-renderer.js
+- [ ] codex/core/pixelbrain/vixel/vri-schema.js
 - [ ] codex/core/pixelbrain/voxel-axes.js
 - [ ] codex/core/pixelbrain/voxel-block.js
 - [ ] codex/core/pixelbrain/voxel-keyframe.js
@@ -543,7 +552,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `XStateAdapter` in `src/core/compose/workflow/XStateAdapter.ts`
 - [ ] `createXStateAdapter` in `src/core/compose/workflow/XStateAdapter.ts`
 - [ ] `Lch` in `src/core/phenotype/color.ts`
-- [ ] `relativeLuminance` in `src/core/phenotype/color.ts`
 - [ ] `IsolationContract` in `src/core/phenotype/isolation.ts`
 - [ ] `PaletteRole` in `src/core/phenotype/quantize/chromaticity.ts`
 - [ ] `quantizeChromaticity` in `src/core/phenotype/quantize/chromaticity.ts`
@@ -567,6 +575,7 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `vectorToSCD64` in `src/core/phenotype/vector.ts`
 - [ ] `SCD64DiagnosticMatch` in `src/core/scd64/RuleRegistry.ts`
 - [ ] `SCD64Rule` in `src/core/scd64/RuleRegistry.ts`
+- [ ] `ArtSlotAlias` in `src/core/scd64/constants.ts`
 - [ ] `lookupSCD64BlocksInMCP` in `src/core/scd64/decodeSCD64.ts`
 - [ ] `writeSCD64RegressionTest` in `src/core/scd64/generateSCD64RegressionTest.ts`
 - [ ] `buildSCD64Glossary` in `src/core/scd64/glossary.ts`
@@ -954,6 +963,7 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `loadPhaserRuntime` in `src/lib/phaser/phaser-runtime.adapter.js`
 - [ ] `PHOTONIC_ERROR_CODES` in `src/lib/photonic-quantization/photonic-errors.js`
 - [ ] `PHOTONIC_SEVERITIES` in `src/lib/photonic-quantization/photonic-errors.js`
+- [ ] `MOTIF_NOMINATION_SCHEMA` in `src/lib/photonic-retina/motif-nomination.js`
 - [ ] `bindUniforms` in `src/lib/pixelbrain/shader-webgl-preview.js`
 - [ ] `runPixelBrainPipeline` in `src/lib/pixelbrain.adapter.js`
 - [ ] `buildPixelBrainPhotonicRoute` in `src/lib/pixelbrain.adapter.js`
@@ -1537,6 +1547,10 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `AnatomySchemas` in `codex/core/pixelbrain/anatomy-registry.js`
 - [ ] `getAnatomySchema` in `codex/core/pixelbrain/anatomy-registry.js`
 - [ ] `ASEPRITE_BINARY_CODEC_VERSION` in `codex/core/pixelbrain/aseprite-binary-codec.js`
+- [ ] `ASSET_PIPELINE_CONTRACT` in `codex/core/pixelbrain/asset-pipeline.js`
+- [ ] `LINEAGE_CONTRACT` in `codex/core/pixelbrain/asset-pipeline.js`
+- [ ] `CONSTRUCTION_LINK` in `codex/core/pixelbrain/asset-pipeline.js`
+- [ ] `verifyLineage` in `codex/core/pixelbrain/asset-pipeline.js`
 - [ ] `NEGOTIATION_THRESHOLD` in `codex/core/pixelbrain/biome-coherence-amp.js`
 - [ ] `MAX_NEGOTIATION_PASSES` in `codex/core/pixelbrain/biome-coherence-amp.js`
 - [ ] `getNeighbors6` in `codex/core/pixelbrain/biome-coherence-amp.js`
@@ -1565,7 +1579,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `composeFaceFeatures` in `codex/core/pixelbrain/character-face-composer.js`
 - [ ] `characterPartIds` in `codex/core/pixelbrain/character-factory.js`
 - [ ] `stampCharacterCellOwnership` in `codex/core/pixelbrain/character-factory.js`
-- [ ] `rasterizeCells` in `codex/core/pixelbrain/character-foundry.js`
 - [ ] `uint8ToBase64` in `codex/core/pixelbrain/character-foundry.js`
 - [ ] `CHARACTER_SPEC_VERSION` in `codex/core/pixelbrain/character-spec.js`
 - [ ] `DEFAULT_ATTENUATION_MODEL` in `codex/core/pixelbrain/chunked-world-volume.js`
@@ -1589,6 +1602,14 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `rateColorIntensity` in `codex/core/pixelbrain/color-intensity-rating-microprocessor.js`
 - [ ] `rateCoordinateColorIntensity` in `codex/core/pixelbrain/color-intensity-rating-microprocessor.js`
 - [ ] `annotateCoordinateColorIntensity` in `codex/core/pixelbrain/color-intensity-rating-microprocessor.js`
+- [ ] `CONSTRAINT_TOLERANCE` in `codex/core/pixelbrain/construction/constraint-solver.js`
+- [ ] `applyTransformConstraints` in `codex/core/pixelbrain/construction/constraint-solver.js`
+- [ ] `verifyConstraints` in `codex/core/pixelbrain/construction/constraint-solver.js`
+- [ ] `angleBetween` in `codex/core/pixelbrain/construction/geometry-utils.js`
+- [ ] `clampToCanvas` in `codex/core/pixelbrain/construction/geometry-utils.js`
+- [ ] `scanlineFill` in `codex/core/pixelbrain/construction-to-coords.js`
+- [ ] `ribbonFill` in `codex/core/pixelbrain/construction-to-coords.js`
+- [ ] `solvedPartToCoords` in `codex/core/pixelbrain/construction-to-coords.js`
 - [ ] `CoordSymmetryProcessor` in `codex/core/pixelbrain/coord-symmetry-amp.js`
 - [ ] `generateSpiralCoordinates` in `codex/core/pixelbrain/coordinate-mapping.js`
 - [ ] `mapSemanticToCoordinateConstraints` in `codex/core/pixelbrain/coordinate-mapping.js`
@@ -1643,6 +1664,7 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `normalizeVectorizedText` in `codex/core/pixelbrain/formula-to-coordinates.js`
 - [ ] `evaluateVectorizedText` in `codex/core/pixelbrain/formula-to-coordinates.js`
 - [ ] `evaluateMathExpression` in `codex/core/pixelbrain/formula-to-coordinates.js`
+- [ ] `evaluateConstructionRequest` in `codex/core/pixelbrain/formula-to-coordinates.js`
 - [ ] `FOUNDRY_ASEPRITE_BRIDGE_VERSION` in `codex/core/pixelbrain/foundry-aseprite-bridge.js`
 - [ ] `GEAR_GLIDE_CONFIG` in `codex/core/pixelbrain/gear-glide-amp.js`
 - [ ] `createGearGlideState` in `codex/core/pixelbrain/gear-glide-amp.js`
@@ -1693,6 +1715,12 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `getLootChestFramePackets` in `codex/core/pixelbrain/loot-chest-forge.js`
 - [ ] `renderLootChestTierFramePng` in `codex/core/pixelbrain/loot-chest-forge.js`
 - [ ] `DEFAULT_EMISSION_FACTOR` in `codex/core/pixelbrain/material-registry.js`
+- [ ] `getMaterialGrain` in `codex/core/pixelbrain/material-registry.js`
+- [ ] `MATERIAL_VALIDATOR_CONTRACT` in `codex/core/pixelbrain/material-validator.js`
+- [ ] `COMPARTMENT_KIND` in `codex/core/pixelbrain/material-validator.js`
+- [ ] `DEFAULT_COMPARTMENTS` in `codex/core/pixelbrain/material-validator.js`
+- [ ] `validateMaterialRegistry` in `codex/core/pixelbrain/material-validator.js`
+- [ ] `formatMaterialReport` in `codex/core/pixelbrain/material-validator.js`
 - [ ] `applyMiningPatch` in `codex/core/pixelbrain/mining-patch.js`
 - [ ] `MIRRORED_TRIM_VALIDATOR_ID` in `codex/core/pixelbrain/mirrored-trim-validator.js`
 - [ ] `MIRRORED_TRIM_VALIDATOR_VERSION` in `codex/core/pixelbrain/mirrored-trim-validator.js`
@@ -1755,8 +1783,22 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `assertDeterministic` in `codex/core/pixelbrain/region-fill-amp.js`
 - [ ] `RENDERERS` in `codex/core/pixelbrain/renderer-registry.js`
 - [ ] `canonicalOp` in `codex/core/pixelbrain/scdl/passes/build-scene-graph.pass.js`
+- [ ] `computeVectorIdentity` in `codex/core/pixelbrain/scdl/render/raster-core.js`
 - [ ] `SPHERE_THRESHOLDS` in `codex/core/pixelbrain/scdl/render/raster-core.js`
 - [ ] `emitScdlRaster` in `codex/core/pixelbrain/scdl-raster-emitter.js`
+- [ ] `PREVIEW_RENDERER_VERSION` in `codex/core/pixelbrain/scdna-art-gene-compiler.js`
+- [ ] `validateApprovalAuthority` in `codex/core/pixelbrain/scdna-art-gene-compiler.js`
+- [ ] `computePreviewChecksums` in `codex/core/pixelbrain/scdna-art-gene-compiler.js`
+- [ ] `renderDeterministicArtPreviewSVG` in `codex/core/pixelbrain/scdna-art-gene-compiler.js`
+- [ ] `evaluateArtProjection` in `codex/core/pixelbrain/scdna-art-gene-compiler.js`
+- [ ] `setArtMemoryLedgerPath` in `codex/core/pixelbrain/scdna-art-gene-store.js`
+- [ ] `getArtMemoryLedgerPath` in `codex/core/pixelbrain/scdna-art-gene-store.js`
+- [ ] `validateArtMemoryRecord` in `codex/core/pixelbrain/scdna-art-gene-store.js`
+- [ ] `queryArtMemoryLedger` in `codex/core/pixelbrain/scdna-art-gene-store.js`
+- [ ] `ART_GENE_CONTRACT` in `codex/core/pixelbrain/scdna-art-gene.js`
+- [ ] `ART_GENE_VERSION` in `codex/core/pixelbrain/scdna-art-gene.js`
+- [ ] `isArtGenesEnabled` in `codex/core/pixelbrain/scdna-art-gene.js`
+- [ ] `validateProjectionMode` in `codex/core/pixelbrain/scdna-art-gene.js`
 - [ ] `createSCDNAGenePacket` in `codex/core/pixelbrain/scdna-gene-packet.js`
 - [ ] `createSCDNAGeneReadyHealthEvent` in `codex/core/pixelbrain/scdna-gene-packet.js`
 - [ ] `SCHOLO_CHIBI_FACE_PROFILES` in `codex/core/pixelbrain/scholo-chibi-face-profiles.js`
@@ -1794,7 +1836,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `SILH_SCHEMA_VERSION` in `codex/core/pixelbrain/silhouette-blueprint.js`
 - [ ] `digestBlueprint` in `codex/core/pixelbrain/silhouette-blueprint.js`
 - [ ] `assertConnected` in `codex/core/pixelbrain/silhouette-composer.js`
-- [ ] `traceContour` in `codex/core/pixelbrain/silhouette-scan.js`
 - [ ] `buildSilhFormBlock` in `codex/core/pixelbrain/silhouette-scan.js`
 - [ ] `SQUARE_SHARPNESS_CONTRAST_AMP_ID` in `codex/core/pixelbrain/square-sharpness-contrast-amp.js`
 - [ ] `SQUARE_SHARPNESS_CONTRAST_VERSION` in `codex/core/pixelbrain/square-sharpness-contrast-amp.js`

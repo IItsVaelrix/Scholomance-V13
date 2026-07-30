@@ -133,7 +133,10 @@ function requirePartPointRef(value, field, issues) {
     || typeof value.point !== 'string'
     || !value.point
   ) {
-    issue(issues, 'VALUE', `${field} must be a PartPointRef`, { field });
+    // Naming the shape matters: three reference forms coexist in this schema
+    // ({ anchor }, { ref, point }, and a bare part-id string) and "must be a
+    // PartPointRef" gave no way to tell which one was wanted.
+    issue(issues, 'VALUE', `${field} must be a PartPointRef: { ref: <part id>, point: <named point> }`, { field });
     return false;
   }
   return true;
@@ -146,7 +149,7 @@ function requirePointRef(value, field, issues) {
 
 function requireRatioSpec(value, field, issues) {
   if (!value?.ratio || typeof value.ratio !== 'object') {
-    issue(issues, 'VALUE', `${field} must be a RatioSpec`, { field });
+    issue(issues, 'VALUE', `${field} must be a RatioSpec: { ratio: { reference: <number|PartPointRef>, value: <positive number> } }`, { field });
     return false;
   }
   const { reference, value: ratio } = value.ratio;
@@ -525,21 +528,30 @@ export function collectConstructionIssues(spec) {
     issue(issues, 'VALUE', 'constraints must be an array');
   }
 
-  if (!spec.validation || typeof spec.validation !== 'object' || Array.isArray(spec.validation)) {
-    issue(issues, 'VALUE', 'validation must be an object');
-  } else {
+  // `validation` and each of its laws are optional: an omitted law asserts
+  // nothing. Requiring all five made a partial object cascade into "must be"
+  // errors for fields the author had never heard of, so writing a first spec meant
+  // discovering the schema one refusal at a time. The constraints in
+  // `spec.constraints` are verified regardless — those are the solver's promise;
+  // these laws are extra assertions you opt into.
+  if (spec.validation !== undefined
+    && (typeof spec.validation !== 'object' || spec.validation === null || Array.isArray(spec.validation))) {
+    issue(issues, 'VALUE', 'validation must be an object when present');
+  } else if (spec.validation) {
     const laws = spec.validation;
-    if (!Array.isArray(laws.closedParts)) {
-      issue(issues, 'VALUE', 'validation.closedParts must be an array');
+    if (laws.closedParts !== undefined && !Array.isArray(laws.closedParts)) {
+      issue(issues, 'VALUE', 'validation.closedParts must be an array of part ids');
     }
-    if (typeof laws.forbidSelfIntersections !== 'boolean') {
+    if (laws.forbidSelfIntersections !== undefined && typeof laws.forbidSelfIntersections !== 'boolean') {
       issue(issues, 'VALUE', 'validation.forbidSelfIntersections must be boolean');
     }
-    if (!WINDING_DIRECTIONS.has(laws.consistentWinding)) {
+    if (laws.consistentWinding !== undefined && !WINDING_DIRECTIONS.has(laws.consistentWinding)) {
       issue(issues, 'VALUE', 'validation.consistentWinding must be clockwise or counterclockwise');
     }
-    requireNonNegative(laws.minimumCurvatureRadius, 'validation.minimumCurvatureRadius', issues);
-    if (typeof laws.requireConnectedAssembly !== 'boolean') {
+    if (laws.minimumCurvatureRadius !== undefined) {
+      requireNonNegative(laws.minimumCurvatureRadius, 'validation.minimumCurvatureRadius', issues);
+    }
+    if (laws.requireConnectedAssembly !== undefined && typeof laws.requireConnectedAssembly !== 'boolean') {
       issue(issues, 'VALUE', 'validation.requireConnectedAssembly must be boolean');
     }
     if (

@@ -107,6 +107,7 @@ export const ServerMessageTypeSchema = z.enum([
   "command.refused",
   "domain.events",
   "scene.patch",
+  "scene.sealed",
   "state.resync.required",
   "server.error",
 ]);
@@ -161,6 +162,25 @@ export const ScenePatchMessageSchema = z.object({
   entityInfo: z.record(z.string(), EntityInfoSchema).optional(),
 });
 
+/**
+ * scene.sealed — Defold Bridge Design §"Runtime Flow" step 4.
+ *
+ * The server builds and seals the packet (ONE producer), then emits this
+ * message. Consumers verify the seal by string equality only; they never
+ * recompute it. `scene.patch` remains during transition so the PixiJS
+ * laboratory keeps working.
+ *
+ * The `packet` field carries the full SealedScenePacket as a plain JSON
+ * object. It is typed as z.unknown() here to avoid a circular dependency
+ * on @polaris/scene-packet; the server validates it before emission.
+ */
+export const SceneSealedMessageSchema = z.object({
+  type: z.literal("scene.sealed"),
+  envelope: RevisionEnvelopeSchema,
+  /** The full SealedScenePacket (see @polaris/scene-packet contracts). */
+  packet: z.unknown(),
+});
+
 export const StateResyncRequiredMessageSchema = z.object({
   type: z.literal("state.resync.required"),
   envelope: RevisionEnvelopeSchema,
@@ -180,6 +200,7 @@ export const ServerMessageSchema = z.discriminatedUnion("type", [
   CommandRefusedMessageSchema,
   DomainEventsMessageSchema,
   ScenePatchMessageSchema,
+  SceneSealedMessageSchema,
   StateResyncRequiredMessageSchema,
   ServerErrorMessageSchema,
 ]);
@@ -191,5 +212,6 @@ export type CommandAcceptedMessage = z.infer<typeof CommandAcceptedMessageSchema
 export type CommandRefusedMessage = z.infer<typeof CommandRefusedMessageSchema>;
 export type DomainEventsMessage = z.infer<typeof DomainEventsMessageSchema>;
 export type ScenePatchMessage = z.infer<typeof ScenePatchMessageSchema>;
+export type SceneSealedMessage = z.infer<typeof SceneSealedMessageSchema>;
 export type StateResyncRequiredMessage = z.infer<typeof StateResyncRequiredMessageSchema>;
 export type ServerErrorMessage = z.infer<typeof ServerErrorMessageSchema>;

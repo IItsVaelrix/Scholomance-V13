@@ -1,0 +1,132 @@
+-- main/bootstrap.script — Defold sovereign runtime entry point.
+--
+-- Defold Bridge Design §"Runtime Flow":
+--   1. Defold input (hotspot tap) → command.submit with expectedRevision.
+--   2. Kernel resolves the command → events → roomRevision bumps.
+--   3. scene-compiler projects a SceneManifest (contractHash).
+--   4. Server calls buildSealedPacket, computes plan1:, emits scene.sealed.
+--   5. Defold polls the socket non-blocking inside update(dt); json.decode
+--      under pcall; revision gate; seal equality; render or fail closed.
+--   6. Defold reports a claim; the bridge mints the receipt.
+--
+-- The engine's frame rate must never become an authority on world time.
+-- LuaSocket is polled non-blocking (settimeout(0)) inside update(dt).
+
+local ws       = require("scenepacket.ws")
+local packet   = require("scenepacket.packet")
+local render   = require("scenepacket.render")
+local claim    = require("scenepacket.claim")
+
+-- Server WebSocket URL. ws:// only — no TLS (Defold Bridge Design §"Decisions").
+local WS_URL = "ws://127.0.0.1:3000/ws"
+
+-- Player identity for this runtime instance.
+local PLAYER_ID = "defold-player-1"
+local ROOM_ID   = "ruined_shrine"
+
+go.register()
+
+function init(self)
+  self.ws_client = ws.create(WS_URL)
+  self.current_state = nil  -- { roomRevision, sequence, seal }
+  self.last_verified_frame = nil
+  self.pending_command = nil
+
+  -- Wire up WebSocket callbacks.
+  self.ws_client:on_open(function()
+    print("[defold-runtime] WebSocket connected")
+    -- Identify and join the room.
+    self.ws_client:send(json.encode({
+      type = "connection.identify",
+      playerId = PLAYER_ID,
+    }))
+    self.ws_client:send(json.encode({
+      type = "room.join",
+      playerId = PLAYER_ID,
+      roomId = ROOM_ID,
+    }))
+  end)
+
+  self.ws_client:on_message(function(raw)
+    local ok, msg = pcall(json.decode, raw)
+    if not ok or type(msg) ~= "table" then return end
+
+    if msg.type == "scene.sealed" then
+      handle_sealed_packet(self, msg)
+    elseif msg.type == "command.accepted" then
+      print("[defold-runtime] Command accepted: " .. tostring(msg.commandId))
+    elseif msg.type == "command.refused" then
+      print("[defold-runtime] Command refused: " .. tostring(msg.refusal))
+    end
+  end)
+
+  self.ws_client:on_close(function()
+    print("[defold-runtime] WebSocket closed; will reconnect")
+  end)
+
+  self.ws_client:on_error(function(err)
+    print("[defold-runtime] WebSocket error: " .. tostring(err))
+  end)
+
+  self.ws_client:connect()
+end
+
+--- Handle a scene.sealed message: decode → gate → seal → render → claim.
+function handle_sealed_packet(self, msg)
+  local raw_packet = msg.packet
+  if not raw_packet then return end
+
+  -- Re-encode the packet sub-object for the byte-cap check.
+  local raw_json = json.encode(raw_packet)
+
+  -- Full acceptance pipeline: decode → revision gate → seal equality.
+  local pkt, reason = packet.accept(raw_json, self.current_state)
+  if not pkt then
+    -- Rule 2: hold last verified frame. Never best-effort.
+    print("[defold-runtime] Packet rejected: " .. tostring(reason))
+    return
+  end
+
+  -- Rule 3: derive visual state from the packet alone.
+  local resolved_assets = render.apply(pkt)
+
+  -- Update current state for the monotonic gate.
+  self.current_state = {
+    roomRevision = pkt.roomRevision,
+    sequence = pkt.sequence,
+    seal = pkt.seal,
+  }
+  self.last_verified_frame = pkt
+
+  -- Step 6: report a claim. The bridge mints the receipt.
+  local mode = "illustrated"
+  local claim_obj = claim.build_claim(pkt.seal, mode, resolved_assets)
+  self.ws_client:send(claim.encode_claim(claim_obj))
+end
+
+function update(self, dt)
+  -- Non-blocking socket poll every frame.
+  -- The engine's frame rate is NOT an authority on world time.
+  self.ws_client:poll(dt)
+end
+
+function on_input(self, action_id, action)
+  -- Hotspot tap → command.submit with expectedRevision (Runtime Flow §1).
+  if action_id == hash("touch") and action.pressed then
+    local command = render.hit_test(action.x, action.y)
+    if command and self.current_state then
+      self.ws_client:send(json.encode({
+        type = "command.submit",
+        commandId = "defold-" .. tostring(os.clock()),
+        playerId = PLAYER_ID,
+        roomId = ROOM_ID,
+        expectedRevision = self.current_state.roomRevision,
+        rawInput = command,
+      }))
+    end
+  end
+end
+
+function final(self)
+  self.ws_client:close()
+end

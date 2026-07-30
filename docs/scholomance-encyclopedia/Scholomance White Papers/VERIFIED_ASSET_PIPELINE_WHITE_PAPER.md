@@ -73,6 +73,13 @@ This paper distinguishes implementation from architectural context.
 - Deterministic geometry, texture, mark, lighting, fog/grading, and raster
   patch rendering.
 - Integer-scale RGBA output.
+- Opt-in palette quantization onto per-material anchor ramps, in luminance-band
+  or nearest-anchor mode, with per-material ramp-coverage reporting.
+- Compile-time reporting of declared-but-unexecuted scene features through
+  `RENDERER_CAPABILITIES` and `provenance.unrenderedDeclarations`.
+- A locked reference render: a fixed fixture whose exact RGBA bytes are
+  asserted against a stored digest, so a renderer change that alters output
+  fails rather than passing a self-consistency check.
 
 ### 1.2 Approved design context
 
@@ -493,8 +500,58 @@ The compiler serializes visible scene content—including coordinates, layer
 payloads, lights, atmosphere, and canvas dimensions—then computes an
 eight-character FNV-1a checksum.
 
+Serialization sorts object keys recursively and preserves array order, so the
+digest is a function of content rather than of the order in which a caller
+happened to assemble a record. Layer payloads are serialized whole rather than
+hand-projected onto a field list; a coordinate field added later is covered by
+the digest on the day it is added.
+
+This matters because a projection is a promise that has to be maintained. An
+earlier implementation reduced each geometry coordinate to
+`{x, y, color, material, signedDistance}`. The renderer also reads `normal`,
+`tangent`, `curvature`, `t`, `arcLength`, `strokeHalfWidth`, and `snappedX/Y`.
+Scenes differing only in those fields therefore produced identical checksums
+and different pixels — `snappedX` alone relocates a sprite. The regression
+suite now varies each of those fields individually and asserts both that the
+render changes and that the checksum changes.
+
 This checksum is content-sensitive and deterministic. It is not the
 cryptographic SHA-256 identity used by the construction contract.
+
+### 6.9 Unrendered-declaration reporting
+
+The VRI schema is deliberately wider than the renderer. That is defensible for
+forward compatibility and for downstream consumers, but a carried-but-inert
+field must not be indistinguishable from a working one: an author who sets
+bloom and sees no change cannot otherwise tell a wrong value from an
+unimplemented pass.
+
+`vri-renderer.js` therefore exports `RENDERER_CAPABILITIES`, a manifest of the
+layer types, blend modes, light kinds, atmosphere passes, and texture spaces
+that are actually executed, plus the payload fields that are never read. The
+compiler diffs each scene against that manifest and records the result in
+`provenance.unrenderedDeclarations`, alongside `provenance.rendererVersion`.
+
+Each entry carries a `field`, its `value`, and a `reason`. Reporting is never
+a refusal — compilation succeeds and the scene is unchanged. An over-declared
+scene reports, for example:
+
+```text
+geometry.aaWidth = 0.7
+    edge softness is derived from output scale; authored aaWidth is not read
+atmosphere.bloom = true
+    the renderer executes no bloom pass; the data is carried but never applied
+gene.binding.operation = "lighting:decrease-key"
+    no compiler branch implements this operation
+gene.binding.recordedOnly = "palette"
+    recorded into provenance as intent; it does not alter the scene
+gene.binding.channel = "sparkle"
+    unknown binding channel; ignored for forward compatibility
+```
+
+The manifest is the single source of truth. A contributor who adds a pass must
+add its capability in the same commit, or the compiler will keep reporting a
+shipped feature as inert.
 
 ---
 
@@ -526,7 +583,8 @@ The current renderer executes:
 3. marks
 4. lighting
 5. fog and color grading
-6. raster patches
+6. palette quantization
+7. raster patches
 ```
 
 The ordering is semantic. A raster patch is the final authored word, while
@@ -587,8 +645,14 @@ The renderer implements:
 | Rim | Fresnel-like grazing-angle emphasis |
 | Ambient | Constant contribution |
 
-Lights can target named materials through their `affects` list. Transparent
-pixels are skipped.
+Lights can target named materials through their `affects` list. An empty list
+means every cell; a non-empty list is an allow-list, and a cell carrying no
+material at all is not on it. Transparent pixels are skipped.
+
+`FOG` and `BLOOM` appear in `LIGHT_KINDS` but are not illumination. The
+lighting pass skips them rather than letting them reach a default branch,
+which previously applied a flat `intensity × 0.5` colour wash to every lit
+cell.
 
 ### 7.7 Atmosphere
 
@@ -601,11 +665,122 @@ The verified atmosphere pass implements:
 Although the scene schema and compiler can carry bloom data, the current
 renderer does not execute a bloom pass.
 
-### 7.8 Final raster patches
+### 7.8 Palette quantization
 
-Raster-patch pixels use logical coordinates and fill the complete scaled cell
-block. Fully opaque patches replace RGBA values. Partial-alpha patches blend
-against the current buffer and raise output alpha as needed.
+Every generative pass computes in continuous RGB: lighting adds, grading
+multiplies, texture modulates. A nine-colour authored sprite therefore left the
+renderer carrying hundreds of colours, and the count grew with output scale, so
+the same asset had no stable colour identity across sizes.
+
+The quantization pass snaps each covered pixel to the nearest colour on its
+material's authored anchor ramp, by luma-weighted RGB distance. On the
+`celestial-sword` fixture:
+
+| | 1× | 4× | 8× |
+|---|---|---|---|
+| `quantize: false` | 308 colours | 864 | 1192 |
+| `quantize: true` | 45 | 45 | 45 |
+
+The stability matters as much as the reduction. A ramp has no notion of
+resolution, so rendering larger can no longer invent colour.
+
+Three placement decisions carry the design:
+
+- It runs **after** every generative pass. Quantizing earlier is undone by
+  whatever runs next.
+- It runs **before** raster patches, so curated pixels — authored patches and
+  gene coordinates alike — are never re-coloured by a machine pass. This is the
+  human-authority principle expressed in pass order.
+- The **compiler** resolves ramps from the material registry and bakes them into
+  the scene. The renderer never imports the registry, so rendering stays a pure
+  function of the scene it is handed, and a caller may supply its own ramps
+  instead.
+
+Selection is nearest-anchor rather than positional index. `qbit-phosphorylation`
+indexes `Object.values(material.anchors)` by SDF depth, treating anchor order as
+the energy ramp — rim to core, `void` to `whiteCore`. That ordering is a registry
+convention rather than a validated contract: of 68 materials carrying anchors, 62
+are monotonic dark-to-bright and six are not, split between deliberately emissive
+ramps whose bright anchors are less luminant and genuine `deep`/`body`
+inversions. Nearest-anchor never assumes position implies brightness, so a
+mis-ordered ramp yields a wrong-index colour rather than an inverted gradient.
+
+Quantization is **opt-in** (`compileVRI(packet, { quantize: true })`). Enabling
+it by default would rewrite every existing asset's checksum and pixels in one
+step, and in this pipeline the checksum is identity. Flip the default once the
+corpus below is reconciled.
+
+#### 7.8.1 Selection mode: the material carries the colour
+
+Quantization has two modes, and the choice is a statement about what an authored
+hex *means*.
+
+`luminance-band` (the default) treats the authored hex as a **value sketch**: it
+maps a pixel's luminance onto ramp position over the absolute [0,1] range, and
+the material supplies the hue. This is what makes a material name carry colour
+intent — swapping `material crystal` for `material ruby` recolours a part while
+preserving its form. It mirrors the registry's own `transmuteMaterialColor`,
+which has always been luminance-driven.
+
+`nearest-anchor` snaps to the nearest ramp colour by luma-weighted RGB distance,
+preserving authored hue. It is the wrong mode when the material is meant to
+*supply* hue. Snapping cyan onto a ruby ramp sends three distinct authored values
+— `#00E5FF`, `#FFFFFF`, `#80F5FF` — all to the same anchor `#FFF0F5`, because
+every ruby anchor is far from cyan and the near-white is merely least far. Blade,
+spine and pommel collapse to one colour and the form is destroyed. Under
+`luminance-band` the same three map to `#F4639B`, `#FFF0F5`, `#FBB6D0` — hue
+changes, structure survives.
+
+Mapping is deliberately **not** normalised against the ramp's own luminance span.
+That looks equivalent for a wide ramp (`sapphire` spans 0.02–0.96) but collapses a
+narrow one: every pixel brighter than 0.15 would land on `abyss`'s top anchor. The
+absolute mapping means a value sketch distributes across whatever ramp it is
+given, so an abyss-material object renders dark but still legible.
+
+Verified against a real asset. `holy_fire_claymore.pbrain` (64×112, 788 coords,
+39 colours) carries **no material data at all** — it predates material semantics.
+Assigning materials per part and rendering under `luminance-band`:
+
+| morph | materials | colours |
+|---|---|---|
+| original | none | 39 |
+| void-ice | sapphire blade, voidsteel hilt, amethyst pommel | 13 |
+| ruby | ruby blade, darksteel guard, leather grip, gold pommel | 16 |
+| emerald | emerald blade, bronze guard, oak_bark grip, moonstone pommel | 15 |
+
+Every rim highlight, the crossguard, and the grip ridges survive each morph. Only
+hue moves. This reproduces the operation `sprite.void_ice_claymore.v1` documents
+as "a luminance-ramp morph of holy_fire_claymore."
+
+#### 7.8.2 Palette coverage
+
+A material swap can only express what the value sketch gives it room to express.
+`provenance.paletteCoverage` reports, per material, how many distinct ramp anchors
+the authored colours reach, with the luminance span they cover.
+
+A part reaching **one** anchor is flagged `flat`: every material renders it as a
+single block, so no morph can do anything but recolour it. That needs no tuned
+threshold — one anchor used means the ramp is doing no work. Across shrine-demo,
+`lightning-sword` is 1/7 on all six of its materials with span 0.00, while
+`moonlit-shrine-forest` reaches 4/7 and 5/7 with spans of 0.98 and 0.76.
+
+This replaces an earlier "palette drift" metric that measured RGB distance from an
+authored colour to its material's ramp, and reported `holy_steel` painted gold as
+a defect. Under value-sketch semantics that is not a defect: gold is luminance
+0.70, landing on holy_steel's upper anchor exactly as designed. The metric was
+measuring hue divergence in a system that discards hue on purpose.
+
+### 7.9 Final raster patches
+
+Raster-patch pixels are snapped to the logical cell grid and fill the complete
+scaled cell block. Fully opaque patches replace RGBA values. Partial-alpha
+patches blend against the current buffer and raise output alpha as needed.
+
+Snapping is load-bearing. An unrounded logical coordinate scales to a
+fractional buffer index, and a fractional index on a `Uint8Array` writes
+nowhere: a patch at `x = 3.1` disappeared entirely at 4×, while `x = 3.5`
+painted a partial block whose size depended on the output scale. The mark pass
+has always rounded; the raster pass now agrees with it.
 
 This last pass guarantees that explicitly authored pixel corrections are not
 subsequently changed by procedural light or atmosphere.
@@ -698,25 +873,40 @@ geometry.
 - Increment construction or render contract versions when semantics change.
 - Do not silently lower an invalid scene graph to empty geometry.
 - Do not treat a declared-but-unrendered schema field as shipped behavior.
-- Add focused tests for every output-bearing parameter.
+- When adding a renderer pass, add its capability to `RENDERER_CAPABILITIES`
+  in the same commit, or the compiler will keep reporting a shipped feature as
+  inert.
+- Do not hand-project scene content for the checksum. Serialize payloads whole,
+  so a new field is covered the day it is added rather than the day someone
+  remembers to extend the projection.
+- Add focused tests for every output-bearing parameter, and guard each one by
+  first asserting the parameter actually moves pixels — a test that only checks
+  the compiler wrote a field proves nothing about the render.
 - Keep authored raster overrides explicit and last.
 
 ---
 
 ## 11. Current Limitations
 
+Every limitation marked *reported* is surfaced at compile time in
+`provenance.unrenderedDeclarations` (§6.9). The remainder are structural and
+carry no automatic diagnostic.
+
 | Limitation | Current consequence |
 |---|---|
-| Construction and VRI are separate composition boundaries | Callers must carry accepted coordinates into the asset packet; VRI does not invoke the solver |
-| VRI checksum is 32-bit FNV-1a displayed as eight hex characters | It is deterministic and content-sensitive, but not a cryptographic content address |
-| VRI constructors freeze outer records and selected arrays/payloads | Recursive immutability is not established for every nested caller object |
+| Construction and VRI are separate composition boundaries | Callers must carry accepted coordinates into the asset packet; VRI does not invoke the solver, and no identity links a solved construction to the scene compiled from it |
+| VRI checksum is 32-bit FNV-1a displayed as eight hex characters | It is deterministic and content-sensitive, but not a cryptographic content address; treat it as a cache key, not a content address |
+| VRI constructors freeze outer records and selected arrays/payloads | Recursive immutability is not established for every nested caller object; the gene-binding pass rebuilds modified layers as unfrozen objects |
 | Scene-graph lowering is not performed inside `compileVRI()` | The caller must provide non-empty `loweredCoordinates` |
-| Bloom is carried but not rendered | Bloom data does not change current RGBA output through a dedicated bloom pass |
-| Masks and composite layer kinds are declared but not generally executed | This paper does not claim general clipping/compositing support |
-| `HARD_LIGHT` is declared by the schema but has no dedicated blend branch | This paper claims only the blend modes explicitly implemented by `applyBlend()` |
-| Some gene channels record intent instead of applying appearance | Geometry and palette intents remain provenance metadata |
-| Unknown gene binding channels are ignored | Forward compatibility takes precedence over strict binding refusal |
+| Bloom is carried but not rendered — *reported* | Bloom data does not change current RGBA output through a dedicated bloom pass |
+| Masks and composite layer kinds are declared but not generally executed — *reported* | This paper does not claim general clipping/compositing support; a `maskRef` is carried into the scene and ignored |
+| `HARD_LIGHT` is declared by the schema but has no dedicated blend branch — *reported* | This paper claims only the blend modes explicitly implemented by `applyBlend()`; an unimplemented mode silently behaves as `NORMAL` |
+| `depthBand` is declared as z-order but never sorted on — *reported* | Layers render in array order; a `depthBand` that disagrees with array order is decoration |
+| `aaWidth`, `coverageMode`, `partFilter`, `ditherMatrix`, `strokeWidth`, per-mark `width` and `kind`, and `light.angle` are accepted but never read — *reported* | They are carried through the scene and the checksum, and reach no pass |
+| Some gene channels record intent instead of applying appearance — *reported* | Geometry and palette intents remain provenance metadata |
+| Unknown gene binding channels are ignored — *reported* | Forward compatibility takes precedence over strict binding refusal, but the ignored channel is named rather than dropped in silence |
 | VRI explicit refusals use ordinary `Error` objects | `PB-ERR-v1` coverage belongs to the construction boundary, not current VRI |
+| The construction suite locks no reference geometry | The VRI suite now pins one reference render (§12.1), but the construction tests assert `passed === true` and replay self-consistency; a solver change that moves every coordinate would still pass |
 | Approval, ledger, retrieval, and Feel loop remain design context | Current VRI compilation does not prove human approval or durable art memory |
 
 These are statements of the present implementation, not promises about future
@@ -740,13 +930,36 @@ Observed result:
 
 ```text
 Test Files  1 passed (1)
-Tests       64 passed (64)
+Tests      114 passed (114)
 ```
 
 The suite covers schema construction, compiler identity sensitivity,
 scene-graph refusal, material texture creation, art-gene bindings, output
 dimensions, alpha behavior, integer scales, and repeatable end-to-end
 VRI-to-RGBA output.
+
+Fifty of those tests were added on 2026-07-29 to lock behavior that was
+previously unasserted:
+
+- a locked reference render: one frozen fixture exercising every implemented
+  pass, whose scene checksum and exact RGBA bytes at 1×, 2×, 4×, and 8× are
+  asserted against stored SHA-256 digests. Its ability to fail was confirmed
+  by mutation — changing the texture modulation constant from 35 to 36 turns
+  the 2×, 4×, and 8× assertions red;
+
+- per-field checksum coverage for `normal`, `tangent`, `curvature`, `t`,
+  `arcLength`, `strokeHalfWidth`, `snappedX`, `snappedY`, and geometry-layer
+  `aaWidth`, each guarded by first asserting the field moves pixels;
+- checksum insensitivity to caller key insertion order;
+- `light.affects` as a strict allow-list, including cells with no material;
+- raster-patch snapping at fractional coordinates and across scales;
+- non-illuminating light kinds contributing nothing;
+- unrendered-declaration reporting for bloom, unexecuted blend modes,
+  ignored masks, unknown gene channels, and recorded-only bindings;
+- palette quantization: ramp resolution, colour-count collapse, scale
+  stability, ramp-membership of every emitted colour, passthrough and unknown
+  materials left alone, authored patches and curated gene coordinates exempt
+  from re-colouring, caller-supplied ramps, and drift reporting.
 
 ### 12.2 Geometric construction
 
@@ -768,6 +981,15 @@ Tests       122 passed (122)
 The focused construction evidence covers the solver contract and the canonical
 migrated crystal-stave asset. These focused results are not presented as a
 repository-wide QA run.
+
+### 12.3 Known stale duplicate
+
+`tests/pixelbrain/crystal-stave-blade.test.js` is an obsolete copy of the
+canonical construction test above. It asserts the retired `scd64:<8 hex>`
+checksum format and a spec variant that fails `connected-assembly`, so it
+fails on `master` and is invisible to the commands in §12.2, which only run
+the `tests/codex/...` path. It should be deleted rather than repaired; the
+`tests/codex/core/pixelbrain/construction/` copy is authoritative.
 
 ---
 

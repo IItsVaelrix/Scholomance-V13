@@ -31,6 +31,13 @@
 
 import { hashString } from '../shared.js';
 
+/**
+ * SCDL_ERROR_CODES.ILLEGAL_CHARACTER (SCDL-022), mirrored as a literal because
+ * scdl.errors.js imports nothing from here and this module must not import it
+ * back. Keep in step with the catalogue in scdl.errors.js.
+ */
+const SCDL_ILLEGAL_CHARACTER = 0x1016;
+
 // ─── Tokenizer ───────────────────────────────────────────────────────────────
 
 const TOKEN_TYPES = Object.freeze({
@@ -53,9 +60,11 @@ const TOKEN_TYPES = Object.freeze({
 /**
  * Tokenize SCDL source text.
  * @param {string} source
+ * @param {Array} [issues] - optional sink; illegal characters are appended here
+ *   rather than being dropped without trace.
  * @returns {Array<{type:string, value:string, line:number, col:number}>}
  */
-export function tokenize(source) {
+export function tokenize(source, issues = null) {
   const tokens = [];
   let pos = 0;
   let line = 1;
@@ -141,8 +150,13 @@ export function tokenize(source) {
       const startLoc = loc();
       let num = '';
       if (peek() === '-') {
+        // See _tokenizeFull: a bare '-' is an illegal character, not a sign.
+        if (!/[0-9]/.test(src[pos + 1] || '')) {
+          _recordIllegalChar(issues, ch, { line, col });
+          advance();
+          continue;
+        }
         num += advance();
-        if (!/[0-9]/.test(peek())) continue;
       }
       while (/[0-9]/.test(peek())) num += advance();
       if (peek() === '.' && /[0-9]/.test(src[pos + 1] || '')) {
@@ -169,7 +183,8 @@ export function tokenize(source) {
       continue;
     }
 
-    // Unknown char — skip
+    // Unknown char: report it, then skip. See _recordIllegalChar.
+    _recordIllegalChar(issues, ch, { line, col });
     advance();
   }
 
@@ -189,8 +204,9 @@ export function parseSCDL(source) {
   // Re-tokenize with proper hex detection (tokenizer above handles both # cases;
   // we do a single-pass tokenizer that treats '#' followed by 6 hex chars as HEX
   // and '#' followed by anything else as a comment start)
-  const tokens = _tokenizeFull(source);
-  const errors = [];
+  const lexIssues = [];
+  const tokens = _tokenizeFull(source, lexIssues);
+  const errors = _illegalCharErrors(lexIssues);
   const checksum = _checksumSource(source);
 
   // Parser state
@@ -254,12 +270,17 @@ export function parseSCDL(source) {
     consume(); // 'palette'
     expect(TOKEN_TYPES.LBRACE, undefined, `Expected '{' after 'palette'`);
     const paletteEntries = {};
+    // Where each entry was written. Without this, a bad hex in the palette can
+    // only be reported against the asset declaration, sending the author to the
+    // wrong line.
+    const paletteLocations = {};
     while (!at(TOKEN_TYPES.RBRACE, TOKEN_TYPES.EOF)) {
       const nameTok = consume(TOKEN_TYPES.IDENT);
       consume(TOKEN_TYPES.EQUALS);
       const hexTok  = consume(TOKEN_TYPES.HEX) || consume(TOKEN_TYPES.BAD_HEX);
       if (nameTok && hexTok) {
         paletteEntries[nameTok.value] = hexTok.value;
+        paletteLocations[nameTok.value] = { line: hexTok.line, col: hexTok.col };
       } else {
         const bad = peek();
         errors.push(_mkErr(`Unexpected token '${bad.value}' in palette block`, loc()));
@@ -267,7 +288,7 @@ export function parseSCDL(source) {
       }
     }
     consume(TOKEN_TYPES.RBRACE);
-    return paletteEntries;
+    return { entries: paletteEntries, locations: paletteLocations };
   }
 
   // ── part operations ──
@@ -759,7 +780,9 @@ export function parseSCDL(source) {
     errors.push(_mkErr(`Missing 'asset' declaration`, { line: 1, col: 1 }));
   }
 
-  const palette = (atValue('palette') ? parsePalette() : null) || {};
+  const paletteBlock = atValue('palette') ? parsePalette() : null;
+  const palette = paletteBlock?.entries || {};
+  const paletteLocations = paletteBlock?.locations || {};
   const defs = [];
   while (atValue('def')) {
     const d = parseDef();
@@ -796,6 +819,7 @@ export function parseSCDL(source) {
     type:           assetDecl?.type  || 'unknown',
     canvas:         assetDecl?.canvas || { width: 0, height: 0 },
     palette,
+    paletteLocations,
     parts,
     defs,
     roots,
@@ -814,7 +838,7 @@ export function parseSCDL(source) {
 
 // ─── Full tokenizer (handles # as hex vs comment) ────────────────────────────
 
-function _tokenizeFull(source) {
+function _tokenizeFull(source, issues = null) {
   const tokens = [];
   let pos = 0;
   let line = 1;
@@ -888,8 +912,16 @@ function _tokenizeFull(source) {
       const sl = line, sc = col;
       let num = '';
       if (ch() === '-') {
+        // A '-' not followed by a digit is not a sign, it is an illegal
+        // character — most often a hyphen someone typed in an asset or part name.
+        // It used to be consumed here and dropped, which is why the diagnostic
+        // surfaced several tokens later pointing at the wrong thing.
+        if (!/[0-9]/.test(ahead(1))) {
+          _recordIllegalChar(issues, ch(), { line, col });
+          adv();
+          continue;
+        }
         num += adv();
-        if (!/[0-9]/.test(ch())) continue;
       }
       while (/[0-9]/.test(ch())) num += adv();
       if (ch() === '.' && /[0-9]/.test(ahead(1))) {
@@ -915,12 +947,47 @@ function _tokenizeFull(source) {
       continue;
     }
 
-    // unknown — skip
+    // A character that begins no token. Dropping it silently is what makes a
+    // typo unfindable: `asset shrine-bell canvas 24x24` lost its hyphen here and
+    // surfaced three tokens later as "Invalid canvas '0x0'" at column 1. Report
+    // it where it is, then skip so the rest of the file still parses.
+    _recordIllegalChar(issues, ch(), { line, col });
     adv();
   }
 
   tokens.push({ type: TOKEN_TYPES.EOF, value: '', line, col });
   return tokens;
+}
+
+/**
+ * Note a character that is legal in no SCDL token.
+ *
+ * Runs of illegal characters collapse into one diagnostic per run so a paste of
+ * smart quotes or a non-ASCII block does not bury the real errors, but the
+ * reported location is always the first offending character.
+ */
+function _recordIllegalChar(issues, char, loc) {
+  if (!Array.isArray(issues)) return;
+  const previous = issues[issues.length - 1];
+  if (previous
+    && previous.loc.line === loc.line
+    && previous.loc.col === loc.col - previous.run) {
+    previous.run += 1;
+    previous.chars += char;
+    return;
+  }
+  issues.push({ chars: char, run: 1, loc: { line: loc.line, col: loc.col } });
+}
+
+/** Turn collected lexer issues into deferred SCDL-022 diagnostics. */
+function _illegalCharErrors(issues) {
+  return issues.map(({ chars, loc }) => _mkErr(
+    `Illegal character${chars.length > 1 ? 's' : ''} ${JSON.stringify(chars)} — `
+    + `legal in no SCDL token. Identifiers accept only letters, digits and '_' `
+    + `(a hyphen in an asset or part name is the usual cause).`,
+    loc,
+    SCDL_ILLEGAL_CHARACTER,
+  ));
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -934,11 +1001,11 @@ function _checksumSource(source) {
   }
 }
 
-function _mkErr(message, loc) {
+function _mkErr(message, loc, code) {
   // Lazy import avoid circular dep — errors module imported by compiler not grammar
-  return { _deferred: true, severity: 'ERROR', message, loc: loc || { line: 0, col: 0 } };
+  return { _deferred: true, severity: 'ERROR', message, loc: loc || { line: 0, col: 0 }, code };
 }
 
-function _mkWarn(message, loc) {
-  return { _deferred: true, severity: 'WARN', message, loc: loc || { line: 0, col: 0 } };
+function _mkWarn(message, loc, code) {
+  return { _deferred: true, severity: 'WARN', message, loc: loc || { line: 0, col: 0 }, code };
 }

@@ -1,0 +1,14 @@
+{
+  "name": "@polaris/defold-bridge",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@polaris/contracts": "workspace:*",
+    "@polaris/pixelbrain-bridge": "workspace:*",
+    "@polaris/scene-packet": "workspace:*"
+  }
+}

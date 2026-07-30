@@ -941,6 +941,123 @@ export const MATERIAL_PALETTES = Object.freeze({
     }),
     rules: Object.freeze({ preserveAlpha: true, preserveShape: true, boostHighlightsToWhite: true }),
   }),
+
+  // ── Authored 2026-07-29 to resolve phantom references ────────────────────
+  // These six ids were referenced by shipping assets but existed in no
+  // registry compartment, so resolveMaterialId() silently rewrote every use to
+  // `source` (SCDL-005) and 14 parts across 5 assets rendered as passthrough.
+  //
+  // Ramps follow house convention: seven anchors, monotonic dark->bright, with
+  // hue carried into the dark end rather than fading to neutral black. `body`
+  // holds the signature colour. Values are derived from the nearest existing
+  // siblings (steel/iron between darksteel and silver; leather and oak_bark
+  // from bark and hair_brown; moonstone and crystal from diamond and sapphire)
+  // and from the colours the referencing assets actually paint.
+  //
+  // The ramps are the one part of this that is taste, not measurement. They are
+  // drafted to be internally lawful and plausible; review them by eye.
+
+  steel: Object.freeze({
+    id: 'steel',
+    emissionFactor: DEFAULT_EMISSION_FACTOR,
+    label: 'Steel',
+    category: MATERIAL_CATEGORIES.METAL,
+    anchors: Object.freeze({
+      void: '#06080B',
+      shadow: '#151B22',
+      deep: '#2E3944',
+      body: '#5C6E80',
+      frost: '#8A9BB0',
+      spectral: '#B8C6D6',
+      whiteCore: '#E4EDF5',
+    }),
+    rules: Object.freeze({ preserveAlpha: true, preserveShape: true }),
+  }),
+
+  iron: Object.freeze({
+    id: 'iron',
+    emissionFactor: DEFAULT_EMISSION_FACTOR,
+    label: 'Iron',
+    category: MATERIAL_CATEGORIES.METAL,
+    anchors: Object.freeze({
+      void: '#08080A',
+      shadow: '#17171B',
+      deep: '#2C2C33',
+      body: '#4A4A52',
+      frost: '#6E6E78',
+      spectral: '#9A9AA4',
+      whiteCore: '#C8C8D0',
+    }),
+    rules: Object.freeze({ preserveAlpha: true, preserveShape: true }),
+  }),
+
+  leather: Object.freeze({
+    id: 'leather',
+    emissionFactor: DEFAULT_EMISSION_FACTOR,
+    label: 'Leather',
+    category: MATERIAL_CATEGORIES.ORGANIC,
+    anchors: Object.freeze({
+      void: '#140C06',
+      shadow: '#2A1A0E',
+      deep: '#452915',
+      body: '#633D22',
+      frost: '#86583A',
+      spectral: '#A87A57',
+      whiteCore: '#C9A183',
+    }),
+    rules: Object.freeze({ preserveAlpha: true, preserveShape: true }),
+  }),
+
+  oak_bark: Object.freeze({
+    id: 'oak_bark',
+    emissionFactor: DEFAULT_EMISSION_FACTOR,
+    label: 'Oak Bark',
+    category: MATERIAL_CATEGORIES.ORGANIC,
+    anchors: Object.freeze({
+      void: '#100C08',
+      shadow: '#221A13',
+      deep: '#382C22',
+      body: '#4A3B32',
+      frost: '#6B584A',
+      spectral: '#96806D',
+      whiteCore: '#C8B8A0',
+    }),
+    rules: Object.freeze({ preserveAlpha: true, preserveShape: true }),
+  }),
+
+  moonstone: Object.freeze({
+    id: 'moonstone',
+    emissionFactor: DEFAULT_EMISSION_FACTOR,
+    label: 'Moonstone',
+    category: MATERIAL_CATEGORIES.GEMSTONE,
+    anchors: Object.freeze({
+      void: '#0A0E16',
+      shadow: '#1C2432',
+      deep: '#3E4C63',
+      body: '#7086A3',
+      frost: '#A8BDD4',
+      spectral: '#D2E1EE',
+      whiteCore: '#F4F9FD',
+    }),
+    rules: Object.freeze({ preserveAlpha: true, preserveShape: true }),
+  }),
+
+  crystal: Object.freeze({
+    id: 'crystal',
+    emissionFactor: DEFAULT_EMISSION_FACTOR,
+    label: 'Crystal',
+    category: MATERIAL_CATEGORIES.GEMSTONE,
+    anchors: Object.freeze({
+      void: '#02080B',
+      shadow: '#06222C',
+      deep: '#0A4757',
+      body: '#0FA3BE',
+      frost: '#00E5FF',
+      spectral: '#80F5FF',
+      whiteCore: '#E8FEFF',
+    }),
+    rules: Object.freeze({ preserveAlpha: true, preserveShape: true }),
+  }),
 });
 
 /**
@@ -1020,6 +1137,12 @@ export const MATERIAL_SHADER_INDEX = Object.freeze({
   rune_glow: 66,
   abyss: 67,
   voidcrystal: 68,
+  steel: 69,
+  iron: 70,
+  leather: 71,
+  oak_bark: 72,
+  moonstone: 73,
+  crystal: 74,
 });
 
 export const MATERIAL_OPTIONS = Object.freeze(

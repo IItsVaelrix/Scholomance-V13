@@ -20,17 +20,23 @@ function makeTrack(overrides: Partial<ResolvedAlbumTrack> = {}): ResolvedAlbumTr
 
 describe('useAlbumAudioEngine', () => {
   let audioEl: HTMLAudioElement;
+  // Stable ref object — must NOT be recreated per render, because the hook
+  // now lists audioRef in useEffect dependency arrays. A new object identity
+  // on re-render would re-run the "set src + setStatus('idle')" effect and
+  // clobber any status set by an event handler in the same tick.
+  let audioRef: { current: HTMLAudioElement };
 
   beforeEach(() => {
     audioEl = document.createElement('audio');
     audioEl.crossOrigin = 'anonymous';
     audioEl.preload = 'metadata';
+    audioRef = { current: audioEl };
   });
 
   it('starts with idle status', () => {
     const { result } = renderHook(() =>
       useAlbumAudioEngine({
-        audioRef: { current: audioEl },
+        audioRef,
         activeTrack: makeTrack(),
         autoplayIntent: false,
         onEnded: vi.fn(),
@@ -45,7 +51,7 @@ describe('useAlbumAudioEngine', () => {
   it('play returns a promise', () => {
     const { result } = renderHook(() =>
       useAlbumAudioEngine({
-        audioRef: { current: audioEl },
+        audioRef,
         activeTrack: makeTrack(),
         autoplayIntent: false,
         onEnded: vi.fn(),
@@ -58,7 +64,7 @@ describe('useAlbumAudioEngine', () => {
   it('seek sets audio currentTime', () => {
     const { result } = renderHook(() =>
       useAlbumAudioEngine({
-        audioRef: { current: audioEl },
+        audioRef,
         activeTrack: makeTrack(),
         autoplayIntent: false,
         onEnded: vi.fn(),
@@ -71,7 +77,7 @@ describe('useAlbumAudioEngine', () => {
   it('pause sets audio paused', () => {
     const { result } = renderHook(() =>
       useAlbumAudioEngine({
-        audioRef: { current: audioEl },
+        audioRef,
         activeTrack: makeTrack(),
         autoplayIntent: false,
         onEnded: vi.fn(),
@@ -87,7 +93,7 @@ describe('useAlbumAudioEngine', () => {
 
     const { rerender } = renderHook(
       ({ track }) => useAlbumAudioEngine({
-        audioRef: { current: audioEl },
+        audioRef,
         activeTrack: track,
         autoplayIntent: false,
         onEnded: vi.fn(),
@@ -104,7 +110,7 @@ describe('useAlbumAudioEngine', () => {
   it('transitions to loading on play event', () => {
     const { result } = renderHook(() =>
       useAlbumAudioEngine({
-        audioRef: { current: audioEl },
+        audioRef,
         activeTrack: makeTrack(),
         autoplayIntent: false,
         onEnded: vi.fn(),
@@ -118,7 +124,7 @@ describe('useAlbumAudioEngine', () => {
   it('transitions to playing on playing event', () => {
     const { result } = renderHook(() =>
       useAlbumAudioEngine({
-        audioRef: { current: audioEl },
+        audioRef,
         activeTrack: makeTrack(),
         autoplayIntent: false,
         onEnded: vi.fn(),
@@ -132,7 +138,7 @@ describe('useAlbumAudioEngine', () => {
   it('transitions to paused on pause event', () => {
     const { result } = renderHook(() =>
       useAlbumAudioEngine({
-        audioRef: { current: audioEl },
+        audioRef,
         activeTrack: makeTrack(),
         autoplayIntent: false,
         onEnded: vi.fn(),
@@ -147,7 +153,7 @@ describe('useAlbumAudioEngine', () => {
     const onEnded = vi.fn();
     const { result } = renderHook(() =>
       useAlbumAudioEngine({
-        audioRef: { current: audioEl },
+        audioRef,
         activeTrack: makeTrack(),
         autoplayIntent: false,
         onEnded,
@@ -162,7 +168,7 @@ describe('useAlbumAudioEngine', () => {
   it('transitions to error on error event', () => {
     const { result } = renderHook(() =>
       useAlbumAudioEngine({
-        audioRef: { current: audioEl },
+        audioRef,
         activeTrack: makeTrack(),
         autoplayIntent: false,
         onEnded: vi.fn(),

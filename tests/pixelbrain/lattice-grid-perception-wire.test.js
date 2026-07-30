@@ -8,6 +8,12 @@ import { describe, expect, it } from 'vitest';
 // function applyLatticePerception(lattice, cols, rows, options) and test THAT.
 
 import { applyLatticePerception } from '../../codex/core/pixelbrain/lattice-grid-engine.js';
+// Register photonic bridge functions needed by the perception frame builder.
+import { registerPhotonicBridge } from '../../codex/core/pixelbrain/photonic-bridge-registry.js';
+import { buildCellSignatures, diffCellSignatures } from '../../src/lib/photonic-retina/retina-cell-index.js';
+import { diffShadowField } from '../../src/lib/photonic-retina/retina-shadow-field.js';
+import { assemblePerceptionFrame } from '../../src/lib/photonic-retina/retina-perception.js';
+registerPhotonicBridge({ buildCellSignatures, diffCellSignatures, diffShadowField, assemblePerceptionFrame });
 
 const cols = 2;
 const rows = 1;

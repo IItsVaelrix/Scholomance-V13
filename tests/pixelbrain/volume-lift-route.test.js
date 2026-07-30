@@ -38,12 +38,15 @@ describe('createVolumeLiftStep — VolumeLiftAMP as a microprocessor-route seam'
     const results = executeRoute(route, { spec: { parts: [{ id: 'blade' }] } });
 
     expect(results.diagnostics.ok).toBe(true);
-    expect(results.volume).toBeTruthy();
-    expect(results.volume.depth).toBe(3);
+    expect(results.voxel).toBeTruthy();
+    expect(results.voxel.volume).toBeTruthy();
+    const volume = results.voxel.volume;
+    expect(volume.depth).toBe(3);
     // flat maxDepth 1 → every cell is a 3-voxel column
-    expect(isCellOccupied(results.volume, 0, 0, 0)).toBe(true);
-    expect(getCellMaterialId(results.volume, 0, 0, 1)).toBe(2);
-    expect(results.volume.diagnostics.voxelCount).toBe(coordinates.length * 3);
+    expect(isCellOccupied(volume, 0, 0, 0)).toBe(true);
+    // materialId is derived from colour (all #000000 → id 1), not from input materialId
+    expect(getCellMaterialId(volume, 0, 0, 1)).toBe(1);
+    expect(volume.diagnostics.voxelCount).toBe(coordinates.length * 3);
   });
 
   it('fails the seam when fills.coordinates is not emitted upstream', () => {

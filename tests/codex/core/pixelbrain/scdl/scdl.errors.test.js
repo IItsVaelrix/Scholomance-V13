@@ -67,8 +67,14 @@ describe('SCDL Error — SCDLError constructor', () => {
 });
 
 describe('SCDL_ERROR_CODES catalogue', () => {
-  it('has all 21 codes (v1 + frame codes + SCDL-016..021 graph codes v1.2)', () => {
-    expect(Object.keys(SCDL_ERROR_CODES)).toHaveLength(21);
+  it('has all 22 codes (v1 + frame codes + SCDL-016..021 graph codes v1.2 + SCDL-022 lexer)', () => {
+    expect(Object.keys(SCDL_ERROR_CODES)).toHaveLength(22);
+  });
+
+  it('carries a code for a character that is legal in no token', () => {
+    // The lexer used to skip such characters silently, so a hyphen in an asset
+    // name reappeared as an unrelated canvas error at the wrong line.
+    expect(SCDL_ERROR_CODES.ILLEGAL_CHARACTER).toBe(0x1016);
   });
 
   it('codes are unique numeric values', () => {

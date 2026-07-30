@@ -145,8 +145,7 @@ describe('HIGH-01: Rhyme Astrology SQL Injection Prevention', () => {
         // Verify the security constant exists by reading the module source
         const fs = await import('fs');
         const path = await import('path');
-        const url = await import('url');
-        const here = path.dirname(url.fileURLToPath(import.meta.url));
+        const here = path.dirname(new URL(import.meta.url).pathname);
         const source = fs.readFileSync(
             path.resolve(here, '../../codex/services/rhyme-astrology/indexRepo.js'),
             'utf-8'

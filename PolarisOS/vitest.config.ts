@@ -15,6 +15,8 @@ export default defineConfig({
       "@polaris/pixelbrain-bridge": resolve(__dirname, "packages/pixelbrain-bridge/src/index.ts"),
       "@polaris/renderer-pixi": resolve(__dirname, "packages/renderer-pixi/src/index.ts"),
       "@polaris/test-harness": resolve(__dirname, "packages/test-harness/src/index.ts"),
+      "@polaris/scene-packet": resolve(__dirname, "packages/scene-packet/src/index.ts"),
+      "@polaris/defold-bridge": resolve(__dirname, "packages/defold-bridge/src/index.ts"),
     },
   },
   test: {
