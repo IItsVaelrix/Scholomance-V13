@@ -1,4 +1,8 @@
-import { join } from 'node:path';
+// Namespace import, not named: this module is reachable from the browser graph
+// (microprocessor-route's literal import() for vi.mock), where Rollup swaps in
+// `__vite-browser-external` and a named import fails the production build.
+// Named `nodePath` because a local `const path` exists below.
+import * as nodePath from 'node:path';
 import { createSubtletyApm } from './subtlety-fingerprint-apm.js';
 import { normalizeCrashEvent } from './subtlety-crash-ingest.js';
 import { createResonanceStore } from './subtlety-resonance-store.js';
@@ -13,7 +17,7 @@ export function createSubtletyRuntime({
   alertFn = () => {},
   raidFn = async () => null,
   dedupWindowMs = DEFAULT_DEDUP_WINDOW_MS,
-  now = () => Date.now(),
+  now = () => Date.now(), // EXEMPT — injectable wall-clock for crash dedup; deterministic in tests via override
 } = {}) {
   if (!store) throw new TypeError('createSubtletyRuntime requires store');
 
@@ -115,7 +119,7 @@ export function createSubtletyRuntime({
 export function getSubtletyRuntime(opts = {}) {
   if (!singleton) {
     const path = process.env.SUBTLETY_RESONANCE_PATH
-      || join(process.cwd(), 'codex/server/data/subtlety-resonance.jsonl');
+      || nodePath.join(process.cwd(), 'codex/server/data/subtlety-resonance.jsonl');
     const store = opts.store || createResonanceStore({ path, now: opts.now });
     singleton = createSubtletyRuntime({ ...opts, store });
   }

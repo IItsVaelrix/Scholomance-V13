@@ -92,10 +92,14 @@ export {
   evaluatePhenotypeFidelity,
 } from './perceptual/index.js';
 
-export {
-  EQUIVALENCE_SCHEMA,
-  evaluateRealizationEquivalence,
-} from './realization-equivalence/index.js';
+// This barrel is browser-reachable (Landing -> storm/photonicStorm.js), so it must
+// only re-export browser-safe modules. `schema.js` is pure data; the equivalence
+// EVALUATOR is not — it pulls vessels-svg/canvas/pixi, which import `node:module`
+// createRequire, and Rollup resolves even a dynamic import() into the browser graph
+// and fails the production build on the __vite-browser-external stub.
+// Node and test callers import ./realization-equivalence/evaluate.js directly.
+// DO NOT re-export evaluateRealizationEquivalence here.
+export { EQUIVALENCE_SCHEMA } from './realization-equivalence/schema.js';
 
 export {
   buildVisualExecutionManifest,

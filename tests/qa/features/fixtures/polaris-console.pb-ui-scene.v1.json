@@ -1169,8 +1169,7 @@
           12,
           12
         ],
-        "align": "stretch",
-        "justify": "stretch"
+        "align": "stretch"
       }
     },
     "polaris-center-flow": {
@@ -1228,5 +1227,5 @@
       "placementSlot": "state-glyph"
     }
   },
-  "sourceChecksum": "scd64:fe43982de62b3702"
+  "sourceChecksum": "scd64:27fd1dbafc243267"
 }

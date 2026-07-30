@@ -22,7 +22,7 @@ import fastifyCors from '@fastify/cors';
 import crypto from 'crypto';
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 import { existsSync, mkdirSync, readdirSync, createWriteStream, unlinkSync, renameSync, statSync } from 'fs';
 import { pipeline } from 'stream/promises';
 import path from 'path';

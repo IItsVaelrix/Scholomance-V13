@@ -39,6 +39,12 @@ const authState = vi.hoisted(() => ({
   user: null,
 }));
 
+// Must mirror every field AuthContext.Provider supplies (AuthContext.jsx:195).
+// The CSRF trio was missing, and ProgressionContext.jsx:69 destructures
+// `clearCsrfToken` from useAuth() and calls it — an incomplete mock surfaced as
+// "clearCsrfToken is not a function" from inside the component tree, not from
+// this file. Mocking ../src/hooks/useProgression.jsx does not cover it: that is
+// a different module from src/context/ProgressionContext.jsx.
 vi.mock("../src/hooks/useAuth.jsx", () => ({
   AuthProvider: ({ children }) => children,
   useAuth: () => ({
@@ -48,6 +54,9 @@ vi.mock("../src/hooks/useAuth.jsx", () => ({
     register: vi.fn(),
     logout: vi.fn(),
     checkMe: vi.fn(),
+    csrfToken: null,
+    getCsrfToken: vi.fn(async () => null),
+    clearCsrfToken: vi.fn(),
   }),
 }));
 

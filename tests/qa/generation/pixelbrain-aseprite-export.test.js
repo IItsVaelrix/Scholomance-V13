@@ -13,7 +13,7 @@
 
 import { describe, it, expect } from 'vitest';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 import {
   createTemplateGrid,
   exportToPixelPerfectAseprite,

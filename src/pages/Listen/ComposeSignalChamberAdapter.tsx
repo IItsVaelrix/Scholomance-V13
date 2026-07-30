@@ -29,7 +29,10 @@ export interface ComposeSignalChamberAdapterProps {
   getEqNodes?: () => any;
   setEqBands?: (bands: any) => void;
   updateOutputDevices?: () => void;
-  detectedSchoolId?: string;
+  // `null` is the producer's "detected nothing" (useSonicAnalysis), and
+  // ScholoCandy — which this forwards to — already accepts `string | null`.
+  // This prop was the only narrow link in the chain.
+  detectedSchoolId?: string | null;
 }
 
 export function ComposeSignalChamberAdapter({
@@ -389,13 +392,17 @@ export function ComposeSignalChamberAdapter({
             </div>
           </div>
 
-          {/* Output Device Selector */}
+          {/* Output Device Selector.
+              onSelect/onRefresh are optional on this adapter but required by
+              the selector, which calls onRefresh() in an effect and on click.
+              Falling back to a no-op keeps an omitted prop inert instead of
+              throwing "undefined is not a function" at runtime. */}
           <div data-compose-kind="signal-field">
             <OutputDeviceSelector
               devices={outputDevices}
               currentSinkId={sinkId}
-              onSelect={onSetOutputDevice}
-              onRefresh={updateOutputDevices}
+              onSelect={onSetOutputDevice ?? (() => {})}
+              onRefresh={updateOutputDevices ?? (() => {})}
               color={activeStation.color}
             />
           </div>

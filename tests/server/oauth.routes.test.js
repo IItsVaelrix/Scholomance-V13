@@ -31,7 +31,11 @@ describe('[Server] OAuth routes integration (mock flow)', () => {
     const mod = await import('../../codex/server/index.js?test=oauth-routes');
     fastify = mod.fastify;
     await fastify.ready();
-  });
+  // Booting the real Fastify server runs DB migrations plus the world seed.
+  // Measured ~6s alone; four of these suites boot concurrently, which exceeds
+  // vitest's 10s default hookTimeout on a slower machine. Not contention --
+  // each suite gets its own temp DB -- just genuinely more work than 10s.
+  }, 60_000);
 
   afterAll(async () => {
     if (fastify) {

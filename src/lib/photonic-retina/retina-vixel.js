@@ -17,7 +17,7 @@
  * demands.
  *
  * DETERMINISM: All computation is pure math on spatial coordinates.
- * No Math.random(), no Date.now(), no performance.now(), no external state.
+ * No Math.random(), no Date.now(), no performance.now(), no external state. // EXEMPT — comment only, no call
  * Identical input → identical Vixel field → identical vixelHash.
  *
  * @bytecode PB-VIXEL-v1

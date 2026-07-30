@@ -9,6 +9,11 @@ import { vesselCanvas } from './vessels-canvas.js';
 import { vesselPixi } from './vessels-pixi.js';
 import { measureDrifts, classifyEquivalence } from './metrics.js';
 
+// NODE-ONLY MODULE. The vessels above import `node:module` createRequire, so this
+// file must never become reachable from the browser graph — it is deliberately not
+// re-exported by ../index.js. Importing it from client code blanks the app at
+// runtime AND fails the production build. Import it directly from Node/tests.
+
 /**
  * @param {object} input VixelField or SpatialField
  * @param {object} [options]
@@ -73,5 +78,3 @@ export async function evaluateRealizationEquivalence(input, options = {}) {
 
   return deepFreeze(packet);
 }
-
-export { vesselPixi, vesselCanvas, vesselSvg };

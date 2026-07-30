@@ -65,7 +65,7 @@ export function createConstellationSkyDefinition(): ScholComponentDefinitionV1 {
     defaultLayout: { layoutId: 'constellation-sky-stack' },
     defaultVisuals: [],
     provenance: {
-      sourceKind: 'authored',
+      sourceKind: 'migrated',
       sourcePath: 'src/pages/Constellation/ComposeConstellationSky.jsx',
       contentHash: 'scd64:constellation-sky-v1',
       author: 'compose-constellation-sky',

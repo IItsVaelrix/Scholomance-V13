@@ -22,11 +22,20 @@ describe('Scholomancer — the title track', () => {
     expect(album!.title).toBe('Scholomancer');
     expect(album!.artist).toBe('Vaelrix');
     expect(album!.releaseDate).toBe('2026-07-15');
-    expect(album!.genres).toEqual(['Hip-Hop', 'Rap']);
-    expect(album!.tracks).toHaveLength(3);
+    // Editorial, not sourced from a tag (see the provenance note above): the
+    // curated list was widened to four on 2026-07-18 (e7b43f71), a day after
+    // this test was written, and the test had not caught up.
+    expect(album!.genres).toEqual(['Hip-Hop', 'Rap', 'Hyperpop', 'Emo']);
+    // Grew to seven; the opening three below are the part this test pins.
+    expect(album!.tracks).toHaveLength(7);
     expect(album!.tracks[0]).toMatchObject({ trackId: SUNO_ID, trackNumber: 1 });
     expect(album!.tracks[1]).toMatchObject({ trackId: THAUMATURGY_ID, trackNumber: 2 });
     expect(album!.tracks[2]).toMatchObject({ trackId: REGRET_ID, trackNumber: 3 });
+    // trackNumber must stay 1..n contiguous however many tracks are added —
+    // the invariant the running order depends on, which a bare count is not.
+    expect(album!.tracks.map((t) => t.trackNumber)).toEqual(
+      album!.tracks.map((_, i) => i + 1),
+    );
   });
 
   // The album's running order is Damien's artistic choice; the shelf claims to

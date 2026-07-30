@@ -71,7 +71,11 @@ return {
     environment: 'jsdom',
     setupFiles: './tests/setup.js',
     include: ['tests/**/*.{test,spec}.{js,jsx,ts,tsx}', 'src/ui/animation/**/__tests__/*.{test,spec}.{js,jsx,ts,tsx}', 'src/pages/Listen/**/__tests__/*.{test,spec}.{js,jsx,ts,tsx}', '*.{test,spec}.{js,jsx,ts,tsx}'],
-    exclude: ['**/tests/visual/**', '**/node_modules/**', 'tests/qa/e2e/**', 'tests/qa/immunity.*.test.js', 'debug_*.test.js', 'phoneme.accuracy.test.js'],
+    // tests/e2e/** and tests/perf/** are Playwright suites (run via
+    // `npm run test:e2e` / playwright.config.js). Their .spec.ts files match
+    // the include glob above, and vitest collecting them fails the run with
+    // "Playwright Test did not expect test() to be called here".
+    exclude: ['**/tests/visual/**', '**/node_modules/**', 'tests/qa/e2e/**', 'tests/e2e/**', 'tests/perf/**', 'tests/qa/immunity.*.test.js', 'debug_*.test.js', 'phoneme.accuracy.test.js'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

@@ -170,7 +170,10 @@ function workspaceGridLayout(): PbLayoutV1 {
       rows: '1fr',
       gapPx: [12, 12],
       align: 'stretch',
-      justify: 'stretch',
+      // No `justify`: grid `justify` lowers to justify-content, whose intent
+      // union is distribution-only (no 'stretch'), and gridJustify() defaults
+      // to 'start' — so omitting it emits exactly the same CSS. The three
+      // minmax() fr tracks already consume the row, making it inert anyway.
     },
   });
 }

@@ -24,5 +24,9 @@ describe('Codebase Dead Code Audit', () => {
         expect(reportContent).toContain('# Dead Code Report');
         expect(reportContent).toContain('## Unreachable Files');
         expect(reportContent).toContain('## Potentially Unused Exports');
-    });
+    // The detector is a full-codebase sweep in a synchronous subprocess and
+    // measured 44s on a Steam Deck, so vitest's 5s default made this test
+    // impossible to pass. 120s leaves ~2.7x headroom on the slowest machine
+    // we run on.
+    }, 120_000);
 });

@@ -3,7 +3,7 @@
  *
  * Every formula and threshold the graph runtime uses lives here so that IDs,
  * ordering, and policy bundles are fully reproducible. No timestamp or
- * `Math.random()` participates anywhere in this module.
+ * `Math.random()` participates anywhere in this module. // EXEMPT — comment only, no call
  */
 import type { CareerPolicyBundle } from './contracts';
 

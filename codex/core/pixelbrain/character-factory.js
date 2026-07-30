@@ -17,7 +17,10 @@
  * bypassed it entirely — letting a character silently compose into an empty
  * part with no structured diagnostic.
  */
-import { validateRoute } from './microprocessor-route.js';
+// .core.js, not microprocessor-route.js: this module is browser-reachable
+// (src/lib/pixelbrain.adapter.js -> character-foundry.js -> here), and the
+// sampling half of microprocessor-route pulls node:fs, which fails the build.
+import { validateRoute } from './microprocessor-route.core.js';
 
 /**
  * Derive the part-id list a character spec will render for a given direction.

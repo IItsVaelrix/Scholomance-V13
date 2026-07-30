@@ -10,7 +10,7 @@
 // docs/superpowers/specs/2026-07-18-lexical-graph-foundation-design.md
 
 import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 import path from 'path';
 import { canonicalizeLower, deviceLexicalId } from './canonicalize.js';
 import { syncLexicalEntryFts } from './ftsSync.js';

@@ -157,7 +157,11 @@ describe('[Server] index route integration', () => {
     fastify = mod.fastify;
     userPersistence = (await import('../../codex/server/user.persistence.js')).persistence;
     await fastify.ready();
-  });
+  // Booting the real Fastify server runs DB migrations plus the world seed.
+  // Measured ~6s alone; four of these suites boot concurrently, which exceeds
+  // vitest's 10s default hookTimeout on a slower machine. Not contention --
+  // each suite gets its own temp DB -- just genuinely more work than 10s.
+  }, 60_000);
 
   beforeEach(() => {
     fetchMock.mockReset();

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 import { SCHOOLS } from '../../../src/data/schools.js';
 
 const __filename = fileURLToPath(import.meta.url);
