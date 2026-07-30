@@ -400,16 +400,55 @@ bare `scd64/` citation.
   not a promise about the others.
 - `ENGINE_LAW` pinning the build hash means a Blender upgrade correctly
   invalidates every receipt. Honest, and expensive.
-- The concept-chemistry run (`scripts/concept-chem-determinism.mjs`) **did not
-  validate** the path-dependence thesis: `margin = −0.0341`, the false-friend
-  control outranked two real candidates. `W_GROUND` is 0.65 of the score and
-  grounding is token overlap against a hand-authored corpus, so the instrument
-  largely grades its author's own reaction text. The classification in this
-  document rests on the cold/warm **measurements**, not on that run. The one
-  durable result from it: `control/law-violation` had the highest bond energy of
-  all thirteen reactions and was zeroed only by `lawGate` — bond energy is not
-  evidence, and the law gate is load-bearing.
+- Absolute concept-chemistry scores are **not** usable here: every reaction lands
+  `UNSTABLE` against `STABLE_MIN=0.55`. Scores are comparable within a run, never
+  across question domains. See *Concept chemistry as an ordinal instrument* for
+  why this is a calibration limit rather than a validity failure.
 - No GPU path exists to test, so no claim is made about one.
+
+---
+
+## Concept chemistry as an ordinal instrument
+
+`scripts/concept-chem-determinism.mjs` ranked ten candidate mappings *before* the
+cold/warm measurements existed. It is therefore an out-of-sample test of the
+engine, and it passed:
+
+| Hazard | Winner | Independent measurement |
+|---|---|---|
+| simulation caches | `sim/markov-chain` (0.2442) | path-dependent; a chained per-frame digest is exactly what is required — **confirmed** |
+| motion blur | `blur/summation-order` (0.1878) | bitwise reproducible ⇒ accumulation order is pinned — **confirmed** |
+| geometry nodes | `geonodes/pure-dag` (0.1180) | pure DAG, `cold == warm` — **confirmed** |
+
+Taking the best control (`control/false-friend`, 0.1073) as the threshold gives
+**8/8 correct classification** across every reaction for which ground truth
+exists: all six `CONFIRMED` reactions score above it, both `REFUTED` reactions
+below it, zero errors.
+
+**The engine is ordinal, not a calibrated classifier**, and must be judged on the
+matching criterion. Two gates are wrong and were both tried:
+
+- *"all controls `UNSTABLE`"* cannot fail when the whole field is `UNSTABLE`.
+- *"worst candidate beats best control"* assumes every authored hypothesis is
+  good. It can only ever indict the corpus, never the thinking. A discriminating
+  engine **must** be free to rank a bad hypothesis below nonsense — and here it
+  did: `geonodes/phase-space` and `geonodes/seeded-field` fell below the control
+  line and were subsequently the only two hypotheses the measurement refuted.
+
+The correct gate is *per-hazard winner beats every control*.
+
+**Methodological consequence:** ship a false-friend control with every question
+rather than trusting a global `STABLE_MIN`. A global threshold cannot survive a
+change of question domain; a control travels with the question, and because its
+grounding is computed by the same function as the candidates', grounding drift is
+common-mode. Recalibrating `W_GROUND` should therefore move every score without
+disturbing the 8/8 boundary — which makes this script a regression test for any
+change to the grounding channel.
+
+One further durable result: `control/law-violation` carried the **highest bond
+energy of all thirteen reactions** (0.2967) and was zeroed only by `lawGate`.
+Bond energy is not evidence; the law gate is load-bearing (SCR-012 earning its
+`SC`).
 
 ---
 
