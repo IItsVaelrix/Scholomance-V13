@@ -14,6 +14,15 @@
  * controls do not come out UNSTABLE, this run has proved nothing.
  */
 import { synthesize } from '../codex/core/pixelbrain/concept-chemistry.js';
+import {
+  loadEncyclopediaIndex,
+  prepareForSynthesize,
+} from '../codex/core/pixelbrain/grounding-index.js';
+
+// --corpus swaps the hand-authored corpus below for the real encyclopedia index.
+// The labelled ground truth (MEASURED) is identical in both modes, so the two
+// runs are a controlled A/B of the grounding channel against physical fact.
+const USE_CORPUS = process.argv.includes('--corpus');
 
 // Substrate: the measured determinism facts, the governing laws, and the
 // registry entries this design already rests on.
@@ -187,9 +196,22 @@ const MEASURED = {
 };
 
 console.log('═══ CONCEPT CHEMISTRY: BLENDER DETERMINISM HAZARDS ═══\n');
-console.log(`Corpus: ${corpus.length} substrate documents\n`);
+
+let corpusIndex = null;
+if (USE_CORPUS) {
+  corpusIndex = prepareForSynthesize(loadEncyclopediaIndex(process.cwd()));
+  console.log(`Grounding: ENCYCLOPEDIA CORPUS via grounding-index.js`);
+  console.log(`  docs=${corpusIndex.documentCount ?? '?'} tokens=${corpusIndex.tokenCount ?? '?'}\n`);
+} else {
+  console.log(`Grounding: hand-authored corpus, ${corpus.length} documents`);
+  console.log(`  (run with --corpus to grade the real encyclopedia index instead)\n`);
+}
 
 const results = reactions.map((r) => {
+  if (USE_CORPUS) {
+    const res = synthesize({ a: r.a, b: r.b, product: r.product, index: corpusIndex });
+    return { ...r, measured: MEASURED[r.id] ?? null, groundingA: NaN, groundingB: NaN, ...res };
+  }
   const gA = groundingScore(r.a);
   const gB = groundingScore(r.b);
   const res = synthesize({ a: r.a, b: r.b, product: r.product, groundingA: gA, groundingB: gB });

@@ -425,6 +425,49 @@ Taking the best control (`control/false-friend`, 0.1073) as the threshold gives
 exists: all six `CONFIRMED` reactions score above it, both `REFUTED` reactions
 below it, zero errors.
 
+**That 8/8 is plausibly overfit and must not be read as a benchmark.** The same
+author wrote both the 24-document corpus and the reaction texts. When the
+grounding channel was replaced with the real encyclopedia index
+(`grounding-index.js`, 59 documents, 6,475 tokens) the same labelled set scored
+**6/8** — winners still 3/3, but two boundary errors appeared
+(`geonodes/seeded-field` REFUTED rose above the control; `blur/temporal-quadrature`
+CONFIRMED fell below it). The corpus-grounded 6/8 is the more honest number.
+
+The comparison that is apples-to-apples — same corpus, grounding formula varied —
+is the one to trust:
+
+| Grounding variant | Boundary |
+|---|---|
+| corpus, attestation-only | **6/8** |
+| corpus, composite (`0.7·attest + 0.3·jaccard`) | 5/8 |
+| corpus, signed/centred jaccard | 6/8 |
+
+Two consequences:
+
+- **`synthesize()` discards the composite.** `groundingScore()` returns
+  `0.7·attest + 0.3·jaccard`, but the caller reads `attestA`/`attestB` and
+  recomputes the attestation-only mean — verified: composite `0.6963` vs used
+  `0.6534`. The 30% co-occurrence term is `INERT` in every feasibility score.
+  **Do not wire it**: doing so scores 5/8, worse than leaving it dead. Delete it
+  or mark it explicitly non-scoring.
+- **`INERT` therefore requires judgement, not reflex.** A declared input that
+  cannot move the output is a finding; whether activating it is an improvement is
+  a separate, measurable question. This qualifies the verdict lattice above:
+  `INERT` reports "unwired," never "wire it."
+
+Why co-occurrence cannot discriminate here: document-level jaccard **saturates**
+(0.438–0.837 across the labelled set, false friend at 0.667 — mid-range). With 59
+documents, any two multi-word technical sentences touch most of the corpus. The
+granularity is wrong; paragraph windows or PMI over token pairs would be needed.
+
+Structurally, **attestation is blind to false friends by construction** — a false
+friend is attested on both sides. The only channel that can express repulsion is
+`bond`, which carries the smallest weight (`W_BOND=0.15`) while the blind channel
+carries the largest (`W_GROUND=0.65`). `bond < 0` is not a safe gate either:
+`blur/conservative-field` is −0.0069 and CONFIRMED, against the false friend's
+−0.0430. The ~6× magnitude gap suggests a threshold exists; three negative data
+points cannot locate it.
+
 **The engine is ordinal, not a calibrated classifier**, and must be judged on the
 matching criterion. Two gates are wrong and were both tried:
 
