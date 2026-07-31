@@ -94,7 +94,14 @@ describe('compareCrossEngine', () => {
     });
     const result = compareCrossEngine(a, b);
     expect(result.verdict).toBe('CAUSES_DIVERGE');
-    expect(result.healthy).toBe(false);
+    // healthy was `false` here while it meant "all seven causes match", which
+    // no correct pair of engines can satisfy: ENGINE_LAW is declared
+    // EXPECTED_DIVERGE. This case diverges only ENGINE_LAW, LIGHT_BUDGET and
+    // the pixels -- all permitted -- so under the corrected definition it IS
+    // the healthy cross-engine state. verdict stays CAUSES_DIVERGE because that
+    // still reports the literal fact that not all seven causes matched.
+    expect(result.healthy).toBe(true);
+    expect(result.requiredAgreementHeld).toBe(true);
   });
 
   it('identifies the healthy state: causes agree, pixels diverge', () => {
@@ -198,5 +205,80 @@ describe('determinism replay', () => {
       results.push(JSON.stringify({ v: r.verdict, m: r.matchingCauses, d: r.divergentCauses }));
     }
     expect(new Set(results).size).toBe(1);
+  });
+});
+
+describe('the alarming outcome is not filed under the benign one', () => {
+  it('distinguishes causes-diverge-but-pixels-agree from pixels-agree', () => {
+    // Two engines that consumed DIFFERENT inputs and produced IDENTICAL pixels
+    // is the most alarming result available. It was reported as PIXELS_AGREE,
+    // the same label as the benign case where causes also agreed.
+    const a = { scd64: 'A'.repeat(64) };
+    const b = { scd64: `${'B'.repeat(56)}${'A'.repeat(8)}` };
+    const result = compareCrossEngine(a, b);
+    expect(result.pixelsAgree).toBe(true);
+    expect(result.verdict).toBe('CAUSES_DIVERGE_PIXELS_AGREE');
+    expect(result.healthy).toBe(false);
+  });
+
+  it('still reports PIXELS_AGREE when the causes agree too', () => {
+    const same = { scd64: 'C'.repeat(64) };
+    expect(compareCrossEngine(same, { ...same }).verdict).toBe('PIXELS_AGREE');
+  });
+
+  it('lists the new verdict', () => {
+    expect(CROSS_ENGINE_VERDICTS).toContain('CAUSES_DIVERGE_PIXELS_AGREE');
+  });
+});
+
+describe('the Remotion claim carries the colour contract', () => {
+  it('declares the policy and transfer so COLOR_LAW can agree', () => {
+    const wire = {
+      packetId: 'P', sourceChecksum: 'S', colorPolicy: 'EXACT',
+      canvas: { width: 4, height: 4 },
+      colorLaw: { transfer: 'sRGB-IEC-61966-2-1' },
+    };
+    const claim = buildRemotionClaim(wire);
+    expect(claim.colorPolicy).toBe('EXACT');
+    expect(claim.observed.transfer).toBe('sRGB-IEC-61966-2-1');
+  });
+});
+
+describe('healthy respects the declared agreement table', () => {
+  it('is not defined as all seven causes matching', () => {
+    // ENGINE_LAW is declared EXPECTED_DIVERGE: a Blender build hash and a JS
+    // canvas can never share it. Defining healthy as all-7 made it unreachable
+    // for any correct pair of engines -- a check that cannot PASS, which is the
+    // mirror of the ones this bridge keeps finding.
+    const agreement = expectedCrossEngineAgreement();
+    expect(agreement.ENGINE_LAW).toBe('EXPECTED_DIVERGE');
+  });
+
+  it('is healthy when every SHOULD_AGREE slot agrees and pixels diverge', () => {
+    // Slots 0..6 are causes; index 2 is ENGINE_LAW (EXPECTED_DIVERGE) and 3 is
+    // LIGHT_BUDGET (MAY_DIVERGE). Diverge exactly those, plus the pixels.
+    const a = 'AAAAAAAA'.repeat(8);
+    const b = [
+      'AAAAAAAA', 'AAAAAAAA', 'BBBBBBBB', 'CCCCCCCC',
+      'AAAAAAAA', 'AAAAAAAA', 'AAAAAAAA', 'DDDDDDDD',
+    ].join('');
+    const r = compareCrossEngine({ scd64: a }, { scd64: b });
+    expect(r.requiredAgreementHeld).toBe(true);
+    expect(r.pixelsAgree).toBe(false);
+    expect(r.healthy).toBe(true);
+  });
+
+  it('is NOT healthy when a SHOULD_AGREE slot diverges', () => {
+    // Slot 5 is COLOR_LAW, declared SHOULD_AGREE. This is exactly the state the
+    // bridge was in before the slot carried the contract instead of the format.
+    const a = 'AAAAAAAA'.repeat(8);
+    const b = [
+      'AAAAAAAA', 'AAAAAAAA', 'AAAAAAAA', 'AAAAAAAA',
+      'AAAAAAAA', 'BBBBBBBB', 'AAAAAAAA', 'DDDDDDDD',
+    ].join('');
+    const r = compareCrossEngine({ scd64: a }, { scd64: b });
+    expect(r.requiredAgreementHeld).toBe(false);
+    expect(r.healthy).toBe(false);
+    expect(r.divergentRequired).toContain('COLOR_LAW');
   });
 });

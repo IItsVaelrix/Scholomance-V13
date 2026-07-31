@@ -38,6 +38,10 @@ export const CROSS_ENGINE_VERDICTS = Object.freeze([
   'CAUSES_DIVERGE',
   'PIXELS_AGREE',
   'PIXELS_DIVERGE',
+  // Two engines that saw different inputs and produced identical pixels. This
+  // is not a milder PIXELS_AGREE; it means a cause slot is not reaching the
+  // render, so the comparison is measuring less than it claims.
+  'CAUSES_DIVERGE_PIXELS_AGREE',
 ]);
 
 /**
@@ -83,11 +87,27 @@ export function compareCrossEngine(receiptA, receiptB, options = {}) {
   let verdict;
   if (causesAgree && pixelsAgree) verdict = 'PIXELS_AGREE';
   else if (causesAgree && !pixelsAgree) verdict = 'CAUSES_AGREE';
-  else if (!causesAgree && pixelsAgree) verdict = 'PIXELS_AGREE';
+  // Previously also 'PIXELS_AGREE', which filed the most alarming outcome the
+  // comparison can produce under the same label as the benign one.
+  else if (!causesAgree && pixelsAgree) verdict = 'CAUSES_DIVERGE_PIXELS_AGREE';
   else verdict = 'CAUSES_DIVERGE';
 
-  // The healthy state: causes agree, pixels diverge
-  const healthy = causesAgree && !pixelsAgree;
+  // The healthy state, judged against the DECLARED agreement table rather than
+  // against all seven causes matching.
+  //
+  // ENGINE_LAW is declared EXPECTED_DIVERGE — a Blender build hash and a pure-JS
+  // canvas can never share it — so `causesAgree && !pixelsAgree` was unreachable
+  // for any correct pair of engines. That is a check that cannot PASS, the
+  // mirror image of the ones this bridge keeps turning up, and it left the
+  // driver printing HEALTHY while this module reported healthy: false.
+  //
+  // What actually matters is narrower and checkable: every slot the table marks
+  // SHOULD_AGREE does agree, and the pixels still diverge.
+  const agreement = expectedCrossEngineAgreement();
+  const requiredSlots = causeSlots.filter((s) => agreement[s.name] === 'SHOULD_AGREE');
+  const divergentRequired = requiredSlots.filter((s) => !s.match).map((s) => s.name);
+  const requiredAgreementHeld = divergentRequired.length === 0;
+  const healthy = requiredAgreementHeld && !pixelsAgree;
 
   // Use the same-engine divergence classifier for additional detail
   const sameEngineDivergence = classifyDivergence(receiptA.scd64, receiptB.scd64);
@@ -99,6 +119,8 @@ export function compareCrossEngine(receiptA, receiptB, options = {}) {
     engineB,
     matchingCauses,
     divergentCauses: Object.freeze(divergentCauses),
+    requiredAgreementHeld,
+    divergentRequired: Object.freeze(divergentRequired),
     pixelsAgree,
     causeSlots: Object.freeze(causeSlots),
     effectSlot: Object.freeze({ ...effectSlot }),
@@ -128,6 +150,10 @@ export function buildRemotionClaim(wire, overrides = {}) {
     colorPolicy: wire.colorPolicy,
     synthClass: 'RASTER',
     observed: {
+      // The declared colour contract, which is what COLOR_LAW hashes now that
+      // it carries the contract rather than the output format. Both engines
+      // read it from the same wire, which is what makes SHOULD_AGREE reachable.
+      transfer: wire.colorLaw?.transfer ?? '',
       blenderVersion: 'remotion-4.0',
       buildHash: 'remotion',
       engine: 'CANVAS_2D',

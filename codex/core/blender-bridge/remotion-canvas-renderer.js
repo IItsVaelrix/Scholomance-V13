@@ -181,6 +181,12 @@ export function buildCanvasClaim(wire, renderResult, overrides = {}) {
       denoiseEnabled: false,
       viewTransform: wire.colorPolicy === 'EXACT' ? 'Standard' : 'AgX',
       look: 'None',
+      // The declared colour contract, read off the SAME wire Blender reads.
+      // COLOR_LAW now hashes policy:transfer:viewTransform:look, so this is
+      // what lets the slot agree across engines; without it the canvas claim
+      // hashes an empty transfer and disagrees for a reason that is bookkeeping
+      // rather than colour.
+      transfer: wire.colorLaw?.transfer ?? '',
       displayDevice: 'sRGB',
       format: 'RAW_RGBA',
       colorDepth: '8',
