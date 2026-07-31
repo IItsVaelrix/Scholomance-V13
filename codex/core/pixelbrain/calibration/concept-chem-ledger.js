@@ -321,18 +321,18 @@ export const LEDGER_ENTRIES = Object.freeze([
     },
     outcome: 'REFUTED',
     evidence:
-      'ENGINE WAS WRONG, IN THE DANGEROUS DIRECTION. This describes a cache that does not ' +
-      'exist — buildStampIndex is a full rebuild — and it scored 0.2460, the TOP SCORE of a ' +
-      'ten-reaction run, above the false-friend bar (0.1994) and above every TRUE statement ' +
-      'about the same engines. "unknown words resolve to nothing, never a guess" — shipped and ' +
-      'measured in 474cd6b1 — scored 0.1148, BELOW the nonsense control (0.1458). 3 of 4 ' +
-      'pre-registered predictions failed. Not a corpus-authorship artifact: ranked on bond + ' +
-      'coherence alone, which touch no corpus, best absent 0.0855 vs worst present 0.0571, NOT ' +
-      'SEPARATED. The four false reactions were written as plausible NEIGHBOURS of real ' +
-      'capabilities, which is the ledger\'s own "failure by synonymy" — previously an anecdote ' +
-      'about the melanin run, now a measurement. Decided by grep: four patterns, four ABSENT. ' +
-      'lawGate also worked, zeroing the law control. The two channels that carry no score are ' +
-      'the two that were right.',
+      'REFUTED BY GREP, NOT BY THE ENGINE — and the engine was right to abstain. This ' +
+      'describes a cache that does not exist (buildStampIndex is a full rebuild). It took the ' +
+      'highest RAW feasibility of a ten-reaction run at 0.2460, with the true ' +
+      '"rare kinds carry the signal band 0 averages away" second at 0.2261. Under the margin ' +
+      'law that is (0.2460-0.2261)/(0.2460-0.1994) = 0.427 against minMargin 0.5 → CLARIFY. ' +
+      'The engine reported that it could not tell the two apart, which is exactly true: one is ' +
+      'fiction and one is fact and it has no channel that distinguishes them. ' +
+      'CORRECTION, same day: this row first read "ENGINE WAS WRONG, IN THE DANGEROUS ' +
+      'DIRECTION" on the strength of raw ordering. That was the reviewer committing the error ' +
+      'this whole calibration layer exists to prevent — a ranking is not a verdict, and the ' +
+      'harness that produced it pre-registered predictions comparing raw feasibilities, which ' +
+      'is a mis-specified test. Recorded rather than quietly amended.',
     source: 'scripts/concept-chem-absent-capability.mjs',
   },
   {
@@ -344,12 +344,15 @@ export const LEDGER_ENTRIES = Object.freeze([
     },
     outcome: 'CONFIRMED',
     evidence:
-      'TRUE, BUILT, MEASURED — and the engine ranked it BELOW its own nonsense control ' +
-      '(0.1148 vs 0.1458). Shipped in 474cd6b1: the hash fallback is deleted and unknown lemmas ' +
-      'return []. Independently measured over 68,480 WordNet lemmas — distinct primitive sets ' +
-      '1,473 to 3,552, singleton sets 208 to 2,324. Recorded as the mirror of the row above: ' +
-      'the same run that promoted a fiction demoted a fact, so the failure is not a single ' +
-      'unlucky reaction but an inability to separate the two populations.',
+      'TRUE, BUILT, MEASURED — and it scored 0.1148, below the nonsense control (0.1458) and ' +
+      'below the bar, so the gate never admitted it as a contender at all. Shipped in ' +
+      '474cd6b1: the hash fallback is deleted and unknown lemmas return []. Independently ' +
+      'measured over 68,480 WordNet lemmas — distinct primitive sets 1,473 to 3,552, singleton ' +
+      'sets 208 to 2,324. The lesson is NOT that the engine inverted this one; the run returned ' +
+      'Clarify and concluded nothing. It is that "does this capability exist" is OUT OF DOMAIN ' +
+      'for an instrument built to rank rival hypotheses inside a settled frame. It has no ' +
+      'channel that reads a codebase. Ask grep. Compare LBL-004, where a low score on a ' +
+      'governance framing was also not a denial.',
     source: 'scripts/concept-chem-absent-capability.mjs + codex/core/semantic/wordnet-senses.js',
   },
 ]);
@@ -385,12 +388,20 @@ export const LEDGER_ENTRIES = Object.freeze([
  * All five are DENIALS, and all three CONFIRMED rows carry receipts. That
  * asymmetry is the good news and the warning at once.
  *
- * The warning: the 2026-07-31 run shows the engine ranking a fluent FICTION
- * highest of ten and a measured TRUTH below its own nonsense control. A denial
- * from an instrument that cannot separate those two populations is not a
- * denial — it is an absence of evidence wearing a verdict's clothes. Those five
- * ideas are UNADJUDICATED, not refuted. Anyone re-proposing one is owed an
- * architectural probe, not a citation of this table.
+ * The warning: the 2026-07-31 run put a fluent FICTION at the highest raw
+ * feasibility of ten, with a true statement 0.0199 behind it. Adjudicated, that
+ * is a CLARIFY — the engine reported it could not tell them apart, and it was
+ * right. But a denial from an instrument that cannot separate those two
+ * populations is not a denial; it is an absence of evidence wearing a verdict's
+ * clothes. Those five ideas are UNADJUDICATED, not refuted. Anyone re-proposing
+ * one is owed an architectural probe, not a citation of this table.
+ *
+ * Note what the failure was NOT. The engine did not return a wrong answer. It
+ * declined, correctly, to answer a question outside its domain: "does this
+ * capability exist" is a fact about a codebase, and this instrument ranks rival
+ * hypotheses inside a settled frame. The first version of these two entries
+ * claimed an inversion on the strength of raw ordering — that was the reviewer
+ * making the error, not the engine.
  *
  * The good news: no row that was ever acted on rests on a score. Every CONFIRMED
  * entry was built and measured, and the two rows that disagreed with the engine

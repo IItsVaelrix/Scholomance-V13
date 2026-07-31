@@ -263,15 +263,30 @@ for (const probe of probes) {
 
 // ── VERDICT ──────────────────────────────────────────────────────────────────
 
-console.log('\n═══ VERDICT ═══\n');
-const allHeld = p1.length === absent.length && p2.length === present.length && p3 && p4;
-if (allHeld) {
-  console.log('  ✅ The instrument failed in the right way. Every capability we do not');
-  console.log('     have ranked at or below the control bar, every capability we do have');
-  console.log('     ranked above it, and no fluent absence outranked a plain presence.');
-} else {
-  console.log('  ❌ The instrument did NOT fail in the right way. Read the predictions');
-  console.log('     above: a ranking that cannot separate present from absent is scoring');
-  console.log('     rhetoric, and prior rankings from this engine need re-reading.');
+console.log('\n═══ WHY THOSE PREDICTIONS WERE MIS-SPECIFIED ═══\n');
+console.log('  P1-P4 compare RAW FEASIBILITIES. That is not how this instrument is');
+console.log('  read, and writing them that way reproduced the exact error the margin');
+console.log('  law exists to prevent: treating an ordering as a verdict. A run is');
+console.log('  adjudicated, not sorted. See the adjudication at the end of this output —');
+console.log('  the predictions above are retained so the mistake stays visible.');
+
+// ── ADJUDICATION ─────────────────────────────────────────────────────────────
+// Raw ordering is not a verdict. This repo has a law against reading one that
+// way, and the harness above broke it: it compared feasibilities directly and
+// called the result a failure. Put the same numbers through the margin law.
+
+const { adjudicateChemistry } = await import('../codex/core/pixelbrain/calibration/chem-gate.js');
+const adjudicated = adjudicateChemistry(results, { consequence: 'destructive', groupKey: 'group' });
+console.log('\n═══ ADJUDICATED THROUGH THE MARGIN LAW ═══\n');
+console.log(`  kind        ${adjudicated.kind}`);
+console.log(`  margin      ${Number.isFinite(adjudicated.margin) ? adjudicated.margin.toFixed(4) : "n/a"}  (minMargin ${adjudicated.risk?.minMargin ?? adjudicated.minMargin ?? "?"})`);
+console.log(`  pick        ${adjudicated.pick?.id ?? 'none'}`);
+console.log(`  rival       ${adjudicated.rival?.id ?? 'none'}`);
+console.log(`  reason      ${adjudicated.reason ?? '—'}`);
+console.log(`  executable  ${adjudicated.executable}`);
+if (adjudicated.kind !== 'Do' && adjudicated.kind !== 'Probe') {
+  console.log('\n  The run does not conclude. A ranking that cannot separate its top two');
+  console.log('  is not an inverted verdict — it is an absence of one, and reading the');
+  console.log('  ordering anyway is the error this gate exists to prevent.');
 }
 console.log('');
