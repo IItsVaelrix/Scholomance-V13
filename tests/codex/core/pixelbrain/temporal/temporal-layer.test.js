@@ -17,6 +17,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import { assertNoNulls } from '../../../../../codex/core/blender-bridge/wire.js';
 
 import {
   TEMPORAL_CONTRACT,
@@ -525,9 +526,21 @@ describe('Temporal Compiler', () => {
     const compiled = compileTemporal(gene, { frameCount: 5 });
     const wire = formatForWire(compiled.frames[2]);
     expect(wire.frame).toBe(2);
-    expect(wire.vertices.length).toBeGreaterThan(0);
-    expect(wire.projectionChecksum).toBeDefined();
-    expect(wire.energyBindings).toBeDefined();
+    expect(wire.contract).toBe('PB-TEMPORAL-FRAME-v1');
+
+    // Was `wire.vertices.length > 0` against a per-vertex object array. The
+    // shape changed deliberately: parallel typed arrays are what a consumer can
+    // foreach_set into, and the old shape had no consumer at all.
+    expect(wire.vertexCount).toBeGreaterThan(0);
+    expect(wire.positions.x).toHaveLength(wire.vertexCount);
+    expect(wire.positions.y).toHaveLength(wire.vertexCount);
+    expect(wire.partIndex).toHaveLength(wire.vertexCount);
+    expect(wire.positions.x.every(Number.isInteger)).toBe(true);
+
+    // Was toBeDefined(), which passes for any value including a wrong one.
+    expect(typeof wire.projectionChecksum).toBe('string');
+    expect(wire.projectionChecksum.length).toBeGreaterThan(0);
+    expect(wire.energyBindings).toBeTypeOf('object');
   });
 });
 
@@ -801,5 +814,51 @@ describe('Algorithm options are forwarded to certification', () => {
       controlPoints: [[0.9, 0.9]],
     });
     expect(cert.certified).toBe(false);
+  });
+});
+
+describe('formatForWire emits a contract a consumer can read', () => {
+  function frame() {
+    return {
+      frame: 3,
+      time: 0.125,
+      projectionChecksum: 'ABCD1234',
+      energy: { PHOTONIC: 0.5 },
+      state: {
+        arm: { spine: [[1.5, 2.5], [3.5, 4.5]] },
+        leg: { closedContour: [[5.5, 6.5]] },
+      },
+    };
+  }
+
+  it('names its contract', () => {
+    expect(formatForWire(frame()).contract).toBe('PB-TEMPORAL-FRAME-v1');
+  });
+
+  it('carries positions as parallel int32 arrays, not objects', () => {
+    // The previous shape was vertices:[{x,y,partId,field}]. Nothing read it --
+    // and a per-vertex object cannot foreach_set into an attribute, which is how
+    // every other wire in this bridge lands.
+    const w = formatForWire(frame());
+    expect(w.positions.x).toEqual([2, 4, 6]);
+    expect(w.positions.y).toEqual([3, 5, 7]);
+    expect(w.vertexCount).toBe(3);
+  });
+
+  it('interns partId to int, because shaders cannot read STRING attributes', () => {
+    const w = formatForWire(frame());
+    expect(w.partIds).toEqual(['arm', 'leg']);
+    expect(w.partIndex).toEqual([0, 0, 1]);
+  });
+
+  it('carries no nulls', () => {
+    expect(() => assertNoNulls(formatForWire(frame()))).not.toThrow();
+  });
+
+  it('preserves frame identity and the projection checksum', () => {
+    const w = formatForWire(frame());
+    expect(w.frame).toBe(3);
+    expect(w.time).toBe(0.125);
+    expect(w.projectionChecksum).toBe('ABCD1234');
   });
 });

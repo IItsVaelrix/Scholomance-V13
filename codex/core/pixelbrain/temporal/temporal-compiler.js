@@ -39,10 +39,14 @@ import {
 } from './temporal-governor.js';
 import { canonicalConstructionStringify } from '../construction/construction-schema.js';
 import { sha256Hex } from '../sha256.js';
+import { quantize, SCALES } from '../../blender-bridge/quantize.js';
 
 // ─── Contract ────────────────────────────────────────────────────────────────
 
 export const TEMPORAL_COMPILED_CONTRACT = 'PB-TEMPORAL-COMPILED-v1';
+
+/** The wire projection of a single compiled frame. Read by temporal_ingest.py. */
+export const TEMPORAL_FRAME_CONTRACT = 'PB-TEMPORAL-FRAME-v1';
 export const TEMPORAL_COMPILER_VERSION = '1.0.0';
 
 // ─── Compilation ─────────────────────────────────────────────────────────────
@@ -220,47 +224,54 @@ export function extractVRIInput(compiledFrame, vriOptions = {}) {
 // ─── Blender Wire Bridge ─────────────────────────────────────────────────────
 
 /**
- * Format a compiled frame for the Blender wire protocol.
+ * Project a compiled frame onto a wire a consumer can actually read.
  *
- * The wire protocol (wire.js) carries construction state as named attributes
- * on a mesh. This adapter formats the temporal state for wire consumption:
- *   - Vertices from state geometry
- *   - Named attributes for energy bindings
- *   - Time parameter for temporal positioning
- *   - Projection checksum for receipt verification
+ * The previous shape emitted vertices:[{x,y,partId,field}] and intersected
+ * neither toPythonWire nor ingest_wire -- handing one to ingest_wire raised
+ * KeyError: 'coordinateCount'. It was a format with no reader.
+ *
+ * It is NOT coerced into a render packet. A temporal frame carries no z and no
+ * colour, so making it one would mean inventing both. It gets its own contract
+ * and its own consumer (temporal_ingest.py), and follows the same wire laws as
+ * the render projection: parallel typed arrays, int32, no nulls, categoricals
+ * interned because a shader cannot read a STRING attribute.
  *
  * @param {object} compiledFrame - A frame from PB-TEMPORAL-COMPILED-v1
- * @param {object} [wireOptions] - Wire protocol options
- * @returns {object} Wire-ready packet
+ * @param {object} [wireOptions]
+ * @returns {object} PB-TEMPORAL-FRAME-v1
  */
 export function formatForWire(compiledFrame, wireOptions = {}) {
   const { state, energy, time, projectionChecksum, frame } = compiledFrame;
 
-  // Extract vertices from state
-  const vertices = [];
-  const partIds = Object.keys(state).sort();
-  for (const partId of partIds) {
+  const partIds = Object.keys(state ?? {}).sort();
+  const xs = [];
+  const ys = [];
+  const partIndex = [];
+
+  partIds.forEach((partId, index) => {
     const part = state[partId];
-    if (!part) continue;
+    if (!part) return;
     for (const field of ['spine', 'closedContour', 'leftBank', 'rightBank']) {
-      if (Array.isArray(part[field])) {
-        for (const point of part[field]) {
-          if (Array.isArray(point)) {
-            vertices.push({ x: point[0], y: point[1], partId, field });
-          }
-        }
+      if (!Array.isArray(part[field])) continue;
+      for (const point of part[field]) {
+        if (!Array.isArray(point)) continue;
+        xs.push(quantize(Number(point[0] ?? 0), SCALES.PIXEL));
+        ys.push(quantize(Number(point[1] ?? 0), SCALES.PIXEL));
+        partIndex.push(index);
       }
     }
-  }
+  });
 
   return {
+    contract: TEMPORAL_FRAME_CONTRACT,
     frame,
     time,
     projectionChecksum,
-    vertexCount: vertices.length,
-    vertices,
-    energyBindings: energy,
+    vertexCount: xs.length,
+    positions: { x: xs, y: ys },
     partIds,
+    partIndex,
+    energyBindings: energy ?? {},
     wireVersion: wireOptions.wireVersion ?? '1.0.0',
   };
 }
