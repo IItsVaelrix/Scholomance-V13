@@ -18,8 +18,8 @@
  *   ~/opt/blender/blender <PATH.blend>
  */
 
-import { readFileSync, writeFileSync, mkdtempSync, existsSync, mkdirSync } from 'node:fs';
-import { join, resolve, dirname } from 'node:path';
+import { readFileSync, writeFileSync, mkdtempSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
+import { join, resolve, dirname, relative } from 'node:path';
 import { tmpdir } from 'node:os';
 
 import { toPythonWire } from '../codex/core/blender-bridge/wire.js';
@@ -36,12 +36,57 @@ const flagValue = (name, fallback) => {
 const packetPath = args.find((a) => a.endsWith('.pbrain')) || 'output/holy_fire_claymore.pbrain';
 const blendPath = resolve(flagValue('--out', 'output/carrier-e2e/asset.blend'));
 
+/** Find every .pbrain in the repo, biggest first, skipping vendored trees. */
+function discoverPackets() {
+  const SKIP = new Set(['node_modules', '.git', '.worktrees', '.claude', 'dist', 'build']);
+  const out = [];
+  const walk = (dir, depth = 0) => {
+    if (depth > 6) return;
+    let entries;
+    try {
+      entries = readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const e of entries) {
+      if (e.isDirectory()) {
+        if (!SKIP.has(e.name)) walk(join(dir, e.name), depth + 1);
+      } else if (e.name.endsWith('.pbrain')) {
+        const p = join(dir, e.name);
+        try {
+          const pk = JSON.parse(readFileSync(p, 'utf8'));
+          out.push({
+            path: relative(process.cwd(), p),
+            coords: pk.coordinates?.length ?? 0,
+            canvas: `${pk.canvas?.width}x${pk.canvas?.height}`,
+          });
+        } catch {
+          out.push({ path: relative(process.cwd(), p), coords: 0, canvas: 'unreadable' });
+        }
+      }
+    }
+  };
+  walk(process.cwd());
+  return out.sort((a, b) => b.coords - a.coords);
+}
+
 if (!existsSync(BLENDER)) {
   console.error(`ERROR: Blender not found at ${BLENDER}`);
   process.exit(1);
 }
 if (!existsSync(packetPath)) {
+  // "not found" without "here is what exists" makes the user go hunting for
+  // something this script already knows. It also catches the common case of
+  // pasting a placeholder path straight out of documentation.
   console.error(`ERROR: packet not found: ${packetPath}`);
+  const found = discoverPackets();
+  if (found.length) {
+    console.error('\nPackets in this repo:');
+    for (const p of found) console.error(`  ${p.path}  (${p.coords} coords, ${p.canvas})`);
+    console.error(`\nFor example:\n  node scripts/blender-open.mjs ${found[0].path}`);
+  } else {
+    console.error('\nNo .pbrain packets found under this repo.');
+  }
   process.exit(1);
 }
 
