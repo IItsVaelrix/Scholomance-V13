@@ -453,27 +453,46 @@ export function generatePhonotopographicVectorFromPhonemes(wordPhonemes, dim = 2
       }
     }
 
-    // Stress pattern encoding: each stressed vowel activates a dim
-    // based on its position in the word
+    // Stress pattern → dims 172–191, by VOWEL POSITION. A trochee lights 172,
+    // an iamb lights 173, so the band records the actual metrical foot instead
+    // of hashing position and stress together into an arbitrary slot.
     let vowelIdx = 0;
     for (const p of phonemes) {
       if (isVowel(p)) {
         const stress = getStress(p);
-        if (stress > 0) {
-          const stressDim = 128 + ((vowelIdx * 7 + stress * 13) % 64);
-          vec[stressDim] += stress === 1 ? 3.0 : 1.5;
+        if (stress > 0 && vowelIdx < 20) {
+          vec[172 + vowelIdx] += stress === 1 ? 3.0 : 1.5;
         }
         vowelIdx++;
       }
     }
   }
 
-  // Global rhythmic features
+  // Global rhythmic features.
+  //
+  // These were four scalars written to four FIXED dims (128–131), which gave
+  // every monosyllable the same band-2 direction — `through` and `tough` were
+  // bit-identical here and `strength` vs `a` read 0.961. Per-band normalization
+  // discards magnitude by construction, so a scalar at a fixed dim is a value
+  // this band cannot carry; since the global score is the mean of four band
+  // cosines, that put a ~0.25 floor under every comparison the module makes.
+  //
+  // Each quantity now selects a BUCKET and the bucket index is the signal.
   if (totalSyllables > 0) {
-    vec[128] += Math.min(totalSyllables, 20) * 0.5;  // syllable count
-    vec[129] += (stressedSyllables / totalSyllables) * 5.0;  // stress density
-    vec[130] += (vowelCount / (vowelCount + consonantCount + 1)) * 5.0;  // V/C ratio
-    vec[131] += Math.min(wordPhonemes.length, 15) * 0.3;  // word count
+    const bucket = (ratio, bins) =>
+      Math.max(0, Math.min(bins - 1, Math.floor(ratio * bins)));
+
+    // Syllable count → dims 128–147 (one dim per syllable, 1..20)
+    vec[128 + Math.min(totalSyllables, 20) - 1] += 2.0;
+
+    // Stress density → dims 148–155
+    vec[148 + bucket(stressedSyllables / totalSyllables, 8)] += 1.5;
+
+    // Vowel/consonant ratio → dims 156–163
+    vec[156 + bucket(vowelCount / (vowelCount + consonantCount + 1), 8)] += 1.5;
+
+    // Word count → dims 164–171
+    vec[164 + Math.min(wordPhonemes.length, 8) - 1] += 1.0;
   }
 
   // ── Band 3 (dims 192–255): Rhyme-domain signature ─────────────────────

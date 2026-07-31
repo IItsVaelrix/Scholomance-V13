@@ -487,3 +487,60 @@ describe('phonotopography: AX/UR feature coverage (minor fix)', () => {
     expect(PHONOLOGICAL_FEATURES_V1['UR'].height).toBe(1);
   });
 });
+
+// ── Band 2 directional encoding (fix 3) ─────────────────────────────────────
+
+describe('phonotopography: Band 2 directional encoding (fix 3)', () => {
+  function band2Cosine(a, b) {
+    const v1 = generatePhonotopographicVector(a);
+    const v2 = generatePhonotopographicVector(b);
+    let dot = 0, n1 = 0, n2 = 0;
+    for (let i = 128; i < 192; i++) {
+      dot += v1[i] * v2[i]; n1 += v1[i] * v1[i]; n2 += v2[i] * v2[i];
+    }
+    if (n1 === 0 || n2 === 0) return 0;
+    return dot / (Math.sqrt(n1) * Math.sqrt(n2));
+  }
+
+  // Band 2 wrote scalar summaries into a FIXED set of dims (128-131 plus one
+  // stress dim), so every monosyllable produced the same band-2 direction and
+  // per-band normalization discarded the only thing that differed: magnitude.
+  //   through / tough  -> bit-identical in band 2
+  //   cat / window     -> 0.894
+  //   strength / a     -> 0.961
+  // Because the global score is the mean of four band cosines, that put a hard
+  // ~0.25 floor under every comparison this module makes.
+
+  it('still matches through and tough, which DO share a metrical shape', () => {
+    // Guard, not a driver: this passed before the fix too. Band 2 measures
+    // rhythm, and /TH R UW/ and /T AH F/ are both one stressed syllable with
+    // one vowel and two consonants. Their distinction is bands 0 and 3's job.
+    // Making band 2 directional must not manufacture a difference here.
+    expect(band2Cosine('through', 'tough')).toBeGreaterThan(0.9);
+  });
+
+  it('separates unrelated words in band 2', () => {
+    expect(band2Cosine('cat', 'window')).toBeLessThan(0.9);
+  });
+
+  it('separates a long word from a single vowel in band 2', () => {
+    expect(band2Cosine('strength', 'a')).toBeLessThan(0.9);
+  });
+
+  it('still reads metrical shape: two trochees beat a trochee and a monosyllable', () => {
+    // This is the signal band 2 exists to carry. Making it directional must
+    // sharpen it, not delete it.
+    expect(band2Cosine('table', 'window')).toBeGreaterThan(band2Cosine('table', 'strength'));
+  });
+
+  it('separates rhyme pairs from unrelated words by a clear margin', () => {
+    // Discrimination, not an absolute floor. Band 2 legitimately finds `cat`
+    // and `window` partly alike — both carry primary stress on the first vowel,
+    // land in the same vowel/consonant bucket, and are one word — so demanding
+    // an arbitrary low number here would mean tuning the engine to a guess.
+    // What must hold is that a shared rhyme outranks a shared rhythm.
+    const rhyme = phonotopographicSimilarity('cake', 'lake');
+    const unrelated = phonotopographicSimilarity('cat', 'window');
+    expect(rhyme - unrelated).toBeGreaterThan(0.4);
+  });
+});
