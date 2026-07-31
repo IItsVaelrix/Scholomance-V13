@@ -63,13 +63,29 @@ def ingest_wire(wire):
     pc = bpy.data.pointclouds.new(f"pb_{wire['packetId']}")
     pc.resize(count)
 
-    # Positions are int32 at PIXEL scale (1:1), so they ARE the coordinates.
+    # Positions are int32 at PIXEL scale (1:1), so they ARE the coordinates —
+    # except for the Y AXIS, which changes handedness at this boundary.
+    #
+    # PixelBrain packets are screen space: y increases DOWNWARD, y=0 is the top
+    # row of the canvas. Blender world space has +Y UP. Landing the packet's y
+    # directly as world y renders every asset vertically MIRRORED.
+    #
+    # That defect is invisible to every other check in this bridge. A mirrored
+    # render hashes consistently, reproduces byte-for-byte, round-trips colour
+    # exactly, and passes asset-dependence — it is wrong only in a way you have
+    # to LOOK at. It was found by putting the Blender render and the Remotion
+    # canvas side by side: Remotion drew the claymore blade-up (matching the
+    # authored blade at y 8..70) and Blender drew it blade-down.
+    #
+    # The flip is (height - 1 - y) so the row indices map exactly onto each
+    # other rather than reflecting about an off-by-one axis.
+    height = int(wire["canvas"]["height"])
     flat = []
     for i in range(count):
         flat.extend(
             (
                 float(positions["x"][i]),
-                float(positions["y"][i]),
+                float(height - 1 - positions["y"][i]),
                 float(positions["z"][i]),
             )
         )

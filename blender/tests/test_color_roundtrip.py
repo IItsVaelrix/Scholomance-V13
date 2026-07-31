@@ -146,7 +146,12 @@ def _exact_count(arr, report=False):
     """
     hits = 0
     for (x, y, hexint) in SPECIMENS:
-        px = arr[y, x]
+        # The wire is screen space (y down); ingest flips it to Blender world
+        # space (y up), and the float32 dump is that buffer bottom-up. So the
+        # row holding screen y is H-1-y. This read was `arr[y, x]` and matched
+        # only while ingest was skipping the flip -- the probe and the bug
+        # shared an assumption, which is why neither of them caught it.
+        px = arr[H - 1 - y, x]
         opaque = float(px[3]) == 1.0
         got = tuple(int(round(_linear_to_srgb(float(c)) * 255.0)) for c in px[:3])
         want = tuple((hexint >> s) & 0xFF for s in (16, 8, 0))

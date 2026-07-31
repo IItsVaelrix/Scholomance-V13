@@ -177,3 +177,7 @@ data/career-graph/raw/
 data/career-graph/normalized/
 data/career-graph/shards/
 data/career-graph/*.sqlite
+
+# Carrier E2E preview renders — regenerate with:
+#   node scripts/blender-carrier-e2e.mjs
+output/carrier-e2e/

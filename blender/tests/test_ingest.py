@@ -54,8 +54,14 @@ def t_creates_object_with_correct_point_count():
 def t_point_positions_match_wire():
     obj = ingest_wire(MINIMAL_WIRE)
     p0 = obj.data.attributes["position"].data[0].vector
+    # X crosses unchanged.
     assert abs(p0[0] - 10.0) < 0.001, f"x mismatch: {p0[0]}"
-    assert abs(p0[1] - 5.0) < 0.001, f"y mismatch: {p0[1]}"
+    # Y changes handedness: screen y-down -> world y-up, so wire y=5 on a
+    # 112-high canvas lands at world y = 112 - 1 - 5 = 106. This assertion read
+    # `p0[1] == 5.0` while ingest landed the packet's y directly, and that was
+    # the whole bug: the test agreed with the code and both were wrong, because
+    # neither of them knew the two spaces disagree about which way is up.
+    assert abs(p0[1] - 106.0) < 0.001, f"y mismatch: {p0[1]}"
 
 def t_points_carry_a_radius():
     obj = ingest_wire(MINIMAL_WIRE)
@@ -136,6 +142,63 @@ def t_albedo_dequantizes_at_the_declared_scale():
 def t_packed_hex_still_crosses_for_provenance():
     obj = ingest_wire(_albedo_wire())
     assert "pb_color_color" in obj.data.attributes
+
+
+
+def _orient_wire():
+    """
+    Asymmetric on purpose: one point at the TOP of the canvas (screen y=0) and
+    one at the BOTTOM (screen y=height-1). A symmetric fixture cannot detect a
+    vertical flip, which is how this survived every existing test.
+    """
+    return {
+        "wireVersion": 1,
+        "packetId": "ORIENT-1",
+        "kind": "test",
+        "colorPolicy": "EXACT",
+        "canvas": {"width": 8, "height": 16, "gridSize": 1},
+        "coordinateCount": 2,
+        "scales": {"pb_albedo": 1000000},
+        "intern": {},
+        "attributes": {},
+        # screen-space: y=0 is the TOP row, y=15 is the BOTTOM row
+        "positions": {"x": [4, 4], "y": [0, 15], "z": [0, 0]},
+        "colors": {
+            "color": [0xFFFFFF, 0x000000],
+            "preSquareColor": [0xFFFFFF, 0x000000],
+            "linear": [1000000, 1000000, 1000000, 0, 0, 0],
+        },
+        "energy": {str(i): [0, 0] for i in range(8)},
+        "sourceChecksum": "ORIENT",
+        "absentId": -1,
+    }
+
+
+def t_screen_y_down_becomes_world_y_up():
+    """
+    The packet is a Godot export: screen space, y increases DOWNWARD. Blender
+    world space has +Y UP. Landing the packet's y directly as world y renders
+    every asset vertically mirrored -- and a mirrored render hashes perfectly
+    and reproduces forever, so no receipt-based check can see it.
+
+    Screen y=0 (top of canvas) must land at the HIGHEST world y.
+    """
+    obj = ingest_wire(_orient_wire())
+    pos = obj.data.attributes["position"].data
+    top_of_canvas = pos[0].vector[1]     # screen y = 0
+    bottom_of_canvas = pos[1].vector[1]  # screen y = 15
+    assert top_of_canvas > bottom_of_canvas, (
+        f"screen y=0 landed at world y={top_of_canvas} and screen y=15 at "
+        f"world y={bottom_of_canvas}: the asset is upside down"
+    )
+
+
+def t_the_flip_spans_the_declared_canvas_height():
+    # height 16 -> screen y 0 maps to world 15, screen y 15 maps to world 0.
+    obj = ingest_wire(_orient_wire())
+    pos = obj.data.attributes["position"].data
+    assert abs(pos[0].vector[1] - 15.0) < 1e-6, pos[0].vector[1]
+    assert abs(pos[1].vector[1] - 0.0) < 1e-6, pos[1].vector[1]
 
 
 for n, f in list(globals().items()):

@@ -108,12 +108,18 @@ def t_photonic_energy_changes_pixels():
     )
 
 
+# The wire is screen space (y down); ingest flips it into Blender world space
+# and the dump is that buffer bottom-up, so screen y lands at row H-1-y.
+PROBE_ROW = H - 1 - POSITIONS["y"][0]
+PROBE_COL = POSITIONS["x"][0]
+
+
 def t_photonic_scales_emission_upward():
     lo = _render(_wire(250000), "photonic_lo")
     hi = _render(_wire(1000000), "photonic_hi")
-    assert hi[16, 8][0] > lo[16, 8][0], (
+    assert hi[PROBE_ROW, PROBE_COL][0] > lo[PROBE_ROW, PROBE_COL][0], (
         f"higher PHOTONIC did not brighten the pixel: "
-        f"{hi[16, 8][0]} <= {lo[16, 8][0]}"
+        f"{hi[PROBE_ROW, PROBE_COL][0]} <= {lo[PROBE_ROW, PROBE_COL][0]}"
     )
 
 
@@ -122,7 +128,7 @@ def t_zero_photonic_preserves_the_colour_law():
     # the binding shifted the baseline, colour would stop round-tripping for
     # every asset that carries no energy at all.
     arr = _render(_wire(0), "photonic_zero_law")
-    px = arr[16, 8]
+    px = arr[PROBE_ROW, PROBE_COL]
     assert abs(float(px[0]) - 0.216030) < 1e-5, (
         f"zero-energy pixel is {px[0]}, not the authored 0.216030 -- "
         "the energy binding moved the baseline"
