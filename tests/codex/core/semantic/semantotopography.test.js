@@ -43,12 +43,24 @@ describe('resolveSemanticPrimitives', () => {
     expect(resolveSemanticPrimitives('all')).toContain('QUANTITY');
   });
 
-  it('resolves root morphemes', () => {
-    expect(resolveSemanticPrimitives('determinism')).toEqual(['CAUSE', 'NECESSARY']);
+  it('resolves exact root morphemes ahead of the dictionary', () => {
     expect(resolveSemanticPrimitives('render')).toEqual(['CREATION', 'ACTION']);
     expect(resolveSemanticPrimitives('draw')).toEqual(['CREATION', 'ACTION']);
     expect(resolveSemanticPrimitives('checksum')).toEqual(['EVALUATE', 'QUANTITY']);
     expect(resolveSemanticPrimitives('hash')).toEqual(['EVALUATE', 'PROCESS']);
+  });
+
+  it('defers a SUBSTRING root match to WordNet', () => {
+    // `determinism` is not an exact ROOT_MAP key — it used to match the root
+    // `determin` by substring and return [CAUSE, NECESSARY]. WordNet files it
+    // under noun.cognition, a philosophical doctrine, giving [ABSTRACT, KNOW].
+    //
+    // The curated reading is arguably richer, but the substring rule is the same
+    // mechanism that resolved `forest` to [ACTION, GROUP, PHYS_OBJ, SPATIAL_REL]
+    // and scored it against `woodland` at 0.091 — below unrelated pairs. A
+    // heuristic that outranks a dictionary is wrong even where it happens to be
+    // right, so exact curated entries win and coincidental prefixes do not.
+    expect(resolveSemanticPrimitives('determinism')).toEqual(['ABSTRACT', 'KNOW']);
   });
 
   it('does NOT match substrings across morpheme boundaries', () => {
@@ -73,14 +85,24 @@ describe('resolveSemanticPrimitives', () => {
     expect(precompute.length).toBeGreaterThan(0);
   });
 
-  it('falls back to deterministic hash for unknown words', () => {
-    const result = resolveSemanticPrimitives('xyzzyplugh');
-    expect(result.length).toBeGreaterThan(0);
-    expect(result.length).toBeLessThanOrEqual(2);
-    // All primitives must be from the inventory
-    for (const p of result) {
-      expect(SEMANTIC_INDEX.has(p)).toBe(true);
-    }
+  it('resolves an unknown word to nothing instead of guessing', () => {
+    // REPLACES "falls back to deterministic hash for unknown words". That
+    // fallback drew two pseudo-random primitives from the domain pools for
+    // anything the authored inventory missed. Measured over 68,480 WordNet
+    // lemmas it collapsed the vocabulary into 1,473 classes and labelled 1,917
+    // of them NEGATED — `carafe`, `brushwood`, `blurred` — poisoning the one
+    // channel this engine exists to provide. It was deterministic, so it
+    // reproduced perfectly, which is what made it look principled.
+    expect(resolveSemanticPrimitives('xyzzyplugh')).toEqual([]);
+  });
+
+  it('grounds an ordinary word WordNet knows', () => {
+    // The complement of the test above: refusing to guess is only honest if the
+    // dictionary actually covers the language.
+    const carafe = resolveSemanticPrimitives('carafe');
+    expect(carafe.length).toBeGreaterThan(0);
+    expect(carafe).not.toContain('NEGATED');
+    for (const p of carafe) expect(SEMANTIC_INDEX.has(p)).toBe(true);
   });
 
   it('returns empty array for empty/null input', () => {

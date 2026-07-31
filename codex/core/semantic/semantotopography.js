@@ -30,6 +30,7 @@ import {
   PRIMITIVE_TO_DOMAIN,
 } from './semantic.constants.js';
 import { quantizeVectorJS, estimateInnerProduct } from '../quantization/turboquant.js';
+import { wordnetPrimitives } from './wordnet-senses.js';
 
 // ── Deterministic hash for n-gram keys ───────────────────────────────────────
 
@@ -1432,22 +1433,78 @@ const ROOT_MAP = Object.freeze({
  * @param {string} word - lowercase word
  * @returns {string[]} semantic primitives
  */
+/** Negating prefixes, and the stems they attach to. */
+const NEGATING_PREFIXES = Object.freeze(['un', 'in', 'im', 'ir', 'il', 'non', 'dis']);
+
+/**
+ * Does this word carry a negating prefix over a stem that is itself a word?
+ *
+ * The dictionary test is what makes this safe. A bare prefix match calls
+ * `interest` and `island` negations; requiring the remainder to be a known lemma
+ * rejects both (`terest`, `land`… `land` IS a lemma, hence the length floor and
+ * the requirement that the base share a part of speech is left to WordNet's own
+ * listing of the negated form).
+ */
+function negatingPrefixOf(lower) {
+  for (const prefix of NEGATING_PREFIXES) {
+    if (!lower.startsWith(prefix)) continue;
+    const stem = lower.slice(prefix.length);
+    if (stem.length < 4) continue;
+    if (wordnetPrimitives(stem) || ownEntry(ROOT_MAP, stem)) return { prefix, stem };
+  }
+  return null;
+}
+
 export function resolveSemanticPrimitives(word) {
   const lower = String(word || '').toLowerCase().replace(/[^a-z]/g, '');
   if (!lower) return [];
 
-  // 1. Closed-class lookup
+  // NEGATION IS CHECKED FIRST AND MERGED, NEVER SUBSTITUTED.
+  //
+  // WordNet lists `unhappy` as its own lemma under adj.all, so a dictionary-first
+  // resolver returns [STATE] and the negation vanishes — the flagship signal
+  // silently deleted by the fix that grounded everything else. It also collapsed
+  // every negated adjective into the same bucket as its positive, taking the
+  // largest collision bucket from 5,190 lemmas to 13,405.
+  //
+  // The stem lookup is what makes the prefix test safe: `interest` is not a
+  // negation because `terest` is not a word.
+  const negation = negatingPrefixOf(lower);
+  if (negation) {
+    const base = resolveSemanticPrimitives(negation.stem);
+    if (base.length > 0) return [...new Set(['NEGATED', ...base])];
+  }
+
+  // RESOLUTION ORDER: exact curated match, then a real dictionary, then
+  // heuristics, then nothing.
+  //
+  // The substring rules used to run ahead of WordNet, and a heuristic that
+  // outranks a dictionary is how `forest` resolved to
+  // [ACTION, GROUP, PHYS_OBJ, SPATIAL_REL] via a ROOT_MAP prefix match while
+  // `woodland` resolved to [SUBSTANCE] — scoring two synonyms at 0.091, below
+  // an unrelated pair. Heuristics exist to cover what the dictionary misses,
+  // not to pre-empt it.
+
+  // 1. Closed-class lookup — exact, curated, and about grammar rather than
+  //    meaning, so no dictionary can improve on it.
   const closed = ownEntry(CLOSED_CLASS_MAP, lower);
   if (closed) return closed;
 
-  // 2. Root map lookup (longest match first)
-  // Match at word start or after a known prefix boundary.
-  // This prevents "surrender" from matching "render".
-  for (const [root, primitives] of Object.entries(ROOT_MAP)) {
-    if (lower === root || lower.startsWith(root)) {
-      return primitives;
-    }
-    // Also match after a known prefix (e.g., "un" + "happy" → NEGATED + FEEL)
+  // 2. Root map, EXACT matches only. A hand-curated entry for the whole word is
+  //    a deliberate assertion; a substring hit is a coincidence.
+  const exactRoot = ownEntry(ROOT_MAP, lower);
+  if (exactRoot) return exactRoot;
+
+  // 3. WordNet grounding — 78,838 lemmas over 45 lexicographer files.
+  const grounded = wordnetPrimitives(lower);
+  if (grounded) return grounded;
+
+  // 4. Root map by prefix boundary, for derived forms WordNet does not list.
+  //    Ordered longest-root-first so `surrender` cannot match `render`.
+  const roots = Object.entries(ROOT_MAP).sort((a, b) => b[0].length - a[0].length);
+  for (const [root, primitives] of roots) {
+    if (lower.startsWith(root)) return primitives;
+    // e.g. "un" + "happy" → NEGATED + FEEL
     for (const [prefix, prefixPrims] of PREFIX_RULES) {
       if (lower.startsWith(prefix) && lower.slice(prefix.length).startsWith(root)) {
         return [...new Set([...prefixPrims, ...primitives])];
@@ -1455,7 +1512,7 @@ export function resolveSemanticPrimitives(word) {
     }
   }
 
-  // 3. Prefix + suffix decomposition
+  // 5. Prefix + suffix decomposition — the last heuristic before giving up.
   const primitives = [];
   let stem = lower;
 
@@ -1477,17 +1534,20 @@ export function resolveSemanticPrimitives(word) {
 
   if (primitives.length > 0) return [...new Set(primitives)];
 
-  // 4. Deterministic hash fallback: FNV-1a → 2 primitives from different domains
-  const hash = fnv1aHash(lower);
-  const domainKeys = Object.keys(SEMANTIC_DOMAINS);
-  const domain1 = domainKeys[hash % domainKeys.length];
-  const domain2 = domainKeys[(hash >>> 8) % domainKeys.length];
-  const pool1 = SEMANTIC_DOMAINS[domain1];
-  const pool2 = SEMANTIC_DOMAINS[domain2];
-  const p1 = pool1[(hash >>> 4) % pool1.length];
-  const p2 = pool2[(hash >>> 12) % pool2.length];
-
-  return p1 === p2 ? [p1] : [p1, p2];
+  // 5. Nothing grounds this word.
+  //
+  // This used to be a deterministic hash fallback that drew two primitives from
+  // the domain pools. Measured over 68,480 WordNet lemmas it collapsed the
+  // vocabulary into 1,473 distinct classes and labelled 1,917 lemmas NEGATED —
+  // `carafe`, `brushwood`, `blurred` among them — poisoning the one channel this
+  // engine exists to provide. It was deterministic, so it reproduced perfectly,
+  // which is exactly what made it look principled rather than invented.
+  //
+  // An empty result is a declared absence the caller can see, the same contract
+  // as `ast-topography` returning null and `SkillScores.semantic: number | null`
+  // in `src/lib/career/graph/contracts.ts`. A resolver that always resolves is a
+  // check that cannot fail.
+  return [];
 }
 
 /**

@@ -25,7 +25,13 @@ export const NOMINATION_SOURCES = Object.freeze([
   'STRUCTURAL',
   'TOKEN',
   'PRION',
-  'VECTOR'
+  'VECTOR',
+  // STAMP — rare-syntactic-kind fingerprint, codex/core/semantic/ast-stamp.js.
+  // High precision, low recall: it covers the identifiable tail (13.4% of files
+  // carry a stamp at all) and says nothing about the rest, which makes it the
+  // complement of VECTOR rather than a rival. Like every other source here it
+  // only NOMINATES — the largest stamp bucket measured held 35 files.
+  'STAMP'
 ]);
 
 const SOURCE_SET = new Set(NOMINATION_SOURCES);

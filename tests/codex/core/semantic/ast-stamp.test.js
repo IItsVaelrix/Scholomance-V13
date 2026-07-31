@@ -9,7 +9,7 @@ import {
   retrieveStampNominations,
   STAMP_SOURCE
 } from '../../../../codex/core/semantic/ast-stamp.js';
-import { NOMINATION_SOURCES } from '../../../../codex/core/immunity/cleri-probe/retrieval.js';
+import { NOMINATION_SOURCES, mergeCandidates } from '../../../../codex/core/immunity/cleri-probe/retrieval.js';
 
 const FIXTURE = 'tests/qa/fixtures/cleri-probe';
 const read = (p) => ({ path: `${FIXTURE}/${p}`, content: readFileSync(`${FIXTURE}/${p}`, 'utf8') });
@@ -213,11 +213,23 @@ describe('stamp nominations', () => {
     expect(noms).toEqual([]);
   });
 
-  it('is documented as unusable by mergeCandidates until STAMP is registered', () => {
-    // retrieval.js:377 drops any nomination whose source is not in the frozen
-    // NOMINATION_SOURCES list — silently, with no error. Wiring this into
-    // production cleri is a one-line change to that frozen array and is not
-    // made here. This test exists so the gap cannot be forgotten.
-    expect(NOMINATION_SOURCES).not.toContain(STAMP_SOURCE);
+  it('survives mergeCandidates instead of being silently dropped', () => {
+    // mergeCandidates filters every nomination against the frozen
+    // NOMINATION_SOURCES and drops unknown sources with no error. STAMP is now
+    // registered, so this asserts the nomination actually arrives — an
+    // unregistered source would make the whole channel a no-op that looks like
+    // a clean run.
+    expect(NOMINATION_SOURCES).toContain(STAMP_SOURCE);
+
+    const noms = retrieveStampNominations(
+      CORPUS,
+      { pathologyClass: 'CONCURRENT_SHARED_STATE_MUTATION' },
+      { manifest, index, threshold: 0.3 }
+    );
+    expect(noms.length).toBeGreaterThan(0);
+
+    const merged = mergeCandidates(noms, { limit: 10 });
+    expect(merged.length).toBe(noms.length);
+    expect(merged.every(c => c.nominators.includes(STAMP_SOURCE))).toBe(true);
   });
 });
