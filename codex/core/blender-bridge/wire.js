@@ -14,6 +14,7 @@
 
 import { quantize, SCALES } from './quantize.js';
 import { internTable, ABSENT_ID } from './intern.js';
+import { hexIntToLinearTriple, COLOR_LAW_EXACT } from './color-law.js';
 
 export class WireError extends Error {
   constructor(message) {
@@ -100,11 +101,25 @@ export function toPythonWire(packet, options = {}) {
     });
   }
 
+  // Declared linear colour. The consumer dequantizes and applies; it never runs
+  // a transfer function of its own, so both engines shade from the same numbers.
+  const linear = [];
+  for (const c of coords) {
+    const [lr, lg, lb] = hexIntToLinearTriple(hexToInt(c.color));
+    linear.push(
+      quantize(lr, SCALES.UNIT),
+      quantize(lg, SCALES.UNIT),
+      quantize(lb, SCALES.UNIT),
+    );
+  }
+  scales.pb_albedo = SCALES.UNIT;
+
   const wire = {
     wireVersion: WIRE_VERSION,
     packetId: String(packet.bytecode ?? ''),
     kind: String(packet.kind ?? ''),
     colorPolicy,
+    colorLaw: COLOR_LAW_EXACT,
     canvas: {
       width: packet.canvas.width,
       height: packet.canvas.height,
@@ -122,6 +137,7 @@ export function toPythonWire(packet, options = {}) {
     colors: {
       color: coords.map((c) => hexToInt(c.color)),
       preSquareColor: coords.map((c) => hexToInt(c.preSquareColor)),
+      linear,
     },
     energy,
     sourceChecksum: String(packet.checksum?.value ?? ''),
