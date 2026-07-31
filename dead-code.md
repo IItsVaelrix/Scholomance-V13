@@ -1,6 +1,6 @@
 # Dead Code Report
 
-Generated at: 2026-07-30T08:32:32.157Z
+Generated at: 2026-07-30T17:17:08.530Z
 
 ## Unreachable Files
 Files in `src/` or `codex/` that are not imported by any entry point or reachable file.
@@ -129,6 +129,14 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] src/lib/phonology.adapter.js
 - [ ] src/lib/photonic-quantization/photonic-errors.js
 - [ ] src/lib/photonic-quantization/photonic-types.js
+- [ ] src/lib/photonic-retina/realization-equivalence/evaluate.js
+- [ ] src/lib/photonic-retina/realization-equivalence/index.js
+- [ ] src/lib/photonic-retina/realization-equivalence/metrics.js
+- [ ] src/lib/photonic-retina/realization-equivalence/specimen.js
+- [ ] src/lib/photonic-retina/realization-equivalence/vessels-canvas.js
+- [ ] src/lib/photonic-retina/realization-equivalence/vessels-lattice.js
+- [ ] src/lib/photonic-retina/realization-equivalence/vessels-pixi.js
+- [ ] src/lib/photonic-retina/realization-equivalence/vessels-svg.js
 - [ ] src/lib/pixelbrain/uniforms.bridge.js
 - [ ] src/lib/reference.engine.js
 - [ ] src/lib/render-engine.js
@@ -256,6 +264,13 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/cli/scholo-immune.js
 - [ ] codex/core/animation/amp/amp.worker.ts
 - [ ] codex/core/archive/truesight/color/visemeMapping.ARCHIVED.js
+- [ ] codex/core/blender-bridge/energy-bindings.js
+- [ ] codex/core/blender-bridge/index.js
+- [ ] codex/core/blender-bridge/intern.js
+- [ ] codex/core/blender-bridge/quantize.js
+- [ ] codex/core/blender-bridge/receipt.js
+- [ ] codex/core/blender-bridge/render-scd64.js
+- [ ] codex/core/blender-bridge/wire.js
 - [ ] codex/core/candidate-lattice/index.ts
 - [ ] codex/core/combat.exegesis.js
 - [ ] codex/core/combat.session.js
@@ -324,11 +339,16 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/core/pixelbrain/amps/qbit/qbit-snap-profile.js
 - [ ] codex/core/pixelbrain/amps/turboquant/turboquant-layer-snapshot.js
 - [ ] codex/core/pixelbrain/asset-pipeline.js
+- [ ] codex/core/pixelbrain/build-gate.js
 - [ ] codex/core/pixelbrain/bytecode-to-scdl-bridge.js
+- [ ] codex/core/pixelbrain/calibration/calibration-001-purity-assay.js
+- [ ] codex/core/pixelbrain/calibration/index.js
 - [ ] codex/core/pixelbrain/character-face-composer.js
 - [ ] codex/core/pixelbrain/color-codec.js
 - [ ] codex/core/pixelbrain/compile-asset.js
+- [ ] codex/core/pixelbrain/concept-chemistry.js
 - [ ] codex/core/pixelbrain/construction-to-coords.js
+- [ ] codex/core/pixelbrain/determinism-purity-assay.js
 - [ ] codex/core/pixelbrain/geometry/bounds.js
 - [ ] codex/core/pixelbrain/geometry/cell-key.js
 - [ ] codex/core/pixelbrain/geometry/cell-set.js
@@ -346,12 +366,14 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/core/pixelbrain/graphic-forge/microprocessors/qbit-propagate.microprocessor.js
 - [ ] codex/core/pixelbrain/graphic-forge/microprocessors/qbit-seed.microprocessor.js
 - [ ] codex/core/pixelbrain/graphic-forge/microprocessors/scdl-exporter.microprocessor.js
+- [ ] codex/core/pixelbrain/grounding-index.js
 - [ ] codex/core/pixelbrain/hair-flow-amp.js
 - [ ] codex/core/pixelbrain/image-lattice-compiler.js
 - [ ] codex/core/pixelbrain/image-segmentation-amp.js
 - [ ] codex/core/pixelbrain/image-to-cell-grid.js
 - [ ] codex/core/pixelbrain/image-to-construction-skeleton.js
 - [ ] codex/core/pixelbrain/inject-hair.js
+- [ ] codex/core/pixelbrain/label-store.js
 - [ ] codex/core/pixelbrain/loot-chest-composition.js
 - [ ] codex/core/pixelbrain/loot-chest-forge.js
 - [ ] codex/core/pixelbrain/material-validator.js
@@ -394,6 +416,9 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/core/pixelbrain/scdna-gene-packet.js
 - [ ] codex/core/pixelbrain/scene-graph-renderer.js
 - [ ] codex/core/pixelbrain/silhouette-scan.js
+- [ ] codex/core/pixelbrain/simulate-law-gate.js
+- [ ] codex/core/pixelbrain/simulate-raid-triage.js
+- [ ] codex/core/pixelbrain/simulate-reaction.js
 - [ ] codex/core/pixelbrain/synthesize-crisp-tile.js
 - [ ] codex/core/pixelbrain/tile-forge/tile-forge.exporter.js
 - [ ] codex/core/pixelbrain/tile-forge/tile-forge.schema.js
@@ -452,7 +477,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `RhymeIcon` in `src/components/Icons.jsx`
 - [ ] `ChevronsRightIcon` in `src/components/Icons.jsx`
 - [ ] `ChevronsLeftIcon` in `src/components/Icons.jsx`
-- [ ] `RefreshIcon` in `src/components/Icons.jsx`
 - [ ] `DownloadIcon` in `src/components/Icons.jsx`
 - [ ] `EqPresetV2` in `src/components/ParaEQ/hooks/useEqPreset.ts`
 - [ ] `FACTORY_SCROLLS` in `src/components/ParaEQ/presets/factoryScrolls.ts`
@@ -1366,7 +1390,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `normalizeScanLimits` in `codex/core/diagnostic/diagnostic-file-source.js`
 - [ ] `DEFAULT_RESONANCE_DIR` in `codex/core/diagnostic/resonanceAntibody.js`
 - [ ] `writeResonanceAntibody` in `codex/core/diagnostic/resonanceAntibody.js`
-- [ ] `INVARIANTS` in `codex/core/diagnostic/truesightImmuneProbe.js`
 - [ ] `scanInvariants` in `codex/core/diagnostic/truesightImmuneProbe.js`
 - [ ] `buildExosome` in `codex/core/diagnostic/truesightImmuneProbe.js`
 - [ ] `shedExosomes` in `codex/core/diagnostic/truesightImmuneProbe.js`
@@ -1562,6 +1585,8 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `BLOCK_TAXONOMY` in `codex/core/pixelbrain/block-taxonomy.js`
 - [ ] `SCHOOL_FALLBACK` in `codex/core/pixelbrain/block-taxonomy.js`
 - [ ] `cellHash` in `codex/core/pixelbrain/block-taxonomy.js`
+- [ ] `GATE_THRESHOLDS` in `codex/core/pixelbrain/build-gate.js`
+- [ ] `buildGate` in `codex/core/pixelbrain/build-gate.js`
 - [ ] `planeToVoxel` in `codex/core/pixelbrain/build-plane.js`
 - [ ] `voxelToPlane` in `codex/core/pixelbrain/build-plane.js`
 - [ ] `createTypeMismatchError` in `codex/core/pixelbrain/bytecode-error.js`
@@ -1569,6 +1594,9 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `createCoordinateError` in `codex/core/pixelbrain/bytecode-error.js`
 - [ ] `createColorError` in `codex/core/pixelbrain/bytecode-error.js`
 - [ ] `compileBytecodeToSCDL` in `codex/core/pixelbrain/bytecode-to-scdl-bridge.js`
+- [ ] `CALIBRATION_DATE` in `codex/core/pixelbrain/calibration/calibration-001-purity-assay.js`
+- [ ] `WEIGHTS_AT_PREDICTION` in `codex/core/pixelbrain/calibration/calibration-001-purity-assay.js`
+- [ ] `verifyInvariants` in `codex/core/pixelbrain/calibration/index.js`
 - [ ] `pyFloat` in `codex/core/pixelbrain/canonical-json.js`
 - [ ] `JsonNumber` in `codex/core/pixelbrain/canonical-json.js`
 - [ ] `pythonFloatRepr` in `codex/core/pixelbrain/canonical-json.js`
@@ -1595,13 +1623,14 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `getHexForByte` in `codex/core/pixelbrain/color-byte-mapping.js`
 - [ ] `getVisemeForFormants` in `codex/core/pixelbrain/color-byte-mapping.js`
 - [ ] `hexToRgb255` in `codex/core/pixelbrain/color-codec.js`
-- [ ] `hexToInt` in `codex/core/pixelbrain/color-codec.js`
 - [ ] `intToHex` in `codex/core/pixelbrain/color-codec.js`
 - [ ] `COLOR_INTENSITY_MICROPROCESSOR_ID` in `codex/core/pixelbrain/color-intensity-rating-microprocessor.js`
 - [ ] `COLOR_INTENSITY_VERSION` in `codex/core/pixelbrain/color-intensity-rating-microprocessor.js`
 - [ ] `rateColorIntensity` in `codex/core/pixelbrain/color-intensity-rating-microprocessor.js`
 - [ ] `rateCoordinateColorIntensity` in `codex/core/pixelbrain/color-intensity-rating-microprocessor.js`
 - [ ] `annotateCoordinateColorIntensity` in `codex/core/pixelbrain/color-intensity-rating-microprocessor.js`
+- [ ] `conceptVector` in `codex/core/pixelbrain/concept-chemistry.js`
+- [ ] `bondEnergy` in `codex/core/pixelbrain/concept-chemistry.js`
 - [ ] `CONSTRAINT_TOLERANCE` in `codex/core/pixelbrain/construction/constraint-solver.js`
 - [ ] `applyTransformConstraints` in `codex/core/pixelbrain/construction/constraint-solver.js`
 - [ ] `verifyConstraints` in `codex/core/pixelbrain/construction/constraint-solver.js`
@@ -1616,6 +1645,15 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `resolveDominantAxis` in `codex/core/pixelbrain/coordinate-mapping.js`
 - [ ] `resolveSymmetryType` in `codex/core/pixelbrain/coordinate-mapping.js`
 - [ ] `applyGoldenRatio` in `codex/core/pixelbrain/coordinate-mapping.js`
+- [ ] `GRADE_PURE` in `codex/core/pixelbrain/determinism-purity-assay.js`
+- [ ] `GRADE_TRACE` in `codex/core/pixelbrain/determinism-purity-assay.js`
+- [ ] `GRADE_CONTAMINATED` in `codex/core/pixelbrain/determinism-purity-assay.js`
+- [ ] `GRADE_TOXIC` in `codex/core/pixelbrain/determinism-purity-assay.js`
+- [ ] `scoreImmune` in `codex/core/pixelbrain/determinism-purity-assay.js`
+- [ ] `scoreDrift` in `codex/core/pixelbrain/determinism-purity-assay.js`
+- [ ] `scoreReplay` in `codex/core/pixelbrain/determinism-purity-assay.js`
+- [ ] `scoreStructural` in `codex/core/pixelbrain/determinism-purity-assay.js`
+- [ ] `assayBatch` in `codex/core/pixelbrain/determinism-purity-assay.js`
 - [ ] `deterministicNoise` in `codex/core/pixelbrain/deterministic-noise.js`
 - [ ] `DimensionCompileError` in `codex/core/pixelbrain/dimension-formula-compiler.ts`
 - [ ] `FormulaNode` in `codex/core/pixelbrain/dimension-formula-compiler.ts`
@@ -1679,6 +1717,10 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `RASTER_CANVAS_SIZE` in `codex/core/pixelbrain/glyph-rasterizer.js`
 - [ ] `createSinisterVoidGraphicForge` in `codex/core/pixelbrain/graphic-forge/graphic-forge.presets.js`
 - [ ] `createImageReceiverGraphicForge` in `codex/core/pixelbrain/graphic-forge/graphic-forge.presets.js`
+- [ ] `PMI_FLOOR` in `codex/core/pixelbrain/grounding-index.js`
+- [ ] `pmiPair` in `codex/core/pixelbrain/grounding-index.js`
+- [ ] `loadEncyclopediaIndex` in `codex/core/pixelbrain/grounding-index.js`
+- [ ] `buildIndexFromTexts` in `codex/core/pixelbrain/grounding-index.js`
 - [ ] `HERALDRY_MICROPROCESSOR_ID` in `codex/core/pixelbrain/heraldry-amp.js`
 - [ ] `HERALDRY_MICROPROCESSOR_VERSION` in `codex/core/pixelbrain/heraldry-amp.js`
 - [ ] `HOLLOW_THRESHOLD` in `codex/core/pixelbrain/hollowness-amp.js`
@@ -1708,6 +1750,9 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `ITEM_SPEC_VERSION` in `codex/core/pixelbrain/item-spec.js`
 - [ ] `categoryOf` in `codex/core/pixelbrain/item-spec.js`
 - [ ] `ITEM_VOXEL_SCHEMA_VERSION` in `codex/core/pixelbrain/item-voxel-packet.js`
+- [ ] `createLabelStore` in `codex/core/pixelbrain/label-store.js`
+- [ ] `toHarnessLabels` in `codex/core/pixelbrain/label-store.js`
+- [ ] `scoreAccuracy` in `codex/core/pixelbrain/label-store.js`
 - [ ] `LOOT_CHEST_SCDL_FIXTURE` in `codex/core/pixelbrain/loot-chest-forge.js`
 - [ ] `compileLootChestSource` in `codex/core/pixelbrain/loot-chest-forge.js`
 - [ ] `renderLootChestSourcePng` in `codex/core/pixelbrain/loot-chest-forge.js`
@@ -1837,6 +1882,13 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `digestBlueprint` in `codex/core/pixelbrain/silhouette-blueprint.js`
 - [ ] `assertConnected` in `codex/core/pixelbrain/silhouette-composer.js`
 - [ ] `buildSilhFormBlock` in `codex/core/pixelbrain/silhouette-scan.js`
+- [ ] `intentToProduct` in `codex/core/pixelbrain/simulate-law-gate.js`
+- [ ] `gateToLawResult` in `codex/core/pixelbrain/simulate-law-gate.js`
+- [ ] `simulateLawGate` in `codex/core/pixelbrain/simulate-law-gate.js`
+- [ ] `specToSymptoms` in `codex/core/pixelbrain/simulate-raid-triage.js`
+- [ ] `simulateRaidTriage` in `codex/core/pixelbrain/simulate-raid-triage.js`
+- [ ] `specFromReaction` in `codex/core/pixelbrain/simulate-reaction.js`
+- [ ] `simulateReaction` in `codex/core/pixelbrain/simulate-reaction.js`
 - [ ] `SQUARE_SHARPNESS_CONTRAST_AMP_ID` in `codex/core/pixelbrain/square-sharpness-contrast-amp.js`
 - [ ] `SQUARE_SHARPNESS_CONTRAST_VERSION` in `codex/core/pixelbrain/square-sharpness-contrast-amp.js`
 - [ ] `STRUCTURAL_ENERGY_VERSION` in `codex/core/pixelbrain/structural-energy.js`
