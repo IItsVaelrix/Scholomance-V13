@@ -1,7 +1,7 @@
 # Blender Bridge — Fully Functional
 
 **Date:** 2026-07-30
-**Status:** Phases 0–2 IMPLEMENTED (2026-07-31). Phases 3–6 proposed.
+**Status:** Phases 0–5 IMPLEMENTED (2026-07-31). Phase 6 (the carrier) proposed.
 **Depends on:** `codex/core/blender-bridge/`, `blender/addons/scholomance_pixelbrain/`,
 `codex/core/pixelbrain/temporal/`, commit `e0cee0f9`
 **Incorporates:** `2026-07-30-sealed-projection-carrier-design.md` (§5 sequencing, §3 carrier laws)
@@ -373,8 +373,8 @@ predicted.
 | 3 | Colour reaches pixels | Two assets differing only in colour → different receipts | **FAILS** (`437f1e1a`) | **PASSES** — `F03189C3` vs `D844E220` |
 | 4 | The palette crosses correctly (§4.1) | Node-group values == wire values; two schools → two node groups | no such check | **PASSES** — 3/3 roles differ |
 | 5 | Energy reaches pixels | PHOTONIC variant vs baseline → different receipts | **FAILS** | **PASSES** |
-| 6 | The sim chain holds | N chained receipts; cold-start refused | **FAILS** | **FAILS** — Phase 3 |
-| 7 | Causes can be compared | Two engines, same packet → `CAUSES_AGREE` | **FAILS** (4/7) | **FAILS** — Phase 4 |
+| 6 | The sim chain holds | N chained receipts; cold-start refused | **FAILS** | **PASSES** — 3 distinct digests |
+| 7 | Causes can be compared | Two engines, same packet → required slots agree | **FAILS** (4/7) | **PASSES** — `COLOR_LAW` MATCH, 5/7 |
 | 8 | Frames are independent | Corrupt frame A ⇒ frame B's checksum unchanged | n/a | n/a — Phase 6 |
 | 9 | The manifest binds frames | Swap two frames' contents ⇒ `root` changes | n/a | n/a — Phase 6 |
 | 10 | Tampering is refused | A tampered frame is refused, observably | n/a | n/a — Phase 6 |
@@ -394,8 +394,39 @@ contains a test that requires the check to FAIL at 64 samples. Without it, a
 round-trip that passed for the wrong reason would look identical to one that
 passed for the right one.
 
-Rows 6 and 7 remain red for their own declared reasons and are the entry points
-to Phases 3 and 4.
+Rows 6 and 7 went green in Phases 3–4 (plan
+`docs/superpowers/plans/2026-07-31-blender-bridge-phases-3-5.md`, commits
+`983ead9d`…`85b139c5`). All four E2E drivers now exit 0, which had never
+happened before. Row 7's falsifier is restated: literal `CAUSES_AGREE` across
+all seven slots was unreachable, because `ENGINE_LAW` is declared
+`EXPECTED_DIVERGE`. It now reads "every slot the table marks `SHOULD_AGREE`
+agrees" — see §5.2.
+
+### 5.2 What Phases 3–5 found
+
+Each defect below was hidden behind the one above it, and each was found by
+running the thing rather than reading it:
+
+- **`steps_per_second` was hiding a simulation that never ran.** With the
+  `AttributeError` gone, every rigid body function turned out to read
+  `obj.location.z` — but the solver writes to the evaluated depsgraph and never
+  back to the authored transform, so the falling cube read `3.0` at every frame.
+  `verify_scene_determinism` was comparing the constant `3.0` against the
+  constant `3.0` and calling the simulation deterministic. It could not have
+  failed for any simulation, including one that was not running.
+- **`test_cold_vs_warm_divergence` did not test cold.** It conceded in a comment
+  that it couldn't, and asserted only the warm side. Measured now: warm stepping
+  gives `z = 3.000, 2.861, 2.306, 0.529, 0.500` at frames 1, 5, 10, 20, 30;
+  cold seeking gives `3.000` at every one.
+- **`healthy` was a check that could not PASS.** Defined as all seven causes
+  matching, while `ENGINE_LAW` is declared `EXPECTED_DIVERGE` — unreachable for
+  any correct pair of engines. It left the driver printing `✓ HEALTHY` while the
+  module reported `healthy: false`. This is the mirror image of the pathology in
+  §1.2, and worth naming as its own species: a check that cannot pass is
+  eventually *disabled*, whereas a check that cannot fail is eventually *trusted*.
+- **There were two claim builders.** `buildRemotionClaim` (used by tests) and
+  `buildCanvasClaim` (used by the E2E). Fixing only the first left `COLOR_LAW`
+  diverging in the E2E for a bookkeeping reason.
 
 ### 5.1 What Phases 0–2 changed about the measurements themselves
 
