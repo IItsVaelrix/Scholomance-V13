@@ -119,6 +119,9 @@ def emit_claim(scene, wire, dump_path):
             "denoise": bool(scene.cycles.use_denoising),
             "viewTransform": scene.view_settings.view_transform,
             "look": scene.view_settings.look,
+            # Reported, not computed. The transfer function is declared on the
+            # wire by color-law.js; the addon states which one it was handed.
+            "transfer": wire.get("colorLaw", {}).get("transfer", ""),
             "resolutionX": int(scene.render.resolution_x),
             "resolutionY": int(scene.render.resolution_y),
             "threads": int(scene.render.threads),

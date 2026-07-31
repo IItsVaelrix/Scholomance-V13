@@ -14,8 +14,13 @@
  */
 
 import { createHash } from 'node:crypto';
+import { COLOR_LAW_TRANSFER } from './color-law.js';
 
-export const RENDER_VERSION = 0x01;
+// 0x02: COLOR_LAW stopped encoding the output file format and started carrying
+// the declared colour contract; format/depth/display moved to ENGINE_LAW. Every
+// receipt changed, so the version changed with it — without that, receipts
+// minted before and after look comparable and are not.
+export const RENDER_VERSION = 0x02;
 
 export const RENDER_SLOT_NAMES = Object.freeze([
   'SYNTH_CLASS',
@@ -84,6 +89,8 @@ export function buildRenderCanonicals(inputs) {
     viewTransform = 'Standard',
     look = 'None',
     displayDevice = 'sRGB',
+    colorPolicy = 'EXACT',
+    transfer = COLOR_LAW_TRANSFER,
     format = 'OPEN_EXR',
     colorDepth = '32',
     sceneGraph = '',
@@ -96,10 +103,14 @@ export function buildRenderCanonicals(inputs) {
   return [
     { slot: 'SYNTH_CLASS', canonical: `v${RENDER_VERSION.toString(16).padStart(2, '0')}:${synthClass}` },
     { slot: 'FRAME_SYS', canonical: `${resolutionX}x${resolutionY}@${pixelAspect}:f${frameIndex}:cam:${cameraMatrix}` },
-    { slot: 'ENGINE_LAW', canonical: `${blenderVersion}+${buildHash}:${engine}:${device}` },
+    { slot: 'ENGINE_LAW', canonical: `${blenderVersion}+${buildHash}:${engine}:${device}:${displayDevice}:${format}:${colorDepth}` },
     { slot: 'LIGHT_BUDGET', canonical: `s${seed}:n${samples}:a${adaptive?1:0}:${adaptiveThreshold}:b${bounces}:c${clamping}:sh${shutterOpen},${shutterClose}:t${timeSamples}` },
     { slot: 'DENOISE', canonical: `${denoiser}:${denoiseInputPasses}:${denoiseEnabled?1:0}` },
-    { slot: 'COLOR_LAW', canonical: `${viewTransform}:${look}:${displayDevice}:${format}:${colorDepth}` },
+    // The COLOUR CONTRACT, not the container. Both engines must honour the same
+    // policy and transfer function; they will never share an output format, and
+    // encoding one here made expectedCrossEngineAgreement's SHOULD_AGREE
+    // impossible to satisfy for any correct implementation.
+    { slot: 'COLOR_LAW', canonical: `${colorPolicy}:${transfer}:${viewTransform}:${look}` },
     { slot: 'SCENE_GRAPH', canonical: `${sceneGraph}:nt:${nodeTreeHashes}:seeds:${declaredSeeds}:seals:${consumedSeals}` },
     { slot: 'PIXEL_RECEIPT', canonical: pixelDumpHash },
   ];

@@ -78,6 +78,11 @@ export function mintReceipt(claim, pixelDumpHash) {
     displayDevice: observed.displayDevice ?? 'sRGB',
     format: observed.format ?? 'OPEN_EXR',
     colorDepth: observed.colorDepth ?? '32',
+    // The declared colour contract, which is what COLOR_LAW now hashes. Taken
+    // from the claim so the consumer reports what it was handed rather than
+    // this module assuming a policy on its behalf.
+    colorPolicy: claim.colorPolicy ?? observed.colorPolicy ?? 'EXACT',
+    transfer: observed.transfer ?? '',
     sceneGraph: claim.packetId ?? '',
     nodeTreeHashes: observed.nodeTreeHashes ?? '',
     declaredSeeds: observed.declaredSeeds ?? '',

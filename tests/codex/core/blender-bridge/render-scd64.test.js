@@ -185,3 +185,53 @@ describe('VERDICTS', () => {
     expect(VERDICTS).toEqual(['REPRODUCED', 'NONDETERMINISTIC', 'RESYNTHESIZED', 'INERT', 'UNRELATED']);
   });
 });
+
+describe('COLOR_LAW carries the colour contract, not the file format', () => {
+  const base = {
+    viewTransform: 'Standard', look: 'None', displayDevice: 'sRGB',
+    colorPolicy: 'EXACT', transfer: 'sRGB-IEC-61966-2-1',
+  };
+
+  function colorLawOf(inputs) {
+    return buildRenderCanonicals(inputs).find((c) => c.slot === 'COLOR_LAW').canonical;
+  }
+  function engineLawOf(inputs) {
+    return buildRenderCanonicals(inputs).find((c) => c.slot === 'ENGINE_LAW').canonical;
+  }
+
+  it('is unchanged by the output file format', () => {
+    // The whole point. An EXR renderer and an RGBA8 canvas can never share a
+    // format, so encoding it here made COLOR_LAW: SHOULD_AGREE unsatisfiable.
+    const exr = colorLawOf({ ...base, format: 'OPEN_EXR', colorDepth: '32' });
+    const png = colorLawOf({ ...base, format: 'PNG', colorDepth: '8' });
+    expect(exr).toBe(png);
+  });
+
+  it('changes when the declared policy changes', () => {
+    expect(colorLawOf({ ...base, colorPolicy: 'EXACT' }))
+      .not.toBe(colorLawOf({ ...base, colorPolicy: 'SYNTHESIZED' }));
+  });
+
+  it('changes when the transfer function changes', () => {
+    expect(colorLawOf({ ...base, transfer: 'sRGB-IEC-61966-2-1' }))
+      .not.toBe(colorLawOf({ ...base, transfer: 'none' }));
+  });
+
+  it('changes when the view transform changes', () => {
+    expect(colorLawOf({ ...base, viewTransform: 'Standard' }))
+      .not.toBe(colorLawOf({ ...base, viewTransform: 'AgX' }));
+  });
+
+  it('moves the file format into ENGINE_LAW, where divergence is expected', () => {
+    const exr = engineLawOf({ ...base, format: 'OPEN_EXR', colorDepth: '32' });
+    const png = engineLawOf({ ...base, format: 'PNG', colorDepth: '8' });
+    expect(exr).not.toBe(png);
+    expect(exr).toContain('OPEN_EXR');
+  });
+
+  it('bumps RENDER_VERSION, because every receipt just changed', () => {
+    // Without a version bump, receipts minted before and after this change look
+    // comparable and are not.
+    expect(RENDER_VERSION).toBe(0x02);
+  });
+});
