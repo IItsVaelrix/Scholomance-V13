@@ -266,8 +266,15 @@ export function ComposeSignalChamberAdapter({
         </nav>
       </motion.aside>
 
-      {/* Center: Resonance Core Console */}
-      <main
+      {/* Center: Resonance Core Console.
+          A plain div, not <main>: the shell above already carries role="main"
+          with aria-label="Scholomance Signal Chamber", so marking this centre
+          column as a landmark too produced BOTH axe failures here —
+          landmark-no-duplicate-main (two mains in the document) and
+          landmark-main-is-top-level (one nested inside the other). This is the
+          middle column of a three-column HUD, not the document's main region;
+          the <h1> below still names it. */}
+      <div
         className="hud-center"
         data-compose-part="core"
         data-compose-kind="resonance-core"
@@ -302,7 +309,7 @@ export function ComposeSignalChamberAdapter({
             onOrbClick={onOrbClick}
           />
         </div>
-      </main>
+      </div>
 
       {/* Right Sidebar: Parameter Rail */}
       <motion.aside
