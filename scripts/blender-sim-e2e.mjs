@@ -19,11 +19,11 @@
  */
 
 import { readFileSync, writeFileSync, mkdtempSync, existsSync } from 'node:fs';
-import { execSync } from 'node:child_process';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
 import { runSimE2E, compareSimRuns } from '../codex/core/blender-bridge/sim-e2e.js';
+import { runBlenderScript, BlenderRunError } from '../codex/core/blender-bridge/blender-run.js';
 
 const BLENDER = process.env.BLENDER || join(process.env.HOME, 'opt/blender/blender');
 const REPO_ROOT = process.cwd();
@@ -35,12 +35,32 @@ if (!existsSync(BLENDER)) {
   process.exit(1);
 }
 
+// Falsifier 1, same as the bridge E2E. This driver reported
+// "sim_manifest.json not found" for an AttributeError, because Blender exits 0
+// on an uncaught traceback and execSync only throws on a non-zero exit — the
+// missing manifest was a downstream symptom of an error it could not see.
+if (process.argv.includes('--self-test')) {
+  const selfDir = mkdtempSync(join(tmpdir(), 'pb-sim-selftest-'));
+  let detected = false;
+  try {
+    runBlenderScript({
+      blender: BLENDER,
+      body: 'raise RuntimeError("deliberate self-test failure")',
+      scriptPath: join(selfDir, 'selftest.py'),
+    });
+  } catch (err) {
+    detected = err instanceof BlenderRunError;
+  }
+  console.log(`[sim-e2e] self-test: Blender failure detected = ${detected}`);
+  process.exit(detected ? 0 : 1);
+}
+
 const workDir = mkdtempSync(join(tmpdir(), 'pb-sim-e2e-'));
 console.log(`[sim-e2e] Work dir: ${workDir}`);
 console.log(`[sim-e2e] Frame count: ${FRAME_COUNT}`);
 
 const blenderScript = `
-import sys, json, os
+import json, os
 sys.path.insert(0, ${JSON.stringify(ADDON_DIR)})
 
 import bpy
@@ -56,7 +76,7 @@ frame_count = ${FRAME_COUNT}
 # Create rigid body scene
 plane, cube = create_rigid_body_scene()
 scene = bpy.context.scene
-setup_rigid_body_world(scene, steps_per_second=60, solver_iterations=10)
+setup_rigid_body_world(scene, substeps_per_frame=10, solver_iterations=10)
 
 # Configure render
 scene.render.resolution_x = 160
@@ -84,16 +104,15 @@ for i, (dump_path, claim) in enumerate(results):
 print("[blender] Done.")
 `;
 
-const scriptPath = join(workDir, 'sim_render.py');
-writeFileSync(scriptPath, blenderScript);
-
 console.log('[sim-e2e] Invoking Blender headless...');
 try {
-  const output = execSync(
-    `"${BLENDER}" -b --factory-startup --python "${scriptPath}"`,
-    { encoding: 'utf8', timeout: 600000, stdio: ['pipe', 'pipe', 'pipe'] }
-  );
-  console.log(output.split('\n').filter(l => l.startsWith('[blender]')).join('\n'));
+  const { blenderLines } = runBlenderScript({
+    blender: BLENDER,
+    body: blenderScript,
+    scriptPath: join(workDir, 'sim_render.py'),
+    timeout: 600000,
+  });
+  console.log(blenderLines.join('\n'));
 } catch (err) {
   console.error('[sim-e2e] Blender failed:');
   console.error(err.stderr || err.message);
