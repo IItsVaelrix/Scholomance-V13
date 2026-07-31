@@ -32,6 +32,14 @@ INTERN_KEY = "pb_intern_tables"
 # overlapping — the coordinate lattice renders as a contiguous surface.
 POINT_RADIUS = 0.5
 
+# Declared linear colour. The wire carries it as int32 triples at the scale
+# named in wire["scales"][ALBEDO_ATTRIBUTE]; this module only divides. The
+# sRGB transfer function lives in codex/core/blender-bridge/color-law.js and
+# must not be reimplemented here — the consumer applies values, it does not
+# derive them.
+LINEAR_KEY = "linear"
+ALBEDO_ATTRIBUTE = "pb_albedo"
+
 
 def ingest_wire(wire):
     """
@@ -67,10 +75,37 @@ def ingest_wire(wire):
         attr = pc.attributes.new(name=name, type="INT", domain="POINT")
         attr.data.foreach_set("value", list(values))
 
-    # Add color attributes
+    # Add packed color attributes, one int per point.
+    #
+    # LINEAR_KEY is excluded deliberately: it is 3 floats per point, not 1 int,
+    # and it has its own typed path below. Letting this generic loop reach it
+    # raises "internal error setting the array" -- foreach_set is given three
+    # times as many values as the attribute has elements.
     for name, values in wire["colors"].items():
+        if name == LINEAR_KEY:
+            continue
         attr = pc.attributes.new(name=f"pb_color_{name}", type="INT", domain="POINT")
         attr.data.foreach_set("value", list(values))
+
+    # Declared linear colour, dequantized at the scale the wire states. The
+    # transfer function ran producer-side; this only divides. A FLOAT_COLOR
+    # attribute is what ShaderNodeAttribute can read -- the packed ints above
+    # cross for provenance and no shader can consume them.
+    linear = wire["colors"].get(LINEAR_KEY)
+    if linear:
+        scale = float(wire["scales"][ALBEDO_ATTRIBUTE])
+        albedo = pc.attributes.new(name=ALBEDO_ATTRIBUTE, type="FLOAT_COLOR", domain="POINT")
+        rgba = []
+        for i in range(count):
+            rgba.extend(
+                (
+                    linear[i * 3 + 0] / scale,
+                    linear[i * 3 + 1] / scale,
+                    linear[i * 3 + 2] / scale,
+                    1.0,
+                )
+            )
+        albedo.data.foreach_set("color", rgba)
 
     # Add energy channel attributes
     for channel, values in wire["energy"].items():

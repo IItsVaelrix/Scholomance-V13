@@ -93,6 +93,51 @@ def t_find_by_packet_id():
     assert find_by_packet_id("NONEXISTENT") is None
 
 
+def _albedo_wire():
+    """A two-point wire carrying declared linear colour for 0xDCB430."""
+    return {
+        "wireVersion": 1,
+        "packetId": "ALBEDO-1",
+        "kind": "test",
+        "colorPolicy": "EXACT",
+        "canvas": {"width": 8, "height": 8, "gridSize": 1},
+        "coordinateCount": 2,
+        "scales": {"pb_albedo": 1000000},
+        "intern": {},
+        "attributes": {},
+        "positions": {"x": [0, 1], "y": [0, 1], "z": [0, 0]},
+        "colors": {
+            "color": [0xDCB430, 0xDCB430],
+            "preSquareColor": [0xDCB430, 0xDCB430],
+            "linear": [715693, 456411, 29557, 715693, 456411, 29557],
+        },
+        "energy": {str(i): [0, 0] for i in range(8)},
+        "sourceChecksum": "DEADBEEF",
+        "absentId": -1,
+    }
+
+
+def t_albedo_attribute_is_float_color_on_point():
+    obj = ingest_wire(_albedo_wire())
+    attrs = obj.data.attributes
+    assert "pb_albedo" in attrs, "pb_albedo attribute missing"
+    assert attrs["pb_albedo"].data_type == "FLOAT_COLOR", attrs["pb_albedo"].data_type
+    assert attrs["pb_albedo"].domain == "POINT", attrs["pb_albedo"].domain
+
+
+def t_albedo_dequantizes_at_the_declared_scale():
+    obj = ingest_wire(_albedo_wire())
+    c = obj.data.attributes["pb_albedo"].data[0]
+    # 715693 / 1e6 -- the linear value of 0xDC, carried as int32 by the wire.
+    assert abs(c.color[0] - 0.715693) < 1e-6, c.color[0]
+    assert abs(c.color[3] - 1.0) < 1e-6, "alpha must be opaque"
+
+
+def t_packed_hex_still_crosses_for_provenance():
+    obj = ingest_wire(_albedo_wire())
+    assert "pb_color_color" in obj.data.attributes
+
+
 for n, f in list(globals().items()):
     if n.startswith("t_"):
         check(n[2:], f)
