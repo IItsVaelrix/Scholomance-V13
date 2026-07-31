@@ -18,6 +18,9 @@ import {
   loadEncyclopediaIndex,
   prepareForSynthesize,
 } from '../codex/core/pixelbrain/grounding-index.js';
+import {
+  computeControlBar,
+} from '../codex/core/pixelbrain/calibration/control-gate.js';
 
 // --corpus swaps the hand-authored corpus below for the real encyclopedia index.
 // The labelled ground truth (MEASURED) is identical in both modes, so the two
@@ -244,9 +247,11 @@ for (const hazard of ['motion blur', 'geometry nodes', 'simulation caches']) {
 }
 
 console.log('\n═══ ORDINAL VALIDITY ═══\n');
+// Law controls detect whether lawGate still works; they are not the floor.
+// See codex/core/pixelbrain/calibration/control-gate.js.
 const controls = results.filter((r) => r.hazard === 'control');
-const bestControl = Math.max(...controls.map((r) => r.feasibility));
-const bestControlId = controls.find((r) => r.feasibility === bestControl).id;
+const { bar: bestControl, barId: bestControlId, findings: lawFindings } =
+  computeControlBar(results, { groupKey: 'hazard' });
 
 // This engine is an ORDINAL instrument — a probability engine that ranks
 // hypotheses — not a calibrated classifier. Two gates are therefore wrong:

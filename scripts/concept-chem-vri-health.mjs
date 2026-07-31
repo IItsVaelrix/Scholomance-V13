@@ -29,6 +29,14 @@ import {
   loadEncyclopediaIndex,
   prepareForSynthesize,
 } from '../codex/core/pixelbrain/grounding-index.js';
+import {
+  computeControlBar,
+  formatControlReport,
+} from '../codex/core/pixelbrain/calibration/control-gate.js';
+import {
+  adjudicateChemistry,
+  formatChemGate,
+} from '../codex/core/pixelbrain/calibration/chem-gate.js';
 
 const USE_CORPUS = process.argv.includes('--corpus');
 
@@ -227,14 +235,10 @@ for (const r of results) {
 
 console.log('═══ ORDINAL VERDICT ═══\n');
 
-const controls = results.filter((r) => r.group === 'control');
-const bestControl = Math.max(...controls.map((r) => r.feasibility));
-const bestControlId = controls.find((r) => r.feasibility === bestControl).id;
+// Law controls are detectors for lawGate, not the floor. See control-gate.js.
+const { bar: bestControl } = computeControlBar(results);
+console.log(formatControlReport(results));
 const polarity = results.find((r) => r.id === 'control/false-friend-polarity');
-
-console.log('  controls:');
-for (const c of controls) console.log(`    ${c.id.padEnd(32)} ${c.feasibility.toFixed(4)}`);
-console.log(`\n  bar to clear: ${bestControlId} ${bestControl.toFixed(4)}\n`);
 
 const hyp = results.filter((r) => r.group === 'hypothesis');
 const alt = results.filter((r) => r.group === 'alternative');
@@ -289,3 +293,7 @@ if (bestHyp.feasibility <= bestControl) {
 }
 console.log('\n  Ordinal result only. Not a calibrated probability. The architectural');
 console.log('  check in the accompanying report is what makes it falsifiable.');
+
+console.log('\n═══ SEMANTIC CALCULUS ADJUDICATION ═══\n');
+console.log(formatChemGate(adjudicateChemistry(results)));
+console.log('');
