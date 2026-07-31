@@ -16,12 +16,12 @@
  */
 
 import { readFileSync, writeFileSync, mkdtempSync, existsSync } from 'node:fs';
-import { execSync } from 'node:child_process';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
 import { toPythonWire, serializeWirePacket } from '../codex/core/blender-bridge/wire.js';
 import { mintReceipt, compareReceipts, hashPixelDump } from '../codex/core/blender-bridge/receipt.js';
+import { runBlenderScript, BlenderRunError } from '../codex/core/blender-bridge/blender-run.js';
 
 const BLENDER = process.env.BLENDER || join(process.env.HOME, 'opt/blender/blender');
 const REPO_ROOT = process.cwd();
@@ -33,6 +33,26 @@ if (!existsSync(BLENDER)) {
   console.error(`ERROR: Blender not found at ${BLENDER}`);
   console.error('Set BLENDER env var to the correct path.');
   process.exit(1);
+}
+
+// Falsifier 1: a Blender failure must be detected. Run with --self-test.
+// Deliberately placed before the packet is loaded — this checks the DRIVER, not
+// the asset. Without it, every verdict printed below is a statement made by a
+// driver that could not tell a Python error from a successful render.
+if (process.argv.includes('--self-test')) {
+  const selfDir = mkdtempSync(join(tmpdir(), 'pb-e2e-selftest-'));
+  let detected = false;
+  try {
+    runBlenderScript({
+      blender: BLENDER,
+      body: 'raise RuntimeError("deliberate self-test failure")',
+      scriptPath: join(selfDir, 'selftest.py'),
+    });
+  } catch (err) {
+    detected = err instanceof BlenderRunError;
+  }
+  console.log(`[e2e] self-test: Blender failure detected = ${detected}`);
+  process.exit(detected ? 0 : 1);
 }
 
 if (!existsSync(packetPath)) {
@@ -124,16 +144,15 @@ print(f"[blender] Render 2 complete: {dump2}")
 print("[blender] Done.")
 `;
 
-const scriptPath = join(workDir, 'render.py');
-writeFileSync(scriptPath, blenderScript);
-
 console.log(`[e2e] Invoking Blender headless...`);
 try {
-  const output = execSync(
-    `"${BLENDER}" -b --factory-startup --python "${scriptPath}"`,
-    { encoding: 'utf8', timeout: 300000, stdio: ['pipe', 'pipe', 'pipe'] }
-  );
-  console.log(output.split('\n').filter(l => l.startsWith('[blender]')).join('\n'));
+  const { blenderLines } = runBlenderScript({
+    blender: BLENDER,
+    body: blenderScript,
+    scriptPath: join(workDir, 'render.py'),
+    timeout: 300000,
+  });
+  console.log(blenderLines.join('\n'));
 } catch (err) {
   console.error('[e2e] Blender failed:');
   console.error(err.stderr || err.message);
