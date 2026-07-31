@@ -27,6 +27,28 @@ function Toggle({ label, value, onToggle, haptic }) {
   );
 }
 
+/**
+ * Momentary action row. Unlike Toggle it holds no state, so no aria-pressed —
+ * it performs an operation and reports only whether it is mid-flight.
+ */
+function Action({ label, actionLabel, ariaLabel, onAct, busy, disabled, haptic }) {
+  return (
+    <div className="ide-hex-row">
+      <span className="ide-hex-row-label">{label}</span>
+      <button
+        type="button"
+        className="settings-toggle"
+        aria-label={ariaLabel || label}
+        aria-busy={busy || undefined}
+        disabled={disabled || busy}
+        onClick={() => { haptic('tap'); onAct(); }}
+      >
+        {busy ? '…' : actionLabel}
+      </button>
+    </div>
+  );
+}
+
 export default function MobileHexSheet({
   isOpen, onClose,
   isTruesight, onToggleTruesight,
@@ -37,6 +59,7 @@ export default function MobileHexSheet({
   selectedSchool, onSchoolChange,
   schoolList,
   hapticEnabled, onToggleHaptic,
+  onTruesightBlink, isAnalyzing, canBlink,
 }) {
   const { haptic } = useHaptic(hapticEnabled);
 
@@ -49,6 +72,17 @@ export default function MobileHexSheet({
           <Toggle label="WordToolTip" value={isLatticeGrid} onToggle={onToggleLatticeGrid} haptic={haptic} />
           <Toggle label="Symmetrical"  value={mirrored}       onToggle={onToggleMirrored}   haptic={haptic} />
           <Toggle label="Predictive"   value={isPredictive}  onToggle={onTogglePredictive} haptic={haptic} />
+          {onTruesightBlink && (
+            <Action
+              label="TrueSight Blink"
+              actionLabel={canBlink === false ? 'Cooling…' : 'Refresh'}
+              ariaLabel="TrueSight Blink (Color Refresh)"
+              onAct={onTruesightBlink}
+              busy={isAnalyzing}
+              disabled={!isTruesight || canBlink === false}
+              haptic={haptic}
+            />
+          )}
         </section>
 
         <section className="ide-hex-section">

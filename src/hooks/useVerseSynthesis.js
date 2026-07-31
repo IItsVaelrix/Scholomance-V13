@@ -5,6 +5,7 @@ import { parseBooleanEnvFlag } from "./useCODExPipeline.jsx";
 import { ScholomanceDictionaryAPI } from "../lib/scholomanceDictionary.api.js";
 import { shouldPreserveArtifactOnError } from "../lib/truesight/synthesisErrorPolicy.js";
 import { buildIdentityKey } from "../lib/lexical/charStart.js";
+import { WORD_REGEX_GLOBAL } from "../lib/wordTokenization.js";
 
 const USE_SERVER_ANALYSIS = parseBooleanEnvFlag(import.meta.env.VITE_USE_SERVER_PANEL_ANALYSIS, true);
 
@@ -13,6 +14,55 @@ const USE_SERVER_ANALYSIS = parseBooleanEnvFlag(import.meta.env.VITE_USE_SERVER_
 // instead of blanking the resonance gate. See synthesisErrorPolicy.js.
 const RATE_LIMIT_RETRY_BASE_MS = 1500;
 const RATE_LIMIT_MAX_RETRIES = 2;
+
+// No time debounce by default. There used to be a flat 4000ms here "for heavy
+// analysis", which cost 4s of grey text on every scroll load and was the reason
+// TrueSight looked broken on first read. It is not needed:
+//
+//   - It was not protecting against analysis cost. Measured 8-176ms server-side.
+//   - It is not what bounds the request rate against the route's 60/min ceiling.
+//     The token-batch gate below does that, because the batch baseline advances
+//     synchronously when a request is ISSUED: crossing the threshold fires once
+//     and immediately re-closes the gate for the next `minTokenDelta` words.
+//     Measured with zero debounce: 201 words typed one keystroke at a time
+//     produces 5 requests, not 201 (see useVerseSynthesis.debounce.test.jsx).
+//
+// The option survives for callers that want extra coalescing; it is no longer
+// load-bearing for rate limiting.
+const DEFAULT_DEBOUNCE_MS = 0;
+
+// Colour re-morphs on a TOKEN BATCH, not on a clock. A time debounce still
+// issues a request for a one-word edit, so a steady typist walks straight into
+// the 60/min ceiling and gets 429s that blank the gate. Instead: re-analyse only
+// once the word multiset has moved by a whole batch from the one last analysed.
+//
+// Symmetric difference, so deleting 50 words counts like adding 50 — both change
+// resonance. Small edits accumulate against the last ANALYSED batch rather than
+// the last render, so 5 x 12 words eventually crosses instead of never counting.
+//
+// The first batch of a document is always analysed: with no previous batch there
+// is nothing to diff, and a short scroll must still paint.
+const DEFAULT_MIN_TOKEN_DELTA = 50;
+
+// Cooldown on TrueSight Blink. The button is a deliberate override of the batch
+// gate, so without a cooldown it IS the request storm the gate prevents — one
+// held-down finger reintroduces exactly the 429s that blank the colours. Tracked
+// as boolean state (not a timestamp) so the control can render the cooldown and
+// no wall-clock read is needed.
+const DEFAULT_BLINK_COOLDOWN_MS = 30_000;
+
+function wordTokens(text) {
+  return String(text || '').toLowerCase().match(WORD_REGEX_GLOBAL) || [];
+}
+
+function tokenDelta(current, previous) {
+  const counts = new Map();
+  for (const t of current) counts.set(t, (counts.get(t) || 0) + 1);
+  for (const t of previous) counts.set(t, (counts.get(t) || 0) - 1);
+  let delta = 0;
+  for (const n of counts.values()) delta += Math.abs(n);
+  return delta;
+}
 
 /**
  * useVerseSynthesis — UI Bridge to the VerseSynthesis AMP
@@ -25,12 +75,25 @@ export function useVerseSynthesis(content, options = {}) {
   const [isSynthesizing, setIsSynthesizing] = useState(false);
   const [error, setError] = useState(null);
 
-  const { mode = 'balanced', school = 'DEFAULT', paused = false } = options;
+  const {
+    mode = 'balanced',
+    school = 'DEFAULT',
+    paused = false,
+    debounceMs = DEFAULT_DEBOUNCE_MS,
+    minTokenDelta = DEFAULT_MIN_TOKEN_DELTA,
+    blinkCooldownMs = DEFAULT_BLINK_COOLDOWN_MS,
+  } = options;
+
+  const [canBlink, setCanBlink] = useState(true);
+  const blinkCooldownTimerRef = useRef(null);
 
   const [highlightedGroup, setHighlightedGroup] = useState(null);
   
   const requestCount = useRef(0);
   const lastRequestContentRef = useRef("");
+  // Word multiset of the batch last SENT for analysis. null until the first
+  // request, which is how "always analyse the first batch" is expressed.
+  const lastAnalyzedTokensRef = useRef(null);
   // Last committed artifact (for the catch path to decide whether to preserve
   // it), the latest requested content (staleness guard for retries), and the
   // pending rate-limit retry timer + attempt counter.
@@ -47,6 +110,9 @@ export function useVerseSynthesis(content, options = {}) {
 
     const requestId = ++requestCount.current;
     lastRequestContentRef.current = text;
+    // Record the batch we are analysing, so the delta gate measures against what
+    // was last SENT rather than what was last rendered.
+    lastAnalyzedTokensRef.current = wordTokens(text);
 
     setIsSynthesizing(true);
     setError(null);
@@ -168,6 +234,49 @@ export function useVerseSynthesis(content, options = {}) {
     setHighlightedGroup(null);
   }, []);
 
+  /**
+   * TrueSight Blink (Color Refresh) — the hex-tools escape hatch for the
+   * token-batch gate. An edit smaller than `minTokenDelta` never re-colours on
+   * its own (that is what keeps a typist clear of the route's 60/min ceiling),
+   * so the operator needs a deliberate way to say "re-read it now".
+   *
+   * Clears both guards before firing: the dedupe guard, so re-blinking identical
+   * content still re-analyses, and the batch baseline, so the request is not
+   * measured against itself.
+   */
+  const blink = useCallback(async () => {
+    const text = latestContentRef.current;
+    if (!text) return;
+    // Cooldown is checked off the ref, not off `canBlink`, so a stale closure
+    // cannot let a second request through before the re-render lands.
+    if (blinkCooldownTimerRef.current !== null) return;
+
+    if (blinkCooldownMs > 0) {
+      setCanBlink(false);
+      blinkCooldownTimerRef.current = setTimeout(() => {
+        blinkCooldownTimerRef.current = null;
+        setCanBlink(true);
+      }, blinkCooldownMs);
+    }
+
+    lastRequestContentRef.current = '';
+    lastAnalyzedTokensRef.current = null;
+    if (retryTimerRef.current) {
+      clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
+    retryAttemptsRef.current = 0;
+    await performSynthesis(text);
+  }, [performSynthesis, blinkCooldownMs]);
+
+  // Don't leave a cooldown timer running past unmount.
+  useEffect(() => () => {
+    if (blinkCooldownTimerRef.current) {
+      clearTimeout(blinkCooldownTimerRef.current);
+      blinkCooldownTimerRef.current = null;
+    }
+  }, []);
+
   const activeConnections = useMemo(() => {
     if (!highlightedGroup) return artifact?.syntaxLayer?.allConnections || artifact?.verseIR?.connections || [];
     const all = artifact?.syntaxLayer?.allConnections || artifact?.verseIR?.connections || [];
@@ -195,12 +304,22 @@ export function useVerseSynthesis(content, options = {}) {
       return;
     }
 
+    // Token-batch gate. The first batch always paints; after that the word
+    // multiset must have moved by at least `minTokenDelta` from the batch last
+    // analysed, so ordinary typing cannot walk into the route's 60/min ceiling.
+    const previousTokens = lastAnalyzedTokensRef.current;
+    if (previousTokens !== null
+      && tokenDelta(wordTokens(content), previousTokens) < minTokenDelta) {
+      setIsSynthesizing(false);
+      return;
+    }
+
     const requestId = ++requestCount.current;
 
     const timer = setTimeout(() => {
       if (requestId !== requestCount.current) return;
       performSynthesis(content);
-    }, 4000); // 4000ms debounce for heavy analysis
+    }, debounceMs);
 
     return () => {
       clearTimeout(timer);
@@ -209,7 +328,7 @@ export function useVerseSynthesis(content, options = {}) {
         retryTimerRef.current = null;
       }
     };
-  }, [content, performSynthesis, paused]);
+  }, [content, performSynthesis, paused, debounceMs, minTokenDelta]);
 
   return {
     artifact,
@@ -218,6 +337,8 @@ export function useVerseSynthesis(content, options = {}) {
     activeConnections,
     highlightRhymeGroup,
     clearHighlight,
+    blink,
+    canBlink,
     // Helper accessors for UI panels
     verseIR: artifact?.verseIR,
     syntaxLayer: artifact?.syntaxLayer,

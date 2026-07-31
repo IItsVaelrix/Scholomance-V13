@@ -412,8 +412,87 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .control-console .console-masthead-pulse.is-active,
-  .control-console .console-readout-live { animation: none !important; }
+  .control-console .console-readout-live,
+  .control-console .console-action.is-busy .console-action-icon { animation: none !important; }
 }
+
+/* ── Momentary action (TrueSight Blink) ───────────────────────────────────────
+   Shares the toggle's chassis so the bank reads as one instrument, but carries
+   no LED and no is-on state: it performs an operation rather than holding one.
+   The accent border is always present — an action is always "available", where a
+   toggle's border communicates on/off. */
+.console-action {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--console-accent) 30%, transparent);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--console-abyss) 55%, transparent);
+  color: var(--text-secondary, #cdc5a8);
+  font-family: var(--font-sans, sans-serif);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast, 150ms ease),
+              border-color var(--transition-fast, 150ms ease),
+              box-shadow var(--transition-fast, 150ms ease);
+}
+.console-action:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--console-accent) 60%, transparent);
+  background: color-mix(in srgb, var(--console-accent) 12%, transparent);
+  color: var(--text-primary, #ede8d4);
+}
+.console-action:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--console-accent), 0 0 12px var(--console-glow);
+}
+.console-action:active:not(:disabled) {
+  background: color-mix(in srgb, var(--console-accent) 20%, transparent);
+}
+.console-action:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  border-color: transparent;
+}
+.console-action-icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  color: var(--console-chrome-dim);
+}
+.console-action-icon svg { width: 16px; height: 16px; }
+.console-action:hover:not(:disabled) .console-action-icon { color: var(--console-glow); }
+/* Busy: the icon pulses on the same keyframe the masthead and live readouts use,
+   so "working" looks identical everywhere on the console. */
+.console-action.is-busy .console-action-icon {
+  animation: console-pulse 1.2s ease-in-out infinite;
+  color: var(--console-glow);
+}
+.console-action-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.console-action-label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.2;
+}
+.console-action-hint {
+  font-size: var(--text-2xs, 0.625rem);
+  color: var(--text-muted, #7a6f55);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ide-layout-wrapper--compact .console-action-hint { display: none; }
 
 /* ============================================================================
    DivWand bespoke button layer.

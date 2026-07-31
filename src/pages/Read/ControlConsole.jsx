@@ -11,6 +11,7 @@ import {
   SymmetryIcon,
   LayersIcon,
   ZapIcon,
+  RefreshIcon,
 } from '../../components/Icons.jsx';
 import './IDE.css';
 import './ControlConsole.css';
@@ -37,6 +38,9 @@ import './ControlConsole.css';
  * @property {string} analysisMode
  * @property {(mode: string) => void} onModeChange
  * @property {boolean} isAnalyzing
+ * @property {() => void} [onTruesightBlink] TrueSight Blink (Color Refresh) —
+ *   forces a re-analysis past the token-batch gate. Absent means unavailable,
+ *   which disables the control rather than rendering a dead button.
  * @property {boolean} predictorReady
  * @property {boolean} resonanceDegraded
  * @property {string} selectedSchool
@@ -56,6 +60,8 @@ import './ControlConsole.css';
  * @property {() => void} onToggleReducedMotion
  * @property {boolean} hapticEnabled
  * @property {() => void} onToggleHaptic
+ * @property {boolean} [canBlink] False while the Blink cooldown is running, so
+ *   the control can show it rather than silently swallowing a click.
  * @property {{ line: number, col: number, syllables: number, lines: number, power: number }} telemetry
  */
 
@@ -80,6 +86,7 @@ export default function ControlConsole(props) {
     isPredictive, onTogglePredictive,
     showScorePanel, onToggleScorePanel,
     analysisMode, onModeChange, isAnalyzing,
+    onTruesightBlink, canBlink,
     predictorReady, resonanceDegraded,
     selectedSchool, onSchoolChange, schoolList,
     auroraLevel, onSetAurora,
@@ -105,6 +112,21 @@ export default function ControlConsole(props) {
         { kind: 'toggle', id: 'mirror', label: 'Symmetrical', hint: 'Mirror the working', icon: SymmetryIcon, value: mirrored, onToggle: onToggleMirrored },
         { kind: 'toggle', id: 'predict', label: 'Ritual Prediction', hint: predictorReady ? 'Predictive completions' : 'Predictor warming…', icon: SparkleIcon, value: isPredictive, onToggle: onTogglePredictive },
         { kind: 'toggle', id: 'metrics', label: 'CODEx Metrics', hint: 'Score instrument panel', icon: MetricsIcon, value: showScorePanel, onToggle: onToggleScorePanel },
+        // Colour re-morphs on a whole token batch, not per keystroke, so the
+        // operator needs a deliberate "re-read it now" for smaller edits.
+        {
+          kind: 'action',
+          id: 'truesight-blink',
+          label: 'TrueSight Blink',
+          // Say WHY it is unavailable. A refresh button that silently ignores a
+          // click during its cooldown reads as broken.
+          hint: canBlink === false ? 'Cooling…' : 'Color Refresh',
+          ariaLabel: 'TrueSight Blink (Color Refresh)',
+          icon: RefreshIcon,
+          onAct: onTruesightBlink,
+          busy: isAnalyzing,
+          disabled: !isTruesight || !onTruesightBlink || canBlink === false,
+        },
       ],
     },
     {
@@ -162,7 +184,7 @@ export default function ControlConsole(props) {
     isTruesight, onToggleTruesight, isLatticeGrid, onToggleLatticeGrid,
     mirrored, onToggleMirrored, isPredictive, onTogglePredictive,
     showScorePanel, onToggleScorePanel, analysisMode, onModeChange,
-    isAnalyzing, predictorReady, resonanceDegraded, selectedSchool,
+    isAnalyzing, onTruesightBlink, canBlink, predictorReady, resonanceDegraded, selectedSchool,
     onSchoolChange, schoolList, auroraLevel, onSetAurora, focusMode,
     onToggleFocus, showOraclePanel, onToggleOracle, fontSize, onFontSizeChange,
     compactMode, onToggleCompact, reducedMotion, onToggleReducedMotion,
@@ -223,6 +245,8 @@ function ConsoleBank({ bank }) {
               return <ConsoleSchoolSelect key={control.id} control={control} />;
             case 'readout':
               return <ConsoleReadout key={control.id} control={control} />;
+            case 'action':
+              return <ConsoleAction key={control.id} control={control} />;
             default:
               return null;
           }
@@ -250,6 +274,34 @@ function ConsoleToggle({ control }) {
         {control.hint && <span className="console-toggle-hint">{control.hint}</span>}
       </span>
       <span className={`console-led${control.value ? ' is-on' : ''}`} aria-hidden="true" />
+    </button>
+  );
+}
+
+/**
+ * Momentary action, not state. Every other control on this console reflects a
+ * value; this one performs an operation and has nothing to be "on". So: no
+ * aria-pressed, no LED — a plain button that reports it is working.
+ *
+ * @param {{ control: any }} props
+ */
+function ConsoleAction({ control }) {
+  const Icon = control.icon;
+  return (
+    <button
+      type="button"
+      className={`console-action${control.busy ? ' is-busy' : ''}`}
+      disabled={control.disabled || control.busy}
+      onClick={control.disabled || control.busy ? undefined : control.onAct}
+      aria-label={control.ariaLabel || control.label}
+      aria-busy={control.busy || undefined}
+      title={control.hint}
+    >
+      <span className="console-action-icon" aria-hidden="true">{Icon ? <Icon /> : null}</span>
+      <span className="console-action-text">
+        <span className="console-action-label">{control.label}</span>
+        {control.hint && <span className="console-action-hint">{control.hint}</span>}
+      </span>
     </button>
   );
 }

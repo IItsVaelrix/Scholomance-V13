@@ -315,6 +315,8 @@ export default function ReadPage() {
     activeConnections,
     highlightRhymeGroup,
     clearHighlight,
+    blink: truesightBlink,
+    canBlink,
     verseIR,
     scheme: schemeDetection,
     meter: meterDetection,
@@ -331,6 +333,11 @@ export default function ReadPage() {
     school: selectedSchool,
     // Keep analyzing under TrueSight even if focus briefly flips to EDIT.
     paused: ideMode === "EDIT" && !isTruesight,
+    // No debounce on either path. Colour re-morphs on a whole token batch
+    // (minTokenDelta), which is what keeps request rate under the route's
+    // 60/min ceiling — a timer on top of that only delayed the first paint.
+    // TrueSight Blink on the hex tools is the deliberate refresh for edits
+    // smaller than a batch.
   });
 
   // Fallbacks for legacy fields moving to AMP
@@ -964,6 +971,14 @@ export default function ReadPage() {
 
   // One prop contract, consumed by both the desktop TOOLS tab and the mobile
   // tools sheet. Every field maps to real Scribe state or a persisted setting.
+  // TrueSight Blink (Color Refresh). Also clears any stale line highlight so the
+  // repaint is read as a fresh pass rather than a partial one. Fire-and-forget:
+  // the hook already surfaces progress via isAnalyzing and errors via `error`.
+  const handleTruesightBlink = useCallback(() => {
+    setHighlightedLines([]);
+    void truesightBlink();
+  }, [truesightBlink]);
+
   const controlConsoleProps = {
     isTruesight,
     onToggleTruesight: handleToggleTruesight,
@@ -978,6 +993,10 @@ export default function ReadPage() {
     analysisMode,
     onModeChange: handleModeChange,
     isAnalyzing,
+    // TrueSight Blink (Color Refresh): colour re-morphs on a whole token batch,
+    // so a smaller edit needs a deliberate re-read.
+    onTruesightBlink: handleTruesightBlink,
+    canBlink,
     predictorReady,
     resonanceDegraded,
     selectedSchool,
@@ -1294,6 +1313,9 @@ export default function ReadPage() {
           onTogglePredictive={handleTogglePredictive}
           mirrored={mirrored}
           onToggleMirrored={handleToggleMirrored}
+          onTruesightBlink={handleTruesightBlink}
+          isAnalyzing={isAnalyzing}
+          canBlink={canBlink}
           analysisMode={analysisMode}
           onModeChange={handleModeChange}
           selectedSchool={selectedSchool}
