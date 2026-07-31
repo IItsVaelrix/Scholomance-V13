@@ -766,7 +766,13 @@ export async function collabRoutes(fastify, _options) {
     //  STATUS (health check)
     // ========================
 
-    fastify.get('/status', async (_request, reply) => {
+    // Guarded like every sibling route. getStatus() is only counts, but it does
+    // disclose agent/task/lock activity, and the test written alongside this
+    // route (index.notfound.test.js) has always asserted 401 for an
+    // unauthenticated caller — the preHandler was simply missed.
+    fastify.get('/status', {
+        preHandler: [requireCollabAuth],
+    }, async (_request, reply) => {
         return reply.code(200).send(await collabService.getStatus());
     });
 

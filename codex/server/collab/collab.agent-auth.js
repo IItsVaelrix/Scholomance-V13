@@ -168,8 +168,14 @@ export async function requireCollabAuth(request, reply) {
         return;
     }
 
-    // Allow seamless bypass in local development
-    if (process.env.NODE_ENV !== 'production') {
+    // Allow seamless bypass in local development.
+    //
+    // 'test' is excluded deliberately. A bare `!== 'production'` also covered the
+    // test environment, which meant every assertion that collab auth REJECTS an
+    // unauthenticated caller silently passed through this bypass and could never
+    // fail — the guard was untestable by construction. Local dev (NODE_ENV
+    // unset or 'development') still bypasses exactly as before.
+    if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test') {
         request.session = request.session || {};
         request.session.user = { id: 'local-dev', name: 'Local Developer' };
         return;

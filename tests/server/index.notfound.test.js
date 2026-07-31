@@ -155,7 +155,10 @@ describe('[Server] index route integration', () => {
 
     const mod = await import('../../codex/server/index.js?test=index-route-integration');
     fastify = mod.fastify;
-    userPersistence = (await import('../../codex/server/user.persistence.js')).persistence;
+    // The module exports `userPersistence`, not `persistence` — every other
+    // suite imports it under the right name. This read `undefined`, which only
+    // surfaced once the boot hook stopped timing out and these tests ran.
+    userPersistence = (await import('../../codex/server/user.persistence.js')).userPersistence;
     await fastify.ready();
   // Booting the real Fastify server runs DB migrations plus the world seed.
   // Measured ~6s alone; four of these suites boot concurrently, which exceeds
@@ -175,8 +178,10 @@ describe('[Server] index route integration', () => {
       await fastify.close();
     }
     try {
-      const userPersistence = await import('../../codex/server/user.persistence.js');
-      userPersistence.persistence?.close?.();
+      // Same wrong name here, but silenced by optional chaining — so the DB
+      // handle was never actually closed on teardown.
+      const mod = await import('../../codex/server/user.persistence.js');
+      mod.userPersistence?.close?.();
     } catch {
       // Best-effort cleanup
     }
@@ -265,6 +270,9 @@ describe('[Server] index route integration', () => {
       synonyms: [],
       antonyms: [],
       rhymes: [],
+      // Added deliberately in 083780e8 (2026-07-22); this exact-match
+      // expectation had not caught up because the suite was not running.
+      slantRhymes: [],
       rhymeFamily: null,
       lore: { seed: 'arcana' },
     });
