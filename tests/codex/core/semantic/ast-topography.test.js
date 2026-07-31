@@ -6,7 +6,9 @@ import {
   resolveAstKinds,
   generateAstTopographicVector,
   astTopographicSimilarity,
-  AST_BAND_COUNT
+  AST_BAND_COUNT,
+  NONDETERMINISM_CALLEES,
+  assertInventoryFenced
 } from '../../../../codex/core/semantic/ast-topography.js';
 
 const BANDS = [
@@ -136,5 +138,50 @@ describe('determinism', () => {
     const src = read('concurrent-mutation/verified.js');
     expect(Array.from(generateAstTopographicVector(src)))
       .toEqual(Array.from(generateAstTopographicVector(src)));
+  });
+});
+
+// ── The one place the inventory is not purely parser-derived ────────────────
+
+describe('callee kinds are fenced', () => {
+  it('keeps every pre-existing kind at its original dimension', () => {
+    // The header contract is "dim N means the same thing forever". Callee kinds
+    // are APPENDED, never inserted, so vectors built before them stay readable.
+    expect(AST_INDEX.get('fact:function')).toBe(0);
+    expect(AST_INDEX.get('fact:call')).toBe(1);
+    expect(AST_INDEX.get('shape:callBare')).toBe(39);
+  });
+
+  it('admits only callees on the frozen nondeterminism list', () => {
+    const known = resolveAstKinds({ path: 'a.js', content: 'const r = Math.random();' });
+    expect(known.kinds).toContain('callee:Math.random');
+  });
+
+  it('drops an unknown callee instead of minting a kind for it', () => {
+    // THE FENCE. Hashing arbitrary callee names into the inventory would
+    // reintroduce exactly the open vocabulary this engine exists to avoid --
+    // semantotopography's step-4 fallback, rebuilt one layer up.
+    const unknown = resolveAstKinds({ path: 'b.js', content: 'const r = myOwnRandomThing();' });
+    expect(unknown.kinds.some(k => k.startsWith('callee:'))).toBe(false);
+  });
+
+  it('states a membership criterion every entry satisfies', () => {
+    // A closed list without a criterion grows by ad-hoc addition until it is
+    // open again. Every entry must be a callee that introduces nondeterminism
+    // into an otherwise pure path.
+    for (const callee of NONDETERMINISM_CALLEES) {
+      expect(AST_INDEX.has(`callee:${callee}`), `${callee} has no inventory slot`).toBe(true);
+    }
+    expect(AST_INVENTORY.filter(k => k.startsWith('callee:')).length)
+      .toBe(NONDETERMINISM_CALLEES.length);
+  });
+
+  it('refuses an inventory that would overflow band 0', () => {
+    expect(() => assertInventoryFenced([...Array(65)].map((_, i) => `k${i}`)))
+      .toThrow(/band 0|64/i);
+  });
+
+  it('refuses an inventory with duplicate kinds', () => {
+    expect(() => assertInventoryFenced(['a', 'b', 'a'])).toThrow(/duplicate/i);
   });
 });

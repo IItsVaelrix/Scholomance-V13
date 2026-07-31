@@ -96,12 +96,70 @@ const SHAPE_KINDS = Object.freeze([
   'shape:callBare'
 ]);
 
+/**
+ * THE ONE PLACE THIS INVENTORY IS NOT PURELY PARSER-DERIVED, AND ITS FENCE.
+ *
+ * Some pathologies have no distinguishing fact kind: `Math.random()` is just a
+ * `fact:call` whose callee happens to matter. Callee names are an OPEN
+ * vocabulary, and hashing them into the inventory would rebuild
+ * semantotopography's step-4 fallback one layer up — the exact failure this
+ * engine exists to avoid.
+ *
+ * So the list is closed, and closed by a CRITERION rather than by taste:
+ *
+ *   a callee that introduces NONDETERMINISM into an otherwise pure path.
+ *
+ * A closed list without a stated criterion grows by ad-hoc addition until it is
+ * open again. This one a reviewer can adjudicate: either the callee makes the
+ * same input produce a different output, or it does not belong. Anything not on
+ * this list yields no `callee:` kind at all — `resolveAstKinds` drops it rather
+ * than minting a slot for it.
+ */
+export const NONDETERMINISM_CALLEES = Object.freeze([
+  'Math.random',
+  'Date.now',
+  'performance.now',
+  'crypto.randomUUID',
+  'crypto.getRandomValues'
+]);
+
+const CALLEE_KINDS = Object.freeze(NONDETERMINISM_CALLEES.map(c => `callee:${c}`));
+const CALLEE_KIND_SET = new Set(CALLEE_KINDS);
+
+/**
+ * Structural fence, enforced at module load rather than by review.
+ *
+ * Band 0 direct-indexes the inventory into 64 dims with no hashing, so an
+ * inventory that outgrows the band would silently start aliasing — the aliasing
+ * that band 3 was explicitly designed to avoid in phonotopography.
+ */
+export function assertInventoryFenced(inventory) {
+  const seen = new Set();
+  for (const kind of inventory) {
+    if (seen.has(kind)) {
+      throw new Error(`AST_INVENTORY_DUPLICATE: "${kind}" appears twice; dimensions must be unique.`);
+    }
+    seen.add(kind);
+  }
+  if (inventory.length > BAND_WIDTH) {
+    throw new Error(
+      `AST_INVENTORY_OVERFLOW: ${inventory.length} kinds exceed band 0's ${BAND_WIDTH} dimensions. ` +
+      'Band 0 direct-indexes with no hashing; growing past the band would alias kinds onto each other.'
+    );
+  }
+}
+
+// Callee kinds are APPENDED, never inserted: the header contract is that dim N
+// means the same thing forever, so vectors built before this list stay readable.
 export const AST_INVENTORY = Object.freeze([
   ...FACT_KINDS,
   ...BINDING_KINDS,
   ...ARGUMENT_KINDS,
-  ...SHAPE_KINDS
+  ...SHAPE_KINDS,
+  ...CALLEE_KINDS
 ]);
+
+assertInventoryFenced(AST_INVENTORY);
 
 export const AST_INDEX = new Map(AST_INVENTORY.map((kind, i) => [kind, i]));
 
@@ -159,6 +217,11 @@ export function resolveAstKinds(source) {
     for (const arg of call.argumentKinds || []) {
       push(inventoryOr('arg', arg, 'arg:other'), call.span);
     }
+    // Fenced: a callee outside NONDETERMINISM_CALLEES yields NO kind. There is
+    // deliberately no `callee:other` bucket — one would turn "any call at all"
+    // into a fired dimension and destroy the signal the list exists to carry.
+    const calleeKind = `callee:${call.callee}`;
+    if (CALLEE_KIND_SET.has(calleeKind)) push(calleeKind, call.span);
   }
 
   for (const effect of facts.effects || []) {

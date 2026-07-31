@@ -51,7 +51,15 @@ const PATHOLOGY_STAMP_KINDS = Object.freeze({
   SWALLOWED_ERROR: Object.freeze(['shape:catchEmpty', 'shape:catchRethrows', 'fact:catch']),
   CONCURRENT_SHARED_STATE_MUTATION: Object.freeze(['fact:concurrentCallback']),
   UNSAFE_EXTERNAL_RESPONSE_ACCESS: Object.freeze(['fact:externalRequest']),
-  UNSEEDED_RANDOMNESS: Object.freeze([])
+  // Covered by the fenced callee list in ast-topography: nondeterminism has no
+  // distinguishing fact kind, only a callee that matters.
+  UNSEEDED_RANDOMNESS: Object.freeze([
+    'callee:Math.random',
+    'callee:Date.now',
+    'callee:performance.now',
+    'callee:crypto.randomUUID',
+    'callee:crypto.getRandomValues'
+  ])
 });
 
 function fnv1aHash(str) {

@@ -186,13 +186,27 @@ describe('stamp nominations', () => {
     expect(rareKindsFor(deploymentShaped, 0.3).has('fact:externalRequest')).toBe(true);
   });
 
-  it('declares UNSEEDED_RANDOMNESS as uncovered rather than silently missing it', () => {
-    // Math.random is a call CALLEE, and the inventory has no callee-level kinds,
-    // so this family has no rare-kind evidence at all. Returning [] is the
-    // honest answer; a stamp channel that quietly covers four of five families
-    // and reports nothing about the fifth is the absence that looks like a pass.
+  it('covers UNSEEDED_RANDOMNESS through the fenced callee list', () => {
+    // Math.random is a call CALLEE, not a fact kind, so this family had no
+    // rare-kind evidence until ast-topography grew a CLOSED nondeterminism
+    // callee list. It nominates both fixtures, which is correct: the hard
+    // negative uses Math.random too, for visual jitter where it is acceptable.
+    // Deciding that is the verifier's job, not the stamp's.
     const noms = retrieveStampNominations(
       CORPUS,
+      { pathologyClass: 'UNSEEDED_RANDOMNESS' },
+      { manifest, index, threshold: 0.3 }
+    );
+    expect(noms.length).toBe(2);
+    expect(noms.every(n => n.path.includes('unseeded-randomness'))).toBe(true);
+    expect(noms.every(n => n.matchedKinds.includes('callee:Math.random'))).toBe(true);
+  });
+
+  it('nominates no family from a callee outside the fence', () => {
+    // The fence has to hold at the nominator too: a bespoke random helper must
+    // not become evidence just because its name suggests randomness.
+    const noms = retrieveStampNominations(
+      [{ path: 'custom.js', content: 'export const roll = () => myOwnRandomThing();' }],
       { pathologyClass: 'UNSEEDED_RANDOMNESS' },
       { manifest, index, threshold: 0.3 }
     );
