@@ -87,6 +87,11 @@ class SubstrateBridgeService:
         self._query_count = 0
         self._store_count = 0
         self._engine = "none"        # "cortex" | "substrate" | "none"
+        # Advanced retrieval layers (Information Matrix + Semantic Ballistics)
+        self._lattice = None
+        self._matrix = None
+        self._ballistics = None
+        self._advanced_ready = False
 
     # ── Lazy init ───────────────────────────────────────────────────────
 
@@ -439,3 +444,260 @@ class SubstrateBridgeService:
             }
         except Exception as e:
             return {"ok": False, "error": f"Tag scan failed: {e}"}
+
+    # ── Step 5: Advanced Retrieval (Information Matrix + Semantic Ballistics) ──
+
+    def _ensure_advanced(self) -> bool:
+        """Initialize the QBIT Lattice + Information Matrix + Ballistics engine.
+
+        Lazy-init: only created on first advanced_query call.
+        Requires the substrate/ package to be importable.
+        """
+        if self._advanced_ready:
+            return True
+
+        if not self._ensure_engine():
+            return False
+
+        try:
+            from substrate.lattice_index import QBITLattice, compute_dimension_ranges
+            from substrate.information_matrix import InformationMatrix
+            from substrate.semantic_ballistics import SemanticBallistics
+
+            substrate = self._get_substrate()
+            dim = substrate.dim
+
+            self._lattice = QBITLattice(self._db_path, dim=dim)
+            self._matrix = InformationMatrix(self._db_path)
+            self._ballistics = SemanticBallistics(
+                lattice=self._lattice,
+                matrix=self._matrix,
+            )
+            self._advanced_ready = True
+            return True
+        except ImportError as e:
+            self._init_error = f"Advanced retrieval not available: {e}"
+            return False
+        except Exception as e:
+            self._init_error = f"Advanced init failed: {e}\n{traceback.format_exc()}"
+            return False
+
+    def build_lattice_index(self) -> Dict[str, Any]:
+        """Build/rebuild the QBIT Lattice index from all substrate memories.
+
+        This is a one-time (or periodic) operation that indexes all memories
+        into the constellation of partial addresses for sub-linear retrieval.
+
+        Returns:
+            {ok, indexed_count, stats, duration_ms}
+        """
+        if not self._ensure_advanced():
+            return {"ok": False, "error": self._init_error}
+
+        t0 = time.monotonic()
+        try:
+            from substrate.lattice_index import compute_dimension_ranges
+            from substrate_engine import dequantize_4bit
+
+            substrate = self._get_substrate()
+            dim = substrate.dim
+
+            # Load all memories and dequantize their vectors
+            conn = sqlite3.connect(self._db_path)
+            rows = conn.execute(
+                "SELECT id, embedding, scale, zero_point FROM memories"
+            ).fetchall()
+            conn.close()
+
+            if not rows:
+                return {"ok": True, "indexed_count": 0, "stats": {}, "duration_ms": 0}
+
+            # Dequantize all vectors
+            vectors = []
+            ids = []
+            for mem_id, packed, scale, zp in rows:
+                vec = dequantize_4bit(packed, scale, zp, dim)
+                vectors.append(vec)
+                ids.append(mem_id)
+
+            # Compute dimension ranges
+            dim_ranges = compute_dimension_ranges(vectors)
+
+            # Clear and rebuild
+            self._lattice.clear()
+            entries = list(zip(ids, vectors))
+            self._lattice.index_batch(entries, dim_ranges)
+            self._lattice.save_dim_ranges(dim_ranges)
+
+            stats = self._lattice.stats()
+            elapsed = round((time.monotonic() - t0) * 1000, 1)
+
+            return {
+                "ok": True,
+                "indexed_count": len(ids),
+                "stats": stats,
+                "duration_ms": elapsed,
+            }
+        except Exception as e:
+            return {"ok": False, "error": f"Lattice build failed: {e}\n{traceback.format_exc()}"}
+
+    def advanced_query(
+        self,
+        text: str,
+        top_k: int = 10,
+        tag_filter: Optional[str] = None,
+        query_tags: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
+        """Advanced retrieval via Semantic Ballistics trajectory.
+
+        Uses the QBIT Lattice (constellation of partial addresses),
+        Information Matrix (scoped authority), and Triangulation
+        (point + relational convergence) for sub-linear, disambiguated,
+        authority-aware retrieval.
+
+        Falls back to standard query() if advanced layers aren't available.
+
+        Args:
+            text: Natural-language query.
+            top_k: Max results (default 10, capped at 20).
+            tag_filter: Optional metadata tag filter.
+            query_tags: Optional domain tags for authority activation.
+
+        Returns:
+            {ok, query, results, trajectory, context_block, stats}
+        """
+        top_k = max(1, min(top_k, 20))
+
+        # Try advanced path
+        if not self._ensure_advanced():
+            # Fall back to standard query
+            return self.query(text, top_k=top_k, tag_filter=tag_filter)
+
+        t0 = time.monotonic()
+        try:
+            from substrate_engine import dequantize_4bit
+
+            substrate = self._get_substrate()
+            dim = substrate.dim
+
+            # Load dimension ranges (must have been built)
+            dim_ranges = self._lattice.load_dim_ranges()
+            if dim_ranges is None:
+                # Lattice not built yet — fall back to standard
+                return self.query(text, top_k=top_k, tag_filter=tag_filter)
+
+            # Encode query
+            query_vec = substrate.embed.encode(text)
+
+            # Load all vectors for reranking (in production, this would be
+            # cached or loaded from the lattice candidates only)
+            conn = sqlite3.connect(self._db_path)
+            rows = conn.execute(
+                "SELECT id, text, embedding, scale, zero_point, metadata FROM memories"
+            ).fetchall()
+            conn.close()
+
+            all_vectors = {}
+            all_texts = {}
+            all_metadata = {}
+            for mem_id, mem_text, packed, scale, zp, meta_json in rows:
+                all_vectors[mem_id] = dequantize_4bit(packed, scale, zp, dim)
+                all_texts[mem_id] = mem_text
+                all_metadata[mem_id] = json.loads(meta_json or "{}")
+
+            # Apply tag filter to metadata if provided
+            if tag_filter:
+                filtered_ids = {
+                    mid for mid, meta in all_metadata.items()
+                    if meta.get("tag") == tag_filter
+                }
+                all_vectors = {k: v for k, v in all_vectors.items() if k in filtered_ids}
+                all_texts = {k: v for k, v in all_texts.items() if k in filtered_ids}
+                all_metadata = {k: v for k, v in all_metadata.items() if k in filtered_ids}
+
+            # Derive query_tags from tag_filter if not provided
+            if query_tags is None and tag_filter:
+                query_tags = [tag_filter]
+
+            # Fire the ballistic trajectory
+            results, trajectory_log = self._ballistics.fire(
+                query=text,
+                query_vector=query_vec,
+                dim_ranges=dim_ranges,
+                all_vectors=all_vectors,
+                all_texts=all_texts,
+                all_metadata=all_metadata,
+                top_k=top_k,
+                query_tags=query_tags,
+            )
+
+            # Build context block
+            lines = ["[[SUBSTRATE MEMORIES — BALLISTIC TRAJECTORY]]"]
+            for i, r in enumerate(results, 1):
+                meta = r.get("metadata", {})
+                tag = meta.get("tag", "?")
+                src = meta.get("source", "?")
+                conv = r.get("convergence_type", "?")
+                auth = r.get("authority", 0)
+                lines.append(
+                    f"[{i}] (sim={r['similarity']:.3f}, score={r['composite_score']:.3f}, "
+                    f"auth={auth:.2f}, {conv}) [{tag}] {src}"
+                )
+                lines.append(r["text"][:300])
+                lines.append("")
+
+            elapsed_ms = round((time.monotonic() - t0) * 1000, 1)
+            self._query_count += 1
+
+            return {
+                "ok": True,
+                "query": text,
+                "results": results,
+                "context_block": "\n".join(lines),
+                "trajectory": {
+                    "hops": trajectory_log.total_hops,
+                    "candidates": trajectory_log.total_candidates,
+                    "convergence": trajectory_log.convergence_mode,
+                    "checksum": trajectory_log.deterministic_checksum,
+                    "hop_details": [
+                        {
+                            "hop": h.hop_number,
+                            "action": h.action,
+                            "input": h.input_count,
+                            "output": h.output_count,
+                            "added": h.candidates_added,
+                            "ms": round(h.duration_ms, 1),
+                        }
+                        for h in trajectory_log.hops
+                    ],
+                },
+                "stats": {
+                    "query_time_ms": elapsed_ms,
+                    "result_count": len(results),
+                    "engine": "ballistics",
+                    "tag_filter": tag_filter,
+                    "session_queries": self._query_count,
+                },
+            }
+        except Exception as e:
+            # Fall back to standard query on any error
+            return self.query(text, top_k=top_k, tag_filter=tag_filter)
+
+    def advanced_status(self) -> Dict[str, Any]:
+        """Status of the advanced retrieval layers."""
+        info = {
+            "ok": True,
+            "advanced_ready": self._advanced_ready,
+            "lattice": None,
+            "matrix": None,
+        }
+
+        if self._advanced_ready and self._lattice:
+            info["lattice"] = self._lattice.stats()
+        if self._advanced_ready and self._matrix:
+            info["matrix"] = self._matrix.stats()
+
+        if self._init_error and not self._advanced_ready:
+            info["error"] = self._init_error
+
+        return info
