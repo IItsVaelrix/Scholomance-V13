@@ -26,6 +26,10 @@ CAMERA_HEIGHT = 100.0
 EMISSION_MATERIAL = "pb_emission"
 EMISSION_STRENGTH = 1.0
 
+# The attribute the shader reads colour from. Written by ingest as FLOAT_COLOR
+# on the POINT domain; a packed INT attribute cannot drive a shader input.
+ALBEDO_ATTRIBUTE = "pb_albedo"
+
 
 def _asset_bounds(obj):
     """
@@ -47,20 +51,39 @@ def _asset_bounds(obj):
 
 def ensure_emission_material(pc):
     """
-    Attach a deterministic emission material so the render does not depend on a
-    light rig. Idempotent: the material is created once and reused, because a
-    second bpy.data.materials.new() would collide-rename silently.
+    Attach a deterministic emission material driven by the pb_albedo attribute.
+
+    Emission rather than a lit BSDF because a light rig would make the pixel
+    depend on the rig instead of on the coordinate. The Attribute node is what
+    turns a crossed attribute into a shaded pixel -- without that link, 24 named
+    attributes land on the POINT domain and every asset renders the same white.
+
+    The node tree is rebuilt on every call rather than reused. The previous
+    version built it only when the material did not yet exist, so a material
+    left over from an earlier render kept whatever graph it had; rebuilding
+    makes the shading a function of this code alone. The datablock is still
+    looked up rather than recreated, because a second bpy.data.materials.new()
+    would collide-rename silently.
     """
     mat = bpy.data.materials.get(EMISSION_MATERIAL)
     if mat is None:
         mat = bpy.data.materials.new(EMISSION_MATERIAL)
-        mat.use_nodes = True
-        tree = mat.node_tree
-        tree.nodes.clear()
-        emission = tree.nodes.new("ShaderNodeEmission")
-        emission.inputs["Strength"].default_value = EMISSION_STRENGTH
-        output = tree.nodes.new("ShaderNodeOutputMaterial")
-        tree.links.new(emission.outputs["Emission"], output.inputs["Surface"])
+
+    mat.use_nodes = True
+    tree = mat.node_tree
+    tree.nodes.clear()
+
+    albedo = tree.nodes.new("ShaderNodeAttribute")
+    albedo.attribute_type = "GEOMETRY"
+    albedo.attribute_name = ALBEDO_ATTRIBUTE
+
+    emission = tree.nodes.new("ShaderNodeEmission")
+    emission.inputs["Strength"].default_value = EMISSION_STRENGTH
+
+    output = tree.nodes.new("ShaderNodeOutputMaterial")
+
+    tree.links.new(albedo.outputs["Color"], emission.inputs["Color"])
+    tree.links.new(emission.outputs["Emission"], output.inputs["Surface"])
 
     if len(pc.materials) == 0:
         pc.materials.append(mat)
@@ -131,14 +154,49 @@ def _radius_of(obj):
     return float(attrs["radius"].data[0].value)
 
 
-def prepare_render_scene(obj, scene=None, margin=FRAME_MARGIN):
+def frame_camera_on_canvas(canvas, scene=None):
+    """
+    Frame the camera on the CANVAS, one world unit per pixel.
+
+    This is the projection the EXACT colour law is defined against. Asset-bounds
+    framing (frame_camera_on) zooms to fit, so the mapping from canvas
+    coordinate to rendered pixel depends on where the asset happens to sit — a
+    64-wide canvas holding a 32-wide asset renders at ortho_scale 37.95, and
+    pixel (x, y) is then not coordinate (x, y). Under a law that claims a
+    specific pixel carries a specific authored colour, the projection has to be
+    canonical rather than flattering.
+
+    The camera is offset by half a pixel on each axis so that integer coordinate
+    (x, y) lands on the CENTRE of pixel (x, y) rather than on its corner, where
+    it would sit on the seam between four pixels.
+    """
+    scene = scene or bpy.context.scene
+    width = float(canvas["width"])
+    height = float(canvas["height"])
+
+    cam = ensure_camera(scene)
+    cam.data.type = "ORTHO"
+    cam.data.ortho_scale = max(width, height)
+    cam.location = (width / 2.0 - 0.5, height / 2.0 - 0.5, CAMERA_HEIGHT)
+    cam.rotation_euler = (0.0, 0.0, 0.0)
+    return cam
+
+
+def prepare_render_scene(obj, scene=None, margin=FRAME_MARGIN, canvas=None):
     """
     Make the scene describe the asset and nothing else.
 
     Removes non-asset renderables, attaches the emission material, and frames an
-    orthographic camera on the asset bounds. Returns the camera.
+    orthographic camera. Returns the camera.
+
+    When `canvas` is supplied the camera is framed in canvas space (one unit per
+    pixel) — required by the EXACT colour law. Otherwise the camera frames the
+    asset bounds, which fills the frame regardless of where the asset sits but
+    makes the coordinate-to-pixel mapping asset-dependent.
     """
     scene = scene or bpy.context.scene
     clear_non_asset_renderables(keep=obj)
     ensure_emission_material(obj.data)
+    if canvas is not None:
+        return frame_camera_on_canvas(canvas, scene=scene)
     return frame_camera_on(obj, scene=scene, margin=margin)
