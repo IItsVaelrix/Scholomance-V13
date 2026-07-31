@@ -235,7 +235,7 @@ for (const r of results) {
   const pmi = r.corpusPMI
     ? `pmi=${r.corpusPMI.meanPMI.toFixed(3)}(${r.corpusPMI.signal})`
     : 'pmi=n/a';
-  console.log(`  bond=${sign}${mag} ground=${r.grounding} cohere=${r.coherence} ${pmi} law=${r.lawNote}`);
+  console.log(`  bond=${sign}${mag} phono=${r.phonoBondSign ?? '?'}${(r.phonoBond ?? 0).toFixed(4)} semanto=${r.semantoBondSign ?? '?'}${(r.semantoBond ?? 0).toFixed(4)} ground=${r.grounding} cohere=${r.coherence} ${pmi} law=${r.lawNote}`);
   console.log(`  gA=${r.groundingA.toFixed(3)} gB=${r.groundingB.toFixed(3)}  checksum=${r.checksum}`);
   console.log('');
 }
@@ -336,7 +336,7 @@ for (const r of labelled) {
   const sign = r.bondSign ?? (r.bond > 0 ? '+' : r.bond < 0 ? '-' : '0');
   const mag = (r.bondMagnitude ?? Math.abs(r.bond)).toFixed(4);
   const pmi = r.corpusPMI ? `${r.corpusPMI.meanPMI.toFixed(3)} ${r.corpusPMI.signal.padEnd(9)}` : 'n/a (hand mode)';
-  console.log(`  ${r.measured.padEnd(9)} bond=${sign}${mag}  pmi=${pmi}  ${r.id}`);
+  console.log(`  ${r.measured.padEnd(9)} bond=${sign}${mag}  phono=${r.phonoBondSign ?? '?'}${(r.phonoBond ?? 0).toFixed(4)}  semanto=${r.semantoBondSign ?? '?'}${(r.semantoBond ?? 0).toFixed(4)}  pmi=${pmi}  ${r.id}`);
 }
 const repulsedRefuted = labelled.filter((r) => r.corpusPMI && r.corpusPMI.meanPMI < 0 && r.measured === 'REFUTED').length;
 const totalRefuted = labelled.filter((r) => r.measured === 'REFUTED').length;

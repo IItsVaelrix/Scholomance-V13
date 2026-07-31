@@ -28,6 +28,8 @@
  */
 
 import { createHash } from 'node:crypto';
+import { phonotopographicSimilarity } from '../semantic/phonotopography.js';
+import { semanticTopographicSimilarity } from '../semantic/semantotopography.js';
 
 export const SCHEMA = 'PB-CONCEPT-CHEM-v1';
 export const DIM = 512;
@@ -266,6 +268,50 @@ export function synthesize({ a, b, product, groundingA, groundingB, index }) {
   const canon = JSON.stringify(result, Object.keys(result).sort());
   result.checksum =
     'synth1:' + createHash('sha256').update(canon, 'utf8').digest('hex').slice(0, 16);
+
+  // ── PHONOTOPOGRAPHIC BOND (diagnostic channel) ──────────────────────────
+  // The existing `bond` channel is sha256 feature-hash cosine: purely lexical.
+  // It cannot detect that "knight" ≈ "night" (same phonemes /N AY T/) or that
+  // "through" ≠ "tough" (different phonemes despite similar spelling).
+  //
+  // The phonotopography engine (codex/core/semantic/phonotopography.js) resolves
+  // ARPAbet phonemes and maps them into a 256-dim topographic vector space with
+  // four bands: unigram, bigram transitions, stress topology, rhyme domain.
+  // It is pure, deterministic, zero I/O. PDR §18 compliant.
+  //
+  // This channel is DIAGNOSTIC ONLY. It does NOT enter the feasibility formula.
+  // W_BOND is unchanged. The regression harness accumulates labels against it.
+  // Reweighting requires evidence, not intuition.
+  //
+  // Added AFTER the checksum so existing frozen checksums are not invalidated.
+  const phono = phonotopographicSimilarity(a, b);
+  result.phonoBond = round4(phono);
+  result.phonoBondSign = phono > 0.5 ? '+' : phono < 0.2 ? '-' : '~';
+  result.phonoBondMagnitude = round4(phono);
+
+  // ── SEMANTOTOPOGRAPHIC BOND (diagnostic channel) ─────────────────────────
+  // The phonotopographic bond measures SOUND similarity (phoneme topology).
+  // It cannot detect that "determinism" ≈ "reproducibility" (same semantic
+  // domain: causal necessity) or that "render" ≠ "surrender" (different
+  // semantic primitives despite shared substring).
+  //
+  // The semantotopography engine (codex/core/semantic/semantotopography.js)
+  // resolves semantic primitives (40-element closed inventory across 5 domains:
+  // ENTITY, EVENT, RELATION, COGNITION, MODALITY) and maps them into a 256-dim
+  // topographic vector space with four bands: primitive distribution, gravity-
+  // weighted bigram transitions, semantic topology, domain signature.
+  // It is pure, deterministic, zero I/O. PDR §18 compliant.
+  //
+  // This channel is DIAGNOSTIC ONLY. It does NOT enter the feasibility formula.
+  // W_BOND is unchanged. The regression harness accumulates labels against it.
+  // Reweighting requires evidence, not intuition.
+  //
+  // Added AFTER the checksum so existing frozen checksums are not invalidated.
+  const semanto = semanticTopographicSimilarity(a, b);
+  result.semantoBond = round4(semanto);
+  result.semantoBondSign = semanto > 0.9 ? '+' : semanto < 0.7 ? '-' : '~';
+  result.semantoBondMagnitude = round4(semanto);
+
   return Object.freeze(result);
 }
 
