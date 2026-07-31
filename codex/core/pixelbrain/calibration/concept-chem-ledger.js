@@ -306,6 +306,52 @@ export const LEDGER_ENTRIES = Object.freeze([
       'Corrects an earlier overstatement that the check was purely tautological.',
     source: 'codex/core/pixelbrain/temporal/temporal-governor.js certifyInterpolation',
   },
+
+  // ── 2026-07-31 · NEGATIVE CONTROL ON THE INSTRUMENT ──────────────────
+  // Read this before citing any row above that rests on a ranking alone.
+  {
+    // THE SECOND DISAGREEMENT, and worse than LBL-004. There the engine ranked
+    // a true idea too LOW and a human overrode it. Here it ranked a FALSE idea
+    // highest of all, under a prediction written before the numbers existed.
+    tier: 'PHYSICAL',
+    reaction: {
+      a: 'content hash from the parser is the cache key parse once stamp once',
+      b: 'incremental index invalidation recomputes only the entries that changed',
+      product: 'the stamp index updates incrementally on file change so only touched files are reparsed',
+    },
+    outcome: 'REFUTED',
+    evidence:
+      'ENGINE WAS WRONG, IN THE DANGEROUS DIRECTION. This describes a cache that does not ' +
+      'exist — buildStampIndex is a full rebuild — and it scored 0.2460, the TOP SCORE of a ' +
+      'ten-reaction run, above the false-friend bar (0.1994) and above every TRUE statement ' +
+      'about the same engines. "unknown words resolve to nothing, never a guess" — shipped and ' +
+      'measured in 474cd6b1 — scored 0.1148, BELOW the nonsense control (0.1458). 3 of 4 ' +
+      'pre-registered predictions failed. Not a corpus-authorship artifact: ranked on bond + ' +
+      'coherence alone, which touch no corpus, best absent 0.0855 vs worst present 0.0571, NOT ' +
+      'SEPARATED. The four false reactions were written as plausible NEIGHBOURS of real ' +
+      'capabilities, which is the ledger\'s own "failure by synonymy" — previously an anecdote ' +
+      'about the melanin run, now a measurement. Decided by grep: four patterns, four ABSENT. ' +
+      'lawGate also worked, zeroing the law control. The two channels that carry no score are ' +
+      'the two that were right.',
+    source: 'scripts/concept-chem-absent-capability.mjs',
+  },
+  {
+    tier: 'PHYSICAL',
+    reaction: {
+      a: 'unknown word resolves to empty declared absence never a guess',
+      b: 'a resolver that always resolves is a check that cannot fail',
+      product: 'refusing to resolve makes a coverage gap visible instead of filling it with confident noise',
+    },
+    outcome: 'CONFIRMED',
+    evidence:
+      'TRUE, BUILT, MEASURED — and the engine ranked it BELOW its own nonsense control ' +
+      '(0.1148 vs 0.1458). Shipped in 474cd6b1: the hash fallback is deleted and unknown lemmas ' +
+      'return []. Independently measured over 68,480 WordNet lemmas — distinct primitive sets ' +
+      '1,473 to 3,552, singleton sets 208 to 2,324. Recorded as the mirror of the row above: ' +
+      'the same run that promoted a fiction demoted a fact, so the failure is not a single ' +
+      'unlucky reaction but an inability to separate the two populations.',
+    source: 'scripts/concept-chem-absent-capability.mjs + codex/core/semantic/wordnet-senses.js',
+  },
 ]);
 
 /**
@@ -324,6 +370,33 @@ export const LEDGER_ENTRIES = Object.freeze([
  *
  * THE CHEMISTRY RANKED. THE PROBE DECIDED. Whenever those two are conflated
  * again, this table is the evidence that they are different instruments.
+ *
+ * ── AUDIT, 2026-07-31 ─────────────────────────────────────────────────────
+ *
+ * After the engine failed its negative control (see the last two entries), the
+ * whole ledger was re-read for which rows depend on a ranking and which carry
+ * independent receipts. Of 18 entries, 13 cite a build, a measurement, a
+ * mutation test or an architectural grep. FIVE rest on the ranking alone:
+ *
+ *   REFUTED  vri-health          "health supplies determinism the generator lacks"
+ *   REFUTED  interlocutor        (both rows)
+ *   REFUTED  paint-bucket        (both rows)
+ *
+ * All five are DENIALS, and all three CONFIRMED rows carry receipts. That
+ * asymmetry is the good news and the warning at once.
+ *
+ * The warning: the 2026-07-31 run shows the engine ranking a fluent FICTION
+ * highest of ten and a measured TRUTH below its own nonsense control. A denial
+ * from an instrument that cannot separate those two populations is not a
+ * denial — it is an absence of evidence wearing a verdict's clothes. Those five
+ * ideas are UNADJUDICATED, not refuted. Anyone re-proposing one is owed an
+ * architectural probe, not a citation of this table.
+ *
+ * The good news: no row that was ever acted on rests on a score. Every CONFIRMED
+ * entry was built and measured, and the two rows that disagreed with the engine
+ * (LBL-004 and the 2026-07-31 pair) were both settled by looking at the code.
+ * The ledger's habit of demanding receipts is what makes this audit possible at
+ * all — an instrument that logged only scores could not be audited this way.
  *
  * @type {ReadonlyArray<object>}
  */
