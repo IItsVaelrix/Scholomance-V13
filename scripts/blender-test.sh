@@ -35,11 +35,23 @@ echo "Running $TEST_FILE in Blender headless..."
 # `set -e` aborts on a non-zero exit before $? can be read, so the FAIL branch
 # below was unreachable: this harness could only ever print PASS. Guard the run
 # so a failing suite is actually reported as failing.
+# Blender returns exit 0 when a --python script raises an uncaught exception,
+# so this harness reported PASS for a test file that never ran. sys.exit DOES
+# propagate, so the file is executed via runpy inside a try/except that converts
+# any exception into sys.exit(1). SystemExit is re-raised untouched, because the
+# suites call sys.exit themselves and swallowing it would invert their verdict.
 EXIT_CODE=0
-"$BLENDER" -b --factory-startup \
-    --python-expr "import sys; sys.path.insert(0, '$ADDON_DIR')" \
-    --python "$TEST_FILE" \
-    2>&1 || EXIT_CODE=$?
+"$BLENDER" -b --factory-startup --python-expr "
+import sys, runpy, traceback
+sys.path.insert(0, '$ADDON_DIR')
+try:
+    runpy.run_path('$TEST_FILE', run_name='__main__')
+except SystemExit:
+    raise
+except BaseException:
+    traceback.print_exc()
+    sys.exit(1)
+" 2>&1 || EXIT_CODE=$?
 
 if [ $EXIT_CODE -eq 0 ]; then
     echo "PASS: $TEST_FILE"
