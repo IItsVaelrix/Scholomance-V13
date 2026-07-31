@@ -30,6 +30,11 @@ EMISSION_STRENGTH = 1.0
 # on the POINT domain; a packed INT attribute cannot drive a shader input.
 ALBEDO_ATTRIBUTE = "pb_albedo"
 
+# The one declared energy binding: PHOTONIC -> Emission Strength, grade FA,
+# linear transfer (codex/core/blender-bridge/energy-bindings.js). The other
+# seven energy types cross as raw attributes and are deliberately not read here.
+PHOTONIC_ATTRIBUTE = "pb_photonic"
+
 
 def _asset_bounds(obj):
     """
@@ -84,6 +89,22 @@ def ensure_emission_material(pc):
 
     tree.links.new(albedo.outputs["Color"], emission.inputs["Color"])
     tree.links.new(emission.outputs["Emission"], output.inputs["Surface"])
+
+    # Declared binding: PHOTONIC -> Emission Strength, grade FA, linear transfer.
+    # Added to the base strength rather than replacing it, so an asset carrying
+    # no energy renders at exactly EMISSION_STRENGTH and the byte-exact colour
+    # law still holds in its declared PHOTONIC = 0 scope. Multiplying would
+    # black out every zero-energy asset and silently void that law.
+    energy = tree.nodes.new("ShaderNodeAttribute")
+    energy.attribute_type = "GEOMETRY"
+    energy.attribute_name = PHOTONIC_ATTRIBUTE
+
+    add_strength = tree.nodes.new("ShaderNodeMath")
+    add_strength.operation = "ADD"
+    add_strength.inputs[1].default_value = EMISSION_STRENGTH
+
+    tree.links.new(energy.outputs["Factor"], add_strength.inputs[0])
+    tree.links.new(add_strength.outputs["Value"], emission.inputs["Strength"])
 
     if len(pc.materials) == 0:
         pc.materials.append(mat)

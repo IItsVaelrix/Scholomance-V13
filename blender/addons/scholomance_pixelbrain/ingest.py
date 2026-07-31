@@ -40,6 +40,16 @@ POINT_RADIUS = 0.5
 LINEAR_KEY = "linear"
 ALBEDO_ATTRIBUTE = "pb_albedo"
 
+# The declared PHOTONIC binding -- grade FA, Emission Strength, linear transfer.
+# See codex/core/blender-bridge/energy-bindings.js. It lands as FLOAT because a
+# shader cannot drive a float input from an INT attribute. The other seven
+# energy types cross as raw ints and MUST NOT be wired: SCR-017 forbids implicit
+# bindings, and a binding invented to fill out the table is indistinguishable
+# from one that was measured.
+PHOTONIC_CHANNEL = "1"
+PHOTONIC_ATTRIBUTE = "pb_photonic"
+UNIT_SCALE = 1000000.0
+
 
 def ingest_wire(wire):
     """
@@ -107,10 +117,20 @@ def ingest_wire(wire):
             )
         albedo.data.foreach_set("color", rgba)
 
-    # Add energy channel attributes
+    # Add energy channel attributes. All eight cross as raw ints; the bridge
+    # carries the energy vector and does not interpret it.
     for channel, values in wire["energy"].items():
         attr = pc.attributes.new(name=f"pb_energy_{channel}", type="INT", domain="POINT")
         attr.data.foreach_set("value", list(values))
+
+    # PHOTONIC additionally lands as FLOAT, because it is the one channel with a
+    # declared shader binding and ShaderNodeAttribute cannot drive a float input
+    # from an INT attribute. Adding this for any other channel would wire a
+    # binding nobody declared.
+    photonic = wire["energy"].get(PHOTONIC_CHANNEL)
+    if photonic:
+        attr = pc.attributes.new(name=PHOTONIC_ATTRIBUTE, type="FLOAT", domain="POINT")
+        attr.data.foreach_set("value", [v / UNIT_SCALE for v in photonic])
 
     obj = bpy.data.objects.new(f"pb_{wire['packetId']}", pc)
     bpy.context.scene.collection.objects.link(obj)
