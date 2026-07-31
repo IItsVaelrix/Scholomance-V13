@@ -51,3 +51,19 @@ export {
   preparePalettePayload, runPaletteE2E, comparePaletteRenders,
   PaletteE2EError,
 } from './palette-e2e.js';
+
+// Phase 0-2 — driver honesty and the colour law
+export { wrapPythonBody, runBlenderScript, BlenderRunError } from './blender-run.js';
+// srgbToLinear is deliberately absent here: palette-wire.js already re-exports
+// it from this barrel, and since that module now delegates to color-law.js it
+// is the same function. Exporting it twice is a duplicate-export SyntaxError.
+export {
+  linearToSrgb, hexIntToLinearTriple, linearTripleToHexInt,
+  COLOR_LAW_EXACT, COLOR_LAW_TRANSFER,
+} from './color-law.js';
+
+// Phase 6 — PB-CARRIER-v1
+export {
+  CARRIER_CONTRACT, CARRIER_FRAME_KINDS, frameChecksum,
+  sealCarrier, verifyCarrier, selectFrame, CarrierError,
+} from './carrier.js';

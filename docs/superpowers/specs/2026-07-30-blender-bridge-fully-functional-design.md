@@ -1,7 +1,7 @@
 # Blender Bridge — Fully Functional
 
 **Date:** 2026-07-30
-**Status:** Phases 0–5 IMPLEMENTED (2026-07-31). Phase 6 (the carrier) proposed.
+**Status:** Phases 0–6 IMPLEMENTED (2026-07-31). All eleven falsifiers green.
 **Depends on:** `codex/core/blender-bridge/`, `blender/addons/scholomance_pixelbrain/`,
 `codex/core/pixelbrain/temporal/`, commit `e0cee0f9`
 **Incorporates:** `2026-07-30-sealed-projection-carrier-design.md` (§5 sequencing, §3 carrier laws)
@@ -375,10 +375,10 @@ predicted.
 | 5 | Energy reaches pixels | PHOTONIC variant vs baseline → different receipts | **FAILS** | **PASSES** |
 | 6 | The sim chain holds | N chained receipts; cold-start refused | **FAILS** | **PASSES** — 3 distinct digests |
 | 7 | Causes can be compared | Two engines, same packet → required slots agree | **FAILS** (4/7) | **PASSES** — `COLOR_LAW` MATCH, 5/7 |
-| 8 | Frames are independent | Corrupt frame A ⇒ frame B's checksum unchanged | n/a | n/a — Phase 6 |
-| 9 | The manifest binds frames | Swap two frames' contents ⇒ `root` changes | n/a | n/a — Phase 6 |
-| 10 | Tampering is refused | A tampered frame is refused, observably | n/a | n/a — Phase 6 |
-| 11 | The consumer never hashes | Static check: no digest call in `blender/addons/` | passes | **passes** |
+| 8 | Frames are independent | Corrupt frame A ⇒ frame B's checksum unchanged | n/a | **PASSES** |
+| 9 | The manifest binds frames | Swap two frames' contents ⇒ `root` changes | n/a | **PASSES** — reorder too |
+| 10 | Tampering is refused | A tampered frame is refused, observably | n/a | **PASSES** — names the frame |
+| 11 | The consumer never hashes | No digest on the receipt path in `blender/addons/` | *unverified* | **PASSES** — see §5.3 |
 
 Rows 2 and 4 were marked "no such check exists" rather than FAILS. That was the
 stronger statement: the palette E2E did not fail, it reported `✓ Determinism
@@ -401,6 +401,31 @@ happened before. Row 7's falsifier is restated: literal `CAUSES_AGREE` across
 all seven slots was unreachable, because `ENGINE_LAW` is declared
 `EXPECTED_DIVERGE`. It now reads "every slot the table marks `SHOULD_AGREE`
 agrees" — see §5.2.
+
+### 5.1 What Phases 0–2 changed about the measurements themselves
+
+Three of this spec's own measuring instruments were wrong, and each was found by
+a test written before the code:
+
+- **`blender-test.sh` reported PASS for a file that raised at import.** Same
+  exit-0 defect as §1.1, in the harness that validates everything else.
+- **The colour falsifier counted background as a match.** Film is transparent
+  black, so an empty pixel is a perfect `#000000` and a completely blank render
+  scored 1/6. It now requires `alpha == 1`.
+- **The camera was never in canvas space.** `frame_camera_on` fits *asset* bounds
+  with a 1.15 margin, so a 64-wide canvas holding a 32-wide asset renders at
+  `ortho_scale` 37.95 and pixel (x, y) is not coordinate (x, y). §3.1 declared
+  canvas-space framing; the addon predated it and disagreed.
+
+A fourth was in a verification loop written during execution:
+`printf ... "$(basename $t)" "$?"` reports exit 0 for every file, because the
+command substitution resets `$?` while the arguments are being built. It briefly
+showed a known-red suite as green.
+
+**Falsifier 2 is the model**, because its failure mode is demonstrated rather than
+assumed: 6/6 at `samples=1`, 0/6 at `samples=64` with a Gaussian filter. A check
+whose failure mode has been observed is worth more than one that has only ever
+been green.
 
 ### 5.2 What Phases 3–5 found
 
@@ -428,30 +453,52 @@ running the thing rather than reading it:
   `buildCanvasClaim` (used by the E2E). Fixing only the first left `COLOR_LAW`
   diverging in the E2E for a bookkeeping reason.
 
-### 5.1 What Phases 0–2 changed about the measurements themselves
+### 5.3 Falsifier 11 was never verified, and its wording was wrong
 
-Three of this spec's own measuring instruments were wrong, and each was found by
-a test written before the code:
+Row 11 was carried as "passes" from the original spec and re-recorded as
+"measured 07-30" during Phases 0–2. **The grep was never run.** Running it in
+Phase 6: `classify.py` imports `hashlib` and calls `sha256().hexdigest()` twice.
 
-- **`blender-test.sh` reported PASS for a file that raised at import.** Same
-  exit-0 defect as §1.1, in the harness that validates everything else.
-- **The colour falsifier counted background as a match.** Film is transparent
-  black, so an empty pixel is a perfect `#000000` and a completely blank render
-  scored 1/6. It now requires `alpha == 1`.
-- **The camera was never in canvas space.** `frame_camera_on` fits *asset* bounds
-  with a 1.15 margin, so a 64-wide canvas holding a 32-wide asset renders at
-  `ortho_scale` 37.95 and pixel (x, y) is not coordinate (x, y). §3.1 declared
-  canvas-space framing; the addon predated it and disagreed.
+The law it states is also too broad as written. What matters is that no
+consumer-computed digest reaches a **receipt** or a **verification decision** —
+otherwise a receipt is self-attested and a seal compares a packet to itself.
+`classify_feature` hashes two in-process states to test them for equality and
+returns `CONSERVATIVE` or `PATH_DEPENDENT`; that result is a classification, and
+never a receipt slot.
 
-A fourth was in a verification loop written during execution:
-`printf ... "$(basename $t)" "$?"` reports exit 0 for every file, because the
-command substitution resets `$?` while the arguments are being built. It briefly
-showed a known-red suite as green.
+So the row is narrowed rather than declared green — and the narrowing is itself
+checked, because an exemption nobody re-checks is how a narrowed law becomes no
+law. `test_carrier_ingest.py` carries three assertions: the receipt path computes
+no hash; `classify.py` imports nothing from the receipt, claim or packet modules
+(if it ever does, its digests can reach a receipt and the exemption stops
+holding); and the exempt list never grows to cover a module that mints claims.
 
-**Falsifier 2 is the model**, because its failure mode is demonstrated rather than
-assumed: 6/6 at `samples=1`, 0/6 at `samples=64` with a Gaussian filter. A check
-whose failure mode has been observed is worth more than one that has only ever
-been green.
+The process lesson is the same one this spec keeps recording, turned on the
+author: a row marked "measured" that was not measured is indistinguishable, from
+the outside, from one that was.
+
+### 5.4 What Phase 6 delivers, and what it does not
+
+`PB-CARRIER-v1` ships. Measured end to end on 2026-07-31: a carrier holding a
+788-coordinate render packet and a compiled temporal frame, sealed JS-side,
+crossed into Blender, root verified by string equality against an independently
+delivered value, both frames selected and ingested by their own readers — and a
+wrong expected root refused.
+
+**What the consumer cannot do, declared rather than implied.** Laws 2 and 3
+bound it:
+
+| tampering | consumer (string equality) | JS `verifyCarrier` |
+|---|---|---|
+| carrier substituted wholesale | detected | detected |
+| `root` edited | detected | detected |
+| a frame edited, `root` left alone | **NOT detected** | detected |
+| a frame edited *and* `root` updated | detected | a different, self-consistent carrier |
+
+The consumer verifies **identity**; this bridge's JS side verifies **integrity**.
+Catching an edited frame means recomputing a checksum, which is hashing, which
+law 2 forbids the consumer. A design implying otherwise would be claiming a check
+it does not have — the shape of every defect in §1.
 
 ---
 
