@@ -19,6 +19,7 @@ from scholomance_pixelbrain.sim_scene import (
     setup_rigid_body_world,
     verify_scene_determinism,
     get_cube_z_at_frame,
+    simulated_z,
 )
 
 
@@ -55,11 +56,14 @@ class TestSimScene(unittest.TestCase):
     def test_setup_rigid_body_world(self):
         create_rigid_body_scene()
         scene = bpy.context.scene
-        rb_world = setup_rigid_body_world(scene, steps_per_second=60, solver_iterations=10)
+        rb_world = setup_rigid_body_world(scene, substeps_per_frame=10, solver_iterations=10)
 
         self.assertIsNotNone(rb_world)
-        self.assertEqual(rb_world.steps_per_second, 60)
+        self.assertEqual(rb_world.substeps_per_frame, 10)
         self.assertEqual(rb_world.solver_iterations, 10)
+        # steps_per_second was removed in Blender 2.91. Asserting its absence
+        # keeps a future "helpful" reintroduction from silently reappearing.
+        self.assertFalse(hasattr(rb_world, "steps_per_second"))
 
     def test_cube_falls_over_frames(self):
         create_rigid_body_scene()
@@ -71,6 +75,22 @@ class TestSimScene(unittest.TestCase):
 
         # Cube should have fallen (z decreased)
         self.assertGreater(z_start, z_later)
+
+    def test_authored_location_is_not_the_simulated_one(self):
+        """
+        The solver writes to the evaluated depsgraph, never back to
+        obj.location. Reading obj.location.z returns the authored 3.0 at every
+        frame, which is what made verify_scene_determinism compare a constant
+        against itself and call the result deterministic.
+        """
+        create_rigid_body_scene()
+        scene = bpy.context.scene
+        setup_rigid_body_world(scene)
+        cube = bpy.data.objects["PB_FallingCube"]
+
+        get_cube_z_at_frame(scene, 30)
+        self.assertEqual(cube.location.z, 3.0, "authored location should not move")
+        self.assertLess(simulated_z(cube), 3.0, "simulated z should have fallen")
 
     def test_simulation_is_deterministic(self):
         create_rigid_body_scene()
@@ -93,18 +113,25 @@ class TestSimScene(unittest.TestCase):
         scene = bpy.context.scene
         setup_rigid_body_world(scene)
 
-        # Warm path: step 1..20
-        for f in range(1, 21):
-            scene.frame_set(f)
-        z_warm = scene.frame_current
-        cube = bpy.data.objects["PB_FallingCube"]
-        z_warm_pos = cube.location.z
+        # Warm path: every frame from 1 to 20, in order.
+        z_warm = get_cube_z_at_frame(scene, 20, warm=True)
+        self.assertLess(z_warm, 3.0, "warm-stepped cube should have fallen from z=3")
 
-        # Cold path: jump directly to frame 20
-        # (In a fresh scene, this would return un-simulated state)
-        # We can't fully test cold start without a fresh scene, but we can
-        # verify the warm path produces a fallen cube
-        self.assertLess(z_warm_pos, 3.0, "Cube should have fallen from z=3")
+        # Cold path: seek straight to 20 in a scene that has not been stepped.
+        # This used to be un-testable ("we can't fully test cold start without a
+        # fresh scene"), so the assertion only ever checked the warm side and the
+        # divergence it names went unmeasured.
+        create_rigid_body_scene()
+        scene = bpy.context.scene
+        setup_rigid_body_world(scene)
+        z_cold = get_cube_z_at_frame(scene, 20, warm=False)
+
+        self.assertEqual(z_cold, 3.0, "cold seek should return the un-simulated state")
+        self.assertNotEqual(
+            z_cold, z_warm,
+            "cold and warm agreed -- the divergence the chained receipt protocol "
+            "exists to catch is not observable here",
+        )
 
 
 if __name__ == '__main__':
