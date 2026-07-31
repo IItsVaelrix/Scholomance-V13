@@ -42,6 +42,22 @@ function fnv1aHash(str) {
   return hash;
 }
 
+/** The vector is four equal bands, normalized and scored independently. */
+export const BAND_COUNT = 4;
+
+/**
+ * Own-property lookup for word-keyed maps.
+ *
+ * These maps are keyed by ordinary English words, and English contains
+ * `constructor`, `toString`, `valueOf` and `name`. A bare `MAP[word]` walks the
+ * prototype chain and returns `Object` — a Function — where an array of
+ * primitives belongs, which then propagates into the vector as a spread over a
+ * non-iterable.
+ */
+function ownEntry(map, key) {
+  return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : undefined;
+}
+
 // ── Closed-class word → primitive mapping ────────────────────────────────────
 // Analogous to the CMU dictionary: a direct, deterministic lookup table.
 // These words have fixed semantic roles regardless of context.
@@ -1421,7 +1437,7 @@ export function resolveSemanticPrimitives(word) {
   if (!lower) return [];
 
   // 1. Closed-class lookup
-  const closed = CLOSED_CLASS_MAP[lower];
+  const closed = ownEntry(CLOSED_CLASS_MAP, lower);
   if (closed) return closed;
 
   // 2. Root map lookup (longest match first)
@@ -1547,20 +1563,35 @@ export function generateSemantotopographicVectorFromPrimitives(wordSemantics, di
   // Each of the 40 semantic primitives maps to a unique dimension (0–39).
   // Dims 40–63 remain zero (reserved for future expansion).
   // Weighted by semantic feature salience.
-  const unigrams = extractSemanticUnigrams(allPrimitives);
-  for (const [primitive, count] of unigrams) {
-    const idx = SEMANTIC_INDEX.get(primitive);
-    if (idx === undefined) continue;
-    const features = SEMANTIC_FEATURES_V1[primitive];
-    // Weight by feature complexity: more distinctive primitives get higher weight
-    const featureWeight = features
-      ? 1.0
-        + (features.concreteness || 0) * 0.4
-        + (features.volition || 0) * 0.3
-        + (features.transitivity || 0) * 0.2
-        + (features.boundedness || 0) * 0.1
-      : 1.0;
-    vec[idx] += count * featureWeight;
+  // NEGATION IS A SIGN, NOT A SLOT. Adding a NEGATED primitive alongside the
+  // others makes "not X" maximally SIMILAR to X: `impossible` resolved to
+  // [NEGATED, POSSIBLE, STATE] and `possible` to [POSSIBLE, STATE], sharing two
+  // of three non-negative dims, so the pair scored 0.976 — the engine reproduced
+  // the negation blindness it exists to remove. NEGATED now inverts the sign of
+  // the primitives in its own word's scope and claims no dimension of its own,
+  // so "possible" and "impossible" land antiparallel.
+  //
+  // Scope is the WORD, which is why this accumulates per entry rather than over
+  // the flattened sequence: negation in one word must not invert its neighbours.
+  for (const entry of wordSemantics) {
+    if (!Array.isArray(entry.primitives) || entry.primitives.length === 0) continue;
+    const negated = entry.primitives.includes('NEGATED');
+    const sign = negated ? -1 : 1;
+    for (const primitive of entry.primitives) {
+      if (primitive === 'NEGATED') continue;
+      const idx = SEMANTIC_INDEX.get(primitive);
+      if (idx === undefined) continue;
+      const features = SEMANTIC_FEATURES_V1[primitive];
+      // Weight by feature complexity: more distinctive primitives get higher weight
+      const featureWeight = features
+        ? 1.0
+          + (features.concreteness || 0) * 0.4
+          + (features.volition || 0) * 0.3
+          + (features.transitivity || 0) * 0.2
+          + (features.boundedness || 0) * 0.1
+        : 1.0;
+      vec[idx] += sign * featureWeight;
+    }
   }
 
   // ── Band 1 (dims 64–127): Semantic bigram transitions ─────────────────
@@ -1584,12 +1615,8 @@ export function generateSemantotopographicVectorFromPrimitives(wordSemantics, di
   }
 
   // ── Band 2 (dims 128–191): Semantic topology ──────────────────────────
-  // Captures argument structure, abstraction level, modality profile.
-  let entityCount = 0;
-  let eventCount = 0;
-  let relationCount = 0;
-  let cognitionCount = 0;
-  let modalityCount = 0;
+  // Captures abstraction level, volition, polarity and per-word shape. The
+  // domain tallies that used to be counted here are band 3's business.
   let concreteCount = 0;
   let abstractCount = 0;
   let volitionalCount = 0;
@@ -1598,13 +1625,6 @@ export function generateSemantotopographicVectorFromPrimitives(wordSemantics, di
   for (const entry of wordSemantics) {
     if (!Array.isArray(entry.primitives)) continue;
     for (const p of entry.primitives) {
-      const domain = PRIMITIVE_TO_DOMAIN[p];
-      if (domain === 'ENTITY') entityCount++;
-      else if (domain === 'EVENT') eventCount++;
-      else if (domain === 'RELATION') relationCount++;
-      else if (domain === 'COGNITION') cognitionCount++;
-      else if (domain === 'MODALITY') modalityCount++;
-
       const features = SEMANTIC_FEATURES_V1[p];
       if (features) {
         if (features.concreteness) concreteCount++;
@@ -1617,52 +1637,74 @@ export function generateSemantotopographicVectorFromPrimitives(wordSemantics, di
 
   const total = allPrimitives.length || 1;
 
-  // Domain distribution → dims 128–132
-  vec[128] += (entityCount / total) * 8.0;
-  vec[129] += (eventCount / total) * 8.0;
-  vec[130] += (relationCount / total) * 8.0;
-  vec[131] += (cognitionCount / total) * 8.0;
-  vec[132] += (modalityCount / total) * 8.0;
+  // The domain distribution belongs to band 3 and is NOT restated here. It used
+  // to be written into dims 128–132 at scale 8.0 while band 3 wrote the same
+  // quantity into 192–196 at scale 6.0 — one measurement, two bands, which made
+  // their rankings correlate at rho = 0.903 and cost the vector a whole
+  // independent channel.
+  //
+  // Everything below encodes in DIRECTION — which dim fires — never in
+  // magnitude. Per-band L2 normalization discards magnitude by construction, so
+  // a scalar written to a fixed dim is a value the vector cannot carry: every
+  // short text ends up with the same band direction and the band reads ~1.0 for
+  // unrelated inputs. Ratios therefore select a BUCKET, and the bucket index is
+  // the signal.
+  const bucketOf = (ratio, bins) =>
+    Math.max(0, Math.min(bins - 1, Math.floor(ratio * bins)));
 
-  // Abstraction profile → dims 133–135
-  vec[133] += (concreteCount / total) * 6.0;
-  vec[134] += (abstractCount / total) * 6.0;
-  vec[135] += (volitionalCount / total) * 4.0;
+  // Abstraction profile → dims 128–135 (8 buckets of concrete:abstract ratio)
+  const featured = concreteCount + abstractCount;
+  if (featured > 0) {
+    vec[128 + bucketOf(concreteCount / featured, 8)] += 2.0;
+  }
 
-  // Polarity profile → dim 136
-  vec[136] += (negatedCount / total) * 5.0;
+  // Volition profile → dims 136–143 (8 buckets)
+  vec[136 + bucketOf(volitionalCount / total, 8)] += 1.5;
 
-  // Word count and primitive density → dims 137–138
-  vec[137] += Math.min(wordSemantics.length, 30) * 0.3;
-  vec[138] += (total / Math.max(wordSemantics.length, 1)) * 3.0;
+  // Polarity profile → dims 144–151 (8 buckets)
+  vec[144 + bucketOf(negatedCount / total, 8)] += 1.5;
 
-  // Per-word primitive pattern hashing → dims 140–191
+  // Primitive density → dims 152–159 (8 buckets, ~1..8 primitives per word)
+  const density = total / Math.max(wordSemantics.length, 1);
+  vec[152 + Math.max(0, Math.min(7, Math.round(density) - 1))] += 1.0;
+
+  // Per-word primitive pattern hashing → dims 160–191
   for (let wi = 0; wi < wordSemantics.length; wi++) {
     const entry = wordSemantics[wi];
     if (!Array.isArray(entry.primitives) || entry.primitives.length === 0) continue;
-    const patternKey = entry.primitives.join('+');
-    const patternHash = fnv1aHash(patternKey) % 52;
-    vec[140 + patternHash] += 1.5;
+    const patternKey = [...entry.primitives].sort().join('+');
+    const patternHash = fnv1aHash(patternKey) % 32;
+    vec[160 + patternHash] += 2.0;
   }
 
   // ── Band 3 (dims 192–255): Domain signature ───────────────────────────
   // Layout:
-  //   192–196: Domain activation (5 domains)
-  //   197–212: Cross-domain transition hash (16 dims)
-  //   213–228: Register / formality signature (16 dims)
-  //   229–255: Reserved
+  //   192–221: Domain share, 5 domains x 6 buckets (absent domains stay silent)
+  //   222–237: Cross-domain transition hash (16 dims)
+  //   238–245: Register / formality bucket (8 dims)
+  //   246–255: Reserved
+  //
+  // Directional for the same reason band 2 is. Writing each domain's share to
+  // its own fixed dim made every text share a band-3 direction: the band read
+  // 0.887-0.988 for every pair probed, including 0.915 for quantum
+  // chromodynamics vs birthday cake. A share now selects a BUCKET, and a domain
+  // with no primitives writes nothing at all — so which dims fire varies with
+  // content instead of only how hard a constant set of dims fires.
+  const DOMAIN_ORDER = ['ENTITY', 'EVENT', 'RELATION', 'COGNITION', 'MODALITY'];
+  const DOMAIN_BUCKETS = 6;
 
-  // Domain activation
   const domainCounts = { ENTITY: 0, EVENT: 0, RELATION: 0, COGNITION: 0, MODALITY: 0 };
   for (const p of allPrimitives) {
     const domain = PRIMITIVE_TO_DOMAIN[p];
     if (domain) domainCounts[domain]++;
   }
-  vec[192] += (domainCounts.ENTITY / total) * 6.0;
-  vec[193] += (domainCounts.EVENT / total) * 6.0;
-  vec[194] += (domainCounts.RELATION / total) * 6.0;
-  vec[195] += (domainCounts.COGNITION / total) * 6.0;
-  vec[196] += (domainCounts.MODALITY / total) * 6.0;
+  for (let d = 0; d < DOMAIN_ORDER.length; d++) {
+    const count = domainCounts[DOMAIN_ORDER[d]];
+    if (count === 0) continue;  // silence is the signal: this domain is absent
+    const bucket = Math.max(0, Math.min(DOMAIN_BUCKETS - 1,
+      Math.floor((count / total) * DOMAIN_BUCKETS)));
+    vec[192 + d * DOMAIN_BUCKETS + bucket] += 3.0;
+  }
 
   // Cross-domain transitions: when adjacent words activate different domains
   for (let i = 0; i < wordSemantics.length - 1; i++) {
@@ -1674,31 +1716,41 @@ export function generateSemantotopographicVectorFromPrimitives(wordSemantics, di
     if (domA && domB && domA !== domB) {
       const transKey = `${domA}>${domB}`;
       const transHash = fnv1aHash(transKey) % 16;
-      vec[197 + transHash] += 2.0;
+      vec[222 + transHash] += 2.0;
     }
   }
 
-  // Register signature: ratio of closed-class to open-class words
+  // Register signature: ratio of closed-class to open-class words, bucketed.
+  // Two complementary dims (r and 1-r) at fixed positions gave every text the
+  // same two-dim register direction and differed only in magnitude.
   let closedClassCount = 0;
   for (const entry of wordSemantics) {
-    if (CLOSED_CLASS_MAP[entry.word]) closedClassCount++;
+    if (ownEntry(CLOSED_CLASS_MAP, entry.word)) closedClassCount++;
   }
   const registerRatio = closedClassCount / Math.max(wordSemantics.length, 1);
-  vec[213] += registerRatio * 8.0;  // high = function-word-heavy (formal/grammatical)
-  vec[214] += (1 - registerRatio) * 8.0;  // high = content-word-heavy (informal/lexical)
+  vec[238 + Math.max(0, Math.min(7, Math.floor(registerRatio * 8)))] += 2.0;
 
-  // ── Center and normalize ──────────────────────────────────────────────
-  // Mean-subtract, then L2-normalize so cosine spans [-1, 1].
-  let sum = 0;
-  for (let i = 0; i < dim; i++) sum += vec[i];
-  const mean = sum / dim;
-  for (let i = 0; i < dim; i++) vec[i] -= mean;
-
-  let norm = 0;
-  for (let i = 0; i < dim; i++) norm += vec[i] * vec[i];
-  norm = Math.sqrt(norm);
-  if (norm > 1e-10) {
-    for (let i = 0; i < dim; i++) vec[i] /= norm;
+  // ── Per-band normalization ────────────────────────────────────────────
+  // Normalize each 64-dim band to unit norm INDEPENDENTLY, matching
+  // phonotopography v2. A single global L2 lets the loudest band steer the
+  // whole vector's direction: band 2 wrote at magnitude 8.0 and band 3 at 6.0
+  // while band 0 wrote at ~1.0, so bands 2 and 3 held ~75% of the energy, their
+  // cosines sat at 0.75–0.99 for every pair, and unrelated texts scored 0.917.
+  // Band 0 — the band that actually discriminates, reading 0.037 for maximally
+  // distant text — was outvoted at 14% of the energy.
+  //
+  // The global cosine then equals the MEAN of the per-band cosines, so every
+  // band gets one vote. There is no mean-subtraction: centering would reintroduce
+  // a shared component across all dims, which is the baseline this removes.
+  const bandWidth = dim / BAND_COUNT;
+  for (let band = 0; band < BAND_COUNT; band++) {
+    const start = band * bandWidth;
+    let bandNorm = 0;
+    for (let i = start; i < start + bandWidth; i++) bandNorm += vec[i] * vec[i];
+    bandNorm = Math.sqrt(bandNorm);
+    if (bandNorm > 1e-10) {
+      for (let i = start; i < start + bandWidth; i++) vec[i] /= bandNorm;
+    }
   }
 
   return vec;
@@ -1735,8 +1787,17 @@ export function semanticTopographicSimilarity(textA, textB) {
   let dot = 0;
   for (let i = 0; i < vecA.length; i++) dot += vecA[i] * vecB[i];
 
-  // Cosine similarity → [0, 1], clamped for floating-point safety
-  return Math.min(1, Math.max(0, (dot + 1) / 2));
+  // Each band carries unit norm, so the raw dot product is the SUM of the four
+  // per-band cosines and spans [-4, 4]. Dividing by the band count makes it
+  // their mean — one vote per band — which is the whole point of normalizing
+  // per band rather than globally.
+  //
+  // No (x + 1) / 2 remapping: that maps orthogonal vectors to 0.5 and would
+  // reinstate exactly the structural floor this change exists to remove. Band 0
+  // is signed (negation inverts it), so an antiparallel pair lands below zero
+  // and clamps to 0 — which is the correct similarity for "X" versus "not X".
+  const meanBandCosine = dot / BAND_COUNT;
+  return Math.min(1, Math.max(0, meanBandCosine));
 }
 
 /**

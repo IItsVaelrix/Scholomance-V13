@@ -127,11 +127,15 @@ describe('generateSemantotopographicVector', () => {
     expect(vec.length).toBe(256);
   });
 
-  it('produces a unit vector (L2 norm ≈ 1)', () => {
+  it('produces four unit bands, so the global norm is 2', () => {
+    // Normalization is PER BAND, not global: a single global L2 let the loudest
+    // band steer the whole vector's direction. Four unit bands give a global
+    // norm of sqrt(4) = 2, and the dot product of two vectors is then the SUM
+    // of their per-band cosines. See BAND_COUNT in semantotopography.js.
     const vec = generateSemantotopographicVector('render the pixel art');
     let norm = 0;
     for (let i = 0; i < vec.length; i++) norm += vec[i] * vec[i];
-    expect(Math.sqrt(norm)).toBeCloseTo(1.0, 5);
+    expect(Math.sqrt(norm)).toBeCloseTo(2.0, 5);
   });
 
   it('produces a zero vector for empty input', () => {
