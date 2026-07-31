@@ -15,14 +15,30 @@ import traceback
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "addons"))
 
 import bpy
+from scholomance_pixelbrain import palette as palette_mod
 from scholomance_pixelbrain.palette import (
     SCHOOL_PALETTE,
-    hex_to_linear,
     dequantize_color,
     get_palette,
     create_palette_node_group,
-    apply_palette_to_material,
 )
+
+
+def _wire_palette(channels):
+    """
+    A wire palette in the shape palette-wire.js:paletteToWire emits.
+    Values are int32 at UNIT scale; the consumer only divides.
+    """
+    return {
+        "school": "TEST",
+        "colorPolicy": "EXACT",
+        "transferFunction": "sRGB-IEC-61966-2-1",
+        "scale": 1000000,
+        "channels": {
+            role: {"hex": "#000000", "srgb": triple, "linear": triple}
+            for role, triple in channels.items()
+        },
+    }
 
 passed = 0
 failed = 0
@@ -40,15 +56,20 @@ def check(name, condition, detail=""):
 
 print("[test_palette] Starting palette tests...")
 
-# --- hex_to_linear ---
-print("[test_palette] hex_to_linear:")
-r, g, b = hex_to_linear("#ffffff")
-check("white → (1,1,1)", abs(r - 1.0) < 1e-5 and abs(g - 1.0) < 1e-5 and abs(b - 1.0) < 1e-5,
-      f"got ({r},{g},{b})")
-
-r, g, b = hex_to_linear("#000000")
-check("black → (0,0,0)", abs(r) < 1e-10 and abs(g) < 1e-10 and abs(b) < 1e-10,
-      f"got ({r},{g},{b})")
+# --- the consumer owns no transfer function ---
+print("[test_palette] consumer computes nothing:")
+check(
+    "hex_to_linear is deleted",
+    not hasattr(palette_mod, "hex_to_linear"),
+    "the consumer must not compute a transfer function; color-law.js owns it "
+    "and the wire carries the result",
+)
+check(
+    "apply_palette_to_material is deleted",
+    not hasattr(palette_mod, "apply_palette_to_material"),
+    "it built a node group and linked it to nothing, so three different "
+    "schools rendered byte-identical pixels",
+)
 
 # --- dequantize_color ---
 print("[test_palette] dequantize_color:")
@@ -64,9 +85,17 @@ check("SONIC palette exists", p is not None and "primary" in p)
 p_default = get_palette("NONEXISTENT")
 check("unknown school falls back to default", p_default == SCHOOL_PALETTE["default"])
 
-# --- create_palette_node_group (no wire — fallback path) ---
-print("[test_palette] create_palette_node_group (fallback):")
-ng = create_palette_node_group("SONIC")
+# --- create_palette_node_group: structure ---
+# Previously exercised a no-wire "fallback path" that derived colour from local
+# hex constants via hex_to_linear. That path is gone: the consumer applies
+# declared values or refuses. The structural assertions still hold, so they now
+# run against a supplied wire palette.
+print("[test_palette] create_palette_node_group (structure):")
+ng = create_palette_node_group("SONIC", _wire_palette({
+    "primary": [201556, 42311, 846873],
+    "accent": [421291, 285901, 908375],
+    "glow": [201556, 42311, 846873],
+}))
 check("node group created", ng is not None)
 check("node group name", ng.name == "PB_Palette_SONIC", f"got {ng.name}")
 check("node group is ShaderNodeTree", ng.bl_idname == "ShaderNodeTree", f"got {ng.bl_idname}")
@@ -115,19 +144,73 @@ else:
 
 # --- Idempotent re-creation ---
 print("[test_palette] idempotent re-creation:")
-ng3 = create_palette_node_group("SONIC")
+ng3 = create_palette_node_group("SONIC", _wire_palette({
+    "primary": [201556, 42311, 846873],
+    "accent": [421291, 285901, 908375],
+    "glow": [201556, 42311, 846873],
+}))
 check("re-creation does not collide-rename", ng3.name == "PB_Palette_SONIC", f"got {ng3.name}")
 sonic_groups = [g for g in bpy.data.node_groups if g.name.startswith("PB_Palette_SONIC")]
 check("exactly one SONIC group", len(sonic_groups) == 1, f"got {len(sonic_groups)}")
 
-# --- apply_palette_to_material ---
-print("[test_palette] apply_palette_to_material:")
-mat = bpy.data.materials.new("test_palette_mat")
-ng4 = apply_palette_to_material(mat, "VOID")
-check("material palette applied", ng4 is not None)
-check("material has nodes", mat.use_nodes)
-group_nodes = [n for n in mat.node_tree.nodes if n.bl_idname == "ShaderNodeGroup"]
-check("group node added to material", len(group_nodes) >= 1, f"got {len(group_nodes)}")
+# --- the palette CROSSES correctly ---
+#
+# This replaces three assertions that checked a node had been ADDED to a
+# material, never that it was LINKED. They were green while three schools
+# rendered byte-identical pixels. The claim below is the one the palette can
+# actually support: the values that crossed are the values applied.
+print("[test_palette] palette crossing:")
+
+WIRE_A = _wire_palette({
+    "primary": [500000, 250000, 1000000],
+    "accent": [100000, 200000, 300000],
+    "glow": [900000, 800000, 700000],
+})
+WIRE_B = _wire_palette({
+    "primary": [111111, 222222, 333333],
+    "accent": [444444, 555555, 666666],
+    "glow": [777777, 888888, 999999],
+})
+
+
+def _rgb_values(node_group):
+    """Read back the RGB node values the group was built with, by label."""
+    return {
+        n.label: tuple(round(v, 6) for v in n.outputs[0].default_value[:3])
+        for n in node_group.nodes
+        if n.bl_idname == "ShaderNodeRGB"
+    }
+
+
+ng_a = create_palette_node_group("SCHOOL_A", WIRE_A)
+vals_a = _rgb_values(ng_a)
+check(
+    "node group values equal the wire's declared linear values",
+    vals_a["primary"] == (0.5, 0.25, 1.0),
+    f"got {vals_a.get('primary')}",
+)
+
+ng_b = create_palette_node_group("SCHOOL_B", WIRE_B)
+vals_b = _rgb_values(ng_b)
+check(
+    "two different palettes produce two different node groups",
+    vals_a["primary"] != vals_b["primary"]
+    and vals_a["accent"] != vals_b["accent"]
+    and vals_a["glow"] != vals_b["glow"],
+    f"A={vals_a} B={vals_b}",
+)
+
+# The consumer cannot invent values the wire did not carry.
+refused = False
+try:
+    create_palette_node_group("SCHOOL_C", None)
+except ValueError:
+    refused = True
+check(
+    "a palette with no wire values is refused, not derived",
+    refused,
+    "create_palette_node_group fell back to deriving colour consumer-side",
+)
 
 # --- Summary ---
 print(f"\n[test_palette] Results: {passed} passed, {failed} failed")

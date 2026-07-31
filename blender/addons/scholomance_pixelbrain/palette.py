@@ -23,21 +23,6 @@ SCHOOL_PALETTE = {
 }
 
 
-def hex_to_linear(hex_color):
-    """
-    Convert sRGB hex to scene-linear RGB.
-    Under EXACT policy, the transfer function is recorded in COLOR_LAW.
-    IEC 61966-2-1 transfer function.
-    """
-    h = hex_color.lstrip("#")
-    r, g, b = int(h[0:2], 16) / 255.0, int(h[2:4], 16) / 255.0, int(h[4:6], 16) / 255.0
-
-    def to_linear(c):
-        return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
-
-    return (to_linear(r), to_linear(g), to_linear(b))
-
-
 def dequantize_color(int_triple, scale):
     """
     Dequantize an int32 [r, g, b] triple at the declared scale.
@@ -87,16 +72,17 @@ def create_palette_node_group(school, wire_palette=None):
         rgb_node.location = (0, -i * 200)
 
         if wire_palette and role in wire_palette.get("channels", {}):
-            # Canonical path: dequantize from wire int32
+            # The only path. The integer is truth, the float is derived.
             ch = wire_palette["channels"][role]
             scale = wire_palette.get("scale", 1e6)
             linear = dequantize_color(ch["linear"], scale)
             rgb_node.outputs[0].default_value = (linear[0], linear[1], linear[2], 1.0)
         else:
-            # Fallback: derive from local hex constants
-            palette = get_palette(school)
-            linear = hex_to_linear(palette[role])
-            rgb_node.outputs[0].default_value = (linear[0], linear[1], linear[2], 1.0)
+            raise ValueError(
+                f"no wire palette channel for role {role!r}. The consumer cannot "
+                "derive one: the sRGB transfer function lives in color-law.js and "
+                "its result must arrive on the wire."
+            )
 
         rgb_nodes[role] = rgb_node
 
@@ -134,22 +120,26 @@ def create_palette_node_group(school, wire_palette=None):
     return node_group
 
 
-def apply_palette_to_material(material, school, wire_palette=None):
-    """
-    Apply a school palette to a material's shader node tree.
-    Creates the palette node group and connects it to the material output.
+"""
+apply_palette_to_material was deleted here, deliberately.
 
-    Returns the created node group.
-    """
-    if not material.use_nodes:
-        material.use_nodes = True
+It created the palette node group, added a ShaderNodeGroup referencing it, and
+returned -- linking nothing to the material output. The group was inert. Worse,
+scene.prepare_render_scene assigns materials[0] = pb_emission, so even a linked
+palette material would have been clobbered before the render.
 
-    tree = material.node_tree
-    node_group = create_palette_node_group(school, wire_palette)
+Measured 2026-07-30: the same claymore under ALCHEMY, VOID and WILL produced the
+byte-identical pixel hash A4B6E16C and the identical SCD64 receipt, while
+test_palette asserted "group node added to material" -- that a node was ADDED,
+never that it was LINKED. Nineteen assertions were green over a path that
+reached nothing.
 
-    # Add a group node referencing our palette
-    group_node = tree.nodes.new("ShaderNodeGroup")
-    group_node.node_tree = node_group
-    group_node.location = (-200, 0)
+It is not repaired, because there is nothing to repair it INTO. pb_albedo now
+drives Emission.Color per coordinate, so a per-asset school accent has no
+declared binding saying what it should modulate. Inventing one would be the
+SCR-017 violation this bridge refuses for the seven unbound energy types.
+Giving the palette a route to pixels is an art-direction decision with a
+declared grade and evidence attached, and belongs in its own design.
 
-    return node_group
+The palette still crosses, and create_palette_node_group still verifies that.
+"""

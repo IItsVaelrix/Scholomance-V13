@@ -12,6 +12,7 @@
  */
 
 import { quantize, SCALES } from './quantize.js';
+import { srgbToLinear as colorLawSrgbToLinear } from './color-law.js';
 
 export class PaletteError extends Error {
   constructor(message) {
@@ -52,9 +53,20 @@ export function hexToSrgb(hex) {
 
 /**
  * sRGB component to scene-linear (IEC 61966-2-1).
+ *
+ * Delegates to color-law.js rather than reimplementing. There were three copies
+ * of this function -- here, in palette.py, and in color-law.js -- and a colour
+ * law with three implementations cannot be the thing two engines are compared
+ * against: any drift between them surfaces as a COLOR_LAW disagreement that
+ * cannot be attributed to either side.
+ *
+ * Kept as a function declaration, not `export const x = y`. The export form is
+ * part of the contract: a const is not hoisted, so any consumer evaluating it
+ * before this module finishes would hit the temporal dead zone. Delegating
+ * costs one call and changes nothing for the ten call sites.
  */
 export function srgbToLinear(c) {
-  return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  return colorLawSrgbToLinear(c);
 }
 
 /**
