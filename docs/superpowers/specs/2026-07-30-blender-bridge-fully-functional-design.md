@@ -1,7 +1,7 @@
 # Blender Bridge — Fully Functional
 
 **Date:** 2026-07-30
-**Status:** Proposed
+**Status:** Phases 0–2 IMPLEMENTED (2026-07-31). Phases 3–6 proposed.
 **Depends on:** `codex/core/blender-bridge/`, `blender/addons/scholomance_pixelbrain/`,
 `codex/core/pixelbrain/temporal/`, commit `e0cee0f9`
 **Incorporates:** `2026-07-30-sealed-projection-carrier-design.md` (§5 sequencing, §3 carrier laws)
@@ -23,6 +23,13 @@ from notes.
 
 Summary: **geometry crosses and reaches pixels. Appearance does not, in any
 channel.**
+
+> **Superseded by Phases 0–2 (2026-07-31).** Appearance now reaches pixels:
+> colour byte-exactly per coordinate, and the declared PHOTONIC binding through
+> Emission Strength. The palette does *not* reach pixels and is no longer
+> claimed to (§4.1). §1 below is retained as the measured starting state — the
+> "Reality" column describes the bridge before the work, not now. See §5 for the
+> before/after.
 
 ### 1.1 The meta-defect: Blender exits 0 on a traceback
 
@@ -354,31 +361,61 @@ Every row is a check that *can* fail. The "Today" column separates what was
 measured in this session from what is carried forward — a distinction that
 matters, because a carried result is a claim about a tree that has since changed.
 
-| # | Claim | Falsifier | Today | Source |
+Phases 0–2 are **implemented** (plan
+`docs/superpowers/plans/2026-07-30-blender-bridge-phases-0-2.md`, commits
+`f3e832ba`…`1595bab1`). The "After" column was observed on 2026-07-31, not
+predicted.
+
+| # | Claim | Falsifier | Before | After |
 |---|---|---|---|---|
-| 1 | A Blender failure is detected | Inject a deliberate traceback; driver must exit non-zero | **FAILS** | measured 07-30 |
-| 2 | Colour is byte-exact | Probe pixels under known coords; must equal authored hex | **no such check exists** | probe 07-30 |
-| 3 | Colour reaches pixels | Two assets differing only in colour → different receipts | **FAILS** (`437f1e1a`) | carried, not re-run |
-| 4 | The palette crosses correctly (§4.1) | Node-group values == wire values; two schools → two node groups | **no such check exists** | measured 07-30 |
-| 5 | Energy reaches pixels | PHOTONIC variant vs baseline → different receipts | **FAILS** | carried, not re-run |
-| 6 | The sim chain holds | N chained receipts; cold-start refused | **FAILS** | measured 07-30 |
-| 7 | Causes can be compared | Two engines, same packet → `CAUSES_AGREE` | **FAILS** (4/7) | measured 07-30 |
-| 8 | Frames are independent | Corrupt frame A ⇒ frame B's checksum unchanged | n/a | — |
-| 9 | The manifest binds frames | Swap two frames' contents ⇒ `root` changes | n/a | — |
-| 10 | Tampering is refused | A tampered frame is refused, observably | n/a | — |
-| 11 | The consumer never hashes | Static check: no digest call in `blender/addons/` | passes | measured 07-30 |
+| 1 | A Blender failure is detected | Inject a deliberate traceback; driver must exit non-zero | **FAILS** | **PASSES** — `--self-test` |
+| 2 | Colour is byte-exact | Probe pixels under known coords; must equal authored hex | no such check | **PASSES** — 6/6 |
+| 3 | Colour reaches pixels | Two assets differing only in colour → different receipts | **FAILS** (`437f1e1a`) | **PASSES** — `F03189C3` vs `D844E220` |
+| 4 | The palette crosses correctly (§4.1) | Node-group values == wire values; two schools → two node groups | no such check | **PASSES** — 3/3 roles differ |
+| 5 | Energy reaches pixels | PHOTONIC variant vs baseline → different receipts | **FAILS** | **PASSES** |
+| 6 | The sim chain holds | N chained receipts; cold-start refused | **FAILS** | **FAILS** — Phase 3 |
+| 7 | Causes can be compared | Two engines, same packet → `CAUSES_AGREE` | **FAILS** (4/7) | **FAILS** — Phase 4 |
+| 8 | Frames are independent | Corrupt frame A ⇒ frame B's checksum unchanged | n/a | n/a — Phase 6 |
+| 9 | The manifest binds frames | Swap two frames' contents ⇒ `root` changes | n/a | n/a — Phase 6 |
+| 10 | Tampering is refused | A tampered frame is refused, observably | n/a | n/a — Phase 6 |
+| 11 | The consumer never hashes | Static check: no digest call in `blender/addons/` | passes | **passes** |
 
-Rows 2 and 4 are marked "no such check exists" rather than FAILS. That is the
-stronger statement: the current palette E2E does not fail, it reports
-`✓ Determinism holds` while measuring nothing (§1.2). An absent check and a red
-check are not the same condition, and collapsing them is how the first one
-survives.
+Rows 2 and 4 were marked "no such check exists" rather than FAILS. That was the
+stronger statement: the palette E2E did not fail, it reported `✓ Determinism
+holds` while measuring nothing (§1.2). An absent check and a red check are not
+the same condition, and collapsing them is how the first one survives.
 
-Rows 3 and 5 are carried from an earlier session on 2026-07-30 and were **not**
-re-run here. They must be re-measured at the start of Phase 1 rather than assumed
-still true.
+Row 3 was re-measured rather than assumed, with geometry held identical so that
+colour is the only variable — the earlier `437f1e1a` result compared assets that
+also differed structurally.
 
-Ten of eleven are red, absent, or unwritten. That is the honest starting line.
+**Falsifier 2 asserts its own non-vacuity.** `blender/tests/test_color_roundtrip.py`
+contains a test that requires the check to FAIL at 64 samples. Without it, a
+round-trip that passed for the wrong reason would look identical to one that
+passed for the right one.
+
+Rows 6 and 7 remain red for their own declared reasons and are the entry points
+to Phases 3 and 4.
+
+### 5.1 What Phases 0–2 changed about the measurements themselves
+
+Three of this spec's own measuring instruments were wrong, and each was found by
+a test written before the code:
+
+- **`blender-test.sh` reported PASS for a file that raised at import.** Same
+  exit-0 defect as §1.1, in the harness that validates everything else.
+- **The colour falsifier counted background as a match.** Film is transparent
+  black, so an empty pixel is a perfect `#000000` and a completely blank render
+  scored 1/6. It now requires `alpha == 1`.
+- **The camera was never in canvas space.** `frame_camera_on` fits *asset* bounds
+  with a 1.15 margin, so a 64-wide canvas holding a 32-wide asset renders at
+  `ortho_scale` 37.95 and pixel (x, y) is not coordinate (x, y). §3.1 declared
+  canvas-space framing; the addon predated it and disagreed.
+
+A fourth was in a verification loop written during execution:
+`printf ... "$(basename $t)" "$?"` reports exit 0 for every file, because the
+command substitution resets `$?` while the arguments are being built. It briefly
+showed a known-red suite as green.
 
 **Falsifier 2 is the model**, because its failure mode is demonstrated rather than
 assumed: 6/6 at `samples=1`, 0/6 at `samples=64` with a Gaussian filter. A check
