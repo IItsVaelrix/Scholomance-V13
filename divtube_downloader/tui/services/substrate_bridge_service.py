@@ -117,8 +117,15 @@ class SubstrateBridgeService:
         try:
             from cortex import Cortex
             self._cortex = Cortex(substrate_db=self._db_path)
-            # Lower the L1 cache similarity threshold for hash embeddings
-            # (default 0.3 is too high; hash embeddings produce low cosine scores)
+            # Lower the similarity gates for hash embeddings (MEASURED
+            # 2026-08: hash-based cosine caps around 0.15-0.23 with no
+            # relevant/irrelevant separation). The stock gates (0.25
+            # multi-hop confidence, 0.15 single-hop) filtered out nearly
+            # everything, so retrieval silently returned zero results.
+            # NOTE: ranking quality under the hash embedder is unreliable —
+            # treat returned order as candidate-set, not ground truth.
+            self._cortex.l2_threshold = 0.05
+            self._cortex.retriever.confidence_threshold = 0.05
             self._engine = "cortex"
             return True
         except ImportError:
@@ -188,16 +195,24 @@ class SubstrateBridgeService:
                     text, top_k=top_k, metadata_filter=metadata_filter
                 )
 
-            results = [
-                {
-                    "text": r["text"][:500],
-                    "similarity": round(r.get("similarity", 0), 4),
-                    "metadata": r.get("metadata", {}),
-                    "hop": r.get("hop", 0),
-                    "source": r.get("source", "L2"),
-                }
-                for r in results_raw
-            ]
+            # Dedup by text (the substrate can return the same memory several
+            # times from duplicate rows). Keep the first/highest-ranked hit.
+            results = []
+            _seen_texts = set()
+            for r in results_raw:
+                t = r.get("text", "")
+                if t in _seen_texts:
+                    continue
+                _seen_texts.add(t)
+                results.append(
+                    {
+                        "text": t[:500],
+                        "similarity": round(r.get("similarity", 0), 4),
+                        "metadata": r.get("metadata", {}),
+                        "hop": r.get("hop", 0),
+                        "source": r.get("source", "L2"),
+                    }
+                )
 
             # Build context block
             lines = ["[[SUBSTRATE MEMORIES]]"]
@@ -379,9 +394,22 @@ class SubstrateBridgeService:
     # ── Status / health ─────────────────────────────────────────────────
 
     def status(self) -> Dict[str, Any]:
-        """Health and status of the substrate bridge."""
+        """Health and status of the substrate bridge.
+
+        Triggers lazy engine init so the reported state is the TRUE state.
+        Before this fix, status() called before the first query always
+        reported engine='none' / cortex_available=False even when the engine
+        initializes fine — which misled agents into believing the substrate
+        was offline when it was merely uninitialized.
+        """
         db_exists = os.path.isfile(self._db_path)
         db_size_mb = round(os.path.getsize(self._db_path) / (1024 * 1024), 2) if db_exists else 0
+
+        # Best-effort lazy init so status is honest (non-fatal).
+        try:
+            self._ensure_engine()
+        except Exception:
+            pass
 
         info = {
             "ok": True,

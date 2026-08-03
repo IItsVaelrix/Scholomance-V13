@@ -533,6 +533,16 @@ class Cortex:
         
         # Stats
         self._query_count = 0
+
+        # L2 (substrate) similarity gate for the single-hop path.
+        # MEASURED 2026-08: the hash-based EmbeddingProvider produces cosine
+        # similarities that cap around 0.15-0.23 with NO separation between
+        # relevant and irrelevant queries (irrelevant queries routinely score
+        # higher). The previous hardcoded gate of 0.15 therefore filtered out
+        # nearly everything, making retrieval silently return zero results.
+        # Default lowered so results flow; the gate is configurable so a real
+        # neural embedder (with a sane similarity regime) can raise it again.
+        self.l2_threshold = 0.05
     
     def retrieve(self, query: str, top_k: int = 5, multi_hop: bool = True) -> Tuple[List[Dict], str]:
         """
@@ -555,8 +565,14 @@ class Cortex:
             results_raw = self.substrate.retrieve(query, top_k=top_k)
             # Cross-reference with L1
             results = []
+            seen_texts = set()
             for r in results_raw:
-                if r["similarity"] >= 0.15:
+                # Dedup: the substrate can return the same memory text several
+                # times (duplicate rows); collapse before gating.
+                if r["text"] in seen_texts:
+                    continue
+                if r["similarity"] >= self.l2_threshold:
+                    seen_texts.add(r["text"])
                     r["hop"] = 0
                     r["source"] = "L2"
                     results.append(r)

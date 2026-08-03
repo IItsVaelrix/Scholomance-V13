@@ -1964,6 +1964,13 @@ class ToolService:
     def _tui_inspect(self, kwargs, callback):
         if callback and hasattr(callback, "__self__"):
             app = callback.__self__
+            # _ChatLogger shims the bound-method protocol by setting
+            # __self__ = itself (so PromptService hook probing works). When
+            # the agent callback is a chat logger rather than a bound method
+            # of the App, resolve through to the real Textual app — otherwise
+            # `app.screen` below raised AttributeError and tui_inspect died.
+            if not hasattr(app, "screen") and hasattr(app, "_app"):
+                app = app._app
             def _dump_widget(w):
                 d = {
                     "type": w.__class__.__name__,
