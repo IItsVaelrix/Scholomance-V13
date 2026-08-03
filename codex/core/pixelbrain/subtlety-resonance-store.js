@@ -15,8 +15,11 @@ import * as fs from 'node:fs';
 import * as nodePath from 'node:path';
 import { sha256Hex } from './sha256.js';
 import { canonicalStringify } from './canonical-json.js';
+import { normalizeObservationContext } from './subtlety-observation-context.js';
 
 export const SUBTLETY_RESONANCE_SCHEMA = 'SUBTLETY-RESONANCE-RECORD-v1';
+export const SUBTLETY_RESONANCE_SCHEMA_V1 = SUBTLETY_RESONANCE_SCHEMA;
+export const SUBTLETY_RESONANCE_SCHEMA_V2 = 'SUBTLETY-RESONANCE-RECORD-v2';
 
 function seal(record) {
   const { checksum: _c, ...body } = record;
@@ -27,12 +30,18 @@ export function createResonanceStore({ path, now = () => new Date().toISOString(
   if (!path) throw new TypeError('createResonanceStore requires path');
   fs.mkdirSync(nodePath.dirname(path), { recursive: true });
 
-  function append(kind, payload) {
+  function append(kind, payload, { context } = {}) {
+    const normalizedContext = context === undefined
+      ? undefined
+      : normalizeObservationContext(context);
     const record = seal({
-      schema: SUBTLETY_RESONANCE_SCHEMA,
+      schema: normalizedContext
+        ? SUBTLETY_RESONANCE_SCHEMA_V2
+        : SUBTLETY_RESONANCE_SCHEMA_V1,
       recordedAt: now(),
       kind,
       payload,
+      ...(normalizedContext ? { context: normalizedContext } : {}),
     });
     fs.appendFileSync(path, `${JSON.stringify(record)}\n`, 'utf8');
     return record;

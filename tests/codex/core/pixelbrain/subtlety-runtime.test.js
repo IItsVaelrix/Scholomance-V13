@@ -50,4 +50,29 @@ describe('subtlety-runtime', () => {
     expect(b.occurrenceCount).toBe(2);
     expect(alerts).toHaveLength(1);
   });
+
+  it('persists normalized crash context in the outer fingerprint record', async () => {
+    const store = createResonanceStore({
+      path: join(dir, 'context.jsonl'),
+      now: () => '2026-08-03T10:15:00.000Z',
+    });
+    const rt = createSubtletyRuntime({ store, now: () => 1_000 });
+
+    const result = await rt.ingestCrash({
+      ...sample,
+      message: 'https://me:pw@example.test/a\r\nBearer abc123\0 token=secret-value',
+    });
+    const fingerprint = store.readAll().find((record) => record.kind === 'fingerprint');
+
+    expect(fingerprint.schema).toBe('SUBTLETY-RESONANCE-RECORD-v2');
+    expect(fingerprint.context).toMatchObject({
+      schema: 'SUBTLETY-OBSERVATION-CONTEXT-v1',
+      runtime: 'divtube-tui',
+      errorType: 'textual._context.NoActiveAppError',
+      message: 'https://[REDACTED]@example.test/a\nBearer [REDACTED] token=[REDACTED]',
+      topFrame: 'File "tui/ui/app.py", line 284, in run',
+      thread: 'Thread-32',
+    });
+    expect(result.packet.checksum).toBe(fingerprint.payload.checksum);
+  });
 });

@@ -64,6 +64,14 @@ describe('subtlety routes', () => {
     expect(body.occurrenceCount).toBe(1);
     expect(body.unitId).toBe(sample.unitId);
     expect(store.readAll().some((r) => r.kind === 'fingerprint')).toBe(true);
+    expect(store.readAll().find((r) => r.kind === 'fingerprint').context).toMatchObject({
+      schema: 'SUBTLETY-OBSERVATION-CONTEXT-v1',
+      runtime: sample.runtime,
+      errorType: sample.errorType,
+      message: sample.message,
+      topFrame: sample.stack,
+      thread: sample.thread,
+    });
     expect(alerts).toHaveLength(1);
     expect(alerts[0].collab).toBe(true);
   });
