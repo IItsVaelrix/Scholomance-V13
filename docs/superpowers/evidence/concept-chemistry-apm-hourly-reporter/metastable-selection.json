@@ -1,0 +1,17 @@
+{
+  "schema": "PB-CONCEPT-CHEM-APM-METASTABLE-SELECTION-v1",
+  "recordedAt": "2026-08-03T00:00:00.000-04:00",
+  "designSpec": "docs/superpowers/specs/2026-08-03-concept-chemistry-metastable-stateless-reporter-design.md",
+  "selectedArchitecture": "stateless-chronicle-compiler",
+  "state": "METASTABLE_SELECTED",
+  "clearingWins": 2,
+  "clearingRounds": [
+    1,
+    3
+  ],
+  "hasMetastableClearingWin": true,
+  "aggregateMargin": 0.1259,
+  "lawControlsCaught": true,
+  "sourceEvidenceChecksum": "sha256:fd809fd89df908c1e243d2c74612d9d20b49a35f272804e20ee51750bbc57d3f",
+  "passed": true
+}
