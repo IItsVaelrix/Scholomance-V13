@@ -1,3 +1,5 @@
+import { computeControlBar } from '../../codex/core/pixelbrain/calibration/control-gate.js';
+
 export const EXPERIMENT_SCHEMA = 'PB-CONCEPT-CHEM-APM-HOURLY-v1';
 export const EXPERIMENT_ID = 'concept-chemistry-apm-hourly-reporter-2026-08-03';
 
@@ -221,3 +223,200 @@ export const ROUNDS = deepFreeze([
     ],
   },
 ]);
+
+export function median(values) {
+  if (
+    !Array.isArray(values)
+    || values.length === 0
+    || values.some((value) => !Number.isFinite(value))
+  ) {
+    throw new TypeError('median requires a non-empty array of finite numbers');
+  }
+
+  const ordered = [...values].sort((left, right) => left - right);
+  const middle = Math.floor(ordered.length / 2);
+  return ordered.length % 2 === 1
+    ? ordered[middle]
+    : (ordered[middle - 1] + ordered[middle]) / 2;
+}
+
+export function scoreRounds({ rounds = ROUNDS, scoreReaction }) {
+  if (typeof scoreReaction !== 'function') {
+    throw new TypeError('scoreReaction must be a function');
+  }
+
+  return rounds.map((round) => Object.freeze({
+    round: round.round,
+    reactions: Object.freeze(round.reactions.map((reaction) => {
+      const score = scoreReaction(reaction);
+      if (!score || typeof score !== 'object' || !Number.isFinite(score.feasibility)) {
+        throw new TypeError(`invalid score for ${reaction.id}`);
+      }
+      return Object.freeze({ ...score, ...reaction });
+    })),
+  }));
+}
+
+function assertScoredRounds(scoredRounds, stableMin) {
+  if (!Number.isFinite(stableMin)) {
+    throw new TypeError('stableMin must be a finite number');
+  }
+  if (!Array.isArray(scoredRounds) || scoredRounds.length !== ROUNDS.length) {
+    throw new TypeError('experiment requires exactly 3 scored rounds');
+  }
+
+  for (const [roundIndex, scoredRound] of scoredRounds.entries()) {
+    const expectedRound = ROUNDS[roundIndex];
+    if (
+      !scoredRound
+      || scoredRound.round !== expectedRound.round
+      || !Array.isArray(scoredRound.reactions)
+      || scoredRound.reactions.length !== expectedRound.reactions.length
+    ) {
+      throw new TypeError(`malformed scored round ${roundIndex + 1}`);
+    }
+
+    const expectedIds = expectedRound.reactions.map((reaction) => reaction.id);
+    const actualIds = scoredRound.reactions.map((reaction) => reaction.id);
+    if (actualIds.some((id, index) => id !== expectedIds[index])) {
+      throw new TypeError(`scored round ${roundIndex + 1} does not match the frozen matrix`);
+    }
+
+    const candidates = scoredRound.reactions.filter((reaction) => reaction.kind === 'candidate');
+    const barControls = scoredRound.reactions.filter(
+      (reaction) => reaction.kind === 'control' && reaction.controlType !== 'law-violation',
+    );
+    const lawControls = scoredRound.reactions.filter(
+      (reaction) => reaction.kind === 'control' && reaction.controlType === 'law-violation',
+    );
+
+    if (candidates.length !== 3 || barControls.length !== 3 || lawControls.length !== 1) {
+      throw new TypeError(`scored round ${roundIndex + 1} must have the frozen 3+3+1 shape`);
+    }
+    if (
+      candidates.some((reaction) => !ARCHITECTURES.includes(reaction.architecture))
+      || candidates.some((reaction) => reaction.variant !== roundIndex + 1)
+      || scoredRound.reactions.some((reaction) => !Number.isFinite(reaction.feasibility))
+    ) {
+      throw new TypeError(`scored round ${roundIndex + 1} contains malformed evidence`);
+    }
+  }
+}
+
+function makeGate(passed, detail) {
+  return Object.freeze({ passed, detail });
+}
+
+export function evaluateExperiment({ scoredRounds, stableMin }) {
+  assertScoredRounds(scoredRounds, stableMin);
+
+  const roundDecisions = scoredRounds.map((scoredRound) => {
+    const candidates = scoredRound.reactions
+      .filter((reaction) => reaction.kind === 'candidate')
+      .sort((left, right) => (
+        right.feasibility - left.feasibility
+        || ARCHITECTURES.indexOf(left.architecture) - ARCHITECTURES.indexOf(right.architecture)
+      ));
+    const topFeasibility = candidates[0].feasibility;
+    const topCandidates = candidates.filter(
+      (candidateReaction) => candidateReaction.feasibility === topFeasibility,
+    );
+    const uniqueWinner = topCandidates.length === 1;
+    const winner = uniqueWinner ? topCandidates[0].architecture : null;
+
+    const controlResults = scoredRound.reactions
+      .filter((reaction) => reaction.kind === 'control')
+      .map((reaction) => ({
+        id: reaction.controlId,
+        kind: 'control',
+        feasibility: reaction.feasibility,
+        lawNote: reaction.lawNote,
+      }));
+    const controlGate = computeControlBar(controlResults, { groupKey: 'kind' });
+    const lawControlsCaught = controlGate.lawControls.every(
+      (reaction) => typeof reaction.lawNote === 'string'
+        && reaction.lawNote.startsWith('LAW_VIOLATION'),
+    ) && controlGate.findings.length === 0;
+
+    return Object.freeze({
+      round: scoredRound.round,
+      winner,
+      uniqueWinner,
+      winnerFeasibility: topFeasibility,
+      barControlId: controlGate.barId,
+      barFeasibility: controlGate.bar,
+      winnerBeatsBar: uniqueWinner && topFeasibility > controlGate.bar,
+      lawControlsCaught,
+    });
+  });
+
+  const candidateMedians = Object.fromEntries(ARCHITECTURES.map((architecture) => [
+    architecture,
+    median(scoredRounds.map((round) => round.reactions.find(
+      (reaction) => reaction.kind === 'candidate' && reaction.architecture === architecture,
+    ).feasibility)),
+  ]));
+
+  const uniqueWinnerEveryRound = roundDecisions.every((round) => round.uniqueWinner);
+  const uniqueWinners = new Set(roundDecisions.map((round) => round.winner));
+  const commonWinner = uniqueWinnerEveryRound && uniqueWinners.size === 1
+    ? roundDecisions[0].winner
+    : null;
+  const sameWinnerEveryRound = commonWinner !== null;
+  const winnerBeatsBarEveryRound = roundDecisions.every((round) => round.winnerBeatsBar);
+  const lawControlsCaughtEveryRound = roundDecisions.every(
+    (round) => round.lawControlsCaught,
+  );
+  const commonWinnerMedian = commonWinner === null ? null : candidateMedians[commonWinner];
+  const winnerMedianStable = commonWinnerMedian !== null && commonWinnerMedian >= stableMin;
+
+  const gates = Object.freeze({
+    threeAlignedRounds: makeGate(
+      true,
+      '3/3 rounds have the frozen 3+3+1 shape',
+    ),
+    uniqueWinnerEveryRound: makeGate(
+      uniqueWinnerEveryRound,
+      uniqueWinnerEveryRound
+        ? 'all rounds have one strict first place'
+        : 'at least one round has a first-place tie',
+    ),
+    sameWinnerEveryRound: makeGate(
+      sameWinnerEveryRound,
+      sameWinnerEveryRound
+        ? `${commonWinner} won rounds 1, 2, 3`
+        : 'the same architecture did not win all three rounds',
+    ),
+    winnerBeatsBarEveryRound: makeGate(
+      winnerBeatsBarEveryRound,
+      winnerBeatsBarEveryRound
+        ? 'strictly above all bar controls in rounds 1, 2, 3'
+        : 'a round winner tied or fell below its highest bar control',
+    ),
+    lawControlsCaughtEveryRound: makeGate(
+      lawControlsCaughtEveryRound,
+      lawControlsCaughtEveryRound
+        ? 'all 3 law controls returned LAW_VIOLATION'
+        : 'at least one law control was not caught by the law gate',
+    ),
+    winnerMedianStable: makeGate(
+      winnerMedianStable,
+      commonWinnerMedian === null
+        ? `no common winner can be tested against STABLE_MIN ${stableMin}`
+        : `${commonWinnerMedian} ${winnerMedianStable ? '>=' : '<'} STABLE_MIN ${stableMin}`,
+    ),
+  });
+  const failures = Object.entries(gates)
+    .filter(([, gate]) => !gate.passed)
+    .map(([gateName]) => gateName);
+  const passed = failures.length === 0;
+
+  return Object.freeze({
+    passed,
+    selectedArchitecture: passed ? commonWinner : null,
+    candidateMedians: Object.freeze(candidateMedians),
+    rounds: Object.freeze(roundDecisions),
+    gates,
+    failures: Object.freeze(failures),
+  });
+}
