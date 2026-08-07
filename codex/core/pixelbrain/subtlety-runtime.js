@@ -54,7 +54,15 @@ export function createSubtletyRuntime({
       const unitId = identity.unitId;
 
       const packet = apm.recordObserved(identity, output, { seam, mode: 'observed' });
-      store.append('fingerprint', packet);
+      store.append('fingerprint', packet, {
+        context: {
+          runtime: identity.runtimeProfile,
+          errorType: output.error?.type,
+          message: output.error?.message,
+          topFrame: output.error?.site,
+          thread: output.error?.thread,
+        },
+      });
 
       const assessment = apm.assess(unitId, {
         current: { identity, buildId: identity.buildId },

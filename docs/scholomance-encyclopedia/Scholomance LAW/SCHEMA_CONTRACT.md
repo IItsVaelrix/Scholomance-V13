@@ -7,11 +7,58 @@
 
 ## Living Document - Owned by Codex, Read by All Agents
 
-**Version: 1.35** | Last updated: 2026-07-29
+**Version: 1.36** | Last updated: 2026-08-03
 
 > Bump the version on every schema change.
 > Notify Claude for UI-consumed field changes.
 > Notify Gemini for fixture, regression-test, and backend implementation changes.
+
+---
+
+## SCHEMA CHANGE NOTICE
+
+- Schema: Subtlety Resonance Observation Context
+- Version: 1.35 -> 1.36
+- Date: 2026-08-03
+- Changed fields: registered additive `SUBTLETY-RESONANCE-RECORD-v2` records and optional sealed `SUBTLETY-OBSERVATION-CONTEXT-v1` fingerprint context while preserving `SUBTLETY-FINGERPRINT-v1` unchanged
+- Breaking: no; v1 outer records remain readable indefinitely and writers without observation context continue to emit v1
+- Owner: Codex
+- Claude impact: none; no UI field or event changes
+- Gemini impact: add v1/v2 fixtures, outer-checksum context coverage, ordered redaction and Unicode code-point bound tests, legacy fallback tests, and unchanged fingerprint-packet checksum coverage
+- Error codes: unsupported or invalid records are isolated as deterministic report warnings rather than changing an existing public error-code contract
+
+```ts
+interface SubtletyObservationContextV1 {
+  schema: "SUBTLETY-OBSERVATION-CONTEXT-v1";
+  runtime: string;   // 1..128 Unicode code points; missing => "unknown"
+  errorType: string; // 1..256 Unicode code points; missing => "unknown"
+  message: string;   // 0..2048 Unicode code points
+  topFrame: string;  // 1..1024 Unicode code points; missing => "unknown"
+  thread: string;    // 0..256 Unicode code points
+}
+
+interface SubtletyResonanceRecordV2 {
+  schema: "SUBTLETY-RESONANCE-RECORD-v2";
+  recordedAt: string; // valid ISO-8601 instant
+  kind: "fingerprint" | "assessment";
+  payload: object;
+  context?: SubtletyObservationContextV1;
+  checksum: string; // lowercase SHA-256 of canonical record body without checksum
+}
+```
+
+Before persistence, each context string normalizes CRLF/CR to LF, removes NUL,
+then applies case-insensitive redaction in this order: URL credentials become
+`scheme://[REDACTED]@host`; bearer values become `Bearer [REDACTED]`; values
+assigned by `:` or `=` to `api-key`, `api_key`, `apikey`, `token`, `password`,
+or `secret` become `[REDACTED]` while the field name and separator remain.
+Truncation by Unicode code point occurs after redaction. The v2 outer checksum
+covers context; the nested `SUBTLETY-FINGERPRINT-v1` checksum never does.
+
+Legacy v1 readers derive runtime from fingerprint identity/execution, error type
+from the first `thread.crash.*` emit, top frame as `unknown`, and empty message
+and thread display values. The reduced identity precision must be reported as a
+warning and never back-merged into later enriched identities.
 
 ---
 

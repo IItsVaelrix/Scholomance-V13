@@ -1,0 +1,36 @@
+{
+  "schema": "PB-CONCEPT-CHEM-APM-IMPLEMENTATION-REPLAY-v1",
+  "state": "IMPLEMENTED_METASTABLE",
+  "sourceLedger": "/home/deck/Downloads/Scholomance-V12-main/.worktrees/apm-hourly-chemistry-gate/codex/server/data/subtlety-resonance.jsonl",
+  "sourceChecksum": "888a216266181b0e87e4751507339f7f33b7d5eaeb0ff8dc396474c2eb8967ab",
+  "sourceUnchanged": true,
+  "reports": [
+    {
+      "filename": "APM-2026-07-20-1600-UTC-0400.md",
+      "checksum": "ff596efd93c06a8677d1803fb03889e110a53a2ffb8f534c98ccba008cfa0f35"
+    },
+    {
+      "filename": "APM-2026-07-21-1600-UTC-0400.md",
+      "checksum": "6a6dfa50de72fec0e767ad7efffe8dc247fb7bd08be34e2a0091fd7d0a89dc56"
+    },
+    {
+      "filename": "APM-2026-07-21-1900-UTC-0400.md",
+      "checksum": "f3a20a1840a3ff190fc9992e70108d2948372f0ae86b8129b402f7efdb61ae87"
+    },
+    {
+      "filename": "APM-2026-07-22-0400-UTC-0400.md",
+      "checksum": "929cb03715bfc3689f3c3538a9a07297baabdb75158a4574840e3701ec676aa7"
+    },
+    {
+      "filename": "APM-2026-07-22-0500-UTC-0400.md",
+      "checksum": "1a3689bdb40bbea66bbbf7b6eb48b8babcdade36dcff3a536b8f2322c027b210"
+    },
+    {
+      "filename": "APM-2026-07-30-0900-UTC-0400.md",
+      "checksum": "ee9cbfbde3e624b15b2a3feeac6ffaaf7afa10072a972459712b824f23c0fb26"
+    }
+  ],
+  "secondPassByteIdentical": true,
+  "recurrenceGrowthObserved": true,
+  "testCommit": "7f55aad062ef05990e887bed2a0cf555da025597"
+}
