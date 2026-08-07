@@ -149,6 +149,45 @@ export function selectHeadToken(tokens, freqMap, posMap) {
     if (demoted.has(a)) continue;
     if (agreementSubject(a, b) === 'first') demoted.add(b);
   }
+
+  /**
+   * POSITIONAL ROLE — a noun TAG is not a nominal SLOT.
+   *
+   * `cold water runs deep` survived every cue above and still anchored on
+   * `deep`. Measured, nothing voted for `water`: every frame reading abstained,
+   * agreement spoke only about `runs`, and `cold`/`water`/`deep` all carry an
+   * "n" tag, so rarity picked the rarest survivor unopposed. There was no
+   * conflict to arbitrate — the signal was simply absent.
+   *
+   * Both distractors have a real noun sense somewhere in wordnet (`cold` the
+   * sensation, `deep` the deep), and neither occupies a referential slot here:
+   *
+   *     cold water runs deep
+   *      └─ attributive modifier, directly before a noun
+   *                         └─ predicate complement, directly after a verb
+   *
+   * So position is read, not just the tag. Both rules require ADJACENCY and an
+   * adjective-shaped token, and both stay silent otherwise — an adjective that
+   * neither precedes a nominal nor follows a verb keeps its place.
+   */
+  for (let i = 0; i < all.length; i += 1) {
+    const t = all[i];
+    if (!nominal.includes(t) || demoted.has(t)) continue;
+    if (!looksAdjective(t)) continue;
+
+    // (1) Attributive: an adjective sitting on a following nominal modifies it.
+    const next = all[i + 1];
+    if (next && nominal.includes(next) && !demoted.has(next)) {
+      demoted.add(t);
+      continue;
+    }
+
+    // (2) Predicative: an adjective after the token agreement settled as the
+    // verb is a complement of that verb, not a second subject.
+    const prev = i > 0 ? all[i - 1] : null;
+    if (prev && demoted.has(prev)) demoted.add(t);
+  }
+
   const filtered = nominal.filter((t) => !demoted.has(t));
   // No nominal candidate is not a failure — a query can be all verbs and
   // adjectives, and rarity over everything is still the best available answer.

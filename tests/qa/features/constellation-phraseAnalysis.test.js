@@ -196,6 +196,72 @@ describe('selectHeadToken — agreement demotes the verb of an adjacent pair', (
   });
 });
 
+// ─── selectHeadToken: positional role ────────────────────────────────
+
+/**
+ * A NOUN TAG IS NOT A NOMINAL SLOT.
+ *
+ * `cold water runs deep` cleared every other cue and still anchored on `deep`.
+ * Measured, nothing voted for `water`: every frame reading abstained, agreement
+ * spoke only about `runs`, and cold/water/deep all carry an "n" tag — `cold`
+ * the sensation, `deep` the deep — so rarity took the rarest survivor
+ * unopposed. Position is the missing signal, not arbitration between cues.
+ */
+describe('selectHeadToken — positional role demotes non-referential nominals', () => {
+  const pos = new Map([
+    ['cold', ['a', 'n']], ['water', ['n', 'v']], ['runs', ['n', 'v']],
+    ['deep', ['a', 'n', 'r']], ['moon', ['n']], ['pale', ['a']],
+    ['smoke', ['n', 'v']], ['black', ['a', 'n']], ['dark', ['a', 'n']],
+    ['river', ['n']], ['flows', ['n', 'v']], ['wound', ['a', 'n', 'v']],
+    ['clock', ['n', 'v']],
+  ]);
+  const freq = new Map([
+    ['cold', 402], ['water', 597], ['runs', 65], ['deep', 289],
+    ['moon', 300], ['smoke', 250], ['black', 800], ['dark', 434],
+    ['river', 164], ['flows', 40], ['wound', 79], ['clock', 251],
+  ]);
+
+  it('demotes an attributive adjective sitting on a following nominal', () => {
+    // `cold` carries a noun sense but modifies `water`; it is not the subject.
+    expect(selectHeadToken(['cold', 'water', 'runs', 'deep'], freq, pos)).toBe('water');
+  });
+
+  it('demotes a predicate complement following the verb', () => {
+    // `deep` follows the token agreement settled as the verb, so it complements
+    // that verb rather than heading a second subject.
+    const head = selectHeadToken(['cold', 'water', 'runs', 'deep'], freq, pos);
+    expect(head).not.toBe('deep');
+  });
+
+  it('demotes a colour word used attributively', () => {
+    expect(selectHeadToken(['black', 'smoke', 'drifts', 'low'], freq, pos)).toBe('smoke');
+  });
+
+  /**
+   * Adjacency is required. An adjective that neither precedes a nominal nor
+   * follows a settled verb keeps its place — the rules stay silent rather than
+   * demoting on shape alone.
+   */
+  it('leaves an adjective alone when it is in neither position', () => {
+    const p2 = new Map([['dark', ['a', 'n']], ['gravity', ['n']]]);
+    const f2 = new Map([['dark', 434], ['gravity', 12]]);
+    // `dark` is last, follows nothing demoted, precedes nothing: it survives,
+    // and rarity still picks the rarer `gravity`.
+    expect(selectHeadToken(['gravity', 'and', 'dark'], f2, p2)).toBe('gravity');
+  });
+
+  it('does not strip the last nominal standing', () => {
+    // Demoting everything would leave no anchor; the pool falls back rather
+    // than returning null on a phrase that plainly has a subject.
+    const p2 = new Map([['dark', ['a', 'n']]]);
+    expect(selectHeadToken(['dark'], new Map([['dark', 434]]), p2)).toBe('dark');
+  });
+
+  it('leaves a heteronym anchor intact across a determiner', () => {
+    expect(selectHeadToken(['he', 'wound', 'the', 'clock'], freq, pos)).toBe('wound');
+  });
+});
+
 // ─── detectCompounds ─────────────────────────────────────────────────
 
 describe('detectCompounds', () => {
