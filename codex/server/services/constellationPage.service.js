@@ -275,6 +275,11 @@ export async function buildConstellationPage(rawQuery, deps) {
     phraseStructure: {
       intent: phraseStructure.intent,
       headToken: phraseStructure.headToken,
+      // 'rarity' | 'last-content' | null — and which cue vetoed each rejected
+      // candidate, so a surprising anchor can be traced rather than argued with.
+      headDecidedBy: phraseStructure.headDecidedBy ?? null,
+      headPool: phraseStructure.headPool ?? [],
+      headDemoted: phraseStructure.headDemoted ?? [],
       compounds: phraseStructure.compounds,
       tokenRoles: phraseStructure.tokenRoles,
       devices: phraseStructure.devices,

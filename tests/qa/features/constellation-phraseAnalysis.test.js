@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   classifyIntent,
   selectHeadToken,
+  resolveHead,
   detectCompounds,
   assignTokenRoles,
   detectPhraseDevices,
@@ -259,6 +260,64 @@ describe('selectHeadToken — positional role demotes non-referential nominals',
 
   it('leaves a heteronym anchor intact across a determiner', () => {
     expect(selectHeadToken(['he', 'wound', 'the', 'clock'], freq, pos)).toBe('wound');
+  });
+});
+
+// ─── resolveHead: provenance ─────────────────────────────────────────
+
+/**
+ * THE ANCHOR NOW SHOWS ITS WORK. Precedence used to live in statement order and
+ * the winner was never recorded, so a surprising anchor could only be argued
+ * with, not traced. This is the same discipline leximancy's `selectedBy`
+ * enforces one layer up.
+ */
+describe('resolveHead — records which cue vetoed each candidate', () => {
+  const pos = new Map([
+    ['cold', ['a', 'n']], ['water', ['n', 'v']], ['runs', ['n', 'v']],
+    ['deep', ['a', 'n', 'r']], ['horse', ['n', 'v']], ['barn', ['n']],
+    ['fell', ['a', 'n', 'v']], ['past', ['a', 'n', 'r']], ['raced', ['v']],
+  ]);
+  const freq = new Map([
+    ['cold', 402], ['water', 597], ['runs', 65], ['deep', 289],
+    ['horse', 206], ['barn', 25], ['fell', 333], ['past', 378],
+  ]);
+
+  it('names the cue that removed each demoted candidate', () => {
+    const r = resolveHead(['cold', 'water', 'runs', 'deep'], freq, pos);
+    const by = Object.fromEntries(r.demoted.map((d) => [d.token, d.vetoedBy]));
+    expect(by.cold).toBe('attributive-modifier');
+    expect(by.runs).toBe('agreement-predicate');
+    expect(by.deep).toBe('predicate-complement');
+    expect(r.token).toBe('water');
+    expect(r.decidedBy).toBe('rarity');
+  });
+
+  /**
+   * THE GARDEN PATH, AND WHY IT FAILS LEGIBLY.
+   *
+   * `the horse raced past the barn fell` anchors on `barn`, not `horse`. The
+   * provenance shows the reason is an ABSENCE, not a wrong verdict: no token
+   * carries an inflectional -s so agreement is blind across the whole sentence,
+   * and no adjective sits before a nominal or after a settled verb, so both
+   * positional cues stay silent. Nothing is demoted and rarity picks the rarest
+   * survivor unopposed. There is no cue to correct — there is a cue missing.
+   */
+  it('demotes nothing in the garden-path sentence, exposing the missing cue', () => {
+    const r = resolveHead(['the', 'horse', 'raced', 'past', 'the', 'barn', 'fell'], freq, pos);
+    expect(r.demoted).toEqual([]);
+    expect(r.pool).toContain('horse');
+    expect(r.token).toBe('barn');
+    expect(r.decidedBy).toBe('rarity');
+  });
+
+  it('reports last-content when no frequency signal exists', () => {
+    expect(resolveHead(['cold', 'water'], new Map(), pos).decidedBy).toBe('last-content');
+  });
+
+  it('never strips the last candidate standing', () => {
+    const p2 = new Map([['dark', ['a', 'n']]]);
+    const r = resolveHead(['dark'], new Map([['dark', 434]]), p2);
+    expect(r.token).toBe('dark');
   });
 });
 
