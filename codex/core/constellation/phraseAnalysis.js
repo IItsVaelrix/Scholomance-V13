@@ -17,7 +17,7 @@
  */
 
 import { STOPWORDS } from './stopwords.js';
-import { agreementSubject } from '../phonology/prosodic-metronome.js';
+import { agreementSubject, PREPOSITION_CUES } from '../phonology/prosodic-metronome.js';
 import { arbitrate, support, veto, abstain } from './cue-arbiter.js';
 
 // ─── Intent Classification ───────────────────────────────────────────
@@ -100,6 +100,25 @@ function agreementPredicates(tokens, nominal) {
 }
 
 /**
+ * Is the token at `index` the object of a preposition?
+ *
+ * Scans left across determiners only — `past the barn` and `across roads` both
+ * qualify, `past the barn fell` does not reach `fell`, and a content word
+ * between the two ends the search rather than being scanned through.
+ */
+function insidePrepositionalPhrase(tokens, index) {
+  if (index < 1) return false;
+  const DETERMINERS = new Set(['a', 'an', 'the', 'this', 'that', 'these', 'those',
+    'my', 'your', 'his', 'her', 'its', 'our', 'their']);
+  for (let i = index - 1; i >= 0 && index - i <= 2; i -= 1) {
+    const tok = tokens[i];
+    if (PREPOSITION_CUES.has(tok)) return true;
+    if (!DETERMINERS.has(tok)) return false;
+  }
+  return false;
+}
+
+/**
  * Resolve the phrase's anchor, with the reason it was chosen.
  *
  * CONVERTED TO THE ARBITER because precedence used to live in statement order
@@ -153,6 +172,29 @@ export function resolveHead(tokens, freqMap, posMap) {
        */
       (adjectival && prev && predicates.has(prev))
         ? veto('predicate-complement') : abstain('predicate-complement'),
+      /**
+       * A NOMINAL INSIDE A PREPOSITIONAL PHRASE IS NOT THE CLAUSE SUBJECT.
+       *
+       * The cue the garden-path sentence was missing. `the horse raced past the
+       * barn fell` demoted nothing at all — every existing cue abstained,
+       * because none of them reads further than an adjacent pair — and rarity
+       * took `barn` (freq 25) over `horse` (206). `barn` is the object of
+       * `past`, so it was never available to head the clause.
+       *
+       * PREPOSITIONS ARE A CLOSED CLASS, AND THAT IS THE WHOLE POINT. An earlier
+       * form of this cue vetoed any nominal introduced by an object-taking
+       * token, which also caught `saw a comet` and demoted `comet` — correct for
+       * subjecthood, wrong for a reader asking about the comet. Restricting the
+       * trigger to a fixed preposition list separates the prepositional object
+       * from the direct object, and leaves salience alone.
+       */
+      insidePrepositionalPhrase(all, at) ? veto('pp-object') : abstain('pp-object'),
+      /**
+       * A preposition is not a referent, whatever tags it carries. `past` holds
+       * an "n" tag (a past, as in history) and would otherwise compete for the
+       * anchor of a sentence it merely joins.
+       */
+      PREPOSITION_CUES.has(t) ? veto('preposition') : abstain('preposition'),
       // Nothing disqualifying: this token may anchor the phrase.
       support('nominal-candidate', t, 1),
     ]);

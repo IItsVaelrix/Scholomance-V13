@@ -293,21 +293,35 @@ describe('resolveHead — records which cue vetoed each candidate', () => {
   });
 
   /**
-   * THE GARDEN PATH, AND WHY IT FAILS LEGIBLY.
+   * THE GARDEN PATH, RESOLVED BY THE CUE THAT WAS MISSING.
    *
-   * `the horse raced past the barn fell` anchors on `barn`, not `horse`. The
-   * provenance shows the reason is an ABSENCE, not a wrong verdict: no token
-   * carries an inflectional -s so agreement is blind across the whole sentence,
-   * and no adjective sits before a nominal or after a settled verb, so both
-   * positional cues stay silent. Nothing is demoted and rarity picks the rarest
-   * survivor unopposed. There is no cue to correct — there is a cue missing.
+   * `barn` is the object of `past`, so it was never available to head the
+   * clause. Every prior cue abstained because none reads further than an
+   * adjacent pair; this one reads the phrase boundary.
    */
-  it('demotes nothing in the garden-path sentence, exposing the missing cue', () => {
+  it('anchors the garden-path sentence on the clause subject', () => {
     const r = resolveHead(['the', 'horse', 'raced', 'past', 'the', 'barn', 'fell'], freq, pos);
-    expect(r.demoted).toEqual([]);
-    expect(r.pool).toContain('horse');
-    expect(r.token).toBe('barn');
-    expect(r.decidedBy).toBe('rarity');
+    expect(r.token).toBe('horse');
+    const by = Object.fromEntries(r.demoted.map((d) => [d.token, d.vetoedBy]));
+    expect(by.barn).toBe('pp-object');
+    expect(by.past).toBe('preposition');
+  });
+
+  /**
+   * PREPOSITIONS ARE A CLOSED CLASS, AND THAT IS THE WHOLE POINT.
+   *
+   * An earlier form of this cue vetoed any nominal introduced by an
+   * object-taking token, which also caught `saw a comet` — correct for
+   * subjecthood, wrong for a reader asking about the comet. Restricting the
+   * trigger to a fixed preposition list separates the prepositional object from
+   * the direct object, so subjecthood is gained without spending salience.
+   */
+  it('leaves a direct object alone — only prepositional objects are demoted', () => {
+    const p2 = new Map([['man', ['n']], ['saw', ['n', 'v']], ['comet', ['n']]]);
+    const f2 = new Map([['man', 900], ['saw', 400], ['comet', 12]]);
+    const r = resolveHead(['the', 'man', 'saw', 'a', 'comet'], f2, p2);
+    expect(r.token).toBe('comet');
+    expect(r.demoted.map((d) => d.token)).not.toContain('comet');
   });
 
   it('reports last-content when no frequency signal exists', () => {

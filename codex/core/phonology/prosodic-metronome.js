@@ -54,6 +54,11 @@ export const VERB_CUES = new Set([
 export const PREPOSITION_CUES = new Set([
   'of','in','on','at','from','with','by','for','into','onto','upon',
   'through','across','against','beneath','under','over','about','without',
+  // `past` was missing, and its absence cost a real case: in `the horse raced
+  // past the barn fell` nothing marked `past` as a preposition, so it stayed a
+  // nominal candidate (it carries an "n" tag) and `barn` looked like a free
+  // subject rather than the object of a prepositional phrase.
+  'past','beyond','beside','behind','within','among','toward','towards','along','around','off',
 ]);
 
 /**
