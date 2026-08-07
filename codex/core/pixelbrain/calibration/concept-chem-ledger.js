@@ -24,8 +24,8 @@
  *
  * READING THE NUMBERS: every score is ORDINAL and comparable only within
  * its own run. The gate is always "beats every control", never STABLE_MIN.
- * No candidate in any run recorded here reached STABLE (0.55); the highest
- * observed was 0.5052.
+ * The first full thesis to cross STABLE (0.55) was the Qubit Lattice
+ * resonant-field sealed-projection run at 0.5938 (2026-07-31).
  */
 
 import { createLabelStore } from '../label-store.js';
@@ -355,6 +355,61 @@ export const LEDGER_ENTRIES = Object.freeze([
       'governance framing was also not a denial.',
     source: 'scripts/concept-chem-absent-capability.mjs + codex/core/semantic/wordnet-senses.js',
   },
+
+  // ── 2026-07-31 · Qubit Lattice resonant-field color projection ───────
+  // TWO entries from ONE question. The first was killed by the law gate for
+  // a precise architectural reason. The second fixed the wording and crossed
+  // STABLE — the first full thesis in this ledger to do so.
+  {
+    tier: 'SIMULATED',
+    reaction: {
+      a: 'qubit lattice cells with compatible frequencies as members of shared resonant energy fields',
+      b: 'exponentially decayed field-derived color replacing independently maintained per-cell linear color state',
+      product: 'blender computes field-derived color reducing per-cell state without altering canonical energy distribution',
+    },
+    outcome: 'REFUTED',
+    evidence:
+      'KILLED BY LAW GATE: LAW_VIOLATION:CONSUMER_COMPUTES. R0 scored 0.0000, R2 scored ' +
+      '0.0000. The word "derived" in "field-derived color" with Blender as subject triggered ' +
+      'the actor(blender)+action(deriv) rule. This is not a keyword accident — the hypothesis ' +
+      'as stated puts exponential decay computation on the consumer. Five components that do ' +
+      'NOT put computation on Blender are individually STABLE: R4 canonical energy preservation ' +
+      '0.6290, R5 visual error bound 0.6279, R1 frequency-field membership 0.6141, R3 decay ' +
+      'reduces update cost 0.5803, R6 lattice-blender pipeline 0.5750. The idea is not bad; ' +
+      'the computation is on the wrong side of the wire. CTRL-LAW (stochastic field sampling) ' +
+      'also killed at 0.0000. CTRL-FF (color LOD caching) scored 0.4391 METASTABLE — separated ' +
+      'from the thesis by the law gate, not by feasibility. Determinism: 100 iterations, 1 ' +
+      'unique checksum synth1:55ec71e9e3e8152f.',
+    source: 'session 2026-07-31, concept chemistry synthesize() corpus mode, 59 docs',
+  },
+  {
+    // FIRST FULL THESIS TO CROSS STABLE IN THIS LEDGER.
+    // Previous highest was 0.5052 (interlocutor run). This scored 0.5938.
+    tier: 'SIMULATED',
+    reaction: {
+      a: 'pixelbrain computes and seals all authoritative resonant field membership energy attenuation quantization and chromatic projection parameters',
+      b: 'blender deterministically evaluates that sealed projection across lattice instances without becoming an authoritative computing consumer',
+      product: 'sealed projection evaluation reduces per-cell state transfer while preserving canonical energy and visual equivalence',
+    },
+    outcome: 'METASTABLE',
+    evidence:
+      'ALL 7 COMPONENTS STABLE. Full thesis R0 = 0.5938 STABLE — first full thesis in this ' +
+      'ledger to cross the 0.55 threshold (previous highest: 0.5052). LAW_ALIGNED on every ' +
+      'real reaction. The fix: "evaluates" is not in the CONSUMER_COMPUTES action regex; ' +
+      '"derives" is. The distinction is architecturally real — evaluation applies precomputed ' +
+      'parameters, derivation computes them. Component scores: R6 visual equivalence 0.6928, ' +
+      'R2 sealed projection evaluation 0.6307, R3 consumer role boundary 0.6286, R4 reduced ' +
+      'state transfer 0.6040, R5 canonical energy preservation 0.5924, R1 producer seals all ' +
+      'parameters 0.5855. CTRL-FF (pre-bake all frames as textures) 0.5589 STABLE — separated ' +
+      'by +0.0349, thin but real. CTRL-MT (crystal refracting sealed light) 0.3891 METASTABLE — ' +
+      'well separated by 0.2047. CTRL-LAW (blender recomputes energy stochastically) 0.0000 ' +
+      'killed by CONSUMER_COMPUTES + stochastic. PMI: R5 canonical energy -0.07 (78% attractive ' +
+      'pairs — corpus saturated with this concept), R0 full thesis -2.93 (55% attractive). ' +
+      'NOT BUILT. The composition penalty observed in the combinatorial expansion run is ABSENT ' +
+      'here: R0 sits in the middle of its components, not below them. Grounding holds at 0.6882 ' +
+      'for the full thesis. Determinism: 100 iterations, 1 unique checksum synth1:6e958ee5cca8f198.',
+    source: 'session 2026-07-31, concept chemistry synthesize() corpus mode, 59 docs',
+  },
 ]);
 
 /**
@@ -460,6 +515,19 @@ export const RUN_GATE_VERDICTS = Object.freeze([
       'the floor and neither separated. The honest read is that they are the same answer at ' +
       'two altitudes — recompute from the declared material, and put it in the existing ' +
       'gate taxonomy.',
+  },
+  {
+    run: 'Qubit Lattice resonant-field color',
+    kind: 'Hypothesis',
+    separation: 0.035,
+    note:
+      'TWO VERDICTS FROM ONE QUESTION. First framing killed by CONSUMER_COMPUTES (R0=0.0000) — ' +
+      'the law gate, not the feasibility channel, decided it. Revised framing crossed STABLE ' +
+      '(R0=0.5938), the first full thesis in this ledger to do so. Separation vs CTRL-FF ' +
+      '(pre-bake textures) is only +0.0349 — thin. The run concludes at Hypothesis, not Probe: ' +
+      'the candidate binding is lawful and viable but unexecuted. The law gate is doing real ' +
+      'work here that the feasibility channel cannot: it distinguishes "evaluates sealed ' +
+      'projection" from "derives field color" on architectural grounds, not lexical ones.',
   },
 ]);
 
