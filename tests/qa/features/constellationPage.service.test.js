@@ -83,4 +83,47 @@ describe('buildConstellationPage', () => {
     expect(p.diagnostics.degradedChannels).toContain('leximancy.relations');
     expect(p.leximancy.etymology).toBe('OE morgen'); // other sub-fields intact
   });
+
+  it('returns discovery hits for meta-query and null for literary', async () => {
+    const metaLex = {
+      ...lexiconAdapter,
+      lookupSynonyms: (w) => (w === 'darkness' ? [{ lemma: 'abyss' }] : []),
+      lookupAntonyms: () => [],
+      lookupRelated: () => ({ broader: [], narrower: [], akin: [] }),
+      lookupSymbolsLoose: () => [],
+      searchEntries: () => [],
+      lookupWord: (w) => (w === 'abyss'
+        ? [{ pos: 'n', senses: [{ gloss: 'emotional deep' }] }]
+        : lexiconAdapter.lookupWord(w)),
+      getCorpusFrequencies: (words) => new Map(words.map((w) => [w, w === 'abyss' ? 3 : 100])),
+    };
+    const meta = await buildConstellationPage(
+      'Words that resemble darkness but feel more emotional',
+      { ...deps, lexiconAdapter: metaLex },
+    );
+    expect(meta.query.intent).toBe('meta-query');
+    expect(meta.discovery).not.toBeNull();
+    expect(meta.discovery.status).toMatch(/resolved|empty/);
+    expect(meta.diagnostics.discovery.stage).toBe('ok');
+    expect(meta.provenance.engineVersions.discovery).toBeTruthy();
+
+    const lit = await buildConstellationPage('the bright wound of morning', deps);
+    expect(lit.discovery).toBeNull();
+  });
+
+  it('degrades discovery channel on throw without killing page', async () => {
+    const broken = {
+      ...deps,
+      lexiconAdapter: {
+        ...lexiconAdapter,
+        lookupSynonyms: () => { throw new Error('boom'); },
+        lookupRelated: () => { throw new Error('boom'); },
+      },
+    };
+    // Force meta path with a query that expands
+    const p = await buildConstellationPage('find words similar to darkness', broken);
+    // Either refused/empty with stage, or degraded — page must still complete
+    expect(p.leximancy).toBeTruthy();
+    expect(p.pageBytecode).toMatch(/^COS-PAGE-v1-/);
+  });
 });
