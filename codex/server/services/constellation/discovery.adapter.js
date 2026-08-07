@@ -115,13 +115,30 @@ function fetchSource(source, seed, genType, lexiconAdapter) {
   }
 
   if (source === 'related') {
+    // Sub-buckets: sort each ASC, concat broader→narrower→akin, then cap
+    // without a global re-sort (preserves sub-bucket order).
     const rel = lexiconAdapter.lookupRelated?.(seed) || {};
-    const raw = [
-      ...(rel.broader || []),
-      ...(rel.narrower || []),
-      ...(rel.akin || []),
-    ].map((r) => normLemma(r?.lemma ?? r));
-    return { lemmas: sortCap(raw), viaTag: `related:${seed}` };
+    const bucketAsc = (arr) => {
+      const unique = [
+        ...new Set((arr || []).map((r) => normLemma(r?.lemma ?? r)).filter(Boolean)),
+      ];
+      unique.sort((a, b) => a.localeCompare(b));
+      return unique;
+    };
+    const ordered = [
+      ...bucketAsc(rel.broader),
+      ...bucketAsc(rel.narrower),
+      ...bucketAsc(rel.akin),
+    ];
+    const seen = new Set();
+    const lemmas = [];
+    for (const lemma of ordered) {
+      if (seen.has(lemma)) continue;
+      seen.add(lemma);
+      lemmas.push(lemma);
+      if (lemmas.length >= DISCOVERY_PER_SOURCE_CAP) break;
+    }
+    return { lemmas, viaTag: `related:${seed}` };
   }
 
   if (source === 'symbols') {
@@ -592,6 +609,7 @@ export async function analyzeDiscovery(rawQuery, identity, deps) {
   );
 
   // --- MAP HITS ---
+  // Neutralize PLS badge-count tie-break: score desc, then token asc.
   const hits = ranked
     .map((r) => {
       const meta = metaByToken.get(r.token);
@@ -627,7 +645,8 @@ export async function analyzeDiscovery(rawQuery, identity, deps) {
         evidence,
       };
     })
-    .filter(Boolean);
+    .filter(Boolean)
+    .sort((a, b) => b.score - a.score || a.token.localeCompare(b.token));
 
   const status = hits.length > 0 ? 'resolved' : 'empty';
 
