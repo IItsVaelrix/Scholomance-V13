@@ -51,15 +51,14 @@ export const VERB_CUES = new Set([
  * Prepositions introduce a noun phrase, so the token after one takes a noun
  * beat: "salt in the wound", "blood from wound".
  */
-export const PREPOSITION_CUES = new Set([
-  'of','in','on','at','from','with','by','for','into','onto','upon',
-  'through','across','against','beneath','under','over','about','without',
-  // `past` was missing, and its absence cost a real case: in `the horse raced
-  // past the barn fell` nothing marked `past` as a preposition, so it stayed a
-  // nominal candidate (it carries an "n" tag) and `barn` looked like a free
-  // subject rather than the object of a prepositional phrase.
-  'past','beyond','beside','behind','within','among','toward','towards','along','around','off',
-]);
+/**
+ * Re-exported for compatibility. A preposition list is LEXICAL, not
+ * phonological — it says nothing about sound — so it now lives with the other
+ * closed classes and this module simply forwards it.
+ */
+import { PREPOSITION_CUES } from '../lexical-analysis/closed-class.js';
+
+export { PREPOSITION_CUES };
 
 /**
  * A determiner or object pronoun AFTER the token suggests a transitive verb —
