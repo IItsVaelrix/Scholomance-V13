@@ -33,6 +33,8 @@
  */
 
 import { STOPWORDS } from './stopwords.js';
+import { arbitrate, support, veto, abstain } from './cue-arbiter.js';
+import { agreementSubject } from '../phonology/prosodic-metronome.js';
 
 /**
  * How far right to look for the governed noun. `the bright autumn wound` puts
@@ -49,6 +51,19 @@ const MAX_FORWARD_SCAN = 4;
 const PHRASE_BREAKS = new Set([
   'with', 'without', 'from', 'by', 'than', 'as', 'like',
   'and', 'or', 'but', 'because', 'while', 'when', 'where',
+]);
+
+/**
+ * Determiners. An attributive adjective is NEVER separated from its noun by
+ * one: `shadowy wood` and `bright autumn wound` are attributive, `past the
+ * barn` is not. This is the cue that was missing — the forward scan skipped
+ * stopwords, so the determiner in `past the barn` was invisible and `past`
+ * (which carries an "a" tag) resolved as an adjective governing `barn`.
+ */
+const DETERMINERS = new Set([
+  'a', 'an', 'the', 'this', 'that', 'these', 'those',
+  'my', 'your', 'his', 'her', 'its', 'our', 'their',
+  'no', 'every', 'each', 'some', 'any', 'another', 'both', 'either', 'neither',
 ]);
 
 /** Copulas: `the wood was shadowy` puts the governor BEFORE the adjective. */
@@ -79,23 +94,66 @@ export function resolveGovernor(tokens, adjective, posMap) {
   if (index === -1) return none;
 
   /**
-   * ATTRIBUTIVE FIRST — `shadowy wood`. Scanning right, the first noun that is
-   * not itself a modifier is the head of the phrase. Intervening adjectives are
-   * skipped (`bright shadowy wood`), but a phrase break stops the scan dead.
+   * ATTRIBUTIVE — `shadowy wood`. Each structural condition declares itself to
+   * the arbiter rather than being an early `continue`, so the reason a pairing
+   * was rejected survives into the result instead of vanishing into control
+   * flow.
    */
   for (let i = index + 1; i < list.length && i <= index + MAX_FORWARD_SCAN; i += 1) {
     const tok = list[i];
-    if (PHRASE_BREAKS.has(tok)) break;
-    // A determiner after the adjective means the phrase already closed:
-    // `shadowy, the wood` is not an attributive attachment.
-    if (!isNoun(posMap, tok) && STOPWORDS.has(tok)) {
-      if (COPULAS.has(tok)) break;
-      continue;
+    const distance = i - index;
+
+    const ruling = arbitrate([
+      // A conjunction or a new preposition ends the phrase outright.
+      PHRASE_BREAKS.has(tok) ? veto('phrase-break') : abstain('phrase-break'),
+      // A copula means the adjective is predicative, handled below, not here.
+      COPULAS.has(tok) ? veto('copula-ahead') : abstain('copula-ahead'),
+      /**
+       * THE DETERMINER BARRIER. Ungrammatical, not merely unlikely: no English
+       * attributive adjective takes a determiner before its noun, so this vetoes
+       * rather than down-weighting. `past the barn` dies here.
+       */
+      DETERMINERS.has(tok) ? veto('determiner-barrier') : abstain('determiner-barrier'),
+      /**
+       * A NOUN INSIDE A COMPOUND IS NOT THE HEAD.
+       *
+       * `the bright autumn wound` resolved `bright` onto `autumn`, because the
+       * scan settled on the first noun it met. English noun-noun compounds put
+       * the head LAST — `bright` modifies `autumn wound` entire — so a noun
+       * followed by another noun keeps scanning.
+       *
+       * The trap is `cold water runs deep`, where `water runs` is also
+       * noun-followed-by-noun (`runs` carries an "n" tag) but is subject-verb,
+       * not a compound. Agreement already distinguishes the two, so this cue
+       * consults it rather than re-deciding: -s on exactly one of the pair means
+       * predicate, and the compound reading is off.
+       */
+      (isNoun(posMap, tok)
+        && isNoun(posMap, list[i + 1])
+        && agreementSubject(tok, list[i + 1]) !== 'first')
+        ? support('compound-continues', null, 20)
+        : abstain('compound-continues'),
+      // The head itself: a noun, at the end of a run of modifiers.
+      isNoun(posMap, tok)
+        ? support('nominal-head', { governor: tok, distance }, 10)
+        : abstain('nominal-head'),
+      // Another modifier stacked before the head — keep scanning.
+      (!isNoun(posMap, tok) && !STOPWORDS.has(tok))
+        ? support('modifier-chain', null, 1)
+        : abstain('modifier-chain'),
+    ]);
+
+    if (ruling.vetoedBy) break;
+    if (ruling.decidedBy === 'nominal-head') {
+      return {
+        governor: ruling.payload.governor,
+        relation: 'attributive',
+        distance: ruling.payload.distance,
+        cue: `right:${ruling.payload.distance}`,
+        decidedBy: ruling.decidedBy,
+      };
     }
-    if (isNoun(posMap, tok)) {
-      return { governor: tok, relation: 'attributive', distance: i - index, cue: `right:${i - index}` };
-    }
-    // A non-stopword that is not a noun (another adjective) — keep scanning.
+    // compound-continues, modifier-chain, or nothing at all: advance.
   }
 
   /**
