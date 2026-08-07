@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createResonanceStore } from '../../../codex/core/pixelbrain/subtlety-resonance-store.js';
 import { createSubtletyRuntime } from '../../../codex/core/pixelbrain/subtlety-runtime.js';
 import { buildSubtletyAlertRecord, drainSubtletySpool, subtletyRoutes } from '../../../codex/server/routes/subtlety.routes.js';
+import { subtletyApmHourlyPlugin } from '../../../codex/server/plugins/subtlety-apm-hourly.plugin.js';
 
 describe('subtlety routes', () => {
   let dir;
@@ -232,5 +233,51 @@ describe('buildSubtletyAlertRecord', () => {
     expect(row.identity_packet.propose_only).toBe(true);
     expect(row.identity_packet.expires_at).toBe(6000);
     expect(row.id).toMatch(/^alr_subtlety_/);
+  });
+});
+
+describe('subtlety ingest stays isolated from hourly-reporter failures', () => {
+  it('returns 200 and persists the fingerprint even when reporter start/stop throw', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'subtlety-routes-isolated-'));
+    try {
+      const store = createResonanceStore({ path: join(dir, 'r.jsonl') });
+      const app = Fastify({ logger: false });
+      await app.register(subtletyRoutes, {
+        store,
+        authConfig: { token: '', isProduction: false },
+        runtimeOpts: {
+          now: () => 1_000,
+          dedupWindowMs: 60_000,
+          raidFn: async () => ({ verdict: 'DENIED', confidence: 0 }),
+        },
+        createAlert: async () => {},
+      });
+      await app.register(subtletyApmHourlyPlugin, {
+        reporter: {
+          start: () => { throw new Error('reporter start exploded'); },
+          stop: async () => { throw new Error('reporter stop exploded'); },
+        },
+      });
+      await app.ready();
+      const res = await app.inject({
+        method: 'POST',
+        url: '/subtlety/crash',
+        payload: {
+          runtime: 'divtube-tui',
+          unitId: 'crash.divtube.tui.reporter_isolation',
+          errorType: 'textual._context.NoActiveAppError',
+          message: 'NoActiveAppError',
+          stack: 'File "tui/ui/app.py", line 284, in run',
+          thread: 'Thread-1',
+          buildId: 'b1',
+        },
+      });
+      expect(res.statusCode).toBe(200);
+      expect(res.json().ok).toBe(true);
+      expect(store.readAll().some((r) => r.kind === 'fingerprint')).toBe(true);
+      await app.close();
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

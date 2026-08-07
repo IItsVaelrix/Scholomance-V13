@@ -97,6 +97,8 @@ import { catalogRoutes } from './routes/catalog.routes.js';
 import { buildSubtletyAlertRecord, drainSubtletySpool, subtletyRoutes } from './routes/subtlety.routes.js';
 import { installSubtletyNodeAdapters } from './subtlety-node-adapter.js';
 import { getSubtletyRuntime } from '../core/pixelbrain/subtlety-runtime.js';
+import { createResonanceStore } from '../core/pixelbrain/subtlety-resonance-store.js';
+import { subtletyApmHourlyPlugin } from './plugins/subtlety-apm-hourly.plugin.js';
 import { studioRoutes } from './routes/studio.routes.js';
 import { createMailQueueWorker, createMailerService } from './services/mailer.service.js';
 import { R2AudioAdapter } from './services/r2Audio.adapter.js';
@@ -1220,8 +1222,22 @@ fastify.decorate('subtletyCreateAlert', async (payload) => {
     }
 });
 // Eager hub init so route sampling / adapters cannot race a no-op alertFn singleton.
-getSubtletyRuntime({ alertFn: fastify.subtletyCreateAlert });
+// The ingest writer and the hourly reporter share one resolved ledger path so
+// they can never silently diverge.
+const subtletyResonancePath = process.env.SUBTLETY_RESONANCE_PATH
+    || path.join(PROJECT_ROOT, 'codex', 'server', 'data', 'subtlety-resonance.jsonl');
+const subtletyApmReportDir = process.env.SUBTLETY_APM_REPORT_DIR
+    || path.join(PROJECT_ROOT, 'divtube_downloader', 'APM-Hourly-Reports');
+getSubtletyRuntime({
+    alertFn: fastify.subtletyCreateAlert,
+    store: createResonanceStore({ path: subtletyResonancePath }),
+});
 fastify.register(subtletyRoutes);
+fastify.register(subtletyApmHourlyPlugin, {
+    enabled: !IS_TEST_RUNTIME,
+    ledgerPath: subtletyResonancePath,
+    reportDir: subtletyApmReportDir,
+});
 installSubtletyNodeAdapters({ fastify });
 
 // Drain unconditionally: drainSubtletySpool treats a missing dir as empty, and
