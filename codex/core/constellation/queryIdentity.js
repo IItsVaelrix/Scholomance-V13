@@ -15,11 +15,13 @@ function splitTokens(normalized) {
  * @param {Map<string, number>} [freqMap] - optional corpus frequency map for
  *   rarest-token head selection (PDR §3.2). When omitted, falls back to
  *   last-content-token.
+ * @param {Map<string, string[]>} [posMap] - optional word → POS tags, so the
+ *   anchor is the nominal head rather than whichever token is rarest.
  * @returns {{ raw: string, normalized: string, kind: 'word'|'phrase'|'line'|'multiline',
  *   tokenCount: number, graphemeCount: number, tokens: string[],
  *   primaryContentToken: string|null, intent: string }}
  */
-export function resolveQueryIdentity(rawQuery, freqMap) {
+export function resolveQueryIdentity(rawQuery, freqMap, posMap) {
   const raw = String(rawQuery || '');
   const normalized = normalizeQuery(raw);
   const tokens = splitTokens(normalized);
@@ -36,9 +38,9 @@ export function resolveQueryIdentity(rawQuery, freqMap) {
   // Intent classification (pure, no I/O)
   const intent = classifyIntent(identity);
 
-  // Head-token selection: rarest content token when freqMap is provided,
-  // otherwise last content token (backward-compatible).
-  const primaryContentToken = selectHeadToken(tokens, freqMap);
+  // Head-token selection: nominal head first, rarest among nominals when
+  // freqMap is provided, otherwise last content token (backward-compatible).
+  const primaryContentToken = selectHeadToken(tokens, freqMap, posMap);
 
   return {
     ...identity,

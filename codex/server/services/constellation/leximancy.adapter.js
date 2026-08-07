@@ -99,6 +99,32 @@ export function analyzeLeximancy(lexiconAdapter, contentToken, phraseContext) {
     return { ...empty, warnings: [`No lexicon entry for "${contentToken}"`] };
   }
 
+  /**
+   * TRUE POS COMES FROM wordnet_lemma, NOT FROM THE ENTRY.
+   *
+   * Measured against scholomance_dict.sqlite: lookupWord('wound') returns ONE
+   * entry with pos 'a' and all seven senses inside it, and the senses carry no
+   * pos of their own. Every sense therefore inherited 'a' — "an injury to living
+   * tissue" shipped as an adjective, and the POS-divergence branch below could
+   * never fire, so a three-way split reported 'resolved'.
+   *
+   * lookupLexicalEntries keeps the partition. Joining on gloss text is the
+   * honest join — ids are built independently on each side and can silently
+   * disagree, the same reasoning semanticInquiry.adapter documents. A gloss that
+   * does not join keeps the entry's pos, which is no worse than before.
+   */
+  const posByGloss = new Map();
+  try {
+    for (const group of lexiconAdapter.lookupLexicalEntries?.(lookupToken, 40) || []) {
+      for (const sense of group.senses || []) {
+        const gloss = String(sense?.gloss || '').trim();
+        if (gloss && !posByGloss.has(gloss)) posByGloss.set(gloss, group.pos);
+      }
+    }
+  } catch {
+    // Best-effort: an unavailable partition leaves the entry's pos in place.
+  }
+
   // Flatten senses into interpretations, carrying each sense's ENTRY provenance
   // (etymology / pronunciation) so a homograph's origin follows the selected sense.
   const raw = [];
@@ -114,17 +140,31 @@ export function analyzeLeximancy(lexiconAdapter, contentToken, phraseContext) {
       raw.push({ gloss: senseGloss(lexiconAdapter, sense), pos, examples: senseExamples(sense), ...provenance });
     }
   }
-  let kept = raw.filter((r) => r.gloss);
-  if (kept.length === 0) kept = raw;
-  kept = kept.slice(0, MAX_INTERPRETATIONS);
+  /**
+   * A SENSE WITH NO GLOSS IS NOT AN INTERPRETATION.
+   *
+   * The old fallback kept the un-glossed rows when every gloss was empty, and
+   * the page then shipped a selected interpretation whose text was "" — an
+   * answer-shaped blank. `the silent stars burn` rendered exactly that. When
+   * nothing has a gloss there is nothing to report, and saying so is the honest
+   * result.
+   */
+  const kept = raw.filter((r) => r.gloss);
+  if (kept.length === 0) {
+    return { ...empty, warnings: [`No glossed sense for "${lookupToken}"`], lookupToken, compoundUsed };
+  }
+  const capped = kept.slice(0, MAX_INTERPRETATIONS);
 
-  const interpretations = kept.map((r, i) => ({
-    id: `${lookupToken}.${r.pos || 'x'}.${i}`,
-    gloss: r.gloss,
-    confidence: rankConfidence(i, kept.length),
-    pos: r.pos,
-    examples: r.examples,
-  }));
+  const interpretations = capped.map((r, i) => {
+    const pos = posByGloss.get((r.gloss || '').trim()) || r.pos;
+    return {
+      id: `${lookupToken}.${pos || 'x'}.${i}`,
+      gloss: r.gloss,
+      confidence: rankConfidence(i, capped.length),
+      pos,
+      examples: r.examples,
+    };
+  });
 
   const nearKin = (lexiconAdapter.lookupSynonyms?.(lookupToken, 20) || []).map((e) => e.lemma);
   const counterfield = (lexiconAdapter.lookupAntonyms?.(lookupToken, 20) || []).map((e) => e.lemma);
@@ -168,7 +208,7 @@ export function analyzeLeximancy(lexiconAdapter, contentToken, phraseContext) {
   const selectedInterpretationId = selectedIndex === null ? null : interpretations[selectedIndex].id;
 
   // Etymology/IPA descend from the selected entry; when ambiguous, from the top entry.
-  const originItem = kept[selectedIndex === null ? 0 : selectedIndex] || kept[0] || {};
+  const originItem = capped[selectedIndex === null ? 0 : selectedIndex] || capped[0] || {};
 
   return {
     status,

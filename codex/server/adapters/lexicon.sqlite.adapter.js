@@ -123,6 +123,7 @@ export function createLexiconAdapter(dbPath, options = {}) {
   let reconnectCount = 0;
   let hasCorpusFreqColumn = false;
   let hasWordnetSynset = false;
+  let hasLemmaForm = false;
   let healthLog = [];
   const familyBatchStmtCache = new Map();
   const validateBatchStmtCache = new Map();
@@ -185,6 +186,11 @@ export function createLexiconAdapter(dbPath, options = {}) {
        */
       hasWordnetSynset = db
         .prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE type='table' AND name='wordnet_synset'")
+        .get().n > 0;
+
+      /** Probed, not assumed — same reasoning as the two flags above. */
+      hasLemmaForm = db
+        .prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE type='table' AND name='lemma_form'")
         .get().n > 0;
 
       if (!hasCorpusFreq) {
@@ -287,6 +293,11 @@ export function createLexiconAdapter(dbPath, options = {}) {
          * wordnet_lemma kept them. This reads the faithful view: one group per part of
          * speech, which for a heteronym is one group per WORD.
          */
+        /** Surface form -> lemma POS, for words wordnet_lemma stores only as a base. */
+        lemmaFormPos: hasLemmaForm ? db.prepare(`
+          SELECT DISTINCT pos FROM lemma_form
+          WHERE surface_lower = ? AND pos IS NOT NULL
+        `) : null,
         lookupLexicalEntries: hasWordnetSynset ? db.prepare(`
           SELECT l.pos AS pos, l.synset_id AS synsetId, l.sense_rank AS senseRank,
                  s.definition AS gloss, s.examples_json AS examplesJson
@@ -541,6 +552,41 @@ export function createLexiconAdapter(dbPath, options = {}) {
       if (!sets.has(row.lemma_lower)) sets.set(row.lemma_lower, new Set());
       sets.get(row.lemma_lower).add(row.pos.trim());
     }
+    /**
+     * INFLECTED FORMS FALL THROUGH TO lemma_form.
+     *
+     * wordnet_lemma stores base forms only, so a plural or an inflected verb
+     * returns NO tags at all — and an empty tag list is indistinguishable from
+     * "this word is not a noun". Measured consequence: for `the silent stars
+     * burn`, `stars` came back `[]` while `burn` came back `["n","v"]`, so the
+     * nominal-head rule dropped the actual subject from the candidate pool and
+     * a rare verb won the anchor on rarity alone. Same for `cold water runs
+     * deep`, which anchored on `deep`.
+     *
+     * lemma_form carries 369,925 surface->lemma rows with a spelled-out pos
+     * ("noun"), so the tag is mapped back to wordnet's single letter. Irregulars
+     * absent from the table (`geese`, `wrote`) still return nothing, which stays
+     * an honest "no signal" rather than a guess.
+     */
+    const missing = normalized.filter((w) => !sets.has(w));
+    if (missing.length > 0 && stmts.lemmaFormPos) {
+      const POS_LETTER = { noun: 'n', verb: 'v', adjective: 'a', adverb: 'r' };
+      for (const surface of missing) {
+        let rows2;
+        try {
+          rows2 = stmts.lemmaFormPos.all(surface);
+        } catch {
+          break;                                   // table absent on this DB
+        }
+        for (const r of rows2) {
+          const letter = POS_LETTER[String(r.pos || '').toLowerCase()];
+          if (!letter) continue;
+          if (!sets.has(surface)) sets.set(surface, new Set());
+          sets.get(surface).add(letter);
+        }
+      }
+    }
+
     const out = {};
     for (const [wordLower, posSet] of sets) out[wordLower] = [...posSet].sort();
     return out;

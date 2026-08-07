@@ -84,3 +84,79 @@ describe('buildConstellationPage', () => {
     expect(p.leximancy.etymology).toBe('OE morgen'); // other sub-fields intact
   });
 });
+
+/**
+ * MEASURED INERTNESS. Against the live page, `a wound` resolved framePos 'n' and
+ * viableWordCount 1 — the heteronym settled as the noun — and the packet still
+ * shipped `wound.a.0` "put in a coil". `he wound the clock` resolved framePos
+ * 'v' and shipped the same sense. The frame reader did its work and the answer
+ * threw it away, because the ONLY wire into leximancy's selection ran through
+ * h_sense_by_gloss_overlap, and gloss overlap is not what settled the word.
+ *
+ * A resolved frame is hard syntactic evidence. It gets its own wire.
+ */
+describe('buildConstellationPage — a settled frame decides the sense', () => {
+  const WOUND_GROUPS = [
+    { pos: 'a', senses: [{ synsetId: 'oewn-02325885-s', gloss: 'put in a coil', examples: [] }] },
+    { pos: 'n', senses: [{ synsetId: 'oewn-14322317-n', gloss: 'an injury to living tissue', examples: [] }] },
+    { pos: 'v', senses: [{ synsetId: 'oewn-00069650-v', gloss: 'cause injuries or bodily harm to', examples: [] }] },
+  ];
+
+  /** Mirrors scholomance_dict.sqlite: lookupWord collapses POS, lookupLexicalEntries keeps it. */
+  const woundLexicon = {
+    lookupWord: (w) => (w === 'wound'
+      ? [{ pos: 'a', senses: WOUND_GROUPS.flatMap((g) => g.senses), etymology: 'OE wund', pronunciation: '/waʊnd/' }]
+      : []),
+    extractGloss: (s) => { const x = s?.[0]; return typeof x === 'string' ? x : (x && x.gloss) || null; },
+    lookupSynonyms: () => [],
+    lookupAntonyms: () => [],
+    lookupRelated: () => ({ broader: [], narrower: [], akin: [] }),
+    // Real corpus counts, so head selection is exercised rather than sidestepped.
+    getCorpusFrequencies: (words) => new Map(words.map((w) => [w, { wound: 79, clock: 251 }[w] ?? 0])),
+    batchLookupPos: (words) => Object.fromEntries(
+      words.map((w) => [w, { wound: ['a', 'n', 'v'], clock: ['n', 'v'] }[w] ?? []]),
+    ),
+    lookupLexicalEntries: (w) => (w === 'wound' ? WOUND_GROUPS : []),
+  };
+
+  /** Two distinct pronunciations — /waʊnd/ coiled vs /wuːnd/ injured. */
+  const twoWayPhonology = {
+    async ready() { return true; },
+    variants: () => [['W', 'AW1', 'N', 'D'], ['W', 'UW1', 'N', 'D']],
+  };
+
+  const woundDeps = {
+    lexiconAdapter: woundLexicon,
+    rhymeQueryEngine,
+    rhymeLexiconRepo,
+    phonology: twoWayPhonology,
+  };
+
+  it('selects the noun sense when a determiner settles the frame', async () => {
+    const p = await buildConstellationPage('a wound', woundDeps);
+    expect(p.semanticInquiry.framePos).toBe('n');
+    expect(p.semanticInquiry.viableWordCount).toBe(1);
+
+    const selected = p.leximancy.interpretations.find((i) => i.id === p.leximancy.selectedInterpretationId);
+    expect(selected).toBeDefined();
+    expect(selected.pos).toBe('n');
+    expect(selected.gloss).toBe('an injury to living tissue');
+  });
+
+  it('selects the verb sense when a subject pronoun settles the frame', async () => {
+    const p = await buildConstellationPage('he wound the clock', woundDeps);
+    expect(p.semanticInquiry.framePos).toBe('v');
+
+    const selected = p.leximancy.interpretations.find((i) => i.id === p.leximancy.selectedInterpretationId);
+    expect(selected).toBeDefined();
+    expect(selected.pos).toBe('v');
+  });
+
+  it('leaves the split unselected when no frame settles it', async () => {
+    const p = await buildConstellationPage('wound', woundDeps);
+    expect(p.semanticInquiry.framePos).toBeNull();
+    expect(p.semanticInquiry.viableWordCount).toBeGreaterThan(1);
+    // Refusing to pick is the correct answer here, not a shortfall.
+    expect(p.leximancy.selectedInterpretationId).toBeNull();
+  });
+});

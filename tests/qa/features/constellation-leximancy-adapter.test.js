@@ -155,3 +155,56 @@ describe('analyzeLeximancy', () => {
     expect(analyzeLeximancy(noSignal, 'owl').rarity).toBeNull();
   });
 });
+
+/**
+ * THE MOCKS ABOVE DO NOT MIRROR THE REAL ADAPTER.
+ *
+ * Measured against scholomance_dict.sqlite: lookupWord('wound') returns ONE
+ * entry, pos 'a', with all 7 senses inside it and NO per-sense pos. Every mock
+ * above hands back pre-partitioned entries, so the POS-divergence branch is
+ * exercised in tests and structurally dead in production — `wound` shipped as
+ * 7 × `wound.a.N`, "an injury to living tissue" labelled an adjective, and
+ * status 'resolved' on a word with a three-way POS split.
+ *
+ * lookupLexicalEntries DOES retain the partition (wordnet_lemma.pos), so the
+ * true POS is recoverable. Joining on gloss text is the honest join — the same
+ * convention semanticInquiry.adapter already documents.
+ */
+describe('analyzeLeximancy — POS truth from the real adapter shape', () => {
+  /** Mirrors scholomance_dict.sqlite exactly: collapsed lookupWord, partitioned lexical entries. */
+  function realShapeAdapter() {
+    const senses = [
+      { gloss: 'put in a coil' },
+      { gloss: 'an injury to living tissue' },
+      { gloss: 'cause injuries or bodily harm to' },
+    ];
+    return {
+      lookupWord: () => [{ pos: 'a', senses, etymology: 'OE wund', pronunciation: '/waʊnd/' }],
+      extractGloss: (s) => {
+        const x = s && s[0];
+        return typeof x === 'string' ? x : (x && x.gloss) || null;
+      },
+      lookupSynonyms: () => [],
+      lookupAntonyms: () => [],
+      lookupLexicalEntries: () => [
+        { pos: 'a', senses: [{ synsetId: 'oewn-02325885-s', gloss: 'put in a coil', examples: [] }] },
+        { pos: 'n', senses: [{ synsetId: 'oewn-14322317-n', gloss: 'an injury to living tissue', examples: [] }] },
+        { pos: 'v', senses: [{ synsetId: 'oewn-00069650-v', gloss: 'cause injuries or bodily harm to', examples: [] }] },
+      ],
+    };
+  }
+
+  it('labels each sense with its true POS, not the collapsed entry POS', () => {
+    const r = analyzeLeximancy(realShapeAdapter(), 'wound');
+    const byGloss = Object.fromEntries(r.interpretations.map((i) => [i.gloss, i.pos]));
+    expect(byGloss['put in a coil']).toBe('a');
+    expect(byGloss['an injury to living tissue']).toBe('n');
+    expect(byGloss['cause injuries or bodily harm to']).toBe('v');
+  });
+
+  it('reports a three-way POS split as ambiguous rather than resolved', () => {
+    const r = analyzeLeximancy(realShapeAdapter(), 'wound');
+    expect(r.status).toBe('ambiguous');
+    expect(r.selectedInterpretationId).toBeNull();
+  });
+});

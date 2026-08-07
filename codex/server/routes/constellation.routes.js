@@ -5,14 +5,24 @@ const CONTROL_CHARS = /[\u0000-\u0008\u000E-\u001F\u007F-\u009F]/;
 
 /**
  * @param {import('fastify').FastifyInstance} fastify
- * @param {{ lexiconAdapter, rhymeQueryEngine, rhymeLexiconRepo }} opts
+ * @param {{ lexiconAdapter, rhymeQueryEngine, rhymeLexiconRepo,
+ *   wordnetGraph?, corpusVectors?, scaleOrders? }} opts
  */
 export async function constellationRoutes(fastify, opts) {
   const deps = {
     lexiconAdapter: opts.lexiconAdapter,
     rhymeQueryEngine: opts.rhymeQueryEngine,
     rhymeLexiconRepo: opts.rhymeLexiconRepo,
+    // Optional. Absent => the scaleField channel reports itself unavailable and
+    // every other channel renders exactly as before.
+    wordnetGraph: opts.wordnetGraph ?? null,
+    corpusVectors: opts.corpusVectors ?? null,
+    scaleOrders: opts.scaleOrders ?? null,
   };
+  // Evaluated per request: cmudict finishes loading after the routes register.
+  const isPhonologyReady = typeof opts.isPhonologyReady === 'function'
+    ? opts.isPhonologyReady
+    : () => false;
 
   fastify.get('/api/constellation/page', {
     config: { rateLimit: { max: 60, timeWindow: '1 minute' } },
@@ -29,7 +39,10 @@ export async function constellationRoutes(fastify, opts) {
         return reply.status(400).send({ error: 'query contains control characters' });
       }
       try {
-        const packet = await buildConstellationPage(query, deps);
+        const packet = await buildConstellationPage(
+          query,
+          { ...deps, phonologyReady: isPhonologyReady() },
+        );
         return packet;
       } catch (error) {
         fastify.log?.error?.({ err: error }, '[ConstellationRoute] page build failed');

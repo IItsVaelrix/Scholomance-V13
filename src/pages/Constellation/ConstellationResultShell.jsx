@@ -387,6 +387,68 @@ function GenomeBody({ phraseGenome }) {
   );
 }
 
+
+/* ─── The scale field: where the word sits on its axis, and among what ──────
+   PAINTS ONLY. Every position, span and similarity is computed backend-side and
+   travels in the packet; nothing here recomputes a rank. A missing scale is a
+   real answer — most neighbourhoods are flat (14,101 clusters carry no vertical
+   against 423 that do) — so it is rendered as such, not hidden. */
+function ScaleFieldBody({ scaleField }) {
+  if (!scaleField || scaleField.status !== 'ok') {
+    return <p className="constellation-result-awaiting">Awaiting engine — Scale Field</p>;
+  }
+  const { scale, neighbours = [], opposites = [] } = scaleField;
+  return (
+    <div className="constellation-scalefield">
+      {scale && scale.ladder?.length > 1 ? (
+        <div className="constellation-scalefield__ladder">
+          <div className="constellation-scalefield__axis" aria-hidden="true" />
+          <ol className="constellation-scalefield__rungs">
+            {scale.ladder.map((step) => (
+              <li
+                key={step.word}
+                className={[
+                  'constellation-scalefield__rung',
+                  step.isAnchor ? 'constellation-scalefield__rung--anchor' : '',
+                ].filter(Boolean).join(' ')}
+                /* The backend's own relative position, painted verbatim. */
+                style={{ '--rung-at': step.relative }}
+              >
+                <span className="constellation-scalefield__word">{step.word}</span>
+                <span className="constellation-scalefield__at">{step.relative.toFixed(2)}</span>
+              </li>
+            ))}
+          </ol>
+          {/* Span is shown because scales differ in vertical extent by up to 16x;
+              a position without it invites a meaningless cross-scale comparison. */}
+          <p className="constellation-scalefield__span">
+            axis span {scale.span == null ? '—' : scale.span.toFixed(2)} · {scale.memberCount} words on this axis
+          </p>
+        </div>
+      ) : (
+        <p className="constellation-result-awaiting">
+          No axis — this neighbourhood has no degree to measure along.
+        </p>
+      )}
+
+      {neighbours.length > 0 ? (
+        <Chips
+          label="Field"
+          tone="kin"
+          /* Sound is shown when it was measured — for synonyms it is the only
+             axis that discriminates, since they share a synset and read 1.00. */
+          items={neighbours.map((n) => (
+            n.soundSimilarity == null
+              ? `${n.word} ${n.similarity.toFixed(2)}`
+              : `${n.word} ${n.similarity.toFixed(2)} ♪${n.soundSimilarity.toFixed(2)}`
+          ))}
+        />
+      ) : null}
+      {opposites.length > 0 ? <Chips label="Opposed" tone="counter" items={opposites} /> : null}
+    </div>
+  );
+}
+
 /* ─── The hero figure: the answer drawn as a living constellation ──────────
    Pure geometry from `heroFigure(packet)`; the seed touches only the lodestar
    and per-star twinkle. Gold is reserved for the single lodestar nucleus — every
@@ -577,6 +639,19 @@ function ComposedResultShell({ packet, scene, reducedMotion }) {
         <GenomeBody phraseGenome={phraseGenome} />
       </section>
 
+      {/* ── Plate IV·b · Scale Field: the axis this word sits on ── */}
+      {packet.scaleField ? (
+        <section
+          className="constellation-result-plate"
+          data-compose-part="scale-field"
+          aria-labelledby="cos-scale"
+          style={nextReveal()}
+        >
+          <h2 id="cos-scale" className="constellation-result-plate__overline">Scale Field</h2>
+          <ScaleFieldBody scaleField={packet.scaleField} />
+        </section>
+      ) : null}
+
       {/* ── Plate V · Verdict: was the pick evidenced? (only when the channel ran) ── */}
       {semanticInquiry ? (
         <section
@@ -668,6 +743,13 @@ function PlainResultShell({ packet }) {
         <h2 id="cos-genome">Phrase Genome</h2>
         <GenomeBody phraseGenome={phraseGenome} />
       </section>
+
+      {packet.scaleField ? (
+        <section className="constellation-result-section" aria-labelledby="cos-scale">
+          <h2 id="cos-scale">Scale Field</h2>
+          <ScaleFieldBody scaleField={packet.scaleField} />
+        </section>
+      ) : null}
     </div>
   );
 }

@@ -88,6 +88,9 @@ import { corpusRoutes } from './routes/corpus.routes.js';
 import { rhymeAstrologyRoutes } from './routes/rhymeAstrology.routes.js';
 import { resolveRhymeAstrologyArtifactPaths } from './utils/rhymeAstrologyPaths.js';
 import { constellationRoutes } from './routes/constellation.routes.js';
+import { loadWordnetGraph } from './adapters/wordnetGraph.sqlite.adapter.js';
+import { CmuPhonemeEngine } from '../core/phonology/cmu.phoneme.engine.js';
+import { createCorpusVectors, loadScaleOrders } from './adapters/corpusVectors.sqlite.adapter.js';
 import { createRhymeAstrologyLexiconRepo } from './services/rhyme-astrology/lexiconRepo.js';
 import { createRhymeAstrologyIndexRepo } from './services/rhyme-astrology/indexRepo.js';
 import { createRhymeAstrologyQueryEngine } from '../runtime/rhyme-astrology/queryEngine.js';
@@ -1332,10 +1335,58 @@ if (ENABLE_RHYME_ASTROLOGY) {
     fastify.log.info('[RhymeAstrology] API disabled. Set ENABLE_RHYME_ASTROLOGY=true to enable.');
 }
 
+/**
+ * SEMANTIC FIELD ARTEFACTS for the constellation scaleField channel.
+ *
+ * The WordNet graph is ~1.8s to build and small enough to hold resident. The
+ * PPMI table is 14.8M rows / 5.9GB and is NOT loaded — createCorpusVectors
+ * keeps a read-only handle and resolves one word at a time. Both are optional:
+ * a missing artefact degrades that one channel and leaves the page intact.
+ */
+let constellationWordnetGraph = null;
+let constellationCorpusVectors = null;
+let constellationScaleOrders = null;
+try {
+    constellationWordnetGraph = loadWordnetGraph(SCHOLOMANCE_DICT_PATH);
+    const adjCorpusPath = path.join(process.cwd(), 'adjective_corpus.sqlite');
+    if (existsSync(adjCorpusPath)) {
+        constellationCorpusVectors = createCorpusVectors(adjCorpusPath);
+        constellationScaleOrders = loadScaleOrders(adjCorpusPath);
+        fastify.log.info(
+            `[Constellation] scale field: ${constellationWordnetGraph.stats.clusters} clusters, `
+            + `${constellationScaleOrders.size} measured scales`,
+        );
+    } else {
+        fastify.log.info('[Constellation] adjective_corpus.sqlite absent; scaleField runs on WordNet alone');
+    }
+} catch (err) {
+    fastify.log.warn({ err }, '[Constellation] scale field artefacts unavailable');
+}
+
+/**
+ * cmudict powers the sound-distance tiebreaker in the scaleField channel. It is
+ * warmed here rather than lazily, because init() is async while the adapter is
+ * synchronous: an un-awaited engine reports "not ready" and the channel then
+ * withholds the measurement instead of computing it from spelling.
+ */
+let constellationPhonologyReady = false;
+CmuPhonemeEngine.init()
+    .then(() => {
+        constellationPhonologyReady = CmuPhonemeEngine._available === true;
+        fastify.log.info(`[Constellation] cmudict ${constellationPhonologyReady ? 'ready' : 'unavailable'}; sound distance ${constellationPhonologyReady ? 'enabled' : 'withheld'}`);
+    })
+    .catch((err) => fastify.log.warn({ err }, '[Constellation] cmudict init failed; sound distance withheld'));
+
 fastify.register(constellationRoutes, {
     lexiconAdapter,
     rhymeQueryEngine: sharedRhymeAstrologyQueryEngine,
     rhymeLexiconRepo: sharedRhymeAstrologyLexiconRepo,
+    wordnetGraph: constellationWordnetGraph,
+    corpusVectors: constellationCorpusVectors,
+    scaleOrders: constellationScaleOrders,
+    // Read at request time, so a slow dictionary load does not permanently
+    // disable the channel for the life of the process.
+    isPhonologyReady: () => constellationPhonologyReady,
 });
 
 // Lifecycle: close the shared engine EXACTLY ONCE. rhymeAstrologyRoutes only closes

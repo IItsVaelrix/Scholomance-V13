@@ -42,6 +42,7 @@
       "files": [
         "codex/**/*.js",
         "scripts/**/*.js",
+        "scripts/**/*.mjs",
         "playwright.config.js",
         "vite.config.js",
         "mailer.adapter.js"

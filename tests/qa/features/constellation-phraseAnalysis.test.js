@@ -91,6 +91,111 @@ describe('selectHeadToken', () => {
   });
 });
 
+// ─── selectHeadToken: nominal-head precedence ────────────────────────
+
+/**
+ * MEASURED REGRESSION. `the wound healed` anchored on "healed" (corpus freq 7)
+ * over "wound" (79) because rarity ran over every content token. A page about a
+ * phrase is about its nominal head; rarity only ranks AMONG nominals.
+ */
+describe('selectHeadToken — nominal head precedence', () => {
+  const posMap = new Map([
+    ['wound', ['a', 'n', 'v']],
+    ['healed', ['a']],
+    ['bright', ['a']],
+    ['morning', ['n']],
+    ['clock', ['n', 'v']],
+  ]);
+
+  it('anchors on the noun, not a rarer non-noun predicate', () => {
+    const freqMap = new Map([['wound', 79], ['healed', 7]]);
+    expect(selectHeadToken(['the', 'wound', 'healed'], freqMap, posMap)).toBe('wound');
+  });
+
+  it('still ranks by rarity among the nominal candidates', () => {
+    const freqMap = new Map([['bright', 194], ['wound', 79], ['morning', 599]]);
+    // "bright" has no noun entry and drops out; wound (79) is rarer than morning (599).
+    expect(selectHeadToken(['the', 'bright', 'wound', 'of', 'morning'], freqMap, posMap)).toBe('wound');
+  });
+
+  it('leaves rarity-only behaviour intact when no token is nominal', () => {
+    const freqMap = new Map([['bright', 194], ['healed', 7]]);
+    expect(selectHeadToken(['the', 'bright', 'healed'], freqMap, posMap)).toBe('healed');
+  });
+
+  it('leaves rarity-only behaviour intact when no POS data is available', () => {
+    const freqMap = new Map([['wound', 79], ['healed', 7]]);
+    expect(selectHeadToken(['the', 'wound', 'healed'], freqMap, new Map())).toBe('healed');
+  });
+});
+
+// ─── selectHeadToken: subject-verb agreement ─────────────────────────
+
+/**
+ * AN ORTHOGRAPHIC CUE, NO LOOKUP REQUIRED. English puts -s on exactly one of a
+ * subject/verb pair, so the complementary distribution across an adjacent pair
+ * names the roles:
+ *
+ *     singular subject + verb-s      water runs
+ *     plural subject   + bare verb   stars burn
+ *
+ * The naive suffix test fails and is worth naming: `runs` is a verb ending in
+ * -s and `stars` is a noun ending in -s, so the ending alone says nothing.
+ */
+describe('selectHeadToken — agreement demotes the verb of an adjacent pair', () => {
+  const pos = new Map([
+    ['water', ['n', 'v']], ['runs', ['n', 'v']], ['stars', ['n', 'v']],
+    ['burn', ['n', 'v']], ['river', ['n']], ['flows', ['n', 'v']],
+    ['wound', ['a', 'n', 'v']], ['healed', ['a']], ['clock', ['n', 'v']],
+    ['glass', ['n']], ['breaks', ['n', 'v']],
+  ]);
+
+  it('keeps the singular subject over a rarer verb carrying -s', () => {
+    const freq = new Map([['water', 597], ['runs', 65]]);
+    expect(selectHeadToken(['water', 'runs'], freq, pos)).toBe('water');
+  });
+
+  it('keeps the plural subject over a rarer bare verb', () => {
+    const freq = new Map([['stars', 124], ['burn', 32]]);
+    expect(selectHeadToken(['the', 'silent', 'stars', 'burn'], freq, pos)).toBe('stars');
+  });
+
+  /** `ss` is not an inflection — reading it as one would invert this pair. */
+  it('does not mistake a bare singular ending in ss for a plural', () => {
+    const freq = new Map([['glass', 500], ['breaks', 100]]);
+    expect(selectHeadToken(['glass', 'breaks'], freq, pos)).toBe('glass');
+  });
+
+  /**
+   * Neither word carries -s, so there is no agreement signal. Abstaining leaves
+   * the rarity rule in charge rather than inventing a role.
+   */
+  it('abstains when the pair carries no -s at all', () => {
+    const freq = new Map([['wound', 79], ['healed', 7]]);
+    // `healed` is rarer but is not nominal, so the nominal rule still holds.
+    expect(selectHeadToken(['the', 'wound', 'healed'], freq, pos)).toBe('wound');
+  });
+
+  /**
+   * Demotion must not chain. `water runs` settles `runs` as the predicate, and
+   * `runs` is then unavailable to head `runs deep` — otherwise both nominals
+   * after the verb vanish and the anchor falls through to an earlier modifier.
+   */
+  it('does not let a demoted verb act as the subject of the next pair', () => {
+    const p2 = new Map([...pos, ['cold', ['a', 'n']], ['deep', ['a', 'n', 'r']]]);
+    const freq = new Map([['cold', 402], ['water', 597], ['runs', 65], ['deep', 289]]);
+    const head = selectHeadToken(['cold', 'water', 'runs', 'deep'], freq, p2);
+    expect(head).not.toBe('cold');
+  });
+
+  it('leaves the anchor alone when no candidate follows it', () => {
+    // `he wound the clock` — a determiner separates the pair, so agreement
+    // never fires and the heteronym the query exists to disambiguate survives.
+    const freq = new Map([['wound', 79], ['clock', 251]]);
+    expect(selectHeadToken(['he', 'wound', 'the', 'clock'], freq, pos)).toBe('wound');
+  });
+});
+
 // ─── detectCompounds ─────────────────────────────────────────────────
 
 describe('detectCompounds', () => {

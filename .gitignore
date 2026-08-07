@@ -181,3 +181,8 @@ data/career-graph/*.sqlite
 # Carrier E2E preview renders — regenerate with:
 #   node scripts/blender-carrier-e2e.mjs
 output/carrier-e2e/
+
+# Gutenberg corpus cache — 5,318 books / 1.9GB, rebuilt by
+# scripts/fetch-gutenberg-corpus.mjs. Derived data, not source.
+cache/gutenberg/
+cache/pg_catalog.csv

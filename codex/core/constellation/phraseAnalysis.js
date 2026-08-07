@@ -17,6 +17,7 @@
  */
 
 import { STOPWORDS } from './stopwords.js';
+import { agreementSubject } from '../phonology/prosodic-metronome.js';
 
 // ─── Intent Classification ───────────────────────────────────────────
 
@@ -79,24 +80,92 @@ export function classifyIntent(identity) {
  * Rarest wins; ties break toward the last content token.
  * Falls back to last-content-token when no frequency data is available.
  *
+ * NOMINAL HEADS RANK FIRST. Rarity alone anchored `the wound healed` on
+ * "healed" — corpus frequency 7 against wound's 79 — so the page answered a
+ * question nobody asked. A phrase is ABOUT its nominal head; the predicate is
+ * what is said about it. Rarity is the right ordering, but only among the
+ * tokens that can be a subject in the first place.
+ *
+ * The POS partition is injected, never looked up: this module is zero-I/O
+ * (PDR §18 Core law), exactly as freqMap is injected. With no POS data the
+ * function degrades to the original rarity-over-all-content behaviour, which is
+ * the honest reading of "no signal" — not "nothing is a noun".
+ *
  * @param {string[]} tokens
  * @param {Map<string, number>} [freqMap] - word → corpus occurrence count
+ * @param {Map<string, string[]>} [posMap] - word → wordnet POS tags (['a','n','v'])
  * @returns {string|null}
  */
-export function selectHeadToken(tokens, freqMap) {
+export function selectHeadToken(tokens, freqMap, posMap) {
   const content = (tokens || []).filter((t) => !STOPWORDS.has(t) && t.length > 0);
   if (content.length === 0) return null;
-  if (!freqMap || freqMap.size === 0) return content[content.length - 1];
 
-  let best = content[content.length - 1];
+  /**
+   * A NOUN TAG IS NOT A NOUN ROLE.
+   *
+   * `cold water runs deep` anchored on `runs` and `the silent stars burn` on
+   * `burn`: both carry a noun sense somewhere in wordnet and both are rarer than
+   * the actual subject, so rarity handed the page to a word that is plainly
+   * verbing.
+   *
+   * THE GENERAL FRAME READER CANNOT CLOSE THIS. Filtering through resolveFrame
+   * was tried and fixed NEITHER case — its cue tables read determiners, subject
+   * pronouns and prepositions, and a bare noun sitting before a verb matches
+   * none of them. It also flipped `he wound the clock` onto `clock`, discarding
+   * the heteronym that query exists to disambiguate.
+   *
+   * AGREEMENT IS THE CUE THAT WORKS, and it is purely orthographic: English puts
+   * -s on exactly one of a subject/verb pair, so the complementary distribution
+   * across an ADJACENT pair names the roles with no lookup at all. It fires only
+   * where a signal genuinely exists, and only against the token to the right, so
+   * it cannot demote a word that no candidate follows — which is why
+   * `he wound the clock` keeps its anchor.
+   */
+  const nominal = posMap && posMap.size > 0
+    ? content.filter((t) => (posMap.get(t) || []).includes('n'))
+    : [];
+
+  /**
+   * Drop a nominal that agreement identifies as the VERB of an adjacent pair.
+   * Adjacency in the original token stream is required: `stars ... burn` with a
+   * determiner between them is not one clause's subject and predicate.
+   */
+  const demoted = new Set();
+  const all = tokens || [];
+  for (let i = 0; i + 1 < all.length; i += 1) {
+    const a = all[i];
+    const b = all[i + 1];
+    if (!nominal.includes(a) || !nominal.includes(b)) continue;
+    /**
+     * A DEMOTED TOKEN CANNOT THEN BE A SUBJECT.
+     *
+     * Without this the demotion chains: in `cold water runs deep`, `water runs`
+     * correctly marks `runs` a verb, and then `runs deep` reads `runs` as a
+     * subject and demotes `deep` as well. Both nominals downstream of the verb
+     * were removed and the anchor fell through to `cold`. Agreement describes
+     * ONE subject/predicate pair; a word already settled as the predicate is not
+     * available to head the next one.
+     */
+    if (demoted.has(a)) continue;
+    if (agreementSubject(a, b) === 'first') demoted.add(b);
+  }
+  const filtered = nominal.filter((t) => !demoted.has(t));
+  // No nominal candidate is not a failure — a query can be all verbs and
+  // adjectives, and rarity over everything is still the best available answer.
+  const nominalPool = filtered.length > 0 ? filtered : nominal;
+  const pool = nominalPool.length > 0 ? nominalPool : content;
+
+  if (!freqMap || freqMap.size === 0) return pool[pool.length - 1];
+
+  let best = pool[pool.length - 1];
   // Unknown words (not in freqMap) are treated as maximally rare (freq 0).
   let bestFreq = freqMap.get(best) ?? 0;
 
-  for (let i = content.length - 2; i >= 0; i -= 1) {
-    const freq = freqMap.get(content[i]) ?? 0;
+  for (let i = pool.length - 2; i >= 0; i -= 1) {
+    const freq = freqMap.get(pool[i]) ?? 0;
     // Strictly rarer wins; equal freq keeps the later (rightmost) token
     if (freq < bestFreq) {
-      best = content[i];
+      best = pool[i];
       bestFreq = freq;
     }
   }
@@ -276,6 +345,7 @@ export function detectPhraseDevices(identity) {
  *
  * @param {{ tokens: string[], normalized: string, kind: string }} identity
  * @param {Map<string, number>} [freqMap] - word → corpus frequency
+ * @param {Map<string, string[]>} [posMap] - word → wordnet POS tags
  * @returns {{
  *   intent: string,
  *   headToken: string|null,
@@ -284,9 +354,9 @@ export function detectPhraseDevices(identity) {
  *   devices: string[],
  * }}
  */
-export function analyzePhraseStructure(identity, freqMap) {
+export function analyzePhraseStructure(identity, freqMap, posMap) {
   const intent = classifyIntent(identity);
-  const headToken = selectHeadToken(identity.tokens, freqMap);
+  const headToken = selectHeadToken(identity.tokens, freqMap, posMap);
   const compounds = detectCompounds(identity.tokens);
   const tokenRoles = assignTokenRoles(identity.tokens, headToken);
   const devices = detectPhraseDevices(identity);

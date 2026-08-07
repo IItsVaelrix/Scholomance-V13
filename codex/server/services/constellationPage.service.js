@@ -8,8 +8,14 @@ import {
   analyzeSemanticInquiry,
   SEMANTIC_ADAPTER_VERSION,
 } from './constellation/semanticInquiry.adapter.js';
+import {
+  analyzeScaleField,
+  SCALE_FIELD_ADAPTER_VERSION,
+} from './constellation/scaleField.adapter.js';
+import { resolveGovernedPairs } from '../../core/constellation/governor.js';
+import { selectGovernedSense } from '../../core/semantic/governed-sense.js';
 
-const CONSTELLATION_OS_VERSION = 'phase2-phrase-1';
+const CONSTELLATION_OS_VERSION = 'phase3-scale-1';
 
 function emptyLeximancy() {
   return { status: 'unsupported', selectedInterpretationId: null, interpretations: [], nearKin: [], counterfield: [], warnings: [], anchor: null };
@@ -32,11 +38,25 @@ export async function buildConstellationPage(rawQuery, deps) {
     // Frequency lookup is best-effort; fall back to last-content-token.
   }
 
-  // Re-resolve with frequency data for rarest-token head selection.
-  const identity = resolveQueryIdentity(rawQuery, freqMap);
+  /**
+   * One batched POS call so the anchor can be the phrase's nominal head. Without
+   * it, rarity alone anchored `the wound healed` on "healed" and the whole page
+   * answered the wrong word. Empty Map = no signal, which selectHeadToken reads
+   * as "rank by rarity over everything", never as "nothing is a noun".
+   */
+  let posMap = new Map();
+  try {
+    const tags = deps.lexiconAdapter.batchLookupPos?.(preliminary.tokens) || {};
+    posMap = new Map(Object.entries(tags).map(([w, list]) => [w, Array.isArray(list) ? list : []]));
+  } catch {
+    // POS lookup is best-effort; head selection degrades to rarity-only.
+  }
+
+  // Re-resolve with frequency + POS data for nominal-head selection.
+  const identity = resolveQueryIdentity(rawQuery, freqMap, posMap);
 
   // Full phrase-structure analysis (pure, deterministic).
-  const phraseStructure = analyzePhraseStructure(identity, freqMap);
+  const phraseStructure = analyzePhraseStructure(identity, freqMap, posMap);
 
   const degradedChannels = [];
   const warnings = [];
@@ -97,10 +117,132 @@ export async function buildConstellationPage(rawQuery, deps) {
     warnings.push('phonology unavailable: heteronym check could not run, so no sense can be evidenced');
   }
 
-  // Apply the probe's selection only when the evidence warranted it. Everything
-  // else — eliminated, underdetermined, unmatched — leaves leximancy untouched.
+  /**
+   * TWO WIRES INTO THE SELECTION, BECAUSE THERE ARE TWO KINDS OF EVIDENCE.
+   *
+   * Gloss overlap is soft lexical evidence and it was, until now, the only thing
+   * that could move leximancy's pick. So `a wound` resolved framePos 'n' with
+   * viableWordCount 1 — the heteronym settled, the word identified — and still
+   * shipped "put in a coil", because the frame had nowhere to write its answer.
+   * Correct work, discarded at the last step.
+   *
+   * A settled frame is HARD syntactic evidence and outranks a rank-1 default. It
+   * does not outrank the probe: when the probe is warranted it has read the same
+   * frame (the harness restricts candidates to the frame's group) plus gloss
+   * evidence on top, so it stays first.
+   *
+   * `selectedBy` travels with the packet. A reader must be able to tell an
+   * evidenced pick from wordnet's rank-1 default, which is exactly the
+   * distinction that was invisible while the frame was inert.
+   */
+  /**
+   * RANK-1 IS NOT AN ANSWER FOR A POLYSEME.
+   *
+   * `selectedBy: 'rank'` means wordnet's first sense was shipped with no
+   * evidence behind it. On a word with one sense that is fine. On a polyseme it
+   * is a coin toss wearing a verdict's clothes, and it was measurably wrong:
+   * `the shadowy wood` shipped "United States film actress (1938-1981)" —
+   * Natalie Wood — and `the silent stars burn` shipped a sense whose gloss was
+   * the empty string.
+   *
+   * So an unevidenced pick survives only when there was nothing to choose
+   * between. Otherwise the page reports the interpretations and selects none,
+   * which is what `ambiguous` already means everywhere else here.
+   */
+  const UNEVIDENCED_MULTI_SENSE = (leximancy.interpretations || []).length > 1;
+  let selectedBy = leximancy.selectedInterpretationId ? 'rank' : null;
+  if (selectedBy === 'rank' && UNEVIDENCED_MULTI_SENSE) {
+    leximancy = { ...leximancy, selectedInterpretationId: null, status: 'ambiguous' };
+    selectedBy = null;
+  }
   if (semanticInquiry?.selection?.warranted && semanticInquiry.selection.senseId) {
     leximancy = { ...leximancy, selectedInterpretationId: semanticInquiry.selection.senseId };
+    selectedBy = 'probe';
+  } else if (semanticInquiry?.framePos && semanticInquiry.viableWordCount === 1) {
+    const framed = (leximancy.interpretations || []).find((i) => i.pos === semanticInquiry.framePos);
+    if (framed) {
+      // Naming a selection while still reporting 'ambiguous' would contradict
+      // itself: the frame is what resolved it.
+      leximancy = { ...leximancy, selectedInterpretationId: framed.id, status: 'resolved' };
+      selectedBy = 'frame';
+    }
+  }
+
+  /**
+   * SCALE FIELD — where the head token sits, and among what.
+   *
+   * Runs last because it measures against words the other channels have already
+   * surfaced: leximancy's kin and relations are the candidate pool, so the
+   * ranking is over the page's own vocabulary rather than an arbitrary list.
+   *
+   * Fully optional. Without the wordnet graph or the corpus vectors it reports
+   * a status and no field, because a page that renders every other channel is
+   * still a page — this one adds a dimension, it does not gate the answer.
+   */
+  let scaleField = null;
+  let governed = [];
+  try {
+    if (deps.wordnetGraph) {
+      const pool = [
+        ...(leximancy.nearKin || []),
+        ...(leximancy.counterfield || []),
+        ...(leximancy.relations?.akin || []),
+        ...(leximancy.relations?.narrower || []),
+        ...(identity.tokens || []),
+      ];
+      scaleField = analyzeScaleField(
+        {
+          wordnetGraph: deps.wordnetGraph,
+          corpusVectors: deps.corpusVectors,
+          scaleOrders: deps.scaleOrders,
+        },
+        identity.primaryContentToken,
+        pool,
+        /**
+         * Readiness is threaded from the caller rather than read off the engine:
+         * without cmudict, phonotopography silently falls back to a
+         * spelling-derived G2P and the sound ranking becomes an orthographic
+         * one — measured, that put `shaded` first for `shadowy` on the shared
+         * "shad-" prefix where real phonemes put `murky` first.
+         */
+        { phonologyReady: deps.phonologyReady === true },
+      );
+      if (scaleField.warnings?.length) warnings.push(...scaleField.warnings);
+
+      /**
+       * THE MODIFIERS GET RESOLVED TOO.
+       *
+       * Until now the page collapsed a phrase to one head token and every other
+       * word went unanswered — `the shadowy wood` reported on `wood` and never
+       * asked what `shadowy` meant here. The governor is the noun an attributive
+       * adjective is predicated of, and that one word settles the sense:
+       * measured, governor extraction was 7/7 and the corpus-affinity pick was
+       * right for `shadowy wood` (shade) and `shadowy figure` (indistinctness).
+       *
+       * It abstains freely. `shadowy dealings` reports insufficient_support
+       * rather than choosing off a single co-occurrence, and a near-tie reports
+       * `tied` — both are answers about the phrase, unlike silence.
+       */
+      governed = resolveGovernedPairs(identity.tokens, posMap).map((pair) => {
+        const verdict = selectGovernedSense(
+          deps.wordnetGraph, deps.corpusVectors, pair.adjective, pair.governor,
+        );
+        return {
+          adjective: pair.adjective,
+          governor: pair.governor,
+          relation: pair.relation,
+          distance: pair.distance,
+          senseHead: verdict.head,
+          reason: verdict.reason,
+          score: verdict.score,
+          support: verdict.support,
+        };
+      });
+    }
+  } catch (err) {
+    degradedChannels.push('scaleField');
+    warnings.push(`scaleField channel failed: ${err.message}`);
+    scaleField = null;
   }
 
   const engineVersions = {
@@ -109,6 +251,7 @@ export async function buildConstellationPage(rawQuery, deps) {
     rhymeAstrology: RHYME_ADAPTER_VERSION,
     phraseGenome: GENOME_ADAPTER_VERSION,
     semanticInquiry: SEMANTIC_ADAPTER_VERSION,
+    scaleField: SCALE_FIELD_ADAPTER_VERSION,
   };
 
   const pageBytecode = computePageBytecode({
@@ -139,6 +282,8 @@ export async function buildConstellationPage(rawQuery, deps) {
     leximancy: {
       status: leximancy.status,
       selectedInterpretationId: leximancy.selectedInterpretationId,
+      // 'probe' | 'frame' | 'rank' | null — how the pick was earned, if at all.
+      selectedBy,
       interpretations: leximancy.interpretations,
       warnings: leximancy.warnings,
       nearKin: leximancy.nearKin,
@@ -200,6 +345,18 @@ export async function buildConstellationPage(rawQuery, deps) {
           lexicalEntries: semanticInquiry.lexicalEntries,
         }
       : null,
+    /**
+     * Where the head token sits and among what — the four semantic channels
+     * composed. `null` when the graph is unavailable, which a reader must take
+     * as "not measured" rather than "no field exists".
+     */
+    scaleField,
+    /**
+     * Adjective -> the noun it modifies, with the sense that pairing settles.
+     * The first channel that answers about a phrase's INTERNAL structure rather
+     * than about one token lifted out of it.
+     */
+    governed,
     diagnostics: { degradedChannels, warnings },
     provenance: { engineVersions },
   };

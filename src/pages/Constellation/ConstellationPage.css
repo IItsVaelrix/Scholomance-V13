@@ -839,3 +839,92 @@
 .constellation-stage--animate .constellation-result-shell--composed .constellation-result-plate {
   animation: cos-plate-reveal 480ms ease-out both;
 }
+
+/* ─── Scale Field ────────────────────────────────────────────────────────────
+   The axis a word sits on, drawn as a ladder. Rung positions come from the
+   packet's own `relative` value via --rung-at; nothing here recomputes rank. */
+.constellation-scalefield {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.constellation-scalefield__ladder {
+  position: relative;
+  padding-left: 1.1rem;
+}
+
+.constellation-scalefield__axis {
+  position: absolute;
+  left: 0.32rem;
+  top: 0.2rem;
+  bottom: 1.6rem;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--token-color-focus, #cbb682) 12%, transparent),
+    color-mix(in oklab, var(--token-color-focus, #cbb682) 62%, transparent)
+  );
+}
+
+.constellation-scalefield__rungs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+}
+
+.constellation-scalefield__rung {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.86rem;
+  /* Higher on the axis reads brighter — the position IS the emphasis. */
+  opacity: calc(0.55 + (var(--rung-at, 0) * 0.45));
+}
+
+.constellation-scalefield__rung::before {
+  content: '';
+  position: absolute;
+  left: -0.86rem;
+  top: 0.42em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--token-color-focus, #cbb682) 70%, transparent);
+}
+
+.constellation-scalefield__rung--anchor {
+  opacity: 1;
+  font-weight: 600;
+  color: var(--token-color-focus, #cbb682);
+}
+
+.constellation-scalefield__rung--anchor::before {
+  width: 8px;
+  height: 8px;
+  left: -0.98rem;
+  background: var(--token-color-focus, #cbb682);
+  box-shadow: 0 0 6px color-mix(in oklab, var(--token-color-focus, #cbb682) 60%, transparent);
+}
+
+.constellation-scalefield__at {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.74rem;
+  opacity: 0.6;
+}
+
+.constellation-scalefield__span {
+  margin: 0.6rem 0 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  opacity: 0.62;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .constellation-scalefield__rung--anchor::before { box-shadow: none; }
+}
