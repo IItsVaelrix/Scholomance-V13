@@ -59,6 +59,10 @@ function clamp(value, min, max) {
 }
 
 export function computeWeightedScore(vote) {
+  // A veto is not a score. It asserts that a candidate is impossible, which no
+  // weighting can express — a zero-confidence vote still leaves the candidate
+  // eligible to win on other jurors' support.
+  if (vote.veto) return 0;
   const jurorWeight = JUROR_WEIGHTS[vote.jurorId] ?? 0;
 
   return (
@@ -80,6 +84,7 @@ export function tallyJuryVotes(candidates, votes) {
 
   for (const vote of votes) {
     if (!aggregate.has(vote.candidateKey)) continue;
+    if (vote.veto) continue;
 
     const weightedScore = computeWeightedScore(vote);
     const current = aggregate.get(vote.candidateKey) ?? 0;
@@ -90,7 +95,27 @@ export function tallyJuryVotes(candidates, votes) {
   return Object.fromEntries(aggregate);
 }
 
+/**
+ * Candidate keys a juror has declared impossible.
+ *
+ * A VETO IS ABSOLUTE. It is not a strong opinion to be outweighed — it says the
+ * candidate cannot be an answer at all, so it is removed from consideration
+ * before ranking rather than scored down within it. Filtering before ranking is
+ * the same ordering discipline the cue arbiter enforces: a candidate that
+ * should never have been eligible must not be able to occupy the top slot.
+ */
+function vetoedKeys(votes) {
+  const out = new Set();
+  for (const vote of votes) {
+    if (vote && vote.veto && typeof vote.candidateKey === 'string') {
+      out.add(vote.candidateKey);
+    }
+  }
+  return out;
+}
+
 export function resolveWinner(candidates, aggregate, votes = []) {
+  const vetoed = vetoedKeys(votes);
   const phonotacticByCandidate = new Map();
 
   for (const vote of votes) {
@@ -105,6 +130,7 @@ export function resolveWinner(candidates, aggregate, votes = []) {
   }
 
   const ranked = candidates
+    .filter((candidate) => !vetoed.has(candidate.phonemes.join(' ')))
     .map((candidate) => {
       const key = candidate.phonemes.join(' ');
 
@@ -234,6 +260,20 @@ export function dedupeCandidates(candidates) {
 }
 
 export function isValidVote(vote) {
+  /**
+   * A veto carries no numeric fields, because it makes no quantitative claim.
+   * Requiring confidence or weights here would force a juror to invent a score
+   * for a judgement that is categorical.
+   */
+  if (vote && vote.veto === true) {
+    return Boolean(
+      typeof vote.candidateKey === 'string'
+      && G2P_JUROR_IDS[vote.jurorId]
+      && typeof vote.rationale === 'string'
+      && vote.rationale.length > 0,
+    );
+  }
+
   return Boolean(
     vote &&
     typeof vote.candidateKey === 'string' &&

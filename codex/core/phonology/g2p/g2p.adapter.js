@@ -188,6 +188,18 @@ function createJurors(cmuEntries) {
 }
 
 function normalizeVote(vote) {
+  // A veto has no numeric fields to normalise, and clamping absent numbers into
+  // the legal range would turn it into an ordinary low-confidence vote.
+  if (vote.veto === true) {
+    return {
+      candidateKey: String(vote.candidateKey || ''),
+      jurorId: String(vote.jurorId),
+      veto: true,
+      rationale: String(vote.rationale || ''),
+      fidelityGrade: FIDELITY_GRADES.includes(vote.fidelityGrade) ? vote.fidelityGrade : 'F',
+    };
+  }
+
   return {
     candidateKey: String(vote.candidateKey || ''),
     jurorId: String(vote.jurorId),

@@ -141,3 +141,73 @@ describe('G2P Schemas and Tally', () => {
     expect(id1).toBe(id2);
   });
 });
+
+/**
+ * THE VETO GAP.
+ *
+ * Every juror verdict was a weighted score, summed per candidate, highest wins.
+ * A juror could decline to vote or vote low, but it could not say "this
+ * candidate is IMPOSSIBLE" — so a phonotactically illegal pronunciation could
+ * still win on aggregate if the other jurors liked it.
+ *
+ * This is the distinction `cue-arbiter.js` was built around: a veto encodes
+ * structural impossibility, not low confidence, and no amount of support from
+ * elsewhere may overturn it.
+ */
+describe('juror veto', () => {
+  const candidates = [
+    { phonemes: ['AA', 'B'], confidence: 0.9 },
+    { phonemes: ['IY', 'D'], confidence: 0.5 },
+  ];
+  const scoringVote = (key, jurorId, confidence) => ({
+    candidateKey: key, jurorId, confidence,
+    tokenWeight: 1, stageSignal: 1, syntaxModifier: 1,
+    rationale: 'test', fidelityGrade: 'A',
+  });
+  const vetoVote = (key, jurorId) => ({
+    candidateKey: key, jurorId, veto: true, rationale: 'illegal onset',
+  });
+
+  it('accepts a veto as a valid vote without numeric scores', () => {
+    expect(isValidVote(vetoVote('AA B', 'PHONOTACTIC'))).toBe(true);
+  });
+
+  it('contributes no score — a veto is not a zero-confidence vote', () => {
+    const tally = tallyJuryVotes(candidates, [vetoVote('AA B', 'PHONOTACTIC')]);
+    expect(tally['AA B']).toBe(0);
+  });
+
+  /** The whole point: aggregate support cannot overturn it. */
+  it('excludes a vetoed candidate even when it leads on aggregate', () => {
+    const votes = [
+      scoringVote('AA B', 'SEMANTIC', 1),
+      scoringVote('AA B', 'GRAPH', 1),
+      scoringVote('IY D', 'SEMANTIC', 0.1),
+      vetoVote('AA B', 'PHONOTACTIC'),
+    ];
+    const tally = tallyJuryVotes(candidates, votes);
+    expect(tally['AA B']).toBeGreaterThan(tally['IY D']);
+
+    const winner = resolveWinner(candidates, tally, votes);
+    expect(winner.phonemes).toEqual(['IY', 'D']);
+  });
+
+  /**
+   * If every candidate is impossible, there is no winner. Returning the
+   * least-bad one would be the soft answer this architecture exists to avoid.
+   */
+  it('returns no winner when every candidate is vetoed', () => {
+    const votes = [
+      scoringVote('AA B', 'SEMANTIC', 1),
+      vetoVote('AA B', 'PHONOTACTIC'),
+      vetoVote('IY D', 'PHONOTACTIC'),
+    ];
+    expect(resolveWinner(candidates, tallyJuryVotes(candidates, votes), votes)).toBeNull();
+  });
+
+  it('leaves behaviour unchanged when no juror vetoes', () => {
+    const votes = [scoringVote('AA B', 'SEMANTIC', 1), scoringVote('IY D', 'SEMANTIC', 0.1)];
+    const winner = resolveWinner(candidates, tallyJuryVotes(candidates, votes), votes);
+    expect(winner.phonemes).toEqual(['AA', 'B']);
+  });
+});
