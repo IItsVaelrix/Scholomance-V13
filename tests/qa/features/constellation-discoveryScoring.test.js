@@ -24,12 +24,16 @@ describe('discoveryScoring', () => {
   });
 
   it('rarityBoost is 0 when baseEvidence is false', () => {
-    expect(computeRarityBoost(false, 8)).toBe(0);
+    expect(computeRarityBoost(false, 1)).toBe(0);
   });
 
-  it('rarityBoost is positive when baseEvidence and high rarity band', () => {
-    expect(computeRarityBoost(true, 8)).toBeGreaterThan(0);
-    expect(computeRarityBoost(true, 8)).toBeLessThanOrEqual(1);
+  it('rarityBoost prefers low band (rare) over high band (common)', () => {
+    const rare = computeRarityBoost(true, 1);
+    const common = computeRarityBoost(true, 8);
+    expect(rare).toBeGreaterThan(0);
+    expect(common).toBeGreaterThan(0);
+    expect(rare).toBeGreaterThan(common);
+    expect(rare).toBeLessThanOrEqual(1);
   });
 
   it('pre-score formula is deterministic', () => {

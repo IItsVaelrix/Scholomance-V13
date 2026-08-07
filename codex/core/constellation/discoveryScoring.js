@@ -80,7 +80,9 @@ export function computeModifierFit(candidate, attractorSet, glossTokens) {
 /**
  * Rarity lift from corpus band. Zero when generator base evidence is missing.
  *
- * band 1–9 → (band/9)*0.4 (capped 0–0.4). null/invalid band → 0.
+ * Low band = rare (LABEL_FOR_BAND: band ≤ 3 rare, 9 common). Product law:
+ * rarer words get a slight ranking lift when baseEvidence is true.
+ * band 1–9 → ((10 - band) / 9) * 0.4 (capped 0–0.4). null/invalid band → 0.
  *
  * @param {boolean} baseEvidence
  * @param {number|null|undefined} rarityBandOrNull
@@ -91,7 +93,7 @@ export function computeRarityBoost(baseEvidence, rarityBandOrNull) {
   if (rarityBandOrNull == null || !Number.isFinite(Number(rarityBandOrNull))) return 0;
 
   const band = Math.min(9, Math.max(0, Number(rarityBandOrNull)));
-  return clamp01((band / 9) * 0.4);
+  return clamp01(((10 - band) / 9) * 0.4);
 }
 
 /**
