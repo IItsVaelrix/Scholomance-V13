@@ -13,6 +13,7 @@ import {
   SCALE_FIELD_ADAPTER_VERSION,
 } from './constellation/scaleField.adapter.js';
 import { resolveGovernedPairs } from '../../core/constellation/governor.js';
+import { resolveReadings } from '../../core/constellation/readings.js';
 import { selectGovernedSense } from '../../core/semantic/governed-sense.js';
 
 const CONSTELLATION_OS_VERSION = 'phase3-scale-1';
@@ -57,6 +58,18 @@ export async function buildConstellationPage(rawQuery, deps) {
 
   // Full phrase-structure analysis (pure, deterministic).
   const phraseStructure = analyzePhraseStructure(identity, freqMap, posMap);
+
+  /**
+   * THE STRUCTURE CHANNEL — competing readings, left standing.
+   *
+   * Every other channel here answers about ONE token. This one reports what the
+   * phrase's specialists each concluded and whether they agree, so a line that
+   * is genuinely two-ways-readable is SHOWN to be rather than resolved to
+   * whichever cue ran last. `the man saw a comet` is about `man` to
+   * subjecthood and `comet` to salience, and both are right about different
+   * questions.
+   */
+  const readings = resolveReadings(identity.tokens, freqMap, posMap);
 
   const degradedChannels = [];
   const warnings = [];
@@ -356,6 +369,18 @@ export async function buildConstellationPage(rawQuery, deps) {
      * as "not measured" rather than "no field exists".
      */
     scaleField,
+    /**
+     * Competing analyses of the phrase, with the specialist behind each and
+     * whether they disagree. `contested` is a first-class result, not a failure.
+     */
+    readings: {
+      contested: readings.contested,
+      primary: readings.primary,
+      readings: readings.readings,
+      // Specialists that had no jurisdiction here — distinct from having been
+      // asked and having nothing to say.
+      silent: readings.silent,
+    },
     /**
      * Adjective -> the noun it modifies, with the sense that pairing settles.
      * The first channel that answers about a phrase's INTERNAL structure rather

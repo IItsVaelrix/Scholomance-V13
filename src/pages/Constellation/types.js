@@ -16,6 +16,10 @@
  *     span: number|null, ladder: Array<{ word: string, rank: number, relative: number, isAnchor: boolean }> }|null,
  *   neighbours: Array<{ word: string, similarity: number, source: string, method: string|null, localSimilarity: number|null, soundSimilarity: number|null }>,
  *   opposites: string[], warnings: string[] } | null} scaleField
+ * @property {{ contested: boolean,
+ *   primary: { anchor: string, role: string, proposedBy: string, rationale: string, candidate: boolean }|null,
+ *   readings: Array<{ anchor: string, role: string, proposedBy: string, rationale: string, candidate: boolean }>,
+ *   silent: string[] }} readings
  * @property {{ degradedChannels: string[], warnings: string[] }} diagnostics
  * @property {{ engineVersions: Record<string, string> }} provenance
  */

@@ -449,6 +449,51 @@ function ScaleFieldBody({ scaleField }) {
   );
 }
 
+
+/* ─── Readings: what the phrase's specialists each concluded ────────────────
+   PAINTS ONLY. Contest, roles and rationales all arrive decided in the packet.
+   A contested phrase is SHOWN as contested — that is the point of the channel,
+   not a defect to hide behind a single answer. */
+function ReadingsBody({ readings }) {
+  if (!readings || !readings.readings?.length) {
+    return <p className="constellation-result-awaiting">Awaiting engine — Readings</p>;
+  }
+  const candidates = readings.readings.filter((r) => r.candidate);
+  const context = readings.readings.filter((r) => !r.candidate);
+  return (
+    <div className="constellation-readings">
+      <p className={[
+        'constellation-readings__verdict',
+        readings.contested ? 'constellation-readings__verdict--contested' : '',
+      ].filter(Boolean).join(' ')}>
+        {readings.contested
+          ? 'This line reads two ways — the specialists disagree on what it is about.'
+          : 'The specialists agree on what this line is about.'}
+      </p>
+      <ul className="constellation-readings__list">
+        {candidates.map((r) => (
+          <li key={`${r.anchor}-${r.role}`} className="constellation-readings__item">
+            <span className="constellation-readings__anchor">{r.anchor}</span>
+            <span className="constellation-readings__role">{r.role.replace(/-/g, ' ')}</span>
+            <span className="constellation-readings__why">{r.rationale}</span>
+          </li>
+        ))}
+      </ul>
+      {context.length > 0 ? (
+        <ul className="constellation-readings__list constellation-readings__list--context">
+          {context.map((r) => (
+            <li key={`${r.anchor}-${r.role}`} className="constellation-readings__item">
+              <span className="constellation-readings__anchor">{r.anchor}</span>
+              <span className="constellation-readings__role">{r.role.replace(/-/g, ' ')}</span>
+              <span className="constellation-readings__why">{r.rationale}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
 /* ─── The hero figure: the answer drawn as a living constellation ──────────
    Pure geometry from `heroFigure(packet)`; the seed touches only the lodestar
    and per-star twinkle. Gold is reserved for the single lodestar nucleus — every
@@ -639,6 +684,19 @@ function ComposedResultShell({ packet, scene, reducedMotion }) {
         <GenomeBody phraseGenome={phraseGenome} />
       </section>
 
+      {/* ── Plate IV·a · Readings: how many ways this line parses ── */}
+      {packet.readings?.readings?.length ? (
+        <section
+          className="constellation-result-plate"
+          data-compose-part="readings"
+          aria-labelledby="cos-readings"
+          style={nextReveal()}
+        >
+          <h2 id="cos-readings" className="constellation-result-plate__overline">Readings</h2>
+          <ReadingsBody readings={packet.readings} />
+        </section>
+      ) : null}
+
       {/* ── Plate IV·b · Scale Field: the axis this word sits on ── */}
       {packet.scaleField ? (
         <section
@@ -743,6 +801,13 @@ function PlainResultShell({ packet }) {
         <h2 id="cos-genome">Phrase Genome</h2>
         <GenomeBody phraseGenome={phraseGenome} />
       </section>
+
+      {packet.readings?.readings?.length ? (
+        <section className="constellation-result-section" aria-labelledby="cos-readings">
+          <h2 id="cos-readings">Readings</h2>
+          <ReadingsBody readings={packet.readings} />
+        </section>
+      ) : null}
 
       {packet.scaleField ? (
         <section className="constellation-result-section" aria-labelledby="cos-scale">

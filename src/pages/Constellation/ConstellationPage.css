@@ -928,3 +928,56 @@
 @media (prefers-reduced-motion: reduce) {
   .constellation-scalefield__rung--anchor::before { box-shadow: none; }
 }
+
+/* ─── Readings ───────────────────────────────────────────────────────────────
+   Competing analyses of the line. Contest is stated, never hidden — a line that
+   reads two ways is information a writer wants, not a failure to conceal. */
+.constellation-readings { display: flex; flex-direction: column; gap: 0.7rem; }
+
+.constellation-readings__verdict {
+  margin: 0;
+  font-size: 0.82rem;
+  opacity: 0.72;
+}
+
+.constellation-readings__verdict--contested {
+  opacity: 1;
+  color: var(--token-color-focus, #cbb682);
+}
+
+.constellation-readings__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.constellation-readings__list--context { opacity: 0.55; }
+
+.constellation-readings__item {
+  display: grid;
+  grid-template-columns: minmax(4.5rem, auto) minmax(6rem, auto) 1fr;
+  gap: 0.6rem;
+  align-items: baseline;
+  font-size: 0.84rem;
+}
+
+.constellation-readings__anchor {
+  font-weight: 600;
+  color: var(--token-color-focus, #cbb682);
+}
+
+.constellation-readings__role {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.constellation-readings__why { font-size: 0.76rem; opacity: 0.66; }
+
+@media (max-width: 32rem) {
+  .constellation-readings__item { grid-template-columns: 1fr; gap: 0.15rem; }
+}
