@@ -231,9 +231,10 @@ async function collectRhymeTokens(target, deps) {
     try {
       const result = await rhymeQueryEngine.query({ text: target, mode: 'word' });
       const constellation = result?.constellations?.[0];
+      // Members are engine node IDs (e.g. `w_2033`), not lemmas — resolve via
+      // lookupNodeById → token; never fall back to raw IDs (mirror rhymeAstrology).
       for (const id of constellation?.members || []) {
-        const node = rhymeLexiconRepo?.lookupNodeById?.(id);
-        const tok = normLemma(node?.token ?? id);
+        const tok = normLemma(rhymeLexiconRepo?.lookupNodeById?.(id)?.token);
         if (tok) out.add(tok);
       }
       for (const m of result?.topMatches || []) {
@@ -295,12 +296,14 @@ export async function hasRhymeEvidence(candidate, target, deps) {
       const result = await engine.query({ text: b, mode: 'word' });
       const members = new Set();
       const constellation = result?.constellations?.[0];
+      // Resolve member IDs → tokens only; never treat raw node IDs as lemmas.
       for (const id of constellation?.members || []) {
-        const node = repo?.lookupNodeById?.(id);
-        members.add(normLemma(node?.token ?? id));
+        const tok = normLemma(repo?.lookupNodeById?.(id)?.token);
+        if (tok) members.add(tok);
       }
       for (const m of result?.topMatches || []) {
-        members.add(normLemma(m?.token));
+        const tok = normLemma(m?.token);
+        if (tok) members.add(tok);
       }
       if (members.has(a)) return true;
     } catch {

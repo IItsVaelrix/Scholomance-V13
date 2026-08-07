@@ -33,13 +33,13 @@ import { emitPbUiScene } from '../scene/emit-scene';
 
 export const CONSTELLATION_RESULT_KIND = 'constellation-result';
 export const CONSTELLATION_RESULT_ID = 'constellation-result';
-export const CONSTELLATION_RESULT_VERSION = '1.0.0';
+export const CONSTELLATION_RESULT_VERSION = '1.1.0';
 
 /**
- * The six plates of the answer. Order is load-bearing: identity first (what was
- * asked), meaning second (what it signifies), sound third (how it rings), then
- * genome, verdict, and the provenance seal. The shell renders them in this order
- * and tags each with `data-compose-part`.
+ * The plates of the answer. Order is load-bearing: identity first (what was
+ * asked), discovery second when present (meta-query kin), meaning next (what it
+ * signifies), sound (how it rings), then genome, verdict, and the provenance
+ * seal. The shell renders them in this order and tags each with `data-compose-part`.
  */
 export const RESULT_PARTS = [
   {
@@ -54,6 +54,12 @@ export const RESULT_PARTS = [
     role: 'region',
     label: 'Phrase identity plate',
     description: 'The query as asked — kind, intent, scale, and the page seal.',
+  },
+  {
+    id: 'discovery-field',
+    role: 'region',
+    label: 'Discovery field',
+    description: 'Ranked local kin from poetic discovery — seeds, constraints, hits, and warnings.',
   },
   {
     id: 'meaning-field',
@@ -144,10 +150,10 @@ const RESULT_VISUALS: Record<string, VisualAttachment> = {
 export function createConstellationResultDefinition(): ScholComponentDefinitionV1 {
   return {
     contract: 'SCHOL-COMPONENT-DEFINITION-v1',
-    version: '1.0.0',
+    version: '1.1.0',
     kind: CONSTELLATION_RESULT_KIND,
     description:
-      'ConstellationOS answer plate — six sealed channels from identity to provenance.',
+      'ConstellationOS answer plate — sealed channels from identity through discovery to provenance.',
     anatomy: {
       rootRole: 'article',
       parts: [
@@ -188,7 +194,7 @@ export function createConstellationResultDefinition(): ScholComponentDefinitionV
     provenance: {
       sourceKind: 'typescript',
       sourcePath: 'src/pages/Constellation/ConstellationResultShell.jsx',
-      contentHash: 'scd64:constellation-result-v1',
+      contentHash: 'scd64:constellation-result-v1.1',
       author: 'compose-constellation-result',
       establishedAt: '2026-07-23T00:00:00.000Z',
     },

@@ -779,6 +779,7 @@ function ComposedResultShell({ packet, scene, reducedMotion }) {
 function PlainResultShell({ packet }) {
   const { query, leximancy, rhymeAstrology, phraseGenome, pageBytecode, provenance, diagnostics } = packet;
   const semanticInquiry = packet.semanticInquiry ?? null;
+  const discovery = packet.discovery ?? null;
   const engineVersions = provenance?.engineVersions ?? {};
   const degraded = diagnostics?.degradedChannels ?? [];
 
@@ -795,6 +796,13 @@ function PlainResultShell({ packet }) {
         <IdentityDl query={query} leximancy={leximancy} phraseGenome={phraseGenome} pageBytecode={pageBytecode} />
         <VersionsList engineVersions={engineVersions} />
       </section>
+
+      {discovery != null ? (
+        <section className="constellation-result-section" aria-labelledby="cos-discovery">
+          <h2 id="cos-discovery">Discovery Field</h2>
+          <DiscoveryBody discovery={discovery} />
+        </section>
+      ) : null}
 
       <section className="constellation-result-section" aria-labelledby="cos-leximancy">
         <h2 id="cos-leximancy">Leximancy Meaning Field</h2>
