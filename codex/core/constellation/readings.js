@@ -46,6 +46,10 @@ import { arbitrate, support, outside, abstain } from './cue-arbiter.js';
  * @property {string} role          what the anchor IS under this reading
  * @property {string} proposedBy    the specialist that proposed it
  * @property {string} rationale     one line a reader can check
+ * @property {string} structure     the clause structure this reading assumes.
+ *   Two readings can name the SAME anchor and still disagree, because the
+ *   garden path is an argument about which verb the subject belongs to, not
+ *   about which token the phrase is around. Anchor alone cannot express that.
  * @property {boolean} candidate    does this reading claim the phrase is ABOUT
  *   this token? A prepositional object is a fact about the phrase, not a rival
  *   claim to its subject, and counting it as one made every phrase containing a
@@ -67,6 +71,7 @@ function proposeClauseSubject(tokens, pool) {
   return support('clause-subject', {
     anchor: first,
     role: 'clause-subject',
+    structure: 'main-clause',
     candidate: true,
     rationale: 'first surviving nominal; English declaratives put the subject first',
   }, 5);
@@ -90,6 +95,7 @@ function proposeSalience(pool, freqMap) {
   return support('lexical-salience', {
     anchor: best,
     role: 'rarest-content-word',
+    structure: 'main-clause',
     candidate: true,
     rationale: `corpus frequency ${bestFreq}, rarest of the surviving nominals`,
   }, 4);
@@ -111,11 +117,53 @@ function proposePrepositionalObject(tokens, demoted) {
   return support('prepositional-object', {
     anchor: obj.token,
     role: 'prepositional-object',
+    structure: 'main-clause',
     // Explicitly NOT a candidate: this reading's whole content is that the
     // token is unavailable as the subject.
     candidate: false,
     rationale: 'object of a preposition; inside a phrase, so not the clause subject',
   }, 1);
+}
+
+/**
+ * REDUCED RELATIVE — the subject belongs to a LATER verb, with an earlier
+ * participle modifying it: `the horse [raced past the barn] fell`.
+ *
+ * The signal is an arithmetic one and needs no parse. A finite clause spends one
+ * subject on one verb. When more verb-capable tokens follow the subject than
+ * there are nominals available to subject them, one of those verbs cannot be
+ * heading a clause of its own, and a reduced relative is the structure that
+ * accounts for it. `the horse raced past the barn fell` leaves `raced` and
+ * `fell` competing for one `horse`; `the man saw a comet` leaves `saw` alone
+ * and the specialist says nothing.
+ *
+ * Jurisdiction: a POS table must exist and the phrase must have a subject to
+ * argue about. Without POS this is not conservative, it is blind — the same
+ * reason lexical-salience refuses to rank on an empty freqMap.
+ *
+ * This does NOT decide the garden path. It states that a second structure is
+ * available, which is the fact a single anchor could never carry.
+ */
+function proposeReducedRelative(tokens, pool, posMap) {
+  if (!posMap || posMap.size === 0 || pool.length === 0) return outside('reduced-relative');
+  const subject = pool[0];
+  const at = (tokens || []).indexOf(subject);
+  if (at < 0) return outside('reduced-relative');
+
+  const verbsAfter = (tokens || [])
+    .slice(at + 1)
+    .filter((t) => (posMap.get(t) || []).includes('v'));
+
+  if (verbsAfter.length < 2) return abstain('reduced-relative');
+
+  return support('reduced-relative', {
+    anchor: subject,
+    role: 'clause-subject',
+    structure: 'reduced-relative',
+    candidate: true,
+    rationale: `${verbsAfter.length} finite verbs (${verbsAfter.join(', ')}) share one subject; `
+      + `\`${verbsAfter[0]}\` reads as a participle modifying \`${subject}\``,
+  }, 3);
 }
 
 /**
@@ -136,6 +184,7 @@ export function resolveReadings(tokens, freqMap, posMap) {
     proposeClauseSubject(tokens, pool),
     proposeSalience(pool, freqMap),
     proposePrepositionalObject(tokens, head.demoted),
+    proposeReducedRelative(tokens, pool, posMap),
   ];
 
   /**
@@ -149,7 +198,10 @@ export function resolveReadings(tokens, freqMap, posMap) {
   const seen = new Set();
   for (const p of proposals) {
     if (p.verdict !== 'support' || !p.payload) continue;
-    const key = `${p.payload.anchor}:${p.payload.role}`;
+    // Structure is part of identity. `horse` as subject of the main clause and
+    // `horse` as subject of a reduced relative share an anchor AND a role, and
+    // keying on those alone would discard the second as a duplicate of the first.
+    const key = `${p.payload.anchor}:${p.payload.role}:${p.payload.structure}`;
     if (seen.has(key)) continue;
     seen.add(key);
     readings.push({ ...p.payload, proposedBy: p.name });
@@ -167,8 +219,19 @@ export function resolveReadings(tokens, freqMap, posMap) {
    * When subjecthood and salience both land on `wound`, the phrase is not
    * ambiguous either; it is over-determined, which is the opposite thing.
    */
-  const candidateAnchors = new Set(readings.filter((r) => r.candidate).map((r) => r.anchor));
-  const contested = candidateAnchors.size > 1;
+  /**
+   * A CONTEST IS OVER (ANCHOR, STRUCTURE), NOT ANCHOR ALONE.
+   *
+   * Measured on the garden path: both live readings anchor `horse`, so counting
+   * anchors returned 1 and the most famously ambiguous sentence in the
+   * literature reported as over-determined. The disagreement is real and it is
+   * structural — `horse` is the subject of `raced` or the subject of `fell` —
+   * so the pair is what identifies a distinct reading.
+   */
+  const candidateReadings = new Set(
+    readings.filter((r) => r.candidate).map((r) => `${r.anchor}:${r.structure}`),
+  );
+  const contested = candidateReadings.size > 1;
 
   const primary = readings.find((r) => r.proposedBy === ruling.decidedBy && r.candidate)
     ?? readings.find((r) => r.candidate) ?? null;

@@ -56,18 +56,47 @@ describe('resolveReadings', () => {
   });
 
   /**
-   * The garden path is SETTLED, not contested: once `barn` is recognised as the
-   * object of `past`, both anchor specialists land on `horse`. The losing
-   * reading is still surfaced, so a reader can see why `barn` lost rather than
-   * only that it did.
+   * SUPERSEDED CONCLUSION, KEPT FOR THE PART THAT SURVIVED IT.
+   *
+   * This test used to assert `contested === false` — that once `barn` was
+   * recognised as the object of `past`, both anchor specialists landed on
+   * `horse` and the phrase was settled. That was true of the ANCHOR and false of
+   * the phrase: the rival reading was structural and the contest could not
+   * represent it. See the reduced-relative test below for the overturn.
+   *
+   * What survives is the anchor result and the losing reading's visibility: a
+   * reader can still see WHY `barn` lost rather than only that it did.
    */
-  it('settles the garden path and still shows why the rival lost', () => {
+  it('anchors the garden path on the subject and shows why the rival lost', () => {
     const r = resolveReadings(T('the horse raced past the barn fell'), freq, pos);
-    expect(r.contested).toBe(false);
     expect(r.primary.anchor).toBe('horse');
+    expect(r.primary.structure).toBe('main-clause');
     const barn = r.readings.find((x) => x.anchor === 'barn');
     expect(barn.role).toBe('prepositional-object');
     expect(barn.candidate).toBe(false);
+  });
+
+  /**
+   * THE GARDEN PATH IS A STRUCTURE AMBIGUITY, NOT AN ANCHOR ONE.
+   *
+   * Both live readings anchor `horse` — it is the subject either way. What they
+   * disagree about is WHICH VERB it is the subject OF:
+   *
+   *   main-clause       the horse raced past the barn        (main verb `raced`)
+   *   reduced-relative  the horse [raced past the barn] fell (main verb `fell`)
+   *
+   * A contest counted over anchors alone cannot see this: one anchor, so the
+   * phrase reads as over-determined when it is the most famously ambiguous
+   * sentence in the literature. Readings must be distinguished by the structure
+   * they assume, not only by the token they name.
+   */
+  it('reports the garden path as contested between two structures on one anchor', () => {
+    const r = resolveReadings(T('the horse raced past the barn fell'), freq, pos);
+    expect(r.contested).toBe(true);
+    const onHorse = r.readings.filter((x) => x.candidate && x.anchor === 'horse');
+    const structures = onHorse.map((x) => x.structure);
+    expect(structures).toContain('main-clause');
+    expect(structures).toContain('reduced-relative');
   });
 
   /**
