@@ -434,3 +434,47 @@ The user approved:
 - the three-level promotion model ending in live `STABLE_OPERATIONAL` evidence.
 
 Implementation planning may proceed only against this versioned specification.
+
+## Result record — 2026-08-07
+
+Recorded after executing the 10-task implementation plan
+(`docs/superpowers/plans/2026-08-03-metastable-stateless-apm-hourly-reporter.md`)
+end to end on branch `feature/apm-hourly-chemistry-gate`.
+
+The original stable-selection protocol **failed**, and that negative result is
+retained unchanged:
+
+- `docs/superpowers/evidence/concept-chemistry-apm-hourly-reporter/score.json`
+  — frozen 3-round experiment; gates `sameWinnerEveryRound`,
+  `winnerBeatsBarEveryRound`, and `winnerMedianStable` failed (best median
+  feasibility 0.2646 < STABLE_MIN 0.55); `selectedArchitecture: null`.
+
+The revised majority-control thesis then selected the Stateless Chronicle
+Compiler under the metastable rule approved for this design:
+
+- `docs/superpowers/evidence/concept-chemistry-apm-hourly-reporter/metastable-selection.json`
+  — `METASTABLE_SELECTED`, clearing wins in rounds 1 and 3, aggregate margin
+  0.1259, all law controls caught.
+
+Implementation was validated against the real ledger without touching the
+production report directory:
+
+- `docs/superpowers/evidence/concept-chemistry-apm-hourly-reporter/implementation-replay.json`
+  — `IMPLEMENTED_METASTABLE`; 6 reports replayed from the real 54-record
+  ledger; `sourceUnchanged: true`, `secondPassByteIdentical: true`,
+  `recurrenceGrowthObserved: true`; tested at commit `7f55aad0`.
+
+Automated verification at this point: 48/48 focused Level-1 tests across 12
+files, full PixelBrain regression green (the single `calibration.test.js`
+100-iteration timeout flake passes in isolation and is unrelated), production
+`build:app` green, `immune:scan:all` clean.
+
+The revised thesis has **not yet reached `STABLE_OPERATIONAL`**. The final
+live-restart proof (plan Task 10 Step 7) is pending: it requires integrating
+this branch through the repository merge workflow, restarting the authority
+server, and observing one completed machine-local active hour. A quiet hour
+leaves the step pending and is not a failure. The capture/verify driver
+(`scripts/verify-subtlety-apm-live-operation.mjs`) is committed and tested;
+the `live-operation.json` evidence file will be written only by a passing
+verify phase.
+
