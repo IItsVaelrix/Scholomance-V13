@@ -30,6 +30,7 @@ import { summarize } from '../codex/core/constellation/treebank-metrics.js';
 import {
   compose, projectAnswer, rankByAttraction, guessPos,
 } from '../codex/core/constellation/compose.js';
+import { composePacked, projectAnswers } from '../codex/core/constellation/compose-packed.js';
 import { irregularPos } from '../codex/core/lexical-analysis/irregular-forms.js';
 import { tokenize } from '../codex/core/tokenizer.js';
 
@@ -41,6 +42,11 @@ const argOf = (flag, fallback) => {
 const SPLIT = argOf('--split', 'dev');
 const LIMIT = Number(argOf('--limit', '0')) || Infinity;
 const MAX_TOKENS = Number(argOf('--max-tokens', '28')) || 28;
+const PARSER = argOf('--parser', 'classic');
+if (PARSER !== 'classic' && PARSER !== 'packed') {
+  console.error(`--parser must be classic or packed, got ${PARSER}`);
+  process.exit(1);
+}
 
 const CORPUS = path.resolve(`cache/ud/en_ewt-ud-${SPLIT}.conllu`);
 const DICT = path.resolve('scholomance_dict.sqlite');
@@ -133,18 +139,28 @@ const rows = sample.map((record) => {
   let result;
   let goldResult;
   try {
-    result = compose(tokens, posMap);
-    goldResult = compose(tokens, goldMap);
+    result = PARSER === 'packed' ? composePacked(tokens, posMap) : compose(tokens, posMap);
+    goldResult = PARSER === 'packed' ? composePacked(tokens, goldMap) : compose(tokens, goldMap);
   } catch {
     droppedThrew += 1;
     return null;
   }
 
-  const answers = result.stable.map(projectAnswer);
+  const answers = PARSER === 'packed'
+    ? result.stable.flatMap((s) => projectAnswers(s))
+    : result.stable.map(projectAnswer);
   const contained = answers.some((a) => same(a.subject, gold.subject) && same(a.verb, gold.verb));
 
+  /**
+   * DECISION IS NOT AVAILABLE FOR THE PACKED PARSER. `rankByAttraction` scores
+   * the leaves of one concrete parse, and a packed node is not one parse. Its
+   * geometric mean is not Viterbi-decomposable because `counted` varies by
+   * derivation, so making it work is a separate, measured decision. Reporting
+   * null is the honest form; substituting a number would print an accuracy for
+   * a measurement nobody made.
+   */
   let decided = null;
-  if (senseMap) {
+  if (PARSER === 'classic' && senseMap) {
     const ranked = rankByAttraction(result.stable, senseMap);
     const top = ranked.length > 0 ? projectAnswer(ranked[0].molecule) : null;
     decided = Boolean(top && same(top.subject, gold.subject) && same(top.verb, gold.verb));
@@ -177,7 +193,7 @@ const rows = sample.map((record) => {
 const report = summarize(rows);
 const pct = (x) => (x === null ? '  null' : `${(x * 100).toFixed(1)}%`);
 
-console.log(`\nUD English-EWT / ${SPLIT} — ${report.n} sentences (cap: --max-tokens ${MAX_TOKENS})\n`);
+console.log(`\nUD English-EWT / ${SPLIT} — ${report.n} sentences (parser: ${PARSER}, cap: --max-tokens ${MAX_TOKENS})\n`);
 console.log(`  skipped (> ${MAX_TOKENS} tokens)     ${skippedTooLong} of ${sample.length}   — compose materialises every parse; these do not terminate`);
 console.log(`  dropped (compose threw)    ${droppedThrew}`);
 console.log(`coverage      ${pct(report.coverage)}   a spanning S exists`);
