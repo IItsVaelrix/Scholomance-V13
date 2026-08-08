@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { composePacked, headsOf, projectAnswers } from '../../../codex/core/constellation/compose-packed.js';
-import { compose, BONDS } from '../../../codex/core/constellation/compose.js';
+import { compose, projectAnswer, BONDS } from '../../../codex/core/constellation/compose.js';
 
 const pos = new Map([
   ['stars', ['n']], ['burn', ['n', 'v']], ['bright', ['a', 'r']],
@@ -36,6 +36,16 @@ describe('composePacked — the packing invariant', () => {
     expect(totalDerivations).toBeGreaterThan(r.molecules.length);
   });
 
+  /**
+   * `events` counts agenda POPS (== pushes, since the agenda always drains to
+   * empty), not cell insertions. Under the wake rule those two are the same
+   * number for correct code, which is why this still reads as an equality —
+   * but the equality is no longer definitional. If the wake rule leaks and an
+   * EXISTING node gets pushed back onto the agenda, that extra pop is counted
+   * here and `events` stops matching `molecules.length` (a fresh push adds no
+   * new distinct node, so `molecules.length` does not move with it). See the
+   * mutation check below, which proves this on the stacked-PP sentence.
+   */
   it('enqueues each (span, category) exactly once', () => {
     const r = composePacked(STACKED, pos);
     expect(r.events).toBe(r.molecules.length);
@@ -49,6 +59,22 @@ describe('composePacked — the packing invariant', () => {
     const n = STACKED.length;
     const r = composePacked(STACKED, pos);
     expect(r.events).toBeLessThanOrEqual((n * (n + 1)) / 2 * 40);
+  });
+
+  /**
+   * THE MUTATION CHECK. `events` is documented as agenda activity, not node
+   * creation. This pins the number itself — 106 pops on the 17-token
+   * stacked-PP sentence — so a future change that reintroduces the old
+   * "count node creation" definition (which stays at 106 even when the wake
+   * rule leaks, because it is blind to re-pushes) is caught even without
+   * deliberately breaking the wake rule to notice.
+   */
+  it('counts exactly the measured agenda activity on the stacked-PP sentence', () => {
+    const r = composePacked(STACKED, pos);
+    const totalDerivations = r.molecules.reduce((sum, m) => sum + m.derivations.length, 0);
+    expect(r.events).toBe(106);
+    expect(r.molecules.length).toBe(106);
+    expect(totalDerivations).toBe(134);
   });
 });
 
@@ -92,6 +118,26 @@ describe('composePacked — edges', () => {
   it('honours a declared root other than S', () => {
     const r = composePacked(T('the old man'), pos, { roots: ['NP'] });
     expect(r.stable.map((m) => m.type)).toContain('NP');
+  });
+
+  /**
+   * THE PLACE THE TWO CHARTS WERE KNOWN TO DISAGREE. `projectAnswer` in
+   * compose.js opens with `if (molecule.type !== 'S') return { subject: null,
+   * verb: null }`. Before `projectAnswersFrom` gained the matching guard, the
+   * packed chart fell through to the NP's own `DET + N` derivation and
+   * reported the determiner as the subject: `{ subject: 'the', verb: 'man' }`
+   * for a bare NP query, where the classic chart correctly answered
+   * `{ subject: null, verb: null }`. Pinned here so the two charts cannot
+   * silently diverge on this again.
+   */
+  it('agrees with the classic chart when the root is NP, not S', () => {
+    const tokens = T('the old man');
+    const classicMolecule = compose(tokens, pos, { roots: ['NP'] }).stable[0];
+    const packedNode = composePacked(tokens, pos, { roots: ['NP'] }).stable[0];
+    const classicAnswer = projectAnswer(classicMolecule);
+    const packedAnswers = projectAnswers(packedNode);
+    expect(classicAnswer).toEqual({ subject: null, verb: null });
+    expect(packedAnswers).toEqual([]);
   });
 });
 

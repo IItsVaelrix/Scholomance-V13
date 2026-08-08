@@ -289,12 +289,38 @@ const BONDS = [
  * A default of 0 would reproduce exactly that failure, because the bonds nobody
  * reviewed would keep the old behaviour. Throwing here means an unreviewed bond
  * cannot run.
+ *
+ * A declared head is only unambiguous if `(left, right, result)` names at
+ * most one bond — `headOf` looks a bond up by that triple and trusts there is
+ * only one match. That uniqueness holds today (68 bonds, 68 distinct
+ * signatures) but nothing enforced it before this loop; a second bond
+ * quietly reusing a signature would make `headOf` read whichever one
+ * `BONDS.find` happened to see first, and nothing here would say so. This
+ * loop now checks BOTH properties this module depends on: every bond
+ * declares a head, and no two bonds share a signature.
+ *
+ * Factored into a function, rather than inlined as a bare loop, so a test can
+ * run the same check against a synthetic bond list and prove the duplicate
+ * branch actually fires — the real `BONDS` table only has one chance to
+ * exercise it (module load), and that chance is spent proving BONDS is
+ * clean, not proving the check works.
+ *
+ * @param {Array<[string, string, string, 0|1]>} bonds
  */
-for (const bond of BONDS) {
-  if (bond.length !== 4 || (bond[3] !== 0 && bond[3] !== 1)) {
-    throw new Error(`BONDS entry missing a head index: ${JSON.stringify(bond)}`);
+export function validateBonds(bonds) {
+  const seenSignatures = new Set();
+  for (const bond of bonds) {
+    if (bond.length !== 4 || (bond[3] !== 0 && bond[3] !== 1)) {
+      throw new Error(`BONDS entry missing a head index: ${JSON.stringify(bond)}`);
+    }
+    const signature = `${bond[0]}|${bond[1]}|${bond[2]}`;
+    if (seenSignatures.has(signature)) {
+      throw new Error(`BONDS has more than one entry for ${signature} — headOf's lookup would be ambiguous`);
+    }
+    seenSignatures.add(signature);
   }
 }
+validateBonds(BONDS);
 
 /** Unary lifts: a bare token standing in for a phrase. */
 /**
@@ -447,15 +473,25 @@ function atomsFor(token, index, posMap) {
 function headOf(m) {
   if (m.parts.length === 0) return m.token;
   if (m.parts.length === 1) return headOf(m.parts[0]);
-  // `(left, right, result)` is unique across the table — verified 2026-08-08,
-  // no duplicate signatures — so this find is unambiguous.
+  // `(left, right, result)` is unique across the table — the validation loop
+  // above throws at module load if two bonds ever share a signature — so this
+  // find is unambiguous whenever it succeeds.
   const bond = BONDS.find(
     (b) => b[0] === m.parts[0].type && b[1] === m.parts[1].type && b[2] === m.type,
   );
-  // A molecule whose bond cannot be found is a chart the grammar did not build.
-  // Falling back to the left child keeps this total rather than throwing inside
-  // a projection, and the head-declaration test proves the table is complete.
-  return headOf(bond ? m.parts[bond[3]] : m.parts[0]);
+  // A molecule whose bond cannot be found is a chart the grammar did not
+  // build — every molecule this module constructs is built by walking BONDS,
+  // so this can only mean the caller handed in a molecule from somewhere
+  // else, or a corrupted one. Silently falling back to the left child
+  // reproduces the exact positional-guessing bug this branch removed
+  // (`headOf` used to guess `parts[0]` for everything); throwing keeps that
+  // bug from coming back through the one path nobody was watching.
+  if (!bond) {
+    throw new Error(
+      `headOf: no bond found for ${m.parts[0].type} + ${m.parts[1].type} -> ${m.type}`,
+    );
+  }
+  return headOf(m.parts[bond[3]]);
 }
 
 /**

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  compose, projectAnswer, guessPos, rankByAttraction,
+  compose, projectAnswer, guessPos, rankByAttraction, validateBonds,
 } from '../../../codex/core/constellation/compose.js';
 
 const pos = new Map([
@@ -618,6 +618,61 @@ describe('compose', () => {
       const bare = spanningS(compose(T('the dog chased the cat'), pos));
       const punctuated = spanningS(compose(T('the dog chased the cat .'), pos));
       expect(projectAnswer(punctuated[0])).toEqual(projectAnswer(bare[0]));
+    });
+  });
+
+  /**
+   * `headOf` looks a bond up by `(left, right, result)` and trusts the match
+   * is unique. `validateBonds` is the enforcement of that trust — it is the
+   * same loop the module runs on the real `BONDS` at load time, factored out
+   * so a test can run it against a synthetic table and prove the duplicate
+   * branch actually fires, rather than trusting the real table never
+   * happening to hit it.
+   */
+  describe('validateBonds — the uniqueness headOf depends on', () => {
+    it('accepts a table with no duplicate signatures', () => {
+      expect(() => validateBonds([
+        ['DET', 'N', 'NP', 1],
+        ['ADJ', 'N', 'N', 1],
+      ])).not.toThrow();
+    });
+
+    it('throws when two bonds share a (left, right, result) signature', () => {
+      expect(() => validateBonds([
+        ['DET', 'N', 'NP', 1],
+        ['DET', 'N', 'NP', 0],
+      ])).toThrow(/more than one entry/);
+    });
+
+    it('still throws on a bond missing a head index', () => {
+      expect(() => validateBonds([['DET', 'N', 'NP']])).toThrow(/missing a head index/);
+    });
+  });
+
+  /**
+   * `headOf` used to fall back to `parts[0]` when no bond matched — silently
+   * reproducing the exact positional-guessing bug this branch removed. It now
+   * throws instead. A molecule whose `(left, right, result)` signature is not
+   * in `BONDS` is not buildable by `compose`, so this can only be exercised
+   * with a hand-built molecule, the same way the packed chart's equivalent
+   * bug (Finding 2) could only be shown with a hand-built root.
+   */
+  describe('headOf — no bond found', () => {
+    it('throws rather than silently guessing the left child', () => {
+      const bogusChild = {
+        type: 'NOT_A_REAL_RESULT',
+        parts: [
+          { type: 'ZZZ', parts: [], token: 'first' },
+          { type: 'YYY', parts: [], token: 'second' },
+        ],
+        token: null,
+      };
+      const bogusRoot = {
+        type: 'S',
+        parts: [bogusChild, { type: 'VP', parts: [], token: 'verb' }],
+        token: null,
+      };
+      expect(() => projectAnswer(bogusRoot)).toThrow(/no bond found/);
     });
   });
 });

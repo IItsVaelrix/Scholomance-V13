@@ -28,9 +28,15 @@ import { BONDS, LIFTS, atomsFor } from './compose.js';
  * @param {{roots?: string[]}} [options] acceptable root types; defaults to a
  *   complete clause, matching `compose`.
  * @returns {{atoms: object[], molecules: object[], spanning: object[],
- *   stable: object[], events: number}} `events` is how many nodes were ever
- *   enqueued — the termination measurement, exposed so a test can assert the
- *   bound rather than trust it.
+ *   stable: object[], events: number}} `events` is how many times a node was
+ *   pushed onto the agenda — the termination measurement, exposed so a test
+ *   can assert the bound rather than trust it. This is NOT the same as the
+ *   number of distinct nodes: it counts agenda activity, and the wake rule
+ *   (see `offer` below) is precisely what keeps agenda activity from
+ *   exceeding the node count. A counter that only counted node creation would
+ *   be blind to a wake-rule leak — incrementing on `agenda.push` is what
+ *   makes this the actual termination measurement rather than a tautology
+ *   against `molecules.length`.
  */
 export function composePacked(tokens, posMap, options = {}) {
   const roots = options.roots || ['S'];
@@ -57,7 +63,6 @@ export function composePacked(tokens, posMap, options = {}) {
     const node = { type, from, to, derivations: [derivation], token: null };
     cell[from][to].set(type, node);
     agenda.push(node);
-    events += 1;
   };
 
   const atoms = [];
@@ -69,12 +74,21 @@ export function composePacked(tokens, posMap, options = {}) {
       cell[i][i].set(a.type, node);
       atoms.push(node);
       agenda.push(node);
-      events += 1;
     }
   }
 
+  /**
+   * `events` counts POPS, not pushes at a call site. This is deliberate: every
+   * pushed node is popped exactly once before the loop below exits (the
+   * agenda drains to empty), so counting pops is equivalent to counting
+   * pushes yet needs no cooperation from wherever a push happens. A wake-rule
+   * leak that pushes an EXISTING node — the exact mutation this counter must
+   * catch — still goes through this same loop and still gets popped, so it
+   * still gets counted, with no separate instrumentation to forget.
+   */
   while (agenda.length > 0) {
     const node = agenda.pop();
+    events += 1;
 
     // Unary lifts occupy the same span, so they are offered like any other
     // derivation. A lift onto a category the cell already has adds a
@@ -191,6 +205,16 @@ export function headsOf(node, memo = new Map()) {
  * subject is genuinely absent and projects as null rather than as an invented
  * `you`.
  *
+ * ONLY `S` NODES HAVE {subject, verb} SHAPE. `{ roots: ['NP'] }` is
+ * first-class — `compose.js` documents that a bare noun phrase is queried as
+ * often as a sentence — so a non-`S` node reaching this function is not an
+ * error, it is a caller asking the wrong projection of a right answer. The
+ * classic `projectAnswer` in `compose.js` guards this with
+ * `molecule.type !== 'S'`; `projectAnswersFrom` below guards it the same way,
+ * otherwise `{ roots: ['NP'] }` on `the old man` would fall through to the
+ * NP's own two-child derivation (`DET + N`) and report the determiner as the
+ * subject — exactly the positional guess the head-declaration work removed.
+ *
  * TERMINAL PUNCTUATION IS NOT A PREDICATE. `S + PUNCT -> S` lets a clause
  * absorb its trailing `. ! ? ; :` so the whole sentence can span, because UD
  * tokenizes that mark separately from the word before it. A derivation whose
@@ -225,7 +249,7 @@ export function projectAnswers(node, memo = new Map()) {
  * @returns {Array<{subject: string|null, verb: string}>}
  */
 function projectAnswersFrom(node, memo, visiting) {
-  if (!node || visiting.has(node)) return [];
+  if (!node || node.type !== 'S' || visiting.has(node)) return [];
   visiting.add(node);
   const byKey = new Map();
   for (const d of node.derivations) {
