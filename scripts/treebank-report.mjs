@@ -200,7 +200,9 @@ console.log(`coverage      ${pct(report.coverage)}   a spanning S exists`);
 console.log(`containment   ${pct(report.containment)}   gold answer is among the projected answers`);
 console.log(`decision      ${pct(report.decision)}   top-ranked parse projects to the gold answer`);
 if (report.decision === null) {
-  console.log('              (no sense source — decision is not reported rather than faked)');
+  console.log(PARSER === 'packed'
+    ? '              (packed nodes are not single parses — rankByAttraction does not apply; see the ranking section of the spec)'
+    : '              (no sense source — decision is not reported rather than faked)');
 }
 
 console.log('\nby gold root UPOS');
