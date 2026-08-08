@@ -193,17 +193,53 @@ export function headsOf(node, memo = new Map()) {
  * subject is genuinely absent and projects as null rather than as an invented
  * `you`.
  *
+ * TERMINAL PUNCTUATION IS NOT A PREDICATE. `S + PUNCT -> S` lets a clause
+ * absorb its trailing `. ! ? ; :` so the whole sentence can span, because UD
+ * tokenizes that mark separately from the word before it. A derivation whose
+ * right child is `PUNCT` is not `[subject, predicate]` — reading `headOf`
+ * off `d.right` there answers `.`, which is exactly what made every newly
+ * parsing sentence report its full stop as the verb. Such a derivation
+ * contributes whatever `d.left` contributes, and nothing of its own, so this
+ * descends into `d.left`'s derivations and re-projects from there instead.
+ * This must match `projectAnswer` in `compose.js` exactly — the equivalence
+ * harness compares the two functions directly.
+ *
  * @param {object} node a root node, or undefined
  * @param {Map<object, Set<string>>} [memo]
  * @returns {Array<{subject: string|null, verb: string}>}
  */
 export function projectAnswers(node, memo = new Map()) {
-  if (!node) return [];
+  return projectAnswersFrom(node, memo, new Set());
+}
+
+/**
+ * `projectAnswers`'s body, plus the `visiting` cycle guard the PUNCT-
+ * absorption recursion needs — in the same spirit as `headsOf`'s
+ * memo-seeded guard. Spans strictly shrink on every recursive step today
+ * (a PUNCT atom is never zero tokens wide), so this never actually fires;
+ * it is defensive rather than load-bearing. Kept as a separate, unexported
+ * function so the public `projectAnswers(node, memo)` signature never
+ * changes shape.
+ *
+ * @param {object} node a root node, or undefined
+ * @param {Map<object, Set<string>>} memo
+ * @param {Set<object>} visiting nodes currently on the recursion stack
+ * @returns {Array<{subject: string|null, verb: string}>}
+ */
+function projectAnswersFrom(node, memo, visiting) {
+  if (!node || visiting.has(node)) return [];
+  visiting.add(node);
   const byKey = new Map();
   for (const d of node.derivations) {
     if (d.lift) {
       for (const verb of headsOf(d.child, memo)) {
         byKey.set(`|${verb}`, { subject: null, verb });
+      }
+      continue;
+    }
+    if (d.right.type === 'PUNCT') {
+      for (const answer of projectAnswersFrom(d.left, memo, visiting)) {
+        byKey.set(`${answer.subject ?? ''}|${answer.verb}`, answer);
       }
       continue;
     }
@@ -213,5 +249,6 @@ export function projectAnswers(node, memo = new Map()) {
       }
     }
   }
+  visiting.delete(node);
   return [...byKey.values()];
 }

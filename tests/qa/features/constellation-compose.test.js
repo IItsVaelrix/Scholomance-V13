@@ -595,4 +595,29 @@ describe('compose', () => {
       expect(compose(T('the dark wood'), pos).stable).toEqual([]);
     });
   });
+
+  /**
+   * TERMINAL PUNCTUATION IS NOT A PREDICATE. `S + PUNCT -> S` lets a clause
+   * absorb its trailing `.` so sentences that end in punctuation can span at
+   * all — but `parts[1]` of that S is the punctuation atom, not a verb
+   * phrase. Before this fix `projectAnswer` read `headOf(parts[1])` blindly
+   * and reported the full stop itself as the verb.
+   */
+  describe('terminal punctuation', () => {
+    it('projects a sentence with a trailing period onto its real verb, not the period', () => {
+      const [s] = spanningS(compose(T('stars burn .'), pos));
+      expect(projectAnswer(s)).toEqual({ subject: 'stars', verb: 'burn' });
+    });
+
+    it('absorbs terminal punctuation on a transitive clause without changing the answer', () => {
+      const [s] = spanningS(compose(T('the dog chased the cat .'), pos));
+      expect(projectAnswer(s)).toEqual({ subject: 'dog', verb: 'chased' });
+    });
+
+    it('agrees with the punctuation-free projection of the same clause', () => {
+      const bare = spanningS(compose(T('the dog chased the cat'), pos));
+      const punctuated = spanningS(compose(T('the dog chased the cat .'), pos));
+      expect(projectAnswer(punctuated[0])).toEqual(projectAnswer(bare[0]));
+    });
+  });
 });

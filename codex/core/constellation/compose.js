@@ -430,6 +430,17 @@ export function projectAnswer(molecule) {
    */
   const [first, second] = molecule.parts;
   if (!second) return { subject: null, verb: headOf(first) };
+  /**
+   * TERMINAL PUNCTUATION IS NOT A PREDICATE. `S + PUNCT -> S` lets a clause
+   * absorb its trailing `. ! ? ; :` so the whole sentence can span, because UD
+   * tokenizes that mark separately from the word before it — but `parts[1]`
+   * here is the punctuation atom, not a verb phrase, and reading `headOf` off
+   * it answers `.`. Every sentence that only newly parses because of this bond
+   * would otherwise report its full stop as the verb. Look through it instead:
+   * the answer is whatever `parts[0]` — the clause that did the absorbing —
+   * already projects to, and the punctuation contributes nothing of its own.
+   */
+  if (second.type === 'PUNCT') return projectAnswer(first);
   return { subject: headOf(first), verb: headOf(second) };
 }
 

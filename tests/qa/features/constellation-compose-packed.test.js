@@ -157,3 +157,44 @@ describe('headsOf / projectAnswers', () => {
     expect([...headsOf(twoWays)].sort()).toEqual(['alpha', 'beta']);
   });
 });
+
+/**
+ * TERMINAL PUNCTUATION IS NOT A PREDICATE. `S + PUNCT -> S` lets a clause
+ * absorb its trailing `.` so sentences that end in punctuation can span at
+ * all — but the derivation's right child there is the punctuation atom, not
+ * a verb phrase. Before this fix `projectAnswers` unioned in `headsOf(PUNCT
+ * atom)` as the verb, so every newly-parsing punctuated sentence answered
+ * `.` instead of its real verb.
+ */
+describe('projectAnswers — terminal punctuation absorption', () => {
+  it('projects a sentence with a trailing period onto its real verb, not the period', () => {
+    const r = composePacked(T('stars burn .'), pos);
+    const answers = projectAnswers(r.stable[0]);
+    expect(answers.map(answerKey)).toEqual(['stars|burn']);
+  });
+
+  it('absorbs terminal punctuation on a transitive clause without changing the answer', () => {
+    const r = composePacked(T('the dog chased the cat .'), pos);
+    const answers = projectAnswers(r.stable[0]);
+    expect(answers.map(answerKey)).toEqual(['dog|chased']);
+  });
+
+  it('agrees with the punctuation-free projection of the same clause', () => {
+    const bare = composePacked(T('the dog chased the cat'), pos);
+    const punctuated = composePacked(T('the dog chased the cat .'), pos);
+    const bareAnswers = projectAnswers(bare.stable[0]).map(answerKey).sort();
+    const punctuatedAnswers = projectAnswers(punctuated.stable[0]).map(answerKey).sort();
+    expect(punctuatedAnswers).toEqual(bareAnswers);
+  });
+
+  /**
+   * The punctuation-free cases from the block above must still project
+   * exactly as they did — this bond only changes derivations whose right
+   * child actually is PUNCT.
+   */
+  it('leaves the stacked-PP answer unaffected by the PUNCT absorption rule', () => {
+    const r = composePacked(STACKED, pos);
+    const answers = projectAnswers(r.stable[0]);
+    expect(answers.map(answerKey)).toEqual(['dog|chased']);
+  });
+});
