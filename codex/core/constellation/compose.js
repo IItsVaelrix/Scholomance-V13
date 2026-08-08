@@ -168,6 +168,15 @@ const BONDS = [
   ['SCOMMA', 'S', 'S'],          // he ran , she fell
 
   /**
+   * TERMINAL PUNCTUATION. UD tokenizes sentence-final `.` `!` `?` `;` `:` as
+   * their own token, separate from the word before them, so a clause must be
+   * able to absorb it directly or nothing spans the input at all — the
+   * measured top cause of parse failure (see PUNCT atom above). Deliberately
+   * minimal: only a clause absorbs it, nothing else does yet.
+   */
+  ['S', 'PUNCT', 'S'],      // a clause absorbs its terminal punctuation
+
+  /**
    * ── PARTICLES / PHRASAL VERBS ──────────────────────────────────────────
    *
    * The particle joins the VERB rather than forming a phrase of its own, which
@@ -367,6 +376,16 @@ function atomsFor(token, index, posMap) {
   if (lower === 'to') out.push('TO');
   if (lower === 'than') out.push('THAN');
   if (lower === ',') out.push('COMMA');
+  /**
+   * TERMINAL PUNCTUATION. UD tokenizes `.` `!` `?` `;` `:` as their own token,
+   * separate from the word before them — so a clause that spans everything up
+   * to but not including the final period has nothing left to absorb it into.
+   * Measured as the single largest cause of parse failure across 2,001 gold
+   * EWT sentences (918 `PUNCT -> VERB` failures alone). Kept distinct from
+   * COMMA, which has its own constructions (fronting, apposition, clause
+   * coordination) built on it above.
+   */
+  if (lower === '.' || lower === '!' || lower === '?' || lower === ';' || lower === ':') out.push('PUNCT');
   if (PARTICLES.has(lower)) out.push('PRT');
   // The clitic either arrives glued (`man's`) or split off by the tokenizer
   // (`'s`); both are possessive, and the split form is also the copula in

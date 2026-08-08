@@ -41,13 +41,13 @@ describe('composePacked — the packing invariant', () => {
   });
 
   /**
-   * THE BOUND. n(n+1)/2 spans x 39 categories. Exceeding it means the wake
+   * THE BOUND. n(n+1)/2 spans x 40 categories. Exceeding it means the wake
    * rule is leaking and a cell is re-broadcasting on a category it already had.
    */
   it('stays under the span x category bound', () => {
     const n = STACKED.length;
     const r = composePacked(STACKED, pos);
-    expect(r.events).toBeLessThanOrEqual((n * (n + 1)) / 2 * 39);
+    expect(r.events).toBeLessThanOrEqual((n * (n + 1)) / 2 * 40);
   });
 });
 
