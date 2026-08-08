@@ -56,6 +56,8 @@
     "test:qa:stasis:watch": "vitest tests/qa/ui-stasis-bytecode.test.jsx",
     "test:qa:features": "vitest run tests/qa/features",
     "test:qa:backend": "vitest run tests/qa/backend",
+    "treebank:fetch": "node scripts/fetch-ud-treebank.mjs",
+    "treebank:report": "node scripts/treebank-report.mjs",
     "ui:schema:validate": "vitest run tests/qa/features/compose-schema.test.ts tests/qa/features/compose-packet-golden.test.ts",
     "ui:contracts:test": "vitest run tests/qa/features/compose-phase1.test.ts tests/qa/features/compose-packet-golden.test.ts",
     "ui:layout:test": "vitest run tests/qa/features/compose-layout.test.ts tests/qa/features/compose-taffy-wasm.test.ts",

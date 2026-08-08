@@ -186,3 +186,7 @@ output/carrier-e2e/
 # scripts/fetch-gutenberg-corpus.mjs. Derived data, not source.
 cache/gutenberg/
 cache/pg_catalog.csv
+
+# Universal Dependencies English-EWT — gold treebank, fetched by
+# scripts/fetch-ud-treebank.mjs. CC BY-SA 4.0, not vendored.
+cache/ud/
