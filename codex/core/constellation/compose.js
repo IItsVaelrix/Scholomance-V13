@@ -588,3 +588,16 @@ export function compose(tokens, posMap, options = {}) {
 
   return { atoms, molecules, spanning, stable };
 }
+
+/**
+ * EXPOSED FOR `compose-packed.js`, which reuses this grammar and this atom
+ * typing verbatim rather than copying them.
+ *
+ * A second copy of `atomsFor` would be a second place for the capitalisation
+ * rule and the lexicon/irregular/suffix precedence to drift, and the two
+ * parsers must be comparable atom-for-atom or the equivalence harness proves
+ * nothing about the chart.
+ *
+ * This is an export-only addition. No logic in this file changes.
+ */
+export { BONDS, LIFTS, atomsFor };
