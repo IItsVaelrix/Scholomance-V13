@@ -45,10 +45,10 @@ import { irregularPos } from '../lexical-analysis/irregular-forms.js';
  * phrase already under test.
  */
 const BONDS = [
-  ['DET', 'N', 'NP'],
-  ['P', 'NP', 'PP'],
-  ['V', 'PP', 'VP'],
-  ['NP', 'VP', 'S'],
+  ['DET', 'N', 'NP', 1],      // UD det: the noun is the head
+  ['P', 'NP', 'PP', 1],       // UD case: the preposition is a dependent
+  ['V', 'PP', 'VP', 0],
+  ['NP', 'VP', 'S', 1],       // UD roots a clause on its verb
   /**
    * The same two atoms bond two ways. `raced` + `past the barn` is a finite verb
    * phrase OR a participial modifier, and nothing local distinguishes them —
@@ -56,47 +56,51 @@ const BONDS = [
    * for one set of atoms with two arrangements, and it is the right one here:
    * these are isomers, not a mistake to be resolved at bond time.
    */
-  ['V', 'PP', 'PART'],
-  ['NP', 'PART', 'NP'],
-  ['V', 'NP', 'VP'],
-  ['V', 'NPO', 'VP'],      // saw HIM
-  ['P', 'NPO', 'PP'],      // with HIM
-  ['V', 'ADJ', 'VP'],
+  ['V', 'PP', 'PART', 0],
+  ['NP', 'PART', 'NP', 0],
+  ['V', 'NP', 'VP', 0],
+  ['V', 'NPO', 'VP', 0],      // saw HIM
+  ['P', 'NPO', 'PP', 1],      // UD case
+  ['V', 'ADJ', 'VP', 0],
   /**
    * THE CATALAN GENERATOR. A prepositional phrase can modify what was done or
    * what it was done to, and nothing structural chooses between them. These two
    * rules are where parse counts start multiplying, and they are also
    * unavoidable — English genuinely permits both.
    */
-  ['VP', 'PP', 'VP'],
-  ['NP', 'PP', 'NP'],
+  ['VP', 'PP', 'VP', 0],
+  ['NP', 'PP', 'NP', 0],
 
   /* ── coverage rules ─────────────────────────────────────────────────── */
-  ['ADJ', 'N', 'N'],       // the OLD MAN — stacks, so `the old grey man` works
-  ['ADV', 'ADJ', 'ADJ'],   // VERY OLD
-  ['ADV', 'VP', 'VP'],     // QUICKLY RAN
-  ['VP', 'ADV', 'VP'],     // RAN QUICKLY
+  ['ADJ', 'N', 'N', 1],       // the OLD MAN — stacks, so `the old grey man` works
+                               // THE BUG: attributive adjective is amod, not the head
+  ['ADV', 'ADJ', 'ADJ', 1],   // VERY OLD
+  ['ADV', 'VP', 'VP', 1],     // QUICKLY RAN
+  ['VP', 'ADV', 'VP', 0],     // RAN QUICKLY
   /**
    * Only a COPULA takes a predicate — `he is happy`, never `he will happy`.
    * Every auxiliary kind can take a verb phrase, which is what `AUX`/`MODAL`
    * license below.
    */
-  ['COP', 'ADJ', 'VP'],    // IS TIRED
-  ['COP', 'NP', 'VP'],     // IS A MAN
-  ['COP', 'VP', 'VP'],     // IS RUNNING
-  ['AUX', 'VP', 'VP'],     // HAD GONE
-  ['MODAL', 'VP', 'VP'],   // CAN RUN
-  ['REL', 'VP', 'RELC'],   // WHO RAN
-  ['NP', 'RELC', 'NP'],    // the man WHO RAN
+  ['COP', 'ADJ', 'VP', 1],    // IS TIRED — UD cop: `is tired` roots on tired
+  ['COP', 'NP', 'VP', 1],     // IS A MAN — UD cop: `is a man` roots on man
+  ['COP', 'VP', 'VP', 1],     // IS RUNNING — THE BUG
+  ['AUX', 'VP', 'VP', 1],     // HAD GONE — THE BUG: `had gone` roots on gone
+  ['MODAL', 'VP', 'VP', 1],   // CAN RUN — THE BUG: `can run` roots on run
+  ['REL', 'VP', 'RELC', 1],   // WHO RAN
+  ['NP', 'RELC', 'NP', 0],    // the man WHO RAN
 
   /**
    * Coordination is ternary (`X and Y`) and this table is binary, so the
    * conjunction first bonds rightward into a partial, which then bonds left.
    * Same shape for every category that coordinates.
    */
-  ['CONJ', 'NP', 'CONJNP'], ['NP', 'CONJNP', 'NP'],
-  ['CONJ', 'VP', 'CONJVP'], ['VP', 'CONJVP', 'VP'],
-  ['CONJ', 'S', 'CONJS'], ['S', 'CONJS', 'S'],
+  ['CONJ', 'NP', 'CONJNP', 1], // UD cc: the conjunction is a dependent
+  ['NP', 'CONJNP', 'NP', 0],   // UD conj attaches to the FIRST conjunct
+  ['CONJ', 'VP', 'CONJVP', 1],
+  ['VP', 'CONJVP', 'VP', 0],   // first conjunct
+  ['CONJ', 'S', 'CONJS', 1],
+  ['S', 'CONJS', 'S', 0],      // first conjunct
   /**
    * DISCOURSE-INITIAL COORDINATION. `And the Spirit of God moved upon the face
    * of the waters` joins a sentence that is not in the input, so the left
@@ -104,7 +108,7 @@ const BONDS = [
    * sentences composed across their whole length and still failed for want of
    * this one bond.
    */
-  ['CONJ', 'S', 'S'],
+  ['CONJ', 'S', 'S', 1],     // sentence-initial `And ...`; the clause is the head
 
   /**
    * ── the four the failure set named ─────────────────────────────────────
@@ -113,29 +117,35 @@ const BONDS = [
    * rule-gap failures and 0.0% of successes. Negation, existentials and
    * wh-questions were equally common in both and are deliberately NOT here.
    */
-  ['TO', 'VP', 'INF'],      // TO RUN
-  ['V', 'INF', 'VP'],       // wants TO RUN
-  ['COP', 'INF', 'VP'],     // is TO BE done
-  ['NP', 'INF', 'NP'],      // a man TO SEE
+  ['TO', 'VP', 'INF', 1],      // TO RUN — UD mark
+  ['V', 'INF', 'VP', 0],       // wants TO RUN
+  ['COP', 'INF', 'VP', 1],     // is TO BE done — UD cop
+  ['NP', 'INF', 'NP', 0],      // a man TO SEE
 
-  ['SUB', 'S', 'SBAR'],     // BECAUSE SHE CAME
-  ['S', 'SBAR', 'S'],       // he left BECAUSE SHE CAME
-  ['SBAR', 'S', 'S'],       // BECAUSE SHE CAME, he left
+  ['SUB', 'S', 'SBAR', 1],     // BECAUSE SHE CAME — UD mark
+  ['S', 'SBAR', 'S', 0],       // he left BECAUSE SHE CAME — main clause is the head
+  ['SBAR', 'S', 'S', 1],       // BECAUSE SHE CAME, he left — fronted subordinate clause; main clause is the head
 
-  ['THAN', 'NP', 'THANP'],  // THAN THE BOY
-  ['ADJ', 'THANP', 'ADJ'],  // older THAN THE BOY
-  ['VP', 'THANP', 'VP'],    // ran faster THAN THE BOY
+  ['THAN', 'NP', 'THANP', 1],  // THAN THE BOY
+  ['ADJ', 'THANP', 'ADJ', 0],  // older THAN THE BOY
+  ['VP', 'THANP', 'VP', 0],    // ran faster THAN THE BOY
 
   /** A possessor modifies its noun exactly as an adjective does. */
-  ['POSS', 'N', 'N'],       // THE MAN'S hat
+  ['POSS', 'N', 'N', 1],       // THE MAN'S hat
 
   /**
    * A SPLIT clitic scopes over the whole possessor phrase, not the adjacent
    * noun: in `the old man 's hat` it is THE OLD MAN who owns it. This is why a
    * correct tokenizer separates it — glued to `man`, that reading is unsayable.
+   *
+   * RULING: neither bond below is settled by "head is the content word" alone —
+   * both children are already phrases. `NP + POSS -> GEN` heads on the
+   * possessor NP, because the possessor is who the phrase is about until the
+   * possessed noun arrives. `GEN + N -> NP` then heads on the possessed noun,
+   * per UD nmod:poss.
    */
-  ['NP', 'POSS', 'GEN'],    // the old man + 'S
-  ['GEN', 'N', 'NP'],       // (the old man 's) + HAT
+  ['NP', 'POSS', 'GEN', 0],    // the old man + 'S — RULING: the possessor noun heads the possessor phrase
+  ['GEN', 'N', 'NP', 1],       // (the old man 's) + HAT — UD nmod:poss: the POSSESSED noun is the head
 
   /**
    * ── COMMA CONSTRUCTIONS ────────────────────────────────────────────────
@@ -149,23 +159,32 @@ const BONDS = [
    * and every one of these patterns is ternary — the same shape coordination
    * already uses.
    */
-  ['ADV', 'COMMA', 'FRONTED'],   // quickly ,
-  ['SBAR', 'COMMA', 'FRONTED'],  // because she came ,
-  ['PP', 'COMMA', 'FRONTED'],    // in the morning ,
-  ['FRONTED', 'S', 'S'],         // ... , he left
+  ['ADV', 'COMMA', 'FRONTED', 0],   // quickly , — the comma is punct
+  ['SBAR', 'COMMA', 'FRONTED', 0],  // because she came ,
+  ['PP', 'COMMA', 'FRONTED', 0],    // in the morning ,
+  ['FRONTED', 'S', 'S', 1],         // ... , he left — main clause is the head
 
-  ['NP', 'COMMA', 'NPCOMMA'],
-  ['NPCOMMA', 'NP', 'APPOS'],    // the dog , the old cat
-  ['APPOS', 'COMMA', 'NP'],      // ... , (closing comma)
+  ['NP', 'COMMA', 'NPCOMMA', 0],
+  /**
+   * RULING: UD appos attaches to the FIRST NP, not the appositive that follows
+   * the comma.
+   */
+  ['NPCOMMA', 'NP', 'APPOS', 0],    // the dog , the old cat — RULING: UD appos attaches to the FIRST NP
+  ['APPOS', 'COMMA', 'NP', 0],      // ... , (closing comma)
   /**
    * `the cat and the man` bonds into an NP before the comma ever sees it, so the
    * list form needs the plain NP on the right. Apposition and listing are
    * genuinely ambiguous here — `the dog , the cat` is both — and both survive.
    */
-  ['NPCOMMA', 'NP', 'NP'],       // the dog , the cat and the man
+  ['NPCOMMA', 'NP', 'NP', 0],       // the dog , the cat and the man — first conjunct
 
-  ['S', 'COMMA', 'SCOMMA'],
-  ['SCOMMA', 'S', 'S'],          // he ran , she fell
+  ['S', 'COMMA', 'SCOMMA', 0],
+  /**
+   * RULING: UD conj — first clause heads, though the result type matches the
+   * RIGHT child. UD's convention beats endocentricity here, and that is the
+   * point of declaring rather than inferring.
+   */
+  ['SCOMMA', 'S', 'S', 0],          // he ran , she fell — RULING: UD conj, first clause heads
 
   /**
    * TERMINAL PUNCTUATION. UD tokenizes sentence-final `.` `!` `?` `;` `:` as
@@ -174,7 +193,7 @@ const BONDS = [
    * measured top cause of parse failure (see PUNCT atom above). Deliberately
    * minimal: only a clause absorbs it, nothing else does yet.
    */
-  ['S', 'PUNCT', 'S'],      // a clause absorbs its terminal punctuation
+  ['S', 'PUNCT', 'S', 0],    // a clause absorbs its terminal punctuation
 
   /**
    * ── PARTICLES / PHRASAL VERBS ──────────────────────────────────────────
@@ -184,8 +203,8 @@ const BONDS = [
    * takes `the ghost`. English also separates the pair around the object, so
    * both orders need a bond.
    */
-  ['V', 'PRT', 'V'],        // GAVE UP (the ghost)
-  ['VP', 'PRT', 'VP'],      // picked it UP
+  ['V', 'PRT', 'V', 0],      // GAVE UP (the ghost) — UD compound:prt
+  ['VP', 'PRT', 'VP', 0],    // picked it UP
 
   /**
    * ── BARE FRONTING ──────────────────────────────────────────────────────
@@ -195,8 +214,8 @@ const BONDS = [
    * phrase parsed, the clause parsed, and nothing joined them because every
    * fronting rule above requires a COMMA.
    */
-  ['PP', 'S', 'S'],
-  ['ADV', 'S', 'S'],
+  ['PP', 'S', 'S', 1],
+  ['ADV', 'S', 'S', 1],
 
   /**
    * ── COMPLEMENT CLAUSES AND INVERSION ───────────────────────────────────
@@ -211,24 +230,27 @@ const BONDS = [
    * whole clause as the verb's object. Distinct from the relative use above
    * (`REL + VP -> RELC`), where the same word introduces a modifier instead.
    */
-  ['REL', 'S', 'SBAR'],     // THAT the man ran
-  ['V', 'SBAR', 'VP'],      // answered THAT ...
-  ['COP', 'SBAR', 'VP'],    // is THAT ...
+  ['REL', 'S', 'SBAR', 1],   // THAT the man ran
+  ['V', 'SBAR', 'VP', 0],    // answered THAT ...
+  ['COP', 'SBAR', 'VP', 1],  // is THAT ... — UD cop
 
   /** An infinitive completing an adjective: `likely TO BE true`. */
-  ['ADJ', 'INF', 'ADJ'],
+  ['ADJ', 'INF', 'ADJ', 0],
 
   /**
    * SUBJECT-AUX INVERSION. The auxiliary precedes its subject, so `NP + VP -> S`
    * cannot fire — the pieces are in the wrong order, not missing. The auxiliary
    * binds its subject first, and the result takes the predicate.
+   *
+   * RULING: INV bundles an auxiliary with the subject; the subject NP is the
+   * content word, so it heads INV. INV is never itself a head in bonds 65-67.
    */
-  ['MODAL', 'NP', 'INV'],   // SHALL WE ...
-  ['AUX', 'NP', 'INV'],     // DID HE ...
-  ['COP', 'NP', 'INV'],     // IS HE ...
-  ['INV', 'VP', 'S'],       // ... go
-  ['INV', 'ADJ', 'S'],      // ... happy
-  ['INV', 'NP', 'S'],       // ... a doctor
+  ['MODAL', 'NP', 'INV', 1],   // SHALL WE ...
+  ['AUX', 'NP', 'INV', 1],     // DID HE ...
+  ['COP', 'NP', 'INV', 1],     // IS HE ...
+  ['INV', 'VP', 'S', 1],       // ... go — main verb heads the clause
+  ['INV', 'ADJ', 'S', 1],      // ... happy — UD cop: `is he happy` roots on happy
+  ['INV', 'NP', 'S', 1],       // ... a doctor — UD cop
 
   /**
    * ── ADVERB PLACEMENT (EE / EF / EN / MVi) — MEASURED AND REJECTED ───────
@@ -254,6 +276,25 @@ const BONDS = [
    * Re-add only alongside a consumer that reads constituent structure.
    */
 ];
+
+/**
+ * EVERY BOND MUST DECLARE ITS HEAD. Not optional with a default.
+ *
+ * `headOf` used to find a head by position — leftmost, with one hand-carved
+ * exception for determiners — and English puts the head on the right in several
+ * constructions. Each one nobody tested was silently wrong: measured on UD
+ * English-EWT, 46.4% of scoreable parses reported the auxiliary as the verb and
+ * 5.6% reported the adjective as the subject.
+ *
+ * A default of 0 would reproduce exactly that failure, because the bonds nobody
+ * reviewed would keep the old behaviour. Throwing here means an unreviewed bond
+ * cannot run.
+ */
+for (const bond of BONDS) {
+  if (bond.length !== 4 || (bond[3] !== 0 && bond[3] !== 1)) {
+    throw new Error(`BONDS entry missing a head index: ${JSON.stringify(bond)}`);
+  }
+}
 
 /** Unary lifts: a bare token standing in for a phrase. */
 /**

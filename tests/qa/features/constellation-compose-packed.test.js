@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { composePacked, headsOf, projectAnswers } from '../../../codex/core/constellation/compose-packed.js';
-import { compose } from '../../../codex/core/constellation/compose.js';
+import { compose, BONDS } from '../../../codex/core/constellation/compose.js';
 
 const pos = new Map([
   ['stars', ['n']], ['burn', ['n', 'v']], ['bright', ['a', 'r']],
@@ -196,5 +196,29 @@ describe('projectAnswers — terminal punctuation absorption', () => {
     const r = composePacked(STACKED, pos);
     const answers = projectAnswers(r.stable[0]);
     expect(answers.map(answerKey)).toEqual(['dog|chased']);
+  });
+});
+
+describe('BONDS head declarations', () => {
+  it('declares a head on every bond', () => {
+    const undeclared = BONDS.filter((b) => b.length !== 4 || (b[3] !== 0 && b[3] !== 1));
+    expect(undeclared).toEqual([]);
+  });
+
+  /**
+   * The three constructions the positional default got wrong. Pinning them by
+   * signature means a future edit that reorders or retypes them is caught here
+   * rather than in a coverage number three weeks later.
+   */
+  it.each([
+    ['ADJ', 'N', 'N', 1],
+    ['AUX', 'VP', 'VP', 1],
+    ['MODAL', 'VP', 'VP', 1],
+    ['COP', 'VP', 'VP', 1],
+    ['DET', 'N', 'NP', 1],
+  ])('declares %s + %s -> %s with head index %i', (l, r, result, head) => {
+    const found = BONDS.find((b) => b[0] === l && b[1] === r && b[2] === result);
+    expect(found).toBeDefined();
+    expect(found[3]).toBe(head);
   });
 });
