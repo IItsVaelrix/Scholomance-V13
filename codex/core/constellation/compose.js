@@ -437,16 +437,25 @@ function atomsFor(token, index, posMap) {
 }
 
 /**
- * The lexical head of a molecule — the token it is ultimately about.
+ * The head of a molecule, read from the bond that built it.
  *
- * `DET N` heads on the noun. `NP PP` and `NP PART` head on the NP, which is why
- * a stack of prepositional phrases cannot move the subject: every attachment
- * hangs off a head that was already fixed.
+ * This used to guess by position — leftmost child, with one hand-carved
+ * exception for `DET`. English puts the head on the right in several
+ * constructions and each untested one was silently wrong. The exception is gone
+ * because `['DET', 'N', 'NP', 1]` now says the same thing as data.
  */
 function headOf(m) {
   if (m.parts.length === 0) return m.token;
-  if (m.type === 'NP' && m.parts[0].type === 'DET') return headOf(m.parts[1]);
-  return headOf(m.parts[0]);
+  if (m.parts.length === 1) return headOf(m.parts[0]);
+  // `(left, right, result)` is unique across the table — verified 2026-08-08,
+  // no duplicate signatures — so this find is unambiguous.
+  const bond = BONDS.find(
+    (b) => b[0] === m.parts[0].type && b[1] === m.parts[1].type && b[2] === m.type,
+  );
+  // A molecule whose bond cannot be found is a chart the grammar did not build.
+  // Falling back to the left child keeps this total rather than throwing inside
+  // a projection, and the head-declaration test proves the table is complete.
+  return headOf(bond ? m.parts[bond[3]] : m.parts[0]);
 }
 
 /**

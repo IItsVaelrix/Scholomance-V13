@@ -8,6 +8,7 @@ const pos = new Map([
   ['barn', ['n']], ['road', ['n']], ['river', ['n']],
   ['horse', ['n', 'v']], ['raced', ['v']], ['past', ['a', 'n', 'r']], ['fell', ['a', 'n', 'v']],
   ['old', ['a']], ['man', ['n']], ['men', ['n']],
+  ['is', []], ['will', []], ['was', []], ['chasing', ['v', 'a']],
 ]);
 const T = (s) => s.split(' ');
 
@@ -104,18 +105,14 @@ describe('headsOf / projectAnswers', () => {
   });
 
   /**
-   * REPRODUCING A BUG ON PURPOSE. `headOf` in compose.js takes parts[0], and
-   * `ADJ + N -> N` puts the adjective there, so the head of `the old man` is
-   * `old`. That is wrong — the head is `man` — and it understates containment
-   * on every prenominal-adjective subject. It is fixed in compose.js, where
-   * both charts get it, NOT here: this module's contract is to be equivalent
-   * to the classic chart, and a unilateral improvement would make the
-   * equivalence harness unable to tell a real packing bug from this.
+   * WAS bug-compatible on purpose. `headOf` used to take parts[0] with one
+   * exception for determiners, so the head of `the old man` came back as `old`.
+   * Both charts now read a declared head, so both say `man`.
    */
-  it('reproduces the classic chart, adjective-head bug included', () => {
+  it('takes the noun as the head of a determined noun phrase', () => {
     const r = composePacked(T('the old man fell'), pos);
     const np = r.molecules.find((m) => m.type === 'NP' && m.from === 0 && m.to === 2);
-    expect([...headsOf(np)]).toEqual(['old']);
+    expect([...headsOf(np)]).toEqual(['man']);
   });
 
   /**
@@ -150,8 +147,8 @@ describe('headsOf / projectAnswers', () => {
     const twoWays = {
       type: 'NP', from: 0, to: 1, token: null,
       derivations: [
-        { bond: ['N', 'N', 'NP'], left, right },
-        { bond: ['DET', 'N', 'NP'], left: { ...left, type: 'DET' }, right },
+        { bond: ['N', 'N', 'NP', 0], left, right },
+        { bond: ['DET', 'N', 'NP', 1], left: { ...left, type: 'DET' }, right },
       ],
     };
     expect([...headsOf(twoWays)].sort()).toEqual(['alpha', 'beta']);
@@ -220,5 +217,32 @@ describe('BONDS head declarations', () => {
     const found = BONDS.find((b) => b[0] === l && b[1] === r && b[2] === result);
     expect(found).toBeDefined();
     expect(found[3]).toBe(head);
+  });
+});
+
+describe('the head is declared, not guessed by position', () => {
+  const answerOf = (text) => {
+    const r = composePacked(T(text), pos);
+    return r.stable.length > 0 ? projectAnswers(r.stable[0]) : [];
+  };
+
+  it('takes the noun as the head of an attributive adjective phrase', () => {
+    expect(answerOf('the old man fell')).toEqual([{ subject: 'man', verb: 'fell' }]);
+  });
+
+  it('takes the noun when there is no determiner either', () => {
+    expect(answerOf('old men ran')).toEqual([{ subject: 'men', verb: 'ran' }]);
+  });
+
+  it('does not let an auxiliary steal the verb', () => {
+    expect(answerOf('the dog is chasing the cat .')).toContainEqual({ subject: 'dog', verb: 'chasing' });
+  });
+
+  it('does not let a modal steal the verb', () => {
+    expect(answerOf('the dog will run .')).toContainEqual({ subject: 'dog', verb: 'run' });
+  });
+
+  it('still honours the determiner rule now that it is data', () => {
+    expect(answerOf('the dog chased the cat')).toEqual([{ subject: 'dog', verb: 'chased' }]);
   });
 });

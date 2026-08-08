@@ -174,7 +174,8 @@ export function headsOf(node, memo = new Map()) {
         for (const h of headsOf(d.child, memo)) out.add(h);
         continue;
       }
-      const source = node.type === 'NP' && d.left.type === 'DET' ? d.right : d.left;
+      // The bond declares which child is the head; see BONDS in compose.js.
+      const source = d.bond[3] === 1 ? d.right : d.left;
       for (const h of headsOf(source, memo)) out.add(h);
     }
   }
