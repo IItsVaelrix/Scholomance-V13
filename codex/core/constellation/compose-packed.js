@@ -136,20 +136,17 @@ export function composePacked(tokens, posMap, options = {}) {
  * The DET rule matches `compose.js`: `headOf` takes `parts[1]` when an NP was
  * built from a determiner, and `parts[0]` otherwise.
  *
- * DEVIATION FROM THE BRIEF, MEASURED NOT ASSUMED. Restricting the swap to
- * `node.type === 'NP' && d.left.type === 'DET'` (the brief's literal text)
- * reproduces `compose.js`'s `headOf` exactly — including its one blind spot:
- * `['ADJ', 'N', 'N']` composes `old man` with `old` as `parts[0]`, and the
- * unqualified default takes `parts[0]`, so both the classic and a literal
- * port of `headsOf` report the head of "the old man" as `old`. Verified
- * directly against `compose.js`: `projectAnswer` on "the old man fell"
- * returns `{subject: 'old', verb: 'fell'}`. `compose.js` is off-limits, so
- * the fix lives only here: a second, narrowly-scoped swap for exactly the
- * `['ADJ', 'N', 'N']` bond (`node.type === 'N' && d.left.type === 'ADJ' &&
- * d.right.type === 'N'`), which does not touch the other two bonds with
- * `ADJ` on the left — `['ADJ', 'THANP', 'ADJ']` and `['ADJ', 'INF', 'ADJ']`
- * — where the adjective genuinely is the head and `THANP`/`INF` is its
- * complement, not a modified noun.
+ * THIS IS DELIBERATELY BUG-COMPATIBLE WITH `compose.js`. `['ADJ', 'N', 'N']`
+ * composes `old man` with `old` as `parts[0]`, and the unqualified default
+ * takes `parts[0]`, so `headsOf` reports the head of "the old man" as `old`
+ * — the same wrong answer `compose.js`'s own `headOf` gives. That is a known
+ * defect (it understates containment on every prenominal-adjective subject),
+ * and the fix belongs in `compose.js`, where both charts inherit it, not
+ * here: Task 5 proves this module equivalent to the classic chart across a
+ * large sentence set, and that proof is what licenses using this chart in
+ * place of the classic one. A unilateral improvement here would make every
+ * divergence something to manually excuse, which is exactly the condition
+ * under which a real packing bug hides among the expected ones.
  *
  * @param {object} node
  * @param {Map<object, Set<string>>} [memo] shared across a traversal
@@ -177,9 +174,7 @@ export function headsOf(node, memo = new Map()) {
         for (const h of headsOf(d.child, memo)) out.add(h);
         continue;
       }
-      const isDetNP = node.type === 'NP' && d.left.type === 'DET';
-      const isAdjN = node.type === 'N' && d.left.type === 'ADJ' && d.right.type === 'N';
-      const source = isDetNP || isAdjN ? d.right : d.left;
+      const source = node.type === 'NP' && d.left.type === 'DET' ? d.right : d.left;
       for (const h of headsOf(source, memo)) out.add(h);
     }
   }
