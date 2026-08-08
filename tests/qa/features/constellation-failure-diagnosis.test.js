@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { diagnose, OUTCOME } from '../../../codex/core/constellation/failure-diagnosis.js';
+import { diagnose, frontierSignature, OUTCOME } from '../../../codex/core/constellation/failure-diagnosis.js';
 
 /** `the dog barked` — det(dog<-the), nsubj(barked<-dog), root(barked). */
 const DOG = {
@@ -104,5 +104,23 @@ describe('diagnose', () => {
     expect(d.nonProjective).toBe(1);
     // `hearing` is undiagnosable, so `scheduled` above it must not be named.
     expect(d.categories.map((c) => c.deprel)).not.toContain('root');
+  });
+});
+
+describe('frontierSignature', () => {
+  it('tiles the input with the widest molecule starting at each position', () => {
+    const r = result([
+      molecule('DET', 0, 0), molecule('N', 1, 1), molecule('NP', 0, 1), molecule('V', 2, 2),
+    ]);
+    expect(frontierSignature(r, 3)).toBe('NP V');
+  });
+
+  it('marks a position no molecule starts at, rather than skipping it', () => {
+    const r = result([molecule('DET', 0, 0), molecule('V', 2, 2)]);
+    expect(frontierSignature(r, 3)).toBe('DET ? V');
+  });
+
+  it('is empty for an empty chart over zero tokens', () => {
+    expect(frontierSignature(result([]), 0)).toBe('');
   });
 });

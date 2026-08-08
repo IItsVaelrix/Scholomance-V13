@@ -156,3 +156,37 @@ export function diagnose(record, result, goldResult = null) {
   }
   return { outcome: OUTCOME.GRAMMAR, overGenerated: false, ...frontier };
 }
+
+/**
+ * A signature for text with NO gold tree — the Gutenberg corpus every prior
+ * coverage number was measured against.
+ *
+ * The greedy maximal tiling is where the chart stopped, expressed as a type
+ * sequence. It is deliberately NOT given a construction name here: a name is
+ * earned only by matching a signature to a deprel category on the golded side.
+ * The caller reports unmatched signatures as UNCLASSIFIED with a count, because
+ * a classifier with an "other" bucket always achieves 100% coverage.
+ *
+ * Ties are broken by first appearance, which is deterministic given that
+ * `compose` enumerates its chart in a fixed order.
+ *
+ * @param {object} result
+ * @param {number} tokenCount
+ * @returns {string}
+ */
+export function frontierSignature(result, tokenCount) {
+  const widest = new Map();
+  for (const molecule of (result && result.molecules) || []) {
+    const current = widest.get(molecule.from);
+    if (!current || molecule.to > current.to) widest.set(molecule.from, molecule);
+  }
+  const out = [];
+  let at = 0;
+  while (at < tokenCount) {
+    const molecule = widest.get(at);
+    if (!molecule) { out.push('?'); at += 1; continue; }
+    out.push(molecule.type);
+    at = molecule.to + 1;
+  }
+  return out.join(' ');
+}
