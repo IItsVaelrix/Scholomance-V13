@@ -133,20 +133,17 @@ export function composePacked(tokens, posMap, options = {}) {
  * Its size is the ambiguity that actually matters — measured at a mean of 1.54
  * distinct answers while parses reached 32.02, which is why this stays cheap.
  *
- * The DET rule matches `compose.js`: `headOf` takes `parts[1]` when an NP was
- * built from a determiner, and `parts[0]` otherwise.
+ * The head comes from the bond that built each derivation: `d.bond[3]` is the
+ * declared head index — `0` for left, `1` for right — so `source` is `d.right`
+ * when the bond says the head is on the right and `d.left` otherwise. No
+ * lookup is needed; the derivation already carries the whole bond tuple.
  *
- * THIS IS DELIBERATELY BUG-COMPATIBLE WITH `compose.js`. `['ADJ', 'N', 'N']`
- * composes `old man` with `old` as `parts[0]`, and the unqualified default
- * takes `parts[0]`, so `headsOf` reports the head of "the old man" as `old`
- * — the same wrong answer `compose.js`'s own `headOf` gives. That is a known
- * defect (it understates containment on every prenominal-adjective subject),
- * and the fix belongs in `compose.js`, where both charts inherit it, not
- * here: Task 5 proves this module equivalent to the classic chart across a
- * large sentence set, and that proof is what licenses using this chart in
- * place of the classic one. A unilateral improvement here would make every
- * divergence something to manually excuse, which is exactly the condition
- * under which a real packing bug hides among the expected ones.
+ * This used to guess by position instead — `parts[0]`, with one hand-carved
+ * exception that took `parts[1]` when an NP was built from a determiner — and
+ * it was DELIBERATELY BUG-COMPATIBLE WITH `compose.js`'s own positional
+ * `headOf`: `['ADJ', 'N', 'N']` composes `old man` with `old` as `parts[0]`,
+ * so both charts reported the head of "the old man" as `old`, which is wrong.
+ * Both now read the declared head instead, so both say `man`.
  *
  * @param {object} node
  * @param {Map<object, Set<string>>} [memo] shared across a traversal
