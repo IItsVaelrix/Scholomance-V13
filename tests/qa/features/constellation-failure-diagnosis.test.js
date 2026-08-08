@@ -123,4 +123,9 @@ describe('frontierSignature', () => {
   it('is empty for an empty chart over zero tokens', () => {
     expect(frontierSignature(result([]), 0)).toBe('');
   });
+
+  it('breaks ties (same from/to) by first appearance', () => {
+    const r = result([molecule('N', 0, 0), molecule('NP', 0, 0)]);
+    expect(frontierSignature(r, 2)).toBe('N ?');
+  });
 });
