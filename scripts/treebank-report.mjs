@@ -7,11 +7,18 @@
  * subtree the chart failed to build.
  *
  * Usage:
- *   node scripts/treebank-report.mjs [--split dev|test|train] [--limit N]
+ *   node scripts/treebank-report.mjs [--split dev|test|train] [--limit N] [--max-tokens N]
  *
  * The default split is `dev`. `test` is the held-out set: reporting on it while
  * iterating on the grammar makes "coverage went up" and "the eval set was
  * fitted" indistinguishable.
+ *
+ * `compose` materialises every parse into `cell[from][to]`, so the chart grows
+ * combinatorially with sentence length and does not terminate on some long
+ * sentences. `--max-tokens` (default 28) skips a sentence before it ever
+ * reaches `compose` rather than hanging the runner. The skip count is printed,
+ * not absorbed silently, because `report.n` is already post-filter and a
+ * silent skip would quietly narrow what "coverage" means.
  */
 import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
@@ -33,6 +40,7 @@ const argOf = (flag, fallback) => {
 };
 const SPLIT = argOf('--split', 'dev');
 const LIMIT = Number(argOf('--limit', '0')) || Infinity;
+const MAX_TOKENS = Number(argOf('--max-tokens', '28')) || 28;
 
 const CORPUS = path.resolve(`cache/ud/en_ewt-ud-${SPLIT}.conllu`);
 const DICT = path.resolve('scholomance_dict.sqlite');
@@ -86,10 +94,25 @@ let tokenizerAgree = 0;
 let tokenizerTotal = 0;
 let oracleLeaks = 0;
 let oracleTokens = 0;
+let skippedTooLong = 0;
+let droppedThrew = 0;
 const signatures = new Map();
 
 const rows = sample.map((record) => {
   const tokens = record.tokens.map((t) => t.form);
+
+  /**
+   * `compose` materialises every parse into `cell[from][to]`; the chart grows
+   * combinatorially with sentence length and does not terminate on some long
+   * sentences. Skip BEFORE calling `compose` rather than hang, and count the
+   * skip — `report.n` is already post-filter, so an uncounted skip would
+   * silently narrow what "coverage" means.
+   */
+  if (tokens.length > MAX_TOKENS) {
+    skippedTooLong += 1;
+    return null;
+  }
+
   const gold = goldAnswer(record);
   const goldMap = goldPosMap(record);
 
@@ -113,6 +136,7 @@ const rows = sample.map((record) => {
     result = compose(tokens, posMap);
     goldResult = compose(tokens, goldMap);
   } catch {
+    droppedThrew += 1;
     return null;
   }
 
@@ -153,7 +177,9 @@ const rows = sample.map((record) => {
 const report = summarize(rows);
 const pct = (x) => (x === null ? '  null' : `${(x * 100).toFixed(1)}%`);
 
-console.log(`\nUD English-EWT / ${SPLIT} — ${report.n} sentences\n`);
+console.log(`\nUD English-EWT / ${SPLIT} — ${report.n} sentences (cap: --max-tokens ${MAX_TOKENS})\n`);
+console.log(`  skipped (> ${MAX_TOKENS} tokens)     ${skippedTooLong} of ${sample.length}   — compose materialises every parse; these do not terminate`);
+console.log(`  dropped (compose threw)    ${droppedThrew}`);
 console.log(`coverage      ${pct(report.coverage)}   a spanning S exists`);
 console.log(`containment   ${pct(report.containment)}   gold answer is among the projected answers`);
 console.log(`decision      ${pct(report.decision)}   top-ranked parse projects to the gold answer`);
