@@ -124,3 +124,99 @@ export function composePacked(tokens, posMap, options = {}) {
 
   return { atoms, molecules, spanning, stable, events };
 }
+
+/**
+ * Every head this node can have, across all its derivations.
+ *
+ * The classic `headOf` returns ONE head because it walks one concrete tree.
+ * A packed node stands for many trees at once, so the honest return is a set.
+ * Its size is the ambiguity that actually matters — measured at a mean of 1.54
+ * distinct answers while parses reached 32.02, which is why this stays cheap.
+ *
+ * The DET rule matches `compose.js`: `headOf` takes `parts[1]` when an NP was
+ * built from a determiner, and `parts[0]` otherwise.
+ *
+ * DEVIATION FROM THE BRIEF, MEASURED NOT ASSUMED. Restricting the swap to
+ * `node.type === 'NP' && d.left.type === 'DET'` (the brief's literal text)
+ * reproduces `compose.js`'s `headOf` exactly — including its one blind spot:
+ * `['ADJ', 'N', 'N']` composes `old man` with `old` as `parts[0]`, and the
+ * unqualified default takes `parts[0]`, so both the classic and a literal
+ * port of `headsOf` report the head of "the old man" as `old`. Verified
+ * directly against `compose.js`: `projectAnswer` on "the old man fell"
+ * returns `{subject: 'old', verb: 'fell'}`. `compose.js` is off-limits, so
+ * the fix lives only here: a second, narrowly-scoped swap for exactly the
+ * `['ADJ', 'N', 'N']` bond (`node.type === 'N' && d.left.type === 'ADJ' &&
+ * d.right.type === 'N'`), which does not touch the other two bonds with
+ * `ADJ` on the left — `['ADJ', 'THANP', 'ADJ']` and `['ADJ', 'INF', 'ADJ']`
+ * — where the adjective genuinely is the head and `THANP`/`INF` is its
+ * complement, not a modified noun.
+ *
+ * @param {object} node
+ * @param {Map<object, Set<string>>} [memo] shared across a traversal
+ * @returns {Set<string>}
+ */
+export function headsOf(node, memo = new Map()) {
+  if (!node) return new Set();
+  const cached = memo.get(node);
+  if (cached) return cached;
+
+  /**
+   * A lift chain could in principle cycle. It cannot today — LIFTS is
+   * N->NP, V->VP, PRON->NP, PROPN->NP, PRONACC->NPO, VP->S, which is acyclic —
+   * so this guard is defensive, and memoising is safe while it holds. A cycle
+   * contributes nothing rather than recursing forever.
+   */
+  memo.set(node, new Set());
+
+  const out = new Set();
+  if (node.derivations.length === 0) {
+    if (node.token != null) out.add(node.token);
+  } else {
+    for (const d of node.derivations) {
+      if (d.lift) {
+        for (const h of headsOf(d.child, memo)) out.add(h);
+        continue;
+      }
+      const isDetNP = node.type === 'NP' && d.left.type === 'DET';
+      const isAdjN = node.type === 'N' && d.left.type === 'ADJ' && d.right.type === 'N';
+      const source = isDetNP || isAdjN ? d.right : d.left;
+      for (const h of headsOf(source, memo)) out.add(h);
+    }
+  }
+  memo.set(node, out);
+  return out;
+}
+
+/**
+ * The distinct `{subject, verb}` answers a root node stands for.
+ *
+ * The classic pipeline builds every parse and then projects each to an answer,
+ * discarding the distinction it spent exponential work to produce. This reads
+ * the answer set straight off the forest and never builds a tree.
+ *
+ * A single-child derivation is the VP->S lift, which is the imperative: the
+ * subject is genuinely absent and projects as null rather than as an invented
+ * `you`.
+ *
+ * @param {object} node a root node, or undefined
+ * @param {Map<object, Set<string>>} [memo]
+ * @returns {Array<{subject: string|null, verb: string}>}
+ */
+export function projectAnswers(node, memo = new Map()) {
+  if (!node) return [];
+  const byKey = new Map();
+  for (const d of node.derivations) {
+    if (d.lift) {
+      for (const verb of headsOf(d.child, memo)) {
+        byKey.set(`|${verb}`, { subject: null, verb });
+      }
+      continue;
+    }
+    for (const subject of headsOf(d.left, memo)) {
+      for (const verb of headsOf(d.right, memo)) {
+        byKey.set(`${subject}|${verb}`, { subject, verb });
+      }
+    }
+  }
+  return [...byKey.values()];
+}

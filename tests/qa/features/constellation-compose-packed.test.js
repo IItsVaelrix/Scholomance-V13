@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { composePacked } from '../../../codex/core/constellation/compose-packed.js';
+import { composePacked, headsOf, projectAnswers } from '../../../codex/core/constellation/compose-packed.js';
 import { compose } from '../../../codex/core/constellation/compose.js';
 
 const pos = new Map([
@@ -91,5 +91,61 @@ describe('composePacked — edges', () => {
   it('honours a declared root other than S', () => {
     const r = composePacked(T('the old man'), pos, { roots: ['NP'] });
     expect(r.stable.map((m) => m.type)).toContain('NP');
+  });
+});
+
+const answerKey = (a) => `${a.subject || ''}|${a.verb || ''}`;
+
+describe('headsOf / projectAnswers', () => {
+  it('reads an atom head as its own token', () => {
+    const r = composePacked(T('stars burn'), pos);
+    const atom = r.atoms.find((a) => a.from === 0 && a.type === 'N');
+    expect([...headsOf(atom)]).toEqual(['stars']);
+  });
+
+  it('takes the noun as the head of a determined noun phrase', () => {
+    const r = composePacked(T('the old man fell'), pos);
+    const np = r.molecules.find((m) => m.type === 'NP' && m.from === 0 && m.to === 2);
+    expect([...headsOf(np)]).toContain('man');
+    expect([...headsOf(np)]).not.toContain('the');
+  });
+
+  /**
+   * THE POINT OF THE MODULE. Four stacked PPs are 42 readings in the classic
+   * chart and one answer. Packed, the 42 are never built — the answer set is
+   * read straight off the forest.
+   */
+  it('collapses the stacked-PP forest to a single answer', () => {
+    const r = composePacked(STACKED, pos);
+    const answers = projectAnswers(r.stable[0]);
+    expect(answers.map(answerKey)).toEqual(['dog|chased']);
+  });
+
+  it('projects an imperative with a null subject', () => {
+    const r = composePacked(T('chased the cat'), pos, { roots: ['S'] });
+    const answers = projectAnswers(r.stable[0]);
+    expect(answers.some((a) => a.subject === null && a.verb === 'chased')).toBe(true);
+  });
+
+  it('returns no answers for a node that is not there', () => {
+    expect(projectAnswers(undefined)).toEqual([]);
+  });
+
+  /**
+   * A node built two ways with two different heads must report BOTH. Taking
+   * derivations[0] would pass every other test in this file and silently
+   * answer about one arbitrary tree.
+   */
+  it('unions heads across derivations rather than taking the first', () => {
+    const left = { type: 'N', from: 0, to: 0, derivations: [], token: 'alpha' };
+    const right = { type: 'N', from: 1, to: 1, derivations: [], token: 'beta' };
+    const twoWays = {
+      type: 'NP', from: 0, to: 1, token: null,
+      derivations: [
+        { bond: ['N', 'N', 'NP'], left, right },
+        { bond: ['DET', 'N', 'NP'], left: { ...left, type: 'DET' }, right },
+      ],
+    };
+    expect([...headsOf(twoWays)].sort()).toEqual(['alpha', 'beta']);
   });
 });
