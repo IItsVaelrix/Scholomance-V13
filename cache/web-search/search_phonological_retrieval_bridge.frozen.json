@@ -1,0 +1,35 @@
+{
+  "schema": "PB-WEB-SEARCH-v1",
+  "query": "phonological retrieval bridge papers",
+  "frozen_at": "2026-07-31T07:13:52.705171+00:00",
+  "result_count": 5,
+  "results": [
+    {
+      "title": "Phonetic Query Expansion for Spoken Document Retrieval",
+      "url": "https://www.isca-archive.org/interspeech_2008/mamou08_interspeech.pdf",
+      "snippet": "Proposes phonetically expanding spoken queries with a joint maximum-entropy n-gram model and reports improved phonetic search performance on NIST spoken term detection data. Operates directly over phoneme sequences and n-gram phonetic modeling for search."
+    },
+    {
+      "title": "A Survey of Automatic Query Expansion in Information Retrieval",
+      "url": "https://www.iro.umontreal.ca/~nie/IFT6255/carpineto-Survey-QE.pdf",
+      "snippet": "Reviews many query-expansion methods used to improve recall in information retrieval, including approaches that incorporate lexical variation, morphological decomposition, and related-term generation for wider retrieval surface."
+    },
+    {
+      "title": "Query Expansion in the Age of Pre-trained and Large Language Models",
+      "url": "https://www.alphaxiv.org/abs/2509.07794v3",
+      "snippet": "Places retrieval-augmented generation within a broader taxonomy of modern query-expansion techniques and explicitly discusses RAG-related query-expansion methods, sub-word tokenization, and their role in retrieval pipelines."
+    },
+    {
+      "title": "Retrieval-Augmented Generation meets Theoretical Linguistics",
+      "url": "https://helda.helsinki.fi/server/api/core/bitstreams/c4a8aa70-9cba-45e8-90e2-5137ea15579c/",
+      "snippet": "Integrates theoretical linguistics into RAG systems, discussing how phonological and morphological analysis can improve retrieval quality and reduce hallucination in language model outputs."
+    },
+    {
+      "title": "Retrieval-Augmented Generation: A Comprehensive Survey of Architecture",
+      "url": "https://arxiv.org/html/2506.00054v1",
+      "snippet": "Comprehensive survey of RAG architectures covering retrieval mechanisms, query processing pipelines, tokenization strategies, and the role of linguistic features in improving retrieval recall and precision."
+    }
+  ],
+  "checksum": "search1:ff703e00f43213a9",
+  "determinism_note": "This artifact is frozen. The checksum covers query + results (not timestamp). The grounding index may consume this artifact deterministically. Live search is non-deterministic and must never be fed directly into scoring channels."
+}
