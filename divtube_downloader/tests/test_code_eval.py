@@ -93,6 +93,17 @@ class TestPython(unittest.TestCase):
         self.assertFalse(result["ok"])
         self.assertIn("stage", result)
 
+    def test_package_relative_imports_resolve(self):
+        """code_eval.py imports tui.services.code_lens at module level, so it
+        can only load if the driver puts the package root on sys.path. This is
+        the lens evaluating a module shaped exactly like itself."""
+        result = code_eval.evaluate(
+            PROJECT_ROOT, "divtube_downloader/tui/services/code_eval.py", "DEFAULT_TIMEOUT"
+        )
+        self.assertTrue(result["ok"], result.get("error"))
+        self.assertFalse(result["called"])
+        self.assertEqual(result["value"], 10)
+
 
 class TestBounds(unittest.TestCase):
     def test_timeout_is_enforced_and_reported(self):

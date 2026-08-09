@@ -140,9 +140,19 @@ function summarise(v, depth) {
 """
 
 _PY_DRIVER = r'''
-import importlib.util, json, sys, traceback
+import importlib.util, json, os, sys, traceback
 
 mod_path, symbol, args_json, summarise_only = sys.argv[1:5]
+
+# Make package-relative imports resolvable: walk up from the target while
+# __init__.py exists and put the package root on sys.path. Without this, any
+# module that imports its own siblings (including this lens itself) dies with
+# ModuleNotFoundError before the symbol is ever reached.
+_pkg_dir = os.path.dirname(os.path.abspath(mod_path))
+while os.path.isfile(os.path.join(_pkg_dir, "__init__.py")):
+    _pkg_dir = os.path.dirname(_pkg_dir)
+if _pkg_dir not in sys.path:
+    sys.path.insert(0, _pkg_dir)
 
 def shape_of(v):
     if v is None:
