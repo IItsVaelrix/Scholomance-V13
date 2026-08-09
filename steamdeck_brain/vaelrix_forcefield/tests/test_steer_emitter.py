@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 import pytest
 
 from vaelrix_forcefield.search_governor import record_search, should_allow_search
+from vaelrix_forcefield import steer_emitter
 from vaelrix_forcefield.steer_emitter import emit_deflection, phase0_field_checksum
 from vaelrix_forcefield.tool_governor import record_tool_call, should_allow_tool_call
 from vaelrix_forcefield.types import TaskField, VaelrixCortexForceField
@@ -258,3 +259,39 @@ def test_allowed_tool_call_writes_nothing(fresh_field, ledger):
     decision = should_allow_tool_call(fresh_field, "read_file", {"path": "b.py"}, "first read")
     assert decision.allowed is True
     assert not ledger.exists() or ledger.read_text() == ""
+
+
+class TestLiveCorpusIsNeverSeededByTests:
+    """
+    Regression for a measured contamination: running the forcefield test
+    suite appended 70 synthetic deflections to the live Phase 0 corpus.
+    """
+
+    def test_default_path_is_refused_under_a_test_runner(self, monkeypatch):
+        monkeypatch.delenv("SCHOLO_STEER_LEDGER_PATH", raising=False)
+        monkeypatch.setenv("PYTEST_CURRENT_TEST", "x::y (call)")
+        assert steer_emitter.refuses_default_ledger() is True
+        assert steer_emitter.emit_deflection(
+            governor="search", category="REPEATED_SEARCH", tier="Y2",
+            utterance="q", candidate_key="search:q",
+        ) is None
+        # MUTATION: drop the refuses_default_ledger() check in
+        # emit_deflection. Must go red.
+
+    def test_an_explicit_override_still_writes(self, tmp_path, monkeypatch):
+        # Tests may exercise emission — only the LIVE corpus is protected.
+        target = tmp_path / "steer.jsonl"
+        monkeypatch.setenv("SCHOLO_STEER_LEDGER_PATH", str(target))
+        monkeypatch.setenv("PYTEST_CURRENT_TEST", "x::y (call)")
+        assert steer_emitter.refuses_default_ledger() is False
+        assert steer_emitter.emit_deflection(
+            governor="search", category="REPEATED_SEARCH", tier="Y2",
+            utterance="q", candidate_key="search:q",
+        ) == "steer-000001"
+        assert target.exists()
+
+    def test_production_is_unaffected(self, monkeypatch):
+        monkeypatch.delenv("PYTEST_CURRENT_TEST", raising=False)
+        monkeypatch.delenv("VITEST", raising=False)
+        monkeypatch.delenv("SCHOLO_STEER_LEDGER_PATH", raising=False)
+        assert steer_emitter.refuses_default_ledger() is False

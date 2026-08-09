@@ -75,6 +75,29 @@ def ledger_path() -> Path:
     return repo_root / "bench/semantic-calculus/corpus/steer-receipts.jsonl"
 
 
+def under_test_runner() -> bool:
+    """True when a test runner is driving this process."""
+    return "PYTEST_CURRENT_TEST" in os.environ or "VITEST" in os.environ
+
+
+def refuses_default_ledger() -> bool:
+    """
+    A test run must never write to the LIVE corpus.
+
+    Measured 2026-08-09: `pytest steamdeck_brain/vaelrix_forcefield/tests/`
+    injected 70 synthetic deflections into the measurement window — the same
+    category distribution, the same eight-second burst, the utterance
+    literally "search". The corpus IS the Phase 0 experiment, so a test run
+    silently seeding it is not noise, it is contamination of the only data
+    the exit criteria are computed from. (It is also the most likely origin
+    of the r3 "live ledger opened by the cockpit itself" rows.)
+
+    Tests may still exercise emission — they set SCHOLO_STEER_LEDGER_PATH to
+    a temp file, which is honoured above. Only the DEFAULT path is refused.
+    """
+    return under_test_runner() and not os.environ.get("SCHOLO_STEER_LEDGER_PATH")
+
+
 def phase0_field_checksum() -> str:
     """Checksum of the empty field — Phase 0 has no ridges/corridors/gates."""
     return hashlib.sha256(_FIELD_CHECKSUM_PAYLOAD.encode("utf-8")).hexdigest()[:12]
@@ -126,6 +149,8 @@ def emit_deflection(
     the checksum either way.
     """
     try:
+        if path is None and refuses_default_ledger():
+            return None  # never seed the live corpus from a test run
         source = CATEGORY_PRESSURE[category]
         target = path or ledger_path()
         target.parent.mkdir(parents=True, exist_ok=True)

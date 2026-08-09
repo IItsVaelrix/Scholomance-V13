@@ -1,7 +1,7 @@
 # PDR: Pressure Field Governor
 ## Continuous Behavioral Governance as a Deterministic Decision Landscape
 
-**Status:** Phase 0 shipped — separability clock running (since 2026-08-09). Phases 1–5 NOT approved until Phase 0 exit criteria are met.
+**Status:** Phase 0 shipped and audited (r4). Measurement window `phase0-w1` opened 2026-08-09T15:25:42Z; the r3 window was voided as a smoke run. Phases 1–5 NOT approved until the Phase 0 exit criteria are met.
 **Classification:** Architectural | Agent Governance | Semantic Calculus | Deterministic Telemetry | Shadow-Mode
 **Priority:** High
 **Primary Goal:** Replace post-hoc boolean gating with a deterministic, telemetry-calibrated pressure landscape that steers candidate agent trajectories before execution, with governed Gates that the agent can never self-open.
@@ -21,6 +21,7 @@
 |---|---|---|
 | r1 | Qwen | Initial draft. |
 | r2 | Claude | Grounds-tagged every justifying claim (§5.0). Retracted the `gate_keeper.py` premise (§1, §11-Q3, §17) — unsupported, and contradicted by live code. Rebased composition on `permission.ts` (§3.1-F2, §9.1). Fixed the lexicographic-collapse defect and the all-deflected selection bug (§9.2). Added the missing outcome field that made F9 unimplementable (§3.3, F8a). Added F10 (no self-scored pressure) and the Phase 0 separability precondition. Added mutation-testing to §15. |
+| r4 | Claude | **Post-ship audit + four fixes.** r3's ledger could not reach its own exit criteria. (1) `--pending` added — `--resolve` needed an id and nothing listed them, so criteria 1 and 2 had no mechanism; zero of 70 rows were resolved. (2) Gate emission added (`--steer` + `gate-pressure.ts`) — every governor row is unary (1 candidate / 1 source / magnitude 1.0), so the corpus was a one-hot and could not test ranking; the gate is the only producer of real rival sets. (3) Criterion 3 split into **3a** per-rule precision (governor rows) and **3b** field separability (gate rows) — only 3b tests the central bet. (4) `PB-STEER-EPOCH-v1` markers added and window `phase0-w1` opened: the r3 "live" corpus was 70 rows in 8.0 seconds, 83% one category, and is now retained as history but excluded from the fit. Also: `provenance` is now required on multi-source candidates, making F10 a query over the corpus. **Fifth fix, found while verifying the other four: a pytest run was writing 70 synthetic deflections into the live corpus** — guarded, mutation-tested, and window `phase0-w2` opened as the first uncontaminated one. 43 ledger/gate tests + 16 Python, 7 mutations applied — 6 red as required, **1 (`goal` excluded from dominant-source) proved inert and is recorded as unfalsifiable rather than given a fake test**. |
 | r3 | Qwen | **Phase 0 implemented and live.** Added `steer_emitter.py` to §7 (shared emitter both governors call — keeps the schema in one place; the governors stay emit-only call sites). Implementation record: ledger core `steer-ledger.ts`, Python emitter, 9/9 governor block sites instrumented, `scholo-gate.mjs --resolve`, 26 TS tests + 13 Python tests green, cross-language fixture byte-identical, golden diff 24/24 byte-identical, 70/70 live checksums valid. **Two-week clock started 2026-08-09** (first receipt `steer-000001` captured 15:04:05Z). Phases 1–5 remain unapproved pending §8 exit criteria. |
 
 ## Context (seed — not the Executive Summary)
@@ -208,7 +209,8 @@ Every justifying claim carries `measured | architectural | judgement`, per the d
 
 ```
 codex/core/semantic-calculus/
-  steer-ledger.ts            NEW  Gemini  PHASE 0. receipt + resolution writers, reader, validation
+  steer-ledger.ts            NEW  Gemini  PHASE 0. receipt/resolution/epoch writers, reader, pending view
+  gate-pressure.ts           NEW  Claude  PHASE 0. per-candidate vectors from 4 independent producers
   pressure-field.ts          NEW  Codex   pure composition: vectors, tiers, ranking, absorbing boundary
   field-registry.ts          NEW  Codex   ridge/corridor/gate loaders + checksum
   field-defs/
@@ -216,7 +218,7 @@ codex/core/semantic-calculus/
     corridors.json           NEW  Codex   declarative Corridors (seed: bug-fix corridor)
     gates.json               NEW  Codex   declarative Gates (seed: architectural-rewrite gate)
 scripts/
-  scholo-gate.mjs            MOD  Gemini  add --steer and --resolve; default path untouched
+  scholo-gate.mjs            MOD  Gemini  add --steer, --resolve, --pending, --epoch; default path untouched
   calibrate-field.mjs        NEW  Gemini  offline proposal-only weight fitter (+ shuffled control)
 steamdeck_brain/vaelrix_forcefield/
   steer_emitter.py           NEW  Qwen    PHASE 0 (r3). shared emitter both governors call; schema,
@@ -226,7 +228,9 @@ steamdeck_brain/vaelrix_forcefield/
 bench/semantic-calculus/corpus/
   steer-receipts.jsonl       NEW  (runtime artifact, append-only; live since 2026-08-09)
 tests/semantic-calculus/
-  steer-ledger.test.js       NEW  Gemini  PHASE 0. append-only, null-outcome invisibility, malformed-row throw
+  steer-ledger.test.js       NEW  Gemini  PHASE 0. append-only, null-outcome invisibility, malformed-row throw,
+                                          pending/resolved complement, epoch windows, provenance (F10)
+  gate-pressure.test.js      NEW  Claude  PHASE 0. rival vectors vary, goal sign convention, producer refusal
   fixtures/steer-row-from-python.jsonl  NEW  Qwen  PHASE 0 (r3). cross-language contract fixture
   pressure-field.test.js     NEW  Gemini  composition, absorbing boundary, tier reachability, determinism
   field-gates.test.js        NEW  Gemini  gate refusal, external authorization, checksums
@@ -243,12 +247,35 @@ Dependency direction: `scripts/scholo-gate.mjs` → `pressure-field.ts` → `fie
 **Phase 0 — Separability precondition (Gemini, ~half a day + 2 weeks elapsed). BLOCKS PHASE 1.**
 Ship *only* the deflection ledger: the `PB-STEER-v1` / `PB-STEER-RESOLVE-v1` writers, and instrumentation of the two sites that already deflect and already know why — `search_governor.should_allow_search` and `tool_governor.should_allow_tool_call`. Both already produce a structured reason and a tier and currently discard it into `field.search.blockedSearches`, which nothing reads. No field, no tiers, no ridges.
 
-Run for two weeks. Exit criteria — **all three must hold, and any failure refutes the PDR**:
-1. ≥ `MIN_RESOLVED` (40) receipts carry a non-null outcome.
-2. At least one receipt carries `deflection_was_wrong`. *If nothing was ever wrongly deflected, the ledger cannot falsify a weight and the calibrator has no gradient to descend — the instrument is a check that cannot fail.*
-3. A logistic fit over the recorded pressure features separates `succeeded` from `regressed ∪ needed_rework` better than a shuffled-label control, reported with the control's score alongside.
+**Phase 0 emits from two shapes of event, and they answer different questions.** The r3 build instrumented only the first, which is why criterion 3 below had to be split — see the r4 amendment.
 
-If (3) fails, **stop.** Do not build the field. The receipt ledger is a genuinely useful artifact on its own — it is the half of the denial ledger that records counterfactuals rather than refusals — and shipping it alone is a legitimate, non-embarrassing outcome to be recorded in the PIR. This inverts the r1 risk profile, which built the landscape and *hoped* telemetry would calibrate it later; see U2 for why that hope already failed once here.
+| | **Governor rows** | **Gate rows** |
+|---|---|---|
+| Source | `search_governor`, `tool_governor` | `scholo-gate.mjs --steer` |
+| Shape | **unary** — 1 candidate, 1 source, magnitude 1.0 | **multi** — up to 5 rivals, 4 sources each |
+| Feature space | one-hot over 9 rule categories | `destructive`, `authorization`, `law`, `goal` |
+| Can answer | which rules over-fire | whether graded pressure ranks rivals correctly |
+| Cannot answer | anything about ranking | per-rule precision |
+
+A governor block has no rival, no comparison, and no gradient — so a fit over governor rows alone can only ever learn "category X over-fires." That is worth measuring and is now criterion 3a. It is **not** the pressure-field hypothesis, which is about ranking among rivals; that is criterion 3b, and it needs the gate rows.
+
+Run for two weeks. Exit criteria — **all four must hold, and any failure refutes the corresponding claim**:
+1. ≥ `MIN_RESOLVED` (40) receipts carry a non-null outcome. *Requires `--pending`; a receipt nobody can find is as unresolvable as one with no outcome field.*
+2. At least one receipt carries `deflection_was_wrong`. *If nothing was ever wrongly deflected, the ledger cannot falsify a weight and the calibrator has no gradient to descend — the instrument is a check that cannot fail.*
+3. **(a) Per-rule precision, governor rows.** Deflection categories differ in their `deflection_was_wrong` rate by more than the sampling interval. Refuting this means the governors are uniformly right or uniformly wrong and there is nothing to tune — a useful finding either way, and independent of the field.
+4. **(b) Field separability, gate rows.** A logistic fit over the four-source per-candidate vectors separates `succeeded` from `regressed ∪ needed_rework` better than a shuffled-label control, reported with the control's score alongside. **This is the one that tests the PDR's central bet.**
+
+If **3b** fails, **stop.** Do not build the field. The receipt ledger is a genuinely useful artifact on its own — it is the half of the denial ledger that records counterfactuals rather than refusals, and 3a keeps its value independently — so shipping it alone is a legitimate, non-embarrassing outcome to be recorded in the PIR. This inverts the r1 risk profile, which built the landscape and *hoped* telemetry would calibrate it later; see U2 for why that hope already failed once here.
+
+**Clock discipline.** The measurement window is the rows after the last `PB-STEER-EPOCH-v1` marker. Re-dating is an appended row carrying a required `reason`; earlier rows stay on disk and are excluded from the fit. Nothing is ever truncated, and why a window was abandoned is part of the record.
+
+**The corpus is the experiment, so a test run may not write to it.** Measured 2026-08-09: `pytest steamdeck_brain/vaelrix_forcefield/tests/` appended 70 synthetic governor deflections to the live ledger — same category distribution, same eight-second burst, utterance literally `"search"`. This is also the most likely origin of the r3 rows described as *"live ledger opened by the cockpit itself: 70+ receipts in the first minutes"*; that claim should be read as a test artifact, not as usage. `steer_emitter.refuses_default_ledger()` now blocks writes to the DEFAULT path whenever a test runner is driving the process, while an explicit `SCHOLO_STEER_LEDGER_PATH` still works so emission remains testable. Mutation-tested.
+
+| Window | Opened | Status |
+|---|---|---|
+| (pre-epoch) | 2026-08-09T15:04Z | r3 smoke run, 70 rows in 8.0s — voided |
+| `phase0-w1` | 2026-08-09T15:25:42Z | contaminated by a pytest run 3 min later — voided |
+| **`phase0-w2`** | **2026-08-09T15:32:18Z** | **active — the first window a test run cannot seed** |
 
 **Phase 1 — Core field (Codex, ~1 day). Requires Phase 0 exit criteria met.** Milestone: `pressure-field.ts` + `field-registry.ts` + registries imported by tests only. Exit criteria: all unit tests green; 100-iteration determinism test passes; registry checksum stable across reloads.
 
@@ -527,7 +554,8 @@ Example runnable test (determinism, §9.7) ships with the implementation; every 
 
 - [ ] `npx vitest run tests/semantic-calculus/pressure-field.test.js tests/semantic-calculus/field-gates.test.js` — all pass.
 - [ ] 100-iteration determinism test passes (byte-identical receipts).
-- [ ] **Phase 0 exit criteria met and recorded**, including the shuffled-label control score printed beside the real fit. A fit reported without its control is not evidence.
+- [ ] **Phase 0 exit criteria met and recorded** — all four, with 3a and 3b reported separately and the shuffled-label control score printed beside the 3b fit. A fit reported without its control is not evidence, and 3a passing does not license building the field.
+- [ ] The window fitted is the one after the last epoch marker, and the marker's `reason` is quoted in the PIR.
 - [ ] Falsification test passes: max goal attraction cannot rescue a law violation.
 - [ ] **Every guard in §9.8 mutation-tested and confirmed red when broken**, with the five mutations applied one at a time and the failure output pasted into the PIR. A green suite proves nothing until the guards have been shown capable of going red — `project-checks-that-cannot-fail`. This box may not be ticked by reading the tests.
 - [ ] Tiers 1–3 demonstrably affect ranking (§9.8 test 3) — the r1 defect cannot silently return.
@@ -578,7 +606,7 @@ Required PIR: `steamdeck_brain/knowledge/scholomance-encyclopedia/post-implement
 
 The PIR must record:
 
-- **Phase 0 result in full**, whichever way it went: resolved-receipt count, the count of `deflection_was_wrong`, the logistic fit score **and the shuffled-label control score beside it**. If Phase 0 refuted the field, the PIR says so plainly and the PDR closes at Phase 0 — that is a successful outcome, not a failure to report around.
+- **Phase 0 result in full**, whichever way it went: resolved-receipt count, the count of `deflection_was_wrong`, the 3a per-category wrong-rate table, and the 3b logistic fit score **with the shuffled-label control score beside it**. Governor-row and gate-row counts reported separately — a corpus that is 95% unary governor rows cannot support 3b however large it is. If Phase 0 refuted the field, the PIR says so plainly and the PDR closes at Phase 0 — that is a successful outcome, not a failure to report around.
 - **The five mutation results from §9.8**, each with the failing test name and message. Any mutation that left the suite green is recorded as a dead guard, with the resolution taken.
 - Final receipt count from the first week of shadow operation.
 - Every `GATED_CLOSED` / `GATED_OPEN` event.

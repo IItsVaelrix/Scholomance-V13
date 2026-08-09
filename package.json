@@ -129,7 +129,9 @@
     "career:graph:verify": "node scripts/career-graph/verify-shards.mjs data/career-graph/shards",
     "career:graph:publish": "node scripts/career-graph/publish-shards.mjs data/career-graph/shards public/data/career-graph/shards",
     "career:graph:all": "npm run career:sources:prepare && npm run career:graph:ingest && npm run career:graph:build && npm run career:graph:shards && npm run career:graph:verify && npm run career:graph:publish",
-    "career:benchmark": "node scripts/career-benchmark.mjs"
+    "career:benchmark": "node scripts/career-benchmark.mjs",
+    "steer:pending": "npx tsx scripts/scholo-gate.mjs --pending",
+    "steer:gate": "npx tsx scripts/scholo-gate.mjs --steer"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

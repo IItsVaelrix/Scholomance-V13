@@ -24,6 +24,7 @@ import {
   normalizeSteerReceipt, normalizeResolution,
   appendSteerReceipt, appendResolution, readLedger, verifyLedger,
   nextSteerId, resolvedReceipts,
+  EPOCH_SCHEMA, appendEpoch, rowsSinceEpoch, currentEpoch, pendingReceipts,
 } from '../../codex/core/semantic-calculus/steer-ledger.ts';
 
 // Vitest runs from the repo root; the fixture is committed beside these tests.
@@ -279,5 +280,106 @@ describe('cross-language contract — the Python-written row verifies here', () 
 
   it('the default ledger path sits under the corpus, not beside the module', () => {
     expect(DEFAULT_LEDGER_PATH.endsWith(join('bench', 'semantic-calculus', 'corpus', 'steer-receipts.jsonl'))).toBe(true);
+  });
+});
+
+// ── Post-audit additions ────────────────────────────────────────────────────
+// The first audit of the shipped Phase 0 ledger found two ways it could not
+// reach its own exit criteria. These guard the fixes.
+
+describe('pendingReceipts — criteria 1 and 2 need findable ids', () => {
+  it('lists unresolved receipts and drops them once resolved', () => {
+    appendSteerReceipt(receipt(), ledger);
+    appendSteerReceipt(receipt({ utterance: 'second' }), ledger);
+    let rows = readLedger(ledger).rows;
+    expect(pendingReceipts(rows).map((r) => r.id)).toEqual(['steer-000001', 'steer-000002']);
+
+    appendResolution({
+      schema: RESOLVE_SCHEMA, steer_id: 'steer-000001',
+      outcome: 'succeeded', deflected_candidate: null, note: '',
+    }, ledger);
+    rows = readLedger(ledger).rows;
+    expect(pendingReceipts(rows).map((r) => r.id)).toEqual(['steer-000002']);
+  });
+  // MUTATION: make pendingReceipts ignore the resolution set. Must go red.
+
+  it('is the exact complement of resolvedReceipts', () => {
+    appendSteerReceipt(receipt(), ledger);
+    appendSteerReceipt(receipt({ utterance: 'second' }), ledger);
+    appendResolution({
+      schema: RESOLVE_SCHEMA, steer_id: 'steer-000002',
+      outcome: 'regressed', deflected_candidate: null, note: '',
+    }, ledger);
+    const rows = readLedger(ledger).rows;
+    const pending = pendingReceipts(rows).map((r) => r.id);
+    const resolved = resolvedReceipts(rows).map((r) => r.receipt.id);
+    expect([...pending, ...resolved].sort()).toEqual(['steer-000001', 'steer-000002']);
+    expect(pending.filter((id) => resolved.includes(id))).toEqual([]);
+  });
+});
+
+describe('epoch markers — re-date the clock without deleting history', () => {
+  it('rowsSinceEpoch excludes earlier rows but leaves them on disk', () => {
+    appendSteerReceipt(receipt({ utterance: 'smoke run' }), ledger);
+    appendEpoch({ schema: EPOCH_SCHEMA, epoch: 'real-clock', reason: 'smoke run was 70 rows in 8s', note: '' }, ledger);
+    appendSteerReceipt(receipt({ utterance: 'real' }), ledger);
+
+    const { rows, receipts, epochs } = readLedger(ledger);
+    expect(receipts).toHaveLength(2);          // history retained
+    expect(epochs).toHaveLength(1);
+    const window = rowsSinceEpoch(rows);
+    expect(window.filter((r) => r.schema === SCHEMA).map((r) => r.utterance)).toEqual(['real']);
+    expect(currentEpoch(rows).epoch).toBe('real-clock');
+  });
+  // MUTATION: make rowsSinceEpoch return all rows. Must go red.
+
+  it('an epoch refuses to open without a reason', () => {
+    expect(() => appendEpoch({ schema: EPOCH_SCHEMA, epoch: 'x', note: '' }, ledger))
+      .toThrow(/"reason" is required/);
+  });
+
+  it('epoch rows checksum and survive a strict read', () => {
+    appendEpoch({ schema: EPOCH_SCHEMA, epoch: 'e1', reason: 'because', note: '' }, ledger);
+    expect(verifyLedger(ledger).ok).toBe(true);
+    expect(() => readLedger(ledger)).not.toThrow();
+  });
+
+  it('with no marker the whole ledger is one window', () => {
+    appendSteerReceipt(receipt(), ledger);
+    const { rows } = readLedger(ledger);
+    expect(rowsSinceEpoch(rows)).toHaveLength(1);
+    expect(currentEpoch(rows)).toBeNull();
+  });
+});
+
+describe('provenance — F10 as a query over the corpus, not a promise', () => {
+  const multi = (provenance) => receipt({
+    candidates: [{
+      key: 'build:app',
+      pressure: { destructive: 1.0, law: 0.7 },
+      result: 'PERMITTED',
+      dominant_source: 'destructive',
+      gate_considered: null,
+      ...(provenance === undefined ? {} : { provenance }),
+    }],
+    selected_trajectory: 'build:app',
+    verdict: 'PERMITTED',
+  });
+
+  it('a multi-source candidate must name a producer for every source', () => {
+    expect(() => normalizeSteerReceipt(multi())).toThrow(/provenance is required/);
+    expect(() => normalizeSteerReceipt(multi({ destructive: 'cliLexicon.classify' })))
+      .toThrow(/omits "law"/);
+  });
+  // MUTATION: drop the >1-source provenance requirement. Must go red.
+
+  it('provenance may not name a source that carries no pressure', () => {
+    expect(() => normalizeSteerReceipt(multi({
+      destructive: 'cliLexicon.classify', law: 'kind.adjudicateLaw', goal: 'proposer',
+    }))).toThrow(/names "goal", which carries no measured pressure/);
+  });
+
+  it('a single-source governor row still needs none — category describes it', () => {
+    expect(() => normalizeSteerReceipt(receipt())).not.toThrow();
   });
 });

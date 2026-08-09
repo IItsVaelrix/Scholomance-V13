@@ -65,6 +65,15 @@ import { canonicalStringify, parseCanonicalJson, pyFloat } from '../pixelbrain/c
 
 export const SCHEMA = 'PB-STEER-v1';
 export const RESOLVE_SCHEMA = 'PB-STEER-RESOLVE-v1';
+/**
+ * An epoch marker starts a fresh measurement window WITHOUT deleting anything.
+ * Append-only forbids truncating a smoke run out of the corpus, but a run that
+ * emitted 70 rows in eight seconds is not evidence about a two-week clock
+ * either. So the calibrator fits only rows after the LAST epoch marker, and
+ * the earlier rows stay in the file as history. Re-dating the clock is one
+ * appended row, and the reason it was re-dated is part of the record.
+ */
+export const EPOCH_SCHEMA = 'PB-STEER-EPOCH-v1';
 
 /** F1 — the nine pressure sources. Tier membership lives in the field core
  *  (Phase 1); the ledger only needs the closed vocabulary. */
@@ -96,10 +105,13 @@ export const RECEIPT_KEYS = Object.freeze([
 ] as const);
 export const CANDIDATE_KEYS = Object.freeze([
   'key', 'pressure', 'result', 'dominant_source', 'gate_considered',
-  'governor', 'category', 'tier', 'suggested_alternative',
+  'governor', 'category', 'tier', 'suggested_alternative', 'provenance',
 ] as const);
 export const RESOLUTION_KEYS = Object.freeze([
   'schema', 'steer_id', 'outcome', 'deflected_candidate', 'note',
+] as const);
+export const EPOCH_KEYS = Object.freeze([
+  'schema', 'epoch', 'reason', 'note',
 ] as const);
 
 /** Phase 0 emits from two governors; Phase 2 (--steer) emits from the gate. */
@@ -226,6 +238,28 @@ function normalizeCandidate(value: unknown, index: number): Record<string, unkno
   if (value.suggested_alternative !== undefined) {
     candidate.suggested_alternative = requireNonEmptyString(value.suggested_alternative, `${where}.suggested_alternative`);
   }
+  // F10 in the data, not just in review: every pressure names the module that
+  // produced it, so "no source was authored by the thing it ranks" is a query
+  // over the corpus rather than a promise. Required once a candidate carries
+  // more than one source — a single-source governor row is self-describing
+  // through `category`, but a vector is not.
+  if (value.provenance !== undefined) {
+    if (!isPlainObject(value.provenance)) fail(`${where}.provenance must be an object`);
+    for (const [source, producer] of Object.entries(value.provenance)) {
+      if (!(source in pressure)) {
+        fail(`${where}.provenance names "${source}", which carries no measured pressure`);
+      }
+      requireNonEmptyString(producer, `${where}.provenance.${source}`);
+    }
+    for (const source of Object.keys(pressure)) {
+      if (!(source in (value.provenance as object))) {
+        fail(`${where}.provenance omits "${source}" — every pressure must name its producer (F10)`);
+      }
+    }
+    candidate.provenance = { ...(value.provenance as Record<string, string>) };
+  } else if (Object.keys(pressure).length > 1) {
+    fail(`${where}.provenance is required when a candidate carries more than one pressure source (F10)`);
+  }
   return candidate;
 }
 
@@ -306,6 +340,22 @@ export function normalizeResolution(entry: Record<string, unknown>, knownIds: Re
   };
 }
 
+/**
+ * Validate an epoch marker. `epoch` is a human-readable label for the window
+ * it opens; `reason` says why the previous window was abandoned. Both are
+ * required — an unexplained clock restart is how a smoke run quietly becomes
+ * the dataset.
+ */
+export function normalizeEpoch(entry: Record<string, unknown>): Record<string, unknown> {
+  if (!isPlainObject(entry)) fail('epoch must be an object');
+  if (entry.schema !== EPOCH_SCHEMA) fail(`"schema" must be "${EPOCH_SCHEMA}"`);
+  const epoch = requireNonEmptyString(entry.epoch, 'epoch');
+  const reason = requireNonEmptyString(entry.reason, 'reason');
+  const note = entry.note ?? '';
+  if (typeof note !== 'string') fail('"note" must be a string');
+  return { schema: EPOCH_SCHEMA, epoch, reason, note };
+}
+
 /** Checksum a canonical payload: everything except checksum + capturedAt. */
 function rowChecksum(payload: Record<string, unknown>): string {
   return 'steer1:' + sha256Hex(canonicalStringify(payload)).slice(0, 16);
@@ -315,6 +365,7 @@ export interface LedgerContents {
   rows: Record<string, unknown>[];
   receipts: Record<string, unknown>[];
   resolutions: Record<string, unknown>[];
+  epochs: Record<string, unknown>[];
   skipped: number;
 }
 
@@ -326,7 +377,7 @@ export interface LedgerContents {
  */
 export function readLedger(path: string = ledgerPath(), options: { strict?: boolean } = {}): LedgerContents {
   const strict = options.strict !== false;
-  if (!existsSync(path)) return { rows: [], receipts: [], resolutions: [], skipped: 0 };
+  if (!existsSync(path)) return { rows: [], receipts: [], resolutions: [], epochs: [], skipped: 0 };
 
   const lines = readFileSync(path, 'utf8').split('\n').filter((l) => l.trim().length > 0);
   const rows: Record<string, unknown>[] = [];
@@ -340,6 +391,9 @@ export function readLedger(path: string = ledgerPath(), options: { strict?: bool
       if (row.schema === SCHEMA) {
         normalizeSteerReceipt(row);
         row.id = row.id; // keep assigned id
+        rows.push(row);
+      } else if (row.schema === EPOCH_SCHEMA) {
+        normalizeEpoch(row);
         rows.push(row);
       } else if (row.schema === RESOLVE_SCHEMA) {
         // Referential integrity is checked at WRITE time; reads tolerate an
@@ -361,6 +415,7 @@ export function readLedger(path: string = ledgerPath(), options: { strict?: bool
     rows,
     receipts: rows.filter((r) => r.schema === SCHEMA),
     resolutions: rows.filter((r) => r.schema === RESOLVE_SCHEMA),
+    epochs: rows.filter((r) => r.schema === EPOCH_SCHEMA),
     skipped,
   };
 }
@@ -446,6 +501,41 @@ export function appendResolution(entry: Record<string, unknown>, path: string = 
   const known = new Set(receipts.map((r) => r.id as string));
   const body = normalizeResolution(entry, known);
   return writeRow(path, body);
+}
+
+/** Append an epoch marker, opening a fresh measurement window. */
+export function appendEpoch(entry: Record<string, unknown>, path: string = ledgerPath()): Record<string, unknown> {
+  return writeRow(path, normalizeEpoch(entry));
+}
+
+/**
+ * Rows belonging to the current measurement window: everything after the LAST
+ * epoch marker. With no marker the whole ledger is one window, so behaviour is
+ * unchanged for a fresh file. History before the marker is retained on disk and
+ * simply not fitted — nothing is ever deleted.
+ */
+export function rowsSinceEpoch(rows: Record<string, unknown>[]): Record<string, unknown>[] {
+  let start = 0;
+  rows.forEach((row, i) => { if (row.schema === EPOCH_SCHEMA) start = i + 1; });
+  return rows.slice(start);
+}
+
+/** The active window's marker, or null when the ledger has never been re-dated. */
+export function currentEpoch(rows: Record<string, unknown>[]): Record<string, unknown> | null {
+  const markers = rows.filter((r) => r.schema === EPOCH_SCHEMA);
+  return markers.length ? markers[markers.length - 1] : null;
+}
+
+/**
+ * The complement of `resolvedReceipts`, and the reason Phase 0 can reach its
+ * own exit criteria. A receipt nobody can FIND is as unresolvable as one with
+ * no outcome field: criteria 1 and 2 both require a human to act on specific
+ * ids, so the ids have to be listable. Ordered oldest first — the longest
+ * unresolved deflection is the most interesting one.
+ */
+export function pendingReceipts(rows: Record<string, unknown>[]): Record<string, unknown>[] {
+  const resolved = new Set(rows.filter((r) => r.schema === RESOLVE_SCHEMA).map((r) => r.steer_id as string));
+  return rows.filter((r) => r.schema === SCHEMA && !resolved.has(r.id as string));
 }
 
 /**
