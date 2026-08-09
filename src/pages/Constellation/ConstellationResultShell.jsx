@@ -144,9 +144,16 @@ function MeaningBody({ leximancy, semanticInquiry, query }) {
   const selectedInterpretation =
     leximancy.interpretations.find((i) => i.id === leximancy.selectedInterpretationId) || null;
   const hasLeximancy = leximancy.interpretations.length > 0;
+  const anchorToken = leximancy.lookupToken || leximancy.anchor || null;
 
   return (
     <>
+      {anchorToken ? (
+        <p className="constellation-result-anchor" data-testid="constellation-lexical-anchor">
+          Meaning anchored on &ldquo;{anchorToken}&rdquo;
+          {leximancy.compoundUsed ? ` (from ${leximancy.compoundUsed})` : ''}
+        </p>
+      ) : null}
       {rarity ? (
         <p className="constellation-result-rarity" aria-label={`Lexical rarity ${rarity.label}`}>
           {rarity.label} · {rarity.band}/{rarity.max}
@@ -494,6 +501,125 @@ function ReadingsBody({ readings }) {
   );
 }
 
+/** Phrase roles/devices from packet.phraseStructure — map fields only. */
+function PhraseStructureChips({ phraseStructure }) {
+  if (!phraseStructure) return null;
+  const compounds = Array.isArray(phraseStructure.compounds) ? phraseStructure.compounds : [];
+  const devices = Array.isArray(phraseStructure.devices) ? phraseStructure.devices : [];
+  const hasAny =
+    phraseStructure.intent ||
+    phraseStructure.headToken ||
+    compounds.length > 0 ||
+    devices.length > 0;
+  if (!hasAny) return null;
+  return (
+    <dl className="constellation-result-dl constellation-result-phrase-structure" data-testid="constellation-phrase-structure">
+      {phraseStructure.intent ? (
+        <div>
+          <dt>Intent</dt>
+          <dd>{phraseStructure.intent}</dd>
+        </div>
+      ) : null}
+      {phraseStructure.headToken ? (
+        <div>
+          <dt>Head</dt>
+          <dd>{phraseStructure.headToken}</dd>
+        </div>
+      ) : null}
+      {compounds.length > 0 ? (
+        <div>
+          <dt>Compounds</dt>
+          <dd>{compounds.join(', ')}</dd>
+        </div>
+      ) : null}
+      {devices.length > 0 ? (
+        <div>
+          <dt>Devices</dt>
+          <dd>{devices.join(', ')}</dd>
+        </div>
+      ) : null}
+    </dl>
+  );
+}
+
+/**
+ * Discovery Field — ranked kin from packet.discovery. Client maps fields only;
+ * no frontend re-ranking or invented hits.
+ */
+function DiscoveryBody({ discovery }) {
+  if (!discovery) return null;
+  const hits = Array.isArray(discovery.hits) ? discovery.hits : [];
+  const seeds = Array.isArray(discovery.seeds) ? discovery.seeds : [];
+  const rhymeWith = discovery.constraints?.rhymeWith ?? null;
+  const warnings = Array.isArray(discovery.warnings) ? discovery.warnings : [];
+
+  return (
+    <>
+      <ul className="constellation-result-masthead-chips" aria-label="Discovery mode">
+        {discovery.mode ? (
+          <li className="constellation-result-masthead-chip constellation-result-masthead-chip--intent">
+            {discovery.mode}
+          </li>
+        ) : null}
+        {discovery.status ? (
+          <li className="constellation-result-masthead-chip">{discovery.status}</li>
+        ) : null}
+        {discovery.relation && discovery.relation !== 'unknown' ? (
+          <li className="constellation-result-masthead-chip">{discovery.relation}</li>
+        ) : null}
+      </ul>
+      {seeds.length > 0 ? <Chips items={seeds} label="Seeds" tone="kin" /> : null}
+      {rhymeWith ? (
+        <p className="constellation-result-discovery-constraint">
+          Rhyme with <span className="constellation-result-mono">{rhymeWith}</span>
+        </p>
+      ) : null}
+      {hits.length > 0 ? (
+        <ol className="constellation-result-discovery-hits" data-testid="constellation-discovery-hits">
+          {hits.map((hit) => {
+            const badges = Array.isArray(hit.badges) ? hit.badges : [];
+            const firstReason =
+              Array.isArray(hit.reasons) && hit.reasons.length > 0 ? hit.reasons[0] : null;
+            const scoreText =
+              typeof hit.score === 'number' && Number.isFinite(hit.score)
+                ? hit.score.toFixed(3)
+                : String(hit.score ?? '');
+            return (
+              <li key={hit.token} className="constellation-result-discovery-hit">
+                <span className="constellation-result-discovery-hit__token">{hit.token}</span>
+                <span className="constellation-result-confidence">{scoreText}</span>
+                {badges.length > 0 ? (
+                  <ul className="constellation-result-discovery-badges" aria-label="Evidence badges">
+                    {badges.map((b) => (
+                      <li key={b} className="constellation-result-discovery-badge">
+                        {b}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                {firstReason ? (
+                  <span className="constellation-result-discovery-hit__reason">{firstReason}</span>
+                ) : null}
+              </li>
+            );
+          })}
+        </ol>
+      ) : (
+        <p className="constellation-result-awaiting" data-testid="constellation-discovery-empty">
+          No local kin found for this inquiry
+        </p>
+      )}
+      {warnings.length > 0 ? (
+        <ul className="constellation-result-warnings">
+          {warnings.map((w) => (
+            <li key={w}>{w}</li>
+          ))}
+        </ul>
+      ) : null}
+    </>
+  );
+}
+
 /* ─── The hero figure: the answer drawn as a living constellation ──────────
    Pure geometry from `heroFigure(packet)`; the seed touches only the lodestar
    and per-star twinkle. Gold is reserved for the single lodestar nucleus — every
@@ -583,6 +709,8 @@ class HeroFigureBoundary extends Component {
 function ComposedResultShell({ packet, scene, reducedMotion }) {
   const { query, leximancy, rhymeAstrology, phraseGenome, pageBytecode, provenance, diagnostics } = packet;
   const semanticInquiry = packet.semanticInquiry ?? null;
+  const phraseStructure = packet.phraseStructure ?? null;
+  const discovery = packet.discovery ?? null;
   const engineVersions = provenance?.engineVersions ?? {};
   const degraded = diagnostics?.degradedChannels ?? [];
 
@@ -648,8 +776,22 @@ function ComposedResultShell({ packet, scene, reducedMotion }) {
             </li>
           ) : null}
         </ul>
+        <PhraseStructureChips phraseStructure={phraseStructure} />
         <IdentityDl query={query} leximancy={leximancy} phraseGenome={phraseGenome} pageBytecode={pageBytecode} />
       </section>
+
+      {/* ── Discovery Field: meta-query kin plate (before Leximancy) ── */}
+      {discovery != null ? (
+        <section
+          className="constellation-result-plate"
+          data-compose-part="discovery-field"
+          aria-labelledby="cos-discovery"
+          style={nextReveal()}
+        >
+          <h2 id="cos-discovery" className="constellation-result-plate__overline">Discovery Field</h2>
+          <DiscoveryBody discovery={discovery} />
+        </section>
+      ) : null}
 
       {/* ── Plate II · Meaning field ── */}
       <section
@@ -770,6 +912,7 @@ function ComposedResultShell({ packet, scene, reducedMotion }) {
 function PlainResultShell({ packet }) {
   const { query, leximancy, rhymeAstrology, phraseGenome, pageBytecode, provenance, diagnostics } = packet;
   const semanticInquiry = packet.semanticInquiry ?? null;
+  const discovery = packet.discovery ?? null;
   const engineVersions = provenance?.engineVersions ?? {};
   const degraded = diagnostics?.degradedChannels ?? [];
 
@@ -786,6 +929,13 @@ function PlainResultShell({ packet }) {
         <IdentityDl query={query} leximancy={leximancy} phraseGenome={phraseGenome} pageBytecode={pageBytecode} />
         <VersionsList engineVersions={engineVersions} />
       </section>
+
+      {discovery != null ? (
+        <section className="constellation-result-section" aria-labelledby="cos-discovery">
+          <h2 id="cos-discovery">Discovery Field</h2>
+          <DiscoveryBody discovery={discovery} />
+        </section>
+      ) : null}
 
       <section className="constellation-result-section" aria-labelledby="cos-leximancy">
         <h2 id="cos-leximancy">Leximancy Meaning Field</h2>

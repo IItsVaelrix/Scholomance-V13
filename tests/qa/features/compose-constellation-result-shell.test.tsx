@@ -59,9 +59,9 @@ describe('composed answer plate', () => {
     const { container } = render(<ConstellationResultShell packet={basePacket} />);
     const el = root(container);
     expect(el.getAttribute('data-compose-kind')).toBe('constellation-result');
-    expect(el.getAttribute('data-compose-version')).toBe('1.0.0');
+    expect(el.getAttribute('data-compose-version')).toBe('1.1.0');
     // The checksum is the golden value pinned in the packet test.
-    expect(el.getAttribute('data-compose-scene')).toBe('scd64:672f55146b2753a4');
+    expect(el.getAttribute('data-compose-scene')).toBe('scd64:c34223becabac5a7');
     expect(el.getAttribute('role')).toBe('article');
   });
 

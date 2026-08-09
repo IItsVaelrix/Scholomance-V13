@@ -23,11 +23,13 @@ import {
  * Frozen golden checksum. The scene is a pure function of frozen constants, so
  * this value is stable across environments and builds. If you intentionally
  * change the plate anatomy, re-seal by updating this constant (and say why).
+ *
+ * Re-sealed 2026-08-07: added discovery-field after masthead (v1.1.0).
  */
-const GOLDEN_CHECKSUM = 'scd64:672f55146b2753a4';
+const GOLDEN_CHECKSUM = 'scd64:c34223becabac5a7';
 
 describe('ConstellationResult PB scene (answer plate contract)', () => {
-  it('emits a PB-UI-SCENE-v1 whose children are the six declared plates, in order', () => {
+  it('emits a PB-UI-SCENE-v1 whose children are the declared plates, in order', () => {
     const scene = createConstellationResultScene();
     expect(scene.contract).toBe('PB-UI-SCENE-v1');
     expect(scene.root.kind).toBe(CONSTELLATION_RESULT_KIND);
@@ -37,10 +39,11 @@ describe('ConstellationResult PB scene (answer plate contract)', () => {
     expect(ids).toEqual(
       RESULT_PARTS.map((p) => `${CONSTELLATION_RESULT_ID}.${p.id}`),
     );
-    // Order is load-bearing: identity → meaning → sound → genome → verdict → seal.
+    // Order is load-bearing: identity → discovery → meaning → sound → genome → verdict → seal.
     expect(ids).toEqual([
       'constellation-result.hero-figure',
       'constellation-result.masthead',
+      'constellation-result.discovery-field',
       'constellation-result.meaning-field',
       'constellation-result.sound-field',
       'constellation-result.genome-field',

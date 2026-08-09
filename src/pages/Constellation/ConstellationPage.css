@@ -741,6 +741,76 @@
   color: rgba(232, 201, 106, 0.9);
 }
 
+/* ── Literary anchor honesty (meaning is head/compound, not the whole phrase) ── */
+.constellation-result-anchor {
+  margin: 0 0 0.85rem;
+  font-family: var(--cos-body);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--cos-ink-dim);
+}
+
+/* ── Phrase structure (roles / compounds / devices from packet) ── */
+.constellation-result-phrase-structure {
+  margin-bottom: 1rem;
+}
+
+/* ── Discovery Field: ranked kin (packet.discovery map-only) ── */
+.constellation-result-discovery-constraint {
+  margin: 0.75rem 0 0;
+  font-family: var(--cos-body);
+  font-size: 0.85rem;
+  color: var(--cos-ink-dim);
+}
+.constellation-result-discovery-hits {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+}
+.constellation-result-discovery-hit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.45rem 0.75rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--cos-hair);
+}
+.constellation-result-discovery-hit:last-child {
+  border-bottom: none;
+}
+.constellation-result-discovery-hit__token {
+  font-family: var(--cos-display);
+  font-weight: 600;
+  color: var(--cos-ink);
+  min-width: 6rem;
+}
+.constellation-result-discovery-hit__reason {
+  flex: 1 1 100%;
+  font-family: var(--cos-body);
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--cos-ink-dim);
+}
+.constellation-result-discovery-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.constellation-result-discovery-badge {
+  font-family: var(--cos-body);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid var(--cos-hair);
+  background: rgba(139, 124, 255, 0.07);
+  color: var(--cos-ink-dim);
+}
+
 /* ── Phoneme arc: the sound of the query drawn as a constellation figure ── */
 .constellation-result-arc {
   display: block;

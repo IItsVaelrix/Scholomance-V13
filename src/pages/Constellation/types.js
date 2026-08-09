@@ -20,7 +20,8 @@
  *   primary: { anchor: string, role: string, proposedBy: string, rationale: string, candidate: boolean }|null,
  *   readings: Array<{ anchor: string, role: string, proposedBy: string, rationale: string, candidate: boolean }>,
  *   silent: string[] }} readings
- * @property {{ degradedChannels: string[], warnings: string[] }} diagnostics
+ * @property {object|null} [discovery] Discovery channel payload (meta-query only); null for literary/craft/comparison
+ * @property {{ degradedChannels: string[], warnings: string[], discovery?: { stage: string, message: string|null } }} diagnostics
  * @property {{ engineVersions: Record<string, string> }} provenance
  */
 export {};

@@ -15,6 +15,10 @@ import {
 import { resolveGovernedPairs } from '../../core/constellation/governor.js';
 import { resolveReadings } from '../../core/constellation/readings.js';
 import { selectGovernedSense } from '../../core/semantic/governed-sense.js';
+import {
+  analyzeDiscovery,
+  DISCOVERY_ADAPTER_VERSION,
+} from './constellation/discovery.adapter.js';
 
 const CONSTELLATION_OS_VERSION = 'phase3-scale-1';
 
@@ -258,6 +262,31 @@ export async function buildConstellationPage(rawQuery, deps) {
     scaleField = null;
   }
 
+  /**
+   * Discovery (poetic expand → constrain → score → rank) runs only for meta-query
+   * intent. Literary / craft / comparison leave discovery null; engine version
+   * still ships for deterministic pageBytecode.
+   */
+  let discovery = null;
+  let discoveryDiag = { stage: 'ok', message: null };
+  if (identity.intent === 'meta-query') {
+    try {
+      discoveryDiag.stage = 'parse';
+      discovery = await analyzeDiscovery(rawQuery, identity, {
+        lexiconAdapter: deps.lexiconAdapter,
+        rhymeQueryEngine: deps.rhymeQueryEngine,
+        rhymeLexiconRepo: deps.rhymeLexiconRepo,
+        phonemeEngine: deps.phonemeEngine,
+      });
+      discoveryDiag.stage = 'ok';
+    } catch (err) {
+      degradedChannels.push('discovery');
+      warnings.push(`discovery channel failed: ${err.message}`);
+      discoveryDiag = { stage: 'expand', message: err.message };
+      discovery = null;
+    }
+  }
+
   const engineVersions = {
     constellationOS: CONSTELLATION_OS_VERSION,
     leximancy: LEXIMANCY_ADAPTER_VERSION,
@@ -265,6 +294,7 @@ export async function buildConstellationPage(rawQuery, deps) {
     phraseGenome: GENOME_ADAPTER_VERSION,
     semanticInquiry: SEMANTIC_ADAPTER_VERSION,
     scaleField: SCALE_FIELD_ADAPTER_VERSION,
+    discovery: DISCOVERY_ADAPTER_VERSION,
   };
 
   const pageBytecode = computePageBytecode({
@@ -387,7 +417,12 @@ export async function buildConstellationPage(rawQuery, deps) {
      * than about one token lifted out of it.
      */
     governed,
-    diagnostics: { degradedChannels, warnings },
+    /**
+     * Discovery channel payload — meta-queries only; null for literary,
+     * craft and comparison kinds.
+     */
+    discovery,
+    diagnostics: { degradedChannels, warnings, discovery: discoveryDiag },
     provenance: { engineVersions },
   };
 }
