@@ -23,6 +23,7 @@ import {
   requiredConfirmation,
   confirmationsRequired,
 } from '../codex/core/semantic-calculus/utterance.ts';
+import { appendResolution, OUTCOMES } from '../codex/core/semantic-calculus/steer-ledger.ts';
 
 const C = { d: '\x1b[2m', b: '\x1b[1m', r: '\x1b[0m', g: '\x1b[32m', y: '\x1b[33m', c: '\x1b[36m', red: '\x1b[31m', m: '\x1b[35m' };
 const KIND_COLOR = { Do: C.g, Clarify: C.y, Probe: C.c, Theory: C.m, Hypothesis: '\x1b[38;5;208m' };
@@ -31,6 +32,42 @@ const CORPUS = 'bench/semantic-calculus/corpus/cli-intents.jsonl';
 const args = process.argv.slice(2);
 const shouldLog = args.includes('--log');
 const asJson = args.includes('--json');
+
+/**
+ * F8a — resolve a steer receipt. Appends a PB-STEER-RESOLVE-v1 row; never
+ * mutates the evaluation row. A deflection nobody can mark wrong is not
+ * evidence, and `deflection_was_wrong` is the only signal that can falsify
+ * a weight — so this flag is what turns the Phase 0 ledger into telemetry.
+ */
+const flagValue = (name) => {
+  const hit = args.find((a) => a.startsWith(`--${name}=`));
+  return hit ? hit.slice(name.length + 3) : undefined;
+};
+const resolveId = flagValue('resolve');
+if (resolveId !== undefined) {
+  const outcome = flagValue('outcome');
+  if (!outcome) {
+    console.error(`usage: npx tsx scripts/scholo-gate.mjs --resolve=<steer-id> --outcome=<${OUTCOMES.join('|')}> [--deflected=<candidate-key>] [--note=<text>]`);
+    process.exit(2);
+  }
+  try {
+    const row = appendResolution({
+      schema: 'PB-STEER-RESOLVE-v1',
+      steer_id: resolveId,
+      outcome,
+      deflected_candidate: flagValue('deflected') ?? null,
+      note: flagValue('note') ?? '',
+    });
+    console.log(`  ${C.g}resolved${C.r} ${row.steer_id} -> ${C.b}${row.outcome}${C.r}` +
+      `${row.deflected_candidate ? `  ${C.d}(deflection: ${row.deflected_candidate})${C.r}` : ''}` +
+      `  ${C.d}· appended, never mutated · steer-receipts.jsonl${C.r}`);
+  } catch (err) {
+    console.error(`${C.red}resolve refused:${C.r} ${err.message}`);
+    process.exit(1);
+  }
+  process.exit(0);
+}
+
 const utterance = args.filter((a) => !a.startsWith('--')).join(' ').trim();
 
 /**
@@ -48,6 +85,7 @@ const spoken = asDerived || taint.length ? derivedUtterance(utterance, taint) : 
 
 if (!utterance) {
   console.error('usage: npx tsx scripts/scholo-gate.mjs [--json] [--log] [--derived] [--taint=<src>] "<what you want>"');
+  console.error('       npx tsx scripts/scholo-gate.mjs --resolve=<steer-id> --outcome=<verdict> [--deflected=<key>] [--note=<text>]');
   process.exit(2);
 }
 

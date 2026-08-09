@@ -10,7 +10,31 @@ from __future__ import annotations
 
 from copy import deepcopy
 
+from .steer_emitter import emit_deflection
 from .types import ToolCallField, ToolCallRequest, ToolDecision, VaelrixCortexForceField
+
+
+def _emit_tool_deflection(
+    category: str,
+    tier: str,
+    tool: str,
+    args: dict,
+    decision: ToolDecision,
+) -> None:
+    """
+    PHASE 0 (Pressure Field Governor PDR): record the deflection in the
+    steer ledger. EMIT ONLY — never influences the decision, and every
+    failure is swallowed inside emit_deflection.
+    """
+    key = normalize_tool_call(tool, args)
+    emit_deflection(
+        governor="tool",
+        category=category,
+        tier=tier,
+        utterance=key,
+        candidate_key=f"tool:{key}",
+        suggested_alternative=decision.suggestedAlternative,
+    )
 
 
 # Tools that can materially change the codebase or runtime.
@@ -76,43 +100,51 @@ def should_allow_tool_call(
         )
 
     if allowed_tools is not None and tool not in allowed_tools:
-        return ToolDecision(
+        decision = ToolDecision(
             allowed=False,
             reason=f"Tool '{tool}' is not in the active brain's allowed tool set",
             suggestedAlternative="Use a tool listed in the brain's allowedTools",
             riskLevel="blocked",
             tieredSignals=[_tool_signal("R2", f"Tool {tool} not in allowed set")],
         )
+        _emit_tool_deflection("TOOL_NOT_ALLOWED", "R2", tool, args, decision)
+        return decision
 
     if require_reason and not reason.strip():
-        return ToolDecision(
+        decision = ToolDecision(
             allowed=False,
             reason="Tool call blocked because no reason was provided",
             suggestedAlternative="Provide a reason explaining what unknown this resolves",
             riskLevel="blocked",
             tieredSignals=[_tool_signal("R2", "Tool call missing reason")],
         )
+        _emit_tool_deflection("TOOL_MISSING_REASON", "R2", tool, args, decision)
+        return decision
 
     budget = max_calls_per_phase if max_calls_per_phase is not None else field.tools.maxCallsPerPhase
     if field.tools.callsThisPhase >= budget:
-        return ToolDecision(
+        decision = ToolDecision(
             allowed=False,
             reason="Tool call blocked because the current phase budget is exhausted",
             suggestedAlternative="Escalate to the Council Arbiter or end the phase",
             riskLevel="blocked",
             tieredSignals=[_tool_signal("Y3", "Tool-call budget exhausted")],
         )
+        _emit_tool_deflection("TOOL_BUDGET_EXHAUSTED", "Y3", tool, args, decision)
+        return decision
 
     key = normalize_tool_call(tool, args)
     for past in field.tools.lastCalls:
         if past.get("_key") == key:
-            return ToolDecision(
+            decision = ToolDecision(
                 allowed=False,
                 reason="Tool call blocked because this exact call was already made",
                 suggestedAlternative="Use the prior result or refine the arguments",
                 riskLevel="blocked",
                 tieredSignals=[_tool_signal("Y2", "Repeated identical tool call")],
             )
+            _emit_tool_deflection("REPEATED_TOOL_CALL", "Y2", tool, args, decision)
+            return decision
 
     risk_level = "high" if tool in _DESTRUCTIVE_TOOLS else "low"
     if tool in _READ_ONLY_TOOLS:
