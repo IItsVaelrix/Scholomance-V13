@@ -21,6 +21,8 @@ PROJECT_ROOT = os.path.abspath(os.path.join(DIVTUBE_ROOT, ".."))
 
 PROJECTION = "codex/core/constellation/grimoire/projection-laws.js"
 LENS = "divtube_downloader/tui/services/code_lens.py"
+AST_TOPO = "codex/core/semantic/ast-topography.js"
+THIS_MODULE = "divtube_downloader/tui/services/code_eval.py"
 
 
 class TestPathSafety(unittest.TestCase):
@@ -36,7 +38,7 @@ class TestPathSafety(unittest.TestCase):
 
 class TestJavaScript(unittest.TestCase):
     def test_calls_a_zero_arg_export_and_reports_its_length(self):
-        """The motivating case: the doc says 'every licensed law', it returns 50."""
+        """The motivating case: the doc says 'every licensed law', it returns 79."""
         result = code_eval.evaluate(PROJECT_ROOT, PROJECTION, "synthesizeByProjection")
         self.assertTrue(result["ok"], result.get("error"))
         self.assertTrue(result["called"])
@@ -96,13 +98,41 @@ class TestPython(unittest.TestCase):
     def test_package_relative_imports_resolve(self):
         """code_eval.py imports tui.services.code_lens at module level, so it
         can only load if the driver puts the package root on sys.path. This is
-        the lens evaluating a module shaped exactly like itself."""
-        result = code_eval.evaluate(
-            PROJECT_ROOT, "divtube_downloader/tui/services/code_eval.py", "DEFAULT_TIMEOUT"
-        )
+        the lens evaluating a module shaped exactly like itself. Regression:
+        the driver used to die with ModuleNotFoundError before reaching the
+        symbol."""
+        result = code_eval.evaluate(PROJECT_ROOT, THIS_MODULE, "DEFAULT_TIMEOUT")
         self.assertTrue(result["ok"], result.get("error"))
         self.assertFalse(result["called"])
         self.assertEqual(result["value"], 10)
+
+
+class TestPurityClaims(unittest.TestCase):
+    """declaredPure must read declarations, not mentions of them."""
+
+    def test_quoted_mentions_are_not_claims(self):
+        """code_eval.py's header QUOTES the purity phrases while documenting
+        the detector. The module runs subprocesses by design; reading its own
+        documentation as a purity claim is the regression this guards."""
+        result = code_eval.evaluate(PROJECT_ROOT, THIS_MODULE, "DEFAULT_TIMEOUT")
+        self.assertTrue(result["ok"], result.get("error"))
+        self.assertFalse(result["declaredPure"])
+
+    def test_declaration_sharing_a_line_with_quoted_code_still_counts(self):
+        """ast-topography.js declares purity on a line that also quotes a code
+        span; stripping quotes must remove the span, not the declaration."""
+        result = code_eval.evaluate(
+            PROJECT_ROOT, AST_TOPO, "assertInventoryFenced", args=[["FunctionDeclaration"]]
+        )
+        self.assertTrue(result["ok"], result.get("error"))
+        self.assertTrue(result["declaredPure"])
+
+    def test_no_subprocess_form_counts(self):
+        """code_lens.py writes 'pure stdlib — … no subprocess', a fourth
+        documented form of the repo's purity declaration."""
+        result = code_eval.evaluate(PROJECT_ROOT, LENS, "_lang_of", args=["x.js"])
+        self.assertTrue(result["ok"], result.get("error"))
+        self.assertTrue(result["declaredPure"])
 
 
 class TestBounds(unittest.TestCase):

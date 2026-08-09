@@ -53,19 +53,32 @@ PURITY_HEADER_LINES = 60
 EVALUABLE_LANGS = {"javascript", "python"}
 
 # `PURE AND ZERO-I/O`, `zero-I/O and pure`, `PURE, ZERO-I/O` — the repo writes
-# its purity declaration several ways. Both halves must appear in the header.
+# its purity declaration several ways. A fourth is `pure stdlib … no subprocess`
+# (code_lens.py). Both halves must appear on one line, after stripping
+# backtick-quoted spans: a quoted span is a *mention*, not a declaration. This
+# module's own header quotes the phrases above while documenting the detector;
+# stripping them is what keeps it from reading its own documentation as a
+# purity claim.
 _PURE_RE = re.compile(r"\bpure\b", re.IGNORECASE)
 _ZERO_IO_RE = re.compile(r"zero[\s\-]?i/?o", re.IGNORECASE)
+_NO_SUBPROCESS_RE = re.compile(r"\bno subprocess\b", re.IGNORECASE)
+_QUOTED_SPAN_RE = re.compile(r"`[^`]*`")
 
 
 def _declared_pure(abs_path: str) -> bool:
     """Whether the module's own header claims purity. A claim, not a finding."""
     try:
         with open(abs_path, "r", encoding="utf-8", errors="replace") as fh:
-            head = "".join(fh.readline() for _ in range(PURITY_HEADER_LINES))
+            head = [fh.readline() for _ in range(PURITY_HEADER_LINES)]
     except OSError:
         return False
-    return bool(_PURE_RE.search(head) and _ZERO_IO_RE.search(head))
+    for line in head:
+        bare = _QUOTED_SPAN_RE.sub("", line)
+        if not _PURE_RE.search(bare):
+            continue
+        if _ZERO_IO_RE.search(bare) or _NO_SUBPROCESS_RE.search(bare):
+            return True
+    return False
 
 
 # --------------------------------------------------------------------------
