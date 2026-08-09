@@ -1,0 +1,40 @@
+import { defineConstruction, CONSTRUCTION_STATUS as S } from '../schemas.js';
+
+export const RELATIVE = [
+  defineConstruction({
+    id: 'relative-subject-gap',
+    family: 'relative-clause',
+    left: 'REL', right: 'VP', result: 'RELC', head: 1,
+    status: S.APPROXIMATION,
+    relation: 'acl:relcl',
+    construction: 'subject-gap-relative',
+    roles: { left: 'relativizer', right: 'clause-body' },
+    limitation: 'Subject-gap relatives only; object/oblique/poss not modeled. RELC is scaffold result.',
+    note: 'who ran',
+    flags: ['relative-oversimple', 'scaffold-result', 'construction-bundle'],
+    grades: { C: 'Y', R: 'Y', H: 'G', X: 'R' },
+  }),
+  defineConstruction({
+    id: 'np-relative',
+    family: 'relative-clause',
+    left: 'NP', right: 'RELC', result: 'NP', head: 0,
+    status: S.GRAMMAR,
+    relation: 'acl:relcl',
+    construction: 'noun-modified-by-relative',
+    roles: { left: 'head-noun-phrase', right: 'relative-clause' },
+    note: 'UD: noun outside the clause is head; clause depends',
+    flags: ['ud-aligned'],
+  }),
+  defineConstruction({
+    id: 'complementizer-that-s',
+    family: 'relative-clause',
+    left: 'REL', right: 'S', result: 'SBAR', head: 1,
+    status: S.APPROXIMATION,
+    construction: 'that-complement',
+    roles: { left: 'complementizer', right: 'clause' },
+    limitation: 'Same REL atom as relative; complementizer that+S conflated with relativizer',
+    note: 'THAT the man ran (complement)',
+    flags: ['rel-token-overload', 'construction-bundle'],
+    grades: { C: 'Y', R: 'Y', H: 'G', X: 'Y' },
+  }),
+];

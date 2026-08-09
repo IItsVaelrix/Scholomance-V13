@@ -34,248 +34,17 @@ import {
   PRONOUNS, AUXILIARIES, PARTICLES,
 } from '../lexical-analysis/closed-class.js';
 import { irregularPos } from '../lexical-analysis/irregular-forms.js';
-
-
-
 /**
- * BINARY BOND TABLE — the typed compatibility that licenses joining.
+ * BINARY BOND TABLE — projected from the Construction Registry (Grimoire).
  *
- * Deliberately tiny. The grammar is not the point of this experiment; whether
- * atoms bond at all is. Every rule here earns its place by being needed for a
- * phrase already under test.
+ * The chart still consumes dumb 4-tuples `[left, right, result, head]`.
+ * What those bonds *mean* about grammar lives in `./grimoire/` — status
+ * (grammar | scaffold | approximation | deprecated), family, relation, and
+ * limitations. BONDS are the spells; the Grimoire is the book.
+ *
+ * @see codex/core/constellation/grimoire/index.js
  */
-const BONDS = [
-  ['DET', 'N', 'NP', 1],      // UD det: the noun is the head
-  ['P', 'NP', 'PP', 1],       // UD case: the preposition is a dependent
-  ['V', 'PP', 'VP', 0],
-  ['NP', 'VP', 'S', 1],       // UD roots a clause on its verb
-  /**
-   * The same two atoms bond two ways. `raced` + `past the barn` is a finite verb
-   * phrase OR a participial modifier, and nothing local distinguishes them —
-   * this single ambiguous bond is the entire garden path. Chemistry has a word
-   * for one set of atoms with two arrangements, and it is the right one here:
-   * these are isomers, not a mistake to be resolved at bond time.
-   */
-  ['V', 'PP', 'PART', 0],
-  ['NP', 'PART', 'NP', 0],
-  ['V', 'NP', 'VP', 0],
-  ['V', 'NPO', 'VP', 0],      // saw HIM
-  ['P', 'NPO', 'PP', 1],      // UD case
-  ['V', 'ADJ', 'VP', 0],
-  /**
-   * THE CATALAN GENERATOR. A prepositional phrase can modify what was done or
-   * what it was done to, and nothing structural chooses between them. These two
-   * rules are where parse counts start multiplying, and they are also
-   * unavoidable — English genuinely permits both.
-   */
-  ['VP', 'PP', 'VP', 0],
-  ['NP', 'PP', 'NP', 0],
-
-  /* ── coverage rules ─────────────────────────────────────────────────── */
-  ['ADJ', 'N', 'N', 1],       // the OLD MAN — stacks, so `the old grey man` works
-                               // THE BUG: attributive adjective is amod, not the head
-  ['ADV', 'ADJ', 'ADJ', 1],   // VERY OLD
-  ['ADV', 'VP', 'VP', 1],     // QUICKLY RAN
-  ['VP', 'ADV', 'VP', 0],     // RAN QUICKLY
-  /**
-   * Only a COPULA takes a predicate — `he is happy`, never `he will happy`.
-   * Every auxiliary kind can take a verb phrase, which is what `AUX`/`MODAL`
-   * license below.
-   */
-  ['COP', 'ADJ', 'VP', 1],    // IS TIRED — UD cop: `is tired` roots on tired
-  ['COP', 'NP', 'VP', 1],     // IS A MAN — UD cop: `is a man` roots on man
-  ['COP', 'VP', 'VP', 1],     // IS RUNNING — THE BUG
-  ['AUX', 'VP', 'VP', 1],     // HAD GONE — THE BUG: `had gone` roots on gone
-  ['MODAL', 'VP', 'VP', 1],   // CAN RUN — THE BUG: `can run` roots on run
-  ['REL', 'VP', 'RELC', 1],   // WHO RAN
-  ['NP', 'RELC', 'NP', 0],    // the man WHO RAN
-
-  /**
-   * Coordination is ternary (`X and Y`) and this table is binary, so the
-   * conjunction first bonds rightward into a partial, which then bonds left.
-   * Same shape for every category that coordinates.
-   */
-  ['CONJ', 'NP', 'CONJNP', 1], // UD cc: the conjunction is a dependent
-  ['NP', 'CONJNP', 'NP', 0],   // UD conj attaches to the FIRST conjunct
-  ['CONJ', 'VP', 'CONJVP', 1],
-  ['VP', 'CONJVP', 'VP', 0],   // first conjunct
-  ['CONJ', 'S', 'CONJS', 1],
-  ['S', 'CONJS', 'S', 0],      // first conjunct
-  /**
-   * DISCOURSE-INITIAL COORDINATION. `And the Spirit of God moved upon the face
-   * of the waters` joins a sentence that is not in the input, so the left
-   * operand simply is not there. Measured as the single largest blocker: 148
-   * sentences composed across their whole length and still failed for want of
-   * this one bond.
-   */
-  ['CONJ', 'S', 'S', 1],     // sentence-initial `And ...`; the clause is the head
-
-  /**
-   * ── the four the failure set named ─────────────────────────────────────
-   *
-   * Chosen by measurement, not intuition: infinitives appeared in 10.9% of
-   * rule-gap failures and 0.0% of successes. Negation, existentials and
-   * wh-questions were equally common in both and are deliberately NOT here.
-   */
-  ['TO', 'VP', 'INF', 1],      // TO RUN — UD mark
-  ['V', 'INF', 'VP', 0],       // wants TO RUN
-  ['COP', 'INF', 'VP', 1],     // is TO BE done — UD cop
-  ['NP', 'INF', 'NP', 0],      // a man TO SEE
-
-  ['SUB', 'S', 'SBAR', 1],     // BECAUSE SHE CAME — UD mark
-  ['S', 'SBAR', 'S', 0],       // he left BECAUSE SHE CAME — main clause is the head
-  ['SBAR', 'S', 'S', 1],       // BECAUSE SHE CAME, he left — fronted subordinate clause; main clause is the head
-
-  ['THAN', 'NP', 'THANP', 1],  // THAN THE BOY
-  ['ADJ', 'THANP', 'ADJ', 0],  // older THAN THE BOY
-  ['VP', 'THANP', 'VP', 0],    // ran faster THAN THE BOY
-
-  /** A possessor modifies its noun exactly as an adjective does. */
-  ['POSS', 'N', 'N', 1],       // THE MAN'S hat
-
-  /**
-   * A SPLIT clitic scopes over the whole possessor phrase, not the adjacent
-   * noun: in `the old man 's hat` it is THE OLD MAN who owns it. This is why a
-   * correct tokenizer separates it — glued to `man`, that reading is unsayable.
-   *
-   * RULING: neither bond below is settled by "head is the content word" alone —
-   * both children are already phrases. `NP + POSS -> GEN` heads on the
-   * possessor NP, because the possessor is who the phrase is about until the
-   * possessed noun arrives. `GEN + N -> NP` then heads on the possessed noun,
-   * per UD nmod:poss.
-   */
-  ['NP', 'POSS', 'GEN', 0],    // the old man + 'S — RULING: the possessor noun heads the possessor phrase
-  ['GEN', 'N', 'NP', 1],       // (the old man 's) + HAT — UD nmod:poss: the POSSESSED noun is the head
-
-  /**
-   * ── COMMA CONSTRUCTIONS ────────────────────────────────────────────────
-   *
-   * Sourced from Link Grammar's own priorities: its hand-curated English
-   * dictionary spends more mass on comma connectors (Xc/Xd, 1,522 uses) than on
-   * objects (O, 327). The harness had been stripping commas entirely, which
-   * deleted every construction below before the parser ever saw it.
-   *
-   * A comma binds RIGHTWARD into a partial first, because this table is binary
-   * and every one of these patterns is ternary — the same shape coordination
-   * already uses.
-   */
-  ['ADV', 'COMMA', 'FRONTED', 0],   // quickly , — the comma is punct
-  ['SBAR', 'COMMA', 'FRONTED', 0],  // because she came ,
-  ['PP', 'COMMA', 'FRONTED', 0],    // in the morning ,
-  ['FRONTED', 'S', 'S', 1],         // ... , he left — main clause is the head
-
-  ['NP', 'COMMA', 'NPCOMMA', 0],
-  /**
-   * RULING: UD appos attaches to the FIRST NP, not the appositive that follows
-   * the comma.
-   */
-  ['NPCOMMA', 'NP', 'APPOS', 0],    // the dog , the old cat — RULING: UD appos attaches to the FIRST NP
-  ['APPOS', 'COMMA', 'NP', 0],      // ... , (closing comma)
-  /**
-   * `the cat and the man` bonds into an NP before the comma ever sees it, so the
-   * list form needs the plain NP on the right. Apposition and listing are
-   * genuinely ambiguous here — `the dog , the cat` is both — and both survive.
-   */
-  ['NPCOMMA', 'NP', 'NP', 0],       // the dog , the cat and the man — first conjunct
-
-  ['S', 'COMMA', 'SCOMMA', 0],
-  /**
-   * RULING: UD conj — first clause heads, though the result type matches the
-   * RIGHT child. UD's convention beats endocentricity here, and that is the
-   * point of declaring rather than inferring.
-   */
-  ['SCOMMA', 'S', 'S', 0],          // he ran , she fell — RULING: UD conj, first clause heads
-
-  /**
-   * TERMINAL PUNCTUATION. UD tokenizes sentence-final `.` `!` `?` `;` `:` as
-   * their own token, separate from the word before them, so a clause must be
-   * able to absorb it directly or nothing spans the input at all — the
-   * measured top cause of parse failure (see PUNCT atom above). Deliberately
-   * minimal: only a clause absorbs it, nothing else does yet.
-   */
-  ['S', 'PUNCT', 'S', 0],    // a clause absorbs its terminal punctuation
-
-  /**
-   * ── PARTICLES / PHRASAL VERBS ──────────────────────────────────────────
-   *
-   * The particle joins the VERB rather than forming a phrase of its own, which
-   * is why the result is `V` and not `VP`: `gave up` is still a verb and still
-   * takes `the ghost`. English also separates the pair around the object, so
-   * both orders need a bond.
-   */
-  ['V', 'PRT', 'V', 0],      // GAVE UP (the ghost) — UD compound:prt
-  ['VP', 'PRT', 'VP', 0],    // picked it UP
-
-  /**
-   * ── BARE FRONTING ──────────────────────────────────────────────────────
-   *
-   * English fronts adjuncts with no comma at all: `In his right hand he grasped
-   * a long sword`. Measured as the dominant remaining blocker — the fronted
-   * phrase parsed, the clause parsed, and nothing joined them because every
-   * fronting rule above requires a COMMA.
-   */
-  ['PP', 'S', 'S', 1],
-  ['ADV', 'S', 'S', 1],
-
-  /**
-   * ── COMPLEMENT CLAUSES AND INVERSION ───────────────────────────────────
-   *
-   * All three read off the blocker sample rather than guessed: `that` was the
-   * 4th most common blocking token (24 sentences), `to` the 2nd (57), and
-   * inversion appeared as `Shall we go` and `Why can not we call up Mr`.
-   */
-
-  /**
-   * `that` as a COMPLEMENTIZER — `he answered THAT the name was new` embeds a
-   * whole clause as the verb's object. Distinct from the relative use above
-   * (`REL + VP -> RELC`), where the same word introduces a modifier instead.
-   */
-  ['REL', 'S', 'SBAR', 1],   // THAT the man ran
-  ['V', 'SBAR', 'VP', 0],    // answered THAT ...
-  ['COP', 'SBAR', 'VP', 1],  // is THAT ... — UD cop
-
-  /** An infinitive completing an adjective: `likely TO BE true`. */
-  ['ADJ', 'INF', 'ADJ', 0],
-
-  /**
-   * SUBJECT-AUX INVERSION. The auxiliary precedes its subject, so `NP + VP -> S`
-   * cannot fire — the pieces are in the wrong order, not missing. The auxiliary
-   * binds its subject first, and the result takes the predicate.
-   *
-   * RULING: INV bundles an auxiliary with the subject; the subject NP is the
-   * content word, so it heads INV. INV is never itself a head in bonds 65-67.
-   */
-  ['MODAL', 'NP', 'INV', 1],   // SHALL WE ...
-  ['AUX', 'NP', 'INV', 1],     // DID HE ...
-  ['COP', 'NP', 'INV', 1],     // IS HE ...
-  ['INV', 'VP', 'S', 1],       // ... go — main verb heads the clause
-  ['INV', 'ADJ', 'S', 1],      // ... happy — UD cop: `is he happy` roots on happy
-  ['INV', 'NP', 'S', 1],       // ... a doctor — UD cop
-
-  /**
-   * ── ADVERB PLACEMENT (EE / EF / EN / MVi) — MEASURED AND REJECTED ───────
-   *
-   * Link Grammar's `<ordinary-adv>` distinguishes adverb-modifying-adverb (EE),
-   * post-adjective (EF), adverb-modifying-preposition (EN) and infinitival verb
-   * modifiers (MVi). All four were added here and REMOVED after measurement:
-   *
-   *     baseline      27.2% coverage   21.89 mean parses   1,536 worst
-   *     +MVi only     27.5%            29.15               5,088
-   *     +all four     27.6%            37.78               5,088
-   *
-   * +0.4 points of coverage for +73% parses and a 3.3x worst case. The reason is
-   * that every one of these constructions ALREADY spanned by flat attachment —
-   * `he ran very quickly` bracketed as `(VP (VP (VP ran) very) quickly)`. The
-   * rules buy correct NESTING, not reach, and no consumer reads the nesting:
-   * `projectAnswer` takes subject and verb, which adverb bracketing never moves.
-   *
-   * `VP + INF -> VP` was the worst offender on its own, because `V + INF -> VP`
-   * already exists and the two overlap — every infinitive could then attach at
-   * two levels.
-   *
-   * Re-add only alongside a consumer that reads constituent structure.
-   */
-];
+import { BONDS } from './grimoire/index.js';
 
 /**
  * EVERY BOND MUST DECLARE ITS HEAD. Not optional with a default.
@@ -330,7 +99,7 @@ validateBonds(BONDS);
  * subject, which is what stops `him ran` while leaving `the man saw him` intact.
  */
 const LIFTS = [
-  ['N', 'NP'], ['V', 'VP'], ['PRON', 'NP'], ['PROPN', 'NP'], ['PRONACC', 'NPO'],
+  ['N', 'NP'], ['NC', 'N'], ['V', 'VP'], ['PRON', 'NP'], ['PROPN', 'NP'], ['PRONACC', 'NPO'],
   /**
    * THE IMPERATIVE. `speak`, `tell me all about it` — a clause with no subject,
    * so `NP + VP -> S` can never fire and the input could not span. Common enough
@@ -426,15 +195,49 @@ function atomsFor(token, index, posMap) {
 
   if (DETERMINERS.has(lower)) out.push('DET');
   if (PREPOSITION_CUES.has(lower)) out.push('P');
-  if (tags.includes('n')) out.push('N');
-  if (tags.includes('v')) out.push('V');
-  if (tags.includes('a') || tags.includes('s')) out.push('ADJ');
-  if (tags.includes('r')) out.push('ADV');
+  /**
+   * CLOSED-CLASS WORDS ARE NOT CONTENT NOUNS. Construction autopsy of N+N found
+   * ~48% "juxtaposition-orphan" firings on mistyped N (e.g. `a`+`car`, `courts`+`in`).
+   * Function membership outranks lemma_form `n` so compound chemistry only sees
+   * real content nouns.
+   */
+  const closedForContent = DETERMINERS.has(lower)
+    || PREPOSITION_CUES.has(lower)
+    || CONJUNCTIONS.has(lower)
+    || RELATIVIZERS.has(lower)
+    || SUBORDINATORS.has(lower)
+    || COPULAS.has(lower)
+    || MODALS.has(lower)
+    || AUXILIARY_VERBS.has(lower)
+    || PRONOUNS.has(lower)
+    || lower === 'to'
+    || lower === 'than';
+  /**
+   * Pure nouns → NC only (lift NC→N→NP). Dual n+v → N only (subjects/objects
+   * without entering compound chemistry). That split stops barn+fell and avoids
+   * doubling every noun as both N and NC (which exploded stable counts).
+   */
+  if (tags.includes('n') && !closedForContent) {
+    if (tags.includes('v')) out.push('N');
+    else out.push('NC');
+  }
+  if (tags.includes('v') && !closedForContent) out.push('V');
+  if ((tags.includes('a') || tags.includes('s')) && !closedForContent) out.push('ADJ');
+  if (tags.includes('r') && !closedForContent) out.push('ADV');
   // Case and auxiliary subtype are the features that decide behaviour, so they
   // are what the atom carries — membership alone let `him ran` compose.
   if (PRONOUNS_NOMINATIVE.has(lower)) out.push('PRON');
   if (PRONOUNS_ACCUSATIVE.has(lower)) out.push('PRONACC');
-  if (COPULAS.has(lower)) out.push('COP');
+  /**
+   * BE-FORMS ARE BOTH COP AND AUX. UD: *be* is cop with a nonverbal predicate
+   * (`is tired`) and aux with a lexical verb (`is running`, `was arrested`).
+   * Emitting both atoms lets COP+ADJ/NP and AUX+VP select the right theory;
+   * the deprecated COP+VP bond is no longer projected into BONDS.
+   */
+  if (COPULAS.has(lower)) {
+    out.push('COP');
+    out.push('AUX');
+  }
   if (MODALS.has(lower)) out.push('MODAL');
   if (AUXILIARY_VERBS.has(lower)) out.push('AUX');
   if (CONJUNCTIONS.has(lower)) out.push('CONJ');
@@ -451,8 +254,13 @@ function atomsFor(token, index, posMap) {
    * EWT sentences (918 `PUNCT -> VERB` failures alone). Kept distinct from
    * COMMA, which has its own constructions (fronting, apposition, clause
    * coordination) built on it above.
+   *
+   * CLOSURE 2026-08-08: also accept REPEATED terminal marks as one PUNCT atom
+   * (`!!`, `...`, `???`). Root-closure autopsy found S already built with only
+   * multi-char punct fringe, and single-char equality left those atoms untyped
+   * so S+PUNCT could never fire. Still not COMMA.
    */
-  if (lower === '.' || lower === '!' || lower === '?' || lower === ';' || lower === ':') out.push('PUNCT');
+  if (/^[.!?…;:]+$/.test(lower)) out.push('PUNCT');
   if (PARTICLES.has(lower)) out.push('PRT');
   // The clitic either arrives glued (`man's`) or split off by the tokenizer
   // (`'s`); both are possessive, and the split form is also the copula in
@@ -527,6 +335,19 @@ export function projectAnswer(molecule) {
    * already projects to, and the punctuation contributes nothing of its own.
    */
   if (second.type === 'PUNCT') return projectAnswer(first);
+  /**
+   * MATRIX-PRESERVING ADJUNCTION. Fronted ADV/PP/ADJ/FRONTED/CONJ + S declare
+   * head on the matrix. Positional [subj, pred] would report the adjunct head
+   * as subject (`old men ran` → subject "old"). When the head child is S,
+   * re-project from that matrix — same spirit as PUNCT absorb.
+   */
+  const bond = BONDS.find(
+    (b) => b[0] === first.type && b[1] === second.type && b[2] === 'S',
+  );
+  if (bond) {
+    if (bond[3] === 1 && second.type === 'S') return projectAnswer(second);
+    if (bond[3] === 0 && first.type === 'S') return projectAnswer(first);
+  }
   return { subject: headOf(first), verb: headOf(second) };
 }
 

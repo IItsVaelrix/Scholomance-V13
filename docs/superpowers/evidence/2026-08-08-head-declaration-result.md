@@ -1,5 +1,9 @@
 # Head Declaration — Result — 2026-08-08
 
+**Status:** final — measurement banked against the pre-work prediction.
+**Spec:** [`docs/superpowers/specs/2026-08-08-head-declaring-bonds-design.md`](../specs/2026-08-08-head-declaring-bonds-design.md)
+**Plan:** [`docs/superpowers/plans/2026-08-08-head-declaring-bonds.md`](../plans/2026-08-08-head-declaring-bonds.md)
+
 Change: every bond declares its head; `headOf` and `headsOf` follow it; the
 `DET` exception deleted. Grammar otherwise unchanged — no bond added, removed,
 or retyped.

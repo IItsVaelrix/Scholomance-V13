@@ -1,6 +1,10 @@
 # Head-Declaring Bonds Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** This plan is **complete**. Steps use checkbox syntax for tracking; every step below is checked. As-built deviations from the original snippets are recorded in [Completion & as-built](#completion--as-built).
+
+**Status:** **complete** — all three tasks shipped and measured (2026-08-08).
+**Spec:** [`docs/superpowers/specs/2026-08-08-head-declaring-bonds-design.md`](../specs/2026-08-08-head-declaring-bonds-design.md)
+**Evidence:** [`docs/superpowers/evidence/2026-08-08-head-declaration-result.md`](../evidence/2026-08-08-head-declaration-result.md)
 
 **Goal:** Make every bond declare which child is its head, so head-finding stops being a positional guess with hand-carved exceptions.
 
@@ -25,13 +29,13 @@
 
 ## File Structure
 
-| File | Responsibility | New? |
+| File | Responsibility | Status |
 |---|---|---|
-| `codex/core/constellation/compose.js` | `BONDS` gains head indices; load-time assertion; `headOf` follows the declaration | modify |
-| `codex/core/constellation/compose-packed.js` | `headsOf` follows the declaration | modify |
-| `tests/qa/features/constellation-compose.test.js` | update assertions that encode the bug | modify |
-| `tests/qa/features/constellation-compose-packed.test.js` | update the bug-compatible test; add head-declaration tests | modify |
-| `docs/superpowers/evidence/2026-08-08-head-declaration-result.md` | measured before/after against the recorded prediction | create |
+| `codex/core/constellation/compose.js` | `BONDS` 4-tuples; `validateBonds`; `headOf` follows the declaration | done |
+| `codex/core/constellation/compose-packed.js` | `headsOf` follows the declaration | done |
+| `tests/qa/features/constellation-compose.test.js` | assertions updated to content-word heads | done |
+| `tests/qa/features/constellation-compose-packed.test.js` | bug-compatible test rewritten; head-declaration tests added | done |
+| `docs/superpowers/evidence/2026-08-08-head-declaration-result.md` | measured before/after against the recorded prediction | done |
 
 ---
 
@@ -47,13 +51,13 @@
 
 **This task changes no behaviour.** `compose` destructures `for (const [l, r, result] of BONDS)`, so a 4th element is ignored. That is deliberate: this task adds the data and the guard, and the next task starts reading it. A reviewer can therefore check the assignments in isolation from their effects.
 
-- [ ] **Step 1: Record the baseline test result**
+- [x] **Step 1: Record the baseline test result**
 
 Run: `npx vitest run tests/qa/features/constellation-compose.test.js tests/qa/features/constellation-irregular.test.js tests/qa/features/constellation-compose-packed.test.js 2>&1 | tail -5`
 
 Write down the exact "Tests N passed" line. Step 5 compares against it.
 
-- [ ] **Step 2: Append the head index to each bond, in order**
+- [x] **Step 2: Append the head index to each bond, in order**
 
 Open `codex/core/constellation/compose.js` and append a 4th element to every entry of `BONDS`, **preserving every existing comment, blank line, and the array's order**. Do not rewrite the array wholesale — edit entries in place.
 
@@ -135,24 +139,15 @@ The table below is in the array's current order. The middle column is the bond a
 
 Put the short justifications in the code as comments where the file's existing style has room. The five rows marked RULING must each carry their comment — they are the assignments not settled by the content-head rule, and a future reader needs to know they were decided rather than defaulted.
 
-- [ ] **Step 3: Add the load-time assertion**
+- [x] **Step 3: Add the load-time assertion**
 
-Immediately after the `BONDS` array's closing `];` in `codex/core/constellation/compose.js`, add:
+Immediately after the `BONDS` array's closing `];` in `codex/core/constellation/compose.js`, add a load-time check that every entry has `length === 4` and `bond[3] ∈ {0, 1}`.
+
+**As-built (preferred):** the check is `export function validateBonds(bonds)` called as `validateBonds(BONDS)`. It also rejects duplicate `(left, right, result)` signatures — the property `headOf`'s lookup depends on — and is unit-tested with a synthetic duplicate so the failure branch is proven. See [Completion & as-built](#completion--as-built).
+
+Original sketch (superseded by the as-built form):
 
 ```js
-/**
- * EVERY BOND MUST DECLARE ITS HEAD. Not optional with a default.
- *
- * `headOf` used to find a head by position — leftmost, with one hand-carved
- * exception for determiners — and English puts the head on the right in several
- * constructions. Each one nobody tested was silently wrong: measured on UD
- * English-EWT, 46.4% of scoreable parses reported the auxiliary as the verb and
- * 5.6% reported the adjective as the subject.
- *
- * A default of 0 would reproduce exactly that failure, because the bonds nobody
- * reviewed would keep the old behaviour. Throwing here means an unreviewed bond
- * cannot run.
- */
 for (const bond of BONDS) {
   if (bond.length !== 4 || (bond[3] !== 0 && bond[3] !== 1)) {
     throw new Error(`BONDS entry missing a head index: ${JSON.stringify(bond)}`);
@@ -160,7 +155,7 @@ for (const bond of BONDS) {
 }
 ```
 
-- [ ] **Step 4: Write the exhaustiveness test**
+- [x] **Step 4: Write the exhaustiveness test**
 
 Append to `tests/qa/features/constellation-compose-packed.test.js`. That file already imports `compose` from `../../../codex/core/constellation/compose.js` for its agreement tests — **widen that existing import to include `BONDS`**. Do not add a second import line from the same module.
 
@@ -190,13 +185,13 @@ describe('BONDS head declarations', () => {
 });
 ```
 
-- [ ] **Step 5: Run the tests and confirm NOTHING changed**
+- [x] **Step 5: Run the tests and confirm NOTHING changed**
 
 Run: `npx vitest run tests/qa/features/constellation-compose.test.js tests/qa/features/constellation-irregular.test.js tests/qa/features/constellation-compose-packed.test.js 2>&1 | tail -5`
 
 Expected: the Step 1 count **plus the 6 new tests**, all passing. Any pre-existing test that changed result means the data was not inert — revert and find out why.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add codex/core/constellation/compose.js tests/qa/features/constellation-compose-packed.test.js
@@ -222,7 +217,7 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 - Consumes: `BONDS` 4-tuples from Task 1.
 - Produces: `headOf(molecule)` and `headsOf(node, memo)` both follow the declared head child. Signatures unchanged.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Append to `tests/qa/features/constellation-compose-packed.test.js`. The module-scope helpers `pos`, `T` and `composePacked` already exist in that file; reuse them. Add these lexicon entries to the existing `pos` map if absent: `['is', []]`, `['will', []]`, `['was', []]`, `['chasing', ['v', 'a']]`.
 
@@ -255,7 +250,7 @@ describe('the head is declared, not guessed by position', () => {
 });
 ```
 
-- [ ] **Step 2: Update the test that deliberately encodes the bug**
+- [x] **Step 2: Update the test that deliberately encodes the bug**
 
 `tests/qa/features/constellation-compose-packed.test.js` contains a test named `reproduces the classic chart, adjective-head bug included`, asserting the head of `the old man` is `old`. Its comment says the fix belongs in `compose.js` where both charts inherit it. That is now happening, so rewrite the test rather than deleting it, keeping the history legible:
 
@@ -272,40 +267,32 @@ describe('the head is declared, not guessed by position', () => {
   });
 ```
 
-- [ ] **Step 3: Run the tests to verify they fail**
+- [x] **Step 3: Run the tests to verify they fail**
 
 Run: `npx vitest run tests/qa/features/constellation-compose-packed.test.js`
 Expected: the five new tests FAIL (reporting `old`, `is`, `will`), and the rewritten test FAILS.
 
-- [ ] **Step 4: Make `headOf` read the declaration**
+- [x] **Step 4: Make `headOf` read the declaration**
 
-In `codex/core/constellation/compose.js`, replace `headOf` with:
+In `codex/core/constellation/compose.js`, replace `headOf` so it looks up the bond by `(leftType, rightType, resultType)` and descends into `m.parts[bond[3]]`. Unary molecules still recurse on the single child; leaves return `m.token`.
+
+**As-built (preferred):** if no bond matches, **throw** — do not fall back to `m.parts[0]`. A silent left fallback reintroduces the positional bug through the one unwatched path. Uniqueness of signatures is enforced by `validateBonds` at module load. See [Completion & as-built](#completion--as-built).
+
+Original sketch used a left-child fallback on missing bond; that form is **not** what shipped:
 
 ```js
-/**
- * The head of a molecule, read from the bond that built it.
- *
- * This used to guess by position — leftmost child, with one hand-carved
- * exception for `DET`. English puts the head on the right in several
- * constructions and each untested one was silently wrong. The exception is gone
- * because `['DET', 'N', 'NP', 1]` now says the same thing as data.
- */
+// SUPERSEDED — as-built throws instead of `bond ? parts[bond[3]] : parts[0]`
 function headOf(m) {
   if (m.parts.length === 0) return m.token;
   if (m.parts.length === 1) return headOf(m.parts[0]);
-  // `(left, right, result)` is unique across the table — verified 2026-08-08,
-  // no duplicate signatures — so this find is unambiguous.
   const bond = BONDS.find(
     (b) => b[0] === m.parts[0].type && b[1] === m.parts[1].type && b[2] === m.type,
   );
-  // A molecule whose bond cannot be found is a chart the grammar did not build.
-  // Falling back to the left child keeps this total rather than throwing inside
-  // a projection, and the head-declaration test proves the table is complete.
   return headOf(bond ? m.parts[bond[3]] : m.parts[0]);
 }
 ```
 
-- [ ] **Step 5: Make `headsOf` read the declaration**
+- [x] **Step 5: Make `headsOf` read the declaration**
 
 In `codex/core/constellation/compose-packed.js`, the derivation already carries its bond as `d.bond`, so no lookup is needed. Replace the head-selection line inside `headsOf` — currently choosing `d.right` when `node.type === 'NP' && d.left.type === 'DET'` and `d.left` otherwise — with:
 
@@ -316,13 +303,13 @@ In `codex/core/constellation/compose-packed.js`, the derivation already carries 
 
 Delete the `NP`/`DET` special case and its comment. Leave the lift branch alone: a lift has one child, which is its head.
 
-- [ ] **Step 6: Run the tests**
+- [x] **Step 6: Run the tests**
 
 Run: `npx vitest run tests/qa/features/constellation-compose.test.js tests/qa/features/constellation-irregular.test.js tests/qa/features/constellation-compose-packed.test.js`
 
 Expected: the new tests PASS. Some pre-existing assertions in `constellation-compose.test.js` will now fail — those reading a subject or verb from a sentence containing a prenominal adjective, auxiliary, modal, or copula. **Update them to the correct answer; do not weaken them.** For each one you change, note in your report the sentence, the old expectation, and the new one, so a reviewer can confirm each change is the bug being fixed rather than a regression being absorbed.
 
-- [ ] **Step 7: Confirm the two charts still agree**
+- [x] **Step 7: Confirm the two charts still agree**
 
 Run:
 ```bash
@@ -341,7 +328,7 @@ for (const s of ['the old man fell','old men ran','the dog chased the cat','the 
 ```
 Expected: `MATCH` on every line. A `DIVERGE` means the two head implementations drifted — fix before committing.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add codex/core/constellation/compose.js codex/core/constellation/compose-packed.js tests/qa/features/constellation-compose.test.js tests/qa/features/constellation-compose-packed.test.js
@@ -364,78 +351,50 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 - Consumes: `scripts/treebank-report.mjs`, `.superpowers/sdd/2026-08-08-packed-chart/wrongness.mjs`.
 - Produces: the evidence document.
 
-- [ ] **Step 1: Re-run the report on both splits**
+- [x] **Step 1: Re-run the report on both splits**
 
 ```bash
 node scripts/treebank-report.mjs --split dev  --parser packed --max-tokens 999 > /tmp/head-dev.txt 2>&1
 node scripts/treebank-report.mjs --split test --parser packed --max-tokens 999 > /tmp/head-test.txt 2>&1
 ```
 
-- [ ] **Step 2: Re-run the wrongness breakdown**
+- [x] **Step 2: Re-run the wrongness breakdown**
 
 Run: `node .superpowers/sdd/2026-08-08-packed-chart/wrongness.mjs dev`
 
 This is the script that produced the before-numbers. It classifies parsed-but-wrong sentences into: correct, subject-right-verb-wrong, constituent-not-built, head-taken-from-inside, and different-span-won.
 
-- [ ] **Step 3: Write the evidence document**
+- [x] **Step 3: Write the evidence document**
 
 Create `docs/superpowers/evidence/2026-08-08-head-declaration-result.md`, filling every slot from the captured output.
 
-```markdown
-# Head Declaration — Result — 2026-08-08
-
-Change: every bond declares its head; `headOf` and `headsOf` follow it; the
-`DET` exception deleted. Grammar otherwise unchanged — no bond added, removed,
-or retyped.
-
-## The prediction, recorded before the work
-
-Ceiling of 159/233 (68%) of scored parses, against 16.3% before.
-The previous prediction (punctuation to ~32%) landed at 21.7%, over-shooting by
-about 1.5x, so meaningfully less than the ceiling was expected here too.
-
-## Actual
+**Filled (as-built)** — no placeholders remain in the evidence file:
 
 | | before | after |
 |---|---|---|
-| dev coverage | 21.7% | ... |
-| dev containment | 5.2% | ... |
-| test coverage | 21.9% | ... |
-| test containment | 5.9% | ... |
+| dev coverage | 21.7% | 21.7% |
+| dev containment | 5.2% | 10.9% |
+| test coverage | 21.9% | 21.9% |
+| test containment | 5.9% | 11.4% |
+| correct | 38 (16.3%) | 130 (55.8%) |
+| subject right, VERB wrong | 108 (46.4%) | 12 (5.2%) |
+| subject constituent NOT BUILT | 4 (1.7%) | 3 (1.3%) |
+| built, head taken from inside | 13 (5.6%) | 4 (1.7%) |
+| built, different span won | 70 (30.0%) | 84 (36.1%) |
 
-Wrongness breakdown, dev (before → after):
-
-| bucket | before | after |
-|---|---|---|
-| correct | 38 (16.3%) | ... |
-| subject right, VERB wrong | 108 (46.4%) | ... |
-| subject constituent NOT BUILT | 4 (1.7%) | ... |
-| built, head taken from inside | 13 (5.6%) | ... |
-| built, different span won | 70 (30.0%) | ... |
-
-State plainly whether the prediction held, over-shot, or under-shot, and by how
-much. Coverage should NOT move — this changes head extraction, not the chart. If
-coverage moved, say so and explain, because that would mean the change did
-something it was not supposed to do.
-
-## What is left
-
-Whatever the largest remaining bucket is, name it and say what it would take.
-If `different span won` is now dominant, say that selection is the next problem
-and that it needs a selection principle, not another head rule.
-```
-
-- [ ] **Step 4: Verify no placeholder survived**
+Coverage did not move (control). Residual dominant bucket is selection. Full
+narrative is in the evidence document; do not re-author from this plan.
+- [x] **Step 4: Verify no placeholder survived**
 
 Run: `grep -n '\.\.\.' docs/superpowers/evidence/2026-08-08-head-declaration-result.md`
 Expected: no output.
 
-- [ ] **Step 5: Run the whole feature suite**
+- [x] **Step 5: Run the whole feature suite**
 
 Run: `npm run test:qa:features`
 Expected: the same pass/fail set as before this plan started. If something fails, check whether it failed before these commits, and report it as failing rather than filing it under "pre-existing".
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add docs/superpowers/evidence/2026-08-08-head-declaration-result.md
@@ -455,10 +414,79 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
   currently reads the wrong child as the subject. The spec puts this out of
   scope so its effect is measured separately rather than blended into this
   result. It is the obvious next task and should get its own before/after.
-- **The 30% selection bucket** — the right constituent built and a different span
-  won. Larger than the head bug and a different problem: it needs a selection
-  principle.
-- Subcategorisation frames, semantic valence, retrieval. The 1.7%
+- **The selection bucket** — the right constituent built and a different span
+  won. Was 30.0% before this work; **36.1% after** (now dominant). Larger than
+  the residual head bug and a different problem: it needs a selection principle.
+- Subcategorisation frames, semantic valence, retrieval. The ~1.7%
   "constituent not built" measurement rules these out as limits on
   correctness-given-a-parse; they remain relevant to coverage.
 - The pre-existing pixelbrain/subtlety working-tree changes.
+
+---
+
+## Completion & as-built
+
+**Closed 2026-08-08.** All Task 1–3 steps checked. Grammar unchanged (68 bonds,
+same types); every bond carries a head index; both charts follow it; evidence
+banked.
+
+### Result (from evidence)
+
+| | before | after |
+|---|---|---|
+| correct (dev, scoreable) | 38 (16.3%) | **130 (55.8%)** |
+| subject right, VERB wrong | 108 (46.4%) | 12 (5.2%) |
+| head taken from inside | 13 (5.6%) | 4 (1.7%) |
+| different span won | 70 (30.0%) | 84 (36.1%) — now dominant |
+| dev / test coverage | 21.7% / 21.9% | unchanged (control) |
+| dev / test containment | 5.2% / 5.9% | 10.9% / 11.4% |
+
+Ceiling was 159/233 (68%); actual 130/233 = **81.8% of ceiling** (over-shoot
+factor 1.22x vs 1.47x on the prior punctuation prediction). Full narrative:
+`docs/superpowers/evidence/2026-08-08-head-declaration-result.md`.
+
+### Commits
+
+| commit | task |
+|---|---|
+| `4cbd0aff` | Task 1 — inert head indices + load-time guard |
+| `86cd3396` | Task 2 — `headOf` / `headsOf` follow declaration |
+| `463cd5f6` | Task 2 follow-up — `headsOf` JSDoc |
+| `79dc565b` | Task 3 — evidence document |
+| `052ec757` | review hardening (below) |
+
+### Deviations from the original plan snippets (intentional, post-review)
+
+These strengthen the same invariants; they do not change the grammar or the
+measured head-declaration result (coverage/containment still 21.7%/10.9% on dev
+after the review commit).
+
+1. **`validateBonds(bonds)`** — exported; checks head indices **and** unique
+   `(left, right, result)` signatures. Called at module load as
+   `validateBonds(BONDS)`. A unit test feeds a synthetic duplicate so the
+   failure branch is proven (the real table only proves cleanliness, not that
+   the check works).
+2. **`headOf` missing-bond path throws** — original sketch fell back to
+   `m.parts[0]`; as-built throws
+   `headOf: no bond found for L + R -> T`. Silent left fallback was the bug
+   class under a different door.
+3. **Review co-travelers in the same fix commit** (not required by Tasks 1–3,
+   but closed as blockers on the branch): packed-chart `events` counts agenda
+   pops in the drain loop; `projectAnswersFrom` rejects non-`S` roots the way
+   classic `projectAnswer` does. Neither alters BONDS/LIFTS.
+
+### Files touched (as planned)
+
+| File | Role |
+|---|---|
+| `codex/core/constellation/compose.js` | `BONDS` 4-tuples, `validateBonds`, `headOf` |
+| `codex/core/constellation/compose-packed.js` | `headsOf` reads `d.bond[3]` |
+| `tests/qa/features/constellation-compose.test.js` | assertions updated to correct heads |
+| `tests/qa/features/constellation-compose-packed.test.js` | exhaustiveness + head-declaration tests |
+| `docs/superpowers/evidence/2026-08-08-head-declaration-result.md` | before/after measurement |
+
+### Next work (explicitly not this plan)
+
+1. **Selection principle** for the 36.1% "different span won" bucket.
+2. **Generalised punctuation / endocentric descent** in projection (own
+   before/after).

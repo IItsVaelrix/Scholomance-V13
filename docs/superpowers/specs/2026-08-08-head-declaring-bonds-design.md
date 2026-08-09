@@ -2,7 +2,23 @@
 
 **Date:** 2026-08-08
 **Branch:** `feature/semantic-calculus-lexical-predicates`
-**Status:** approved, not implemented
+**Status:** **implemented and measured** (2026-08-08)
+**Plan:** [`docs/superpowers/plans/2026-08-08-head-declaring-bonds.md`](../plans/2026-08-08-head-declaring-bonds.md)
+**Evidence:** [`docs/superpowers/evidence/2026-08-08-head-declaration-result.md`](../evidence/2026-08-08-head-declaration-result.md)
+
+### Result (banked)
+
+| metric | before | after |
+|---|---|---|
+| correct (dev, scoreable) | 38/233 (16.3%) | **130/233 (55.8%)** |
+| subject right, VERB wrong | 108 (46.4%) | 12 (5.2%) |
+| head taken from inside | 13 (5.6%) | 4 (1.7%) |
+| dev / test coverage | 21.7% / 21.9% | **unchanged** (control) |
+| dev / test containment | 5.2% / 5.9% | 10.9% / 11.4% |
+
+Reached 81.8% of the recorded ceiling (130 of 159). Dominant residual is
+**different span won** (36.1%) — selection, not another head rule. Full write-up
+in the evidence document.
 
 ## Problem
 
@@ -18,15 +34,16 @@ function headOf(m) {
 
 Take the leftmost child, with exactly one hand-carved exception for determiners.
 English puts the head on the right in several constructions, and each one that
-was never tested is silently wrong. Three instances are now measured:
+was never tested was silently wrong. Three instances were measured (all **fixed**
+by this work — status column is pre-fix):
 
-| construction | head is | status |
+| construction | head is | pre-fix status |
 |---|---|---|
 | `DET + N -> NP` | right | patched by the one exception |
-| `ADJ + N -> N` | right | **broken** — reports the adjective |
-| `COP / AUX / MODAL + VP -> VP` | right | **broken** — reports the auxiliary |
+| `ADJ + N -> N` | right | **broken** — reported the adjective |
+| `COP / AUX / MODAL + VP -> VP` | right | **broken** — reported the auxiliary |
 
-Reproduced directly:
+Reproduced pre-fix:
 
 ```
 the old man fell             -> subject "old"      (gold: man)
@@ -82,6 +99,15 @@ being fixed: the bonds nobody reviewed would silently keep the old behaviour,
 which is how `ADJ + N` and `AUX + VP` survived this long. Module load asserts
 every entry has a head index in `{0, 1}` and throws otherwise, so an
 unreviewed bond cannot run.
+
+**As-built hardening** (post-implementation review, still in scope of the
+invariant): load-time validation also rejects duplicate `(left, right, result)`
+signatures — `headOf` looks bonds up by that triple, so uniqueness is a
+prerequisite for a declared head to be unambiguous. The check is exported as
+`validateBonds` so a test can prove the duplicate branch fires. Missing-bond
+lookups in `headOf` **throw** rather than falling back to the left child; a
+silent left fallback would reintroduce the positional bug through the one path
+nobody was watching.
 
 `LIFTS` needs no change: a unary lift has one child, which is trivially the head.
 
@@ -149,25 +175,22 @@ table itself is shared; only the two traversal functions need editing, and they
 must stay behaviourally identical — a differential harness proves the two charts
 equivalent across 2,001 sentences, and it compares exactly these functions.
 
-## Tests that assert the bug and must be updated
+## Tests that asserted the bug (updated)
 
-These currently encode the defect on purpose and will fail. That is correct and
-expected; they are updated, not weakened:
+These encoded the defect on purpose and were updated, not weakened:
 
-- `tests/qa/features/constellation-compose-packed.test.js` — the test named
-  `reproduces the classic chart, adjective-head bug included`, which asserts the
-  head of `the old man` is `old`. It becomes `man`, and its comment — which says
-  the fix belongs in `compose.js` where both charts inherit it — is now
-  satisfied and should be rewritten rather than deleted, so the history stays
-  legible.
-- Any assertion in `tests/qa/features/constellation-compose.test.js` that reads a
-  subject or verb from a sentence containing a prenominal adjective, an
-  auxiliary, a modal, or a copula.
+- `tests/qa/features/constellation-compose-packed.test.js` — the test formerly
+  named `reproduces the classic chart, adjective-head bug included` was rewritten
+  to `takes the noun as the head of a determined noun phrase` (expects `man`),
+  preserving the history in the comment.
+- Assertions in `tests/qa/features/constellation-compose.test.js` that read a
+  subject or verb from sentences with prenominal adjectives, auxiliaries,
+  modals, or copulas were corrected to the content-word heads.
 
-New tests, one per instance of the bug class, each of which must fail against
-today's code: `ADJ + N`, `AUX + VP`, `MODAL + VP`, `COP + VP`, plus a `DET + N`
-regression proving the deleted exception is still honoured by the data. And one
-exhaustiveness test asserting every `BONDS` entry carries a head index.
+New regression coverage (shipped): `ADJ + N`, `AUX + VP`, `MODAL + VP`, plus a
+`DET + N` regression proving the deleted exception is still honoured by the data;
+exhaustiveness test that every `BONDS` entry carries a head index; signature-
+uniqueness / throw-on-missing-bond tests from review hardening.
 
 ## Prediction, recorded before the work
 
@@ -184,6 +207,16 @@ the hit.
 Containment on the held-out `test` split is **5.9%** at the time of writing;
 that is the number this work is trying to move.
 
+### Outcome (measured after the work)
+
+- **130/233 = 55.8% correct** — 81.8% of the ceiling; over-shoot factor 1.22x
+  (tighter than the prior 1.47x punctuation miss).
+- Coverage unchanged (21.7% / 21.9%) — control passed.
+- Containment roughly doubled (dev 5.2%→10.9%, test 5.9%→11.4%).
+- Dominant residual: **different span won** at 36.1% — selection, not heads.
+
+See the evidence document for the full before/after tables and narrative.
+
 ## Out of scope
 
 - **Unifying the punctuation projection.** `projectAnswers` currently has an
@@ -195,13 +228,28 @@ that is the number this work is trying to move.
 - **Subcategorisation frames, semantic valence, retrieval.** The 1.7%
   "constituent not built" figure says these do not limit correctness-given-a-parse.
   They remain relevant to *coverage*, which is a different measurement.
-- **The 30% selection bucket** — sentences where the right constituent was built
-  and a different span won. Real, larger than the head bug, and a separate
-  problem: it needs a selection principle, not a head declaration.
+- **The selection bucket** — was 30% pre-fix, **36.1% post-fix** (now
+  dominant). Sentences where the right constituent was built and a different
+  span won. Real, larger than the residual head bug, and a separate problem: it
+  needs a selection principle, not a head declaration.
 
 ## Related
 
+- `docs/superpowers/plans/2026-08-08-head-declaring-bonds.md` — implementation
+  plan (all tasks complete; as-built notes record review hardening).
+- `docs/superpowers/evidence/2026-08-08-head-declaration-result.md` — before/after
+  against the prediction recorded above.
 - `docs/superpowers/specs/2026-08-08-gold-treebank-failure-diagnosis-design.md` —
   the instrument that found this.
 - `docs/superpowers/specs/2026-08-08-packed-chart-design.md` — the chart whose
   `headsOf` changes alongside `headOf`.
+
+## Commits (implementation)
+
+| commit | summary |
+|---|---|
+| `4cbd0aff` | every bond declares its head (inert data + guard) |
+| `86cd3396` | `headOf` / `headsOf` follow the declaration; DET exception deleted |
+| `463cd5f6` | `headsOf` JSDoc updated to the declared-head contract |
+| `79dc565b` | evidence measured against the prediction |
+| `052ec757` | review blockers: signature uniqueness, throw on missing bond, related packed-chart guards |

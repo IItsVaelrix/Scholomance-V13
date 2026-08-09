@@ -40,6 +40,8 @@ import { BONDS, LIFTS, atomsFor } from './compose.js';
  */
 export function composePacked(tokens, posMap, options = {}) {
   const roots = options.roots || ['S'];
+  /** Optional bond table override for reactor experiments; default is Grimoire BONDS. */
+  const bonds = options.bonds || BONDS;
   const n = (tokens || []).length;
   if (n === 0 || !posMap) {
     return { atoms: [], molecules: [], spanning: [], stable: [], events: 0 };
@@ -104,7 +106,7 @@ export function composePacked(tokens, posMap, options = {}) {
     if (node.to + 1 < n) {
       for (let k = node.to + 1; k < n; k += 1) {
         for (const right of [...cell[node.to + 1][k].values()]) {
-          for (const bond of BONDS) {
+          for (const bond of bonds) {
             if (node.type !== bond[0] || right.type !== bond[1]) continue;
             offer(node.from, k, bond[2], { bond, left: node, right });
           }
@@ -118,7 +120,7 @@ export function composePacked(tokens, posMap, options = {}) {
     if (node.from - 1 >= 0) {
       for (let j = 0; j <= node.from - 1; j += 1) {
         for (const left of [...cell[j][node.from - 1].values()]) {
-          for (const bond of BONDS) {
+          for (const bond of bonds) {
             if (left.type !== bond[0] || node.type !== bond[1]) continue;
             offer(j, node.to, bond[2], { bond, left, right: node });
           }
@@ -223,6 +225,13 @@ export function headsOf(node, memo = new Map()) {
  * parsing sentence report its full stop as the verb. Such a derivation
  * contributes whatever `d.left` contributes, and nothing of its own, so this
  * descends into `d.left`'s derivations and re-projects from there instead.
+ *
+ * MATRIX-PRESERVING ADJUNCTION. The same pattern applies when a bond builds S
+ * by attaching a non-subject (ADV/PP/ADJ/FRONTED/CONJ/…) onto an already-built
+ * matrix S and declares head on that matrix: re-project from the head child
+ * instead of treating the adjunct as subject. Without this, `old men ran`
+ * (ADJ+S) and `quickly men ran` (ADV+S) invent adjunct subjects.
+ *
  * This must match `projectAnswer` in `compose.js` exactly — the equivalence
  * harness compares the two functions directly.
  *
@@ -260,6 +269,28 @@ function projectAnswersFrom(node, memo, visiting) {
       continue;
     }
     if (d.right.type === 'PUNCT') {
+      for (const answer of projectAnswersFrom(d.left, memo, visiting)) {
+        byKey.set(`${answer.subject ?? ''}|${answer.verb}`, answer);
+      }
+      continue;
+    }
+    /**
+     * MATRIX-PRESERVING ADJUNCTION. Bonds like ADV+S→S, PP+S→S, ADJ+S→S,
+     * FRONTED+S→S, CONJ+S→S declare head on the matrix clause. Treating the
+     * left child as subject (positional [subj, pred]) answers "old"/"quickly"
+     * for fronted material. When the head child is itself an S, the answer
+     * is whatever that matrix already projects — same spirit as PUNCT absorb.
+     */
+    const headIdx = Array.isArray(d.bond) && (d.bond[3] === 0 || d.bond[3] === 1)
+      ? d.bond[3]
+      : null;
+    if (headIdx === 1 && d.right.type === 'S') {
+      for (const answer of projectAnswersFrom(d.right, memo, visiting)) {
+        byKey.set(`${answer.subject ?? ''}|${answer.verb}`, answer);
+      }
+      continue;
+    }
+    if (headIdx === 0 && d.left.type === 'S') {
       for (const answer of projectAnswersFrom(d.left, memo, visiting)) {
         byKey.set(`${answer.subject ?? ''}|${answer.verb}`, answer);
       }

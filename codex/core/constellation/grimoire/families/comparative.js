@@ -1,0 +1,40 @@
+import { defineConstruction, CONSTRUCTION_STATUS as S } from '../schemas.js';
+
+export const COMPARATIVE = [
+  defineConstruction({
+    id: 'than-np',
+    family: 'comparative',
+    left: 'THAN', right: 'NP', result: 'THANP', head: 1,
+    status: S.APPROXIMATION,
+    construction: 'than-nominal',
+    roles: { left: 'than', right: 'standard' },
+    limitation: 'than-NP is one of several than constructions (clausal, PP, stranded); THANP is scaffold',
+    note: 'THAN THE BOY',
+    flags: ['comparative-oversimple', 'scaffold-result', 'construction-bundle'],
+    grades: { C: 'Y', R: 'Y', H: 'G', X: 'R' },
+  }),
+  defineConstruction({
+    id: 'adj-thanp',
+    family: 'comparative',
+    left: 'ADJ', right: 'THANP', result: 'ADJ', head: 0,
+    status: S.APPROXIMATION,
+    construction: 'comparative-adjective',
+    roles: { left: 'adjective', right: 'than-phrase' },
+    limitation: 'Clausal than not covered',
+    note: 'older THAN THE BOY',
+    flags: ['comparative-oversimple'],
+    grades: { C: 'G', R: 'G', H: 'G', X: 'Y' },
+  }),
+  defineConstruction({
+    id: 'vp-thanp',
+    family: 'comparative',
+    left: 'VP', right: 'THANP', result: 'VP', head: 0,
+    status: S.APPROXIMATION,
+    construction: 'comparative-adverbial',
+    roles: { left: 'verb-phrase', right: 'than-phrase' },
+    limitation: 'Same than-underspecification as adj-thanp',
+    note: 'ran faster THAN THE BOY',
+    flags: ['comparative-oversimple'],
+    grades: { C: 'G', R: 'G', H: 'G', X: 'Y' },
+  }),
+];
