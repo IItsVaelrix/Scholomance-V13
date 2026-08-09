@@ -88,6 +88,7 @@
     "dict:ingest-antonyms": "python3 scripts/ingest_oewn_antonyms.py --db scholomance_dict.sqlite --oewn_path dict_data/english-wordnet-2024.xml.gz --expected-release 2024",
     "track:add:suno": "node scripts/add_suno_track.js",
     "ledger:add": "node scripts/add-update-ledger-entry.mjs",
+    "deny": "node scripts/deny.mjs",
     "bake:visualiser:truesight": "npx tsx scripts/bake-visualiser-truesight.mjs",
     "test:visualiser:truesight-amp": "vitest run tests/lib/truesight/visualizerTruesightAmp.test.js",
     "mcp:collab": "node --env-file=.env codex/server/collab/mcp-bridge-entry.js",
