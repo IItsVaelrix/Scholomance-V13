@@ -42,15 +42,19 @@ function fingerprint(at, unitId) {
   });
 }
 
+const productionReportDir = resolve(process.cwd(), 'divtube_downloader', 'APM-Hourly-Reports');
+
 describe('isolated real-ledger replay', () => {
   let dir;
   let ledgerPath;
   let reportDir;
+  let productionBefore;
 
   beforeEach(async () => {
     dir = await mkdtemp(join(tmpdir(), 'apm-replay-'));
     ledgerPath = join(dir, 'ledger.jsonl');
     reportDir = join(dir, 'reports');
+    productionBefore = await readdir(productionReportDir).catch(() => []);
   });
 
   afterEach(async () => rm(dir, { recursive: true, force: true }));
@@ -77,8 +81,10 @@ describe('isolated real-ledger replay', () => {
     expect(manifest.reports.length).toBeGreaterThan(0);
     expect(manifest.sourceChecksum).toBe(sha256Hex(await (await import('node:fs/promises')).readFile(ledgerPath, 'utf8')));
 
-    const productionReportDir = resolve(process.cwd(), 'divtube_downloader', 'APM-Hourly-Reports');
-    expect(await readdir(productionReportDir).catch(() => [])).toEqual([]);
+    // The guard is "the replay wrote nothing into production", NOT "production
+    // is empty" — the live reporter legitimately fills this directory, so an
+    // emptiness assertion would break precisely when the APM starts working.
+    expect(await readdir(productionReportDir).catch(() => [])).toEqual(productionBefore);
   });
 
   it('reports no recurrence growth for a single-occurrence ledger', async () => {

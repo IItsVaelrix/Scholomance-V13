@@ -21,4 +21,35 @@ describe('subtlety-crash-ingest', () => {
     expect(n.seam.emits).toContain('thread.crash.NoActiveAppError');
     expect(n.dedupKey).toContain('NoActiveAppError');
   });
+
+  it('extracts a V8-style browser frame', () => {
+    const n = normalizeCrashEvent({
+      runtime: 'browser',
+      stack: 'TypeError: x is not a function\n    at render (https://app/main.js:12:5)',
+    });
+    expect(n.output.error.site).toBe('at render (https://app/main.js:12:5)');
+  });
+
+  it('extracts a SpiderMonkey-style frame, which carries no "at " prefix', () => {
+    const n = normalizeCrashEvent({
+      runtime: 'browser',
+      stack: 'render@https://app/main.js:12:5\nmount@https://app/main.js:40:1',
+    });
+    expect(n.output.error.site).toBe('render@https://app/main.js:12:5');
+  });
+
+  it('keeps the bare file:line:col the sensor falls back to when there is no Error object', () => {
+    // browserCrashSensor.js sends `${filename}:${lineno}:${colno}` for
+    // cross-origin script errors, which expose no error object at all.
+    const n = normalizeCrashEvent({
+      runtime: 'browser',
+      stack: 'https://app/main.js:12:5',
+    });
+    expect(n.output.error.site).toBe('https://app/main.js:12:5');
+  });
+
+  it('reports unknown only when the stack carries no locatable frame', () => {
+    expect(normalizeCrashEvent({ stack: '' }).output.error.site).toBe('unknown');
+    expect(normalizeCrashEvent({ stack: 'something went wrong' }).output.error.site).toBe('unknown');
+  });
 });

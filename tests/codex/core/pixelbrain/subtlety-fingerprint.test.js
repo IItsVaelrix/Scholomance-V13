@@ -319,6 +319,36 @@ describe('Lens II — Seam-Flow (§6)', () => {
     expect(detectSeamViolations(graph).ok).toBe(true);
   });
 
+  it('collapses repeated observations of one unit into a single graph node', () => {
+    const graph = buildDataflowGraph([
+      fp('crash.browser.window', { consumes: ['process.exception'] }),
+      fp('crash.browser.window', { consumes: ['process.exception'] }),
+      fp('crash.browser.window', { consumes: ['process.exception'] }),
+    ]);
+    expect(graph.units).toHaveLength(1);
+  });
+
+  it('reports one dangling-input violation per unit, not per observation', () => {
+    const graph = buildDataflowGraph(
+      Array.from({ length: 8 }, () =>
+        fp('crash.browser.window', { consumes: ['process.exception'] })),
+    );
+    const { violations } = detectSeamViolations(graph);
+    expect(violations).toHaveLength(1);
+    expect(violations[0].code).toBe('SUBTLETY_SEAM_DANGLING_INPUT');
+  });
+
+  it('unions the seam vocabulary observed across a unit’s readings', () => {
+    const graph = buildDataflowGraph([
+      fp('a', { consumes: ['ghost.one'], emits: ['out.one'], mutates: ['m.one'] }),
+      fp('a', { consumes: ['ghost.two'], emits: ['out.two'], mutates: ['m.two'] }),
+    ]);
+    expect(graph.units).toHaveLength(1);
+    expect(graph.units[0].consumes).toEqual(['ghost.one', 'ghost.two']);
+    expect(graph.units[0].emits).toEqual(['out.one', 'out.two']);
+    expect(graph.units[0].mutates).toEqual(['m.one', 'm.two']);
+  });
+
   it('dead tissue carries a confidence class, never a bare assertion (§6.3)', () => {
     const graph = buildDataflowGraph([
       fp('a', { emits: ['unused', 'clientField', 'futureField', 'branchField'] }),
@@ -430,6 +460,18 @@ describe('Facade — createSubtletyApm (§8)', () => {
       current: { identity: baseIdentity, buildId: 'build-A', proposedPatch: 'p', rollbackPatch: 'r' },
     });
     expect(withBaseline.recovery.proposals.some((p) => p.allowed)).toBe(true);
+  });
+
+  it('a repeatedly-crashing unit yields one seam finding, not one per crash', () => {
+    const apm = createSubtletyApm();
+    const identity = { ...baseIdentity, unitId: 'crash.browser.window' };
+    const seam = { consumes: ['process.exception'], emits: ['thread.crash.Error'], mutates: [] };
+    for (let i = 0; i < 8; i += 1) {
+      apm.recordObserved(identity, { ok: false }, { seam, mode: 'observed' });
+    }
+    const assessment = apm.assess(identity.unitId);
+    expect(assessment.seam.violations).toHaveLength(1);
+    expect(assessment.recovery.proposals).toHaveLength(1);
   });
 
   it('probe + assess: a seeded unit is stable end-to-end', () => {

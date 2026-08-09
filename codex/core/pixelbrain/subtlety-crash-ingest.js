@@ -1,6 +1,16 @@
+// Python tracebacks and V8 stacks label their frames; SpiderMonkey/JSC do not,
+// and the browser sensor falls back to a bare `file:line:col` when a
+// cross-origin script error exposes no Error object. Marker matching runs
+// across every line first so a labelled frame always outranks a location-only
+// one (a V8 stack's first line is the message, not a frame).
+const FRAME_MARKER = /File "|\bat /u;
+const FRAME_LOCATION = /(?:@.+|):\d+:\d+\)?$/u;
+
 function topStackFrame(stack) {
   if (!stack) return 'unknown';
-  const line = String(stack).split('\n').map((l) => l.trim()).find((l) => /File "|at /.test(l));
+  const lines = String(stack).split('\n').map((l) => l.trim()).filter(Boolean);
+  const line = lines.find((l) => FRAME_MARKER.test(l))
+    || lines.find((l) => FRAME_LOCATION.test(l));
   return line || 'unknown';
 }
 

@@ -51,19 +51,33 @@ export function buildDataflowGraph(fingerprints) {
     if (!map.get(field).includes(unitId)) map.get(field).push(unitId);
   };
 
+  // A graph node is a UNIT, not an observation. The same unit is fingerprinted
+  // once per occurrence, so N readings of one crash unit must still collapse to
+  // one node — otherwise every downstream check that iterates `units` reports
+  // the same structural finding N times, scaling noise with crash frequency.
+  // Seam vocabulary is unioned across readings: a unit's contract is everything
+  // it has been observed to touch.
+  const unitsById = new Map();
+  const absorb = (list, values) => {
+    for (const value of values) if (!list.includes(value)) list.push(value);
+  };
+
   for (const fp of fingerprints || []) {
     const unitId = fp.identity?.unitId;
     const seam = fp.fingerprint || {};
     const consumes = seam.consumes || [];
     const emits = seam.emits || [];
     const mutates = seam.mutates || [];
-    units.push({
-      unitId,
-      consumes,
-      emits,
-      mutates,
-      mergeContract: fp.mergeContract || null,
-    });
+    let unit = unitsById.get(unitId);
+    if (!unit) {
+      unit = { unitId, consumes: [], emits: [], mutates: [], mergeContract: null };
+      unitsById.set(unitId, unit);
+      units.push(unit);
+    }
+    absorb(unit.consumes, consumes);
+    absorb(unit.emits, emits);
+    absorb(unit.mutates, mutates);
+    unit.mergeContract = unit.mergeContract || fp.mergeContract || null;
     for (const f of emits) push(fieldOwners, f, unitId);
     for (const f of mutates) push(fieldMutators, f, unitId);
     for (const f of consumes) push(fieldConsumers, f, unitId);
