@@ -73,7 +73,9 @@ async function walk(dir, callback) {
         if (entry.isDirectory()) {
             if (IGNORED_DIRS.has(entry.name) || entry.name.startsWith('.venv')) continue;
             await walk(fullPath, callback);
-        } else if (/\.(js|jsx|ts|tsx|md|toml|jsonc)$/.test(entry.name)) {
+        } else if (/\.(js|jsx|ts|tsx|py|md|toml|jsonc)$/.test(entry.name)) {
+            // NOTE: .py added so steamdeck_brain/, blender addons, and the
+            // divtube Python services are semantically searchable too.
             await callback(fullPath);
         }
     }
