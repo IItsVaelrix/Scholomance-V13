@@ -6,6 +6,7 @@ import time
 
 from tui.services.exec_session_service import get_exec_session
 from tui.services import harness_tools
+from tui.services import code_eval, code_lens
 
 # Boon 3 (strangler-fig cut 1): the module-level bridge subprocess cluster
 # now lives in bridge_dispatch.py. Re-import every name so the ~50 handlers
@@ -480,6 +481,73 @@ class ToolService:
                             }
                         },
                         "required": ["entry"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "telescope",
+                    "description": "Zoom OUT: structural map of a directory or file — tree of dirs/files with line counts, languages, and top-level symbols. Use this BEFORE grep/search to build the map of an unknown area.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "path": {
+                                "type": "string",
+                                "description": "Repo-relative directory or file, e.g. 'codex/core/blender-bridge' or '.'"
+                            },
+                            "max_depth": {
+                                "type": "integer",
+                                "description": "Tree depth (default 2, max 6)"
+                            },
+                            "with_symbols": {
+                                "type": "boolean",
+                                "description": "Include top-level symbols per code file (default true)"
+                            }
+                        },
+                        "required": ["path"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "microscope",
+                    "description": "Zoom IN on one file: symbol table (functions/classes/methods with exact line ranges, Python via AST, JS/TS via regex). Pass symbol= to extract a definition body, line= for a window around a line, refs=true to cross-reference a symbol repo-wide. No args returns the file's full symbol index. eval=true RUNS symbol (JS/Python, sandboxed subprocess) and reports what it actually returns — use it when a doc comment claims a behaviour you want confirmed, since the symbol table only shows what a file says about itself.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "path": {
+                                "type": "string",
+                                "description": "Repo-relative file, e.g. 'divtube_downloader/tui/services/harness_tools.py'"
+                            },
+                            "symbol": {
+                                "type": "string",
+                                "description": "Symbol name (substring match) to extract or cross-reference"
+                            },
+                            "line": {
+                                "type": "integer",
+                                "description": "Line number to center a window on"
+                            },
+                            "context": {
+                                "type": "integer",
+                                "description": "Context lines around line= (default 2, max 40)"
+                            },
+                            "refs": {
+                                "type": "boolean",
+                                "description": "Also cross-reference symbol across the repo (default false)"
+                            },
+                            "eval": {
+                                "type": "boolean",
+                                "description": "Run symbol and report its real return value/shape (default false). Requires symbol=. Executes code in a subprocess with a timeout."
+                            },
+                            "args": {
+                                "type": "array",
+                                "description": "JSON literal arguments for eval=true; omit for a zero-arg call",
+                                "items": {}
+                            }
+                        },
+                        "required": ["path"]
                     }
                 }
             },
@@ -1529,6 +1597,10 @@ class ToolService:
             return self._browser_inspect(kwargs, callback)
         elif tool_name == "dependency_graph":
             return self._dependency_graph(kwargs, callback)
+        elif tool_name == "telescope":
+            return self._telescope(kwargs, callback)
+        elif tool_name == "microscope":
+            return self._microscope(kwargs, callback)
         elif tool_name == "replace_file_content":
             return self._replace_file_content(kwargs, callback)
         elif tool_name == "search_youtube":
@@ -2755,6 +2827,76 @@ class ToolService:
                 f"{result.get('node_count', 0)} nodes / {result.get('edge_count', 0)} edges"
             )
         return json.dumps(result, indent=2, default=str)[:6000]
+
+    def _telescope(self, kwargs, callback):
+        path = kwargs.get("path") or "."
+        max_depth = int(kwargs.get("max_depth") or 2)
+        with_symbols = kwargs.get("with_symbols")
+        with_symbols = True if with_symbols is None else bool(with_symbols)
+        if callback:
+            callback(f"  [bold #FFD700]🔭[/] telescope({path}, depth={max_depth})")
+        result = code_lens.telescope(
+            PROJECT_ROOT, path, max_depth=max_depth, with_symbols=with_symbols
+        )
+        if callback:
+            mark = "#7CFF8B" if result.get("ok") else "#FF5C7A"
+            if result.get("ok") and result.get("type") == "dir":
+                s = result.get("summary", {})
+                detail = (
+                    f"{s.get('dirs', 0)} dirs / {s.get('files', 0)} files / "
+                    f"{s.get('lines', 0)} lines"
+                )
+            else:
+                detail = result.get("error", result.get("type", ""))
+            callback(f"  [{mark}]✓[/] telescope: {detail}")
+        return json.dumps(result, indent=2, default=str)[:8000]
+
+    def _microscope(self, kwargs, callback):
+        path = kwargs.get("path") or ""
+        if not path:
+            return "Error: path is required."
+        symbol = kwargs.get("symbol")
+        line = kwargs.get("line")
+        context = int(kwargs.get("context") or 2)
+        refs = bool(kwargs.get("refs"))
+        run_eval = bool(kwargs.get("eval"))
+        if callback:
+            focus = symbol or (f"line {line}" if line else "index")
+            if run_eval:
+                focus = f"{focus} ⚗ eval"
+            callback(f"  [bold #FFD700]🔬[/] microscope({path}, {focus})")
+        result = code_lens.microscope(
+            PROJECT_ROOT, path, symbol=symbol, line=line,
+            context=context, refs=refs,
+        )
+        # The eval lens runs code, so it lives outside code_lens (which promises
+        # pure-stdlib, no-subprocess, deterministic) and is attached here.
+        if run_eval:
+            if not symbol:
+                result["eval"] = {"ok": False, "error": "eval=true requires symbol="}
+            else:
+                result["eval"] = code_eval.evaluate(
+                    PROJECT_ROOT, path, symbol, args=kwargs.get("args") or [],
+                )
+        if callback:
+            mark = "#7CFF8B" if result.get("ok") else "#FF5C7A"
+            ev = result.get("eval")
+            if ev:
+                shape = ev.get("shape") or {}
+                desc = ", ".join(f"{k}={v}" for k, v in shape.items()) or ev.get("error", "")
+                emark = "#7CFF8B" if ev.get("ok") else "#FF5C7A"
+                callback(f"  [{emark}]⚗[/] eval: {desc}")
+            mode = result.get("mode", "")
+            if mode == "symbol":
+                detail = f"{len(result.get('matches', []))} definition(s)"
+            elif mode == "line":
+                detail = f"{len(result.get('lines', []))} lines"
+            elif mode == "index":
+                detail = f"{len(result.get('symbols', []))} symbols"
+            else:
+                detail = result.get("error", mode)
+            callback(f"  [{mark}]✓[/] microscope: {detail}")
+        return json.dumps(result, indent=2, default=str)[:8000]
 
     def _heal(self, kwargs, callback):
         symptoms = kwargs.get("symptoms", [])
