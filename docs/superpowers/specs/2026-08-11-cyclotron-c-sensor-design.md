@@ -58,7 +58,7 @@ Two files.
 No file I/O, no wall clock, no randomness. Each stage is a named function carrying its atom's
 port contract, following the house style established by the A2 harness.
 
-    [RX]     experimentReceipt(report, provenance) -> receipt
+    [RX]     experimentReceipt(report) -> receipt
                offers experiment-receipt; seeks candidate-frontier + feasibility-score
     [LEDGER] ledgerStructure(receipt, approvedBaseline) -> structure
                offers structure; seeks experiment-receipt + validation-verdict
@@ -66,7 +66,7 @@ port contract, following the house style established by the A2 harness.
     [SEAL]   sealArtifact(artifact) -> "cyclosensor1:<sha256>"
     [VER]    verifyReceiptSchema(structure) -> verdict
 
-Public surface: `buildReceipt(report, provenance)`, `assess(receipt, baseline)`,
+Public surface: `buildReceipt(report)`, `assess(receipt, baseline)`,
 `sealReceipt(receipt)`, and the contract constant. `sealReceipt` is the composition of the
 `[SER]` and `[SEAL]` stages — it canonicalizes the receipt and returns
 `{ artifact, checksum }`. The five stage functions are module-internal.
@@ -143,10 +143,18 @@ automated regression engine.
 
 1. **Report fails `verifySemanticCyclotronReport`** → throw. Never seal an unverified report;
    a sensor that seals a corrupt reading launders it.
-2. **Incomplete provenance** (missing `atomBankChecksum`, missing `groundingIndexChecksum`, or
-   `chemistryProvenance()` unresolvable) → refuse, exit 2. Silently omitting a field from the
-   input class would merge two different classes and manufacture both false `DEVIATION`s and
-   false `STABLE`s.
+2. **Incomplete provenance** → refuse, exit 2. Provenance is read from *inside the report*
+   (`report.chemistryProvenance`, which `semantic-valence-cyclotron.js:907` already stamps into
+   the checksummed body), never recomputed at assess time — recomputing would read the current
+   code's weights and attribute them to an older report. A report missing
+   `atomBankChecksum`, `groundingIndexChecksum`, or `chemistryProvenance` is refused with
+   `NO_CHEMISTRY_PROVENANCE`, the same finding code A2 emits. Silently omitting a field from
+   the input class would merge two different classes and manufacture both false `DEVIATION`s
+   and false `STABLE`s.
+
+   Consequence: evidence artifacts produced before that stamp existed — including
+   `2026-08-11-semantic-valence-cyclotron-100k.json` — cannot be assessed and must be
+   regenerated to become sensor-auditable.
 3. **Ledger absent** → `NO_BASELINE`, exit 0. Never create a baseline implicitly.
 4. **Ledger self-seal mismatch** → hard error, exit 2, no verdict. A sensor whose own record
    has been tampered with must not be able to report `STABLE`.
