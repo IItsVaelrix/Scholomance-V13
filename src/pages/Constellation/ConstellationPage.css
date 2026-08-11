@@ -18,7 +18,13 @@
   --cos-harmonic: 1600ms;
 
   position: relative;
-  min-height: 100vh;
+  /* Fill the locked page shell exactly (index.css pins .page-container to
+     100dvh while this stage is mounted). A BOUNDED height is what lets
+     overflow-y:auto actually scroll the result inside the chamber; a
+     min-height-only box just stretches and hands scrolling to the window.
+     If the lock is ever absent, height:100% against an auto-height parent
+     resolves to auto and the page degrades to its old stretch behavior. */
+  height: 100%;
   overflow: hidden;
   color: var(--cos-ink);
   background:
@@ -101,7 +107,10 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  /* 100% of the stage, not 100vh: the stage now sits BELOW the nav rail
+     inside the locked shell, so a 100vh foreground would overfill it and
+     create phantom scroll in idle mode. */
+  min-height: 100%;
   padding: 1.5rem;
   text-align: center;
 }
@@ -245,7 +254,14 @@
 
 /* ---------- Submitted: compress to a top rail ---------- */
 
-.constellation-stage--submitted { overflow-y: auto; }
+.constellation-stage--submitted {
+  /* The stage is now a bounded-height box (see .constellation-stage), so
+     this REALLY scrolls: the answer plate moves inside the chamber while
+     the sky stays pinned behind it and the brand/search rail sticks. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: rgba(139, 124, 255, 0.45) transparent;
+}
 
 .constellation-stage--submitted .constellation-foreground {
   justify-content: flex-start;
@@ -269,7 +285,12 @@
 
 .constellation-stage--submitted .constellation-search {
   position: sticky;
-  top: 2.6rem;
+  /* Track the sticky brand's exact height instead of a hard-coded offset:
+     brand = line-height 0.98 × clamp(1.3rem, 3vw, 1.9rem) + 0.7rem top
+     padding + 0.2rem bottom padding. Using the SAME clamp expression keeps
+     the search pill flush under the brand at every viewport width, now that
+     sticky actually engages (the stage is a real scroll container). */
+  top: calc(clamp(1.3rem, 3vw, 1.9rem) * 0.98 + 0.9rem);
   z-index: 2;
   max-width: none;
   margin: 0;

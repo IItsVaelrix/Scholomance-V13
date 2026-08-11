@@ -2004,6 +2004,18 @@ body:has(.ide-layout-wrapper) .page-container {
   overflow: hidden;
 }
 
+/* ConstellationOS: lock the page shell to the viewport so the chamber
+   becomes a REAL scroll container for the answer plate. Without the lock
+   the stage's height is unbounded (min-height only), its overflow-y:auto
+   never engages, the box stretches with the result, and the window scrolls
+   instead — the sticky brand/search rail never pins and the result reads
+   as unscrollable. Same lock pattern as the Read IDE above. */
+body:has(#constellation-stage) .page-container {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
 body:has(.ide-layout-wrapper) .page-content {
   display: flex;
   flex-direction: column;
