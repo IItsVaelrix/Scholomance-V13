@@ -22,6 +22,7 @@ import {
   createMemoryCellPacket,
   evaluateMemoryCellOsmosis,
 } from '../immunity/memory-cell-osmosis.js';
+import { crowdingFromHeat, shouldEquilibrate } from './osmotic-equilibrium.js';
 import {
   BytecodeError,
   ERROR_CATEGORIES,
@@ -64,13 +65,13 @@ const DEFAULTS = Object.freeze({
   nucleusMinDomains: 3,
   osmosisSimilarityFloor: 0.83,
   osmosisDriftCeiling: 0.17,
+  osmosisConcentrationLimit: 0.5,
   entropyEnabled: false,
   entropyDecayLambda: 0.35,
   entropyExactWeight: 4,
   entropyFamilyWeight: 2,
   entropyNeighborhoodWeight: 0.5,
   entropyEscapeAttempts: 3,
-  entropyActivationHeat: 5,
 });
 
 function fail(message, context = {}, category = ERROR_CATEGORIES.VALUE) {
@@ -237,6 +238,11 @@ function normalizeConfig(options) {
     nucleusMinDomains: integer(options.nucleusMinDomains, DEFAULTS.nucleusMinDomains, 2, 6, 'nucleusMinDomains'),
     osmosisSimilarityFloor: unit(options.osmosisSimilarityFloor, DEFAULTS.osmosisSimilarityFloor, 'osmosisSimilarityFloor'),
     osmosisDriftCeiling: unit(options.osmosisDriftCeiling, DEFAULTS.osmosisDriftCeiling, 'osmosisDriftCeiling'),
+    osmosisConcentrationLimit: unit(
+      options.osmosisConcentrationLimit,
+      DEFAULTS.osmosisConcentrationLimit,
+      'osmosisConcentrationLimit',
+    ),
     entropyEnabled,
     entropyDecayLambda: finite(
       options.entropy?.decayLambda,
@@ -254,13 +260,6 @@ function normalizeConfig(options) {
       0,
       16,
       'entropy.escapeAttempts',
-    ),
-    entropyActivationHeat: finite(
-      options.entropy?.activationHeat,
-      DEFAULTS.entropyActivationHeat,
-      0,
-      1_000_000_000,
-      'entropy.activationHeat',
     ),
     environments,
   });
@@ -391,7 +390,7 @@ function prepareAtomBank(rawAtoms, rawBridgeRules, config) {
     membrane: {
       similarityFloor: config.osmosisSimilarityFloor,
       driftCeiling: config.osmosisDriftCeiling,
-      concentrationLimit: 1,
+      concentrationLimit: config.osmosisConcentrationLimit,
     },
     stableContext: {
       detector: 'semantic-valence-cyclotron',
@@ -632,15 +631,29 @@ function selectLicensedTrial(prepared, config, trialIndex, environment, occupanc
   if (!baselineTrial) return null;
   const baselineRow = scoreTrial(prepared, baselineTrial);
   if (!config.entropyEnabled || config.entropyEscapeAttempts === 0) return baselineRow;
+
   const baselineRevisits = moleculeOccupancy(prepared, occupancy, baselineRow.molecule);
   const baselineInfluence = effectiveSearchAttraction(
     config,
     baselineRevisits,
     baselineRow.molecule.energy,
   );
-  if (baselineInfluence.occupancyHeat < config.entropyActivationHeat) return baselineRow;
+  const baselineCrowding = crowdingFromHeat(baselineInfluence.occupancyHeat);
+  const baselineOsmosis = evaluateMemoryCellOsmosis(prepared.baselineCell, {
+    vector: baselineRow.vector,
+    concentration: baselineCrowding,
+    seed: 42,
+  });
+  const withOsmosis = {
+    ...baselineRow,
+    osmosis: baselineOsmosis,
+    crowding: baselineCrowding,
+  };
+  // The membrane decides WHEN transport happens. Previously this was
+  // `occupancyHeat < config.entropyActivationHeat`, a bare magic number.
+  if (!shouldEquilibrate(baselineOsmosis)) return withOsmosis;
 
-  let selected = baselineRow;
+  let selected = withOsmosis;
   let selectedInfluence = baselineInfluence;
   let selectedAttempt = 0;
   occupancy.pressureApplications += 1;
@@ -654,10 +667,20 @@ function selectLicensedTrial(prepared, config, trialIndex, environment, occupanc
     const revisits = moleculeOccupancy(prepared, occupancy, alternate.molecule);
     const influence = effectiveSearchAttraction(config, revisits, alternate.molecule.energy);
     occupancy.pressureApplications += 1;
+    const alternateCrowding = crowdingFromHeat(influence.occupancyHeat);
+    const alternateRow = {
+      ...alternate,
+      osmosis: evaluateMemoryCellOsmosis(prepared.baselineCell, {
+        vector: alternate.vector,
+        concentration: alternateCrowding,
+        seed: 42,
+      }),
+      crowding: alternateCrowding,
+    };
     if (influence.attraction > selectedInfluence.attraction
       || (influence.attraction === selectedInfluence.attraction
-        && alternate.molecule.checksum.localeCompare(selected.molecule.checksum) < 0)) {
-      selected = alternate;
+        && alternateRow.molecule.checksum.localeCompare(selected.molecule.checksum) < 0)) {
+      selected = alternateRow;
       selectedInfluence = influence;
       selectedAttempt = attempt;
     }
@@ -708,11 +731,7 @@ function reactionFor(row, prepared, groundingIndex) {
 function finalizeCandidate(row, prepared, config, groundingIndex) {
   const atoms = row.atomIndexes.map((index) => prepared.atoms[index]);
   const conceptChemistry = reactionFor(row, prepared, groundingIndex);
-  const osmosis = evaluateMemoryCellOsmosis(prepared.baselineCell, {
-    vector: row.vector,
-    concentration: row.molecule.energy,
-    seed: 42,
-  });
+  const osmosis = row.osmosis ?? null;
   const repelled = conceptChemistry.corpusPMI?.signal === 'REPULSION';
   const domainCount = new Set(atoms.map((atom) => atom.domain)).size;
   const finalScore = clamp01(
@@ -920,6 +939,7 @@ export function runSemanticValenceCyclotron(options = {}) {
       nucleusMinDomains: config.nucleusMinDomains,
       osmosisSimilarityFloor: config.osmosisSimilarityFloor,
       osmosisDriftCeiling: config.osmosisDriftCeiling,
+      osmosisConcentrationLimit: config.osmosisConcentrationLimit,
       environments: config.environments,
       entropy: {
         enabled: config.entropyEnabled,
@@ -928,7 +948,6 @@ export function runSemanticValenceCyclotron(options = {}) {
         familyWeight: round6(config.entropyFamilyWeight),
         neighborhoodWeight: round6(config.entropyNeighborhoodWeight),
         escapeAttempts: config.entropyEscapeAttempts,
-        activationHeat: round6(config.entropyActivationHeat),
       },
     },
     counts,

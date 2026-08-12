@@ -80,3 +80,47 @@ describe('verdict predicate ignores osmosis', () => {
     expect(judged.length).toBeGreaterThan(0);  // fails today: gate closed => all REFUSED
   });
 });
+
+describe('membrane governs occupancy, not novelty', () => {
+  it('feeds the membrane a crowding fraction, not an energy score', () => {
+    const report = runSemanticValenceCyclotron(RUN({ entropy: { enabled: true } }));
+    const withOsmosis = report.candidates.filter((c) => c.osmosis);
+    expect(withOsmosis.length).toBeGreaterThan(0);
+
+    for (const candidate of withOsmosis) {
+      // concentration must be a crowding fraction in [0,1), and must NOT equal
+      // the molecule's energy — that was the category error.
+      expect(candidate.osmosis.concentration).toBeGreaterThanOrEqual(0);
+      expect(candidate.osmosis.concentration).toBeLessThan(1);
+    }
+    const matchesEnergy = withOsmosis.filter(
+      (c) => Math.abs(c.osmosis.concentration - c.molecule.energy) < 1e-6,
+    );
+    expect(matchesEnergy.length).toBe(0);
+  });
+
+  it('reports over-concentration on a bank small enough to saturate', () => {
+    // 4 atoms and 600 trials guarantees heavy revisiting, so crowding must
+    // clear a 0.5 limit somewhere.
+    const report = runSemanticValenceCyclotron(RUN({
+      entropy: { enabled: true },
+      osmosisConcentrationLimit: 0.5,
+    }));
+    const concentrated = report.candidates.filter(
+      (c) => c.osmosis?.anomalyKind === 'concentration',
+    );
+    expect(concentrated.length).toBeGreaterThan(0);
+  });
+
+  it('stays silent when the limit is above anything reachable', () => {
+    // Discrimination check: a membrane that always fires is no membrane.
+    const report = runSemanticValenceCyclotron(RUN({
+      entropy: { enabled: true },
+      osmosisConcentrationLimit: 0.999999,
+    }));
+    const concentrated = report.candidates.filter(
+      (c) => c.osmosis?.anomalyKind === 'concentration',
+    );
+    expect(concentrated.length).toBe(0);
+  });
+});
