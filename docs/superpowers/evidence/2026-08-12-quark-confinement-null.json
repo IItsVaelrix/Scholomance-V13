@@ -1,0 +1,53 @@
+{
+  "contract": "PB-QUARK-CHAMBER-v1",
+  "falsifier": "F1-confinement-configuration-null",
+  "prereg": "docs/superpowers/evidence/2026-08-12-PREREG-quark-chamber.md",
+  "preregSha256": "abf637b6e8e6fddbc424e481199c29f46565e8ef2a2acbb163ef04fd2a022d92",
+  "bonferroniThreshold": 0.0125,
+  "statistics": [
+    "edges",
+    "rules",
+    "confined",
+    "maxWaypoints"
+  ],
+  "real": {
+    "edges": 191,
+    "rules": 169,
+    "confined": 15,
+    "maxWaypoints": 3
+  },
+  "stats": {
+    "edges": {
+      "nullMean": 190.32,
+      "nullSd": 1.7081,
+      "real": 191,
+      "z": 0.3981,
+      "p": 0.482587
+    },
+    "rules": {
+      "nullMean": 185.965,
+      "nullSd": 9.1216,
+      "real": 169,
+      "z": -1.8599,
+      "p": 0.9801
+    },
+    "confined": {
+      "nullMean": 8,
+      "nullSd": 2.9138,
+      "real": 15,
+      "z": 2.4024,
+      "p": 0.0199
+    },
+    "maxWaypoints": {
+      "nullMean": 2.36,
+      "nullSd": 0.52,
+      "real": 3,
+      "z": 1.2308,
+      "p": 0.343284
+    }
+  },
+  "shuffles": 200,
+  "confinementMin": 2,
+  "verdict": "FAILS",
+  "checksum": "272a4a1589c5257b98fc180777a6accf2b0b23ecf46b473c42806e94425d3e24"
+}
