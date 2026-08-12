@@ -41,6 +41,44 @@ export const W_BOND = 0.15;
 export const W_GROUND = 0.65;
 export const W_COHERE = 0.20;
 
+/**
+ * v1 weights, preserved verbatim for A/B and regression. `relation` is absent
+ * from v1 because v1 never scored a relational term.
+ */
+export const WEIGHTS_V1 = Object.freeze({
+  bond: W_BOND, grounding: W_GROUND, coherence: W_COHERE, relation: 0,
+});
+
+/**
+ * v2 weights — REPAIR 3.
+ *
+ * DERIVED, NOT FITTED — and deliberately so. The pre-existing negative control
+ * contains 7 reactions; fitting 4 weights to 7 points would be overfitting, and
+ * this module's own note already forbids it ("Reweighting requires evidence, not
+ * intuition"). These weights are therefore derived from the module's stated design
+ * and then TESTED on three independent harnesses, none of which selected them.
+ *
+ * The derivation. The header declares: "The production compatibility channel is
+ * substrate co-occurrence (do two concepts appear together in the corpus?),
+ * supplied via the `grounding` inputs." That is not what v1 shipped —
+ * `grounding = (attestA + attestB) / 2` attests each concept SEPARATELY, so it
+ * measures vocabulary familiarity, never whether the two belong together. The
+ * co-occurrence channel the header describes was computed (`coOcc`, then
+ * `corpusPMI`) and discarded from the score both times.
+ *
+ * v2 keeps the header's intended ORDERING — compatibility dominant, surface bond a
+ * minor bonus — and simply routes the dominant weight to the channel that actually
+ * measures compatibility. `grounding` is retained at a reduced share because
+ * attestation is real evidence, just not relational evidence.
+ *
+ * Verified on: the 8/8 determinism run (regression guard), the absent-capability
+ * negative control (the documented v1 failure), and a held-out null-substrate
+ * attack. See docs/superpowers/evidence/2026-08-11-chem-repair-results.md
+ */
+export const WEIGHTS_V2 = Object.freeze({
+  bond: 0.10, grounding: 0.30, coherence: 0.15, relation: 0.45,
+});
+
 // Stability thresholds (calibrate against a labelled reaction set).
 export const STABLE_MIN = 0.55;
 export const METASTABLE_MIN = 0.30;
@@ -101,6 +139,69 @@ export function cosine(a, b) {
 /** Surface-form bond energy (similarity). Minor compatibility bonus. */
 export function bondEnergy(a, b) {
   return cosine(conceptVector(a), conceptVector(b));
+}
+
+/** Token set under conceptVector's normalization. */
+function conceptTokens(text) {
+  return String(text).toLowerCase().replace(/[-_]/g, ' ').split(/\s+/).filter(Boolean);
+}
+
+/**
+ * REPAIR 2 — the coherence tautology.
+ *
+ * v1 computed `coherence = cosine(a + b, product)`. Callers that build the
+ * product by CONCATENATING the reactants (the valence cyclotron does exactly
+ * this) therefore compared a string to a superstring of itself. Measured
+ * 2026-08-11: flipping "satisfies" to "destroys" moved coherence 0.8234 →
+ * 0.8252 — the score rose when the claim was negated.
+ *
+ * The repair scores the RESIDUAL: what the product asserts beyond restating its
+ * reactants. A product that adds nothing but boilerplate asserts nothing and
+ * earns no coherence credit.
+ *
+ * @returns {{coherence:number, residual:string, containment:number}}
+ */
+export function residualCoherence(a, b, product) {
+  const reactantTokens = new Set(conceptTokens(`${a} ${b}`));
+  const productTokens = conceptTokens(product);
+  if (productTokens.length === 0) return { coherence: 0, residual: '', containment: 0 };
+  const residualTokens = productTokens.filter((token) => !reactantTokens.has(token));
+  const containment = 1 - (residualTokens.length / productTokens.length);
+  if (residualTokens.length === 0) {
+    // Pure restatement of the reactants — no claim was made.
+    return { coherence: 0, residual: '', containment: 1 };
+  }
+  const residual = residualTokens.join(' ');
+  return {
+    coherence: cosine(conceptVector(`${a} ${b}`), conceptVector(residual)),
+    residual,
+    containment,
+  };
+}
+
+/**
+ * REPAIR 1 — fold the signed relational signal into the score.
+ *
+ * `conceptPMI` was computed and explicitly discarded ("Diagnostic only — NOT
+ * folded into feasibility"), and `coOcc` before it was excluded for being unable
+ * to express repulsion. PMI can. It is the only channel in this module that asks
+ * whether two concepts belong TOGETHER rather than whether each is familiar.
+ *
+ * Maps signed mean PMI to [0,1] with 0.5 at neutral, then drags toward 0 in
+ * proportion to token pairs that never co-occur at all.
+ *
+ * @param {{meanPMI:number, pairs:number, flooredNeverCooccur:number}|null} pmi
+ * @returns {{relation:number, basis:string}}
+ */
+export function relationScore(pmi) {
+  if (!pmi || !Number.isFinite(pmi.meanPMI) || pmi.pairs === 0) {
+    // No attested token pairs is absence of evidence, not evidence of repulsion.
+    return { relation: 0.5, basis: 'NO_SIGNAL' };
+  }
+  const centred = (Math.tanh(pmi.meanPMI) + 1) / 2;
+  const neverFraction = pmi.flooredNeverCooccur / Math.max(1, pmi.pairs);
+  const relation = Math.max(0, Math.min(1, centred * (1 - neverFraction)));
+  return { relation, basis: pmi.signal ?? 'NEUTRAL' };
 }
 
 /**
@@ -195,7 +296,7 @@ function round4(x) {
  * @param {object} [args.index]      GroundingIndex from grounding-index.js (corpus-derived)
  * @returns {object} scored, checksummed, frozen result
  */
-export function synthesize({ a, b, product, groundingA, groundingB, index }) {
+export function synthesize({ a, b, product, groundingA, groundingB, index, weights }) {
   const bond = bondEnergy(a, b);
 
   // Resolve grounding: explicit values > corpus index > zero
@@ -221,9 +322,42 @@ export function synthesize({ a, b, product, groundingA, groundingB, index }) {
   }
 
   const grounding = (gA + gB) / 2;
-  const coherence = bondEnergy(a + ' ' + b, product);
+  const w = weights ?? WEIGHTS_V2;
+  const useV1 = w.relation === 0;
+
+  // REPAIR 2: score the residual claim, not the restatement. v1 shape preserved
+  // when v1 weights are requested, so the A/B is a true comparison.
+  const cohere = useV1
+    ? { coherence: bondEnergy(a + ' ' + b, product), residual: null, containment: null }
+    : residualCoherence(a, b, product);
+  const coherence = cohere.coherence;
+
+  // REPAIR 1: the signed relational channel, previously computed and discarded.
+  const rel = useV1 ? { relation: 0, basis: 'V1_DISABLED' } : relationScore(corpusPMI);
+
+  // A channel with NO EVIDENCE must ABSTAIN, not award half credit. On the
+  // explicit-grounding path there is no corpus index, so PMI is unavailable; paying
+  // a flat 0.5 there would spend 45% of the score on a constant and compress the
+  // channels that do have signal. Caught by the 8/8 determinism guard, which fell
+  // to 7/8 before this renormalization. Weight is redistributed proportionally.
+  let wBond = w.bond;
+  let wGround = w.grounding;
+  let wCohere = w.coherence;
+  let wRelation = w.relation;
+  if (wRelation > 0 && rel.basis === 'NO_SIGNAL') {
+    const rest = wBond + wGround + wCohere;
+    const scale = rest > 0 ? (rest + wRelation) / rest : 1;
+    wBond *= scale;
+    wGround *= scale;
+    wCohere *= scale;
+    wRelation = 0;
+  }
+
   const law = lawGate(product);
-  const raw = W_BOND * bond + W_GROUND * grounding + W_COHERE * coherence;
+  const raw = wBond * bond
+    + wGround * grounding
+    + wCohere * coherence
+    + wRelation * rel.relation;
   const feasibility = raw * law.scale;
 
   const result = {
@@ -233,6 +367,9 @@ export function synthesize({ a, b, product, groundingA, groundingB, index }) {
     bond: round4(bond),
     grounding: round4(grounding),
     coherence: round4(coherence),
+    relation: round4(rel.relation),
+    relationBasis: wRelation === 0 && w.relation > 0 ? 'ABSTAINED' : rel.basis,
+    weightsVersion: useV1 ? 'v1' : 'v2',
     lawScale: law.scale,
     lawNote: law.note,
     feasibility: round4(feasibility),
@@ -257,12 +394,17 @@ export function synthesize({ a, b, product, groundingA, groundingB, index }) {
   result.bondSign = bond > 0 ? '+' : bond < 0 ? '-' : '0';
   result.bondMagnitude = round4(Math.abs(bond));
 
-  // FIX #2: corpus-derived SIGNED co-occurrence (token-pair PMI over paragraph
-  // windows). Diagnostic only — deliberately NOT part of the feasibility
-  // formula. A negative meanPMI flags a false friend (the concepts' tokens
-  // repel in the corpus). Correlate against measured truth before wiring in.
+  // Corpus-derived SIGNED co-occurrence (token-pair PMI over paragraph windows).
+  // REPAIR 1 (2026-08-11): this is NO LONGER diagnostic-only — under v2 weights it
+  // is folded into feasibility via relationScore(). A negative meanPMI flags a
+  // false friend (the concepts' tokens repel in the corpus). v1 weights restore
+  // the old behaviour for A/B.
   if (corpusPMI) {
     result.corpusPMI = corpusPMI;
+  }
+  if (!useV1) {
+    result.coherenceResidual = cohere.residual;
+    result.coherenceContainment = cohere.containment === null ? null : round4(cohere.containment);
   }
 
   const canon = JSON.stringify(result, Object.keys(result).sort());
@@ -316,3 +458,37 @@ export function synthesize({ a, b, product, groundingA, groundingB, index }) {
 }
 
 export const weights = Object.freeze({ W_BOND, W_GROUND, W_COHERE, STABLE_MIN, METASTABLE_MIN });
+
+/**
+ * PROVENANCE STAMP.
+ *
+ * Any report whose numbers depend on this module MUST embed this, the way reports
+ * already embed `atomBankChecksum` and `groundingIndexChecksum`. Without it, a
+ * scoring change is indistinguishable from a substrate change when someone re-runs
+ * a sealed benchmark months later and gets a different figure.
+ *
+ * Concretely: the 2026-08-11 repair moved the fission benchmark's `chemistry`
+ * channel from 0.2430 to 0.2018 on an unchanged task. Every result recorded before
+ * that repair was produced under `v1` and cannot be reproduced by the current code.
+ *
+ * @returns {{version:string, weights:object, coherenceMode:string, abstainsWithoutSignal:boolean, checksum:string}}
+ */
+export function chemistryProvenance(activeWeights = WEIGHTS_V2) {
+  const isV1 = activeWeights.relation === 0;
+  const body = {
+    schema: SCHEMA,
+    version: isV1 ? 'v1' : 'v2',
+    weights: { ...activeWeights },
+    // v1 compared the reactants to the product directly, which is a tautology when
+    // the caller builds the product by concatenating them.
+    coherenceMode: isV1 ? 'product-similarity' : 'residual-claim',
+    // v1 had no relational channel at all; v2 folds in signed corpus PMI.
+    relationalChannel: isV1 ? 'none' : 'corpus-pmi-signed',
+    abstainsWithoutSignal: !isV1,
+    stabilityThresholds: { STABLE_MIN, METASTABLE_MIN },
+  };
+  const checksum = 'chemweights1:' + createHash('sha256')
+    .update(JSON.stringify(body, Object.keys(body).sort()), 'utf8')
+    .digest('hex').slice(0, 16);
+  return Object.freeze({ ...body, checksum });
+}
