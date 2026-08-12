@@ -13,6 +13,9 @@ export async function constellationRoutes(fastify, opts) {
     lexiconAdapter: opts.lexiconAdapter,
     rhymeQueryEngine: opts.rhymeQueryEngine,
     rhymeLexiconRepo: opts.rhymeLexiconRepo,
+    // Optional. Absent => leximancy looks up the surface form only, exactly as
+    // it did before morphological expansion existed.
+    lemmaAdapter: opts.lemmaAdapter ?? null,
     // Optional. Absent => the scaleField channel reports itself unavailable and
     // every other channel renders exactly as before.
     wordnetGraph: opts.wordnetGraph ?? null,

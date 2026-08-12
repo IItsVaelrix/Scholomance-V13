@@ -1379,6 +1379,9 @@ CmuPhonemeEngine.init()
 
 fastify.register(constellationRoutes, {
     lexiconAdapter,
+    // Lets leximancy reach `cope` from `coping` instead of only ever seeing the
+    // surface form's homograph.
+    lemmaAdapter,
     rhymeQueryEngine: sharedRhymeAstrologyQueryEngine,
     rhymeLexiconRepo: sharedRhymeAstrologyLexiconRepo,
     wordnetGraph: constellationWordnetGraph,

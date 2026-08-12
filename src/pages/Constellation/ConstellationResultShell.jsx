@@ -26,7 +26,7 @@ import {
   CONSTELLATION_RESULT_VERSION,
 } from '../../core/compose/migrated/ConstellationResult.ts';
 import { validateComposeScene } from '../../core/compose/packets.ts';
-import { phonemeArc, plateRevealFor, heroFigure, twinkleFor, fnv1a32, SPARK_PATH, heroStarGlyph } from './skyChart.js';
+import { plateRevealFor, heroFigure, twinkleFor, fnv1a32, SPARK_PATH, heroStarGlyph } from './skyChart.js';
 
 /* ─── Shared atoms ─────────────────────────────────────────────────────── */
 
@@ -264,16 +264,194 @@ function MeaningBody({ leximancy, semanticInquiry, query }) {
   );
 }
 
+const SOUNDWAVE_DUST = Array.from({ length: 38 }, (_, index) => ({
+  x: 5 + ((index * 47) % 210),
+  y: 7 + ((index * 31) % 80),
+  radius: 0.18 + (index % 4) * 0.08,
+  opacity: 0.22 + (index % 5) * 0.1,
+}));
+
+function phonemeEnergy(phoneme, index) {
+  const code = Array.from(String(phoneme)).reduce((sum, character) => sum + character.codePointAt(0), 0);
+  const stressed = /[12]$/.test(phoneme);
+  const amplitude = stressed ? 19 + (code % 7) : 8 + (code % 11);
+  return {
+    stressed,
+    amplitude,
+    polarity: index % 2 === 0 ? -1 : 1,
+  };
+}
+
+function buildSmoothWave(points) {
+  if (points.length === 0) return 'M 8 46 L 212 46';
+  const anchors = [{ x: 8, y: 46 }, ...points, { x: 212, y: 46 }];
+  let path = `M ${anchors[0].x} ${anchors[0].y}`;
+
+  for (let index = 0; index < anchors.length - 1; index += 1) {
+    const p0 = anchors[index - 1] ?? anchors[index];
+    const p1 = anchors[index];
+    const p2 = anchors[index + 1];
+    const p3 = anchors[index + 2] ?? p2;
+    const cp1x = p1.x + (p2.x - p0.x) / 6;
+    const cp1y = p1.y + (p2.y - p0.y) / 6;
+    const cp2x = p2.x - (p3.x - p1.x) / 6;
+    const cp2y = p2.y - (p3.y - p1.y) / 6;
+    path += ` C ${cp1x.toFixed(2)} ${cp1y.toFixed(2)} ${cp2x.toFixed(2)} ${cp2y.toFixed(2)} ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
+  }
+
+  return path;
+}
+
+function CosmicSoundwave({ phonemes, exactRhymes }) {
+  const denominator = Math.max(phonemes.length - 1, 1);
+  const points = phonemes.map((phoneme, index) => {
+    const energy = phonemeEnergy(phoneme, index);
+    return {
+      id: `${phoneme}-${index}`,
+      phoneme,
+      x: 18 + (index / denominator) * 184,
+      y: 46 + energy.polarity * energy.amplitude,
+      ...energy,
+    };
+  });
+  const mirrored = points.map((point) => ({ ...point, y: 92 - point.y }));
+  const wavePath = buildSmoothWave(points);
+  const mirrorPath = buildSmoothWave(mirrored);
+  const stressedCount = points.filter((point) => point.stressed).length;
+  const resonanceOrigin = points.at(-1) ?? { x: 202, y: 46 };
+  const resonanceCount = Math.min(Math.max(exactRhymes?.length ?? 0, 1), 3);
+
+  return (
+    <svg
+      className="constellation-soundwave constellation-result-arc"
+      viewBox="0 0 220 92"
+      role="img"
+      aria-label={`Spectral soundwave of ${phonemes.length} phonemes with ${stressedCount} stressed nuclei`}
+    >
+      <desc>
+        A mirrored cosmic waveform. Each vertical energy bar represents one phoneme; gold flares mark stress and the final rings show rhyme resonance.
+      </desc>
+      <defs>
+        <radialGradient id="cos-wave-nebula-violet" cx="28%" cy="44%" r="58%">
+          <stop offset="0%" stopColor="rgba(139, 124, 255, 0.3)" />
+          <stop offset="100%" stopColor="rgba(139, 124, 255, 0)" />
+        </radialGradient>
+        <radialGradient id="cos-wave-nebula-blue" cx="76%" cy="58%" r="52%">
+          <stop offset="0%" stopColor="rgba(207, 230, 255, 0.2)" />
+          <stop offset="100%" stopColor="rgba(207, 230, 255, 0)" />
+        </radialGradient>
+        <linearGradient id="cos-wave-spectrum" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="var(--cos-amethyst)" />
+          <stop offset="52%" stopColor="var(--cos-arc)" />
+          <stop offset="76%" stopColor="var(--cos-gold)" />
+          <stop offset="100%" stopColor="var(--cos-arc)" />
+        </linearGradient>
+        <filter id="cos-wave-glow" x="-30%" y="-80%" width="160%" height="260%">
+          <feGaussianBlur stdDeviation="1.7" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <rect className="constellation-soundwave__void" x="0" y="0" width="220" height="92" rx="4" />
+      <rect x="0" y="0" width="220" height="92" fill="url(#cos-wave-nebula-violet)" />
+      <rect x="0" y="0" width="220" height="92" fill="url(#cos-wave-nebula-blue)" />
+
+      <g className="constellation-soundwave__dust" aria-hidden="true">
+        {SOUNDWAVE_DUST.map((star, index) => (
+          <circle
+            key={index}
+            cx={star.x}
+            cy={star.y}
+            r={star.radius}
+            opacity={star.opacity}
+          />
+        ))}
+      </g>
+
+      <g className="constellation-soundwave__orbits" aria-hidden="true">
+        <ellipse cx="110" cy="46" rx="86" ry="29" />
+        <ellipse cx="110" cy="46" rx="57" ry="38" transform="rotate(-8 110 46)" />
+      </g>
+
+      <line className="constellation-soundwave__horizon" x1="8" y1="46" x2="212" y2="46" />
+
+      <g className="constellation-soundwave__constellation" aria-hidden="true">
+        {points.slice(0, -1).map((point, index) => (
+          <line
+            key={`${point.id}-chord`}
+            x1={point.x}
+            y1={point.y}
+            x2={points[index + 1].x}
+            y2={points[index + 1].y}
+            className="constellation-soundwave__chord constellation-result-arc__edge"
+          />
+        ))}
+      </g>
+
+      <g className="constellation-soundwave__energy-bars">
+        {points.map((point) => {
+          const mirrorY = 92 - point.y;
+          return (
+            <line
+              key={point.id}
+              x1={point.x}
+              y1={Math.min(point.y, mirrorY)}
+              x2={point.x}
+              y2={Math.max(point.y, mirrorY)}
+              data-stressed={String(point.stressed)}
+            />
+          );
+        })}
+      </g>
+
+      <path className="constellation-soundwave__wave constellation-soundwave__wave--echo" d={mirrorPath} pathLength="1" />
+      <path className="constellation-soundwave__wave constellation-soundwave__wave--core" d={wavePath} pathLength="1" />
+
+      <g className="constellation-soundwave__nodes">
+        {points.map((point) => point.stressed ? (
+          <path
+            key={point.id}
+            d={SPARK_PATH}
+            transform={`translate(${point.x} ${point.y}) scale(1.45)`}
+            className="constellation-soundwave__stress constellation-result-arc__spark"
+          />
+        ) : (
+          <circle
+            key={point.id}
+            cx={point.x}
+            cy={point.y}
+            r="1.15"
+            className="constellation-soundwave__node constellation-result-arc__node"
+          />
+        ))}
+      </g>
+
+      <g className="constellation-soundwave__resonance" aria-hidden="true">
+        {Array.from({ length: resonanceCount }, (_, index) => (
+          <circle
+            key={index}
+            cx={resonanceOrigin.x}
+            cy={resonanceOrigin.y}
+            r={5 + index * 5}
+          />
+        ))}
+      </g>
+    </svg>
+  );
+}
+
 /**
- * The sound figure. `variant === 'arc'` draws the phonemes as an edged sky-arc
- * with stressed vowels ignited as gold sparks (the composed presentation);
- * `variant === 'dots'` draws the quiet flat row the fallback has always used.
+ * The sound figure. `variant === 'arc'` renders the authoritative phoneme
+ * sequence as a mirrored spectral nebula waveform; `variant === 'dots'`
+ * retains the quiet deterministic fallback.
  */
 function SoundBody({ rhymeAstrology, variant }) {
   if (!rhymeAstrology) {
     return <p className="constellation-result-awaiting">Awaiting engine — Rhyme Astrology</p>;
   }
-  const arc = phonemeArc(rhymeAstrology.phonemes);
   return (
     <>
       <table className="constellation-result-table">
@@ -306,35 +484,10 @@ function SoundBody({ rhymeAstrology, variant }) {
         </tbody>
       </table>
       {variant === 'arc' ? (
-        <svg
-          className="constellation-result-arc"
-          viewBox="0 0 100 34"
-          role="img"
-          aria-label={`Phoneme constellation (${arc.nodes.length} nodes)`}
-        >
-          {arc.edges.map(([a, b]) => (
-            <line
-              key={`${a}-${b}`}
-              x1={arc.nodes[a].x}
-              y1={arc.nodes[a].y}
-              x2={arc.nodes[b].x}
-              y2={arc.nodes[b].y}
-              className="constellation-result-arc__edge"
-            />
-          ))}
-          {arc.nodes.map((nd, i) =>
-            nd.stressed ? (
-              <path
-                key={i}
-                d={SPARK_PATH}
-                transform={`translate(${nd.x} ${nd.y}) scale(1.7)`}
-                className="constellation-result-arc__spark"
-              />
-            ) : (
-              <circle key={i} cx={nd.x} cy={nd.y} r={1.5} className="constellation-result-arc__node" />
-            ),
-          )}
-        </svg>
+        <CosmicSoundwave
+          phonemes={rhymeAstrology.phonemes}
+          exactRhymes={rhymeAstrology.exactRhymes}
+        />
       ) : (
         <svg
           className="constellation-result-rhyme-chart"

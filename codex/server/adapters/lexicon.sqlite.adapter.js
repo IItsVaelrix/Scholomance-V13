@@ -307,6 +307,21 @@ export function createLexiconAdapter(dbPath, options = {}) {
           ORDER BY l.pos ASC, l.sense_rank ASC
           LIMIT ?
         `) : null,
+        /**
+         * NAMED ENTITIES, STRUCTURALLY.
+         *
+         * WordNet distinguishes a TYPE from an INSTANCE: `hope` the feeling is
+         * a type, Bob Hope the comedian is an instance, and only the instance
+         * carries `instance_hypernym`. Both are pos `n` and both sit at
+         * sense_rank 1, so neither POS nor rank can separate them — this
+         * relation is the only honest signal.
+         */
+        lookupInstanceSynsets: hasWordnetSynset ? db.prepare(`
+          SELECT DISTINCT l.synset_id AS synsetId
+          FROM wordnet_lemma l
+          JOIN wordnet_rel r ON r.synset_id = l.synset_id
+          WHERE l.lemma_lower = ? AND r.rel = 'instance_hypernym'
+        `) : null,
         lookupSynonyms: db.prepare(`
           SELECT l2.lemma AS lemma, l2.pos AS pos
           FROM wordnet_lemma l1
@@ -644,6 +659,24 @@ export function createLexiconAdapter(dbPath, options = {}) {
       .filter((g) => g.senses.length > 0);
   }
 
+  /**
+   * Synset ids for this spelling that name an INSTANCE (a person, place or
+   * titled work) rather than a kind of thing.
+   *
+   * @returns {Set<string>} empty when the relation table is absent, which reads
+   *   as "nothing is known to be a named entity" and leaves ordering untouched.
+   */
+  function lookupInstanceSynsets(word) {
+    if (!tryConnect()) return new Set();
+    const normalized = normalizeWord(word);
+    if (!normalized || !stmts.lookupInstanceSynsets) return new Set();
+    try {
+      return new Set(stmts.lookupInstanceSynsets.all(normalized).map((r) => String(r.synsetId || '')));
+    } catch {
+      return new Set();
+    }
+  }
+
   function lookupSynonyms(word, limit = 20) {
     if (!tryConnect()) return [];
     const normalized = normalizeWord(word);
@@ -766,6 +799,7 @@ export function createLexiconAdapter(dbPath, options = {}) {
     searchEntries,
     suggestEntries,
     lookupLexicalEntries,
+    lookupInstanceSynsets,
     lookupSynonyms,
     lookupAntonyms,
     lookupRelated,

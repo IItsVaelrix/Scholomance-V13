@@ -4,13 +4,34 @@
  * Coverage is one number and it hides three. A sentence that spans as S with
  * the wrong subject is a success under coverage and a failure under both of the
  * others, so they are reported side by side and never collapsed.
+ *
+ * ─── WHY THIS DOES NOT IMPORT `treebank.js` ────────────────────────────────
+ *
+ * The shared name implies a relationship the imports deny, and the denial is
+ * correct: `treebank.js` reads CoNLL-U and produces gold answers, while this
+ * file only aggregates already-scored rows. They are separate concerns that
+ * happen to serve one report, and an import here would drag a parser into a
+ * counting module.
+ *
+ * The rows are built by `scripts/treebank-report.mjs`, which is also the only
+ * caller of `summarize`. That means the row contract lives in a consumer rather
+ * than in a module, so it is enumerated below instead of being referred out to
+ * a planning document that this file cannot check against.
  */
 import { OUTCOME } from './failure-diagnosis.js';
 
 const ratio = (part, whole) => (whole === 0 ? 0 : part / whole);
 
 /**
- * @param {Array<object>} rows one per sentence; see the plan's Interfaces block
+ * @param {Array<object>} rows one per sentence, as built by
+ *   `scripts/treebank-report.mjs`. Fields actually read here:
+ * @param {string}   rows[].outcome       an `OUTCOME` value from `failure-diagnosis.js`
+ * @param {boolean|null} rows[].decided   null when the decision could not be taken
+ * @param {string}   [rows[].rootUpos]    gold root UPOS; absent is bucketed as `NONE`
+ * @param {boolean}  [rows[].contained]   gold answer inside the chart
+ * @param {boolean}  [rows[].overGenerated] parsed, but the chart admitted extra readings
+ * @param {Array<{label: string, deprel: string}>} [rows[].categories] failure frontier
+ * @param {number}   [rows[].nonProjective] non-projective arc count, summed
  * @returns {object} the report
  */
 export function summarize(rows) {

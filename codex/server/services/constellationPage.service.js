@@ -83,7 +83,7 @@ export async function buildConstellationPage(rawQuery, deps) {
     leximancy = analyzeLeximancy(deps.lexiconAdapter, identity.primaryContentToken, {
       compounds: phraseStructure.compounds,
       intent: phraseStructure.intent,
-    });
+    }, deps.lemmaAdapter);
   } catch (err) {
     degradedChannels.push('leximancy');
     warnings.push(`leximancy channel failed: ${err.message}`);

@@ -2,14 +2,14 @@ import { useState } from 'react';
 import './ConstellationPage.css';
 import ComposeConstellationSky from './ComposeConstellationSky.jsx';
 import ConstellationSearch from './ConstellationSearch.jsx';
-import ConstellationResultShell from './ConstellationResultShell.jsx';
+import ConstellationExperience from './ConstellationExperience.jsx';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js';
 import { useConstellationPage } from '../../hooks/useConstellationPage.js';
 
 export default function ConstellationPage() {
   const reducedMotion = usePrefersReducedMotion();
   const [submittedQuery, setSubmittedQuery] = useState(null);
-  const { packet } = useConstellationPage(submittedQuery);
+  const { status, packet } = useConstellationPage(submittedQuery);
   const mode = submittedQuery != null ? 'submitted' : 'idle';
   // The sky's deterministic animation is seeded by the resolved page bytecode,
   // so each answered query lights its own lodestar (PDR §7.7). Idle → constant.
@@ -30,6 +30,7 @@ export default function ConstellationPage() {
         .filter(Boolean)
         .join(' ')}
       data-mode={mode}
+      data-status={status}
     >
       <ComposeConstellationSky reducedMotion={reducedMotion} bytecode={skyBytecode} />
       <div className="constellation-foreground">
@@ -43,7 +44,13 @@ export default function ConstellationPage() {
           defaultValue={submittedQuery ?? ''}
           reducedMotion={reducedMotion}
         />
-        {packet != null ? <ConstellationResultShell packet={packet} reducedMotion={reducedMotion} /> : null}
+        {status === 'loading' && packet == null ? (
+          <div className="constellation-charting" role="status" aria-live="polite">
+            <span className="constellation-charting__glyph" aria-hidden="true">✦</span>
+            <span>Charting the literary sky…</span>
+          </div>
+        ) : null}
+        {packet != null ? <ConstellationExperience packet={packet} reducedMotion={reducedMotion} /> : null}
       </div>
     </div>
   );
