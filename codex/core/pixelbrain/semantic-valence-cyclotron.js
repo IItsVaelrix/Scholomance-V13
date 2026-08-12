@@ -721,8 +721,7 @@ function finalizeCandidate(row, prepared, config, groundingIndex) {
   );
   let verdict = 'REFUSED';
   if (
-    osmosis.anomalyKind === 'baseline_drift'
-    && conceptChemistry.stability !== 'UNSTABLE'
+    conceptChemistry.stability !== 'UNSTABLE'
     && !repelled
     && atoms.length >= config.nucleusMinDomains
     && domainCount >= config.nucleusMinDomains
@@ -731,8 +730,7 @@ function finalizeCandidate(row, prepared, config, groundingIndex) {
   ) {
     verdict = 'NUCLEUS';
   } else if (
-    osmosis.anomalyKind === 'baseline_drift'
-    && !repelled
+    !repelled
     && finalScore >= config.finalScoreFloor
   ) {
     verdict = 'HYPOTHESIS';

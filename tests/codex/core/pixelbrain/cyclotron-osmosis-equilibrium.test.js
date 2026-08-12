@@ -62,3 +62,21 @@ describe('finalScore excludes osmosis', () => {
     expect(report.candidates[0]).toHaveProperty('osmosis');
   });
 });
+
+describe('verdict predicate ignores osmosis', () => {
+  it('crowns candidates even when the membrane would report no drift', () => {
+    // Force the membrane silent by making drift impossible: a similarityFloor
+    // of 0 and driftCeiling of 1 mean `baseline_drift` can never fire.
+    const report = runSemanticValenceCyclotron(RUN({
+      osmosisSimilarityFloor: 0,
+      osmosisDriftCeiling: 1,
+    }));
+    const drifted = report.candidates.filter(
+      (c) => c.osmosis?.anomalyKind === 'baseline_drift',
+    );
+    expect(drifted.length).toBe(0);   // precondition: the gate would have closed
+
+    const judged = report.candidates.filter((c) => c.verdict !== 'REFUSED');
+    expect(judged.length).toBeGreaterThan(0);  // fails today: gate closed => all REFUSED
+  });
+});
