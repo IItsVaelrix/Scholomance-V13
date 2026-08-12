@@ -1,0 +1,625 @@
+{
+  "contract": "PB-EVIDENCE-INTEGRITY-v1",
+  "schemaVersion": "1.0.0",
+  "generatedFrom": "nucleus bytecode-seal+canonical-serializer+diagnostic-event-bus+immutable-packet+schema-verifier (T2)",
+  "artifactCount": 49,
+  "packets": [
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-audition-jury-selection-measure.md",
+      "contentSeal": "seal1:ba599f6d6a208f29b7f524b7be0fdb230d82e85b9d3d9864560b358f8cae6588",
+      "bytes": 4252,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-bond-ablation-adj-conjadj-adj.md",
+      "contentSeal": "seal1:29da0c08166ea49aac4d4bd0236dca26307ae66fcf2ff28a93db9b748b8f3cdd",
+      "bytes": 1661,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-bond-ablation-conj-adj-conjadj.md",
+      "contentSeal": "seal1:df51c6771c5171487987c6443c013b0e7b051c2e0bf39fb15ecd114ebfb7259a",
+      "bytes": 1635,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-bond-anatomy-audit.md",
+      "contentSeal": "seal1:d695e27da0795aff8fc6bd33b13592dcc11fe226893307eb5d13a09e640a80fb",
+      "bytes": 4771,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-bond-rediscovery.md",
+      "contentSeal": "seal1:803926174b87650674125351188114caa5d4bee44dfc99d8d430e7583f651a67",
+      "bytes": 2878,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-closure-slice-punct-absorb.md",
+      "contentSeal": "seal1:ad5acfa407146dca2878c2f5347873664f9ca19fd45290fccfd774bc71b18334",
+      "bytes": 2374,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-compound-family-retest.md",
+      "contentSeal": "seal1:caefa40296eaa518186d230522cc95d621f80335ed71d1ff4fa2d6d73fb4ca76",
+      "bytes": 2963,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-conservation-legal-reactor.md",
+      "contentSeal": "seal1:62a34c1e566931643522c4795a5b66590ef9ec4f2929cfb9f80199a7f7c1d4e7",
+      "bytes": 1235,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-constellation-ultimate-diagnostic.md",
+      "contentSeal": "seal1:9cbc4369f73fd5b0ddfad52e785f6852e23636ad11ffeebc92a5255ba4042dd9",
+      "bytes": 7330,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-construction-autopsy-n-n-n-h0.md",
+      "contentSeal": "seal1:ecdde82d60c70c596d69d41e451954edbea98f0f38f7e19d5df3ee97ba53f88c",
+      "bytes": 4587,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-construction-autopsy-np-np-np-h0.md",
+      "contentSeal": "seal1:af74d0237193e9a6c2bacf2273ee96af87ae6408cfa3b396bf5f16940679367b",
+      "bytes": 5393,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-construction-autopsy-np-s-s-h1.md",
+      "contentSeal": "seal1:1b7e0fdffa25d499475ce5e9ea15793447646e39bc3f7d2a2578eba36c6b0bc3",
+      "bytes": 5396,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-construction-autopsy-propn-propn-n-h0.md",
+      "contentSeal": "seal1:cea98b62e6ea14fe5f01588b74cbc778fa3d9dded18c96a70dae14166ae76e16",
+      "bytes": 2323,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-construction-autopsy-s-s-s-h0.md",
+      "contentSeal": "seal1:759559617242e17e5b0035c57eb21a345b7543ea9029ce2c313f9227c6b063e1",
+      "bytes": 5459,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-construction-autopsy.md",
+      "contentSeal": "seal1:9a722cd8ea94cfb7ff08f0ff5a068424a683ea14c50d39d9debfd2567d130c93",
+      "bytes": 2797,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-construction-family-split.md",
+      "contentSeal": "seal1:a0e36e69c6cb5c668056c76abbf58a0e60bb6b5bd213a5e5319ff9f630cf9f69",
+      "bytes": 9918,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": [
+        "NO_REPRO_COMMAND"
+      ]
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-cop-to-aux-theory-intervention.md",
+      "contentSeal": "seal1:38667c8343b6020e631e4260a17199978d11a67813b980f601d36442461b4726",
+      "bytes": 1841,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": [
+        "NO_REPRO_COMMAND"
+      ]
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-det-np-fission.md",
+      "contentSeal": "seal1:2a87c8580071a5ad1aad077ac04ae227def65d3d6473fbd5f46ff726452b601d",
+      "bytes": 3628,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": [
+        "NO_REPRO_COMMAND"
+      ]
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-extra-bond-reactor.md",
+      "contentSeal": "seal1:f93a4c3e5b2eeab1058ed1716581d1b2dce5ee9f8c160004118edce2458a9d34",
+      "bytes": 9031,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-gap-grammar-simulation.md",
+      "contentSeal": "seal1:7c294fb75706000f6f5e5d4c53f820fe0e1e8c8416a89130209681b011265576",
+      "bytes": 7206,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-head-declaration-result.md",
+      "contentSeal": "seal1:ed9e7bdedf59912cb50ec18641ff7994d45a75a52129246447ff95cf91f6bd8f",
+      "bytes": 5120,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": [
+        "NO_REPRO_COMMAND"
+      ]
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-hint-grammar-simulation.md",
+      "contentSeal": "seal1:efc8eab1e1668e745fd4907712356ece6af8a51b0de7d4d864e6acedec3c3b8b",
+      "bytes": 4174,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-hint-nuclei-promote.md",
+      "contentSeal": "seal1:69cf494e6f7b4ac160064dc387883eea283e8bc8899c7de260f7ec41b4e9dac1",
+      "bytes": 5951,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": [
+        "NO_REPRO_COMMAND"
+      ]
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-result-conservation.md",
+      "contentSeal": "seal1:200bdc22384cdf8497f9b97a691e935185b9d17bb2d50b14930db65928d154fd",
+      "bytes": 1698,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-root-closure-autopsy.md",
+      "contentSeal": "seal1:e3905ff683bec593ef2225a98544a6264308c885148b1d67af8ba7a7462a4832",
+      "bytes": 7854,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-08-session-synthesis-hint-fission.md",
+      "contentSeal": "seal1:8acfba8076c9bdcfa4c608bc26a3c028491bb19093b738ed53fa716d78fb5f53",
+      "bytes": 2987,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": [
+        "NO_REPRO_COMMAND"
+      ]
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-09-cyclotron-extrapolation.md",
+      "contentSeal": "seal1:a555a3fccec07ef45cf7904e7ceaa0a8821ca73f78d4fa65550b13a5fbbb375b",
+      "bytes": 9278,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-09-nervous-system-plan-collision.md",
+      "contentSeal": "seal1:61a53a4bab5eaacdd0fe7bcb06608c3445ffd1aeaa8f91ca9640fd9558e846f4",
+      "bytes": 6109,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": [
+        "NO_REPRO_COMMAND"
+      ]
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-11-PREREG-ccg-channel.md",
+      "contentSeal": "seal1:842a9e0df4be1744e91ac17951ecda51b448bccad25b8a1ebeb42cac8d82f71b",
+      "bytes": 5152,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-11-PREREG-fission-vs-random.md",
+      "contentSeal": "seal1:74e50a1fad719428d5ebccce8661d6cf133daf58ec44642d943bea7e3132ba28",
+      "bytes": 5835,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-11-PREREG-nucleus-value.md",
+      "contentSeal": "seal1:182c108ea63441226dbb412d6481e2ff43a7784f13864e44e306f2b746bbcef1",
+      "bytes": 3597,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": [
+        "NO_REPRO_COMMAND"
+      ]
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-11-PREREG-null-substrate.md",
+      "contentSeal": "seal1:871187da326409560a7d63ccbc41b6fade0cb4be5c96cdcefba8eacb0c23178b",
+      "bytes": 3759,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-11-ccg-channel-prereg.json",
+      "contentSeal": "seal1:cf2a3592a929097f1116fc0e055785fb4b758bae6a2398dac3debba1c6c0afd7",
+      "bytes": 19998,
+      "contract": "PB-CCG-CHANNEL-PREREG-v1",
+      "schemaVersion": "1.0.0",
+      "declaresContract": true,
+      "selfSeal": "verified",
+      "provenance": {
+        "chemistry": null,
+        "atomBank": null,
+        "grounding": null
+      },
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-11-chem-repair-results.md",
+      "contentSeal": "seal1:b5e8f7d4b179ed8f227b8ad280501801295d1cbc834ae81037125cbd1bef871c",
+      "bytes": 5491,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-11-cyclotron-occupancy-entropy.json",
+      "contentSeal": "seal1:73411603e4a6ecf4dbf37beecb25b704b9085956f633e1c0a2e466fc2e38f038",
+      "bytes": 2580,
+      "contract": "PB-CYCLOTRON-OCCUPANCY-BENCHMARK-v1",
+      "schemaVersion": "1.0.0",
+      "declaresContract": true,
+      "selfSeal": "verified",
+      "provenance": {
+        "chemistry": null,
+        "atomBank": null,
+        "grounding": null
+      },
+      "findings": [
+        "NO_CHEMISTRY_PROVENANCE"
+      ]
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-11-cyclotron-sensor-proof.md",
+      "contentSeal": "seal1:fb2e1d47065285094ab4732f22b16e5ded7f364baf0d92922e3ccaaae23eeebb",
+      "bytes": 5380,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-11-direct-ai-blind-proposals.json",
+      "contentSeal": "seal1:a780e91d051daa4f6f96895ae1cd6a9cb80c3c625ec4c53fb60efb826bb84a20",
+      "bytes": 1685,
+      "contract": "PB-SEMANTIC-DIRECT-PROPOSALS-v1",
+      "schemaVersion": "1.0.0",
+      "declaresContract": true,
+      "selfSeal": "verified",
+      "provenance": {
+        "chemistry": null,
+        "atomBank": null,
+        "grounding": null
+      },
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-11-entropic-decay-dampener.json",
+      "contentSeal": "seal1:93d80fe15e8558e58306a8fbf73a11ee0d19d13206d955bea36911cf00fa6fd3",
+      "bytes": 3571,
+      "contract": "PB-OCCUPANCY-ENTROPY-EVIDENCE-v1",
+      "schemaVersion": "1.0.0",
+      "declaresContract": true,
+      "selfSeal": "verified",
+      "provenance": {
+        "chemistry": null,
+        "atomBank": null,
+        "grounding": null
+      },
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-11-fission-vs-random-prereg-701.json",
+      "contentSeal": "seal1:e2b7e6af2eac6c15b7b3bca23a4398fa42e3f99975cd2e97b8507ae0bbf3fe48",
+      "bytes": 19103,
+      "contract": "PB-SEMANTIC-REACTOR-PREREG-v1",
+      "schemaVersion": "1.0.0",
+      "declaresContract": true,
+      "selfSeal": "verified",
+      "provenance": {
+        "chemistry": null,
+        "atomBank": null,
+        "grounding": null
+      },
+      "findings": [
+        "NO_CHEMISTRY_PROVENANCE"
+      ]
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-11-nucleus-geometry-results.md",
+      "contentSeal": "seal1:52627cdd994559256238ab12d5c476f0e7a7279f570d87e4e0e751f153b66e01",
+      "bytes": 4594,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": [
+        "NO_REPRO_COMMAND"
+      ]
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-11-nucleus-to-harness.md",
+      "contentSeal": "seal1:80bb1a3a7b4b1c19b5c41c1b2a0c868993d3da9557832ef287dc2ac82b82f0bd",
+      "bytes": 4502,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-11-nucleus-value-results.md",
+      "contentSeal": "seal1:38300f300158cd2d68b21604307b20fa286a101bdaeff34015090fb9285b3c6f",
+      "bytes": 4943,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": [
+        "NO_REPRO_COMMAND"
+      ]
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-11-null-substrate-attack.json",
+      "contentSeal": "seal1:1f353b15d0c71b63214b9fe2fd3d7a1de9b2919bb9c6342a1218b77aaaadf364",
+      "bytes": 2062,
+      "contract": "PB-NULL-SUBSTRATE-ATTACK-v1",
+      "schemaVersion": "1.0.0",
+      "declaresContract": true,
+      "selfSeal": "verified",
+      "provenance": {
+        "chemistry": "chemweights1:52ed14ac0c46ee82",
+        "atomBank": "atombank1:ce3f75efc69bfdcf",
+        "grounding": null
+      },
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-11-null-substrate-seed-control.md",
+      "contentSeal": "seal1:638ecf0ead1c49274d770b3c6ec8d9dfc395810fd49e0cdf25e61140331c468d",
+      "bytes": 3412,
+      "contract": null,
+      "schemaVersion": null,
+      "declaresContract": false,
+      "selfSeal": "n/a",
+      "provenance": null,
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-11-semantic-fission-reactor-benchmark.json",
+      "contentSeal": "seal1:c4b0e09ae8fdb71fd1013300dd268796e5c074c4d7d1e7b09a6d2940d117d521",
+      "bytes": 18558,
+      "contract": "PB-SEMANTIC-REACTOR-BENCHMARK-v1",
+      "schemaVersion": "1.0.0",
+      "declaresContract": true,
+      "selfSeal": "verified",
+      "provenance": {
+        "chemistry": null,
+        "atomBank": null,
+        "grounding": null
+      },
+      "findings": [
+        "NO_CHEMISTRY_PROVENANCE"
+      ]
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-11-semantic-molecule-blind-benchmark.json",
+      "contentSeal": "seal1:6900aa13d680893a36c83058b8b7a79446ebd41f83c79f9ecad6cf31bc0385b3",
+      "bytes": 9976,
+      "contract": "PB-SEMANTIC-BLIND-BENCHMARK-v1",
+      "schemaVersion": "1.0.0",
+      "declaresContract": true,
+      "selfSeal": "verified",
+      "provenance": {
+        "chemistry": null,
+        "atomBank": null,
+        "grounding": null
+      },
+      "findings": [
+        "NO_CHEMISTRY_PROVENANCE"
+      ]
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-11-semantic-valence-cyclotron-100k.json",
+      "contentSeal": "seal1:cff6086207524f1d314d2b61c126c0cd58bc55c074469894dd8028620e87b8e0",
+      "bytes": 573646,
+      "contract": "PB-SEMANTIC-CYCLOTRON-REPORT-v1",
+      "schemaVersion": "1.0.0",
+      "declaresContract": true,
+      "selfSeal": "verified",
+      "provenance": {
+        "chemistry": null,
+        "atomBank": "atombank1:fdb594f75fae202a",
+        "grounding": "grnd1:37c87b90a96e27a7"
+      },
+      "findings": [
+        "NO_CHEMISTRY_PROVENANCE"
+      ]
+    },
+    {
+      "path": "docs/superpowers/evidence/2026-08-11-top-five-semantic-molecules.json",
+      "contentSeal": "seal1:82fa253f485cce10f086797e39ea54272fb308cd37aed2955844b2e0cdc8ed8f",
+      "bytes": 3987,
+      "contract": "PB-SEMANTIC-MOLECULE-EVAL-v1",
+      "schemaVersion": "1.0.0",
+      "declaresContract": true,
+      "selfSeal": "verified",
+      "provenance": {
+        "chemistry": null,
+        "atomBank": null,
+        "grounding": null
+      },
+      "findings": []
+    },
+    {
+      "path": "docs/superpowers/evidence/CYCLOTRON-SENSOR-LEDGER.json",
+      "contentSeal": "seal1:ff9384c1fa3def1f06a1a5a4a8ca42f9b98d112f16428477bac039addaf1ff17",
+      "bytes": 2021,
+      "contract": "PB-CYCLOTRON-SENSOR-LEDGER-v1",
+      "schemaVersion": "1.0.0",
+      "declaresContract": true,
+      "selfSeal": "verified",
+      "provenance": {
+        "chemistry": null,
+        "atomBank": null,
+        "grounding": null
+      },
+      "findings": [
+        "NO_CHEMISTRY_PROVENANCE"
+      ]
+    }
+  ],
+  "drift": [],
+  "checksum": "evidence-integrity1:e60570aaf4bb97e20d7038455d61993b265959702b374cb3330159d7cedaa83e"
+}

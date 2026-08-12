@@ -1,0 +1,82 @@
+{
+  "contract": "PB-CYCLOTRON-SENSOR-LEDGER-v1",
+  "schemaVersion": "1.0.0",
+  "baselines": {
+    "inclass1:c757f76328e39ac66d33dc78c6f6cb260082c386b6aec85c1205e61444639963": {
+      "contract": "PB-CYCLOTRON-SENSOR-v1",
+      "schemaVersion": "1.0.0",
+      "inputClass": "inclass1:c757f76328e39ac66d33dc78c6f6cb260082c386b6aec85c1205e61444639963",
+      "inputs": {
+        "reportContract": "PB-SEMANTIC-CYCLOTRON-REPORT-v1",
+        "reportSchemaVersion": "1.0.0",
+        "atomBankChecksum": "atombank1:ce3f75efc69bfdcf",
+        "groundingIndexChecksum": "grnd1:6d012f5a65a6e404",
+        "chemistryVersion": "v2",
+        "chemistryWeights": {
+          "bond": 0.1,
+          "coherence": 0.15,
+          "grounding": 0.3,
+          "relation": 0.45
+        },
+        "configuration": {
+          "controlEvery": 5,
+          "controlPercentile": 0.99,
+          "entropy": {
+            "activationHeat": 5,
+            "decayLambda": 0.35,
+            "enabled": false,
+            "escapeAttempts": 3,
+            "exactWeight": 4,
+            "familyWeight": 2,
+            "neighborhoodWeight": 0.5
+          },
+          "environments": [
+            "governance",
+            "immunity",
+            "memory",
+            "retrieval",
+            "synthesis"
+          ],
+          "finalScoreFloor": 0.58,
+          "maxMoleculeSize": 5,
+          "noveltyFloor": 0.04,
+          "nucleusMinDomains": 3,
+          "nucleusNoveltyFloor": 0.32,
+          "nucleusScoreFloor": 0.765,
+          "osmosisDriftCeiling": 0.17,
+          "osmosisSimilarityFloor": 0.83,
+          "shortlistFamilyCap": 2,
+          "shortlistLimit": 256
+        },
+        "seed": 6045712,
+        "requestedTrials": 2000
+      },
+      "outputs": {
+        "reportChecksum": "cyclotron1:edce675e94066adb6643f51fcd7a713a",
+        "controlBar": 0.200493,
+        "meanFinalScore": 0.667286539062,
+        "meanEnergy": 0.795759371094,
+        "meanNovelty": 0.33866171875,
+        "meanGrounding": 0.488732808594,
+        "meanChemistryFeasibility": 0.34116171875,
+        "shortlistDigest": "shortlist1:d9adaef0e556cff4947f1cc5bb944b2f70f61c68cfa0ec8e78edca9b946a3734",
+        "count.candidateTrials": 1600,
+        "count.controlTrials": 400,
+        "count.duplicateMolecules": 249,
+        "count.hypotheses": 114,
+        "count.nuclei": 6,
+        "count.refused": 136,
+        "count.shortlisted": 256,
+        "count.unboundTrials": 0,
+        "count.uniqueMolecules": 1351
+      },
+      "approval": {
+        "reason": "2000-trial reference run for the C-sensor proof",
+        "approvedAt": "2026-08-12T01:42:36.847Z",
+        "reportChecksum": "cyclotron1:edce675e94066adb6643f51fcd7a713a"
+      }
+    }
+  },
+  "receipts": {},
+  "checksum": "cyclosensor-ledger1:a6ee3d50e199a71125a9075f12fae62aece5ceba56f54c1b9217410f45113145"
+}
