@@ -36,6 +36,11 @@ export const SEMANTIC_CYCLOTRON_CONTRACT = 'PB-SEMANTIC-CYCLOTRON-REPORT-v1';
 export const SEMANTIC_CYCLOTRON_SCHEMA_VERSION = '1.0.0';
 export const VECTOR_DIMENSIONS = 128;
 
+// Osmosis was removed from finalScore on 2026-08-12 (PB-OSMOTIC-EQUILIBRIUM-v1).
+// The original 50:35 energy:feasibility ratio is preserved, rescaled to [0,1].
+const ENERGY_WEIGHT = 0.50 / 0.85;
+const FEASIBILITY_WEIGHT = 0.35 / 0.85;
+
 const DEFAULT_ENVIRONMENTS = Object.freeze([
   'retrieval',
   'synthesis',
@@ -708,13 +713,11 @@ function finalizeCandidate(row, prepared, config, groundingIndex) {
     concentration: row.molecule.energy,
     seed: 42,
   });
-  const osmoticNovelty = osmosis.anomalyKind === 'baseline_drift' ? osmosis.confidence : 0;
   const repelled = conceptChemistry.corpusPMI?.signal === 'REPULSION';
   const domainCount = new Set(atoms.map((atom) => atom.domain)).size;
   const finalScore = clamp01(
-    0.50 * row.molecule.energy
-    + 0.35 * clamp01(conceptChemistry.feasibility)
-    + 0.15 * osmoticNovelty,
+    ENERGY_WEIGHT * row.molecule.energy
+    + FEASIBILITY_WEIGHT * clamp01(conceptChemistry.feasibility),
   );
   let verdict = 'REFUSED';
   if (
