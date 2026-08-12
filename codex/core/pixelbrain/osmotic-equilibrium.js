@@ -51,35 +51,87 @@ export function shouldEquilibrate(osmosis) {
 
 /**
  * Derive a membrane permeability threshold from an observed crowding
- * distribution. A limit nothing reaches, or one everything exceeds, is a check
- * that cannot fail — so this refuses rather than returning it.
+ * distribution, and refuse one that cannot be shown to discriminate on the
+ * distribution it will actually govern.
  *
- * @param {number[]} samples observed crowding values
- * @param {{percentile?: number}} [options]
+ * Three failures on 2026-08-12 motivate the shape of this function; each has a
+ * regression test in `tests/codex/core/pixelbrain/osmotic-equilibrium.test.js`.
+ *
+ *   1. `Math.ceil(p * n)` clamped to `n-1` returns the LAST index — the
+ *      maximum — whenever `ceil(p*n) >= n-1`, i.e. for every `n < 2/(1-p)`.
+ *      At p=0.90 that is every sample below 20, and the shipped calibration
+ *      ran at n=12. `floor` is the correct nearest-rank estimator for an
+ *      upper percentile and does not degenerate.
+ *
+ *   2. When the limit is the maximum, `clearedFraction` can never be 0 (the
+ *      max clears itself under `>=`) and is 1 only under a total tie. So the
+ *      0%/100% guard was unfalsifiable: `admissible` was true for any
+ *      non-degenerate input. A guard against checks that cannot fail must
+ *      itself be able to fail.
+ *
+ *   3. The limit was derived on a synthetic 4-atom chain and applied to the
+ *      44- and 56-atom banks, where it fired on 84–91% of candidates. A limit
+ *      derived without reference to what it governs cannot be shown to
+ *      transfer — so `governed` is required, not optional, and the transfer
+ *      check is structural rather than a matter of discipline.
+ *
+ * NOTE: a percentile of any distribution guarantees a fixed clearance fraction
+ * by construction. Crowding is an absolute quantity — `h/(1+h)` for occupancy
+ * heat `h` — so the stronger form of this calibration declares the limit in
+ * terms of a revisit policy (`h = 4*ln(1+R)`) and uses this function only to
+ * check that the policy discriminates. That change is not made here.
+ *
+ * @param {number[]} samples observed crowding values used to derive the limit
+ * @param {object} options
+ * @param {number} [options.percentile=0.90] target upper percentile
+ * @param {number[]} options.governed the distribution the limit will govern
+ * @param {number} [options.tolerance=0.10] allowed drift of the realized
+ *   governed clearance from the target `1 - percentile`
+ * @returns {{limit:number, clearedFraction:number, governedFraction:number,
+ *   admissible:boolean, reason:string|null}}
  */
 export function calibrateConcentrationLimit(samples, options = {}) {
   if (!Array.isArray(samples) || samples.length === 0) {
     throw new TypeError('calibrateConcentrationLimit: no samples — cannot derive a limit');
   }
+  const { governed } = options;
+  if (!Array.isArray(governed) || governed.length === 0) {
+    throw new TypeError(
+      'calibrateConcentrationLimit: `governed` must be the distribution this limit '
+      + 'will govern — a limit derived without one cannot be shown to transfer',
+    );
+  }
   const percentile = Number.isFinite(options.percentile) ? options.percentile : 0.90;
+  const tolerance = Number.isFinite(options.tolerance) ? options.tolerance : 0.10;
+  const target = 1 - percentile;
+
   const sorted = [...samples].sort((a, b) => a - b);
-  // Nearest-rank percentile: the limit is the smallest value whose clearance
-  // fraction is ≤ 1−p, i.e. the boundary of the top (1−p) fraction. For
-  // p=0.90 over 100 samples that is index 90 (the top decile clears it).
   const index = Math.min(
     sorted.length - 1,
-    Math.max(0, Math.ceil(percentile * sorted.length)),
+    Math.max(0, Math.floor(percentile * sorted.length)),
   );
   const limit = sorted[index];
-  const clearedBy = samples.filter((value) => value >= limit).length;
-  const clearedFraction = clearedBy / samples.length;
+
+  const clearedFraction = samples.filter((value) => value >= limit).length / samples.length;
+  const governedFraction = governed.filter((value) => value >= limit).length / governed.length;
+
+  // A sample of n can resolve no fraction finer than 1/n; asking it for a
+  // narrower tail than it can represent yields a rank, not a percentile.
+  const minimumSamples = target > 0 ? Math.ceil(1 / target) : 1;
 
   let reason = null;
-  if (clearedFraction === 0) {
-    reason = `limit ${limit} is unreachable — 0% of ${samples.length} samples clear it`;
-  } else if (clearedFraction === 1) {
-    reason = `limit ${limit} always fires — 100% of ${samples.length} samples clear it`;
+  if (samples.length < minimumSamples) {
+    reason = `${samples.length} samples cannot resolve the top ${(target * 100).toFixed(0)}% `
+      + `— ${minimumSamples} required`;
+  } else if (governedFraction === 0) {
+    reason = `limit ${limit} is unreachable — 0% of the ${governed.length} governed values clear it`;
+  } else if (governedFraction === 1) {
+    reason = `limit ${limit} always fires — 100% of the ${governed.length} governed values clear it`;
+  } else if (Math.abs(governedFraction - target) > tolerance) {
+    reason = `limit ${limit} does not transfer — ${(governedFraction * 100).toFixed(1)}% of the `
+      + `${governed.length} governed values clear it, target ${(target * 100).toFixed(0)}% `
+      + `±${(tolerance * 100).toFixed(0)}`;
   }
 
-  return { limit, clearedFraction, admissible: reason === null, reason };
+  return { limit, clearedFraction, governedFraction, admissible: reason === null, reason };
 }
