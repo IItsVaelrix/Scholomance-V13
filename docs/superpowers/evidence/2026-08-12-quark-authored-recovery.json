@@ -1,0 +1,25 @@
+{
+  "contract": "PB-QUARK-CHAMBER-v1",
+  "falsifier": "F2-authored-bridge-recovery",
+  "prereg": "docs/superpowers/evidence/2026-08-12-PREREG-quark-chamber.md",
+  "preregSha256": "7a58617a07d47b9472841e82ac5d6049b62907e04f4fee89bc4871a014b0050d",
+  "bonferroniThreshold": 0.0125,
+  "substrate": {
+    "atoms": 56,
+    "authoredBridges": 20
+  },
+  "real": {
+    "heldOut": 20,
+    "recovered": 0,
+    "recall": 0,
+    "recoveredPairs": [],
+    "candidateCount": 8
+  },
+  "nullMean": 0.005,
+  "nullSd": 0.0705,
+  "z": -0.0709,
+  "p": 1,
+  "shuffles": 200,
+  "verdict": "FAILS",
+  "checksum": "811eaa26acdb9d871cad0471bfca7a8ff1b0c48f5e78b721e5c1f540813c94f2"
+}
