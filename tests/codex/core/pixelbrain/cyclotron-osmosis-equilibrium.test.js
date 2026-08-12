@@ -15,6 +15,12 @@ const BANK = [
   ATOM('end-d', 'evidence ledger structure sink', 'artifact', ['port-d'], ['port-c'], 0.90),
 ];
 
+/**
+ * Calibrated for this four-atom test bank by the p90 of its own crowding.
+ * There is no portable default: see `no portable concentration limit` below.
+ */
+const BANK_CONCENTRATION_LIMIT = 0.83;
+
 const RUN = (overrides = {}) => ({
   atoms: BANK,
   trialCount: 600,
@@ -29,7 +35,61 @@ const RUN = (overrides = {}) => ({
   nucleusScoreFloor: 0.60,
   nucleusNoveltyFloor: 0.20,
   nucleusMinDomains: 3,
+  osmosisConcentrationLimit: BANK_CONCENTRATION_LIMIT,
   ...overrides,
+});
+
+describe('no portable concentration limit', () => {
+  // 2026-08-12: `osmosisConcentrationLimit` had a default of 0.904402, derived
+  // on a synthetic chain. It fired on 91% of the 44-atom ritual bank and 0% of
+  // the 56-atom full bank. Occupancy heat is a weighted log of revisit counts,
+  // and revisits are a function of how small the reachable graph is — so heat
+  // measures graph size as much as crowding and no absolute threshold over it
+  // transfers between banks. The option is therefore required, not defaulted.
+  it('refuses to run without a caller-supplied limit', () => {
+    const { osmosisConcentrationLimit, ...withoutLimit } = RUN();
+    expect(() => runSemanticValenceCyclotron(withoutLimit))
+      .toThrow(/osmosisConcentrationLimit/);
+  });
+
+  it('names the calibrator in the refusal', () => {
+    const { osmosisConcentrationLimit, ...withoutLimit } = RUN();
+    expect(() => runSemanticValenceCyclotron(withoutLimit))
+      .toThrow(/calibrate-osmotic-membrane/);
+  });
+});
+
+describe('misplaced entropy options are refused, not dropped', () => {
+  // 2026-08-12: `normalizeConfig` reads only `options.entropy?.*`, so every
+  // caller passing the flat `entropyEnabled` form got the DEFAULT instead of
+  // what it asked for. `ablate-codebase-nuclei.mjs` ran an arm named
+  // `entropy_off` that was byte-identical to its own controls
+  // (nucleiTopo=29, proposals=12, collapse=0.326), and the shipped evidence
+  // recorded `entropyEnabled: false` for it. Silent option-dropping turned a
+  // manipulation into a label.
+  it('rejects a flat entropyEnabled instead of silently ignoring it', () => {
+    expect(() => runSemanticValenceCyclotron(RUN({ entropyEnabled: false })))
+      .toThrow(/entropy\.enabled/);
+  });
+
+  it('rejects every flat entropy tuning key', () => {
+    for (const key of [
+      'entropyDecayLambda',
+      'entropyExactWeight',
+      'entropyFamilyWeight',
+      'entropyNeighborhoodWeight',
+      'entropyEscapeAttempts',
+      'entropyActivationHeat',
+    ]) {
+      expect(() => runSemanticValenceCyclotron(RUN({ [key]: 1 })), key)
+        .toThrow(/entropy\./);
+    }
+  });
+
+  it('accepts the nested form', () => {
+    const report = runSemanticValenceCyclotron(RUN({ entropy: { enabled: false } }));
+    expect(report.configuration.entropy.enabled).toBe(false);
+  });
 });
 
 const ENERGY_WEIGHT = 0.50 / 0.85;

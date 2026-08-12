@@ -65,9 +65,8 @@ const DEFAULTS = Object.freeze({
   nucleusMinDomains: 3,
   osmosisSimilarityFloor: 0.83,
   osmosisDriftCeiling: 0.17,
-  // Derived, not guessed: scripts/calibrate-osmotic-membrane.mjs, seed
-  // 0x4f534d4f, 8000 trials, p90 of measured crowding (2026-08-12).
-  osmosisConcentrationLimit: 0.904402,
+  // osmosisConcentrationLimit has NO default and is required — see
+  // requireConcentrationLimit below.
   entropyEnabled: true,
   entropyDecayLambda: 0.35,
   entropyExactWeight: 4,
@@ -169,6 +168,49 @@ function normalizeBridgeRule(input = {}) {
   });
 }
 
+/** Flat option name → the nested path that actually configures it. */
+const FLAT_ENTROPY_KEYS = Object.freeze({
+  entropyEnabled: 'entropy.enabled',
+  entropyDecayLambda: 'entropy.decayLambda',
+  entropyExactWeight: 'entropy.exactWeight',
+  entropyFamilyWeight: 'entropy.familyWeight',
+  entropyNeighborhoodWeight: 'entropy.neighborhoodWeight',
+  entropyEscapeAttempts: 'entropy.escapeAttempts',
+  entropyActivationHeat: 'entropy.activationHeat',
+});
+
+/**
+ * `osmosisConcentrationLimit` is required and has no default.
+ *
+ * Crowding is `h/(1+h)` over occupancy heat, and heat is a weighted log of
+ * revisit counts — which are a function of how small the reachable graph is.
+ * Heat therefore measures graph size as much as it measures crowding, and no
+ * absolute threshold over it transfers between banks. Measured 2026-08-12: the
+ * ritual-bank-calibrated 0.940198 clears 13.3% of the 44-atom ritual bank and
+ * 0.0% of the 56-atom full bank; the previously shipped 0.904402 cleared 91%
+ * and 84% respectively. A default here is a number that is arbitrary on every
+ * substrate but the one it came from.
+ */
+function requireConcentrationLimit(value) {
+  if (value === undefined) {
+    fail(
+      'osmosisConcentrationLimit is required and has no default: calibrate it for '
+      + 'this atom bank with scripts/calibrate-osmotic-membrane.mjs. No constant is '
+      + 'portable across banks — occupancy heat scales with graph size.',
+      { field: 'osmosisConcentrationLimit' },
+    );
+  }
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed < 0 || parsed > 1) {
+    fail(
+      'osmosisConcentrationLimit must be finite in 0..1',
+      { field: 'osmosisConcentrationLimit', value },
+      ERROR_CATEGORIES.RANGE,
+    );
+  }
+  return parsed;
+}
+
 function normalizeConfig(options) {
   const integer = (value, fallback, min, max, field) => {
     const parsed = value === undefined ? fallback : Number(value);
@@ -191,6 +233,20 @@ function normalizeConfig(options) {
     }
     return parsed;
   };
+  // Entropy tuning is read exclusively from the nested `entropy` object. The
+  // flat form was silently dropped, so every caller using it got the DEFAULT
+  // rather than what it asked for: `ablate-codebase-nuclei.mjs` shipped an arm
+  // named `entropy_off` that was byte-identical to its own controls, and the
+  // evidence recorded the manipulation as though it had happened. An option
+  // this engine does not honour must be refused, not ignored.
+  for (const [flat, nested] of Object.entries(FLAT_ENTROPY_KEYS)) {
+    if (options[flat] !== undefined) {
+      fail(
+        `${flat} is not a recognised option — entropy tuning is nested: use ${nested}`,
+        { field: flat, nested, value: options[flat] },
+      );
+    }
+  }
   const entropyEnabled = options.entropy?.enabled ?? DEFAULTS.entropyEnabled;
   if (typeof entropyEnabled !== 'boolean') {
     fail('entropy.enabled must be boolean', { field: 'entropy.enabled', value: entropyEnabled });
@@ -240,11 +296,7 @@ function normalizeConfig(options) {
     nucleusMinDomains: integer(options.nucleusMinDomains, DEFAULTS.nucleusMinDomains, 2, 6, 'nucleusMinDomains'),
     osmosisSimilarityFloor: unit(options.osmosisSimilarityFloor, DEFAULTS.osmosisSimilarityFloor, 'osmosisSimilarityFloor'),
     osmosisDriftCeiling: unit(options.osmosisDriftCeiling, DEFAULTS.osmosisDriftCeiling, 'osmosisDriftCeiling'),
-    osmosisConcentrationLimit: unit(
-      options.osmosisConcentrationLimit,
-      DEFAULTS.osmosisConcentrationLimit,
-      'osmosisConcentrationLimit',
-    ),
+    osmosisConcentrationLimit: requireConcentrationLimit(options.osmosisConcentrationLimit),
     entropyEnabled,
     entropyDecayLambda: finite(
       options.entropy?.decayLambda,

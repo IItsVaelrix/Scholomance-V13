@@ -36,6 +36,16 @@ import {
 import { sha256Hex } from '../codex/core/immunity/cleri-probe/canonical-report.js';
 import { verdictAdmissible } from '../codex/core/pixelbrain/gate-reachability.js';
 
+/**
+ * This script builds its own synthetic banks, so neither calibrated constant
+ * applies. It runs with entropy disabled, where the limit steers nothing: it
+ * only colours the `anomalyKind` reported on each candidate. Declared here so
+ * the value is visibly local and visibly uncalibrated rather than borrowed
+ * from a bank this script never uses.
+ */
+const INERT_CONCENTRATION_LIMIT = 0.5;
+
+
 const OUT_JSON = 'docs/superpowers/evidence/2026-08-11-super-heavy-nucleus-attack.json';
 const OUT_MD = 'docs/superpowers/evidence/2026-08-11-super-heavy-nucleus-attack.md';
 const SEED = 0x48454156; // HEAV
@@ -108,6 +118,7 @@ function probeConfigCeiling() {
       atoms,
       trialCount: 10,
       seed: SEED,
+      osmosisConcentrationLimit: INERT_CONCENTRATION_LIMIT,
       maxMoleculeSize: 12, // above hard cap of 6
     });
     return {
@@ -208,13 +219,14 @@ function main() {
     controlEvery: 5,
     controlPercentile: 0.99,
     shortlistLimit: 256,
+    osmosisConcentrationLimit: INERT_CONCENTRATION_LIMIT,
     shortlistFamilyCap: 4,
     noveltyFloor: config.noveltyFloor,
     finalScoreFloor: config.finalScoreFloor,
     nucleusScoreFloor: config.nucleusScoreFloor,
     nucleusNoveltyFloor: config.nucleusNoveltyFloor,
     nucleusMinDomains: config.nucleusMinDomains,
-    entropyEnabled: false,
+    entropy: { enabled: false },
   });
   if (!verifySemanticCyclotronReport(report)) {
     throw new Error('report checksum failed');

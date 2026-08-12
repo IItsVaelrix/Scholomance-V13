@@ -34,6 +34,16 @@ import {
 import { sha256Hex } from '../codex/core/immunity/cleri-probe/canonical-report.js';
 import { verdictAdmissible } from '../codex/core/pixelbrain/gate-reachability.js';
 
+/**
+ * This script builds its own synthetic banks, so neither calibrated constant
+ * applies. It runs with entropy disabled, where the limit steers nothing: it
+ * only colours the `anomalyKind` reported on each candidate. Declared here so
+ * the value is visibly local and visibly uncalibrated rather than borrowed
+ * from a bank this script never uses.
+ */
+const INERT_CONCENTRATION_LIMIT = 0.5;
+
+
 const OUT_JSON = 'docs/superpowers/evidence/2026-08-11-architectural-density-control.json';
 const OUT_MD = 'docs/superpowers/evidence/2026-08-11-architectural-density-control.md';
 const SEED = 0x44454e53; // DENS
@@ -350,13 +360,14 @@ function runArm(name, bank, trials) {
     controlEvery: 5,
     controlPercentile: 0.99,
     shortlistLimit: 256,
+    osmosisConcentrationLimit: INERT_CONCENTRATION_LIMIT,
     shortlistFamilyCap: 4,
     noveltyFloor: FLOORS.noveltyFloor,
     finalScoreFloor: FLOORS.finalScoreFloor,
     nucleusScoreFloor: FLOORS.nucleusScoreFloor,
     nucleusNoveltyFloor: FLOORS.nucleusNoveltyFloor,
     nucleusMinDomains: FLOORS.nucleusMinDomains,
-    entropyEnabled: false,
+    entropy: { enabled: false },
   });
   if (!verifySemanticCyclotronReport(report)) {
     throw new Error(`${name}: report seal failed`);

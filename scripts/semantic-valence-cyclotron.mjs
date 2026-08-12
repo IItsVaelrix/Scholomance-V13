@@ -7,7 +7,7 @@
  * The script writes no per-trial prose and asks no model to propose bonds.
  */
 
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { performance } from 'node:perf_hooks';
 import { pathToFileURL } from 'node:url';
 import {
@@ -19,6 +19,11 @@ import {
   loadEncyclopediaIndex,
   prepareForSynthesize,
 } from '../codex/core/pixelbrain/grounding-index.js';
+import {
+  senseValenceCompile,
+  exitCodeForReading,
+} from '../codex/core/pixelbrain/process-sensor-valence-wire.js';
+import { sha256Hex } from '../codex/core/immunity/cleri-probe/canonical-report.js';
 
 const DEFAULT_OUTPUT_PATH = 'docs/superpowers/evidence/2026-08-11-semantic-valence-cyclotron-100k.json';
 const DEFAULT_TRIALS = 100_000;
@@ -39,6 +44,59 @@ function parseStringFlag(name) {
   const prefix = `--${name}=`;
   const raw = process.argv.slice(2).find((arg) => arg.startsWith(prefix));
   return raw ? raw.slice(prefix.length) : null;
+}
+
+function hasFlag(name) {
+  return process.argv.slice(2).includes(`--${name}`);
+}
+
+/**
+ * process-sensor + valence-compiler wire (shell side).
+ * Loads an approved baseline for the report's input class from the C-sensor ledger
+ * when present; never promotes a baseline. Exit code follows sensor policy.
+ */
+function runProcessSensorWire(report, ledgerPath) {
+  let baseline = null;
+  if (ledgerPath && existsSync(ledgerPath)) {
+    const ledger = JSON.parse(readFileSync(ledgerPath, 'utf8'));
+    const { checksum, ...body } = ledger;
+    const expected = `cyclosensor-ledger1:${sha256Hex(body)}`;
+    if (checksum !== expected) {
+      console.error('REFUSED LEDGER_SEAL_MISMATCH: process-sensor wire will not assess against a broken ledger');
+      process.exitCode = 2;
+      return;
+    }
+    // Provisional: assess needs a baseline object; resolve exact class after receipt build.
+    // senseValenceCompile builds the receipt — we pass null first then re-assess if needed.
+    // Simpler: pass the full baselines map by building receipt inside wire... wire takes one baseline.
+    // Build once via wire with null to get inputClass, then re-sense with match.
+    const probe = senseValenceCompile(report, null);
+    baseline = ledger.baselines?.[probe.receipt.inputClass] ?? null;
+    // If exact class miss, pick sole same-contract baseline (same rule as cyclotron-sensor shell).
+    if (!baseline) {
+      const candidates = Object.values(ledger.baselines ?? {}).filter(
+        (row) => row?.contract === probe.receipt.contract
+          && row?.schemaVersion === probe.receipt.schemaVersion,
+      );
+      if (candidates.length === 1) baseline = candidates[0];
+    }
+  }
+
+  const result = senseValenceCompile(report, baseline);
+  console.log('');
+  console.log('── process-sensor + valence-compiler ──');
+  console.log(`frontier    ${result.frontierSize} candidates (valence-compiler surface)`);
+  console.log(`feasibility ${result.hasFeasibility ? 'present' : 'absent'}`);
+  console.log(`inputClass  ${result.receipt.inputClass}`);
+  console.log(`receipt     ${result.seal.checksum}`);
+  console.log(`VERDICT     ${result.reading.verdict}${result.reading.reason ? ` (${result.reading.reason})` : ''}`);
+  for (const name of result.reading.differing ?? []) {
+    console.log(`  input changed  ${name}`);
+  }
+  for (const m of result.reading.moved ?? []) {
+    console.log(`  output moved   ${m.field}`);
+  }
+  process.exitCode = exitCodeForReading(result.reading);
 }
 
 function resolveOutputPath(trialCount) {
@@ -113,6 +171,16 @@ export const ATOM_BLUEPRINTS = Object.freeze([
   atom('evidence-ledger', 'content addressed evidence ledger', 'memory', ['structure'], ['experiment-receipt', 'validation-verdict'], 'docs/superpowers/evidence'),
 ]);
 
+/**
+ * Membrane permeability calibrated for THIS bank: p90 of measured crowding,
+ * derived at seed 0x4f534d4f and validated at 0x484f4c44.
+ * Evidence: docs/superpowers/evidence/2026-08-12-osmotic-equilibrium.md
+ *
+ * Not portable. It clears 0.0% of the 56-atom full bank. See
+ * FULL_BANK_CONCENTRATION_LIMIT in codex/core/pixelbrain/codebase-nuclei-bank.js.
+ */
+export const RITUAL_CONCENTRATION_LIMIT = 0.940172;
+
 export const BRIDGE_RULES = Object.freeze([
   { from: 'phoneme-topology', to: 'dense-vector', relation: 'projects', strength: 0.92 },
   { from: 'semantic-topology', to: 'dense-vector', relation: 'projects', strength: 0.94 },
@@ -155,6 +223,7 @@ function main() {
     nucleusScoreFloor: 0.765,
     nucleusNoveltyFloor: 0.32,
     nucleusMinDomains: 3,
+    osmosisConcentrationLimit: RITUAL_CONCENTRATION_LIMIT,
   });
   const elapsedMs = performance.now() - started;
 
@@ -185,6 +254,13 @@ function main() {
       candidate.conceptChemistry.stability.padEnd(10),
       candidate.molecule.atomIds.join(' + '),
     ].join('  '));
+  }
+
+  // process-sensor + valence-compiler: optional wire. Never auto-approves baselines.
+  if (hasFlag('sensor')) {
+    const ledgerPath = parseStringFlag('sensor-ledger')
+      ?? 'docs/superpowers/evidence/CYCLOTRON-SENSOR-LEDGER.json';
+    runProcessSensorWire(report, ledgerPath);
   }
 }
 
