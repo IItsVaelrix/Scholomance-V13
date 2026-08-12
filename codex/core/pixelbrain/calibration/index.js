@@ -54,11 +54,34 @@ export function verifyInvariants(synthesizeFn) {
 
     const byId = Object.fromEntries(scored.map((s) => [s.id, s]));
 
-    // Invariant 1: top reaction must be STABLE
-    if (INVARIANTS.topReactionMustBeStable) {
+    // Invariant 1: the top reaction must lead every control by a margin.
+    //
+    // MADE ORDINAL 2026-08-12. This formerly asserted `stability === 'STABLE'`
+    // and `feasibility >= 0.55`, both ABSOLUTE. WEIGHTS_V2 compresses the scale
+    // downward — it raised discrimination while lowering the mean — so the top
+    // reaction now scores 0.5149 and nothing on this set reaches STABLE_MIN.
+    //
+    // Re-freezing the absolute numbers would have made the STABLE tier
+    // unreachable here, i.e. a tier that can never be entered guarding a check
+    // that can never fail. Concept Chemistry is ORDINAL, not a classifier, and
+    // the controls are what set the bar — so the invariant now says what it
+    // always meant: the best real reaction must beat every planted control, and
+    // by enough that the gap is not noise.
+    if (INVARIANTS.topReactionMustLeadControls) {
       const top = byId[INVARIANTS.topReactionId];
-      const ok = top && top.stability === 'STABLE' && top.feasibility >= INVARIANTS.topReactionMinFeasibility;
-      details.push({ case: cal.CALIBRATION_ID, invariant: 'topReactionStable', ok, actual: top?.stability, feasibility: top?.feasibility });
+      const controls = INVARIANTS.controlIds.map((id) => byId[id]).filter(Boolean);
+      const margin = controls.length
+        ? Math.min(...controls.map((c) => top.feasibility - c.feasibility))
+        : 0;
+      const ok = Boolean(top) && controls.length > 0 && margin >= INVARIANTS.topReactionMinControlMargin;
+      details.push({
+        case: cal.CALIBRATION_ID,
+        invariant: 'topReactionLeadsControls',
+        ok,
+        feasibility: top?.feasibility,
+        margin: Math.round(margin * 1e4) / 1e4,
+        required: INVARIANTS.topReactionMinControlMargin,
+      });
       ok ? passed++ : failed++;
     }
 

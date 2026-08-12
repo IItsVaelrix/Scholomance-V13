@@ -81,14 +81,24 @@ describe('Calibration Registry', () => {
       expect(report.passed).toBeGreaterThanOrEqual(5);
     });
 
-    it('top reaction (R1) is STABLE with feasibility >= 0.55', () => {
-      const r1 = cal001.REACTIONS.find((r) => r.id === 'R1');
-      const live = synthesize({
-        a: r1.a, b: r1.b, product: r1.product,
-        groundingA: r1.groundingA, groundingB: r1.groundingB,
-      });
-      expect(live.stability).toBe('STABLE');
-      expect(live.feasibility).toBeGreaterThanOrEqual(0.55);
+    // MADE ORDINAL 2026-08-12, mirroring INVARIANTS.topReactionMustLeadControls.
+    // The old form asserted an absolute class and an absolute 0.55 floor; under
+    // WEIGHTS_V2 nothing on this set reaches STABLE_MIN, and re-freezing the
+    // numbers would guard a tier that can no longer be entered. What the case
+    // actually needs to prove is that the best real reaction beats every planted
+    // control, which is what Concept Chemistry's ordinal reading supports.
+    it('top reaction (R1) leads every control by a clear margin', () => {
+      const score = (r) => synthesize({
+        a: r.a, b: r.b, product: r.product,
+        groundingA: r.groundingA, groundingB: r.groundingB,
+      }).feasibility;
+      const r1 = score(cal001.REACTIONS.find((r) => r.id === 'R1'));
+      for (const id of cal001.INVARIANTS.controlIds) {
+        const control = score(cal001.REACTIONS.find((r) => r.id === id));
+        expect(r1 - control).toBeGreaterThanOrEqual(cal001.INVARIANTS.topReactionMinControlMargin);
+      }
+      // Measured 2026-08-12: tightest margin is 0.2066, against CTRL-FF.
+      expect(r1).toBeGreaterThan(0);
     });
 
     it('law violation (CTRL-LAW) is killed at 0.000', () => {

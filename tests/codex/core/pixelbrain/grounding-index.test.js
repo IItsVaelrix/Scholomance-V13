@@ -21,7 +21,7 @@ import {
   PMI_FLOOR,
   SCHEMA,
 } from '../../../../codex/core/pixelbrain/grounding-index.js';
-import { synthesize } from '../../../../codex/core/pixelbrain/concept-chemistry.js';
+import { synthesize, relationScore } from '../../../../codex/core/pixelbrain/concept-chemistry.js';
 
 // ─── Test corpus (small, controlled) ─────────────────────────────────
 
@@ -272,6 +272,47 @@ describe('Grounding Index (PB-GROUNDING-v1)', () => {
       expect(unattested.grounding).toBe(0);
       expect(unattested.feasibility).toBeLessThan(0.1);
     });
+
+    // The property nobody tested, which is why the inversion shipped.
+    it('does not reward ignorance: an unattested pair cannot outscore an attested co-occurring pair', () => {
+      // Every token attested AND co-occurring in the corpus.
+      const known = synthesize({
+        a: 'sealed packet canonical serialization',
+        b: 'checksum content-addressed identity',
+        product: 'content-addressed sealed packet',
+        index: idx,
+      });
+
+      // Not one token of `b` appears anywhere in the corpus.
+      const ignorant = synthesize({
+        a: 'sealed packet canonical serialization',
+        b: 'zzyzx quixotry brillig slithy toves',
+        product: 'sealed zzyzx equivalence',
+        index: idx,
+      });
+
+      expect(ignorant.feasibility).toBeLessThan(known.feasibility);
+    });
+
+    it('reports coverage so a low-evidence pair cannot claim a confident signal', () => {
+      const pmi = conceptPMI(idx, 'checksum content-addressed hash', 'dense latent vector embedding neural');
+      expect(pmi.crossPairs).toBeGreaterThan(pmi.pairs);   // unattested tokens are counted, not dropped
+      expect(pmi.coverage).toBeLessThan(0.5);
+      expect(relationScore(pmi, idx.baseCooccurRate).relation).toBeLessThan(0.75);
+    });
+
+    it('measures the corpus co-occurrence base rate rather than assuming one', () => {
+      // Never-co-occurring is this substrate's DEFAULT state, so the base rate must
+      // come from the corpus. Measured 2026-08-12: ~0.176 here, ~0.034 for the real
+      // encyclopedia index. A hardcoded constant would be wrong on both.
+      expect(idx.baseCooccurRate).toBeGreaterThan(0);
+      expect(idx.baseCooccurRate).toBeLessThan(1);
+    });
+
+    it('abstains rather than inventing a rate when the index has none', () => {
+      const pmi = conceptPMI(idx, 'sealed packet canonical serialization', 'checksum content-addressed identity');
+      expect(relationScore(pmi, undefined).basis).toBe('NO_SIGNAL');
+    });
   });
 
   describe('100-iteration determinism replay', () => {
@@ -292,6 +333,11 @@ describe('Grounding Index (PB-GROUNDING-v1)', () => {
   });
 
   describe('backward compatibility', () => {
+    // RECALIBRATED 2026-08-12 for WEIGHTS_V2. This is the EXPLICIT grounding path,
+    // which takes no index, so `relation` abstains and its weight redistributes —
+    // the false-friend repair does not touch this number. The move from 0.629 to
+    // 0.5149 comes from WEIGHTS_V2 plus residualCoherence (REPAIR 2), both of which
+    // are deliberate. The frozen constant was a v1 value in a v2 world.
     it('CAL-001 explicit grounding still produces same feasibility', () => {
       // From calibration-001: R1 with explicit groundingA=0.85, groundingB=0.90
       const r = synthesize({
@@ -301,8 +347,10 @@ describe('Grounding Index (PB-GROUNDING-v1)', () => {
         groundingA: 0.85,
         groundingB: 0.90,
       });
-      expect(r.feasibility).toBe(0.629);
-      expect(r.stability).toBe('STABLE');
+      expect(r.feasibility).toBe(0.5149);
+      // stabilityClass() is a pure function of feasibility, so the class follows
+      // the recalibrated score mechanically. Not an independent regression.
+      expect(r.stability).toBe('METASTABLE');
       expect(r.groundingSource).toBe('explicit');
     });
   });
@@ -392,7 +440,7 @@ describe('FIX #2: PMI signed co-occurrence over paragraph windows', () => {
   });
 });
 
-describe('FIX #2/#3: synthesize surfaces PMI + bond sign as diagnostics, not scores', () => {
+describe('FIX #2/#3: synthesize surfaces bond sign as a diagnostic; PMI is a scored channel (v2)', () => {
   const idx = prepareForSynthesize(buildIndex(PMI_CORPUS));
 
   it('attaches corpusPMI when an index is provided', () => {
@@ -408,14 +456,24 @@ describe('FIX #2/#3: synthesize surfaces PMI + bond sign as diagnostics, not sco
     expect(r.bondMagnitude).toBe(Math.round(Math.abs(r.bond) * 1e4) / 1e4);
   });
 
-  it('corpusPMI does NOT alter feasibility (diagnostic only, not a weight)', () => {
+  // CONTRACT REVERSED by f343f375 and completed 2026-08-12. This test formerly
+  // asserted "corpusPMI does NOT alter feasibility (diagnostic only, not a
+  // weight)". Folding PMI in IS the point of WEIGHTS_V2 — it is the only channel
+  // that asks whether two concepts belong together — so the old assertion can
+  // never hold again and asserting it would pin the module to a contract it
+  // deliberately left.
+  it('corpusPMI DOES enter feasibility, weighted by coverage and base rate', () => {
+    // PMI_CORPUS: alpha/beta share a window, gamma/delta share another, and the
+    // two groups never co-occur — so every cross pair is attested (coverage 1.0)
+    // and none of them co-occur (cooccurRate 0).
     const r = synthesize({ a: 'alpha beta', b: 'gamma delta', product: 'alpha gamma merge', index: idx });
-    // Recompute feasibility purely from bond/grounding/coherence/lawScale —
-    // the three scored channels. If PMI were wired in, this would diverge.
+    // The v1 three-channel sum is no longer the whole score.
     const W_BOND = 0.15, W_GROUND = 0.65, W_COHERE = 0.20;
-    const raw = W_BOND * r.bond + W_GROUND * r.grounding + W_COHERE * r.coherence;
-    const expected = raw * r.lawScale;
-    expect(r.feasibility).toBeCloseTo(expected, 3);
+    const v1Raw = W_BOND * r.bond + W_GROUND * r.grounding + W_COHERE * r.coherence;
+    expect(r.feasibility).not.toBeCloseTo(v1Raw * r.lawScale, 3);
+    expect(r.corpusPMI).toBeDefined();
+    expect(r.corpusPMI.coverage).toBeGreaterThan(0);
+    expect(r.corpusPMI.cooccurRate).toBeGreaterThanOrEqual(0);
   });
 
   it('no corpusPMI when explicit grounding is used (index path not taken)', () => {

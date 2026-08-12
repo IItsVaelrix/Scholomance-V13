@@ -18,6 +18,7 @@ import {
   synthesize,
   bondEnergy,
   weights,
+  WEIGHTS_V2,
 } from '../../../../codex/core/pixelbrain/concept-chemistry.js';
 import {
   phonotopographicSimilarity,
@@ -111,12 +112,20 @@ describe('phonoBond — diagnostic only, does not affect feasibility', () => {
 
   it('feasibility formula does not include phonoBond', () => {
     const r = react('knight', 'night', 'armored darkness', 0.5, 0.5);
-    // Manually recompute: W_BOND * bond + W_GROUND * grounding + W_COHERE * coherence
-    const expected = weights.W_BOND * r.bond
-      + weights.W_GROUND * r.grounding
-      + weights.W_COHERE * r.coherence;
+    // RECALIBRATED 2026-08-12 for WEIGHTS_V2. The claim under test is unchanged —
+    // phonoBond must not reach the score — but the formula it is checked against
+    // is now the v2 one. This is the EXPLICIT grounding path, so there is no
+    // corpus index, `relation` abstains (NO_SIGNAL), and synthesize redistributes
+    // its weight proportionally across the three channels that do have signal.
+    const rest = WEIGHTS_V2.bond + WEIGHTS_V2.grounding + WEIGHTS_V2.coherence;
+    const scale = (rest + WEIGHTS_V2.relation) / rest;
+    const expected = WEIGHTS_V2.bond * scale * r.bond
+      + WEIGHTS_V2.grounding * scale * r.grounding
+      + WEIGHTS_V2.coherence * scale * r.coherence;
     // law scale is 0.7 (neutral) for 'armored darkness'
     expect(r.feasibility).toBeCloseTo(expected * r.lawScale, 4);
+    // phonoBond is surfaced as a diagnostic and must stay out of the score.
+    expect(r.phonoBond).toBeDefined();
   });
 
   it('two reactions with different phonoBond but same inputs have same feasibility', () => {

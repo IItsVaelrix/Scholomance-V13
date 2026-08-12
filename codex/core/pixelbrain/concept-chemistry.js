@@ -187,21 +187,52 @@ export function residualCoherence(a, b, product) {
  * to express repulsion. PMI can. It is the only channel in this module that asks
  * whether two concepts belong TOGETHER rather than whether each is familiar.
  *
- * Maps signed mean PMI to [0,1] with 0.5 at neutral, then drags toward 0 in
- * proportion to token pairs that never co-occur at all.
+ * REPAIR 4 — the ignorance reward (2026-08-12).
  *
- * @param {{meanPMI:number, pairs:number, flooredNeverCooccur:number}|null} pmi
- * @returns {{relation:number, basis:string}}
+ * The first version of this mapped signed MEAN PMI to [0,1] and dragged toward 0
+ * in proportion to never-co-occurring pairs. That inverted the property this
+ * channel exists to provide: a false friend built from unattested tokens scored
+ * 0.9929 while a real correspondence scored 0.0053. The detector systematically
+ * preferred concepts it COULD NOT MEASURE.
+ *
+ * Root cause: THE FLOOR IS THE BACKGROUND. Only 17.6% of attested token pairs
+ * co-occur in the test corpus and 3.4% in the encyclopedia, so `neverFraction`
+ * read ordinary sparsity as maximum repulsion, driving every measurable pair
+ * toward 0 — while unmeasurable pairs hit NO_SIGNAL, abstained, and kept their
+ * score. Coverage-weighting plus a median for direction was tried and is NOT
+ * sufficient: the median of a distribution that is 82% floor is the floor.
+ *
+ * So direction comes from the pairs that ACTUALLY co-occur (`liveMean`), and
+ * confidence is how much of the cross-product was observable (`coverage`) times
+ * how far the pair's co-occurrence rate exceeds the corpus base rate. A pair
+ * co-occurring at the base rate asserts nothing; one well above it asserts a
+ * relation.
+ *
+ * Derived, not fitted: coverage and cooccurRate are fractions, the base rate is
+ * measured from the index, and 0.5 is the pre-existing neutral point.
+ *
+ * @param {{meanPMI:number, liveMean:number, pairs:number, coverage:number,
+ *          cooccurRate:number, signal:string}|null} pmi
+ * @param {number} baseCooccurRate from the index; absent ⇒ this channel abstains
+ * @returns {{relation:number, basis:string, coverage:number}}
  */
-export function relationScore(pmi) {
+export function relationScore(pmi, baseCooccurRate) {
   if (!pmi || !Number.isFinite(pmi.meanPMI) || pmi.pairs === 0) {
     // No attested token pairs is absence of evidence, not evidence of repulsion.
-    return { relation: 0.5, basis: 'NO_SIGNAL' };
+    // synthesize() redistributes this channel's weight rather than paying 0.5.
+    return { relation: 0.5, basis: 'NO_SIGNAL', coverage: 0 };
   }
-  const centred = (Math.tanh(pmi.meanPMI) + 1) / 2;
-  const neverFraction = pmi.flooredNeverCooccur / Math.max(1, pmi.pairs);
-  const relation = Math.max(0, Math.min(1, centred * (1 - neverFraction)));
-  return { relation, basis: pmi.signal ?? 'NEUTRAL' };
+  const base = Number.isFinite(baseCooccurRate) && baseCooccurRate > 0 ? baseCooccurRate : null;
+  if (base === null) {
+    // An index with no measured base rate cannot support this channel. Abstain
+    // rather than substitute a constant that is arbitrary on every corpus but one.
+    return { relation: 0.5, basis: 'NO_SIGNAL', coverage: pmi.coverage ?? 0 };
+  }
+  const centred = (Math.tanh(pmi.liveMean) + 1) / 2;
+  const coverage = Number.isFinite(pmi.coverage) ? pmi.coverage : 1;
+  const excess = Math.min(1, pmi.cooccurRate / base);
+  const relation = 0.5 + (centred - 0.5) * coverage * excess;
+  return { relation: Math.max(0, Math.min(1, relation)), basis: pmi.signal ?? 'NEUTRAL', coverage };
 }
 
 /**
@@ -333,7 +364,7 @@ export function synthesize({ a, b, product, groundingA, groundingB, index, weigh
   const coherence = cohere.coherence;
 
   // REPAIR 1: the signed relational channel, previously computed and discarded.
-  const rel = useV1 ? { relation: 0, basis: 'V1_DISABLED' } : relationScore(corpusPMI);
+  const rel = useV1 ? { relation: 0, basis: 'V1_DISABLED' } : relationScore(corpusPMI, index?.baseCooccurRate);
 
   // A channel with NO EVIDENCE must ABSTAIN, not award half credit. On the
   // explicit-grounding path there is no corpus index, so PMI is unavailable; paying
