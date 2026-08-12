@@ -89,6 +89,17 @@ describe('buildReceipt', () => {
     const b = buildReceipt(flipped);
     expect(b.outputs.shortlistDigest).toBe(a.outputs.shortlistDigest);
   });
+
+  // The shortlist is ordered by plain code-unit comparison, never
+  // localeCompare — localeCompare is ICU/locale-sensitive, and this digest
+  // must be identical on every machine. The pinned value proves the
+  // comparator swap changed nothing on the fixture, and it alarms on any
+  // future drift of the ordering, the rounding, or the serializer.
+  it('pins the shortlist digest — ordering is locale-independent', () => {
+    const { outputs } = buildReceipt(makeReport());
+    expect(outputs.shortlistDigest)
+      .toBe('shortlist1:c9768835f0cfacd8ea02ab24570fc58f420e74eaa684c310de93598e3d1e681f');
+  });
 });
 
 describe('assess', () => {
@@ -135,7 +146,9 @@ describe('assess', () => {
   });
 
   // Every INPUT field must be able to produce an ABSTAIN — and must never
-  // produce a DEVIATION. Changing an input is not evidence of drift.
+  // produce a DEVIATION. Changing an input is not evidence of drift. The
+  // observed receipt recomputes its own class honestly, exactly as a
+  // legitimate producer must.
   const inputFields = Object.keys(buildReceipt(makeReport()).inputs);
   it.each(inputFields)('ABSTAIN fires and names the changed input field: %s', (field) => {
     const baseline = baselineOf();
@@ -143,11 +156,34 @@ describe('assess', () => {
     observed.inputs[field] = typeof observed.inputs[field] === 'number'
       ? observed.inputs[field] + 1
       : `${JSON.stringify(observed.inputs[field])}-perturbed`;
-    observed.inputClass = 'inclass1:recomputed-elsewhere';
+    observed.inputClass = `inclass1:${sha256Hex(observed.inputs)}`;
     const reading = assess(observed, baseline);
     expect(reading.verdict).toBe('ABSTAIN');
     expect(reading.reason).toBe('INPUT_CLASS_CHANGED');
     expect(reading.differing).toContain(field);
+  });
+
+  // The claimed inputClass must be the hash of the inputs it travels with.
+  // A receipt that keeps the baseline's class while carrying different inputs
+  // is attempting to skip the ABSTAIN branch and be judged on outputs alone.
+  // assess never trusts the claim — it recomputes, and a mismatch is FORGED:
+  // no verdict, never STABLE.
+  it('refuses a receipt whose claimed class matches the baseline but whose inputs moved (FORGED)', () => {
+    const baseline = baselineOf();
+    const forged = baselineOf();
+    forged.inputs.seed = 999;
+    forged.inputClass = baseline.inputClass;
+    const reading = assess(forged, baseline);
+    expect(reading.verdict).toBe('FORGED');
+    expect(reading.reason).toBe('INPUT_CLASS_FORGED');
+  });
+
+  it('refuses a self-inconsistent class before issuing ANY verdict, even with no baseline', () => {
+    const forged = baselineOf();
+    forged.inputClass = 'inclass1:deadbeefdeadbeef';
+    const reading = assess(forged, null);
+    expect(reading.verdict).toBe('FORGED');
+    expect(reading.reason).toBe('INPUT_CLASS_FORGED');
   });
 });
 

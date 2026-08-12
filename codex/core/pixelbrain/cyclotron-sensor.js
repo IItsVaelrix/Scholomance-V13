@@ -73,7 +73,13 @@ export function buildReceipt(report) {
 
   const shortlist = candidates
     .map((row) => [[...(row.molecule?.atomIds ?? [])].sort(), round12(row.finalScore ?? 0)])
-    .sort((a, b) => stableStringify(a).localeCompare(stableStringify(b)));
+    // Code-unit ordering, never localeCompare: the shortlist digest must be
+    // identical on every machine, and localeCompare is ICU/locale-sensitive.
+    .sort((a, b) => {
+      const x = stableStringify(a);
+      const y = stableStringify(b);
+      return x < y ? -1 : x > y ? 1 : 0;
+    });
 
   const outputs = {
     reportChecksum: required(report.checksum, 'checksum'),
@@ -111,6 +117,16 @@ export function assess(receipt, baseline) {
     differing: [],
     moved: [],
   };
+
+  // The claimed inputClass must be the hash of the inputs it travels with.
+  // A receipt that keeps the baseline's class while carrying different inputs
+  // would skip the ABSTAIN branch and be judged on outputs alone — possibly
+  // as STABLE. The claim is never trusted: recompute, and refuse on mismatch.
+  // A forged receipt gets NO verdict, not even NO_BASELINE.
+  if (receipt.inputClass !== `inclass1:${sha256Hex(receipt.inputs ?? {})}`) {
+    return { ...base, verdict: 'FORGED', reason: 'INPUT_CLASS_FORGED' };
+  }
+
   if (!baseline) return base;
 
   if (baseline.contract !== receipt.contract

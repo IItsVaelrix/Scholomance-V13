@@ -11,7 +11,7 @@
  *   node scripts/cyclotron-sensor.mjs --report=<path> --record
  *   node scripts/cyclotron-sensor.mjs --report=<path> --approve --reason="<why>"
  *
- * Exit codes: 0 STABLE/ABSTAIN/NO_BASELINE, 1 DEVIATION, 2 refusal.
+ * Exit codes: 0 STABLE/ABSTAIN/NO_BASELINE, 1 DEVIATION, 2 refusal (incl. FORGED).
  */
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -133,10 +133,24 @@ for (const m of reading.moved) console.log(`  output moved   ${m.field}: ${stabl
 if (has('approve')) {
   const reason = flag('reason');
   if (!reason) refuse('NO_REASON', 'approving a baseline requires --reason="<why>"');
+  // Approval never erases what it replaces: the superseded baseline is
+  // archived under baselineHistory[inputClass], and the new approval names
+  // what it supersedes. The sensor audits the reactor; this keeps the
+  // sensor's own approval trail auditable too.
+  const prior = ledger.baselines[receipt.inputClass];
   ledger.baselines[receipt.inputClass] = {
     ...receipt,
-    approval: { reason, approvedAt: new Date().toISOString(), reportChecksum: receipt.outputs.reportChecksum },
+    approval: {
+      reason,
+      approvedAt: new Date().toISOString(),
+      reportChecksum: receipt.outputs.reportChecksum,
+      ...(prior ? { supersedes: prior.approval ?? null } : {}),
+    },
   };
+  if (prior) {
+    ledger.baselineHistory ??= {};
+    (ledger.baselineHistory[receipt.inputClass] ??= []).push(prior);
+  }
   writeFileSync(ledgerPath, `${JSON.stringify(sealLedger(ledger), null, 2)}\n`, 'utf8');
   console.log(`APPROVED    baseline for ${receipt.inputClass} written to ${ledgerPath}`);
   process.exit(0);
@@ -148,4 +162,4 @@ if (has('record')) {
   console.log(`RECORDED    ${seal.checksum} -> ${ledgerPath}`);
 }
 
-process.exit(reading.verdict === 'DEVIATION' ? 1 : 0);
+process.exit(reading.verdict === 'DEVIATION' ? 1 : reading.verdict === 'FORGED' ? 2 : 0);

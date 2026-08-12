@@ -106,4 +106,30 @@ describe('cyclotron-sensor CLI', () => {
     expect(code).toBe(2);
     expect(stdout).toMatch(/NO_CHEMISTRY_PROVENANCE/);
   });
+
+  it('keeps every superseded approval — re-approval never overwrites history', () => {
+    run([`--report=${reportPath}`, `--ledger=${ledgerPath}`, '--approve', '--reason=first baseline']);
+    const afterFirst = JSON.parse(readFileSync(ledgerPath, 'utf8'));
+    expect(afterFirst.baselineHistory).toBeUndefined();
+    const theClass = Object.keys(afterFirst.baselines)[0];
+
+    // Same inputs (only outputs moved) → same input class → re-approval path.
+    writeFileSync(reportPath, JSON.stringify({
+      ...report, counts: { nuclei: 3, shortlisted: 2 }, checksum: 'cyclotron1:v2',
+    }));
+    const second = run([`--report=${reportPath}`, `--ledger=${ledgerPath}`, '--approve', '--reason=reactor v2']);
+    expect(second.code).toBe(0);
+
+    const ledger = JSON.parse(readFileSync(ledgerPath, 'utf8'));
+    expect(ledger.baselineHistory?.[theClass]).toHaveLength(1);
+    expect(ledger.baselineHistory[theClass][0].approval.reason).toBe('first baseline');
+    expect(ledger.baselines[theClass].approval.reason).toBe('reactor v2');
+    expect(ledger.baselines[theClass].approval.supersedes.reason).toBe('first baseline');
+
+    // The seal covers the new history field — the ledger still verifies, and
+    // the new baseline is immediately usable.
+    const replay = run([`--report=${reportPath}`, `--ledger=${ledgerPath}`]);
+    expect(replay.code).toBe(0);
+    expect(replay.stdout).toMatch(/STABLE/);
+  });
 });
