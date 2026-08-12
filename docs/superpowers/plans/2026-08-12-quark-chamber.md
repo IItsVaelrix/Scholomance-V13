@@ -138,22 +138,50 @@ Commit `f343f375` folded `corpusPMI` into the feasibility score and was committe
 | real correspondence | 25 | −2.4272 | REPULSION | 0.0053 | 0.1478 |
 | false friend | 6 | +2.4717 | ATTRACTION | 0.9929 | 0.5187 |
 
-`relation` is 86.1% of the false friend's score. Two defects compound:
+`relation` is 86.1% of the false friend's score. Three defects compound, and the third is the one that matters most.
 
-1. **Coverage asymmetry.** `conceptPMI` skips pairs where `pmiPair` returns `null` (token unattested). The false friend's `latent`, `embedding`, `neural`, `dense`, `vector` vanish from the denominator, leaving 6 surviving pairs that all co-occur. Unattested tokens cost nothing; attested-but-never-together tokens are floored at `PMI_FLOOR` and cost a great deal. **A concept built from words the corpus has never heard outscores one built from words it knows but does not associate.**
-2. **Floor outlier domination.** The mean over 25 pairs is dragged to −2.43 by 8 floored pairs. An arithmetic mean over a distribution with an arbitrary floor is not robust.
+1. **Coverage asymmetry.** `conceptPMI` skips pairs where `pmiPair` returns `null` (token unattested). The false friend's `latent`, `embedding`, `neural`, `dense`, `vector` vanish from the denominator, leaving 6 surviving pairs that all co-occur. Unattested tokens cost nothing; attested-but-never-together tokens are floored at `PMI_FLOOR` and cost a great deal.
+2. **Floor outlier domination.** The mean over 25 pairs is dragged to −2.43 by 8 floored pairs.
+3. **The floor IS the background.** Measured 2026-08-12 over the full token cross-product: **82.4% of all attested pairs in the test corpus never co-occur — and 96.6% in the real encyclopedia index** (6,680 vocab, 5,116 windows, sampled 32,208 pairs). Never-co-occurring is the *default state of the substrate*, not evidence about a concept pair. Both `neverFraction` and any median therefore read ordinary sparsity as maximal repulsion, and in the production corpus this drives essentially every *measurable* pair toward 0 while *unmeasurable* pairs abstain and keep their score.
 
-The repair is *derived, not fitted*: scale confidence by coverage, and aggregate with a floor-robust statistic. No weight is tuned against the failing tests.
+**The one-sentence statement of the bug: the detector systematically prefers concepts it cannot measure.**
+
+This is why the repair is not a reweighting. Only the ~3–18% of pairs that actually co-occur carry information; the floored majority is background and must be treated as such. Direction comes from the co-occurring pairs alone, and confidence comes from whether they co-occur *more than the corpus base rate*.
+
+**The repair was measured before being prescribed**, on the four discrimination cases (a first attempt using coverage + median fixed the false-friend test but left the second one failing, which is how defect 3 was found):
+
+| case | before | after | `relation` | why |
+|---|---|---|---|---|
+| real correspondence | 0.1478 | **0.5535** | 0.907 | 17/25 pairs co-occur, far above base rate |
+| false friend | 0.5187 | **0.3634** | 0.648 | 30% coverage shrinks its confident +2.47 |
+| bothAttested | 0.1539 | **0.5386** | 0.855 | 3/12 co-occur, still above the 17.6% base |
+| oneForeign | 0.1576 | **0.1576** | abstains | no attested pairs; weight redistributes |
+
+Both orderings the tests demand now hold. No constant was tuned against the tests: coverage and co-occurrence rate are fractions, and the base rate is measured from the index.
+
+**`baseCooccurRate` must be computed from the index, never hardcoded.** It is 0.176 for the 8-document test fixture and ≈0.034 for the real encyclopedia — a 5× difference. A literal here would be the same non-portability trap as `osmosisConcentrationLimit`, which this repo already learned the hard way (`requireConcentrationLimit` refuses to supply a default and says why).
 
 **Files:**
-- Modify: `codex/core/pixelbrain/grounding-index.js` (`conceptPMI` — add coverage fields)
+- Modify: `codex/core/pixelbrain/grounding-index.js` (`conceptPMI` fields; `buildIndex` gains `baseCooccurRate`)
 - Modify: `codex/core/pixelbrain/concept-chemistry.js` (`relationScore`)
-- Test: `tests/codex/core/pixelbrain/grounding-index.test.js` (add the missing property test)
+- Test: `tests/codex/core/pixelbrain/grounding-index.test.js` (new property test; rewrite one stale-contract test; recalibrate one frozen constant)
 - Test: `tests/codex/core/pixelbrain/calibration.test.js` (recalibrate frozen constants)
 
 **Interfaces:**
 - Consumes: nothing.
-- Produces: `conceptPMI` result gains `crossPairs: number` (size of the full token cross-product, excluding self-pairs) and `coverage: number` (`pairs / crossPairs`, `0` when `crossPairs === 0`). `relationScore(pmi)` returns `{relation: number, basis: string, coverage: number}`.
+- Produces:
+  - `buildIndex` result gains `baseCooccurRate: number` — the fraction of attested token pairs in the corpus that co-occur in at least one window. Sampled, deterministically, when the vocabulary is large.
+  - `conceptPMI` result gains `crossPairs: number` (full cross-product excluding self-pairs), `coverage: number` (`pairs / crossPairs`), `live: number` (attested pairs that actually co-occur), `cooccurRate: number` (`live / pairs`), and `liveMean: number` (mean PMI over co-occurring pairs only). `meanPMI` and `signal` keep their exact former values.
+  - `relationScore(pmi, baseCooccurRate)` returns `{relation: number, basis: string, coverage: number}`.
+
+**The four currently-red tests in this file, and what each needs.** Two are the bug; two are not. Do not treat them alike:
+
+| test | status | action |
+|---|---|---|
+| `real correspondence scores higher than false friend` | the bug | fixed by Steps 3–4 |
+| `attested pair scores higher than one attested + one foreign` | the bug | fixed by Steps 3–4 |
+| `CAL-001 explicit grounding still produces same feasibility` (0.5149 vs 0.629) | **not the bug** | explicit path takes no index, so `relation` already abstains. The delta is `WEIGHTS_V2` + `residualCoherence` — a stale v1 constant. Recalibrate in Step 6. |
+| `corpusPMI does NOT alter feasibility (diagnostic only, not a weight)` | **not the bug** | asserts the *old* contract and can never pass under v2. Rewrite in Step 6 to assert the new one. |
 
 - [ ] **Step 1: Write the failing test that should have existed**
 
@@ -182,9 +210,22 @@ it('does not reward ignorance: an unattested pair cannot outscore an attested co
 
 it('reports coverage so a low-evidence pair cannot claim a confident signal', () => {
   const pmi = conceptPMI(idx, 'checksum content-addressed hash', 'dense latent vector embedding neural');
-  expect(pmi.crossPairs).toBeGreaterThan(pmi.pairs);
+  expect(pmi.crossPairs).toBeGreaterThan(pmi.pairs);   // unattested tokens are counted, not dropped
   expect(pmi.coverage).toBeLessThan(0.5);
-  expect(relationScore(pmi).relation).toBeLessThan(0.75);
+  expect(relationScore(pmi, idx.baseCooccurRate).relation).toBeLessThan(0.75);
+});
+
+it('measures the corpus co-occurrence base rate rather than assuming one', () => {
+  // Never-co-occurring is this substrate's DEFAULT state, so the base rate must
+  // come from the corpus. Measured 2026-08-12: ~0.176 here, ~0.034 for the real
+  // encyclopedia index. A hardcoded constant would be wrong on both.
+  expect(idx.baseCooccurRate).toBeGreaterThan(0);
+  expect(idx.baseCooccurRate).toBeLessThan(1);
+});
+
+it('abstains rather than inventing a rate when the index has none', () => {
+  const pmi = conceptPMI(idx, 'sealed packet canonical serialization', 'checksum content-addressed identity');
+  expect(relationScore(pmi, undefined).basis).toBe('NO_SIGNAL');
 });
 ```
 
@@ -209,35 +250,35 @@ export function conceptPMI(index, conceptA, conceptB) {
   const toksB = [...new Set(tokenize(conceptB))];
   let sum = 0, pairs = 0, attractive = 0, repulsive = 0, floored = 0;
   let crossPairs = 0;
-  const observed = [];
+  let liveSum = 0, live = 0;
   for (const ta of toksA) {
     for (const tb of toksB) {
       if (ta === tb) continue; // skip self-pairs
       crossPairs += 1;
       const r = pmiPair(index, ta, tb);
-      if (r.pmi === null) continue; // unattested pair → no signal, but it still counted above
-      observed.push(r.pmi);
+      if (r.pmi === null) continue; // unattested: counted in crossPairs, carries no signal
       sum += r.pmi;
       pairs++;
-      if (r.pmi < 0) {
-        repulsive++;
-        if (r.note && r.note.startsWith('never')) floored++;
+      const isFloored = Boolean(r.note && r.note.startsWith('never'));
+      if (isFloored) {
+        floored++;
       } else {
-        attractive++;
+        // Only pairs that ACTUALLY co-occur carry directional information. The
+        // floored majority is substrate background — 82% of this corpus, 97% of
+        // the encyclopedia — and averaging it in measures corpus sparsity.
+        liveSum += r.pmi;
+        live++;
       }
+      if (r.pmi < 0) repulsive++; else attractive++;
     }
   }
   const meanPMI = pairs === 0 ? 0 : sum / pairs;
-  const sorted = [...observed].sort((a, b) => a - b);
-  const medianPMI = sorted.length === 0
-    ? 0
-    : (sorted.length % 2 === 1
-      ? sorted[(sorted.length - 1) / 2]
-      : (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2);
   const signal = meanPMI < -0.5 ? 'REPULSION' : meanPMI > 0.5 ? 'ATTRACTION' : 'NEUTRAL';
   return {
     meanPMI: round4(meanPMI),
-    medianPMI: round4(medianPMI),
+    liveMean: round4(live === 0 ? 0 : liveSum / live),
+    live,
+    cooccurRate: pairs === 0 ? 0 : round4(live / pairs),
     crossPairs,
     coverage: crossPairs === 0 ? 0 : round4(pairs / crossPairs),
     pairs,
@@ -249,9 +290,47 @@ export function conceptPMI(index, conceptA, conceptB) {
 }
 ```
 
-`meanPMI` and `signal` keep their exact former values, so every existing consumer of those two fields is unaffected.
+`meanPMI` and `signal` keep their exact former values, so every existing consumer of those two fields — including the eight passing `FIX #2` tests — is unaffected.
 
-- [ ] **Step 4: Make `relationScore` coverage-weighted and floor-robust**
+Then add `baseCooccurRate` to `buildIndex`'s returned object. It is the fraction of attested token pairs across the corpus that co-occur in at least one window. Compute it over a deterministic sample when the vocabulary is large, so index construction stays fast:
+
+```js
+/**
+ * The corpus's own co-occurrence base rate. Measured 2026-08-12: 0.176 for the
+ * 8-document test fixture, ~0.034 for the encyclopedia index. NEVER hardcode a
+ * value here — the same non-portability that made `osmosisConcentrationLimit`
+ * refuse to have a default applies exactly.
+ *
+ * Deterministic sample: the first SAMPLE_VOCAB tokens in sorted order.
+ */
+function computeBaseCooccurRate(index, tokens) {
+  const SAMPLE_VOCAB = 180;
+  const sample = [...tokens].sort().slice(0, SAMPLE_VOCAB);
+  let attested = 0, live = 0;
+  for (const ta of sample) {
+    for (const tb of sample) {
+      if (ta === tb) continue;
+      const r = pmiPair(index, ta, tb);
+      if (r.pmi === null) continue;
+      attested += 1;
+      if (!(r.note && r.note.startsWith('never'))) live += 1;
+    }
+  }
+  return attested === 0 ? 0 : round4(live / attested);
+}
+```
+
+Call it at the end of `buildIndex`, after `inverted` and `windowInverted` are populated, and include `baseCooccurRate` on the returned object. **Leave it out of the `grnd1` checksum** — the eight `FIX #2` tests include one asserting the checksum is stable under additive window data, and this is additive in exactly the same sense.
+
+- [ ] **Step 3b: Verify the base rate is measured, not assumed**
+
+```bash
+npx vitest run tests/codex/core/pixelbrain/grounding-index.test.js -t "keeps the grnd1 checksum stable"
+```
+
+Expected: PASS. If this fails, `baseCooccurRate` leaked into the checksum.
+
+- [ ] **Step 4: Make `relationScore` read the co-occurring pairs against the base rate**
 
 In `codex/core/pixelbrain/concept-chemistry.js`, replace `relationScore`:
 
@@ -260,57 +339,104 @@ In `codex/core/pixelbrain/concept-chemistry.js`, replace `relationScore`:
  * REPAIR 4 — the ignorance reward.
  *
  * Measured 2026-08-12: a false friend built from unattested tokens scored
- * relation 0.9929 while a real correspondence scored 0.0053, inverting the
- * property this channel exists to provide. Two causes, both fixed here.
+ * relation 0.9929 while a real correspondence scored 0.0053 — the inverse of
+ * the property this channel exists to provide. The detector systematically
+ * preferred concepts it could not measure.
  *
- * (1) COVERAGE. `conceptPMI` drops unattested pairs, so a pair the corpus
- *     knows nothing about arrives looking unanimous. Confidence is now scaled
- *     by how much of the token cross-product was actually observed: an
- *     unobserved pair pulls toward the neutral 0.5, it does not vanish.
- * (2) ROBUSTNESS. The mean is dominated by `PMI_FLOOR` outliers — 8 floored
- *     pairs dragged a 25-pair mean to -2.43. The median is used for the
- *     direction; `neverFraction` still applies the floored-pair penalty, so
- *     never-co-occurrence is punished once rather than twice.
+ * WHY THE OBVIOUS FIX IS WRONG. The first attempt scaled by coverage and took
+ * the median for direction. It repaired the false-friend case and left the
+ * attested-vs-foreign case still inverted, which exposed the real cause: in
+ * this substrate the FLOOR IS THE BACKGROUND. 82.4% of attested token pairs in
+ * the test corpus never co-occur, and 96.6% in the encyclopedia index. The
+ * median of a distribution that is 82% floor is the floor, and `neverFraction`
+ * reads ordinary sparsity as maximal repulsion. Neither statistic can survive
+ * that, so neither is used.
  *
- * Derived, not fitted: no constant here was chosen by running the tests.
- * Coverage is a fraction, the median is a fraction-free order statistic, and
- * 0.5 is the pre-existing neutral point.
+ * WHAT IS USED. Only the pairs that ACTUALLY co-occur carry information, so
+ * they alone set the direction (`liveMean`). Confidence is how much of the
+ * cross-product was observable (`coverage`) times how far the pair's
+ * co-occurrence rate exceeds the corpus's own base rate. A pair that co-occurs
+ * at the base rate asserts nothing; one well above it asserts a relation.
+ *
+ * Derived, not fitted. Coverage and cooccurRate are fractions, the base rate is
+ * measured from the index, and 0.5 is the pre-existing neutral point. No
+ * constant was chosen by running the tests.
  */
-export function relationScore(pmi) {
+export function relationScore(pmi, baseCooccurRate) {
   if (!pmi || !Number.isFinite(pmi.meanPMI) || pmi.pairs === 0) {
     // No attested token pairs is absence of evidence, not evidence of repulsion.
+    // synthesize() redistributes this channel's weight rather than paying 0.5.
     return { relation: 0.5, basis: 'NO_SIGNAL', coverage: 0 };
   }
-  const direction = Number.isFinite(pmi.medianPMI) ? pmi.medianPMI : pmi.meanPMI;
-  const centred = (Math.tanh(direction) + 1) / 2;
-  const neverFraction = pmi.flooredNeverCooccur / Math.max(1, pmi.pairs);
+  const base = Number.isFinite(baseCooccurRate) && baseCooccurRate > 0 ? baseCooccurRate : null;
+  if (base === null) {
+    // An index without a measured base rate cannot support this channel. Abstain
+    // rather than substitute a constant that is arbitrary on every corpus but one.
+    return { relation: 0.5, basis: 'NO_SIGNAL', coverage: pmi.coverage ?? 0 };
+  }
+  const centred = (Math.tanh(pmi.liveMean) + 1) / 2;
   const coverage = Number.isFinite(pmi.coverage) ? pmi.coverage : 1;
-  // Shrink toward neutral in proportion to unobserved evidence.
-  const confident = 0.5 + (centred - 0.5) * coverage;
-  const relation = Math.max(0, Math.min(1, confident * (1 - neverFraction)));
-  return { relation, basis: pmi.signal ?? 'NEUTRAL', coverage };
+  const excess = Math.min(1, pmi.cooccurRate / base);
+  const relation = 0.5 + (centred - 0.5) * coverage * excess;
+  return { relation: Math.max(0, Math.min(1, relation)), basis: pmi.signal ?? 'NEUTRAL', coverage };
 }
 ```
 
-- [ ] **Step 5: Run the new tests and the false-friend test**
+Update the one call site in `synthesize` to pass the rate through — it already has the index in scope:
+
+```js
+const rel = useV1 ? { relation: 0, basis: 'V1_DISABLED' } : relationScore(corpusPMI, index?.baseCooccurRate);
+```
+
+The existing `NO_SIGNAL` weight-redistribution block below it is correct and must not change. It is what makes "no evidence" abstain instead of paying half credit, and with this repair an abstaining pair now scores *below* a well-measured one rather than above it.
+
+- [ ] **Step 5: Run the discrimination tests**
 
 ```bash
 npx vitest run tests/codex/core/pixelbrain/grounding-index.test.js
 ```
 
-Expected: `does not reward ignorance`, `reports coverage`, and `real correspondence scores higher than false friend` all PASS.
+Expected to PASS now: `does not reward ignorance`, `reports coverage`, `real correspondence scores higher than false friend`, `attested concept pair scores higher than one attested + one foreign`, and all eight `FIX #2` PMI tests.
 
-If `real correspondence scores higher than false friend` still fails, **stop and report the measured numbers** — do not tune a constant to make it pass. The repair is derived; if the derivation is wrong the derivation must change, not its coefficients. `project-checks-that-cannot-fail` and `feedback-measure-dont-rationalize` both apply.
+Expected to STILL FAIL at this step — they are addressed in Step 6, not here: `CAL-001 explicit grounding still produces same feasibility` and `corpusPMI does NOT alter feasibility`.
 
-- [ ] **Step 6: Recalibrate the CAL-001 frozen constants**
+Reference values measured on this corpus before implementation, for comparison: real 0.5535, false friend 0.3634, bothAttested 0.5386, oneForeign 0.1576 (abstains). Small deviations are fine — `round4` on the new fields and the exact `residualCoherence` path can move the last digits. The **orderings** are what the tests assert.
 
-The calibration registry froze feasibility values under v1 weights. They are now stale by construction, not wrong. Run:
+If a discrimination test still fails, **stop and report the measured numbers** — do not tune a constant to make it pass. The repair is derived; if the derivation is wrong the derivation must change, not its coefficients. `project-checks-that-cannot-fail` and `feedback-measure-dont-rationalize` both apply.
+
+- [ ] **Step 6: Rewrite the stale-contract test and recalibrate the frozen constants**
+
+These are **not** the bug. Two different things are needed.
+
+**6a — `corpusPMI does NOT alter feasibility (diagnostic only, not a weight)` asserts the old contract.** Commit `f343f375` deliberately reversed it: `corpusPMI` now *is* a weight. The test can never pass and must be rewritten to assert the contract that actually holds. Replace its body with:
+
+```js
+it('corpusPMI DOES enter feasibility, weighted by coverage and base rate', () => {
+  const r = synthesize({
+    a: 'sealed packet canonical serialization',
+    b: 'checksum content-addressed identity',
+    product: 'content-addressed sealed packet',
+    index: idx,
+  });
+  // The v1 three-channel sum is no longer the whole score: relation is the
+  // fourth channel, and REPAIR 1 folding it in is the point of WEIGHTS_V2.
+  const v1Raw = W_BOND * r.bond + W_GROUND * r.grounding + W_COHERE * r.coherence;
+  expect(r.feasibility).not.toBeCloseTo(v1Raw * r.lawScale, 3);
+  expect(r.corpusPMI).toBeDefined();
+  expect(r.corpusPMI.cooccurRate).toBeGreaterThanOrEqual(0);
+  expect(r.corpusPMI.coverage).toBeGreaterThan(0);
+});
+```
+
+Rename the enclosing describe block from `FIX #2/#3: synthesize surfaces PMI + bond sign as diagnostics, not scores` to `FIX #2/#3: synthesize surfaces bond sign as a diagnostic; PMI is a scored channel (v2)`, so the file does not keep advertising a contract it no longer has.
+
+**6b — recalibrate the frozen v1 constants.** `CAL-001 explicit grounding still produces same feasibility` (`0.5149` vs `0.629`) takes the *explicit* grounding path, where there is no index, so `relation` already abstains and this repair does not touch it. The delta comes from `WEIGHTS_V2` plus `residualCoherence` — a v1 constant frozen into a v2 world. The same applies to the five failures in `calibration.test.js`:
 
 ```bash
 npx vitest run tests/codex/core/pixelbrain/calibration.test.js
 ```
 
-For each failure, update the **recorded** constant in the calibration registry to the value produced under `WEIGHTS_V2`, and add a comment naming this task and the date. Do **not** change an assertion's *direction* (e.g. `toBeGreaterThan` → `toBeLessThan`) — a flipped invariant is a refutation, not a recalibration. If an invariant's direction no longer holds, stop and report it.
+For each, update the **recorded** constant to the value produced under `WEIGHTS_V2`, with a comment naming this task and the date. Do **not** change an assertion's *direction* (e.g. `toBeGreaterThan` → `toBeLessThan`) — a flipped invariant is a refutation, not a recalibration. If a direction no longer holds, stop and report it.
 
 - [ ] **Step 7: Run the whole pixelbrain suite**
 
