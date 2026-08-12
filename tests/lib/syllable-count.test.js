@@ -1,3 +1,9 @@
+// @vitest-environment node
+// The suite default is jsdom (vite.config.js), and cmu.phoneme.engine.js guards
+// its loader with `typeof window !== "undefined"` — so under jsdom the CMU
+// dictionary NEVER LOADS, loadCmuEntries() swallows that into [], and this file
+// would test a rule-guessing fallback instead of the real pipeline. Measured
+// 2026-08-12. Do not remove.
 /**
  * Syllable count golden tests.
  *
