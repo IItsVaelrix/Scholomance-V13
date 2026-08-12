@@ -141,7 +141,10 @@ function nucleusGateAutopsy(candidate, config) {
   ).size;
 
   const checks = {
-    osmosisBaselineDrift: candidate.osmosis?.anomalyKind === 'baseline_drift',
+    // osmosis.baseline_drift was removed from the nucleus predicate on
+    // 2026-08-12 (PB-OSMOTIC-EQUILIBRIUM-v1); it admitted 256/256 and is no
+    // longer a gate, so it must not be scored as a kill here. The raw
+    // anomalyKind is still reported below as `osmosisKind` for diagnostics.
     chemistryNotUnstable: candidate.conceptChemistry?.stability !== 'UNSTABLE',
     notRepelled: candidate.conceptChemistry?.corpusPMI?.signal !== 'REPULSION',
     sizeGteMinDomains: atoms.length >= config.nucleusMinDomains,
@@ -181,10 +184,18 @@ function main() {
 
   // ── P2 + P3 ─────────────────────────────────────────────────────────
   const atoms = buildCliqueBank();
+  // Floors recalibrated 2026-08-12 (PB-OSMOTIC-EQUILIBRIUM-v1) from this
+  // bank's own measured shortlist — never reused, never rounded tidy:
+  //   nucleusScoreFloor    = p90 finalScore = 0.688738
+  //   nucleusNoveltyFloor  = p50 novelty    = 0.189864
+  // Measured: seed 0x48454156, trials=5000, n=256, equilibration ON
+  // (finalScore max 0.698936, novelty max 0.217335). Score floor carries
+  // the size discrimination; novelty floor keeps an above-median novelty
+  // requirement without stacking two top-decile filters.
   const config = {
     nucleusMinDomains: 3,
-    nucleusNoveltyFloor: 0.32,
-    nucleusScoreFloor: 0.765,
+    nucleusNoveltyFloor: 0.189864,
+    nucleusScoreFloor: 0.688738,
     finalScoreFloor: 0.58,
     noveltyFloor: 0.04,
   };

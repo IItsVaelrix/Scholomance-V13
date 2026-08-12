@@ -39,13 +39,23 @@ const OUT_MD = 'docs/superpowers/evidence/2026-08-11-architectural-density-contr
 const SEED = 0x44454e53; // DENS
 const DEFAULT_TRIALS = 8_000;
 
-// Standard nucleus floors (same as ritual / super-heavy attack)
+// Nucleus floors recalibrated 2026-08-12 (PB-OSMOTIC-EQUILIBRIUM-v1) from
+// measured arm ceilings — the osmosis-free renormalisation moved the score
+// range down, leaving the old 0.765 floor above every ceiling (VACUOUS).
+// Derived, not guessed, not rounded tidy (trials=8000, seed 0x44454e53,
+// equilibration ON):
+//   arm ceilings  DENSITY 0.725747 | MUTANT 0.713392 | CLIQUE 0.715513
+//   novelty       DENSITY 0.436437 | MUTANT 0.304029 | CLIQUE 0.427476
+// Rule: strictly below the positive arm (DENSITY), strictly above the
+// single-variable control (MUTANT) — midpoint of the two ceilings per gate:
+//   score:   (0.725747 + 0.713392) / 2 = 0.7195695
+//   novelty: (0.436437 + 0.304029) / 2 = 0.370233
 const FLOORS = Object.freeze({
   maxMoleculeSize: 6,
   noveltyFloor: 0.04,
   finalScoreFloor: 0.58,
-  nucleusScoreFloor: 0.765,
-  nucleusNoveltyFloor: 0.32,
+  nucleusScoreFloor: 0.7195695,
+  nucleusNoveltyFloor: 0.370233,
   nucleusMinDomains: 3,
 });
 

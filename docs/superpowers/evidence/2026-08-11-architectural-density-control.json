@@ -1,0 +1,1061 @@
+{
+  "contract": "PB-ARCHITECTURAL-DENSITY-CONTROL-v1",
+  "schemaVersion": "1.0.0",
+  "seed": 1145392723,
+  "trials": 8000,
+  "floors": {
+    "maxMoleculeSize": 6,
+    "noveltyFloor": 0.04,
+    "finalScoreFloor": 0.58,
+    "nucleusScoreFloor": 0.7195695,
+    "nucleusNoveltyFloor": 0.370233,
+    "nucleusMinDomains": 3
+  },
+  "hypothesis": {
+    "claim": "NUCLEUS promotion tracks architectural information density, not molecule mass",
+    "positiveControl": "sparse asymmetric size-6 pipeline with novel extension + real evidence",
+    "negativeControl": "fully licensed clique of similar mass/domain span"
+  },
+  "arms": {
+    "clique": {
+      "name": "CLIQUE",
+      "kind": "clique-generic",
+      "novelExtension": null,
+      "counts": {
+        "candidateTrials": 6400,
+        "controlTrials": 1600,
+        "duplicateMolecules": 0,
+        "hypotheses": 256,
+        "nuclei": 0,
+        "refused": 0,
+        "shortlisted": 256,
+        "unboundTrials": 0,
+        "uniqueMolecules": 6400
+      },
+      "checksum": "cyclotron1:9d9bc3aa8fd769c363389424c84ee71c",
+      "bySize": {
+        "2": {
+          "NUCLEUS": 0,
+          "HYPOTHESIS": 98,
+          "REFUSED": 0,
+          "total": 98,
+          "maxFinal": 0.715513,
+          "maxNovelty": 0.427476
+        },
+        "3": {
+          "NUCLEUS": 0,
+          "HYPOTHESIS": 113,
+          "REFUSED": 0,
+          "total": 113,
+          "maxFinal": 0.709325,
+          "maxNovelty": 0.421429
+        },
+        "4": {
+          "NUCLEUS": 0,
+          "HYPOTHESIS": 33,
+          "REFUSED": 0,
+          "total": 33,
+          "maxFinal": 0.702563,
+          "maxNovelty": 0.399755
+        },
+        "5": {
+          "NUCLEUS": 0,
+          "HYPOTHESIS": 10,
+          "REFUSED": 0,
+          "total": 10,
+          "maxFinal": 0.689485,
+          "maxNovelty": 0.39124
+        },
+        "6": {
+          "NUCLEUS": 0,
+          "HYPOTHESIS": 2,
+          "REFUSED": 0,
+          "total": 2,
+          "maxFinal": 0.671264,
+          "maxNovelty": 0.36655
+        }
+      },
+      "byVerdict": {
+        "NUCLEUS": 0,
+        "HYPOTHESIS": 256,
+        "REFUSED": 0
+      },
+      "reachability": {
+        "admissible": false,
+        "reason": "VACUOUS: 0 NUCLEUS was guaranteed by configuration, not measured — nucleusScoreFloor=0.7195695 > arm ceiling 0.715513. No crown/no-crown contrast may be drawn from this arm.",
+        "gates": [
+          {
+            "name": "nucleusScoreFloor",
+            "floor": 0.7195695,
+            "observedMax": 0.715513,
+            "clearedBy": 0,
+            "reachable": false,
+            "headroom": -0.004057
+          },
+          {
+            "name": "nucleusNoveltyFloor",
+            "floor": 0.370233,
+            "observedMax": 0.427476,
+            "clearedBy": 112,
+            "reachable": true,
+            "headroom": 0.057243
+          }
+        ],
+        "armCeiling": 0.715513
+      },
+      "nucleusCount": 0,
+      "heavyNucleusCount": 0,
+      "maxSizeNucleusCount": 0,
+      "heavyNuclei": [],
+      "top": [
+        {
+          "verdict": "HYPOTHESIS",
+          "size": 2,
+          "finalScore": 0.715513,
+          "novelty": 0.386082,
+          "energy": 0.881912,
+          "feasibility": 0.4778,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "clique-atom-4",
+            "clique-atom-9"
+          ]
+        },
+        {
+          "verdict": "HYPOTHESIS",
+          "size": 2,
+          "finalScore": 0.715513,
+          "novelty": 0.386082,
+          "energy": 0.881912,
+          "feasibility": 0.4778,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "clique-atom-4",
+            "clique-atom-9"
+          ]
+        },
+        {
+          "verdict": "HYPOTHESIS",
+          "size": 2,
+          "finalScore": 0.714828,
+          "novelty": 0.378318,
+          "energy": 0.880748,
+          "feasibility": 0.4778,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "clique-atom-4",
+            "clique-atom-9"
+          ]
+        },
+        {
+          "verdict": "HYPOTHESIS",
+          "size": 2,
+          "finalScore": 0.714828,
+          "novelty": 0.378318,
+          "energy": 0.880748,
+          "feasibility": 0.4778,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "clique-atom-4",
+            "clique-atom-9"
+          ]
+        },
+        {
+          "verdict": "HYPOTHESIS",
+          "size": 2,
+          "finalScore": 0.714315,
+          "novelty": 0.372505,
+          "energy": 0.879876,
+          "feasibility": 0.4778,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "clique-atom-4",
+            "clique-atom-9"
+          ]
+        },
+        {
+          "verdict": "HYPOTHESIS",
+          "size": 2,
+          "finalScore": 0.714315,
+          "novelty": 0.372505,
+          "energy": 0.879876,
+          "feasibility": 0.4778,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "clique-atom-4",
+            "clique-atom-9"
+          ]
+        },
+        {
+          "verdict": "HYPOTHESIS",
+          "size": 2,
+          "finalScore": 0.71314,
+          "novelty": 0.359184,
+          "energy": 0.877878,
+          "feasibility": 0.4778,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "clique-atom-4",
+            "clique-atom-9"
+          ]
+        },
+        {
+          "verdict": "HYPOTHESIS",
+          "size": 2,
+          "finalScore": 0.71314,
+          "novelty": 0.359184,
+          "energy": 0.877878,
+          "feasibility": 0.4778,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "clique-atom-4",
+            "clique-atom-9"
+          ]
+        },
+        {
+          "verdict": "HYPOTHESIS",
+          "size": 2,
+          "finalScore": 0.710802,
+          "novelty": 0.376222,
+          "energy": 0.872433,
+          "feasibility": 0.4799,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "clique-atom-3",
+            "clique-atom-4"
+          ]
+        },
+        {
+          "verdict": "HYPOTHESIS",
+          "size": 2,
+          "finalScore": 0.710802,
+          "novelty": 0.376222,
+          "energy": 0.872433,
+          "feasibility": 0.4799,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "clique-atom-3",
+            "clique-atom-4"
+          ]
+        }
+      ]
+    },
+    "density": {
+      "name": "DENSITY",
+      "kind": "density-coherent",
+      "novelExtension": "frontier-process-gate",
+      "counts": {
+        "candidateTrials": 6400,
+        "controlTrials": 1600,
+        "duplicateMolecules": 4264,
+        "hypotheses": 223,
+        "nuclei": 33,
+        "refused": 0,
+        "shortlisted": 256,
+        "unboundTrials": 927,
+        "uniqueMolecules": 1209
+      },
+      "checksum": "cyclotron1:b009f26c0de76ca850877eaf904f5934",
+      "bySize": {
+        "2": {
+          "NUCLEUS": 0,
+          "HYPOTHESIS": 22,
+          "REFUSED": 0,
+          "total": 22,
+          "maxFinal": 0.719058,
+          "maxNovelty": 0.436437
+        },
+        "3": {
+          "NUCLEUS": 0,
+          "HYPOTHESIS": 25,
+          "REFUSED": 0,
+          "total": 25,
+          "maxFinal": 0.720285,
+          "maxNovelty": 0.423182
+        },
+        "4": {
+          "NUCLEUS": 8,
+          "HYPOTHESIS": 57,
+          "REFUSED": 0,
+          "total": 65,
+          "maxFinal": 0.725747,
+          "maxNovelty": 0.408799
+        },
+        "5": {
+          "NUCLEUS": 24,
+          "HYPOTHESIS": 79,
+          "REFUSED": 0,
+          "total": 103,
+          "maxFinal": 0.725008,
+          "maxNovelty": 0.411496
+        },
+        "6": {
+          "NUCLEUS": 1,
+          "HYPOTHESIS": 40,
+          "REFUSED": 0,
+          "total": 41,
+          "maxFinal": 0.720974,
+          "maxNovelty": 0.404687
+        }
+      },
+      "byVerdict": {
+        "NUCLEUS": 33,
+        "HYPOTHESIS": 223,
+        "REFUSED": 0
+      },
+      "reachability": {
+        "admissible": true,
+        "reason": null,
+        "gates": null,
+        "armCeiling": 0.725747
+      },
+      "nucleusCount": 33,
+      "heavyNucleusCount": 25,
+      "maxSizeNucleusCount": 1,
+      "heavyNuclei": [
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.725008,
+          "novelty": 0.411496,
+          "energy": 0.881324,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.724771,
+          "novelty": 0.408799,
+          "energy": 0.88092,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.72452,
+          "novelty": 0.40596,
+          "energy": 0.880494,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.723831,
+          "novelty": 0.398144,
+          "energy": 0.879322,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.723141,
+          "novelty": 0.390327,
+          "energy": 0.878149,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.723141,
+          "novelty": 0.390327,
+          "energy": 0.878149,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.723141,
+          "novelty": 0.390327,
+          "energy": 0.878149,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.722766,
+          "novelty": 0.386082,
+          "energy": 0.877512,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.722691,
+          "novelty": 0.385234,
+          "energy": 0.877385,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.722579,
+          "novelty": 0.383959,
+          "energy": 0.877194,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.722478,
+          "novelty": 0.382813,
+          "energy": 0.877022,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.722478,
+          "novelty": 0.382813,
+          "energy": 0.877022,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.722478,
+          "novelty": 0.382813,
+          "energy": 0.877022,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.722478,
+          "novelty": 0.382813,
+          "energy": 0.877022,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.722478,
+          "novelty": 0.382813,
+          "energy": 0.877022,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.722022,
+          "novelty": 0.377644,
+          "energy": 0.876247,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.722022,
+          "novelty": 0.377644,
+          "energy": 0.876247,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.722022,
+          "novelty": 0.377644,
+          "energy": 0.876247,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.722022,
+          "novelty": 0.377644,
+          "energy": 0.876247,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.722022,
+          "novelty": 0.377644,
+          "energy": 0.876247,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.721761,
+          "novelty": 0.374695,
+          "energy": 0.875804,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.721761,
+          "novelty": 0.374695,
+          "energy": 0.875804,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.721606,
+          "novelty": 0.372937,
+          "energy": 0.875541,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.721469,
+          "novelty": 0.371381,
+          "energy": 0.875307,
+          "feasibility": 0.5017
+        },
+        {
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "inventory-seed",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ],
+          "finalScore": 0.720974,
+          "novelty": 0.404687,
+          "energy": 0.878036,
+          "feasibility": 0.4966
+        }
+      ],
+      "top": [
+        {
+          "verdict": "NUCLEUS",
+          "size": 4,
+          "finalScore": 0.725747,
+          "novelty": 0.408799,
+          "energy": 0.88132,
+          "feasibility": 0.5035,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "schema-seal",
+            "valence-compiler"
+          ]
+        },
+        {
+          "verdict": "NUCLEUS",
+          "size": 4,
+          "finalScore": 0.72521,
+          "novelty": 0.402716,
+          "energy": 0.880407,
+          "feasibility": 0.5035,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "schema-seal",
+            "valence-compiler"
+          ]
+        },
+        {
+          "verdict": "NUCLEUS",
+          "size": 5,
+          "finalScore": 0.725008,
+          "novelty": 0.411496,
+          "energy": 0.881324,
+          "feasibility": 0.5017,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ]
+        },
+        {
+          "verdict": "NUCLEUS",
+          "size": 4,
+          "finalScore": 0.724913,
+          "novelty": 0.388812,
+          "energy": 0.880322,
+          "feasibility": 0.5029,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "feasibility-scorer",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ]
+        },
+        {
+          "verdict": "NUCLEUS",
+          "size": 5,
+          "finalScore": 0.724771,
+          "novelty": 0.408799,
+          "energy": 0.88092,
+          "feasibility": 0.5017,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ]
+        },
+        {
+          "verdict": "NUCLEUS",
+          "size": 5,
+          "finalScore": 0.72452,
+          "novelty": 0.40596,
+          "energy": 0.880494,
+          "feasibility": 0.5017,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ]
+        },
+        {
+          "verdict": "NUCLEUS",
+          "size": 4,
+          "finalScore": 0.723863,
+          "novelty": 0.387445,
+          "energy": 0.878117,
+          "feasibility": 0.5035,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "schema-seal",
+            "valence-compiler"
+          ]
+        },
+        {
+          "verdict": "NUCLEUS",
+          "size": 5,
+          "finalScore": 0.723831,
+          "novelty": 0.398144,
+          "energy": 0.879322,
+          "feasibility": 0.5017,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ]
+        },
+        {
+          "verdict": "NUCLEUS",
+          "size": 4,
+          "finalScore": 0.723805,
+          "novelty": 0.376258,
+          "energy": 0.878439,
+          "feasibility": 0.5029,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "feasibility-scorer",
+            "process-sensor",
+            "schema-seal",
+            "valence-compiler"
+          ]
+        },
+        {
+          "verdict": "NUCLEUS",
+          "size": 4,
+          "finalScore": 0.723742,
+          "novelty": 0.386082,
+          "energy": 0.877912,
+          "feasibility": 0.5035,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "feasibility-scorer",
+            "frontier-process-gate",
+            "schema-seal",
+            "valence-compiler"
+          ]
+        }
+      ]
+    },
+    "mutant": {
+      "name": "MUTANT",
+      "kind": "density-atoms-clique-wiring",
+      "novelExtension": null,
+      "counts": {
+        "candidateTrials": 6400,
+        "controlTrials": 1600,
+        "duplicateMolecules": 8,
+        "hypotheses": 256,
+        "nuclei": 0,
+        "refused": 0,
+        "shortlisted": 256,
+        "unboundTrials": 0,
+        "uniqueMolecules": 6392
+      },
+      "checksum": "cyclotron1:0b3a6cfe590525d8c6f87f9496cd9b1c",
+      "bySize": {
+        "2": {
+          "NUCLEUS": 0,
+          "HYPOTHESIS": 66,
+          "REFUSED": 0,
+          "total": 66,
+          "maxFinal": 0.713392,
+          "maxNovelty": 0.304029
+        },
+        "3": {
+          "NUCLEUS": 0,
+          "HYPOTHESIS": 141,
+          "REFUSED": 0,
+          "total": 141,
+          "maxFinal": 0.71042,
+          "maxNovelty": 0.228256
+        },
+        "4": {
+          "NUCLEUS": 0,
+          "HYPOTHESIS": 34,
+          "REFUSED": 0,
+          "total": 34,
+          "maxFinal": 0.709939,
+          "maxNovelty": 0.231157
+        },
+        "5": {
+          "NUCLEUS": 0,
+          "HYPOTHESIS": 15,
+          "REFUSED": 0,
+          "total": 15,
+          "maxFinal": 0.707334,
+          "maxNovelty": 0.221111
+        }
+      },
+      "byVerdict": {
+        "NUCLEUS": 0,
+        "HYPOTHESIS": 256,
+        "REFUSED": 0
+      },
+      "reachability": {
+        "admissible": false,
+        "reason": "VACUOUS: 0 NUCLEUS was guaranteed by configuration, not measured — nucleusScoreFloor=0.7195695 > arm ceiling 0.713392; nucleusNoveltyFloor=0.370233 > arm ceiling 0.304029. No crown/no-crown contrast may be drawn from this arm.",
+        "gates": [
+          {
+            "name": "nucleusScoreFloor",
+            "floor": 0.7195695,
+            "observedMax": 0.713392,
+            "clearedBy": 0,
+            "reachable": false,
+            "headroom": -0.006177
+          },
+          {
+            "name": "nucleusNoveltyFloor",
+            "floor": 0.370233,
+            "observedMax": 0.304029,
+            "clearedBy": 0,
+            "reachable": false,
+            "headroom": -0.066204
+          }
+        ],
+        "armCeiling": 0.713392
+      },
+      "nucleusCount": 0,
+      "heavyNucleusCount": 0,
+      "maxSizeNucleusCount": 0,
+      "heavyNuclei": [],
+      "top": [
+        {
+          "verdict": "HYPOTHESIS",
+          "size": 2,
+          "finalScore": 0.713392,
+          "novelty": 0.214975,
+          "energy": 0.860246,
+          "feasibility": 0.5036,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "feasibility-scorer",
+            "schema-seal"
+          ]
+        },
+        {
+          "verdict": "HYPOTHESIS",
+          "size": 2,
+          "finalScore": 0.713392,
+          "novelty": 0.214975,
+          "energy": 0.860246,
+          "feasibility": 0.5036,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "feasibility-scorer",
+            "schema-seal"
+          ]
+        },
+        {
+          "verdict": "HYPOTHESIS",
+          "size": 2,
+          "finalScore": 0.713152,
+          "novelty": 0.212255,
+          "energy": 0.859838,
+          "feasibility": 0.5036,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "feasibility-scorer",
+            "schema-seal"
+          ]
+        },
+        {
+          "verdict": "HYPOTHESIS",
+          "size": 2,
+          "finalScore": 0.713152,
+          "novelty": 0.212255,
+          "energy": 0.859838,
+          "feasibility": 0.5036,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "feasibility-scorer",
+            "schema-seal"
+          ]
+        },
+        {
+          "verdict": "HYPOTHESIS",
+          "size": 2,
+          "finalScore": 0.71094,
+          "novelty": 0.187186,
+          "energy": 0.856078,
+          "feasibility": 0.5036,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "feasibility-scorer",
+            "schema-seal"
+          ]
+        },
+        {
+          "verdict": "HYPOTHESIS",
+          "size": 2,
+          "finalScore": 0.71094,
+          "novelty": 0.187186,
+          "energy": 0.856078,
+          "feasibility": 0.5036,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "feasibility-scorer",
+            "schema-seal"
+          ]
+        },
+        {
+          "verdict": "HYPOTHESIS",
+          "size": 2,
+          "finalScore": 0.710521,
+          "novelty": 0.182432,
+          "energy": 0.855365,
+          "feasibility": 0.5036,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "feasibility-scorer",
+            "schema-seal"
+          ]
+        },
+        {
+          "verdict": "HYPOTHESIS",
+          "size": 2,
+          "finalScore": 0.710521,
+          "novelty": 0.182432,
+          "energy": 0.855365,
+          "feasibility": 0.5036,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "feasibility-scorer",
+            "schema-seal"
+          ]
+        },
+        {
+          "verdict": "HYPOTHESIS",
+          "size": 3,
+          "finalScore": 0.71042,
+          "novelty": 0.205405,
+          "energy": 0.854144,
+          "feasibility": 0.5051,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "feasibility-scorer",
+            "schema-seal",
+            "valence-compiler"
+          ]
+        },
+        {
+          "verdict": "HYPOTHESIS",
+          "size": 3,
+          "finalScore": 0.71042,
+          "novelty": 0.205405,
+          "energy": 0.854144,
+          "feasibility": 0.5051,
+          "stability": "METASTABLE",
+          "atomIds": [
+            "feasibility-scorer",
+            "schema-seal",
+            "valence-compiler"
+          ]
+        }
+      ]
+    }
+  },
+  "contrast": {
+    "cliqueHeavyNuclei": 0,
+    "densityHeavyNuclei": 25,
+    "cliqueAnyNuclei": 0,
+    "densityAnyNuclei": 33,
+    "densityIntendedTopologyInTop": false,
+    "topologyIsolated": {
+      "densityCeiling": 0.725747,
+      "mutantCeiling": 0.713392,
+      "ceilingDelta": 0.012355,
+      "densityNuclei": 33,
+      "mutantNuclei": 0,
+      "heldConstant": [
+        "atoms",
+        "labels",
+        "evidence",
+        "grounding",
+        "domains",
+        "bankSize"
+      ],
+      "varied": [
+        "portWiring"
+      ]
+    },
+    "densityNovelExtensionInTop": true,
+    "intendedTopology": [
+      "inventory-seed",
+      "valence-compiler",
+      "feasibility-scorer",
+      "process-sensor",
+      "frontier-process-gate",
+      "schema-seal"
+    ]
+  },
+  "interpretation": [
+    "NEGATIVE ARM INADMISSIBLE — VACUOUS: 0 NUCLEUS was guaranteed by configuration, not measured — nucleusScoreFloor=0.7195695 > arm ceiling 0.715513. No crown/no-crown contrast may be drawn from this arm. The CLIQUE/DENSITY contrast therefore cannot attribute anything to architecture: the two arms differ in bank size, topology, labels, grounding spread, domain distribution and evidence diversity at once, and the floor lands between their score ceilings. Use a single-variable mutant (same atoms, rewired ports) instead.",
+    "PARTIAL: DENSITY crowns 25 NUCLEUS at size≥5, which refutes a PURE MASS VETO on its own — that conclusion needs no contrast and stands. The attribution to \"density\" does not.",
+    "CLIQUE at max legal size 6: 0/2 crowned (ceiling 0.6713 vs floor 0.7195695).",
+    "DENSITY at max legal size 6: 1/41 crowned (ceiling 0.7210 vs floor 0.7195695).",
+    "TOPOLOGY ISOLATED (single variable): rewiring the DENSITY atoms into a clique — same labels, evidence, grounding, domains and bank size — moves the score ceiling 0.725747 → 0.713392 (Δ=0.012355) and nuclei 33 → 0. The ceiling delta is the load-bearing number: it does not depend on where the floor sits. Architecture is worth 1.24 points of finalScore in this bank.",
+    "DESIGNED TOPOLOGY LOST: the intended 6-atom pipeline (inventory-seed → valence-compiler → feasibility-scorer → process-sensor → frontier-process-gate → schema-seal) does not appear in the DENSITY top-10. The arm was built around it; the winners are smaller subsets of it. The diagram documents the design, not the result."
+  ],
+  "checksum": "archdensity1:089d5b9abc017b57812436cf7c01dc2d547179cc44ae0847c6cee27cd8cdb6dd"
+}

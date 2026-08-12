@@ -1,0 +1,359 @@
+{
+  "contract": "PB-SUPER-HEAVY-ATTACK-v1",
+  "schemaVersion": "1.0.0",
+  "seed": 1212498262,
+  "trials": 5000,
+  "reportChecksum": "cyclotron1:7a36a6410a1c9e227dd49a7f071f07d8",
+  "atomBank": {
+    "kind": "artificial-clique",
+    "atoms": 12,
+    "domains": 6,
+    "note": "Fully licensed clique so heaviness is not blocked by missing edges"
+  },
+  "probes": {
+    "P1_CONFIG_CEILING": {
+      "probe": "P1_CONFIG_CEILING",
+      "rejected": true,
+      "detail": "maxMoleculeSize must be an integer in 2..6",
+      "expected": true
+    },
+    "P2_MAX_LEGAL_HEAVINESS": {
+      "maxMoleculeSize": 6,
+      "counts": {
+        "candidateTrials": 4000,
+        "controlTrials": 1000,
+        "duplicateMolecules": 1,
+        "hypotheses": 256,
+        "nuclei": 0,
+        "refused": 0,
+        "shortlisted": 256,
+        "unboundTrials": 0,
+        "uniqueMolecules": 3999
+      },
+      "bySize": {
+        "2": {
+          "NUCLEUS": 0,
+          "HYPOTHESIS": 122,
+          "REFUSED": 0,
+          "total": 122,
+          "maxFinal": 0.698936,
+          "maxEnergy": 0.853732
+        },
+        "3": {
+          "NUCLEUS": 0,
+          "HYPOTHESIS": 93,
+          "REFUSED": 0,
+          "total": 93,
+          "maxFinal": 0.691155,
+          "maxEnergy": 0.845894
+        },
+        "4": {
+          "NUCLEUS": 0,
+          "HYPOTHESIS": 35,
+          "REFUSED": 0,
+          "total": 35,
+          "maxFinal": 0.685746,
+          "maxEnergy": 0.841669
+        },
+        "5": {
+          "NUCLEUS": 0,
+          "HYPOTHESIS": 5,
+          "REFUSED": 0,
+          "total": 5,
+          "maxFinal": 0.670565,
+          "maxEnergy": 0.832046
+        },
+        "6": {
+          "NUCLEUS": 0,
+          "HYPOTHESIS": 1,
+          "REFUSED": 0,
+          "total": 1,
+          "maxFinal": 0.654973,
+          "maxEnergy": 0.830234
+        }
+      },
+      "shortlistSizes": {
+        "2": 122,
+        "3": 93,
+        "4": 35,
+        "5": 5,
+        "6": 1
+      },
+      "size6": {
+        "shortlisted": 1,
+        "NUCLEUS": 0,
+        "HYPOTHESIS": 1,
+        "REFUSED": 0
+      },
+      "rejectedSuperHeavyAsNucleus": true
+    },
+    "P0_GATE_REACHABILITY": {
+      "admissible": true,
+      "reason": null,
+      "gates": [
+        {
+          "name": "nucleusScoreFloor",
+          "floor": 0.688738,
+          "observedMax": 0.698936,
+          "clearedBy": 25,
+          "reachable": true,
+          "headroom": 0.010198
+        },
+        {
+          "name": "nucleusNoveltyFloor",
+          "floor": 0.189864,
+          "observedMax": 0.217335,
+          "clearedBy": 129,
+          "reachable": true,
+          "headroom": 0.027471
+        }
+      ]
+    },
+    "P3_GATE_AUTOPSY": {
+      "config": {
+        "nucleusMinDomains": 3,
+        "nucleusNoveltyFloor": 0.189864,
+        "nucleusScoreFloor": 0.688738,
+        "finalScoreFloor": 0.58,
+        "noveltyFloor": 0.04
+      },
+      "size6KillHistogram": {
+        "noveltyGteFloor": 1,
+        "finalScoreGteFloor": 1
+      },
+      "allSizesKillHistogram": {
+        "sizeGteMinDomains": 122,
+        "domainCountGteMin": 152,
+        "noveltyGteFloor": 127,
+        "finalScoreGteFloor": 231
+      },
+      "shortlistTotal": 256,
+      "meanFinalScoreBySize": {
+        "2": 0.676129,
+        "3": 0.66965,
+        "4": 0.662304,
+        "5": 0.658244,
+        "6": 0.654973
+      },
+      "heavinessTax": 0.021156,
+      "heaviestExamples": [
+        {
+          "atomIds": [
+            "heavy-atom-1",
+            "heavy-atom-3",
+            "heavy-atom-4",
+            "heavy-atom-6",
+            "heavy-atom-8",
+            "heavy-atom-9"
+          ],
+          "verdict": "HYPOTHESIS",
+          "autopsy": {
+            "size": 6,
+            "domainCount": 5,
+            "finalScore": 0.654973,
+            "novelty": 0.183783,
+            "energy": 0.830234,
+            "feasibility": 0.4046,
+            "stability": "METASTABLE",
+            "osmosisKind": "concentration",
+            "valenceSatisfaction": 1,
+            "checks": {
+              "chemistryNotUnstable": true,
+              "notRepelled": true,
+              "sizeGteMinDomains": true,
+              "domainCountGteMin": true,
+              "noveltyGteFloor": false,
+              "finalScoreGteFloor": false
+            },
+            "failedGates": [
+              "noveltyGteFloor",
+              "finalScoreGteFloor"
+            ],
+            "wouldBeNucleus": false,
+            "actualVerdict": "HYPOTHESIS"
+          }
+        },
+        {
+          "atomIds": [
+            "heavy-atom-4",
+            "heavy-atom-5",
+            "heavy-atom-7",
+            "heavy-atom-8",
+            "heavy-atom-9"
+          ],
+          "verdict": "HYPOTHESIS",
+          "autopsy": {
+            "size": 5,
+            "domainCount": 5,
+            "finalScore": 0.670565,
+            "novelty": 0.194009,
+            "energy": 0.830701,
+            "feasibility": 0.4418,
+            "stability": "METASTABLE",
+            "osmosisKind": "concentration",
+            "valenceSatisfaction": 1,
+            "checks": {
+              "chemistryNotUnstable": true,
+              "notRepelled": true,
+              "sizeGteMinDomains": true,
+              "domainCountGteMin": true,
+              "noveltyGteFloor": true,
+              "finalScoreGteFloor": false
+            },
+            "failedGates": [
+              "finalScoreGteFloor"
+            ],
+            "wouldBeNucleus": false,
+            "actualVerdict": "HYPOTHESIS"
+          }
+        },
+        {
+          "atomIds": [
+            "heavy-atom-11",
+            "heavy-atom-3",
+            "heavy-atom-4",
+            "heavy-atom-8",
+            "heavy-atom-9"
+          ],
+          "verdict": "HYPOTHESIS",
+          "autopsy": {
+            "size": 5,
+            "domainCount": 4,
+            "finalScore": 0.659244,
+            "novelty": 0.142959,
+            "energy": 0.829444,
+            "feasibility": 0.4161,
+            "stability": "METASTABLE",
+            "osmosisKind": "concentration",
+            "valenceSatisfaction": 1,
+            "checks": {
+              "chemistryNotUnstable": true,
+              "notRepelled": true,
+              "sizeGteMinDomains": true,
+              "domainCountGteMin": true,
+              "noveltyGteFloor": false,
+              "finalScoreGteFloor": false
+            },
+            "failedGates": [
+              "noveltyGteFloor",
+              "finalScoreGteFloor"
+            ],
+            "wouldBeNucleus": false,
+            "actualVerdict": "HYPOTHESIS"
+          }
+        },
+        {
+          "atomIds": [
+            "heavy-atom-11",
+            "heavy-atom-3",
+            "heavy-atom-4",
+            "heavy-atom-8",
+            "heavy-atom-9"
+          ],
+          "verdict": "HYPOTHESIS",
+          "autopsy": {
+            "size": 5,
+            "domainCount": 4,
+            "finalScore": 0.659244,
+            "novelty": 0.142959,
+            "energy": 0.829444,
+            "feasibility": 0.4161,
+            "stability": "METASTABLE",
+            "osmosisKind": "concentration",
+            "valenceSatisfaction": 1,
+            "checks": {
+              "chemistryNotUnstable": true,
+              "notRepelled": true,
+              "sizeGteMinDomains": true,
+              "domainCountGteMin": true,
+              "noveltyGteFloor": false,
+              "finalScoreGteFloor": false
+            },
+            "failedGates": [
+              "noveltyGteFloor",
+              "finalScoreGteFloor"
+            ],
+            "wouldBeNucleus": false,
+            "actualVerdict": "HYPOTHESIS"
+          }
+        },
+        {
+          "atomIds": [
+            "heavy-atom-11",
+            "heavy-atom-4",
+            "heavy-atom-7",
+            "heavy-atom-8",
+            "heavy-atom-9"
+          ],
+          "verdict": "HYPOTHESIS",
+          "autopsy": {
+            "size": 5,
+            "domainCount": 5,
+            "finalScore": 0.652333,
+            "novelty": 0.181643,
+            "energy": 0.832046,
+            "feasibility": 0.3956,
+            "stability": "METASTABLE",
+            "osmosisKind": "concentration",
+            "valenceSatisfaction": 1,
+            "checks": {
+              "chemistryNotUnstable": true,
+              "notRepelled": true,
+              "sizeGteMinDomains": true,
+              "domainCountGteMin": true,
+              "noveltyGteFloor": false,
+              "finalScoreGteFloor": false
+            },
+            "failedGates": [
+              "noveltyGteFloor",
+              "finalScoreGteFloor"
+            ],
+            "wouldBeNucleus": false,
+            "actualVerdict": "HYPOTHESIS"
+          }
+        },
+        {
+          "atomIds": [
+            "heavy-atom-1",
+            "heavy-atom-2",
+            "heavy-atom-7",
+            "heavy-atom-8",
+            "heavy-atom-9"
+          ],
+          "verdict": "HYPOTHESIS",
+          "autopsy": {
+            "size": 5,
+            "domainCount": 3,
+            "finalScore": 0.649835,
+            "novelty": 0.210458,
+            "energy": 0.829969,
+            "feasibility": 0.3925,
+            "stability": "METASTABLE",
+            "osmosisKind": "concentration",
+            "valenceSatisfaction": 1,
+            "checks": {
+              "chemistryNotUnstable": true,
+              "notRepelled": true,
+              "sizeGteMinDomains": true,
+              "domainCountGteMin": true,
+              "noveltyGteFloor": true,
+              "finalScoreGteFloor": false
+            },
+            "failedGates": [
+              "finalScoreGteFloor"
+            ],
+            "wouldBeNucleus": false,
+            "actualVerdict": "HYPOTHESIS"
+          }
+        }
+      ]
+    }
+  },
+  "verdict": {
+    "configRejectsOversize": true,
+    "size6PromotedToNucleus": false,
+    "size6PresentInShortlist": true,
+    "summary": "P1 HOLD: super-heavy above size 6 is rejected at config (hard cap 6). P2 HOLD: 1 size-6 molecules shortlisted; 0 promoted to NUCLEUS (1 HYPOTHESIS, 0 REFUSED). Super-heavy is not crowned. P3 top kill gates on size-6 non-NUCLEUS: noveltyGteFloor=1 (fires on 127/256 of ALL sizes), finalScoreGteFloor=1 (fires on 231/256 of ALL sizes) P3 heaviness tax (MEAN finalScore): size2=0.6761 → size6=0.6550 (Δ=0.0212 — heavier scores lower). Max-based Δ=0.0440 is an order statistic over n=122 vs n=1 and is NOT evidence of a tax."
+  },
+  "checksum": "superheavy1:9216400938dab53483b1b512dd6f7c98263891a614bf6dfa4b92ed73962f5eb9"
+}
