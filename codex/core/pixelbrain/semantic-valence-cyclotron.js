@@ -68,7 +68,7 @@ const DEFAULTS = Object.freeze({
   // Derived, not guessed: scripts/calibrate-osmotic-membrane.mjs, seed
   // 0x4f534d4f, 8000 trials, p90 of measured crowding (2026-08-12).
   osmosisConcentrationLimit: 0.904402,
-  entropyEnabled: false,
+  entropyEnabled: true,
   entropyDecayLambda: 0.35,
   entropyExactWeight: 4,
   entropyFamilyWeight: 2,

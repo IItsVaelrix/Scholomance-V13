@@ -124,3 +124,30 @@ describe('membrane governs occupancy, not novelty', () => {
     expect(concentrated.length).toBe(0);
   });
 });
+
+describe('equilibration actually evens occupancy', () => {
+  // `report.candidates` is deduplicated upstream (seenMolecules), so its
+  // per-checksum counts are always 1 and carry no occupancy signal. The
+  // engine's real occupancy distribution is exposed at
+  // `searchLandscape.entropy.exact` over ALL bound trials. Flatter
+  // occupancy => lower maximumOccupancy, higher effectiveDiversity.
+  const exact = (report) => report.searchLandscape.entropy.exact;
+
+  it('produces flatter occupancy with the membrane on than off', () => {
+    const on = runSemanticValenceCyclotron(RUN({ trialCount: 4000, entropy: { enabled: true } }));
+    const off = runSemanticValenceCyclotron(RUN({ trialCount: 4000, entropy: { enabled: false } }));
+    expect(exact(on).observations).toBe(exact(off).observations); // same work done
+    expect(exact(on).maximumOccupancy).toBeLessThan(exact(off).maximumOccupancy);
+    expect(exact(on).effectiveDiversity).toBeGreaterThan(exact(off).effectiveDiversity);
+    expect(on.searchLandscape.entropy.redirects).toBeGreaterThan(0); // transport happened
+    expect(off.searchLandscape.entropy.redirects).toBe(0);
+  }, 20000);
+
+  it('is on by default', () => {
+    const explicit = runSemanticValenceCyclotron(RUN({ trialCount: 4000, entropy: { enabled: true } }));
+    const byDefault = runSemanticValenceCyclotron(RUN({ trialCount: 4000 }));
+    expect(byDefault.counts.shortlisted).toBe(explicit.counts.shortlisted);
+    expect(byDefault.searchLandscape.entropy.exact).toEqual(explicit.searchLandscape.entropy.exact);
+    expect(byDefault.checksum).toBe(explicit.checksum);
+  }, 20000);
+});
