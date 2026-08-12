@@ -120,26 +120,44 @@ describe('G2P juror discrimination (characterisation, not endorsement)', () => {
   });
 
   /**
-   * RECORDED DEFECT, 2026-08-12. These three jurors emit an identical vote for
-   * every candidate of every word — measured over 200 words and 4,100 votes,
-   * one distinct value on all four numeric axes. They hold 0.55 of the jury's
-   * weight (SEMANTIC 0.20 + GRAPH 0.20 + HHM 0.15) and contribute no judgement.
+   * RECORDED DEFECT, 2026-08-12 — refined after reading each juror's source.
+   * All three return an identical vote for two plausible candidates, but for
+   * THREE DIFFERENT REASONS, and only one of them is a stub:
    *
-   * This asserts what they DO, not what they SHOULD do, so that implementing
-   * any of them breaks this test and forces the author to delete the entry
-   * deliberately rather than leaving a stub indistinguishable from a juror.
+   *   HHM      A true stub. Hardcoded literals, no model call, and a rationale
+   *            string announcing a "Hidden-state analysis" it never performs.
+   *            It is named for codex/core/shared/models/harkov.model.js, which
+   *            is PHONEME-BLIND: its toTokenSnapshot carries no phoneme field,
+   *            and its own PHONEME stage reads only token.stressRole. Wiring
+   *            the juror to that model yields a constant with extra steps,
+   *            because every candidate for a word shares role, lineRole,
+   *            stressRole, rhymePolicy and neighbours.
    *
-   * It also explains why the veto added on 2026-08-07 has never fired: a
-   * constant has nothing to object to.
+   *   GRAPH    Real logic, starved. g2p.adapter.js constructs it as
+   *            createGraphJuror(null), so it scores against no graph at all —
+   *            and says so in every vote it casts ("missing token graph").
+   *
+   *   SEMANTIC Real logic, SATURATED. runVectorAmp works; the inner product
+   *            returns 1.0000 for both 'HH AW1 S' and 'AH0 M Y UW1 Z' against
+   *            HOUSE. Only nonsense moves it ('Z Z Z Z Z Z Z' -> 0.5000). It
+   *            discriminates plausible from absurd, never good from bad.
+   *
+   * Together they hold 0.55 of the jury weight (SEMANTIC 0.20 + GRAPH 0.20 +
+   * HHM 0.15) and contribute no usable judgement, which is why the veto added
+   * on 2026-08-07 has never fired.
+   *
+   * These assert what the jurors DO, not what they should, so that fixing any
+   * one of them breaks this test and forces a deliberate deletion rather than
+   * leaving a non-discriminating juror indistinguishable from a working one.
    */
-  const KNOWN_CONSTANT_JURORS = Object.freeze([
+  const NON_DISCRIMINATING_JURORS = Object.freeze([
     ['SEMANTIC', createSemanticJuror],
     ['GRAPH', () => createGraphJuror(null)],
     ['HHM', createHHMJuror],
   ]);
 
-  for (const [name, make] of KNOWN_CONSTANT_JURORS) {
-    it(`${name} is currently a STUB — identical vote for unlike candidates`, () => {
+  for (const [name, make] of NON_DISCRIMINATING_JURORS) {
+    it(`${name} does not discriminate — identical vote for two plausible candidates`, () => {
       const juror = make();
       const a = juror.vote(CANDIDATE_A, CTX);
       const b = juror.vote(CANDIDATE_B, CTX);
