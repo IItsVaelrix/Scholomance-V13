@@ -16,7 +16,7 @@ Design spec: `docs/superpowers/specs/2026-08-09-nervous-system-design.md`
 - **Curated files are never machine-written.** `*.capability.json` is hand/agent authored only. All generated output goes to `docs/superpowers/evidence/2026-08-09-nervous-sweep-*.md`.
 - **Per-domain output files plus an index.** Never one hardcoded output path — a receipt the next run overwrites is not a receipt.
 - **Chemistry never appears in an admission test.** No score thresholds anywhere. Kinds are categorical.
-- **Python lives beside its dependencies.** `code_lens` and `code_eval` are in `divtube_downloader/tui/services/`; the new Python modules join them and are imported the same way.
+- **Python lives beside its dependencies.** `code_lens` and `code_eval` are in `divtube_downloader/tui/services/`; the new Python modules join them and are imported the same way. **One dependency is outside that tree and is the documented exception:** `capability_store` lives in `steamdeck_brain/vaelrix_forcefield/scdna/`. Reach it with the pattern already proven in `scripts/verify_capabilities.py:35-40` — put `steamdeck_brain` on `sys.path`, then import from `vaelrix_forcefield.scdna.capability_store`. Do not vendor, copy or re-implement it; the checksum refusal in `load_packets` is load-bearing and must have exactly one implementation.
 - **Test command (Python):** run from `divtube_downloader/`: `PYTHONPATH=. .venv/bin/python -m pytest tests/<file> -v`
 - **Real-repository ground truth**, as `test_code_lens.py` already does — not toy fixtures.
 - **`assert` result vocabulary is exactly:** `"passed"`, `"failed"`, `"uncheckable"`.
@@ -396,6 +396,11 @@ Append to `divtube_downloader/tests/test_nervous_assertions.py`:
 
 ```python
 PROJECTION = "codex/core/constellation/grimoire/projection-laws.js"
+# NOT code_lens.py: it declares `pure stdlib — no subprocess`, a declaration form
+# the detector has accepted since bb65e4a2, so _declared_pure() returns True for
+# it and the purity refusal never fires. harness_tools.py declares nothing, and
+# its resolve_node_bin_dir() globs the filesystem — a real side effect to refuse.
+IMPURE = "divtube_downloader/tui/services/harness_tools.py"
 
 
 class TestSymbolReturns(unittest.TestCase):
@@ -415,13 +420,24 @@ class TestSymbolReturns(unittest.TestCase):
         self.assertEqual(r["result"], na.FAILED)
 
     def test_impure_module_is_uncheckable_and_never_executed(self):
-        """code_lens.py declares no purity, so the resolver must refuse rather
-        than risk running import-time side effects."""
+        """harness_tools.py declares no purity, so the resolver must refuse
+        rather than risk running import-time side effects."""
         r = na.assert_symbol_returns(
-            PROJECT_ROOT, LENS, "microscope", {"type": "object"},
+            PROJECT_ROOT, IMPURE, "resolve_node_bin_dir", {"type": "string"},
         )
         self.assertEqual(r["result"], na.UNCHECKABLE)
         self.assertIn("purity", r["detail"].lower())
+
+    def test_purity_refusal_names_purity_not_a_call_error(self):
+        """The refusal must come from the purity gate, not from a downstream
+        evaluation failure that happens to also return UNCHECKABLE. Both paths
+        return UNCHECKABLE, so asserting the result alone cannot tell them
+        apart — which is how the original code_lens.py fixture went stale
+        without the assertion noticing."""
+        r = na.assert_symbol_returns(
+            PROJECT_ROOT, IMPURE, "resolve_node_bin_dir", {"type": "string"},
+        )
+        self.assertNotIn("could not evaluate", r["detail"].lower())
 
     def test_symbol_that_throws_is_uncheckable_not_failed(self):
         """An execution error means we did not learn the shape, not that the
@@ -437,7 +453,7 @@ class TestSymbolReturns(unittest.TestCase):
 ```bash
 PYTHONPATH=. .venv/bin/python -m pytest tests/test_nervous_assertions.py -k SymbolReturns -v
 ```
-Expected: 4 errors — no attribute `assert_symbol_returns`.
+Expected: 5 errors — no attribute `assert_symbol_returns`.
 
 - [ ] **Step 3: Write the implementation**
 
@@ -653,6 +669,20 @@ git commit -m "feat(nervous): absent-under resolver and assertion dispatcher"
 
 **Interfaces:**
 - Consumes: `capability_store.load_packets(directory) -> tuple[list[dict], list[str]]`; `nervous_assertions.run_assertion`
+- **Import mechanism for `capability_store` (do not leave this to the implementer).** It is not in `divtube_downloader/`, so the package-relative import used for `code_lens`/`code_eval` will not reach it. Use the pattern proven in `scripts/verify_capabilities.py:35-40`, with the root computed for this module's depth:
+
+```python
+from pathlib import Path
+
+_ROOT = Path(__file__).resolve().parents[3]  # services -> tui -> divtube_downloader -> repo
+sys.path.insert(0, str(_ROOT / "steamdeck_brain"))
+
+from vaelrix_forcefield.scdna.capability_store import (  # noqa: E402
+    load_packets,
+)
+```
+
+  Note `parents[3]`, not `parent.parent` — `verify_capabilities.py` sits in `scripts/`, one level below the root, while this module sits three. Copying its `_ROOT` line verbatim would point at `divtube_downloader/` and the import would fail.
 - Produces: `probe_entry(project_root, entry) -> dict`; `probe_packet(project_root, packet) -> dict`; `probe_all(project_root, capabilities_dir) -> dict`
 
 - [ ] **Step 1: Write the failing tests**
@@ -666,10 +696,21 @@ The prober gathers evidence and takes no view on what it warrants. Every test
 here asserts about evidence, never about kinds -- kinds are the gate's job.
 """
 
+import json
 import os
+import shutil
+import sys
+import tempfile
 import unittest
+from pathlib import Path
 
 from tui.services import nervous_probe as np
+
+# Same exception as the prober: capability_store is outside divtube_downloader/.
+sys.path.insert(
+    0, str(Path(__file__).resolve().parents[2] / "steamdeck_brain")
+)
+from vaelrix_forcefield.scdna.capability_store import load_packets  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
@@ -751,6 +792,65 @@ class TestCorruptionMetaTest(unittest.TestCase):
         self.assertEqual(r["counts"]["failed"], 1)
 
 
+class TestTamperedPacketIsRefused(unittest.TestCase):
+    """The test above corrupts a CLAIM. This one corrupts the PACKET.
+
+    They are different failures and only one of them proves the prober is
+    reading through capability_store: a raw glob + json.load passes a
+    hand-edited packet straight through, and every claim inside it would be
+    probed and reported as evidence. The checksum refusal is the only thing
+    standing between "curated" and "someone edited this file", so the sweep
+    must go red rather than probe the survivors.
+    """
+
+    @staticmethod
+    def _clean_dir(tmp: str) -> list[str]:
+        """Copy in only the packets the store currently accepts.
+
+        Deliberately NOT a copy of the whole directory. As of 2026-08-09
+        `pixel-art-direction.capability.json` carries no `checksum` key and the
+        store already refuses it, so a wholesale copy would make this test go
+        green off repo hygiene rather than off the prober's behaviour — and it
+        would keep passing after that packet is fixed, for a third reason.
+        """
+        real_dir = os.path.join(
+            PROJECT_ROOT, "steamdeck_brain/vaelrix_forcefield/scdna/capabilities"
+        )
+        valid, _ = load_packets(Path(real_dir))
+        names = []
+        for packet in valid:
+            name = f"{packet['domain']}.capability.json"
+            shutil.copy(os.path.join(real_dir, name), os.path.join(tmp, name))
+            names.append(name)
+        return names
+
+    def test_a_clean_directory_sweeps_green(self):
+        """The positive control. Without it, the refusal test below cannot
+        distinguish "detected the tamper" from "always red"."""
+        with tempfile.TemporaryDirectory() as tmp:
+            self._clean_dir(tmp)
+            report = np.probe_all(PROJECT_ROOT, capabilities_dir=tmp)
+        self.assertTrue(report["ok"], report.get("error"))
+
+    def test_a_checksum_mismatch_refuses_the_whole_sweep(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            names = self._clean_dir(tmp)
+            victim = os.path.join(tmp, names[0])
+            packet = json.loads(open(victim, encoding="utf-8").read())
+            # Edit content while leaving the declared checksum alone — exactly
+            # what hand-editing a curated file looks like.
+            packet["need"] = packet.get("need", "") + " (hand-edited)"
+            with open(victim, "w", encoding="utf-8") as fh:
+                json.dump(packet, fh)
+
+            report = np.probe_all(PROJECT_ROOT, capabilities_dir=tmp)
+
+        self.assertFalse(report["ok"])
+        self.assertEqual(report["stage"], "load")
+        self.assertIn("checksum mismatch", report["error"])
+        self.assertEqual(report["domains"], [])
+
+
 if __name__ == "__main__":
     unittest.main()
 ```
@@ -784,9 +884,20 @@ import glob as _glob
 import json
 import os
 import sys
+from pathlib import Path
 
 from tui.services.nervous_assertions import (
     FAILED, PASSED, UNCHECKABLE, run_assertion,
+)
+
+# capability_store is the one dependency outside divtube_downloader/. Same
+# pattern as scripts/verify_capabilities.py:35-40, but this module is three
+# levels below the repo root rather than one.
+_ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(_ROOT / "steamdeck_brain"))
+
+from vaelrix_forcefield.scdna.capability_store import (  # noqa: E402
+    load_packets,
 )
 
 DEFAULT_CAPABILITIES_DIR = (
@@ -857,16 +968,23 @@ def probe_all(project_root: str, capabilities_dir: str | None = None) -> dict:
             "error": f"no capabilities directory at {rel_dir}",
             "domains": [],
         }
-    packets = []
-    for path in sorted(_glob.glob(os.path.join(abs_dir, "*.capability.json"))):
-        try:
-            with open(path, "r", encoding="utf-8") as fh:
-                packets.append(json.load(fh))
-        except (OSError, json.JSONDecodeError) as exc:
-            return {
-                "ok": False, "stage": "load",
-                "error": f"{os.path.basename(path)}: {exc}", "domains": [],
-            }
+    # load_packets, NOT a raw glob + json.load. A packet failing its checksum was
+    # hand-edited outside the compiler -- uncurated content wearing a curated
+    # badge -- and the store excludes it rather than serving it. Reading the
+    # files directly would bypass that refusal and let the prober verify claims
+    # from a packet nothing curated. It takes a Path, not a str.
+    packets, load_errors = load_packets(Path(abs_dir))
+
+    # A refused packet is not a clean sweep. Report it; never silently probe the
+    # survivors and emit ok:true.
+    if load_errors:
+        return {
+            "ok": False, "stage": "load",
+            "error": "; ".join(load_errors),
+            "refused": len(load_errors),
+            "domains": [],
+        }
+
     domains = sorted(
         (probe_packet(project_root, p) for p in packets),
         key=lambda d: d["domain"],

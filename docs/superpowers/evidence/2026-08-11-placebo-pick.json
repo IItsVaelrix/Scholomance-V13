@@ -1,0 +1,151 @@
+{
+  "contract": "PB-PLACEBO-PICK-v1",
+  "schemaVersion": "1.0.0",
+  "prereg": "docs/superpowers/evidence/2026-08-11-PREREG-placebo-architectural-hit.md",
+  "sampleSeed": 1347175234,
+  "cyclotronSeed": 6045712,
+  "trials": 8000,
+  "reportChecksum": "cyclotron1:91f5b0a0cc7d60adcc3701b9cfcaa205",
+  "treatment": {
+    "topology": "process-sensor|valence-compiler",
+    "atomIds": [
+      "process-sensor",
+      "valence-compiler"
+    ],
+    "size": 2,
+    "closedPorts": 1,
+    "openPorts": 4,
+    "openPortList": [
+      "atom-inventory",
+      "feasibility-score",
+      "trial-counter",
+      "validation-verdict"
+    ],
+    "internalPorts": [
+      "candidate-frontier"
+    ],
+    "extensionCount": 1,
+    "chemistry": 0.719164,
+    "evidenceRealized": 1,
+    "utility": 0.5222160800000001,
+    "verdict": "NUCLEUS"
+  },
+  "matching": {
+    "hard": [
+      "size"
+    ],
+    "bands": {
+      "chemistryAbs": 0.12,
+      "closedPortsAbs": 1,
+      "evidenceRealizedMin": 0.8
+    },
+    "extensionMatchPossible": false,
+    "extensionMatchNote": "No size-matched non-selected candidate has extensionCount=1; extension nuisance is unmatched by necessity.",
+    "sizeMatchedNonSelected": 7,
+    "eligibleAfterBands": 7
+  },
+  "excludedUtilityTopologies": [
+    "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|test-contract",
+    "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor",
+    "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor|schema-verifier",
+    "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier|test-contract",
+    "canonical-serializer|evidence-ledger|schema-verifier|test-contract",
+    "canonical-serializer|schema-verifier|test-contract",
+    "fission-reactor|law-gate|molecule-generator",
+    "process-sensor|retrieval-index",
+    "process-sensor|retrieval-index|valence-compiler",
+    "process-sensor|test-contract|valence-compiler",
+    "process-sensor|valence-compiler",
+    "schema-verifier|test-contract"
+  ],
+  "placebos": [
+    {
+      "label": "PLACEBO-A",
+      "topology": "canonical-serializer|immutable-packet",
+      "atomIds": [
+        "canonical-serializer",
+        "immutable-packet"
+      ],
+      "size": 2,
+      "closedPorts": 1,
+      "openPorts": 2,
+      "openPortList": [
+        "checksum",
+        "structure"
+      ],
+      "internalPorts": [
+        "artifact"
+      ],
+      "extensionCount": 0,
+      "chemistry": 0.69605,
+      "utility": 0.2,
+      "evidenceRealized": 1,
+      "distance": 3.184912,
+      "verdict": "HYPOTHESIS",
+      "domains": [
+        "artifact"
+      ]
+    },
+    {
+      "label": "PLACEBO-B",
+      "topology": "canonical-serializer|schema-verifier",
+      "atomIds": [
+        "canonical-serializer",
+        "schema-verifier"
+      ],
+      "size": 2,
+      "closedPorts": 1,
+      "openPorts": 1,
+      "openPortList": [
+        "structure"
+      ],
+      "internalPorts": [
+        "artifact"
+      ],
+      "extensionCount": 0,
+      "chemistry": 0.736242,
+      "utility": 0.2,
+      "evidenceRealized": 1,
+      "distance": 3.636624,
+      "verdict": "NUCLEUS",
+      "domains": [
+        "artifact",
+        "governance"
+      ]
+    },
+    {
+      "label": "PLACEBO-C",
+      "topology": "schema-verifier|server-authority",
+      "atomIds": [
+        "schema-verifier",
+        "server-authority"
+      ],
+      "size": 2,
+      "closedPorts": 1,
+      "openPorts": 2,
+      "openPortList": [
+        "artifact",
+        "diagnostic-event"
+      ],
+      "internalPorts": [
+        "schema-verdict"
+      ],
+      "extensionCount": 0,
+      "chemistry": 0.779701,
+      "utility": 0.2,
+      "evidenceRealized": 1,
+      "distance": 3.484296,
+      "verdict": "HYPOTHESIS",
+      "domains": [
+        "governance"
+      ]
+    }
+  ],
+  "effortCeiling": {
+    "coreLines": 120,
+    "testLines": 120,
+    "shellLines": 40,
+    "newDependencies": "forbidden except shared seal utilities"
+  },
+  "checksum": "placebopick1:6d19adf095cfb5d2b80c0943e027983bfda52e8310a73addcf01ea2d59ce5660"
+}

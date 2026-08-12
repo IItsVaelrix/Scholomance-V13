@@ -7,11 +7,497 @@
 
 ## Living Document - Owned by Codex, Read by All Agents
 
-**Version: 1.36** | Last updated: 2026-08-03
+**Version: 1.42** | Last updated: 2026-08-11
 
 > Bump the version on every schema change.
 > Notify Claude for UI-consumed field changes.
 > Notify Gemini for fixture, regression-test, and backend implementation changes.
+
+---
+
+## SCHEMA CHANGE NOTICE
+
+- Schema: Cyclotron Occupancy Entropy
+- Version: 1.41 -> 1.42
+- Date: 2026-08-11
+- Changed fields: replaced resonance/confidence decay with immutable `PB-OCCUPANCY-ENTROPY-v1` search-influence results; added optional entropy configuration and `searchLandscape` diagnostics to new Cyclotron reports; registered matched `PB-CYCLOTRON-OCCUPANCY-BENCHMARK-v1` evidence
+- Breaking: yes for the unpromoted v1.41 experiment; `PB-ENTROPIC-DECAY-DAMPENER-v1` and additive reactor prediction decay fields are retired, while the pre-v1.41 reactor prediction contract is restored
+- Owner: Codex
+- Claude impact: none; no UI or client-authoritative surface
+- Gemini impact: replace resonance fixtures with exact/family/neighborhood occupancy, immutable intrinsic-energy, bounded attraction, deterministic escape, matched-arm, and replay fixtures
+- Error codes: malformed occupancy and entropy configuration fails before search influence or a Cyclotron report is emitted
+
+```ts
+interface OccupancyEntropyResultV1 {
+  contract: "PB-OCCUPANCY-ENTROPY-v1";
+  intrinsicEnergy: number; // copied unchanged from caller evidence
+  occupancy: {
+    exactRevisits: number;
+    familyRevisits: number;
+    neighborhoodRevisits: number;
+  };
+  weights: { exact: number; family: number; neighborhood: number };
+  decayLambda: number;
+  occupancyHeat: number;
+  entropicPressure: number;
+  attractionMultiplier: number;
+  effectiveAttraction: number; // search-only, never evidentiary truth
+  attractionSpent: number;
+  checksum: `occupancy-entropy1:${string}`;
+}
+
+interface CyclotronSearchLandscapeV1 {
+  intrinsicQuality: object;
+  buckets: object[];
+  entropy: {
+    enabled: boolean;
+    candidateObservations: number;
+    redirects: number;
+    selections: number;
+    pressureApplications: number;
+    meanSelectedHeat: number;
+    meanSelectedAttraction: number;
+    exact: object;
+    family: object;
+    neighborhood: object;
+  };
+}
+
+interface OccupancyEntropyEvidenceV1 {
+  contract: "PB-OCCUPANCY-ENTROPY-EVIDENCE-v1";
+  schemaVersion: "1.0.0";
+  protocol: object;
+  sweep: object;
+  exactReplay: boolean;
+  boundaries: Record<string, OccupancyEntropyResultV1>;
+  boundaryChecks: Record<string, boolean>;
+  verdict: "PASS" | "FAIL";
+  checksum: `occupancy-evidence1:${string}`;
+}
+
+interface CyclotronOccupancyBenchmarkV1 {
+  contract: "PB-CYCLOTRON-OCCUPANCY-BENCHMARK-v1";
+  schemaVersion: "1.0.0";
+  protocol: object;
+  arms: { control: object; treatment: object };
+  changes: object;
+  pairedBuckets: object;
+  criteria: object;
+  generalization: object;
+  verdict: "SEARCH_PROCESS_IMPROVED_UTILITY_UNTESTED" | "NO_DECISIVE_SEARCH_IMPROVEMENT";
+  checksum: `occupancy-benchmark1:${string}`;
+}
+```
+
+Cyclotron Occupancy Entropy invariants:
+- Entropic pressure modifies proposal selection influence only. Molecule energy,
+  novelty, grounding, evidence, Concept Chemistry output, confidence, and
+  promotion verdicts retain their intrinsic values.
+- Exact occupancy keys include environment, canonical atom IDs, and canonical
+  bonds. Family occupancy spans shared atom pairs; neighborhood occupancy spans
+  shared domain-pair/relation basins, preventing trivial checksum variations
+  from escaping accumulated pressure.
+- Occupancy heat is a weighted, sublinear `ln(1 + revisits)` accumulation and
+  effective attraction is `intrinsicEnergy * exp(-lambda * occupancyHeat)`.
+- Escape proposals are counter-addressed and bounded. Identical inputs replay
+  the same collision choices, landscape summaries, and report checksum.
+- Search improvement requires materially lower duplicates, materially higher
+  unique yield, preserved intrinsic-quality tails, and no material family or
+  neighborhood diversity collapse. It does not imply generalization accuracy
+  when no executable molecule-to-blind-task binding exists.
+
+---
+
+## SCHEMA CHANGE NOTICE
+
+- Schema: Resonance-Activated Entropic Decay Dampener
+- Version: 1.40 -> 1.41
+- Date: 2026-08-11
+- Status: retired by v1.42; retained below as historical migration context only
+- Changed fields: registered immutable `PB-ENTROPIC-DECAY-DAMPENER-v1` results, additive reactor prediction decay diagnostics, and `PB-ENTROPIC-DECAY-DAMPENER-EVIDENCE-v1` property-sweep evidence
+- Breaking: no; reactor prediction choice, margin, and calibrated fields retain their prior semantics
+- Owner: Codex
+- Claude impact: none; no UI or client-authoritative surface
+- Gemini impact: add equality-boundary, bounded-rate, no-amplification, epoch-monotonicity, checksum, and deterministic-replay fixtures
+- Error codes: malformed dampener parameters fail as typed `TypeError` diagnostics before a result is emitted
+
+```ts
+interface EntropicDecayDampenerResultV1 {
+  contract: "PB-ENTROPIC-DECAY-DAMPENER-v1";
+  resonance: number; // finite 0..1
+  baseline: number; // finite 0..1
+  activated: boolean; // true iff resonance > baseline
+  normalizedExcess: number;
+  activationIntensity: number;
+  initialStrength: number; // finite 0..1
+  epochsSinceValidation: number; // integer, never wall-clock time
+  decayRate: number;
+  maxDampening: number; // finite 0..0.99
+  dampeningFraction: number;
+  effectiveDecayRate: number;
+  undampenedStrength: number;
+  retainedStrength: number;
+  strengthPreserved: number;
+  halfLifeEpochs: number | null;
+  checksum: `entropy-damp1:${string}`;
+}
+
+interface SemanticFissionPredictionV1 {
+  relation: string;
+  choice: string;
+  margin: number;
+  calibrated: boolean;
+  confidenceActive: boolean;
+  minimumRetainedStrength: number;
+  entropicDecay: EntropicDecayDampenerResultV1;
+  genomeChecksum: `fission-genome1:${string}`;
+}
+
+interface EntropicDecayDampenerEvidenceV1 {
+  contract: "PB-ENTROPIC-DECAY-DAMPENER-EVIDENCE-v1";
+  schemaVersion: "1.0.0";
+  protocol: object;
+  sweep: object;
+  exactReplay: boolean;
+  boundaries: Record<string, EntropicDecayDampenerResultV1>;
+  boundaryChecks: Record<string, boolean>;
+  verdict: "PASS" | "FAIL";
+  checksum: `entropy-evidence1:${string}`;
+}
+```
+
+Entropic Decay Dampener invariants:
+- Activation is strict: resonance equal to or below baseline is an exact
+  undampened identity operation.
+- Dampening may only reduce the declared exponential decay rate. It may never
+  make that rate negative, increase strength above its validated initial value,
+  or convert an uncalibrated reactor prediction into a calibrated one.
+- Decay advances only through caller-declared integer validation epochs. No
+  timestamp, elapsed duration, mutable hidden state, or client verdict enters it.
+- Retained strength is monotone non-increasing across epochs and is never below
+  the corresponding ordinary-decay strength for the same declared inputs.
+- Evidence is deterministically replayable, checksum-bound, and retains failed
+  property cases as bounded negative evidence.
+
+---
+
+## SCHEMA CHANGE NOTICE
+
+- Schema: Semantic Fission Reactor
+- Version: 1.39 -> 1.40
+- Date: 2026-08-11
+- Changed fields: registered immutable `PB-SEMANTIC-FISSION-GENOME-v1`, `PB-SEMANTIC-FISSION-REPORT-v1`, and `PB-SEMANTIC-REACTOR-BENCHMARK-v1` evolutionary search and holdout evidence contracts
+- Breaking: no; additive pure-core and offline diagnostic contracts only
+- Owner: Codex
+- Claude impact: none; no UI or client-authoritative surface
+- Gemini impact: add malformed feature, split leakage, deterministic evolution, archive diversity, validation-only selection, report checksum, and unseen-test isolation fixtures
+- Error codes: invalid reactor inputs fail as typed `TypeError` diagnostics before a genome or benchmark artifact is emitted
+
+```ts
+interface SemanticFissionGenomeV1 {
+  contract: "PB-SEMANTIC-FISSION-GENOME-v1";
+  relation: string;
+  weights: number[]; // signed integers in -1000..1000
+  activeGenes: number;
+  generation: number;
+  parents: `fission-genome1:${string}`[];
+  checksum: `fission-genome1:${string}`;
+}
+
+interface SemanticFissionIslandV1 {
+  relation: string;
+  selectedGenome: SemanticFissionGenomeV1;
+  training: object;
+  validation: object;
+  confidenceCalibration: object;
+  archiveCells: number;
+  generationTrace: object[];
+  negativeEvidence: string[];
+}
+
+interface SemanticFissionReportV1 {
+  contract: "PB-SEMANTIC-FISSION-REPORT-v1";
+  schemaVersion: "1.0.0";
+  featureNames: string[];
+  relations: string[];
+  configuration: object;
+  splitChecksums: { training: string; validation: string };
+  counts: { training: number; validation: number; islands: number };
+  islands: SemanticFissionIslandV1[];
+  checksum: `fission-reactor1:${string}`;
+}
+
+interface SemanticReactorBenchmarkV1 {
+  contract: "PB-SEMANTIC-REACTOR-BENCHMARK-v1";
+  schemaVersion: "1.0.0";
+  substrate: object;
+  protocol: object;
+  reactor: SemanticFissionReportV1;
+  generalization: object;
+  aiAugmentation: object;
+  verdict: "DECISIVE_AI_AUGMENTATION" | "REACTOR_IMPROVED_NOT_AI" | "NO_DECISIVE_IMPROVEMENT";
+  checksum: `fission-benchmark1:${string}`;
+}
+```
+
+Semantic Fission Reactor invariants:
+- Only declared training tasks supply evolutionary fitness. Only disjoint
+  validation tasks select a frozen genome and confidence threshold.
+- Test tasks and sealed prior challenges are never accepted by the reactor API
+  during evolution, archive construction, genome selection, or calibration.
+- Counter-addressed initialization, fission crossover, mutation, archive
+  replacement, and tie-breaking replay exactly from declared inputs.
+- Signed sparse weights are complexity-penalized; zero-weight operators do not
+  count as active genes. Failed training cases remain bounded negative evidence.
+- A reactor improvement is decisive only when paired holdout wins exceed losses
+  with an exact two-sided sign-test probability below 0.05.
+- AI augmentation requires the same paired criterion against the sealed direct-AI
+  proposal. Reactor improvement alone cannot receive the augmentation verdict.
+- No source Cyclotron score, test answer, timestamp, runtime duration, or client
+  verdict enters reactor fitness or validation selection.
+
+---
+
+## SCHEMA CHANGE NOTICE
+
+- Schema: Blind Semantic Molecule Benchmark
+- Version: 1.38 -> 1.39
+- Date: 2026-08-11
+- Changed fields: registered sealed `PB-SEMANTIC-BLIND-CHALLENGE-v1`, `PB-SEMANTIC-DIRECT-PROPOSALS-v1`, and `PB-SEMANTIC-BLIND-BENCHMARK-v1` diagnostic evidence contracts
+- Breaking: no; additive offline evaluation artifacts only
+- Owner: Codex
+- Claude impact: none; no UI or client-authoritative surface
+- Gemini impact: add answer-redaction, proposal-binding, deterministic sampling/replay, source-exclusion, and failed-arm retention fixtures
+- Error codes: source/proposal/checksum violations halt the offline runner before benchmark evidence is written
+
+```ts
+interface SemanticBlindTaskV1 {
+  taskId: string;
+  relation: "hypernym" | "antonym" | "mero_part" | "similar";
+  instruction: string;
+  source: { lemma: string; definition: string };
+  candidates: Array<{ label: string; lemma: string; definition: string }>;
+}
+
+interface SemanticBlindChallengeV1 {
+  contract: "PB-SEMANTIC-BLIND-CHALLENGE-v1";
+  schemaVersion: "1.0.0";
+  seed: number;
+  source: object;
+  taskPolicy: object;
+  tasks: SemanticBlindTaskV1[]; // never contains an answer field
+  checksum: `blind-challenge1:${string}`;
+}
+
+interface SemanticDirectProposalsV1 {
+  contract: "PB-SEMANTIC-DIRECT-PROPOSALS-v1";
+  schemaVersion: "1.0.0";
+  challengeChecksum: `blind-challenge1:${string}`;
+  method: "one-pass-direct-ai-no-retrieval-no-answer-key";
+  choices: Array<{ taskId: string; candidateLabel: string }>;
+  checksum: `direct-proposals1:${string}`;
+}
+
+interface SemanticBlindBenchmarkV1 {
+  contract: "PB-SEMANTIC-BLIND-BENCHMARK-v1";
+  schemaVersion: "1.0.0";
+  seed: number;
+  substrate: object;
+  protocol: object;
+  methods: object[];
+  comparisons: object[];
+  novelty: { cyclotronExclusiveCorrect: number; definition: string };
+  mechanismVerdict: "SUPPORTED_ABOVE_UNIFORM_CHANCE" | "NOT_SUPPORTED";
+  theoryVerdict: "STRONGLY_VALIDATED" | "PARTIALLY_SUPPORTED" | "INCONCLUSIVE" | "NOT_VALIDATED";
+  disclosedTasks: object[];
+  checksum: `blind-benchmark1:${string}`;
+}
+```
+
+Blind Semantic Molecule Benchmark invariants:
+- The challenge is sampled deterministically from an external lexical-relation
+  substrate excluded from the original encyclopedia grounding index.
+- Challenge tasks expose candidate labels but never answer keys or target IDs.
+- The direct-AI proposal checksum binds every choice to the exact blinded
+  challenge before benchmark truth is scored.
+- All arms receive identical tasks and candidate frontiers. Failed arms and
+  per-relation outcomes remain in evidence.
+- Cyclotron selection scores from the originating 100k simulation are never
+  inputs or outcomes in this benchmark.
+- Strong validation requires separation from the random confidence interval,
+  accuracy above direct-AI and human/reference arms, and at least three correct
+  choices exclusive to Cyclotron. Lesser outcomes cannot receive that verdict.
+- Fixed database content, seed, proposal packet, and implementation replay to
+  one checksum; timestamps and runtime duration are excluded.
+
+---
+
+## SCHEMA CHANGE NOTICE
+
+- Schema: Semantic Molecule Evaluation
+- Version: 1.37 -> 1.38
+- Date: 2026-08-11
+- Changed fields: registered immutable `PB-SEMANTIC-MOLECULE-EVAL-v1` evidence for executable, ablation-controlled evaluation of ranked semantic molecule hypotheses
+- Breaking: no; additive offline diagnostic artifact only
+- Owner: Codex
+- Claude impact: none; there is no UI or client-authoritative surface
+- Gemini impact: add deterministic replay, distinct-family selection, source-checksum rejection, and favorable-verdict boundary fixtures
+- Error codes: invalid source evidence or replay divergence fails the offline runner before an evaluation artifact is written
+
+```ts
+interface SemanticMoleculeEvaluationResultV1 {
+  rank: number;
+  sourceScore: number;
+  sourceVerdict: "NUCLEUS" | "HYPOTHESIS" | "REFUSED";
+  moleculeChecksum: `molecule1:${string}`;
+  atomIds: string[];
+  implementation: string;
+  full: Readonly<Record<string, string | number | boolean>>;
+  ablation: Readonly<Record<string, string | number | boolean>>;
+  favorable: boolean;
+  reason: string;
+}
+
+interface SemanticMoleculeEvaluationReportV1 {
+  contract: "PB-SEMANTIC-MOLECULE-EVAL-v1";
+  schemaVersion: "1.0.0";
+  sourceReportChecksum: `cyclotron1:${string}`;
+  selection: "top-five-distinct-atom-families-by-final-score";
+  evaluationPolicy: {
+    controls: string;
+    favorable: string;
+    selectionScoreUsedAsOutcome: false;
+  };
+  counts: { evaluated: number; favorable: number; unfavorable: number };
+  results: SemanticMoleculeEvaluationResultV1[];
+  checksum: `molecule-eval1:${string}`;
+}
+```
+
+Semantic Molecule Evaluation invariants:
+- The sealed Cyclotron report must verify before candidates are selected.
+- Atom-ID family identity, rather than environment variants or assembly order,
+  defines distinct topologies for ranking.
+- Source selection scores are descriptive inputs and never outcome metrics.
+- Every result declares a matched ablation and an observable favorability rule.
+- A favorable verdict requires strict improvement plus every scenario-specific
+  safety invariant; equality is neutral and therefore not favorable.
+- Fixed inputs replay to the same evaluation checksum. Timing and timestamps
+  are excluded from the artifact.
+
+---
+
+## SCHEMA CHANGE NOTICE
+
+- Schema: Semantic Valence Cyclotron
+- Version: 1.36 -> 1.37
+- Date: 2026-08-11
+- Changed fields: registered immutable `PB-SEMANTIC-ATOM-v1`, `PB-SEMANTIC-MOLECULE-v1`, and `PB-SEMANTIC-CYCLOTRON-REPORT-v1` internal diagnostic contracts for typed-valence molecule generation and bounded simulation evidence
+- Breaking: no; additive pure-core and CLI diagnostic contracts only
+- Owner: Codex
+- Claude impact: none; there is no UI or client-authoritative surface
+- Gemini impact: add malformed atom, deterministic replay, control calibration, TurboQuant novelty, Osmosis anomaly, and report-checksum fixtures
+- Error codes: invalid inputs reuse PB-ERR-v1 `VALUE`/`RANGE` under the `ARTIFACT` module; discoveries are structured diagnostic candidates, not errors
+
+```ts
+type SemanticValenceDirection = "offer" | "seek";
+type SemanticMoleculeVerdict = "NUCLEUS" | "HYPOTHESIS" | "REFUSED";
+
+interface SemanticAtomV1 {
+  contract: "PB-SEMANTIC-ATOM-v1";
+  id: string;
+  label: string;
+  domain: string;
+  offers: string[];
+  seeks: string[];
+  traits: string[];
+  inhibits: string[];
+  grounding: number; // finite 0..1, derived by the caller from sealed evidence
+  evidence: string[];
+  checksum: `atom1:${string}`;
+}
+
+interface SemanticValenceBondV1 {
+  fromAtomId: string;
+  toAtomId: string;
+  offer: string;
+  seek: string;
+  relation: string;
+  strength: number; // finite 0..1
+  licensed: boolean;
+}
+
+interface SemanticMoleculeV1 {
+  contract: "PB-SEMANTIC-MOLECULE-v1";
+  environment: string;
+  atomIds: string[];
+  bonds: SemanticValenceBondV1[];
+  label: string; // deterministic description derived from atoms and bonds
+  energy: number;
+  novelty: number;
+  grounding: number;
+  valenceSatisfaction: number;
+  checksum: `molecule1:${string}`;
+}
+
+interface SemanticCyclotronCandidateV1 {
+  molecule: SemanticMoleculeV1;
+  conceptChemistry: object;
+  osmosis: MemoryCellOsmosisResult;
+  finalScore: number;
+  verdict: SemanticMoleculeVerdict;
+}
+
+interface SemanticCyclotronReportV1 {
+  contract: "PB-SEMANTIC-CYCLOTRON-REPORT-v1";
+  schemaVersion: "1.0.0";
+  seed: number;
+  requestedTrials: number;
+  completedTrials: number;
+  atomBankChecksum: `atombank1:${string}`;
+  groundingIndexChecksum: string | null;
+  configuration: object;
+  counts: {
+    candidateTrials: number;
+    controlTrials: number;
+    unboundTrials: number;
+    duplicateMolecules: number;
+    uniqueMolecules: number;
+    shortlisted: number;
+    nuclei: number;
+    hypotheses: number;
+    refused: number;
+  };
+  control: { percentile: number; bar: number; samples: number };
+  candidates: SemanticCyclotronCandidateV1[];
+  checksum: `cyclotron1:${string}`;
+}
+```
+
+Semantic Valence Cyclotron invariants:
+- Trial variation is derived only from declared input, an integer seed, and the
+  canonical trial counter. Replaying identical inputs produces an identical
+  report checksum.
+- TurboQuant is a comparison/reranking substrate. It never creates atom IDs,
+  bonds, labels, or promotion verdicts.
+- A bond is licensed only when an offered port satisfies a sought port exactly
+  or through a declared bridge rule. Shuffled controls use the same atom and
+  environment opportunity but carry unlicensed bonds.
+- Molecule identity excludes the trial counter. Repeated assembly of the same
+  topology is a duplicate, not a discovery. Atom order, bond order, vector
+  accumulation, labels, and Concept Chemistry reactants canonicalize from the
+  molecule topology rather than the path that assembled it.
+- Shortlisting applies a bounded per-topology family cap so environment variants
+  cannot monopolize the slow validation frontier.
+- Osmosis remains anomaly-only. A novelty anomaly may nominate a hypothesis but
+  never certifies semantic truth or mutates memory.
+- Nucleus promotion additionally requires the configured cross-domain, novelty,
+  signed-PMI, and final-score floors; a high feasibility score alone is never
+  sufficient.
+- `NUCLEUS` and `HYPOTHESIS` are diagnostic labels. Neither auto-registers a
+  semantic relation, changes scoring weights, or becomes server authority.
+- Reports contain aggregate counts and bounded candidates, not raw user text,
+  wall-clock time, runtime duration, or environment-dependent metadata.
 
 ---
 
@@ -2929,6 +3415,13 @@ conceptId asc. `CareerGraphManifest` seals a built artifact with `artifactId`, `
 | 1.33 | 2026-07-18 | Added Lexical Graph Foundation overlay schemas (`LexicalEntry`, relations, literary devices, embeddings, FTS cursor) | no |
 | 1.34 | 2026-07-24 | Added Career Graph contracts (`CareerPolicyBundle`, `OccupationCandidate`, `SkillClassification`, `CareerGraphAnalysis`, `CareerGraphManifest`) with namespaced O*NET/ESCO identities, `mapped_to` crosswalk predicate, and the mandatory-posting-evidence missing-skill law | no |
 | 1.35 | 2026-07-29 | Registered `PB-GEOMETRY-CONSTRUCTION-v1`, canonical nested Wand construction requests, complete primitive/constraint vocabularies, recursive freezing, and SHA-256 construction/result identities | no |
+| 1.36 | 2026-08-03 | Registered `SUBTLETY-RESONANCE-RECORD-v2` with optional sealed observation context while preserving v1 readability | no |
+| 1.37 | 2026-08-11 | Registered deterministic Semantic Valence Cyclotron atom, molecule, and diagnostic report contracts | no |
+| 1.38 | 2026-08-11 | Registered deterministic, ablation-controlled evaluation evidence for ranked semantic molecule hypotheses | no |
+| 1.39 | 2026-08-11 | Registered blinded external semantic-relation challenge, sealed direct-AI proposals, and comparative benchmark evidence | no |
+| 1.40 | 2026-08-11 | Registered deterministic Semantic Fission Reactor genomes, validation-selected island reports, and decisive holdout benchmark evidence | no |
+| 1.41 | 2026-08-11 | Registered resonance-activated bounded entropic decay results, additive reactor confidence persistence, and deterministic property-sweep evidence | no |
+| 1.42 | 2026-08-11 | Retired resonance/confidence decay; registered exact/family/neighborhood occupancy entropy over Cyclotron search influence and matched benchmark evidence | yes (unpromoted 1.41 experiment only) |
 
 ---
 

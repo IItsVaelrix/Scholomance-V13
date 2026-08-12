@@ -1,0 +1,2169 @@
+{
+  "contract": "PB-CODEBASE-NUCLEI-ABLATION-v1",
+  "schemaVersion": "1.0.0",
+  "seed": 6045712,
+  "trials": 8000,
+  "arms": [
+    {
+      "condition": "baseline",
+      "question": "Real extension atoms — control arm",
+      "entropyEnabled": true,
+      "requireExtension": true,
+      "atomCount": 56,
+      "extensionIds": [
+        "process-sensor",
+        "artifact-auditor",
+        "subtlety-fingerprint",
+        "subtlety-closed-loop",
+        "raid-healer",
+        "fission-reactor",
+        "ccg-channel",
+        "treebank-metrics",
+        "precedent-compose",
+        "entropy-dampener",
+        "test-contract",
+        "canonical-tokenizer-atom"
+      ],
+      "elapsedMs": 5392,
+      "counts": {
+        "candidateTrials": 6400,
+        "controlTrials": 1600,
+        "duplicateMolecules": 1188,
+        "hypotheses": 32,
+        "nuclei": 43,
+        "refused": 181,
+        "shortlisted": 256,
+        "unboundTrials": 0,
+        "uniqueMolecules": 5212
+      },
+      "checksum": "cyclotron1:91f5b0a0cc7d60adcc3701b9cfcaa205",
+      "atomBankChecksum": "atombank1:470f7196ad478832",
+      "uniqueNucleusTopologies": 29,
+      "nucleusTopologies": [
+        "bytecode-seal|canonical-serializer|schema-verifier",
+        "semantic-memory|valence-compiler",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|semantic-memory",
+        "bytecode-seal|canonical-serializer|evidence-ledger|schema-verifier",
+        "bytecode-seal|canonical-serializer|immutable-packet|semantic-memory",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|server-authority",
+        "canonical-serializer|evidence-ledger|schema-verifier",
+        "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|schema-verifier",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|test-contract",
+        "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier|semantic-memory",
+        "canonical-serializer|evidence-ledger",
+        "bytecode-seal|canonical-serializer|evidence-ledger",
+        "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor|schema-verifier",
+        "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier",
+        "cyclotron-reactor|retrieval-index|valence-compiler",
+        "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet",
+        "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|test-contract",
+        "canonical-serializer|schema-verifier",
+        "canonical-serializer|evidence-ledger|immutable-packet",
+        "canonical-serializer|schema-verifier|server-authority",
+        "canonical-serializer|immutable-packet|schema-verifier",
+        "canonical-serializer|evidence-ledger|schema-verifier|test-contract",
+        "fission-reactor|law-gate|molecule-generator"
+      ],
+      "uniqueHypothesisTopologies": 16,
+      "proposalCount": 12,
+      "proposalTopologies": [
+        "process-sensor|test-contract|valence-compiler",
+        "canonical-serializer|evidence-ledger|schema-verifier|test-contract",
+        "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor",
+        "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor|schema-verifier",
+        "process-sensor|retrieval-index",
+        "process-sensor|valence-compiler",
+        "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|test-contract",
+        "schema-verifier|test-contract",
+        "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier|test-contract",
+        "fission-reactor|law-gate|molecule-generator",
+        "canonical-serializer|schema-verifier|test-contract",
+        "process-sensor|retrieval-index|valence-compiler"
+      ],
+      "proposals": [
+        {
+          "topology": "process-sensor|test-contract|valence-compiler",
+          "atomIds": [
+            "process-sensor",
+            "test-contract",
+            "valence-compiler"
+          ],
+          "utility": 0.616588,
+          "finalScore": 0.658732,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 2
+        },
+        {
+          "topology": "canonical-serializer|evidence-ledger|schema-verifier|test-contract",
+          "atomIds": [
+            "canonical-serializer",
+            "evidence-ledger",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.558589,
+          "finalScore": 0.727354,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "evidence-ledger",
+            "process-sensor"
+          ],
+          "utility": 0.548505,
+          "finalScore": 0.720479,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor|schema-verifier",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "evidence-ledger",
+            "process-sensor",
+            "schema-verifier"
+          ],
+          "utility": 0.539304,
+          "finalScore": 0.74229,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "process-sensor|retrieval-index",
+          "atomIds": [
+            "process-sensor",
+            "retrieval-index"
+          ],
+          "utility": 0.533144,
+          "finalScore": 0.650653,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "process-sensor|valence-compiler",
+          "atomIds": [
+            "process-sensor",
+            "valence-compiler"
+          ],
+          "utility": 0.522216,
+          "finalScore": 0.719164,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|test-contract",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "evidence-ledger",
+            "immutable-packet",
+            "test-contract"
+          ],
+          "utility": 0.518321,
+          "finalScore": 0.737821,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "schema-verifier|test-contract",
+          "atomIds": [
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.515905,
+          "finalScore": 0.754114,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier|test-contract",
+          "atomIds": [
+            "canonical-serializer",
+            "evidence-ledger",
+            "immutable-packet",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.513544,
+          "finalScore": 0.716107,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "fission-reactor|law-gate|molecule-generator",
+          "atomIds": [
+            "fission-reactor",
+            "law-gate",
+            "molecule-generator"
+          ],
+          "utility": 0.512403,
+          "finalScore": 0.723046,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "canonical-serializer|schema-verifier|test-contract",
+          "atomIds": [
+            "canonical-serializer",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.509832,
+          "finalScore": 0.674995,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "process-sensor|retrieval-index|valence-compiler",
+          "atomIds": [
+            "process-sensor",
+            "retrieval-index",
+            "valence-compiler"
+          ],
+          "utility": 0.50583,
+          "finalScore": 0.693165,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        }
+      ],
+      "withProcessSensor": 6,
+      "withTestContract": 6,
+      "withFission": 1,
+      "sealHeavyProposals": 4,
+      "extensionBearingProposals": 12,
+      "meanProposalUtility": 0.532848,
+      "meanProposalChemistry": 0.709827,
+      "collapseRatio": 0.325581,
+      "extensionHitCounts": {
+        "process-sensor": 24,
+        "artifact-auditor": 102,
+        "subtlety-fingerprint": 2,
+        "subtlety-closed-loop": 0,
+        "raid-healer": 3,
+        "fission-reactor": 3,
+        "ccg-channel": 0,
+        "treebank-metrics": 0,
+        "precedent-compose": 2,
+        "entropy-dampener": 0,
+        "test-contract": 62,
+        "canonical-tokenizer-atom": 0
+      },
+      "jaccardVsBaseline": 1
+    },
+    {
+      "condition": "shuffled_ports",
+      "question": "Does topology matter?",
+      "entropyEnabled": true,
+      "requireExtension": true,
+      "atomCount": 56,
+      "extensionIds": [
+        "process-sensor",
+        "artifact-auditor",
+        "subtlety-fingerprint",
+        "subtlety-closed-loop",
+        "raid-healer",
+        "fission-reactor",
+        "ccg-channel",
+        "treebank-metrics",
+        "precedent-compose",
+        "entropy-dampener",
+        "test-contract",
+        "canonical-tokenizer-atom"
+      ],
+      "elapsedMs": 4302,
+      "counts": {
+        "candidateTrials": 6400,
+        "controlTrials": 1600,
+        "duplicateMolecules": 1168,
+        "hypotheses": 18,
+        "nuclei": 19,
+        "refused": 219,
+        "shortlisted": 256,
+        "unboundTrials": 0,
+        "uniqueMolecules": 5232
+      },
+      "checksum": "cyclotron1:408306216e5833d362da2134450d439c",
+      "atomBankChecksum": "atombank1:e2e19e22fdba73fc",
+      "uniqueNucleusTopologies": 13,
+      "nucleusTopologies": [
+        "correspondence-registry|valence-compiler",
+        "schema-verifier|semantic-memory",
+        "canonical-serializer|valence-compiler",
+        "fission-reactor|test-contract|valence-compiler",
+        "correspondence-registry|phonetic-encoder|valence-compiler",
+        "canonical-serializer|phonetic-encoder",
+        "canonical-serializer|law-gate|osmosis-receptor|valence-compiler",
+        "canonical-serializer|phonetic-encoder|test-contract|valence-compiler",
+        "canonical-serializer|law-gate|osmosis-receptor|phonetic-encoder",
+        "fission-reactor|osmosis-receptor|phonetic-encoder|test-contract",
+        "correspondence-registry|test-contract|valence-compiler",
+        "canonical-serializer|law-gate|osmosis-receptor",
+        "canonical-serializer|grounding-index|law-gate|osmosis-receptor|phonetic-encoder"
+      ],
+      "uniqueHypothesisTopologies": 14,
+      "proposalCount": 12,
+      "proposalTopologies": [
+        "process-sensor|test-contract|valence-compiler",
+        "fission-reactor|test-contract|valence-compiler",
+        "fission-reactor|query-expander|test-contract",
+        "fission-reactor|osmosis-receptor|phonetic-encoder|test-contract",
+        "test-contract|valence-compiler",
+        "canonical-serializer|test-contract|valence-compiler",
+        "canonical-serializer|corpus-loader|test-contract",
+        "correspondence-registry|test-contract|valence-compiler",
+        "canonical-serializer|phonetic-encoder|process-sensor|test-contract|valence-compiler",
+        "law-gate|osmosis-receptor|phonetic-encoder|raid-healer|test-contract",
+        "canonical-serializer|test-contract",
+        "canonical-serializer|corpus-loader|correspondence-registry|test-contract|valence-compiler"
+      ],
+      "proposals": [
+        {
+          "topology": "process-sensor|test-contract|valence-compiler",
+          "atomIds": [
+            "process-sensor",
+            "test-contract",
+            "valence-compiler"
+          ],
+          "utility": 0.651261,
+          "finalScore": 0.657246,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 2
+        },
+        {
+          "topology": "fission-reactor|test-contract|valence-compiler",
+          "atomIds": [
+            "fission-reactor",
+            "test-contract",
+            "valence-compiler"
+          ],
+          "utility": 0.6405,
+          "finalScore": 0.744699,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 2
+        },
+        {
+          "topology": "fission-reactor|query-expander|test-contract",
+          "atomIds": [
+            "fission-reactor",
+            "query-expander",
+            "test-contract"
+          ],
+          "utility": 0.58934,
+          "finalScore": 0.630332,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 2
+        },
+        {
+          "topology": "fission-reactor|osmosis-receptor|phonetic-encoder|test-contract",
+          "atomIds": [
+            "fission-reactor",
+            "osmosis-receptor",
+            "phonetic-encoder",
+            "test-contract"
+          ],
+          "utility": 0.575487,
+          "finalScore": 0.732734,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 2
+        },
+        {
+          "topology": "test-contract|valence-compiler",
+          "atomIds": [
+            "test-contract",
+            "valence-compiler"
+          ],
+          "utility": 0.571958,
+          "finalScore": 0.690716,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "canonical-serializer|test-contract|valence-compiler",
+          "atomIds": [
+            "canonical-serializer",
+            "test-contract",
+            "valence-compiler"
+          ],
+          "utility": 0.561188,
+          "finalScore": 0.726611,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "canonical-serializer|corpus-loader|test-contract",
+          "atomIds": [
+            "canonical-serializer",
+            "corpus-loader",
+            "test-contract"
+          ],
+          "utility": 0.555103,
+          "finalScore": 0.698952,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "correspondence-registry|test-contract|valence-compiler",
+          "atomIds": [
+            "correspondence-registry",
+            "test-contract",
+            "valence-compiler"
+          ],
+          "utility": 0.542395,
+          "finalScore": 0.723006,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "canonical-serializer|phonetic-encoder|process-sensor|test-contract|valence-compiler",
+          "atomIds": [
+            "canonical-serializer",
+            "phonetic-encoder",
+            "process-sensor",
+            "test-contract",
+            "valence-compiler"
+          ],
+          "utility": 0.537743,
+          "finalScore": 0.688444,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 2
+        },
+        {
+          "topology": "law-gate|osmosis-receptor|phonetic-encoder|raid-healer|test-contract",
+          "atomIds": [
+            "law-gate",
+            "osmosis-receptor",
+            "phonetic-encoder",
+            "raid-healer",
+            "test-contract"
+          ],
+          "utility": 0.53471,
+          "finalScore": 0.681738,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 2
+        },
+        {
+          "topology": "canonical-serializer|test-contract",
+          "atomIds": [
+            "canonical-serializer",
+            "test-contract"
+          ],
+          "utility": 0.534289,
+          "finalScore": 0.655857,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "canonical-serializer|corpus-loader|correspondence-registry|test-contract|valence-compiler",
+          "atomIds": [
+            "canonical-serializer",
+            "corpus-loader",
+            "correspondence-registry",
+            "test-contract",
+            "valence-compiler"
+          ],
+          "utility": 0.52569,
+          "finalScore": 0.68041,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        }
+      ],
+      "withProcessSensor": 2,
+      "withTestContract": 12,
+      "withFission": 3,
+      "sealHeavyProposals": 0,
+      "extensionBearingProposals": 12,
+      "meanProposalUtility": 0.568305,
+      "meanProposalChemistry": 0.692562,
+      "collapseRatio": 0.315789,
+      "extensionHitCounts": {
+        "process-sensor": 23,
+        "artifact-auditor": 65,
+        "subtlety-fingerprint": 0,
+        "subtlety-closed-loop": 3,
+        "raid-healer": 1,
+        "fission-reactor": 12,
+        "ccg-channel": 2,
+        "treebank-metrics": 0,
+        "precedent-compose": 0,
+        "entropy-dampener": 0,
+        "test-contract": 77,
+        "canonical-tokenizer-atom": 5
+      },
+      "jaccardVsBaseline": 0.043478
+    },
+    {
+      "condition": "random_evidence",
+      "question": "Does grounding (evidence path) matter?",
+      "entropyEnabled": true,
+      "requireExtension": true,
+      "atomCount": 56,
+      "extensionIds": [
+        "process-sensor",
+        "artifact-auditor",
+        "subtlety-fingerprint",
+        "subtlety-closed-loop",
+        "raid-healer",
+        "fission-reactor",
+        "ccg-channel",
+        "treebank-metrics",
+        "precedent-compose",
+        "entropy-dampener",
+        "test-contract",
+        "canonical-tokenizer-atom"
+      ],
+      "elapsedMs": 3742,
+      "counts": {
+        "candidateTrials": 6400,
+        "controlTrials": 1600,
+        "duplicateMolecules": 1188,
+        "hypotheses": 32,
+        "nuclei": 43,
+        "refused": 181,
+        "shortlisted": 256,
+        "unboundTrials": 0,
+        "uniqueMolecules": 5212
+      },
+      "checksum": "cyclotron1:cadfd3e9847d45030d35a08179585e7f",
+      "atomBankChecksum": "atombank1:b058d64e6a779570",
+      "uniqueNucleusTopologies": 29,
+      "nucleusTopologies": [
+        "bytecode-seal|canonical-serializer|schema-verifier",
+        "semantic-memory|valence-compiler",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|semantic-memory",
+        "bytecode-seal|canonical-serializer|evidence-ledger|schema-verifier",
+        "bytecode-seal|canonical-serializer|immutable-packet|semantic-memory",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|server-authority",
+        "canonical-serializer|evidence-ledger|schema-verifier",
+        "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|schema-verifier",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|test-contract",
+        "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier|semantic-memory",
+        "canonical-serializer|evidence-ledger",
+        "bytecode-seal|canonical-serializer|evidence-ledger",
+        "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor|schema-verifier",
+        "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier",
+        "cyclotron-reactor|retrieval-index|valence-compiler",
+        "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet",
+        "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|test-contract",
+        "canonical-serializer|schema-verifier",
+        "canonical-serializer|evidence-ledger|immutable-packet",
+        "canonical-serializer|schema-verifier|server-authority",
+        "canonical-serializer|immutable-packet|schema-verifier",
+        "canonical-serializer|evidence-ledger|schema-verifier|test-contract",
+        "fission-reactor|law-gate|molecule-generator"
+      ],
+      "uniqueHypothesisTopologies": 16,
+      "proposalCount": 12,
+      "proposalTopologies": [
+        "process-sensor|test-contract|valence-compiler",
+        "canonical-serializer|evidence-ledger|schema-verifier|test-contract",
+        "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor",
+        "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor|schema-verifier",
+        "process-sensor|retrieval-index",
+        "process-sensor|valence-compiler",
+        "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|test-contract",
+        "schema-verifier|test-contract",
+        "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier|test-contract",
+        "fission-reactor|law-gate|molecule-generator",
+        "canonical-serializer|schema-verifier|test-contract",
+        "process-sensor|retrieval-index|valence-compiler"
+      ],
+      "proposals": [
+        {
+          "topology": "process-sensor|test-contract|valence-compiler",
+          "atomIds": [
+            "process-sensor",
+            "test-contract",
+            "valence-compiler"
+          ],
+          "utility": 0.616588,
+          "finalScore": 0.658732,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 2
+        },
+        {
+          "topology": "canonical-serializer|evidence-ledger|schema-verifier|test-contract",
+          "atomIds": [
+            "canonical-serializer",
+            "evidence-ledger",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.558589,
+          "finalScore": 0.727354,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "evidence-ledger",
+            "process-sensor"
+          ],
+          "utility": 0.548505,
+          "finalScore": 0.720479,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor|schema-verifier",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "evidence-ledger",
+            "process-sensor",
+            "schema-verifier"
+          ],
+          "utility": 0.539304,
+          "finalScore": 0.74229,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "process-sensor|retrieval-index",
+          "atomIds": [
+            "process-sensor",
+            "retrieval-index"
+          ],
+          "utility": 0.533144,
+          "finalScore": 0.650653,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "process-sensor|valence-compiler",
+          "atomIds": [
+            "process-sensor",
+            "valence-compiler"
+          ],
+          "utility": 0.522216,
+          "finalScore": 0.719164,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|test-contract",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "evidence-ledger",
+            "immutable-packet",
+            "test-contract"
+          ],
+          "utility": 0.518321,
+          "finalScore": 0.737821,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "schema-verifier|test-contract",
+          "atomIds": [
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.515905,
+          "finalScore": 0.754114,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier|test-contract",
+          "atomIds": [
+            "canonical-serializer",
+            "evidence-ledger",
+            "immutable-packet",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.513544,
+          "finalScore": 0.716107,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "fission-reactor|law-gate|molecule-generator",
+          "atomIds": [
+            "fission-reactor",
+            "law-gate",
+            "molecule-generator"
+          ],
+          "utility": 0.512403,
+          "finalScore": 0.723046,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "canonical-serializer|schema-verifier|test-contract",
+          "atomIds": [
+            "canonical-serializer",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.509832,
+          "finalScore": 0.674995,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "process-sensor|retrieval-index|valence-compiler",
+          "atomIds": [
+            "process-sensor",
+            "retrieval-index",
+            "valence-compiler"
+          ],
+          "utility": 0.50583,
+          "finalScore": 0.693165,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        }
+      ],
+      "withProcessSensor": 6,
+      "withTestContract": 6,
+      "withFission": 1,
+      "sealHeavyProposals": 4,
+      "extensionBearingProposals": 12,
+      "meanProposalUtility": 0.532848,
+      "meanProposalChemistry": 0.709827,
+      "collapseRatio": 0.325581,
+      "extensionHitCounts": {
+        "process-sensor": 24,
+        "artifact-auditor": 102,
+        "subtlety-fingerprint": 2,
+        "subtlety-closed-loop": 0,
+        "raid-healer": 3,
+        "fission-reactor": 3,
+        "ccg-channel": 0,
+        "treebank-metrics": 0,
+        "precedent-compose": 2,
+        "entropy-dampener": 0,
+        "test-contract": 62,
+        "canonical-tokenizer-atom": 0
+      },
+      "jaccardVsBaseline": 1
+    },
+    {
+      "condition": "entropy_off",
+      "question": "Does search collapse recur?",
+      "entropyEnabled": false,
+      "requireExtension": true,
+      "atomCount": 56,
+      "extensionIds": [
+        "process-sensor",
+        "artifact-auditor",
+        "subtlety-fingerprint",
+        "subtlety-closed-loop",
+        "raid-healer",
+        "fission-reactor",
+        "ccg-channel",
+        "treebank-metrics",
+        "precedent-compose",
+        "entropy-dampener",
+        "test-contract",
+        "canonical-tokenizer-atom"
+      ],
+      "elapsedMs": 2257,
+      "counts": {
+        "candidateTrials": 6400,
+        "controlTrials": 1600,
+        "duplicateMolecules": 1188,
+        "hypotheses": 32,
+        "nuclei": 43,
+        "refused": 181,
+        "shortlisted": 256,
+        "unboundTrials": 0,
+        "uniqueMolecules": 5212
+      },
+      "checksum": "cyclotron1:91f5b0a0cc7d60adcc3701b9cfcaa205",
+      "atomBankChecksum": "atombank1:470f7196ad478832",
+      "uniqueNucleusTopologies": 29,
+      "nucleusTopologies": [
+        "bytecode-seal|canonical-serializer|schema-verifier",
+        "semantic-memory|valence-compiler",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|semantic-memory",
+        "bytecode-seal|canonical-serializer|evidence-ledger|schema-verifier",
+        "bytecode-seal|canonical-serializer|immutable-packet|semantic-memory",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|server-authority",
+        "canonical-serializer|evidence-ledger|schema-verifier",
+        "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|schema-verifier",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|test-contract",
+        "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier|semantic-memory",
+        "canonical-serializer|evidence-ledger",
+        "bytecode-seal|canonical-serializer|evidence-ledger",
+        "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor|schema-verifier",
+        "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier",
+        "cyclotron-reactor|retrieval-index|valence-compiler",
+        "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet",
+        "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|test-contract",
+        "canonical-serializer|schema-verifier",
+        "canonical-serializer|evidence-ledger|immutable-packet",
+        "canonical-serializer|schema-verifier|server-authority",
+        "canonical-serializer|immutable-packet|schema-verifier",
+        "canonical-serializer|evidence-ledger|schema-verifier|test-contract",
+        "fission-reactor|law-gate|molecule-generator"
+      ],
+      "uniqueHypothesisTopologies": 16,
+      "proposalCount": 12,
+      "proposalTopologies": [
+        "process-sensor|test-contract|valence-compiler",
+        "canonical-serializer|evidence-ledger|schema-verifier|test-contract",
+        "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor",
+        "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor|schema-verifier",
+        "process-sensor|retrieval-index",
+        "process-sensor|valence-compiler",
+        "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|test-contract",
+        "schema-verifier|test-contract",
+        "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier|test-contract",
+        "fission-reactor|law-gate|molecule-generator",
+        "canonical-serializer|schema-verifier|test-contract",
+        "process-sensor|retrieval-index|valence-compiler"
+      ],
+      "proposals": [
+        {
+          "topology": "process-sensor|test-contract|valence-compiler",
+          "atomIds": [
+            "process-sensor",
+            "test-contract",
+            "valence-compiler"
+          ],
+          "utility": 0.616588,
+          "finalScore": 0.658732,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 2
+        },
+        {
+          "topology": "canonical-serializer|evidence-ledger|schema-verifier|test-contract",
+          "atomIds": [
+            "canonical-serializer",
+            "evidence-ledger",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.558589,
+          "finalScore": 0.727354,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "evidence-ledger",
+            "process-sensor"
+          ],
+          "utility": 0.548505,
+          "finalScore": 0.720479,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor|schema-verifier",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "evidence-ledger",
+            "process-sensor",
+            "schema-verifier"
+          ],
+          "utility": 0.539304,
+          "finalScore": 0.74229,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "process-sensor|retrieval-index",
+          "atomIds": [
+            "process-sensor",
+            "retrieval-index"
+          ],
+          "utility": 0.533144,
+          "finalScore": 0.650653,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "process-sensor|valence-compiler",
+          "atomIds": [
+            "process-sensor",
+            "valence-compiler"
+          ],
+          "utility": 0.522216,
+          "finalScore": 0.719164,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|test-contract",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "evidence-ledger",
+            "immutable-packet",
+            "test-contract"
+          ],
+          "utility": 0.518321,
+          "finalScore": 0.737821,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "schema-verifier|test-contract",
+          "atomIds": [
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.515905,
+          "finalScore": 0.754114,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier|test-contract",
+          "atomIds": [
+            "canonical-serializer",
+            "evidence-ledger",
+            "immutable-packet",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.513544,
+          "finalScore": 0.716107,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "fission-reactor|law-gate|molecule-generator",
+          "atomIds": [
+            "fission-reactor",
+            "law-gate",
+            "molecule-generator"
+          ],
+          "utility": 0.512403,
+          "finalScore": 0.723046,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "canonical-serializer|schema-verifier|test-contract",
+          "atomIds": [
+            "canonical-serializer",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.509832,
+          "finalScore": 0.674995,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "process-sensor|retrieval-index|valence-compiler",
+          "atomIds": [
+            "process-sensor",
+            "retrieval-index",
+            "valence-compiler"
+          ],
+          "utility": 0.50583,
+          "finalScore": 0.693165,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        }
+      ],
+      "withProcessSensor": 6,
+      "withTestContract": 6,
+      "withFission": 1,
+      "sealHeavyProposals": 4,
+      "extensionBearingProposals": 12,
+      "meanProposalUtility": 0.532848,
+      "meanProposalChemistry": 0.709827,
+      "collapseRatio": 0.325581,
+      "extensionHitCounts": {
+        "process-sensor": 24,
+        "artifact-auditor": 102,
+        "subtlety-fingerprint": 2,
+        "subtlety-closed-loop": 0,
+        "raid-healer": 3,
+        "fission-reactor": 3,
+        "ccg-channel": 0,
+        "treebank-metrics": 0,
+        "precedent-compose": 2,
+        "entropy-dampener": 0,
+        "test-contract": 62,
+        "canonical-tokenizer-atom": 0
+      },
+      "jaccardVsBaseline": 1
+    },
+    {
+      "condition": "extension_req_off",
+      "question": "Does the legacy bank monopolize discovery?",
+      "entropyEnabled": true,
+      "requireExtension": false,
+      "atomCount": 56,
+      "extensionIds": [
+        "process-sensor",
+        "artifact-auditor",
+        "subtlety-fingerprint",
+        "subtlety-closed-loop",
+        "raid-healer",
+        "fission-reactor",
+        "ccg-channel",
+        "treebank-metrics",
+        "precedent-compose",
+        "entropy-dampener",
+        "test-contract",
+        "canonical-tokenizer-atom"
+      ],
+      "elapsedMs": 2108,
+      "counts": {
+        "candidateTrials": 6400,
+        "controlTrials": 1600,
+        "duplicateMolecules": 1188,
+        "hypotheses": 32,
+        "nuclei": 43,
+        "refused": 181,
+        "shortlisted": 256,
+        "unboundTrials": 0,
+        "uniqueMolecules": 5212
+      },
+      "checksum": "cyclotron1:91f5b0a0cc7d60adcc3701b9cfcaa205",
+      "atomBankChecksum": "atombank1:470f7196ad478832",
+      "uniqueNucleusTopologies": 29,
+      "nucleusTopologies": [
+        "bytecode-seal|canonical-serializer|schema-verifier",
+        "semantic-memory|valence-compiler",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|semantic-memory",
+        "bytecode-seal|canonical-serializer|evidence-ledger|schema-verifier",
+        "bytecode-seal|canonical-serializer|immutable-packet|semantic-memory",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|server-authority",
+        "canonical-serializer|evidence-ledger|schema-verifier",
+        "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|schema-verifier",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|test-contract",
+        "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier|semantic-memory",
+        "canonical-serializer|evidence-ledger",
+        "bytecode-seal|canonical-serializer|evidence-ledger",
+        "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor|schema-verifier",
+        "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier",
+        "cyclotron-reactor|retrieval-index|valence-compiler",
+        "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet",
+        "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|test-contract",
+        "canonical-serializer|schema-verifier",
+        "canonical-serializer|evidence-ledger|immutable-packet",
+        "canonical-serializer|schema-verifier|server-authority",
+        "canonical-serializer|immutable-packet|schema-verifier",
+        "canonical-serializer|evidence-ledger|schema-verifier|test-contract",
+        "fission-reactor|law-gate|molecule-generator"
+      ],
+      "uniqueHypothesisTopologies": 16,
+      "proposalCount": 12,
+      "proposalTopologies": [
+        "bytecode-seal|canonical-serializer|schema-verifier",
+        "schema-verifier|server-authority",
+        "semantic-memory|valence-compiler",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier",
+        "bytecode-seal|canonical-serializer|evidence-ledger|schema-verifier",
+        "bytecode-seal|canonical-serializer|immutable-packet|semantic-memory",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|server-authority",
+        "bytecode-seal|canonical-serializer|immutable-packet",
+        "canonical-serializer|evidence-ledger|schema-verifier",
+        "bytecode-seal|canonical-serializer",
+        "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|schema-verifier",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|test-contract"
+      ],
+      "proposals": [
+        {
+          "topology": "bytecode-seal|canonical-serializer|schema-verifier",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "schema-verifier"
+          ],
+          "utility": 0.2,
+          "finalScore": 0.783055,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 0
+        },
+        {
+          "topology": "schema-verifier|server-authority",
+          "atomIds": [
+            "schema-verifier",
+            "server-authority"
+          ],
+          "utility": 0.2,
+          "finalScore": 0.779701,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 0
+        },
+        {
+          "topology": "semantic-memory|valence-compiler",
+          "atomIds": [
+            "semantic-memory",
+            "valence-compiler"
+          ],
+          "utility": 0.35,
+          "finalScore": 0.773291,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 0
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "immutable-packet",
+            "schema-verifier"
+          ],
+          "utility": 0.2,
+          "finalScore": 0.766813,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 0
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|evidence-ledger|schema-verifier",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "evidence-ledger",
+            "schema-verifier"
+          ],
+          "utility": 0.2,
+          "finalScore": 0.762811,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 0
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|immutable-packet|semantic-memory",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "immutable-packet",
+            "semantic-memory"
+          ],
+          "utility": 0.2,
+          "finalScore": 0.760983,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 0
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|server-authority",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "immutable-packet",
+            "schema-verifier",
+            "server-authority"
+          ],
+          "utility": 0.2,
+          "finalScore": 0.760062,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 0
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|immutable-packet",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "immutable-packet"
+          ],
+          "utility": 0.2,
+          "finalScore": 0.75915,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 0
+        },
+        {
+          "topology": "canonical-serializer|evidence-ledger|schema-verifier",
+          "atomIds": [
+            "canonical-serializer",
+            "evidence-ledger",
+            "schema-verifier"
+          ],
+          "utility": 0.2,
+          "finalScore": 0.758631,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 0
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer"
+          ],
+          "utility": 0.2,
+          "finalScore": 0.756864,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 0
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|schema-verifier",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "evidence-ledger",
+            "immutable-packet",
+            "schema-verifier"
+          ],
+          "utility": 0.2,
+          "finalScore": 0.754986,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 0
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|test-contract",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "immutable-packet",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.502036,
+          "finalScore": 0.754708,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        }
+      ],
+      "withProcessSensor": 0,
+      "withTestContract": 1,
+      "withFission": 0,
+      "sealHeavyProposals": 10,
+      "extensionBearingProposals": 1,
+      "meanProposalUtility": 0.23767,
+      "meanProposalChemistry": 0.764255,
+      "collapseRatio": 0.325581,
+      "extensionHitCounts": {
+        "process-sensor": 24,
+        "artifact-auditor": 102,
+        "subtlety-fingerprint": 2,
+        "subtlety-closed-loop": 0,
+        "raid-healer": 3,
+        "fission-reactor": 3,
+        "ccg-channel": 0,
+        "treebank-metrics": 0,
+        "precedent-compose": 2,
+        "entropy-dampener": 0,
+        "test-contract": 62,
+        "canonical-tokenizer-atom": 0
+      },
+      "jaccardVsBaseline": 0
+    },
+    {
+      "condition": "no_process_sensor",
+      "question": "What architectures disappear?",
+      "entropyEnabled": true,
+      "requireExtension": true,
+      "atomCount": 55,
+      "extensionIds": [
+        "artifact-auditor",
+        "subtlety-fingerprint",
+        "subtlety-closed-loop",
+        "raid-healer",
+        "fission-reactor",
+        "ccg-channel",
+        "treebank-metrics",
+        "precedent-compose",
+        "entropy-dampener",
+        "test-contract",
+        "canonical-tokenizer-atom"
+      ],
+      "elapsedMs": 2045,
+      "counts": {
+        "candidateTrials": 6400,
+        "controlTrials": 1600,
+        "duplicateMolecules": 1309,
+        "hypotheses": 25,
+        "nuclei": 53,
+        "refused": 178,
+        "shortlisted": 256,
+        "unboundTrials": 0,
+        "uniqueMolecules": 5091
+      },
+      "checksum": "cyclotron1:25bfa4869d9f3d2453c5b18f2b85c759",
+      "atomBankChecksum": "atombank1:59fca2e725b8041c",
+      "uniqueNucleusTopologies": 29,
+      "nucleusTopologies": [
+        "bytecode-seal|canonical-serializer|schema-verifier",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|semantic-memory",
+        "bytecode-seal|canonical-serializer|schema-verifier|test-contract",
+        "bytecode-seal|canonical-serializer|schema-verifier|server-authority",
+        "bytecode-seal|canonical-serializer|immutable-packet|semantic-memory",
+        "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|schema-verifier",
+        "immutable-packet|schema-verifier|server-authority",
+        "canonical-serializer|evidence-ledger|schema-verifier",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|test-contract",
+        "graph-traversal|semantic-ballistics|valence-compiler",
+        "canonical-serializer|immutable-packet|schema-verifier|semantic-memory",
+        "canonical-serializer|evidence-ledger",
+        "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier",
+        "bytecode-seal|canonical-serializer|evidence-ledger",
+        "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet",
+        "canonical-serializer|schema-verifier",
+        "canonical-serializer|evidence-ledger|immutable-packet",
+        "canonical-serializer|cyclotron-reactor|evidence-ledger|schema-verifier|server-authority",
+        "bytecode-seal|canonical-serializer|evidence-ledger|holdout-validator|schema-verifier",
+        "canonical-serializer|schema-verifier|server-authority",
+        "bytecode-seal|canonical-serializer|hypothesis-registry|schema-verifier|test-contract",
+        "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier|treebank-metrics",
+        "fission-reactor|law-gate|molecule-generator"
+      ],
+      "uniqueHypothesisTopologies": 15,
+      "proposalCount": 12,
+      "proposalTopologies": [
+        "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier|treebank-metrics",
+        "schema-verifier|test-contract",
+        "canonical-serializer|evidence-ledger|schema-verifier|server-authority|test-contract",
+        "canonical-serializer|evidence-ledger|immutable-packet|test-contract",
+        "fission-reactor|law-gate|molecule-generator",
+        "canonical-serializer|schema-verifier|test-contract",
+        "bytecode-seal|canonical-serializer|hypothesis-registry|schema-verifier|test-contract",
+        "bytecode-seal|canonical-serializer|schema-verifier|test-contract",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|test-contract",
+        "evidence-ledger|operator-registry|schema-verifier|test-contract",
+        "immutable-packet|schema-verifier|test-contract",
+        "canonical-serializer|immutable-packet|schema-verifier|test-contract"
+      ],
+      "proposals": [
+        {
+          "topology": "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier|treebank-metrics",
+          "atomIds": [
+            "canonical-serializer",
+            "evidence-ledger",
+            "immutable-packet",
+            "schema-verifier",
+            "treebank-metrics"
+          ],
+          "utility": 0.536248,
+          "finalScore": 0.728398,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "schema-verifier|test-contract",
+          "atomIds": [
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.515905,
+          "finalScore": 0.754114,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "canonical-serializer|evidence-ledger|schema-verifier|server-authority|test-contract",
+          "atomIds": [
+            "canonical-serializer",
+            "evidence-ledger",
+            "schema-verifier",
+            "server-authority",
+            "test-contract"
+          ],
+          "utility": 0.514324,
+          "finalScore": 0.719655,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "canonical-serializer|evidence-ledger|immutable-packet|test-contract",
+          "atomIds": [
+            "canonical-serializer",
+            "evidence-ledger",
+            "immutable-packet",
+            "test-contract"
+          ],
+          "utility": 0.514309,
+          "finalScore": 0.724131,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "fission-reactor|law-gate|molecule-generator",
+          "atomIds": [
+            "fission-reactor",
+            "law-gate",
+            "molecule-generator"
+          ],
+          "utility": 0.512844,
+          "finalScore": 0.725047,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "canonical-serializer|schema-verifier|test-contract",
+          "atomIds": [
+            "canonical-serializer",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.509203,
+          "finalScore": 0.672136,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|hypothesis-registry|schema-verifier|test-contract",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "hypothesis-registry",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.50777,
+          "finalScore": 0.728826,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|schema-verifier|test-contract",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.507202,
+          "finalScore": 0.769101,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|test-contract",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "immutable-packet",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.501589,
+          "finalScore": 0.752677,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "evidence-ledger|operator-registry|schema-verifier|test-contract",
+          "atomIds": [
+            "evidence-ledger",
+            "operator-registry",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.496819,
+          "finalScore": 0.667359,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "immutable-packet|schema-verifier|test-contract",
+          "atomIds": [
+            "immutable-packet",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.464939,
+          "finalScore": 0.670935,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "canonical-serializer|immutable-packet|schema-verifier|test-contract",
+          "atomIds": [
+            "canonical-serializer",
+            "immutable-packet",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.461145,
+          "finalScore": 0.687024,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        }
+      ],
+      "withProcessSensor": 0,
+      "withTestContract": 10,
+      "withFission": 1,
+      "sealHeavyProposals": 7,
+      "extensionBearingProposals": 12,
+      "meanProposalUtility": 0.503525,
+      "meanProposalChemistry": 0.716617,
+      "collapseRatio": 0.45283,
+      "extensionHitCounts": {
+        "artifact-auditor": 114,
+        "subtlety-fingerprint": 0,
+        "subtlety-closed-loop": 1,
+        "raid-healer": 1,
+        "fission-reactor": 3,
+        "ccg-channel": 0,
+        "treebank-metrics": 1,
+        "precedent-compose": 0,
+        "entropy-dampener": 0,
+        "test-contract": 66,
+        "canonical-tokenizer-atom": 0
+      },
+      "jaccardVsBaseline": 0.142857
+    },
+    {
+      "condition": "no_evidence_atoms",
+      "question": "What basin replaces them?",
+      "entropyEnabled": true,
+      "requireExtension": true,
+      "atomCount": 48,
+      "extensionIds": [
+        "raid-healer",
+        "fission-reactor",
+        "ccg-channel",
+        "treebank-metrics",
+        "precedent-compose",
+        "entropy-dampener",
+        "test-contract",
+        "canonical-tokenizer-atom"
+      ],
+      "elapsedMs": 2838,
+      "counts": {
+        "candidateTrials": 6400,
+        "controlTrials": 1600,
+        "duplicateMolecules": 1545,
+        "hypotheses": 45,
+        "nuclei": 92,
+        "refused": 119,
+        "shortlisted": 256,
+        "unboundTrials": 0,
+        "uniqueMolecules": 4855
+      },
+      "checksum": "cyclotron1:db2e52199c64ce0c95a853f8a4bd3f47",
+      "atomBankChecksum": "atombank1:ec96109ddcba9c1a",
+      "uniqueNucleusTopologies": 35,
+      "nucleusTopologies": [
+        "bytecode-seal|canonical-serializer|schema-verifier",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|semantic-memory",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier",
+        "correspondence-registry|valence-compiler",
+        "semantic-memory|valence-compiler",
+        "bytecode-seal|canonical-serializer|schema-verifier|test-contract",
+        "bytecode-seal|canonical-serializer|schema-verifier|server-authority",
+        "bytecode-seal|canonical-serializer|immutable-packet|semantic-memory",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|test-contract",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|server-authority",
+        "immutable-packet|schema-verifier|server-authority",
+        "graph-traversal|semantic-ballistics|valence-compiler",
+        "cyclotron-reactor|graph-traversal|retrieval-index|valence-compiler",
+        "bytecode-seal|canonical-serializer|immutable-packet|molecule-generator|semantic-memory",
+        "bytecode-seal|immutable-packet|schema-verifier",
+        "canonical-serializer|immutable-packet|schema-verifier|semantic-memory|valence-compiler",
+        "bytecode-seal|immutable-packet|schema-verifier|test-contract",
+        "fission-reactor|law-gate|molecule-generator|semantic-memory",
+        "bytecode-seal|immutable-packet|schema-verifier|server-authority|test-contract",
+        "canonical-serializer|schema-verifier",
+        "canonical-serializer|immutable-packet|semantic-memory",
+        "canonical-serializer|schema-verifier|server-authority",
+        "immutable-packet|schema-verifier|semantic-memory|server-authority",
+        "canonical-serializer|immutable-packet|schema-verifier"
+      ],
+      "uniqueHypothesisTopologies": 20,
+      "proposalCount": 12,
+      "proposalTopologies": [
+        "correspondence-registry|fission-reactor|law-gate",
+        "schema-verifier|test-contract",
+        "fission-reactor|law-gate|molecule-generator",
+        "canonical-serializer|schema-verifier|test-contract",
+        "bytecode-seal|canonical-serializer|schema-verifier|test-contract",
+        "fission-reactor|law-gate|molecule-generator|semantic-memory",
+        "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|test-contract",
+        "bytecode-seal|immutable-packet|schema-verifier|test-contract",
+        "canonical-serializer|immutable-packet|operator-registry|schema-verifier|test-contract",
+        "immutable-packet|schema-verifier|test-contract",
+        "canonical-serializer|immutable-packet|schema-verifier|test-contract",
+        "canonical-serializer|schema-verifier|server-authority|test-contract"
+      ],
+      "proposals": [
+        {
+          "topology": "correspondence-registry|fission-reactor|law-gate",
+          "atomIds": [
+            "correspondence-registry",
+            "fission-reactor",
+            "law-gate"
+          ],
+          "utility": 0.555512,
+          "finalScore": 0.700813,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "schema-verifier|test-contract",
+          "atomIds": [
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.515905,
+          "finalScore": 0.754114,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "fission-reactor|law-gate|molecule-generator",
+          "atomIds": [
+            "fission-reactor",
+            "law-gate",
+            "molecule-generator"
+          ],
+          "utility": 0.512731,
+          "finalScore": 0.724533,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "canonical-serializer|schema-verifier|test-contract",
+          "atomIds": [
+            "canonical-serializer",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.509161,
+          "finalScore": 0.671943,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|schema-verifier|test-contract",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.507202,
+          "finalScore": 0.769101,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "fission-reactor|law-gate|molecule-generator|semantic-memory",
+          "atomIds": [
+            "fission-reactor",
+            "law-gate",
+            "molecule-generator",
+            "semantic-memory"
+          ],
+          "utility": 0.5066,
+          "finalScore": 0.737791,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|test-contract",
+          "atomIds": [
+            "bytecode-seal",
+            "canonical-serializer",
+            "immutable-packet",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.503971,
+          "finalScore": 0.763506,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "bytecode-seal|immutable-packet|schema-verifier|test-contract",
+          "atomIds": [
+            "bytecode-seal",
+            "immutable-packet",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.50099,
+          "finalScore": 0.740862,
+          "verdict": "NUCLEUS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "canonical-serializer|immutable-packet|operator-registry|schema-verifier|test-contract",
+          "atomIds": [
+            "canonical-serializer",
+            "immutable-packet",
+            "operator-registry",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.479546,
+          "finalScore": 0.652482,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "immutable-packet|schema-verifier|test-contract",
+          "atomIds": [
+            "immutable-packet",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.464777,
+          "finalScore": 0.670197,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "canonical-serializer|immutable-packet|schema-verifier|test-contract",
+          "atomIds": [
+            "canonical-serializer",
+            "immutable-packet",
+            "schema-verifier",
+            "test-contract"
+          ],
+          "utility": 0.46263,
+          "finalScore": 0.693771,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        },
+        {
+          "topology": "canonical-serializer|schema-verifier|server-authority|test-contract",
+          "atomIds": [
+            "canonical-serializer",
+            "schema-verifier",
+            "server-authority",
+            "test-contract"
+          ],
+          "utility": 0.460808,
+          "finalScore": 0.685491,
+          "verdict": "HYPOTHESIS",
+          "newAtomCount": 1
+        }
+      ],
+      "withProcessSensor": 0,
+      "withTestContract": 9,
+      "withFission": 3,
+      "sealHeavyProposals": 7,
+      "extensionBearingProposals": 12,
+      "meanProposalUtility": 0.498319,
+      "meanProposalChemistry": 0.713717,
+      "collapseRatio": 0.619565,
+      "extensionHitCounts": {
+        "raid-healer": 0,
+        "fission-reactor": 6,
+        "ccg-channel": 0,
+        "treebank-metrics": 0,
+        "precedent-compose": 2,
+        "entropy-dampener": 0,
+        "test-contract": 53,
+        "canonical-tokenizer-atom": 2
+      },
+      "jaccardVsBaseline": 0.142857
+    }
+  ],
+  "baselineProposalTopologies": [
+    "process-sensor|test-contract|valence-compiler",
+    "canonical-serializer|evidence-ledger|schema-verifier|test-contract",
+    "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor",
+    "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor|schema-verifier",
+    "process-sensor|retrieval-index",
+    "process-sensor|valence-compiler",
+    "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|test-contract",
+    "schema-verifier|test-contract",
+    "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier|test-contract",
+    "fission-reactor|law-gate|molecule-generator",
+    "canonical-serializer|schema-verifier|test-contract",
+    "process-sensor|retrieval-index|valence-compiler"
+  ],
+  "topologyMatchedControls": [
+    {
+      "matchedProposal": "process-sensor|test-contract|valence-compiler",
+      "atomIds": [
+        "purity-assay",
+        "fission-reactor",
+        "concept-chemistry"
+      ],
+      "topology": "concept-chemistry|fission-reactor|purity-assay",
+      "size": 3
+    },
+    {
+      "matchedProposal": "process-sensor|test-contract|valence-compiler",
+      "atomIds": [
+        "test-contract",
+        "canonical-serializer",
+        "bytecode-seal"
+      ],
+      "topology": "bytecode-seal|canonical-serializer|test-contract",
+      "size": 3
+    },
+    {
+      "matchedProposal": "process-sensor|test-contract|valence-compiler",
+      "atomIds": [
+        "server-authority",
+        "canonical-tokenizer",
+        "semantic-ballistics"
+      ],
+      "topology": "canonical-tokenizer|semantic-ballistics|server-authority",
+      "size": 3
+    },
+    {
+      "matchedProposal": "canonical-serializer|evidence-ledger|schema-verifier|test-contract",
+      "atomIds": [
+        "canonical-tokenizer-atom",
+        "molecule-generator",
+        "schema-verifier",
+        "phonotopography"
+      ],
+      "topology": "canonical-tokenizer-atom|molecule-generator|phonotopography|schema-verifier",
+      "size": 4
+    },
+    {
+      "matchedProposal": "canonical-serializer|evidence-ledger|schema-verifier|test-contract",
+      "atomIds": [
+        "query-expander",
+        "contradiction-gate",
+        "graph-traversal",
+        "canonical-serializer"
+      ],
+      "topology": "canonical-serializer|contradiction-gate|graph-traversal|query-expander",
+      "size": 4
+    },
+    {
+      "matchedProposal": "canonical-serializer|evidence-ledger|schema-verifier|test-contract",
+      "atomIds": [
+        "label-store",
+        "semantic-memory",
+        "cyclotron-reactor",
+        "authorization-calculus"
+      ],
+      "topology": "authorization-calculus|cyclotron-reactor|label-store|semantic-memory",
+      "size": 4
+    },
+    {
+      "matchedProposal": "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor",
+      "atomIds": [
+        "novelty-detector",
+        "query-expander",
+        "semantic-ballistics",
+        "counter-scheduler"
+      ],
+      "topology": "counter-scheduler|novelty-detector|query-expander|semantic-ballistics",
+      "size": 4
+    },
+    {
+      "matchedProposal": "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor",
+      "atomIds": [
+        "morphology-analyzer",
+        "entropy-dampener",
+        "contradiction-gate",
+        "clerical-raid"
+      ],
+      "topology": "clerical-raid|contradiction-gate|entropy-dampener|morphology-analyzer",
+      "size": 4
+    },
+    {
+      "matchedProposal": "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor",
+      "atomIds": [
+        "contradiction-gate",
+        "concept-chemistry",
+        "morphology-analyzer",
+        "phonotopography"
+      ],
+      "topology": "concept-chemistry|contradiction-gate|morphology-analyzer|phonotopography",
+      "size": 4
+    },
+    {
+      "matchedProposal": "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor|schema-verifier",
+      "atomIds": [
+        "subtlety-fingerprint",
+        "lexical-graph",
+        "control-generator",
+        "build-gate",
+        "clerical-raid"
+      ],
+      "topology": "build-gate|clerical-raid|control-generator|lexical-graph|subtlety-fingerprint",
+      "size": 5
+    },
+    {
+      "matchedProposal": "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor|schema-verifier",
+      "atomIds": [
+        "novelty-detector",
+        "control-generator",
+        "molecule-generator",
+        "authorization-calculus",
+        "operator-registry"
+      ],
+      "topology": "authorization-calculus|control-generator|molecule-generator|novelty-detector|operator-registry",
+      "size": 5
+    },
+    {
+      "matchedProposal": "bytecode-seal|canonical-serializer|evidence-ledger|process-sensor|schema-verifier",
+      "atomIds": [
+        "counter-scheduler",
+        "molecule-generator",
+        "entropy-dampener",
+        "control-generator",
+        "graph-traversal"
+      ],
+      "topology": "control-generator|counter-scheduler|entropy-dampener|graph-traversal|molecule-generator",
+      "size": 5
+    },
+    {
+      "matchedProposal": "process-sensor|retrieval-index",
+      "atomIds": [
+        "entropy-dampener",
+        "phonetic-encoder"
+      ],
+      "topology": "entropy-dampener|phonetic-encoder",
+      "size": 2
+    },
+    {
+      "matchedProposal": "process-sensor|retrieval-index",
+      "atomIds": [
+        "semantic-memory",
+        "wordnet-resolver"
+      ],
+      "topology": "semantic-memory|wordnet-resolver",
+      "size": 2
+    },
+    {
+      "matchedProposal": "process-sensor|retrieval-index",
+      "atomIds": [
+        "osmosis-receptor",
+        "schema-verifier"
+      ],
+      "topology": "osmosis-receptor|schema-verifier",
+      "size": 2
+    },
+    {
+      "matchedProposal": "process-sensor|valence-compiler",
+      "atomIds": [
+        "fission-reactor",
+        "test-contract"
+      ],
+      "topology": "fission-reactor|test-contract",
+      "size": 2
+    },
+    {
+      "matchedProposal": "process-sensor|valence-compiler",
+      "atomIds": [
+        "label-store",
+        "semantotopography"
+      ],
+      "topology": "label-store|semantotopography",
+      "size": 2
+    },
+    {
+      "matchedProposal": "process-sensor|valence-compiler",
+      "atomIds": [
+        "diagnostic-event-bus",
+        "semantic-memory"
+      ],
+      "topology": "diagnostic-event-bus|semantic-memory",
+      "size": 2
+    },
+    {
+      "matchedProposal": "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|test-contract",
+      "atomIds": [
+        "raid-healer",
+        "phonotopography",
+        "lexical-graph",
+        "evidence-ledger",
+        "retrieval-index"
+      ],
+      "topology": "evidence-ledger|lexical-graph|phonotopography|raid-healer|retrieval-index",
+      "size": 5
+    },
+    {
+      "matchedProposal": "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|test-contract",
+      "atomIds": [
+        "precedent-compose",
+        "entropy-dampener",
+        "molecule-generator",
+        "graph-traversal",
+        "purity-assay"
+      ],
+      "topology": "entropy-dampener|graph-traversal|molecule-generator|precedent-compose|purity-assay",
+      "size": 5
+    },
+    {
+      "matchedProposal": "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|test-contract",
+      "atomIds": [
+        "precedent-compose",
+        "holdout-validator",
+        "retrieval-index",
+        "query-expander",
+        "correspondence-registry"
+      ],
+      "topology": "correspondence-registry|holdout-validator|precedent-compose|query-expander|retrieval-index",
+      "size": 5
+    },
+    {
+      "matchedProposal": "schema-verifier|test-contract",
+      "atomIds": [
+        "subtlety-fingerprint",
+        "precedent-compose"
+      ],
+      "topology": "precedent-compose|subtlety-fingerprint",
+      "size": 2
+    },
+    {
+      "matchedProposal": "schema-verifier|test-contract",
+      "atomIds": [
+        "query-expander",
+        "semantic-ballistics"
+      ],
+      "topology": "query-expander|semantic-ballistics",
+      "size": 2
+    },
+    {
+      "matchedProposal": "schema-verifier|test-contract",
+      "atomIds": [
+        "canonical-serializer",
+        "osmosis-receptor"
+      ],
+      "topology": "canonical-serializer|osmosis-receptor",
+      "size": 2
+    },
+    {
+      "matchedProposal": "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier|test-contract",
+      "atomIds": [
+        "label-store",
+        "control-generator",
+        "subtlety-fingerprint",
+        "osmosis-receptor",
+        "retrieval-index"
+      ],
+      "topology": "control-generator|label-store|osmosis-receptor|retrieval-index|subtlety-fingerprint",
+      "size": 5
+    },
+    {
+      "matchedProposal": "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier|test-contract",
+      "atomIds": [
+        "correspondence-registry",
+        "law-gate",
+        "canonical-tokenizer",
+        "phonetic-encoder",
+        "false-friend-detector"
+      ],
+      "topology": "canonical-tokenizer|correspondence-registry|false-friend-detector|law-gate|phonetic-encoder",
+      "size": 5
+    },
+    {
+      "matchedProposal": "canonical-serializer|evidence-ledger|immutable-packet|schema-verifier|test-contract",
+      "atomIds": [
+        "holdout-validator",
+        "test-contract",
+        "canonical-tokenizer-atom",
+        "fission-reactor",
+        "subtlety-closed-loop"
+      ],
+      "topology": "canonical-tokenizer-atom|fission-reactor|holdout-validator|subtlety-closed-loop|test-contract",
+      "size": 5
+    },
+    {
+      "matchedProposal": "fission-reactor|law-gate|molecule-generator",
+      "atomIds": [
+        "artifact-auditor",
+        "semantotopography",
+        "contradiction-gate"
+      ],
+      "topology": "artifact-auditor|contradiction-gate|semantotopography",
+      "size": 3
+    },
+    {
+      "matchedProposal": "fission-reactor|law-gate|molecule-generator",
+      "atomIds": [
+        "process-sensor",
+        "purity-assay",
+        "holdout-validator"
+      ],
+      "topology": "holdout-validator|process-sensor|purity-assay",
+      "size": 3
+    },
+    {
+      "matchedProposal": "fission-reactor|law-gate|molecule-generator",
+      "atomIds": [
+        "law-gate",
+        "holdout-validator",
+        "lexical-graph"
+      ],
+      "topology": "holdout-validator|law-gate|lexical-graph",
+      "size": 3
+    },
+    {
+      "matchedProposal": "canonical-serializer|schema-verifier|test-contract",
+      "atomIds": [
+        "artifact-auditor",
+        "hypothesis-registry",
+        "entropy-dampener"
+      ],
+      "topology": "artifact-auditor|entropy-dampener|hypothesis-registry",
+      "size": 3
+    },
+    {
+      "matchedProposal": "canonical-serializer|schema-verifier|test-contract",
+      "atomIds": [
+        "human-review",
+        "phonetic-encoder",
+        "cyclotron-reactor"
+      ],
+      "topology": "cyclotron-reactor|human-review|phonetic-encoder",
+      "size": 3
+    },
+    {
+      "matchedProposal": "canonical-serializer|schema-verifier|test-contract",
+      "atomIds": [
+        "operator-registry",
+        "treebank-metrics",
+        "semantic-ballistics"
+      ],
+      "topology": "operator-registry|semantic-ballistics|treebank-metrics",
+      "size": 3
+    },
+    {
+      "matchedProposal": "process-sensor|retrieval-index|valence-compiler",
+      "atomIds": [
+        "false-friend-detector",
+        "subtlety-fingerprint",
+        "build-gate"
+      ],
+      "topology": "build-gate|false-friend-detector|subtlety-fingerprint",
+      "size": 3
+    },
+    {
+      "matchedProposal": "process-sensor|retrieval-index|valence-compiler",
+      "atomIds": [
+        "false-friend-detector",
+        "ccg-channel",
+        "turboquant"
+      ],
+      "topology": "ccg-channel|false-friend-detector|turboquant",
+      "size": 3
+    },
+    {
+      "matchedProposal": "process-sensor|retrieval-index|valence-compiler",
+      "atomIds": [
+        "concept-chemistry",
+        "human-review",
+        "evidence-ledger"
+      ],
+      "topology": "concept-chemistry|evidence-ledger|human-review",
+      "size": 3
+    }
+  ],
+  "hitRate": {
+    "selected": 1,
+    "survived": 1,
+    "rate": 1,
+    "controlSelected": 0,
+    "controlSurvived": 0,
+    "controlRate": null
+  },
+  "preregInterpretation": {
+    "shuffled_ports": "jaccard≪1 => topology load-bearing",
+    "random_evidence": "jaccard≈1 expected if grounding is label-based; utility may still move",
+    "entropy_off": "higher collapseRatio => search collapse recurs",
+    "extension_req_off": "sealHeavy≈proposalCount => legacy monopoly",
+    "no_process_sensor": "withProcessSensor=0 and dropped topos => non-redundant",
+    "no_evidence_atoms": "basin shift in proposal topologies"
+  },
+  "checksum": "ablation1:a9eb3ab4232e048d6ff4b0b40e5bf97c02fe09dccc7f164337721f48932bbf97"
+}

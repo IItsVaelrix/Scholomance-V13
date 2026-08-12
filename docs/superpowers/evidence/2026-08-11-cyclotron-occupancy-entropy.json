@@ -1,0 +1,117 @@
+{
+  "arms": {
+    "control": {
+      "aboveControlBar": 25167,
+      "boundCandidateTrials": 80000,
+      "candidateTrials": 80000,
+      "duplicateMolecules": 54833,
+      "duplicateRate": 0.685412,
+      "entropyRedirects": 0,
+      "familyEffectiveDiversity": 91.678812,
+      "highFinalScoreTail": 57,
+      "hypotheses": 215,
+      "maximumIntrinsicEnergy": 0.826574,
+      "meanIntrinsicEnergy": 0.762758,
+      "meanNovelty": 0.319079,
+      "neighborhoodEffectiveDiversity": 43.909533,
+      "nuclei": 0,
+      "reportChecksum": "cyclotron1:04ab168e44412a30aa4c971946bd717a",
+      "shortlisted": 256,
+      "trials": 100000,
+      "uniqueMolecules": 25167,
+      "uniqueYield": 0.314588
+    },
+    "treatment": {
+      "aboveControlBar": 46471,
+      "boundCandidateTrials": 80000,
+      "candidateTrials": 80000,
+      "duplicateMolecules": 33529,
+      "duplicateRate": 0.419112,
+      "entropyRedirects": 59952,
+      "familyEffectiveDiversity": 91.341429,
+      "highFinalScoreTail": 61,
+      "hypotheses": 203,
+      "maximumIntrinsicEnergy": 0.826574,
+      "meanIntrinsicEnergy": 0.762261,
+      "meanNovelty": 0.32423,
+      "neighborhoodEffectiveDiversity": 43.495753,
+      "nuclei": 1,
+      "reportChecksum": "cyclotron1:93556b5f2ab6291be8c7bb885d1515f4",
+      "shortlisted": 256,
+      "trials": 100000,
+      "uniqueMolecules": 46471,
+      "uniqueYield": 0.580888
+    }
+  },
+  "changes": {
+    "aboveControlBar": 21304,
+    "duplicateRate": -0.2663,
+    "familyEffectiveDiversity": -0.337383,
+    "highFinalScoreTail": 4,
+    "meanIntrinsicEnergy": -0.000497,
+    "meanNovelty": 0.005151,
+    "neighborhoodEffectiveDiversity": -0.41378,
+    "uniqueMolecules": 21304,
+    "uniqueYield": 0.2663
+  },
+  "checksum": "occupancy-benchmark1:e67de259afd9542f5d7ef49aba510641",
+  "contract": "PB-CYCLOTRON-OCCUPANCY-BENCHMARK-v1",
+  "criteria": {
+    "familyDiversityImproved": false,
+    "familyDiversityPreserved": true,
+    "neighborhoodDiversityPreserved": true,
+    "qualityPreserved": true,
+    "searchImproved": true,
+    "yieldImproved": true
+  },
+  "generalization": {
+    "accuracy": null,
+    "discordantLosses": null,
+    "discordantWins": null,
+    "status": "NOT_MEASURED_NO_EXECUTABLE_MOLECULE_TO_BLIND_TASK_BINDING"
+  },
+  "pairedBuckets": {
+    "duplicateMolecules": {
+      "exactTwoSidedSignP": 0.000002,
+      "field": "duplicateMolecules",
+      "losses": 0,
+      "ties": 0,
+      "wins": 20
+    },
+    "meanIntrinsicEnergy": {
+      "exactTwoSidedSignP": 0.011818,
+      "field": "meanEnergy",
+      "losses": 16,
+      "ties": 0,
+      "wins": 4
+    },
+    "meanNovelty": {
+      "exactTwoSidedSignP": 0.000002,
+      "field": "meanNovelty",
+      "losses": 0,
+      "ties": 0,
+      "wins": 20
+    },
+    "uniqueMolecules": {
+      "exactTwoSidedSignP": 0.000002,
+      "field": "uniqueMolecules",
+      "losses": 0,
+      "ties": 0,
+      "wins": 20
+    }
+  },
+  "protocol": {
+    "atomBankShared": true,
+    "evidenceConfidenceDecayed": false,
+    "groundingIndexShared": true,
+    "intrinsicEnergyDecayed": false,
+    "seed": 6045712,
+    "selectionInfluenceOnly": true,
+    "shuffledControlScheduleShared": true,
+    "treatmentReplayExact": true,
+    "trialScheduleShared": true,
+    "trialsPerArm": 100000
+  },
+  "schemaVersion": "1.0.0",
+  "verdict": "SEARCH_PROCESS_IMPROVED_UTILITY_UNTESTED"
+}

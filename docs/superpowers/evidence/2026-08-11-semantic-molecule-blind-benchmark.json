@@ -1,0 +1,596 @@
+{
+  "contract": "PB-SEMANTIC-BLIND-BENCHMARK-v1",
+  "schemaVersion": "1.0.0",
+  "seed": 1836018737,
+  "substrate": {
+    "name": "Open English WordNet",
+    "release": "2024",
+    "sourceUrl": "https://en-word.net/static/english-wordnet-2024.xml.gz",
+    "fingerprint": "oewn-substrate1:661fd88a8ab80d5bfdc86f7889a99a1b",
+    "excludedFromCyclotronGroundingCorpus": true
+  },
+  "protocol": {
+    "blindedChallengeChecksum": "blind-challenge1:aadd63d80529a7918b8ad86f8ae03920",
+    "directProposalChecksum": "direct-proposals1:d2ef680856e3412401fafa6997533d2e",
+    "tasks": 24,
+    "candidatesPerTask": 5,
+    "graphTrialsPerTask": 256,
+    "energeticVotesPerTask": 64,
+    "uniformChanceAccuracy": 0.2,
+    "sourceSelectionScoreUsed": false,
+    "truthReadAfterDirectProposalSeal": true
+  },
+  "methods": [
+    {
+      "name": "cyclotron",
+      "correct": 15,
+      "total": 24,
+      "accuracy": 0.625,
+      "wilson95": [
+        0.4271,
+        0.788406
+      ],
+      "byRelation": {
+        "hypernym": {
+          "correct": 4,
+          "total": 6,
+          "accuracy": 0.666667
+        },
+        "antonym": {
+          "correct": 5,
+          "total": 6,
+          "accuracy": 0.833333
+        },
+        "mero_part": {
+          "correct": 3,
+          "total": 6,
+          "accuracy": 0.5
+        },
+        "similar": {
+          "correct": 3,
+          "total": 6,
+          "accuracy": 0.5
+        }
+      }
+    },
+    {
+      "name": "random_valence",
+      "correct": 16,
+      "total": 24,
+      "accuracy": 0.666667,
+      "wilson95": [
+        0.467063,
+        0.820278
+      ],
+      "byRelation": {
+        "hypernym": {
+          "correct": 4,
+          "total": 6,
+          "accuracy": 0.666667
+        },
+        "antonym": {
+          "correct": 6,
+          "total": 6,
+          "accuracy": 1
+        },
+        "mero_part": {
+          "correct": 3,
+          "total": 6,
+          "accuracy": 0.5
+        },
+        "similar": {
+          "correct": 3,
+          "total": 6,
+          "accuracy": 0.5
+        }
+      }
+    },
+    {
+      "name": "direct_ai_one_pass",
+      "correct": 23,
+      "total": 24,
+      "accuracy": 0.958333,
+      "wilson95": [
+        0.797582,
+        0.992607
+      ],
+      "byRelation": {
+        "hypernym": {
+          "correct": 6,
+          "total": 6,
+          "accuracy": 1
+        },
+        "antonym": {
+          "correct": 6,
+          "total": 6,
+          "accuracy": 1
+        },
+        "mero_part": {
+          "correct": 6,
+          "total": 6,
+          "accuracy": 1
+        },
+        "similar": {
+          "correct": 5,
+          "total": 6,
+          "accuracy": 0.833333
+        }
+      }
+    },
+    {
+      "name": "human_reference",
+      "correct": 15,
+      "total": 24,
+      "accuracy": 0.625,
+      "wilson95": [
+        0.4271,
+        0.788406
+      ],
+      "byRelation": {
+        "hypernym": {
+          "correct": 4,
+          "total": 6,
+          "accuracy": 0.666667
+        },
+        "antonym": {
+          "correct": 5,
+          "total": 6,
+          "accuracy": 0.833333
+        },
+        "mero_part": {
+          "correct": 3,
+          "total": 6,
+          "accuracy": 0.5
+        },
+        "similar": {
+          "correct": 3,
+          "total": 6,
+          "accuracy": 0.5
+        }
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "baseline": "random_valence",
+      "wins": 0,
+      "losses": 1,
+      "ties": 23,
+      "accuracyDelta": -0.041667,
+      "exactTwoSidedSignP": 1
+    },
+    {
+      "baseline": "direct_ai_one_pass",
+      "wins": 0,
+      "losses": 8,
+      "ties": 16,
+      "accuracyDelta": -0.333333,
+      "exactTwoSidedSignP": 0.007813
+    },
+    {
+      "baseline": "human_reference",
+      "wins": 0,
+      "losses": 0,
+      "ties": 24,
+      "accuracyDelta": 0,
+      "exactTwoSidedSignP": 1
+    }
+  ],
+  "novelty": {
+    "cyclotronExclusiveCorrect": 0,
+    "definition": "correct Cyclotron choices missed by random-valence, direct-AI, and human-reference arms"
+  },
+  "mechanismVerdict": "SUPPORTED_ABOVE_UNIFORM_CHANCE",
+  "theoryVerdict": "NOT_VALIDATED",
+  "disclosedTasks": [
+    {
+      "taskId": "oewn-antonym-1709e23ce2",
+      "relation": "antonym",
+      "sourceSynsetId": "oewn-01430630-a",
+      "answer": "B",
+      "choices": {
+        "cyclotron": "B",
+        "random_valence": "B",
+        "direct_ai_one_pass": "B",
+        "human_reference": "B"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.836657,
+        "randomMean": 0.758024,
+        "distinctEnergeticTopologies": 4
+      }
+    },
+    {
+      "taskId": "oewn-antonym-41aeaf1555",
+      "relation": "antonym",
+      "sourceSynsetId": "oewn-00370340-n",
+      "answer": "A",
+      "choices": {
+        "cyclotron": "A",
+        "random_valence": "A",
+        "direct_ai_one_pass": "A",
+        "human_reference": "A"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.592383,
+        "randomMean": 0.380975,
+        "distinctEnergeticTopologies": 4
+      }
+    },
+    {
+      "taskId": "oewn-antonym-b0cd3e3840",
+      "relation": "antonym",
+      "sourceSynsetId": "oewn-02057338-a",
+      "answer": "A",
+      "choices": {
+        "cyclotron": "A",
+        "random_valence": "A",
+        "direct_ai_one_pass": "A",
+        "human_reference": "A"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.892022,
+        "randomMean": 0.838334,
+        "distinctEnergeticTopologies": 7
+      }
+    },
+    {
+      "taskId": "oewn-antonym-bc396581ac",
+      "relation": "antonym",
+      "sourceSynsetId": "oewn-01741490-a",
+      "answer": "C",
+      "choices": {
+        "cyclotron": "C",
+        "random_valence": "C",
+        "direct_ai_one_pass": "C",
+        "human_reference": "C"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.504554,
+        "randomMean": 0.352046,
+        "distinctEnergeticTopologies": 7
+      }
+    },
+    {
+      "taskId": "oewn-antonym-e93e05b1d7",
+      "relation": "antonym",
+      "sourceSynsetId": "oewn-00069669-a",
+      "answer": "E",
+      "choices": {
+        "cyclotron": "E",
+        "random_valence": "E",
+        "direct_ai_one_pass": "E",
+        "human_reference": "E"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.885825,
+        "randomMean": 0.735606,
+        "distinctEnergeticTopologies": 7
+      }
+    },
+    {
+      "taskId": "oewn-antonym-f573486a9b",
+      "relation": "antonym",
+      "sourceSynsetId": "oewn-00282894-n",
+      "answer": "A",
+      "choices": {
+        "cyclotron": "E",
+        "random_valence": "A",
+        "direct_ai_one_pass": "A",
+        "human_reference": "E"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.454173,
+        "randomMean": 0.311458,
+        "distinctEnergeticTopologies": 4
+      }
+    },
+    {
+      "taskId": "oewn-hypernym-2355c76282",
+      "relation": "hypernym",
+      "sourceSynsetId": "oewn-07550088-n",
+      "answer": "D",
+      "choices": {
+        "cyclotron": "A",
+        "random_valence": "A",
+        "direct_ai_one_pass": "D",
+        "human_reference": "A"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.711629,
+        "randomMean": 0.47871,
+        "distinctEnergeticTopologies": 4
+      }
+    },
+    {
+      "taskId": "oewn-hypernym-2760b73736",
+      "relation": "hypernym",
+      "sourceSynsetId": "oewn-14400260-n",
+      "answer": "B",
+      "choices": {
+        "cyclotron": "B",
+        "random_valence": "B",
+        "direct_ai_one_pass": "B",
+        "human_reference": "B"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.473623,
+        "randomMean": 0.35629,
+        "distinctEnergeticTopologies": 6
+      }
+    },
+    {
+      "taskId": "oewn-hypernym-286df18649",
+      "relation": "hypernym",
+      "sourceSynsetId": "oewn-02046082-v",
+      "answer": "D",
+      "choices": {
+        "cyclotron": "D",
+        "random_valence": "D",
+        "direct_ai_one_pass": "D",
+        "human_reference": "D"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.738601,
+        "randomMean": 0.414425,
+        "distinctEnergeticTopologies": 1
+      }
+    },
+    {
+      "taskId": "oewn-hypernym-5f2e32d3e0",
+      "relation": "hypernym",
+      "sourceSynsetId": "oewn-03389963-n",
+      "answer": "E",
+      "choices": {
+        "cyclotron": "E",
+        "random_valence": "E",
+        "direct_ai_one_pass": "E",
+        "human_reference": "E"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.921349,
+        "randomMean": 0.63773,
+        "distinctEnergeticTopologies": 4
+      }
+    },
+    {
+      "taskId": "oewn-hypernym-d3fbdf71f9",
+      "relation": "hypernym",
+      "sourceSynsetId": "oewn-04101154-n",
+      "answer": "D",
+      "choices": {
+        "cyclotron": "D",
+        "random_valence": "D",
+        "direct_ai_one_pass": "D",
+        "human_reference": "D"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.900885,
+        "randomMean": 0.784877,
+        "distinctEnergeticTopologies": 7
+      }
+    },
+    {
+      "taskId": "oewn-hypernym-e563c87058",
+      "relation": "hypernym",
+      "sourceSynsetId": "oewn-07268725-n",
+      "answer": "B",
+      "choices": {
+        "cyclotron": "A",
+        "random_valence": "A",
+        "direct_ai_one_pass": "B",
+        "human_reference": "A"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.375298,
+        "randomMean": 0.254469,
+        "distinctEnergeticTopologies": 7
+      }
+    },
+    {
+      "taskId": "oewn-mero_part-2019a87a21",
+      "relation": "mero_part",
+      "sourceSynsetId": "oewn-03406636-n",
+      "answer": "C",
+      "choices": {
+        "cyclotron": "C",
+        "random_valence": "C",
+        "direct_ai_one_pass": "C",
+        "human_reference": "C"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.564361,
+        "randomMean": 0.322502,
+        "distinctEnergeticTopologies": 5
+      }
+    },
+    {
+      "taskId": "oewn-mero_part-314e090d05",
+      "relation": "mero_part",
+      "sourceSynsetId": "oewn-09405883-n",
+      "answer": "D",
+      "choices": {
+        "cyclotron": "D",
+        "random_valence": "D",
+        "direct_ai_one_pass": "D",
+        "human_reference": "D"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.590129,
+        "randomMean": 0.361583,
+        "distinctEnergeticTopologies": 8
+      }
+    },
+    {
+      "taskId": "oewn-mero_part-9b2d5f28ad",
+      "relation": "mero_part",
+      "sourceSynsetId": "oewn-09395415-n",
+      "answer": "C",
+      "choices": {
+        "cyclotron": "D",
+        "random_valence": "D",
+        "direct_ai_one_pass": "C",
+        "human_reference": "D"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.450514,
+        "randomMean": 0.351503,
+        "distinctEnergeticTopologies": 3
+      }
+    },
+    {
+      "taskId": "oewn-mero_part-9c178dc3c1",
+      "relation": "mero_part",
+      "sourceSynsetId": "oewn-09628463-n",
+      "answer": "D",
+      "choices": {
+        "cyclotron": "B",
+        "random_valence": "B",
+        "direct_ai_one_pass": "D",
+        "human_reference": "B"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.462903,
+        "randomMean": 0.319339,
+        "distinctEnergeticTopologies": 3
+      }
+    },
+    {
+      "taskId": "oewn-mero_part-a82547b986",
+      "relation": "mero_part",
+      "sourceSynsetId": "oewn-05501782-n",
+      "answer": "D",
+      "choices": {
+        "cyclotron": "D",
+        "random_valence": "D",
+        "direct_ai_one_pass": "D",
+        "human_reference": "D"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.679998,
+        "randomMean": 0.48787,
+        "distinctEnergeticTopologies": 2
+      }
+    },
+    {
+      "taskId": "oewn-mero_part-f41cb3a3f1",
+      "relation": "mero_part",
+      "sourceSynsetId": "oewn-03409359-n",
+      "answer": "C",
+      "choices": {
+        "cyclotron": "D",
+        "random_valence": "B",
+        "direct_ai_one_pass": "C",
+        "human_reference": "D"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.405886,
+        "randomMean": 0.260206,
+        "distinctEnergeticTopologies": 8
+      }
+    },
+    {
+      "taskId": "oewn-similar-1a49b347d9",
+      "relation": "similar",
+      "sourceSynsetId": "oewn-00337070-v",
+      "answer": "D",
+      "choices": {
+        "cyclotron": "A",
+        "random_valence": "A",
+        "direct_ai_one_pass": "D",
+        "human_reference": "A"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.389204,
+        "randomMean": 0.244385,
+        "distinctEnergeticTopologies": 3
+      }
+    },
+    {
+      "taskId": "oewn-similar-2d459dcb72",
+      "relation": "similar",
+      "sourceSynsetId": "oewn-00760378-v",
+      "answer": "D",
+      "choices": {
+        "cyclotron": "D",
+        "random_valence": "D",
+        "direct_ai_one_pass": "D",
+        "human_reference": "D"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.413544,
+        "randomMean": 0.288242,
+        "distinctEnergeticTopologies": 3
+      }
+    },
+    {
+      "taskId": "oewn-similar-67fc3674bb",
+      "relation": "similar",
+      "sourceSynsetId": "oewn-00664507-v",
+      "answer": "A",
+      "choices": {
+        "cyclotron": "B",
+        "random_valence": "B",
+        "direct_ai_one_pass": "E",
+        "human_reference": "B"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.776913,
+        "randomMean": 0.688048,
+        "distinctEnergeticTopologies": 3
+      }
+    },
+    {
+      "taskId": "oewn-similar-7476857f31",
+      "relation": "similar",
+      "sourceSynsetId": "oewn-01870178-v",
+      "answer": "C",
+      "choices": {
+        "cyclotron": "C",
+        "random_valence": "C",
+        "direct_ai_one_pass": "C",
+        "human_reference": "C"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.907087,
+        "randomMean": 0.832424,
+        "distinctEnergeticTopologies": 3
+      }
+    },
+    {
+      "taskId": "oewn-similar-a49d9284fd",
+      "relation": "similar",
+      "sourceSynsetId": "oewn-00614907-v",
+      "answer": "A",
+      "choices": {
+        "cyclotron": "E",
+        "random_valence": "D",
+        "direct_ai_one_pass": "A",
+        "human_reference": "E"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.324808,
+        "randomMean": 0.233374,
+        "distinctEnergeticTopologies": 4
+      }
+    },
+    {
+      "taskId": "oewn-similar-c28afb0a8c",
+      "relation": "similar",
+      "sourceSynsetId": "oewn-02113499-v",
+      "answer": "D",
+      "choices": {
+        "cyclotron": "D",
+        "random_valence": "D",
+        "direct_ai_one_pass": "D",
+        "human_reference": "D"
+      },
+      "cyclotronDiagnostic": {
+        "energeticMean": 0.824465,
+        "randomMean": 0.684637,
+        "distinctEnergeticTopologies": 3
+      }
+    }
+  ],
+  "checksum": "blind-benchmark1:aa6a69b8a2f14b05b841c2152c095948"
+}

@@ -1,0 +1,1000 @@
+{
+  "contract": "PB-SEMANTIC-REACTOR-BENCHMARK-v1",
+  "schemaVersion": "1.0.0",
+  "substrate": {
+    "name": "Open English WordNet",
+    "release": "2024",
+    "fingerprint": "oewn-substrate1:661fd88a8ab80d5bfdc86f7889a99a1b",
+    "excludedFromOriginalGroundingCorpus": true
+  },
+  "protocol": {
+    "trainingTasks": 400,
+    "validationTasks": 160,
+    "generalizationTestTasks": 240,
+    "sealedAiTestTasks": 24,
+    "candidatesPerTask": 5,
+    "trainValidationTestSourceDisjoint": true,
+    "priorBlindTasksExcludedFromEvolution": true,
+    "testTruthAcceptedByReactor": false,
+    "contaminatedPilotDiscarded": true,
+    "pilotInvalidationReason": "cross-split source synset reuse across relation types",
+    "pilotReservationChecksum": "reactor-pilot-reservation1:8572d1659bf9d0a2c322042b9e84f658",
+    "directProposalChecksum": "direct-proposals1:d2ef680856e3412401fafa6997533d2e",
+    "priorChallengeChecksum": "blind-challenge1:aadd63d80529a7918b8ad86f8ae03920",
+    "splitChecksums": {
+      "training": "reactor-split1:e3998d595b4b22a9866834bce850abb0",
+      "validation": "reactor-split1:58fda0ae7fb749804f66d480e28e4a21",
+      "generalizationTest": "reactor-split1:85e08c3d49d1f96271ee4d45b53b95db",
+      "sealedAiTest": "reactor-split1:1e2241bbe6612954e4f59c7f950f425b"
+    }
+  },
+  "reactor": {
+    "checksum": "fission-reactor1:fb73c4166a78de743d04a35115db096f",
+    "configuration": {
+      "candidatePoolSize": 32,
+      "complexityPenalty": 0.003,
+      "eliteCount": 16,
+      "generations": 60,
+      "marginReward": 0.02,
+      "minimumActiveGenes": 2,
+      "mutationPermille": 180,
+      "populationSize": 96,
+      "seed": 1919246691
+    },
+    "contract": "PB-SEMANTIC-FISSION-REPORT-v1",
+    "counts": {
+      "islands": 4,
+      "training": 400,
+      "validation": 160
+    },
+    "featureNames": [
+      "lexical",
+      "vector",
+      "chemistry",
+      "containment",
+      "polarity",
+      "lexical_vector",
+      "lexical_chemistry",
+      "vector_chemistry",
+      "containment_chemistry",
+      "polarity_vector"
+    ],
+    "islands": [
+      {
+        "archiveCells": 9,
+        "confidenceCalibration": {
+          "accepted": 40,
+          "coverage": 1,
+          "precision": 0.95,
+          "threshold": 0.057892,
+          "total": 40
+        },
+        "generationTrace": [
+          {
+            "archiveCells": 7,
+            "bestAccuracy": 0.92,
+            "bestActiveGenes": 8,
+            "bestFitness": 0.92519,
+            "generation": 0
+          },
+          {
+            "archiveCells": 7,
+            "bestAccuracy": 0.94,
+            "bestActiveGenes": 9,
+            "bestFitness": 0.944905,
+            "generation": 10
+          },
+          {
+            "archiveCells": 9,
+            "bestAccuracy": 0.94,
+            "bestActiveGenes": 6,
+            "bestFitness": 0.947185,
+            "generation": 20
+          },
+          {
+            "archiveCells": 9,
+            "bestAccuracy": 0.94,
+            "bestActiveGenes": 5,
+            "bestFitness": 0.94757,
+            "generation": 30
+          },
+          {
+            "archiveCells": 9,
+            "bestAccuracy": 0.94,
+            "bestActiveGenes": 5,
+            "bestFitness": 0.947666,
+            "generation": 40
+          },
+          {
+            "archiveCells": 9,
+            "bestAccuracy": 0.94,
+            "bestActiveGenes": 5,
+            "bestFitness": 0.94776,
+            "generation": 50
+          },
+          {
+            "archiveCells": 9,
+            "bestAccuracy": 0.94,
+            "bestActiveGenes": 5,
+            "bestFitness": 0.94776,
+            "generation": 60
+          }
+        ],
+        "negativeEvidence": [
+          "oewn-reactor-antonym-6c9d004b77",
+          "oewn-reactor-antonym-760c663ab4",
+          "oewn-reactor-antonym-0a19f27cfb",
+          "oewn-reactor-antonym-6291cd5bb1",
+          "oewn-reactor-antonym-b1a734cac1",
+          "oewn-reactor-antonym-6aa889a61a"
+        ],
+        "relation": "antonym",
+        "selectedGenome": {
+          "activeGenes": 5,
+          "checksum": "fission-genome1:0176685a021969c731b02fbc114374f9",
+          "contract": "PB-SEMANTIC-FISSION-GENOME-v1",
+          "generation": 58,
+          "parents": [
+            "fission-genome1:0d683cea1d354f5ee0265391d6bf8719",
+            "fission-genome1:33c0a20c94b955f3bf6f426cedb908b0"
+          ],
+          "relation": "antonym",
+          "weights": [
+            913,
+            0,
+            548,
+            0,
+            1000,
+            0,
+            0,
+            -506,
+            0,
+            352
+          ]
+        },
+        "training": {
+          "accuracy": 0.94,
+          "complexity": 0.5,
+          "correct": 94,
+          "failures": [
+            "oewn-reactor-antonym-6c9d004b77",
+            "oewn-reactor-antonym-760c663ab4",
+            "oewn-reactor-antonym-0a19f27cfb",
+            "oewn-reactor-antonym-6291cd5bb1",
+            "oewn-reactor-antonym-b1a734cac1",
+            "oewn-reactor-antonym-6aa889a61a"
+          ],
+          "fitness": 0.94776,
+          "meanMargin": 0.462998,
+          "total": 100
+        },
+        "validation": {
+          "accuracy": 0.95,
+          "complexity": 0.5,
+          "correct": 38,
+          "failures": [
+            "oewn-reactor-antonym-48acaf663e",
+            "oewn-reactor-antonym-e35e7c01f1"
+          ],
+          "fitness": 0.958247,
+          "meanMargin": 0.487355,
+          "total": 40
+        }
+      },
+      {
+        "archiveCells": 10,
+        "confidenceCalibration": {
+          "accepted": 22,
+          "coverage": 0.55,
+          "precision": 0.954545,
+          "threshold": 0.45346,
+          "total": 40
+        },
+        "generationTrace": [
+          {
+            "archiveCells": 7,
+            "bestAccuracy": 0.81,
+            "bestActiveGenes": 9,
+            "bestFitness": 0.810748,
+            "generation": 0
+          },
+          {
+            "archiveCells": 8,
+            "bestAccuracy": 0.83,
+            "bestActiveGenes": 5,
+            "bestFitness": 0.838483,
+            "generation": 10
+          },
+          {
+            "archiveCells": 9,
+            "bestAccuracy": 0.83,
+            "bestActiveGenes": 3,
+            "bestFitness": 0.839166,
+            "generation": 20
+          },
+          {
+            "archiveCells": 10,
+            "bestAccuracy": 0.83,
+            "bestActiveGenes": 5,
+            "bestFitness": 0.839299,
+            "generation": 30
+          },
+          {
+            "archiveCells": 10,
+            "bestAccuracy": 0.83,
+            "bestActiveGenes": 4,
+            "bestFitness": 0.839574,
+            "generation": 40
+          },
+          {
+            "archiveCells": 10,
+            "bestAccuracy": 0.83,
+            "bestActiveGenes": 4,
+            "bestFitness": 0.839635,
+            "generation": 50
+          },
+          {
+            "archiveCells": 10,
+            "bestAccuracy": 0.83,
+            "bestActiveGenes": 4,
+            "bestFitness": 0.839642,
+            "generation": 60
+          }
+        ],
+        "negativeEvidence": [
+          "oewn-reactor-hypernym-163a16de8b",
+          "oewn-reactor-hypernym-cd99a93709",
+          "oewn-reactor-hypernym-c25e5ac470",
+          "oewn-reactor-hypernym-5e8df164d1",
+          "oewn-reactor-hypernym-d859f175d5",
+          "oewn-reactor-hypernym-4cc0d1c9d2",
+          "oewn-reactor-hypernym-778b625742",
+          "oewn-reactor-hypernym-c5e48bcc8a",
+          "oewn-reactor-hypernym-11ea160e00",
+          "oewn-reactor-hypernym-593b9edf49",
+          "oewn-reactor-hypernym-ed998b4ac3",
+          "oewn-reactor-hypernym-3be2cea335",
+          "oewn-reactor-hypernym-8c814381b0",
+          "oewn-reactor-hypernym-ea7cb88f4b",
+          "oewn-reactor-hypernym-9782c719a5",
+          "oewn-reactor-hypernym-67c0a46a0a",
+          "oewn-reactor-hypernym-8099565380"
+        ],
+        "relation": "hypernym",
+        "selectedGenome": {
+          "activeGenes": 4,
+          "checksum": "fission-genome1:03f862a9892d1ef81ce6cfeb3826cbc0",
+          "contract": "PB-SEMANTIC-FISSION-GENOME-v1",
+          "generation": 60,
+          "parents": [
+            "fission-genome1:781cae62cf55aab9ce4bd2d3628b109e",
+            "fission-genome1:efe1fb4e03415c24b31fd55631b07c21"
+          ],
+          "relation": "hypernym",
+          "weights": [
+            352,
+            0,
+            0,
+            670,
+            0,
+            85,
+            1000,
+            0,
+            0,
+            0
+          ]
+        },
+        "training": {
+          "accuracy": 0.83,
+          "complexity": 0.4,
+          "correct": 83,
+          "failures": [
+            "oewn-reactor-hypernym-163a16de8b",
+            "oewn-reactor-hypernym-cd99a93709",
+            "oewn-reactor-hypernym-c25e5ac470",
+            "oewn-reactor-hypernym-5e8df164d1",
+            "oewn-reactor-hypernym-d859f175d5",
+            "oewn-reactor-hypernym-4cc0d1c9d2",
+            "oewn-reactor-hypernym-778b625742",
+            "oewn-reactor-hypernym-c5e48bcc8a",
+            "oewn-reactor-hypernym-11ea160e00",
+            "oewn-reactor-hypernym-593b9edf49",
+            "oewn-reactor-hypernym-ed998b4ac3",
+            "oewn-reactor-hypernym-3be2cea335",
+            "oewn-reactor-hypernym-8c814381b0",
+            "oewn-reactor-hypernym-ea7cb88f4b",
+            "oewn-reactor-hypernym-9782c719a5",
+            "oewn-reactor-hypernym-67c0a46a0a",
+            "oewn-reactor-hypernym-8099565380"
+          ],
+          "fitness": 0.839642,
+          "meanMargin": 0.542111,
+          "total": 100
+        },
+        "validation": {
+          "accuracy": 0.725,
+          "complexity": 0.4,
+          "correct": 29,
+          "failures": [
+            "oewn-reactor-hypernym-5044da750e",
+            "oewn-reactor-hypernym-9a0b6cd8bf",
+            "oewn-reactor-hypernym-02a36cedf4",
+            "oewn-reactor-hypernym-d92dab7abf",
+            "oewn-reactor-hypernym-5f60fd5875",
+            "oewn-reactor-hypernym-71cca4a8e0",
+            "oewn-reactor-hypernym-07dedbbbc9",
+            "oewn-reactor-hypernym-a3d14a793b",
+            "oewn-reactor-hypernym-d3af55d505",
+            "oewn-reactor-hypernym-0195e40d74",
+            "oewn-reactor-hypernym-08985e8c3a"
+          ],
+          "fitness": 0.733271,
+          "meanMargin": 0.473539,
+          "total": 40
+        }
+      },
+      {
+        "archiveCells": 10,
+        "confidenceCalibration": {
+          "accepted": 25,
+          "coverage": 0.625,
+          "precision": 0.96,
+          "threshold": 0.31211,
+          "total": 40
+        },
+        "generationTrace": [
+          {
+            "archiveCells": 7,
+            "bestAccuracy": 0.77,
+            "bestActiveGenes": 9,
+            "bestFitness": 0.772121,
+            "generation": 0
+          },
+          {
+            "archiveCells": 8,
+            "bestAccuracy": 0.8,
+            "bestActiveGenes": 7,
+            "bestFitness": 0.804042,
+            "generation": 10
+          },
+          {
+            "archiveCells": 9,
+            "bestAccuracy": 0.8,
+            "bestActiveGenes": 3,
+            "bestFitness": 0.808675,
+            "generation": 20
+          },
+          {
+            "archiveCells": 9,
+            "bestAccuracy": 0.8,
+            "bestActiveGenes": 2,
+            "bestFitness": 0.809873,
+            "generation": 30
+          },
+          {
+            "archiveCells": 9,
+            "bestAccuracy": 0.8,
+            "bestActiveGenes": 2,
+            "bestFitness": 0.809972,
+            "generation": 40
+          },
+          {
+            "archiveCells": 10,
+            "bestAccuracy": 0.8,
+            "bestActiveGenes": 2,
+            "bestFitness": 0.809972,
+            "generation": 50
+          },
+          {
+            "archiveCells": 10,
+            "bestAccuracy": 0.8,
+            "bestActiveGenes": 2,
+            "bestFitness": 0.810035,
+            "generation": 60
+          }
+        ],
+        "negativeEvidence": [
+          "oewn-reactor-mero_part-e0ca7a3810",
+          "oewn-reactor-mero_part-adb32b96ac",
+          "oewn-reactor-mero_part-11d7520a79",
+          "oewn-reactor-mero_part-7af3157bf0",
+          "oewn-reactor-mero_part-d69ce1f2c2",
+          "oewn-reactor-mero_part-c4dab08d76",
+          "oewn-reactor-mero_part-5d30da310c",
+          "oewn-reactor-mero_part-0b83fb49a3",
+          "oewn-reactor-mero_part-5350ee3394",
+          "oewn-reactor-mero_part-dd7f0dc0d6",
+          "oewn-reactor-mero_part-502053a491",
+          "oewn-reactor-mero_part-7db3bb543b",
+          "oewn-reactor-mero_part-51240e9e46",
+          "oewn-reactor-mero_part-98713ae221",
+          "oewn-reactor-mero_part-5474b52811",
+          "oewn-reactor-mero_part-a846d1d94e",
+          "oewn-reactor-mero_part-cf10cf53f6",
+          "oewn-reactor-mero_part-b58e1e638f",
+          "oewn-reactor-mero_part-99b3d0c99d",
+          "oewn-reactor-mero_part-77df6f81e0"
+        ],
+        "relation": "mero_part",
+        "selectedGenome": {
+          "activeGenes": 2,
+          "checksum": "fission-genome1:3ec1645ddea201fd08c47b7852d881d1",
+          "contract": "PB-SEMANTIC-FISSION-GENOME-v1",
+          "generation": 59,
+          "parents": [
+            "fission-genome1:15a66280beb8810884c5d3f9a9c73cd7",
+            "fission-genome1:71dce1a290c37e42f0d10a5a3c1db1fa"
+          ],
+          "relation": "mero_part",
+          "weights": [
+            1000,
+            0,
+            0,
+            602,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "training": {
+          "accuracy": 0.8,
+          "complexity": 0.2,
+          "correct": 80,
+          "failures": [
+            "oewn-reactor-mero_part-e0ca7a3810",
+            "oewn-reactor-mero_part-adb32b96ac",
+            "oewn-reactor-mero_part-11d7520a79",
+            "oewn-reactor-mero_part-7af3157bf0",
+            "oewn-reactor-mero_part-d69ce1f2c2",
+            "oewn-reactor-mero_part-c4dab08d76",
+            "oewn-reactor-mero_part-5d30da310c",
+            "oewn-reactor-mero_part-0b83fb49a3",
+            "oewn-reactor-mero_part-5350ee3394",
+            "oewn-reactor-mero_part-dd7f0dc0d6",
+            "oewn-reactor-mero_part-502053a491",
+            "oewn-reactor-mero_part-7db3bb543b",
+            "oewn-reactor-mero_part-51240e9e46",
+            "oewn-reactor-mero_part-98713ae221",
+            "oewn-reactor-mero_part-5474b52811",
+            "oewn-reactor-mero_part-a846d1d94e",
+            "oewn-reactor-mero_part-cf10cf53f6",
+            "oewn-reactor-mero_part-b58e1e638f",
+            "oewn-reactor-mero_part-99b3d0c99d",
+            "oewn-reactor-mero_part-77df6f81e0"
+          ],
+          "fitness": 0.810035,
+          "meanMargin": 0.53176,
+          "total": 100
+        },
+        "validation": {
+          "accuracy": 0.675,
+          "complexity": 0.2,
+          "correct": 27,
+          "failures": [
+            "oewn-reactor-mero_part-24989738aa",
+            "oewn-reactor-mero_part-a4b58fa5b2",
+            "oewn-reactor-mero_part-91420426f8",
+            "oewn-reactor-mero_part-1f42fd57af",
+            "oewn-reactor-mero_part-2d66eaf085",
+            "oewn-reactor-mero_part-c6ac0454e5",
+            "oewn-reactor-mero_part-45955c9a96",
+            "oewn-reactor-mero_part-8745559402",
+            "oewn-reactor-mero_part-cef047099f",
+            "oewn-reactor-mero_part-1483476afb",
+            "oewn-reactor-mero_part-7e14545c63",
+            "oewn-reactor-mero_part-599f3d8fa7",
+            "oewn-reactor-mero_part-2be7e4917d"
+          ],
+          "fitness": 0.68311,
+          "meanMargin": 0.435487,
+          "total": 40
+        }
+      },
+      {
+        "archiveCells": 10,
+        "confidenceCalibration": {
+          "accepted": 0,
+          "coverage": 0,
+          "precision": 1,
+          "threshold": 1,
+          "total": 40
+        },
+        "generationTrace": [
+          {
+            "archiveCells": 7,
+            "bestAccuracy": 0.49,
+            "bestActiveGenes": 5,
+            "bestFitness": 0.493037,
+            "generation": 0
+          },
+          {
+            "archiveCells": 9,
+            "bestAccuracy": 0.54,
+            "bestActiveGenes": 7,
+            "bestFitness": 0.54031,
+            "generation": 10
+          },
+          {
+            "archiveCells": 10,
+            "bestAccuracy": 0.54,
+            "bestActiveGenes": 5,
+            "bestFitness": 0.541217,
+            "generation": 20
+          },
+          {
+            "archiveCells": 10,
+            "bestAccuracy": 0.54,
+            "bestActiveGenes": 5,
+            "bestFitness": 0.54129,
+            "generation": 30
+          },
+          {
+            "archiveCells": 10,
+            "bestAccuracy": 0.54,
+            "bestActiveGenes": 5,
+            "bestFitness": 0.54129,
+            "generation": 40
+          },
+          {
+            "archiveCells": 10,
+            "bestAccuracy": 0.54,
+            "bestActiveGenes": 5,
+            "bestFitness": 0.541294,
+            "generation": 50
+          },
+          {
+            "archiveCells": 10,
+            "bestAccuracy": 0.54,
+            "bestActiveGenes": 5,
+            "bestFitness": 0.541399,
+            "generation": 60
+          }
+        ],
+        "negativeEvidence": [
+          "oewn-reactor-similar-27bb4e554b",
+          "oewn-reactor-similar-dbe4cb68be",
+          "oewn-reactor-similar-85031000ce",
+          "oewn-reactor-similar-954c01bb74",
+          "oewn-reactor-similar-72c18af9b7",
+          "oewn-reactor-similar-48e643cf06",
+          "oewn-reactor-similar-b8f7027e71",
+          "oewn-reactor-similar-cc2fe4b4a1",
+          "oewn-reactor-similar-677013a19c",
+          "oewn-reactor-similar-0558f52435",
+          "oewn-reactor-similar-c87b9b37b4",
+          "oewn-reactor-similar-cdf22ad4de",
+          "oewn-reactor-similar-d99fd2c3a9",
+          "oewn-reactor-similar-fe01f397b5",
+          "oewn-reactor-similar-d64f4d877e",
+          "oewn-reactor-similar-dc077c2f1c",
+          "oewn-reactor-similar-4fceeabcee",
+          "oewn-reactor-similar-6179a9af7f",
+          "oewn-reactor-similar-b564b516d9",
+          "oewn-reactor-similar-3f40521562",
+          "oewn-reactor-similar-02484cc439",
+          "oewn-reactor-similar-d837188e25",
+          "oewn-reactor-similar-edb23d012b",
+          "oewn-reactor-similar-753f884ff7",
+          "oewn-reactor-similar-4ac279d67e",
+          "oewn-reactor-similar-a4c325671e",
+          "oewn-reactor-similar-5df5b8ad30",
+          "oewn-reactor-similar-1a356f16a9",
+          "oewn-reactor-similar-7275983d9f",
+          "oewn-reactor-similar-7222d67ed8",
+          "oewn-reactor-similar-41a4fdb5ec",
+          "oewn-reactor-similar-7b69f3c183",
+          "oewn-reactor-similar-77ff57a355",
+          "oewn-reactor-similar-9592d59089",
+          "oewn-reactor-similar-f84c4c1a92",
+          "oewn-reactor-similar-00a8baac63",
+          "oewn-reactor-similar-3e9a241513",
+          "oewn-reactor-similar-ab7ceaffe4",
+          "oewn-reactor-similar-183c164974",
+          "oewn-reactor-similar-c40430934e",
+          "oewn-reactor-similar-c9c0a5f24b",
+          "oewn-reactor-similar-14eb97e67c",
+          "oewn-reactor-similar-db629b1303",
+          "oewn-reactor-similar-b501e21b48",
+          "oewn-reactor-similar-f2800ccf0f",
+          "oewn-reactor-similar-e2c4e248d0"
+        ],
+        "relation": "similar",
+        "selectedGenome": {
+          "activeGenes": 7,
+          "checksum": "fission-genome1:2eff7c1dab794716b1ff9e2673ecf760",
+          "contract": "PB-SEMANTIC-FISSION-GENOME-v1",
+          "generation": 60,
+          "parents": [
+            "fission-genome1:0f577e38efe546db0cd0860c4c4060ac",
+            "fission-genome1:491a4faded37e315bd2d74b0966dd30d"
+          ],
+          "relation": "similar",
+          "weights": [
+            187,
+            -808,
+            1000,
+            14,
+            0,
+            458,
+            1000,
+            -891,
+            0,
+            0
+          ]
+        },
+        "training": {
+          "accuracy": 0.54,
+          "complexity": 0.7,
+          "correct": 54,
+          "failures": [
+            "oewn-reactor-similar-27bb4e554b",
+            "oewn-reactor-similar-dbe4cb68be",
+            "oewn-reactor-similar-85031000ce",
+            "oewn-reactor-similar-954c01bb74",
+            "oewn-reactor-similar-72c18af9b7",
+            "oewn-reactor-similar-48e643cf06",
+            "oewn-reactor-similar-b8f7027e71",
+            "oewn-reactor-similar-cc2fe4b4a1",
+            "oewn-reactor-similar-677013a19c",
+            "oewn-reactor-similar-0558f52435",
+            "oewn-reactor-similar-c87b9b37b4",
+            "oewn-reactor-similar-cdf22ad4de",
+            "oewn-reactor-similar-d99fd2c3a9",
+            "oewn-reactor-similar-fe01f397b5",
+            "oewn-reactor-similar-d64f4d877e",
+            "oewn-reactor-similar-dc077c2f1c",
+            "oewn-reactor-similar-4fceeabcee",
+            "oewn-reactor-similar-6179a9af7f",
+            "oewn-reactor-similar-b564b516d9",
+            "oewn-reactor-similar-3f40521562",
+            "oewn-reactor-similar-02484cc439",
+            "oewn-reactor-similar-d837188e25",
+            "oewn-reactor-similar-edb23d012b",
+            "oewn-reactor-similar-753f884ff7",
+            "oewn-reactor-similar-4ac279d67e",
+            "oewn-reactor-similar-a4c325671e",
+            "oewn-reactor-similar-5df5b8ad30",
+            "oewn-reactor-similar-1a356f16a9",
+            "oewn-reactor-similar-7275983d9f",
+            "oewn-reactor-similar-7222d67ed8",
+            "oewn-reactor-similar-41a4fdb5ec",
+            "oewn-reactor-similar-7b69f3c183",
+            "oewn-reactor-similar-77ff57a355",
+            "oewn-reactor-similar-9592d59089",
+            "oewn-reactor-similar-f84c4c1a92",
+            "oewn-reactor-similar-00a8baac63",
+            "oewn-reactor-similar-3e9a241513",
+            "oewn-reactor-similar-ab7ceaffe4",
+            "oewn-reactor-similar-183c164974",
+            "oewn-reactor-similar-c40430934e",
+            "oewn-reactor-similar-c9c0a5f24b",
+            "oewn-reactor-similar-14eb97e67c",
+            "oewn-reactor-similar-db629b1303",
+            "oewn-reactor-similar-b501e21b48",
+            "oewn-reactor-similar-f2800ccf0f",
+            "oewn-reactor-similar-e2c4e248d0"
+          ],
+          "fitness": 0.540912,
+          "meanMargin": 0.150577,
+          "total": 100
+        },
+        "validation": {
+          "accuracy": 0.55,
+          "complexity": 0.7,
+          "correct": 22,
+          "failures": [
+            "oewn-reactor-similar-e21039c824",
+            "oewn-reactor-similar-6251de82bb",
+            "oewn-reactor-similar-a9fc3b5b2d",
+            "oewn-reactor-similar-53fc19fc2c",
+            "oewn-reactor-similar-365badc05f",
+            "oewn-reactor-similar-048e8330b1",
+            "oewn-reactor-similar-7ca1a67435",
+            "oewn-reactor-similar-5b9eef2d37",
+            "oewn-reactor-similar-55a8ac2a1b",
+            "oewn-reactor-similar-4502a32600",
+            "oewn-reactor-similar-9b2d5a26aa",
+            "oewn-reactor-similar-8cc2e48199",
+            "oewn-reactor-similar-bcd453cfb7",
+            "oewn-reactor-similar-67ecd8b3f0",
+            "oewn-reactor-similar-b15dcbf064",
+            "oewn-reactor-similar-4878f26b85",
+            "oewn-reactor-similar-028491579e",
+            "oewn-reactor-similar-b8ec0012ae"
+          ],
+          "fitness": 0.551099,
+          "meanMargin": 0.15993,
+          "total": 40
+        }
+      }
+    ],
+    "relations": [
+      "antonym",
+      "hypernym",
+      "mero_part",
+      "similar"
+    ],
+    "schemaVersion": "1.0.0",
+    "splitChecksums": {
+      "training": "fission-train1:d1ea64b6e96da47a7ad1711955d44e43",
+      "validation": "fission-validation1:14c31dca46f1a993a884fe5f2f0444f5"
+    }
+  },
+  "generalization": {
+    "methods": [
+      {
+        "name": "fission_reactor",
+        "correct": 165,
+        "total": 240,
+        "accuracy": 0.6875,
+        "wilson95": [
+          0.626294,
+          0.742799
+        ],
+        "byRelation": {
+          "hypernym": {
+            "correct": 45,
+            "total": 60,
+            "accuracy": 0.75
+          },
+          "antonym": {
+            "correct": 54,
+            "total": 60,
+            "accuracy": 0.9
+          },
+          "mero_part": {
+            "correct": 44,
+            "total": 60,
+            "accuracy": 0.733333
+          },
+          "similar": {
+            "correct": 22,
+            "total": 60,
+            "accuracy": 0.366667
+          }
+        }
+      },
+      {
+        "name": "current_cyclotron",
+        "correct": 163,
+        "total": 240,
+        "accuracy": 0.679167,
+        "wilson95": [
+          0.617686,
+          0.735002
+        ],
+        "byRelation": {
+          "hypernym": {
+            "correct": 43,
+            "total": 60,
+            "accuracy": 0.716667
+          },
+          "antonym": {
+            "correct": 54,
+            "total": 60,
+            "accuracy": 0.9
+          },
+          "mero_part": {
+            "correct": 43,
+            "total": 60,
+            "accuracy": 0.716667
+          },
+          "similar": {
+            "correct": 23,
+            "total": 60,
+            "accuracy": 0.383333
+          }
+        }
+      },
+      {
+        "name": "random_valence",
+        "correct": 155,
+        "total": 240,
+        "accuracy": 0.645833,
+        "wilson95": [
+          0.583463,
+          0.703608
+        ],
+        "byRelation": {
+          "hypernym": {
+            "correct": 38,
+            "total": 60,
+            "accuracy": 0.633333
+          },
+          "antonym": {
+            "correct": 54,
+            "total": 60,
+            "accuracy": 0.9
+          },
+          "mero_part": {
+            "correct": 41,
+            "total": 60,
+            "accuracy": 0.683333
+          },
+          "similar": {
+            "correct": 22,
+            "total": 60,
+            "accuracy": 0.366667
+          }
+        }
+      },
+      {
+        "name": "human_reference",
+        "correct": 168,
+        "total": 240,
+        "accuracy": 0.7,
+        "wilson95": [
+          0.639245,
+          0.754453
+        ],
+        "byRelation": {
+          "hypernym": {
+            "correct": 42,
+            "total": 60,
+            "accuracy": 0.7
+          },
+          "antonym": {
+            "correct": 55,
+            "total": 60,
+            "accuracy": 0.916667
+          },
+          "mero_part": {
+            "correct": 47,
+            "total": 60,
+            "accuracy": 0.783333
+          },
+          "similar": {
+            "correct": 24,
+            "total": 60,
+            "accuracy": 0.4
+          }
+        }
+      }
+    ],
+    "comparisons": [
+      {
+        "left": "fission_reactor",
+        "right": "current_cyclotron",
+        "wins": 17,
+        "losses": 15,
+        "ties": 208,
+        "accuracyDelta": 0.008333,
+        "exactTwoSidedSignP": 0.86005
+      },
+      {
+        "left": "fission_reactor",
+        "right": "random_valence",
+        "wins": 23,
+        "losses": 13,
+        "ties": 204,
+        "accuracyDelta": 0.041667,
+        "exactTwoSidedSignP": 0.132498
+      },
+      {
+        "left": "fission_reactor",
+        "right": "human_reference",
+        "wins": 11,
+        "losses": 14,
+        "ties": 215,
+        "accuracyDelta": -0.0125,
+        "exactTwoSidedSignP": 0.690038
+      }
+    ],
+    "reactorExclusiveCorrect": 10
+  },
+  "aiAugmentation": {
+    "methods": [
+      {
+        "name": "ai_plus_reactor",
+        "correct": 21,
+        "total": 24,
+        "accuracy": 0.875,
+        "wilson95": [
+          0.689961,
+          0.956557
+        ],
+        "byRelation": {
+          "hypernym": {
+            "correct": 5,
+            "total": 6,
+            "accuracy": 0.833333
+          },
+          "antonym": {
+            "correct": 5,
+            "total": 6,
+            "accuracy": 0.833333
+          },
+          "mero_part": {
+            "correct": 6,
+            "total": 6,
+            "accuracy": 1
+          },
+          "similar": {
+            "correct": 5,
+            "total": 6,
+            "accuracy": 0.833333
+          }
+        }
+      },
+      {
+        "name": "direct_ai_one_pass",
+        "correct": 23,
+        "total": 24,
+        "accuracy": 0.958333,
+        "wilson95": [
+          0.797582,
+          0.992607
+        ],
+        "byRelation": {
+          "hypernym": {
+            "correct": 6,
+            "total": 6,
+            "accuracy": 1
+          },
+          "antonym": {
+            "correct": 6,
+            "total": 6,
+            "accuracy": 1
+          },
+          "mero_part": {
+            "correct": 6,
+            "total": 6,
+            "accuracy": 1
+          },
+          "similar": {
+            "correct": 5,
+            "total": 6,
+            "accuracy": 0.833333
+          }
+        }
+      },
+      {
+        "name": "fission_reactor",
+        "correct": 16,
+        "total": 24,
+        "accuracy": 0.666667,
+        "wilson95": [
+          0.467063,
+          0.820278
+        ],
+        "byRelation": {
+          "hypernym": {
+            "correct": 4,
+            "total": 6,
+            "accuracy": 0.666667
+          },
+          "antonym": {
+            "correct": 5,
+            "total": 6,
+            "accuracy": 0.833333
+          },
+          "mero_part": {
+            "correct": 4,
+            "total": 6,
+            "accuracy": 0.666667
+          },
+          "similar": {
+            "correct": 3,
+            "total": 6,
+            "accuracy": 0.5
+          }
+        }
+      }
+    ],
+    "comparison": {
+      "left": "ai_plus_reactor",
+      "right": "direct_ai_one_pass",
+      "wins": 0,
+      "losses": 2,
+      "ties": 22,
+      "accuracyDelta": -0.083333,
+      "exactTwoSidedSignP": 0.5
+    },
+    "calibratedOverrides": 11
+  },
+  "verdict": "NO_DECISIVE_IMPROVEMENT",
+  "checksum": "fission-benchmark1:336c542edf0856786877784eb63a720b"
+}

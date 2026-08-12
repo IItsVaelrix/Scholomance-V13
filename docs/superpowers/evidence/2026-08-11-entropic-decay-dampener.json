@@ -1,0 +1,170 @@
+{
+  "boundaries": {
+    "exactOnly": {
+      "attractionMultiplier": 0.001562967965,
+      "attractionSpent": 0.798749625628,
+      "checksum": "occupancy-entropy1:475ec05110527deda6d714f0c23c24d3",
+      "contract": "PB-OCCUPANCY-ENTROPY-v1",
+      "decayLambda": 0.35,
+      "effectiveAttraction": 0.001250374372,
+      "entropicPressure": 6.461168723578,
+      "intrinsicEnergy": 0.8,
+      "occupancy": {
+        "exactRevisits": 100,
+        "familyRevisits": 0,
+        "neighborhoodRevisits": 0
+      },
+      "occupancyHeat": 18.460482067365,
+      "weights": {
+        "exact": 4,
+        "family": 2,
+        "neighborhood": 0.5
+      }
+    },
+    "familyOnly": {
+      "attractionMultiplier": 0.03953438965,
+      "attractionSpent": 0.76837248828,
+      "checksum": "occupancy-entropy1:4b7dac7721d9f0148d2fcecd5353ed1c",
+      "contract": "PB-OCCUPANCY-ENTROPY-v1",
+      "decayLambda": 0.35,
+      "effectiveAttraction": 0.03162751172,
+      "entropicPressure": 3.230584361789,
+      "intrinsicEnergy": 0.8,
+      "occupancy": {
+        "exactRevisits": 0,
+        "familyRevisits": 100,
+        "neighborhoodRevisits": 0
+      },
+      "occupancyHeat": 9.230241033683,
+      "weights": {
+        "exact": 4,
+        "family": 2,
+        "neighborhood": 0.5
+      }
+    },
+    "neighborhoodOnly": {
+      "attractionMultiplier": 0.445906455297,
+      "attractionSpent": 0.443274835762,
+      "checksum": "occupancy-entropy1:435b0017af5d7273418be514af8cf375",
+      "contract": "PB-OCCUPANCY-ENTROPY-v1",
+      "decayLambda": 0.35,
+      "effectiveAttraction": 0.356725164238,
+      "entropicPressure": 0.807646090447,
+      "intrinsicEnergy": 0.8,
+      "occupancy": {
+        "exactRevisits": 0,
+        "familyRevisits": 0,
+        "neighborhoodRevisits": 100
+      },
+      "occupancyHeat": 2.307560258421,
+      "weights": {
+        "exact": 4,
+        "family": 2,
+        "neighborhood": 0.5
+      }
+    },
+    "unoccupied": {
+      "attractionMultiplier": 1,
+      "attractionSpent": 0,
+      "checksum": "occupancy-entropy1:153c4d3785f4ff127969283956164319",
+      "contract": "PB-OCCUPANCY-ENTROPY-v1",
+      "decayLambda": 0.35,
+      "effectiveAttraction": 0.8,
+      "entropicPressure": 0,
+      "intrinsicEnergy": 0.8,
+      "occupancy": {
+        "exactRevisits": 0,
+        "familyRevisits": 0,
+        "neighborhoodRevisits": 0
+      },
+      "occupancyHeat": 0,
+      "weights": {
+        "exact": 4,
+        "family": 2,
+        "neighborhood": 0.5
+      }
+    },
+    "zeroEnergy": {
+      "attractionMultiplier": 0.000063007506,
+      "attractionSpent": 0,
+      "checksum": "occupancy-entropy1:09a59638ded6048acbbefe274deeaa74",
+      "contract": "PB-OCCUPANCY-ENTROPY-v1",
+      "decayLambda": 0.35,
+      "effectiveAttraction": 0,
+      "entropicPressure": 9.672256691041,
+      "intrinsicEnergy": 0,
+      "occupancy": {
+        "exactRevisits": 1000,
+        "familyRevisits": 0,
+        "neighborhoodRevisits": 0
+      },
+      "occupancyHeat": 27.635019117261,
+      "weights": {
+        "exact": 4,
+        "family": 2,
+        "neighborhood": 0.5
+      }
+    },
+    "zeroLambda": {
+      "attractionMultiplier": 1,
+      "attractionSpent": 0,
+      "checksum": "occupancy-entropy1:b5bce4590913a3229343fb049c2e6eb0",
+      "contract": "PB-OCCUPANCY-ENTROPY-v1",
+      "decayLambda": 0,
+      "effectiveAttraction": 0.8,
+      "entropicPressure": 0,
+      "intrinsicEnergy": 0.8,
+      "occupancy": {
+        "exactRevisits": 1000,
+        "familyRevisits": 0,
+        "neighborhoodRevisits": 0
+      },
+      "occupancyHeat": 27.635019117261,
+      "weights": {
+        "exact": 4,
+        "family": 2,
+        "neighborhood": 0.5
+      }
+    }
+  },
+  "boundaryChecks": {
+    "exactBasinDecays": true,
+    "familyBasinDecays": true,
+    "neighborhoodDecays": true,
+    "unoccupiedPreservesAttraction": true,
+    "zeroEnergyRemainsZero": true,
+    "zeroLambdaDisablesDecay": true
+  },
+  "checksum": "occupancy-evidence1:2cbce1be4928b41b3d934cf87afa037c",
+  "contract": "PB-OCCUPANCY-ENTROPY-EVIDENCE-v1",
+  "exactReplay": true,
+  "protocol": {
+    "deterministicCounterAddressing": true,
+    "replayedInFull": true,
+    "trials": 100000,
+    "wallClockInputs": false
+  },
+  "schemaVersion": "1.0.0",
+  "sweep": {
+    "counts": {
+      "checksumVerified": 100000,
+      "violations": 0
+    },
+    "measurements": {
+      "meanAttractionSpent": 0.495412709814,
+      "meanEffectiveAttraction": 0.005593340186
+    },
+    "properties": {
+      "boundedSearchInfluence": true,
+      "checksumsVerify": true,
+      "declaredWeightsPreserved": true,
+      "intrinsicEnergyImmutable": true,
+      "nonnegativePressure": true,
+      "occupancyMonotonicity": true
+    },
+    "sampledTraceChecksum": "occupancy-trace1:95e5bddae1001d24cc41b61efff8a056",
+    "trials": 100000,
+    "violations": []
+  },
+  "verdict": "PASS"
+}

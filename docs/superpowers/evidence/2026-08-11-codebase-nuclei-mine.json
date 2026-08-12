@@ -1,0 +1,774 @@
+{
+  "contract": "PB-CODEBASE-NUCLEI-MINE-v1",
+  "schemaVersion": "1.0.0",
+  "seed": 6045712,
+  "trials": 20000,
+  "elapsedMs": 4274,
+  "outPath": "docs/superpowers/evidence/2026-08-11-codebase-nuclei-mine.json",
+  "reportPath": "docs/superpowers/evidence/2026-08-11-codebase-nuclei-mine.md",
+  "atomCount": 56,
+  "baseAtomCount": 44,
+  "extensionAtomCount": 12,
+  "extensionAtomIds": [
+    "process-sensor",
+    "artifact-auditor",
+    "subtlety-fingerprint",
+    "subtlety-closed-loop",
+    "raid-healer",
+    "fission-reactor",
+    "ccg-channel",
+    "treebank-metrics",
+    "precedent-compose",
+    "entropy-dampener",
+    "test-contract",
+    "canonical-tokenizer-atom"
+  ],
+  "shippedTopologies": [
+    "bytecode-seal|canonical-serializer|diagnostic-event-bus|immutable-packet|schema-verifier",
+    "bytecode-seal|canonical-serializer|cyclotron-reactor|evidence-ledger|schema-verifier",
+    "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|semantic-memory"
+  ],
+  "cyclotron": {
+    "checksum": "cyclotron1:8b9893a81e948bb0ebed6c84c82b916b",
+    "atomBankChecksum": "atombank1:470f7196ad478832",
+    "groundingIndexChecksum": "grnd1:6d012f5a65a6e404",
+    "chemistryProvenance": {
+      "abstainsWithoutSignal": true,
+      "checksum": "chemweights1:52ed14ac0c46ee82",
+      "coherenceMode": "residual-claim",
+      "relationalChannel": "corpus-pmi-signed",
+      "schema": "PB-CONCEPT-CHEM-v1",
+      "stabilityThresholds": {
+        "METASTABLE_MIN": 0.3,
+        "STABLE_MIN": 0.55
+      },
+      "version": "v2",
+      "weights": {
+        "bond": 0.1,
+        "coherence": 0.15,
+        "grounding": 0.3,
+        "relation": 0.45
+      }
+    },
+    "counts": {
+      "candidateTrials": 16000,
+      "controlTrials": 4000,
+      "duplicateMolecules": 4746,
+      "hypotheses": 29,
+      "nuclei": 48,
+      "refused": 179,
+      "shortlisted": 256,
+      "unboundTrials": 0,
+      "uniqueMolecules": 11254
+    },
+    "control": {
+      "bar": 0.198576,
+      "percentile": 0.99,
+      "samples": 4000
+    },
+    "configuration": {
+      "controlEvery": 5,
+      "controlPercentile": 0.99,
+      "entropy": {
+        "activationHeat": 5,
+        "decayLambda": 0.35,
+        "enabled": false,
+        "escapeAttempts": 3,
+        "exactWeight": 4,
+        "familyWeight": 2,
+        "neighborhoodWeight": 0.5
+      },
+      "environments": [
+        "governance",
+        "immunity",
+        "memory",
+        "retrieval",
+        "synthesis"
+      ],
+      "finalScoreFloor": 0.52,
+      "maxMoleculeSize": 5,
+      "noveltyFloor": 0.04,
+      "nucleusMinDomains": 2,
+      "nucleusNoveltyFloor": 0.28,
+      "nucleusScoreFloor": 0.7,
+      "osmosisDriftCeiling": 0.17,
+      "osmosisSimilarityFloor": 0.83,
+      "shortlistFamilyCap": 2,
+      "shortlistLimit": 256
+    }
+  },
+  "uniqueNucleusTopologies": 25,
+  "uniqueHypothesisTopologies": 15,
+  "shippedRediscoveries": 2,
+  "proposals": [
+    {
+      "topology": "canonical-serializer|evidence-ledger|schema-verifier|test-contract",
+      "atomIds": [
+        "canonical-serializer",
+        "evidence-ledger",
+        "schema-verifier",
+        "test-contract"
+      ],
+      "verdict": "NUCLEUS",
+      "finalScore": 0.727354,
+      "utility": 0.558589,
+      "domains": [
+        "artifact",
+        "governance",
+        "memory"
+      ],
+      "evidenceRealized": 1,
+      "openPorts": [
+        "experiment-receipt",
+        "integrity-verdict",
+        "process-verdict"
+      ],
+      "internalPorts": [
+        "artifact",
+        "schema-verdict",
+        "structure",
+        "validation-verdict"
+      ],
+      "newAtomCount": 1,
+      "why": [
+        "Every atom resolves to a real file in this tree.",
+        "Includes 1 codebase-extension atom(s) absent from the ritual bank.",
+        "Crosses 3 domains: artifact, governance, memory.",
+        "Many open ports (3) — likely under-specified."
+      ],
+      "moleculeChecksum": "molecule1:1addda2ba2edaeac"
+    },
+    {
+      "topology": "canonical-serializer|evidence-ledger|process-sensor|schema-verifier",
+      "atomIds": [
+        "canonical-serializer",
+        "evidence-ledger",
+        "process-sensor",
+        "schema-verifier"
+      ],
+      "verdict": "HYPOTHESIS",
+      "finalScore": 0.685604,
+      "utility": 0.540833,
+      "domains": [
+        "artifact",
+        "governance",
+        "immunity",
+        "memory"
+      ],
+      "evidenceRealized": 1,
+      "openPorts": [
+        "candidate-frontier",
+        "feasibility-score",
+        "validation-verdict"
+      ],
+      "internalPorts": [
+        "artifact",
+        "experiment-receipt",
+        "structure"
+      ],
+      "newAtomCount": 1,
+      "why": [
+        "Every atom resolves to a real file in this tree.",
+        "Includes 1 codebase-extension atom(s) absent from the ritual bank.",
+        "Crosses 4 domains: artifact, governance, immunity, memory.",
+        "Many open ports (3) — likely under-specified."
+      ],
+      "moleculeChecksum": "molecule1:9a33c5beb70fb49e"
+    },
+    {
+      "topology": "process-sensor|retrieval-index",
+      "atomIds": [
+        "process-sensor",
+        "retrieval-index"
+      ],
+      "verdict": "HYPOTHESIS",
+      "finalScore": 0.650653,
+      "utility": 0.533144,
+      "domains": [
+        "immunity",
+        "retrieval"
+      ],
+      "evidenceRealized": 1,
+      "openPorts": [
+        "feasibility-score",
+        "probe-family",
+        "validation-verdict"
+      ],
+      "internalPorts": [
+        "candidate-frontier"
+      ],
+      "newAtomCount": 1,
+      "why": [
+        "Every atom resolves to a real file in this tree.",
+        "Includes 1 codebase-extension atom(s) absent from the ritual bank.",
+        "Many open ports (3) — likely under-specified."
+      ],
+      "moleculeChecksum": "molecule1:e124c8faff8d547b"
+    },
+    {
+      "topology": "process-sensor|valence-compiler",
+      "atomIds": [
+        "process-sensor",
+        "valence-compiler"
+      ],
+      "verdict": "NUCLEUS",
+      "finalScore": 0.719164,
+      "utility": 0.522216,
+      "domains": [
+        "immunity",
+        "synthesis"
+      ],
+      "evidenceRealized": 1,
+      "openPorts": [
+        "atom-inventory",
+        "feasibility-score",
+        "trial-counter",
+        "validation-verdict"
+      ],
+      "internalPorts": [
+        "candidate-frontier"
+      ],
+      "newAtomCount": 1,
+      "why": [
+        "Every atom resolves to a real file in this tree.",
+        "Includes 1 codebase-extension atom(s) absent from the ritual bank.",
+        "Many open ports (4) — likely under-specified."
+      ],
+      "moleculeChecksum": "molecule1:aa08a53719c7d80e"
+    },
+    {
+      "topology": "schema-verifier|test-contract",
+      "atomIds": [
+        "schema-verifier",
+        "test-contract"
+      ],
+      "verdict": "HYPOTHESIS",
+      "finalScore": 0.754114,
+      "utility": 0.515905,
+      "domains": [
+        "governance"
+      ],
+      "evidenceRealized": 1,
+      "openPorts": [
+        "artifact",
+        "integrity-verdict",
+        "process-verdict"
+      ],
+      "internalPorts": [
+        "schema-verdict"
+      ],
+      "newAtomCount": 1,
+      "why": [
+        "Every atom resolves to a real file in this tree.",
+        "Includes 1 codebase-extension atom(s) absent from the ritual bank.",
+        "Many open ports (3) — likely under-specified."
+      ],
+      "moleculeChecksum": "molecule1:2f8f6b8b94c6ff52"
+    },
+    {
+      "topology": "fission-reactor|law-gate|molecule-generator",
+      "atomIds": [
+        "fission-reactor",
+        "law-gate",
+        "molecule-generator"
+      ],
+      "verdict": "NUCLEUS",
+      "finalScore": 0.726871,
+      "utility": 0.513245,
+      "domains": [
+        "governance",
+        "linguistic",
+        "synthesis"
+      ],
+      "evidenceRealized": 1,
+      "openPorts": [
+        "atom-inventory",
+        "corpus-grounding",
+        "operator-law",
+        "semantic-relation",
+        "token-stream"
+      ],
+      "internalPorts": [
+        "proposal"
+      ],
+      "newAtomCount": 1,
+      "why": [
+        "Every atom resolves to a real file in this tree.",
+        "Includes 1 codebase-extension atom(s) absent from the ritual bank.",
+        "Crosses 3 domains: governance, linguistic, synthesis.",
+        "Many open ports (5) — likely under-specified."
+      ],
+      "moleculeChecksum": "molecule1:e18f95576a5f4a0d"
+    },
+    {
+      "topology": "canonical-serializer|schema-verifier|test-contract",
+      "atomIds": [
+        "canonical-serializer",
+        "schema-verifier",
+        "test-contract"
+      ],
+      "verdict": "HYPOTHESIS",
+      "finalScore": 0.674995,
+      "utility": 0.509832,
+      "domains": [
+        "artifact",
+        "governance"
+      ],
+      "evidenceRealized": 1,
+      "openPorts": [
+        "integrity-verdict",
+        "process-verdict",
+        "structure"
+      ],
+      "internalPorts": [
+        "artifact",
+        "schema-verdict"
+      ],
+      "newAtomCount": 1,
+      "why": [
+        "Every atom resolves to a real file in this tree.",
+        "Includes 1 codebase-extension atom(s) absent from the ritual bank.",
+        "Many open ports (3) — likely under-specified."
+      ],
+      "moleculeChecksum": "molecule1:a4b392e6580c5bd6"
+    },
+    {
+      "topology": "bytecode-seal|canonical-serializer|schema-verifier|test-contract",
+      "atomIds": [
+        "bytecode-seal",
+        "canonical-serializer",
+        "schema-verifier",
+        "test-contract"
+      ],
+      "verdict": "NUCLEUS",
+      "finalScore": 0.765804,
+      "utility": 0.506477,
+      "domains": [
+        "artifact",
+        "governance"
+      ],
+      "evidenceRealized": 1,
+      "openPorts": [
+        "integrity-verdict",
+        "process-verdict",
+        "structure"
+      ],
+      "internalPorts": [
+        "artifact",
+        "schema-verdict"
+      ],
+      "newAtomCount": 1,
+      "why": [
+        "Every atom resolves to a real file in this tree.",
+        "Includes 1 codebase-extension atom(s) absent from the ritual bank.",
+        "Many open ports (3) — likely under-specified.",
+        "Cyclotron nucleus score 0.7658."
+      ],
+      "moleculeChecksum": "molecule1:384db6334dd396de"
+    },
+    {
+      "topology": "process-sensor|retrieval-index|valence-compiler",
+      "atomIds": [
+        "process-sensor",
+        "retrieval-index",
+        "valence-compiler"
+      ],
+      "verdict": "HYPOTHESIS",
+      "finalScore": 0.693165,
+      "utility": 0.50583,
+      "domains": [
+        "immunity",
+        "retrieval",
+        "synthesis"
+      ],
+      "evidenceRealized": 1,
+      "openPorts": [
+        "atom-inventory",
+        "feasibility-score",
+        "probe-family",
+        "trial-counter",
+        "validation-verdict"
+      ],
+      "internalPorts": [
+        "candidate-frontier"
+      ],
+      "newAtomCount": 1,
+      "why": [
+        "Every atom resolves to a real file in this tree.",
+        "Includes 1 codebase-extension atom(s) absent from the ritual bank.",
+        "Crosses 3 domains: immunity, retrieval, synthesis.",
+        "Many open ports (5) — likely under-specified."
+      ],
+      "moleculeChecksum": "molecule1:04f5f89d1cce3c62"
+    },
+    {
+      "topology": "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|test-contract",
+      "atomIds": [
+        "bytecode-seal",
+        "canonical-serializer",
+        "immutable-packet",
+        "schema-verifier",
+        "test-contract"
+      ],
+      "verdict": "NUCLEUS",
+      "finalScore": 0.759059,
+      "utility": 0.502993,
+      "domains": [
+        "artifact",
+        "governance"
+      ],
+      "evidenceRealized": 1,
+      "openPorts": [
+        "integrity-verdict",
+        "process-verdict",
+        "structure"
+      ],
+      "internalPorts": [
+        "artifact",
+        "checksum",
+        "schema-verdict"
+      ],
+      "newAtomCount": 1,
+      "why": [
+        "Every atom resolves to a real file in this tree.",
+        "Includes 1 codebase-extension atom(s) absent from the ritual bank.",
+        "Many open ports (3) — likely under-specified."
+      ],
+      "moleculeChecksum": "molecule1:34387f85009fd6a5"
+    },
+    {
+      "topology": "bytecode-seal|immutable-packet|schema-verifier|test-contract",
+      "atomIds": [
+        "bytecode-seal",
+        "immutable-packet",
+        "schema-verifier",
+        "test-contract"
+      ],
+      "verdict": "NUCLEUS",
+      "finalScore": 0.740862,
+      "utility": 0.50099,
+      "domains": [
+        "artifact",
+        "governance"
+      ],
+      "evidenceRealized": 1,
+      "openPorts": [
+        "artifact",
+        "integrity-verdict",
+        "process-verdict"
+      ],
+      "internalPorts": [
+        "checksum",
+        "schema-verdict"
+      ],
+      "newAtomCount": 1,
+      "why": [
+        "Every atom resolves to a real file in this tree.",
+        "Includes 1 codebase-extension atom(s) absent from the ritual bank.",
+        "Many open ports (3) — likely under-specified."
+      ],
+      "moleculeChecksum": "molecule1:bb336427207c1513"
+    },
+    {
+      "topology": "canonical-serializer|immutable-packet|schema-verifier|test-contract",
+      "atomIds": [
+        "canonical-serializer",
+        "immutable-packet",
+        "schema-verifier",
+        "test-contract"
+      ],
+      "verdict": "HYPOTHESIS",
+      "finalScore": 0.695114,
+      "utility": 0.462925,
+      "domains": [
+        "artifact",
+        "governance"
+      ],
+      "evidenceRealized": 1,
+      "openPorts": [
+        "checksum",
+        "integrity-verdict",
+        "process-verdict",
+        "structure"
+      ],
+      "internalPorts": [
+        "artifact",
+        "schema-verdict"
+      ],
+      "newAtomCount": 1,
+      "why": [
+        "Every atom resolves to a real file in this tree.",
+        "Includes 1 codebase-extension atom(s) absent from the ritual bank.",
+        "Many open ports (4) — likely under-specified."
+      ],
+      "moleculeChecksum": "molecule1:6f33020ca1daf2b3"
+    }
+  ],
+  "bestPerExtension": {
+    "test-contract": {
+      "extensionAtom": "test-contract",
+      "topology": "canonical-serializer|evidence-ledger|schema-verifier|test-contract",
+      "atomIds": [
+        "canonical-serializer",
+        "evidence-ledger",
+        "schema-verifier",
+        "test-contract"
+      ],
+      "verdict": "NUCLEUS",
+      "finalScore": 0.727354,
+      "utility": 0.558589,
+      "openPorts": [
+        "experiment-receipt",
+        "integrity-verdict",
+        "process-verdict"
+      ],
+      "domains": [
+        "artifact",
+        "governance",
+        "memory"
+      ]
+    },
+    "process-sensor": {
+      "extensionAtom": "process-sensor",
+      "topology": "canonical-serializer|evidence-ledger|process-sensor|schema-verifier",
+      "atomIds": [
+        "canonical-serializer",
+        "evidence-ledger",
+        "process-sensor",
+        "schema-verifier"
+      ],
+      "verdict": "HYPOTHESIS",
+      "finalScore": 0.685604,
+      "utility": 0.540833,
+      "openPorts": [
+        "candidate-frontier",
+        "feasibility-score",
+        "validation-verdict"
+      ],
+      "domains": [
+        "artifact",
+        "governance",
+        "immunity",
+        "memory"
+      ]
+    },
+    "fission-reactor": {
+      "extensionAtom": "fission-reactor",
+      "topology": "fission-reactor|law-gate|molecule-generator",
+      "atomIds": [
+        "fission-reactor",
+        "law-gate",
+        "molecule-generator"
+      ],
+      "verdict": "NUCLEUS",
+      "finalScore": 0.726871,
+      "utility": 0.513245,
+      "openPorts": [
+        "atom-inventory",
+        "corpus-grounding",
+        "operator-law",
+        "semantic-relation",
+        "token-stream"
+      ],
+      "domains": [
+        "governance",
+        "linguistic",
+        "synthesis"
+      ]
+    }
+  },
+  "rediscoveries": [
+    {
+      "topology": "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|semantic-memory",
+      "finalScore": 0.774921,
+      "utility": 0.12
+    },
+    {
+      "topology": "bytecode-seal|canonical-serializer|diagnostic-event-bus|immutable-packet|schema-verifier",
+      "finalScore": 0.6655,
+      "utility": 0.12
+    }
+  ],
+  "topEngineNuclei": [
+    {
+      "atomIds": [
+        "bytecode-seal",
+        "canonical-serializer",
+        "schema-verifier"
+      ],
+      "finalScore": 0.783055,
+      "topology": "bytecode-seal|canonical-serializer|schema-verifier",
+      "shipped": false
+    },
+    {
+      "atomIds": [
+        "bytecode-seal",
+        "canonical-serializer",
+        "schema-verifier"
+      ],
+      "finalScore": 0.78003,
+      "topology": "bytecode-seal|canonical-serializer|schema-verifier",
+      "shipped": false
+    },
+    {
+      "atomIds": [
+        "bytecode-seal",
+        "canonical-serializer",
+        "immutable-packet",
+        "schema-verifier",
+        "semantic-memory"
+      ],
+      "finalScore": 0.774921,
+      "topology": "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|semantic-memory",
+      "shipped": true
+    },
+    {
+      "atomIds": [
+        "bytecode-seal",
+        "canonical-serializer",
+        "schema-verifier",
+        "server-authority"
+      ],
+      "finalScore": 0.771487,
+      "topology": "bytecode-seal|canonical-serializer|schema-verifier|server-authority",
+      "shipped": false
+    },
+    {
+      "atomIds": [
+        "bytecode-seal",
+        "canonical-serializer",
+        "immutable-packet",
+        "schema-verifier"
+      ],
+      "finalScore": 0.770586,
+      "topology": "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier",
+      "shipped": false
+    },
+    {
+      "atomIds": [
+        "bytecode-seal",
+        "canonical-serializer",
+        "immutable-packet",
+        "schema-verifier"
+      ],
+      "finalScore": 0.769171,
+      "topology": "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier",
+      "shipped": false
+    },
+    {
+      "atomIds": [
+        "bytecode-seal",
+        "canonical-serializer",
+        "immutable-packet",
+        "schema-verifier"
+      ],
+      "finalScore": 0.766813,
+      "topology": "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier",
+      "shipped": false
+    },
+    {
+      "atomIds": [
+        "bytecode-seal",
+        "canonical-serializer",
+        "immutable-packet",
+        "schema-verifier"
+      ],
+      "finalScore": 0.766813,
+      "topology": "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier",
+      "shipped": false
+    },
+    {
+      "atomIds": [
+        "bytecode-seal",
+        "canonical-serializer",
+        "immutable-packet",
+        "schema-verifier"
+      ],
+      "finalScore": 0.766783,
+      "topology": "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier",
+      "shipped": false
+    },
+    {
+      "atomIds": [
+        "bytecode-seal",
+        "canonical-serializer",
+        "schema-verifier",
+        "server-authority"
+      ],
+      "finalScore": 0.766407,
+      "topology": "bytecode-seal|canonical-serializer|schema-verifier|server-authority",
+      "shipped": false
+    },
+    {
+      "atomIds": [
+        "bytecode-seal",
+        "canonical-serializer",
+        "schema-verifier",
+        "test-contract"
+      ],
+      "finalScore": 0.765804,
+      "topology": "bytecode-seal|canonical-serializer|schema-verifier|test-contract",
+      "shipped": false
+    },
+    {
+      "atomIds": [
+        "bytecode-seal",
+        "canonical-serializer",
+        "evidence-ledger",
+        "schema-verifier"
+      ],
+      "finalScore": 0.762811,
+      "topology": "bytecode-seal|canonical-serializer|evidence-ledger|schema-verifier",
+      "shipped": false
+    },
+    {
+      "atomIds": [
+        "bytecode-seal",
+        "canonical-serializer",
+        "immutable-packet",
+        "schema-verifier",
+        "server-authority"
+      ],
+      "finalScore": 0.761861,
+      "topology": "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|server-authority",
+      "shipped": false
+    },
+    {
+      "atomIds": [
+        "bytecode-seal",
+        "canonical-serializer",
+        "evidence-ledger",
+        "immutable-packet",
+        "schema-verifier"
+      ],
+      "finalScore": 0.761462,
+      "topology": "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|schema-verifier",
+      "shipped": false
+    },
+    {
+      "atomIds": [
+        "bytecode-seal",
+        "canonical-serializer",
+        "immutable-packet",
+        "schema-verifier",
+        "server-authority"
+      ],
+      "finalScore": 0.760062,
+      "topology": "bytecode-seal|canonical-serializer|immutable-packet|schema-verifier|server-authority",
+      "shipped": false
+    },
+    {
+      "atomIds": [
+        "bytecode-seal",
+        "canonical-serializer",
+        "evidence-ledger",
+        "immutable-packet",
+        "schema-verifier"
+      ],
+      "finalScore": 0.759676,
+      "topology": "bytecode-seal|canonical-serializer|evidence-ledger|immutable-packet|schema-verifier",
+      "shipped": false
+    }
+  ],
+  "checksum": "codemine1:48b875e3a7ad1d740d3f58768114675793570919ecc26356557e586ef78a679e"
+}

@@ -1,0 +1,88 @@
+{
+  "contract": "PB-NULL-SUBSTRATE-ATTACK-v1",
+  "schemaVersion": "1.0.0",
+  "preregistration": "docs/superpowers/evidence/2026-08-11-PREREG-null-substrate.md",
+  "permutationSeed": 1314212940,
+  "chemistry": {
+    "schema": "PB-CONCEPT-CHEM-v1",
+    "version": "v2",
+    "weights": {
+      "bond": 0.1,
+      "grounding": 0.3,
+      "coherence": 0.15,
+      "relation": 0.45
+    },
+    "coherenceMode": "residual-claim",
+    "relationalChannel": "corpus-pmi-signed",
+    "abstainsWithoutSignal": true,
+    "stabilityThresholds": {
+      "STABLE_MIN": 0.55,
+      "METASTABLE_MIN": 0.3
+    },
+    "checksum": "chemweights1:52ed14ac0c46ee82"
+  },
+  "trials": 100000,
+  "control": {
+    "checksum": "cyclotron1:f8c456d471d2140188adddabb52a71df",
+    "atomBankChecksum": "atombank1:ce3f75efc69bfdcf",
+    "uniqueMolecules": 25167,
+    "duplicateMolecules": 54833,
+    "nuclei": 26,
+    "hypotheses": 189,
+    "refused": 41,
+    "shortlisted": 256,
+    "controlBar": 0.201721,
+    "meanFinalScore": 0.7241508945312499,
+    "meanEnergy": 0.8126124531250003,
+    "meanNovelty": 0.38411116796875056,
+    "meanGrounding": 0.5415803945312507,
+    "meanChemistryFeasibility": 0.4795554687499997,
+    "verdicts": {
+      "NUCLEUS": 26,
+      "HYPOTHESIS": 189,
+      "REFUSED": 41
+    }
+  },
+  "nullArm": {
+    "checksum": "cyclotron1:454160d47e67be2d810f2df53e050000",
+    "atomBankChecksum": "atombank1:448c62b7bfff550a",
+    "uniqueMolecules": 25167,
+    "duplicateMolecules": 54833,
+    "nuclei": 0,
+    "hypotheses": 113,
+    "refused": 143,
+    "shortlisted": 256,
+    "controlBar": 0.193122,
+    "meanFinalScore": 0.6649265859375003,
+    "meanEnergy": 0.8039990468749996,
+    "meanNovelty": 0.3395152734374998,
+    "meanGrounding": 0.5153586406249996,
+    "meanChemistryFeasibility": 0.3226480468750005,
+    "verdicts": {
+      "HYPOTHESIS": 113,
+      "REFUSED": 143
+    }
+  },
+  "predictions": {
+    "P1_topology_identical": {
+      "expected": "PASS",
+      "uniqueDelta": 0,
+      "duplicateDelta": 0,
+      "held": true
+    },
+    "P2_energy_blind": {
+      "predicted": "FAIL — no detection (|delta| < 0.01)",
+      "deltaMeanEnergy": -0.008613,
+      "systemDetected": false
+    },
+    "P3_chemistry_blind": {
+      "predicted": "FAIL — no detection (|delta| < 0.02, nuclei stay 0)",
+      "deltaMeanFinalScore": -0.059224,
+      "deltaNuclei": -26,
+      "hypothesesRatio": 0.5979,
+      "systemDetected": true
+    }
+  },
+  "verdict": "SURPRISE — THE SYSTEM DETECTED THE SCRAMBLE",
+  "checksum": "null-substrate1:57106041e040eb52d0227bb34e802b1efe661a3735964df73e623b0af1e35af7"
+}

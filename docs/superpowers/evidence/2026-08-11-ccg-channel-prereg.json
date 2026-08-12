@@ -1,0 +1,1078 @@
+{
+  "contract": "PB-CCG-CHANNEL-PREREG-v1",
+  "schemaVersion": "1.0.0",
+  "primaryEndpoint": {
+    "declaredIn": "docs/superpowers/evidence/2026-08-11-PREREG-ccg-channel.md",
+    "preregChecksum": "prereg1:74ee63c092b17e40db2f5c30bc80bad7",
+    "comparison": "fission_reactor_ccg vs fission_reactor_base",
+    "statistic": "exact two-sided sign test over discordant pairs",
+    "alpha": 0.05,
+    "population": "all generalization-test tasks, pooled across all four relations",
+    "plannedTasks": 699,
+    "achievedTasks": 699,
+    "allocation": {
+      "hypernym": 205,
+      "antonym": 205,
+      "mero_part": 205,
+      "similar": 84
+    },
+    "similarCapForcedBySubstrate": true,
+    "wins": 4,
+    "losses": 5,
+    "ties": 690,
+    "accuracyDelta": -0.001431,
+    "exactTwoSidedSignP": 1,
+    "supported": false
+  },
+  "substrate": {
+    "name": "Open English WordNet",
+    "release": "2024",
+    "fingerprint": "oewn-substrate1:661fd88a8ab80d5bfdc86f7889a99a1b",
+    "excludedFromOriginalGroundingCorpus": true
+  },
+  "protocol": {
+    "trainingTasks": 400,
+    "validationTasks": 160,
+    "generalizationTestTasks": 699,
+    "sealedAiTestTasks": 24,
+    "candidatesPerTask": 5,
+    "trainValidationTestSourceDisjoint": true,
+    "priorBlindTasksExcludedFromEvolution": true,
+    "testTruthAcceptedByReactor": false,
+    "contaminatedPilotDiscarded": true,
+    "pilotInvalidationReason": "cross-split source synset reuse across relation types",
+    "pilotReservationChecksum": "reactor-pilot-reservation1:8572d1659bf9d0a2c322042b9e84f658",
+    "directProposalChecksum": "direct-proposals1:d2ef680856e3412401fafa6997533d2e",
+    "priorChallengeChecksum": "blind-challenge1:aadd63d80529a7918b8ad86f8ae03920",
+    "splitChecksums": {
+      "training": "reactor-split1:334e589bed6f2ae01201ce2e0bdd9174",
+      "validation": "reactor-split1:8ad368c5982d312def0fce1743aea268",
+      "generalizationTest": "reactor-split1:1cc4031890ffe57546e3b8a02fb96e98",
+      "sealedAiTest": "reactor-split1:1e2241bbe6612954e4f59c7f950f425b"
+    }
+  },
+  "reactor": {
+    "checksum": "fission-reactor1:38536e99cf1fe108e3328fb21b630a65",
+    "configuration": {
+      "candidatePoolSize": 32,
+      "complexityPenalty": 0.003,
+      "eliteCount": 16,
+      "generations": 60,
+      "marginReward": 0.02,
+      "minimumActiveGenes": 2,
+      "mutationPermille": 180,
+      "populationSize": 96,
+      "seed": 1919246691
+    },
+    "contract": "PB-SEMANTIC-FISSION-REPORT-v1",
+    "counts": {
+      "islands": 4,
+      "training": 400,
+      "validation": 160
+    },
+    "featureNames": [
+      "lexical",
+      "vector",
+      "chemistry",
+      "containment",
+      "polarity",
+      "lexical_vector",
+      "lexical_chemistry",
+      "vector_chemistry",
+      "containment_chemistry",
+      "polarity_vector",
+      "ccg"
+    ],
+    "islands": [
+      {
+        "archiveCells": 11,
+        "confidenceCalibration": {
+          "accepted": 27,
+          "coverage": 0.675,
+          "precision": 0.962963,
+          "threshold": 0.331368,
+          "total": 40
+        },
+        "generationTrace": [
+          {
+            "archiveCells": 9,
+            "bestAccuracy": 0.87,
+            "bestActiveGenes": 9,
+            "bestFitness": 0.873531,
+            "generation": 0
+          },
+          {
+            "archiveCells": 11,
+            "bestAccuracy": 0.89,
+            "bestActiveGenes": 6,
+            "bestFitness": 0.894347,
+            "generation": 10
+          },
+          {
+            "archiveCells": 11,
+            "bestAccuracy": 0.9,
+            "bestActiveGenes": 5,
+            "bestFitness": 0.90577,
+            "generation": 20
+          },
+          {
+            "archiveCells": 11,
+            "bestAccuracy": 0.9,
+            "bestActiveGenes": 4,
+            "bestFitness": 0.906385,
+            "generation": 30
+          },
+          {
+            "archiveCells": 11,
+            "bestAccuracy": 0.9,
+            "bestActiveGenes": 5,
+            "bestFitness": 0.906653,
+            "generation": 40
+          },
+          {
+            "archiveCells": 11,
+            "bestAccuracy": 0.9,
+            "bestActiveGenes": 5,
+            "bestFitness": 0.906653,
+            "generation": 50
+          },
+          {
+            "archiveCells": 11,
+            "bestAccuracy": 0.9,
+            "bestActiveGenes": 5,
+            "bestFitness": 0.906653,
+            "generation": 60
+          }
+        ],
+        "negativeEvidence": [
+          "oewn-reactor-antonym-6c9d004b77",
+          "oewn-reactor-antonym-15166a4fd7",
+          "oewn-reactor-antonym-760c663ab4",
+          "oewn-reactor-antonym-0a19f27cfb",
+          "oewn-reactor-antonym-db7b23fcf1",
+          "oewn-reactor-antonym-10728810b4",
+          "oewn-reactor-antonym-6291cd5bb1",
+          "oewn-reactor-antonym-b6deb2eb15",
+          "oewn-reactor-antonym-3cb061d35f",
+          "oewn-reactor-antonym-0899cf4fc6"
+        ],
+        "relation": "antonym",
+        "selectedGenome": {
+          "activeGenes": 7,
+          "checksum": "fission-genome1:cb4a7cd7a757f0dda7e430c89ff0f0e4",
+          "contract": "PB-SEMANTIC-FISSION-GENOME-v1",
+          "generation": 59,
+          "parents": [
+            "fission-genome1:02759d93407f08437859bb2de71d7de5",
+            "fission-genome1:ab6ab2ca787bcceb79c5b53ce93db976"
+          ],
+          "relation": "antonym",
+          "weights": [
+            169,
+            0,
+            630,
+            0,
+            1000,
+            697,
+            0,
+            -633,
+            -4,
+            253,
+            0
+          ]
+        },
+        "training": {
+          "accuracy": 0.9,
+          "complexity": 0.636364,
+          "correct": 90,
+          "failures": [
+            "oewn-reactor-antonym-6c9d004b77",
+            "oewn-reactor-antonym-15166a4fd7",
+            "oewn-reactor-antonym-760c663ab4",
+            "oewn-reactor-antonym-0a19f27cfb",
+            "oewn-reactor-antonym-db7b23fcf1",
+            "oewn-reactor-antonym-10728810b4",
+            "oewn-reactor-antonym-6291cd5bb1",
+            "oewn-reactor-antonym-b6deb2eb15",
+            "oewn-reactor-antonym-3cb061d35f",
+            "oewn-reactor-antonym-0899cf4fc6"
+          ],
+          "fitness": 0.906179,
+          "meanMargin": 0.404391,
+          "total": 100
+        },
+        "validation": {
+          "accuracy": 0.825,
+          "complexity": 0.636364,
+          "correct": 33,
+          "failures": [
+            "oewn-reactor-antonym-a7e89aff58",
+            "oewn-reactor-antonym-94972433ab",
+            "oewn-reactor-antonym-b1a734cac1",
+            "oewn-reactor-antonym-b023066c39",
+            "oewn-reactor-antonym-d937e3cf02",
+            "oewn-reactor-antonym-a842e3eac0",
+            "oewn-reactor-antonym-6aa889a61a"
+          ],
+          "fitness": 0.830682,
+          "meanMargin": 0.379533,
+          "total": 40
+        }
+      },
+      {
+        "archiveCells": 12,
+        "confidenceCalibration": {
+          "accepted": 27,
+          "coverage": 0.675,
+          "precision": 0.962963,
+          "threshold": 0.48458,
+          "total": 40
+        },
+        "generationTrace": [
+          {
+            "archiveCells": 9,
+            "bestAccuracy": 0.82,
+            "bestActiveGenes": 10,
+            "bestFitness": 0.821358,
+            "generation": 0
+          },
+          {
+            "archiveCells": 9,
+            "bestAccuracy": 0.85,
+            "bestActiveGenes": 5,
+            "bestFitness": 0.860094,
+            "generation": 10
+          },
+          {
+            "archiveCells": 11,
+            "bestAccuracy": 0.85,
+            "bestActiveGenes": 4,
+            "bestFitness": 0.86078,
+            "generation": 20
+          },
+          {
+            "archiveCells": 11,
+            "bestAccuracy": 0.85,
+            "bestActiveGenes": 4,
+            "bestFitness": 0.860856,
+            "generation": 30
+          },
+          {
+            "archiveCells": 12,
+            "bestAccuracy": 0.85,
+            "bestActiveGenes": 4,
+            "bestFitness": 0.86086,
+            "generation": 40
+          },
+          {
+            "archiveCells": 12,
+            "bestAccuracy": 0.85,
+            "bestActiveGenes": 4,
+            "bestFitness": 0.860872,
+            "generation": 50
+          },
+          {
+            "archiveCells": 12,
+            "bestAccuracy": 0.85,
+            "bestActiveGenes": 4,
+            "bestFitness": 0.860872,
+            "generation": 60
+          }
+        ],
+        "negativeEvidence": [
+          "oewn-reactor-hypernym-163a16de8b",
+          "oewn-reactor-hypernym-cd99a93709",
+          "oewn-reactor-hypernym-c25e5ac470",
+          "oewn-reactor-hypernym-421b5035b3",
+          "oewn-reactor-hypernym-5e8df164d1",
+          "oewn-reactor-hypernym-d859f175d5",
+          "oewn-reactor-hypernym-ff0e743223",
+          "oewn-reactor-hypernym-e346a17c98",
+          "oewn-reactor-hypernym-4cc0d1c9d2",
+          "oewn-reactor-hypernym-778b625742",
+          "oewn-reactor-hypernym-c5e48bcc8a",
+          "oewn-reactor-hypernym-03eb5ca553",
+          "oewn-reactor-hypernym-855b077f84",
+          "oewn-reactor-hypernym-737be1a3d1",
+          "oewn-reactor-hypernym-11ea160e00"
+        ],
+        "relation": "hypernym",
+        "selectedGenome": {
+          "activeGenes": 4,
+          "checksum": "fission-genome1:7842e3b9a8558e31d8963df2610400c0",
+          "contract": "PB-SEMANTIC-FISSION-GENOME-v1",
+          "generation": 60,
+          "parents": [
+            "fission-genome1:0889873254f14f9755d0314ecbfa804d",
+            "fission-genome1:0f137285406e97bb73d335dbb74ae752"
+          ],
+          "relation": "hypernym",
+          "weights": [
+            1000,
+            0,
+            0,
+            608,
+            0,
+            0,
+            783,
+            0,
+            276,
+            0,
+            0
+          ]
+        },
+        "training": {
+          "accuracy": 0.85,
+          "complexity": 0.363636,
+          "correct": 85,
+          "failures": [
+            "oewn-reactor-hypernym-163a16de8b",
+            "oewn-reactor-hypernym-cd99a93709",
+            "oewn-reactor-hypernym-c25e5ac470",
+            "oewn-reactor-hypernym-421b5035b3",
+            "oewn-reactor-hypernym-5e8df164d1",
+            "oewn-reactor-hypernym-d859f175d5",
+            "oewn-reactor-hypernym-ff0e743223",
+            "oewn-reactor-hypernym-e346a17c98",
+            "oewn-reactor-hypernym-4cc0d1c9d2",
+            "oewn-reactor-hypernym-778b625742",
+            "oewn-reactor-hypernym-c5e48bcc8a",
+            "oewn-reactor-hypernym-03eb5ca553",
+            "oewn-reactor-hypernym-855b077f84",
+            "oewn-reactor-hypernym-737be1a3d1",
+            "oewn-reactor-hypernym-11ea160e00"
+          ],
+          "fitness": 0.860645,
+          "meanMargin": 0.58678,
+          "total": 100
+        },
+        "validation": {
+          "accuracy": 0.85,
+          "complexity": 0.363636,
+          "correct": 34,
+          "failures": [
+            "oewn-reactor-hypernym-a1e1fd70e3",
+            "oewn-reactor-hypernym-593b9edf49",
+            "oewn-reactor-hypernym-ed998b4ac3",
+            "oewn-reactor-hypernym-82b3a1e404",
+            "oewn-reactor-hypernym-112d36edf7",
+            "oewn-reactor-hypernym-08c60da753"
+          ],
+          "fitness": 0.86139,
+          "meanMargin": 0.624022,
+          "total": 40
+        }
+      },
+      {
+        "archiveCells": 12,
+        "confidenceCalibration": {
+          "accepted": 11,
+          "coverage": 0.275,
+          "precision": 1,
+          "threshold": 0.800025,
+          "total": 40
+        },
+        "generationTrace": [
+          {
+            "archiveCells": 9,
+            "bestAccuracy": 0.76,
+            "bestActiveGenes": 10,
+            "bestFitness": 0.760786,
+            "generation": 0
+          },
+          {
+            "archiveCells": 11,
+            "bestAccuracy": 0.81,
+            "bestActiveGenes": 3,
+            "bestFitness": 0.818596,
+            "generation": 10
+          },
+          {
+            "archiveCells": 11,
+            "bestAccuracy": 0.81,
+            "bestActiveGenes": 3,
+            "bestFitness": 0.818625,
+            "generation": 20
+          },
+          {
+            "archiveCells": 12,
+            "bestAccuracy": 0.81,
+            "bestActiveGenes": 3,
+            "bestFitness": 0.818801,
+            "generation": 30
+          },
+          {
+            "archiveCells": 12,
+            "bestAccuracy": 0.81,
+            "bestActiveGenes": 3,
+            "bestFitness": 0.818863,
+            "generation": 40
+          },
+          {
+            "archiveCells": 12,
+            "bestAccuracy": 0.81,
+            "bestActiveGenes": 3,
+            "bestFitness": 0.818966,
+            "generation": 50
+          },
+          {
+            "archiveCells": 12,
+            "bestAccuracy": 0.82,
+            "bestActiveGenes": 4,
+            "bestFitness": 0.827496,
+            "generation": 60
+          }
+        ],
+        "negativeEvidence": [
+          "oewn-reactor-mero_part-e0ca7a3810",
+          "oewn-reactor-mero_part-4cd96b3f69",
+          "oewn-reactor-mero_part-adb32b96ac",
+          "oewn-reactor-mero_part-11d7520a79",
+          "oewn-reactor-mero_part-90990f44d5",
+          "oewn-reactor-mero_part-e029272343",
+          "oewn-reactor-mero_part-7af3157bf0",
+          "oewn-reactor-mero_part-afcd778fa0",
+          "oewn-reactor-mero_part-bd8128581c",
+          "oewn-reactor-mero_part-d69ce1f2c2",
+          "oewn-reactor-mero_part-c4dab08d76",
+          "oewn-reactor-mero_part-5d30da310c",
+          "oewn-reactor-mero_part-dcfb8ea227",
+          "oewn-reactor-mero_part-0b83fb49a3",
+          "oewn-reactor-mero_part-00ad26d09b",
+          "oewn-reactor-mero_part-5350ee3394",
+          "oewn-reactor-mero_part-502053a491",
+          "oewn-reactor-mero_part-9b58daa940",
+          "oewn-reactor-mero_part-ed11229c78",
+          "oewn-reactor-mero_part-98ff6cee8f"
+        ],
+        "relation": "mero_part",
+        "selectedGenome": {
+          "activeGenes": 3,
+          "checksum": "fission-genome1:894c3eb045fbd1706b25d7c8079acb2c",
+          "contract": "PB-SEMANTIC-FISSION-GENOME-v1",
+          "generation": 60,
+          "parents": [
+            "fission-genome1:27da9847066042e1f65daa61aa0887d0",
+            "fission-genome1:c9bc6bcf5761ff62e6e05c6fce612af1"
+          ],
+          "relation": "mero_part",
+          "weights": [
+            201,
+            0,
+            0,
+            382,
+            0,
+            340,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "training": {
+          "accuracy": 0.8,
+          "complexity": 0.272727,
+          "correct": 80,
+          "failures": [
+            "oewn-reactor-mero_part-e0ca7a3810",
+            "oewn-reactor-mero_part-4cd96b3f69",
+            "oewn-reactor-mero_part-adb32b96ac",
+            "oewn-reactor-mero_part-11d7520a79",
+            "oewn-reactor-mero_part-90990f44d5",
+            "oewn-reactor-mero_part-e029272343",
+            "oewn-reactor-mero_part-7af3157bf0",
+            "oewn-reactor-mero_part-afcd778fa0",
+            "oewn-reactor-mero_part-bd8128581c",
+            "oewn-reactor-mero_part-d69ce1f2c2",
+            "oewn-reactor-mero_part-c4dab08d76",
+            "oewn-reactor-mero_part-5d30da310c",
+            "oewn-reactor-mero_part-dcfb8ea227",
+            "oewn-reactor-mero_part-0b83fb49a3",
+            "oewn-reactor-mero_part-00ad26d09b",
+            "oewn-reactor-mero_part-5350ee3394",
+            "oewn-reactor-mero_part-502053a491",
+            "oewn-reactor-mero_part-9b58daa940",
+            "oewn-reactor-mero_part-ed11229c78",
+            "oewn-reactor-mero_part-98ff6cee8f"
+          ],
+          "fitness": 0.809171,
+          "meanMargin": 0.499461,
+          "total": 100
+        },
+        "validation": {
+          "accuracy": 0.75,
+          "complexity": 0.272727,
+          "correct": 30,
+          "failures": [
+            "oewn-reactor-mero_part-7db3bb543b",
+            "oewn-reactor-mero_part-b0e4449ccd",
+            "oewn-reactor-mero_part-91f6bf16a0",
+            "oewn-reactor-mero_part-98713ae221",
+            "oewn-reactor-mero_part-8593e76739",
+            "oewn-reactor-mero_part-0ea3d70bd6",
+            "oewn-reactor-mero_part-68338ea381",
+            "oewn-reactor-mero_part-5474b52811",
+            "oewn-reactor-mero_part-a846d1d94e",
+            "oewn-reactor-mero_part-67a640dc46"
+          ],
+          "fitness": 0.758386,
+          "meanMargin": 0.460189,
+          "total": 40
+        }
+      },
+      {
+        "archiveCells": 12,
+        "confidenceCalibration": {
+          "accepted": 0,
+          "coverage": 0,
+          "precision": 1,
+          "threshold": 1,
+          "total": 40
+        },
+        "generationTrace": [
+          {
+            "archiveCells": 9,
+            "bestAccuracy": 0.51,
+            "bestActiveGenes": 6,
+            "bestFitness": 0.512807,
+            "generation": 0
+          },
+          {
+            "archiveCells": 11,
+            "bestAccuracy": 0.54,
+            "bestActiveGenes": 4,
+            "bestFitness": 0.545471,
+            "generation": 10
+          },
+          {
+            "archiveCells": 11,
+            "bestAccuracy": 0.55,
+            "bestActiveGenes": 8,
+            "bestFitness": 0.552501,
+            "generation": 20
+          },
+          {
+            "archiveCells": 12,
+            "bestAccuracy": 0.55,
+            "bestActiveGenes": 5,
+            "bestFitness": 0.554666,
+            "generation": 30
+          },
+          {
+            "archiveCells": 12,
+            "bestAccuracy": 0.55,
+            "bestActiveGenes": 4,
+            "bestFitness": 0.555351,
+            "generation": 40
+          },
+          {
+            "archiveCells": 12,
+            "bestAccuracy": 0.55,
+            "bestActiveGenes": 4,
+            "bestFitness": 0.555364,
+            "generation": 50
+          },
+          {
+            "archiveCells": 12,
+            "bestAccuracy": 0.55,
+            "bestActiveGenes": 4,
+            "bestFitness": 0.555364,
+            "generation": 60
+          }
+        ],
+        "negativeEvidence": [
+          "oewn-reactor-similar-27bb4e554b",
+          "oewn-reactor-similar-535bbb0c50",
+          "oewn-reactor-similar-b74408ccfe",
+          "oewn-reactor-similar-53f97804d7",
+          "oewn-reactor-similar-b8f7027e71",
+          "oewn-reactor-similar-cc2fe4b4a1",
+          "oewn-reactor-similar-0558f52435",
+          "oewn-reactor-similar-c87b9b37b4",
+          "oewn-reactor-similar-cdf22ad4de",
+          "oewn-reactor-similar-d99fd2c3a9",
+          "oewn-reactor-similar-fe01f397b5",
+          "oewn-reactor-similar-d64f4d877e",
+          "oewn-reactor-similar-d540c3a587",
+          "oewn-reactor-similar-dc077c2f1c",
+          "oewn-reactor-similar-4fceeabcee",
+          "oewn-reactor-similar-901fff8102",
+          "oewn-reactor-similar-6179a9af7f",
+          "oewn-reactor-similar-b564b516d9",
+          "oewn-reactor-similar-3f40521562",
+          "oewn-reactor-similar-02484cc439",
+          "oewn-reactor-similar-1562c7bff9",
+          "oewn-reactor-similar-3969fc9613",
+          "oewn-reactor-similar-2a56301048",
+          "oewn-reactor-similar-a4c325671e",
+          "oewn-reactor-similar-3cb716d98c",
+          "oewn-reactor-similar-5df5b8ad30",
+          "oewn-reactor-similar-1a356f16a9",
+          "oewn-reactor-similar-7b69f3c183",
+          "oewn-reactor-similar-77ff57a355",
+          "oewn-reactor-similar-a12819eaef",
+          "oewn-reactor-similar-9592d59089",
+          "oewn-reactor-similar-f84c4c1a92",
+          "oewn-reactor-similar-ca9c95072c",
+          "oewn-reactor-similar-7ff31906c5",
+          "oewn-reactor-similar-00a8baac63",
+          "oewn-reactor-similar-3e9a241513",
+          "oewn-reactor-similar-ab7ceaffe4",
+          "oewn-reactor-similar-183c164974",
+          "oewn-reactor-similar-734c9a316e",
+          "oewn-reactor-similar-c40430934e",
+          "oewn-reactor-similar-c9c0a5f24b",
+          "oewn-reactor-similar-14eb97e67c",
+          "oewn-reactor-similar-db629b1303",
+          "oewn-reactor-similar-b501e21b48",
+          "oewn-reactor-similar-f2800ccf0f"
+        ],
+        "relation": "similar",
+        "selectedGenome": {
+          "activeGenes": 5,
+          "checksum": "fission-genome1:0e4ba1b4710aa8398ae115e0eb37f54b",
+          "contract": "PB-SEMANTIC-FISSION-GENOME-v1",
+          "generation": 55,
+          "parents": [
+            "fission-genome1:13794bc125672be52c3c5781a3f87ae5",
+            "fission-genome1:8b9f47d74bc4ba9f4a408c654bfa8f4a"
+          ],
+          "relation": "similar",
+          "weights": [
+            0,
+            0,
+            757,
+            0,
+            0,
+            14,
+            1000,
+            77,
+            0,
+            0,
+            469
+          ]
+        },
+        "training": {
+          "accuracy": 0.55,
+          "complexity": 0.454545,
+          "correct": 55,
+          "failures": [
+            "oewn-reactor-similar-27bb4e554b",
+            "oewn-reactor-similar-535bbb0c50",
+            "oewn-reactor-similar-b74408ccfe",
+            "oewn-reactor-similar-53f97804d7",
+            "oewn-reactor-similar-b8f7027e71",
+            "oewn-reactor-similar-cc2fe4b4a1",
+            "oewn-reactor-similar-0558f52435",
+            "oewn-reactor-similar-c87b9b37b4",
+            "oewn-reactor-similar-cdf22ad4de",
+            "oewn-reactor-similar-d99fd2c3a9",
+            "oewn-reactor-similar-fe01f397b5",
+            "oewn-reactor-similar-d64f4d877e",
+            "oewn-reactor-similar-d540c3a587",
+            "oewn-reactor-similar-dc077c2f1c",
+            "oewn-reactor-similar-4fceeabcee",
+            "oewn-reactor-similar-901fff8102",
+            "oewn-reactor-similar-6179a9af7f",
+            "oewn-reactor-similar-b564b516d9",
+            "oewn-reactor-similar-3f40521562",
+            "oewn-reactor-similar-02484cc439",
+            "oewn-reactor-similar-1562c7bff9",
+            "oewn-reactor-similar-3969fc9613",
+            "oewn-reactor-similar-2a56301048",
+            "oewn-reactor-similar-a4c325671e",
+            "oewn-reactor-similar-3cb716d98c",
+            "oewn-reactor-similar-5df5b8ad30",
+            "oewn-reactor-similar-1a356f16a9",
+            "oewn-reactor-similar-7b69f3c183",
+            "oewn-reactor-similar-77ff57a355",
+            "oewn-reactor-similar-a12819eaef",
+            "oewn-reactor-similar-9592d59089",
+            "oewn-reactor-similar-f84c4c1a92",
+            "oewn-reactor-similar-ca9c95072c",
+            "oewn-reactor-similar-7ff31906c5",
+            "oewn-reactor-similar-00a8baac63",
+            "oewn-reactor-similar-3e9a241513",
+            "oewn-reactor-similar-ab7ceaffe4",
+            "oewn-reactor-similar-183c164974",
+            "oewn-reactor-similar-734c9a316e",
+            "oewn-reactor-similar-c40430934e",
+            "oewn-reactor-similar-c9c0a5f24b",
+            "oewn-reactor-similar-14eb97e67c",
+            "oewn-reactor-similar-db629b1303",
+            "oewn-reactor-similar-b501e21b48",
+            "oewn-reactor-similar-f2800ccf0f"
+          ],
+          "fitness": 0.555101,
+          "meanMargin": 0.32322,
+          "total": 100
+        },
+        "validation": {
+          "accuracy": 0.475,
+          "complexity": 0.454545,
+          "correct": 19,
+          "failures": [
+            "oewn-reactor-similar-725decf0d0",
+            "oewn-reactor-similar-a8c9880aa6",
+            "oewn-reactor-similar-4bbab3760e",
+            "oewn-reactor-similar-e2c4e248d0",
+            "oewn-reactor-similar-3ec210de31",
+            "oewn-reactor-similar-3ceed3aeb0",
+            "oewn-reactor-similar-fbeb8c3b04",
+            "oewn-reactor-similar-48820628ed",
+            "oewn-reactor-similar-e21039c824",
+            "oewn-reactor-similar-a9fc3b5b2d",
+            "oewn-reactor-similar-53fc19fc2c",
+            "oewn-reactor-similar-365badc05f",
+            "oewn-reactor-similar-406d67e9dd",
+            "oewn-reactor-similar-7ca1a67435",
+            "oewn-reactor-similar-5b9eef2d37",
+            "oewn-reactor-similar-55a8ac2a1b",
+            "oewn-reactor-similar-4502a32600",
+            "oewn-reactor-similar-9b2d5a26aa",
+            "oewn-reactor-similar-8cc2e48199",
+            "oewn-reactor-similar-bcd453cfb7",
+            "oewn-reactor-similar-67ecd8b3f0"
+          ],
+          "fitness": 0.481134,
+          "meanMargin": 0.374907,
+          "total": 40
+        }
+      }
+    ],
+    "relations": [
+      "antonym",
+      "hypernym",
+      "mero_part",
+      "similar"
+    ],
+    "schemaVersion": "1.0.0",
+    "splitChecksums": {
+      "training": "fission-train1:e8f7bfda924ee4d468fe8c1508b73d65",
+      "validation": "fission-validation1:4424696f067f767d80f562142753a1dd"
+    }
+  },
+  "ccgGeneWeights": {
+    "antonym": 0,
+    "hypernym": 0,
+    "mero_part": 0,
+    "similar": 0.469
+  },
+  "baseReactorChecksum": "fission-reactor1:5628437cc25ad393e4701bf50454e954",
+  "generalization": {
+    "methods": [
+      {
+        "name": "fission_reactor_ccg",
+        "correct": 519,
+        "total": 699,
+        "accuracy": 0.742489,
+        "wilson95": [
+          0.70881,
+          0.773518
+        ],
+        "byRelation": {
+          "hypernym": {
+            "correct": 144,
+            "total": 205,
+            "accuracy": 0.702439
+          },
+          "antonym": {
+            "correct": 186,
+            "total": 205,
+            "accuracy": 0.907317
+          },
+          "mero_part": {
+            "correct": 154,
+            "total": 205,
+            "accuracy": 0.75122
+          },
+          "similar": {
+            "correct": 35,
+            "total": 84,
+            "accuracy": 0.416667
+          }
+        }
+      },
+      {
+        "name": "fission_reactor_base",
+        "correct": 520,
+        "total": 699,
+        "accuracy": 0.74392,
+        "wilson95": [
+          0.710291,
+          0.774882
+        ],
+        "byRelation": {
+          "hypernym": {
+            "correct": 144,
+            "total": 205,
+            "accuracy": 0.702439
+          },
+          "antonym": {
+            "correct": 187,
+            "total": 205,
+            "accuracy": 0.912195
+          },
+          "mero_part": {
+            "correct": 155,
+            "total": 205,
+            "accuracy": 0.756098
+          },
+          "similar": {
+            "correct": 34,
+            "total": 84,
+            "accuracy": 0.404762
+          }
+        }
+      },
+      {
+        "name": "current_cyclotron",
+        "correct": 512,
+        "total": 699,
+        "accuracy": 0.732475,
+        "wilson95": [
+          0.698453,
+          0.763955
+        ],
+        "byRelation": {
+          "hypernym": {
+            "correct": 138,
+            "total": 205,
+            "accuracy": 0.673171
+          },
+          "antonym": {
+            "correct": 186,
+            "total": 205,
+            "accuracy": 0.907317
+          },
+          "mero_part": {
+            "correct": 155,
+            "total": 205,
+            "accuracy": 0.756098
+          },
+          "similar": {
+            "correct": 33,
+            "total": 84,
+            "accuracy": 0.392857
+          }
+        }
+      },
+      {
+        "name": "random_valence",
+        "correct": 493,
+        "total": 699,
+        "accuracy": 0.705293,
+        "wilson95": [
+          0.670447,
+          0.737895
+        ],
+        "byRelation": {
+          "hypernym": {
+            "correct": 129,
+            "total": 205,
+            "accuracy": 0.629268
+          },
+          "antonym": {
+            "correct": 184,
+            "total": 205,
+            "accuracy": 0.897561
+          },
+          "mero_part": {
+            "correct": 148,
+            "total": 205,
+            "accuracy": 0.721951
+          },
+          "similar": {
+            "correct": 32,
+            "total": 84,
+            "accuracy": 0.380952
+          }
+        }
+      },
+      {
+        "name": "human_reference",
+        "correct": 521,
+        "total": 699,
+        "accuracy": 0.745351,
+        "wilson95": [
+          0.711773,
+          0.776246
+        ],
+        "byRelation": {
+          "hypernym": {
+            "correct": 139,
+            "total": 205,
+            "accuracy": 0.678049
+          },
+          "antonym": {
+            "correct": 187,
+            "total": 205,
+            "accuracy": 0.912195
+          },
+          "mero_part": {
+            "correct": 161,
+            "total": 205,
+            "accuracy": 0.785366
+          },
+          "similar": {
+            "correct": 34,
+            "total": 84,
+            "accuracy": 0.404762
+          }
+        }
+      }
+    ],
+    "comparisons": [
+      {
+        "left": "fission_reactor_ccg",
+        "right": "fission_reactor_base",
+        "wins": 4,
+        "losses": 5,
+        "ties": 690,
+        "accuracyDelta": -0.001431,
+        "exactTwoSidedSignP": 1
+      },
+      {
+        "left": "fission_reactor_ccg",
+        "right": "current_cyclotron",
+        "wins": 28,
+        "losses": 21,
+        "ties": 650,
+        "accuracyDelta": 0.010014,
+        "exactTwoSidedSignP": 0.391603
+      },
+      {
+        "left": "fission_reactor_ccg",
+        "right": "random_valence",
+        "wins": 43,
+        "losses": 17,
+        "ties": 639,
+        "accuracyDelta": 0.037196,
+        "exactTwoSidedSignP": 0.001066
+      },
+      {
+        "left": "fission_reactor_ccg",
+        "right": "human_reference",
+        "wins": 22,
+        "losses": 24,
+        "ties": 653,
+        "accuracyDelta": -0.002862,
+        "exactTwoSidedSignP": 0.882996
+      }
+    ],
+    "reactorExclusiveCorrect": 1
+  },
+  "aiAugmentation": {
+    "methods": [
+      {
+        "name": "ai_plus_reactor",
+        "correct": 22,
+        "total": 24,
+        "accuracy": 0.916667,
+        "wilson95": [
+          0.741512,
+          0.976841
+        ],
+        "byRelation": {
+          "hypernym": {
+            "correct": 5,
+            "total": 6,
+            "accuracy": 0.833333
+          },
+          "antonym": {
+            "correct": 6,
+            "total": 6,
+            "accuracy": 1
+          },
+          "mero_part": {
+            "correct": 6,
+            "total": 6,
+            "accuracy": 1
+          },
+          "similar": {
+            "correct": 5,
+            "total": 6,
+            "accuracy": 0.833333
+          }
+        }
+      },
+      {
+        "name": "direct_ai_one_pass",
+        "correct": 23,
+        "total": 24,
+        "accuracy": 0.958333,
+        "wilson95": [
+          0.797582,
+          0.992607
+        ],
+        "byRelation": {
+          "hypernym": {
+            "correct": 6,
+            "total": 6,
+            "accuracy": 1
+          },
+          "antonym": {
+            "correct": 6,
+            "total": 6,
+            "accuracy": 1
+          },
+          "mero_part": {
+            "correct": 6,
+            "total": 6,
+            "accuracy": 1
+          },
+          "similar": {
+            "correct": 5,
+            "total": 6,
+            "accuracy": 0.833333
+          }
+        }
+      },
+      {
+        "name": "fission_reactor",
+        "correct": 15,
+        "total": 24,
+        "accuracy": 0.625,
+        "wilson95": [
+          0.4271,
+          0.788406
+        ],
+        "byRelation": {
+          "hypernym": {
+            "correct": 4,
+            "total": 6,
+            "accuracy": 0.666667
+          },
+          "antonym": {
+            "correct": 5,
+            "total": 6,
+            "accuracy": 0.833333
+          },
+          "mero_part": {
+            "correct": 3,
+            "total": 6,
+            "accuracy": 0.5
+          },
+          "similar": {
+            "correct": 3,
+            "total": 6,
+            "accuracy": 0.5
+          }
+        }
+      }
+    ],
+    "comparison": {
+      "left": "ai_plus_reactor",
+      "right": "direct_ai_one_pass",
+      "wins": 0,
+      "losses": 1,
+      "ties": 23,
+      "accuracyDelta": -0.041666,
+      "exactTwoSidedSignP": 1
+    },
+    "calibratedOverrides": 6
+  },
+  "verdict": "NO_DECISIVE_IMPROVEMENT",
+  "checksum": "fission-benchmark1:cd1708191f2a9eaeafbe27bb62ae7b0d"
+}

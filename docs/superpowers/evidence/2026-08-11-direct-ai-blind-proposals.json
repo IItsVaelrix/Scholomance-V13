@@ -1,0 +1,33 @@
+{
+  "contract": "PB-SEMANTIC-DIRECT-PROPOSALS-v1",
+  "schemaVersion": "1.0.0",
+  "challengeChecksum": "blind-challenge1:aadd63d80529a7918b8ad86f8ae03920",
+  "method": "one-pass-direct-ai-no-retrieval-no-answer-key",
+  "choices": [
+    { "taskId": "oewn-antonym-1709e23ce2", "candidateLabel": "B" },
+    { "taskId": "oewn-antonym-41aeaf1555", "candidateLabel": "A" },
+    { "taskId": "oewn-antonym-b0cd3e3840", "candidateLabel": "A" },
+    { "taskId": "oewn-antonym-bc396581ac", "candidateLabel": "C" },
+    { "taskId": "oewn-antonym-e93e05b1d7", "candidateLabel": "E" },
+    { "taskId": "oewn-antonym-f573486a9b", "candidateLabel": "A" },
+    { "taskId": "oewn-hypernym-2355c76282", "candidateLabel": "D" },
+    { "taskId": "oewn-hypernym-2760b73736", "candidateLabel": "B" },
+    { "taskId": "oewn-hypernym-286df18649", "candidateLabel": "D" },
+    { "taskId": "oewn-hypernym-5f2e32d3e0", "candidateLabel": "E" },
+    { "taskId": "oewn-hypernym-d3fbdf71f9", "candidateLabel": "D" },
+    { "taskId": "oewn-hypernym-e563c87058", "candidateLabel": "B" },
+    { "taskId": "oewn-mero_part-2019a87a21", "candidateLabel": "C" },
+    { "taskId": "oewn-mero_part-314e090d05", "candidateLabel": "D" },
+    { "taskId": "oewn-mero_part-9b2d5f28ad", "candidateLabel": "C" },
+    { "taskId": "oewn-mero_part-9c178dc3c1", "candidateLabel": "D" },
+    { "taskId": "oewn-mero_part-a82547b986", "candidateLabel": "D" },
+    { "taskId": "oewn-mero_part-f41cb3a3f1", "candidateLabel": "C" },
+    { "taskId": "oewn-similar-1a49b347d9", "candidateLabel": "D" },
+    { "taskId": "oewn-similar-2d459dcb72", "candidateLabel": "D" },
+    { "taskId": "oewn-similar-67fc3674bb", "candidateLabel": "E" },
+    { "taskId": "oewn-similar-7476857f31", "candidateLabel": "C" },
+    { "taskId": "oewn-similar-a49d9284fd", "candidateLabel": "A" },
+    { "taskId": "oewn-similar-c28afb0a8c", "candidateLabel": "D" }
+  ],
+  "checksum": "direct-proposals1:d2ef680856e3412401fafa6997533d2e"
+}

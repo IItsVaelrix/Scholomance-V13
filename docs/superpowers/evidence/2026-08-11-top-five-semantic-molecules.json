@@ -1,0 +1,156 @@
+{
+  "contract": "PB-SEMANTIC-MOLECULE-EVAL-v1",
+  "schemaVersion": "1.0.0",
+  "sourceReportChecksum": "cyclotron1:f94405e8e3e63586f78425ce6bf57e90",
+  "selection": "top-five-distinct-atom-families-by-final-score",
+  "evaluationPolicy": {
+    "controls": "matched one-component or decision-boundary ablations",
+    "favorable": "strict observable improvement with all declared safety invariants preserved",
+    "selectionScoreUsedAsOutcome": false
+  },
+  "counts": {
+    "evaluated": 5,
+    "favorable": 4,
+    "unfavorable": 1
+  },
+  "results": [
+    {
+      "rank": 1,
+      "sourceScore": 0.7725,
+      "sourceVerdict": "HYPOTHESIS",
+      "moleculeChecksum": "molecule1:872ded45925da44b",
+      "atomIds": [
+        "law-gate",
+        "molecule-generator",
+        "operator-registry",
+        "schema-verifier"
+      ],
+      "implementation": "operator registry -> molecule generator -> schema verifier -> law gate",
+      "full": {
+        "targetRealized": true,
+        "deterministicReplay": true,
+        "schemaAccepted": true,
+        "tamperRejected": true,
+        "operatorResolved": true,
+        "safetyPassRate": 1
+      },
+      "ablation": {
+        "name": "generator without schema verifier or law gate",
+        "safetyPassRate": 0.5
+      },
+      "favorable": true,
+      "reason": "The composed gate is favorable only if it realizes the topology, replays exactly, and rejects a modified report."
+    },
+    {
+      "rank": 2,
+      "sourceScore": 0.766196,
+      "sourceVerdict": "HYPOTHESIS",
+      "moleculeChecksum": "molecule1:b517bac4467ed562",
+      "atomIds": [
+        "law-gate",
+        "molecule-generator",
+        "operator-registry",
+        "schema-verifier",
+        "server-authority"
+      ],
+      "implementation": "governed generator -> schema verdict -> server-authoritative resolution",
+      "full": {
+        "targetRealized": true,
+        "deterministicReplay": true,
+        "honestAcceptanceRate": 1,
+        "forgedAcceptanceRate": 0
+      },
+      "ablation": {
+        "name": "client verdict trusted without server recomputation",
+        "honestAcceptanceRate": 1,
+        "forgedAcceptanceRate": 1
+      },
+      "favorable": true,
+      "reason": "Server authority is favorable only if it preserves honest accepts while reducing forged accepts."
+    },
+    {
+      "rank": 3,
+      "sourceScore": 0.759744,
+      "sourceVerdict": "REFUSED",
+      "moleculeChecksum": "molecule1:3b08b280dc856e21",
+      "atomIds": [
+        "bytecode-seal",
+        "immutable-packet",
+        "operator-registry",
+        "schema-verifier"
+      ],
+      "implementation": "operator registry -> schema verifier -> bytecode seal -> immutable packet",
+      "full": {
+        "immutableRate": 1,
+        "validSealRate": 1,
+        "tamperRejectionRate": 1
+      },
+      "ablation": {
+        "name": "mutable packet without bytecode seal",
+        "immutableRate": 0,
+        "validSealRate": 0,
+        "tamperRejectionRate": 0
+      },
+      "favorable": true,
+      "reason": "The artifact molecule is favorable only if every packet is immutable, validly sealed, and tamper-evident."
+    },
+    {
+      "rank": 4,
+      "sourceScore": 0.759284,
+      "sourceVerdict": "REFUSED",
+      "moleculeChecksum": "molecule1:3acc695737fe373a",
+      "atomIds": [
+        "correspondence-registry",
+        "law-gate",
+        "molecule-generator",
+        "operator-registry",
+        "schema-verifier"
+      ],
+      "implementation": "correspondence registry inventory -> governed semantic molecule generator",
+      "full": {
+        "parsedEntries": 25,
+        "validEntryRate": 1,
+        "bidirectionalLookupRate": 1,
+        "targetRealized": true,
+        "deterministicReplay": true
+      },
+      "ablation": {
+        "name": "generator with no correspondence inventory",
+        "parsedEntries": 0,
+        "validEntryRate": 0,
+        "bidirectionalLookupRate": 0,
+        "targetRealized": false
+      },
+      "favorable": true,
+      "reason": "The inventory molecule is favorable only if every correspondence is bounded by caveats/evidence and the five-atom topology executes deterministically."
+    },
+    {
+      "rank": 5,
+      "sourceScore": 0.758034,
+      "sourceVerdict": "REFUSED",
+      "moleculeChecksum": "molecule1:ba5a52497ee8bd41",
+      "atomIds": [
+        "retrieval-index",
+        "semantic-ballistics",
+        "valence-compiler"
+      ],
+      "implementation": "retrieval frontier + valence frontier -> semantic-ballistics reranking",
+      "full": {
+        "meanReciprocalRank": 0.645833,
+        "meanReciprocalRankDelta": 0.0125,
+        "improvedFixtures": 1,
+        "regressedFixtures": 1,
+        "unchangedFixtures": 2,
+        "targetRealized": true,
+        "deterministicReplay": true
+      },
+      "ablation": {
+        "name": "lexical retrieval index without ballistic reranking",
+        "meanReciprocalRank": 0.633333
+      },
+      "favorable": false,
+      "reason": "The retrieval molecule is favorable only if equal-weight ballistic reranking improves held-out target rank over lexical retrieval alone without regressing another fixture."
+    }
+  ],
+  "checksum": "molecule-eval1:ecd92c47584fae002ba27ca72f8a304a"
+}
