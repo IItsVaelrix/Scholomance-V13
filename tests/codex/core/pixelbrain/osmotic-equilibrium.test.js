@@ -52,3 +52,32 @@ describe('contract', () => {
     expect(OSMOTIC_EQUILIBRIUM_CONTRACT).toBe('PB-OSMOTIC-EQUILIBRIUM-v1');
   });
 });
+
+import { calibrateConcentrationLimit } from '../../../../codex/core/pixelbrain/osmotic-equilibrium.js';
+
+describe('calibrateConcentrationLimit', () => {
+  it('places the limit at the requested upper percentile of observed crowding', () => {
+    const samples = Array.from({ length: 100 }, (_, i) => i / 100);  // 0.00 .. 0.99
+    const result = calibrateConcentrationLimit(samples, { percentile: 0.90 });
+    expect(result.limit).toBeCloseTo(0.90, 2);
+    expect(result.admissible).toBe(true);
+  });
+
+  it('refuses a limit nothing can reach', () => {
+    const samples = Array.from({ length: 50 }, () => 0.01);
+    const result = calibrateConcentrationLimit(samples, { percentile: 0.90 });
+    expect(result.admissible).toBe(false);
+    expect(result.reason).toMatch(/0%|unreachable/i);
+  });
+
+  it('refuses a limit everything exceeds', () => {
+    const samples = Array.from({ length: 50 }, () => 0.99);
+    const result = calibrateConcentrationLimit(samples, { percentile: 0.0 });
+    expect(result.admissible).toBe(false);
+    expect(result.reason).toMatch(/100%|always/i);
+  });
+
+  it('refuses an empty sample rather than inventing a limit', () => {
+    expect(() => calibrateConcentrationLimit([], {})).toThrow(/no samples/i);
+  });
+});
