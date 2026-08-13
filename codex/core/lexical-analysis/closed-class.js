@@ -110,6 +110,23 @@ export const CONJUNCTIONS = new Set(['and', 'or', 'but', 'nor', 'yet']);
 export const RELATIVIZERS = new Set(['who', 'which', 'that', 'whom', 'whose']);
 
 /**
+ * INTERROGATIVE ADVERBS — `how`, `where`, `why`.
+ *
+ * They were in no table at all, so `atomsFor` gave them no atom, and a token
+ * with no atom cannot bond: every sentence carrying one was unparseable whatever
+ * the grammar did. Measured over the frozen gate corpus, they are the 3rd, 5th
+ * and 6th most common atomless tokens in the failing set.
+ *
+ * `when` is deliberately absent: it is already a SUBORDINATOR, and giving it a
+ * second identity buys readings without buying parses.
+ *
+ * Closed class as well as adverbial, which is the half that matters at position
+ * zero — `How are you` used to type `How` as a proper noun, because the
+ * unknown-word escape hatch had never heard of it either.
+ */
+export const INTERROGATIVE_ADVERBS = new Set(['how', 'where', 'why']);
+
+/**
  * VERB PARTICLES — the second half of a phrasal verb.
  *
  * A particle is not a preposition, and the difference is whether an object is

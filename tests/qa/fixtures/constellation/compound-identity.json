@@ -6,19 +6,19 @@
     "books": 900,
     "phrases": 4000,
     "rates": {
-      "split": 0.205,
-      "fused": 0.165,
-      "union": 0.28775
+      "split": 0.20975,
+      "fused": 0.16825,
+      "union": 0.29275
     },
     "fusedToUnion": {
       "aOnly": 64,
-      "bOnly": 555,
-      "p": 1.3055086172942188e-98
+      "bOnly": 562,
+      "p": 2.1747487072138205e-100
     },
     "splitToUnion": {
-      "aOnly": 145,
-      "bOnly": 476,
-      "p": 4.638361494393321e-42
+      "aOnly": 149,
+      "bOnly": 481,
+      "p": 1.128880666921591e-41
     }
   },
   "regressions": 64,
@@ -198,10 +198,6 @@
     ],
     "ba": [
       "n"
-    ],
-    "babies": [
-      "n",
-      "v"
     ],
     "back": [
       "a",
@@ -1968,10 +1964,6 @@
       "n",
       "v"
     ],
-    "land": [
-      "n",
-      "v"
-    ],
     "language": [
       "n"
     ],
@@ -2635,6 +2627,9 @@
       "r"
     ],
     "perpetual": [
+      "a"
+    ],
+    "philanthropic": [
       "a"
     ],
     "physic": [
@@ -6309,8 +6304,8 @@
       ],
       "fromPrefix": true,
       "split": false,
-      "fused": false,
-      "union": false
+      "fused": true,
+      "union": true
     },
     {
       "tokens": [
@@ -6364,7 +6359,7 @@
         "how-do"
       ],
       "fromPrefix": false,
-      "split": false,
+      "split": true,
       "fused": true,
       "union": false
     },
@@ -8942,25 +8937,6 @@
     {
       "tokens": [
         "there",
-        "are",
-        "land-babies",
-        "then",
-        "why",
-        "not",
-        "water-babies"
-      ],
-      "compounds": [
-        "land-babies",
-        "water-babies"
-      ],
-      "fromPrefix": false,
-      "split": false,
-      "fused": true,
-      "union": false
-    },
-    {
-      "tokens": [
-        "there",
         "is",
         "further",
         "compliment",
@@ -9483,6 +9459,23 @@
       "compounds": [
         "tsz-fuh",
         "king-pih",
+        "tsz-kung"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "tsz-kung",
+        "asked",
+        "how",
+        "to",
+        "become",
+        "philanthropic"
+      ],
+      "compounds": [
         "tsz-kung"
       ],
       "fromPrefix": false,

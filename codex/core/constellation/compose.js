@@ -30,6 +30,7 @@
 import {
   PREPOSITION_CUES, DETERMINERS, CONJUNCTIONS, RELATIVIZERS, SUBORDINATORS,
   PRONOUNS_NOMINATIVE, PRONOUNS_ACCUSATIVE, COPULAS, MODALS, AUXILIARY_VERBS,
+  INTERROGATIVE_ADVERBS,
   // Unions, used only for the "is this word known at all" test.
   PRONOUNS, AUXILIARIES, PARTICLES,
 } from '../lexical-analysis/closed-class.js';
@@ -232,7 +233,8 @@ function atomsFor(token, index, posMap) {
   const capitalised = /^[A-Z]/.test(String(token));
   const isClosedClass = DETERMINERS.has(lower) || PRONOUNS.has(lower)
     || AUXILIARIES.has(lower) || CONJUNCTIONS.has(lower)
-    || RELATIVIZERS.has(lower) || PREPOSITION_CUES.has(lower);
+    || RELATIVIZERS.has(lower) || PREPOSITION_CUES.has(lower)
+    || INTERROGATIVE_ADVERBS.has(lower);
   // A closed-class word is never unknown, even when the content lexicon —
   // which stores nouns, verbs and adjectives — has no row for it.
   //
@@ -294,6 +296,7 @@ function atomsFor(token, index, posMap) {
   if (CONJUNCTIONS.has(lower)) out.push('CONJ');
   if (RELATIVIZERS.has(lower)) out.push('REL');
   if (SUBORDINATORS.has(lower)) out.push('SUB');
+  if (INTERROGATIVE_ADVERBS.has(lower)) out.push('ADV');
   if (lower === 'to') out.push('TO');
   if (lower === 'than') out.push('THAN');
   if (lower === ',') out.push('COMMA');

@@ -1,4 +1,65 @@
 {
   "contract": "SCHOL-TREEBANK-ANTIGEN-v1",
-  "retired": []
+  "retired": [
+    {
+      "signature": "? S NC ? NP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "AUX ? INV ? N ? VP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "COP DET ? S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "MODAL ? ? VP ? S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "NP ? INF PUNCT",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "PRON ? VP ? S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "PRON AUX ? V ? NC ? N ? S NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "PROPN P ? NC CONJADJ ? PP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "S ? NC NP COP PUNCT",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "S N TO INV",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "S TO PROPN CONJ ? P S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "V ? S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    }
+  ]
 }
