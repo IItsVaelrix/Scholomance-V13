@@ -69,7 +69,11 @@ export function composePacked(tokens, posMap, options = {}) {
 
   const atoms = [];
   for (let i = 0; i < n; i += 1) {
-    for (const a of atomsFor(tokens[i], i, posMap)) {
+    // `options` reaches the atom typing here too. Without it `compoundIdentity`
+    // would be honoured by the classic parser and silently dropped by this one,
+    // so a caller asking for the arm switch would get the opposite behaviour
+    // with nothing to say so — and the treebank gate runs on this parser.
+    for (const a of atomsFor(tokens[i], i, posMap, options)) {
       // Two atoms of the same type at the same position ARE the same node.
       if (cell[i][i].has(a.type)) continue;
       const node = { type: a.type, from: i, to: i, derivations: [], token: a.token };
