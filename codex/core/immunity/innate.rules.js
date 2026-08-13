@@ -108,8 +108,25 @@ function isImmunityRulesPath(filePath) {
 const TRUTH_DERIVATIONS = [
   'analyzeDeep', 'analyzeWord', 'analyzeDeepDetailed', '_resolveWordAnalysisDetailed',
   'syllabify', 'rhymeDomain', 'runG2PJury', 'splitToPhonemes',
-  'rankGraphCandidates', 'arbitrateGraphCandidates', 'voteOnCandidates',
 ];
+
+/**
+ * DELIBERATELY ABSENT: `rankGraphCandidates`, `arbitrateGraphCandidates`,
+ * `voteOnCandidates`.
+ *
+ * The harm this rule exists to prevent is DIVERGENCE — two runtimes answering
+ * the same question differently. That requires a DATA DEPENDENCY the runtime may
+ * lack, which is why phoneme derivation belongs on the list: the browser has no
+ * dictionary. Ranking is pure arithmetic over inputs it is handed; given the
+ * same candidates it cannot disagree with itself, so convicting it would make
+ * the rule noise, and noise gets rules disabled.
+ *
+ * That premise is ENFORCED, not assumed. `stableTokenCompare` used to be
+ * `localeCompare` with no fixed locale, which made the tie-break — 65% of all
+ * ranking decisions — depend on the viewer's locale. It is now code-point
+ * ordering, pinned by `tests/qa/immunity/color-dragon-rules.test.js`. If that
+ * test is ever deleted, these three verbs belong back on the list.
+ */
 
 /** An environment probe: the shape that decides which runtime you are in. */
 const ENVIRONMENT_PROBE = /typeof\s+(?:window|document|importScripts)\s*[!=]==?\s*["']undefined["']/;

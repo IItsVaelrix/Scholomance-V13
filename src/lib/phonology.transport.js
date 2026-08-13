@@ -126,8 +126,13 @@ export function createPhonologyTransport(coreEngine, options = {}) {
      */
     getAnalysis: (word) => (browser ? fromCache(word) : (coreEngine?.analyzeWord?.(word) ?? null)),
     getAnalysisDeep: (word) => (browser ? fromCache(word) : (coreEngine?.analyzeDeep?.(word) ?? null)),
+    // IMMUNE_ALLOW: ui-shadow-computation — this file IS the boundary ARCH-0F0E
+    // enforces. The legacy verbs are overridden rather than dropped on purpose:
+    // `...coreEngine` would otherwise spread the RAW engine's `analyzeWord` back
+    // into the browser and re-open the fork for any caller that had not migrated
+    // to `getAnalysis`. The derivation below runs only on the server branch,
+    // where the dictionary exists.
     analyzeWord,
-    // `analyzeDeep` carried the same guess. Same rule: cached truth or nothing.
     analyzeDeep: (word) => (browser ? fromCache(word) : (coreEngine?.analyzeDeep?.(word) ?? null)),
     /** True when the returned analysis came from the dictionary, not a rule. */
     isCanonical: (word) => Boolean(fromCache(word)?.canonical),

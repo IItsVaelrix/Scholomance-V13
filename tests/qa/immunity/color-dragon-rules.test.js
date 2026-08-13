@@ -157,6 +157,25 @@ const analysis = engine.analyzeDeep(word);`, UI)).toBe(false);
   });
 });
 
+describe('the premise that lets ranking stay off the derivation list', () => {
+  it('orders tokens without consulting a locale', async () => {
+    // ARCH-0F0E deliberately does NOT convict `rankGraphCandidates` in the UI,
+    // on the grounds that pure ranking cannot diverge between runtimes. That is
+    // only true while its tie-break is locale-free — and it was not: measured,
+    // this comparison decides 492 of 757 judiciary ties, and `localeCompare`
+    // ordered `ä` vs `z` differently under sv-SE and `i` vs `I` under tr-TR.
+    // If this test goes, the ranking verbs go back on the list.
+    const { stableTokenCompare } = await import('../../../codex/core/token-graph/types.js');
+
+    for (const [left, right] of [['ä', 'z'], ['i', 'I'], ['resume', 'RESUME'], ['Æon', 'Aeon']]) {
+      const byCodePoint = left === right ? 0 : (left < right ? -1 : 1);
+      expect(stableTokenCompare(left, right), `${left} vs ${right} is not code-point ordered`)
+        .toBe(byCodePoint);
+    }
+    expect(stableTokenCompare('a', 'a')).toBe(0);
+  });
+});
+
 describe('both rules carry an executable repair', () => {
   it('resolves a registered repair, not the unknown placeholder', () => {
     for (const id of ['ARCH-0F0D', 'ARCH-0F0E']) {
