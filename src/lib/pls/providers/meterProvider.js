@@ -10,7 +10,7 @@ export function meterProvider(context, engines, candidates) {
   // Count syllables already on the current line
   let currentSyllables = 0;
   for (const word of (currentLineWords || [])) {
-    const analysis = phonemeEngine.analyzeWord(word);
+    const analysis = phonemeEngine.getAnalysis(word);
     if (analysis) currentSyllables += analysis.syllableCount || 1;
   }
 
@@ -26,7 +26,7 @@ export function meterProvider(context, engines, candidates) {
   const remaining = Math.max(1, target - currentSyllables);
 
   return candidates.map(c => {
-    const analysis = phonemeEngine.analyzeWord(c.token);
+    const analysis = phonemeEngine.getAnalysis(c.token);
     const candidateSyllables = analysis?.syllableCount || 1;
     const delta = Math.abs(candidateSyllables - remaining);
     const score = Math.max(0, 1 - (delta / Math.max(remaining, 1)));

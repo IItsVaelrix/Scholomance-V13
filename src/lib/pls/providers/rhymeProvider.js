@@ -76,7 +76,7 @@ export async function rhymeProvider(context, engines) {
   const verseIRState = resolvePlsVerseIRState(context);
   const verseIRTarget = verseIRState?.previousLineEnd || null;
   const targetWord = verseIRTarget?.word || prevLineEndWord;
-  const targetAnalysis = phonemeEngine.analyzeWord(targetWord);
+  const targetAnalysis = phonemeEngine.getAnalysis(targetWord);
   if (!targetAnalysis && !verseIRTarget) return [];
 
   const targetRhymeKey = targetAnalysis?.rhymeKey || verseIRTarget?.rhymeTailSignature || '';
@@ -115,7 +115,7 @@ export async function rhymeProvider(context, engines) {
     const frequency = Number(entry?.frequency) || 0;
     const frequencySignal = Math.log10(frequency + 1.1) / Math.log10(maxFrequency + 1.1);
     const sequentialSignal = sequentialRankMap.get(tokenUpper) || 0;
-    const candidateAnalysis = phonemeEngine.analyzeWord(tokenUpper);
+    const candidateAnalysis = phonemeEngine.getAnalysis(tokenUpper);
     const verseIRSignal = getVerseIRCandidateSignal(candidateAnalysis, verseIRState);
     const score = clamp(
       (baseScore * 0.71) + (sequentialSignal * 0.16) + (frequencySignal * 0.07) + (verseIRSignal * 0.06),
@@ -149,7 +149,7 @@ export async function rhymeProvider(context, engines) {
   for (const entry of familyMatches) {
     if (seen.has(entry.token)) continue;
 
-    const candidateAnalysis = phonemeEngine.analyzeWord(entry.token);
+    const candidateAnalysis = phonemeEngine.getAnalysis(entry.token);
     if (!candidateAnalysis) continue;
 
     const candidateRhymeKeys = buildCandidateRhymeKeys(candidateAnalysis);
@@ -184,7 +184,7 @@ export async function rhymeProvider(context, engines) {
         if (prefixUpper && !upper.startsWith(prefixUpper)) continue;
 
         let score = 0.6;
-        const candidateAnalysis = phonemeEngine.analyzeWord(upper);
+        const candidateAnalysis = phonemeEngine.getAnalysis(upper);
         const candidateRhymeKeys = buildCandidateRhymeKeys(candidateAnalysis);
         const verseIRSignal = getVerseIRCandidateSignal(candidateAnalysis, verseIRState);
 

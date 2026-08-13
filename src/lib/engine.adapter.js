@@ -25,13 +25,28 @@ import { createTokenGraphSequenceRepo as coreCreateTokenGraphSequenceRepo } from
 import { createRitualPredictionEngine as coreCreateRitualPredictionEngine } from '../../codex/core/ritual-prediction/run.js';
 import { RhymeIndex as coreRhymeIndex } from '../../codex/core/shared/rhymeIndex.js';
 import * as coreMusicEmbeds from '../../codex/core/shared/musicEmbeds.js';
+import { createPhonologyTransport, primePhonology, phonologyStatus } from './phonology.transport.js';
 
 /**
  * --- SHARED CORE ACCESS ---
  */
 
 export const processorBridge = coreProcessorBridge;
-export const PhonemeEngine = corePhonemeEngine;
+
+/**
+ * THE UI GETS A TRANSPORT, NOT AN ENGINE.
+ *
+ * Re-exporting the core engine straight into the browser was the Color Dragon:
+ * `cmu.phoneme.engine.js` has no dictionary when `window` is defined, so every
+ * UI call fell through to letter-guessing while the server used real phonemes.
+ * SILENCE was `S AY1 L AH0 N S` on one side and `S IH0 L EH1 N K` on the other.
+ *
+ * The transport delegates to the core engine on the server, where the dictionary
+ * exists, and serves cached backend answers in the browser. A miss returns null
+ * rather than a fabrication — call `primePhonology(words)` first.
+ */
+export const PhonemeEngine = createPhonologyTransport(corePhonemeEngine);
+export { primePhonology, phonologyStatus };
 export const RhymeIndex = coreRhymeIndex;
 export const musicEmbeds = coreMusicEmbeds;
 

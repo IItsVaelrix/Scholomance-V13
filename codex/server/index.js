@@ -73,6 +73,8 @@ import { createLexicalGraphAdapter } from './adapters/lexicalGraph.sqlite.adapte
 import { createLemmaAdapter } from './adapters/lemma.sqlite.adapter.js';
 import { createLexicalAnalyzeService } from './services/lexicalAnalyze.service.js';
 import { lexicalAnalyzeRoutes } from './routes/lexicalAnalyze.routes.js';
+import { phonologyRoutes } from './routes/phonology.routes.js';
+import { PhonemeEngine as canonicalPhonemeEngine } from '../core/phonology/phoneme.engine.js';
 import {
   DEVICE_EMBEDDING_DIMENSIONS,
   DEVICE_EMBEDDING_KIND,
@@ -1179,6 +1181,8 @@ fastify.register(lexicalAnalyzeRoutes, {
     service: lexicalAnalyzeService,
     versions: lexicalAnalyzeVersions,
 });
+// The dictionary lives here, so the answers live here. See phonology.routes.js.
+await fastify.register(phonologyRoutes, { phonemeEngine: canonicalPhonemeEngine });
 fastify.register(grimdesignRoutes);
 await fastify.register(panelAnalysisRoutes, {
     enableRhymeAstrology: fastify.featureFlags?.rhymeAstrology,

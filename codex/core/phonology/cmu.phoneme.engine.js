@@ -104,6 +104,13 @@ export const CmuPhonemeEngine = {
   _initPromise: null,
   /** @type {boolean} */
   _available: false,
+  /**
+   * WHY it is unavailable. A bare `false` was the Color Dragon: callers could
+   * not tell "no dictionary in this runtime" from "this word is not a word", so
+   * the UI rendered letter-guesses as though they were the dictionary. A reason
+   * is what lets a caller refuse to guess. See innate rule ARCH-0F0D.
+   */
+  _unavailableReason: null,
   /** @type {Map<string, string[][]>} */
   _entriesByWord: new Map(),
   /** @type {Map<string, PhonemeAnalysis>} */
@@ -119,6 +126,8 @@ export const CmuPhonemeEngine = {
     this._initPromise = (async () => {
       if (isBrowser) {
         this._available = false;
+        this._unavailableReason = 'no pronunciation dictionary in a browser runtime; '
+          + 'consume /api/phonology/analyze instead of deriving locally';
         return false;
       }
 
@@ -142,6 +151,11 @@ export const CmuPhonemeEngine = {
     })();
 
     return this._initPromise;
+  },
+
+  /** The named degradation, for a caller that must explain a blank. */
+  unavailableReason() {
+    return this._available ? null : this._unavailableReason;
   },
 
   isAvailable() {

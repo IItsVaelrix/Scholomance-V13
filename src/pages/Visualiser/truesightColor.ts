@@ -78,10 +78,10 @@ export function wordTruesight(word: string): { color: string; school: string; an
     if (stem && VISUALISER_FUNCTION_WORDS.has(stem)) return null;
   }
   const engine = PhonemeEngine as {
-    analyzeDeep?: (w: string) => any | null;
+    getAnalysisDeep?: (w: string) => any | null;
     getSchoolFromVowelFamily?: (f: string) => string | null;
   };
-  const analysis = engine.analyzeDeep?.(clean) || null;
+  const analysis = engine.getAnalysisDeep?.(clean) || null;
   const family = familyFromRhymeKey(analysis?.rhymeKey)
     || safeVowelFamily(analysis?.vowelFamily);
   const school = safeSchoolForFamily(engine, family);
@@ -108,7 +108,7 @@ export function tokenTruesight(
   // we do not ban VISUALISER_FUNCTION_WORDS here. If the backend gate allows a function word, it deserves color!
   const engine = PhonemeEngine as {
     getSchoolFromVowelFamily?: (f: string) => string | null;
-    analyzeDeep?: (w: string) => any | null;
+    getAnalysisDeep?: (w: string) => any | null;
   };
 
   // Hue follows the RHYME, not the stress (see familyFromRhymeKey). The backend
@@ -130,8 +130,8 @@ export function tokenTruesight(
     || safeVowelFamily(tokenData?.vowelFamily);
   let family = backendFamily;
   if (!family && allowFrontendFallback) {
-    family = familyFromRhymeKey(engine.analyzeDeep?.(clean)?.rhymeKey)
-      || safeVowelFamily(engine.analyzeDeep?.(clean)?.vowelFamily);
+    family = familyFromRhymeKey(engine.getAnalysisDeep?.(clean)?.rhymeKey)
+      || safeVowelFamily(engine.getAnalysisDeep?.(clean)?.vowelFamily);
   }
   const school = safeSchoolForFamily(engine, family);
   return { color: generateSchoolColor(school), school, analysis: tokenData || null };

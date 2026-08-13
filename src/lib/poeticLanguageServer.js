@@ -77,7 +77,7 @@ export class PoeticLanguageServer {
     this.ritualPredictionEngine = createRitualPredictionEngine({
       sequenceGraphRepo: this.sequenceGraphRepo,
       semanticGraphRepo: this.semanticGraphRepo,
-      analyzeWord: (token) => this.phonemeEngine?.analyzeWord?.(token) || null,
+      analyzeWord: (token) => this.phonemeEngine?.getAnalysis?.(token) || null,
       resolveSchool: (analysis) => resolvePredictionSchool(this.phonemeEngine, analysis),
     });
     this.rhymeIndex = new RhymeIndex();

@@ -72,7 +72,7 @@ export function colorProvider(context, engines, candidates) {
 
   if (familyCounts.size === 0) {
     for (const word of (currentLineWords || [])) {
-      const analysis = phonemeEngine.analyzeWord(word);
+      const analysis = phonemeEngine.getAnalysis(word);
       if (!analysis) continue;
       const family = resolveColorFamily(analysis.vowelFamily);
       if (family) familyCounts.set(family, (familyCounts.get(family) || 0) + 1);
@@ -88,7 +88,7 @@ export function colorProvider(context, engines, candidates) {
   if (!centroid) return candidates;
 
   return candidates.map((candidate) => {
-    const analysis = phonemeEngine.analyzeWord(candidate.token);
+    const analysis = phonemeEngine.getAnalysis(candidate.token);
     const candidateFamily = resolveColorFamily(analysis?.vowelFamily || '');
     if (!candidateFamily) {
       return {

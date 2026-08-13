@@ -91,7 +91,7 @@ export async function democracyProvider(context, engines, candidates) {
   const verseIRState = resolvePlsVerseIRState(context);
   const verseIRTarget = verseIRState?.previousLineEnd || null;
   const targetAnalysis = (prevLineEndWord && phonemeEngine)
-    ? phonemeEngine.analyzeWord(verseIRTarget?.word || prevLineEndWord)
+    ? phonemeEngine.getAnalysis(verseIRTarget?.word || prevLineEndWord)
     : null;
   const targetRhymeKey = verseIRTarget?.rhymeTailSignature || targetAnalysis?.rhymeKey || null;
 
@@ -131,7 +131,7 @@ export async function democracyProvider(context, engines, candidates) {
     }
 
     if (targetRhymeKey && phonemeEngine) {
-      const candidateAnalysis = phonemeEngine.analyzeWord(word);
+      const candidateAnalysis = phonemeEngine.getAnalysis(word);
       const candidateRhymeKeys = buildCandidateRhymeKeys(candidateAnalysis);
       if (candidateRhymeKeys.has(targetRhymeKey)) {
         judiciaryCandidates.push({

@@ -203,7 +203,7 @@ export function PredictorProvider({ children }) {
     sequenceGraphRepo,
     semanticGraphRepo,
     judiciary,
-    analyzeWord: (token) => PhonemeEngine.analyzeWord(token),
+    analyzeWord: (token) => PhonemeEngine.getAnalysis(token),
     resolveSchool: resolvePredictionSchool,
   }));
   const [isReady, setIsReady] = useState(false);

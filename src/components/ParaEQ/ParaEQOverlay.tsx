@@ -227,7 +227,7 @@ export const ParaEQOverlay: React.FC<ParaEQOverlayProps> = ({
       await PhonemeEngine.ensureInitialized();
 
       
-      const analysis = PhonemeEngine.analyzeWord(textData.trim());
+      const analysis = PhonemeEngine.getAnalysis(textData.trim());
       if (analysis && analysis.vowelFamily) {
         const vowelFamily = String(analysis.vowelFamily) as keyof typeof VOWEL_FAMILY_TO_SCHOOL;
         schoolId = VOWEL_FAMILY_TO_SCHOOL[vowelFamily] || 'NEUTRAL';
