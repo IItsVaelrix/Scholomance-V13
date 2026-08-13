@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,6 +21,44 @@ const ROOT = process.cwd();
 const BIBLE_DIR = path.join(ROOT, 'docs/scholomance-bible');
 const BIBLE_PATH = path.join(BIBLE_DIR, 'SCHOLOMANCE_BIBLE.md');
 const INDEX_PATH = path.join(BIBLE_DIR, 'BIBLE_BYTECODE_INDEX.md');
+const SIDECAR_PATH = path.join(BIBLE_DIR, 'bible.json');
+
+/**
+ * BIBLE-JSON-v1 — machine-readable sidecar of the Bible.
+ *
+ * The markdown Bible is human scripture; this JSON is what the Code Atlas
+ * (divtube_downloader/tui/services/code_atlas.py) consumes for glossary
+ * telemetry (layer / bytecodes / pathogens per file). Pure function of its
+ * inputs: sorted, deduplicated, checksummed — identical inputs produce
+ * byte-identical output. NEVER parse the markdown tables back into data;
+ * this payload is built from the same in-memory objects that generate them.
+ */
+export function buildSidecarPayload(inventory, pathogens, date) {
+  const files = inventory
+    .map((item) => ({
+      path: item.path,
+      layer: item.layer,
+      errorCodes: [...new Set(item.errorCodes)].sort(),
+      healthCodes: [...new Set(item.healthCodes)].sort(),
+    }))
+    .sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+
+  const sortedPathogens = [...pathogens].sort((a, b) =>
+    a.file === b.file
+      ? (a.code < b.code ? -1 : a.code > b.code ? 1 : 0)
+      : (a.file < b.file ? -1 : 1));
+
+  const payload = {
+    schema: 'BIBLE-JSON-v1',
+    version: VERSION,
+    generated: date,
+    files,
+    pathogens: sortedPathogens,
+  };
+  const canonical = JSON.stringify(payload);
+  payload.checksum = crypto.createHash('sha256').update(canonical).digest('hex');
+  return payload;
+}
 
 const VERSION = '1.0.0';
 
@@ -32,7 +70,12 @@ function walk(dir, results = []) {
   const list = fs.readdirSync(dir);
   for (let file of list) {
     file = path.join(dir, file);
-    const stat = fs.statSync(file);
+    let stat;
+    try {
+      stat = fs.statSync(file);
+    } catch {
+      continue; // broken symlink / unreadable entry: skip, never die mid-ritual
+    }
     if (stat && stat.isDirectory()) {
       if (
         file.includes('node_modules') || 
@@ -78,7 +121,12 @@ async function synthesizeBible() {
     // Skip large non-code files
     if (relPath.endsWith('.png') || relPath.endsWith('.jpg') || relPath.endsWith('.bmp') || relPath.endsWith('.sqlite')) continue;
 
-    const content = fs.readFileSync(file, 'utf8');
+    let content;
+    try {
+      content = fs.readFileSync(file, 'utf8');
+    } catch {
+      continue; // unreadable (broken symlink, race): skip, never die mid-ritual
+    }
     
     // Classify
     let layer = 'Unknown';
@@ -124,7 +172,12 @@ async function synthesizeBible() {
     if (item.path.includes('diagnostic/cells/')) continue;
     if (item.path.includes('scripts/')) continue;
 
-    const content = fs.readFileSync(path.join(ROOT, item.path), 'utf8');
+    let content;
+    try {
+      content = fs.readFileSync(path.join(ROOT, item.path), 'utf8');
+    } catch {
+      continue; // unreadable: skip pathogen scan for this file, never die
+    }
 
     // 1. Direct UI -> Codex Breach (Law 11)
     if (item.layer === 'UI' && !item.path.startsWith('src/lib/') && !item.path.startsWith('src/hooks/')) {
@@ -301,7 +354,14 @@ Flat, machine-parseable index of every bytecode string prefix in the system.
 
   fs.writeFileSync(INDEX_PATH, indexContent);
 
+  // BIBLE-JSON-v1 sidecar: the machine-readable twin consumed by the Code
+  // Atlas. Built from the same in-memory objects as the markdown tables —
+  // never scraped back out of them.
+  const sidecar = buildSidecarPayload(inventory, pathogens, date);
+  fs.writeFileSync(SIDECAR_PATH, `${JSON.stringify(sidecar, null, 2)}\n`);
+
   console.log(`[bible] synthesis complete. checksum: ${checksum}`);
+  console.log(`[bible] sidecar written: ${path.relative(ROOT, SIDECAR_PATH)} (${sidecar.files.length} files, checksum ${sidecar.checksum.slice(0, 12)}…)`);
   console.log(`[bible] artifacts written to ${BIBLE_DIR}`);
 
   // Emit Health Signal
@@ -320,4 +380,10 @@ Flat, machine-parseable index of every bytecode string prefix in the system.
   console.log(`[bible] PB-OK-v1-BIBLE-GENERATED-${checksum}`);
 }
 
-synthesizeBible().catch(console.error);
+// Run only when executed directly — importing this module (e.g. from tests)
+// must not trigger a full synthesis.
+const _isMain = process.argv[1]
+  && import.meta.url === pathToFileURL(process.argv[1]).href;
+if (_isMain) {
+  synthesizeBible().catch(console.error);
+}

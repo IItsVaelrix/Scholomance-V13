@@ -195,3 +195,7 @@ cache/pg_catalog.csv
 # Universal Dependencies English-EWT — gold treebank, fetched by
 # scripts/fetch-ud-treebank.mjs. CC BY-SA 4.0, not vendored.
 cache/ud/
+
+# Code Atlas — regenerable build artifacts (rebuild: python -m divtube_downloader.tui.services.code_atlas or via code_lens)
+.atlas/
+docs/scholomance-bible/bible.json

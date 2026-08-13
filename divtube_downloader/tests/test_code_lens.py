@@ -264,5 +264,126 @@ class TestDeterminismStress(unittest.TestCase):
             self.assertEqual(first, again)
 
 
+class TestAtlasTelemetryWiring(unittest.TestCase):
+    """The lenses must surface atlas telemetry and never answer silently.
+
+    Fixture is a real git repo + a real atlas build, so staleness, glossary
+    merging and the refs fast-path are exercised end to end.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from tests.test_code_atlas import _make_fixture_repo
+        from tui.services import code_atlas
+        cls._fixture = _make_fixture_repo
+        cls.code_atlas = code_atlas
+        cls.repo = _make_fixture_repo()
+        built = code_atlas.build_atlas(cls.repo)
+        assert built["ok"], built
+
+    @classmethod
+    def tearDownClass(cls):
+        import shutil
+        shutil.rmtree(cls.repo, ignore_errors=True)
+
+    def test_telescope_dir_has_telemetry_and_rollup(self):
+        result = code_lens.telescope(self.repo, "codex", max_depth=3)
+        self.assertTrue(result["ok"])
+        t = result.get("telemetry")
+        self.assertIsNotNone(t)
+        self.assertTrue(t["available"])
+        self.assertFalse(t["stale"])
+        self.assertEqual(t["rollup"]["files"], 1)
+        self.assertEqual(t["rollup"]["byLayer"], {"Core": 1})
+
+    def test_telescope_file_nodes_annotated(self):
+        result = code_lens.telescope(self.repo, "codex/core", max_depth=2)
+        self.assertTrue(result["ok"])
+        node = result["tree"]["children"][0]  # thing.js
+        self.assertEqual(node.get("telemetry", {}).get("layer"), "Core")
+        self.assertGreaterEqual(node["telemetry"]["commits"], 1)
+
+    def test_telescope_single_file_has_telemetry(self):
+        result = code_lens.telescope(self.repo, "src/App.jsx")
+        self.assertTrue(result["ok"])
+        self.assertEqual(result["view"]["telemetry"]["layer"], "UI")
+
+    def test_telescope_without_atlas_flags_unavailable(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            os.makedirs(os.path.join(tmp, "x"))
+            with open(os.path.join(tmp, "x", "a.py"), "w") as fh:
+                fh.write("def f():\n    pass\n")
+            result = code_lens.telescope(tmp, ".")
+            self.assertTrue(result["ok"])
+            self.assertFalse(result["telemetry"]["available"])
+            self.assertEqual(result["telemetry"]["reason"], "atlas-not-built")
+
+    def test_microscope_file_telemetry(self):
+        result = code_lens.microscope(self.repo, "src/App.jsx")
+        self.assertTrue(result["ok"])
+        t = result["telemetry"]
+        self.assertTrue(t["available"])
+        self.assertEqual(t["file"]["layer"], "UI")
+        self.assertEqual(t["file"]["pathogens"], 1)
+        self.assertFalse(t["stale"])
+
+    def test_microscope_refs_via_atlas_are_exhaustive(self):
+        result = code_lens.microscope(
+            self.repo, "codex/core/thing.js",
+            symbol="buildExtrapolationSlate", refs=True,
+        )
+        self.assertEqual(result.get("refsSource"), "atlas")
+        files = {h["file"] for h in result["refs"]}
+        self.assertEqual(
+            files, {"codex/core/thing.js", "scripts/runner.mjs"})
+        self.assertTrue(result["refsExhaustiveFileSet"])
+        for h in result["refs"]:
+            self.assertIn("buildExtrapolationSlate", h["text"])
+
+    def test_microscope_refs_non_token_falls_back_to_walker(self):
+        result = code_lens.microscope(
+            self.repo, "codex/core/thing.js",
+            symbol="build.*Slate", refs=True,
+        )
+        self.assertEqual(result.get("refsSource"), "walker")
+
+    def test_blind_spot_never_surfaces(self):
+        result = code_lens.microscope(
+            self.repo, "codex/core/thing.js",
+            symbol="buildExtrapolationSlate", refs=True,
+        )
+        for h in result["refs"]:
+            self.assertFalse(h["file"].startswith("nlp_chatbot/"))
+
+
+class TestAtlasStalenessWiring(unittest.TestCase):
+    """A new commit after the build must be STAMPED, never silent."""
+
+    def setUp(self):
+        from tests.test_code_atlas import _make_fixture_repo, _git, _write
+        from tui.services import code_atlas
+        self._git = _git
+        self._write = _write
+        self.code_atlas = code_atlas
+        self.repo = _make_fixture_repo()
+        built = code_atlas.build_atlas(self.repo)
+        assert built["ok"], built
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.repo, ignore_errors=True)
+
+    def test_new_commit_is_surfaced_as_stale(self):
+        self._write(self.repo, "src/New.jsx",
+                    "export const New = () => null;\n")
+        self._git(self.repo, "add", "-A")
+        self._git(self.repo, "commit", "-q", "-m", "second")
+        result = code_lens.telescope(self.repo, "codex", max_depth=3)
+        t = result["telemetry"]
+        self.assertTrue(t["available"])
+        self.assertTrue(t["stale"])
+        self.assertEqual(t["commitsBehind"], 1)
+
+
 if __name__ == "__main__":
     unittest.main()

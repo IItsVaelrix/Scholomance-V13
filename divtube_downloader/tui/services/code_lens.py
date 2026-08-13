@@ -312,7 +312,19 @@ def telescope(
             ]
             if len(syms) > MAX_SYMBOLS_PER_FILE:
                 entry["symbolsTruncated"] = True
-        return {"ok": True, "type": "file", "view": entry}
+        atlas = _atlas_for(project_root)
+        if atlas is not None:
+            info = atlas.file_info(entry["path"])
+            if info:
+                entry["telemetry"] = {
+                    k: info[k] for k in _TELEMETRY_FILE_FIELDS if k in info
+                }
+        return {
+            "ok": True,
+            "type": "file",
+            "view": entry,
+            "telemetry": _telemetry_block(atlas, project_root),
+        }
 
     # Directory walk --------------------------------------------------------
     stats = {"dirs": 0, "files": 0, "lines": 0, "symbolized": 0}
@@ -380,6 +392,9 @@ def telescope(
         return node
 
     tree = build(abs_path, 0)
+    atlas = _atlas_for(project_root)
+    if atlas is not None:
+        _annotate_tree(tree, atlas)
     return {
         "ok": True,
         "type": "dir",
@@ -387,6 +402,7 @@ def telescope(
         "maxDepth": max_depth,
         "tree": tree,
         "summary": stats,
+        "telemetry": _telemetry_block(atlas, project_root, rollup_path=rel(abs_path)),
     }
 
 
@@ -460,6 +476,69 @@ def _cross_reference(
     walk(root_abs)
     hits.sort(key=lambda h: (h["file"], h["line"]))
     return hits
+
+
+# --------------------------------------------------------------------------
+# Atlas telemetry — what a file IS (glossary) and whether it is ALIVE (git).
+# The atlas (code_atlas.py) is disk-backed and lazily imported so code_lens
+# stays importable and subprocess-free even where no atlas exists. When it
+# is absent, telemetry says so explicitly: never a silent gap.
+# --------------------------------------------------------------------------
+
+_ATLAS_TOKEN_RE = re.compile(r"[A-Za-z0-9_$]+(?:-[A-Za-z0-9_$]+)*")
+_TELEMETRY_FILE_FIELDS = (
+    "layer", "pathogens", "errorCodes", "healthCodes",
+    "commits", "lastCommit", "churn",
+)
+
+
+def _atlas_for(project_root: str):
+    """Validated atlas handle, or None (missing module/file/checksum)."""
+    try:
+        from tui.services import code_atlas
+    except Exception:  # noqa: BLE001 — atlas is an optional steroid
+        return None
+    try:
+        atlas = code_atlas.load_atlas(project_root)
+    except Exception:  # noqa: BLE001
+        return None
+    if atlas is None or not atlas.verify():
+        return None
+    return atlas
+
+
+def _telemetry_block(atlas, project_root: str, *, rollup_path: str | None = None) -> dict:
+    """Staleness-stamped telemetry header; never answers silently."""
+    if atlas is None:
+        return {"available": False, "reason": "atlas-not-built"}
+    st = atlas.is_stale(project_root)
+    block: dict[str, Any] = {
+        "available": True,
+        "source": "code-atlas",
+        "atlasHead": atlas.meta["builtAtHead"],
+        "stale": st["stale"],
+        "commitsBehind": st["commitsBehind"],
+    }
+    if st.get("unverifiable"):
+        block["unverifiable"] = True
+    if rollup_path is not None:
+        roll = atlas.dir_rollup(rollup_path)
+        if roll:
+            block["rollup"] = roll
+    return block
+
+
+def _annotate_tree(node: dict, atlas) -> None:
+    """Attach per-file glossary/vitality to telescope tree nodes."""
+    if node.get("type") == "file":
+        info = atlas.file_info(node["path"])
+        if info:
+            node["telemetry"] = {
+                k: info[k] for k in _TELEMETRY_FILE_FIELDS if k in info
+            }
+        return
+    for child in node.get("children", []):
+        _annotate_tree(child, atlas)
 
 
 def microscope(
@@ -558,9 +637,53 @@ def microscope(
         if len(syms) > 100:
             result["symbolsTruncated"] = True
 
+    atlas = _atlas_for(project_root)
+    telemetry = _telemetry_block(atlas, project_root)
+    if atlas is not None:
+        info = atlas.file_info(result["path"])
+        if info:
+            telemetry["file"] = {
+                k: info[k] for k in _TELEMETRY_FILE_FIELDS if k in info
+            }
+    result["telemetry"] = telemetry
+
     if refs and symbol:
-        result["refs"] = _cross_reference(
-            project_root, symbol.strip(), max_hits=max(1, min(int(max_refs), 50))
-        )
+        sym = symbol.strip()
+        max_hits = max(1, min(int(max_refs), 50))
+        if atlas is not None and _ATLAS_TOKEN_RE.fullmatch(sym):
+            # Atlas fast path: EXHAUSTIVE file set (no 4000-file walk cap,
+            # no alphabetical bias), then line-level hits within those
+            # files only. Semantics match the walker: word-boundary grep.
+            from tui.services import code_atlas as _ca
+
+            files = atlas.refs(sym, max_files=_ca.MAX_REF_FILES)
+            root_abs = os.path.abspath(project_root)
+            pattern = re.compile(r"\b" + re.escape(sym) + r"\b")
+            hits: list[dict] = []
+            for rel_file in files:
+                file_lines = _read_lines(os.path.join(root_abs, rel_file))
+                if file_lines is None:
+                    continue
+                for lineno, text in enumerate(file_lines, start=1):
+                    if pattern.search(text):
+                        hits.append({
+                            "file": rel_file,
+                            "line": lineno,
+                            "text": text.strip()[:160],
+                        })
+                        if len(hits) >= max_hits:
+                            break
+                if len(hits) >= max_hits:
+                    break
+            result["refs"] = hits
+            result["refsSource"] = "atlas"
+            result["refsFilesScanned"] = len(files)
+            result["refsExhaustiveFileSet"] = len(files) < _ca.MAX_REF_FILES
+        else:
+            # No atlas (or non-token query): the legacy bounded walk.
+            result["refs"] = _cross_reference(
+                project_root, sym, max_hits=max_hits
+            )
+            result["refsSource"] = "walker"
 
     return result
