@@ -35,11 +35,22 @@ describe('Project Gutenberg corpus sanitation', () => {
       .toEqual(['Mr. & Mrs. Gardiner arrived.']);
   });
 
-  it('does not let a coordinator protect a title with no second name after it', () => {
-    // The coordinator alone must not be enough, or `the Dr. and left` would
-    // swallow the boundary wherever a title happens to precede one.
+  it('treats a bound title as never sentence-final', () => {
+    // `I saw the Dr. and left.` IS one sentence. An earlier fixture here pinned
+    // it as two, to bound the connector rule — that assertion was wrong English,
+    // and the bound-title rule corrects it: `Mr`, `Dr`, `MS` and their kin exist
+    // to precede something, so their period is never a boundary.
     expect(segmentGutenbergParagraph('I saw the Dr. and left.'))
-      .toEqual(['I saw the Dr.', 'and left.']);
+      .toEqual(['I saw the Dr. and left.']);
+    expect(segmentGutenbergParagraph('He said Mr. what’s his name. She laughed.'))
+      .toEqual(['He said Mr. what’s his name.', 'She laughed.']);
+  });
+
+  it('still requires context for a title that CAN end a sentence', () => {
+    // `St.` is the pair that forces the distinction: Saint binds to a name,
+    // `Main St.` binds to nothing.
+    expect(segmentGutenbergParagraph('She met Dr. Watson at St. Paul. It rained.'))
+      .toEqual(['She met Dr. Watson at St. Paul.', 'It rained.']);
   });
 
   it('recognises sentence boundaries after closing quotation marks', () => {
@@ -54,6 +65,24 @@ describe('Project Gutenberg corpus sanitation', () => {
     expect(endsWithProtectedAbbreviation('etc.', 'and more followed.')).toBe(true);
     expect(endsWithProtectedAbbreviation('etc.', 'Another sentence began.')).toBe(false);
     expect(endsWithProtectedAbbreviation('Vol.', 'Another sentence began.')).toBe(false);
+  });
+
+  it('classifies a contents block and a heading line, and leaves prose alone', () => {
+    // A TOC paragraph is long, so the length test could not reach it, and
+    // segmentation minted `CHAPTER XII.` as a sentence 26 times in the rebuilt
+    // corpus. The keyword count is CASE-SENSITIVE on purpose: `The chapter of
+    // accidents is the longest chapter in the book` reaches three in lower case
+    // and is prose — quarantining it would be the same silent population edit
+    // in a new coat.
+    expect(classifyStructuralParagraph('CHAPTER I. Down the Rabbit-Hole CHAPTER II. The Pool of Tears CHAPTER III. A Caucus-Race'))
+      .toBe('heading');
+    expect(classifyStructuralParagraph('SCENE: In the end of the Fourth Act, in England; through the rest of the Play, in Scotland'))
+      .toBe('heading');
+    expect(classifyStructuralParagraph('ACT I Scene I. An open Place.')).toBe('heading');
+    expect(classifyStructuralParagraph('The chapter of accidents is the longest chapter in the book, as they say.'))
+      .toBeNull();
+    expect(classifyStructuralParagraph('In Act I, Scene II, the actor described a long and winding road.'))
+      .toBeNull();
   });
 
   it('classifies structural matter narrowly and leaves prose unclassified', () => {

@@ -382,11 +382,21 @@ def audit(db_path):
     """Report the corpus against the laws, without changing it."""
     conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
     sentences = conn.execute("SELECT COUNT(*) FROM sentence").fetchone()[0]
-    truncated = conn.execute(
-        "SELECT COUNT(*) FROM sentence WHERE "
-        "text LIKE '% Mr.' OR text LIKE '% Mrs.' OR text LIKE '% Dr.' "
-        "OR text LIKE '% St.' OR text LIKE '% Messrs.'"
-    ).fetchone()[0]
+    # A record ENDING in a bare title, wherever it sits. The first version of
+    # this query required a leading space and therefore could not see a record
+    # that is only `Mr.` — an audit that passes by being loose is the shape this
+    # whole exercise exists to forbid.
+    titles = ("Mr", "Mrs", "Dr", "St", "Messrs", "Prof", "Rev", "Capt", "Col", "Ms")
+    # GLOB, not LIKE: SQLite's LIKE is case-insensitive for ASCII, so `Rev.`
+    # matched the word `rev.` in Ulysses and `Ms.` matched `MS.` (manuscript).
+    # Two of the three residues this audit first reported were its own bug.
+    truncated = sum(
+        conn.execute(
+            "SELECT COUNT(*) FROM sentence WHERE text = ? OR text GLOB ?",
+            (f"{title}.", f"* {title}."),
+        ).fetchone()[0]
+        for title in titles
+    )
     has_ledger = conn.execute(
         "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='sanitation'"
     ).fetchone()[0]

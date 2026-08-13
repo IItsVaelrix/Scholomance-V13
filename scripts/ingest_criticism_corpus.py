@@ -10,7 +10,9 @@ from __future__ import annotations
 
 import argparse
 import re
+import json
 import sqlite3
+import subprocess
 import urllib.request
 from pathlib import Path
 from typing import Iterable
@@ -85,7 +87,12 @@ END_MARKERS = [
     "*** END OF THE PROJECT GUTENBERG EBOOK",
 ]
 
-SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+")
+SANITIZER = "scripts/gutenberg-sanitize.mjs"
+CONTRACT = "SCHOL-GUTENBERG-SANITIZATION-v1"
+LAWFUL_REASONS = {
+    "illustration", "asterism", "heading", "markup",
+    "tooShort", "tooLong", "noCompound", "unreadable",
+}
 
 
 def init_db(conn: sqlite3.Connection) -> None:
@@ -138,16 +145,42 @@ def clean_gutenberg_text(raw_text: str) -> str:
 
 
 def split_sentences(text: str) -> list[str]:
-    candidates = SENTENCE_SPLIT_RE.split(text)
-    sentences: list[str] = []
-    for sentence in candidates:
-        normalized = re.sub(r"\s+", " ", sentence).strip()
-        if len(normalized) < 12:
-            continue
-        if len(normalized) > 700:
-            continue
-        sentences.append(normalized)
-    return sentences
+    """Segment via the canonical contract. See `scripts/gutenberg-sanitize.mjs`.
+
+    This used to be `re.split(r"(?<=[.!?])\\s+")` followed by two silent
+    `continue` branches on character length — the exact construction the Failure
+    Tribunal of 2026-08-13 convicted, in a script that writes to the same
+    database. It shattered `Mrs. Bennet` and then deleted the surname.
+
+    Sentencehood has ONE authority and it is not this file. The ledger returned
+    by the contract is reported by the caller rather than discarded.
+    """
+    packet = sanitize_packet(text)
+    return list(packet["segments"])
+
+
+def sanitize_packet(text: str, min_tokens: int = 3, max_tokens: int = 140) -> dict:
+    """Run the sanitation contract and refuse anything it will not vouch for."""
+    result = subprocess.run(
+        ["node", SANITIZER, "--min-tokens", str(min_tokens), "--max-tokens", str(max_tokens)],
+        input=text.encode("utf-8"),
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"sanitizer refused the text: {result.stderr.decode('utf-8', 'replace').strip()}"
+        )
+    packet = json.loads(result.stdout.decode("utf-8"))
+    if packet.get("contract") != CONTRACT:
+        raise RuntimeError(f"unexpected sanitation contract: {packet.get('contract')!r}")
+    unknown = set(packet.get("quarantine", {})) - LAWFUL_REASONS
+    if unknown:
+        raise RuntimeError(f"unknown sanitation reason(s): {sorted(unknown)}")
+    counts = packet["counts"]
+    if counts["accepted"] + counts["sentenceQuarantined"] != counts["sentenceCandidates"]:
+        raise RuntimeError("sanitation accounting invariant failed in the caller's view")
+    return packet
 
 
 def download_gutenberg_text(pg_id: int) -> str:
@@ -221,8 +254,16 @@ def ingest_criticism(conn: sqlite3.Connection) -> None:
             print(f"[error] Could not download PG {pg_id}: {err}")
             continue
 
-        cleaned_text = clean_gutenberg_text(raw_text)
-        sentences = split_sentences(cleaned_text)
+        # The contract owns wrapper removal too, so the RAW text goes in and one
+        # authority decides what is prose. `clean_gutenberg_text` is kept for
+        # callers that only want the body.
+        packet = sanitize_packet(raw_text)
+        sentences = list(packet["segments"])
+        counts = packet["counts"]
+        print(
+            f"[sanitize] PG {pg_id}: {counts['accepted']} of {counts['sentenceCandidates']} candidates"
+            f"; quarantined {packet['quarantine']}"
+        )
         if not sentences:
             print(f"[warn] PG {pg_id} produced no usable sentences")
             continue

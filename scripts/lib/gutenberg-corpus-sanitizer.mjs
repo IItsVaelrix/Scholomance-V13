@@ -25,11 +25,30 @@ export const SANITIZATION_REASON = Object.freeze({
 
 const REASONS = new Set(Object.values(SANITIZATION_REASON));
 
-/** Titles whose period belongs to the name construction before them. */
-const NAME_TITLES = new Set([
-  'mr', 'mrs', 'ms', 'dr', 'st', 'prof', 'rev', 'hon', 'capt', 'col', 'gen', 'lt',
+/**
+ * BOUND TITLES. These cannot be the last word of a sentence: English does not
+ * end a sentence with `Mr`, because the form exists to precede a name. Their
+ * period is therefore an abbreviation period whatever follows it.
+ *
+ * Found by rebuilding and reading the residue: `Mr. what's his name--that tall,
+ * proud man.` (dialogue, Austen) and `...she brought the MS. to us.` (a
+ * manuscript, Stoker) both split at a title followed by a lowercase word. No
+ * capital-letter rule can reach them, because the construction is bound, not
+ * capitalised.
+ */
+const BOUND_TITLES = new Set([
+  'mr', 'mrs', 'ms', 'dr', 'prof', 'rev', 'hon', 'capt', 'col', 'gen', 'lt',
   'sgt', 'messrs', 'mme', 'mlle',
 ]);
+
+/**
+ * Titles that CAN end a sentence, so they need context. `st` is the pair that
+ * forces the distinction: `Saint` binds to a name, `he lives on Main St.` does
+ * not bind to anything.
+ */
+const CONTEXTUAL_TITLES = new Set(['st']);
+
+const NAME_TITLES = new Set([...BOUND_TITLES, ...CONTEXTUAL_TITLES]);
 
 /** Abbreviations protected only when the following token is numeric/Roman. */
 const ENUMERATION_ABBREVIATIONS = new Set(['no', 'vol', 'ch', 'fig', 'pp']);
@@ -59,8 +78,27 @@ const STRUCTURAL = Object.freeze([
   { reason: SANITIZATION_REASON.ILLUSTRATION, test: (t) => /^\[Illustration/i.test(t) },
   { reason: SANITIZATION_REASON.ASTERISM, test: (t) => /^(?:\s*\*\s*){3,}$/.test(t) },
   {
+    /**
+     * A heading, a heading LINE, or a table of contents.
+     *
+     * The length test alone reached only short paragraphs, so a TOC block — long
+     * by nature — passed through and segmentation then minted `CHAPTER XII.` as
+     * a sentence 26 times over. Found by rebuilding the corpus and reading the
+     * residue, not by imagining a fixture.
+     */
     reason: SANITIZATION_REASON.HEADING,
-    test: (t) => /^(CHAPTER|BOOK|PART|ACT|SCENE|CANTO)\b/i.test(t) && t.length < 60,
+    test: (t) => {
+      if (/^(CHAPTER|BOOK|PART|ACT|SCENE|CANTO)\b/i.test(t) && t.length < 60) return true;
+      // Three or more heading keywords IN CAPITALS is a contents block. The
+      // count must be case-sensitive: `The chapter of accidents is the longest
+      // chapter in the book` reaches three in lower case and is prose, and
+      // quarantining it would be the same silent population edit in a new coat.
+      const keywords = t.match(/\b(CHAPTER|BOOK|PART|ACT|SCENE|CANTO)\b/g) ?? [];
+      if (keywords.length >= 3) return true;
+      // A heading LINE at any length: an all-caps keyword introducing a label,
+      // `SCENE: In the end of the Fourth Act` or `ACT I Scene I. An open Place.`
+      return /^(CHAPTER|BOOK|PART|ACT|SCENE|CANTO)\b\s*(?::|[IVXLCDM]+\b|\d)/.test(t);
+    },
   },
   {
     reason: SANITIZATION_REASON.MARKUP,
@@ -175,7 +213,8 @@ export function endsWithProtectedAbbreviation(text, followingText = '') {
 
   if (/^[A-Z]$/.test(word)) return /^[A-Z]/.test(following);
   const lower = word.toLowerCase();
-  if (NAME_TITLES.has(lower)) {
+  if (BOUND_TITLES.has(lower)) return true;
+  if (CONTEXTUAL_TITLES.has(lower)) {
     return /^[A-Z0-9]/.test(following) || continuesAName(followingText);
   }
   if (ENUMERATION_ABBREVIATIONS.has(lower)) return /^(?:\d+|[IVXLCDM]+)$/i.test(following);
