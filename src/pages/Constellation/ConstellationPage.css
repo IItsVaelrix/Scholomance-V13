@@ -27,6 +27,11 @@
   --cos-surface: rgba(7, 8, 20, 0.78);
   --cos-surface-raised: rgba(12, 14, 31, 0.9);
   --cos-z-content: 1;
+  /* Stacking Sovereignty (VAELRIX Law 10): no hardcoded z-index > 1.
+     The sticky rail pair added in bab32e02 originally shipped hardcoded 3/2;
+     they now draw from this page-local scale like everything else. */
+  --cos-z-search: 2;
+  --cos-z-brand: 3;
 
   position: relative;
   /* Fill the locked page shell exactly (index.css pins .page-container to
@@ -285,7 +290,7 @@
 .constellation-stage--submitted .constellation-brand {
   position: sticky;
   top: 0;
-  z-index: 3;
+  z-index: var(--cos-z-brand);
   font-size: clamp(1.3rem, 3vw, 1.9rem);
   letter-spacing: 0.1em;
   margin: 0;
@@ -302,7 +307,7 @@
      the search pill flush under the brand at every viewport width, now that
      sticky actually engages (the stage is a real scroll container). */
   top: calc(clamp(1.3rem, 3vw, 1.9rem) * 0.98 + 0.9rem);
-  z-index: 2;
+  z-index: var(--cos-z-search);
   max-width: none;
   margin: 0;
   padding: 0 1.5rem 0.75rem;
