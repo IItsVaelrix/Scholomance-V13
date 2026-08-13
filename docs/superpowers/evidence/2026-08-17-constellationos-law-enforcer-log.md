@@ -25,8 +25,8 @@ LAW-DET-006 (determinism), LAW-ZIDX-010 (stacking sovereignty), LAW-LAYER-001/00
 ## 4. Attack attempts (failed — evidence)
 
 - **Random in analysis:** grep 'Math.random' src/pages/Constellation/** → zero hits. Determinism proven via fnv1a32+mulberry32 (skyChart.js), FNV stablePhase, frozen constants; golden-angle star placement in viewport.
-- **Uncontrolled z-index:** post-fix grep 'z-index' ConstellationPage.css → all 5 occurrences reference tokens; zero literals > 1.
-- **Schema leakage:** grep 'src/lib' codex/server/** → zero; grep "from 'codex'" src/** → zero (type-only JSDoc imports only); old types.js now 4 lines, re-exporter only; `npm run build` green.
+- **Uncontrolled z-index:** post-fix grep 'z-index' ConstellationPage.css → 9 occurrences total: 3 literal (values 0/1, within the ≤1 band) + 6 token references (`--cos-z-brand/search/content`); zero literals > 1.
+- **Schema leakage:** grep 'src/lib' codex/server/** → zero; grep "from 'codex'" src/** → zero (type-only JSDoc imports only); old types.js now 27 lines, re-exporter only (schema bodies removed); `npm run build` green.
 - **Orphaned effects:** useFrame cleanup + AbortController on unmount; no module-level listeners/intervals.
 - **Silent diagnostics:** every adapter failure → degradedChannels + warnings in packet; heteronym/phonology block refuses inert-decorative degradation.
 - **Injection surface:** 600-grapheme allow-list, control-char rejection, 60/min rate limit, generic 500 with no stack.
