@@ -29,12 +29,32 @@
  * the barn fell` nothing marked `past` as a preposition, so it stayed a nominal
  * candidate (it carries an "n" tag) and `barn` looked like a free subject
  * rather than the object of a prepositional phrase.
+ *
+ * ─── `to` IS BOTH, AND MEMBERSHIP HERE IS HOW IT SAYS SO ───────────────────
+ *
+ * `atomsFor` has always emitted the infinitival marker `TO` for `to`, and `to`
+ * was in no preposition list, so `P + NP -> PP` could never fire for it. English
+ * `to` is polyfunctional — `going to Fiji` is adpositional, `going to eat` is
+ * infinitival — and the parser had only the second reading.
+ *
+ * Found by the Grammar Valence Cyclotron (`PB-CONSTELLATION-GRAMMAR-GAP-v1`,
+ * docs/superpowers/evidence/2026-08-13-grammar-valence-discovery.md), whose
+ * point is worth keeping: seven broad clause-glue bonds all looked productive
+ * and all failed the purity bar, because the parser was repairing this lexical
+ * omission at a later chart frontier. The gap was `TO+NP`, 99 DEV events, whose
+ * gold evidence was 59 oblique links — prepositional, not infinitival.
+ *
+ * Membership here is additive: the `TO` atom is still emitted, so `TO+VP->INF`
+ * is untouched. It also makes `to` closed class, which stops `To` at position
+ * zero being typed a proper noun.
  */
 export const PREPOSITION_CUES = new Set([
   'of', 'in', 'on', 'at', 'from', 'with', 'by', 'for', 'into', 'onto', 'upon',
   'through', 'across', 'against', 'beneath', 'under', 'over', 'about', 'without',
   'past', 'beyond', 'beside', 'behind', 'within', 'among', 'toward', 'towards',
   'along', 'around', 'off',
+  // Adpositional AND infinitival; see the note above.
+  'to',
   // Archaic prepositions. `unto` was the single most common untyped token (117).
   'unto', 'betwixt', 'amongst', 'amidst', 'ere', 'save',
 ]);

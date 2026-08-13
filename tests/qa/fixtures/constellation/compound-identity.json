@@ -6,24 +6,24 @@
     "books": 900,
     "phrases": 4000,
     "rates": {
-      "split": 0.2055,
-      "fused": 0.11375,
-      "union": 0.29275
+      "split": 0.21725,
+      "fused": 0.12075,
+      "union": 0.3125
     },
     "fusedToUnion": {
       "aOnly": 0,
-      "bOnly": 716,
-      "p": 5.801671039719287e-216
+      "bOnly": 767,
+      "p": 2.5764595078388307e-231
     },
     "splitToUnion": {
-      "aOnly": 147,
-      "bOnly": 496,
-      "p": 3.879848092980205e-45
+      "aOnly": 151,
+      "bOnly": 532,
+      "p": 1.2761221572965062e-50
     }
   },
   "regressions": 0,
   "regressionsFrozen": 0,
-  "splitRegressions": 147,
+  "splitRegressions": 151,
   "splitRegressionsFrozen": 56,
   "lexicon": {
     "a": [
@@ -255,9 +255,6 @@
     ],
     "birding": [
       "v"
-    ],
-    "bishop": [
-      "n"
     ],
     "biting": [
       "a",
@@ -857,6 +854,10 @@
       "a",
       "n"
     ],
+    "draft": [
+      "n",
+      "v"
+    ],
     "dragon": [
       "n"
     ],
@@ -913,9 +914,8 @@
       "a",
       "r"
     ],
-    "eating": [
-      "n",
-      "v"
+    "editor": [
+      "n"
     ],
     "educated": [
       "a",
@@ -959,6 +959,9 @@
     ],
     "errant": [
       "a"
+    ],
+    "error": [
+      "n"
     ],
     "esprit": [
       "n"
@@ -1336,9 +1339,6 @@
     ],
     "goodly": [
       "a"
-    ],
-    "gorging": [
-      "v"
     ],
     "grand": [
       "a",
@@ -2032,6 +2032,11 @@
       "n",
       "v"
     ],
+    "meaning": [
+      "a",
+      "n",
+      "v"
+    ],
     "means": [
       "n",
       "v"
@@ -2100,9 +2105,6 @@
       "v"
     ],
     "mon": [
-      "n"
-    ],
-    "money": [
       "n"
     ],
     "monger": [
@@ -2511,6 +2513,9 @@
     ],
     "prince": [
       "n"
+    ],
+    "prone": [
+      "a"
     ],
     "proof": [
       "a",
@@ -3498,9 +3503,6 @@
       "n",
       "v"
     ],
-    "usurer": [
-      "n"
-    ],
     "v": [
       "a",
       "n"
@@ -3618,6 +3620,9 @@
       "a"
     ],
     "well-knit": [
+      "a"
+    ],
+    "well-meaning": [
       "a"
     ],
     "well-nigh": [
@@ -4141,36 +4146,6 @@
       ],
       "compounds": [
         "twenty-third"
-      ],
-      "fromPrefix": false,
-      "split": true,
-      "fused": false,
-      "union": false
-    },
-    {
-      "tokens": [
-        "and",
-        "a",
-        "man-eating",
-        "bishop"
-      ],
-      "compounds": [
-        "man-eating"
-      ],
-      "fromPrefix": false,
-      "split": true,
-      "fused": false,
-      "union": false
-    },
-    {
-      "tokens": [
-        "and",
-        "a",
-        "money-gorging",
-        "usurer"
-      ],
-      "compounds": [
-        "money-gorging"
       ],
       "fromPrefix": false,
       "split": true,
@@ -5372,9 +5347,9 @@
         "god-den"
       ],
       "fromPrefix": true,
-      "split": false,
+      "split": true,
       "fused": false,
-      "union": false
+      "union": true
     },
     {
       "tokens": [
@@ -5918,6 +5893,24 @@
     },
     {
       "tokens": [
+        "how",
+        "prone",
+        "to",
+        "error",
+        "are",
+        "the",
+        "well-meaning"
+      ],
+      "compounds": [
+        "well-meaning"
+      ],
+      "fromPrefix": false,
+      "split": true,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
         "how-do",
         "the",
         "boy",
@@ -6025,7 +6018,7 @@
       "fromPrefix": true,
       "split": false,
       "fused": false,
-      "union": false
+      "union": true
     },
     {
       "tokens": [
@@ -6136,7 +6129,7 @@
       "fromPrefix": true,
       "split": false,
       "fused": false,
-      "union": false
+      "union": true
     },
     {
       "tokens": [
@@ -7326,6 +7319,23 @@
     },
     {
       "tokens": [
+        "of",
+        "his",
+        "draft-letter",
+        "to",
+        "the",
+        "editor"
+      ],
+      "compounds": [
+        "draft-letter"
+      ],
+      "fromPrefix": false,
+      "split": true,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
         "or",
         "is",
         "it",
@@ -7682,7 +7692,7 @@
       "fromPrefix": true,
       "split": false,
       "fused": false,
-      "union": false
+      "union": true
     },
     {
       "tokens": [
@@ -8881,9 +8891,9 @@
         "dread-bolted"
       ],
       "fromPrefix": true,
-      "split": false,
-      "fused": false,
-      "union": false
+      "split": true,
+      "fused": true,
+      "union": true
     },
     {
       "tokens": [

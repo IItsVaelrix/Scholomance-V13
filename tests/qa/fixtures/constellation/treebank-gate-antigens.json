@@ -2,7 +2,17 @@
   "contract": "SCHOL-TREEBANK-ANTIGEN-v1",
   "retired": [
     {
+      "signature": "? N PRON NC NP ? DET S TO NP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
       "signature": "? S NC ? NP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "ADJ ? TO ? S",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
     },
@@ -17,6 +27,11 @@
       "retiredOn": "2026-08-13"
     },
     {
+      "signature": "INF TO DET ADJ ? NC ? COMMA PP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
       "signature": "MODAL ? ? VP ? S",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
@@ -27,7 +42,37 @@
       "retiredOn": "2026-08-13"
     },
     {
+      "signature": "N TO APPOS ? S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "N TO DET SBAR",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "N TO S P PP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "NC COP P DET ? NP TO NP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
       "signature": "NP ? INF PUNCT",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "PP TO S P VP N",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "PRON ? SBAR TO AUX COMMA SBAR SUB PROPN ADV MODAL PUNCT",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
     },
@@ -42,6 +87,16 @@
       "retiredOn": "2026-08-13"
     },
     {
+      "signature": "PRON COP PP TO SCOMMA ADV PUNCT ?",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "PRON NC TO S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
       "signature": "PROPN P ? NC CONJADJ ? PP",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
@@ -52,8 +107,53 @@
       "retiredOn": "2026-08-13"
     },
     {
+      "signature": "S ? S TO S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
       "signature": "S N TO INV",
       "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "S NP TO NP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "S TO ? NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "S TO INV",
+      "wasFailing": 2,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "S TO INV ? S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "S TO NC SBAR",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "S TO NP",
+      "wasFailing": 2,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "S TO NP S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "S TO PRONACC PUNCT",
+      "wasFailing": 2,
       "retiredOn": "2026-08-13"
     },
     {
@@ -62,7 +162,62 @@
       "retiredOn": "2026-08-13"
     },
     {
+      "signature": "S TO PROPN CONJ ADV P S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "S TO PROPN P PP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "S TO S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "S TO S ? N",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "S VP TO NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "SBAR TO PROPN SBAR TO NP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
       "signature": "V ? S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "VP S TO CONJADJ TO",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "VP TO ? COMMA N TO PRONACC PUNCT",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "VP TO NC P ? ? PROPN",
+      "wasFailing": 2,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "VP TO NP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "VP TO PUNCT",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
     }

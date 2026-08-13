@@ -150,6 +150,19 @@ export function resolveFrame(tokens, targetIndex) {
   // Before-cues attach directly to the token, so they decide first.
   if (prev) {
     if (NOUN_CUES.has(prev)) return { frame: 'noun', cue: `determiner:${prev}` };
+    /**
+     * A WORD IN BOTH LISTS IS NOT DECIDED BY LIST ORDER.
+     *
+     * `to` is the only member of both today, and it is the reason this branch
+     * exists: it is a preposition AND the infinitive marker, and before a
+     * stress-shift homograph it is overwhelmingly the infinitive — `to recórd`,
+     * never `to récord`. It reached the preposition branch first purely because
+     * that branch is written first, and the metronome silently began stressing
+     * every such verb as a noun the moment `to` joined PREPOSITION_CUES.
+     */
+    if (VERB_CUES.has(prev) && PREPOSITION_CUES.has(prev)) {
+      return { frame: 'verb', cue: `infinitive-marker:${prev}` };
+    }
     if (PREPOSITION_CUES.has(prev)) return { frame: 'noun', cue: `preposition:${prev}` };
     if (VERB_CUES.has(prev)) return { frame: 'verb', cue: `subject-or-aux:${prev}` };
   }

@@ -23,31 +23,31 @@
     "droppedThrew": 0
   },
   "metrics": {
-    "coverage": 0.25063291139240507,
-    "containment": 0.15949367088607594,
-    "parsedBoth": 50,
-    "parsedOnlyBecausePosWasVague": 49,
-    "taggingFailure": 16,
-    "grammarFailure": 280
+    "coverage": 0.27341772151898736,
+    "containment": 0.17215189873417722,
+    "parsedBoth": 55,
+    "parsedOnlyBecausePosWasVague": 53,
+    "taggingFailure": 18,
+    "grammarFailure": 269
   },
   "instrument": {
-    "failures": 296,
-    "withCategory": 235,
+    "failures": 287,
+    "withCategory": 226,
     "oracleLeaks": 7,
     "oracleTokens": 3500
   },
-  "outcomes": "PGGLGGGRGGGGPGGGRGGGGGGGGGGGGPPGGPGGGPGGGPGPLGGGGGPGGPGLPGPGGPPRRGRLGPPRRGPGPGGGGGGGPPGGGPGGGRGGGGPRRPGGGPGGPGGLGGPGRLPGGRPPGPGGRPGPGGGGRPRGRGRPRGRRGGRRRRGRPGRRRGPPGPGPPRLRPPGPGRRGRPGRGGPPRRRGRGRRPGPGGRPGGPGGGGGPGGGGGGGPGGGGLGGGPGPGRPGPGPPPGGGGRPGGGGGGGPGGGGGGGGGGRGRGLRGPGPGPPRGGLGGGLGRPPGGPPGPGLPGGGGGRGGPGGPPGGGPPGGPPGGGPPGGGGGGPGGGGGGGRGGPLGRGGGPGLGRGGRRPGGPGRGGGLPGGPGGGGGPPRPPRRPPPPPPRPRLP",
-  "contained": "00000000000000000000000000000010010001000101000000100100101001100000011000101000000011000100000000000000000000000010001000110000010100000100000000000000000010000011010000001101000001000000000000000010000001000001000000000000000010100101010000000100000001000000000000000000000010000000000000001010010000000010010000110011000100000001000000000000000000000000001001000000000100000110100000000100001",
+  "outcomes": "PGGLGGGRGGGGPGGGRGGGGGGGGGGGGPPGGPGGGPGGGPGPLGGGGGPGGPGLPPPGGPPRRLRLGPPRRLPGPGGGGGGGPPGGGPGGGRPGGGPRRPGGGPGGPGGLGGPGRLPPGRPPGPGGRPGPGGPGRPRGRGRPRGRRPGRRRRGRPPRRRGPPGPGPPRLRPPGPGRRGRPGRGGPPRRRGRGRRPGPGGRPGGPGGGGGPGGGGGGGPGGGGLGGGPGPGRPGPGPPPGGGGRPGGGGGGGPGGGGGGGGGGRGRGLRGPGPPPPRGGLGGGLGRPPGGPPGPGLPGGGGGRGGPGGPPGGGPPGGPPGGGPPGGGGGGPPGGGGGGRGGPLGRGGPPGLGRGGRRPGGPGRGGGLPGGPGGGGGPPRPPRRPPPPPPRPRLP",
+  "contained": "00000000000000000000000000000010010001000101000000100100111001100000011000101000000011000100000000000000000000000010001100110000010100100100000000000000000011000011010000001101000001000000000000000010000001000001000000000000000010100101010000000100000001000000000000000000000010000000000000001010010000000010010000110011000100000001100000000000000000000000001001000000000100000110100000000100001",
   "signatures": {
-    "distinct": 192,
-    "failing": 296,
+    "distinct": 181,
+    "failing": 287,
     "census": {
       "?": 8,
       "? ? ?": 1,
       "? ? PP": 1,
       "? ? PROPN": 8,
       "? N ?": 2,
-      "? N PRON NC NP ? DET S TO NP": 1,
+      "? N PRON NC NP ? DET S": 1,
       "? NC ?": 1,
       "? PROPN": 4,
       "? PROPN ?": 1,
@@ -55,7 +55,7 @@
       "? S": 1,
       "? S ?": 1,
       "? S VP": 1,
-      "ADJ ? TO ? S": 1,
+      "ADJ ? P ? S": 1,
       "ADJ FRONTED SUB NC COP ADV NP NP": 1,
       "ADJ PP NP": 1,
       "ADJ SBAR ? CONJADJ ? VP": 1,
@@ -82,7 +82,7 @@
       "GEN NP": 2,
       "GEN S": 2,
       "GEN S V ? NP ?": 1,
-      "INF TO DET ADJ ? NC ? COMMA PP": 1,
+      "INF P DET ADJ ? NC ? COMMA PP": 1,
       "INV": 1,
       "MODAL ? ? VP S": 1,
       "N": 10,
@@ -94,16 +94,14 @@
       "N ? NC ? VP": 1,
       "N ? PROPN ? ? ? ?": 1,
       "N ? PUNCT": 1,
+      "N P DET SBAR": 1,
       "N S": 1,
-      "N TO APPOS ? S": 1,
-      "N TO DET SBAR": 1,
-      "N TO S P PP": 1,
       "NC": 11,
       "NC ? ?": 1,
       "NC ? ADV NC CONJ ADV NC": 1,
       "NC ? S NC NP": 1,
       "NC AUX ? S ?": 1,
-      "NC COP P DET ? NP TO NP": 1,
+      "NC COP P DET ? NP": 1,
       "NC S": 1,
       "NP": 9,
       "NP ? ADJ ? NP ? PUNCT": 1,
@@ -118,11 +116,10 @@
       "PP": 2,
       "PP ? PROPN ? VP ? PUNCT": 1,
       "PP ADJ": 1,
-      "PP TO S P VP N": 1,
       "PRON ? NP": 1,
       "PRON ? P": 1,
       "PRON ? S": 1,
-      "PRON ? SBAR TO AUX COMMA SBAR SUB PROPN ADV MODAL PUNCT": 1,
+      "PRON ? SBAR P AUX COMMA SBAR SUB PROPN ADV MODAL PUNCT": 1,
       "PRON ? VP": 1,
       "PRON ? VP S": 1,
       "PRON APPOS SUB PRON AUX ? VP S": 1,
@@ -131,13 +128,12 @@
       "PRON AUX ? VP": 1,
       "PRON AUX ? VP ? N ? S NC": 1,
       "PRON COP ? PP NP": 1,
-      "PRON COP PP TO SCOMMA ADV PUNCT ?": 1,
       "PRON COP S S": 1,
+      "PRON COP SCOMMA ADV PUNCT ?": 1,
       "PRON INV S NC": 1,
       "PRON NC ? NC NP ? COMMA VP": 1,
       "PRON NC NP S N": 1,
-      "PRON NC TO S": 1,
-      "PRON S": 1,
+      "PRON S": 2,
       "PRON S CONJ ? COMMA APPOS ? PUNCT": 1,
       "PRON S VP": 1,
       "PRONACC S P S": 1,
@@ -154,16 +150,18 @@
       "PUNCT S SUB NP S DET CONJ PUNCT": 1,
       "RELC": 1,
       "S ?": 3,
+      "S ? N": 1,
       "S ? NC ? PP": 1,
       "S ? NP": 1,
       "S ? NP DET AUX ? N": 1,
-      "S ? S": 2,
+      "S ? S": 3,
       "S ? S ?": 1,
       "S ? S COP ADV NP": 1,
-      "S ? S TO S": 1,
+      "S ? S N": 1,
       "S ? VP": 2,
       "S ADJ": 1,
       "S AUX COP PP": 1,
+      "S CONJ ADV P S": 1,
       "S CONJADJ COMMA P ?": 1,
       "S COP ?": 1,
       "S COP ? PUNCT": 1,
@@ -179,15 +177,19 @@
       "S NC": 3,
       "S NC ? NP": 1,
       "S NC NP": 1,
-      "S NP": 3,
+      "S NP": 4,
       "S NP ? S": 1,
       "S NP COP PUNCT": 1,
       "S NP NC MODAL SBAR COP PP NC": 1,
-      "S NP TO NP": 1,
       "S P ?": 2,
+      "S P ? NC": 1,
       "S P ? PUNCT": 1,
+      "S P INV": 2,
+      "S P INV ? S": 1,
       "S P PP": 2,
+      "S P S": 1,
       "S P VP": 1,
+      "S P VP N": 1,
       "S PRON AUX ? VP": 1,
       "S PRON NC": 1,
       "S S": 6,
@@ -195,23 +197,10 @@
       "S S DET VP": 1,
       "S SCOMMA ? NP ?": 1,
       "S SUB ? VP DET S": 1,
-      "S TO ? NC": 1,
-      "S TO INV": 2,
-      "S TO INV ? S": 1,
-      "S TO NC SBAR": 1,
-      "S TO NP": 2,
-      "S TO NP S": 1,
-      "S TO PRONACC PUNCT": 2,
-      "S TO PROPN CONJ ADV P S": 1,
-      "S TO PROPN P PP": 1,
-      "S TO S": 1,
-      "S TO S ? N": 1,
-      "S VP": 5,
+      "S VP": 6,
       "S VP ? NP": 1,
       "S VP ? S": 2,
-      "S VP TO NC": 1,
       "SBAR": 1,
-      "SBAR TO PROPN SBAR TO NP": 1,
       "SCOMMA": 2,
       "SCOMMA ? PUNCT": 1,
       "SUB PRON NC NP NC PRON NC": 1,
@@ -226,21 +215,21 @@
       "VP N SUB NP FRONTED CONJ SUB PRON INV COMMA S": 1,
       "VP NC": 2,
       "VP P ?": 1,
+      "VP P ? ? PROPN": 2,
+      "VP P ? COMMA S": 1,
       "VP P DET NP ? ?": 1,
+      "VP P PP": 1,
+      "VP P PUNCT": 1,
       "VP S": 2,
-      "VP S TO CONJADJ TO": 1,
-      "VP TO ? COMMA N TO PRONACC PUNCT": 1,
-      "VP TO NC P ? ? PROPN": 2,
-      "VP TO NP": 1,
-      "VP TO PUNCT": 1,
+      "VP S P CONJADJ P": 1,
       "VP VP": 5
     }
   },
   "categories": [
     {
       "label": "root (VERB -> ROOT)",
-      "failures": 22,
-      "soleCause": 21
+      "failures": 24,
+      "soleCause": 23
     },
     {
       "label": "punct (PUNCT -> NOUN)",
@@ -253,16 +242,6 @@
       "soleCause": 13
     },
     {
-      "label": "obl (NOUN -> VERB)",
-      "failures": 13,
-      "soleCause": 4
-    },
-    {
-      "label": "obl (PROPN -> VERB)",
-      "failures": 13,
-      "soleCause": 6
-    },
-    {
       "label": "advmod (PART -> VERB)",
       "failures": 11,
       "soleCause": 3
@@ -270,17 +249,12 @@
     {
       "label": "list (NUM -> NUM)",
       "failures": 10,
-      "soleCause": 8
+      "soleCause": 10
     },
     {
       "label": "punct (PUNCT -> VERB)",
       "failures": 9,
       "soleCause": 3
-    },
-    {
-      "label": "nmod (NOUN -> NOUN)",
-      "failures": 8,
-      "soleCause": 4
     },
     {
       "label": "advcl (VERB -> VERB)",
@@ -295,7 +269,7 @@
     {
       "label": "obj (PRON -> VERB)",
       "failures": 7,
-      "soleCause": 2
+      "soleCause": 3
     },
     {
       "label": "root (NOUN -> ROOT)",
@@ -305,7 +279,7 @@
     {
       "label": "advmod (ADV -> VERB)",
       "failures": 6,
-      "soleCause": 3
+      "soleCause": 4
     },
     {
       "label": "root (PROPN -> ROOT)",
@@ -323,9 +297,19 @@
       "soleCause": 2
     },
     {
-      "label": "obl (PRON -> VERB)",
+      "label": "nmod (NOUN -> NOUN)",
       "failures": 5,
       "soleCause": 4
+    },
+    {
+      "label": "obl (NOUN -> VERB)",
+      "failures": 5,
+      "soleCause": 2
+    },
+    {
+      "label": "obl (PROPN -> VERB)",
+      "failures": 5,
+      "soleCause": 3
     },
     {
       "label": "xcomp (VERB -> VERB)",
@@ -345,7 +329,7 @@
     {
       "label": "amod (ADJ -> NOUN)",
       "failures": 3,
-      "soleCause": 1
+      "soleCause": 2
     },
     {
       "label": "ccomp (VERB -> VERB)",
@@ -448,19 +432,9 @@
       "soleCause": 2
     },
     {
-      "label": "obl (NUM -> VERB)",
-      "failures": 2,
-      "soleCause": 0
-    },
-    {
-      "label": "obl (PROPN -> ADV)",
-      "failures": 2,
-      "soleCause": 0
-    },
-    {
       "label": "parataxis (NOUN -> VERB)",
       "failures": 2,
-      "soleCause": 0
+      "soleCause": 1
     },
     {
       "label": "punct (PUNCT -> ADJ)",
@@ -490,7 +464,7 @@
     {
       "label": "acl (VERB -> NOUN)",
       "failures": 1,
-      "soleCause": 0
+      "soleCause": 1
     },
     {
       "label": "acl (VERB -> PRON)",
@@ -640,7 +614,7 @@
     {
       "label": "mark (SCONJ -> VERB)",
       "failures": 1,
-      "soleCause": 0
+      "soleCause": 1
     },
     {
       "label": "nmod (DET -> NOUN)",
@@ -708,9 +682,19 @@
       "soleCause": 0
     },
     {
+      "label": "obl (NUM -> VERB)",
+      "failures": 1,
+      "soleCause": 0
+    },
+    {
       "label": "obl (PRON -> ADV)",
       "failures": 1,
       "soleCause": 0
+    },
+    {
+      "label": "obl (PRON -> VERB)",
+      "failures": 1,
+      "soleCause": 1
     },
     {
       "label": "obl:agent (NOUN -> VERB)",
@@ -724,6 +708,11 @@
     },
     {
       "label": "parataxis (VERB -> NOUN)",
+      "failures": 1,
+      "soleCause": 0
+    },
+    {
+      "label": "parataxis (VERB -> VERB)",
       "failures": 1,
       "soleCause": 0
     },
