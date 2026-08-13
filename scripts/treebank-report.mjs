@@ -24,15 +24,8 @@ import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import Database from 'better-sqlite3';
 
-import { parseConllu, goldAnswer, goldPosMap } from '../codex/core/constellation/treebank.js';
-import { diagnose, frontierSignature, OUTCOME } from '../codex/core/constellation/failure-diagnosis.js';
-import { summarize } from '../codex/core/constellation/treebank-metrics.js';
-import {
-  compose, projectAnswer, rankByAttraction, guessPos,
-} from '../codex/core/constellation/compose.js';
-import { composePacked, projectAnswers } from '../codex/core/constellation/compose-packed.js';
-import { irregularPos } from '../codex/core/lexical-analysis/irregular-forms.js';
-import { tokenize } from '../codex/core/tokenizer.js';
+import { parseConllu } from '../codex/core/constellation/treebank.js';
+import { runTreebank } from '../codex/core/constellation/treebank-run.js';
 
 const args = process.argv.slice(2);
 const argOf = (flag, fallback) => {
@@ -59,142 +52,47 @@ if (!existsSync(CORPUS)) {
 const LEMMA_POS = new Map([
   ['noun', 'n'], ['verb', 'v'], ['adjective', 'a'], ['adverb', 'r'],
 ]);
-/** UPOS values that name a lexical category; anything else is not one. */
-const LEXICAL_UPOS = new Set(['NOUN', 'PROPN', 'VERB', 'ADJ', 'ADV']);
-
 function loadLexicon() {
   if (!existsSync(DICT)) return { posMap: new Map(), senseMap: null };
   const db = new Database(DICT, { readonly: true });
 
-  const posMap = new Map();
+  const posTable = new Map();
   for (const r of db.prepare('SELECT surface_lower, pos FROM lemma_form').iterate()) {
     const tag = LEMMA_POS.get(r.pos);
     if (!tag) continue;
-    const have = posMap.get(r.surface_lower);
-    if (have) { if (!have.includes(tag)) have.push(tag); } else posMap.set(r.surface_lower, [tag]);
+    const have = posTable.get(r.surface_lower);
+    if (have) { if (!have.includes(tag)) have.push(tag); } else posTable.set(r.surface_lower, [tag]);
   }
 
-  const senseMap = new Map();
-  const rows = db.prepare(
+  const senses = new Map();
+  const senseRows = db.prepare(
     'SELECT lemma_lower, pos, COUNT(*) AS n FROM wordnet_lemma GROUP BY lemma_lower, pos',
   ).all();
-  for (const r of rows) {
+  for (const r of senseRows) {
     // Satellite adjectives are adjectives — `atomsFor` types `a` and `s` alike.
     const key = r.pos === 's' ? 'a' : r.pos;
     if (!['n', 'v', 'a', 'r'].includes(key)) continue;
-    const entry = senseMap.get(r.lemma_lower) || {};
+    const entry = senses.get(r.lemma_lower) || {};
     entry[key] = (entry[key] || 0) + r.n;
-    senseMap.set(r.lemma_lower, entry);
+    senses.set(r.lemma_lower, entry);
   }
   db.close();
-  return { posMap, senseMap: senseMap.size > 0 ? senseMap : null };
+  return { posMap: posTable, senseMap: senses.size > 0 ? senses : null };
 }
 
 const { posMap, senseMap } = loadLexicon();
 const records = parseConllu(readFileSync(CORPUS, 'utf8'));
 const sample = records.slice(0, LIMIT === Infinity ? records.length : LIMIT);
 
-const same = (a, b) => String(a || '').toLowerCase() === String(b || '').toLowerCase();
+const {
+  report, sampled, skippedTooLong, droppedThrew,
+  oracleLeaks, oracleTokens, tokenizerAgree, tokenizerTotal, signatures,
+} = runTreebank({ records: sample, posMap, senseMap, parser: PARSER, maxTokens: MAX_TOKENS });
 
-let tokenizerAgree = 0;
-let tokenizerTotal = 0;
-let oracleLeaks = 0;
-let oracleTokens = 0;
-let skippedTooLong = 0;
-let droppedThrew = 0;
-const signatures = new Map();
-
-const rows = sample.map((record) => {
-  const tokens = record.tokens.map((t) => t.form);
-
-  /**
-   * `compose` materialises every parse into `cell[from][to]`; the chart grows
-   * combinatorially with sentence length and does not terminate on some long
-   * sentences. Skip BEFORE calling `compose` rather than hang, and count the
-   * skip — `report.n` is already post-filter, so an uncounted skip would
-   * silently narrow what "coverage" means.
-   */
-  if (tokens.length > MAX_TOKENS) {
-    skippedTooLong += 1;
-    return null;
-  }
-
-  const gold = goldAnswer(record);
-  const goldMap = goldPosMap(record);
-
-  /**
-   * ORACLE IMPURITY. An empty POS entry does not stop `atomsFor` falling
-   * through to `irregularPos` and `guessPos`, so gold UPOS cannot fully
-   * suppress a lexical reading. `during` ends in `-ing` and `several` in `-al`;
-   * both pick up a lexical atom gold forbids. Claiming a clean oracle would be
-   * a check that cannot fail, so the leak is counted and printed instead.
-   */
-  for (const t of record.tokens) {
-    oracleTokens += 1;
-    if (LEXICAL_UPOS.has(t.upos)) continue;
-    const lower = String(t.form).toLowerCase();
-    if (irregularPos(lower).length > 0 || guessPos(lower).length > 0) oracleLeaks += 1;
-  }
-
-  let result;
-  let goldResult;
-  try {
-    result = PARSER === 'packed' ? composePacked(tokens, posMap) : compose(tokens, posMap);
-    goldResult = PARSER === 'packed' ? composePacked(tokens, goldMap) : compose(tokens, goldMap);
-  } catch {
-    droppedThrew += 1;
-    return null;
-  }
-
-  const answers = PARSER === 'packed'
-    ? result.stable.flatMap((s) => projectAnswers(s))
-    : result.stable.map(projectAnswer);
-  const contained = answers.some((a) => same(a.subject, gold.subject) && same(a.verb, gold.verb));
-
-  /**
-   * DECISION IS NOT AVAILABLE FOR THE PACKED PARSER. `rankByAttraction` scores
-   * the leaves of one concrete parse, and a packed node is not one parse. Its
-   * geometric mean is not Viterbi-decomposable because `counted` varies by
-   * derivation, so making it work is a separate, measured decision. Reporting
-   * null is the honest form; substituting a number would print an accuracy for
-   * a measurement nobody made.
-   */
-  let decided = null;
-  if (PARSER === 'classic' && senseMap) {
-    const ranked = rankByAttraction(result.stable, senseMap);
-    const top = ranked.length > 0 ? projectAnswer(ranked[0].molecule) : null;
-    decided = Boolean(top && same(top.subject, gold.subject) && same(top.verb, gold.verb));
-  }
-
-  const d = diagnose(record, result, goldResult);
-
-  if (d.outcome !== OUTCOME.PARSED) {
-    // Same signature the off-gold Gutenberg path would produce, recorded here
-    // so the two can be matched later. Unnamed on purpose.
-    const sig = frontierSignature(result, tokens.length);
-    signatures.set(sig, (signatures.get(sig) || 0) + 1);
-  }
-
-  const rootToken = record.tokens.find((t) => t.head === 0);
-  tokenizerTotal += 1;
-  if (record.text && tokenize(record.text).length === tokens.length) tokenizerAgree += 1;
-
-  return {
-    outcome: d.outcome,
-    overGenerated: d.overGenerated,
-    categories: d.categories,
-    nonProjective: d.nonProjective,
-    rootUpos: rootToken ? rootToken.upos : 'NONE',
-    contained,
-    decided,
-  };
-}).filter(Boolean);
-
-const report = summarize(rows);
 const pct = (x) => (x === null ? '  null' : `${(x * 100).toFixed(1)}%`);
 
 console.log(`\nUD English-EWT / ${SPLIT} — ${report.n} sentences (parser: ${PARSER}, cap: --max-tokens ${MAX_TOKENS})\n`);
-console.log(`  skipped (> ${MAX_TOKENS} tokens)     ${skippedTooLong} of ${sample.length}   — compose materialises every parse; these do not terminate`);
+console.log(`  skipped (> ${MAX_TOKENS} tokens)     ${skippedTooLong} of ${sampled}   — compose materialises every parse; these do not terminate`);
 console.log(`  dropped (compose threw)    ${droppedThrew}`);
 console.log(`coverage      ${pct(report.coverage)}   a spanning S exists`);
 console.log(`containment   ${pct(report.containment)}   gold answer is among the projected answers`);
