@@ -70,11 +70,23 @@ async function main() {
     console.warn(`[infusion] ${orphaned.length} antigen(s) in the substrate have no scar in ${MEMORY_DIR}:`);
     for (const a of orphaned) console.warn(`             - ${a.title}  (from ${a.source})`);
     console.warn('[infusion] RETAINING them. They are carried forward, not regenerated.');
-    console.warn('[infusion] To retire one, delete its INFUSION_ALLOW block and pass --allow-forget.');
-    if (process.argv.includes('--allow-forget')) {
-      console.warn('[infusion] --allow-forget given: dropping them.');
-      retained = [];
+    console.warn('[infusion] To retire one: --forget "<substring of its title>"');
+  }
+
+  // Retiring is PER-ANTIGEN. A blanket --allow-forget would let a superseded
+  // draft be cleaned up by discarding every other orphan alongside it, which is
+  // the same wholesale amnesia the guard above exists to prevent.
+  const forgetIndex = process.argv.indexOf('--forget');
+  const forgetNeedle = forgetIndex !== -1 ? process.argv[forgetIndex + 1] : null;
+  if (forgetNeedle) {
+    const doomed = retained.filter((a) => a.title.includes(forgetNeedle));
+    if (doomed.length === 0) {
+      console.error(`[infusion] --forget "${forgetNeedle}" matched no retained antigen. Refusing to guess.`);
+      process.exitCode = 1;
+      return;
     }
+    for (const a of doomed) console.warn(`[infusion] RETIRING: ${a.title}`);
+    retained = retained.filter((a) => !a.title.includes(forgetNeedle));
   }
 
   const merged = [...retained.filter((a) => !incomingTitles.has(a.title)), ...validAntigens];
