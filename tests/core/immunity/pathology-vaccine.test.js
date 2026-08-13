@@ -67,6 +67,37 @@ describe('identity versus census', () => {
     expect(vaccine.bytecode).toBe(before);
   });
 
+  /**
+   * REGRESSION. The first version documented danger-weighting and then summed 1
+   * per finding, so the sealed pulse led with collab.routes.js — whose forty
+   * findings are all `catch (error) { return sendServiceError(reply, error); }`,
+   * i.e. correct code. Counting is not triage.
+   */
+  it('weights by danger when given weightOf, not by finding count', () => {
+    const vaccine = mintPathologyVaccine(SWALLOWED);
+    const findings = [
+      ...Array.from({ length: 40 }, () => ({ path: 'correct.js', cls: 'SKIP_ONLY' })),
+      ...Array.from({ length: 3 }, () => ({ path: 'dangerous.js', cls: 'SILENT_FALLBACK' })),
+    ];
+    const weights = { SKIP_ONLY: 0.15, SILENT_FALLBACK: 1.0 };
+    const pulse = pulseFromFindings(vaccine, findings, { weightOf: (f) => weights[f.cls] });
+
+    // 3 x 1.0 = 3.0 beats 40 x 0.15 = 6.0? No — it does not, and that is the
+    // point: the caller's weights decide, not the row count. Assert the ratio.
+    const byPath = Object.fromEntries(pulse.hotspots.map((h) => [h.path, h.resonance]));
+    expect(byPath['dangerous.js'] / byPath['correct.js']).toBeCloseTo(3.0 / 6.0, 5);
+
+    // Unweighted, the correct file wins purely on volume.
+    const flat = pulseFromFindings(vaccine, findings);
+    expect(flat.hotspots[0].path).toBe('correct.js');
+  });
+
+  it('rejects a non-finite weight rather than poisoning the field', () => {
+    const vaccine = mintPathologyVaccine(SWALLOWED);
+    expect(() => pulseFromFindings(vaccine, [{ path: 'a.js' }], { weightOf: () => Number.NaN }))
+      .toThrow(/non-finite/i);
+  });
+
   it('puts the volatile map on the pulse, capped, ordered by density', () => {
     const vaccine = mintPathologyVaccine(SWALLOWED);
     const findings = [

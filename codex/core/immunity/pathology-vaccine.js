@@ -127,25 +127,34 @@ export function sealVaccineFromReport(vaccine, report, options = {}) {
  * which is correct for it — a verified finding is a verified finding. But for
  * ranking WHERE TO LOOK FIRST that flattens a real distinction: collab.routes.js
  * carries 40 findings that are all `catch (error) { return sendServiceError(...) }`,
- * i.e. correct code, and would outrank a file with three silent fallbacks.
- * Callers that have triaged their findings pass the classifier here instead.
+ * i.e. correct code, and outranks a file with three silent fallbacks.
+ *
+ * So callers pass `weightOf`. Without it this counts findings, and counting is
+ * exactly the failure above — the first version of this function documented the
+ * weighting and then summed 1 per finding, and the sealed pulse duly led with
+ * the file whose forty findings were all correct.
  *
  * @param {BytecodeXPVaccine} vaccine
  * @param {Array<{path: string}>} findings
- * @param {{maxHotspots?: number, reason?: string}} [options]
+ * @param {{weightOf?: (f: object) => number, maxHotspots?: number, reason?: string}} [options]
  */
 export function pulseFromFindings(vaccine, findings, options = {}) {
-  const counts = new Map();
+  const weightOf = options.weightOf ?? (() => 1);
+  const weights = new Map();
   for (const finding of findings) {
     const path = finding?.path;
     if (!path) continue;
-    counts.set(path, (counts.get(path) ?? 0) + 1);
+    const weight = Number(weightOf(finding));
+    if (!Number.isFinite(weight)) {
+      throw new TypeError(`weightOf returned a non-finite weight for ${path}`);
+    }
+    weights.set(path, (weights.get(path) ?? 0) + weight);
   }
-  const busiest = Math.max(1, ...counts.values());
-  const hotspots = [...counts.entries()].map(([path, count]) => ({
+  const peak = Math.max(1e-9, ...weights.values());
+  const hotspots = [...weights.entries()].map(([path, weight]) => ({
     path,
-    resonance: count / busiest,
-    reason: options.reason || `${vaccine.stableContext.pathologyClass}:${count}`,
+    resonance: Math.min(1, weight / peak),
+    reason: options.reason || `${vaccine.stableContext.pathologyClass}:${weight.toFixed(2)}`,
   }));
 
   return buildQbitPulseNode(vaccine, { hotspots, maxHotspots: options.maxHotspots });
