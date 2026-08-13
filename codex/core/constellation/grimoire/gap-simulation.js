@@ -14,8 +14,12 @@
  * @module codex/core/constellation/grimoire/gap-simulation
  */
 
+import { createHash } from 'node:crypto';
+
 import { BONDS } from '../compose.js';
 import { composePacked } from '../compose-packed.js';
+import { diagnose, OUTCOME } from '../failure-diagnosis.js';
+import { goldPosMap } from '../treebank.js';
 import {
   pairOperation,
   projectResult,
@@ -147,15 +151,36 @@ function licensedPairs() {
   return new Set(BONDS.map((b) => `${b[0]}+${b[1]}`));
 }
 
+function compareText(a, b) {
+  const left = String(a);
+  const right = String(b);
+  return left < right ? -1 : left > right ? 1 : 0;
+}
+
+function corpusRef(record, tokens) {
+  if (record.sentId) return String(record.sentId);
+  const digest = createHash('sha256')
+    .update(tokens.join('\u001f'), 'utf8')
+    .digest('hex')
+    .slice(0, 16);
+  return `sentence:${digest}`;
+}
+
 /**
  * Mine unlicensed adjacent maximal-node pairs on sentences without spanning S.
  *
  * @param {object[]} records conllu records
  * @param {Map} posMap
- * @param {{limit?: number}} [options]
+ * `grammarOnly` is the strict diagnostic mode used by the Grammar Valence
+ * Cyclotron. It runs the existing gold-POS diagnosis and refuses lexical
+ * failures and spanning root-type mismatches before they can masquerade as a
+ * missing construction.
+ *
+ * @param {{limit?: number, grammarOnly?: boolean}} [options]
  */
 export function mineCoverageGapPairs(records, posMap, options = {}) {
-  const limit = options.limit || Infinity;
+  const limit = options.limit ?? Infinity;
+  const grammarOnly = options.grammarOnly === true;
   const licensed = licensedPairs();
   const counts = new Map();
 
@@ -167,6 +192,13 @@ export function mineCoverageGapPairs(records, posMap, options = {}) {
     const chart = composePacked(tokens, posMap);
     const hasStableS = chart.stable.some((s) => s.type === 'S');
     if (hasStableS) continue;
+
+    let diagnosis = null;
+    if (grammarOnly) {
+      const goldChart = composePacked(tokens, goldPosMap(rec));
+      diagnosis = diagnose(rec, chart, goldChart);
+      if (diagnosis.outcome !== OUTCOME.GRAMMAR) continue;
+    }
 
     const nodes = chart.molecules;
     const maximal = nodes.filter(
@@ -184,18 +216,57 @@ export function mineCoverageGapPairs(records, posMap, options = {}) {
         const pair = `${a.type}+${b.type}`;
         if (licensed.has(pair)) continue;
         if (!counts.has(pair)) {
-          counts.set(pair, { pair, left: a.type, right: b.type, n: 0, examples: [] });
+          counts.set(pair, {
+            pair,
+            left: a.type,
+            right: b.type,
+            n: 0,
+            examples: [],
+            corpusRefs: [],
+            dependencyEvidence: new Map(),
+          });
         }
         const row = counts.get(pair);
         row.n += 1;
         if (row.examples.length < 3) {
           row.examples.push((rec.text || tokens.join(' ')).slice(0, 100));
         }
+        const ref = corpusRef(rec, tokens);
+        if (row.corpusRefs.length < 16 && !row.corpusRefs.includes(ref)) {
+          row.corpusRefs.push(ref);
+        }
+        for (const category of diagnosis?.categories || []) {
+          // The gold frontier must cross this adjacency to be evidence about
+          // this vacancy. Other unreachable subtrees in the same sentence are
+          // not evidence for this pair.
+          if (category.from > a.to || category.to < b.from) continue;
+          const key = `${category.deprel}|${category.label}`;
+          const prior = row.dependencyEvidence.get(key);
+          row.dependencyEvidence.set(key, {
+            deprel: category.deprel,
+            label: category.label,
+            count: (prior?.count || 0) + 1,
+          });
+        }
       }
     }
   }
 
-  return [...counts.values()].sort((a, b) => b.n - a.n);
+  return [...counts.values()]
+    .map((row) => ({
+      pair: row.pair,
+      left: row.left,
+      right: row.right,
+      n: row.n,
+      examples: row.examples,
+      corpusRefs: [...row.corpusRefs].sort(),
+      dependencyEvidence: [...row.dependencyEvidence.values()].sort(
+        (a, b) => b.count - a.count
+          || compareText(a.deprel, b.deprel)
+          || compareText(a.label, b.label),
+      ),
+    }))
+    .sort((a, b) => b.n - a.n || compareText(a.pair, b.pair));
 }
 
 /**
@@ -279,13 +350,13 @@ export function proposeForGapPair(left, right) {
  *
  * @param {object[]} records
  * @param {Map} posMap
- * @param {{topPairs?: number, minCount?: number}} [options]
+ * @param {{topPairs?: number, minCount?: number, limit?: number, grammarOnly?: boolean}} [options]
  */
 export function buildGapSimulationSlate(records, posMap, options = {}) {
   const topPairs = options.topPairs ?? 40;
   const minCount = options.minCount ?? 10;
 
-  const gaps = mineCoverageGapPairs(records, posMap)
+  const gaps = mineCoverageGapPairs(records, posMap, options)
     .filter((g) => g.n >= minCount)
     .slice(0, topPairs);
 
@@ -338,7 +409,7 @@ export function buildGapSimulationSlate(records, posMap, options = {}) {
   }
 
   const candidates = [...bySig.values()].sort(
-    (a, b) => (b.gapCount || 0) - (a.gapCount || 0) || a.signature.localeCompare(b.signature),
+    (a, b) => (b.gapCount || 0) - (a.gapCount || 0) || compareText(a.signature, b.signature),
   );
 
   return {

@@ -85,6 +85,11 @@ dict_data/*
 !dict_data/.gitkeep
 !dict_data/README.md
 *.sqlite
+# Backups of gitignored databases are still databases. A 16MB binary in git
+# history cannot be taken back out; the raw sources rebuild them instead.
+*.sqlite.*
+*.sqlite-wal
+*.sqlite-shm
 *.sqlite-shm
 *.sqlite-wal
 scholomance_collab_test_*.sqlite
