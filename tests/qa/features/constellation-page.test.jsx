@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import ConstellationPage from '../../../src/pages/Constellation/ConstellationPage.jsx';
@@ -99,6 +99,37 @@ describe('ConstellationPage chamber', () => {
     expect(screen.getByText(/akin/i)).toBeInTheDocument();
     expect(screen.getByText(/\d\/9/)).toBeInTheDocument();            // rarity "n/9"
     expect(screen.getByText('IPA')).toBeInTheDocument();
+  });
+
+  /**
+   * THE RETRY PATH IS THE FAILURE PATH. Submitting the same words again is the
+   * only way this page offers to re-ask a question, and it was a no-op:
+   * `setSubmittedQuery(q)` with an unchanged `q` is a React bail-out, so the
+   * fetch effect never re-ran. Invisible while the backend is up; a dead end the
+   * moment it is not, because the reader is holding the offline fixture and the
+   * one control that could replace it does nothing.
+   */
+  it('re-submitting the identical query issues a new request', async () => {
+    const fetchMock = vi.fn(async () => { throw new Error('offline'); });
+    vi.stubGlobal('fetch', fetchMock);
+    try {
+      render(
+        <MemoryRouter>
+          <ConstellationPage />
+        </MemoryRouter>,
+      );
+      const field = screen.getByLabelText(/search the literary sky/i);
+      fireEvent.change(field, { target: { value: 'gravity' } });
+      fireEvent.keyDown(field, { key: 'Enter', code: 'Enter' });
+      expect(await screen.findByRole('heading', { name: /phrase identity/i })).toBeInTheDocument();
+      const afterFirst = fetchMock.mock.calls.length;
+      expect(afterFirst).toBeGreaterThan(0);
+
+      fireEvent.keyDown(field, { key: 'Enter', code: 'Enter' });
+      await waitFor(() => expect(fetchMock.mock.calls.length).toBeGreaterThan(afterFirst));
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it('disables morph animation class when reduced motion is preferred', () => {

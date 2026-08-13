@@ -8,15 +8,24 @@ import { useConstellationPage } from '../../hooks/useConstellationPage.js';
 
 export default function ConstellationPage() {
   const reducedMotion = usePrefersReducedMotion();
-  const [submittedQuery, setSubmittedQuery] = useState(null);
-  const { status, packet } = useConstellationPage(submittedQuery);
-  const mode = submittedQuery != null ? 'submitted' : 'idle';
+  /**
+   * A submission is a query AND an attempt number. Holding the query alone made
+   * re-asking the same question impossible: `setSubmittedQuery('gravity')` when
+   * the state is already `'gravity'` is a React bail-out, so the fetch effect
+   * never re-ran and Enter did nothing. That is only invisible while the backend
+   * is up — the moment it fails, the reader is handed the offline fixture with
+   * no way back, because the only retry affordance on this page is submitting
+   * the same words again.
+   */
+  const [submission, setSubmission] = useState({ query: null, attempt: 0 });
+  const { status, packet } = useConstellationPage(submission.query, submission.attempt);
+  const mode = submission.query != null ? 'submitted' : 'idle';
   // The sky's deterministic animation is seeded by the resolved page bytecode,
   // so each answered query lights its own lodestar (PDR §7.7). Idle → constant.
   const skyBytecode = packet?.pageBytecode ?? null;
 
   const handleSubmit = (query) => {
-    setSubmittedQuery(query);
+    setSubmission((previous) => ({ query, attempt: previous.attempt + 1 }));
   };
 
   return (
@@ -41,7 +50,7 @@ export default function ConstellationPage() {
         <ConstellationSearch
           mode={mode}
           onSubmit={handleSubmit}
-          defaultValue={submittedQuery ?? ''}
+          defaultValue={submission.query ?? ''}
           reducedMotion={reducedMotion}
         />
         {status === 'loading' && packet == null ? (

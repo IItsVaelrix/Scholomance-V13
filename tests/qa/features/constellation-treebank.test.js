@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { parseConllu, goldAnswer, goldPosMap } from '../../../codex/core/constellation/treebank.js';
+import { runTreebank } from '../../../codex/core/constellation/treebank-run.js';
 
 /**
  * A real EWT sentence. The subject is token 6 and the root is token 4 —
@@ -94,4 +98,40 @@ describe('goldPosMap', () => {
     };
     expect(goldPosMap(record).get('run').sort()).toEqual(['n', 'v']);
   });
+});
+
+/**
+ * THE DEFAULT PARSER HAD NO TEST. `runTreebank`'s `parser` defaults to
+ * `'classic'`, and the gate freezes `'packed'` — so the classic corpus path,
+ * the one every caller gets by omission, was executed by nothing. It broke
+ * silently the moment `projectAnswer` grew an optional second parameter,
+ * because `stable.map(projectAnswer)` feeds it the array index.
+ *
+ * This asserts the path RUNS and reports, not what it reports: the numbers
+ * belong to the gate's ratchet, and duplicating them here would create a second
+ * baseline to keep in sync.
+ */
+describe('runTreebank — the classic parser path executes', () => {
+  const FIXTURES = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../fixtures/constellation');
+  const read = (name) => fs.readFileSync(path.join(FIXTURES, name), 'utf8');
+
+  it('completes a classic run and returns a populated report', () => {
+    // A slice, not the corpus: the classic chart materialises every parse, so
+    // the full fixture costs ~20s. Executing the path is the point here — the
+    // gate owns the numbers and the budget.
+    const records = parseConllu(read('treebank-gate.conllu')).slice(0, 40);
+    const out = runTreebank({
+      records,
+      posMap: new Map(Object.entries(JSON.parse(read('treebank-gate-lexicon.json')))),
+      senseMap: null,
+      parser: 'classic',
+      maxTokens: 20,
+    });
+    expect(out.report.n).toBeGreaterThan(0);
+    // Coverage above zero is the load-bearing assertion: it means at least one
+    // sentence produced a stable molecule, which means `projectAnswer` actually
+    // RAN. `containment` is left alone — it is a property of the corpus, and a
+    // second copy of the gate's numbers is a second baseline to keep in sync.
+    expect(out.report.coverage).toBeGreaterThan(0);
+  }, 20_000);
 });

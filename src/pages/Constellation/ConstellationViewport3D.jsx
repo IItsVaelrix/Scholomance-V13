@@ -31,21 +31,41 @@ function readScenePalette(element) {
  * failure that should be reported is indistinguishable from a plain absence.
  * The returned fallback carries the caught error and a reason instead.
  *
+ * THE PROBE GIVES THE CONTEXT BACK. Asking the question costs a real GPU context,
+ * and browsers cap how many a page may hold — Chrome evicts the OLDEST when the
+ * cap is passed, which is the live `<Canvas>` this probe exists to authorise.
+ * Leaving the probe's context alive means every remount of this page spends one
+ * of a small, shared budget on a canvas that will never be drawn, and the
+ * symptom lands somewhere else entirely: the field goes black after N visits.
+ * `WEBGL_lose_context` releases it immediately rather than waiting for GC.
+ *
+ * EXPORTED FOR THE LIFECYCLE TEST, in the same spirit as `validateBonds` in
+ * compose.js: the release only happens on the success path, and the success path
+ * cannot be reached through this component in jsdom without mounting a real
+ * `<Canvas>`. Calling the probe directly is the only way a test can assert that
+ * the context comes back rather than trust the comment above.
+ *
  * @returns {{ ok: boolean, error: Error | null, reason: string }}
  */
-function probeWebGL() {
+export function probeWebGL() {
   if (typeof document === 'undefined') {
     return { ok: false, error: null, reason: 'no document — rendered outside a browser' };
   }
+  let context = null;
   try {
     const canvas = document.createElement('canvas');
-    const context = canvas.getContext('webgl2') || canvas.getContext('webgl');
+    context = canvas.getContext('webgl2') || canvas.getContext('webgl');
     if (!context) {
       return { ok: false, error: null, reason: 'this browser returned no webgl2 or webgl context' };
     }
     return { ok: true, error: null, reason: 'webgl context acquired' };
   } catch (error) {
     return { ok: false, error, reason: `webgl context creation threw: ${error?.message ?? String(error)}` };
+  } finally {
+    // `finally`, not the success path: the context may exist even when a later
+    // line throws, and a probe that leaks only on the error path is a probe that
+    // leaks exactly when the page is already in trouble.
+    try { context?.getExtension?.('WEBGL_lose_context')?.loseContext(); } catch { /* nothing to release */ }
   }
 }
 

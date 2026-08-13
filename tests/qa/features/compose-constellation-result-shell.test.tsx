@@ -247,4 +247,59 @@ describe('hero figure failure stays local (PDR §7.8)', () => {
     expect(container.querySelector('[data-compose-part="meaning-field"]')).toBeTruthy();
     spy.mockRestore();
   });
+
+  /**
+   * A boundary that only latches is local in SPACE and permanent in TIME. This
+   * instance is never keyed or remounted between answers, so before `resetKey`
+   * one bad packet blanked the figure for every packet after it — a page-wide
+   * regression from a single-packet fault, invisible because the plate simply
+   * renders nothing.
+   */
+  it('says why it failed rather than swallowing the error', async () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { default: Shell } = await import('../../../src/pages/Constellation/ConstellationResultShell.jsx');
+    render(<Shell packet={basePacket} />);
+    const reported = spy.mock.calls.some(
+      (args) => typeof args[0] === 'string' && args[0].includes('[ConstellationOS] hero figure failed to render'),
+    );
+    expect(reported).toBe(true);
+    spy.mockRestore();
+  });
+});
+
+describe('hero figure failure does not condemn the next answer', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    // Keyed on the PACKET, not on a call counter: React re-invokes a component
+    // that threw so it can rebuild the stack, so "first call" is not the same
+    // thing as "first packet" and a counter would arm only the retry.
+    vi.doMock('../../../src/pages/Constellation/skyChart.js', async (importOriginal) => {
+      const actual = await importOriginal<typeof import('../../../src/pages/Constellation/skyChart.js')>();
+      return {
+        ...actual,
+        heroFigure: vi.fn((packet) => {
+          if (packet.pageBytecode === 'COS-PAGE-v1-BRIGHT-WOUND-001') throw new Error('boom');
+          return actual.heroFigure(packet);
+        }),
+      };
+    });
+  });
+
+  afterEach(() => {
+    vi.doUnmock('../../../src/pages/Constellation/skyChart.js');
+    vi.resetModules();
+    cleanup();
+  });
+
+  it('recovers when a new packet arrives', async () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { default: Shell } = await import('../../../src/pages/Constellation/ConstellationResultShell.jsx');
+    const { container, rerender } = render(<Shell packet={basePacket} />);
+    expect(container.querySelector('.constellation-result-hero')).toBeNull();
+
+    // A different answer is a different bytecode — and a fresh chance.
+    rerender(<Shell packet={{ ...basePacket, pageBytecode: 'COS-PAGE-v1-A-SECOND-QUESTION' }} />);
+    expect(container.querySelector('.constellation-result-hero')).toBeTruthy();
+    spy.mockRestore();
+  });
 });

@@ -138,8 +138,6 @@ const PROJECTIONS = Object.freeze({
 export function predictHead(left, right, result) {
   const lFn = FUNCTION_TYPES.has(left);
   const rFn = FUNCTION_TYPES.has(right);
-  const lC = CONTENT_TYPES.has(left) || !lFn;
-  const rC = CONTENT_TYPES.has(right) || !rFn;
 
   // Coordination complete: first conjunct heads (UD technical head).
   if (right.startsWith('CONJ') && left === result) return 0;

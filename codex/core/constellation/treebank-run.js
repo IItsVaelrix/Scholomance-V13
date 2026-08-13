@@ -93,7 +93,9 @@ export function runTreebank({
 
     const answers = parser === 'packed'
       ? result.stable.flatMap((s) => projectAnswers(s))
-      : result.stable.map(projectAnswer);
+      // Wrapped, not point-free: `projectAnswer` takes an optional bond table as
+      // its second argument, and `Array.map` would hand it the element INDEX.
+      : result.stable.map((s) => projectAnswer(s));
     const contained = answers.some((a) => same(a.subject, gold.subject) && same(a.verb, gold.verb));
 
     /**

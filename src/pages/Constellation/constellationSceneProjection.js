@@ -61,13 +61,24 @@ function channelItems(packet, channelId) {
         magnitude: 0.56 + clamp(item.confidence) * 0.42,
       }));
     case 'sound': {
+      /**
+       * STRESS AND VOWELHOOD ARE DIFFERENT QUESTIONS. In ARPAbet a trailing digit
+       * marks a vowel, and its VALUE marks the stress: 1 primary, 2 secondary,
+       * 0 unstressed. Testing `/[012]$/` answers "is this a vowel" — using it as
+       * the high-magnitude gate drew every unstressed `AH0` at the same size as a
+       * primary-stressed nucleus, while the shell's aria-label (`/[12]$/`) refused
+       * to count it. One packet field, two contradictory readings, in one feature.
+       * Three bands instead, matching `skyChart.js`, which already names both.
+       */
       const phonemes = (packet.rhymeAstrology?.phonemes ?? []).slice(0, 9).map((phoneme, index) => ({
         id: `phoneme-${index}`,
         label: phoneme,
-        magnitude: /[012]$/.test(phoneme) ? 0.92 : 0.64,
+        magnitude: /[12]$/.test(phoneme) ? 0.92 : /[012]$/.test(phoneme) ? 0.78 : 0.64,
       }));
-      const rhymes = (packet.rhymeAstrology?.exactRhymes ?? []).slice(0, 4).map((rhyme) => ({
-        id: `rhyme-${rhyme}`,
+      // Index-qualified, like `readings` below: these ids become React keys, and
+      // a repeated rhyme or ladder word would otherwise collide into a duplicate.
+      const rhymes = (packet.rhymeAstrology?.exactRhymes ?? []).slice(0, 4).map((rhyme, index) => ({
+        id: `rhyme-${index}-${rhyme}`,
         label: rhyme,
         magnitude: 0.58,
       }));
@@ -91,14 +102,14 @@ function channelItems(packet, channelId) {
         magnitude: reading.candidate ? 0.82 : 0.56,
       }));
     case 'scale':
-      return (packet.scaleField?.scale?.ladder ?? []).slice(0, 10).map((step) => ({
-        id: `scale-${step.word}`,
+      return (packet.scaleField?.scale?.ladder ?? []).slice(0, 10).map((step, index) => ({
+        id: `scale-${index}-${step.word}`,
         label: `${step.word} · ${Number(step.relative).toFixed(2)}`,
         magnitude: step.isAnchor ? 1 : 0.5 + clamp(step.relative) * 0.35,
       }));
     case 'discovery':
-      return (packet.discovery?.hits ?? []).slice(0, 10).map((hit) => ({
-        id: `discovery-${hit.token}`,
+      return (packet.discovery?.hits ?? []).slice(0, 10).map((hit, index) => ({
+        id: `discovery-${index}-${hit.token}`,
         label: hit.token,
         magnitude: 0.52 + clamp(hit.score) * 0.46,
       }));

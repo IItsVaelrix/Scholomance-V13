@@ -19,7 +19,6 @@ import ConstellationBackdrop from './ConstellationBackdrop.jsx';
 import {
   CONSTELLATIONS,
   DUST,
-  ANCHOR_STARS,
   SPARK_PATH,
   skySeed,
   twinkleFor,

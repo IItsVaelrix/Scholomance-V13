@@ -339,28 +339,29 @@ function atomsFor(token, index, posMap, options = {}) {
  * constructions and each untested one was silently wrong. The exception is gone
  * because `['DET', 'N', 'NP', 1]` now says the same thing as data.
  */
-function headOf(m) {
+function headOf(m, bonds = BONDS) {
   if (m.parts.length === 0) return m.token;
-  if (m.parts.length === 1) return headOf(m.parts[0]);
-  // `(left, right, result)` is unique across the table — the validation loop
-  // above throws at module load if two bonds ever share a signature — so this
-  // find is unambiguous whenever it succeeds.
-  const bond = BONDS.find(
+  if (m.parts.length === 1) return headOf(m.parts[0], bonds);
+  // `(left, right, result)` is unique across the table — `validateBonds` throws
+  // if two bonds ever share a signature, and `compose` runs it on an override
+  // too — so this find is unambiguous whenever it succeeds.
+  const bond = bonds.find(
     (b) => b[0] === m.parts[0].type && b[1] === m.parts[1].type && b[2] === m.type,
   );
-  // A molecule whose bond cannot be found is a chart the grammar did not
-  // build — every molecule this module constructs is built by walking BONDS,
-  // so this can only mean the caller handed in a molecule from somewhere
-  // else, or a corrupted one. Silently falling back to the left child
-  // reproduces the exact positional-guessing bug this branch removed
+  // A molecule whose bond cannot be found is a chart THIS TABLE did not build —
+  // either a molecule from somewhere else, a corrupted one, or (the case this
+  // parameter exists for) a molecule composed under `options.bonds` and then
+  // projected against the default table. Silently falling back to the left
+  // child reproduces the exact positional-guessing bug this branch removed
   // (`headOf` used to guess `parts[0]` for everything); throwing keeps that
   // bug from coming back through the one path nobody was watching.
   if (!bond) {
     throw new Error(
-      `headOf: no bond found for ${m.parts[0].type} + ${m.parts[1].type} -> ${m.type}`,
+      `headOf: no bond found for ${m.parts[0].type} + ${m.parts[1].type} -> ${m.type}`
+      + ' — project with the same bond table you composed with',
     );
   }
-  return headOf(m.parts[bond[3]]);
+  return headOf(m.parts[bond[3]], bonds);
 }
 
 /**
@@ -373,10 +374,33 @@ function headOf(m) {
  * resolving which noun an adjective is predicated of — must not use this
  * projection, because for them the difference is the whole answer.
  *
+ * THE TABLE TRAVELS WITH THE ANSWER. A molecule built under `options.bonds` can
+ * only be projected against that same table: the chart honours the override but
+ * a molecule carries no record of which table built it, so head resolution has
+ * to be told. Callers that composed with an override MUST pass it here — the
+ * default is the standing grammar, which keeps every existing call byte-identical
+ * and makes the mismatch throw in `headOf` rather than guess.
+ *
  * @param {object} molecule a molecule of type 'S'
+ * @param {ReadonlyArray<[string, string, string, 0|1]>} [bonds] the table the
+ *   molecule was composed with; defaults to the standing grammar
  * @returns {{subject: string, verb: string}}
  */
-export function projectAnswer(molecule) {
+export function projectAnswer(molecule, bonds = BONDS) {
+  /**
+   * `stable.map(projectAnswer)` hands the ELEMENT INDEX to this parameter. That
+   * is not hypothetical — `treebank-run.js` did exactly that, and the index
+   * reaches `bonds.find` as a number, so the failure would have surfaced as
+   * "bonds.find is not a function" thousands of molecules deep in a corpus run,
+   * pointing at this file rather than at the call site that caused it. Naming
+   * the mistake costs one type check per molecule.
+   */
+  if (!Array.isArray(bonds)) {
+    throw new TypeError(
+      'projectAnswer: `bonds` must be an array of bonds'
+      + ` (received ${typeof bonds}) — a point-free \`.map(projectAnswer)\` passes the index here`,
+    );
+  }
   if (!molecule || molecule.type !== 'S') return { subject: null, verb: null };
   /**
    * An IMPERATIVE has one child, not two — `speak`, `tell me all about it`. The
@@ -384,7 +408,7 @@ export function projectAnswer(molecule) {
    * `you` would put a token in the answer that the parse never saw.
    */
   const [first, second] = molecule.parts;
-  if (!second) return { subject: null, verb: headOf(first) };
+  if (!second) return { subject: null, verb: headOf(first, bonds) };
   /**
    * TERMINAL PUNCTUATION IS NOT A PREDICATE. `S + PUNCT -> S` lets a clause
    * absorb its trailing `. ! ? ; :` so the whole sentence can span, because UD
@@ -395,21 +419,21 @@ export function projectAnswer(molecule) {
    * the answer is whatever `parts[0]` — the clause that did the absorbing —
    * already projects to, and the punctuation contributes nothing of its own.
    */
-  if (second.type === 'PUNCT') return projectAnswer(first);
+  if (second.type === 'PUNCT') return projectAnswer(first, bonds);
   /**
    * MATRIX-PRESERVING ADJUNCTION. Fronted ADV/PP/ADJ/FRONTED/CONJ + S declare
    * head on the matrix. Positional [subj, pred] would report the adjunct head
    * as subject (`old men ran` → subject "old"). When the head child is S,
    * re-project from that matrix — same spirit as PUNCT absorb.
    */
-  const bond = BONDS.find(
+  const bond = bonds.find(
     (b) => b[0] === first.type && b[1] === second.type && b[2] === 'S',
   );
   if (bond) {
-    if (bond[3] === 1 && second.type === 'S') return projectAnswer(second);
-    if (bond[3] === 0 && first.type === 'S') return projectAnswer(first);
+    if (bond[3] === 1 && second.type === 'S') return projectAnswer(second, bonds);
+    if (bond[3] === 0 && first.type === 'S') return projectAnswer(first, bonds);
   }
-  return { subject: headOf(first), verb: headOf(second) };
+  return { subject: headOf(first, bonds), verb: headOf(second, bonds) };
 }
 
 /**
@@ -535,6 +559,25 @@ function closeUnderLifts(bucket, from, to) {
  */
 export function compose(tokens, posMap, options = {}) {
   const roots = options.roots || ['S'];
+  /**
+   * Optional bond table override, honoured identically by composePacked.
+   * Both charts must read the SAME table or a family-ablation run compares a
+   * restricted grammar against the full one and calls the difference a
+   * result. Defaulting to BONDS keeps every existing caller byte-identical.
+   *
+   * THE OVERRIDE IS VALIDATED, NOT TRUSTED. `validateBonds` runs on the standing
+   * table at module load precisely so an unreviewed bond cannot run; an override
+   * that skipped it would be the one door left open — a candidate with no declared
+   * head would fall through to the positional guess that the whole head-declaration
+   * branch exists to eliminate, silently and only on the experimental path.
+   *
+   * PROJECTION IS THE CALLER'S JOB. The chart honours this table; `projectAnswer`
+   * and `headOf` cannot see it, because a molecule carries no record of which table
+   * built it. A caller composing with an override must project with the same one —
+   * `projectAnswer(m, bonds)`. Mismatches throw in `headOf` rather than guess.
+   */
+  const bonds = options.bonds || BONDS;
+  if (options.bonds) validateBonds(bonds);
   const n = (tokens || []).length;
   if (n === 0 || !posMap) {
     return { atoms: [], molecules: [], spanning: [], stable: [] };
@@ -558,7 +601,7 @@ export function compose(tokens, posMap, options = {}) {
       for (let split = from; split < to; split += 1) {
         for (const left of cell[from][split]) {
           for (const right of cell[split + 1][to]) {
-            for (const [l, r, result] of BONDS) {
+            for (const [l, r, result] of bonds) {
               if (left.type !== l || right.type !== r) continue;
               cell[from][to].push({ type: result, from, to, parts: [left, right] });
             }

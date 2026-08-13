@@ -844,10 +844,38 @@ function HeroFigure({ packet, reducedMotion }) {
 /**
  * Failure stays local (PDR §7.8): a throw anywhere in the generated hero figure
  * renders nothing there and never takes the rest of the answer down.
+ *
+ * LOCAL IN SPACE, NOT IN TIME. A boundary that only ever latches `failed` is
+ * local to the render and permanent for the session: this instance is not keyed
+ * or remounted between queries, so one bad packet blanked the figure for every
+ * packet after it. `resetKey` is the page bytecode — a new answer is a new
+ * chance, and a figure that fails for one query does not condemn the next.
+ *
+ * AND IT SAYS SO. `getDerivedStateFromError` alone swallows the error outright in
+ * a production build: no console, no diagnostics, an empty plate and no way to
+ * learn why. Every adapter failure in this system declares itself; a presentation
+ * failure that declares nothing is the one blind spot left.
  */
 class HeroFigureBoundary extends Component {
-  constructor(props) { super(props); this.state = { failed: false }; }
+  constructor(props) {
+    super(props);
+    this.state = { failed: false, resetKey: props.resetKey };
+  }
+
   static getDerivedStateFromError() { return { failed: true }; }
+
+  static getDerivedStateFromProps(props, state) {
+    if (props.resetKey === state.resetKey) return null;
+    return { failed: false, resetKey: props.resetKey };
+  }
+
+  componentDidCatch(error, info) {
+    // The only channel a client-side presentation failure has. Silence here is
+    // what made this invisible in a production build: no console, no
+    // diagnostics, an empty plate and no way to learn why.
+    console.error('[ConstellationOS] hero figure failed to render', error, info?.componentStack);
+  }
+
   render() { return this.state.failed ? null : this.props.children; }
 }
 
@@ -907,7 +935,7 @@ function ComposedResultShell({ packet, scene, reducedMotion }) {
         aria-label="Sound-bones constellation figure"
         style={nextReveal()}
       >
-        <HeroFigureBoundary>
+        <HeroFigureBoundary resetKey={pageBytecode}>
           <HeroFigure packet={packet} reducedMotion={reducedMotion} />
         </HeroFigureBoundary>
       </section>

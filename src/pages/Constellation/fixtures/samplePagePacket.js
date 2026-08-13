@@ -1,4 +1,7 @@
-/** @typedef {import('../types.js').ConstellationPhase1Packet} ConstellationPhase1Packet */
+/** @typedef {import('../../../hooks/constellation.types.js').ConstellationPhase1Packet} ConstellationPhase1Packet */
+
+/** The channel name a packet wears when it never reached the engine at all. */
+export const LIVE_ENGINE_CHANNEL = 'live engine';
 
 function normalizeQuery(raw) {
   return String(raw || '').trim().replace(/\s+/g, ' ').toLowerCase();
@@ -131,4 +134,40 @@ export function resolveConstellationFixture(rawQuery) {
     };
   }
   return buildAwaitingPacket(rawQuery);
+}
+
+/**
+ * Stamp a fixture as what it is: an answer that never reached the engine.
+ *
+ * `SAMPLE_BRIGHT_WOUND_PACKET` ships `degradedChannels: []` and `warnings: []`
+ * — a truthful claim about the fixture and a LIE about the page, because the
+ * shell reads exactly that field to decide whether to raise the "Partial sky"
+ * banner. Substituted verbatim on a 500, it renders a fully-populated answer
+ * that asserts perfect health while the service is down, and the only tell
+ * reaching the reader is a provenance line reading `phase1-fixture`.
+ *
+ * Every adapter failure already declares itself in `degradedChannels`. A
+ * whole-service failure is the largest degradation there is and was the one
+ * that declared nothing.
+ *
+ * @param {ConstellationPhase1Packet} packet
+ * @param {string} reason why the live engine was not reached
+ * @returns {ConstellationPhase1Packet}
+ */
+export function markEngineUnreached(packet, reason) {
+  const diagnostics = packet.diagnostics ?? { degradedChannels: [], warnings: [] };
+  const degradedChannels = diagnostics.degradedChannels ?? [];
+  return {
+    ...packet,
+    diagnostics: {
+      ...diagnostics,
+      degradedChannels: degradedChannels.includes(LIVE_ENGINE_CHANNEL)
+        ? degradedChannels
+        : [LIVE_ENGINE_CHANNEL, ...degradedChannels],
+      warnings: [
+        `Live engine unreachable (${reason}) — showing the offline fixture, not an analysis of this query.`,
+        ...(diagnostics.warnings ?? []),
+      ],
+    },
+  };
 }

@@ -106,6 +106,122 @@ describe('composePacked — agreement with the classic chart', () => {
     const packed = new Set(composePacked(tokens, pos).molecules.map(key));
     expect([...packed].sort()).toEqual([...classic].sort());
   });
+
+  /**
+   * The cases above call both charts with TWO arguments. Both accept a third,
+   * and agreement on the default path says nothing about agreement on the
+   * options path — which is exactly where these two have diverged before: a
+   * bond option honoured by one chart and silently dropped by the other.
+   *
+   * `bonds` is the option that matters, because construction-families.js
+   * drives family ablation through it (`composePacked(t, pos, { bonds })`).
+   * If one chart ignores the override, an ablation "measurement" compares a
+   * restricted table against the full one and reports a difference that is
+   * an artefact of the harness rather than of the grammar.
+   */
+  const HALF_BONDS = Object.freeze(BONDS.filter((_, i) => i % 2 === 0));
+
+  it.each(CASES)('agrees under a bond-table override too: "%s"', (text) => {
+    const tokens = T(text);
+    const key = (m) => `${m.from}:${m.to}:${m.type}`;
+    const options = { bonds: HALF_BONDS };
+    const classic = new Set(compose(tokens, pos, options).molecules.map(key));
+    const packed = new Set(composePacked(tokens, pos, options).molecules.map(key));
+    expect([...packed].sort()).toEqual([...classic].sort());
+  });
+
+  it('the override actually restricts the grammar (guards the guard)', () => {
+    // If HALF_BONDS produced the same chart as BONDS, the test above would
+    // pass without exercising anything.
+    const tokens = T('the dog chased the cat through the garden');
+    const full = composePacked(tokens, pos).molecules.length;
+    const half = composePacked(tokens, pos, { bonds: HALF_BONDS }).molecules.length;
+    expect(half).toBeLessThan(full);
+  });
+
+  /**
+   * SUBSETTING IS THE EASY HALF. Every case above restricts the table, and a
+   * restricted table is the one shape where head resolution cannot notice the
+   * override: every bond that fires is still in the standing grammar, so
+   * `BONDS.find` keeps working by accident. The shape production actually uses
+   * is the other one — `construction-families.js` APPENDS a candidate to the
+   * base table — and that is where the two charts diverged: the packed chart
+   * stores the bond on the derivation and reads the head off it, while the
+   * classic chart re-looks-the-bond-up and, before this, looked it up in the
+   * wrong table.
+   */
+  const AUGMENTED = Object.freeze([...BONDS, ['DET', 'N', 'N', 0]]);
+
+  it('an augmented table builds molecules the standing grammar cannot', () => {
+    // Guards the two tests below: if the candidate never fired, they would pass
+    // against the base grammar and prove nothing about the override at all.
+    const tokens = T('the old man fell');
+    const base = compose(tokens, pos).stable.length;
+    const trial = compose(tokens, pos, { bonds: AUGMENTED }).stable.length;
+    expect(trial).toBeGreaterThan(base);
+  });
+
+  it('projects an augmented-table molecule when handed the same table', () => {
+    const out = compose(T('the old man fell'), pos, { bonds: AUGMENTED });
+    expect(out.stable.length).toBeGreaterThan(0);
+    for (const molecule of out.stable) {
+      const answer = projectAnswer(molecule, AUGMENTED);
+      expect(answer.verb).toBe('fell');
+    }
+  });
+
+  /**
+   * A molecule carries no record of which table built it, so the mismatch has
+   * to be loud. Falling back to the left child here would report a positional
+   * guess as an answer on the exact path — candidate-bond graduation — whose
+   * entire purpose is measuring whether a bond earns its place.
+   */
+  it('throws rather than guess when projected against the wrong table', () => {
+    const out = compose(T('the old man fell'), pos, { bonds: AUGMENTED });
+    const orphan = out.stable.find((m) => {
+      try { projectAnswer(m); return false; } catch { return true; }
+    });
+    expect(orphan).toBeDefined();
+    expect(() => projectAnswer(orphan)).toThrow(/no bond found for DET \+ N -> N/);
+  });
+
+  /**
+   * `validateBonds` runs on the standing table at module load so an unreviewed
+   * bond cannot run. An override that skipped it would be the one door left
+   * open — and it is the ONLY door candidates ever come through.
+   */
+  it.each([
+    ['classic', compose],
+    ['packed', composePacked],
+  ])('%s rejects an override entry with no declared head', (_label, parser) => {
+    expect(() => parser(T('the old man'), pos, { bonds: [...BONDS, ['NP', 'NP', 'S']] }))
+      .toThrow(/missing a head index/);
+  });
+
+  /**
+   * The optional second parameter is a loaded gun pointed at `Array.map`, which
+   * passes (element, index, array). `treebank-run.js` was point-free here and
+   * would have started feeding integers to `bonds.find` on the classic parser's
+   * corpus path — a TypeError thousands of molecules deep, blaming compose.js
+   * for a call-site mistake.
+   */
+  it('names the mistake when handed a map index instead of a bond table', () => {
+    const out = compose(T('the dog chased the cat'), pos);
+    expect(out.stable.length).toBeGreaterThan(0);
+    expect(() => out.stable.map(projectAnswer)).toThrow(/must be an array of bonds/);
+    // The wrapped form — what every call site must use — is unaffected.
+    expect(() => out.stable.map((m) => projectAnswer(m))).not.toThrow();
+  });
+
+  it.each([
+    ['classic', compose],
+    ['packed', composePacked],
+  ])('%s rejects an override that duplicates a bond signature', (_label, parser) => {
+    const [l, r, result] = BONDS[0];
+    const clashing = [...BONDS, [l, r, result, BONDS[0][3] === 1 ? 0 : 1]];
+    expect(() => parser(T('the old man'), pos, { bonds: clashing }))
+      .toThrow(/more than one entry/);
+  });
 });
 
 describe('composePacked — edges', () => {

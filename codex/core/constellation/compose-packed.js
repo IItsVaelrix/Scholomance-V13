@@ -18,7 +18,7 @@
  * exist, and once a reading is dropped a missing grammar rule and a discarded
  * reading look identical.
  */
-import { BONDS, LIFTS, atomsFor } from './compose.js';
+import { BONDS, LIFTS, atomsFor, validateBonds } from './compose.js';
 
 /**
  * Compose bottom-up over a packed chart.
@@ -40,8 +40,18 @@ import { BONDS, LIFTS, atomsFor } from './compose.js';
  */
 export function composePacked(tokens, posMap, options = {}) {
   const roots = options.roots || ['S'];
-  /** Optional bond table override for reactor experiments; default is Grimoire BONDS. */
+  /**
+   * Optional bond table override for reactor experiments; default is Grimoire BONDS.
+   *
+   * Validated on the same terms as the standing table. `headsOf` below reads the
+   * head index straight off `d.bond[3]`, so a candidate arriving without a declared
+   * head would not throw — it would compare `undefined === 1`, take `d.left`, and
+   * report a positional guess as a measurement. `validateBonds` is what makes that
+   * impossible; running it here is what extends that guarantee to the experimental
+   * path, which is the only path where unreviewed bonds ever appear.
+   */
   const bonds = options.bonds || BONDS;
+  if (options.bonds) validateBonds(bonds);
   const n = (tokens || []).length;
   if (n === 0 || !posMap) {
     return { atoms: [], molecules: [], spanning: [], stable: [], events: 0 };

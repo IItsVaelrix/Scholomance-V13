@@ -1,6 +1,18 @@
 import { buildConstellationPage } from '../services/constellationPage.service.js';
 
 const MAX_QUERY_GRAPHEMES = 600;
+/**
+ * C0/C1 control characters, deliberately excluding the whitespace a pasted line
+ * legitimately carries (U+0009-U+000D: tab, newline, CR).
+ *
+ * `no-control-regex` exists to catch control characters that got into a pattern
+ * by accident. Here they are the SUBJECT of the pattern — matching them is the
+ * whole job — so the rule is firing on the one case it was never meant to catch.
+ * Disabled with its reason stated, the way the two sibling files in this feature
+ * disable their own rules, rather than left as a standing error that makes
+ * `npm run lint` red for everyone.
+ */
+// eslint-disable-next-line no-control-regex -- the control characters are the deny-list
 const CONTROL_CHARS = /[\u0000-\u0008\u000E-\u001F\u007F-\u009F]/;
 
 /**

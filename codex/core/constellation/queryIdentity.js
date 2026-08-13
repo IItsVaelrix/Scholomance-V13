@@ -1,4 +1,3 @@
-import { STOPWORDS } from './stopwords.js';
 import { classifyIntent, selectHeadToken } from './phraseAnalysis.js';
 
 function normalizeQuery(raw) {

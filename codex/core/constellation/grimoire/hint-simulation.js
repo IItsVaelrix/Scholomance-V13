@@ -16,8 +16,6 @@
 
 import { BONDS, LIFTS } from '../compose.js';
 import {
-  PAIR_OPERATIONS,
-  projectResult,
   conservesResult,
   CONSTRUCTION_SCHEMAS,
   synthesizeByProjection,
