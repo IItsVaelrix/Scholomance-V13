@@ -30,13 +30,17 @@ export function extractMemoryAntigens(memoryDir) {
       const block = match[1].trim();
       const lines = block.split('\n');
       const title = lines[0].replace(/^[#\s*-]+/, '').trim();
-      
-      let antigenCounter = 0;
+
+      // `let antigenCounter = 0` used to live HERE, inside the loop, so it reset
+      // on every match and every antigen was stamped addedAt: 0. The substrate
+      // committed before that regression carries real epoch millis, which is
+      // what an antigen needs: when the scar entered the system. A counter that
+      // is always zero is not provenance.
       antigens.push({
         source: path.join('memory', file),
         title,
         description: block,
-        addedAt: antigenCounter++,
+        addedAt: Date.now(),
       });
     }
   }
