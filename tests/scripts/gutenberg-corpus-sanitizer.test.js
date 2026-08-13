@@ -23,6 +23,25 @@ describe('Project Gutenberg corpus sanitation', () => {
       .toEqual(['J. R. Hartley wrote it.', 'Vol. II.', 'It sold.']);
   });
 
+  it('keeps a title joined to its name by a lowercase connector', () => {
+    // Two shapes, both found by rebuilding the 115k-row corpus and reading what
+    // survived: `Mr. and Mrs. Bennet` (21 truncations) and `Mr. de Ville` (1).
+    // The title rule wanted a capital and found a lowercase connector.
+    expect(segmentGutenbergParagraph('He had a letter from Mr. de Ville of London. She read it.'))
+      .toEqual(['He had a letter from Mr. de Ville of London.', 'She read it.']);
+    expect(segmentGutenbergParagraph('Mr. and Mrs. Bennet went out. She stayed.'))
+      .toEqual(['Mr. and Mrs. Bennet went out.', 'She stayed.']);
+    expect(segmentGutenbergParagraph('Mr. & Mrs. Gardiner arrived.'))
+      .toEqual(['Mr. & Mrs. Gardiner arrived.']);
+  });
+
+  it('does not let a coordinator protect a title with no second name after it', () => {
+    // The coordinator alone must not be enough, or `the Dr. and left` would
+    // swallow the boundary wherever a title happens to precede one.
+    expect(segmentGutenbergParagraph('I saw the Dr. and left.'))
+      .toEqual(['I saw the Dr.', 'and left.']);
+  });
+
   it('recognises sentence boundaries after closing quotation marks', () => {
     expect(segmentGutenbergParagraph('“Run!” cried Dr. Watson. He ran.'))
       .toEqual(['“Run!”', 'cried Dr. Watson.', 'He ran.']);

@@ -126,6 +126,33 @@ function nextWord(text) {
   return String(text || '').match(/[A-Za-z0-9]+/)?.[0] ?? '';
 }
 
+/**
+ * Lowercase words that can stand BETWEEN a name title and the name itself:
+ * coordinators joining two titles, and nobiliary particles inside one name.
+ */
+const NAME_CONNECTORS = new Set([
+  'and', 'or',
+  'de', 'du', 'da', 'del', 'della', 'di', 'dos', 'das',
+  'van', 'von', 'der', 'den', 'ten', 'ter', 'la', 'le', 'bin', 'ibn',
+]);
+
+/**
+ * True when a lowercase connector introduces the rest of a name, so the title's
+ * period is internal to the construction rather than a sentence boundary.
+ *
+ * Both shapes were found by rebuilding the 115k-row corpus and reading what was
+ * left: `Mr. and Mrs. Bennet` accounted for 21 truncations and `Mr. de Ville`
+ * for the last one. The connector alone is never enough — a capitalised word
+ * must follow it — so `I saw the Dr. and left.` keeps its boundary.
+ */
+function continuesAName(followingText) {
+  const match = String(followingText || '').match(/^\s*([A-Za-z&']+)\W+([A-Za-z]+)/);
+  if (!match) return false;
+  const [, connector, next] = match;
+  if (connector !== '&' && !NAME_CONNECTORS.has(connector.toLowerCase())) return false;
+  return /^[A-Z]/.test(next);
+}
+
 function dottedTail(text) {
   let withoutClosers = String(text || '').trimEnd();
   while (withoutClosers && CLOSERS.has(withoutClosers.at(-1))) {
@@ -148,7 +175,9 @@ export function endsWithProtectedAbbreviation(text, followingText = '') {
 
   if (/^[A-Z]$/.test(word)) return /^[A-Z]/.test(following);
   const lower = word.toLowerCase();
-  if (NAME_TITLES.has(lower)) return /^[A-Z0-9]/.test(following);
+  if (NAME_TITLES.has(lower)) {
+    return /^[A-Z0-9]/.test(following) || continuesAName(followingText);
+  }
   if (ENUMERATION_ABBREVIATIONS.has(lower)) return /^(?:\d+|[IVXLCDM]+)$/i.test(following);
   if (CONTINUATION_ABBREVIATIONS.has(lower)) return /^[a-z]/.test(following);
   return false;
