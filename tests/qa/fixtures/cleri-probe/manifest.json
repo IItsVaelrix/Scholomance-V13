@@ -9,7 +9,7 @@
       "expected": "NO_FINDING",
       "expectedLine": 19,
       "subtype": "ADVERSARIAL_HARD_NEGATIVE",
-      "notes": "Adversarial hard negative: Promise.all gathers entries, then Object.fromEntries — no shared mutable state, but the shape resembles the verified cache mutation."
+      "notes": "Adversarial hard negative: Promise.all gathers entries, then Object.fromEntries \u2014 no shared mutable state, but the shape resembles the verified cache mutation."
     },
     {
       "id": "concurrent-mutation-cache-shared",
@@ -37,6 +37,78 @@
       "expectedLine": 7,
       "subtype": "CLEAR_POSITIVE",
       "notes": "Clear positive: Promise.all mutates a shared results object from parallel workers."
+    },
+    {
+      "id": "empty-collection-truthiness-bailout-with-message",
+      "pathologyClass": "EMPTY_COLLECTION_TRUTHINESS",
+      "path": "empty-collection-truthiness/hard-negative.js",
+      "expected": "NO_FINDING",
+      "expectedLine": 50,
+      "subtype": "DIRECT_HARD_NEGATIVE",
+      "notes": "Direct hard negative: a bail-out that records a message before it returns is still a bail-out, so the branch is a nullish guard rather than an emptiness test."
+    },
+    {
+      "id": "empty-collection-truthiness-domain-size-field",
+      "pathologyClass": "EMPTY_COLLECTION_TRUTHINESS",
+      "path": "empty-collection-truthiness/hard-negative.js",
+      "expected": "NO_FINDING",
+      "expectedLine": 36,
+      "subtype": "ADVERSARIAL_HARD_NEGATIVE",
+      "notes": "Adversarial hard negative measured in codex/core/modulation/planner/formula-validator.js: a plain object with a field called size is not a Map, and the negation is a type guard that bails out."
+    },
+    {
+      "id": "empty-collection-truthiness-guarded-in-one-test",
+      "pathologyClass": "EMPTY_COLLECTION_TRUTHINESS",
+      "path": "empty-collection-truthiness/hard-negative.js",
+      "expected": "NO_FINDING",
+      "expectedLine": 27,
+      "subtype": "ADVERSARIAL_HARD_NEGATIVE",
+      "notes": "Adversarial hard negative: `!points || points.length < 3` asks both questions in one test, and the same line spreads the array into a literal."
+    },
+    {
+      "id": "empty-collection-truthiness-lexicon-tags",
+      "pathologyClass": "EMPTY_COLLECTION_TRUTHINESS",
+      "path": "empty-collection-truthiness/verified.js",
+      "expected": "VERIFIED",
+      "expectedLine": 11,
+      "subtype": "REAL_WORLD_POSITIVE",
+      "notes": "Real-world positive: the lexicon answers an unknown word with an empty array, so `!known` cannot fire for it while line 9 proves the author expects it."
+    },
+    {
+      "id": "empty-collection-truthiness-nullish-bailout",
+      "pathologyClass": "EMPTY_COLLECTION_TRUTHINESS",
+      "path": "empty-collection-truthiness/hard-negative.js",
+      "expected": "NO_FINDING",
+      "expectedLine": 10,
+      "subtype": "DIRECT_HARD_NEGATIVE",
+      "notes": "Direct hard negative: the negation bails out on a missing result and the very next line handles the empty one."
+    },
+    {
+      "id": "empty-collection-truthiness-optional-length",
+      "pathologyClass": "EMPTY_COLLECTION_TRUTHINESS",
+      "path": "empty-collection-truthiness/hard-negative.js",
+      "expected": "NO_FINDING",
+      "expectedLine": 64,
+      "subtype": "DIRECT_HARD_NEGATIVE",
+      "notes": "Direct hard negative: the repaired shape, `!known?.length`, which answers the missing case and the empty case at once."
+    },
+    {
+      "id": "empty-collection-truthiness-retrieval-note",
+      "pathologyClass": "EMPTY_COLLECTION_TRUTHINESS",
+      "path": "empty-collection-truthiness/verified.js",
+      "expected": "VERIFIED",
+      "expectedLine": 23,
+      "subtype": "CLEAR_POSITIVE",
+      "notes": "Clear positive: `!matches` records the no-candidate note for a proven array, so a query that matched nothing is reported as if it had matched."
+    },
+    {
+      "id": "empty-collection-truthiness-string-emptiness",
+      "pathologyClass": "EMPTY_COLLECTION_TRUTHINESS",
+      "path": "empty-collection-truthiness/hard-negative.js",
+      "expected": "NO_FINDING",
+      "expectedLine": 19,
+      "subtype": "ADVERSARIAL_HARD_NEGATIVE",
+      "notes": "Adversarial hard negative: `!text` is the correct emptiness test for a string, and the adjacent .length read is exactly what a collection would show."
     },
     {
       "id": "external-response-axios-guarded",

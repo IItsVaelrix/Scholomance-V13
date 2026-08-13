@@ -59,6 +59,12 @@ const PATHOLOGY_RETRIEVAL_PROFILES = Object.freeze({
   UNSAFE_EXTERNAL_RESPONSE_ACCESS: Object.freeze({
     terms: Object.freeze(['response.data', 'res.data', 'fetch', 'axios', 'json']),
     patterns: Object.freeze([/\.\s*data\s*[.[]/, /\bfetch\s*\(/, /\baxios\s*\./])
+  }),
+  EMPTY_COLLECTION_TRUTHINESS: Object.freeze({
+    terms: Object.freeze(['length', 'size', 'empty']),
+    // A bare negation of an identifier: the shape that cannot see an empty
+    // collection. The length-aware sibling test is what the verifier proves.
+    patterns: Object.freeze([/!\s*[A-Za-z_$][\w$]*\s*(?:&&|\|\||\)|\?)/, /\.\s*length\b/, /\.\s*size\b/])
   })
 });
 

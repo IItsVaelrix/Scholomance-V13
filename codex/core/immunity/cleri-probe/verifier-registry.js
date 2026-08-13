@@ -14,6 +14,7 @@ import {
 } from '../../pixelbrain/bytecode-error.js';
 import { createEvidence, deepFreeze, EVIDENCE_KINDS } from './contracts.js';
 import { concurrentMutationVerifier } from './verifiers/concurrent-mutation.verifier.js';
+import { emptyCollectionTruthinessVerifier } from './verifiers/empty-collection-truthiness.verifier.js';
 import { externalResponseVerifier } from './verifiers/external-response.verifier.js';
 import { listenerLifecycleVerifier } from './verifiers/listener-lifecycle.verifier.js';
 import { swallowedErrorVerifier } from './verifiers/swallowed-error.verifier.js';
@@ -322,6 +323,7 @@ export function validateVerifierResult(result) {
  */
 export const DEFAULT_VERIFIERS = deepFreeze([
   concurrentMutationVerifier,
+  emptyCollectionTruthinessVerifier,
   externalResponseVerifier,
   listenerLifecycleVerifier,
   swallowedErrorVerifier,

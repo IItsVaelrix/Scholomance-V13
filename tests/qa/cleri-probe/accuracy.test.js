@@ -31,6 +31,7 @@ const families = [...new Set(MANIFEST.cases.map(item => item.pathologyClass))].s
 /** One hypothesis per family, phrased the way an operator would phrase it. */
 const HYPOTHESES = Object.freeze({
   CONCURRENT_SHARED_STATE_MUTATION: "race condition from concurrent mutation under promise all",
+  EMPTY_COLLECTION_TRUTHINESS: "an empty array is truthy so the empty collection branch never fires",
   LEAKED_LISTENER_SUBSCRIPTION: "leaked event listener subscription missing useeffect cleanup",
   SWALLOWED_ERROR: "swallowed error in an empty catch block",
   UNSAFE_EXTERNAL_RESPONSE_ACCESS: "unguarded api response data from fetch",

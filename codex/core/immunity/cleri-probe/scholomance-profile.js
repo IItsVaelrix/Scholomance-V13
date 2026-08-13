@@ -210,7 +210,8 @@ export const IMMUNE_ALLOW_TOKENS = deepFreeze({
   LEAKED_LISTENER_SUBSCRIPTION: 'listener-lifecycle',
   SWALLOWED_ERROR: 'swallowed-error',
   UNSAFE_EXTERNAL_RESPONSE_ACCESS: 'external-response',
-  CONCURRENT_SHARED_STATE_MUTATION: 'concurrent-mutation'
+  CONCURRENT_SHARED_STATE_MUTATION: 'concurrent-mutation',
+  EMPTY_COLLECTION_TRUTHINESS: 'empty-collection-truthiness'
 });
 
 const ANNOTATION_PROXIMITY_LINES = 1;

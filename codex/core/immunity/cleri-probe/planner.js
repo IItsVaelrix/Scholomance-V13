@@ -65,6 +65,20 @@ export const DEFAULT_PATHOLOGY_PROFILE = deepFreeze({
       counterchecks: ['APPROVED_SYNCHRONIZATION_ADAPTER', 'TARGET_IS_CALLBACK_LOCAL']
     },
     {
+      pathologyClass: 'EMPTY_COLLECTION_TRUTHINESS',
+      verifierId: 'empty-collection-truthiness/v1',
+      terms: [
+        'empty array',
+        'empty collection',
+        'empty list',
+        'empty result',
+        'empty map',
+        'truthy empty',
+        'is always truthy'
+      ],
+      counterchecks: ['SIZE_READ_IN_SAME_GUARD', 'GUARD_IS_A_NULLISH_BAILOUT']
+    },
+    {
       pathologyClass: 'NON_DETERMINISTIC_DATETIME',
       verifierId: 'datetime-lifecycle/v1',
       terms: ['new date', 'date now', 'performance now', 'current time'],

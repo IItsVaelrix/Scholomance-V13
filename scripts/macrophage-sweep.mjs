@@ -45,6 +45,18 @@ const SWALLOWED_ERROR = Object.freeze({
   safePattern: 'catch (error) { return { ok: false, error, fallback: [] }; }',
 });
 
+/**
+ * The classes this driver can mint a vaccine for, keyed by pathology class.
+ *
+ * A class is absent here when the BytecodeXP vaccine cannot express its repair:
+ * `mintPathologyVaccine` demands a recoveryKey from cleri-probe's approved list,
+ * and EMPTY_COLLECTION_TRUTHINESS is retired by `!items?.length`, which is not a
+ * recovery return at all. Stamping the swallowed-error vaccine on it would hand
+ * an agent a repair that leaves the verifier still convicting the site, so those
+ * findings are patrolled for location and the missing vaccine is announced.
+ */
+const VACCINES = Object.freeze({ SWALLOWED_ERROR });
+
 function flag(name) {
   const index = process.argv.indexOf(`--${name}`);
   return index === -1 ? null : process.argv[index + 1];
@@ -60,7 +72,33 @@ function main() {
   const ticks = Number(flag('ticks') ?? 25);
 
   const sweep = JSON.parse(readFileSync(reportPath, 'utf8'));
-  const findings = sweep.results.flatMap((r) => r.findings).filter((f) => f.path);
+
+  // One patrol per pathology class. A sweep now carries more than one antigen,
+  // and a finding proved by one verifier must never be handed another's repair.
+  const byClass = new Map();
+  for (const result of sweep.results) {
+    for (const pathologyClass of result.classes ?? ['SWALLOWED_ERROR']) {
+      if (!byClass.has(pathologyClass)) byClass.set(pathologyClass, []);
+      byClass.get(pathologyClass).push(...result.findings.filter((f) => f.path));
+    }
+  }
+  for (const [pathologyClass, classFindings] of [...byClass].sort()) {
+    if (pathologyClass === 'SWALLOWED_ERROR') continue;
+    console.log(`\n── ${pathologyClass}: ${classFindings.length} finding(s) in `
+      + `${new Set(classFindings.map((f) => f.path)).size} file(s)`);
+    for (const f of classFindings) console.log(`     ${f.path}:${f.line}  ${f.symbol ?? ''}`);
+    if (!VACCINES[pathologyClass]) {
+      console.log(`     NO VACCINE REGISTERED for ${pathologyClass} — location only. The BytecodeXP`);
+      console.log('     envelope carries a recovery key, and this pathology is not retired by one.');
+    }
+    console.log('');
+  }
+
+  const findings = (byClass.get('SWALLOWED_ERROR') ?? []).filter((f) => f.path);
+  if (findings.length === 0) {
+    console.log('no SWALLOWED_ERROR findings to patrol; nothing was anchored.');
+    return;
+  }
   const paths = [...new Set(findings.map((f) => f.path))].sort();
 
   const read = readSource(ROOT);

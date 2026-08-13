@@ -75,6 +75,14 @@ const GUIDES = deepFreeze({
     safePattern: 'if (!response.ok) throw new BytecodeError(...); const data = ProfileSchema.parse(await response.json());',
     verificationSteps: ['npm run test:qa', 'npm run typecheck']
   },
+  EMPTY_COLLECTION_TRUTHINESS: {
+    repairKey: null,
+    recommendationId: 'cleri.empty-collection-test',
+    summary: 'Ask a collection about its size. `!items` answers "is it missing", never "is it empty".',
+    unsafePattern: 'const tags = posMap.get(word); if (!tags) return unknownWord();',
+    safePattern: 'const tags = posMap.get(word); if (!tags?.length) return unknownWord();',
+    verificationSteps: ['npm run test:qa']
+  },
   CONCURRENT_SHARED_STATE_MUTATION: {
     repairKey: null,
     recommendationId: 'cleri.concurrent-shared-state',

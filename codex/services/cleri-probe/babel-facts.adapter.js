@@ -20,7 +20,7 @@ import { sha256Hex } from "../../core/immunity/cleri-probe/canonical-report.js";
  * disposable index is keyed on it, so a stale cache can never feed an old fact
  * shape to a new verifier.
  */
-export const PARSER_VERSION = "1.1.0";
+export const PARSER_VERSION = "1.3.0";
 
 const HOOKS = new Set([
   "useEffect",
@@ -50,6 +50,42 @@ const MUTATING_METHODS = new Set([
   "copyWithin",
   "delete"
 ]);
+
+/**
+ * Methods that exist on Array/Map/Set and NOT on String.
+ *
+ * `includes`, `indexOf`, `slice`, `concat` and `length` are deliberately absent:
+ * a string answers all of them, so they prove nothing about collection identity,
+ * and `!someString` is a correct emptiness test where `!someArray` is not.
+ */
+const ARRAY_ONLY_METHODS = new Set([
+  "map",
+  "filter",
+  "forEach",
+  "some",
+  "every",
+  "find",
+  "findIndex",
+  "findLast",
+  "reduce",
+  "reduceRight",
+  "flat",
+  "flatMap",
+  "join",
+  "push",
+  "pop",
+  "shift",
+  "unshift",
+  "splice",
+  "sort",
+  "reverse",
+  "fill",
+  "toSorted",
+  "toReversed"
+]);
+
+/** Methods that exist on Map/Set and not on Array or String. */
+const MAP_SET_ONLY_METHODS = new Set(["add", "clear"]);
 
 const CLIENT_PATTERNS = [
   { test: callee => callee === "fetch" || callee.startsWith("fetch."), client: "fetch" },
@@ -310,6 +346,56 @@ function collectDottedReads(node, out = []) {
   return out;
 }
 
+/**
+ * Collects the bare identifiers a guard test negates, e.g. `known` in
+ * `!known && !isClosedClass`.
+ *
+ * Only a direct `!identifier` counts. `!items.length` is a length test and is
+ * already visible through the guard's dotted reads, so folding it in here would
+ * erase the very distinction this fact exists to draw.
+ */
+function collectNegatedRoots(node, out = []) {
+  if (!node || typeof node !== "object" || typeof node.type !== "string") return out;
+  if (node.type === "UnaryExpression" && node.operator === "!" && node.argument?.type === "Identifier") {
+    out.push(node.argument.name);
+  }
+  for (const key of Object.keys(node)) {
+    if (key === "loc" || key === "start" || key === "end") continue;
+    const value = node[key];
+    if (Array.isArray(value)) {
+      for (const item of value) collectNegatedRoots(item, out);
+    } else if (value && typeof value === "object" && typeof value.type === "string") {
+      collectNegatedRoots(value, out);
+    }
+  }
+  return out;
+}
+
+/**
+ * What the guarded branch does with control flow.
+ *
+ * BAILOUT — the branch returns, throws, breaks, or continues. A bail-out is how
+ * a nullish check is written, so it reads very differently from a guard whose
+ * branch goes on to do work.
+ */
+function consequentKind(statementNode) {
+  if (!statementNode) return "NONE";
+  if (statementNode.type !== "IfStatement") return "EXPRESSION";
+  const consequent = statementNode.consequent;
+  if (!consequent) return "NONE";
+  const statements = consequent.type === "BlockStatement" ? consequent.body : [consequent];
+  if (statements.length === 0) return "EMPTY";
+  // The branch bails out whether it leaves immediately or records a message
+  // first: `{ errors.push(...); return; }` is still a bail-out.
+  const leaves = statements.some(statement =>
+    statement.type === "ReturnStatement" ||
+    statement.type === "ThrowStatement" ||
+    statement.type === "BreakStatement" ||
+    statement.type === "ContinueStatement"
+  );
+  return leaves ? "BAILOUT" : "WORK";
+}
+
 export function parseSourceFacts({ path: filePath, content }) {
   // Named filePath so it does not shadow Babel's visitor `path` in every visitor below.
   const normalizedPath = normalizeRepositoryPath(filePath);
@@ -391,6 +477,7 @@ export function parseSourceFacts({ path: filePath, content }) {
       memberReads: [],
       externalRequests: [],
       guards: [],
+      collectionEvidence: [],
       concurrentCallbacks: [],
       comments: [],
       diagnostics: [deepFreeze(diagnostic)]
@@ -406,6 +493,7 @@ export function parseSourceFacts({ path: filePath, content }) {
   const memberReads = [];
   const externalRequests = [];
   const guards = [];
+  const collectionEvidence = [];
   const concurrentCallbacks = [];
   const comments = (ast.comments || []).map(comment => deepFreeze({
     type: comment.type,
@@ -627,6 +715,24 @@ export function parseSourceFacts({ path: filePath, content }) {
       const kind = path.node.kind;
       for (const declarator of path.node.declarations) {
         extractPatternBindings(declarator.id, kind, currentFunction().id, describeInit(declarator.init));
+        if (declarator.id.type !== "Identifier" || !declarator.init) continue;
+        const bindingId = resolveBinding(declarator.id.name);
+        if (declarator.init.type === "ArrayExpression") {
+          recordCollectionEvidence(bindingId, "ARRAY_LITERAL_INIT", declarator);
+        } else if (
+          declarator.init.type === "NewExpression" &&
+          declarator.init.callee.type === "Identifier" &&
+          (declarator.init.callee.name === "Map" || declarator.init.callee.name === "Set")
+        ) {
+          recordCollectionEvidence(bindingId, `${declarator.init.callee.name.toUpperCase()}_INIT`, declarator);
+        }
+      }
+    },
+    ArrayExpression(path) {
+      for (const element of path.node.elements) {
+        if (element?.type === "SpreadElement" && element.argument.type === "Identifier") {
+          recordCollectionEvidence(resolveBinding(element.argument.name), "SPREAD_INTO_ARRAY", element);
+        }
       }
     },
     ImportDeclaration(path) {
@@ -704,11 +810,15 @@ export function parseSourceFacts({ path: filePath, content }) {
     },
     ConditionalExpression(path) {
       recordGuards(path.node.test, path.node);
+      recordUnifiedBranches(path.node);
     },
     LogicalExpression(path) {
       // `response.ok && use(response)` guards just as an if-statement does.
       if (path.node.operator === "&&" || path.node.operator === "||") {
-        recordGuards(path.node.left, path.node);
+        recordGuards(path.node.left, path.node, path.node);
+      }
+      if (path.node.operator === "||" || path.node.operator === "??") {
+        recordUnifiedBranches(path.node);
       }
     },
     ThrowStatement(path) {
@@ -785,6 +895,19 @@ export function parseSourceFacts({ path: filePath, content }) {
       });
     }
 
+    // Only a direct `binding.method()` proves anything about `binding`: in
+    // `page.rows.map(...)` the array is `page.rows`, not `page`.
+    if (method && receiverBindingId && node.callee.object?.type === "Identifier") {
+      if (ARRAY_ONLY_METHODS.has(method)) {
+        recordCollectionEvidence(receiverBindingId, `ARRAY_ONLY_METHOD:${method}`, node);
+      } else if (MAP_SET_ONLY_METHODS.has(method)) {
+        recordCollectionEvidence(receiverBindingId, `MAP_SET_METHOD:${method}`, node);
+      }
+    }
+    if (callee === "Array.isArray" && node.arguments[0]?.type === "Identifier") {
+      recordCollectionEvidence(resolveBinding(node.arguments[0].name), "ARRAY_ISARRAY_CHECK", node);
+    }
+
     const client = clientForCallee(callee);
     if (client) {
       const bindingId = externalRequestBindingId(path);
@@ -829,9 +952,16 @@ export function parseSourceFacts({ path: filePath, content }) {
     });
   }
 
-  function recordGuards(testNode, statementNode) {
+  function recordGuards(testNode, statementNode, scopeNode = testNode) {
     const roots = [...new Set(collectIdentifierRoots(testNode))];
     const dotted = [...new Set(collectDottedReads(testNode))].sort();
+    // `!items` is only half of `!items || items.length === 0`. A guard recorded
+    // from one operand must still be able to see what the whole test asked.
+    const scoped = scopeNode === testNode
+      ? dotted
+      : [...new Set(collectDottedReads(scopeNode))].sort();
+    const negated = new Set(collectNegatedRoots(testNode));
+    const branch = consequentKind(statementNode);
     for (const name of roots) {
       const bindingId = resolveBinding(name);
       if (bindingId) {
@@ -841,10 +971,49 @@ export function parseSourceFacts({ path: filePath, content }) {
           // Dotted reads let a verifier tell `if (response.ok)` (a status guard)
           // apart from `if (response)` (a mere existence check).
           properties: dotted.filter(entry => entry === name || entry.startsWith(`${name}.`)),
+          scopeProperties: scoped.filter(entry => entry === name || entry.startsWith(`${name}.`)),
+          // `!x` asks whether there is nothing; `x` asks whether there is
+          // something. Only the first is an emptiness question.
+          negated: negated.has(name),
+          consequent: branch,
           functionId: currentFunction().id,
           span: makeSpan(statementNode)
         });
       }
+    }
+  }
+
+  /**
+   * Records proof that a binding holds an Array, Map, or Set.
+   *
+   * Only kinds a string cannot satisfy are recorded here: the whole purpose of
+   * this fact is to separate `!collection` (never true for an empty one) from
+   * `!string` (true for an empty one).
+   *
+   * A `.size` read and a `for…of` are deliberately NOT proof. Strings are
+   * iterable, and a plain object is free to carry a field called `size` — as
+   * `child.size` (width and height) does in the modulation planner, which this
+   * verifier reported as a collection until the shape was measured.
+   */
+  function recordCollectionEvidence(bindingId, kind, node) {
+    if (!bindingId) return;
+    collectionEvidence.push({
+      bindingId,
+      kind,
+      functionId: currentFunction().id,
+      span: makeSpan(node)
+    });
+  }
+
+  /** `known && known.length ? known : []` unifies `known` with an array. */
+  function recordUnifiedBranches(node) {
+    const branches = node.type === "ConditionalExpression"
+      ? [[node.consequent, node.alternate], [node.alternate, node.consequent]]
+      : [[node.left, node.right], [node.right, node.left]];
+    for (const [candidate, sibling] of branches) {
+      if (candidate?.type !== "Identifier") continue;
+      if (sibling?.type !== "ArrayExpression") continue;
+      recordCollectionEvidence(resolveBinding(candidate.name), "ARRAY_UNIFIED_WITH_LITERAL", candidate);
     }
   }
 
@@ -1002,6 +1171,7 @@ export function parseSourceFacts({ path: filePath, content }) {
     memberReads,
     externalRequests,
     guards,
+    collectionEvidence,
     concurrentCallbacks,
     comments,
     diagnostics: []
