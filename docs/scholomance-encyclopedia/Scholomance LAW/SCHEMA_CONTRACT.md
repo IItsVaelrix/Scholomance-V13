@@ -7,11 +7,210 @@
 
 ## Living Document - Owned by Codex, Read by All Agents
 
-**Version: 1.42** | Last updated: 2026-08-11
+**Version: 1.44** | Last updated: 2026-08-13
 
 > Bump the version on every schema change.
 > Notify Claude for UI-consumed field changes.
 > Notify Gemini for fixture, regression-test, and backend implementation changes.
+
+---
+
+## SCHEMA CHANGE NOTICE
+
+- Schema: Project Gutenberg Corpus Sanitation
+- Version: 1.43 -> 1.44
+- Date: 2026-08-13
+- Changed fields: registered `SCHOL-GUTENBERG-SANITIZATION-v1` for deterministic wrapper removal, context-aware sentence segmentation, structural classification, bounded experiment selection, and exhaustive reason-coded quarantine accounting
+- Breaking: no; additive offline experiment contract only
+- Owner: Codex
+- Claude impact: none; no UI or client-authoritative surface
+- Gemini impact: direct regression fixtures must cover honorifics, initials, enumeration abbreviations, closing quotation marks, wrapper boundaries, structural matter, and the no-silent-exclusion accounting invariant
+- Error codes: invalid token bounds, tokenizer output, acceptance callback, ledger, or quarantine reason throws before a packet is emitted
+
+```ts
+type GutenbergSanitizationReason =
+  | "illustration"
+  | "asterism"
+  | "heading"
+  | "markup"
+  | "tooShort"
+  | "tooLong"
+  | "noCompound"
+  | "unreadable";
+
+interface GutenbergSanitizedSegment<T = unknown> {
+  text: string;
+  tokens: string[];
+  value: T | null;
+}
+
+interface GutenbergSanitizationPacketV1<T = unknown> {
+  contract: "SCHOL-GUTENBERG-SANITIZATION-v1";
+  segments: GutenbergSanitizedSegment<T>[];
+  quarantine: Partial<Record<GutenbergSanitizationReason, number>>;
+  counts: {
+    paragraphs: number;
+    sentenceCandidates: number;
+    accepted: number;
+    sentenceQuarantined: number;
+    structuralQuarantined: number;
+  };
+}
+```
+
+Project Gutenberg sanitation invariants:
+- The downloaded source is immutable evidence. Wrapper removal and whitespace
+  normalization derive a view; they never overwrite the cached source.
+- Sentence segmentation protects only contextual abbreviation constructions.
+  Titles and name initials require a following name-like token; enumeration
+  abbreviations require a numeric/Roman target; continuation abbreviations are
+  protected only before a lowercase continuation. Closing quotation marks are
+  included in the sentence whose punctuation they close.
+- Structural matter is classified by narrow, named rules. No generic "junk" or
+  "other" bucket exists, because such a bucket would make silent scope expansion
+  impossible to detect.
+- Every sentence candidate satisfies `accepted + sentenceQuarantined =
+  sentenceCandidates`. A caller-specific selection such as `noCompound` is a
+  counted exclusion even though it is not source contamination.
+- Bounds required for parser termination, including the compound experiment's
+  ten-token ceiling, remain lawful only as declared quarantine reasons. A bound
+  may narrow an experiment; it may not silently redefine its population.
+- Absolute coverage from a selected Gutenberg population is not transferable to
+  another corpus. Paired-arm deltas are admissible only when every arm receives
+  the identical accepted segment set and all exclusions are reported.
+- UD English-EWT and other gold treebanks arrive pre-segmented and do not consume
+  this contract.
+
+---
+
+## SCHEMA CHANGE NOTICE
+
+- Schema: Constellation Grammar Valence Cyclotron
+- Version: 1.42 -> 1.43
+- Date: 2026-08-13
+- Changed fields: registered immutable `PB-CONSTELLATION-GRAMMAR-GAP-v1` reports for gold-classified grammar-frontier vacancies, semantic frontier atoms, optional antigen memory-cell matches, lawful construction candidates, and Cleri evidence references
+- Breaking: no; additive pure-core and offline diagnostic contract only
+- Owner: Codex
+- Claude impact: none; no UI or client-authoritative surface
+- Gemini impact: add grammar-only classification, unlicensed-pair, antigen-match, no-raw-text, deterministic replay, paired-candidate, and checksum fixtures
+- Error codes: malformed records, options, antigen cells, or report artifacts fail before a report is emitted
+
+```ts
+type GrammarValenceCandidateVerdict = "CANDIDATE_ONLY" | "REFUSED";
+type GrammarValenceGapVerdict =
+  | "CANDIDATE_ONLY"
+  | "MISSING_STRUCTURE_UNRESOLVED"
+  | "REFUSED";
+
+interface GrammarValenceAntigenMatchV1 {
+  cellId: string;
+  anomalyKind: "antigen_match";
+  similarity: number;
+  confidence: number;
+  checksum: string;
+}
+
+interface GrammarValenceCandidateV1 {
+  signature: string;
+  bonds: Array<{
+    left: string;
+    right: string;
+    result: string;
+    head: 0 | 1;
+    law: string;
+    source: string;
+    status: string;
+  }>;
+  companionSignatures: string[];
+  fireability: {
+    fireable: boolean;
+    missing: string[];
+    suppliedBySlate: string[];
+    pairedOnly: boolean;
+  };
+  productive: boolean;
+  evidence: {
+    occurrences: number;
+    deprels: string[];
+    antigenRefs: string[];
+  };
+  verdict: GrammarValenceCandidateVerdict;
+  reason: string;
+}
+
+interface GrammarValenceGapV1 {
+  gapId: `grammar-gap1:${string}`;
+  pair: string;
+  left: string;
+  right: string;
+  occurrences: number;
+  corpusRefs: string[];
+  dependencyEvidence: Array<{ deprel: string; label: string; count: number }>;
+  atoms: {
+    left: SemanticAtomV1;
+    right: SemanticAtomV1;
+    vacancy: SemanticAtomV1;
+  };
+  unmetValence: "grammar.bond";
+  existingLaw: { checked: true; found: false };
+  antigenMatches: GrammarValenceAntigenMatchV1[];
+  candidates: GrammarValenceCandidateV1[];
+  verdict: GrammarValenceGapVerdict;
+}
+
+interface GrammarValenceCyclotronReportV1 {
+  contract: "PB-CONSTELLATION-GRAMMAR-GAP-v1";
+  schemaVersion: "1.0.0";
+  mode: "grammar-valence-vacancy";
+  configuration: {
+    limit: number | null;
+    topPairs: number;
+    minCount: number;
+    candidateLimit: number;
+    grammarOnly: true;
+  };
+  substrate: {
+    grammarChecksum: `grammar1:${string}`;
+    recordsChecksum: `records1:${string}`;
+  };
+  counts: {
+    recordsInput: number;
+    observedGapTypes: number;
+    occurrences: number;
+    candidates: number;
+    rejectedPairs: number;
+    antigenMatches: number;
+  };
+  gaps: GrammarValenceGapV1[];
+  rejectedPairs: Array<{ pair: string; occurrences: number; reason: string }>;
+  cleriEvidenceRefs: string[];
+  verdict: "GAPS_DETECTED" | "NO_GAPS";
+  checksum: `grammar-cyclotron1:${string}`;
+}
+```
+
+Constellation Grammar Valence Cyclotron invariants:
+- Only failures classified `GRAMMAR` by the existing gold-POS diagnosis may
+  enter the report. Lexical failures, successful parses, and spanning
+  root-type mismatches are excluded before gap aggregation.
+- A reported vacancy joins adjacent maximal chart molecules for which the
+  active `BONDS` registry contains no consuming pair. The diagnostic atoms and
+  vacancy artifact never enter the parser chart or mutate that registry.
+- Candidate bonds come only from Result Conservation, a registered construction
+  schema, or a named gap construction. Candidate and gap verdicts are
+  diagnostic; none authorizes automatic Grimoire promotion.
+- Optional antigen evidence accepts only verified `SCHOL-MEMCELL-v1` packets in
+  `antigen` mode. Antigen similarity prioritizes a recurring wound shape and
+  never proves a grammatical fact or changes candidate productivity.
+- `CleriEvidenceRefs` may reference sealed `SCHOL-CLERI-PROBE-v2` reports that
+  verify parser implementation or registry provenance. Cleri source findings
+  never substitute for corpus evidence of a grammatical construction.
+- Reports include stable sentence identifiers or digests, aggregate dependency
+  evidence, and checksums. Raw sentence text, raw user-authored text, wall-clock
+  time, runtime duration, and environment metadata are prohibited.
+- Identical records, grammar, antigen cells, Cleri references, and configuration
+  replay to one checksum. Array ordering is canonical and report objects are
+  recursively frozen.
 
 ---
 
@@ -3422,6 +3621,8 @@ conceptId asc. `CareerGraphManifest` seals a built artifact with `artifactId`, `
 | 1.40 | 2026-08-11 | Registered deterministic Semantic Fission Reactor genomes, validation-selected island reports, and decisive holdout benchmark evidence | no |
 | 1.41 | 2026-08-11 | Registered resonance-activated bounded entropic decay results, additive reactor confidence persistence, and deterministic property-sweep evidence | no |
 | 1.42 | 2026-08-11 | Retired resonance/confidence decay; registered exact/family/neighborhood occupancy entropy over Cyclotron search influence and matched benchmark evidence | yes (unpromoted 1.41 experiment only) |
+| 1.43 | 2026-08-13 | Registered deterministic Constellation grammar-valence vacancy reports with semantic frontier atoms, optional antigen matches, lawful construction candidates, and Cleri evidence references | no |
+| 1.44 | 2026-08-13 | Registered deterministic Gutenberg sanitation packets with contextual segmentation and exhaustive reason-coded quarantine accounting | no |
 
 ---
 

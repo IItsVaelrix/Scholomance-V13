@@ -33,6 +33,13 @@ import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import Database from 'better-sqlite3';
 import { compose } from '../codex/core/constellation/compose.js';
+import {
+  SANITIZATION_REASON,
+  countQuarantine,
+  createQuarantineLedger,
+  mergeQuarantine,
+  sanitizeGutenbergText,
+} from './lib/gutenberg-corpus-sanitizer.mjs';
 
 const args = process.argv.slice(2);
 const argOf = (flag, fallback) => {
@@ -75,95 +82,32 @@ function isFractured(token) {
   return posMap.has(token.split('-').join(''));
 }
 
-/**
- * ─── SEGMENTATION, WITH THE DAMAGE MADE VISIBLE ─────────────────────────────
- *
- * Splitting at every period shatters `Mr. Bennet` into `Mr.` and `Bennet.`, and
- * a length filter then deletes the pieces. Audited over 900 cached books, the
- * naive version of this function produced 2,919,191 segments of which 4.4%
- * began after an abbreviation or a name initial — each one a sentence starting
- * mid-clause — and silently discarded 70.3% of them, 248M characters.
- *
- * Silent deletion is the part that corrupts a measurement rather than merely
- * shrinking it, because the survivors are not a random sample: short malformed
- * fragments parse MORE easily than whole sentences, so a corpus that keeps them
- * and drops the long ones flatters every coverage number computed on it.
- *
- * So: abbreviations are protected before segmentation, structural matter is
- * skipped, and nothing is dropped without a reason code that gets counted and
- * printed. The token cap stays — `compose` materialises every parse and does not
- * terminate on long input — but it is now a declared quarantine, not a silence.
- */
-const ABBREVIATIONS = new Set([
-  'mr', 'mrs', 'ms', 'dr', 'st', 'prof', 'rev', 'hon', 'jr', 'sr', 'capt', 'col',
-  'gen', 'lt', 'sgt', 'messrs', 'mme', 'mlle', 'vs', 'etc', 'viz', 'no', 'vol',
-  'ch', 'fig', 'pp', 'ed', 'esq', 'inst', 'ult', 'i.e', 'e.g',
-]);
-
-/** `Mr.` and `J.` end a word, not a sentence. */
-function endsWithProtectedAbbreviation(text) {
-  const tail = text.trimEnd();
-  if (!tail.endsWith('.')) return false;
-  const word = tail.slice(0, -1).split(/[\s(]/).pop() || '';
-  if (/^[A-Z]$/.test(word)) return true;               // name initial: `J.`
-  return ABBREVIATIONS.has(word.toLowerCase());
-}
-
-/** Segments a paragraph into sentences without breaking a protected form. */
-function sentencesOf(flat) {
-  const pieces = flat.split(/(?<=[.!?])\s+/);
-  const out = [];
-  for (const piece of pieces) {
-    if (out.length > 0 && endsWithProtectedAbbreviation(out[out.length - 1])) {
-      out[out.length - 1] = `${out[out.length - 1]} ${piece}`;
-    } else {
-      out.push(piece);
-    }
-  }
-  return out;
-}
-
-const STRUCTURAL = [
-  { code: 'illustration', test: t => /^\[Illustration/i.test(t) },
-  { code: 'asterism', test: t => /^[*\s]{3,}$/.test(t) },
-  { code: 'heading', test: t => /^(CHAPTER|BOOK|PART|ACT|SCENE|CANTO)\b/i.test(t) && t.length < 60 },
-  { code: 'markup', test: t => /^[_*[\]{}<>|=+~-]+$/.test(t) },
-];
-
 function phrasesFrom(text, reasons) {
-  // Strip the Project Gutenberg wrapper; its legal boilerplate is not English prose.
-  const start = text.indexOf('*** START');
-  const end = text.indexOf('*** END');
-  const body = text.slice(start >= 0 ? text.indexOf('\n', start) + 1 : 0, end >= 0 ? end : undefined);
-
-  const out = [];
-  for (const paragraph of body.split(/\n\s*\n/)) {
-    // Physical line wrapping is typesetting, not structure: rejoin before segmenting.
-    const flat = paragraph.replace(/\s+/g, ' ').trim();
-    if (!flat) continue;
-
-    const structural = STRUCTURAL.find(rule => rule.test(flat));
-    if (structural) { reasons[structural.code] = (reasons[structural.code] ?? 0) + 1; continue; }
-
-    for (const raw of sentencesOf(flat)) {
-      const tokens = raw.toLowerCase().replace(/[^a-z\s'-]/g, ' ').split(/\s+/).filter(Boolean);
-      if (tokens.length < MIN_TOKENS) { reasons.tooShort = (reasons.tooShort ?? 0) + 1; continue; }
-      if (tokens.length > MAX_TOKENS) { reasons.tooLong = (reasons.tooLong ?? 0) + 1; continue; }
+  const packet = sanitizeGutenbergText(text, {
+    minTokens: MIN_TOKENS,
+    maxTokens: MAX_TOKENS,
+    tokenize: raw => raw.toLowerCase().replace(/[^a-z\s'-]/g, ' ').split(/\s+/).filter(Boolean),
+    accept: ({ tokens }) => {
       const compounds = tokens.filter(t => COMPOUND.test(t) && !isFractured(t));
-      if (compounds.length === 0) { reasons.noCompound = (reasons.noCompound ?? 0) + 1; continue; }
-      out.push({ tokens, compounds });
-    }
-  }
-  return out;
+      return compounds.length > 0
+        ? { accepted: true, value: { compounds } }
+        : { accepted: false, reason: SANITIZATION_REASON.NO_COMPOUND };
+    },
+  });
+  mergeQuarantine(reasons, packet.quarantine);
+  return packet.segments.map(segment => ({
+    tokens: segment.tokens,
+    compounds: segment.value.compounds,
+  }));
 }
 
 const files = readdirSync(CORPUS_DIR).filter(f => f.endsWith('.txt')).sort().slice(0, BOOKS);
 const phrases = [];
-const quarantine = {};
+const quarantine = createQuarantineLedger();
 for (const file of files) {
   if (phrases.length >= PHRASES) break;
   let text;
-  try { text = readFileSync(path.join(CORPUS_DIR, file), 'utf8'); } catch { quarantine.unreadable = (quarantine.unreadable ?? 0) + 1; continue; }
+  try { text = readFileSync(path.join(CORPUS_DIR, file), 'utf8'); } catch { countQuarantine(quarantine, SANITIZATION_REASON.UNREADABLE); continue; }
   for (const phrase of phrasesFrom(text, quarantine)) {
     phrases.push({ ...phrase, book: file });
     if (phrases.length >= PHRASES) break;
@@ -171,11 +115,19 @@ for (const file of files) {
 }
 
 // ─── The arms ────────────────────────────────────────────────────────────────
+/**
+ * A phrase the chart cannot build returns an empty `stable`. A phrase that makes
+ * the chart THROW is a different event, and folding the two together would let a
+ * crash quietly depress an arm — the same silence this experiment was tried for.
+ * Chart failures are counted separately and reported; they are not sanitation
+ * exclusions, so they stay out of the sanitizer's closed reason ledger.
+ */
+const chartFailures = [];
 const spans = (tokens, options) => {
   try {
     return compose(tokens, posMap, options).stable.length > 0;
-  } catch {
-    // A phrase the chart cannot build is a failure, not a crash of the run.
+  } catch (error) {
+    chartFailures.push({ tokens: tokens.join(' '), error: error.message });
     return false;
   }
 };
@@ -234,6 +186,11 @@ const splitRegressions = results
   .map(r => ({ tokens: r.phrase.tokens.join(' '), compounds: r.phrase.compounds, book: r.phrase.book }));
 
 const pct = x => `${(x * 100).toFixed(1)}%`;
+if (chartFailures.length > 0) {
+  console.log(`\n  WARNING: the chart THREW on ${chartFailures.length} arm evaluation(s). Those arms were`);
+  console.log('  scored as non-spanning, which depresses them for a reason that is not grammar:');
+  for (const failure of chartFailures.slice(0, 5)) console.log(`    ${failure.error} — ${failure.tokens}`);
+}
 console.log(`\ncompound-bearing phrases: ${results.length} from ${files.length} books`);
 console.log(`quarantined: ${JSON.stringify(quarantine)}\n`);
 console.log(`  SPLIT (pieces separate)          ${pct(rate('split'))}`);

@@ -5,21 +5,23 @@
  * identities. Measured over 4,000 compound-bearing Gutenberg phrases with the
  * product's own lexicon (`scripts/compound-identity-experiment.mjs`):
  *
- *   SPLIT  pieces fed separately            21.5%
- *   FUSED  compound identity switched off   12.2%   <- the product before
- *   UNION  one token, pieces' identities    31.5%   <- after
+ *   SPLIT  pieces fed separately            22.7%
+ *   FUSED  compound identity switched off   12.7%   <- the product before
+ *   UNION  one token, pieces' identities    32.9%   <- after
  *
- *   FUSED -> UNION  +19.3pp, gained 773, lost 0, McNemar exact p = 4.0e-233
- *   SPLIT -> UNION  +10.0pp, gained 538, lost 137
+ *   FUSED -> UNION  +20.1pp, gained 805, lost 0, McNemar exact p = 9.4e-243
+ *   SPLIT -> UNION  +10.2pp, gained 558, lost 151
  *
  * The phrases are SANITISED. Splitting at every period shatters `Mr. Bennet`,
  * and a length filter then deletes the pieces; audited over 900 books, the naive
  * extractor began 4.4% of its segments mid-clause and silently discarded 70.3%
  * of them. Short malformed fragments parse MORE easily than whole sentences, so
  * that corpus flatters every coverage number taken on it. Abbreviations are now
- * protected before segmentation and every drop carries a reason code. The delta
- * moved +19.2 -> +19.3pp under sanitation: a paired design cancels damage that
- * hits all three arms, which is why it was worth checking rather than assuming.
+ * protected before segmentation, closing quotes are real boundaries, and every
+ * drop carries a reason code. The original +19.2pp delta survived the first
+ * sanitation pass at +19.3pp and the contract-hardened replay at +20.1pp: a
+ * paired design cancels damage that hits all three arms, which is why it was
+ * worth checking rather than assuming.
  *
  * ZERO LOSSES AGAINST FUSED IS A PROPERTY, NOT A RESULT. `compoundTags` fires
  * only when nothing else named the token, so it strictly adds atoms, and more
@@ -29,7 +31,7 @@
  * adjective. The arm is now the real switch, and the invariant is asserted
  * rather than the artifact pinned.
  *
- * The 147 losses against SPLIT are real, and are the tokenizer question this
+ * The 151 losses against SPLIT are real, and are the tokenizer question this
  * feature does not settle: whether the reader should fuse at all.
  *
  * The corpus is 1.8GB and not in the repository. The phrases and the lexicon
@@ -48,13 +50,14 @@ const fixture = JSON.parse(
 );
 
 const posMap = new Map(Object.entries(fixture.lexicon));
-const spans = (tokens, options) => {
-  try {
-    return compose(tokens, posMap, options).stable.length > 0;
-  } catch {
-    return false;
-  }
-};
+/**
+ * NO CATCH. A chart that cannot build a phrase returns an empty `stable`; it
+ * does not throw. Swallowing an exception here would convert a crash into a
+ * quiet "this phrase changed outcome" mismatch — the failure would present as
+ * evidence drift rather than as the error it is. Tribunal rule 10: silence is a
+ * state mutation.
+ */
+const spans = (tokens, options) => compose(tokens, posMap, options).stable.length > 0;
 
 /** The arms, reproduced exactly as the experiment defines them. */
 const NO_COMPOUND = { compoundIdentity: false };
