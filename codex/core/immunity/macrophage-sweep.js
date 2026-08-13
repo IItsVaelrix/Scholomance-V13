@@ -66,8 +66,9 @@ export function buildImportGraph(paths, readFile) {
   const known = new Set(paths);
   const graph = new Map(paths.map((p) => [p, new Set()]));
   for (const path of paths) {
-    const source = readFile(path);
-    if (!source) continue;
+    const read = readFile(path);
+    if (!read.ok) continue; // unreadable, not uncoupled — the caller reports it
+    const source = read.source;
     IMPORT_RE.lastIndex = 0;
     let match;
     while ((match = IMPORT_RE.exec(source)) !== null) {
@@ -148,12 +149,44 @@ export function couplingLocality(anchors, graph, { stride = 3 } = {}) {
   return { observed, chance, lift: chance === 0 ? 0 : observed / chance, pairs };
 }
 
+/**
+ * Read a file, returning a documented fallback that NAMES the failure.
+ *
+ * Found by this repository's own immune system on 2026-08-12, in the module
+ * that drives it: the first version was
+ *
+ *     try { cache.set(path, readFileSync(...)); } catch { cache.set(path, null); }
+ *
+ * which is the exact prion this sweep hunts. An unreadable file became `null`,
+ * indistinguishable from an empty one — so `classifyFinding` scored it
+ * SKIP_ONLY, the LOWEST danger weight, and `buildImportGraph` gave it no edges.
+ * A file we could not read was reported as a file with nothing wrong.
+ *
+ * The repair is the one the SWALLOWED_ERROR vaccine prescribes: return a
+ * fallback carrying an approved recovery key (`ok`) that names the error, so a
+ * caller can tell "empty" from "unread".
+ *
+ * @returns {(path: string) => {ok: boolean, source: string|null, error: Error|null}}
+ */
 export function readSource(root) {
   const cache = new Map();
   return (path) => {
-    if (!cache.has(path)) {
-      try { cache.set(path, readFileSync(join(root, path), 'utf8')); } catch { cache.set(path, null); }
+    const cached = cache.get(path);
+    if (cached) return cached;
+    try {
+      const entry = { ok: true, source: readFileSync(join(root, path), 'utf8'), error: null };
+      cache.set(path, entry);
+      return entry;
+    } catch (error) {
+      // The literal is written twice ON PURPOSE. approvedRecoveryReturn credits
+      // a return only when it is an OBJECT LITERAL carrying an approved recovery
+      // key and naming the caught error; returning a variable that holds the
+      // same object is not credited, and the verifier says so in its own stated
+      // limitations. Two earlier attempts — assigning the fallback, then
+      // returning a named `entry` — were both still convicted. Recovery is
+      // proved by catch-local control flow, not by intent.
+      cache.set(path, { ok: false, source: null, error });
+      return { ok: false, source: null, error };
     }
-    return cache.get(path);
   };
 }

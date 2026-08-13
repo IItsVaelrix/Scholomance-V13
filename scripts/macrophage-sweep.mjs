@@ -65,8 +65,13 @@ function main() {
 
   const read = readSource(ROOT);
   const lineCache = new Map();
+  const unreadable = [];
   const linesOf = (p) => {
-    if (!lineCache.has(p)) lineCache.set(p, read(p)?.split('\n') ?? null);
+    if (!lineCache.has(p)) {
+      const result = read(p);
+      if (!result.ok) unreadable.push({ path: p, error: result.error?.message ?? 'unknown' });
+      lineCache.set(p, result.source?.split('\n') ?? null);
+    }
     return lineCache.get(p);
   };
   const classOf = (f) => classifyFinding(linesOf(f.path), f.line);
@@ -75,6 +80,12 @@ function main() {
   for (const f of findings) triage[classOf(f)] = (triage[classOf(f)] ?? 0) + 1;
   console.log(`findings ${findings.length} across ${paths.length} files`);
   console.log('triage:', JSON.stringify(triage));
+  if (unreadable.length > 0) {
+    // Unreadable is not harmless. Say so rather than letting these sit at the
+    // lowest danger weight because nothing could be read to classify them.
+    console.log(`  WARNING: ${unreadable.length} file(s) could not be read and are triaged as SKIP_ONLY by default:`);
+    for (const u of unreadable.slice(0, 5)) console.log(`    ${u.path} — ${u.error}`);
+  }
 
   // ── The vaccine: recognition plus the sanctioned repair ────────────────────
   const vaccine = mintPathologyVaccine(SWALLOWED_ERROR);

@@ -50,11 +50,17 @@ describe('anchoring', () => {
     'far.js': '',
   };
   const paths = Object.keys(files).sort();
-  const read = (p) => files[p] ?? null;
+  // readSource's contract: a documented fallback that NAMES the failure, so a
+  // caller can tell an empty file from one it could not read.
+  const read = (p) => (files[p] === undefined
+    ? { ok: false, source: null, error: new Error('ENOENT') }
+    : { ok: true, source: files[p], error: null });
 
   it('reads real internal coupling and ignores package imports', () => {
     const withPkg = { ...files, 'a.js': "import 'react';\nimport './b.js';" };
-    const graph = buildImportGraph(paths, (p) => withPkg[p] ?? null);
+    const graph = buildImportGraph(paths, (p) => (withPkg[p] === undefined
+      ? { ok: false, source: null, error: new Error('ENOENT') }
+      : { ok: true, source: withPkg[p], error: null }));
     expect(graph.get('a.js').has('b.js')).toBe(true);
     expect([...graph.get('a.js')]).not.toContain('react');
   });
@@ -95,5 +101,33 @@ describe('anchoring', () => {
     expect(locality).toHaveProperty('lift');
     expect(locality.observed).toBeGreaterThanOrEqual(0);
     expect(locality.chance).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('readSource contract', () => {
+  /**
+   * The prion this module's own sweep found in this module. An unreadable file
+   * must not be silently indistinguishable from an empty one: classifyFinding
+   * scores a null-source file SKIP_ONLY, the LOWEST danger weight, so a file
+   * nobody could read would be reported as a file with nothing wrong.
+   */
+  it('names the failure instead of returning a bare null', async () => {
+    const { readSource } = await import('../../../codex/core/immunity/macrophage-sweep.js');
+    const read = readSource('/definitely/not/a/real/root');
+    const result = read('nope.js');
+
+    expect(result.ok).toBe(false);
+    expect(result.source).toBeNull();
+    expect(result.error).toBeInstanceOf(Error);
+  });
+
+  it('reports ok with the source for a file that exists', async () => {
+    const { readSource } = await import('../../../codex/core/immunity/macrophage-sweep.js');
+    const read = readSource(process.cwd());
+    const result = read('package.json');
+
+    expect(result.ok).toBe(true);
+    expect(typeof result.source).toBe('string');
+    expect(result.error).toBeNull();
   });
 });
