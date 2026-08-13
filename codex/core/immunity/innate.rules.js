@@ -78,6 +78,134 @@ function isImmunityRulesPath(filePath) {
  *   - detector(content, filePath) -> boolean | { matched: true, context }
  *   - repair        repair-suggestion key in repair.recommendations.js
  */
+
+/**
+ * ─── THE COLOR DRAGON PAIR ──────────────────────────────────────────────────
+ *
+ * Two rules for one recurring failure, kept separate because each half recurs
+ * on its own. Recorded as SCDNA `BUGPATTERN_COLOR_DRAGON_FRONTEND_FALLBACK` at
+ * 0.98 confidence — it has happened before.
+ *
+ * The original, measured 2026-08-13: `cmu.phoneme.engine.js:120` reads
+ * `typeof window !== "undefined"` and returns `false` from `init()`, so the
+ * browser has no pronunciation dictionary. `truesightColor.ts` then calls
+ * `analyzeDeep` IN THE BROWSER, and colours words by heuristic letter-splitting.
+ * Same word, two truths: SILENCE is `S AY1 L AH0 N S` on the server and
+ * `S IH0 L EH1 N K` in the UI. 3 of 8 sampled words disagreed on vowel family,
+ * which is what drives the colour.
+ *
+ * NOTHING CAUGHT IT, and could not have: the degradation is a deliberate branch
+ * rather than a swallowed error, so no cleri-probe family reaches it, and the
+ * tests run under jsdom, where `window` is defined — so the test environment
+ * reproduces the broken branch and agrees with itself.
+ */
+
+/**
+ * Methods that DERIVE backend truth. Importing an engine is legal — `src/lib/`
+ * is the sanctioned bridge — so the import path proves nothing. Calling one of
+ * these in the UI is the shadow computation itself.
+ */
+const TRUTH_DERIVATIONS = [
+  'analyzeDeep', 'analyzeWord', 'analyzeDeepDetailed', '_resolveWordAnalysisDetailed',
+  'syllabify', 'rhymeDomain', 'runG2PJury', 'splitToPhonemes',
+  'rankGraphCandidates', 'arbitrateGraphCandidates', 'voteOnCandidates',
+];
+
+/** An environment probe: the shape that decides which runtime you are in. */
+const ENVIRONMENT_PROBE = /typeof\s+(?:window|document|importScripts)\s*[!=]==?\s*["']undefined["']/;
+
+/** A return that hands the caller a bare, unexplained verdict. */
+const BARE_VERDICT_RETURN = /return\s+(?:false|true|null|\[\s*\]|\{\s*\})\s*;/;
+
+/** A degradation the caller can SEE is the cure, not the disease. */
+const NAMES_ITS_DEGRADATION = /reason|because|degraded|unavailable|notAvailable|error/i;
+
+/**
+ * A real data source on the OTHER branch. This is the whole discriminator.
+ *
+ * `typeof window === "undefined"` answering "can I?" is legitimate — that IS the
+ * answer, and `usePrefersReducedMotion` returning false under SSR is correct.
+ * The defect is different: a module that LOADS AN AUTHORITY on one branch and
+ * skips the load on the other, then keeps answering questions about that
+ * authority as though nothing changed. Without this test the rule convicts
+ * eleven honest capability probes to reach one broken oracle.
+ */
+const LOADS_AN_AUTHORITY = /await\s+import\(|readFile|createReadStream|fetch\s*\(|require\s*\(\s*["']|new\s+Worker\(/;
+
+/** Where the enclosing function ends, for the purposes of the search above. */
+const NEW_FUNCTION_BOUNDARY = /^\s{0,2}(?:export\s+)?(?:async\s+)?function\s|^\s{0,2}(?:export\s+)?(?:const|let|var)\s+[\w$]+\s*=\s*(?:async\s*)?\(/;
+
+/**
+ * True when an environment probe gates a bare verdict.
+ *
+ * TWO SHAPES, because the original used the second and a naive detector missed
+ * it by 111 lines: the probe may be inline in the `if`, or hoisted into a
+ * module constant (`const isBrowser = typeof window !== "undefined"`) that is
+ * tested much later. Both are the same defect.
+ */
+function detectEnvironmentGatedAuthority(content) {
+  const lines = content.split('\n');
+  const isComment = (line) => /^\s*(?:\/\/|\*|\/\*)/.test(line);
+
+  const gatedBareReturn = (fromIndex) => {
+    const window_ = lines.slice(fromIndex, fromIndex + 6).join('\n');
+    if (!BARE_VERDICT_RETURN.test(window_)) return false;
+    if (NAMES_ITS_DEGRADATION.test(window_)) return false;
+    // The skipped branch must actually load something, or this is a capability
+    // probe answering its own question correctly. The search stops at the next
+    // function boundary: an unbounded lookahead convicted `AuthContext`, whose
+    // SSR guard is correct and whose only sin was sitting above a `fetch`.
+    const ahead = [];
+    for (let at = fromIndex + 1; at < Math.min(lines.length, fromIndex + 40); at += 1) {
+      if (NEW_FUNCTION_BOUNDARY.test(lines[at])) break;
+      ahead.push(lines[at]);
+    }
+    return LOADS_AN_AUTHORITY.test(ahead.join('\n'));
+  };
+
+  // Shape 1: the probe is the condition.
+  for (let index = 0; index < lines.length; index += 1) {
+    if (isComment(lines[index]) || !ENVIRONMENT_PROBE.test(lines[index])) continue;
+    if (/^\s*(?:const|let|var)\s/.test(lines[index])) continue;   // that is shape 2
+    if (gatedBareReturn(index)) {
+      return { matched: true, context: { line: index + 1, shape: 'inline-probe', probe: lines[index].trim().slice(0, 72) } };
+    }
+  }
+
+  // Shape 2: the probe is hoisted, and a named flag is tested later.
+  const hoisted = [];
+  for (const line of lines) {
+    if (isComment(line)) continue;
+    // NOT `=[^=]*$` — the probe line contains `!==`, whose `=` characters made
+    // that pattern fail on the very file this rule was written for.
+    const match = /^\s*(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=/.exec(line);
+    if (match && ENVIRONMENT_PROBE.test(line)) hoisted.push(match[1]);
+  }
+  for (const flag of hoisted) {
+    const gate = new RegExp(`\\bif\\s*\\(\\s*!?${flag}\\s*\\)`);
+    for (let index = 0; index < lines.length; index += 1) {
+      if (!gate.test(lines[index])) continue;
+      if (gatedBareReturn(index)) {
+        return { matched: true, context: { line: index + 1, shape: 'hoisted-flag', flag } };
+      }
+    }
+  }
+  return false;
+}
+
+/** True when UI-layer code DERIVES backend truth instead of consuming it. */
+function detectUiShadowComputation(content, filePath) {
+  if (!filePath.startsWith('src/')) return false;
+  const executable = stripCommentsAndStrings(content);
+  for (const method of TRUTH_DERIVATIONS) {
+    const call = new RegExp(`\\.\\s*${method}\\s*(?:\\?\\.)?\\s*\\(`);
+    if (call.test(executable)) {
+      return { matched: true, context: { derivation: method, filePath } };
+    }
+  }
+  return false;
+}
+
 export const INNATE_RULES = [
   {
     id: 'QUANT-0101',
@@ -382,7 +510,42 @@ export const INNATE_RULES = [
       return detectStrayCharacters(content);
     },
   },
+  {
+    id: 'ARCH-0F0D',
+    name: 'Environment gate silently downgrades an authority',
+    category: ERROR_CATEGORIES.STATE,
+    errorCode: ERROR_CODES.IMMUNE_CELL_WALL_VIOLATION,
+    severity: ERROR_SEVERITY.CRIT,
+    moduleId: MODULE_IDS.IMMUNITY,
+    repairKey: 'repair.environment-gated-authority.name-the-degradation',
+    detector: (content, filePath) => {
+      if (!/\.(?:js|jsx|ts|tsx|mjs|cjs)$/i.test(filePath)) return false;
+      if (isTestPath(filePath) || isDocumentationPath(filePath) || isImmunityRulesPath(filePath)) return false;
+      if (content.includes('IMMUNE_ALLOW: environment-gated-authority')) return false;
+      // RAW content, not stripped: the probe is `typeof window !== "undefined"`,
+      // and stripCommentsAndStrings removes the very literal being matched. That
+      // is why the first version of this rule could not see its own origin file.
+      // Comment lines are skipped inside the detector instead.
+      return detectEnvironmentGatedAuthority(content);
+    },
+  },
+  {
+    id: 'ARCH-0F0E',
+    name: 'UI recomputes backend truth (shadow computation)',
+    category: ERROR_CATEGORIES.STATE,
+    errorCode: ERROR_CODES.IMMUNE_FORBIDDEN_IMPORT,
+    severity: ERROR_SEVERITY.CRIT,
+    moduleId: MODULE_IDS.IMMUNITY,
+    repairKey: 'repair.ui-shadow-computation.consume-backend-truth',
+    detector: (content, filePath) => {
+      if (!/\.(?:js|jsx|ts|tsx|mjs|cjs)$/i.test(filePath)) return false;
+      if (isTestPath(filePath) || isDocumentationPath(filePath)) return false;
+      if (content.includes('IMMUNE_ALLOW: ui-shadow-computation')) return false;
+      return detectUiShadowComputation(content, filePath);
+    },
+  },
 ];
+
 
 // Classes applied to the MEASURED Truesight overlay word text. Their rendered
 // glyph advance must equal the canvas measurement, so advance-changing metric

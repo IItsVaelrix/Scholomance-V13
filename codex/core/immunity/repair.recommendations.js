@@ -71,6 +71,53 @@ export const REPAIR_RECOMMENDATIONS = Object.freeze({
     canonical: 'src/lib/<adapter>.js → fetch("/api/...")',
   },
 
+  'repair.environment-gated-authority.name-the-degradation': {
+    key: 'repair.environment-gated-authority.name-the-degradation',
+    title: 'An environment gate must not silently downgrade an authority',
+    suggestions: [
+      'Return a NAMED degraded state, not a bare `false` or a plausible value: `{ ok: false, reason: "no dictionary in this runtime" }`.',
+      'Better: do not compute the authority here at all. Serve it from the backend and consume the served value.',
+      'If the gate is a legitimate capability probe, the caller must be forced to read the reason — a boolean the caller can ignore is how this reaches production.',
+      'If this branch is genuinely equivalent, annotate `// IMMUNE_ALLOW: environment-gated-authority` and say why it is equivalent.',
+    ],
+    constraints: [
+      'The same input must not produce two different truths in two runtimes.',
+      'A degraded path must be distinguishable from a healthy one BY THE CALLER, not only by reading this file.',
+    ],
+    invariants: [
+      'typeof window === "undefined" gates a CAPABILITY, never a silent change of answer',
+    ],
+    references: [
+      'ARCH_RULE_BACKEND_TRUTH_AUTHORITY',
+      'BUGPATTERN_COLOR_DRAGON_FRONTEND_FALLBACK',
+      'codex/core/phonology/cmu.phoneme.engine.js:120 — the original',
+    ],
+    canonical: 'if (isBrowser) return { ok: false, reason: "dictionary unavailable in browser" };',
+  },
+
+  'repair.ui-shadow-computation.consume-backend-truth': {
+    key: 'repair.ui-shadow-computation.consume-backend-truth',
+    title: 'The UI must consume backend truth, never recompute it',
+    suggestions: [
+      'Call the endpoint that already computes this and render what it returns.',
+      'If no endpoint exists, add one; a shadow computation in the UI is not a substitute for the seam.',
+      'A thin adapter in `src/lib/` may TRANSPORT the value. It may not derive it.',
+    ],
+    constraints: [
+      'Frontend display reflects backend state and does not recompute it.',
+      'A UI-side engine that degrades when its data source is absent will disagree with the backend silently, and the tests will agree with the UI because jsdom defines `window`.',
+    ],
+    invariants: [
+      '!filePath.startsWith("src/") || !importsTruthEngine(importPath)',
+    ],
+    references: [
+      'ARCH_RULE_BACKEND_TRUTH_AUTHORITY',
+      'BUGPATTERN_COLOR_DRAGON_FRONTEND_FALLBACK',
+      'src/pages/Visualiser/truesightColor.ts — the original',
+    ],
+    canonical: 'const { vowelFamily } = await fetch("/api/analysis/panels", ...)',
+  },
+
   'repair.duplicate-path.canon': {
     key: 'repair.duplicate-path.canon',
     title: 'Reroute through the canonical path',
