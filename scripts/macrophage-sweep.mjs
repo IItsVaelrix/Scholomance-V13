@@ -131,12 +131,9 @@ function main() {
     const envelope = buildBytecodeXPMemoryEnvelope({
       vaccine,
       pulse,
-      // Provenance rides in LABELS, not in `provenance`. QbitMemoryPersistence's
-      // normalizeProvenance keeps only source/pdr/phase/createdBy, and its
-      // enrichment allowlist predates buildQbitHotspotsFromCleriReport — so
-      // reportId, status, verifiedFindings and coverageComplete are all dropped
-      // on the floor. Labels survive verbatim, so identifiers go there until
-      // that seam is widened deliberately.
+      // Labels carry the run's SHAPE (counts, coupling lift). Identity and
+      // evidence now live in `provenance`, which admits report identifiers since
+      // the Phase 4/Phase 5 allowlist seam was closed.
       labels: [
         SWALLOWED_ERROR.pathologyClass,
         `absorbed:${absorbed.length}`,
@@ -144,7 +141,11 @@ function main() {
         `findings:${findings.length}`,
         `couplingLift:${locality.lift.toFixed(1)}`,
       ],
-      provenance: { source: 'macrophage-sweep', createdBy: 'spatial-immune-orchestrator' },
+      provenance: {
+        source: 'macrophage-sweep',
+        createdBy: 'spatial-immune-orchestrator',
+        verifierId: SWALLOWED_ERROR.verifierId,
+      },
     });
     writeFileSync(sealPath, `${JSON.stringify(envelope, null, 2)}\n`);
     console.log(`\nsealed → ${sealPath}`);

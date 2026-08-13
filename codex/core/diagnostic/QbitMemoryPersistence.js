@@ -137,6 +137,23 @@ function normalizeEnrichment(input) {
   });
 }
 
+/**
+ * This allowlist is a VOLATILITY FILTER, not a schema. Wall-clock fields —
+ * `durationMs` above all — must never reach the checksum, or two identical
+ * investigations would seal to different identities. A test pins that.
+ *
+ * It originally listed only the legacy probe-runner's fields, which predate
+ * `buildQbitHotspotsFromCleriReport`. That builder emits the identifiers of the
+ * investigation that justified the vaccine — reportId, reportBytecode, status,
+ * verifiedFindings, coverageComplete — and every one of them was silently
+ * dropped here, so a sealed vaccine could not say which evidence produced it.
+ * A memory artifact with no provenance is exactly the decorative record this
+ * repository keeps having to delete.
+ *
+ * They are admitted because they are STABLE PROPERTIES OF A GIVEN REPORT: the
+ * same report yields the same values on every run. That is the test for
+ * inclusion here, and duration fails it.
+ */
 function normalizeStableEnrichmentMetadata(metadata) {
   return pickStableKeys({
     probe: metadata.probe,
@@ -149,6 +166,13 @@ function normalizeStableEnrichmentMetadata(metadata) {
     maxHotspots: metadata.maxHotspots,
     maxRuntimeMs: metadata.maxRuntimeMs,
     minResonance: metadata.minResonance,
+    // Report provenance — stable for a given investigation.
+    source: metadata.source,
+    reportId: metadata.reportId,
+    reportBytecode: metadata.reportBytecode,
+    status: metadata.status,
+    verifiedFindings: metadata.verifiedFindings,
+    coverageComplete: metadata.coverageComplete,
   });
 }
 
@@ -159,12 +183,24 @@ function normalizeLabels(labels) {
     .sort((a, b) => a.localeCompare(b)));
 }
 
+/**
+ * Same rule as the enrichment allowlist: stable identifiers only, no wall clock.
+ *
+ * `reportId`, `reportBytecode` and `verifierId` were being passed by callers and
+ * silently discarded, which meant a sealed vaccine named no evidence — it
+ * asserted a pathology on the authority of nothing. They are the whole point of
+ * provenance, so they are admitted; `createdAt` and friends are not, because a
+ * timestamp in the checksum makes every re-seal a different artifact.
+ */
 function normalizeProvenance(provenance) {
   return pickStableKeys({
     source: provenance.source || 'diagnostic',
     pdr: provenance.pdr || 'PDR-2026-06-04-BYTECODE-XP-QBIT-VACCINES',
     phase: provenance.phase || 'phase-5',
     createdBy: provenance.createdBy || 'codex',
+    reportId: provenance.reportId,
+    reportBytecode: provenance.reportBytecode,
+    verifierId: provenance.verifierId,
   });
 }
 

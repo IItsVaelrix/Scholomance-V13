@@ -6,7 +6,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { mintPathologyVaccine, pulseFromFindings, sealVaccineFromReport, PATHOLOGY_SLUGS } from '../../../codex/core/immunity/pathology-vaccine.js';
-import { verifyBytecodeXPMemoryEnvelope, buildBytecodeXPMemoryKey } from '../../../codex/core/diagnostic/QbitMemoryPersistence.js';
+import { verifyBytecodeXPMemoryEnvelope, buildBytecodeXPMemoryKey, buildBytecodeXPMemoryEnvelope } from '../../../codex/core/diagnostic/QbitMemoryPersistence.js';
 import { RECOVERY_RETURN_KEYS } from '../../../codex/core/immunity/cleri-probe/scholomance-profile.js';
 
 const SWALLOWED = Object.freeze({
@@ -163,6 +163,46 @@ describe('sealing a vaccine into memory', () => {
   it('refuses a report that is not a cleri-probe investigation', () => {
     const vaccine = mintPathologyVaccine(SWALLOWED);
     expect(() => sealVaccineFromReport(vaccine, { contract: 'SOMETHING-ELSE' })).toThrow();
+  });
+
+  /**
+   * A sealed vaccine that names no evidence asserts a pathology on the authority
+   * of nothing. QbitMemoryPersistence's allowlists originally predated
+   * buildQbitHotspotsFromCleriReport and dropped every report identifier on the
+   * floor, so this pins that they now survive normalisation.
+   */
+  it('records which investigation justified the vaccine', () => {
+    const vaccine = mintPathologyVaccine(SWALLOWED);
+    const { envelope } = sealVaccineFromReport(vaccine, report);
+
+    expect(envelope.provenance.reportId).toBe(report.reportId);
+    expect(envelope.provenance.reportBytecode).toBe(report.bytecode);
+    expect(envelope.provenance.verifierId).toBe('swallowed-error/v1');
+
+    expect(envelope.enrichment.metadata.reportId).toBe(report.reportId);
+    expect(envelope.enrichment.metadata.status).toBe(report.status);
+    expect(envelope.enrichment.metadata.verifiedFindings).toBeGreaterThan(0);
+    expect(envelope.enrichment.metadata.coverageComplete).toBe(true);
+  });
+
+  /**
+   * The allowlist is a VOLATILITY FILTER, and widening it for provenance must not
+   * have widened it for the wall clock. Two seals of the same report differing
+   * only in duration must be the same artifact.
+   */
+  it('still refuses wall-clock noise into the checksum', () => {
+    const vaccine = mintPathologyVaccine(SWALLOWED);
+    const base = sealVaccineFromReport(vaccine, report).envelope;
+    const noisy = buildBytecodeXPMemoryEnvelope({
+      vaccine,
+      pulse: base.pulse,
+      enrichment: { ...base.enrichment, metadata: { ...base.enrichment.metadata, durationMs: 99.9 } },
+      labels: base.labels,
+      provenance: base.provenance,
+    });
+
+    expect(noisy.enrichment.metadata.durationMs).toBeUndefined();
+    expect(noisy.checksum).toBe(base.checksum);
   });
 
   it('keys memory by the stable vaccine id, so a re-seal overwrites rather than duplicates', () => {
