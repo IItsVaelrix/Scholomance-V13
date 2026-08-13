@@ -432,6 +432,13 @@ body::before {
   --z-above: 10;
   --z-overlay: 100;
   --z-system: 1000;
+
+  /* Page-local stacking scales registered here so Law 10 audits can see them.
+     CONSTELLATION PAGE: --cos-z-content: 1, --cos-z-search: 2, --cos-z-brand: 3
+     (defined + ordered in src/pages/Constellation/ConstellationPage.css only).
+     Scoped to the page's own stacking context. INVARIANT: every --cos-z-* value
+     must stay < --z-above (10) so page content can never rise above global
+     overlays/system layers. LAW-REG-001 charter, 2026-08-17. */
   
   /* Focus Ring */
   --focus-ring: 0 0 0 3px var(--school-sonic);

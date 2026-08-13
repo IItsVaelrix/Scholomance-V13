@@ -29,7 +29,9 @@
   --cos-z-content: 1;
   /* Stacking Sovereignty (VAELRIX Law 10): no hardcoded z-index > 1.
      The sticky rail pair added in bab32e02 originally shipped hardcoded 3/2;
-     they now draw from this page-local scale like everything else. */
+     they now draw from this page-local scale like everything else.
+     CHARTERED in the global registry (src/index.css, "Z-Index Layers"): all
+     --cos-z-* must stay < --z-above (10). LAW-REG-001, 2026-08-17. */
   --cos-z-search: 2;
   --cos-z-brand: 3;
 

@@ -6,7 +6,7 @@ import { resolveConstellationFixture } from '../pages/Constellation/fixtures/sam
  * fixture when the backend is unavailable (PDR §7.8). Never recomputes engine
  * truth on the client — it maps the server packet verbatim.
  * @param {string | null} query
- * @returns {{ status: 'idle' | 'loading' | 'ready', packet: import('../pages/Constellation/types.js').ConstellationPhase1Packet | null }}
+ * @returns {{ status: 'idle' | 'loading' | 'ready', packet: import('./constellation.types.js').ConstellationPhase1Packet | null }}
  */
 export function useConstellationPage(query) {
   const [state, setState] = useState({ status: 'idle', packet: null });

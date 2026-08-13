@@ -29,7 +29,7 @@ function emptyLeximancy() {
 /**
  * @param {string} rawQuery
  * @param {{ lexiconAdapter, rhymeQueryEngine, rhymeLexiconRepo }} deps
- * @returns {Promise<import('../../../src/pages/Constellation/types.js').ConstellationPhase1Packet>}
+ * @returns {Promise<import('../../../src/hooks/constellation.types.js').ConstellationPhase1Packet>}
  */
 export async function buildConstellationPage(rawQuery, deps) {
   // ── Phase 2: Phrase Analysis ──────────────────────────────────────
