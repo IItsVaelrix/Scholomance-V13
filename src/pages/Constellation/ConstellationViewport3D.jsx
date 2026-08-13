@@ -23,14 +23,29 @@ function readScenePalette(element) {
   };
 }
 
-function supportsWebGL() {
-  if (typeof document === 'undefined') return false;
+/**
+ * Probes WebGL support and NAMES why it is unavailable.
+ *
+ * A bare `catch { return false }` reports "no WebGL" identically whether the
+ * browser has none, the driver is blocklisted, or context creation threw — so a
+ * failure that should be reported is indistinguishable from a plain absence.
+ * The returned fallback carries the caught error and a reason instead.
+ *
+ * @returns {{ ok: boolean, error: Error | null, reason: string }}
+ */
+function probeWebGL() {
+  if (typeof document === 'undefined') {
+    return { ok: false, error: null, reason: 'no document — rendered outside a browser' };
+  }
   try {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('webgl2') || canvas.getContext('webgl');
-    return Boolean(context);
-  } catch {
-    return false;
+    if (!context) {
+      return { ok: false, error: null, reason: 'this browser returned no webgl2 or webgl context' };
+    }
+    return { ok: true, error: null, reason: 'webgl context acquired' };
+  } catch (error) {
+    return { ok: false, error, reason: `webgl context creation threw: ${error?.message ?? String(error)}` };
   }
 }
 
@@ -166,10 +181,10 @@ function SpatialField({ model, palette, selectedNodeId, selectedChannel, reduced
   );
 }
 
-function WebGLFallback({ model, onSelect, selectedNodeId }) {
+function WebGLFallback({ model, onSelect, selectedNodeId, reason }) {
   const primaryNodes = model.nodes.filter((node) => node.kind !== 'satellite');
   return (
-    <div className="constellation-viewport__fallback" role="status">
+    <div className="constellation-viewport__fallback" role="status" data-webgl-reason={reason}>
       <span className="constellation-viewport__fallback-mark" aria-hidden="true">✦</span>
       <p>Spatial rendering is unavailable. The complete celestial index remains accessible.</p>
       <div className="constellation-viewport__fallback-actions">
@@ -198,12 +213,12 @@ export default function ConstellationViewport3D({
 }) {
   const rootRef = useRef(null);
   const [palette, setPalette] = useState(DEFAULT_PALETTE);
-  const [webglAvailable, setWebglAvailable] = useState(null);
+  const [webgl, setWebgl] = useState(null);
   const [hoveredNode, setHoveredNode] = useState(null);
 
   useEffect(() => {
     setPalette(readScenePalette(rootRef.current));
-    setWebglAvailable(supportsWebGL());
+    setWebgl(probeWebGL());
   }, []);
 
   const focusNode = hoveredNode ?? selectedNode ?? model.nodes[0];
@@ -230,7 +245,7 @@ export default function ConstellationViewport3D({
         role="group"
         aria-label={`${model.nodes.length} semantic stars arranged around the submitted query`}
       >
-        {webglAvailable ? (
+        {webgl?.ok ? (
           <Canvas
             aria-hidden="true"
             camera={{ position: [0, 0, 13.5], fov: 46, near: 0.1, far: 60 }}
@@ -252,8 +267,13 @@ export default function ConstellationViewport3D({
               onHover={setHoveredNode}
             />
           </Canvas>
-        ) : webglAvailable === false ? (
-          <WebGLFallback model={model} onSelect={onSelectNode} selectedNodeId={selectedNode?.id} />
+        ) : webgl ? (
+          <WebGLFallback
+            model={model}
+            onSelect={onSelectNode}
+            selectedNodeId={selectedNode?.id}
+            reason={webgl.reason}
+          />
         ) : (
           <div className="constellation-viewport__charting" aria-hidden="true">
             <span />
@@ -263,7 +283,7 @@ export default function ConstellationViewport3D({
         )}
       </div>
 
-      {webglAvailable ? (
+      {webgl?.ok ? (
         <nav className="constellation-viewport__node-index" aria-label="Spatial field focus points">
           {primaryNodes.map((node) => (
             <button
