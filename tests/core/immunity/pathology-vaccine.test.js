@@ -4,7 +4,9 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { mintPathologyVaccine, pulseFromFindings, PATHOLOGY_SLUGS } from '../../../codex/core/immunity/pathology-vaccine.js';
+import { readFileSync } from 'node:fs';
+import { mintPathologyVaccine, pulseFromFindings, sealVaccineFromReport, PATHOLOGY_SLUGS } from '../../../codex/core/immunity/pathology-vaccine.js';
+import { verifyBytecodeXPMemoryEnvelope, buildBytecodeXPMemoryKey } from '../../../codex/core/diagnostic/QbitMemoryPersistence.js';
 import { RECOVERY_RETURN_KEYS } from '../../../codex/core/immunity/cleri-probe/scholomance-profile.js';
 
 const SWALLOWED = Object.freeze({
@@ -92,5 +94,51 @@ describe('identity versus census', () => {
     const pulse = pulseFromFindings(vaccine, [{ path: 'real.js' }, { path: null }, {}]);
     expect(pulse.hotspots).toHaveLength(1);
     expect(pulse.hotspots[0].path).toBe('real.js');
+  });
+});
+
+
+describe('sealing a vaccine into memory', () => {
+  // A committed fixture, not a scratch path: a test that reads an agent's temp
+  // directory passes for exactly one person and fails silently for everyone else.
+  const report = JSON.parse(readFileSync(
+    new URL('../../fixtures/cleri/swallowed-error-report.json', import.meta.url), 'utf8',
+  ));
+
+  it('seals vaccine, pulse and enrichment into a verifying envelope', () => {
+    const vaccine = mintPathologyVaccine(SWALLOWED);
+    const { envelope, pulse, enrichment } = sealVaccineFromReport(vaccine, report);
+
+    expect(envelope.schema).toBe('SCHOL-BYTXP-MEM-v1');
+    expect(verifyBytecodeXPMemoryEnvelope(envelope)).toBe(true);
+    expect(envelope.memoryKey).toBe(buildBytecodeXPMemoryKey(vaccine));
+    expect(pulse.vaccineId).toBe(vaccine.vaccineId);
+    expect(enrichment.metadata.verifiedFindings).toBeGreaterThan(0);
+  });
+
+  /**
+   * The reason to use buildQbitHotspotsFromCleriReport rather than reading
+   * findings directly: it runs verifyInvestigationReport and refuses a report
+   * whose contents no longer match its own checksum. A vaccine minted from a
+   * doctored report would immunise the system against a fiction.
+   */
+  it('refuses a tampered report rather than immunising against a fiction', () => {
+    const vaccine = mintPathologyVaccine(SWALLOWED);
+    const tampered = JSON.parse(JSON.stringify(report));
+    tampered.findings[0].span.path = 'somewhere/else.js';
+    expect(() => sealVaccineFromReport(vaccine, tampered)).toThrow();
+  });
+
+  it('refuses a report that is not a cleri-probe investigation', () => {
+    const vaccine = mintPathologyVaccine(SWALLOWED);
+    expect(() => sealVaccineFromReport(vaccine, { contract: 'SOMETHING-ELSE' })).toThrow();
+  });
+
+  it('keys memory by the stable vaccine id, so a re-seal overwrites rather than duplicates', () => {
+    const vaccine = mintPathologyVaccine(SWALLOWED);
+    const a = sealVaccineFromReport(vaccine, report).envelope.memoryKey;
+    const b = sealVaccineFromReport(vaccine, report).envelope.memoryKey;
+    expect(a).toBe(b);
+    expect(a).toContain(vaccine.vaccineId);
   });
 });

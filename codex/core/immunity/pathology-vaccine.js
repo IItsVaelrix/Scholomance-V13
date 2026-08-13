@@ -34,6 +34,8 @@
 
 import { BytecodeXPVaccine, BYTECODE_XP_SOURCE_KINDS } from '../diagnostic/BytecodeXPVaccine.js';
 import { buildQbitPulseNode } from '../diagnostic/QbitPulse.js';
+import { buildQbitHotspotsFromCleriReport } from '../diagnostic/QbitProbeEnrichment.js';
+import { buildBytecodeXPMemoryEnvelope } from '../diagnostic/QbitMemoryPersistence.js';
 import { RECOVERY_RETURN_KEYS } from './cleri-probe/scholomance-profile.js';
 
 /** Slugs are [A-Z0-9]{4,8}; these are declared, not derived, so ids stay readable. */
@@ -81,11 +83,52 @@ export function mintPathologyVaccine({ pathologyClass, verifierId, recoveryKey, 
 }
 
 /**
- * Attach a minted vaccine to where the pathology currently lives.
+ * Attach a vaccine to a VERIFIED cleri-probe report, and seal the pair into a
+ * SCHOL-BYTXP-MEM-v1 envelope so it outlives the process that minted it.
  *
- * Resonance is finding-density per file, normalised to the busiest file, so the
- * pulse's own derivePulseRadius and deriveCollapseConfidence mean something:
- * radius follows the worst site, confidence follows the average.
+ * The hotspots come from `buildQbitHotspotsFromCleriReport`, not from a local
+ * reimplementation, because that function does two things worth having: it
+ * runs `verifyInvestigationReport` and REFUSES a tampered report, and it keeps
+ * only findings whose verdict is VERIFIED. A vaccine built from nominations
+ * would immunise against guesses.
+ *
+ * @param {BytecodeXPVaccine} vaccine
+ * @param {object} report  a SCHOL-CLERI-PROBE-v2 investigation report
+ * @param {{maxHotspots?: number, labels?: string[], agentId?: string}} [options]
+ * @returns {{envelope: object, pulse: object, enrichment: object}}
+ */
+export function sealVaccineFromReport(vaccine, report, options = {}) {
+  const enrichment = buildQbitHotspotsFromCleriReport(report, { maxHotspots: options.maxHotspots });
+  const pulse = buildQbitPulseNode(vaccine, {
+    hotspots: enrichment.hotspots,
+    maxHotspots: options.maxHotspots,
+  });
+
+  const envelope = buildBytecodeXPMemoryEnvelope({
+    vaccine,
+    pulse,
+    enrichment,
+    labels: options.labels ?? [vaccine.stableContext.pathologyClass],
+    provenance: {
+      reportId: report.reportId ?? null,
+      reportBytecode: report.bytecode ?? null,
+      verifierId: vaccine.stableContext.verifierId,
+    },
+  });
+
+  return { envelope, pulse, enrichment };
+}
+
+/**
+ * Attach a minted vaccine to where the pathology currently lives, weighting by
+ * DANGER rather than density.
+ *
+ * `buildQbitHotspotsFromCleriReport` sets every verified finding to resonance 1,
+ * which is correct for it — a verified finding is a verified finding. But for
+ * ranking WHERE TO LOOK FIRST that flattens a real distinction: collab.routes.js
+ * carries 40 findings that are all `catch (error) { return sendServiceError(...) }`,
+ * i.e. correct code, and would outrank a file with three silent fallbacks.
+ * Callers that have triaged their findings pass the classifier here instead.
  *
  * @param {BytecodeXPVaccine} vaccine
  * @param {Array<{path: string}>} findings
