@@ -3,7 +3,7 @@
  * Injects runes, sigils, crystal accents, and arcane glows onto clothing/hair.
  * Designed to layer on top of existing character-foundry output.
  */
-import { registerAmp } from './amp-registry.js'; // assume pattern from other amps
+import { registerAmp } from './amp-registry.js'; // NOTE: this is the ONLY external registrant; see amp-registry.js header (truth pass 2026-08-12)
 
 export function applyScholomanceMotifs(cells, options = {}) {
   const { school = 'void', intensity = 0.7 } = options;
