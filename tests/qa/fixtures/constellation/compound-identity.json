@@ -1,0 +1,10452 @@
+{
+  "contract": "SCHOL-COMPOUND-IDENTITY-v1",
+  "frozenAt": "2026-08-13",
+  "corpus": "Project Gutenberg (public domain), phrases carrying a hyphen-declared compound",
+  "population": {
+    "books": 900,
+    "phrases": 4000,
+    "rates": {
+      "split": 0.205,
+      "fused": 0.165,
+      "union": 0.28775
+    },
+    "fusedToUnion": {
+      "aOnly": 64,
+      "bOnly": 555,
+      "p": 1.3055086172942188e-98
+    },
+    "splitToUnion": {
+      "aOnly": 145,
+      "bOnly": 476,
+      "p": 4.638361494393321e-42
+    }
+  },
+  "regressions": 64,
+  "regressionsFrozen": 62,
+  "lexicon": {
+    "a": [
+      "n"
+    ],
+    "about": [
+      "a",
+      "r"
+    ],
+    "abyssinia": [
+      "n"
+    ],
+    "affection": [
+      "n"
+    ],
+    "after": [
+      "a",
+      "r"
+    ],
+    "afterwards": [
+      "r"
+    ],
+    "again": [
+      "r"
+    ],
+    "ago": [
+      "a",
+      "r"
+    ],
+    "ai": [
+      "n"
+    ],
+    "alas": [
+      "n",
+      "r"
+    ],
+    "ale": [
+      "n"
+    ],
+    "all": [
+      "a",
+      "r"
+    ],
+    "allowed": [
+      "v"
+    ],
+    "alms": [
+      "n"
+    ],
+    "alone": [
+      "a",
+      "r"
+    ],
+    "always": [
+      "r"
+    ],
+    "am": [
+      "n",
+      "r"
+    ],
+    "amber": [
+      "a",
+      "n"
+    ],
+    "ambition": [
+      "n",
+      "v"
+    ],
+    "americana": [
+      "n"
+    ],
+    "an": [
+      "n"
+    ],
+    "anchor": [
+      "n",
+      "v"
+    ],
+    "ancient": [
+      "a",
+      "n"
+    ],
+    "angel": [
+      "n"
+    ],
+    "angelical": [
+      "a"
+    ],
+    "another": [
+      "a"
+    ],
+    "answer": [
+      "n",
+      "v"
+    ],
+    "answers": [
+      "n",
+      "v"
+    ],
+    "anti": [
+      "a",
+      "n"
+    ],
+    "ape": [
+      "n",
+      "v"
+    ],
+    "apparent": [
+      "a"
+    ],
+    "apple": [
+      "n"
+    ],
+    "appointed": [
+      "a",
+      "v"
+    ],
+    "are": [
+      "n"
+    ],
+    "arms": [
+      "n",
+      "v"
+    ],
+    "around": [
+      "r"
+    ],
+    "art": [
+      "n"
+    ],
+    "as": [
+      "n",
+      "r"
+    ],
+    "ascension": [
+      "n"
+    ],
+    "ash": [
+      "n",
+      "v"
+    ],
+    "asia": [
+      "n"
+    ],
+    "asked": [
+      "v"
+    ],
+    "ass": [
+      "n"
+    ],
+    "assist": [
+      "n",
+      "v"
+    ],
+    "at": [
+      "n"
+    ],
+    "attempt": [
+      "n",
+      "v"
+    ],
+    "attendants": [
+      "n"
+    ],
+    "au": [
+      "n"
+    ],
+    "aunt": [
+      "n"
+    ],
+    "away": [
+      "a",
+      "r"
+    ],
+    "ba": [
+      "n"
+    ],
+    "babies": [
+      "n",
+      "v"
+    ],
+    "back": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "bacon": [
+      "n"
+    ],
+    "bag": [
+      "n",
+      "v"
+    ],
+    "bald": [
+      "a",
+      "v"
+    ],
+    "bald-pated": [
+      "a"
+    ],
+    "balls": [
+      "n",
+      "v"
+    ],
+    "bamboo": [
+      "n"
+    ],
+    "bare": [
+      "a",
+      "v"
+    ],
+    "bark": [
+      "n",
+      "v"
+    ],
+    "base": [
+      "a",
+      "n",
+      "v"
+    ],
+    "basket": [
+      "n"
+    ],
+    "bastard": [
+      "a",
+      "n"
+    ],
+    "be": [
+      "n",
+      "v"
+    ],
+    "beamed": [
+      "v"
+    ],
+    "beat": [
+      "a",
+      "n",
+      "v"
+    ],
+    "beaten": [
+      "a"
+    ],
+    "beautiful": [
+      "a"
+    ],
+    "become": [
+      "v"
+    ],
+    "bed": [
+      "n",
+      "v"
+    ],
+    "beetle": [
+      "a",
+      "n",
+      "v"
+    ],
+    "before": [
+      "r"
+    ],
+    "begin": [
+      "n",
+      "v"
+    ],
+    "belike": [
+      "r"
+    ],
+    "bellows": [
+      "n",
+      "v"
+    ],
+    "beloved": [
+      "a",
+      "n"
+    ],
+    "bench": [
+      "n",
+      "v"
+    ],
+    "best": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "better": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "between": [
+      "r"
+    ],
+    "birding": [
+      "v"
+    ],
+    "bites": [
+      "n",
+      "v"
+    ],
+    "biting": [
+      "a",
+      "v"
+    ],
+    "black": [
+      "a",
+      "n",
+      "v"
+    ],
+    "blames": [
+      "n",
+      "v"
+    ],
+    "blank": [
+      "a",
+      "n",
+      "v"
+    ],
+    "blasting": [
+      "a",
+      "v"
+    ],
+    "bless": [
+      "v"
+    ],
+    "blessed": [
+      "a",
+      "v"
+    ],
+    "blind": [
+      "a",
+      "n",
+      "v"
+    ],
+    "blood": [
+      "n",
+      "v"
+    ],
+    "blooded": [
+      "a",
+      "v"
+    ],
+    "bloody": [
+      "a",
+      "r",
+      "v"
+    ],
+    "blot": [
+      "n",
+      "v"
+    ],
+    "blow": [
+      "n",
+      "v"
+    ],
+    "blowers": [
+      "n"
+    ],
+    "blunt": [
+      "a",
+      "v"
+    ],
+    "bobs": [
+      "n",
+      "v"
+    ],
+    "bolted": [
+      "v"
+    ],
+    "bone": [
+      "a",
+      "n",
+      "v"
+    ],
+    "bonfire": [
+      "n"
+    ],
+    "book": [
+      "n",
+      "v"
+    ],
+    "born": [
+      "a",
+      "n"
+    ],
+    "both": [
+      "a"
+    ],
+    "bottle": [
+      "n",
+      "v"
+    ],
+    "boy": [
+      "n"
+    ],
+    "brain": [
+      "n",
+      "v"
+    ],
+    "bras": [
+      "n"
+    ],
+    "brazen": [
+      "a",
+      "v"
+    ],
+    "breaking": [
+      "n",
+      "v"
+    ],
+    "breast": [
+      "n",
+      "v"
+    ],
+    "breath": [
+      "n"
+    ],
+    "breathed": [
+      "a",
+      "v"
+    ],
+    "breeze": [
+      "n",
+      "v"
+    ],
+    "brevity": [
+      "n"
+    ],
+    "bride": [
+      "n"
+    ],
+    "brief": [
+      "a",
+      "n",
+      "v"
+    ],
+    "briers": [
+      "n"
+    ],
+    "brooch": [
+      "n",
+      "v"
+    ],
+    "brook": [
+      "n",
+      "v"
+    ],
+    "brother": [
+      "n"
+    ],
+    "brothers": [
+      "n"
+    ],
+    "buck": [
+      "n",
+      "v"
+    ],
+    "bud": [
+      "n",
+      "v"
+    ],
+    "burgundy": [
+      "n"
+    ],
+    "business": [
+      "n"
+    ],
+    "but": [
+      "r"
+    ],
+    "butcher": [
+      "a",
+      "n",
+      "v"
+    ],
+    "butter": [
+      "n",
+      "v"
+    ],
+    "by": [
+      "r"
+    ],
+    "by-and-by": [
+      "n"
+    ],
+    "c": [
+      "a",
+      "n"
+    ],
+    "call": [
+      "n",
+      "v"
+    ],
+    "called": [
+      "v"
+    ],
+    "calumnious": [
+      "a"
+    ],
+    "calumny": [
+      "n"
+    ],
+    "can": [
+      "n",
+      "v"
+    ],
+    "cap": [
+      "n",
+      "v"
+    ],
+    "capon": [
+      "n"
+    ],
+    "caps": [
+      "n",
+      "v"
+    ],
+    "captain": [
+      "n",
+      "v"
+    ],
+    "car": [
+      "n"
+    ],
+    "cardinal": [
+      "a",
+      "n"
+    ],
+    "carrier": [
+      "n"
+    ],
+    "carrion": [
+      "n"
+    ],
+    "carved": [
+      "a",
+      "v"
+    ],
+    "catch": [
+      "n",
+      "v"
+    ],
+    "caterpillars": [
+      "n"
+    ],
+    "cathay": [
+      "n"
+    ],
+    "ce": [
+      "n",
+      "r"
+    ],
+    "central": [
+      "a",
+      "n"
+    ],
+    "chamber": [
+      "n",
+      "v"
+    ],
+    "changed": [
+      "a",
+      "v"
+    ],
+    "charge": [
+      "n",
+      "v"
+    ],
+    "charles": [
+      "n"
+    ],
+    "chased": [
+      "n",
+      "v"
+    ],
+    "cheating": [
+      "a",
+      "n",
+      "v"
+    ],
+    "cheek": [
+      "n",
+      "v"
+    ],
+    "chosen": [
+      "n"
+    ],
+    "clangor": [
+      "n",
+      "v"
+    ],
+    "clarence": [
+      "n"
+    ],
+    "clean": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "cloth": [
+      "n"
+    ],
+    "coal": [
+      "n",
+      "v"
+    ],
+    "coal-black": [
+      "a"
+    ],
+    "coated": [
+      "a",
+      "v"
+    ],
+    "coats": [
+      "n",
+      "v"
+    ],
+    "cock": [
+      "n",
+      "v"
+    ],
+    "cocks": [
+      "n",
+      "v"
+    ],
+    "col": [
+      "n"
+    ],
+    "coloured": [
+      "a",
+      "n",
+      "v"
+    ],
+    "come": [
+      "n",
+      "v"
+    ],
+    "comes": [
+      "n",
+      "v"
+    ],
+    "comfit": [
+      "n",
+      "v"
+    ],
+    "comfort": [
+      "n",
+      "v"
+    ],
+    "coming": [
+      "a",
+      "n",
+      "v"
+    ],
+    "comment": [
+      "n",
+      "v"
+    ],
+    "competitors": [
+      "n"
+    ],
+    "compliment": [
+      "n",
+      "v"
+    ],
+    "concerning": [
+      "v"
+    ],
+    "conjure": [
+      "v"
+    ],
+    "constant": [
+      "a",
+      "n"
+    ],
+    "consternation": [
+      "n"
+    ],
+    "consulting": [
+      "v"
+    ],
+    "contract": [
+      "n",
+      "v"
+    ],
+    "contrived": [
+      "a",
+      "v"
+    ],
+    "cony": [
+      "n"
+    ],
+    "corner": [
+      "n",
+      "v"
+    ],
+    "corrupts": [
+      "v"
+    ],
+    "council": [
+      "n"
+    ],
+    "court": [
+      "n",
+      "v"
+    ],
+    "courtesy": [
+      "n"
+    ],
+    "cousin": [
+      "n"
+    ],
+    "cover": [
+      "n",
+      "v"
+    ],
+    "coward": [
+      "n"
+    ],
+    "cowl": [
+      "n",
+      "v"
+    ],
+    "coxcomb": [
+      "n"
+    ],
+    "crab": [
+      "n",
+      "v"
+    ],
+    "cream": [
+      "n",
+      "v"
+    ],
+    "creep": [
+      "n",
+      "v"
+    ],
+    "cries": [
+      "n",
+      "v"
+    ],
+    "crooked": [
+      "a",
+      "v"
+    ],
+    "crop": [
+      "n",
+      "v"
+    ],
+    "cross": [
+      "a",
+      "n",
+      "v"
+    ],
+    "cross-questions": [
+      "n"
+    ],
+    "crow": [
+      "n",
+      "v"
+    ],
+    "cruel": [
+      "a"
+    ],
+    "cry": [
+      "n",
+      "v"
+    ],
+    "cuckold": [
+      "n",
+      "v"
+    ],
+    "cur": [
+      "n"
+    ],
+    "cure": [
+      "n",
+      "v"
+    ],
+    "cypress": [
+      "n"
+    ],
+    "d": [
+      "a",
+      "n"
+    ],
+    "damn": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "dare": [
+      "n",
+      "v"
+    ],
+    "dark": [
+      "a",
+      "n"
+    ],
+    "daughter": [
+      "n"
+    ],
+    "daughter-in-law": [
+      "n"
+    ],
+    "day": [
+      "n"
+    ],
+    "de": [
+      "n"
+    ],
+    "dead": [
+      "a",
+      "n",
+      "r"
+    ],
+    "dear": [
+      "a",
+      "n",
+      "r"
+    ],
+    "deceived": [
+      "v"
+    ],
+    "deep": [
+      "a",
+      "n",
+      "r"
+    ],
+    "deer": [
+      "n"
+    ],
+    "define": [
+      "v"
+    ],
+    "deliver": [
+      "v"
+    ],
+    "demeanour": [
+      "n"
+    ],
+    "den": [
+      "n"
+    ],
+    "derived": [
+      "a",
+      "v"
+    ],
+    "deserved": [
+      "a",
+      "v"
+    ],
+    "devil": [
+      "n",
+      "v"
+    ],
+    "dig": [
+      "n",
+      "v"
+    ],
+    "dignities": [
+      "n"
+    ],
+    "dim": [
+      "a",
+      "v"
+    ],
+    "dis": [
+      "n"
+    ],
+    "discharge": [
+      "n",
+      "v"
+    ],
+    "discontented": [
+      "a",
+      "v"
+    ],
+    "dish": [
+      "n",
+      "v"
+    ],
+    "disposed": [
+      "a",
+      "v"
+    ],
+    "disturbed": [
+      "a",
+      "v"
+    ],
+    "dit": [
+      "n"
+    ],
+    "do": [
+      "n",
+      "v"
+    ],
+    "doctor": [
+      "n",
+      "v"
+    ],
+    "does": [
+      "n",
+      "v"
+    ],
+    "dog": [
+      "n",
+      "v"
+    ],
+    "dogs": [
+      "n",
+      "v"
+    ],
+    "doing": [
+      "v"
+    ],
+    "dotes": [
+      "v"
+    ],
+    "double": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "douglas": [
+      "n"
+    ],
+    "dove": [
+      "n"
+    ],
+    "down": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "dozen": [
+      "a",
+      "n"
+    ],
+    "dragon": [
+      "n"
+    ],
+    "drawer": [
+      "n"
+    ],
+    "draws": [
+      "n",
+      "v"
+    ],
+    "dread": [
+      "a",
+      "n",
+      "v"
+    ],
+    "dreaded": [
+      "a",
+      "v"
+    ],
+    "dressed": [
+      "a",
+      "v"
+    ],
+    "drink": [
+      "n",
+      "v"
+    ],
+    "drunk": [
+      "a",
+      "n"
+    ],
+    "dry": [
+      "a",
+      "n",
+      "v"
+    ],
+    "due": [
+      "a",
+      "n",
+      "r"
+    ],
+    "dying": [
+      "a",
+      "n",
+      "v"
+    ],
+    "e": [
+      "n"
+    ],
+    "ear": [
+      "n"
+    ],
+    "easier": [
+      "a",
+      "r"
+    ],
+    "educated": [
+      "a",
+      "v"
+    ],
+    "elbow": [
+      "n",
+      "v"
+    ],
+    "em": [
+      "n"
+    ],
+    "en": [
+      "n"
+    ],
+    "end": [
+      "n",
+      "v"
+    ],
+    "enemy": [
+      "n"
+    ],
+    "england": [
+      "n"
+    ],
+    "enough": [
+      "a",
+      "n",
+      "r"
+    ],
+    "enter": [
+      "v"
+    ],
+    "equal": [
+      "a",
+      "n",
+      "v"
+    ],
+    "er": [
+      "n"
+    ],
+    "errant": [
+      "a"
+    ],
+    "escape": [
+      "n",
+      "v"
+    ],
+    "est": [
+      "n"
+    ],
+    "even": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "ever": [
+      "r"
+    ],
+    "everlasting": [
+      "a",
+      "n"
+    ],
+    "excellent": [
+      "a"
+    ],
+    "exclaimed": [
+      "v"
+    ],
+    "expedition": [
+      "n"
+    ],
+    "explosion": [
+      "n"
+    ],
+    "eyas": [
+      "n"
+    ],
+    "eyed": [
+      "a",
+      "v"
+    ],
+    "eyes": [
+      "n",
+      "v"
+    ],
+    "face": [
+      "n",
+      "v"
+    ],
+    "faced": [
+      "a",
+      "v"
+    ],
+    "fair": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "faith": [
+      "n"
+    ],
+    "falling": [
+      "a",
+      "v"
+    ],
+    "false": [
+      "a",
+      "r"
+    ],
+    "fancy": [
+      "a",
+      "n",
+      "v"
+    ],
+    "fantastically": [
+      "r"
+    ],
+    "far": [
+      "a",
+      "n",
+      "r"
+    ],
+    "farewell": [
+      "n"
+    ],
+    "farthing": [
+      "n"
+    ],
+    "fat": [
+      "a",
+      "n",
+      "v"
+    ],
+    "father": [
+      "n",
+      "v"
+    ],
+    "favoured": [
+      "a",
+      "v"
+    ],
+    "fears": [
+      "n",
+      "v"
+    ],
+    "feather": [
+      "n",
+      "v"
+    ],
+    "feature": [
+      "n",
+      "v"
+    ],
+    "fed": [
+      "n"
+    ],
+    "fee": [
+      "n",
+      "v"
+    ],
+    "feeble": [
+      "a"
+    ],
+    "fellow": [
+      "n"
+    ],
+    "fellows": [
+      "n"
+    ],
+    "fellowship": [
+      "n"
+    ],
+    "fetch": [
+      "n",
+      "v"
+    ],
+    "field": [
+      "n",
+      "v"
+    ],
+    "fiend": [
+      "n"
+    ],
+    "fiery": [
+      "a"
+    ],
+    "fifty": [
+      "a",
+      "n"
+    ],
+    "fifty-five": [
+      "a"
+    ],
+    "fight": [
+      "n",
+      "v"
+    ],
+    "filling": [
+      "n",
+      "v"
+    ],
+    "fillip": [
+      "n"
+    ],
+    "finger": [
+      "n",
+      "v"
+    ],
+    "fire": [
+      "n",
+      "v"
+    ],
+    "first": [
+      "a",
+      "n",
+      "r"
+    ],
+    "five": [
+      "a",
+      "n"
+    ],
+    "flag": [
+      "n",
+      "v"
+    ],
+    "flap": [
+      "n",
+      "v"
+    ],
+    "flask": [
+      "n"
+    ],
+    "flies": [
+      "n",
+      "v"
+    ],
+    "fling": [
+      "n",
+      "v"
+    ],
+    "flout": [
+      "v"
+    ],
+    "flower": [
+      "n",
+      "v"
+    ],
+    "flowers": [
+      "n",
+      "v"
+    ],
+    "flute": [
+      "n",
+      "v"
+    ],
+    "fold": [
+      "n",
+      "v"
+    ],
+    "folk": [
+      "n"
+    ],
+    "fool": [
+      "n",
+      "v"
+    ],
+    "foot": [
+      "n",
+      "v"
+    ],
+    "force": [
+      "n",
+      "v"
+    ],
+    "forces": [
+      "n",
+      "v"
+    ],
+    "forest": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "forsooth": [
+      "r"
+    ],
+    "forth": [
+      "n",
+      "r"
+    ],
+    "fortunate": [
+      "a"
+    ],
+    "fortune": [
+      "n"
+    ],
+    "forward": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "foul": [
+      "a",
+      "n",
+      "v"
+    ],
+    "fowl": [
+      "n",
+      "v"
+    ],
+    "foxes": [
+      "n",
+      "v"
+    ],
+    "frame": [
+      "n",
+      "v"
+    ],
+    "frames": [
+      "n",
+      "v"
+    ],
+    "france": [
+      "n"
+    ],
+    "freestone": [
+      "n"
+    ],
+    "friend": [
+      "n"
+    ],
+    "friends": [
+      "n"
+    ],
+    "fronts": [
+      "n",
+      "v"
+    ],
+    "frosty": [
+      "a"
+    ],
+    "full": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "further": [
+      "a",
+      "r",
+      "v"
+    ],
+    "gabble": [
+      "n",
+      "v"
+    ],
+    "gads": [
+      "n",
+      "v"
+    ],
+    "gall": [
+      "n",
+      "v"
+    ],
+    "gallows": [
+      "n"
+    ],
+    "gar": [
+      "n"
+    ],
+    "garters": [
+      "n",
+      "v"
+    ],
+    "gates": [
+      "n",
+      "v"
+    ],
+    "gee": [
+      "n",
+      "v"
+    ],
+    "gene": [
+      "n"
+    ],
+    "general": [
+      "a",
+      "n",
+      "v"
+    ],
+    "gentle": [
+      "a",
+      "v"
+    ],
+    "gentlewoman": [
+      "n"
+    ],
+    "george": [
+      "n"
+    ],
+    "german": [
+      "a",
+      "n"
+    ],
+    "give": [
+      "n",
+      "v"
+    ],
+    "gives": [
+      "n",
+      "v"
+    ],
+    "glanced": [
+      "v"
+    ],
+    "gloucester": [
+      "n"
+    ],
+    "go": [
+      "a",
+      "n",
+      "v"
+    ],
+    "god": [
+      "n"
+    ],
+    "gods": [
+      "n"
+    ],
+    "gold": [
+      "a",
+      "n"
+    ],
+    "good": [
+      "a",
+      "n",
+      "r"
+    ],
+    "goodly": [
+      "a"
+    ],
+    "grand": [
+      "a",
+      "n"
+    ],
+    "great": [
+      "a",
+      "n"
+    ],
+    "greater": [
+      "a"
+    ],
+    "greek": [
+      "a",
+      "n"
+    ],
+    "green": [
+      "a",
+      "n",
+      "v"
+    ],
+    "grey": [
+      "a",
+      "n",
+      "v"
+    ],
+    "grief": [
+      "n"
+    ],
+    "groat": [
+      "n"
+    ],
+    "gross": [
+      "a",
+      "n",
+      "v"
+    ],
+    "grove": [
+      "n"
+    ],
+    "grow": [
+      "v"
+    ],
+    "growled": [
+      "v"
+    ],
+    "guinea": [
+      "n"
+    ],
+    "gulches": [
+      "n"
+    ],
+    "hail": [
+      "n",
+      "v"
+    ],
+    "half": [
+      "a",
+      "n",
+      "r"
+    ],
+    "half-blooded": [
+      "a"
+    ],
+    "half-hour": [
+      "n"
+    ],
+    "half-moon": [
+      "n"
+    ],
+    "hammer": [
+      "n",
+      "v"
+    ],
+    "hand": [
+      "n",
+      "v"
+    ],
+    "handed": [
+      "a",
+      "v"
+    ],
+    "hang": [
+      "n",
+      "v"
+    ],
+    "hanged": [
+      "v"
+    ],
+    "happy": [
+      "a"
+    ],
+    "hard": [
+      "a",
+      "r"
+    ],
+    "hardly": [
+      "r"
+    ],
+    "has": [
+      "n"
+    ],
+    "haste": [
+      "n"
+    ],
+    "hate": [
+      "n",
+      "v"
+    ],
+    "haunted": [
+      "a",
+      "v"
+    ],
+    "have": [
+      "n",
+      "v"
+    ],
+    "he": [
+      "n"
+    ],
+    "head": [
+      "n",
+      "v"
+    ],
+    "headed": [
+      "a",
+      "v"
+    ],
+    "healed": [
+      "a",
+      "v"
+    ],
+    "hear": [
+      "v"
+    ],
+    "heard": [
+      "a"
+    ],
+    "heart": [
+      "n"
+    ],
+    "heather": [
+      "n"
+    ],
+    "heaven": [
+      "n"
+    ],
+    "heavy": [
+      "a",
+      "n",
+      "r"
+    ],
+    "hector": [
+      "n",
+      "v"
+    ],
+    "hedge": [
+      "n",
+      "v"
+    ],
+    "heir": [
+      "n"
+    ],
+    "helen": [
+      "n"
+    ],
+    "hell": [
+      "n"
+    ],
+    "hell-kite": [
+      "n"
+    ],
+    "hence": [
+      "r"
+    ],
+    "henry": [
+      "n"
+    ],
+    "herbs": [
+      "n"
+    ],
+    "here": [
+      "a",
+      "n",
+      "r"
+    ],
+    "hereafter": [
+      "n",
+      "r"
+    ],
+    "herod": [
+      "n"
+    ],
+    "herods": [
+      "n"
+    ],
+    "hieroglyphic": [
+      "a",
+      "n"
+    ],
+    "high": [
+      "a",
+      "n",
+      "r"
+    ],
+    "hill": [
+      "n",
+      "v"
+    ],
+    "hilt": [
+      "n"
+    ],
+    "his": [
+      "n"
+    ],
+    "hither": [
+      "r"
+    ],
+    "ho": [
+      "n"
+    ],
+    "hocus-pocus": [
+      "n"
+    ],
+    "hog": [
+      "n",
+      "v"
+    ],
+    "hold": [
+      "n",
+      "v"
+    ],
+    "hole": [
+      "n",
+      "v"
+    ],
+    "holes": [
+      "n",
+      "v"
+    ],
+    "holly": [
+      "n"
+    ],
+    "holy": [
+      "a",
+      "n"
+    ],
+    "honest": [
+      "a"
+    ],
+    "honour": [
+      "n",
+      "v"
+    ],
+    "honours": [
+      "n",
+      "v"
+    ],
+    "hook": [
+      "n",
+      "v"
+    ],
+    "hooker": [
+      "n"
+    ],
+    "horn": [
+      "n",
+      "v"
+    ],
+    "horse": [
+      "n",
+      "v"
+    ],
+    "hot": [
+      "a"
+    ],
+    "hot-blooded": [
+      "a"
+    ],
+    "hour": [
+      "n"
+    ],
+    "house": [
+      "n",
+      "v"
+    ],
+    "humility": [
+      "n"
+    ],
+    "humming": [
+      "n"
+    ],
+    "humour": [
+      "n",
+      "v"
+    ],
+    "husband": [
+      "n",
+      "v"
+    ],
+    "i": [
+      "a",
+      "n"
+    ],
+    "iceland": [
+      "n"
+    ],
+    "idiot": [
+      "n"
+    ],
+    "ignoble": [
+      "a"
+    ],
+    "ii": [
+      "a",
+      "n"
+    ],
+    "iii": [
+      "a",
+      "n"
+    ],
+    "il": [
+      "a",
+      "n"
+    ],
+    "ill": [
+      "a",
+      "n",
+      "r"
+    ],
+    "impossible": [
+      "a",
+      "n"
+    ],
+    "in": [
+      "a",
+      "n",
+      "r"
+    ],
+    "indeed": [
+      "r"
+    ],
+    "inducement": [
+      "n"
+    ],
+    "infant": [
+      "n"
+    ],
+    "informed": [
+      "a",
+      "v"
+    ],
+    "iron": [
+      "a",
+      "n",
+      "v"
+    ],
+    "irreproachable": [
+      "a"
+    ],
+    "is": [
+      "n"
+    ],
+    "it": [
+      "n"
+    ],
+    "jack": [
+      "n",
+      "v"
+    ],
+    "james": [
+      "n"
+    ],
+    "jest": [
+      "n",
+      "v"
+    ],
+    "jet": [
+      "a",
+      "n",
+      "v"
+    ],
+    "jig": [
+      "n",
+      "v"
+    ],
+    "jogging": [
+      "n"
+    ],
+    "john": [
+      "n"
+    ],
+    "joint": [
+      "a",
+      "n",
+      "v"
+    ],
+    "jointed": [
+      "a",
+      "v"
+    ],
+    "joseph": [
+      "n"
+    ],
+    "juggler": [
+      "n"
+    ],
+    "jurisdiction": [
+      "n"
+    ],
+    "kazan": [
+      "n"
+    ],
+    "kiang": [
+      "n"
+    ],
+    "kick": [
+      "n",
+      "v"
+    ],
+    "kiln": [
+      "n"
+    ],
+    "kindled": [
+      "a",
+      "v"
+    ],
+    "kindly": [
+      "a",
+      "r"
+    ],
+    "king": [
+      "n"
+    ],
+    "kingly": [
+      "a"
+    ],
+    "kitchen": [
+      "n"
+    ],
+    "kite": [
+      "n",
+      "v"
+    ],
+    "knave": [
+      "n"
+    ],
+    "knaves": [
+      "n"
+    ],
+    "knight": [
+      "n",
+      "v"
+    ],
+    "knight-errant": [
+      "n"
+    ],
+    "knit": [
+      "n",
+      "v"
+    ],
+    "know": [
+      "n",
+      "v"
+    ],
+    "knowing": [
+      "a",
+      "n",
+      "v"
+    ],
+    "knows": [
+      "n",
+      "v"
+    ],
+    "knuckled": [
+      "v"
+    ],
+    "l": [
+      "a",
+      "n"
+    ],
+    "la": [
+      "n"
+    ],
+    "labour": [
+      "n",
+      "v"
+    ],
+    "lack": [
+      "n",
+      "v"
+    ],
+    "ladders": [
+      "n",
+      "v"
+    ],
+    "lamb": [
+      "n",
+      "v"
+    ],
+    "land": [
+      "n",
+      "v"
+    ],
+    "language": [
+      "n"
+    ],
+    "lanyard": [
+      "n"
+    ],
+    "lao": [
+      "a",
+      "n"
+    ],
+    "last": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "latin": [
+      "a",
+      "n"
+    ],
+    "law": [
+      "n"
+    ],
+    "le": [
+      "n"
+    ],
+    "leader": [
+      "n"
+    ],
+    "lean": [
+      "a",
+      "n",
+      "v"
+    ],
+    "learned": [
+      "a",
+      "v"
+    ],
+    "learning": [
+      "n",
+      "v"
+    ],
+    "leather": [
+      "n",
+      "v"
+    ],
+    "leave": [
+      "n",
+      "v"
+    ],
+    "leave-taking": [
+      "n"
+    ],
+    "legends": [
+      "n"
+    ],
+    "les": [
+      "n"
+    ],
+    "let": [
+      "n",
+      "v"
+    ],
+    "letter": [
+      "n",
+      "v"
+    ],
+    "lie": [
+      "n",
+      "v"
+    ],
+    "liege": [
+      "a",
+      "n"
+    ],
+    "lies": [
+      "n",
+      "v"
+    ],
+    "liest": [
+      "a"
+    ],
+    "light": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "like": [
+      "a",
+      "n",
+      "v"
+    ],
+    "liking": [
+      "n",
+      "v"
+    ],
+    "limb": [
+      "n"
+    ],
+    "limbed": [
+      "a"
+    ],
+    "limits": [
+      "n",
+      "v"
+    ],
+    "linen": [
+      "n"
+    ],
+    "linsey-woolsey": [
+      "n"
+    ],
+    "lion": [
+      "n"
+    ],
+    "lived": [
+      "v"
+    ],
+    "liver": [
+      "a",
+      "n",
+      "r"
+    ],
+    "loath": [
+      "a"
+    ],
+    "lobby": [
+      "n",
+      "v"
+    ],
+    "logan": [
+      "n"
+    ],
+    "long": [
+      "a",
+      "r",
+      "v"
+    ],
+    "look": [
+      "n",
+      "v"
+    ],
+    "looks": [
+      "n",
+      "v"
+    ],
+    "loon": [
+      "n"
+    ],
+    "lord": [
+      "n",
+      "v"
+    ],
+    "lore": [
+      "n"
+    ],
+    "love": [
+      "n",
+      "v"
+    ],
+    "loving": [
+      "a",
+      "v"
+    ],
+    "low": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "luce": [
+      "n"
+    ],
+    "luke": [
+      "n"
+    ],
+    "luxury": [
+      "n"
+    ],
+    "lying": [
+      "n",
+      "v"
+    ],
+    "lyrics": [
+      "n",
+      "v"
+    ],
+    "machine": [
+      "n",
+      "v"
+    ],
+    "mad": [
+      "a"
+    ],
+    "made": [
+      "a"
+    ],
+    "magic": [
+      "a",
+      "n"
+    ],
+    "maid": [
+      "n"
+    ],
+    "maidenly": [
+      "a"
+    ],
+    "main": [
+      "a",
+      "n"
+    ],
+    "make": [
+      "n",
+      "v"
+    ],
+    "maker": [
+      "n"
+    ],
+    "maliciously": [
+      "r"
+    ],
+    "malt": [
+      "n",
+      "v"
+    ],
+    "man": [
+      "n",
+      "v"
+    ],
+    "man-at-arms": [
+      "n"
+    ],
+    "mangrove": [
+      "n"
+    ],
+    "marble": [
+      "n",
+      "v"
+    ],
+    "march": [
+      "n",
+      "v"
+    ],
+    "market": [
+      "n",
+      "v"
+    ],
+    "marriage": [
+      "n"
+    ],
+    "marry": [
+      "v"
+    ],
+    "master": [
+      "a",
+      "n",
+      "v"
+    ],
+    "mate": [
+      "n",
+      "v"
+    ],
+    "matter": [
+      "a",
+      "n",
+      "v"
+    ],
+    "me": [
+      "n"
+    ],
+    "meal": [
+      "n"
+    ],
+    "mean": [
+      "a",
+      "n",
+      "v"
+    ],
+    "means": [
+      "n",
+      "v"
+    ],
+    "meantime": [
+      "n",
+      "r"
+    ],
+    "measure": [
+      "n",
+      "v"
+    ],
+    "mechanical": [
+      "a"
+    ],
+    "meddle": [
+      "v"
+    ],
+    "medicine": [
+      "n",
+      "v"
+    ],
+    "men": [
+      "n"
+    ],
+    "mender": [
+      "n"
+    ],
+    "mercury": [
+      "n"
+    ],
+    "mercy": [
+      "n"
+    ],
+    "might": [
+      "n"
+    ],
+    "mighty": [
+      "a",
+      "r"
+    ],
+    "milk": [
+      "n",
+      "v"
+    ],
+    "minded": [
+      "a",
+      "v"
+    ],
+    "mistress": [
+      "n"
+    ],
+    "misused": [
+      "a",
+      "v"
+    ],
+    "mock": [
+      "a",
+      "n",
+      "v"
+    ],
+    "mon": [
+      "n"
+    ],
+    "monger": [
+      "n",
+      "v"
+    ],
+    "monsieur": [
+      "n"
+    ],
+    "monster": [
+      "n"
+    ],
+    "moon": [
+      "n",
+      "v"
+    ],
+    "more": [
+      "a",
+      "n",
+      "r"
+    ],
+    "morrow": [
+      "n"
+    ],
+    "mortal": [
+      "a",
+      "n"
+    ],
+    "mortar": [
+      "n",
+      "v"
+    ],
+    "most": [
+      "a",
+      "r"
+    ],
+    "mother": [
+      "n",
+      "v"
+    ],
+    "mouth": [
+      "n",
+      "v"
+    ],
+    "mr": [
+      "n"
+    ],
+    "much": [
+      "a",
+      "n",
+      "r"
+    ],
+    "musket": [
+      "n"
+    ],
+    "mussel": [
+      "n"
+    ],
+    "must": [
+      "a",
+      "n"
+    ],
+    "mutter": [
+      "n",
+      "v"
+    ],
+    "n": [
+      "n"
+    ],
+    "name": [
+      "n",
+      "v"
+    ],
+    "nan": [
+      "n"
+    ],
+    "naples": [
+      "n"
+    ],
+    "nature": [
+      "n"
+    ],
+    "nay": [
+      "n",
+      "r"
+    ],
+    "ne": [
+      "n"
+    ],
+    "neapolitan": [
+      "a",
+      "n"
+    ],
+    "nearer": [
+      "a",
+      "r"
+    ],
+    "need": [
+      "n",
+      "v"
+    ],
+    "never": [
+      "r"
+    ],
+    "new": [
+      "a",
+      "r"
+    ],
+    "news": [
+      "n"
+    ],
+    "next": [
+      "a",
+      "r"
+    ],
+    "nick": [
+      "n",
+      "v"
+    ],
+    "night": [
+      "n"
+    ],
+    "no": [
+      "a",
+      "n",
+      "r"
+    ],
+    "noble": [
+      "a",
+      "n"
+    ],
+    "noise": [
+      "n",
+      "v"
+    ],
+    "north": [
+      "a",
+      "n",
+      "r"
+    ],
+    "northumberland": [
+      "n"
+    ],
+    "nose": [
+      "n",
+      "v"
+    ],
+    "not": [
+      "r"
+    ],
+    "noted": [
+      "a",
+      "v"
+    ],
+    "noticed": [
+      "a",
+      "v"
+    ],
+    "nous": [
+      "n"
+    ],
+    "now": [
+      "n",
+      "r"
+    ],
+    "nut": [
+      "n",
+      "v"
+    ],
+    "o": [
+      "n"
+    ],
+    "oak": [
+      "n"
+    ],
+    "oases": [
+      "n"
+    ],
+    "oath": [
+      "n"
+    ],
+    "obligations": [
+      "n"
+    ],
+    "offend": [
+      "v"
+    ],
+    "old": [
+      "a",
+      "n"
+    ],
+    "on": [
+      "a",
+      "r"
+    ],
+    "once": [
+      "r"
+    ],
+    "one": [
+      "a",
+      "n"
+    ],
+    "ones": [
+      "n"
+    ],
+    "onion": [
+      "n"
+    ],
+    "only": [
+      "a",
+      "r"
+    ],
+    "operation": [
+      "n"
+    ],
+    "or": [
+      "n"
+    ],
+    "order": [
+      "n",
+      "v"
+    ],
+    "orleans": [
+      "n"
+    ],
+    "other": [
+      "a"
+    ],
+    "out": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "out-herods": [
+      "v"
+    ],
+    "outcast": [
+      "a",
+      "n"
+    ],
+    "outlives": [
+      "v"
+    ],
+    "over": [
+      "a",
+      "n",
+      "r"
+    ],
+    "own": [
+      "a",
+      "v"
+    ],
+    "p": [
+      "n"
+    ],
+    "pa": [
+      "n"
+    ],
+    "pahlavi": [
+      "n"
+    ],
+    "painted": [
+      "a",
+      "v"
+    ],
+    "painting": [
+      "n",
+      "v"
+    ],
+    "panic": [
+      "n",
+      "v"
+    ],
+    "pardon": [
+      "n",
+      "v"
+    ],
+    "pass": [
+      "a",
+      "n",
+      "v"
+    ],
+    "past": [
+      "a",
+      "n",
+      "r"
+    ],
+    "patch": [
+      "n",
+      "v"
+    ],
+    "pated": [
+      "v"
+    ],
+    "patrol": [
+      "n",
+      "v"
+    ],
+    "peace": [
+      "n"
+    ],
+    "peach": [
+      "n",
+      "v"
+    ],
+    "pee": [
+      "n",
+      "v"
+    ],
+    "pell-mell": [
+      "a",
+      "r"
+    ],
+    "people": [
+      "n",
+      "v"
+    ],
+    "perchance": [
+      "r"
+    ],
+    "perpetual": [
+      "a"
+    ],
+    "physic": [
+      "n"
+    ],
+    "pick": [
+      "n",
+      "v"
+    ],
+    "piece": [
+      "n",
+      "v"
+    ],
+    "pieces": [
+      "n",
+      "v"
+    ],
+    "pied": [
+      "a"
+    ],
+    "piercing": [
+      "a",
+      "v"
+    ],
+    "pig": [
+      "n",
+      "v"
+    ],
+    "pint": [
+      "n"
+    ],
+    "pistol": [
+      "n"
+    ],
+    "place": [
+      "n",
+      "v"
+    ],
+    "plain": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "plant": [
+      "n",
+      "v"
+    ],
+    "play": [
+      "n",
+      "v"
+    ],
+    "players": [
+      "n"
+    ],
+    "please": [
+      "r",
+      "v"
+    ],
+    "plum": [
+      "n",
+      "r"
+    ],
+    "pocket": [
+      "n",
+      "v"
+    ],
+    "point": [
+      "n",
+      "v"
+    ],
+    "point-blank": [
+      "a",
+      "r"
+    ],
+    "poor": [
+      "a",
+      "n"
+    ],
+    "post": [
+      "n",
+      "v"
+    ],
+    "pot": [
+      "n",
+      "v"
+    ],
+    "pottle": [
+      "n"
+    ],
+    "pound": [
+      "n",
+      "v"
+    ],
+    "pour": [
+      "v"
+    ],
+    "poverty": [
+      "n"
+    ],
+    "prate": [
+      "n",
+      "v"
+    ],
+    "pray": [
+      "v"
+    ],
+    "prick": [
+      "n",
+      "v"
+    ],
+    "pride": [
+      "n",
+      "v"
+    ],
+    "priest": [
+      "n"
+    ],
+    "prince": [
+      "n"
+    ],
+    "proof": [
+      "a",
+      "n",
+      "v"
+    ],
+    "proper": [
+      "a"
+    ],
+    "prove": [
+      "v"
+    ],
+    "proverbs": [
+      "n"
+    ],
+    "pudding": [
+      "n"
+    ],
+    "puissant": [
+      "a"
+    ],
+    "punch": [
+      "n",
+      "v"
+    ],
+    "punish": [
+      "v"
+    ],
+    "pure": [
+      "a"
+    ],
+    "purse": [
+      "n",
+      "v"
+    ],
+    "put": [
+      "n",
+      "v"
+    ],
+    "questions": [
+      "n",
+      "v"
+    ],
+    "quoit": [
+      "n"
+    ],
+    "rail": [
+      "n",
+      "v"
+    ],
+    "rank": [
+      "a",
+      "n",
+      "v"
+    ],
+    "rascal": [
+      "n"
+    ],
+    "rascally": [
+      "a"
+    ],
+    "rascals": [
+      "n"
+    ],
+    "rather": [
+      "r"
+    ],
+    "raven": [
+      "n",
+      "v"
+    ],
+    "ravening": [
+      "a",
+      "v"
+    ],
+    "raw": [
+      "a",
+      "n"
+    ],
+    "re": [
+      "n"
+    ],
+    "re-enter": [
+      "v"
+    ],
+    "reads": [
+      "n",
+      "v"
+    ],
+    "ready": [
+      "a",
+      "n",
+      "v"
+    ],
+    "recorders": [
+      "n"
+    ],
+    "redbreast": [
+      "n"
+    ],
+    "regal": [
+      "a"
+    ],
+    "regard": [
+      "n",
+      "v"
+    ],
+    "remark": [
+      "n",
+      "v"
+    ],
+    "remedy": [
+      "n",
+      "v"
+    ],
+    "remember": [
+      "v"
+    ],
+    "renowned": [
+      "a"
+    ],
+    "repeated": [
+      "a",
+      "v"
+    ],
+    "repented": [
+      "v"
+    ],
+    "reply": [
+      "n",
+      "v"
+    ],
+    "resolutely": [
+      "r"
+    ],
+    "return": [
+      "n",
+      "v"
+    ],
+    "returned": [
+      "v"
+    ],
+    "rib": [
+      "n",
+      "v"
+    ],
+    "rice": [
+      "n",
+      "v"
+    ],
+    "richardson": [
+      "n"
+    ],
+    "ride": [
+      "n",
+      "v"
+    ],
+    "riding": [
+      "n",
+      "v"
+    ],
+    "right": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "ring": [
+      "n",
+      "v"
+    ],
+    "ripe": [
+      "a"
+    ],
+    "road": [
+      "n"
+    ],
+    "roan": [
+      "a",
+      "n"
+    ],
+    "roar": [
+      "n",
+      "v"
+    ],
+    "roasted": [
+      "a",
+      "v"
+    ],
+    "robe": [
+      "n",
+      "v"
+    ],
+    "robert": [
+      "n"
+    ],
+    "robes": [
+      "n",
+      "v"
+    ],
+    "rock": [
+      "n",
+      "v"
+    ],
+    "rogue": [
+      "n"
+    ],
+    "roswell": [
+      "n"
+    ],
+    "rotten": [
+      "a"
+    ],
+    "rough": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "rous": [
+      "n"
+    ],
+    "rule": [
+      "n",
+      "v"
+    ],
+    "rump": [
+      "n"
+    ],
+    "run": [
+      "n",
+      "v"
+    ],
+    "s": [
+      "n"
+    ],
+    "sack": [
+      "n",
+      "v"
+    ],
+    "said": [
+      "a"
+    ],
+    "saint": [
+      "n",
+      "v"
+    ],
+    "salt": [
+      "a",
+      "n",
+      "v"
+    ],
+    "same": [
+      "a",
+      "n"
+    ],
+    "samson": [
+      "n"
+    ],
+    "sand": [
+      "n",
+      "v"
+    ],
+    "sand-blind": [
+      "a"
+    ],
+    "sap": [
+      "n",
+      "v"
+    ],
+    "sat": [
+      "n"
+    ],
+    "saving": [
+      "a",
+      "n",
+      "v"
+    ],
+    "say": [
+      "n",
+      "v"
+    ],
+    "says": [
+      "n",
+      "v"
+    ],
+    "scaling": [
+      "n",
+      "v"
+    ],
+    "scene": [
+      "n"
+    ],
+    "scoff": [
+      "n",
+      "v"
+    ],
+    "score": [
+      "n",
+      "v"
+    ],
+    "scorn": [
+      "n",
+      "v"
+    ],
+    "scourge": [
+      "n",
+      "v"
+    ],
+    "scurvy": [
+      "a",
+      "n"
+    ],
+    "sea": [
+      "n"
+    ],
+    "searched": [
+      "v"
+    ],
+    "seated": [
+      "a",
+      "v"
+    ],
+    "see": [
+      "n",
+      "v"
+    ],
+    "seen": [
+      "v"
+    ],
+    "seigneur": [
+      "n"
+    ],
+    "self": [
+      "a",
+      "n"
+    ],
+    "senate": [
+      "n"
+    ],
+    "serenity": [
+      "n"
+    ],
+    "serpent": [
+      "n"
+    ],
+    "servant": [
+      "n"
+    ],
+    "serve": [
+      "n",
+      "v"
+    ],
+    "seven": [
+      "a",
+      "n"
+    ],
+    "sex": [
+      "n",
+      "v"
+    ],
+    "shade": [
+      "n",
+      "v"
+    ],
+    "shadow": [
+      "n",
+      "v"
+    ],
+    "shag": [
+      "n",
+      "v"
+    ],
+    "shaked": [
+      "v"
+    ],
+    "shaken": [
+      "a"
+    ],
+    "shame": [
+      "n",
+      "v"
+    ],
+    "shans": [
+      "n"
+    ],
+    "sharers": [
+      "n"
+    ],
+    "sheep": [
+      "n"
+    ],
+    "shell": [
+      "n",
+      "v"
+    ],
+    "sheriff": [
+      "n"
+    ],
+    "shift": [
+      "n",
+      "v"
+    ],
+    "shilling": [
+      "n",
+      "v"
+    ],
+    "short": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "short-lived": [
+      "a"
+    ],
+    "short-winded": [
+      "a"
+    ],
+    "shot": [
+      "a",
+      "n"
+    ],
+    "shove": [
+      "n",
+      "v"
+    ],
+    "show": [
+      "n",
+      "v"
+    ],
+    "showed": [
+      "v"
+    ],
+    "shrill": [
+      "a",
+      "v"
+    ],
+    "sickness": [
+      "n"
+    ],
+    "side": [
+      "a",
+      "n",
+      "v"
+    ],
+    "sight": [
+      "n",
+      "v"
+    ],
+    "silence": [
+      "n",
+      "v"
+    ],
+    "silk": [
+      "n"
+    ],
+    "silken": [
+      "a"
+    ],
+    "simony": [
+      "n"
+    ],
+    "simply": [
+      "r"
+    ],
+    "sin": [
+      "n",
+      "v"
+    ],
+    "sinewy": [
+      "a"
+    ],
+    "sing": [
+      "v"
+    ],
+    "single": [
+      "a",
+      "n",
+      "v"
+    ],
+    "sings": [
+      "v"
+    ],
+    "sir": [
+      "n"
+    ],
+    "sirrah": [
+      "n"
+    ],
+    "sister": [
+      "n"
+    ],
+    "skilfully": [
+      "r"
+    ],
+    "skin": [
+      "n",
+      "v"
+    ],
+    "slave": [
+      "n",
+      "v"
+    ],
+    "slavery": [
+      "n"
+    ],
+    "slaves": [
+      "n",
+      "v"
+    ],
+    "sleep": [
+      "n",
+      "v"
+    ],
+    "sleeping": [
+      "a",
+      "n",
+      "v"
+    ],
+    "sloth": [
+      "n"
+    ],
+    "slush": [
+      "n",
+      "v"
+    ],
+    "small": [
+      "a",
+      "n",
+      "r"
+    ],
+    "smelling": [
+      "a",
+      "n",
+      "v"
+    ],
+    "smells": [
+      "n",
+      "v"
+    ],
+    "smiling": [
+      "a",
+      "n",
+      "v"
+    ],
+    "snapper": [
+      "n"
+    ],
+    "sneak": [
+      "a",
+      "n",
+      "v"
+    ],
+    "so": [
+      "n",
+      "r"
+    ],
+    "so-so": [
+      "a",
+      "r"
+    ],
+    "soap": [
+      "n",
+      "v"
+    ],
+    "soft": [
+      "a",
+      "r"
+    ],
+    "soft-soap": [
+      "v"
+    ],
+    "softly": [
+      "r"
+    ],
+    "soldiers": [
+      "n",
+      "v"
+    ],
+    "some": [
+      "a",
+      "r"
+    ],
+    "son": [
+      "n"
+    ],
+    "sorrows": [
+      "n",
+      "v"
+    ],
+    "sort": [
+      "n",
+      "v"
+    ],
+    "sorts": [
+      "n",
+      "v"
+    ],
+    "soul": [
+      "n"
+    ],
+    "sounded": [
+      "v"
+    ],
+    "sounds": [
+      "n",
+      "v"
+    ],
+    "sovereign": [
+      "a",
+      "n"
+    ],
+    "speak": [
+      "v"
+    ],
+    "spirited": [
+      "a",
+      "v"
+    ],
+    "spirits": [
+      "n",
+      "v"
+    ],
+    "spite": [
+      "n",
+      "v"
+    ],
+    "spoke": [
+      "n"
+    ],
+    "staff": [
+      "n",
+      "v"
+    ],
+    "stained": [
+      "a",
+      "v"
+    ],
+    "stale": [
+      "a",
+      "v"
+    ],
+    "stand": [
+      "n",
+      "v"
+    ],
+    "stands": [
+      "n",
+      "v"
+    ],
+    "star": [
+      "a",
+      "n",
+      "v"
+    ],
+    "stark": [
+      "a",
+      "r"
+    ],
+    "state": [
+      "n",
+      "v"
+    ],
+    "statute": [
+      "a",
+      "n"
+    ],
+    "staves": [
+      "n",
+      "v"
+    ],
+    "steadily": [
+      "r"
+    ],
+    "sterling": [
+      "a",
+      "n"
+    ],
+    "still": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "stone": [
+      "a",
+      "n",
+      "v"
+    ],
+    "stool": [
+      "n",
+      "v"
+    ],
+    "story": [
+      "n"
+    ],
+    "strange": [
+      "a"
+    ],
+    "straws": [
+      "n",
+      "v"
+    ],
+    "strikes": [
+      "n",
+      "v"
+    ],
+    "string": [
+      "n",
+      "v"
+    ],
+    "strong": [
+      "a"
+    ],
+    "struggle": [
+      "n",
+      "v"
+    ],
+    "stubborn": [
+      "a"
+    ],
+    "student": [
+      "n"
+    ],
+    "such": [
+      "a",
+      "r"
+    ],
+    "sugar": [
+      "n",
+      "v"
+    ],
+    "summer": [
+      "n",
+      "v"
+    ],
+    "sure": [
+      "a",
+      "r"
+    ],
+    "swallowed": [
+      "v"
+    ],
+    "swear": [
+      "v"
+    ],
+    "sweet": [
+      "a",
+      "n",
+      "r"
+    ],
+    "sweet-faced": [
+      "a"
+    ],
+    "sweetest": [
+      "a",
+      "r"
+    ],
+    "swelling": [
+      "n",
+      "v"
+    ],
+    "swellings": [
+      "n"
+    ],
+    "sword": [
+      "n"
+    ],
+    "t": [
+      "n"
+    ],
+    "table": [
+      "n",
+      "v"
+    ],
+    "tailor": [
+      "n",
+      "v"
+    ],
+    "take": [
+      "n",
+      "v"
+    ],
+    "taking": [
+      "a",
+      "n",
+      "v"
+    ],
+    "talbot": [
+      "n"
+    ],
+    "tales": [
+      "n"
+    ],
+    "talk": [
+      "n",
+      "v"
+    ],
+    "taunt": [
+      "n",
+      "v"
+    ],
+    "tawny": [
+      "a"
+    ],
+    "teacher": [
+      "n"
+    ],
+    "tear": [
+      "n",
+      "v"
+    ],
+    "tedious": [
+      "a"
+    ],
+    "tell": [
+      "n",
+      "v"
+    ],
+    "temper": [
+      "n",
+      "v"
+    ],
+    "tenants": [
+      "n",
+      "v"
+    ],
+    "tender": [
+      "a",
+      "n",
+      "v"
+    ],
+    "tennis": [
+      "n"
+    ],
+    "terrors": [
+      "n"
+    ],
+    "tes": [
+      "n"
+    ],
+    "th": [
+      "n"
+    ],
+    "thank": [
+      "v"
+    ],
+    "then": [
+      "a",
+      "n",
+      "r"
+    ],
+    "there": [
+      "n",
+      "r"
+    ],
+    "theseus": [
+      "n"
+    ],
+    "thief": [
+      "n"
+    ],
+    "thing": [
+      "n"
+    ],
+    "think": [
+      "n",
+      "v"
+    ],
+    "thompson": [
+      "n"
+    ],
+    "thou": [
+      "n"
+    ],
+    "thousand": [
+      "a",
+      "n"
+    ],
+    "thousand-fold": [
+      "r"
+    ],
+    "three": [
+      "a",
+      "n"
+    ],
+    "thrice": [
+      "r"
+    ],
+    "thunder": [
+      "n",
+      "v"
+    ],
+    "till": [
+      "n",
+      "v"
+    ],
+    "timbered": [
+      "a"
+    ],
+    "time": [
+      "n",
+      "v"
+    ],
+    "tis": [
+      "n"
+    ],
+    "ton": [
+      "n"
+    ],
+    "tongue": [
+      "n",
+      "v"
+    ],
+    "tongued": [
+      "a",
+      "v"
+    ],
+    "too": [
+      "r"
+    ],
+    "tooth": [
+      "n"
+    ],
+    "touch": [
+      "n",
+      "v"
+    ],
+    "touring": [
+      "v"
+    ],
+    "train": [
+      "n",
+      "v"
+    ],
+    "traitor": [
+      "n"
+    ],
+    "treble": [
+      "a",
+      "n",
+      "v"
+    ],
+    "tree": [
+      "n",
+      "v"
+    ],
+    "trees": [
+      "n",
+      "v"
+    ],
+    "trial": [
+      "n"
+    ],
+    "triumph": [
+      "n",
+      "v"
+    ],
+    "troubles": [
+      "n",
+      "v"
+    ],
+    "true": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "trumpet": [
+      "n",
+      "v"
+    ],
+    "truths": [
+      "n"
+    ],
+    "tun": [
+      "n"
+    ],
+    "turkey": [
+      "n"
+    ],
+    "turn": [
+      "n",
+      "v"
+    ],
+    "twenty": [
+      "a",
+      "n"
+    ],
+    "twenty-five": [
+      "a",
+      "n"
+    ],
+    "twenty-seven": [
+      "a",
+      "n"
+    ],
+    "two": [
+      "a",
+      "n"
+    ],
+    "two-fold": [
+      "a"
+    ],
+    "tyrant": [
+      "n"
+    ],
+    "uncle": [
+      "n"
+    ],
+    "undisturbed": [
+      "a"
+    ],
+    "unkindness": [
+      "n"
+    ],
+    "unlettered": [
+      "a"
+    ],
+    "unlooked-for": [
+      "a"
+    ],
+    "up": [
+      "a",
+      "r",
+      "v"
+    ],
+    "ur": [
+      "n"
+    ],
+    "urine": [
+      "n"
+    ],
+    "us": [
+      "n"
+    ],
+    "use": [
+      "n",
+      "v"
+    ],
+    "v": [
+      "a",
+      "n"
+    ],
+    "vainly": [
+      "r"
+    ],
+    "verbs": [
+      "n"
+    ],
+    "very": [
+      "a",
+      "r"
+    ],
+    "vessel": [
+      "n"
+    ],
+    "vestal": [
+      "a",
+      "n"
+    ],
+    "villain": [
+      "n"
+    ],
+    "virginity": [
+      "n"
+    ],
+    "virtue": [
+      "n"
+    ],
+    "virtuous": [
+      "a"
+    ],
+    "voiced": [
+      "a",
+      "v"
+    ],
+    "vouchsafe": [
+      "v"
+    ],
+    "wagon": [
+      "n"
+    ],
+    "waist": [
+      "n"
+    ],
+    "waist-deep": [
+      "r"
+    ],
+    "waiting": [
+      "a",
+      "n",
+      "v"
+    ],
+    "waking": [
+      "a",
+      "n",
+      "v"
+    ],
+    "war": [
+      "n",
+      "v"
+    ],
+    "warrant": [
+      "n",
+      "v"
+    ],
+    "warwick": [
+      "n"
+    ],
+    "was": [
+      "n"
+    ],
+    "washing": [
+      "n",
+      "v"
+    ],
+    "watch": [
+      "n",
+      "v"
+    ],
+    "water": [
+      "n",
+      "v"
+    ],
+    "way": [
+      "n",
+      "r"
+    ],
+    "weaved": [
+      "v"
+    ],
+    "wedding": [
+      "n"
+    ],
+    "wee": [
+      "a",
+      "n",
+      "v"
+    ],
+    "weep": [
+      "v"
+    ],
+    "weeping": [
+      "a",
+      "n",
+      "v"
+    ],
+    "welcome": [
+      "a",
+      "n",
+      "v"
+    ],
+    "well": [
+      "a",
+      "n",
+      "r",
+      "v"
+    ],
+    "well-appointed": [
+      "a"
+    ],
+    "well-chosen": [
+      "a"
+    ],
+    "well-educated": [
+      "a"
+    ],
+    "well-knit": [
+      "a"
+    ],
+    "went": [
+      "v"
+    ],
+    "west": [
+      "a",
+      "n",
+      "r"
+    ],
+    "wheels": [
+      "n",
+      "v"
+    ],
+    "whey": [
+      "n"
+    ],
+    "whin": [
+      "n"
+    ],
+    "whirlwinds": [
+      "n"
+    ],
+    "white": [
+      "a",
+      "n",
+      "v"
+    ],
+    "whitest": [
+      "a"
+    ],
+    "who": [
+      "n"
+    ],
+    "whoreson": [
+      "n"
+    ],
+    "why": [
+      "n"
+    ],
+    "widow": [
+      "n",
+      "v"
+    ],
+    "wife": [
+      "n"
+    ],
+    "will": [
+      "n",
+      "v"
+    ],
+    "wilt": [
+      "n",
+      "v"
+    ],
+    "wind": [
+      "n",
+      "v"
+    ],
+    "winded": [
+      "a",
+      "v"
+    ],
+    "window": [
+      "n"
+    ],
+    "wine": [
+      "n",
+      "v"
+    ],
+    "wit": [
+      "n"
+    ],
+    "witch": [
+      "n",
+      "v"
+    ],
+    "wither": [
+      "v"
+    ],
+    "withered": [
+      "a",
+      "v"
+    ],
+    "within": [
+      "r"
+    ],
+    "wits": [
+      "n"
+    ],
+    "woman": [
+      "n"
+    ],
+    "wool": [
+      "n"
+    ],
+    "word": [
+      "n",
+      "v"
+    ],
+    "worked": [
+      "v"
+    ],
+    "working": [
+      "a",
+      "n",
+      "v"
+    ],
+    "world": [
+      "a",
+      "n"
+    ],
+    "worn": [
+      "a"
+    ],
+    "worship": [
+      "n",
+      "v"
+    ],
+    "worth": [
+      "a",
+      "n"
+    ],
+    "worthy": [
+      "a",
+      "n"
+    ],
+    "wound": [
+      "a",
+      "n",
+      "v"
+    ],
+    "wounding": [
+      "a",
+      "n",
+      "v"
+    ],
+    "wounds": [
+      "n",
+      "v"
+    ],
+    "write": [
+      "v"
+    ],
+    "xxix": [
+      "a",
+      "n"
+    ],
+    "yea": [
+      "n",
+      "r"
+    ],
+    "year": [
+      "n"
+    ],
+    "yes": [
+      "n"
+    ],
+    "yet": [
+      "r"
+    ],
+    "young": [
+      "a",
+      "n"
+    ],
+    "youth": [
+      "n"
+    ]
+  },
+  "phrases": [
+    {
+      "tokens": [
+        "a",
+        "good",
+        "sherris-sack",
+        "hath",
+        "a",
+        "two-fold",
+        "operation",
+        "in",
+        "it"
+      ],
+      "compounds": [
+        "sherris-sack"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "a",
+        "good-limbed",
+        "fellow",
+        "young",
+        "strong",
+        "and",
+        "of",
+        "good",
+        "friends"
+      ],
+      "compounds": [
+        "good-limbed"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "a",
+        "noise",
+        "within",
+        "down",
+        "with",
+        "the",
+        "tawny-coats"
+      ],
+      "compounds": [
+        "tawny-coats"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "a",
+        "plum-tree",
+        "master"
+      ],
+      "compounds": [
+        "plum-tree"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "a",
+        "roan",
+        "a",
+        "crop-ear",
+        "is",
+        "it",
+        "not"
+      ],
+      "compounds": [
+        "crop-ear"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "a",
+        "softly-sprighted",
+        "man",
+        "is",
+        "he",
+        "not"
+      ],
+      "compounds": [
+        "softly-sprighted"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "a",
+        "very",
+        "honest-hearted",
+        "fellow",
+        "and",
+        "as",
+        "poor",
+        "as",
+        "the",
+        "king"
+      ],
+      "compounds": [
+        "honest-hearted"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "about",
+        "some",
+        "half-hour",
+        "hence",
+        "pray",
+        "you",
+        "speak",
+        "with",
+        "me"
+      ],
+      "compounds": [
+        "half-hour"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "ah",
+        "whoreson",
+        "caterpillars",
+        "bacon-fed",
+        "knaves",
+        "they",
+        "hate",
+        "us",
+        "youth"
+      ],
+      "compounds": [
+        "bacon-fed"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "ainsi",
+        "dis-je",
+        "d",
+        "elbow",
+        "de",
+        "nick",
+        "et",
+        "de",
+        "sin"
+      ],
+      "compounds": [
+        "dis-je"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "alack",
+        "sir",
+        "i",
+        "am",
+        "sand-blind",
+        "i",
+        "know",
+        "you",
+        "not"
+      ],
+      "compounds": [
+        "sand-blind"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "alas",
+        "what",
+        "need",
+        "you",
+        "be",
+        "so",
+        "boist",
+        "rous-rough"
+      ],
+      "compounds": [
+        "rous-rough"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "all",
+        "the",
+        "foul",
+        "terrors",
+        "in",
+        "dark-seated",
+        "hell"
+      ],
+      "compounds": [
+        "dark-seated"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "allons-nous",
+        "d",
+        "ner"
+      ],
+      "compounds": [
+        "allons-nous"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "an",
+        "amber-coloured",
+        "raven",
+        "was",
+        "well",
+        "noted"
+      ],
+      "compounds": [
+        "amber-coloured"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "anchor-watch",
+        "repeated",
+        "roswell",
+        "smiling"
+      ],
+      "compounds": [
+        "anchor-watch"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "and",
+        "here",
+        "s",
+        "to",
+        "right",
+        "our",
+        "gentle-hearted",
+        "king"
+      ],
+      "compounds": [
+        "gentle-hearted"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "and",
+        "his",
+        "well-chosen",
+        "bride"
+      ],
+      "compounds": [
+        "well-chosen"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "and",
+        "this",
+        "same",
+        "half-faced",
+        "fellow",
+        "shadow",
+        "give",
+        "me",
+        "this",
+        "man"
+      ],
+      "compounds": [
+        "half-faced"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "and",
+        "yet",
+        "it",
+        "is",
+        "not",
+        "it",
+        "is",
+        "but",
+        "so-so"
+      ],
+      "compounds": [
+        "so-so"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "and",
+        "your",
+        "courtesy",
+        "for",
+        "a",
+        "ring-carrier"
+      ],
+      "compounds": [
+        "ring-carrier"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "are",
+        "you",
+        "more",
+        "stubborn-hard",
+        "than",
+        "hammer",
+        "d",
+        "iron"
+      ],
+      "compounds": [
+        "stubborn-hard"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "aroint",
+        "thee",
+        "witch",
+        "the",
+        "rump-fed",
+        "ronyon",
+        "cries"
+      ],
+      "compounds": [
+        "rump-fed"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "art",
+        "thou",
+        "good",
+        "at",
+        "these",
+        "kick-shawses",
+        "knight"
+      ],
+      "compounds": [
+        "kick-shawses"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "as",
+        "for",
+        "these",
+        "silken-coated",
+        "slaves",
+        "i",
+        "pass",
+        "not"
+      ],
+      "compounds": [
+        "silken-coated"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "at",
+        "hand",
+        "quoth",
+        "pick-purse"
+      ],
+      "compounds": [
+        "pick-purse"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "away",
+        "you",
+        "bottle-ale",
+        "rascal",
+        "you",
+        "basket-hilt",
+        "stale",
+        "juggler",
+        "you"
+      ],
+      "compounds": [
+        "bottle-ale",
+        "basket-hilt"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "ay",
+        "and",
+        "worn",
+        "in",
+        "the",
+        "cap",
+        "of",
+        "a",
+        "tooth-drawer"
+      ],
+      "compounds": [
+        "tooth-drawer"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "ay",
+        "be-gar",
+        "and",
+        "de",
+        "maid",
+        "is",
+        "love-a",
+        "me"
+      ],
+      "compounds": [
+        "be-gar"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "ay",
+        "marry",
+        "was",
+        "it",
+        "mussel-shell"
+      ],
+      "compounds": [
+        "mussel-shell"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "back",
+        "to",
+        "the",
+        "stained",
+        "field",
+        "you",
+        "equal",
+        "potents",
+        "fiery-kindled",
+        "spirits"
+      ],
+      "compounds": [
+        "fiery-kindled"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "back-wounding",
+        "calumny",
+        "the",
+        "whitest",
+        "virtue",
+        "strikes"
+      ],
+      "compounds": [
+        "back-wounding"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "be",
+        "brief",
+        "my",
+        "good",
+        "she-mercury"
+      ],
+      "compounds": [
+        "she-mercury"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "be",
+        "not",
+        "so",
+        "holy-cruel"
+      ],
+      "compounds": [
+        "holy-cruel"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "be-monster",
+        "not",
+        "thy",
+        "feature"
+      ],
+      "compounds": [
+        "be-monster"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "beautiful",
+        "tyrant",
+        "fiend",
+        "angelical",
+        "dove-feather",
+        "d",
+        "raven",
+        "wolvish-ravening",
+        "lamb"
+      ],
+      "compounds": [
+        "dove-feather",
+        "wolvish-ravening"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "because",
+        "he",
+        "hath",
+        "a",
+        "half-face",
+        "like",
+        "my",
+        "father"
+      ],
+      "compounds": [
+        "half-face"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "belike",
+        "unlooked-for",
+        "friends"
+      ],
+      "compounds": [
+        "unlooked-for"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "black",
+        "forsooth",
+        "coal-black",
+        "as",
+        "jet"
+      ],
+      "compounds": [
+        "coal-black"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "bless",
+        "our",
+        "poor",
+        "virginity",
+        "from",
+        "underminers",
+        "and",
+        "blowers-up"
+      ],
+      "compounds": [
+        "blowers-up"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "bless",
+        "thee",
+        "from",
+        "whirlwinds",
+        "star-blasting",
+        "and",
+        "taking"
+      ],
+      "compounds": [
+        "star-blasting"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "blunt-witted",
+        "lord",
+        "ignoble",
+        "in",
+        "demeanour"
+      ],
+      "compounds": [
+        "blunt-witted"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "but",
+        "as",
+        "a",
+        "discontented",
+        "friend",
+        "grief-shot",
+        "with",
+        "his",
+        "unkindness"
+      ],
+      "compounds": [
+        "grief-shot"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "but",
+        "my",
+        "uncle-father",
+        "and",
+        "aunt-mother",
+        "are",
+        "deceived"
+      ],
+      "compounds": [
+        "uncle-father",
+        "aunt-mother"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "but",
+        "out",
+        "upon",
+        "this",
+        "half-faced",
+        "fellowship"
+      ],
+      "compounds": [
+        "half-faced"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "but",
+        "what",
+        "linsey-woolsey",
+        "has",
+        "thou",
+        "to",
+        "speak",
+        "to",
+        "us",
+        "again"
+      ],
+      "compounds": [
+        "linsey-woolsey"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "but",
+        "what",
+        "s",
+        "so",
+        "blessed-fair",
+        "that",
+        "fears",
+        "no",
+        "blot"
+      ],
+      "compounds": [
+        "blessed-fair"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "but",
+        "who",
+        "comes",
+        "in",
+        "such",
+        "haste",
+        "in",
+        "riding-robes"
+      ],
+      "compounds": [
+        "riding-robes"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "by",
+        "gar",
+        "he",
+        "is",
+        "de",
+        "coward",
+        "jack-priest",
+        "of",
+        "de",
+        "vorld"
+      ],
+      "compounds": [
+        "jack-priest"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "by",
+        "heaven",
+        "all",
+        "dry-beaten",
+        "with",
+        "pure",
+        "scoff"
+      ],
+      "compounds": [
+        "dry-beaten"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "by",
+        "the",
+        "lord",
+        "a",
+        "buck-basket"
+      ],
+      "compounds": [
+        "buck-basket"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "by-and-by",
+        "as",
+        "they",
+        "worked",
+        "undisturbed",
+        "serenity",
+        "returned"
+      ],
+      "compounds": [
+        "by-and-by"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "by-and-by",
+        "he",
+        "was",
+        "the",
+        "enemy"
+      ],
+      "compounds": [
+        "by-and-by"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "by-and-by",
+        "the",
+        "order",
+        "of",
+        "march",
+        "was",
+        "disturbed"
+      ],
+      "compounds": [
+        "by-and-by"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "certes",
+        "she",
+        "did",
+        "the",
+        "kitchen-vestal",
+        "scorn",
+        "d",
+        "you"
+      ],
+      "compounds": [
+        "kitchen-vestal"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "chung-kung",
+        "asked",
+        "about",
+        "man's",
+        "proper",
+        "regard",
+        "for",
+        "his",
+        "fellows"
+      ],
+      "compounds": [
+        "chung-kung"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "come",
+        "come",
+        "you",
+        "she",
+        "knight-errant",
+        "come"
+      ],
+      "compounds": [
+        "knight-errant"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "coming",
+        "forward",
+        "peace",
+        "ye",
+        "fat-kidneyed",
+        "rascal"
+      ],
+      "compounds": [
+        "fat-kidneyed"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "comment",
+        "appelez-vous",
+        "la",
+        "main",
+        "en",
+        "anglais"
+      ],
+      "compounds": [
+        "appelez-vous"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "comment",
+        "appelez-vous",
+        "le",
+        "col"
+      ],
+      "compounds": [
+        "appelez-vous"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "comment",
+        "appelez-vous",
+        "le",
+        "pied",
+        "et",
+        "la",
+        "robe"
+      ],
+      "compounds": [
+        "appelez-vous"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "comment",
+        "appelez-vous",
+        "les",
+        "ongles"
+      ],
+      "compounds": [
+        "appelez-vous"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "comment",
+        "tes-vous",
+        "appel"
+      ],
+      "compounds": [
+        "tes-vous"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "concerning",
+        "the",
+        "rice-wine",
+        "drunk",
+        "by",
+        "the",
+        "people",
+        "of",
+        "cathay"
+      ],
+      "compounds": [
+        "rice-wine"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "creep",
+        "into",
+        "the",
+        "kiln-hole"
+      ],
+      "compounds": [
+        "kiln-hole"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "cross-questions",
+        "and",
+        "crooked",
+        "answers"
+      ],
+      "compounds": [
+        "cross-questions"
+      ],
+      "fromPrefix": false,
+      "split": true,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "cry",
+        "you",
+        "mercy",
+        "i",
+        "took",
+        "you",
+        "for",
+        "a",
+        "joint-stool"
+      ],
+      "compounds": [
+        "joint-stool"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "define",
+        "define",
+        "well-educated",
+        "infant"
+      ],
+      "compounds": [
+        "well-educated"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "did",
+        "not",
+        "her",
+        "kitchen-maid",
+        "rail",
+        "taunt",
+        "and",
+        "scorn",
+        "me"
+      ],
+      "compounds": [
+        "kitchen-maid"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "did",
+        "you",
+        "say",
+        "all",
+        "o",
+        "hell-kite",
+        "all"
+      ],
+      "compounds": [
+        "hell-kite"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "dites-moi",
+        "l",
+        "anglais",
+        "pour",
+        "le",
+        "bras"
+      ],
+      "compounds": [
+        "dites-moi"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "do",
+        "you",
+        "remember",
+        "coal-fire",
+        "logan"
+      ],
+      "compounds": [
+        "coal-fire"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "draws",
+        "out",
+        "his",
+        "table-book"
+      ],
+      "compounds": [
+        "table-book"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "enough",
+        "with",
+        "over-measure"
+      ],
+      "compounds": [
+        "over-measure"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "enter",
+        "a",
+        "doctor",
+        "of",
+        "physic",
+        "and",
+        "a",
+        "waiting-gentlewoman"
+      ],
+      "compounds": [
+        "waiting-gentlewoman"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "enter",
+        "john",
+        "and",
+        "robert",
+        "with",
+        "a",
+        "great",
+        "buck-basket"
+      ],
+      "compounds": [
+        "buck-basket"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "enter",
+        "king",
+        "henry",
+        "exeter",
+        "bedford",
+        "gloucester",
+        "and",
+        "soldiers",
+        "with",
+        "scaling-ladders"
+      ],
+      "compounds": [
+        "scaling-ladders"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "enter",
+        "portia",
+        "with",
+        "her",
+        "waiting-woman",
+        "nerissa"
+      ],
+      "compounds": [
+        "waiting-woman"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "enter",
+        "talbot",
+        "bedford",
+        "burgundy",
+        "and",
+        "forces",
+        "with",
+        "scaling-ladders"
+      ],
+      "compounds": [
+        "scaling-ladders"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "est-il",
+        "impossible",
+        "d",
+        "chapper",
+        "la",
+        "force",
+        "de",
+        "ton",
+        "bras"
+      ],
+      "compounds": [
+        "est-il"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "excusez-moi",
+        "je",
+        "vous",
+        "supplie",
+        "mon",
+        "tr",
+        "s-puissant",
+        "seigneur"
+      ],
+      "compounds": [
+        "excusez-moi"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "faith",
+        "sir",
+        "so-so"
+      ],
+      "compounds": [
+        "so-so"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "far",
+        "away",
+        "ba-ree",
+        "heard",
+        "but",
+        "he",
+        "did",
+        "not",
+        "answer"
+      ],
+      "compounds": [
+        "ba-ree"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "farewell",
+        "all-hallown",
+        "summer"
+      ],
+      "compounds": [
+        "all-hallown"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "fetch",
+        "me",
+        "a",
+        "dozen",
+        "crab-tree",
+        "staves",
+        "and",
+        "strong",
+        "ones"
+      ],
+      "compounds": [
+        "crab-tree"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "fling",
+        "out",
+        "the",
+        "anti-slavery",
+        "flag"
+      ],
+      "compounds": [
+        "anti-slavery"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "for",
+        "filling",
+        "a",
+        "bottle",
+        "with",
+        "a",
+        "tun-dish"
+      ],
+      "compounds": [
+        "tun-dish"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "francis",
+        "flute",
+        "the",
+        "bellows-mender"
+      ],
+      "compounds": [
+        "bellows-mender"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "gabble-gabble",
+        "my",
+        "window",
+        "frames",
+        "forest",
+        "and",
+        "heather"
+      ],
+      "compounds": [
+        "gabble-gabble"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "gee-williger",
+        "you",
+        "should",
+        "have",
+        "seen",
+        "pee-wee"
+      ],
+      "compounds": [
+        "gee-williger"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "general",
+        "houtum-schindler",
+        "l",
+        "c",
+        "p"
+      ],
+      "compounds": [
+        "houtum-schindler"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "general",
+        "houtum-schindler",
+        "says",
+        "l",
+        "c",
+        "p"
+      ],
+      "compounds": [
+        "houtum-schindler"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "germain-en-laye",
+        "that",
+        "lanyard",
+        "first",
+        "noticed",
+        "the",
+        "grey",
+        "touring",
+        "car"
+      ],
+      "compounds": [
+        "germain-en-laye"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "give",
+        "you",
+        "good-night"
+      ],
+      "compounds": [
+        "good-night"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "god",
+        "dig-you-den",
+        "all"
+      ],
+      "compounds": [
+        "dig-you-den"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "god-den",
+        "to",
+        "your",
+        "worship",
+        "good",
+        "captain",
+        "james"
+      ],
+      "compounds": [
+        "god-den"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "good",
+        "even",
+        "good",
+        "master",
+        "what-ye-call",
+        "t",
+        "how",
+        "do",
+        "you",
+        "sir"
+      ],
+      "compounds": [
+        "what-ye-call"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "goodly",
+        "lord",
+        "what",
+        "a",
+        "wit-snapper",
+        "are",
+        "you"
+      ],
+      "compounds": [
+        "wit-snapper"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "got",
+        "a",
+        "war-bag",
+        "bud"
+      ],
+      "compounds": [
+        "war-bag"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "greater",
+        "than",
+        "both",
+        "by",
+        "the",
+        "all-hail",
+        "hereafter"
+      ],
+      "compounds": [
+        "all-hail"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "greek",
+        "gravi-somnem",
+        "heavy",
+        "sleep"
+      ],
+      "compounds": [
+        "gravi-somnem"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "had",
+        "i",
+        "been",
+        "thief-stol",
+        "n",
+        "as",
+        "my",
+        "two",
+        "brothers",
+        "happy"
+      ],
+      "compounds": [
+        "thief-stol"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "hail",
+        "hieroglyphic",
+        "state-machine",
+        "contrived",
+        "to",
+        "punish",
+        "fancy",
+        "in"
+      ],
+      "compounds": [
+        "state-machine"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "half-blooded",
+        "fellow",
+        "yes"
+      ],
+      "compounds": [
+        "half-blooded"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "hang",
+        "him",
+        "mechanical",
+        "salt-butter",
+        "rogue"
+      ],
+      "compounds": [
+        "salt-butter"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "hang",
+        "thyself",
+        "in",
+        "thine",
+        "own",
+        "heir-apparent",
+        "garters"
+      ],
+      "compounds": [
+        "heir-apparent"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "hang-hog",
+        "is",
+        "latin",
+        "for",
+        "bacon",
+        "i",
+        "warrant",
+        "you"
+      ],
+      "compounds": [
+        "hang-hog"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "have",
+        "at",
+        "you",
+        "then",
+        "affection",
+        "s",
+        "men-at-arms"
+      ],
+      "compounds": [
+        "men-at-arms"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "he",
+        "can",
+        "come",
+        "no",
+        "other",
+        "way",
+        "but",
+        "by",
+        "this",
+        "hedge-corner"
+      ],
+      "compounds": [
+        "hedge-corner"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "he",
+        "had",
+        "before",
+        "this",
+        "last",
+        "expedition",
+        "twenty-five",
+        "wounds",
+        "upon",
+        "him"
+      ],
+      "compounds": [
+        "twenty-five"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "he",
+        "is",
+        "the",
+        "rock",
+        "the",
+        "oak",
+        "not",
+        "to",
+        "be",
+        "wind-shaken"
+      ],
+      "compounds": [
+        "wind-shaken"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "he",
+        "is",
+        "your",
+        "husband",
+        "on",
+        "a",
+        "pre-contract"
+      ],
+      "compounds": [
+        "pre-contract"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "he",
+        "knows",
+        "punch-the-breeze",
+        "thompson",
+        "too"
+      ],
+      "compounds": [
+        "punch-the-breeze"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "he",
+        "stands",
+        "there",
+        "like",
+        "a",
+        "mortar-piece",
+        "to",
+        "blow",
+        "us"
+      ],
+      "compounds": [
+        "mortar-piece"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "he",
+        "sure",
+        "means",
+        "brevity",
+        "in",
+        "breath",
+        "short-winded"
+      ],
+      "compounds": [
+        "short-winded"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "hear",
+        "me",
+        "my",
+        "lord",
+        "what",
+        "need",
+        "you",
+        "five-and-twenty"
+      ],
+      "compounds": [
+        "five-and-twenty"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "hear",
+        "the",
+        "mighty",
+        "car-wheels",
+        "humming"
+      ],
+      "compounds": [
+        "car-wheels"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "heigh-ho",
+        "sing",
+        "heigh-ho",
+        "unto",
+        "the",
+        "green",
+        "holly"
+      ],
+      "compounds": [
+        "heigh-ho",
+        "heigh-ho"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "heigh-ho",
+        "the",
+        "carrion",
+        "crow"
+      ],
+      "compounds": [
+        "heigh-ho"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "hence",
+        "ash-sap",
+        "was",
+        "a",
+        "german",
+        "remedy",
+        "for",
+        "serpent",
+        "bites"
+      ],
+      "compounds": [
+        "ash-sap"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "here",
+        "comes",
+        "lean",
+        "jack",
+        "here",
+        "comes",
+        "bare-bone"
+      ],
+      "compounds": [
+        "bare-bone"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "here",
+        "take",
+        "the",
+        "humour-letter"
+      ],
+      "compounds": [
+        "humour-letter"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "hocus-pocus",
+        "magic",
+        "of",
+        "a",
+        "sort",
+        "the",
+        "captain",
+        "growled"
+      ],
+      "compounds": [
+        "hocus-pocus"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "horn-mad",
+        "thou",
+        "villain"
+      ],
+      "compounds": [
+        "horn-mad"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "how",
+        "angel-like",
+        "he",
+        "sings"
+      ],
+      "compounds": [
+        "angel-like"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "how",
+        "now",
+        "my",
+        "eyas-musket",
+        "what",
+        "news",
+        "with",
+        "you"
+      ],
+      "compounds": [
+        "eyas-musket"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "how",
+        "now",
+        "wool-sack",
+        "what",
+        "mutter",
+        "you"
+      ],
+      "compounds": [
+        "wool-sack"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "how-do",
+        "the",
+        "boy",
+        "called",
+        "out",
+        "when",
+        "he",
+        "got",
+        "nearer"
+      ],
+      "compounds": [
+        "how-do"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "huh-how",
+        "could",
+        "you",
+        "lul-luke"
+      ],
+      "compounds": [
+        "huh-how",
+        "lul-luke"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "i",
+        "am",
+        "but",
+        "mad",
+        "north-north-west"
+      ],
+      "compounds": [
+        "north-north-west"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "i",
+        "am",
+        "he",
+        "that",
+        "is",
+        "so",
+        "love-shaked"
+      ],
+      "compounds": [
+        "love-shaked"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "i",
+        "am",
+        "maternus-latro"
+      ],
+      "compounds": [
+        "maternus-latro"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "i",
+        "am",
+        "thy",
+        "king",
+        "and",
+        "thou",
+        "a",
+        "false-heart",
+        "traitor"
+      ],
+      "compounds": [
+        "false-heart"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "i",
+        "am",
+        "withered",
+        "like",
+        "an",
+        "old",
+        "apple-john"
+      ],
+      "compounds": [
+        "apple-john"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "i",
+        "come",
+        "to",
+        "fetch",
+        "you",
+        "to",
+        "the",
+        "senate-house"
+      ],
+      "compounds": [
+        "senate-house"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "i",
+        "have",
+        "sounded",
+        "the",
+        "very",
+        "base-string",
+        "of",
+        "humility"
+      ],
+      "compounds": [
+        "base-string"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "i",
+        "ll",
+        "conjure",
+        "you",
+        "i",
+        "ll",
+        "fortune-tell",
+        "you"
+      ],
+      "compounds": [
+        "fortune-tell"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "i",
+        "mean",
+        "not",
+        "cuckold-mad",
+        "but",
+        "sure",
+        "he",
+        "s",
+        "stark",
+        "mad"
+      ],
+      "compounds": [
+        "cuckold-mad"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "i",
+        "painted",
+        "my",
+        "skin",
+        "with",
+        "mangrove-bark",
+        "water"
+      ],
+      "compounds": [
+        "mangrove-bark"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "i",
+        "prithee",
+        "do",
+        "not",
+        "mock",
+        "me",
+        "fellow-student"
+      ],
+      "compounds": [
+        "fellow-student"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "i",
+        "put",
+        "thee",
+        "now",
+        "to",
+        "thy",
+        "book-oath"
+      ],
+      "compounds": [
+        "book-oath"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "i",
+        "say",
+        "gud-day",
+        "captain",
+        "fluellen"
+      ],
+      "compounds": [
+        "gud-day"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "i",
+        "see",
+        "by",
+        "you",
+        "i",
+        "am",
+        "a",
+        "sweet-faced",
+        "youth"
+      ],
+      "compounds": [
+        "sweet-faced"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "i",
+        "think",
+        "hector",
+        "was",
+        "not",
+        "so",
+        "clean-timbered"
+      ],
+      "compounds": [
+        "clean-timbered"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "i",
+        "will",
+        "be",
+        "treble-sinewed",
+        "hearted",
+        "breathed",
+        "and",
+        "fight",
+        "maliciously"
+      ],
+      "compounds": [
+        "treble-sinewed"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "i",
+        "will",
+        "not",
+        "struggle",
+        "i",
+        "will",
+        "stand",
+        "stone-still"
+      ],
+      "compounds": [
+        "stone-still"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "if",
+        "i",
+        "do",
+        "fillip",
+        "me",
+        "with",
+        "a",
+        "three-man",
+        "beetle"
+      ],
+      "compounds": [
+        "three-man"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "ill-weaved",
+        "ambition",
+        "how",
+        "much",
+        "art",
+        "thou",
+        "shrunk"
+      ],
+      "compounds": [
+        "ill-weaved"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "in",
+        "abyssinia",
+        "guinea-fowl",
+        "n",
+        "pound",
+        "sterling",
+        "ii"
+      ],
+      "compounds": [
+        "guinea-fowl"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "in",
+        "the",
+        "pahlavi",
+        "language",
+        "it",
+        "was",
+        "called",
+        "kunuk-duz-mokt"
+      ],
+      "compounds": [
+        "kunuk-duz-mokt"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "indeed",
+        "it",
+        "is",
+        "a",
+        "strange-disposed",
+        "time"
+      ],
+      "compounds": [
+        "strange-disposed"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "is",
+        "she",
+        "shrill-tongued",
+        "or",
+        "low"
+      ],
+      "compounds": [
+        "shrill-tongued"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "is",
+        "the",
+        "buck-basket"
+      ],
+      "compounds": [
+        "buck-basket"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "is",
+        "there",
+        "yet",
+        "another",
+        "dotes",
+        "upon",
+        "rib-breaking"
+      ],
+      "compounds": [
+        "rib-breaking"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "is",
+        "this",
+        "ascension-day"
+      ],
+      "compounds": [
+        "ascension-day"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "it",
+        "is",
+        "the",
+        "right",
+        "butter-women",
+        "s",
+        "rank",
+        "to",
+        "market"
+      ],
+      "compounds": [
+        "butter-women"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "it",
+        "out-herods",
+        "herod"
+      ],
+      "compounds": [
+        "out-herods"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "king",
+        "richard",
+        "c",
+        "ur-de-lion",
+        "was",
+        "thy",
+        "father"
+      ],
+      "compounds": [
+        "ur-de-lion"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "knight",
+        "knight",
+        "good",
+        "mother",
+        "basilisco-like"
+      ],
+      "compounds": [
+        "basilisco-like"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "lean",
+        "raw-bon",
+        "d",
+        "rascals"
+      ],
+      "compounds": [
+        "raw-bon"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "lepidus",
+        "is",
+        "high-coloured"
+      ],
+      "compounds": [
+        "high-coloured"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "let",
+        "not",
+        "sloth",
+        "dim",
+        "your",
+        "honours",
+        "new-begot"
+      ],
+      "compounds": [
+        "new-begot"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "lobby",
+        "before",
+        "the",
+        "council-chamber"
+      ],
+      "compounds": [
+        "council-chamber"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "lobby",
+        "before",
+        "the",
+        "council-chamber",
+        "scene",
+        "iii"
+      ],
+      "compounds": [
+        "council-chamber"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "look",
+        "they",
+        "weep",
+        "and",
+        "i",
+        "an",
+        "ass",
+        "am",
+        "onion-eyed"
+      ],
+      "compounds": [
+        "onion-eyed"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "looks",
+        "like",
+        "punch-the-breeze",
+        "thompson",
+        "said",
+        "mr"
+      ],
+      "compounds": [
+        "punch-the-breeze"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "marry",
+        "sir",
+        "nose-painting",
+        "sleep",
+        "and",
+        "urine"
+      ],
+      "compounds": [
+        "nose-painting"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "meantime",
+        "we",
+        "thank",
+        "you",
+        "for",
+        "your",
+        "well-took",
+        "labour"
+      ],
+      "compounds": [
+        "well-took"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "milk-liver",
+        "d",
+        "man"
+      ],
+      "compounds": [
+        "milk-liver"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "my",
+        "ever-gentle",
+        "cousin",
+        "welcome",
+        "hither"
+      ],
+      "compounds": [
+        "ever-gentle"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "my",
+        "high-repented",
+        "blames",
+        "dear",
+        "sovereign",
+        "pardon",
+        "to",
+        "me"
+      ],
+      "compounds": [
+        "high-repented"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "my",
+        "learned",
+        "and",
+        "well-beloved",
+        "servant",
+        "cranmer",
+        "prithee",
+        "return"
+      ],
+      "compounds": [
+        "well-beloved"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "my",
+        "name",
+        "is",
+        "jeanne-marie"
+      ],
+      "compounds": [
+        "jeanne-marie"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "my",
+        "son",
+        "corrupts",
+        "a",
+        "well-derived",
+        "nature",
+        "with",
+        "his",
+        "inducement"
+      ],
+      "compounds": [
+        "well-derived"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "my",
+        "widow-comfort",
+        "and",
+        "my",
+        "sorrows",
+        "cure"
+      ],
+      "compounds": [
+        "widow-comfort"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "n",
+        "ai-lao",
+        "afterwards",
+        "nan-chao",
+        "ancient",
+        "name",
+        "of",
+        "the",
+        "shans",
+        "ii"
+      ],
+      "compounds": [
+        "ai-lao",
+        "nan-chao"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "n",
+        "gates",
+        "of",
+        "n",
+        "n",
+        "sonagar-pattanam",
+        "ii"
+      ],
+      "compounds": [
+        "sonagar-pattanam"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "n",
+        "n",
+        "n",
+        "limits",
+        "of",
+        "n",
+        "kiang-hung",
+        "xieng-hung",
+        "ii"
+      ],
+      "compounds": [
+        "kiang-hung",
+        "xieng-hung"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "nay",
+        "he",
+        "can",
+        "make",
+        "obligations",
+        "and",
+        "write",
+        "court-hand"
+      ],
+      "compounds": [
+        "court-hand"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "no",
+        "he",
+        "gives",
+        "me",
+        "the",
+        "proverbs",
+        "and",
+        "the",
+        "no-verbs"
+      ],
+      "compounds": [
+        "no-verbs"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "no",
+        "it",
+        "is",
+        "false",
+        "if",
+        "it",
+        "is",
+        "a",
+        "pick-purse"
+      ],
+      "compounds": [
+        "pick-purse"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "no",
+        "more",
+        "thou",
+        "thunder-master",
+        "show",
+        "thy",
+        "spite",
+        "on",
+        "mortal",
+        "flies"
+      ],
+      "compounds": [
+        "thunder-master"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "no",
+        "pray",
+        "thee",
+        "let",
+        "it",
+        "serve",
+        "for",
+        "table-talk"
+      ],
+      "compounds": [
+        "table-talk"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "no",
+        "soft-soap",
+        "business",
+        "please"
+      ],
+      "compounds": [
+        "soft-soap"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "no",
+        "use",
+        "doing",
+        "that",
+        "said",
+        "tsz-kung",
+        "he",
+        "is",
+        "irreproachable"
+      ],
+      "compounds": [
+        "tsz-kung"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "nor",
+        "th",
+        "all-dreaded",
+        "thunder-stone"
+      ],
+      "compounds": [
+        "all-dreaded",
+        "thunder-stone"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "not",
+        "this",
+        "but",
+        "troubles",
+        "of",
+        "the",
+        "marriage-bed"
+      ],
+      "compounds": [
+        "marriage-bed"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "now",
+        "art",
+        "thou",
+        "within",
+        "point-blank",
+        "of",
+        "our",
+        "jurisdiction",
+        "regal"
+      ],
+      "compounds": [
+        "point-blank"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "now",
+        "does",
+        "the",
+        "love-story",
+        "begin",
+        "asked",
+        "his",
+        "wife"
+      ],
+      "compounds": [
+        "love-story"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "now",
+        "from",
+        "head",
+        "to",
+        "foot",
+        "i",
+        "am",
+        "marble-constant"
+      ],
+      "compounds": [
+        "marble-constant"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "now",
+        "it",
+        "s",
+        "twenty-seven"
+      ],
+      "compounds": [
+        "twenty-seven"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "now",
+        "the",
+        "hot-blooded",
+        "gods",
+        "assist",
+        "me"
+      ],
+      "compounds": [
+        "hot-blooded"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "now",
+        "you",
+        "she-foxes"
+      ],
+      "compounds": [
+        "she-foxes"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "nut-hook",
+        "nut-hook",
+        "you",
+        "lie"
+      ],
+      "compounds": [
+        "nut-hook",
+        "nut-hook"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "o",
+        "blood-bespotted",
+        "neapolitan",
+        "outcast",
+        "of",
+        "naples",
+        "england",
+        "s",
+        "bloody",
+        "scourge"
+      ],
+      "compounds": [
+        "blood-bespotted"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "o",
+        "god",
+        "your",
+        "only",
+        "jig-maker"
+      ],
+      "compounds": [
+        "jig-maker"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "o",
+        "hold",
+        "me",
+        "not",
+        "with",
+        "silence",
+        "over-long"
+      ],
+      "compounds": [
+        "over-long"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "o",
+        "how",
+        "full",
+        "of",
+        "briers",
+        "is",
+        "this",
+        "working-day",
+        "world"
+      ],
+      "compounds": [
+        "working-day"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "o",
+        "my",
+        "all-worthy",
+        "lord"
+      ],
+      "compounds": [
+        "all-worthy"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "o",
+        "poverty",
+        "in",
+        "wit",
+        "kingly-poor",
+        "flout"
+      ],
+      "compounds": [
+        "kingly-poor"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "o",
+        "short-lived",
+        "pride"
+      ],
+      "compounds": [
+        "short-lived"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "o",
+        "that",
+        "i",
+        "had",
+        "her",
+        "here",
+        "to",
+        "tear",
+        "her",
+        "limb-meal"
+      ],
+      "compounds": [
+        "limb-meal"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "o",
+        "thou",
+        "art",
+        "a",
+        "perpetual",
+        "triumph",
+        "an",
+        "everlasting",
+        "bonfire-light"
+      ],
+      "compounds": [
+        "bonfire-light"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "o",
+        "thou",
+        "side-piercing",
+        "sight"
+      ],
+      "compounds": [
+        "side-piercing"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "o",
+        "well-knit",
+        "samson",
+        "strong-jointed",
+        "samson"
+      ],
+      "compounds": [
+        "well-knit",
+        "strong-jointed"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "o",
+        "yes",
+        "it",
+        "doth",
+        "a",
+        "thousand-fold",
+        "it",
+        "doth"
+      ],
+      "compounds": [
+        "thousand-fold"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "or",
+        "is",
+        "it",
+        "a",
+        "fee-grief",
+        "due",
+        "to",
+        "some",
+        "single",
+        "breast"
+      ],
+      "compounds": [
+        "fee-grief"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "oui",
+        "mette-le",
+        "au",
+        "mon",
+        "pocket"
+      ],
+      "compounds": [
+        "mette-le"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "oui",
+        "vraiment",
+        "sauf",
+        "votre",
+        "gr",
+        "ce",
+        "ainsi",
+        "dit-il"
+      ],
+      "compounds": [
+        "dit-il"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "our",
+        "very",
+        "loving",
+        "sister",
+        "well",
+        "be-met"
+      ],
+      "compounds": [
+        "be-met"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "out",
+        "you",
+        "mad-headed",
+        "ape"
+      ],
+      "compounds": [
+        "mad-headed"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "over-roasted",
+        "rather",
+        "ready",
+        "long",
+        "ago"
+      ],
+      "compounds": [
+        "over-roasted"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "pa-pah",
+        "they",
+        "exclaimed",
+        "in",
+        "gentle",
+        "consternation"
+      ],
+      "compounds": [
+        "pa-pah"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "panic-striken",
+        "kazan",
+        "searched",
+        "vainly",
+        "for",
+        "a",
+        "means",
+        "of",
+        "escape"
+      ],
+      "compounds": [
+        "panic-striken"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "pardonnez-moi",
+        "i",
+        "cannot",
+        "tell",
+        "wat",
+        "is",
+        "like",
+        "me"
+      ],
+      "compounds": [
+        "pardonnez-moi"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "pell-mell",
+        "down",
+        "with",
+        "them"
+      ],
+      "compounds": [
+        "pell-mell"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "perchance",
+        "till",
+        "after",
+        "theseus",
+        "wedding-day"
+      ],
+      "compounds": [
+        "wedding-day"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "petit",
+        "monsieur",
+        "que",
+        "dit-il"
+      ],
+      "compounds": [
+        "dit-il"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "phewoo-phewoo-phewoo",
+        "come",
+        "here",
+        "bobs",
+        "come",
+        "here"
+      ],
+      "compounds": [
+        "phewoo-phewoo-phewoo"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "pistol",
+        "i",
+        "will",
+        "double-charge",
+        "thee",
+        "with",
+        "dignities"
+      ],
+      "compounds": [
+        "double-charge"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "punch-the-breeze",
+        "thompson",
+        "did",
+        "not",
+        "attempt",
+        "to",
+        "ride",
+        "around",
+        "them"
+      ],
+      "compounds": [
+        "punch-the-breeze"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "punch-the-breeze",
+        "thompson",
+        "had",
+        "returned",
+        "with",
+        "the",
+        "sheriff"
+      ],
+      "compounds": [
+        "punch-the-breeze"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "que",
+        "dit-il",
+        "monsieur"
+      ],
+      "compounds": [
+        "dit-il"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "quoit",
+        "him",
+        "down",
+        "bardolph",
+        "like",
+        "a",
+        "shove-groat",
+        "shilling"
+      ],
+      "compounds": [
+        "shove-groat"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "re-enter",
+        "charles",
+        "alen",
+        "on",
+        "and",
+        "reignier"
+      ],
+      "compounds": [
+        "re-enter"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "re-enter",
+        "gloucester",
+        "with",
+        "france",
+        "burgundy",
+        "and",
+        "attendants"
+      ],
+      "compounds": [
+        "re-enter"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "re-enter",
+        "ophelia",
+        "fantastically",
+        "dressed",
+        "with",
+        "straws",
+        "and",
+        "flowers"
+      ],
+      "compounds": [
+        "re-enter"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "re-enter",
+        "rosencrantz",
+        "and",
+        "guildenstern"
+      ],
+      "compounds": [
+        "re-enter"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "re-enter",
+        "the",
+        "bastard",
+        "of",
+        "orleans",
+        "with",
+        "joan",
+        "la",
+        "pucelle"
+      ],
+      "compounds": [
+        "re-enter"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "re-enter",
+        "the",
+        "players",
+        "with",
+        "recorders"
+      ],
+      "compounds": [
+        "re-enter"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "reads",
+        "that",
+        "unlettered",
+        "small-knowing",
+        "soul"
+      ],
+      "compounds": [
+        "small-knowing"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "reply",
+        "not",
+        "to",
+        "me",
+        "with",
+        "a",
+        "fool-born",
+        "jest"
+      ],
+      "compounds": [
+        "fool-born"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "richardson",
+        "in",
+        "his",
+        "fauni-boreali",
+        "americana",
+        "says",
+        "mr"
+      ],
+      "compounds": [
+        "fauni-boreali"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "saint",
+        "george",
+        "s",
+        "half-cheek",
+        "in",
+        "a",
+        "brooch"
+      ],
+      "compounds": [
+        "half-cheek"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "score",
+        "a",
+        "pint",
+        "of",
+        "bastard",
+        "in",
+        "the",
+        "half-moon",
+        "or",
+        "so"
+      ],
+      "compounds": [
+        "half-moon"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "scurvy",
+        "jack-dog",
+        "priest"
+      ],
+      "compounds": [
+        "jack-dog"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "see",
+        "black's",
+        "folk-medicine",
+        "p"
+      ],
+      "compounds": [
+        "folk-medicine"
+      ],
+      "fromPrefix": false,
+      "split": true,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "see",
+        "folkard's",
+        "plant-lore",
+        "legends",
+        "and",
+        "lyrics",
+        "p"
+      ],
+      "compounds": [
+        "plant-lore"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "see",
+        "hobson-jobson",
+        "s",
+        "v"
+      ],
+      "compounds": [
+        "hobson-jobson"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "see",
+        "homi-cheu",
+        "hooker",
+        "sir",
+        "joseph",
+        "on",
+        "bamboo",
+        "explosion",
+        "ii"
+      ],
+      "compounds": [
+        "homi-cheu"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "sha-chau",
+        "is",
+        "one",
+        "of",
+        "the",
+        "best",
+        "oases",
+        "of",
+        "central",
+        "asia"
+      ],
+      "compounds": [
+        "sha-chau"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "shall",
+        "i",
+        "re-deliver",
+        "you",
+        "e",
+        "en",
+        "so"
+      ],
+      "compounds": [
+        "re-deliver"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "she",
+        "glanced",
+        "again",
+        "at",
+        "the",
+        "dog-train",
+        "jogging",
+        "steadily",
+        "forward"
+      ],
+      "compounds": [
+        "dog-train"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "she",
+        "has",
+        "a",
+        "leathern",
+        "hand",
+        "a",
+        "freestone-coloured",
+        "hand"
+      ],
+      "compounds": [
+        "freestone-coloured"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "she",
+        "is",
+        "allowed",
+        "for",
+        "the",
+        "dey-woman"
+      ],
+      "compounds": [
+        "dey-woman"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "she",
+        "is",
+        "low-voiced"
+      ],
+      "compounds": [
+        "low-voiced"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "she",
+        "is",
+        "pistol-proof",
+        "sir",
+        "you",
+        "shall",
+        "not",
+        "hardly",
+        "offend",
+        "her"
+      ],
+      "compounds": [
+        "pistol-proof"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "she",
+        "was",
+        "then",
+        "a",
+        "bona-roba"
+      ],
+      "compounds": [
+        "bona-roba"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "show",
+        "your",
+        "sheep-biting",
+        "face",
+        "and",
+        "be",
+        "hanged",
+        "an",
+        "hour"
+      ],
+      "compounds": [
+        "sheep-biting"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "simony",
+        "was",
+        "fair-play"
+      ],
+      "compounds": [
+        "fair-play"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "sleeping",
+        "or",
+        "waking",
+        "mad",
+        "or",
+        "well-advis",
+        "d"
+      ],
+      "compounds": [
+        "well-advis"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "so-so",
+        "is",
+        "good",
+        "very",
+        "good",
+        "very",
+        "excellent",
+        "good"
+      ],
+      "compounds": [
+        "so-so"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "speak",
+        "on",
+        "but",
+        "be",
+        "not",
+        "over-tedious"
+      ],
+      "compounds": [
+        "over-tedious"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "such",
+        "short-lived",
+        "wits",
+        "do",
+        "wither",
+        "as",
+        "they",
+        "grow"
+      ],
+      "compounds": [
+        "short-lived"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "suivez-vous",
+        "le",
+        "grand",
+        "capitaine"
+      ],
+      "compounds": [
+        "suivez-vous"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "tennis-balls",
+        "my",
+        "liege"
+      ],
+      "compounds": [
+        "tennis-balls"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "that",
+        "s",
+        "fifty-five",
+        "year",
+        "ago"
+      ],
+      "compounds": [
+        "fifty-five"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "the",
+        "carved-bone",
+        "face",
+        "on",
+        "a",
+        "flask"
+      ],
+      "compounds": [
+        "carved-bone"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "the",
+        "council-chamber",
+        "scene",
+        "iii"
+      ],
+      "compounds": [
+        "council-chamber"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "the",
+        "court",
+        "s",
+        "a",
+        "learning-place",
+        "and",
+        "he",
+        "is",
+        "one"
+      ],
+      "compounds": [
+        "learning-place"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "the",
+        "devil",
+        "damn",
+        "thee",
+        "black",
+        "thou",
+        "cream-fac",
+        "d",
+        "loon"
+      ],
+      "compounds": [
+        "cream-fac"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "the",
+        "gallows-maker",
+        "for",
+        "that",
+        "frame",
+        "outlives",
+        "a",
+        "thousand",
+        "tenants"
+      ],
+      "compounds": [
+        "gallows-maker"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "the",
+        "king",
+        "was",
+        "weeping-ripe",
+        "for",
+        "a",
+        "good",
+        "word"
+      ],
+      "compounds": [
+        "weeping-ripe"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "the",
+        "let-alone",
+        "lies",
+        "not",
+        "in",
+        "your",
+        "good",
+        "will"
+      ],
+      "compounds": [
+        "let-alone"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "the",
+        "o",
+        "er-great",
+        "cardinal",
+        "hath",
+        "showed",
+        "him",
+        "gold"
+      ],
+      "compounds": [
+        "er-great"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "the",
+        "prince",
+        "is",
+        "a",
+        "jack",
+        "a",
+        "sneak-up"
+      ],
+      "compounds": [
+        "sneak-up"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "the",
+        "road",
+        "by",
+        "gads-hill"
+      ],
+      "compounds": [
+        "gads-hill"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "the",
+        "slush",
+        "was",
+        "waist-deep",
+        "in",
+        "the",
+        "gulches"
+      ],
+      "compounds": [
+        "waist-deep"
+      ],
+      "fromPrefix": false,
+      "split": true,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "the",
+        "sweet",
+        "war-man",
+        "is",
+        "dead",
+        "and",
+        "rotten"
+      ],
+      "compounds": [
+        "war-man"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "their",
+        "sweetest",
+        "shade",
+        "a",
+        "grove",
+        "of",
+        "cypress-trees"
+      ],
+      "compounds": [
+        "cypress-trees"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "then",
+        "heigh-ho",
+        "the",
+        "holly"
+      ],
+      "compounds": [
+        "heigh-ho"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "then",
+        "re-enter",
+        "lucius",
+        "and",
+        "iachimo",
+        "with",
+        "imogen"
+      ],
+      "compounds": [
+        "re-enter"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "then",
+        "re-enter",
+        "talbot"
+      ],
+      "compounds": [
+        "re-enter"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "then",
+        "shall",
+        "we",
+        "be",
+        "news-crammed"
+      ],
+      "compounds": [
+        "news-crammed"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "there",
+        "are",
+        "land-babies",
+        "then",
+        "why",
+        "not",
+        "water-babies"
+      ],
+      "compounds": [
+        "land-babies",
+        "water-babies"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "there",
+        "is",
+        "further",
+        "compliment",
+        "of",
+        "leave-taking",
+        "between",
+        "france",
+        "and",
+        "him"
+      ],
+      "compounds": [
+        "leave-taking"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "there",
+        "is",
+        "no",
+        "remedy",
+        "i",
+        "must",
+        "cony-catch",
+        "i",
+        "must",
+        "shift"
+      ],
+      "compounds": [
+        "cony-catch"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "there",
+        "roar",
+        "d",
+        "the",
+        "sea",
+        "and",
+        "trumpet-clangor",
+        "sounds"
+      ],
+      "compounds": [
+        "trumpet-clangor"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "there",
+        "they",
+        "always",
+        "use",
+        "to",
+        "discharge",
+        "their",
+        "birding-pieces"
+      ],
+      "compounds": [
+        "birding-pieces"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "these",
+        "and",
+        "those",
+        "that",
+        "were",
+        "thy",
+        "peach-coloured",
+        "ones"
+      ],
+      "compounds": [
+        "peach-coloured"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "these",
+        "three",
+        "world-sharers",
+        "these",
+        "competitors",
+        "are",
+        "in",
+        "thy",
+        "vessel"
+      ],
+      "compounds": [
+        "world-sharers"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "they",
+        "are",
+        "not",
+        "herbs",
+        "you",
+        "knave",
+        "they",
+        "are",
+        "nose-herbs"
+      ],
+      "compounds": [
+        "nose-herbs"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "they",
+        "have",
+        "made",
+        "him",
+        "drink",
+        "alms-drink"
+      ],
+      "compounds": [
+        "alms-drink"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "this",
+        "is",
+        "the",
+        "cardinal",
+        "s",
+        "doing",
+        "the",
+        "king-cardinal"
+      ],
+      "compounds": [
+        "king-cardinal"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "this",
+        "is",
+        "well",
+        "he",
+        "has",
+        "made",
+        "us",
+        "his",
+        "vlouting-stog"
+      ],
+      "compounds": [
+        "vlouting-stog"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "thou",
+        "art",
+        "an",
+        "old",
+        "love-monger",
+        "and",
+        "speakest",
+        "skilfully"
+      ],
+      "compounds": [
+        "love-monger"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "thou",
+        "art",
+        "easier",
+        "swallowed",
+        "than",
+        "a",
+        "flap-dragon"
+      ],
+      "compounds": [
+        "flap-dragon"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "thou",
+        "changed",
+        "and",
+        "self-cover",
+        "d",
+        "thing",
+        "for",
+        "shame"
+      ],
+      "compounds": [
+        "self-cover"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "thou",
+        "dost",
+        "ride",
+        "on",
+        "a",
+        "foot-cloth",
+        "dost",
+        "thou",
+        "not"
+      ],
+      "compounds": [
+        "foot-cloth"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "thou",
+        "liest",
+        "thou",
+        "shag-ear",
+        "d",
+        "villain"
+      ],
+      "compounds": [
+        "shag-ear"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "thou",
+        "prick-ear",
+        "d",
+        "cur",
+        "of",
+        "iceland"
+      ],
+      "compounds": [
+        "prick-ear"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "thrice",
+        "and",
+        "once",
+        "the",
+        "hedge-pig",
+        "whin",
+        "d"
+      ],
+      "compounds": [
+        "hedge-pig"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "thrice-noble",
+        "suffolk",
+        "tis",
+        "resolutely",
+        "spoke"
+      ],
+      "compounds": [
+        "thrice-noble"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "tilly-fally",
+        "sir",
+        "john",
+        "ne",
+        "er",
+        "tell",
+        "me"
+      ],
+      "compounds": [
+        "tilly-fally"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "tis",
+        "no",
+        "matter",
+        "for",
+        "his",
+        "swellings",
+        "nor",
+        "his",
+        "turkey-cocks"
+      ],
+      "compounds": [
+        "turkey-cocks"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "tis",
+        "the",
+        "next",
+        "way",
+        "to",
+        "turn",
+        "tailor",
+        "or",
+        "be",
+        "redbreast-teacher"
+      ],
+      "compounds": [
+        "redbreast-teacher"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "tis",
+        "very",
+        "like",
+        "he",
+        "hath",
+        "the",
+        "falling-sickness"
+      ],
+      "compounds": [
+        "falling-sickness"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "to",
+        "bardolph",
+        "there",
+        "s",
+        "a",
+        "dish",
+        "of",
+        "leather-coats",
+        "for",
+        "you"
+      ],
+      "compounds": [
+        "leather-coats"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "to",
+        "silvius",
+        "you",
+        "to",
+        "a",
+        "long",
+        "and",
+        "well-deserved",
+        "bed"
+      ],
+      "compounds": [
+        "well-deserved"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "to",
+        "stand",
+        "against",
+        "the",
+        "deep",
+        "dread-bolted",
+        "thunder"
+      ],
+      "compounds": [
+        "dread-bolted"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "to",
+        "t",
+        "luxury",
+        "pell-mell"
+      ],
+      "compounds": [
+        "pell-mell"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "truths",
+        "would",
+        "be",
+        "tales",
+        "where",
+        "now",
+        "half-tales",
+        "be",
+        "truths"
+      ],
+      "compounds": [
+        "half-tales"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "tsz-fuh",
+        "king-pih",
+        "went",
+        "and",
+        "informed",
+        "tsz-kung",
+        "of",
+        "this",
+        "remark"
+      ],
+      "compounds": [
+        "tsz-fuh",
+        "king-pih",
+        "tsz-kung"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "tsz-kung",
+        "then",
+        "spoke",
+        "up"
+      ],
+      "compounds": [
+        "tsz-kung"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "tsz-kung",
+        "was",
+        "consulting",
+        "him",
+        "about",
+        "a",
+        "friend"
+      ],
+      "compounds": [
+        "tsz-kung"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "uh-huh",
+        "gene",
+        "knuckled",
+        "his",
+        "eyes",
+        "and",
+        "sat",
+        "up"
+      ],
+      "compounds": [
+        "uh-huh"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "upon",
+        "thy",
+        "wedding-day"
+      ],
+      "compounds": [
+        "wedding-day"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "very",
+        "ill-favouredly",
+        "master",
+        "brook"
+      ],
+      "compounds": [
+        "ill-favouredly"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "virtue",
+        "is",
+        "no",
+        "horn-maker",
+        "and",
+        "my",
+        "rosalind",
+        "is",
+        "virtuous"
+      ],
+      "compounds": [
+        "horn-maker"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "vouchsafe",
+        "good-morrow",
+        "from",
+        "a",
+        "feeble",
+        "tongue"
+      ],
+      "compounds": [
+        "good-morrow"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "we",
+        "ll",
+        "beat",
+        "em",
+        "into",
+        "bench-holes"
+      ],
+      "compounds": [
+        "bench-holes"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "well",
+        "better",
+        "wits",
+        "have",
+        "worn",
+        "plain",
+        "statute-caps"
+      ],
+      "compounds": [
+        "statute-caps"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "well",
+        "i",
+        "am",
+        "loath",
+        "to",
+        "gall",
+        "a",
+        "new-healed",
+        "wound"
+      ],
+      "compounds": [
+        "new-healed"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "well",
+        "said",
+        "brazen-face",
+        "hold",
+        "it",
+        "out",
+        "come",
+        "forth",
+        "sirrah"
+      ],
+      "compounds": [
+        "brazen-face"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "well-liking",
+        "wits",
+        "they",
+        "have",
+        "gross",
+        "gross",
+        "fat",
+        "fat"
+      ],
+      "compounds": [
+        "well-liking"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "well-minded",
+        "clarence",
+        "be",
+        "thou",
+        "fortunate"
+      ],
+      "compounds": [
+        "well-minded"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "wh-what",
+        "is",
+        "it"
+      ],
+      "compounds": [
+        "wh-what"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "what",
+        "a",
+        "frosty-spirited",
+        "rogue",
+        "is",
+        "this"
+      ],
+      "compounds": [
+        "frosty-spirited"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "what",
+        "a",
+        "hodge-pudding"
+      ],
+      "compounds": [
+        "hodge-pudding"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "what",
+        "a",
+        "lack-brain",
+        "is",
+        "this"
+      ],
+      "compounds": [
+        "lack-brain"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "what",
+        "a",
+        "maidenly",
+        "man-at-arms",
+        "are",
+        "you",
+        "become"
+      ],
+      "compounds": [
+        "man-at-arms"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "what",
+        "a",
+        "past-saving",
+        "slave",
+        "is",
+        "this"
+      ],
+      "compounds": [
+        "past-saving"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "what",
+        "never-dying",
+        "honour",
+        "hath",
+        "he",
+        "got",
+        "against",
+        "renowned",
+        "douglas"
+      ],
+      "compounds": [
+        "never-dying"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "what",
+        "night-rule",
+        "now",
+        "about",
+        "this",
+        "haunted",
+        "grove"
+      ],
+      "compounds": [
+        "night-rule"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "what",
+        "say",
+        "st",
+        "thou",
+        "my",
+        "fair",
+        "flower-de-luce"
+      ],
+      "compounds": [
+        "flower-de-luce"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "what",
+        "says",
+        "sir",
+        "john",
+        "sack-and-sugar"
+      ],
+      "compounds": [
+        "sack-and-sugar"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "what",
+        "soldiers",
+        "whey-face"
+      ],
+      "compounds": [
+        "whey-face"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "what",
+        "weeping-ripe",
+        "my",
+        "lord",
+        "northumberland"
+      ],
+      "compounds": [
+        "weeping-ripe"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "what",
+        "well-appointed",
+        "leader",
+        "fronts",
+        "us",
+        "here"
+      ],
+      "compounds": [
+        "well-appointed"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "what",
+        "woman-post",
+        "is",
+        "this"
+      ],
+      "compounds": [
+        "woman-post"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "what",
+        "you",
+        "poor",
+        "base",
+        "rascally",
+        "cheating",
+        "lack-linen",
+        "mate"
+      ],
+      "compounds": [
+        "lack-linen"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "when",
+        "i",
+        "spoke",
+        "that",
+        "i",
+        "was",
+        "ill-temper",
+        "d",
+        "too"
+      ],
+      "compounds": [
+        "ill-temper"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "when",
+        "night-dogs",
+        "run",
+        "all",
+        "sorts",
+        "of",
+        "deer",
+        "are",
+        "chased"
+      ],
+      "compounds": [
+        "night-dogs"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "where",
+        "is",
+        "that",
+        "devil",
+        "s",
+        "butcher",
+        "richard",
+        "hard-favoured",
+        "richard"
+      ],
+      "compounds": [
+        "hard-favoured"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "where",
+        "s",
+        "the",
+        "cowl-staff"
+      ],
+      "compounds": [
+        "cowl-staff"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "white-handed",
+        "mistress",
+        "one",
+        "sweet",
+        "word",
+        "with",
+        "thee"
+      ],
+      "compounds": [
+        "white-handed"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "why",
+        "here",
+        "he",
+        "comes",
+        "swelling",
+        "like",
+        "a",
+        "turkey-cock"
+      ],
+      "compounds": [
+        "turkey-cock"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "why",
+        "how",
+        "now",
+        "long-tongued",
+        "warwick",
+        "dare",
+        "you",
+        "speak"
+      ],
+      "compounds": [
+        "long-tongued"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "why",
+        "mistress",
+        "sure",
+        "my",
+        "master",
+        "is",
+        "horn-mad"
+      ],
+      "compounds": [
+        "horn-mad"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "why",
+        "then",
+        "three-farthing",
+        "worth",
+        "of",
+        "silk"
+      ],
+      "compounds": [
+        "three-farthing"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": true
+    },
+    {
+      "tokens": [
+        "why",
+        "you",
+        "bald-pated",
+        "lying",
+        "rascal"
+      ],
+      "compounds": [
+        "bald-pated"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "will",
+        "you",
+        "go",
+        "myn-heers"
+      ],
+      "compounds": [
+        "myn-heers"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "will",
+        "you",
+        "kindly",
+        "ring",
+        "for",
+        "the",
+        "patrol-wagon",
+        "jack"
+      ],
+      "compounds": [
+        "patrol-wagon"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "wilt",
+        "thou",
+        "ever",
+        "be",
+        "a",
+        "foul-mouth",
+        "d",
+        "and",
+        "calumnious",
+        "knave"
+      ],
+      "compounds": [
+        "foul-mouth"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": true,
+      "union": true
+    },
+    {
+      "tokens": [
+        "with",
+        "a",
+        "true",
+        "heart",
+        "and",
+        "brother-love",
+        "i",
+        "do",
+        "it"
+      ],
+      "compounds": [
+        "brother-love"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "with",
+        "trial-fire",
+        "touch",
+        "me",
+        "his",
+        "finger-end"
+      ],
+      "compounds": [
+        "trial-fire",
+        "finger-end"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "within",
+        "mome",
+        "malt-horse",
+        "capon",
+        "coxcomb",
+        "idiot",
+        "patch"
+      ],
+      "compounds": [
+        "malt-horse"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "worthy",
+        "fellows",
+        "and",
+        "like",
+        "to",
+        "prove",
+        "most",
+        "sinewy",
+        "sword-men"
+      ],
+      "compounds": [
+        "sword-men"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "xxix",
+        "concerning",
+        "the",
+        "rice-wine",
+        "drunk",
+        "by",
+        "the",
+        "people",
+        "of",
+        "cathay"
+      ],
+      "compounds": [
+        "rice-wine"
+      ],
+      "fromPrefix": false,
+      "split": false,
+      "fused": true,
+      "union": false
+    },
+    {
+      "tokens": [
+        "yea",
+        "sir",
+        "in",
+        "a",
+        "pottle-pot"
+      ],
+      "compounds": [
+        "pottle-pot"
+      ],
+      "fromPrefix": true,
+      "split": true,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "yes",
+        "helen",
+        "you",
+        "might",
+        "be",
+        "my",
+        "daughter-in-law"
+      ],
+      "compounds": [
+        "daughter-in-law"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "you",
+        "have",
+        "simply",
+        "misused",
+        "our",
+        "sex",
+        "in",
+        "your",
+        "love-prate"
+      ],
+      "compounds": [
+        "love-prate"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "you",
+        "see",
+        "an",
+        "ass-head",
+        "of",
+        "your",
+        "own",
+        "do",
+        "you"
+      ],
+      "compounds": [
+        "ass-head"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "you",
+        "swear",
+        "like",
+        "a",
+        "comfit-maker",
+        "s",
+        "wife"
+      ],
+      "compounds": [
+        "comfit-maker"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "you",
+        "were",
+        "best",
+        "call",
+        "it",
+        "daughter-beamed",
+        "eyes"
+      ],
+      "compounds": [
+        "daughter-beamed"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "you",
+        "were",
+        "best",
+        "meddle",
+        "with",
+        "buck-washing"
+      ],
+      "compounds": [
+        "buck-washing"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    },
+    {
+      "tokens": [
+        "your",
+        "nose",
+        "smells",
+        "no",
+        "in",
+        "this",
+        "most",
+        "tender-smelling",
+        "knight"
+      ],
+      "compounds": [
+        "tender-smelling"
+      ],
+      "fromPrefix": true,
+      "split": false,
+      "fused": false,
+      "union": false
+    }
+  ]
+}

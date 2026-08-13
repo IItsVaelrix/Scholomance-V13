@@ -158,6 +158,51 @@ export function guessPos(token) {
 }
 
 /**
+ * The identities a lexicon, the irregulars, and morphology can name for one form.
+ * The precedence is the one `atomsFor` documents; this is it, factored out so a
+ * compound can ask the same question of each of its pieces.
+ */
+function tagsForForm(lower, posMap) {
+  const known = posMap.get(lower);
+  let tags = known && known.length > 0 ? known : [];
+  if (tags.length === 0) tags = irregularPos(lower);
+  if (tags.length === 0) tags = guessPos(lower);
+  return tags;
+}
+
+/** A hyphen with word material on both sides — `peach-tree`, not `--` or `-30`. */
+const HYPHEN_COMPOUND = /^[a-z0-9]+(?:-[a-z0-9]+)+$/;
+
+/**
+ * COMPOUND IDENTITY IS THE UNION OF ITS PIECES.
+ *
+ * The constellation query path splits on whitespace, so a hyphen-declared
+ * compound arrives as ONE token — and `lemma_form` has no row for `peach-tree`,
+ * no irregular names it, and no suffix ends it. It therefore received no lexical
+ * atom at all, could bond with nothing, and took the whole phrase down with it:
+ * `the peach-tree fell` produced zero stable molecules while `the peach tree
+ * fell` parsed.
+ *
+ * UNION, not the head piece alone. Measured 2026-08-11 on 342 compound-bearing
+ * Gutenberg phrases: fusing with the head piece's identity scored 55.6% with 9
+ * regressions, fusing with the union scored 59.9% with 2, against 46.8% for the
+ * split arm. A single inherited identity is the constraint, not the bond.
+ *
+ * The lexicon still outranks this: a hyphenated form the table knows keeps its
+ * own row, and the pieces are consulted only when nothing names the whole.
+ */
+function compoundTags(lower, posMap) {
+  if (!HYPHEN_COMPOUND.test(lower)) return [];
+  const union = [];
+  for (const piece of lower.split('-')) {
+    for (const tag of tagsForForm(piece, posMap)) {
+      if (!union.includes(tag)) union.push(tag);
+    }
+  }
+  return union;
+}
+
+/**
  * Lexical typing from the injected POS table. A token can carry several types —
  * `fell` is a noun AND a verb — and each becomes its own atom, because the
  * ambiguity is real and resolving it here would be guessing.
@@ -173,9 +218,8 @@ function atomsFor(token, index, posMap) {
    * knows rather than becoming the past tense of `wind`.
    */
   const known = posMap.get(lower);
-  let tags = known && known.length > 0 ? known : [];
-  if (tags.length === 0) tags = irregularPos(lower);
-  if (tags.length === 0) tags = guessPos(lower);
+  let tags = tagsForForm(lower, posMap);
+  if (tags.length === 0) tags = compoundTags(lower, posMap);
   const out = [];
 
   /**
