@@ -25,8 +25,8 @@ describe("empty collection truthiness verifier", () => {
       source: `
 function atomsFor(token, index, posMap) {
   const known = posMap.get(token);
-  const tags = known && known.length > 0 ? known : [];
-  const out = [...tags];
+  const out = [];
+  if (known && known.length > 0) known.forEach(tag => out.push(tag));
   if (index > 0 && !known) out.push('PROPN');
   return out;
 }
@@ -68,8 +68,8 @@ function rank(index, query) {
       source: `
 function atomsFor(token, index, posMap, isClosedClass) {
   const known = posMap.get(token);
-  const tags = known && known.length > 0 ? known : [];
-  const out = [...tags];
+  const out = [];
+  if (known && known.length > 0) known.forEach(tag => out.push(tag));
   if (index > 0 || (!known && !isClosedClass)) out.push('PROPN');
   return out;
 }
@@ -113,8 +113,8 @@ function loadRows(source) {
         source: `
 function atomsFor(token, index, posMap) {
   const known = posMap.get(token);
-  const tags = known && known.length > 0 ? known : [];
-  const out = [...tags];
+  const out = [];
+  if (known && known.length > 0) known.forEach(tag => out.push(tag));
   if (index > 0 && !known?.length) out.push('PROPN');
   return out;
 }
@@ -129,8 +129,8 @@ function atomsFor(token, index, posMap) {
         source: `
 function atomsFor(token, index, posMap) {
   const known = posMap.get(token);
-  const tags = known && known.length > 0 ? known : [];
-  const out = [...tags];
+  const out = [];
+  if (known && known.length > 0) known.forEach(tag => out.push(tag));
   // IMMUNE_ALLOW: empty-collection-truthiness — posMap never stores an empty row, reviewed 2026-08-13
   if (index > 0 && !known) out.push('PROPN');
   return out;
@@ -161,10 +161,10 @@ function summarize(text) {
         source: `
 function atomsFor(token, posMap) {
   const known = posMap.get(token);
-  const tags = known ? known : [];
   const out = [];
+  if (known) known.forEach(tag => out.push(tag));
   if (!known) out.push('PROPN');
-  return out.concat(tags);
+  return out;
 }
 `
       });
@@ -199,7 +199,7 @@ function decide(flag) {
         source: read("verified.js")
       });
       expect(result.verdict).toBe("VERIFIED");
-      expect(verifiedLines(result)).toEqual([11, 23]);
+      expect(verifiedLines(result)).toEqual([15, 27]);
     });
 
     it("reports no finding for any hard negative in the frozen corpus", () => {

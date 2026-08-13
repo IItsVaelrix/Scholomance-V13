@@ -6,16 +6,22 @@
  * product's own lexicon (`scripts/compound-identity-experiment.mjs`):
  *
  *   SPLIT  pieces fed separately            20.5%
- *   FUSED  one token nothing can name       16.5%   <- the product before
- *   UNION  one token, pieces' identities    28.8%   <- after
+ *   FUSED  compound identity switched off   11.4%   <- the product before
+ *   UNION  one token, pieces' identities    29.3%   <- after
  *
- *   FUSED -> UNION  +12.3pp, gained 555, lost 64, McNemar exact p = 1.3e-98
+ *   FUSED -> UNION  +17.9pp, gained 716, lost 0, McNemar exact p = 5.8e-216
+ *   SPLIT -> UNION   +8.7pp, gained 496, lost 147
  *
- * THE 64 LOSSES ARE IN THIS FIXTURE. A change that trades them away for
- * something better is a decision somebody should make on purpose, so they are
- * pinned here with their outcomes rather than summarised as a rate. `by-and-by`
- * is the archetype: three pieces whose union drags conjunction and preposition
- * identities into a phrase that parsed without them.
+ * ZERO LOSSES AGAINST FUSED IS A PROPERTY, NOT A RESULT. `compoundTags` fires
+ * only when nothing else named the token, so it strictly adds atoms, and more
+ * atoms can only add molecules. An earlier version of the experiment reported
+ * 64 losses; they were an artifact of modelling FUSED with a placeholder token
+ * that happened to end in `-able`, which the suffix backoff typed as an
+ * adjective. The arm is now the real switch, and the invariant is asserted
+ * rather than the artifact pinned.
+ *
+ * The 147 losses against SPLIT are real, and are the tokenizer question this
+ * feature does not settle: whether the reader should fuse at all.
  *
  * The corpus is 1.8GB and not in the repository. The phrases and the lexicon
  * rows they reach are, so this runs anywhere.
@@ -33,17 +39,16 @@ const fixture = JSON.parse(
 );
 
 const posMap = new Map(Object.entries(fixture.lexicon));
-const spans = tokens => {
+const spans = (tokens, options) => {
   try {
-    return compose(tokens, posMap).stable.length > 0;
+    return compose(tokens, posMap, options).stable.length > 0;
   } catch {
     return false;
   }
 };
 
 /** The arms, reproduced exactly as the experiment defines them. */
-const HIDDEN = ' unnameable';
-const fusedOf = item => item.tokens.map(t => (item.compounds.includes(t) ? HIDDEN : t));
+const NO_COMPOUND = { compoundIdentity: false };
 const splitOf = item => item.tokens.flatMap(t => (item.compounds.includes(t) ? t.split('-') : [t]));
 
 describe('compound identity is the union of its pieces', () => {
@@ -99,20 +104,28 @@ describe('compound identity is the union of its pieces', () => {
     expect(union).toBeGreaterThan(rate('split'));
   });
 
-  it('pins the losses this change accepted', () => {
-    const regressions = fixture.phrases.filter(item => item.fused && !item.union);
-    expect(regressions.length).toBe(fixture.regressionsFrozen);
+  it('can never take a parse away, by construction', () => {
+    // compoundTags fires only when nothing else named the token, so it strictly
+    // ADDS atoms, and more atoms can only add molecules. Zero losses against
+    // FUSED is therefore a property, not a lucky measurement — and this is where
+    // a change that broke the property would surface.
+    const lost = fixture.phrases
+      .filter(item => spans(item.tokens, NO_COMPOUND) && !spans(item.tokens))
+      .map(item => item.tokens.join(' '));
 
-    // Every one still loses, and every one is still reproduced by the arms as
-    // frozen. A regression that silently healed is as much a drift as a new one.
-    for (const item of regressions) {
-      expect(spans(fusedOf(item)), `${item.tokens.join(' ')} no longer parses fused`).toBe(true);
-      expect(spans(item.tokens), `${item.tokens.join(' ')} now parses under union`).toBe(false);
-    }
+    expect(lost, `compound identity removed ${lost.length} parse(s):\n  ${lost.join('\n  ')}`).toEqual([]);
+    expect(fixture.regressionsFrozen).toBe(0);
   });
 
-  it('reproduces the split arm the experiment measured', () => {
-    const drift = fixture.phrases.filter(item => spans(splitOf(item)) !== item.split);
-    expect(drift.map(item => item.tokens.join(' '))).toEqual([]);
+  it('reproduces both arms the experiment measured', () => {
+    const fusedDrift = fixture.phrases.filter(item => spans(item.tokens, NO_COMPOUND) !== item.fused);
+    expect(fusedDrift.map(item => item.tokens.join(' '))).toEqual([]);
+
+    // Losing to SPLIT is real and is the tokenizer question this does not
+    // settle, so those phrases are pinned rather than summarised away.
+    const splitDrift = fixture.phrases.filter(item => spans(splitOf(item)) !== item.split);
+    expect(splitDrift.map(item => item.tokens.join(' '))).toEqual([]);
+    expect(fixture.phrases.filter(item => item.split && !item.union).length)
+      .toBe(fixture.splitRegressionsFrozen);
   });
 });

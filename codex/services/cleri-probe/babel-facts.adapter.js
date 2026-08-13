@@ -728,13 +728,6 @@ export function parseSourceFacts({ path: filePath, content }) {
         }
       }
     },
-    ArrayExpression(path) {
-      for (const element of path.node.elements) {
-        if (element?.type === "SpreadElement" && element.argument.type === "Identifier") {
-          recordCollectionEvidence(resolveBinding(element.argument.name), "SPREAD_INTO_ARRAY", element);
-        }
-      }
-    },
     ImportDeclaration(path) {
       const importSource = path.node.source?.value ?? null;
       for (const specifier of path.node.specifiers) {
@@ -810,15 +803,11 @@ export function parseSourceFacts({ path: filePath, content }) {
     },
     ConditionalExpression(path) {
       recordGuards(path.node.test, path.node);
-      recordUnifiedBranches(path.node);
     },
     LogicalExpression(path) {
       // `response.ok && use(response)` guards just as an if-statement does.
       if (path.node.operator === "&&" || path.node.operator === "||") {
         recordGuards(path.node.left, path.node, path.node);
-      }
-      if (path.node.operator === "||" || path.node.operator === "??") {
-        recordUnifiedBranches(path.node);
       }
     },
     ThrowStatement(path) {
@@ -988,12 +977,21 @@ export function parseSourceFacts({ path: filePath, content }) {
    *
    * Only kinds a string cannot satisfy are recorded here: the whole purpose of
    * this fact is to separate `!collection` (never true for an empty one) from
-   * `!string` (true for an empty one).
+   * `!string` (true for an empty one). Every candidate below was tried and
+   * rejected against a real counter-example:
    *
-   * A `.size` read and a `for…of` are deliberately NOT proof. Strings are
-   * iterable, and a plain object is free to carry a field called `size` — as
-   * `child.size` (width and height) does in the modulation planner, which this
-   * verifier reported as a collection until the shape was measured.
+   *   `.size`      a plain object may carry a field called `size` — `child.size`
+   *                (width and height) in the modulation planner did.
+   *   `for…of`     strings are iterable.
+   *   `[...x]`     strings spread: `[...'ab']` is `['a','b']`.
+   *   `x ? x : []` unifying with an array literal is the AUTHOR's type
+   *                confusion, not proof of the type. Measured: it certified
+   *                `const normalized = text && text.length ? text : []` and
+   *                then convicted the correct `!text` empty-string check
+   *                beside it.
+   *
+   * What survives is method identity: `map`, `filter`, `push`, `join` and their
+   * kin exist on Array and not on String, and `new Map()` says so outright.
    */
   function recordCollectionEvidence(bindingId, kind, node) {
     if (!bindingId) return;
@@ -1003,18 +1001,6 @@ export function parseSourceFacts({ path: filePath, content }) {
       functionId: currentFunction().id,
       span: makeSpan(node)
     });
-  }
-
-  /** `known && known.length ? known : []` unifies `known` with an array. */
-  function recordUnifiedBranches(node) {
-    const branches = node.type === "ConditionalExpression"
-      ? [[node.consequent, node.alternate], [node.alternate, node.consequent]]
-      : [[node.left, node.right], [node.right, node.left]];
-    for (const [candidate, sibling] of branches) {
-      if (candidate?.type !== "Identifier") continue;
-      if (sibling?.type !== "ArrayExpression") continue;
-      recordCollectionEvidence(resolveBinding(candidate.name), "ARRAY_UNIFIED_WITH_LITERAL", candidate);
-    }
   }
 
   function recordMemberRead(path) {

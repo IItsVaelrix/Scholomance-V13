@@ -36,7 +36,7 @@ const REMEDIATION = getRemediation(PATHOLOGY_CLASS);
 
 const LIMITATIONS = deepFreeze([
   'Only a binding the same function also tests by length or size is proven; a bare negation with no length-aware sibling test is not reported.',
-  'Collection identity is proven from Array/Map/Set-exclusive evidence only, so a collection that is only ever indexed or measured with .length is out of scope.',
+  'Collection identity is proven only by a method or constructor a string cannot answer. A binding unified with an array literal, spread, iterated, or measured by .length or .size is NOT proven, because a string satisfies all of those.',
   'A guard whose branch returns, throws, breaks, or continues is read as a nullish bail-out and is never reported.'
 ]);
 

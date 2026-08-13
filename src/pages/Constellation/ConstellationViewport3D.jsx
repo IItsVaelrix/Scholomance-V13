@@ -187,6 +187,16 @@ function WebGLFallback({ model, onSelect, selectedNodeId, reason }) {
     <div className="constellation-viewport__fallback" role="status" data-webgl-reason={reason}>
       <span className="constellation-viewport__fallback-mark" aria-hidden="true">✦</span>
       <p>Spatial rendering is unavailable. The complete celestial index remains accessible.</p>
+      {/*
+        The reason is RENDERED, not only stamped on the element. An attribute a
+        screen reader never announces and a user cannot see is a diagnostic for
+        whoever already knows to open devtools — which is never the person the
+        fallback is for. It sits inside the same role="status" region, so it is
+        announced with the message it explains.
+      */}
+      {reason ? (
+        <p className="constellation-viewport__fallback-reason">Reason: {reason}</p>
+      ) : null}
       <div className="constellation-viewport__fallback-actions">
         {primaryNodes.map((node) => (
           <button

@@ -541,6 +541,19 @@
   font-family: var(--cos-body);
 }
 
+/*
+  The diagnostic line. Subordinate to the message above it — this is the answer
+  to "why", which matters to the reader who asks and should not shout at the one
+  who does not.
+*/
+.constellation-viewport__fallback-reason {
+  max-width: 28rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  opacity: 0.72;
+  overflow-wrap: anywhere;
+}
+
 .constellation-viewport__fallback-mark {
   color: var(--cos-gold);
   font-size: 2rem;

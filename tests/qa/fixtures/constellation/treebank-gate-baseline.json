@@ -13,8 +13,8 @@
   },
   "inputs": {
     "conlluSha256": "224390c92c71569011ee86df3fb9ff3e5ab405e0cfc7ee25d767a3f952f1aada",
-    "lexiconSha256": "e00a0d2fe9db41c91f5baad974d74c46582efd0f52a5e791aba39922b2e6a4a9",
-    "lexiconEntries": 1652
+    "lexiconSha256": "a2ec5be4c09d77cb2ea7de7a0343e56e48cd7b41fd025cd808e411d8a859ad97",
+    "lexiconEntries": 1659
   },
   "sample": {
     "sampled": 500,
@@ -91,8 +91,8 @@
       "N ? APPOS CONJ ? PROPN ? NC ? P DET ADJ ? ? PUNCT": 1,
       "N ? N ? ? ? ?": 2,
       "N ? NC": 1,
+      "N ? NC ? VP": 1,
       "N ? PROPN ? ? ? ?": 1,
-      "N ? PROPN ? ? VP": 1,
       "N ? PUNCT": 1,
       "N S": 1,
       "N TO APPOS ? S": 1,
@@ -245,7 +245,7 @@
     {
       "label": "punct (PUNCT -> NOUN)",
       "failures": 16,
-      "soleCause": 8
+      "soleCause": 9
     },
     {
       "label": "punct (PUNCT -> PROPN)",
@@ -626,11 +626,6 @@
       "label": "flat (X -> X)",
       "failures": 1,
       "soleCause": 1
-    },
-    {
-      "label": "goeswith (X -> NOUN)",
-      "failures": 1,
-      "soleCause": 0
     },
     {
       "label": "goeswith (X -> PRON)",

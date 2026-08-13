@@ -116,7 +116,16 @@ export function sweep({ antigens = INFUSED_ANTIGENS, chunks = buildChunks(), log
       if (out.uncleared) { uncleared.push({ scope, why: out.uncleared }); continue; }
       for (const f of out.findings) {
         const span = f.supportingEvidence?.[0]?.span ?? f.span ?? {};
-        findings.push({ scope, path: span.path ?? null, line: span.startLine ?? null, symbol: span.symbol ?? f.symbol ?? null });
+        findings.push({
+          scope,
+          // The finding's OWN class, not the antigen's. A title can reach two
+          // pathology classes, and a consumer that reads the antigen's list
+          // instead hands a finding the other family's repair.
+          pathologyClass: f.pathologyClass ?? null,
+          path: span.path ?? null,
+          line: span.startLine ?? null,
+          symbol: span.symbol ?? f.symbol ?? null,
+        });
       }
     }
     log(`   verified findings: ${findings.length}   uncleared chunks: ${uncleared.length}`);

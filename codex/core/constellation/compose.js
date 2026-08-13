@@ -208,7 +208,7 @@ function compoundTags(lower, posMap) {
  * `fell` is a noun AND a verb — and each becomes its own atom, because the
  * ambiguity is real and resolving it here would be guessing.
  */
-function atomsFor(token, index, posMap) {
+function atomsFor(token, index, posMap, options = {}) {
   const lower = String(token).toLowerCase();
   /**
    * PRECEDENCE: injected lexicon, then irregular forms, then suffix morphology.
@@ -220,7 +220,14 @@ function atomsFor(token, index, posMap) {
    */
   const known = posMap.get(lower);
   let tags = tagsForForm(lower, posMap);
-  if (tags.length === 0) tags = compoundTags(lower, posMap);
+  // `compoundIdentity: false` is the arm switch for the experiment that
+  // justified this feature. Substituting a placeholder token instead would not
+  // reproduce the old behaviour: the first attempt used one ending in `-able`,
+  // which the suffix backoff types as an adjective, so the "unnameable" arm was
+  // silently measuring "adjective". Default on; nothing in the product passes it.
+  if (tags.length === 0 && options.compoundIdentity !== false) {
+    tags = compoundTags(lower, posMap);
+  }
   const out = [];
 
   /**
@@ -538,7 +545,7 @@ export function compose(tokens, posMap, options = {}) {
   const atoms = [];
 
   for (let i = 0; i < n; i += 1) {
-    for (const a of atomsFor(tokens[i], i, posMap)) {
+    for (const a of atomsFor(tokens[i], i, posMap, options)) {
       atoms.push(a);
       cell[i][i].push(a);
     }

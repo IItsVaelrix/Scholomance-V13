@@ -73,14 +73,32 @@ function main() {
 
   const sweep = JSON.parse(readFileSync(reportPath, 'utf8'));
 
-  // One patrol per pathology class. A sweep now carries more than one antigen,
-  // and a finding proved by one verifier must never be handed another's repair.
+  // One patrol per pathology class, grouped by EACH FINDING'S OWN class.
+  //
+  // Grouping by the antigen's matched classes is wrong and silently so: a title
+  // carrying both 'swallowed error' and 'empty collection' reaches two families,
+  // and every finding would then enter both patrols — an empty-collection
+  // finding would be handed the swallowed-error recovery vaccine, a repair that
+  // does not retire it. An older sweep file has no per-finding class; it is
+  // usable only when its antigen reached exactly one family, and is reported as
+  // unattributable rather than guessed at otherwise.
   const byClass = new Map();
+  const unattributable = [];
+  const push = (pathologyClass, finding) => {
+    if (!byClass.has(pathologyClass)) byClass.set(pathologyClass, []);
+    byClass.get(pathologyClass).push(finding);
+  };
   for (const result of sweep.results) {
-    for (const pathologyClass of result.classes ?? ['SWALLOWED_ERROR']) {
-      if (!byClass.has(pathologyClass)) byClass.set(pathologyClass, []);
-      byClass.get(pathologyClass).push(...result.findings.filter((f) => f.path));
+    const classes = result.classes ?? ['SWALLOWED_ERROR'];
+    for (const finding of result.findings.filter((f) => f.path)) {
+      if (finding.pathologyClass) push(finding.pathologyClass, finding);
+      else if (classes.length === 1) push(classes[0], finding);
+      else unattributable.push({ finding, classes });
     }
+  }
+  if (unattributable.length > 0) {
+    console.log(`  WARNING: ${unattributable.length} finding(s) carry no pathologyClass and their antigen`);
+    console.log('  reached more than one family, so no vaccine can be attributed. Re-run antigen-sweep.');
   }
   for (const [pathologyClass, classFindings] of [...byClass].sort()) {
     if (pathologyClass === 'SWALLOWED_ERROR') continue;

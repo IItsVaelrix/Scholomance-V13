@@ -43,7 +43,7 @@
       "pathologyClass": "EMPTY_COLLECTION_TRUTHINESS",
       "path": "empty-collection-truthiness/hard-negative.js",
       "expected": "NO_FINDING",
-      "expectedLine": 50,
+      "expectedLine": 61,
       "subtype": "DIRECT_HARD_NEGATIVE",
       "notes": "Direct hard negative: a bail-out that records a message before it returns is still a bail-out, so the branch is a nullish guard rather than an emptiness test."
     },
@@ -52,7 +52,7 @@
       "pathologyClass": "EMPTY_COLLECTION_TRUTHINESS",
       "path": "empty-collection-truthiness/hard-negative.js",
       "expected": "NO_FINDING",
-      "expectedLine": 36,
+      "expectedLine": 47,
       "subtype": "ADVERSARIAL_HARD_NEGATIVE",
       "notes": "Adversarial hard negative measured in codex/core/modulation/planner/formula-validator.js: a plain object with a field called size is not a Map, and the negation is a type guard that bails out."
     },
@@ -70,7 +70,7 @@
       "pathologyClass": "EMPTY_COLLECTION_TRUTHINESS",
       "path": "empty-collection-truthiness/verified.js",
       "expected": "VERIFIED",
-      "expectedLine": 11,
+      "expectedLine": 15,
       "subtype": "REAL_WORLD_POSITIVE",
       "notes": "Real-world positive: the lexicon answers an unknown word with an empty array, so `!known` cannot fire for it while line 9 proves the author expects it."
     },
@@ -88,7 +88,7 @@
       "pathologyClass": "EMPTY_COLLECTION_TRUTHINESS",
       "path": "empty-collection-truthiness/hard-negative.js",
       "expected": "NO_FINDING",
-      "expectedLine": 64,
+      "expectedLine": 75,
       "subtype": "DIRECT_HARD_NEGATIVE",
       "notes": "Direct hard negative: the repaired shape, `!known?.length`, which answers the missing case and the empty case at once."
     },
@@ -97,7 +97,7 @@
       "pathologyClass": "EMPTY_COLLECTION_TRUTHINESS",
       "path": "empty-collection-truthiness/verified.js",
       "expected": "VERIFIED",
-      "expectedLine": 23,
+      "expectedLine": 27,
       "subtype": "CLEAR_POSITIVE",
       "notes": "Clear positive: `!matches` records the no-candidate note for a proven array, so a query that matched nothing is reported as if it had matched."
     },
@@ -109,6 +109,15 @@
       "expectedLine": 19,
       "subtype": "ADVERSARIAL_HARD_NEGATIVE",
       "notes": "Adversarial hard negative: `!text` is the correct emptiness test for a string, and the adjacent .length read is exactly what a collection would show."
+    },
+    {
+      "id": "empty-collection-truthiness-string-unified-with-array",
+      "pathologyClass": "EMPTY_COLLECTION_TRUTHINESS",
+      "path": "empty-collection-truthiness/hard-negative.js",
+      "expected": "NO_FINDING",
+      "expectedLine": 38,
+      "subtype": "ADVERSARIAL_HARD_NEGATIVE",
+      "notes": "Adversarial hard negative reported by review: a string unified with an array literal is the author's type confusion, not proof of the type, and !text is the correct emptiness test for a string. The verifier certified it and convicted the check beside it before ARRAY_UNIFIED_WITH_LITERAL was withdrawn as evidence."
     },
     {
       "id": "external-response-axios-guarded",

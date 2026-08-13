@@ -77,17 +77,29 @@ const selected = blocks.filter((_, index) => index % STRIDE === 0).slice(0, LIMI
 const fixtureText = `${selected.join('\n\n')}\n\n`;
 
 // ─── The lexicon slice, restricted to forms these sentences can reach ────────
+// Every form the composer can ASK ABOUT, not merely every token. `compoundTags`
+// queries each hyphen-separated piece, so a slice holding only whole tokens
+// would answer `e-mail` while the live table answers `e` and `mail` too — the
+// gate would then exercise behaviour production does not have. The equivalence
+// check below is what stops this from going stale again.
 const forms = new Set();
 for (const record of parseConllu(fixtureText)) {
-  for (const token of record.tokens) forms.add(String(token.form).toLowerCase());
+  for (const token of record.tokens) {
+    const form = String(token.form).toLowerCase();
+    forms.add(form);
+    for (const piece of form.split('-')) if (piece) forms.add(piece);
+  }
 }
 
 const db = new Database(DICT, { readonly: true });
 const posMap = new Map();
+const livePosMap = new Map();
 for (const row of db.prepare('SELECT surface_lower, pos FROM lemma_form').iterate()) {
-  if (!forms.has(row.surface_lower)) continue;
   const tag = LEMMA_POS.get(row.pos);
   if (!tag) continue;
+  const live = livePosMap.get(row.surface_lower);
+  if (live) { if (!live.includes(tag)) live.push(tag); } else livePosMap.set(row.surface_lower, [tag]);
+  if (!forms.has(row.surface_lower)) continue;
   const have = posMap.get(row.surface_lower);
   if (have) { if (!have.includes(tag)) have.push(tag); } else posMap.set(row.surface_lower, [tag]);
 }
@@ -108,6 +120,38 @@ const run = runTreebank({
   parser: PARSER,
   maxTokens: MAX_TOKENS,
 });
+
+/**
+ * THE SLICE MUST SCORE WHAT THE WHOLE DICTIONARY SCORES.
+ *
+ * A frozen lexicon is only a fair stand-in while it answers every question the
+ * composer asks. It stopped doing that silently once `compoundTags` began
+ * querying hyphen pieces, and nothing noticed because the equivalence had been
+ * checked by hand, once, before that feature existed. So the freezer checks it
+ * every time and refuses to write a slice that scores differently.
+ */
+const liveRun = runTreebank({
+  records,
+  posMap: livePosMap,
+  senseMap: null,
+  parser: PARSER,
+  maxTokens: MAX_TOKENS,
+});
+const drift = ['coverage', 'containment'].filter(
+  key => run.report[key] !== liveRun.report[key],
+).concat(
+  run.report.n !== liveRun.report.n ? ['n'] : [],
+  run.rows.map(r => r.outcome).join('') !== liveRun.rows.map(r => r.outcome).join('') ? ['outcomes'] : [],
+);
+if (drift.length > 0) {
+  console.error('REFUSING TO FREEZE: the lexicon slice does not reproduce the live dictionary.');
+  console.error(`  differs on: ${drift.join(', ')}`);
+  console.error(`  slice  coverage ${run.report.coverage} containment ${run.report.containment} n ${run.report.n}`);
+  console.error(`  live   coverage ${liveRun.report.coverage} containment ${liveRun.report.containment} n ${liveRun.report.n}`);
+  console.error('\nThe slice is built from the forms the composer can ask about. If a new');
+  console.error('identity source asks a question the slice cannot answer, widen `forms`.');
+  process.exit(1);
+}
 
 /**
  * ─── RETIREMENT ────────────────────────────────────────────────────────────

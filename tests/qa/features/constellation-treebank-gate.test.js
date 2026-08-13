@@ -161,15 +161,25 @@ describe('treebank regression gate', () => {
   });
 
   it('holds the failure-shape census the baseline froze', () => {
-    // Distinct shapes and total failing sentences move whenever the chart does,
-    // so they catch a parse change that leaves the six headline metrics level.
-    expect({
-      distinct: run.signatures.size,
-      failing: [...run.signatures.values()].reduce((sum, n) => sum + n, 0),
-    }).toEqual({
-      distinct: baseline.signatures.distinct,
-      failing: baseline.signatures.failing,
-    });
+    // THE WHOLE CENSUS, not its totals. Two shapes can trade counts while both
+    // `distinct` and `failing` hold level and no sentence changes outcome — a
+    // chart change invisible to every other assertion here.
+    const census = {};
+    for (const key of [...run.signatures.keys()].sort()) census[key] = run.signatures.get(key);
+
+    const frozen = baseline.signatures.census;
+    const moved = [];
+    for (const key of new Set([...Object.keys(census), ...Object.keys(frozen)])) {
+      if (census[key] !== frozen[key]) {
+        moved.push(`${key || '(empty)'}: ${frozen[key] ?? 0} → ${census[key] ?? 0}`);
+      }
+    }
+
+    expect(
+      moved,
+      `${moved.length} failure shape(s) changed count:\n  ${moved.join('\n  ')}`,
+    ).toEqual([]);
+    expect(run.signatures.size).toBe(baseline.signatures.distinct);
   });
 
   it('keeps the diagnoser explaining as much of the failure set as before', () => {

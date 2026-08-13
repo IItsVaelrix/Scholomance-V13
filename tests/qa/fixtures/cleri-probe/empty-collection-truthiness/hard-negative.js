@@ -29,6 +29,17 @@ function applyChaikin(points) {
 }
 
 // subtype: ADVERSARIAL_HARD_NEGATIVE
+// A string unified with an array literal. The author's own type confusion is
+// not proof of the type, and `!text` is the CORRECT emptiness test for a
+// string. Reported by review after the verifier certified it and convicted the
+// check beside it — the exact false positive the identity rules now exclude.
+function summarizeNotes(text, notes) {
+  const normalized = text && text.length ? text : [];
+  if (!text) notes.push('empty');
+  return normalized;
+}
+
+// subtype: ADVERSARIAL_HARD_NEGATIVE
 // Measured in codex/core/modulation/planner/formula-validator.js. `child` is a
 // plain object with a field called `size`, and the verifier read that field as
 // proof of a Map until this shape was swept. A domain field is not a type.
