@@ -25,8 +25,8 @@
   "metrics": {
     "coverage": 0.2430379746835443,
     "containment": 0.1518987341772152,
-    "parsedBoth": 42,
-    "parsedOnlyBecausePosWasVague": 54,
+    "parsedBoth": 48,
+    "parsedOnlyBecausePosWasVague": 48,
     "taggingFailure": 18,
     "grammarFailure": 281
   },

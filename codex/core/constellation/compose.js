@@ -191,7 +191,14 @@ function atomsFor(token, index, posMap) {
     || RELATIVIZERS.has(lower) || PREPOSITION_CUES.has(lower);
   // A closed-class word is never unknown, even when the content lexicon —
   // which stores nouns, verbs and adjectives — has no row for it.
-  if (capitalised && (index > 0 || (!known && !isClosedClass))) out.push('PROPN');
+  //
+  // `!known?.length`, NOT `!known`. The convention here — in `goldPosMap` and in
+  // `constellationPage.service.js` — is that a word the lexicon has no tags for
+  // maps to an EMPTY ARRAY, and `[]` is truthy. Written as `!known`, the
+  // unknown-word escape hatch could not fire for any caller that follows the
+  // convention, and every capitalised proper noun at index 0 lost its PROPN
+  // atom. Line 176 above already asks the question the right way.
+  if (capitalised && (index > 0 || (!known?.length && !isClosedClass))) out.push('PROPN');
 
   if (DETERMINERS.has(lower)) out.push('DET');
   if (PREPOSITION_CUES.has(lower)) out.push('P');
