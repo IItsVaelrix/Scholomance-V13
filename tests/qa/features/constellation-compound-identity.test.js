@@ -5,12 +5,21 @@
  * identities. Measured over 4,000 compound-bearing Gutenberg phrases with the
  * product's own lexicon (`scripts/compound-identity-experiment.mjs`):
  *
- *   SPLIT  pieces fed separately            20.5%
- *   FUSED  compound identity switched off   11.4%   <- the product before
- *   UNION  one token, pieces' identities    29.3%   <- after
+ *   SPLIT  pieces fed separately            21.5%
+ *   FUSED  compound identity switched off   12.2%   <- the product before
+ *   UNION  one token, pieces' identities    31.5%   <- after
  *
- *   FUSED -> UNION  +17.9pp, gained 716, lost 0, McNemar exact p = 5.8e-216
- *   SPLIT -> UNION   +8.7pp, gained 496, lost 147
+ *   FUSED -> UNION  +19.3pp, gained 773, lost 0, McNemar exact p = 4.0e-233
+ *   SPLIT -> UNION  +10.0pp, gained 538, lost 137
+ *
+ * The phrases are SANITISED. Splitting at every period shatters `Mr. Bennet`,
+ * and a length filter then deletes the pieces; audited over 900 books, the naive
+ * extractor began 4.4% of its segments mid-clause and silently discarded 70.3%
+ * of them. Short malformed fragments parse MORE easily than whole sentences, so
+ * that corpus flatters every coverage number taken on it. Abbreviations are now
+ * protected before segmentation and every drop carries a reason code. The delta
+ * moved +19.2 -> +19.3pp under sanitation: a paired design cancels damage that
+ * hits all three arms, which is why it was worth checking rather than assuming.
  *
  * ZERO LOSSES AGAINST FUSED IS A PROPERTY, NOT A RESULT. `compoundTags` fires
  * only when nothing else named the token, so it strictly adds atoms, and more
