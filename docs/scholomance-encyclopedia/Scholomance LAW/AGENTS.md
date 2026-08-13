@@ -379,6 +379,16 @@ cwd = "/home/deck/Desktop/Scholomance-V12-main"
 
 **Resources:** `collab://agents` · `collab://tasks` · `collab://locks` · `collab://activity` · `collab://pipelines` · `collab://bugs` · `collab://status` · `collab://memories` · `collab://agents/{id}/memories` · `collab://tasks/{id}/notes` · `collab://bugs/{id}`
 
+### Code Atlas — navigation telemetry for `telescope` / `microscope` (all agents)
+
+The `telescope` and `microscope` lenses are augmented by a **disk-backed code atlas** (`.atlas/code-atlas.json`, gitignored, regenerable). It is shared infrastructure: every agent reading through the Cockpit lenses gets it automatically — there is no per-agent copy. It provides an inverted token index (exact-recall symbol refs), per-file git vitality (churn, last-touched), layer/pathogen annotations from the Bible glossary, and per-directory rollups.
+
+- **Built with:** `python3 -c "import sys; sys.path.insert(0,'divtube_downloader'); from tui.services import code_atlas; print(code_atlas.build_atlas('.'))"` (~30s, HEAD-stamped, checksummed)
+- **Auto-refresh:** `code_atlas.rebuild_if_stale('.')` — rebuilds only when HEAD has drifted past the tolerance
+- **Staleness is stamped, never silent:** every lens response carries `telemetry.stale` / `commitsBehind`. If the atlas is missing, lenses return `{"available": false, "reason": "atlas-not-built"}` instead of quietly answering without telemetry.
+- **Declared blind spot:** `nlp_chatbot` is excluded from the index (vendored corpus); its files are reachable only via the legacy grep fallback.
+- Rule: when the atlas reports stale, rebuild it *before* drawing conclusions from refs or vitality numbers.
+
 ---
 
 ## Commands
