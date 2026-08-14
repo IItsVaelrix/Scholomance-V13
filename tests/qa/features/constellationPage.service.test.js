@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildConstellationPage } from '../../../codex/server/services/constellationPage.service.js';
+import { buildConstellationPage, getConstellationRuntimeStats } from '../../../codex/server/services/constellationPage.service.js';
 
 const lexiconAdapter = {
   lookupWord: (w) => (w === 'morning'
@@ -201,5 +201,53 @@ describe('buildConstellationPage — a settled frame decides the sense', () => {
     expect(p.semanticInquiry.viableWordCount).toBeGreaterThan(1);
     // Refusing to pick is the correct answer here, not a shortfall.
     expect(p.leximancy.selectedInterpretationId).toBeNull();
+  });
+});
+
+describe('buildConstellationPage — runtime orchestration (feedback P1)', () => {
+  it('still composes a full page through the runtime wrapper', async () => {
+    const p = await buildConstellationPage('the bright wound of morning', deps);
+    expect(p.schema_id).toBe('scholomance/constellation-os-page-phase2');
+    expect(p.diagnostics.degradedChannels).toEqual([]);
+  });
+
+  it('exposes deterministic runtime telemetry', async () => {
+    await buildConstellationPage('morning', deps);
+    const stats = getConstellationRuntimeStats();
+    expect(stats.version).toBe('constellation-runtime-1');
+    expect(stats.channelsRun).toBeGreaterThan(0);
+    // A healthy page must not degrade any channel.
+    expect(typeof stats.channelsDegraded).toBe('number');
+    expect(typeof stats.coalescedHits).toBe('number');
+  });
+
+  it('coalesces concurrent identical queries into one build (opt-in)', async () => {
+    // A slow channel so two concurrent requests genuinely overlap in flight.
+    const slowDeps = {
+      ...deps,
+      rhymeQueryEngine: {
+        async query() {
+          await new Promise((r) => setTimeout(r, 40));
+          return rhymeQueryEngine.query();
+        },
+      },
+    };
+    const before = getConstellationRuntimeStats().coalescedHits;
+    const [a, b] = await Promise.all([
+      buildConstellationPage('the bright wound of morning', { ...slowDeps, coalesce: true }),
+      buildConstellationPage('the bright wound of morning', { ...slowDeps, coalesce: true }),
+    ]);
+    expect(a.pageBytecode).toBe(b.pageBytecode);
+    expect(a).toBe(b); // same in-flight promise resolved both callers
+    expect(getConstellationRuntimeStats().coalescedHits).toBeGreaterThan(before);
+  });
+
+  it('does NOT coalesce when the caller does not opt in', async () => {
+    const before = getConstellationRuntimeStats().coalescedHits;
+    await Promise.all([
+      buildConstellationPage('morning', deps),
+      buildConstellationPage('morning', deps),
+    ]);
+    expect(getConstellationRuntimeStats().coalescedHits).toBe(before);
   });
 });

@@ -19,8 +19,26 @@ import {
   analyzeDiscovery,
   DISCOVERY_ADAPTER_VERSION,
 } from './constellation/discovery.adapter.js';
+import { createConstellationRuntime } from '../../runtime/constellationRuntime.js';
 
 const CONSTELLATION_OS_VERSION = 'phase3-scale-1';
+
+/**
+ * The page runtime (PDR: Server -> Runtime -> Services -> Core). Owns channel
+ * isolation, timeout policy, and request coalescing. One per process; the
+ * service no longer hand-rolls try/catch orchestration.
+ */
+const pageRuntime = createConstellationRuntime();
+
+/**
+ * Runtime degradation -> page diagnostics. The warning text is DOMAIN policy
+ * and stays here; the runtime only supplies the failure fact. Kept verbatim
+ * with the pre-runtime strings so degradation reads identically.
+ */
+function degrade(channel, result, degradedChannels, warnings) {
+  degradedChannels.push(channel);
+  warnings.push(`${channel} channel failed: ${result.error}`);
+}
 
 function emptyLeximancy() {
   return { status: 'unsupported', selectedInterpretationId: null, interpretations: [], nearKin: [], counterfield: [], warnings: [], anchor: null };
@@ -33,7 +51,7 @@ function emptyLeximancy() {
  *   phonologyReady?, corpusChecksum?: string|null }} deps
  * @returns {Promise<import('../../../src/hooks/constellation.types.js').ConstellationPagePacket>}
  */
-export async function buildConstellationPage(rawQuery, deps) {
+async function buildConstellationPageDirect(rawQuery, deps) {
   // ── Phase 2: Phrase Analysis ──────────────────────────────────────
   // Fetch corpus frequencies for all tokens so the head-token selector
   // can apply the PDR §3.2 "rarest/last content word" rule.
@@ -81,15 +99,14 @@ export async function buildConstellationPage(rawQuery, deps) {
   const warnings = [];
 
   let leximancy = emptyLeximancy();
-  try {
-    leximancy = analyzeLeximancy(deps.lexiconAdapter, identity.primaryContentToken, {
+  const leximancyResult = await pageRuntime.run(() => analyzeLeximancy(
+    deps.lexiconAdapter, identity.primaryContentToken, {
       compounds: phraseStructure.compounds,
       intent: phraseStructure.intent,
-    }, deps.lemmaAdapter);
-  } catch (err) {
-    degradedChannels.push('leximancy');
-    warnings.push(`leximancy channel failed: ${err.message}`);
-  }
+    }, deps.lemmaAdapter,
+  ));
+  if (leximancyResult.ok) leximancy = leximancyResult.value;
+  else degrade('leximancy', leximancyResult, degradedChannels, warnings);
 
   if (leximancy.relationsFailed) {
     degradedChannels.push('leximancy.relations');
@@ -97,20 +114,14 @@ export async function buildConstellationPage(rawQuery, deps) {
   }
 
   let rhyme = null;
-  try {
-    rhyme = await analyzeRhyme(deps.rhymeQueryEngine, deps.rhymeLexiconRepo, identity);
-  } catch (err) {
-    degradedChannels.push('rhymeAstrology');
-    warnings.push(`rhymeAstrology channel failed: ${err.message}`);
-  }
+  const rhymeResult = await pageRuntime.run(() => analyzeRhyme(deps.rhymeQueryEngine, deps.rhymeLexiconRepo, identity));
+  if (rhymeResult.ok) rhyme = rhymeResult.value;
+  else degrade('rhymeAstrology', rhymeResult, degradedChannels, warnings);
 
   let genome = { syllables: 0, devicesHint: [], schoolHint: null };
-  try {
-    genome = analyzeGenome(rhyme, identity);
-  } catch (err) {
-    degradedChannels.push('phraseGenome');
-    warnings.push(`phraseGenome channel failed: ${err.message}`);
-  }
+  const genomeResult = await pageRuntime.run(() => analyzeGenome(rhyme, identity));
+  if (genomeResult.ok) genome = genomeResult.value;
+  else degrade('phraseGenome', genomeResult, degradedChannels, warnings);
 
   /**
    * Semantic inquiry runs AFTER leximancy because it adjudicates leximancy's own
@@ -118,12 +129,9 @@ export async function buildConstellationPage(rawQuery, deps) {
    * evidenced one — see analyzeSemanticInquiry's gate.
    */
   let semanticInquiry = null;
-  try {
-    semanticInquiry = await analyzeSemanticInquiry(deps.lexiconAdapter, identity, leximancy, deps.phonology);
-  } catch (err) {
-    degradedChannels.push('semanticInquiry');
-    warnings.push(`semanticInquiry channel failed: ${err.message}`);
-  }
+  const semanticResult = await pageRuntime.run(() => analyzeSemanticInquiry(deps.lexiconAdapter, identity, leximancy, deps.phonology));
+  if (semanticResult.ok) semanticInquiry = semanticResult.value;
+  else degrade('semanticInquiry', semanticResult, degradedChannels, warnings);
 
   /**
    * A missing pronunciation count is not a quiet nothing. The heteronym check is
@@ -200,7 +208,10 @@ export async function buildConstellationPage(rawQuery, deps) {
    */
   let scaleField = null;
   let governed = [];
-  try {
+  // Runtime isolation: the scale channel (field + governed pairs) degrades as
+  // ONE unit, exactly as the old try/catch did — a throw mid-channel nulls the
+  // field and reports 'scaleField', never a half-measured page.
+  const scaleResult = await pageRuntime.run(() => {
     if (deps.wordnetGraph) {
       const pool = [
         ...(leximancy.nearKin || []),
@@ -258,10 +269,11 @@ export async function buildConstellationPage(rawQuery, deps) {
         };
       });
     }
-  } catch (err) {
-    degradedChannels.push('scaleField');
-    warnings.push(`scaleField channel failed: ${err.message}`);
+  });
+  if (!scaleResult.ok) {
+    degrade('scaleField', scaleResult, degradedChannels, warnings);
     scaleField = null;
+    governed = [];
   }
 
   /**
@@ -272,19 +284,20 @@ export async function buildConstellationPage(rawQuery, deps) {
   let discovery = null;
   let discoveryDiag = { stage: 'ok', message: null };
   if (identity.intent === 'meta-query') {
-    try {
-      discoveryDiag.stage = 'parse';
-      discovery = await analyzeDiscovery(rawQuery, identity, {
-        lexiconAdapter: deps.lexiconAdapter,
-        rhymeQueryEngine: deps.rhymeQueryEngine,
-        rhymeLexiconRepo: deps.rhymeLexiconRepo,
-        phonemeEngine: deps.phonemeEngine,
-      });
+    discoveryDiag.stage = 'parse';
+    const discoveryResult = await pageRuntime.run(() => analyzeDiscovery(rawQuery, identity, {
+      lexiconAdapter: deps.lexiconAdapter,
+      rhymeQueryEngine: deps.rhymeQueryEngine,
+      rhymeLexiconRepo: deps.rhymeLexiconRepo,
+      phonemeEngine: deps.phonemeEngine,
+    }));
+    if (discoveryResult.ok) {
+      discovery = discoveryResult.value;
       discoveryDiag.stage = 'ok';
-    } catch (err) {
+    } else {
       degradedChannels.push('discovery');
-      warnings.push(`discovery channel failed: ${err.message}`);
-      discoveryDiag = { stage: 'expand', message: err.message };
+      warnings.push(`discovery channel failed: ${discoveryResult.error}`);
+      discoveryDiag = { stage: 'expand', message: discoveryResult.error };
       discovery = null;
     }
   }
@@ -446,4 +459,34 @@ export async function buildConstellationPage(rawQuery, deps) {
     diagnostics: { degradedChannels, warnings, discovery: discoveryDiag },
     provenance: { engineVersions },
   };
+}
+
+/**
+ * PUBLIC ENTRY — runtime coalescing wraps the direct builder.
+ *
+ * Opt-in via `deps.coalesce` (the route sets it; unit tests don't, so fixtures
+ * stay isolated). When on, concurrent identical analyses share ONE computation:
+ * the first caller builds, later callers with the same identity await the same
+ * in-flight promise. Identity is the raw query plus phonology readiness — the
+ * only per-request input that changes what the page can measure (every other
+ * dependency is fixed per server). Coalescing deduplicates in-flight work only;
+ * it never caches results, and the key is dropped the moment the build settles.
+ *
+ * @param {string} rawQuery
+ * @param {Parameters<typeof buildConstellationPageDirect>[1] & { coalesce?: boolean }} deps
+ * @returns {Promise<import('../../../src/hooks/constellation.types.js').ConstellationPagePacket>}
+ */
+export async function buildConstellationPage(rawQuery, deps) {
+  if (!deps?.coalesce) return buildConstellationPageDirect(rawQuery, deps);
+  const key = `${rawQuery}::${deps.phonologyReady ? 'phonology-ready' : 'phonology-pending'}`;
+  return pageRuntime.coalesced(key, () => buildConstellationPageDirect(rawQuery, deps));
+}
+
+/**
+ * Runtime telemetry for observability (PDR: diagnostics belong to Runtime).
+ * Deterministic counters only — no wall-clock.
+ * @returns {{ version: string, channelsRun: number, channelsDegraded: number, coalescedHits: number, inflightCoalesced: number }}
+ */
+export function getConstellationRuntimeStats() {
+  return pageRuntime.stats();
 }

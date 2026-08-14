@@ -74,7 +74,9 @@ export async function constellationRoutes(fastify, opts) {
       try {
         const packet = await buildConstellationPage(
           query,
-          { ...deps, phonologyReady: isPhonologyReady() },
+          // coalesce: concurrent identical queries share one in-flight analysis
+          // (Runtime concern — the route only declares it, never implements it).
+          { ...deps, phonologyReady: isPhonologyReady(), coalesce: true },
         );
         return packet;
       } catch (error) {
