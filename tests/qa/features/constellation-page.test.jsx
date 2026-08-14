@@ -3,6 +3,21 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import ConstellationPage from '../../../src/pages/Constellation/ConstellationPage.jsx';
+import { SAMPLE_BRIGHT_WOUND_PACKET } from '../../../src/pages/Constellation/fixtures/samplePagePacket.js';
+
+/**
+ * Serve the enriched packet down the LIVE path.
+ *
+ * These renders used to reach the enriched surfaces by accident: with no fetch
+ * stub, jsdom's fetch failed and the hook substituted the rich fixture, so the
+ * offline error path was doubling as this suite's content source. Once the
+ * error path started emitting an explicit engine-unreachable packet (empty
+ * channels, by design), that accident stopped paying — and it was the only
+ * coverage the enriched UI had. Stub the response instead, so what these tests
+ * assert is the page rendering a real packet, not a fallback wearing one.
+ */
+const stubLivePacket = () =>
+  vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => SAMPLE_BRIGHT_WOUND_PACKET })));
 
 vi.mock('../../../src/hooks/usePrefersReducedMotion.js', () => ({
   usePrefersReducedMotion: () => true,
@@ -52,23 +67,30 @@ describe('ConstellationPage chamber', () => {
     fireEvent.change(field, { target: { value: 'the bright wound of morning' } });
     fireEvent.keyDown(field, { key: 'Enter', code: 'Enter' });
     expect(document.getElementById('constellation-stage').dataset.mode).toBe('submitted');
-    // The hook fetches live, then falls back to the fixture asynchronously (no server in jsdom).
+    // No fetch stub and no server in jsdom, so the hook emits the engine-unreachable
+    // packet. Deliberately left unstubbed: the shell must mount even when NO analysis
+    // came back, which is the one thing this test is for.
     expect(await screen.findByRole('heading', { name: /phrase identity/i })).toBeInTheDocument();
     expect(document.getElementById('constellation-result-shell')).toBeTruthy();
   });
 
   it('renders ambiguous interpretations for the bright-wound fixture', async () => {
-    render(
-      <MemoryRouter>
-        <ConstellationPage />
-      </MemoryRouter>,
-    );
-    const field = screen.getByLabelText(/search the literary sky/i);
-    fireEvent.change(field, { target: { value: 'the bright wound of morning' } });
-    fireEvent.keyDown(field, { key: 'Enter', code: 'Enter' });
-    expect(await screen.findByText(/injury \/ opening in flesh/i)).toBeInTheDocument();
-    expect(screen.getByText(/past tense of wind/i)).toBeInTheDocument();
-    expect(screen.getByText(/ambiguity is data|margin below/i)).toBeInTheDocument();
+    stubLivePacket();
+    try {
+      render(
+        <MemoryRouter>
+          <ConstellationPage />
+        </MemoryRouter>,
+      );
+      const field = screen.getByLabelText(/search the literary sky/i);
+      fireEvent.change(field, { target: { value: 'the bright wound of morning' } });
+      fireEvent.keyDown(field, { key: 'Enter', code: 'Enter' });
+      expect(await screen.findByText(/injury \/ opening in flesh/i)).toBeInTheDocument();
+      expect(screen.getByText(/past tense of wind/i)).toBeInTheDocument();
+      expect(screen.getByText(/ambiguity is data|margin below/i)).toBeInTheDocument();
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it('shows awaiting state for unwired rhyme on unknown queries', async () => {
@@ -84,21 +106,26 @@ describe('ConstellationPage chamber', () => {
   });
 
   it('renders etymology, rarity, relations, examples, and IPA from the enriched fixture', async () => {
-    render(
-      <MemoryRouter>
-        <ConstellationPage />
-      </MemoryRouter>,
-    );
-    const field = screen.getByLabelText(/search the literary sky/i);
-    fireEvent.change(field, { target: { value: 'the bright wound of morning' } });
-    fireEvent.keyDown(field, { key: 'Enter', code: 'Enter' });
-    // Fixture (Task 5) carries the enrichment; assert each new surface renders.
-    expect(await screen.findByText(/lexical relations/i)).toBeInTheDocument();
-    // Glyphs live in nested aria-hidden spans, so match the label text, not "↑ broader".
-    expect(screen.getByText(/broader/i)).toBeInTheDocument();
-    expect(screen.getByText(/akin/i)).toBeInTheDocument();
-    expect(screen.getByText(/\d\/9/)).toBeInTheDocument();            // rarity "n/9"
-    expect(screen.getByText('IPA')).toBeInTheDocument();
+    stubLivePacket();
+    try {
+      render(
+        <MemoryRouter>
+          <ConstellationPage />
+        </MemoryRouter>,
+      );
+      const field = screen.getByLabelText(/search the literary sky/i);
+      fireEvent.change(field, { target: { value: 'the bright wound of morning' } });
+      fireEvent.keyDown(field, { key: 'Enter', code: 'Enter' });
+      // Fixture (Task 5) carries the enrichment; assert each new surface renders.
+      expect(await screen.findByText(/lexical relations/i)).toBeInTheDocument();
+      // Glyphs live in nested aria-hidden spans, so match the label text, not "↑ broader".
+      expect(screen.getByText(/broader/i)).toBeInTheDocument();
+      expect(screen.getByText(/akin/i)).toBeInTheDocument();
+      expect(screen.getByText(/\d\/9/)).toBeInTheDocument();            // rarity "n/9"
+      expect(screen.getByText('IPA')).toBeInTheDocument();
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   /**
