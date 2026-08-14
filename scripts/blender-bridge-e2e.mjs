@@ -22,6 +22,7 @@ import { tmpdir } from 'node:os';
 import { toPythonWire, serializeWirePacket } from '../codex/core/blender-bridge/wire.js';
 import { mintReceipt, compareReceipts, hashPixelDump } from '../codex/core/blender-bridge/receipt.js';
 import { runBlenderScript, BlenderRunError } from '../codex/core/blender-bridge/blender-run.js';
+import { loadPbrainFile } from '../codex/core/pixelbrain/pbrain-checksum.js';
 
 const BLENDER = process.env.BLENDER || join(process.env.HOME, 'opt/blender/blender');
 const REPO_ROOT = process.cwd();
@@ -61,7 +62,13 @@ if (!existsSync(packetPath)) {
 }
 
 console.log(`[e2e] Loading packet: ${packetPath}`);
-const packet = JSON.parse(readFileSync(packetPath, 'utf8'));
+let packet;
+try {
+  packet = loadPbrainFile(packetPath);
+} catch (error) {
+  console.error(`\n${error.message}\n`);
+  process.exit(1);
+}
 
 console.log(`[e2e] Projecting to Python wire (colorPolicy=EXACT)...`);
 const wire = toPythonWire(packet, { colorPolicy: 'EXACT' });

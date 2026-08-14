@@ -24,6 +24,7 @@ import { tmpdir } from 'node:os';
 
 import { toPythonWire } from '../codex/core/blender-bridge/wire.js';
 import { runBlenderScript } from '../codex/core/blender-bridge/blender-run.js';
+import { loadPbrainFile, verifyPbrainText } from '../codex/core/pixelbrain/pbrain-checksum.js';
 
 const BLENDER = process.env.BLENDER || join(process.env.HOME, 'opt/blender/blender');
 const ADDON_DIR = join(process.cwd(), 'blender/addons');
@@ -54,11 +55,16 @@ function discoverPackets() {
       } else if (e.name.endsWith('.pbrain')) {
         const p = join(dir, e.name);
         try {
-          const pk = JSON.parse(readFileSync(p, 'utf8'));
+          // Listing must not hide a packet, so integrity is REPORTED here
+          // rather than enforced — the load below is what refuses it.
+          const text = readFileSync(p, 'utf8');
+          const pk = JSON.parse(text);
+          const { ok, expected } = verifyPbrainText(text);
           out.push({
             path: relative(process.cwd(), p),
             coords: pk.coordinates?.length ?? 0,
             canvas: `${pk.canvas?.width}x${pk.canvas?.height}`,
+            integrity: ok ? 'verified' : (expected === '' ? 'UNSTAMPED' : 'CORRUPT'),
           });
         } catch {
           out.push({ path: relative(process.cwd(), p), coords: 0, canvas: 'unreadable' });
@@ -82,7 +88,10 @@ if (!existsSync(packetPath)) {
   const found = discoverPackets();
   if (found.length) {
     console.error('\nPackets in this repo:');
-    for (const p of found) console.error(`  ${p.path}  (${p.coords} coords, ${p.canvas})`);
+    for (const p of found) {
+      const flag = p.integrity && p.integrity !== 'verified' ? `, ${p.integrity}` : '';
+      console.error(`  ${p.path}  (${p.coords} coords, ${p.canvas}${flag})`);
+    }
     console.error(`\nFor example:\n  node scripts/blender-open.mjs ${found[0].path}`);
   } else {
     console.error('\nNo .pbrain packets found under this repo.');
@@ -90,7 +99,13 @@ if (!existsSync(packetPath)) {
   process.exit(1);
 }
 
-const packet = JSON.parse(readFileSync(packetPath, 'utf8'));
+let packet;
+try {
+  packet = loadPbrainFile(packetPath);
+} catch (error) {
+  console.error(`\n${error.message}\n`);
+  process.exit(1);
+}
 const wire = toPythonWire(packet, { colorPolicy: 'EXACT' });
 const { width: CW, height: CH } = wire.canvas;
 

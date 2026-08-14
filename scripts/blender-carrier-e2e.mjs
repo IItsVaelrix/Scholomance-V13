@@ -36,6 +36,7 @@ import { renderWireToPixels } from '../codex/core/blender-bridge/remotion-canvas
 import { sealCarrier, verifyCarrier } from '../codex/core/blender-bridge/carrier.js';
 import { mintReceipt, hashPixelDump } from '../codex/core/blender-bridge/receipt.js';
 import { runBlenderScript, BlenderRunError } from '../codex/core/blender-bridge/blender-run.js';
+import { loadPbrainFile } from '../codex/core/pixelbrain/pbrain-checksum.js';
 import {
   linearF32ToRgba8, nearestNeighbourUpscale, encodePng,
 } from '../codex/core/blender-bridge/png-preview.js';
@@ -85,7 +86,13 @@ if (!existsSync(packetPath)) {
 }
 
 // ── 1. render frame ──────────────────────────────────────────────────────────
-const packet = JSON.parse(readFileSync(packetPath, 'utf8'));
+let packet;
+try {
+  packet = loadPbrainFile(packetPath);
+} catch (error) {
+  console.error(`\n${error.message}\n`);
+  process.exit(1);
+}
 const renderWire = toPythonWire(packet, { colorPolicy: 'EXACT' });
 const { width: CW, height: CH } = renderWire.canvas;
 console.log(`[carrier-e2e] Packet: ${packetPath}`);

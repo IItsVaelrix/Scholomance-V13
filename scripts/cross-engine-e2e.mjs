@@ -26,6 +26,7 @@ import { toPythonWire, serializeWirePacket } from '../codex/core/blender-bridge/
 import { mintReceipt, hashPixelDump } from '../codex/core/blender-bridge/receipt.js';
 import { crossEngineRender } from '../codex/core/blender-bridge/remotion-canvas-renderer.js';
 import { compareCrossEngine, expectedCrossEngineAgreement } from '../codex/core/blender-bridge/cross-engine.js';
+import { loadPbrainFile } from '../codex/core/pixelbrain/pbrain-checksum.js';
 
 const BLENDER = process.env.BLENDER || join(process.env.HOME, 'opt/blender/blender');
 const REPO_ROOT = process.cwd();
@@ -38,7 +39,13 @@ if (!existsSync(packetPath)) {
 }
 
 console.log(`[x-engine] Loading packet: ${packetPath}`);
-const packet = JSON.parse(readFileSync(packetPath, 'utf8'));
+let packet;
+try {
+  packet = loadPbrainFile(packetPath);
+} catch (error) {
+  console.error(`\n${error.message}\n`);
+  process.exit(1);
+}
 const wire = toPythonWire(packet, { colorPolicy: 'EXACT' });
 console.log(`[x-engine] Wire: ${wire.coordinateCount} coordinates, checksum=${wire.sourceChecksum}`);
 
