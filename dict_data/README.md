@@ -13,11 +13,14 @@ Render deployment notes:
 To rebuild the offline dictionary locally:
 ```bash
 python scripts/build_scholomance_dict.py \
-  --kaikki_url "PASTE_KAIKKI_URL" \
-  --oewn_url "PASTE_OEWN_URL" \
+  --oewn_path dict_data/english-wordnet-2024.xml.gz \
+  --etymology_path dict_data/raw-wiktextract-data.jsonl.gz \
+  --antonym-timestamp 2026-08-14T00:00:00Z \
   --db scholomance_dict.sqlite \
   --overwrite
 ```
+
+`--etymology_path` is optional. Without it, `entry.etymology` stays null and Leximancy cannot surface origin. The dump is a Kaikki / wiktextract JSONL (plain or gzip); English records with `etymology_text` are joined on `(headword, POS)` after WordNet enrich.
 
 ## Additive OEWN antonym ingest
 

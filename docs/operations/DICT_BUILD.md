@@ -5,6 +5,7 @@ This repo includes a build script to generate an offline dictionary SQLite datab
 ## Sources (Open Data)
 - **CMU Pronouncing Dictionary** (~134k English words with ARPAbet phonemes). Installed via npm (`cmudict` package).
 - **Open English WordNet (OEWN)** for definitions, synonyms, and semantic relations (CC BY 4.0).
+- **Kaikki / wiktextract JSONL** (optional) for `entry.etymology`. English dump from [kaikki.org](https://kaikki.org/dictionary/rawdata.html) (`raw-wiktextract-data.jsonl.gz` or the English subset). Not required to build; without it `Leximancy.etymology` stays null.
 - **Datamuse API** provides runtime enrichment (rhymes, word associations) — no build-time dependency.
 
 ## Prerequisites
@@ -18,6 +19,8 @@ npm install
    - Download from the [Open English WordNet releases](https://github.com/globalwordnet/english-wordnet/releases)
    - Supports both `.xml` and `.xml.gz` formats
 
+3. (Optional) Place a Kaikki / wiktextract JSONL dump locally. The file is large and stays out of git (`dict_data/`). Supports `.jsonl` and `.jsonl.gz`.
+
 No additional Python packages are required — the build script uses only the standard library.
 
 ## Build
@@ -25,6 +28,8 @@ No additional Python packages are required — the build script uses only the st
 ```bash
 python scripts/build_scholomance_dict.py \
   --oewn_path english-wordnet-2025.xml \
+  --etymology_path dict_data/raw-wiktextract-data.jsonl.gz \
+  --antonym-timestamp 2026-08-14T00:00:00Z \
   --db scholomance_dict.sqlite \
   --overwrite
 ```
@@ -32,6 +37,7 @@ python scripts/build_scholomance_dict.py \
 Options:
 - `--cmu_path PATH` — custom CMU dict location (default: `node_modules/cmudict/lib/cmu/cmudict.0.7a`)
 - `--oewn_path PATH` — path to OEWN XML file (required)
+- `--etymology_path PATH` — Kaikki / wiktextract JSONL used to fill `entry.etymology` (optional)
 - `--db PATH` — output SQLite path (default: `scholomance_dict.sqlite`)
 - `--overwrite` — overwrite existing database
 
@@ -52,11 +58,12 @@ For production, use Fastify `/api/lexicon/*` routes and set:
 1. **CMU Dict ingestion** — parses ~134k words with their ARPAbet phonemes, computes vowel families, codas, and rhyme keys. Populates `entry`, `entry_fts`, and `rhyme_index` tables.
 2. **OEWN XML ingestion** — extracts synsets (definitions, examples), lemma-to-synset mappings, and semantic relations (hypernyms, hyponyms, etc.).
 3. **Cross-referencing** — enriches CMU entries with WordNet definitions and POS tags by matching headwords to lemmas.
-4. **Lexicon population** — copies all words into the `lexicon` table for word-validity checks.
+4. **Etymology enrich** — after POS is known, fills empty `entry.etymology` from the Kaikki dump keyed by `(headword_lower, pos)`. Homograph origins do not cross POS. A null POS fills only when that lemma has a single origin in the dump. Existing etymology is never overwritten. Omit `--etymology_path` to skip.
+5. **Lexicon population** — copies all words into the `lexicon` table for word-validity checks.
 
 ## Schema Summary
 
-- `entry`: word entries (headword, phonemes, POS, definitions via senses_json)
+- `entry`: word entries (headword, phonemes, POS, etymology, definitions via senses_json)
 - `entry_fts`: FTS5 index for full-text search over headwords + definitions
 - `rhyme_index`: pre-computed rhyme families and keys for fast rhyme lookup
 - `wordnet_synset`: OEWN synsets (definitions, examples, lexname)

@@ -5,6 +5,7 @@ build_scholomance_dict.py
 Build an offline dictionary SQLite DB with FTS5 from lean, open sources:
 - CMU Pronouncing Dictionary (phonemes, rhyme families)
 - Open English WordNet (OEWN) XML (definitions, synonyms, semantic relations)
+- Kaikki / wiktextract JSONL (etymology, optional, POS-keyed after WordNet)
 - Datamuse API is used at runtime (no build-time dependency)
 
 Output:
@@ -26,6 +27,7 @@ import time
 import xml.etree.ElementTree as ET
 from typing import Optional
 
+from etymology_project import apply_etymology, parse_kaikki_etymology
 from oewn_antonym_project import (
     apply_oewn_antonyms,
     file_sha256,
@@ -35,7 +37,7 @@ from oewn_antonym_project import (
 
 DEFAULT_DB_PATH = "scholomance_dict.sqlite"
 DEFAULT_CMU_PATH = os.path.join("node_modules", "cmudict", "lib", "cmu", "cmudict.0.7a")
-SCHEMA_VERSION = "2"
+SCHEMA_VERSION = "3"
 
 # ARPAbet vowels (match src/lib/phonology/phoneme.constants.js)
 ARPABET_VOWELS = {
@@ -602,6 +604,20 @@ def enrich_entries_from_wordnet(conn: sqlite3.Connection) -> int:
     return enriched
 
 
+def enrich_entries_from_etymology(conn: sqlite3.Connection, etymology_path: str):
+    """Fill empty entry.etymology from a Kaikki JSONL dump, keyed by (lemma, POS)."""
+    wanted = {
+        row[0] for row in conn.execute("SELECT DISTINCT headword_lower FROM entry")
+    }
+    parsed = parse_kaikki_etymology(etymology_path, wanted_lemmas=wanted)
+    return apply_etymology(
+        conn,
+        parsed,
+        source_path=etymology_path,
+        source_sha256=file_sha256(etymology_path),
+    ), parsed
+
+
 # ---------------------------------------------------------------------------
 # Lexicon population from CMU (for word-existence checks)
 # ---------------------------------------------------------------------------
@@ -625,13 +641,19 @@ def populate_lexicon_from_entries(conn: sqlite3.Connection) -> int:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Build Scholomance dictionary from CMU + OEWN.")
+    ap = argparse.ArgumentParser(
+        description="Build Scholomance dictionary from CMU + OEWN + optional etymology dump.",
+    )
     ap.add_argument("--db", default=DEFAULT_DB_PATH, help="SQLite output path.")
     ap.add_argument("--overwrite", action="store_true", help="Overwrite existing DB.")
     ap.add_argument("--cmu_path", default=DEFAULT_CMU_PATH,
                      help="Path to CMU pronouncing dictionary file.")
     ap.add_argument("--oewn_path", required=True,
                      help="Path to OEWN XML file (.xml or .xml.gz).")
+    ap.add_argument(
+        "--etymology_path",
+        help="Kaikki / wiktextract JSONL (.jsonl or .jsonl.gz) used to fill entry.etymology.",
+    )
     ap.add_argument(
         "--antonym-timestamp",
         help="ISO-8601 timestamp for OEWN antonym provenance.",
@@ -661,6 +683,11 @@ def main() -> None:
         print(f"Current working directory: {os.getcwd()}")
         sys.exit(1)
 
+    if args.etymology_path and not os.path.exists(args.etymology_path):
+        print(f"ERROR: etymology dump not found at: {args.etymology_path}")
+        print(f"Current working directory: {os.getcwd()}")
+        sys.exit(1)
+
     conn = init_db(args.db, overwrite=args.overwrite)
     try:
         conn.execute("INSERT OR REPLACE INTO meta(key, value) VALUES (?, ?)",
@@ -674,12 +701,12 @@ def main() -> None:
         conn.commit()
 
         # Step 1: Ingest CMU pronouncing dictionary
-        print("Step 1/4: Ingesting CMU pronouncing dictionary...")
+        print("Step 1/5: Ingesting CMU pronouncing dictionary...")
         cmu_count = ingest_cmu_dict(conn, args.cmu_path)
         print(f"  Inserted {cmu_count:,} CMU entries with phonemes + rhyme index.")
 
         # Step 2: Ingest OEWN XML
-        print("Step 2/4: Ingesting Open English WordNet XML...")
+        print("Step 2/5: Ingesting Open English WordNet XML...")
         syn_count, lemma_count, rel_count = ingest_oewn_xml(
             conn, args.oewn_path, source_url="https://en-word.net/",
         )
@@ -696,12 +723,30 @@ def main() -> None:
         )
 
         # Step 3: Cross-reference — enrich CMU entries with WordNet definitions
-        print("Step 3/4: Enriching entries with WordNet definitions...")
+        print("Step 3/5: Enriching entries with WordNet definitions...")
         enriched = enrich_entries_from_wordnet(conn)
         print(f"  Enriched {enriched:,} entries with definitions and POS tags.")
 
-        # Step 4: Populate lexicon table
-        print("Step 4/4: Populating lexicon...")
+        # Step 4: Etymology — after POS is known so homographs join honestly
+        print("Step 4/5: Enriching entries with etymology...")
+        if args.etymology_path:
+            etym_result, etym_parsed = enrich_entries_from_etymology(conn, args.etymology_path)
+            print(
+                f"  Filled {etym_result.updated_count:,} etymologies "
+                f"from {etym_parsed.kept_count:,} dump keys "
+                f"({etym_result.unmatched_count:,} unmatched, "
+                f"{etym_result.skipped_existing_count:,} already set)."
+            )
+        else:
+            conn.execute(
+                "INSERT OR REPLACE INTO meta(key, value) VALUES (?, ?)",
+                ("etymology_source", "none"),
+            )
+            conn.commit()
+            print("  Skipped (no --etymology_path). Leximancy.etymology will stay null.")
+
+        # Step 5: Populate lexicon table
+        print("Step 5/5: Populating lexicon...")
         lex_count = populate_lexicon_from_entries(conn)
         print(f"  Lexicon: {lex_count:,} words.")
 
