@@ -51,6 +51,11 @@ export async function constellationRoutes(fastify, opts) {
     wordnetGraph: opts.wordnetGraph ?? null,
     corpusVectors: opts.corpusVectors ?? null,
     scaleOrders: opts.scaleOrders ?? null,
+    // Optional. Absent => the corpus cosine stands unmodified, exactly as
+    // before. Present => WordNet-typed opposites are vetoed downward, because a
+    // distributional cosine rates them as SIMILAR (measured AUC 0.642 raw,
+    // 0.435 on the full matrix — below chance) and cannot be argued out of it.
+    antonymCharge: opts.antonymCharge ?? null,
   };
   // Evaluated per request: cmudict finishes loading after the routes register.
   const isPhonologyReady = typeof opts.isPhonologyReady === 'function'

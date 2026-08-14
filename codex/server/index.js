@@ -93,6 +93,7 @@ import { constellationRoutes } from './routes/constellation.routes.js';
 import { loadWordnetGraph } from './adapters/wordnetGraph.sqlite.adapter.js';
 import { CmuPhonemeEngine } from '../core/phonology/cmu.phoneme.engine.js';
 import { createCorpusVectors, loadScaleOrders } from './adapters/corpusVectors.sqlite.adapter.js';
+import { createAdjectiveSubstrate } from './adapters/adjectiveSubstrate.adapter.js';
 import { createRhymeAstrologyLexiconRepo } from './services/rhyme-astrology/lexiconRepo.js';
 import { createRhymeAstrologyIndexRepo } from './services/rhyme-astrology/indexRepo.js';
 import { createRhymeAstrologyQueryEngine } from '../runtime/rhyme-astrology/queryEngine.js';
@@ -1362,6 +1363,13 @@ if (ENABLE_RHYME_ASTROLOGY) {
 let constellationWordnetGraph = null;
 let constellationCorpusVectors = null;
 let constellationScaleOrders = null;
+/**
+ * Antonym veto. A distributional cosine rates opposites as SIMILAR because they
+ * share contexts — the raw substrate scores AUC 0.642 on synonym-vs-antonym and
+ * the full PPMI matrix 0.435, below chance. Null when no substrate is loaded, so
+ * consumers treat it as "no typed evidence" rather than "not opposites".
+ */
+let constellationAntonymCharge = null;
 try {
     constellationWordnetGraph = loadWordnetGraph(SCHOLOMANCE_DICT_PATH);
     const adjCorpusPath = path.join(process.cwd(), 'adjective_corpus.sqlite');
@@ -1373,7 +1381,38 @@ try {
             + `${constellationScaleOrders.size} measured scales`,
         );
     } else {
-        fastify.log.info('[Constellation] adjective_corpus.sqlite absent; scaleField runs on WordNet alone');
+        /**
+         * The 6.3GB corpus has never shipped — it cannot, against a ~923MB build
+         * context and a 1GB volume — so this branch has always been the live one
+         * and scaleField has always run on WordNet alone, which answers 0.7% of
+         * adjective pairs. The committed 2.7MB substrate is the same signal
+         * reduced: truncated SVD to 128 dims, int8, plus WordNet's typed antonym
+         * edges. Measured on 212 labelled pairs through these very functions:
+         *
+         *                        coverage   AUC(syn>unrel)   AUC(syn>anto)
+         *   wordnet alone (was)      41%        0.696            0.911
+         *   substrate + veto        98.1%       0.994            0.929
+         *
+         * See tests/codex/server/adjectiveSubstrate.benchmark.test.js, which
+         * asserts it beats production rather than merely clearing a threshold.
+         */
+        const substrate = createAdjectiveSubstrate({
+            dir: path.join(process.cwd(), 'public', 'substrate'),
+            logger: fastify.log,
+        });
+        if (substrate.available) {
+            constellationCorpusVectors = substrate;
+            constellationAntonymCharge = (a, b) => substrate.antonymCharge(a, b);
+            fastify.log.info(
+                { ...substrate.stats() },
+                '[Constellation] adjective substrate loaded; scaleField has corpus vectors',
+            );
+        } else {
+            fastify.log.info(
+                { reason: substrate.reason },
+                '[Constellation] no adjective corpus and no substrate; scaleField runs on WordNet alone',
+            );
+        }
     }
 } catch (err) {
     fastify.log.warn({ err }, '[Constellation] scale field artefacts unavailable');
@@ -1403,6 +1442,9 @@ fastify.register(constellationRoutes, {
     wordnetGraph: constellationWordnetGraph,
     corpusVectors: constellationCorpusVectors,
     scaleOrders: constellationScaleOrders,
+    // Optional. Absent => scaleField behaves exactly as before; present => the
+    // corpus cosine is vetoed downward for WordNet-typed opposites.
+    antonymCharge: constellationAntonymCharge,
     // Read at request time, so a slow dictionary load does not permanently
     // disable the channel for the life of the process.
     isPhonologyReady: () => constellationPhonologyReady,
