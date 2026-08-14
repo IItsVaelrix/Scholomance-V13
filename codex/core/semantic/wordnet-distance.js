@@ -67,7 +67,8 @@ const DEFAULT_MAX_DEPTH = 14;
  * @typedef {object} WordnetGraph
  * @property {Map<string, string[]>} sensesOf        lemma → synset ids
  * @property {Map<string, string[]>} hypernymsOf     synset → parent synset ids
- * @property {Map<string, string[]>} relatedOf       synset → undirected neighbours
+ * (relatedOf was removed 2026-08-14: built for every synset in both directions,
+ *  read by nothing, 29.5MB of resident heap.)
  * @property {Map<string, string>}   posOf           synset → 'n'|'v'|'a'|'s'|'r'
  * @property {Map<string, string[]>} headsOf         adjective satellite → head synsets
  */

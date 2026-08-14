@@ -21,7 +21,6 @@ function emptyGraph() {
   return {
     sensesOf: new Map(),
     hypernymsOf: new Map(),
-    relatedOf: new Map(),
     posOf: new Map(),
     headsOf: new Map(),
     antonymsOf: new Map(),
@@ -139,8 +138,16 @@ export function loadWordnetGraph(dbPath, options = {}) {
         // guessing an orientation would invent membership.
       }
 
-      push(graph.relatedOf, row.a, row.b);
-      push(graph.relatedOf, row.b, row.a);
+      /**
+       * `relatedOf` used to be built here, both directions per edge: 112,139
+       * keys and 460,072 entries. Measured 2026-08-14, it cost 29.5MB of a
+       * 92.7MB graph and NOTHING read it — the only other mention in the tree
+       * was a JSDoc @property. On a 1GB machine whose live working set is
+       * ~224MB, that was 13% of resident memory serving documentation.
+       *
+       * If an undirected neighbour index is wanted again, derive it on demand
+       * rather than materialising it for every synset at boot.
+       */
       graph.stats.edges += 1;
     }
 
