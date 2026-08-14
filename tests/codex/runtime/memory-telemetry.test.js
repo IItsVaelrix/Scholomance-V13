@@ -68,6 +68,41 @@ describe('memory telemetry', () => {
     expect(record.peakHeapUsedMb).toBe(200);
   });
 
+  /**
+   * Production outage 2026-08-14. The sampler did `const emit = logger.info`
+   * and called it detached. pino's LOG reads `this[msgPrefixSym]`, so it threw
+   * "Cannot read properties of undefined (reading 'Symbol(pino.msgPrefix)')"
+   * during server startup and the process exited with code 1 — the site was
+   * down until it was reverted. Every existing test here passed throughout,
+   * because a plain vi.fn() has no `this` to lose. This double does.
+   */
+  it('calls the logger as a method, so a this-dependent logger survives', () => {
+    const calls = [];
+    const pinoLike = {
+      _brand: 'logger',
+      info(record, message) {
+        // Throws exactly as pino does when invoked unbound.
+        if (this?._brand !== 'logger') throw new TypeError("Cannot read properties of undefined (reading 'Symbol(pino.msgPrefix)')");
+        calls.push(['info', message]);
+      },
+      warn(record, message) {
+        if (this?._brand !== 'logger') throw new TypeError('unbound warn');
+        calls.push(['warn', message]);
+      },
+    };
+    let heap = 100;
+    const telemetry = createMemoryTelemetry({
+      logger: pinoLike,
+      warnRatio: 0.85,
+      memoryUsage: () => usage(heap),
+      heapStatistics: () => ({ heap_size_limit: 257 * 1024 * 1024 }),
+    });
+    expect(() => telemetry.sample()).not.toThrow();
+    heap = 249;
+    expect(() => telemetry.sample()).not.toThrow();
+    expect(calls.map((c) => c[0])).toEqual(['info', 'warn']);
+  });
+
   it('samples immediately on start so a short-lived process still reports', () => {
     const info = vi.fn();
     const setTimer = vi.fn(() => ({ unref() {} }));

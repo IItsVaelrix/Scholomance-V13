@@ -70,10 +70,17 @@ export function createMemoryTelemetry({
       heapUsedRatio: limitBytes ? Math.round((usage.heapUsed / limitBytes) * 1000) / 1000 : null,
     };
     const nearLimit = record.heapUsedRatio !== null && record.heapUsedRatio >= warnRatio;
-    const emit = nearLimit ? (logger.warn || logger.info) : logger.info;
-    emit?.(record, nearLimit
+    const message = nearLimit
       ? '[memory] heap approaching limit — an abort here would leave no JS-level trace'
-      : '[memory] sample');
+      : '[memory] sample';
+    // CALL AS A METHOD, never `const emit = logger.info`. pino's LOG reads
+    // this[msgPrefixSym], so a detached reference throws
+    // "Cannot read properties of undefined (reading 'Symbol(pino.msgPrefix)')"
+    // and — because this runs at startup — takes the whole server down. It did,
+    // in production, on 2026-08-14. Plain vi.fn() doubles do not reproduce it
+    // because they have no `this` dependency; see the bound-logger test.
+    if (nearLimit && typeof logger.warn === 'function') logger.warn(record, message);
+    else if (typeof logger.info === 'function') logger.info(record, message);
     return record;
   }
 
