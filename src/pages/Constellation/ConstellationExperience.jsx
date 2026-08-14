@@ -69,6 +69,14 @@ export default function ConstellationExperience({ packet, reducedMotion }) {
               key={channel.id}
               type="button"
               aria-pressed={channel.id === selectedChannel}
+              aria-label={
+                channel.degraded
+                  ? `${channel.label}, degraded`
+                  : channel.empty
+                    ? `${channel.label}, nothing found`
+                    : undefined
+              }
+              data-state={channel.state}
               onClick={() => selectChannel(channel)}
             >
               {channel.label}

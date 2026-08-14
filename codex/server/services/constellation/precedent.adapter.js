@@ -1,6 +1,15 @@
 /**
  * PRECEDENT ADAPTER — the case book, and the vocabulary translation.
  *
+ * STATUS: EXPERIMENTAL — NOT WIRED
+ *
+ * Truth pass 2026-08-14 (ConstellationOS disparity report, Boon C).
+ * The adapter is complete and tested against real compose() output, but
+ * constellationPage.service.js does not import it. It is not a sky channel.
+ * Do not treat loadCaseBook / recordRuling as live page capabilities.
+ * If you wire this into the page service, delete the NOT WIRED claim in
+ * the same commit as tests/core/constellation/precedent-adapter-truth.test.js.
+ *
  * `codex/core/constellation/precedent.js` is pure and zero-I/O by Core law: it
  * takes a case book as an argument and never reads disk. That is why it had no
  * effect on anything — a module that requires an injected case book does

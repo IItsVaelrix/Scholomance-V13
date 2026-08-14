@@ -110,6 +110,7 @@ function Connection({ from, to, color, active }) {
 
 function StarNode({ node, palette, active, selected, onSelect, onHover }) {
   const color = palette[node.tone] ?? palette.arc;
+  const dimmed = Boolean(node.degraded);
   const scale = node.magnitude * (selected ? 1.28 : active ? 1.1 : 0.86);
 
   return (
@@ -131,9 +132,11 @@ function StarNode({ node, palette, active, selected, onSelect, onHover }) {
         <meshStandardMaterial
           color={color}
           emissive={color}
-          emissiveIntensity={selected ? 1.6 : active ? 0.9 : 0.38}
+          emissiveIntensity={dimmed ? 0.12 : selected ? 1.6 : active ? 0.9 : 0.38}
           roughness={0.42}
           metalness={0.12}
+          transparent={dimmed}
+          opacity={dimmed ? 0.38 : 1}
         />
       </mesh>
       {(selected || node.kind === 'lodestar') ? (
@@ -224,6 +227,8 @@ function WebGLFallback({ model, onSelect, selectedNodeId, reason }) {
             type="button"
             className="constellation-viewport__index-button"
             aria-pressed={node.id === selectedNodeId}
+            aria-label={node.ariaLabel ?? node.label}
+            data-state={node.state}
             onClick={() => onSelect(node)}
           >
             {node.label}
@@ -273,7 +278,7 @@ export default function ConstellationViewport3D({
       <div
         className="constellation-viewport__canvas"
         role="group"
-        aria-label={`${model.nodes.length} semantic stars arranged around the submitted query`}
+        aria-label={`${model.measuredNodeCount ?? model.nodes.length} measured semantic stars arranged around the submitted query`}
       >
         {webgl?.ok ? (
           <Canvas
@@ -321,6 +326,8 @@ export default function ConstellationViewport3D({
               type="button"
               className="constellation-viewport__index-button"
               aria-pressed={node.id === selectedNode?.id}
+              aria-label={node.ariaLabel ?? node.label}
+              data-state={node.state}
               onFocus={() => setHoveredNode(node)}
               onBlur={() => setHoveredNode(null)}
               onClick={() => onSelectNode(node)}

@@ -1,25 +1,12 @@
+import {
+  CONSTELLATION_CHANNEL_REGISTRY,
+  CONSTELLATION_CHANNELS,
+  LIVE_ENGINE_DEGRADE,
+} from './constellationChannelRegistry.js';
+
 const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 
-export const CONSTELLATION_CHANNELS = Object.freeze([
-  { id: 'identity', label: 'Phrase identity', targetId: 'cos-masthead-query', tone: 'gold' },
-  { id: 'meaning', label: 'Meaning field', targetId: 'cos-leximancy', tone: 'amethyst' },
-  { id: 'sound', label: 'Sound field', targetId: 'cos-rhyme', tone: 'arc' },
-  { id: 'genome', label: 'Phrase genome', targetId: 'cos-genome', tone: 'amethyst' },
-  { id: 'readings', label: 'Readings', targetId: 'cos-readings', tone: 'gold' },
-  { id: 'scale', label: 'Scale field', targetId: 'cos-scale', tone: 'arc' },
-  { id: 'discovery', label: 'Discovery field', targetId: 'cos-discovery', tone: 'amethyst' },
-  { id: 'provenance', label: 'Provenance', targetId: 'cos-provenance', tone: 'gold' },
-]);
-
-const CHANNEL_POSITIONS = Object.freeze({
-  meaning: [-4.15, 1.55, -0.8],
-  sound: [4.15, 1.35, -0.45],
-  genome: [0.15, -2.55, 0],
-  readings: [-3.45, -2.3, -1.5],
-  scale: [3.55, -2.2, -1.65],
-  discovery: [0, 3.35, -2.1],
-  provenance: [0, -4.15, -3.2],
-});
+export { CONSTELLATION_CHANNEL_REGISTRY, CONSTELLATION_CHANNELS };
 
 function clamp(value, minimum = 0, maximum = 1) {
   return Math.min(maximum, Math.max(minimum, Number(value) || 0));
@@ -124,18 +111,36 @@ function channelItems(packet, channelId) {
   }
 }
 
-function channelAvailable(packet, channelId) {
-  switch (channelId) {
-    case 'identity': return true;
-    case 'meaning': return Boolean(packet.leximancy);
-    case 'sound': return Boolean(packet.rhymeAstrology);
-    case 'genome': return Boolean(packet.phraseGenome);
-    case 'readings': return Boolean(packet.readings?.readings?.length);
-    case 'scale': return Boolean(packet.scaleField);
-    case 'discovery': return Boolean(packet.discovery);
-    case 'provenance': return Boolean(packet.provenance);
-    default: return false;
-  }
+export function channelAvailable(packet, channelId) {
+  const entry = CONSTELLATION_CHANNEL_REGISTRY[channelId];
+  if (!entry) return false;
+  if (channelId === 'identity') return true;
+  if (channelId === 'readings') return Boolean(packet.readings?.readings?.length);
+  return Boolean(packet[entry.field]);
+}
+
+export function channelDegraded(packet, channelId) {
+  const names = CONSTELLATION_CHANNEL_REGISTRY[channelId]?.degrade ?? [];
+  if (names.length === 0) return false;
+  const degraded = packet?.diagnostics?.degradedChannels ?? [];
+  return names.some((name) => degraded.includes(name))
+    || degraded.includes(LIVE_ENGINE_DEGRADE);
+}
+
+export function channelState(packet, channelId) {
+  if (channelDegraded(packet, channelId)) return 'degraded';
+  if (channelItems(packet, channelId).length === 0) return 'empty';
+  return 'measured';
+}
+
+function channelVisible(packet, channelId) {
+  return channelAvailable(packet, channelId) || channelDegraded(packet, channelId);
+}
+
+function channelAriaLabel(label, state) {
+  if (state === 'degraded') return `${label}, degraded`;
+  if (state === 'empty') return `${label}, nothing found`;
+  return label;
 }
 
 /**
@@ -146,7 +151,17 @@ export function projectConstellationPacket(packet) {
   const pagePhase = stablePhase(packet.pageBytecode);
   const nodes = [];
   const edges = [];
-  const channels = CONSTELLATION_CHANNELS.filter((channel) => channelAvailable(packet, channel.id));
+  const channels = CONSTELLATION_CHANNELS
+    .filter((channel) => channelVisible(packet, channel.id))
+    .map((channel) => {
+      const state = channelState(packet, channel.id);
+      return {
+        ...channel,
+        state,
+        degraded: state === 'degraded',
+        empty: state === 'empty',
+      };
+    });
 
   const queryNode = {
     id: 'query-lodestar',
@@ -155,12 +170,17 @@ export function projectConstellationPacket(packet) {
     kind: 'lodestar',
     tone: 'gold',
     magnitude: 1.35,
-    position: [0, 0.35, 1.35],
+    position: CONSTELLATION_CHANNEL_REGISTRY.identity.pos,
+    state: 'measured',
+    degraded: false,
+    empty: false,
+    ariaLabel: packet.query.raw,
   };
   nodes.push(queryNode);
 
   channels.forEach((channel, channelIndex) => {
     const items = channelItems(packet, channel.id);
+    const ariaLabel = channelAriaLabel(channel.label, channel.state);
     if (channel.id === 'identity') {
       items.forEach((item, itemIndex) => {
         const node = {
@@ -170,6 +190,10 @@ export function projectConstellationPacket(packet) {
           kind: 'satellite',
           tone: channel.tone,
           position: childPosition(queryNode.position, itemIndex, items.length, pagePhase),
+          state: 'measured',
+          degraded: false,
+          empty: false,
+          ariaLabel: item.label,
         };
         nodes.push(node);
         edges.push({ id: `${queryNode.id}-${node.id}`, from: queryNode.id, to: node.id, channelId: channel.id });
@@ -177,15 +201,19 @@ export function projectConstellationPacket(packet) {
       return;
     }
 
-    const position = CHANNEL_POSITIONS[channel.id];
+    const position = CONSTELLATION_CHANNEL_REGISTRY[channel.id].pos;
     const anchor = {
       id: `channel-${channel.id}`,
       channelId: channel.id,
       label: channel.label,
       kind: 'channel',
       tone: channel.tone,
-      magnitude: 0.88,
+      magnitude: channel.degraded ? 0.42 : 0.88,
       position,
+      state: channel.state,
+      degraded: channel.degraded,
+      empty: channel.empty,
+      ariaLabel,
     };
     nodes.push(anchor);
     edges.push({ id: `${queryNode.id}-${anchor.id}`, from: queryNode.id, to: anchor.id, channelId: channel.id });
@@ -203,6 +231,10 @@ export function projectConstellationPacket(packet) {
           items.length,
           pagePhase + channelIndex * 0.73,
         ),
+        state: channel.degraded ? 'degraded' : 'measured',
+        degraded: channel.degraded,
+        empty: false,
+        ariaLabel: item.label,
       };
       nodes.push(node);
       edges.push({ id: `${anchor.id}-${node.id}`, from: anchor.id, to: node.id, channelId: channel.id });
@@ -214,5 +246,6 @@ export function projectConstellationPacket(packet) {
     nodes,
     edges,
     channels,
+    measuredNodeCount: nodes.filter((node) => !node.degraded).length,
   };
 }

@@ -516,6 +516,11 @@
   color: var(--cos-ink);
 }
 
+.constellation-viewport__index-button[data-state='degraded'],
+.constellation-dock__channels button[data-state='degraded'] {
+  opacity: 0.45;
+}
+
 .constellation-viewport__index-button[aria-pressed='true'],
 .constellation-dock__channels button[aria-pressed='true'],
 .constellation-dock__reading-toggle[aria-pressed='true'] {
