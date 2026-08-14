@@ -121,8 +121,31 @@ export function composePacked(tokens, posMap, options = {}) {
       for (let k = node.to + 1; k < n; k += 1) {
         for (const right of [...cell[node.to + 1][k].values()]) {
           for (const bond of bonds) {
-            if (node.type !== bond[0] || right.type !== bond[1]) continue;
-            offer(node.from, k, bond[2], { bond, left: node, right });
+            const [l, r, result] = bond;
+            if (node.type !== l || right.type !== r) continue;
+            
+            // -----------------------------------------------------------
+            // MACROPHAGE ANTIGEN MEMBRANE (Contextual Immune Receptors)
+            // -----------------------------------------------------------
+            let phagocytized = false;
+            if (!options.disableMacrophage) {
+              if (l === 'ADJ' && r === 'S' && result === 'S') {
+                if (node.from !== 0) phagocytized = true;
+              }
+              if (l === 'NP' && r === 'PART' && result === 'NP') {
+                if (right.to - right.from > 7) phagocytized = true;
+              }
+              if (l === 'V' && r === 'PP' && result === 'PART') {
+                if (right.to - right.from > 5) phagocytized = true;
+              }
+              if (l === 'VP' && r === 'INF' && result === 'VP') {
+                if (right.to - right.from > 8) phagocytized = true;
+              }
+            }
+
+            if (phagocytized) continue; // REJECT: Phagocytized by Macrophage
+
+            offer(node.from, k, result, { bond, left: node, right });
           }
         }
       }
@@ -152,7 +175,7 @@ export function composePacked(tokens, posMap, options = {}) {
   const spanning = [...cell[0][n - 1].values()];
   const stable = spanning.filter((m) => roots.includes(m.type));
 
-  return { atoms, molecules, spanning, stable, events };
+  return { atoms, molecules, spanning, stable, events, cell };
 }
 
 /**

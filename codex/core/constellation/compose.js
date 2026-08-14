@@ -603,6 +603,39 @@ export function compose(tokens, posMap, options = {}) {
           for (const right of cell[split + 1][to]) {
             for (const [l, r, result] of bonds) {
               if (left.type !== l || right.type !== r) continue;
+
+              // -----------------------------------------------------------
+              // MACROPHAGE ANTIGEN MEMBRANE (Contextual Immune Receptors)
+              // -----------------------------------------------------------
+              let phagocytized = false;
+              if (!options.disableMacrophage) {
+                // Pathogen 1: ADJ+S -> S
+                if (l === 'ADJ' && r === 'S' && result === 'S') {
+                  if (left.from !== 0) phagocytized = true;
+                }
+                
+                // Pathogen 2: NP+PART -> NP
+                // Overgrown participles (length > 7) replicating endlessly are quarantined.
+                if (l === 'NP' && r === 'PART' && result === 'NP') {
+                  if (right.to - right.from > 7) phagocytized = true;
+                }
+
+                // Pathogen 3: V+PP -> PART
+                if (l === 'V' && r === 'PP' && result === 'PART') {
+                  if (right.to - right.from > 5) phagocytized = true;
+                }
+
+                // Pathogen 4: VP+INF -> VP
+                // Runaway infinitive adjunctions are structurally dampened.
+                if (l === 'VP' && r === 'INF' && result === 'VP') {
+                  if (right.to - right.from > 8) phagocytized = true;
+                }
+              }
+
+              if (phagocytized) {
+                continue; // REJECT: Phagocytized by Macrophage
+              }
+
               cell[from][to].push({ type: result, from, to, parts: [left, right] });
             }
           }

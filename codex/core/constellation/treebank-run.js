@@ -40,6 +40,7 @@ export function runTreebank({
   senseMap = null,
   parser = 'classic',
   maxTokens = 28,
+  options = {},
 }) {
   let tokenizerAgree = 0;
   let tokenizerTotal = 0;
@@ -84,8 +85,8 @@ export function runTreebank({
     let result;
     let goldResult;
     try {
-      result = parser === 'packed' ? composePacked(tokens, posMap) : compose(tokens, posMap);
-      goldResult = parser === 'packed' ? composePacked(tokens, goldMap) : compose(tokens, goldMap);
+      result = parser === 'packed' ? composePacked(tokens, posMap, options) : compose(tokens, posMap, options);
+      goldResult = parser === 'packed' ? composePacked(tokens, goldMap, options) : compose(tokens, goldMap, options);
     } catch {
       droppedThrew += 1;
       return null;
