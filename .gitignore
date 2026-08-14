@@ -199,3 +199,23 @@ cache/ud/
 # Code Atlas — regenerable build artifacts (rebuild: python -m divtube_downloader.tui.services.code_atlas or via code_lens)
 .atlas/
 docs/scholomance-bible/bible.json
+
+# ── Large local subsystems: keep NEW files out of the repo ───────────────────
+# Flagged when a Fly deploy reported a 5.9GB build context; these were the
+# largest paths in it. Note this rule only stops FUTURE additions — files
+# already tracked here (PolarisOS 269, .superpowers 15, cache 1) stay tracked
+# until someone decides to `git rm --cached` them, which is a content decision,
+# not a hygiene one.
+#
+# The deploy size itself is fixed in .dockerignore, not here: Docker never
+# reads .gitignore.
+
+# Whole-tree cache. Narrower rules above (cache/gutenberg, cache/ud) predate
+# this; the frozen web-search fixture under cache/web-search stays tracked.
+cache/
+
+# Polaris OS — separate subsystem, 387MB working tree.
+PolarisOS/
+
+# Superpowers skill/brainstorm artifacts — regenerable, 277MB.
+.superpowers/

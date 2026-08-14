@@ -102,3 +102,25 @@ _combat-1440.png
 
 # Scratch/probe output — never part of a build context.
 .tmp/
+
+# ── Largest paths in the build context (measured, not guessed) ───────────────
+# A Fly deploy reported: "Build context is 5.9 GB across 42,893 files", with
+# these as the top five — ~5.0GB of the total, re-uploaded to the builder on
+# EVERY deploy. The Dockerfile consumes none of them (verified by grep).
+#
+# .worktrees and squashfs-root are already in .gitignore but Docker never reads
+# .gitignore, which is why they kept shipping.
+#
+# Sizes below are from that report. Comments must be on their own line here —
+# a trailing `#` is part of the pattern, not a comment.
+
+# 2.0 GB — corpus / web-search caches, all regenerable
+cache/
+# 1.8 GB — git worktrees, never part of an image
+.worktrees/
+# 531 MB — extracted AppImage
+squashfs-root/
+# 373 MB — separate subsystem, not imported by the app
+PolarisOS/
+# 289 MB — skill / brainstorm artifacts
+.superpowers/
