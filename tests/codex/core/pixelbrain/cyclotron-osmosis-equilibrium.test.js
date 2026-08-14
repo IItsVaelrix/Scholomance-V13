@@ -201,7 +201,8 @@ describe('equilibration actually evens occupancy', () => {
     expect(exact(on).effectiveDiversity).toBeGreaterThan(exact(off).effectiveDiversity);
     expect(on.searchLandscape.entropy.redirects).toBeGreaterThan(0); // transport happened
     expect(off.searchLandscape.entropy.redirects).toBe(0);
-  }, 20000);
+    // Same two-run cost as 'is on by default' below; measured 9187ms.
+  }, 60_000);
 
   it('is on by default', () => {
     const explicit = runSemanticValenceCyclotron(RUN({ trialCount: 4000, entropy: { enabled: true } }));
@@ -209,5 +210,8 @@ describe('equilibration actually evens occupancy', () => {
     expect(byDefault.counts.shortlisted).toBe(explicit.counts.shortlisted);
     expect(byDefault.searchLandscape.entropy.exact).toEqual(explicit.searchLandscape.entropy.exact);
     expect(byDefault.checksum).toBe(explicit.checksum);
-  }, 20000);
+    // Two 4000-trial cyclotron runs: measured 18996ms under a parallel
+    // suite against the old 20000ms budget — 5% of headroom, which is a
+    // flake waiting for a busier machine.
+  }, 60_000);
 });

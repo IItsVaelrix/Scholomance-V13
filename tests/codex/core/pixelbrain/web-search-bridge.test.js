@@ -7,13 +7,19 @@
  */
 import { describe, it, expect } from 'vitest';
 import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync, existsSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PYTHON_SCRIPT = join(__dirname, '..', '..', '..', '..', 'codex', 'core', 'pixelbrain', 'web_search.py');
-const TEST_CACHE = join(__dirname, '__test_cache__');
+// Scratch files live OUTSIDE the repository. Written under tests/ they were
+// visible to anything reading `git status` mid-run — the APM evidence
+// reporter snapshots the working tree, so this suite's temp JSON appeared
+// inside a sibling suite's determinism comparison and failed it at random,
+// depending only on which file vitest happened to schedule first.
+const TEST_CACHE = mkdtempSync(join(tmpdir(), 'pb-web-search-bridge-'));
 
 // ---------------------------------------------------------------------------
 // Fixtures

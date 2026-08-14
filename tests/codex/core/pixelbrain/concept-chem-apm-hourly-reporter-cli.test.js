@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -62,18 +62,43 @@ describe('corpus-backed evidence', () => {
   });
 
   it('repeats all scoring and provenance when only recordedAt changes', () => {
+    // The design (2026-08-03 scoring gate, "Checksums and provenance"):
+    // "A dirty tree is recorded, not rejected, because unrelated user work
+    // already exists and the engine/design/matrix checksums pin the scored
+    // substrate." inputs.git.porcelain is therefore RECORDED CONTEXT, not
+    // part of the substrate — it is a live whole-repo snapshot that any
+    // concurrent writer moves. An unrelated file is created here on purpose
+    // so that fact is asserted rather than left to test-execution order:
+    // a sibling suite writing scratch files used to flip this at random.
+    const intruder = join(process.cwd(), '.apm-evidence-intruder.tmp');
     const first = buildEvidence({
       repoRoot: process.cwd(),
       now: () => new Date('2026-08-03T12:00:00.000Z'),
     });
-    const second = buildEvidence({
-      repoRoot: process.cwd(),
-      now: () => new Date('2026-08-03T13:00:00.000Z'),
-    });
+
+    writeFileSync(intruder, 'unrelated concurrent work\n');
+    let second;
+    try {
+      second = buildEvidence({
+        repoRoot: process.cwd(),
+        now: () => new Date('2026-08-03T13:00:00.000Z'),
+      });
+    } finally {
+      rmSync(intruder, { force: true });
+    }
 
     expect(second.scoredRounds).toEqual(first.scoredRounds);
     expect(second.decision).toEqual(first.decision);
-    expect(second.inputs).toEqual(first.inputs);
+
+    // The pinned substrate must be byte-identical...
+    expect(second.inputs.reactionMatrixChecksum)
+      .toBe(first.inputs.reactionMatrixChecksum);
+    expect(second.inputs.designSpec).toEqual(first.inputs.designSpec);
+    expect(second.inputs.engine).toEqual(first.inputs.engine);
+    expect(second.inputs.corpus).toEqual(first.inputs.corpus);
+    // ...and the commit the experiment ran on must not have moved.
+    expect(second.inputs.git.commit).toBe(first.inputs.git.commit);
+
     expect(second.evidenceChecksum).not.toBe(first.evidenceChecksum);
   });
 });

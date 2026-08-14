@@ -1,1 +1,1 @@
-{"bytecode":"","canvas":{"gridSize":1,"height":2,"width":2},"coordinates":[{"color":"#FFFFFF","x":1,"y":1}],"formula":null,"kind":"scholomance.pixelbrain.godot.v1","palettes":[{"hex":"#FFFFFF","percentage":100}],"version":1}
+{"bytecode":"","canvas":{"gridSize":1,"height":2,"width":2},"coordinates":[{"color":"#FFFFFF","x":1,"y":1}],"formula":null,"kind":"scholomance.pixelbrain.godot.v1","palettes":[{"hex":"#FFFFFF","percentage":100}],"version":1,"checksum":{"algorithm":"FNV-1a-32","scope":"canonical JSON excluding this checksum object","value":"AE76A8DA"}}

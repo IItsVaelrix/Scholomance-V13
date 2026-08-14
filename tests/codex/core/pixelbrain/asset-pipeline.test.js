@@ -196,7 +196,9 @@ describe('compileAsset — diagnostics', () => {
     const spread = compileAsset(src('moonlit-shrine-forest.scdl'));
     expect(flat.diagnostics.vri.paletteCoverage.every(c => c.flat)).toBe(true);
     expect(spread.diagnostics.vri.paletteCoverage.every(c => c.flat)).toBe(false);
-  });
+    // Two full SCDL compiles through the boundary: measured 4161ms idle
+    // against vitest's 5000ms default, so parallel workers tip it over.
+  }, 30_000);
 
   it('reports SCDL errors without throwing', () => {
     const r = compileAsset('this is not valid scdl at all');

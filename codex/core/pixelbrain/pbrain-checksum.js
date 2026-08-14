@@ -11,6 +11,7 @@
  * — the exact failure this module exists to prevent.
  */
 
+import { readFileSync } from 'node:fs';
 import { fnv1a32Hex } from './shared.js';
 import { canonicalStringify, parseCanonicalJson } from './canonical-json.js';
 
@@ -67,4 +68,58 @@ export function stampPbrainChecksum(packet) {
     scope: PBRAIN_CHECKSUM_SCOPE,
     value: computePbrainChecksum(packet),
   };
+}
+
+/** Thrown when a .pbrain file cannot be shown to be what it claims to be. */
+export class PbrainIntegrityError extends Error {
+  constructor({ path, reason, expected, recomputed, cause }) {
+    const detail = {
+      unreadable: `cannot be read: ${cause?.message ?? 'unknown error'}`,
+      absent: 'carries no checksum stamp, so its contents cannot be verified',
+      mismatch: `does not match its stamp (declares ${expected}, contents hash to ${recomputed})`,
+    }[reason];
+    super(`.pbrain integrity failure — ${path} ${detail}`);
+    this.name = 'PbrainIntegrityError';
+    this.path = path;
+    this.reason = reason;
+    this.expected = expected;
+    this.recomputed = recomputed;
+    if (cause) this.cause = cause;
+  }
+}
+
+/**
+ * Read a .pbrain file, PROVE it is what it claims to be, then parse it.
+ *
+ * Every load site used to be `JSON.parse(readFileSync(path))`, which cannot
+ * verify anything: JSON.parse collapses 64.0 to 64, so the digest can only
+ * ever be computed from the raw text. Verification therefore happens here,
+ * on the bytes, before the packet is handed to a consumer.
+ *
+ * Strict by construction. A missing stamp throws exactly like a wrong one —
+ * otherwise deleting the checksum key would be an easier bypass than forging
+ * it, and the check would be one a corrupt packet could always pass.
+ *
+ * @returns the parsed packet (plain JSON objects, as callers already expect)
+ * @throws {PbrainIntegrityError}
+ */
+export function loadPbrainFile(path) {
+  let text;
+  try {
+    text = readFileSync(path, 'utf8');
+  } catch (cause) {
+    throw new PbrainIntegrityError({ path, reason: 'unreadable', cause });
+  }
+
+  const { ok, expected, recomputed } = verifyPbrainText(text);
+  if (!ok) {
+    throw new PbrainIntegrityError({
+      path,
+      reason: expected === '' ? 'absent' : 'mismatch',
+      expected,
+      recomputed,
+    });
+  }
+
+  return JSON.parse(text);
 }

@@ -173,7 +173,10 @@ describe('Calibration Registry', () => {
           expect(replay[j].stability).toBe(baseline[j].stability);
         }
       }
-    });
+      // 100 replays of every calibration reaction: measured 4539ms on an
+      // idle machine against vitest's 5000ms default — a 9% margin that
+      // parallel workers erase. Budget stated, coverage kept.
+    }, 30_000);
 
     it('checksums are content-addressed and stable', () => {
       const r1 = cal001.REACTIONS.find((r) => r.id === 'R1');

@@ -417,7 +417,11 @@ describe('Bridge Corpus Effect (PB-BRIDGE-CORPUS-v1)', () => {
         checksums.add(canon);
       }
       expect(checksums.size).toBe(1);
-    });
+      // 100 full index builds + reaction runs: measured 5226ms on an idle
+      // machine, i.e. already past vitest's 5000ms default before any
+      // parallel load. The replay count is the point of the test, so the
+      // budget is stated explicitly rather than the coverage reduced.
+    }, 30_000);
 
     it('bridge checksum is stable across 100 calls', () => {
       const checksums = new Set();
