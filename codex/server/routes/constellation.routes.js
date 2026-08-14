@@ -21,10 +21,28 @@ const CONTROL_CHARS = /[\u0000-\u0008\u000E-\u001F\u007F-\u009F]/;
  *   wordnetGraph?, corpusVectors?, scaleOrders? }} opts
  */
 export async function constellationRoutes(fastify, opts) {
+  /**
+   * Corpus identity for the page bytecode (PDR §16): built once from the
+   * corpus_meta table — books/tokens/window/rows identify the corpus content
+   * deterministically (the `built` timestamp is excluded on purpose; it would
+   * re-key every page on a rebuild with identical content). Absent corpus =>
+   * null => 'corpus:off' inside the hash.
+   */
+  let corpusChecksum = null;
+  try {
+    const stats = opts.corpusVectors?.stats?.();
+    if (stats?.available) {
+      corpusChecksum = `corpus:${stats.books}:${stats.tokens}:${stats.window}:${stats.rows}`;
+    }
+  } catch {
+    corpusChecksum = null;
+  }
+
   const deps = {
     lexiconAdapter: opts.lexiconAdapter,
     rhymeQueryEngine: opts.rhymeQueryEngine,
     rhymeLexiconRepo: opts.rhymeLexiconRepo,
+    corpusChecksum,
     // Optional. Absent => leximancy looks up the surface form only, exactly as
     // it did before morphological expansion existed.
     lemmaAdapter: opts.lemmaAdapter ?? null,

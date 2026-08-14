@@ -359,7 +359,6 @@ export async function applyRhymeConstraint(candidates, rhymeWith, deps) {
 
   const survivors = [];
   for (const c of candidates) {
-    // eslint-disable-next-line no-await-in-loop -- sequential evidence checks (deterministic)
     const ok = await hasRhymeEvidence(c.token, target, deps);
     if (ok) {
       const via = [...c.via];
@@ -478,7 +477,6 @@ export async function analyzeDiscovery(rawQuery, identity, deps) {
   for (const generator of plan.generators) {
     if (pool.size >= DISCOVERY_GLOBAL_CAP) break;
     if (generator.type === 'rhyme') {
-      // eslint-disable-next-line no-await-in-loop
       await expandRhyme(generator, deps, pool, exclude);
     } else {
       expandSemantic(generator, lexiconAdapter, pool, exclude);

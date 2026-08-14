@@ -28,8 +28,10 @@ function emptyLeximancy() {
 
 /**
  * @param {string} rawQuery
- * @param {{ lexiconAdapter, rhymeQueryEngine, rhymeLexiconRepo }} deps
- * @returns {Promise<import('../../../src/hooks/constellation.types.js').ConstellationPhase1Packet>}
+ * @param {{ lexiconAdapter, rhymeQueryEngine, rhymeLexiconRepo,
+ *   lemmaAdapter?, wordnetGraph?, corpusVectors?, scaleOrders?,
+ *   phonologyReady?, corpusChecksum?: string|null }} deps
+ * @returns {Promise<import('../../../src/hooks/constellation.types.js').ConstellationPagePacket>}
  */
 export async function buildConstellationPage(rawQuery, deps) {
   // ── Phase 2: Phrase Analysis ──────────────────────────────────────
@@ -300,7 +302,26 @@ export async function buildConstellationPage(rawQuery, deps) {
   const pageBytecode = computePageBytecode({
     normalized: identity.normalized,
     kind: identity.kind,
+    // PDR §16: parsed intent is part of page identity — the same words under a
+    // different intent route different channels and produce a different page.
+    intent: identity.intent ?? null,
     engineVersions,
+    // Reserved slot (PDR §16): empty until scoring profiles become first-class.
+    // Wired now so their arrival re-keys page identity instead of silently not.
+    scoringProfiles: {},
+    // Corpus identity when the corpus participated; 'corpus:off' inside the hash
+    // when it did not. Two pages built against different corpora are different
+    // analyses and must not share a bytecode.
+    corpusChecksum: deps.corpusChecksum ?? null,
+    // Deterministic option flags: which optional channels were measurable.
+    // These legitimately change the analysis (a heteronym split only exists
+    // when phonology answered; a scale field only when the graph was present).
+    flags: {
+      phonology: deps.phonologyReady ? 'ready' : 'pending',
+      wordnet: deps.wordnetGraph ? 'on' : 'off',
+      corpus: deps.corpusVectors ? 'on' : 'off',
+      scaleOrders: deps.scaleOrders ? 'on' : 'off',
+    },
   });
 
   return {

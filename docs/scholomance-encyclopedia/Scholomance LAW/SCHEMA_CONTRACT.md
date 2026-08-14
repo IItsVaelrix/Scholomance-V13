@@ -7,7 +7,7 @@
 
 ## Living Document - Owned by Codex, Read by All Agents
 
-**Version: 1.44** | Last updated: 2026-08-13
+**Version: 1.45** | Last updated: 2026-08-19
 
 > Bump the version on every schema change.
 > Notify Claude for UI-consumed field changes.
@@ -3576,6 +3576,124 @@ conceptId asc. `CareerGraphManifest` seals a built artifact with `artifactId`, `
 
 ---
 
+## SCHEMA CHANGE NOTICE
+
+- Schema: ConstellationOS Page Packet (SCHOL-COS-PAGE-v2)
+- Version: NEW — publishes the live Phase-2 packet that was previously uncontracted
+- Date: 2026-08-19
+- Changed fields: registered `scholomance/constellation-os-page-phase2` as the sovereign page packet; freezes the actual emitted shape across identity, phraseStructure, leximancy, rhymeAstrology, phraseGenome, semanticInquiry, scaleField, readings, governed, discovery, diagnostics, and provenance
+- Breaking: no; publication-only — seals what `codex/server/services/constellationPage.service.js` already emits. The stale Phase-1 typedef was the drift, not this.
+- Owner: Codex
+- Claude impact: `src/pages/Constellation/` renders this packet; treat `scaleField: null` as "not measured" and `readings.contested` as a first-class result, never as an error state
+- Gemini impact: producer must keep every channel's local-degradation contract — a failed channel degrades itself and records a warning, it never poisons the page
+- Canonical typedef home: `src/hooks/constellation.types.js` (`ConstellationPagePacket`; `ConstellationPhase1Packet` retained as deprecated alias)
+- Error codes: a channel that throws is appended to `diagnostics.degradedChannels` with a warning; the page still resolves
+
+```ts
+type ConstellationQueryKind =
+  | "word" | "phrase" | "line" | "multiline"
+  | "discovery" | "comparison" | "transformation";
+
+type ConstellationIntent =
+  | "literary" | "meta-query" | "craft-instruction" | "comparison";
+
+interface ConstellationPagePacket {
+  version: 2;
+  schema_id: "scholomance/constellation-os-page-phase2";
+  /** COS-PAGE-v1-{hex}; identity over lawful analysis inputs only (PDR §16). */
+  pageBytecode: string;
+  query: {
+    raw: string;
+    normalized: string;
+    kind: ConstellationQueryKind;
+    tokenCount: number;
+    graphemeCount: number;
+    intent: ConstellationIntent | null;
+  };
+  phraseStructure: {
+    intent: ConstellationIntent | null;
+    headToken: string | null;
+    headDecidedBy: "rarity" | "last-content" | null;
+    headPool: string[];
+    headDemoted: Array<{ token: string; reason: string }>;
+    compounds: string[];
+    tokenRoles: Array<{ token: string; role: "head" | "modifier" | "connector" | "specifier" }>;
+    devices: string[];
+  };
+  leximancy: {
+    status: "resolved" | "ambiguous" | "unsupported";
+    selectedInterpretationId: string | null;
+    /** "probe" | "frame" | "rank" | null — how the pick was earned, if at all. */
+    selectedBy: "probe" | "frame" | "rank" | null;
+    interpretations: Array<{ id: string; gloss: string; confidence: number; pos?: string; examples?: string[] }>;
+    warnings: string[];
+    nearKin?: string[];
+    counterfield?: string[];
+    etymology?: string | null;
+    rarity?: { band: number; max: number; label: string } | null;
+    relations?: { broader: string[]; narrower: string[]; akin: string[] };
+    anchor?: string | null;
+    lookupToken?: string | null;
+    compoundUsed?: string | null;
+  };
+  rhymeAstrology: {
+    phonemes: string[];
+    stress: string;
+    cadenceFamily: string;
+    exactRhymes: string[];
+    slantRhymes: string[];
+    dominantVowelFamily?: string | null;
+    ipa?: string | null;
+  } | null;
+  phraseGenome: { syllables: number; devicesHint: string[]; schoolHint: string | null };
+  semanticInquiry: {
+    status: string;
+    bound: boolean;
+    probeId: string | null;
+    hypotheses: unknown[];
+    selection: unknown | null;
+    evidence: unknown[];
+    isHeteronym: boolean;
+    /** null when CMU could not answer. Absent is not "one pronunciation". */
+    distinctPronunciations: number | null;
+    headToken: string | null;
+    framePos: string | null;
+    frameCue: string | null;
+    viableWordCount: number | null;
+    lexicalEntries: unknown[];
+  } | null;
+  scaleField: {
+    status: string;
+    anchor: string | null;
+    scale: {
+      id: string; dimension: string | null; kind: string; memberCount: number;
+      span: number | null;
+      ladder: Array<{ word: string; rank: number; relative: number; isAnchor: boolean }>;
+    } | null;
+    neighbours: Array<{ word: string; similarity: number; source: string; method: string | null; localSimilarity: number | null; soundSimilarity: number | null }>;
+    opposites: string[];
+    warnings: string[];
+  } | null;
+  readings: {
+    contested: boolean;
+    primary: { anchor: string; role: string; proposedBy: string; rationale: string; candidate: boolean } | null;
+    readings: Array<{ anchor: string; role: string; proposedBy: string; rationale: string; candidate: boolean }>;
+    silent: string[];
+  };
+  governed: Array<{ adjective: string; governor: string | null; relation: "attributive" | "predicative" | null; distance: number; cue?: string }>;
+  /** Discovery channel payload — meta-query only; null otherwise. */
+  discovery?: unknown | null;
+  diagnostics: {
+    degradedChannels: string[];
+    warnings: string[];
+    discovery?: { stage: string; message: string | null };
+  };
+  provenance: { engineVersions: Record<string, string> };
+}
+```
+
+---
+
 ## Version Log
 
 | Version | Date | Change | Breaking |
@@ -3623,6 +3741,7 @@ conceptId asc. `CareerGraphManifest` seals a built artifact with `artifactId`, `
 | 1.42 | 2026-08-11 | Retired resonance/confidence decay; registered exact/family/neighborhood occupancy entropy over Cyclotron search influence and matched benchmark evidence | yes (unpromoted 1.41 experiment only) |
 | 1.43 | 2026-08-13 | Registered deterministic Constellation grammar-valence vacancy reports with semantic frontier atoms, optional antigen matches, lawful construction candidates, and Cleri evidence references | no |
 | 1.44 | 2026-08-13 | Registered deterministic Gutenberg sanitation packets with contextual segmentation and exhaustive reason-coded quarantine accounting | no |
+| 1.45 | 2026-08-19 | Published the live ConstellationOS Phase-2 page packet (`scholomance/constellation-os-page-phase2`) as SCHOL-COS-PAGE-v2; sealed the emitted shape and declared the stale Phase-1 typedef the drift | no |
 
 ---
 

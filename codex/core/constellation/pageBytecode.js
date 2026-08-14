@@ -1,4 +1,4 @@
-export const CONSTELLATION_CONTRACT_VERSION = 'cos-page-phase1-v1';
+export const CONSTELLATION_CONTRACT_VERSION = 'cos-page-v2';
 
 /** FNV-1a 32-bit — the repo's deterministic seed convention. */
 export function fnv1a32(input) {
@@ -11,20 +11,54 @@ export function fnv1a32(input) {
   return hash >>> 0;
 }
 
+/** Sorted, canonical serialization of a version map — key order never matters. */
+function serializeVersionMap(map) {
+  const keys = Object.keys(map || {}).sort();
+  return keys.map((k) => `${k}=${map[k]}`).join('|');
+}
+
 /**
  * Stable page bytecode. Basis excludes request time, cache status, and user
  * identity (PDR §16) — only inputs that legitimately change the analysis.
- * @param {{ normalized: string, kind: string, engineVersions: Record<string,string> }} basis
+ *
+ * BASIS (PDR §16 reconstruction, feedback report 2026-08-19 P0-2):
+ *   - contract version        (CONSTELLATION_CONTRACT_VERSION)
+ *   - normalized query
+ *   - query kind
+ *   - parsed intent           (NEW — literary/meta-query/craft/comparison
+ *                              route to different channels, so two pages with
+ *                              the same words but different intent are
+ *                              different analyses)
+ *   - engine + adapter versions   (engineVersions)
+ *   - scoring profile versions    (scoringProfiles — empty until scoring
+ *                                  profiles become first-class; the slot is
+ *                                  wired so adding them re-keys identity)
+ *   - corpus checksum             (corpusChecksum — 'corpus:off' when the
+ *                                  corpus is absent; two pages built against
+ *                                  different corpora are different analyses)
+ *   - deterministic option flags  (flags — which optional channels were
+ *                                  measurable: phonology readiness, wordnet,
+ *                                  corpus, scale orders)
+ *
+ * Deliberately EXCLUDED (PDR §16): request time, cache status, measured
+ * duration, user identity, animation state, random values, temporary
+ * diagnostics. Personal mastery uses a separate overlay bytecode.
+ *
+ * @param {{ normalized: string, kind: string, intent?: string|null,
+ *   engineVersions: Record<string,string>, scoringProfiles?: Record<string,string>,
+ *   corpusChecksum?: string|null, flags?: Record<string,string> }} basis
  * @returns {string}
  */
 export function computePageBytecode(basis) {
-  const versionKeys = Object.keys(basis.engineVersions || {}).sort();
-  const versionPart = versionKeys.map((k) => `${k}=${basis.engineVersions[k]}`).join('|');
   const material = [
     CONSTELLATION_CONTRACT_VERSION,
     basis.normalized || '',
     basis.kind || '',
-    versionPart,
+    basis.intent || '',
+    serializeVersionMap(basis.engineVersions),
+    serializeVersionMap(basis.scoringProfiles),
+    basis.corpusChecksum || 'corpus:off',
+    serializeVersionMap(basis.flags),
   ].join('::');
   const hex = fnv1a32(material).toString(16).toUpperCase().padStart(8, '0');
   return `COS-PAGE-v1-${hex}`;

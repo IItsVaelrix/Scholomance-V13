@@ -75,7 +75,13 @@ export interface ProvenanceRecord {
 
 export interface ScholComponentDefinitionV1 {
   contract: 'SCHOL-COMPONENT-DEFINITION-v1';
-  version: '1.0.0';
+  /**
+   * Definition revision. '1.0.0' = original anatomy; '1.1.0' admits sealed
+   * anatomy revisions (ConstellationResult re-sealed its contract twice:
+   * hero-figure part + discovery-field, commits 76a73349/6e37af26). The
+   * CONTRACT name stays v1; only the definition revision moves.
+   */
+  version: '1.0.0' | '1.1.0';
   kind: string;
   description?: string;
   anatomy: {
