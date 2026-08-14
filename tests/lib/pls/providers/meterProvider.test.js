@@ -7,6 +7,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { meterProvider } from '../../../../src/lib/pls/providers/meterProvider.js';
+import { createPhonologyTransport } from '../../../../src/lib/phonology.transport.js';
 
 // ── mock phoneme engine ───────────────────────────────────────────────────────
 
@@ -18,13 +19,18 @@ const SYLLABLE_MAP = {
   UNIVERSITY: 5,
 };
 
-const mockEngine = {
+// The double is wrapped in the REAL transport rather than hand-written, so it
+// exposes whatever verbs production exposes. A hand-written double implementing
+// only `analyzeWord` is what let the providers migrate to the consume verb
+// `getAnalysis` while these tests went on passing an object that had never heard
+// of it — green doubles, a provider that threw the moment it met the real thing.
+const mockEngine = createPhonologyTransport({
   analyzeWord(word) {
     const key = String(word || '').toUpperCase().replace(/[^A-Z]/g, '');
     const count = SYLLABLE_MAP[key] ?? 1;
     return { syllableCount: count, vowelFamily: 'A', phonemes: [] };
   },
-};
+}, { isBrowser: false });
 
 function makeCandidate(token, extra = {}) {
   return { token, scores: {}, ...extra };

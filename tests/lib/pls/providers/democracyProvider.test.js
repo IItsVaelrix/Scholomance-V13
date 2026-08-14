@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { democracyProvider } from '../../../../src/lib/pls/providers/democracyProvider.js';
+import { createPhonologyTransport } from '../../../../src/lib/phonology.transport.js';
 
 describe('democracyProvider', () => {
   const mockEngines = {
@@ -10,7 +11,8 @@ describe('democracyProvider', () => {
     spellchecker: {
       suggest: (prefix) => (prefix === 'li' ? ['light', 'life'] : []),
     },
-    phonemeEngine: {
+    // Wrapped in the real transport so the double carries production's verbs.
+    phonemeEngine: createPhonologyTransport({
       analyzeWord: (word) => {
         const dict = {
           NIGHT: { rhymeKey: 'AY-T' },
@@ -19,7 +21,7 @@ describe('democracyProvider', () => {
         };
         return dict[String(word).toUpperCase()] || null;
       },
-    },
+    }, { isBrowser: false }),
   };
 
   const mockContext = {

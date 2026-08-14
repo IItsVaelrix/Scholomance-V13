@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { PoeticLanguageServer } from '../../src/lib/poeticLanguageServer.js';
+import { createPhonologyTransport } from '../../src/lib/phonology.transport.js';
 
 // Mock PhonemeEngine with known word analyses
-const mockPhonemeEngine = {
+const mockCoreEngine = {
   WORD_CACHE: new Map(),
   analyzeWord(word) {
     const upper = String(word).toUpperCase();
@@ -29,6 +30,11 @@ const mockPhonemeEngine = {
     return false;
   },
 };
+
+// Wrapped in the REAL transport, so the double answers the consume verb
+// `getAnalysis` for exactly as long as production does. Hand-written doubles are
+// how the providers migrated off `analyzeWord` without a single test noticing.
+const mockPhonemeEngine = createPhonologyTransport(mockCoreEngine, { isBrowser: false });
 
 // Mock Trie
 class MockTrie {
