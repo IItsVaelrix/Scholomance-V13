@@ -29,7 +29,6 @@ import {
   AuthPage,
   CollabPage,
   ProfilePage,
-  CombatPage,
   ConstellationPage,
   PixelBrainPage,
   CareerPage,
@@ -139,7 +138,10 @@ const router = createBrowserRouter([
           { path: "read", element: <ReadPage /> },
           { path: "auth", element: <AuthPage /> },
           { path: "profile", element: <ProfilePage /> },
-          { path: "combat", element: <CombatPage /> },
+          // Combat retired 2026-08-14 — superseded by the next version of the
+          // game. The route is removed rather than the page deleted, so the
+          // implementation stays available to port from. Nothing lazy-loads
+          // CombatPage now, so neither its chunk nor its sprites are fetched.
           { path: "constellation", element: <ConstellationPage /> },
           { path: "nexus", element: <Navigate to="/constellation" replace /> },
           { path: "collab", element: <AdminRoute><CollabPage /></AdminRoute> },

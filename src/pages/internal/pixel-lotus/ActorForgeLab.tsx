@@ -10,7 +10,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 import type { IsoFacing } from '../../../pixel-lotus/actor-forge/pixelLotusActor.schema';
 import { forgeCharacter } from '../../../lib/pixelbrain.adapter';
 import { enhanceCharacter, EnhancementError } from '../../../lib/character-enhancement';
@@ -134,7 +133,6 @@ export default function ActorForgeLab() {
   const [showCinematic, setShowCinematic] = useState(true);
   const [phase, setPhase] = useState<'falling' | 'impact' | 'whiteout'>('falling');
 
-  const navigate = useNavigate();
   const [characterName, setCharacterName] = useState('Apprentice Scholar');
   const [stylePreset, setStylePreset] = useState<StylePresetId>('starboundEsper');
 
@@ -530,10 +528,14 @@ export default function ActorForgeLab() {
                 displayName: characterName,
                 spec: forge.character.spec,
               }));
-              navigate('/combat');
+              // Combat was retired 2026-08-14; /combat is no longer routed, so
+              // navigating there would dead-end. The actor is still armed in
+              // localStorage under the same key — repoint this at the new
+              // game's entry route when it exists.
             }}
+            title="Actor armed. Combat is retired; rewire this to the new game entry."
           >
-            Enter the Void
+            Arm Actor
           </button>
         </div>
 

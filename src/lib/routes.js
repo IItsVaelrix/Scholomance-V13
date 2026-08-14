@@ -8,7 +8,8 @@ export const GrimoireSpread = lazyWithRetry(() => import("../pages/Grimoire/Grim
 export const AuthPage = lazyWithRetry(() => import("../pages/Auth/AuthPage.jsx"), "auth-page");
 export const CollabPage = lazyWithRetry(() => import("../pages/Collab/CollabPage.jsx"), "collab-page");
 export const ProfilePage = lazyWithRetry(() => import("../pages/Profile/ProfilePage.jsx"), "profile-page");
-export const CombatPage = lazyWithRetry(() => import("../pages/Combat/CombatPage.jsx"), "combat-page");
+// Combat retired 2026-08-14 (superseded). The lazy import is removed so the
+// bundler stops emitting the CombatPage chunk and its Phaser scene graph.
 export const ConstellationPage = lazyWithRetry(
   () => import("../pages/Constellation/ConstellationPage.jsx"),
   "constellation-page",
@@ -43,7 +44,6 @@ export const ALL_COMPONENTS = {
   "/auth": AuthPage,
   "/collab": CollabPage,
   "/profile": ProfilePage,
-  "/combat": CombatPage,
   "/constellation": ConstellationPage,
   "/pixelbrain": PixelBrainPage,
   "/career": CareerPage,
