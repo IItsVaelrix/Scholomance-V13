@@ -2081,3 +2081,47 @@ finalization included pointing the harness at it. Measured results:
 
 The orthogonality matrix must be re-run only when a quantizer changes; ordinary
 chamber CSS tweaks use the before/after single-block loop above.
+
+## 26.3 Live-system reconciliation (2026-08-19) — SUPERSEDES the §26.1 "still not built" record
+
+The 2026-08-19 feedback audit
+(`docs/Scholomance-Feedback-Report/scholomance-feedback-constellationos.md`)
+found this section materially stale: work landed after finalization without a
+finalization update, and §26.1 was actively misdescribing the repository. This
+subsection is the corrected normative record. §26.1 remains as history.
+
+**Every "still not built" and "fixture only" claim in §26.1 is now false.**
+Verified against the repository on 2026-08-19:
+
+| §26.1 claim (2026-07-22) | Live reality (2026-08-19) |
+|---|---|
+| Data: `useConstellationPage` → **fixture only, no network** | The hook fetches `GET /api/constellation/page` live; the fixture survives only as a *degraded fallback* stamped by `markEngineUnreached` (see §26.4) |
+| The ConstellationOS core is not built | `codex/core/constellation/` — **59 modules, 9,356 lines**: queryIdentity, phraseAnalysis, readings, governor, pageBytecode, compose, scale machinery |
+| Engine adapters absent | `codex/server/services/constellation/` — **8 adapters, 2,149 lines**: leximancy, rhymeAstrology, genome, semanticInquiry, scaleField, discovery, precedent, senseProbe harness |
+| HTTP contracts (§17) not built | `GET /api/constellation/page` live in `codex/server/routes/constellation.routes.js`, registered at `codex/server/index.js:1384`, with query bounds, control-character rejection, and rate limiting |
+| Slim Phase-1 packet | Producer emits `version: 2` / `schema_id: scholomance/constellation-os-page-phase2` with phraseStructure, semanticInquiry, scaleField, readings, governed, discovery channels. Published as **SCHOL-COS-PAGE-v2** in SCHEMA_CONTRACT v1.45; canonical typedef: `src/hooks/constellation.types.js` (`ConstellationPagePacket`) |
+| Phases 2–7 unstarted | Phrase analysis, semantic inquiry, scale field, competing readings, governed pairs, and discovery have all shipped |
+| No runtime orchestration | `codex/runtime/constellationRuntime.js` (2026-08-19): channel isolation, timeout policy, request coalescing, deterministic telemetry — the PDR's Server → Runtime → Services → Core flow is now real |
+
+**Bytecode reconciliation.** The page bytecode basis was rebuilt on 2026-08-19 to
+the full §16 set: parsed intent, scoring-profile slot, corpus checksum
+(computed once from `corpus_meta` at route registration), and deterministic
+option flags join contract/normalized/kind/engineVersions. Contract constant:
+`cos-page-v2`. Sealed golden pin: `COS-PAGE-v1-4922C817`
+(`tests/qa/features/constellation-pageBytecode.test.js`).
+
+**Still deferred** (honestly, as of 2026-08-19): the Unified Atlas graph (§9.6),
+Literary Device Observatory (§9.4), corpus/resonance as a *channel* (§9.7–9.8 —
+though corpus-distance already feeds scaleField and governed-sense selection),
+craft routes (§9.9), and the mastery overlay (§9.10). The §24 acceptance
+statement remains the gate for each.
+
+## 26.4 Epistemic honesty of the fallback (2026-08-19)
+
+The audit's experiential finding stood: when the live engine is unreachable the
+hook serves the rich sample packet, stamped degraded. A rich sample can still be
+mistaken for partial live analysis. The accepted standard: the fallback must
+carry `diagnostics.degradedChannels` containing the live-engine marker and a
+warning naming the failure, and the shell must render the degraded banner — an
+explicit "engine unreachable" state, never a silent sample. `markEngineUnreached`
+is the enforcement point; tests pin it.
