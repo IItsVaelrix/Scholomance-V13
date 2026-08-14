@@ -8,6 +8,18 @@ primary_region = "iad"
   NODE_ENV = "production"
   HOST = "0.0.0.0"
   PORT = "8080"
+
+  # HEAP CEILING, STATED. Nothing set --max-old-space-size, so V8 derived its
+  # own limit from machine memory: production died at "249.0 (257.0) MB" on a
+  # 512mb VM. Nobody chose 257. With vm.memory now 1024, the ceiling is declared
+  # rather than inherited, so changing the VM size can never silently move it.
+  #
+  # --heapsnapshot-near-heap-limit=1 writes ONE snapshot just before V8 aborts.
+  # This is the only way to get a JS-level view of an OOM: the abort itself runs
+  # no JavaScript, which is why the subtlety ledger recorded nothing for any of
+  # the 2026-08-14 crashes. --diagnostic-dir puts it on the volume; the default
+  # is cwd, which is ephemeral and would be lost in the reboot that follows.
+  NODE_OPTIONS = "--max-old-space-size=768 --heapsnapshot-near-heap-limit=1 --diagnostic-dir=/var/data/diagnostics"
   TRUST_PROXY = "true"
   ENABLE_COLLAB_API = "true"
 
@@ -62,7 +74,12 @@ primary_region = "iad"
 
 [[vm]]
   size = "shared-cpu-1x"
-  memory = "512mb"
+  # Raised from 512mb on 2026-08-14: headroom while the actual allocator is
+  # identified, NOT a fix. A leak fills whatever it is given. See NODE_OPTIONS
+  # above — max-old-space is deliberately 768, below the 1024 total, so a heap
+  # snapshot has room to be written instead of the kernel OOM-killing the
+  # process mid-write.
+  memory = "1024mb"
 
 [mounts]
   source = "scholomance_scratch"

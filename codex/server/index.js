@@ -96,6 +96,8 @@ import { createCorpusVectors, loadScaleOrders } from './adapters/corpusVectors.s
 import { createRhymeAstrologyLexiconRepo } from './services/rhyme-astrology/lexiconRepo.js';
 import { createRhymeAstrologyIndexRepo } from './services/rhyme-astrology/indexRepo.js';
 import { createRhymeAstrologyQueryEngine } from '../runtime/rhyme-astrology/queryEngine.js';
+import { createMemoryTelemetry } from '../runtime/memory-telemetry.js';
+import { getHeapStatistics } from 'node:v8';
 import { imageAnalysisRoutes } from './routes/imageAnalysis.routes.js';
 import { registerSchoolStylesRoutes } from './routes/schoolStyles.routes.js';
 import { catalogRoutes } from './routes/catalog.routes.js';
@@ -1239,6 +1241,15 @@ getSubtletyRuntime({
     alertFn: fastify.subtletyCreateAlert,
     store: createResonanceStore({ path: subtletyResonancePath }),
 });
+// The subtlety ledger cannot witness a heap death — an OOM is a V8 abort, so no
+// JS runs to record it. This emits the approach instead of the aftermath.
+// IS_TEST_RUNTIME guard matches the APM plugin: no timers in tests.
+if (!IS_TEST_RUNTIME) {
+    createMemoryTelemetry({
+        logger: fastify.log,
+        heapStatistics: () => getHeapStatistics(),
+    }).start();
+}
 fastify.register(subtletyRoutes);
 fastify.register(subtletyApmHourlyPlugin, {
     enabled: !IS_TEST_RUNTIME,
