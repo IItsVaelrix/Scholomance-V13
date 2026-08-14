@@ -44,6 +44,13 @@ export function createMemoryTelemetry({
   intervalMs = DEFAULT_INTERVAL_MS,
   memoryUsage = () => process.memoryUsage(),
   heapStatistics = null,
+  /**
+   * v8.getHeapSpaceStatistics. Names WHICH space is growing, which is the
+   * difference between "the heap is climbing" and a lead: old_space means
+   * retained objects (a leak), large_object_space means big buffers, and
+   * new_space churn is normal allocation the collector will reclaim.
+   */
+  heapSpaceStatistics = null,
   warnRatio = 0.85,
   setTimer = setInterval,
   clearTimer = clearInterval,
@@ -69,6 +76,15 @@ export function createMemoryTelemetry({
       // unknown — an invented denominator is worse than an absent one.
       heapUsedRatio: limitBytes ? Math.round((usage.heapUsed / limitBytes) * 1000) / 1000 : null,
     };
+    // Per-space breakdown, emitted flat so a log grep can trend one space.
+    const spaces = heapSpaceStatistics?.();
+    if (Array.isArray(spaces)) {
+      for (const s of spaces) {
+        if (!s?.space_name) continue;
+        if (s.space_used_size < 1024 * 1024) continue; // sub-MB spaces are noise
+        record[`sp_${s.space_name}`] = mb(s.space_used_size);
+      }
+    }
     const nearLimit = record.heapUsedRatio !== null && record.heapUsedRatio >= warnRatio;
     const message = nearLimit
       ? '[memory] heap approaching limit — an abort here would leave no JS-level trace'

@@ -19,7 +19,11 @@ primary_region = "iad"
   # no JavaScript, which is why the subtlety ledger recorded nothing for any of
   # the 2026-08-14 crashes. --diagnostic-dir puts it on the volume; the default
   # is cwd, which is ephemeral and would be lost in the reboot that follows.
-  NODE_OPTIONS = "--max-old-space-size=768 --heapsnapshot-near-heap-limit=1 --diagnostic-dir=/var/data/diagnostics"
+  # --heapsnapshot-signal lets a snapshot be taken ON DEMAND (kill -USR2 <pid>)
+  # rather than only at the ceiling. Two snapshots taken minutes apart, diffed
+  # by constructor, name the leaking structure instead of inferring it — which
+  # is how the readings map got wrongly blamed on 2026-08-14.
+  NODE_OPTIONS = "--max-old-space-size=768 --heapsnapshot-near-heap-limit=1 --heapsnapshot-signal=SIGUSR2 --diagnostic-dir=/var/data/diagnostics"
   TRUST_PROXY = "true"
   ENABLE_COLLAB_API = "true"
 

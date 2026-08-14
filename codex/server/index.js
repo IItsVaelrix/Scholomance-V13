@@ -97,7 +97,7 @@ import { createRhymeAstrologyLexiconRepo } from './services/rhyme-astrology/lexi
 import { createRhymeAstrologyIndexRepo } from './services/rhyme-astrology/indexRepo.js';
 import { createRhymeAstrologyQueryEngine } from '../runtime/rhyme-astrology/queryEngine.js';
 import { createMemoryTelemetry } from '../runtime/memory-telemetry.js';
-import { getHeapStatistics } from 'node:v8';
+import { getHeapStatistics, getHeapSpaceStatistics } from 'node:v8';
 import { imageAnalysisRoutes } from './routes/imageAnalysis.routes.js';
 import { registerSchoolStylesRoutes } from './routes/schoolStyles.routes.js';
 import { catalogRoutes } from './routes/catalog.routes.js';
@@ -1248,6 +1248,7 @@ if (!IS_TEST_RUNTIME) {
     createMemoryTelemetry({
         logger: fastify.log,
         heapStatistics: () => getHeapStatistics(),
+        heapSpaceStatistics: () => getHeapSpaceStatistics(),
     }).start();
 }
 fastify.register(subtletyRoutes);
