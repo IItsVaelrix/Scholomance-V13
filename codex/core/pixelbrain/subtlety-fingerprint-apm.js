@@ -26,8 +26,28 @@ import { detectDrift } from './subtlety-drift.js';
 import { buildDataflowGraph, detectSeamViolations, detectDeadTissue } from './subtlety-seam-flow.js';
 import { toRaidSymptom, proposeRemediation, recordHealing } from './subtlety-closed-loop.js';
 
+/**
+ * Retained readings per unit.
+ *
+ * `readings` was unbounded on a process-lifetime singleton (getSubtletyRuntime
+ * memoises one instance), so it grew for as long as the server ran and nothing
+ * ever evicted from it. Every observed request added a packet that was never
+ * released: a straightforward leak, and the reason a long-lived production
+ * process climbs in memory with no corresponding traffic growth.
+ *
+ * This is a MEMORY bound, not a de-duplication mechanism. Duplicate structural
+ * findings are already prevented upstream by buildDataflowGraph collapsing
+ * units per unit rather than per observation (de06db1b, 2026-08-09).
+ *
+ * 50 is safe for detection because detectDrift is a MAJORITY VOTE over the
+ * window (group by config signature, most common semanticChecksum wins) rather
+ * than a scan of all history. A rolling window is arguably more correct: stale
+ * readings from a superseded build would otherwise skew the majority.
+ */
+const MAX_READINGS_PER_UNIT = 50;
+
 export function createSubtletyApm() {
-  // readings: Map<unitId, fingerprintPacket[]>
+  // readings: Map<unitId, fingerprintPacket[]> — bounded, newest-last.
   const readings = new Map();
   // baselines: Map<unitId, { fingerprint, expectedBaselineId, baselineApproval, baselineBuildId }>
   const baselines = new Map();
@@ -35,7 +55,13 @@ export function createSubtletyApm() {
 
   function pushReading(unitId, packet) {
     if (!readings.has(unitId)) readings.set(unitId, []);
-    readings.get(unitId).push(packet);
+    const list = readings.get(unitId);
+    list.push(packet);
+    // Ring buffer: drop oldest. splice once rather than shift-per-insert so a
+    // burst that overshoots the cap still costs one operation.
+    if (list.length > MAX_READINGS_PER_UNIT) {
+      list.splice(0, list.length - MAX_READINGS_PER_UNIT);
+    }
     return packet;
   }
 
@@ -88,6 +114,12 @@ export function createSubtletyApm() {
       const graph = buildDataflowGraph([...unitReadings, ...peers]);
       const seamViolations = detectSeamViolations(graph);
       const deadTissue = detectDeadTissue(graph, opts.seamOpts || {});
+      // NOT de-duplicated here. buildDataflowGraph already collapses units by
+      // id and unions seam vocabulary (de06db1b, 2026-08-09) precisely so a
+      // structural finding is reported once rather than once per observation.
+      // The 97.9%-duplicate records on the production volume were written by
+      // builds predating that commit; a second dedupe layer here would only
+      // obscure which mechanism is authoritative.
       const seam = { violations: seamViolations.violations, ok: seamViolations.ok, deadTissue: deadTissue.candidates };
 
       // Lens III — act (only if a deviation was detected AND localized).
