@@ -164,3 +164,61 @@ describe('POST /api/phonology/analyze', () => {
     await app.close();
   });
 });
+
+/**
+ * EVERY DOOR INTO THE UI, NOT JUST THE ONE I FIXED.
+ *
+ * The transport was installed in `engine.adapter.js` and the job was called
+ * done. `src/lib/codex/textAnalysis.js` went on re-exporting the RAW core engine
+ * to five hooks, and the core engine has no `getAnalysis` — so `usePredictor`
+ * threw the instant it asked, and every PLS provider it feeds threw with it.
+ *
+ * Nothing caught it for two reasons worth naming:
+ *
+ *   1. ARCH-0F0E watches for a derivation VERB being CALLED in `src/`. A
+ *      re-export is neither, so the sweep read clean at 1 hit while a ninth
+ *      door stood open.
+ *   2. Every provider test passed a HAND-WRITTEN double implementing
+ *      `analyzeWord`. The providers migrated to `getAnalysis`; the doubles did
+ *      not; the suites stayed green against an object production never uses.
+ *
+ * So these assertions deliberately import the REAL modules. A double cannot
+ * answer the question they ask.
+ */
+describe('the UI cannot reach the raw engine through any door', () => {
+  it('hands back the transport, not the core engine, from every import path', async () => {
+    const [adapter, textAnalysis, core] = await Promise.all([
+      import('../../../src/lib/engine.adapter.js'),
+      import('../../../src/lib/codex/textAnalysis.js'),
+      import('../../../codex/core/phonology/phoneme.engine.js'),
+    ]);
+
+    // The consume verb is the whole contract. Its absence is what threw.
+    expect(typeof adapter.PhonemeEngine.getAnalysis).toBe('function');
+    expect(typeof textAnalysis.PhonemeEngine.getAnalysis).toBe('function');
+
+    // And the thing that must NOT be what the UI receives.
+    expect(core.PhonemeEngine.getAnalysis).toBeUndefined();
+    expect(textAnalysis.PhonemeEngine).not.toBe(core.PhonemeEngine);
+  });
+
+  it('shares ONE transport, so a primed cache serves every caller', async () => {
+    const adapter = await import('../../../src/lib/engine.adapter.js');
+    const textAnalysis = await import('../../../src/lib/codex/textAnalysis.js');
+    // Two transports would each hold their own cache: `primePhonology` would
+    // fill one and the other would answer every browser lookup with a miss —
+    // silently, because a miss is a legitimate answer.
+    expect(textAnalysis.PhonemeEngine).toBe(adapter.PhonemeEngine);
+  });
+
+  it('has no file under src/ re-exporting the core engine', async () => {
+    const { execSync } = await import('node:child_process');
+    const hits = execSync(
+      "git grep -l \"export .*PhonemeEngine.* from .*codex/core/phonology/phoneme.engine\" -- src/ || true",
+      { encoding: 'utf8', cwd: process.cwd() },
+    ).split('\n').filter(Boolean);
+    // `engine.adapter.js` imports the core engine to WRAP it, which is the
+    // boundary itself; re-exporting it onward is what reopens the fork.
+    expect(hits).toEqual([]);
+  });
+});

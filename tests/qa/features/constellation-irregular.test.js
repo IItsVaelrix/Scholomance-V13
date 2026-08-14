@@ -45,11 +45,81 @@ describe('irregular forms', () => {
    * solve.
    */
   it('never overrides the injected lexicon', () => {
+    const tokens = T('the wound healed');
     const pos = new Map([['wound', ['n']], ['the', []], ['healed', ['v']]]);
-    const r = compose(T('the wound healed'), pos);
-    const woundAtoms = r.atoms.filter((a) => a.token === 'wound').map((a) => a.type);
-    expect(woundAtoms).toContain('N');
-    expect(woundAtoms).not.toContain('V');
+    const r = compose(tokens, pos);
+    const at = tokens.indexOf('wound');
+
+    /**
+     * THE VERB READING IS ASSERTED AT THE ATOM LAYER, because that is the only
+     * place the irregular table can speak: `atomsFor` pushes V iff the resolved
+     * tags contain 'v'. If the table ever outranked the lexicon, a V atom is
+     * precisely what would appear here.
+     */
+    const atoms = r.atoms.filter((a) => a.token === 'wound').map((a) => a.type);
+    expect(atoms).not.toContain('V');
+
+    /**
+     * THE NOUN READING IS ASSERTED AT THE SPAN, one layer up. A pure noun
+     * atomises to NC and reaches N through the NC->N lift — only a dual n+v
+     * word emits N directly (see the N/NC split in atomsFor, which exists to
+     * keep pure nouns out of compound chemistry). Probing r.atoms for 'N'
+     * therefore tested the split rather than the precedence it meant to test.
+     */
+    const atSpan = r.molecules.filter((m) => m.from === at && m.to === at).map((m) => m.type);
+    expect(atSpan).toContain('N');
+    expect(atSpan).not.toContain('VP');
+  });
+
+  /**
+   * THE WHOLE LADDER, ON ONE TOKEN.
+   *
+   * `tagsForForm` ranks three sources: injected lexicon > irregular table >
+   * suffix guess. `wound` above only exercises the top rung, because the
+   * suffix guesser is silent on it — so a defect that let MORPHOLOGY outrank
+   * the lexicon produced output identical to correct code and no assertion
+   * in this file could see it.
+   *
+   * `drive` is the token that separates all three: the table types it ['v']
+   * (irregular of drove/driven) and the suffix guesser types it ['a'] off
+   * -ive. The two disagree completely, so each rung yields a different atom —
+   * NC if the lexicon wins, V if the table wins, ADJ if morphology wins.
+   * 27 of the 382 irregular forms have this property; `drive` was chosen
+   * because its two lower rungs share no tag at all.
+   */
+  describe('precedence ladder — lexicon > irregular table > suffix guess', () => {
+    const tokens = T('the drive worked');
+    const at = tokens.indexOf('drive');
+    const atomsOf = (r) => r.atoms.filter((a) => a.token === 'drive').map((a) => a.type);
+    const spanOf = (r) => r.molecules
+      .filter((m) => m.from === at && m.to === at).map((m) => m.type);
+
+    it('the lexicon outranks BOTH lower sources', () => {
+      const pos = new Map([['drive', ['n']], ['the', []], ['worked', ['v']]]);
+      const r = compose(tokens, pos);
+      expect(atomsOf(r)).not.toContain('V');    // the table did not win
+      expect(atomsOf(r)).not.toContain('ADJ');  // morphology did not win
+      expect(spanOf(r)).toContain('N');         // the lexicon did
+    });
+
+    it('the table outranks the suffix guesser when the lexicon abstains', () => {
+      const pos = new Map([['the', []], ['worked', ['v']]]);
+      const r = compose(tokens, pos);
+      expect(atomsOf(r)).toContain('V');        // the table spoke
+      expect(atomsOf(r)).not.toContain('ADJ');  // morphology stayed below it
+    });
+
+    /**
+     * An entry that is PRESENT BUT EMPTY means "the lexicon abstains", not
+     * "typed as nothing" — the distinction a truthiness check cannot make,
+     * since [] is truthy. Asserting it here keeps a future `known ? ... : ...`
+     * from silently turning function-word entries into a veto.
+     */
+    it('reads an empty lexicon entry as abstention, not as a verdict', () => {
+      const absent = compose(tokens, new Map([['the', []], ['worked', ['v']]]));
+      const empty = compose(tokens, new Map([['drive', []], ['the', []], ['worked', ['v']]]));
+      expect(atomsOf(empty)).toEqual(atomsOf(absent));
+    });
   });
 
   it('lets a sentence parse on an irregular the lexicon lacks', () => {
