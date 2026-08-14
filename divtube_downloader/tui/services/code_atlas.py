@@ -18,12 +18,23 @@ worst 111ms), vs 1.47s median for the walker. Break-even: 53 queries.
 
 Design laws
 -----------
-  * DECLARED blind spots, never silent: ATLAS_BLIND_SPOTS is excluded
-    from indexing and recorded in meta.declaredBlindSpots. Excluding a
-    directory is a governance decision; hiding the decision is not.
+  * DECLARED blind spots, never silent: content is excluded three ways —
+    by DIRECTORY (ATLAS_BLIND_SPOTS), by EXTENSION (_INDEX_EXTENSIONS)
+    and by SIZE (MAX_INDEX_FILE_BYTES) — and all three are recorded in
+    meta (declaredBlindSpots / skippedByExtension / skippedForSize).
+    Excluding content is a governance decision; hiding the decision is
+    not, and the class of exclusion does not change that.
   * Stamped freshness: meta.builtAtHead records the git HEAD the atlas
     was built from. is_stale() compares it to the live HEAD and reports
     commitsBehind; a lens must surface this, never answer silently.
+    HEAD-equality alone is NOT freshness — the atlas indexes files but
+    is stamped with a commit, so is_stale() also probes the working tree
+    and reports `dirty`/`dirtyFiles`. That probe is never cached, and it
+    ignores the atlas's own artifact (see _is_atlas_artifact).
+  * Rebuilt, not merely lamented: scripts/atlas_rebuild.py + the
+    scripts/git-hooks/post-commit-atlas hook refresh the index after a
+    commit, so honest staleness reporting is a backstop and not the
+    steady state.
   * Self-integrity: sha256 over the canonical payload (builtAt excluded
     so identical repo state => identical checksum). verify() recomputes.
   * Atomic swap: written via tmp file + os.replace.
@@ -101,6 +112,38 @@ def live_head(project_root: str) -> str | None:
     return out.strip() if out and out.strip() else None
 
 
+def worktree_dirt(project_root: str) -> tuple[bool, int]:
+    """(dirty, changed file count) for the working tree.
+
+    HEAD-equality is not freshness. The atlas is built from FILES, but
+    stamped with a COMMIT, so an edited-but-uncommitted tree reports
+    commitsBehind=0 while the index no longer matches what is on disk.
+    Never cached: dirt changes continuously under a long-lived process.
+    """
+    out = _git(project_root, "status", "--porcelain")
+    if out is None:
+        return False, 0
+    lines = [ln for ln in out.splitlines()
+             if ln.strip() and not _is_atlas_artifact(ln)]
+    return bool(lines), len(lines)
+
+
+def _is_atlas_artifact(status_line: str) -> bool:
+    """The atlas must never report ITSELF as working-tree drift.
+
+    .atlas/ is gitignored in this repo, but relying on that would make a
+    correct dirt verdict depend on a file the atlas does not own: any repo
+    without that ignore rule would read as permanently dirty after a build.
+    """
+    path = status_line[3:].strip() if len(status_line) > 3 else ""
+    if " -> " in path:                       # rename: judge the destination
+        path = path.split(" -> ", 1)[1]
+    path = path.strip('"')
+    if path.startswith("./"):        # NOT lstrip("./") — that eats .atlas's dot
+        path = path[2:]
+    return path.startswith(".atlas")
+
+
 def _git_vitality(project_root: str) -> dict[str, dict]:
     """Single-pass whole-history scan: commits, lastCommit, churn per file.
 
@@ -161,12 +204,21 @@ def _tokens_of(text: str) -> set[str]:
     return set(_TOKEN_RE.findall(text))
 
 
-def _walk_indexable(project_root: str) -> list[str]:
-    """Sorted relative paths of indexable files, blind spots excluded."""
+def _walk_indexable(project_root: str) -> tuple[list[str], dict[str, Any]]:
+    """(sorted relative paths, exclusion census). Blind spots excluded.
+
+    The census exists because a file dropped for its EXTENSION or its SIZE
+    is exactly as invisible to a query as one inside a blind-spot directory.
+    Declaring only the directory exclusions applied the module's own law to
+    one of its three exclusion classes; the other two answered silently.
+    """
     root_abs = os.path.abspath(project_root)
     found: list[str] = []
+    skipped_ext: dict[str, int] = {}
+    skipped_size = 0
 
     def walk(dir_abs: str) -> None:
+        nonlocal skipped_size
         try:
             entries = sorted(os.listdir(dir_abs))
         except OSError:
@@ -181,9 +233,12 @@ def _walk_indexable(project_root: str) -> list[str]:
             elif os.path.isfile(full):
                 ext = os.path.splitext(name)[1].lower()
                 if ext not in _INDEX_EXTENSIONS:
+                    key = ext or "(no extension)"
+                    skipped_ext[key] = skipped_ext.get(key, 0) + 1
                     continue
                 try:
                     if os.path.getsize(full) > MAX_INDEX_FILE_BYTES:
+                        skipped_size += 1
                         continue
                 except OSError:
                     continue
@@ -191,7 +246,11 @@ def _walk_indexable(project_root: str) -> list[str]:
 
     walk(root_abs)
     found.sort()
-    return found
+    census = {
+        "skippedByExtension": {k: skipped_ext[k] for k in sorted(skipped_ext)},
+        "skippedForSize": skipped_size,
+    }
+    return found, census
 
 
 # --------------------------------------------------------------------------
@@ -252,7 +311,7 @@ def build_atlas(project_root: str, *, out_path: str | None = None) -> dict:
         return {"ok": False, "error": "git HEAD unavailable; refusing to build an unstamped atlas."}
 
     try:
-        rel_paths = _walk_indexable(root_abs)
+        rel_paths, census = _walk_indexable(root_abs)
         postings: dict[str, list[int]] = {}
         files_out: list[dict] = []
         vitals = _git_vitality(root_abs)
@@ -302,8 +361,11 @@ def build_atlas(project_root: str, *, out_path: str | None = None) -> dict:
             "postings": {t: sorted_postings[t] for t in sorted(sorted_postings)},
             "meta": {
                 "declaredBlindSpots": list(ATLAS_BLIND_SPOTS),
+                "indexedExtensions": sorted(_INDEX_EXTENSIONS),
+                "maxIndexFileBytes": MAX_INDEX_FILE_BYTES,
                 "fileCount": len(files_out),
                 "tokenCount": len(sorted_postings),
+                **census,
             },
         }
         payload["checksum"] = _canonical(payload)
@@ -381,20 +443,23 @@ class CodeAtlas:
         built_head = self._payload["builtAtHead"]
         root = project_root or getattr(self, "_project_root", None) or os.getcwd()
         head = live_head(root)
+        # Probed on every call and never cached — see worktree_dirt().
+        dirty, dirty_files = worktree_dirt(root)
         if head is None or head == built_head:
             stale = head is not None and head != built_head
             return {"stale": stale, "unverifiable": head is None,
-                    "builtAtHead": built_head, "head": head, "commitsBehind": 0}
+                    "builtAtHead": built_head, "head": head, "commitsBehind": 0,
+                    "dirty": dirty, "dirtyFiles": dirty_files}
         cached = STALENESS_CACHE.get(built_head)
         if cached and cached["head"] == head:
-            return dict(cached)
+            return {**cached, "dirty": dirty, "dirtyFiles": dirty_files}
         out = _git(root, "rev-list", "--count", f"{built_head}..{head}")
         behind = int(out.strip()) if out and out.strip().isdigit() else -1
         verdict = {"stale": True, "unverifiable": behind < 0,
                    "builtAtHead": built_head, "head": head,
                    "commitsBehind": max(behind, 0)}
         STALENESS_CACHE[built_head] = verdict
-        return dict(verdict)
+        return {**verdict, "dirty": dirty, "dirtyFiles": dirty_files}
 
     # -- refs --------------------------------------------------------------
     def refs(self, token: str, *, max_files: int = MAX_REF_FILES) -> list[str]:

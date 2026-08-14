@@ -296,6 +296,19 @@ class TestAtlasTelemetryWiring(unittest.TestCase):
         self.assertEqual(t["rollup"]["files"], 1)
         self.assertEqual(t["rollup"]["byLayer"], {"Core": 1})
 
+    def test_blind_spots_are_surfaced_beside_the_answer(self):
+        """An empty result must be explicable where it is READ.
+
+        Directory, extension and size exclusions all make content
+        unreachable; a lens that names only the first invites a reader to
+        treat "no hits in a .scdl file" as absence rather than exclusion.
+        """
+        result = code_lens.telescope(self.repo, "codex", max_depth=3)
+        spots = result["telemetry"]["blindSpots"]
+        self.assertIn("nlp_chatbot", spots["directories"])
+        self.assertIn(".scdl", spots["skippedByExtension"])
+        self.assertEqual(spots["skippedForSize"], 1)
+
     def test_telescope_file_nodes_annotated(self):
         result = code_lens.telescope(self.repo, "codex/core", max_depth=2)
         self.assertTrue(result["ok"])
@@ -372,6 +385,17 @@ class TestAtlasStalenessWiring(unittest.TestCase):
     def tearDown(self):
         import shutil
         shutil.rmtree(self.repo, ignore_errors=True)
+
+    def test_uncommitted_edits_are_surfaced_as_dirty(self):
+        """commitsBehind=0 is not "current" — the tree moves without commits."""
+        self._write(self.repo, "codex/core/thing.js",
+                    "export function somethingElseEntirely() {}\n")
+        result = code_lens.telescope(self.repo, "codex", max_depth=3)
+        t = result["telemetry"]
+        self.assertTrue(t["available"])
+        self.assertFalse(t["stale"])          # HEAD genuinely unchanged
+        self.assertTrue(t["dirty"])
+        self.assertGreaterEqual(t["dirtyFiles"], 1)
 
     def test_new_commit_is_surfaced_as_stale(self):
         self._write(self.repo, "src/New.jsx",

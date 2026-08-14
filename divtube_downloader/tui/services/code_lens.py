@@ -512,12 +512,26 @@ def _telemetry_block(atlas, project_root: str, *, rollup_path: str | None = None
     if atlas is None:
         return {"available": False, "reason": "atlas-not-built"}
     st = atlas.is_stale(project_root)
+    meta = atlas.meta
     block: dict[str, Any] = {
         "available": True,
         "source": "code-atlas",
-        "atlasHead": atlas.meta["builtAtHead"],
+        "atlasHead": meta["builtAtHead"],
         "stale": st["stale"],
         "commitsBehind": st["commitsBehind"],
+        # HEAD-equality is not freshness: the atlas indexes FILES but is
+        # stamped with a COMMIT, so an edited tree is fresh by the stamp
+        # and wrong by the content.
+        "dirty": st.get("dirty", False),
+        "dirtyFiles": st.get("dirtyFiles", 0),
+        # Every exclusion class, beside the answer: a reader must be able
+        # to tell "not found" from "never indexed" without leaving the
+        # result they are holding.
+        "blindSpots": {
+            "directories": meta.get("declaredBlindSpots", []),
+            "skippedByExtension": meta.get("skippedByExtension", {}),
+            "skippedForSize": meta.get("skippedForSize", 0),
+        },
     }
     if st.get("unverifiable"):
         block["unverifiable"] = True

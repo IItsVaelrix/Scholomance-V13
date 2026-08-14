@@ -65,6 +65,13 @@ def _make_fixture_repo() -> str:
            "import { buildExtrapolationSlate } from '../codex/core/thing.js';\n"
            "const well-known = 'hyphen-token-test';\n")
     _write(repo, "src/App.jsx", "export const App = () => <div>React</div>;\n")
+    # Silent blind spots the first cut of the atlas never declared: an
+    # extension outside _INDEX_EXTENSIONS, and an indexable file over the
+    # byte cap. Both must be COUNTED in meta, not quietly dropped.
+    _write(repo, "assets/sprite.scdl", "sprite buildExtrapolationSlate {}\n")
+    _write(repo, "assets/theme.css", ".buildExtrapolationSlate { color: red }\n")
+    _write(repo, "assets/oversize.js",
+           "// buildExtrapolationSlate\n" + ("x".ljust(80) + "\n") * 13000)
     # Declared blind spot: must never be indexed.
     _write(repo, "nlp_chatbot/corpus/huge.txt", "buildExtrapolationSlate\n" * 50)
     _write(repo, "nlp_chatbot/README.md", "vendored corpus, not first-party\n")
@@ -109,6 +116,31 @@ class TestAtlasBuild(unittest.TestCase):
         self.assertNotIn("nlp_chatbot/corpus/huge.txt",
                          atlas.refs("buildExtrapolationSlate"))
         self.assertIsNone(atlas.file_info("nlp_chatbot/corpus/huge.txt"))
+
+    def test_extension_blind_spot_is_declared(self):
+        """A file skipped for its EXTENSION is a blind spot like any other.
+
+        The module's own law: excluding content is a governance decision,
+        hiding the decision is not. Directory exclusions were declared from
+        day one; extension exclusions were silent.
+        """
+        atlas = code_atlas.load_atlas(self.repo)
+        meta = atlas.meta
+        self.assertIn(".js", meta["indexedExtensions"])
+        self.assertNotIn(".scdl", meta["indexedExtensions"])
+        self.assertEqual(meta["skippedByExtension"].get(".scdl"), 1)
+        self.assertEqual(meta["skippedByExtension"].get(".css"), 1)
+
+    def test_oversize_blind_spot_is_declared(self):
+        """A file skipped for SIZE must be counted, not silently dropped."""
+        atlas = code_atlas.load_atlas(self.repo)
+        meta = atlas.meta
+        self.assertEqual(meta["skippedForSize"], 1)
+        self.assertEqual(meta["maxIndexFileBytes"],
+                         code_atlas.MAX_INDEX_FILE_BYTES)
+        # And it really is absent from the index (the declaration is honest).
+        self.assertNotIn("assets/oversize.js",
+                         atlas.refs("buildExtrapolationSlate"))
 
     def test_token_lookup_exhaustive(self):
         atlas = code_atlas.load_atlas(self.repo)
@@ -203,6 +235,57 @@ class TestAtlasStaleness(unittest.TestCase):
         self.assertTrue(st["stale"])
         self.assertEqual(st["commitsBehind"], 1)
 
+    def test_clean_worktree_is_not_dirty(self):
+        atlas = code_atlas.load_atlas(self.repo)
+        st = atlas.is_stale()
+        self.assertFalse(st["dirty"])
+        self.assertEqual(st["dirtyFiles"], 0)
+
+    def test_atlas_artifact_is_never_its_own_dirt(self):
+        """Writing the atlas must not make the tree look edited.
+
+        The live repo gitignores .atlas/, but that must not be load-bearing:
+        the fixture has no .gitignore, so an unfiltered `git status` reports
+        the atlas file itself and the tree is dirty forever after a build.
+        """
+        st = code_atlas.load_atlas(self.repo).is_stale()
+        self.assertFalse(st["dirty"], "the atlas counted its own output as dirt")
+        self.assertEqual(st["dirtyFiles"], 0)
+
+    def test_uncommitted_edit_marks_dirty_while_head_matches(self):
+        """HEAD-equality is not freshness: the tree can move without a commit.
+
+        Reporting stale=False on an edited tree is the exact silent answer
+        the atlas exists to prevent.
+        """
+        _write(self.repo, "src/App.jsx", "export const App = () => null;\n")
+        atlas = code_atlas.load_atlas(self.repo)
+        st = atlas.is_stale()
+        self.assertFalse(st["stale"])          # HEAD genuinely unchanged
+        self.assertTrue(st["dirty"])
+        self.assertGreaterEqual(st["dirtyFiles"], 1)
+
+    def test_untracked_file_marks_dirty(self):
+        _write(self.repo, "src/Untracked.jsx", "export const U = () => null;\n")
+        st = code_atlas.load_atlas(self.repo).is_stale()
+        self.assertTrue(st["dirty"])
+
+    def test_dirty_flag_is_never_served_from_the_staleness_cache(self):
+        """STALENESS_CACHE keys on builtAtHead; dirtiness changes underneath it.
+
+        Without this, the first stale verdict freezes `dirty` for the life
+        of the process — a cached lie about the working tree.
+        """
+        _git(self.repo, "commit", "-q", "--allow-empty", "-m", "second")
+        atlas = code_atlas.load_atlas(self.repo)
+        first = atlas.is_stale()
+        self.assertTrue(first["stale"])
+        self.assertFalse(first["dirty"])
+        _write(self.repo, "src/App.jsx", "export const App = () => null;\n")
+        second = atlas.is_stale()          # same cached staleness verdict
+        self.assertTrue(second["stale"])
+        self.assertTrue(second["dirty"])
+
     def test_missing_head_marks_unverifiable(self):
         atlas = code_atlas.load_atlas(self.repo)
         forged = dict(atlas._payload)  # noqa: SLF001 — test internals
@@ -210,6 +293,59 @@ class TestAtlasStaleness(unittest.TestCase):
         st = code_atlas.CodeAtlas(forged).is_stale(self.repo)
         self.assertTrue(st["stale"])
         self.assertTrue(st["unverifiable"])
+
+
+class TestAtlasRebuildEntryPoint(unittest.TestCase):
+    """`scripts/atlas_rebuild.py` — what the post-commit hook backgrounds.
+
+    A stamped-stale atlas still degrades honestly, but the dominant real
+    failure is nobody rebuilding it. This is the entry point that closes
+    that loop; it must be runnable from any cwd against any repo root.
+    """
+
+    SCRIPT = os.path.join(PROJECT_ROOT, "scripts", "atlas_rebuild.py")
+
+    def setUp(self):
+        self.repo = _make_fixture_repo()
+        built = code_atlas.build_atlas(self.repo)
+        assert built["ok"], built
+
+    def tearDown(self):
+        shutil.rmtree(self.repo, ignore_errors=True)
+
+    def _run(self, *args):
+        proc = subprocess.run(
+            ["python3", self.SCRIPT, "--root", self.repo, *args],
+            cwd=tempfile.gettempdir(), capture_output=True, text=True,
+        )
+        return proc, json.loads(proc.stdout or "{}")
+
+    def test_rebuilds_after_a_commit_and_restamps_head(self):
+        _write(self.repo, "src/New.jsx", "export const New = () => null;\n")
+        _git(self.repo, "add", "-A")
+        _git(self.repo, "commit", "-q", "-m", "second")
+        head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=self.repo,
+                              capture_output=True, text=True).stdout.strip()
+
+        proc, verdict = self._run()
+
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(verdict["action"], "rebuilt")
+        atlas = code_atlas.load_atlas(self.repo)
+        self.assertEqual(atlas.meta["builtAtHead"], head)
+        self.assertFalse(atlas.is_stale(self.repo)["stale"])
+
+    def test_fresh_atlas_is_left_alone(self):
+        proc, verdict = self._run()
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(verdict["action"], "fresh")
+
+    def test_reports_error_without_pretending_to_succeed(self):
+        proc = subprocess.run(
+            ["python3", self.SCRIPT, "--root",
+             os.path.join(self.repo, "not-a-repo")],
+            cwd=tempfile.gettempdir(), capture_output=True, text=True)
+        self.assertNotEqual(proc.returncode, 0)
 
 
 class TestAtlasOnRealRepo(unittest.TestCase):
