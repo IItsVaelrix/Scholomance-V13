@@ -7,7 +7,7 @@ const DIMS = 4;
 const EDGES = 2;
 
 /** A tiny hand-built substrate, so the loader is tested rather than the corpus. */
-function fixture({ contract = 'SCHOL-ADJ-SUBSTRATE-v1', words = ['warm', 'hot', 'cold'] } = {}) {
+function fixture({ contract = 'SCHOL-ADJ-SUBSTRATE-v2', words = ['warm', 'hot', 'cold'] } = {}) {
   const W = words.length;
   // warm ~ hot (same direction), cold opposed.
   // Every row needs >= MIN_SHARED_CONTEXTS (3) non-zero dims or cosineSparse
@@ -41,6 +41,9 @@ function fixture({ contract = 'SCHOL-ADJ-SUBSTRATE-v1', words = ['warm', 'hot', 
     edges: EDGES,
     words,
     antonyms: { 0: [2], 2: [0] }, // warm <-> cold
+    // v2: the scale ladder. Absent in v1, which is why scaleField.scale was null.
+    scaleOrders: { warm: [{ word: 'warm', rank: 0, relative: 0.5, span: 1 }] },
+    intensity: {},
     layout: {
       embeddings: { offset: 0, length: W * DIMS },
       scales: { offset: W * DIMS, length: W },
@@ -105,6 +108,7 @@ describe('adjective substrate adapter', () => {
   it('reports the corpus checksum so a stale substrate is detectable', () => {
     const s = createAdjectiveSubstrate({ fsApi: fixture() });
     expect(s.stats().corpusChecksum).toBe('deadbeefdeadbeef');
+    expect(s.stats().scales).toBe(1);
     expect(s.stats().words).toBe(3);
   });
 

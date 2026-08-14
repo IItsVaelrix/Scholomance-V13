@@ -1413,6 +1413,9 @@ try {
         if (substrate.available) {
             constellationCorpusVectors = substrate;
             constellationAntonymCharge = (a, b) => substrate.antonymCharge(a, b);
+            // Without this scaleField.scale stays null and the channel degrades
+            // to an unordered neighbour list — the v1 substrate's omission.
+            constellationScaleOrders = substrate.scaleOrders;
             fastify.log.info(
                 { ...substrate.stats() },
                 '[Constellation] adjective substrate loaded; scaleField has corpus vectors',

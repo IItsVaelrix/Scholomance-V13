@@ -238,6 +238,45 @@ for (const [lemma, senses] of graph.sensesOf) {
 }
 log(`${antCount} antonym edges over ${Object.keys(antonyms).length} words`);
 
+/**
+ * SCALE ORDERS. The v1 substrate shipped embeddings, lattice and antonyms and
+ * left these behind, so scaleField.scale has been null in production: the
+ * ladder ("dim < shadowy < murky < pitch-black") is what makes the channel a
+ * SCALE rather than a neighbour list, and it was simply absent.
+ *
+ * They are small — measured 2,814 scale_order rows and 4,581 intensity rows
+ * against 14.8M in ppmi — so there was never a size reason to omit them. Same
+ * shape loadScaleOrders() produces, so the adapter is a drop-in.
+ */
+log('reading scale orders...');
+const db2 = new Database(CORPUS, { readonly: true });
+const scaleOrders = {};
+let scaleRows = 0;
+try {
+  for (const r of db2.prepare(
+    'SELECT head, word, rank, relative, span FROM scale_order ORDER BY head, rank',
+  ).iterate()) {
+    (scaleOrders[r.head] ||= []).push({ word: r.word, rank: r.rank, relative: r.relative, span: r.span });
+    scaleRows += 1;
+  }
+} catch {
+  // Pre-migration corpus: no orderings, which reads as "no scale measured".
+}
+const intensity = {};
+let intensityRows = 0;
+try {
+  for (const r of db2.prepare('SELECT * FROM intensity').iterate()) {
+    const key = r.word ?? r.lemma;
+    if (key == null) continue;
+    intensity[key] = r;
+    intensityRows += 1;
+  }
+} catch {
+  // Optional table.
+}
+db2.close();
+log(`scale_order: ${scaleRows} rows over ${Object.keys(scaleOrders).length} heads; intensity: ${intensityRows} rows`);
+
 // ─── Emit ───────────────────────────────────────────────────────────────────
 mkdirSync(OUT_DIR, { recursive: true });
 const binParts = [
@@ -256,7 +295,10 @@ const corpusChecksum = createHash('sha256')
   .slice(0, 16);
 
 const manifest = {
-  contract: 'SCHOL-ADJ-SUBSTRATE-v1',
+  // v2 adds scaleOrders + intensity. The version is bumped rather than the
+  // field added silently, so a stale v1 substrate is REJECTED loudly instead of
+  // loading fine and leaving the scale ladder mysteriously null.
+  contract: 'SCHOL-ADJ-SUBSTRATE-v2',
   builtAt: new Date().toISOString(),
   generator: 'scripts/build-adjective-substrate.mjs',
   source: { corpus: CORPUS, rows: N, words: W, contexts: C, corpusMeta: meta },
@@ -273,6 +315,8 @@ const manifest = {
   },
   words,
   antonyms,
+  scaleOrders,
+  intensity,
 };
 const manifestPath = join(OUT_DIR, 'adjective-substrate.json');
 writeFileSync(manifestPath, JSON.stringify(manifest));

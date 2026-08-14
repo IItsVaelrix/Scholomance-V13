@@ -31,7 +31,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const DEFAULT_DIR = 'public/substrate';
-const CONTRACT = 'SCHOL-ADJ-SUBSTRATE-v1';
+const CONTRACT = 'SCHOL-ADJ-SUBSTRATE-v2';
 /**
  * Bounded, because an unbounded per-word cache on a long-lived server is the
  * exact shape that put this service into a reboot loop on 2026-08-14.
@@ -77,6 +77,14 @@ export function createAdjectiveSubstrate(opts = {}) {
   }
 
   const { dims, edges, words, antonyms, layout } = manifest;
+
+  /**
+   * Same Map<head, rows[]> shape loadScaleOrders() returns, so scaleField
+   * consumes it unchanged. Without this scaleField.scale is null and the
+   * channel degrades from a measured ladder to an unordered neighbour list —
+   * which is what shipped in v1.
+   */
+  const scaleOrders = new Map(Object.entries(manifest.scaleOrders || {}));
   const W = words.length;
   const index = new Map();
   for (let i = 0; i < W; i += 1) index.set(words[i], i);
@@ -153,7 +161,9 @@ export function createAdjectiveSubstrate(opts = {}) {
     get,
     antonymCharge,
     neighbours,
+    scaleOrders,
     stats: () => ({
+      scales: scaleOrders.size,
       available: true,
       contract: CONTRACT,
       words: W,
