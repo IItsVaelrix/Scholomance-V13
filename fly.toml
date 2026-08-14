@@ -31,6 +31,16 @@ primary_region = "iad"
 
   # Mutable output still belongs on the volume.
   RHYME_ASTROLOGY_OUTPUT_DIR = "/var/data/rhyme-astrology"
+
+  # APM reports were the other half of the 2026-08-14 outage. Unset, this fell
+  # back to <root>/divtube_downloader/APM-Hourly-Reports — a path that is in
+  # .dockerignore, so it is not even in the image, and is wiped every reboot.
+  # The ledger meanwhile persists here on the volume. Reports are what the
+  # reporter used to read back to decide what it had already covered, so every
+  # boot concluded it had covered nothing and replayed ~3 weeks of hours.
+  # The coverage watermark now fixes the replay; this fixes the other symptom,
+  # which is that the analysis itself was being written to disposable storage.
+  SUBTLETY_APM_REPORT_DIR = "/var/data/apm-reports"
   # Subtlety APM resonance ledger (set SUBTLETY_INGEST_TOKEN via `fly secrets`).
   SUBTLETY_RESONANCE_PATH = "/var/data/subtlety-resonance.jsonl"
   ENABLE_TURBOQUANT = "true"

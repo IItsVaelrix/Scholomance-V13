@@ -4,8 +4,24 @@
  * Stateless Chronicle Compiler architecture (METASTABLE_SELECTED by the
  * 2026-08-03 concept-chemistry trial): every pass re-derives completed
  * active windows and recurrence context from a byte-stable ledger
- * snapshot. There is no cursor, checkpoint, or derived-state database;
- * report existence plus ledger history is the only authority.
+ * snapshot.
+ *
+ * AMENDED 2026-08-14 after a production outage. The stateless design rested on
+ * "report existence plus ledger history is the only authority", which is true
+ * only where reports are as durable as the ledger. In production they were not:
+ * the ledger sat on the Fly volume while reportDir defaulted to an ephemeral
+ * container path, so every boot observed zero reports, treated three weeks of
+ * elapsed hours as unreported, and replayed them — each replay re-parsing the
+ * whole ledger — until the heap hit 249/257MB and the machine SIGABRT'd into a
+ * reboot loop. Statelessness was not wrong; the assumed durability was.
+ *
+ * Two amendments, both narrow:
+ *  - a COVERAGE WATERMARK stored beside the ledger, so coverage inherits the
+ *    ledger's durability instead of reportDir's;
+ *  - a BACKLOG DIGEST: when a pass finds backlogThreshold or more unreported
+ *    windows, it emits ONE analysis of the span rather than one report per
+ *    hour. Cost becomes independent of how long the reporter was away.
+ * Steady-state behaviour — one window per hour — is unchanged.
  *
  * Guarantees:
  *  - one active pass at a time, at most one queued follow-up pass;
@@ -17,6 +33,7 @@
  */
 
 import {
+  compileBacklogDigest,
   compileHourlyReport,
   discoverCompletedActiveWindows,
 } from '../core/pixelbrain/subtlety-apm-hourly-compiler.js';
@@ -37,6 +54,11 @@ export function createSubtletyApmHourlyReporter({
   clock = () => Date.now(),
   discoverWindows = discoverCompletedActiveWindows,
   compile = compileHourlyReport,
+  compileBacklog = compileBacklogDigest,
+  // Above this many unreported windows in one pass, the pass is a BACKLOG:
+  // analysed once rather than replayed hour by hour. A live server produces one
+  // window per hour, so normal operation never reaches this.
+  backlogThreshold = 3,
   nextBoundary = nextLocalHourBoundary,
   retryDelays = [250, 1000, 4000],
   setTimer = setTimeout,
@@ -51,23 +73,60 @@ export function createSubtletyApmHourlyReporter({
   let active = Promise.resolve();
   let controller = new AbortController();
 
+  async function publishOrThrow(result) {
+    const published = await reportStore.publish({ filename: result.filename, markdown: result.markdown });
+    if (published.status === 'conflict') {
+      const error = new Error(`APM report integrity conflict: ${result.filename}`);
+      error.code = 'APM_REPORT_CONFLICT';
+      throw error;
+    }
+    return published;
+  }
+
   async function pass() {
     const ledgerText = await reportStore.readLedgerSnapshot();
     const existing = new Set(await reportStore.listReportFilenames());
-    const windows = discoverWindows({ ledgerText, nowMs: clock() });
-    for (const window of windows) {
-      if (controller.signal.aborted || existing.has(window.filename)) continue;
+    // Watermark is optional: stores without it behave exactly as before.
+    const watermarkMs = (await reportStore.readWatermarkMs?.()) ?? null;
+    const discovered = discoverWindows({ ledgerText, nowMs: clock() });
+    const pending = discovered.filter((window) => (
+      (watermarkMs === null || window.endMs > watermarkMs) && !existing.has(window.filename)
+    ));
+    if (pending.length === 0) return;
+
+    const advance = async () => {
+      const furthest = pending.reduce((max, w) => (w.endMs > max ? w.endMs : max), -Infinity);
+      if (Number.isFinite(furthest)) await reportStore.writeWatermarkMs?.(furthest);
+    };
+
+    // BACKLOG: one analysis of the whole span. Never a per-hour replay — that is
+    // what exhausted the production heap.
+    if (pending.length >= backlogThreshold) {
+      const result = compileBacklog({ ledgerText, sourcePath: reportStore.ledgerPath, windows: pending });
+      if (result.status !== 'quiet') {
+        const published = await publishOrThrow(result);
+        logger.info?.({
+          filename: result.filename,
+          status: published.status,
+          hoursCovered: pending.length,
+          emittedAt: new Date(clock()).toISOString(),
+        }, '[subtlety-apm] backlog digest ready');
+      } else {
+        logger.info?.({ hoursCovered: pending.length }, '[subtlety-apm] backlog quiet; no digest emitted');
+      }
+      await advance();
+      return;
+    }
+
+    for (const window of pending) {
+      if (controller.signal.aborted) continue;
       const result = compile({ ledgerText, sourcePath: reportStore.ledgerPath, window });
       if (result.status === 'quiet') continue;
-      const published = await reportStore.publish({ filename: result.filename, markdown: result.markdown });
-      if (published.status === 'conflict') {
-        const error = new Error(`APM report integrity conflict: ${result.filename}`);
-        error.code = 'APM_REPORT_CONFLICT';
-        throw error;
-      }
+      const published = await publishOrThrow(result);
       existing.add(result.filename);
       logger.info?.({ filename: result.filename, status: published.status, emittedAt: new Date(clock()).toISOString() }, '[subtlety-apm] hourly report ready');
     }
+    if (!controller.signal.aborted) await advance();
   }
 
   async function passWithRetry() {

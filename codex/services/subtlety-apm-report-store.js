@@ -3,7 +3,9 @@ import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
 import { sha256Hex } from '../core/pixelbrain/sha256.js';
 
-const REPORT_NAME = /^APM-\d{4}-\d{2}-\d{2}-\d{4}-UTC[+-]\d{4}\.md$/u;
+const HOURLY_NAME = /^APM-\d{4}-\d{2}-\d{2}-\d{4}-UTC[+-]\d{4}\.md$/u;
+const DIGEST_NAME = /^APM-BACKLOG-\d{4}-\d{2}-\d{2}-\d{4}-to-\d{4}-\d{2}-\d{2}-\d{4}-UTC[+-]\d{4}\.md$/u;
+const REPORT_NAME = new RegExp(`(?:${HOURLY_NAME.source})|(?:${DIGEST_NAME.source})`, 'u');
 
 export function createSubtletyApmReportStore({
   ledgerPath,
@@ -73,11 +75,53 @@ export function createSubtletyApmReportStore({
     }
   }
 
+  /**
+   * COVERAGE WATERMARK — the last window end already accounted for.
+   *
+   * The reporter was designed stateless: "report existence plus ledger history
+   * is the only authority". That holds only where reports persist. In
+   * production the ledger lives on the Fly volume while reportDir defaulted to
+   * an ephemeral container path, so every boot saw zero reports, replayed every
+   * elapsed hour, and OOM-killed the machine.
+   *
+   * The watermark restores the missing half: it sits BESIDE THE LEDGER, so it
+   * shares the ledger's durability by construction and cannot drift onto
+   * different storage the way reportDir did.
+   */
+  const watermarkPath = `${ledgerPath}.apm-watermark`;
+
+  async function readWatermarkMs() {
+    try {
+      const raw = await fsApi.readFile(watermarkPath, 'utf8');
+      const value = Number.parseInt(String(raw).trim(), 10);
+      return Number.isFinite(value) ? value : null;
+    } catch (error) {
+      if (error?.code === 'ENOENT') return null;
+      throw error;
+    }
+  }
+
+  async function writeWatermarkMs(endMs) {
+    if (!Number.isFinite(endMs)) throw new TypeError('watermark must be a finite epoch ms');
+    // Write-then-rename: a torn watermark would silently re-replay or skip hours.
+    const temporary = `${watermarkPath}.${process.pid}.${randomUUID()}.tmp`;
+    await fsApi.writeFile(temporary, `${endMs}\n`, 'utf8');
+    try {
+      await fsApi.rename(temporary, watermarkPath);
+    } catch (error) {
+      await fsApi.unlink(temporary).catch(() => {});
+      throw error;
+    }
+  }
+
   return {
     readLedgerSnapshot,
     listReportFilenames,
     publish,
+    readWatermarkMs,
+    writeWatermarkMs,
     ledgerPath,
     reportDir,
+    watermarkPath,
   };
 }
