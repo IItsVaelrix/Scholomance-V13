@@ -55,6 +55,7 @@ import os
 import re
 import subprocess
 import tempfile
+from datetime import datetime, timezone
 from typing import Any
 
 SCHEMA = "CODE-ATLAS-v1"
@@ -105,6 +106,18 @@ def _git(project_root: str, *args: str) -> str | None:
     if proc.returncode != 0:
         return None
     return proc.stdout
+
+
+def iso_from_unix(ts) -> str | None:
+    """UTC ISO-8601 companion for a unix lastCommit / rollup age."""
+    if not ts:
+        return None
+    try:
+        return datetime.fromtimestamp(int(ts), tz=timezone.utc).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
+    except (TypeError, ValueError, OSError, OverflowError):
+        return None
 
 
 def live_head(project_root: str) -> str | None:
@@ -515,7 +528,13 @@ class CodeAtlas:
     # -- telemetry ---------------------------------------------------------
     def file_info(self, rel_path: str) -> dict | None:
         rec = self._by_path.get(rel_path.replace(os.sep, "/"))
-        return dict(rec) if rec else None
+        if rec is None:
+            return None
+        out = dict(rec)
+        iso = iso_from_unix(out.get("lastCommit"))
+        if iso:
+            out["lastCommitIso"] = iso
+        return out
 
     def dir_rollup(self, rel_dir: str) -> dict | None:
         """Aggregate telemetry for one subtree: files, layers, age span."""
@@ -546,6 +565,9 @@ class CodeAtlas:
             out["medianLastCommit"] = mid
             out["oldestLastCommit"] = ages[0]
             out["newestLastCommit"] = ages[-1]
+            out["medianLastCommitIso"] = iso_from_unix(mid)
+            out["oldestLastCommitIso"] = iso_from_unix(ages[0])
+            out["newestLastCommitIso"] = iso_from_unix(ages[-1])
         return out
 
 

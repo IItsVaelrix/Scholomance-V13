@@ -371,6 +371,10 @@ cwd = "/home/deck/Desktop/Scholomance-V12-main"
 | `mcp_scholomance_collab_execute_verification` | Run a verification profile |
 | `mcp_scholomance_collab_diagnostic_scan` | Run the collab diagnostic scan |
 | `mcp_scholomance_collab_search_codebase` | Search indexed codebase context |
+| `mcp_scholomance_collab_telescope` | Zoom OUT: scoped directory/file map (alias: `telescope`) |
+| `mcp_scholomance_collab_microscope` | Zoom IN: symbol body / line / refs (alias: `microscope`) |
+| `mcp_scholomance_collab_atlas` | Atlas rollup / refs / prefix / stale (alias: `atlas`) |
+| `mcp_scholomance_collab_evaluate` | Run a JS/Python export; report real shape (alias: `evaluate`) |
 | `mcp_scholomance_collab_forensic_search` | Search literal or regex codebase evidence |
 | `mcp_scholomance_collab_phenotypic_ideal` | Compose PHENOTYPIC-IDEAL-v1 boon-seed packet (aliases: `phenotypic_ideal`, `phenotypic`) |
 | `mcp_scholomance_collab_immunity_scan_file` | Scan a file for known structural violations |
@@ -383,7 +387,20 @@ cwd = "/home/deck/Desktop/Scholomance-V12-main"
 
 The `telescope` and `microscope` lenses are augmented by a **disk-backed code atlas** (`.atlas/code-atlas.json`, gitignored, regenerable). It is shared infrastructure: every agent reading through the Cockpit lenses gets it automatically — there is no per-agent copy. It provides an inverted token index (exact-recall symbol refs), per-file git vitality (churn, last-touched), layer/pathogen annotations from the Bible glossary, and per-directory rollups.
 
-- **Built with:** `python3 -c "import sys; sys.path.insert(0,'divtube_downloader'); from tui.services import code_atlas; print(code_atlas.build_atlas('.'))"` (~30s, HEAD-stamped, checksummed)
+Drive order: **telescope → microscope → evaluate**. Atlas is the fourth, first-class tool for rollup / refs / prefix / stale — not a silent sidecar.
+
+**Grok / MCP names** (aliases in parentheses):
+
+| Tool | Purpose |
+|---|---|
+| `mcp_scholomance_collab_telescope` (`telescope`) | Zoom OUT. Scoped directory or file map. Do not point at `.`. |
+| `mcp_scholomance_collab_microscope` (`microscope`) | Zoom IN. Index, body, line window, `refs=true`. |
+| `mcp_scholomance_collab_atlas` (`atlas`) | `action=rollup\|refs\|prefix\|stale`. |
+| `mcp_scholomance_collab_evaluate` (`evaluate`) | Run a JS/Python export; reports real return shape. |
+
+CLI (same four verbs): `python3 scripts/lens_cli.py telescope --path codex/core/pixelbrain`
+
+- **Built with:** `python3 scripts/atlas_rebuild.py` (~30s, HEAD-stamped, checksummed)
 - **Auto-refresh:** `code_atlas.rebuild_if_stale('.')` — rebuilds only when HEAD has drifted past the tolerance
 - **Staleness is stamped, never silent:** every lens response carries `telemetry.stale` / `commitsBehind`. If the atlas is missing, lenses return `{"available": false, "reason": "atlas-not-built"}` instead of quietly answering without telemetry.
 - **Declared blind spot:** `nlp_chatbot` is excluded from the index (vendored corpus); its files are reachable only via the legacy grep fallback.
@@ -413,6 +430,10 @@ npx playwright test tests/visual/ide-a11y.spec.js --project=chromium  # IDE axe 
 # MCP collab bridge
 npm run mcp:collab   # Start MCP stdio server (required for native tool access)
 npm run mcp:probe    # Probe initialize/listResources/listTools against the canonical bridge command
+
+# Navigation lenses (telescope / microscope / atlas / evaluate)
+python3 scripts/lens_cli.py telescope --path codex/core/pixelbrain
+python3 scripts/atlas_rebuild.py
 
 # School CSS regeneration
 node scripts/generate-school-styles.js

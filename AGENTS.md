@@ -13,4 +13,4 @@ Read order remains:
 3. [SCHEMA_CONTRACT.md](SCHEMA_CONTRACT.md)
 4. This agent contract
 
-> Navigation note: the `telescope`/`microscope` lenses are powered by the shared disk-backed Code Atlas (`.atlas/code-atlas.json`). See "Code Atlas" in the contract above for the rebuild ritual and staleness rules.
+> Navigation note: `telescope` / `microscope` / `atlas` / `evaluate` are first-class MCP tools (`mcp_scholomance_collab_*`, aliases without the prefix) powered by `.atlas/code-atlas.json`. CLI: `python3 scripts/lens_cli.py`. See "Code Atlas" in the contract for the rebuild ritual.

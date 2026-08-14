@@ -9,7 +9,7 @@ import crypto from 'node:crypto';
 import path from 'path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { execSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
@@ -135,6 +135,32 @@ function createToolError(error) {
  * a native tap into the specialized brains (CODE, PIXEL, LORE, ARCHITECTURE, etc.)
  * and the full amplifier/arbiter/SCDNA pipeline.
  */
+function callLensCli(verb, extraArgs = []) {
+    const script = path.join(ROOT, 'scripts', 'lens_cli.py');
+    try {
+        const out = execFileSync('python3', [script, verb, ...extraArgs], {
+            encoding: 'utf8',
+            cwd: ROOT,
+            maxBuffer: 8 * 1024 * 1024,
+            timeout: 60_000,
+        });
+        return JSON.parse(out);
+    } catch (err) {
+        const stdout = err.stdout ? String(err.stdout) : '';
+        try {
+            if (stdout) return JSON.parse(stdout);
+        } catch {
+            // fall through
+        }
+        return {
+            ok: false,
+            error: err.message || 'lens_cli execution failed',
+            stdout: stdout.slice(0, 2000),
+            stderr: err.stderr ? String(err.stderr).slice(0, 1000) : '',
+        };
+    }
+}
+
 function callDirectBrain(action, args = {}) {
     const script = path.join(ROOT, 'steamdeck_brain', 'direct_brain.py');
     const pythonPath = path.join(ROOT, 'steamdeck_brain');
@@ -230,6 +256,10 @@ const TOOL_ALIASES = new Map(Object.entries({
     mcp_scholomance_collab_law_get: ['law_get'],
     mcp_scholomance_collab_lock_list: ['lock_list'],
     mcp_scholomance_collab_skill_vaelrix_law_debug: ['vaelrix_law_debug', 'law_debug', 'high_inquisitor_debug', 'debug_oracle'],
+    mcp_scholomance_collab_telescope: ['telescope'],
+    mcp_scholomance_collab_microscope: ['microscope'],
+    mcp_scholomance_collab_atlas: ['atlas'],
+    mcp_scholomance_collab_evaluate: ['evaluate'],
 }));
 
 function registerTool(server, name, inputSchema, handler) {
@@ -922,6 +952,63 @@ export function registerCollabMcpBridge(server, service = collabService) {
     registerTool(server, 'mcp_scholomance_collab_codebase_get_neighbors', {
         file_path: z.string().min(1).describe('Target file to find neighbors for'),
     }, ({ file_path }) => getFileNeighbors(file_path));
+
+    // ========================
+    //  CODE LENSES (telescope / microscope / atlas / evaluate)
+    // ========================
+
+    registerTool(server, 'mcp_scholomance_collab_telescope', {
+        path: z.string().min(1).describe(
+            "Repo-relative directory or file, e.g. 'codex/core/pixelbrain' or 'divtube_downloader/tui/services'",
+        ),
+        max_depth: z.number().int().min(0).max(6).optional().default(2)
+            .describe('Tree depth (default 2). Point at a scoped module, not the repo root.'),
+        with_symbols: z.boolean().optional().default(true),
+    }, ({ path: relPath, max_depth, with_symbols }) => {
+        const extra = ['--path', relPath, '--max-depth', String(max_depth ?? 2)];
+        if (with_symbols === false) extra.push('--no-symbols');
+        return callLensCli('telescope', extra);
+    });
+
+    registerTool(server, 'mcp_scholomance_collab_microscope', {
+        path: z.string().min(1).describe('Repo-relative file'),
+        symbol: z.string().optional().describe('Symbol name to extract or cross-reference'),
+        line: z.number().int().optional().describe('Line number to center a window on'),
+        context: z.number().int().min(0).max(40).optional().default(2),
+        refs: z.boolean().optional().default(false)
+            .describe('Cross-reference symbol repo-wide via the atlas'),
+        max_refs: z.number().int().min(1).max(50).optional().default(25),
+    }, ({ path: relPath, symbol, line, context, refs, max_refs }) => {
+        const extra = ['--path', relPath, '--context', String(context ?? 2),
+            '--max-refs', String(max_refs ?? 25)];
+        if (symbol) extra.push('--symbol', symbol);
+        if (line != null) extra.push('--line', String(line));
+        if (refs) extra.push('--refs');
+        return callLensCli('microscope', extra);
+    });
+
+    registerTool(server, 'mcp_scholomance_collab_atlas', {
+        action: z.enum(['rollup', 'refs', 'prefix', 'stale'])
+            .describe('rollup=subtree telemetry, refs=files containing token, prefix=autocomplete, stale=freshness'),
+        path: z.string().optional().describe("Directory for action=rollup, e.g. 'codex/core/pixelbrain'"),
+        token: z.string().optional().describe('Token for action=refs or action=prefix'),
+        limit: z.number().int().min(1).max(200).optional().default(25),
+    }, ({ action, path: relPath, token, limit }) => {
+        const extra = ['--action', action, '--limit', String(limit ?? 25)];
+        if (relPath) extra.push('--path', relPath);
+        if (token) extra.push('--token', token);
+        return callLensCli('atlas', extra);
+    });
+
+    registerTool(server, 'mcp_scholomance_collab_evaluate', {
+        path: z.string().min(1).describe('Repo-relative JS or Python file'),
+        symbol: z.string().min(1).describe('Exported symbol to call or read'),
+        args: z.array(z.any()).optional().describe('JSON-literal arguments; omit for a zero-arg call'),
+    }, ({ path: relPath, symbol, args }) => {
+        const extra = ['--path', relPath, '--symbol', symbol];
+        if (args && args.length) extra.push('--args', JSON.stringify(args));
+        return callLensCli('evaluate', extra);
+    });
 
     // ========================
     //  IMMUNE SYSTEM

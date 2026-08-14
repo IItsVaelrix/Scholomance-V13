@@ -25,6 +25,7 @@ Design laws (same as the rest of the harness):
 from __future__ import annotations
 
 import ast
+import json
 import os
 import re
 from typing import Any
@@ -43,6 +44,14 @@ IGNORED_DIR_NAMES = {
 }
 
 IGNORED_DIR_PREFIXES = (".venv", ".aider")
+
+# Healer / consolidation leftovers inflate line counts and pollute maps.
+IGNORED_FILE_SUFFIXES = (
+    ".bak",
+    ".bak-shm",
+    ".bak-wal",
+    ".consolidation-backup",
+)
 
 LANG_BY_EXT = {
     ".py": "python",
@@ -65,6 +74,7 @@ MAX_BODY_LINES = 400                      # per microscope symbol body
 MAX_LINE_WINDOW = 200                     # per microscope line window
 MAX_REF_FILES_SCANNED = 4000              # breadth cap for cross-reference
 MAX_REF_FILE_BYTES = 1_000_000
+AGENT_JSON_CAP = 24_000
 REF_EXTENSIONS = {
     ".py", ".js", ".mjs", ".cjs", ".jsx", ".ts", ".tsx",
     ".lua", ".sh", ".md", ".json",
@@ -94,6 +104,11 @@ def _is_ignored_dir(name: str) -> bool:
     if name in IGNORED_DIR_NAMES:
         return True
     return any(name.startswith(p) for p in IGNORED_DIR_PREFIXES)
+
+
+def _is_ignored_file(name: str) -> bool:
+    lower = name.lower()
+    return any(lower.endswith(suffix) for suffix in IGNORED_FILE_SUFFIXES)
 
 
 def _lang_of(path: str) -> str:
@@ -168,22 +183,43 @@ def _python_symbols(abs_path: str) -> list[dict]:
 # Symbol extraction — JS/TS (deterministic regex + brace tracking)
 # --------------------------------------------------------------------------
 
-_JS_PATTERNS = [
-    # export [default] [async] function [*] name
-    (re.compile(
-        r"^\s*(?:export\s+)?(?:default\s+)?(?:async\s+)?function\s*\*?\s*"
-        r"([A-Za-z_$][\w$]*)"
-    ), "function"),
-    # export const|let|var name = [async] ( ... ) | function
-    (re.compile(
-        r"^\s*(?:export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*"
-        r"(?:async\s*)?(?:\(|function\b|[A-Za-z_$][\w$]*\s*=>)"
-    ), "const"),
-    # [export] class name
-    (re.compile(
-        r"^\s*(?:export\s+)?(?:default\s+)?class\s+([A-Za-z_$][\w$]*)"
-    ), "class"),
-]
+_JS_FN_HEAD = re.compile(
+    r"^\s*(?:export\s+)?(?:default\s+)?(?:async\s+)?function\s*\*?\s*"
+    r"([A-Za-z_$][\w$]*)"
+)
+_JS_CLASS = re.compile(
+    r"^\s*(?:export\s+)?(?:default\s+)?class\s+([A-Za-z_$][\w$]*)"
+)
+_JS_BINDING = re.compile(
+    r"^\s*(export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*="
+)
+
+
+def _js_rhs_is_function(lines: list[str], start_idx: int, after_eq: str) -> bool:
+    """True for `= function` / `= (…) =>` / `= name =>`, not `const t = (`."""
+    chunk = after_eq
+    for i in range(start_idx + 1, min(len(lines), start_idx + 8)):
+        if "=>" in chunk or re.search(r"\bfunction\b", chunk):
+            break
+        chunk += "\n" + lines[i]
+    stripped = chunk.lstrip()
+    if stripped.startswith("async"):
+        stripped = stripped[5:].lstrip()
+    if stripped.startswith("function"):
+        return True
+    if re.match(r"[A-Za-z_$][\w$]*\s*=>", stripped):
+        return True
+    if not stripped.startswith("("):
+        return False
+    depth = 0
+    for i, ch in enumerate(stripped):
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+            if depth == 0:
+                return stripped[i + 1:].lstrip().startswith("=>")
+    return False
 
 
 def _js_body_end(lines: list[str], start_idx: int) -> int:
@@ -217,7 +253,7 @@ def _js_body_end(lines: list[str], start_idx: int) -> int:
                     if started and depth == 0:
                         return i
         # Expression-style declaration (no braces): stop at a terminating ';'.
-        if not started and i > start_idx and line.rstrip().endswith(";"):
+        if not started and line.rstrip().endswith(";"):
             return i
         if not started and i - start_idx > 6:
             return i
@@ -235,24 +271,40 @@ def _js_symbols(abs_path: str) -> list[dict]:
 
     symbols: list[dict] = []
     seen_spans: set[int] = set()
+
+    def add(name: str, kind: str, idx: int, exported: bool) -> None:
+        if idx in seen_spans:
+            return
+        end = _js_body_end(lines, idx)
+        seen_spans.add(idx)
+        symbols.append({
+            "name": name,
+            "kind": kind,
+            "line": idx + 1,
+            "endLine": end + 1,
+            "exported": exported,
+            "args": [],
+        })
+
     for idx, line in enumerate(lines):
-        for pattern, kind in _JS_PATTERNS:
-            m = pattern.match(line)
-            if not m:
-                continue
-            if idx in seen_spans:
-                break
-            end = _js_body_end(lines, idx)
-            seen_spans.add(idx)
-            symbols.append({
-                "name": m.group(1),
-                "kind": kind,
-                "line": idx + 1,
-                "endLine": end + 1,
-                "exported": line.lstrip().startswith("export"),
-                "args": [],
-            })
-            break
+        m = _JS_FN_HEAD.match(line)
+        if m:
+            add(m.group(1), "function", idx, line.lstrip().startswith("export"))
+            continue
+        m = _JS_CLASS.match(line)
+        if m:
+            add(m.group(1), "class", idx, line.lstrip().startswith("export"))
+            continue
+        m = _JS_BINDING.match(line)
+        if not m:
+            continue
+        exported = bool(m.group(1))
+        name = m.group(2)
+        after_eq = line.split("=", 1)[1]
+        is_fn = _js_rhs_is_function(lines, idx, after_eq)
+        if not exported and not is_fn:
+            continue
+        add(name, "function" if is_fn else "const", idx, exported)
     symbols.sort(key=lambda s: (s["line"], s["name"]))
     return symbols
 
@@ -352,18 +404,10 @@ def telescope(
                 if not _is_ignored_dir(name):
                     dirs.append((name, full))
             elif os.path.isfile(full):
-                files.append((name, full))
+                if not _is_ignored_file(name):
+                    files.append((name, full))
 
-        for name, full in dirs:
-            stats["dirs"] += 1
-            if depth < max_depth:
-                node["children"].append(build(full, depth + 1))
-            else:
-                node["children"].append({
-                    "path": rel(full), "type": "dir", "collapsed": True,
-                })
-
-        for name, full in files:
+        def file_node(full: str) -> dict[str, Any]:
             stats["files"] += 1
             lines = _count_lines(full)
             if lines:
@@ -388,7 +432,31 @@ def telescope(
                     ]
                     stats["symbolized"] += 1
                 budget[0] -= 1
-            node["children"].append(fnode)
+            return fnode
+
+        # Spend the symbol budget on THIS directory first (largest files
+        # first), then recurse so children inherit only what remains.
+        sized: list[tuple[int, str, str]] = []
+        for name, full in files:
+            try:
+                sz = os.path.getsize(full)
+            except OSError:
+                sz = 0
+            sized.append((sz, name, full))
+        sized.sort(key=lambda t: (-t[0], t[1]))
+        built_files = {name: file_node(full) for sz, name, full in sized}
+
+        for name, full in dirs:
+            stats["dirs"] += 1
+            if depth < max_depth:
+                node["children"].append(build(full, depth + 1))
+            else:
+                node["children"].append({
+                    "path": rel(full), "type": "dir", "collapsed": True,
+                })
+
+        for name, full in files:
+            node["children"].append(built_files[name])
         return node
 
     tree = build(abs_path, 0)
@@ -400,9 +468,9 @@ def telescope(
         "type": "dir",
         "path": rel(abs_path),
         "maxDepth": max_depth,
-        "tree": tree,
         "summary": stats,
         "telemetry": _telemetry_block(atlas, project_root, rollup_path=rel(abs_path)),
+        "tree": tree,
     }
 
 
@@ -488,7 +556,7 @@ def _cross_reference(
 _ATLAS_TOKEN_RE = re.compile(r"[A-Za-z0-9_$]+(?:-[A-Za-z0-9_$]+)*")
 _TELEMETRY_FILE_FIELDS = (
     "layer", "pathogens", "errorCodes", "healthCodes",
-    "commits", "lastCommit", "churn",
+    "commits", "lastCommit", "lastCommitIso", "churn",
 )
 
 
@@ -700,4 +768,109 @@ def microscope(
             )
             result["refsSource"] = "walker"
 
+        defined = _definition_from_refs(sym, result.get("refs") or [])
+        local_hits = result.get("matches") or []
+        if defined and not local_hits and result.get("mode") in ("text", None):
+            result["ok"] = True
+            result["mode"] = "rescue"
+            result["definedIn"] = defined
+            result.pop("error", None)
+
     return result
+
+
+def _definition_from_refs(symbol: str, refs: list[dict]) -> str | None:
+    """First ref that looks like a definition of `symbol`, else None."""
+    needle = re.escape(symbol.strip())
+    if not needle:
+        return None
+    defn = re.compile(
+        r"(?:export\s+(?:default\s+)?(?:async\s+)?(?:function\*?|class|const|let|var)\s+"
+        + needle
+        + r"\b|(?:async\s+)?def\s+"
+        + needle
+        + r"\b|class\s+"
+        + needle
+        + r"\b)"
+    )
+    for hit in refs:
+        if defn.search(hit.get("text") or ""):
+            return hit["file"]
+    return None
+
+
+# --------------------------------------------------------------------------
+# Agent-facing serialization — summary/telemetry first, tree last, compact.
+# --------------------------------------------------------------------------
+
+_AGENT_PRIORITY_KEYS = (
+    "ok", "type", "mode", "path", "error", "definedIn",
+    "summary", "telemetry",
+)
+
+
+def _compact_tree(node: dict) -> dict:
+    """Drop per-file symbol lists so a dir map still fits an agent window."""
+    out = {k: node[k] for k in ("path", "type", "lang", "lines", "collapsed")
+           if k in node}
+    if node.get("symbols"):
+        out["nSymbols"] = len(node["symbols"])
+    kids = node.get("children")
+    if kids:
+        out["children"] = [_compact_tree(c) for c in kids]
+    return out
+
+
+def serialize_for_agent(result: dict, *, cap: int = AGENT_JSON_CAP) -> str:
+    """Compact JSON with summary/telemetry before the tree.
+
+    Directory telescopes used to pretty-print `tree` first and slice at
+    8k, so a cockpit agent saw ARCHIVE REFERENCE DOCS and never the
+    summary. Lead with the orientation keys; compact or omit the tree
+    if the window is still too small.
+    """
+    if not isinstance(result, dict):
+        raw = json.dumps(result, default=str, separators=(",", ":"))
+        return raw[:cap]
+
+    ordered: dict[str, Any] = {}
+    for key in _AGENT_PRIORITY_KEYS:
+        if key in result:
+            ordered[key] = result[key]
+    for key, value in result.items():
+        if key not in ordered:
+            ordered[key] = value
+
+    raw = json.dumps(ordered, default=str, separators=(",", ":"))
+    if len(raw) <= cap:
+        return raw
+
+    slim = dict(ordered)
+    if "tree" in slim:
+        slim["tree"] = _compact_tree(slim["tree"])
+        slim["treeCompacted"] = True
+        raw = json.dumps(slim, default=str, separators=(",", ":"))
+        if len(raw) <= cap:
+            return raw
+        slim["tree"] = None
+        slim["treeOmitted"] = True
+        raw = json.dumps(slim, default=str, separators=(",", ":"))
+        if len(raw) <= cap:
+            return raw
+
+    if "matches" in slim:
+        slim["matches"] = [
+            {k: m.get(k) for k in ("name", "kind", "line", "endLine", "truncated")
+             if isinstance(m, dict)}
+            for m in (slim.get("matches") or [])
+        ]
+        slim["bodiesOmitted"] = True
+        raw = json.dumps(slim, default=str, separators=(",", ":"))
+        if len(raw) <= cap:
+            return raw
+
+    marker = ',"truncated":true}'
+    cut = cap - len(marker)
+    if cut < 1:
+        return marker
+    return raw[:cut] + marker

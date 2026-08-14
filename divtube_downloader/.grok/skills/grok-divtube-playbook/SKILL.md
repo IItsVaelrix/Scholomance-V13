@@ -48,6 +48,19 @@ Use the existing memory tools with `agent_id` fixed to `grok`.
 - Prefer keys under `grok:` for Grok-owned context, for example `grok:session-summary`.
 - Do not persist secrets, API keys, raw downloaded media, or user-private drafts.
 
+## Navigation lenses (use these before grep)
+
+The cockpit and the Grok MCP bridge expose the same four instruments:
+
+1. `telescope` — zoom OUT. Scoped path such as `codex/core/pixelbrain` or `divtube_downloader/tui/services`. Never the repo root.
+2. `microscope` — zoom IN. Index / `symbol=` / `line=` / `refs=true`. A wrong-file hit with atlas refs comes back as `mode: "rescue"` + `definedIn`.
+3. `atlas` — `action=rollup|refs|prefix|stale`. Suite health and exhaustive token homes.
+4. `evaluate` — run a JS/Python export and report the real return shape.
+
+MCP names: `mcp_scholomance_collab_telescope` (alias `telescope`), same pattern for `microscope`, `atlas`, `evaluate`. CLI: `python3 scripts/lens_cli.py <verb> …`.
+
+If `telemetry.stale` or `commitsBehind > 0`, rebuild (`python3 scripts/atlas_rebuild.py`) before trusting refs or vitality.
+
 ## DivTube Focus + Full Codebase Access
 
 The DivTube Cockpit (TUI) is your primary operational surface. Start with DivTube surfaces for YouTube, intel, video forge, and TUI concerns:

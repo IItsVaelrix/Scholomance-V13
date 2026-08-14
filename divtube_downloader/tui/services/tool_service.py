@@ -6,7 +6,7 @@ import time
 
 from tui.services.exec_session_service import get_exec_session
 from tui.services import harness_tools
-from tui.services import code_eval, code_lens
+from tui.services import code_atlas, code_eval, code_lens
 
 # Boon 3 (strangler-fig cut 1): the module-level bridge subprocess cluster
 # now lives in bridge_dispatch.py. Re-import every name so the ~50 handlers
@@ -488,13 +488,13 @@ class ToolService:
                 "type": "function",
                 "function": {
                     "name": "telescope",
-                    "description": "Zoom OUT: structural map of a directory or file — tree of dirs/files with line counts, languages, and top-level symbols. Use this BEFORE grep/search to build the map of an unknown area.",
+                    "description": "Zoom OUT: structural map of a directory or file — tree of dirs/files with line counts, languages, and top-level symbols. Use this BEFORE grep/search to build the map of an unknown area. Point it at a scoped module, not the repo root.",
                     "parameters": {
                         "type": "object",
                         "properties": {
                             "path": {
                                 "type": "string",
-                                "description": "Repo-relative directory or file, e.g. 'codex/core/blender-bridge' or '.'"
+                                "description": "Repo-relative directory or file, e.g. 'codex/core/pixelbrain' or 'divtube_downloader/tui/services'"
                             },
                             "max_depth": {
                                 "type": "integer",
@@ -513,7 +513,7 @@ class ToolService:
                 "type": "function",
                 "function": {
                     "name": "microscope",
-                    "description": "Zoom IN on one file: symbol table (functions/classes/methods with exact line ranges, Python via AST, JS/TS via regex). Pass symbol= to extract a definition body, line= for a window around a line, refs=true to cross-reference a symbol repo-wide. No args returns the file's full symbol index. eval=true RUNS symbol (JS/Python, sandboxed subprocess) and reports what it actually returns — use it when a doc comment claims a behaviour you want confirmed, since the symbol table only shows what a file says about itself.",
+                    "description": "Zoom IN on one file: symbol table with exact line ranges. Pass symbol= to extract a definition body, line= for a window, refs=true to cross-reference repo-wide. No extra args returns the file index. Runtime proof is the separate evaluate tool.",
                     "parameters": {
                         "type": "object",
                         "properties": {
@@ -537,9 +537,13 @@ class ToolService:
                                 "type": "boolean",
                                 "description": "Also cross-reference symbol across the repo (default false)"
                             },
+                            "max_refs": {
+                                "type": "integer",
+                                "description": "Cap on ref hits (default 25, max 50)"
+                            },
                             "eval": {
                                 "type": "boolean",
-                                "description": "Run symbol and report its real return value/shape (default false). Requires symbol=. Executes code in a subprocess with a timeout."
+                                "description": "Deprecated: use the evaluate tool. If true, runs symbol in a subprocess."
                             },
                             "args": {
                                 "type": "array",
@@ -548,6 +552,62 @@ class ToolService:
                             }
                         },
                         "required": ["path"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "atlas",
+                    "description": "Code Atlas: directory rollup (layer/pathogen/vitality), exhaustive token refs, token prefix search, or freshness (stale/dirty). Use after telescope when you need suite health or a symbol's true home.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "action": {
+                                "type": "string",
+                                "enum": ["rollup", "refs", "prefix", "stale"],
+                                "description": "rollup=subtree telemetry, refs=files containing token, prefix=token autocomplete, stale=HEAD freshness"
+                            },
+                            "path": {
+                                "type": "string",
+                                "description": "Repo-relative directory for action=rollup (e.g. 'codex/core/pixelbrain')"
+                            },
+                            "token": {
+                                "type": "string",
+                                "description": "Token for action=refs or action=prefix"
+                            },
+                            "limit": {
+                                "type": "integer",
+                                "description": "Max results for refs/prefix (default 25)"
+                            }
+                        },
+                        "required": ["action"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "evaluate",
+                    "description": "Third lens: RUN a JS or Python export in a sandboxed subprocess and report its real return shape. Use when a comment claims a behaviour the symbol table cannot prove.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "path": {
+                                "type": "string",
+                                "description": "Repo-relative JS or Python file, e.g. 'codex/core/constellation/grimoire/projection-laws.js'"
+                            },
+                            "symbol": {
+                                "type": "string",
+                                "description": "Exported symbol to call or read"
+                            },
+                            "args": {
+                                "type": "array",
+                                "description": "JSON literal arguments; omit for a zero-arg call",
+                                "items": {}
+                            }
+                        },
+                        "required": ["path", "symbol"]
                     }
                 }
             },
@@ -1601,6 +1661,10 @@ class ToolService:
             return self._telescope(kwargs, callback)
         elif tool_name == "microscope":
             return self._microscope(kwargs, callback)
+        elif tool_name == "atlas":
+            return self._atlas(kwargs, callback)
+        elif tool_name == "evaluate":
+            return self._evaluate(kwargs, callback)
         elif tool_name == "replace_file_content":
             return self._replace_file_content(kwargs, callback)
         elif tool_name == "search_youtube":
@@ -2849,7 +2913,7 @@ class ToolService:
             else:
                 detail = result.get("error", result.get("type", ""))
             callback(f"  [{mark}]✓[/] telescope: {detail}")
-        return json.dumps(result, indent=2, default=str)[:8000]
+        return code_lens.serialize_for_agent(result)
 
     def _microscope(self, kwargs, callback):
         path = kwargs.get("path") or ""
@@ -2865,9 +2929,11 @@ class ToolService:
             if run_eval:
                 focus = f"{focus} ⚗ eval"
             callback(f"  [bold #FFD700]🔬[/] microscope({path}, {focus})")
+        max_refs = kwargs.get("max_refs")
         result = code_lens.microscope(
             PROJECT_ROOT, path, symbol=symbol, line=line,
             context=context, refs=refs,
+            max_refs=int(max_refs) if max_refs is not None else 25,
         )
         # The eval lens runs code, so it lives outside code_lens (which promises
         # pure-stdlib, no-subprocess, deterministic) and is attached here.
@@ -2893,10 +2959,68 @@ class ToolService:
                 detail = f"{len(result.get('lines', []))} lines"
             elif mode == "index":
                 detail = f"{len(result.get('symbols', []))} symbols"
+            elif mode == "rescue":
+                detail = f"defined in {result.get('definedIn', '?')}"
             else:
                 detail = result.get("error", mode)
             callback(f"  [{mark}]✓[/] microscope: {detail}")
-        return json.dumps(result, indent=2, default=str)[:8000]
+        return code_lens.serialize_for_agent(result)
+
+    def _atlas(self, kwargs, callback):
+        action = (kwargs.get("action") or "").strip()
+        if action not in {"rollup", "refs", "prefix", "stale"}:
+            return "Error: action must be one of rollup, refs, prefix, stale."
+        if callback:
+            callback(f"  [bold #FFD700]🗺[/] atlas({action})")
+        atlas = code_atlas.load_atlas(PROJECT_ROOT)
+        if atlas is None:
+            result = {"ok": False, "available": False, "reason": "atlas-not-built"}
+        elif action == "stale":
+            result = {"ok": True, **atlas.is_stale(PROJECT_ROOT)}
+        elif action == "rollup":
+            path = kwargs.get("path") or "."
+            roll = atlas.dir_rollup(path)
+            result = {
+                "ok": roll is not None,
+                "path": path,
+                "rollup": roll,
+                "stale": atlas.is_stale(PROJECT_ROOT),
+            }
+        elif action == "refs":
+            token = kwargs.get("token") or ""
+            if not token:
+                return "Error: token is required for action=refs."
+            limit = max(1, min(int(kwargs.get("limit") or 25), 200))
+            files = atlas.refs(token, max_files=limit)
+            result = {"ok": True, "token": token, "files": files, "n": len(files)}
+        else:
+            token = kwargs.get("token") or ""
+            if not token:
+                return "Error: token is required for action=prefix."
+            limit = max(1, min(int(kwargs.get("limit") or 25), 200))
+            tokens = atlas.prefix(token, limit=limit)
+            result = {"ok": True, "prefix": token, "tokens": tokens, "n": len(tokens)}
+        if callback:
+            mark = "#7CFF8B" if result.get("ok") else "#FF5C7A"
+            callback(f"  [{mark}]✓[/] atlas: {action}")
+        return code_lens.serialize_for_agent(result)
+
+    def _evaluate(self, kwargs, callback):
+        path = kwargs.get("path") or ""
+        symbol = kwargs.get("symbol") or ""
+        if not path or not symbol:
+            return "Error: path and symbol are required."
+        if callback:
+            callback(f"  [bold #FFD700]⚗[/] evaluate({path}, {symbol})")
+        result = code_eval.evaluate(
+            PROJECT_ROOT, path, symbol, args=kwargs.get("args") or [],
+        )
+        if callback:
+            mark = "#7CFF8B" if result.get("ok") else "#FF5C7A"
+            shape = result.get("shape") or {}
+            desc = ", ".join(f"{k}={v}" for k, v in shape.items()) or result.get("error", "")
+            callback(f"  [{mark}]⚗[/] evaluate: {desc}")
+        return code_lens.serialize_for_agent(result)
 
     def _heal(self, kwargs, callback):
         symptoms = kwargs.get("symptoms", [])
