@@ -1407,6 +1407,9 @@ try {
          * asserts it beats production rather than merely clearing a threshold.
          */
         const substrate = createAdjectiveSubstrate({
+            // Live dictionary version, so antonym edges baked from an older one
+            // are reported rather than silently believed.
+            dictSchemaVersion: constellationWordnetGraph?.stats?.schemaVersion ?? null,
             dir: path.join(process.cwd(), 'public', 'substrate'),
             logger: fastify.log,
         });

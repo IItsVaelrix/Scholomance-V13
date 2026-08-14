@@ -70,6 +70,20 @@ export function loadWordnetGraph(dbPath, options = {}) {
     const graph = emptyGraph();
     graph.stats.available = true;
 
+    /**
+     * The dictionary's declared version, surfaced so consumers that BAKE data
+     * out of it — the adjective substrate's antonym edges — can tell whether
+     * they were built against this dictionary or an older one. This adapter
+     * already holds the handle, so reading it here costs nothing.
+     */
+    try {
+      graph.stats.schemaVersion = db.prepare(
+        "SELECT value FROM meta WHERE key='schema_version'",
+      ).get()?.value ?? null;
+    } catch {
+      graph.stats.schemaVersion = null; // pre-meta dictionary
+    }
+
     for (const row of db.prepare('SELECT id, pos FROM wordnet_synset').iterate()) {
       graph.posOf.set(row.id, row.pos);
     }

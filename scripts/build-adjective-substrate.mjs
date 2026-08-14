@@ -239,6 +239,28 @@ for (const [lemma, senses] of graph.sensesOf) {
 log(`${antCount} antonym edges over ${Object.keys(antonyms).length} words`);
 
 /**
+ * DICTIONARY IDENTITY. The antonym edges above are baked out of
+ * scholomance_dict.sqlite, but corpusChecksum only covers the adjective corpus.
+ * Rebuild the dictionary — as the Kaikki etymology work does, schema 2 -> 3 —
+ * and this substrate's antonyms silently describe the OLD dictionary with
+ * nothing to detect it. That is the same silent-success failure that hid the
+ * missing scale ladder: the artifact loads fine and is quietly wrong.
+ *
+ * Hashing 324MB on every server boot is not viable, so identity is the dict's
+ * declared schema_version plus the antonym edge count actually taken from it.
+ * Either changing means the substrate needs rebuilding.
+ */
+const dictMeta = new Database(DICT, { readonly: true });
+let dictSchemaVersion = null;
+try {
+  dictSchemaVersion = dictMeta.prepare("SELECT value FROM meta WHERE key='schema_version'").get()?.value ?? null;
+} catch {
+  // Pre-meta dictionary: recorded as null, which still differs from any version.
+}
+dictMeta.close();
+log(`dictionary identity: schema_version=${dictSchemaVersion}, antonymEdges=${antCount}`);
+
+/**
  * SCALE ORDERS. The v1 substrate shipped embeddings, lattice and antonyms and
  * left these behind, so scaleField.scale has been null in production: the
  * ladder ("dim < shadowy < murky < pitch-black") is what makes the channel a
@@ -303,6 +325,10 @@ const manifest = {
   generator: 'scripts/build-adjective-substrate.mjs',
   source: { corpus: CORPUS, rows: N, words: W, contexts: C, corpusMeta: meta },
   corpusChecksum,
+  // Identity of the DICTIONARY the antonym edges came from, which corpusChecksum
+  // does not cover. See the note at the dictionary-identity read above.
+  dictSchemaVersion,
+  antonymEdges: antCount,
   dims: DIMS,
   edges: EDGES,
   seed: SEED,

@@ -55,6 +55,14 @@ function unavailable(reason) {
  * @param {{readFileSync: Function}} [opts.fsApi]
  * @param {{warn?: Function, info?: Function}} [opts.logger]
  */
+/**
+ * @param {object} [opts]
+ * @param {string|null} [opts.dictSchemaVersion] the LIVE dictionary's
+ *   schema_version. The antonym edges here were baked out of a dictionary at
+ *   build time; corpusChecksum does not cover that. If the live dictionary has
+ *   moved on, the antonyms describe the old one — loadable, and quietly wrong.
+ *   Passing this makes the drift loud instead.
+ */
 export function createAdjectiveSubstrate(opts = {}) {
   const dir = opts.dir || DEFAULT_DIR;
   const fsApi = opts.fsApi || { readFileSync };
@@ -85,6 +93,22 @@ export function createAdjectiveSubstrate(opts = {}) {
    * which is what shipped in v1.
    */
   const scaleOrders = new Map(Object.entries(manifest.scaleOrders || {}));
+
+  /**
+   * Not fatal — stale antonyms are a DEGRADED veto, not a broken substrate, and
+   * refusing to load would take out similarity and the scale ladder too. But it
+   * is reported at warn level and surfaced in stats(), so it can never be the
+   * kind of silent success that hid the missing ladder.
+   */
+  const expectedDict = opts.dictSchemaVersion ?? null;
+  const dictStale = expectedDict !== null
+    && String(manifest.dictSchemaVersion ?? '') !== String(expectedDict);
+  if (dictStale) {
+    logger.warn?.(
+      { builtAgainst: manifest.dictSchemaVersion ?? null, live: expectedDict, antonymEdges: manifest.antonymEdges ?? null },
+      '[substrate] antonym edges were baked from a DIFFERENT dictionary — rebuild with scripts/build-adjective-substrate.mjs',
+    );
+  }
   const W = words.length;
   const index = new Map();
   for (let i = 0; i < W; i += 1) index.set(words[i], i);
@@ -164,6 +188,9 @@ export function createAdjectiveSubstrate(opts = {}) {
     scaleOrders,
     stats: () => ({
       scales: scaleOrders.size,
+      dictSchemaVersion: manifest.dictSchemaVersion ?? null,
+      antonymEdges: manifest.antonymEdges ?? null,
+      dictStale,
       available: true,
       contract: CONTRACT,
       words: W,

@@ -44,6 +44,8 @@ function fixture({ contract = 'SCHOL-ADJ-SUBSTRATE-v2', words = ['warm', 'hot', 
     // v2: the scale ladder. Absent in v1, which is why scaleField.scale was null.
     scaleOrders: { warm: [{ word: 'warm', rank: 0, relative: 0.5, span: 1 }] },
     intensity: {},
+    dictSchemaVersion: '3',
+    antonymEdges: 2,
     layout: {
       embeddings: { offset: 0, length: W * DIMS },
       scales: { offset: W * DIMS, length: W },
@@ -110,6 +112,37 @@ describe('adjective substrate adapter', () => {
     expect(s.stats().corpusChecksum).toBe('deadbeefdeadbeef');
     expect(s.stats().scales).toBe(1);
     expect(s.stats().words).toBe(3);
+  });
+
+  /**
+   * The antonym edges are baked out of scholomance_dict.sqlite, but
+   * corpusChecksum only covers the adjective corpus. A dictionary rebuilt
+   * underneath the substrate leaves the antonyms describing the old one, and
+   * the substrate still loads perfectly — the silent-success mode that hid the
+   * missing scale ladder for hours.
+   */
+  it('reports a dictionary rebuilt underneath it, without refusing to load', () => {
+    const warn = vi.fn();
+    const s = createAdjectiveSubstrate({
+      fsApi: fixture(), logger: { warn }, dictSchemaVersion: '4', // built against '3'
+    });
+    expect(s.available).toBe(true);            // similarity + ladder still work
+    expect(s.stats().dictStale).toBe(true);    // but the drift is visible
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][1]).toMatch(/different dictionary/i);
+  });
+
+  it('stays quiet when the dictionary matches, and when none is supplied', () => {
+    const warnMatch = vi.fn();
+    const matched = createAdjectiveSubstrate({ fsApi: fixture(), logger: { warn: warnMatch }, dictSchemaVersion: '3' });
+    expect(matched.stats().dictStale).toBe(false);
+    expect(warnMatch).not.toHaveBeenCalled();
+
+    // No expectation passed => nothing to compare against, so no false alarm.
+    const warnNone = vi.fn();
+    const unchecked = createAdjectiveSubstrate({ fsApi: fixture(), logger: { warn: warnNone } });
+    expect(unchecked.stats().dictStale).toBe(false);
+    expect(warnNone).not.toHaveBeenCalled();
   });
 
   it('keeps lookups correct under repeated and unknown-word access', () => {
