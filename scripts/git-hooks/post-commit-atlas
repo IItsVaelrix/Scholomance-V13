@@ -1,0 +1,23 @@
+#!/bin/sh
+# Refresh the Code Atlas after a commit.
+#
+# A stale atlas degrades honestly — every lens stamps builtAtHead and
+# commitsBehind — but honest degradation is not freshness, and before this
+# hook nothing in the repo ever rebuilt it.
+#
+# Backgrounded on purpose: a full rebuild is ~27s on this tree (6,338 files)
+# and a commit must never wait on an index.
+
+ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+[ -n "$ROOT" ] || exit 0
+
+# Opt-in by construction: only a repo that ALREADY has an atlas gets one
+# refreshed. Nobody is handed a 27s background build they never asked for.
+[ -f "$ROOT/.atlas/code-atlas.json" ] || exit 0
+[ -f "$ROOT/scripts/atlas_rebuild.py" ] || exit 0
+
+# .atlas/ is gitignored, so the log lives beside the artifact it describes.
+( python3 "$ROOT/scripts/atlas_rebuild.py" --root "$ROOT" \
+    >>"$ROOT/.atlas/rebuild.log" 2>&1 & ) >/dev/null 2>&1
+
+exit 0
