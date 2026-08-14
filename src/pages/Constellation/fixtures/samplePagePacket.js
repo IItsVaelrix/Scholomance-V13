@@ -122,6 +122,69 @@ export const SAMPLE_BRIGHT_WOUND_PACKET = Object.freeze({
 });
 
 /**
+ * The epistemically clean failure state (feedback report 2026-08-19, P1):
+ * when the live engine is unreachable, the page must say exactly that — not
+ * wear a rich sample's clothes. A full Phase-2 packet with EMPTY channels:
+ * no senses, no etymology, no rhymes, nothing that could be mistaken for a
+ * partial live analysis. The diagnostics carry the whole truth.
+ *
+ * @param {string} rawQuery
+ * @param {string} reason why the live engine was not reached
+ * @returns {import('../../../hooks/constellation.types.js').ConstellationPagePacket}
+ */
+export function buildEngineUnreachablePacket(rawQuery, reason) {
+  const raw = String(rawQuery || '');
+  const normalized = normalizeQuery(raw);
+  return {
+    version: 2,
+    schema_id: 'scholomance/constellation-os-page-phase2',
+    pageBytecode: 'COS-PAGE-v1-ENGINE-UNREACHABLE',
+    query: {
+      raw,
+      normalized,
+      kind: normalized.includes(' ') ? 'phrase' : 'word',
+      tokenCount: countTokens(normalized),
+      graphemeCount: countGraphemes(normalized),
+      intent: null,
+    },
+    phraseStructure: {
+      intent: null, headToken: null, headDecidedBy: null,
+      headPool: [], headDemoted: [], compounds: [], tokenRoles: [], devices: [],
+    },
+    leximancy: {
+      status: 'unsupported',
+      selectedInterpretationId: null,
+      selectedBy: null,
+      interpretations: [],
+      warnings: [],
+      nearKin: [],
+      counterfield: [],
+      etymology: null,
+      rarity: null,
+      relations: { broader: [], narrower: [], akin: [] },
+    },
+    rhymeAstrology: null,
+    phraseGenome: { syllables: 0, devicesHint: [], schoolHint: null },
+    semanticInquiry: null,
+    scaleField: null,
+    readings: { contested: false, primary: null, readings: [], silent: [] },
+    governed: [],
+    discovery: null,
+    diagnostics: {
+      degradedChannels: [LIVE_ENGINE_CHANNEL],
+      warnings: [
+        `Live engine unreachable (${reason}) — no analysis was performed for this query.`,
+      ],
+    },
+    provenance: { engineVersions: {} },
+  };
+}
+
+/**
+ * @deprecated The error path now uses {@link buildEngineUnreachablePacket} —
+ * an explicit engine-unreachable packet instead of a rich sample marked
+ * degraded (feedback report 2026-08-19). Retained for the offline demo path
+ * only; do not wire new consumers.
  * @param {string} rawQuery
  * @returns {ConstellationPhase1Packet}
  */

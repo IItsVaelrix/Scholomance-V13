@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import {
-  markEngineUnreached,
-  resolveConstellationFixture,
-} from '../pages/Constellation/fixtures/samplePagePacket.js';
+import { buildEngineUnreachablePacket } from '../pages/Constellation/fixtures/samplePagePacket.js';
 
 /**
- * Fetches a live ConstellationOS page on submit; falls back to the deterministic
- * fixture when the backend is unavailable (PDR §7.8). Never recomputes engine
- * truth on the client — it maps the server packet verbatim.
+ * Fetches a live ConstellationOS page on submit; when the backend is
+ * unreachable it emits an EXPLICIT engine-unreachable packet — empty channels,
+ * no sample semantics — rather than a rich fixture marked degraded (feedback
+ * report 2026-08-19). Never recomputes engine truth on the client — it maps
+ * the server packet verbatim.
  *
  * THE SAME QUESTION IS A NEW REQUEST. `attempt` exists because the query alone
  * cannot express "ask again": re-submitting an identical string is a React state
@@ -48,15 +47,15 @@ export function useConstellationPage(query, attempt = 0) {
       } catch (err) {
         if (controller.signal.aborted) return;
         if (requestId.current === id) {
-          // The fixture is a stand-in, not an answer. Stamp it as one so the
-          // shell's degraded banner fires and the reader is never shown
-          // fabricated etymology under a packet claiming zero degradation.
+          // Epistemically clean failure (feedback report 2026-08-19): an
+          // EXPLICIT engine-unreachable packet with empty channels. The old
+          // path served the rich sample fixture marked degraded — responsible
+          // disclosure, but a rich sample can still be mistaken for partial
+          // live analysis. Now the page says exactly what happened: nothing
+          // was analyzed, and the diagnostics carry the whole truth.
           setState({
             status: 'ready',
-            packet: markEngineUnreached(
-              resolveConstellationFixture(query),
-              err?.message ?? 'unknown error',
-            ),
+            packet: buildEngineUnreachablePacket(query, err?.message ?? 'unknown error'),
           });
         }
       }

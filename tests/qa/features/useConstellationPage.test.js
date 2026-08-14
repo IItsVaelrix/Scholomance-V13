@@ -10,7 +10,13 @@ describe('useConstellationPage', () => {
     expect(result.current.packet).toBeNull();
   });
 
-  it('returns the bright-wound fixture for that query (case-insensitive trim)', async () => {
+  it('passes the server packet verbatim on success (ambiguous bright-wound)', async () => {
+    // The bright-wound sample now travels the LIVE path, not the error path:
+    // a rich packet is something the engine returned, never a fallback costume.
+    vi.stubGlobal('fetch', vi.fn(async () => ({
+      ok: true,
+      json: async () => SAMPLE_BRIGHT_WOUND_PACKET,
+    })));
     const { result } = renderHook(() =>
       useConstellationPage('  The Bright Wound of Morning  '),
     );
@@ -18,16 +24,27 @@ describe('useConstellationPage', () => {
     expect(result.current.packet.pageBytecode).toBe(SAMPLE_BRIGHT_WOUND_PACKET.pageBytecode);
     expect(result.current.packet.leximancy.status).toBe('ambiguous');
     expect(result.current.packet.leximancy.selectedInterpretationId).toBeNull();
+    vi.unstubAllGlobals();
   });
 
-  it('returns an awaiting packet for unknown queries without inventing senses', async () => {
+  it('returns an explicit engine-unreachable packet — no invented senses, no rich sample', async () => {
+    // Feedback 2026-08-19: on network failure the page must say "engine
+    // unreachable", not wear a sample's clothes. Empty channels, honest
+    // diagnostics, and none of the bright-wound sample's rich semantics.
+    vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('offline'); }));
     const { result } = renderHook(() => useConstellationPage('gravity'));
     await waitFor(() => expect(result.current.status).toBe('ready'));
-    expect(result.current.packet.query.raw).toBe('gravity');
-    expect(result.current.packet.leximancy.status).toBe('unsupported');
-    expect(result.current.packet.leximancy.interpretations).toEqual([]);
-    expect(result.current.packet.rhymeAstrology).toBeNull();
-    expect(result.current.packet.diagnostics.degradedChannels).toContain('leximancy');
+    const p = result.current.packet;
+    expect(p.query.raw).toBe('gravity');
+    expect(p.leximancy.status).toBe('unsupported');
+    expect(p.leximancy.interpretations).toEqual([]);
+    expect(p.leximancy.etymology).toBeNull();
+    expect(p.rhymeAstrology).toBeNull();
+    expect(p.diagnostics.degradedChannels).toContain('live engine');
+    expect(p.diagnostics.warnings.join(' ')).toContain('no analysis was performed');
+    // The rich sample must not leak into the failure state.
+    expect(p.pageBytecode).not.toBe(SAMPLE_BRIGHT_WOUND_PACKET.pageBytecode);
+    vi.unstubAllGlobals();
   });
 
   /**
@@ -72,11 +89,14 @@ describe('useConstellationPage live fetch', () => {
     expect(result.current.packet.pageBytecode).toBe('COS-PAGE-v1-DEADBEEF');
   });
 
-  it('falls back to the fixture when the server errors', async () => {
+  it('returns the explicit engine-unreachable packet when the server errors', async () => {
+    // Feedback 2026-08-19: a 500 must produce "engine unreachable", never the
+    // rich sample. The old fallback (fixture marked degraded) is retired.
     vi.stubGlobal('fetch', vi.fn(async () => ({ ok: false, status: 500, json: async () => ({}) })));
     const { result } = renderHook(() => useConstellationPage('the bright wound of morning'));
     await waitFor(() => expect(result.current.status).toBe('ready'));
-    expect(result.current.packet.pageBytecode).toBe(SAMPLE_BRIGHT_WOUND_PACKET.pageBytecode);
+    expect(result.current.packet.pageBytecode).toBe('COS-PAGE-v1-ENGINE-UNREACHABLE');
+    expect(result.current.packet.diagnostics.degradedChannels).toContain('live engine');
   });
 
   /**
