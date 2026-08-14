@@ -1246,8 +1246,18 @@ getSubtletyRuntime({
 // JS runs to record it. This emits the approach instead of the aftermath.
 // IS_TEST_RUNTIME guard matches the APM plugin: no timers in tests.
 if (!IS_TEST_RUNTIME) {
+    /**
+     * The interval is env-gated so the sampler can be tested as a SUSPECT, not
+     * only used as an instrument. If heap growth holds at the same MB/min when
+     * this moves 30s -> 120s, the growth is wall-clock driven and the sampler is
+     * exonerated; if the rate falls with the sample count, the sampler is the
+     * thing it was measuring. An instrument that cannot be ruled out is not
+     * evidence.
+     */
+    const memoryIntervalMs = Number(process.env.MEMORY_TELEMETRY_INTERVAL_MS || 30_000);
     createMemoryTelemetry({
         logger: fastify.log,
+        intervalMs: Number.isFinite(memoryIntervalMs) && memoryIntervalMs > 0 ? memoryIntervalMs : 30_000,
         heapStatistics: () => getHeapStatistics(),
         heapSpaceStatistics: () => getHeapSpaceStatistics(),
     }).start();

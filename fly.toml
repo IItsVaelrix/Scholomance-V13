@@ -61,6 +61,12 @@ primary_region = "iad"
   SUBTLETY_RESONANCE_PATH = "/var/data/subtlety-resonance.jsonl"
   ENABLE_TURBOQUANT = "true"
 
+  # 120s rather than the 30s default, deliberately: the heap climbs ~1.7 MB/min
+  # and the sampler is one of the few things running on a regular cadence, so it
+  # cannot be excluded from its own measurement. At 4x the interval, a
+  # wall-clock leak keeps the same MB/min and a sampler-caused one falls to ~1/4.
+  MEMORY_TELEMETRY_INTERVAL_MS = "120000"
+
 [http_service]
   internal_port = 8080
   force_https = true
