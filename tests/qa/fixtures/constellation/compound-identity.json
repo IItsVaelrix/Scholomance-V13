@@ -4677,9 +4677,9 @@
         "blunt-witted"
       ],
       "fromPrefix": true,
-      "split": true,
-      "fused": true,
-      "union": true
+      "split": false,
+      "fused": false,
+      "union": false
     },
     {
       "tokens": [
@@ -6398,8 +6398,8 @@
       ],
       "fromPrefix": true,
       "split": false,
-      "fused": true,
-      "union": true
+      "fused": false,
+      "union": false
     },
     {
       "tokens": [

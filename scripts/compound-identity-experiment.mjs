@@ -19,7 +19,7 @@
  * SPLIT vs UNION answers "should the tokenizer fuse?"; FUSED vs UNION answers
  * "what did this change buy?" and is the one that describes the product.
  *
- * A phrase SUCCEEDS when `compose` yields at least one stable molecule spanning
+ * A phrase SUCCEEDS when `composePacked` yields at least one stable molecule spanning
  * every token — the same criterion the treebank report calls coverage.
  *
  * Regressions are enumerated, not just counted: a phrase that parsed before and
@@ -32,7 +32,7 @@
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import Database from 'better-sqlite3';
-import { compose } from '../codex/core/constellation/compose.js';
+import { composePacked } from '../codex/core/constellation/compose-packed.js';
 import {
   SANITIZATION_REASON,
   countQuarantine,
@@ -125,7 +125,7 @@ for (const file of files) {
 const chartFailures = [];
 const spans = (tokens, options) => {
   try {
-    return compose(tokens, posMap, options).stable.length > 0;
+    return composePacked(tokens, posMap, options).stable.length > 0;
   } catch (error) {
     chartFailures.push({ tokens: tokens.join(' '), error: error.message });
     return false;

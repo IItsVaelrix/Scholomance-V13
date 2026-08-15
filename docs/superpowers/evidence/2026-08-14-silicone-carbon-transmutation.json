@@ -1,0 +1,1593 @@
+{
+  "contract": "PB-SILICONE-CARBON-TRANSMUTATION-v1",
+  "prereg": "docs/superpowers/evidence/2026-08-14-PREREG-silicone-carbon.md",
+  "placeboSeed": 1397312585,
+  "inventory": {
+    "silicone": 72,
+    "carbon": 11,
+    "inert": 1,
+    "surpriseSiliconeConstructivePhrase": [
+      {
+        "id": "det-pron",
+        "status": "approximation",
+        "signature": "DET+PRON->NP"
+      },
+      {
+        "id": "verb-pp",
+        "status": "approximation",
+        "signature": "V+PP->VP"
+      },
+      {
+        "id": "verb-np-object",
+        "status": "approximation",
+        "signature": "V+NP->VP"
+      },
+      {
+        "id": "verb-adj",
+        "status": "approximation",
+        "signature": "V+ADJ->VP"
+      },
+      {
+        "id": "cop-adj",
+        "status": "approximation",
+        "signature": "COP+ADJ->VP"
+      },
+      {
+        "id": "cop-np",
+        "status": "approximation",
+        "signature": "COP+NP->VP"
+      },
+      {
+        "id": "verb-infinitive",
+        "status": "approximation",
+        "signature": "V+INF->VP"
+      },
+      {
+        "id": "cop-infinitive",
+        "status": "approximation",
+        "signature": "COP+INF->VP"
+      },
+      {
+        "id": "appos-close-comma",
+        "status": "scaffold",
+        "signature": "APPOS+COMMA->NP"
+      },
+      {
+        "id": "complementizer-that-s",
+        "status": "approximation",
+        "signature": "REL+S->SBAR"
+      },
+      {
+        "id": "verb-sbar",
+        "status": "approximation",
+        "signature": "V+SBAR->VP"
+      },
+      {
+        "id": "cop-sbar",
+        "status": "approximation",
+        "signature": "COP+SBAR->VP"
+      },
+      {
+        "id": "inv-vp",
+        "status": "approximation",
+        "signature": "INV+VP->S"
+      }
+    ]
+  },
+  "pairwise": [
+    {
+      "arm": "TREATMENT",
+      "atoms": 72,
+      "pairs": 208,
+      "transmuted": 47,
+      "contaminated": 0,
+      "assayFailed": 161,
+      "rate": 0.22596153846153846,
+      "products": [
+        {
+          "ids": [
+            "verb-pp",
+            "pp-comma-fronted"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-pp",
+            "fronted-pp-clause"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "np-participle",
+            "verb-np-object"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "np-participle",
+            "cop-np"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-np-object",
+            "np-pp"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-np-object",
+            "np-relative"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-np-object",
+            "coord-np-complete"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-np-object",
+            "np-infinitive"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-np-object",
+            "np-poss-gen"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-np-object",
+            "np-comma-bridge"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-np-object",
+            "np-terminal-punct"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-adj",
+            "adj-noun-stack"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-adj",
+            "adj-nc-stack"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-adj",
+            "coord-adj-complete"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-adj",
+            "adj-thanp"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-adj",
+            "adj-terminal-punct"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-adj",
+            "fronted-adj-clause"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-adj",
+            "adj-infinitive"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "vp-pp",
+            "inv-vp"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "np-pp",
+            "cop-np"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "adj-noun-stack",
+            "cop-adj"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "adj-nc-stack",
+            "cop-adj"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "vp-adv-post",
+            "inv-vp"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "cop-adj",
+            "coord-adj-complete"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-adj",
+            "adj-thanp"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-adj",
+            "adj-terminal-punct"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-adj",
+            "fronted-adj-clause"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-adj",
+            "adj-infinitive"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-np",
+            "np-relative"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-np",
+            "coord-np-complete"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-np",
+            "np-infinitive"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-np",
+            "np-poss-gen"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-np",
+            "np-comma-bridge"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-np",
+            "np-terminal-punct"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "coord-vp-complete",
+            "inv-vp"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "coord-s-complete",
+            "complementizer-that-s"
+          ],
+          "phraseResults": [
+            "SBAR"
+          ]
+        },
+        {
+          "ids": [
+            "vp-infinitive",
+            "inv-vp"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "matrix-then-subordinate",
+            "complementizer-that-s"
+          ],
+          "phraseResults": [
+            "SBAR"
+          ]
+        },
+        {
+          "ids": [
+            "fronted-subordinate",
+            "verb-sbar"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "fronted-subordinate",
+            "cop-sbar"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "vp-thanp",
+            "inv-vp"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "sbar-comma-fronted",
+            "verb-sbar"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "sbar-comma-fronted",
+            "cop-sbar"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "s-comma-bridge",
+            "complementizer-that-s"
+          ],
+          "phraseResults": [
+            "SBAR"
+          ]
+        },
+        {
+          "ids": [
+            "terminal-punct",
+            "complementizer-that-s"
+          ],
+          "phraseResults": [
+            "SBAR"
+          ]
+        },
+        {
+          "ids": [
+            "vp-particle",
+            "inv-vp"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "vp-sbar",
+            "inv-vp"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        }
+      ]
+    },
+    {
+      "arm": "PLACEBO",
+      "atoms": 72,
+      "pairs": 208,
+      "transmuted": 66,
+      "contaminated": 52,
+      "assayFailed": 61,
+      "rate": 0.3173076923076923,
+      "products": [
+        {
+          "ids": [
+            "np-participle-placebo",
+            "verb-np-object-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "np-participle-placebo",
+            "cop-np-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "np-participle-placebo",
+            "coord-np-bridge-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "np-participle-placebo",
+            "apposition-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "np-participle-placebo",
+            "modal-np-inv-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "np-participle-placebo",
+            "cop-np-inv-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-np-object-placebo",
+            "np-poss-gen-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-np-object-placebo",
+            "np-terminal-punct-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-adj-placebo",
+            "adj-noun-stack-placebo"
+          ],
+          "phraseResults": [
+            "NP",
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-adj-placebo",
+            "coord-adj-complete-placebo"
+          ],
+          "phraseResults": [
+            "NP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-adj-placebo",
+            "adj-thanp-placebo"
+          ],
+          "phraseResults": [
+            "NP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-adj-placebo",
+            "adj-terminal-punct-placebo"
+          ],
+          "phraseResults": [
+            "NP",
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "verb-adj-placebo",
+            "fronted-adj-clause-placebo"
+          ],
+          "phraseResults": [
+            "NP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-adj-placebo",
+            "adj-infinitive-placebo"
+          ],
+          "phraseResults": [
+            "NP",
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "vp-pp-placebo",
+            "adv-vp-pre-placebo"
+          ],
+          "phraseResults": [
+            "NP"
+          ]
+        },
+        {
+          "ids": [
+            "vp-pp-placebo",
+            "aux-vp-placebo"
+          ],
+          "phraseResults": [
+            "NP"
+          ]
+        },
+        {
+          "ids": [
+            "vp-pp-placebo",
+            "modal-vp-placebo"
+          ],
+          "phraseResults": [
+            "NP"
+          ]
+        },
+        {
+          "ids": [
+            "vp-pp-placebo",
+            "coord-vp-bridge-placebo"
+          ],
+          "phraseResults": [
+            "NP"
+          ]
+        },
+        {
+          "ids": [
+            "vp-pp-placebo",
+            "pp-comma-fronted-placebo"
+          ],
+          "phraseResults": [
+            "NP"
+          ]
+        },
+        {
+          "ids": [
+            "vp-pp-placebo",
+            "fronted-pp-clause-placebo"
+          ],
+          "phraseResults": [
+            "NP"
+          ]
+        },
+        {
+          "ids": [
+            "vp-pp-placebo",
+            "inv-vp-placebo"
+          ],
+          "phraseResults": [
+            "NP"
+          ]
+        },
+        {
+          "ids": [
+            "adj-noun-stack-placebo",
+            "noun-plus-proper-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "adj-noun-stack-placebo",
+            "adv-adj-placebo"
+          ],
+          "phraseResults": [
+            "S",
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "adj-noun-stack-placebo",
+            "cop-adj-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "compound-nn-placebo",
+            "nc-terminal-punct-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "proper-compound-placebo",
+            "noun-plus-proper-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "noun-plus-proper-placebo",
+            "poss-noun-placebo"
+          ],
+          "phraseResults": [
+            "NP"
+          ]
+        },
+        {
+          "ids": [
+            "adv-adj-placebo",
+            "vp-adv-post-placebo"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "adv-adj-placebo",
+            "coord-adj-complete-placebo"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "adv-adj-placebo",
+            "adj-thanp-placebo"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "adv-adj-placebo",
+            "adj-terminal-punct-placebo"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "adv-adj-placebo",
+            "fronted-adj-clause-placebo"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "adv-adj-placebo",
+            "adj-infinitive-placebo"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "vp-adv-post-placebo",
+            "adv-comma-fronted-placebo"
+          ],
+          "phraseResults": [
+            "SBAR"
+          ]
+        },
+        {
+          "ids": [
+            "cop-adj-placebo",
+            "adj-terminal-punct-placebo"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "cop-adj-placebo",
+            "adj-infinitive-placebo"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "cop-np-placebo",
+            "np-poss-gen-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-np-placebo",
+            "np-terminal-punct-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "coord-np-bridge-placebo",
+            "np-poss-gen-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "coord-np-bridge-placebo",
+            "np-terminal-punct-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "coord-s-bridge-placebo",
+            "terminal-punct-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "coord-s-complete-placebo",
+            "discourse-initial-and-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "coord-s-complete-placebo",
+            "fronted-matrix-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "discourse-initial-and-placebo",
+            "matrix-then-subordinate-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "discourse-initial-and-placebo",
+            "s-comma-bridge-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "discourse-initial-and-placebo",
+            "terminal-punct-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "np-infinitive-placebo",
+            "cop-np-inv-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "matrix-then-subordinate-placebo",
+            "fronted-matrix-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "fronted-subordinate-placebo",
+            "terminal-punct-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "fronted-subordinate-placebo",
+            "verb-sbar-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "fronted-subordinate-placebo",
+            "cop-sbar-placebo"
+          ],
+          "phraseResults": [
+            "NP"
+          ]
+        },
+        {
+          "ids": [
+            "poss-noun-placebo",
+            "np-poss-gen-placebo"
+          ],
+          "phraseResults": [
+            "NP",
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "np-poss-gen-placebo",
+            "apposition-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "np-poss-gen-placebo",
+            "modal-np-inv-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "np-poss-gen-placebo",
+            "cop-np-inv-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "sbar-comma-fronted-placebo",
+            "verb-sbar-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "sbar-comma-fronted-placebo",
+            "cop-sbar-placebo"
+          ],
+          "phraseResults": [
+            "NP"
+          ]
+        },
+        {
+          "ids": [
+            "fronted-matrix-placebo",
+            "s-comma-bridge-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "fronted-matrix-placebo",
+            "terminal-punct-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "np-comma-bridge-placebo",
+            "cop-np-inv-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "apposition-placebo",
+            "np-terminal-punct-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "terminal-punct-placebo",
+            "fronted-pp-clause-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "terminal-punct-placebo",
+            "fronted-adv-clause-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "terminal-punct-placebo",
+            "fronted-adj-clause-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "np-terminal-punct-placebo",
+            "modal-np-inv-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "np-terminal-punct-placebo",
+            "cop-np-inv-placebo"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        }
+      ]
+    },
+    {
+      "arm": "CARBON-FEED",
+      "atoms": 11,
+      "pairs": 2,
+      "transmuted": 0,
+      "contaminated": 2,
+      "assayFailed": 0,
+      "rate": 0,
+      "products": []
+    },
+    {
+      "arm": "MIXED",
+      "atoms": 73,
+      "pairs": 210,
+      "transmuted": 47,
+      "contaminated": 2,
+      "assayFailed": 161,
+      "rate": 0.22380952380952382,
+      "products": [
+        {
+          "ids": [
+            "verb-pp",
+            "pp-comma-fronted"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-pp",
+            "fronted-pp-clause"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "np-participle",
+            "verb-np-object"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "np-participle",
+            "cop-np"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-np-object",
+            "np-pp"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-np-object",
+            "np-relative"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-np-object",
+            "coord-np-complete"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-np-object",
+            "np-infinitive"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-np-object",
+            "np-poss-gen"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-np-object",
+            "np-comma-bridge"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-np-object",
+            "np-terminal-punct"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-adj",
+            "adj-noun-stack"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-adj",
+            "adj-nc-stack"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-adj",
+            "coord-adj-complete"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-adj",
+            "adj-thanp"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-adj",
+            "adj-terminal-punct"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-adj",
+            "fronted-adj-clause"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "verb-adj",
+            "adj-infinitive"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "vp-pp",
+            "inv-vp"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "np-pp",
+            "cop-np"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "adj-noun-stack",
+            "cop-adj"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "adj-nc-stack",
+            "cop-adj"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "vp-adv-post",
+            "inv-vp"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "cop-adj",
+            "coord-adj-complete"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-adj",
+            "adj-thanp"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-adj",
+            "adj-terminal-punct"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-adj",
+            "fronted-adj-clause"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-adj",
+            "adj-infinitive"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-np",
+            "np-relative"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-np",
+            "coord-np-complete"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-np",
+            "np-infinitive"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-np",
+            "np-poss-gen"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-np",
+            "np-comma-bridge"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "cop-np",
+            "np-terminal-punct"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "coord-vp-complete",
+            "inv-vp"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "coord-s-complete",
+            "complementizer-that-s"
+          ],
+          "phraseResults": [
+            "SBAR"
+          ]
+        },
+        {
+          "ids": [
+            "vp-infinitive",
+            "inv-vp"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "matrix-then-subordinate",
+            "complementizer-that-s"
+          ],
+          "phraseResults": [
+            "SBAR"
+          ]
+        },
+        {
+          "ids": [
+            "fronted-subordinate",
+            "verb-sbar"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "fronted-subordinate",
+            "cop-sbar"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "vp-thanp",
+            "inv-vp"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "sbar-comma-fronted",
+            "verb-sbar"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "sbar-comma-fronted",
+            "cop-sbar"
+          ],
+          "phraseResults": [
+            "VP"
+          ]
+        },
+        {
+          "ids": [
+            "s-comma-bridge",
+            "complementizer-that-s"
+          ],
+          "phraseResults": [
+            "SBAR"
+          ]
+        },
+        {
+          "ids": [
+            "terminal-punct",
+            "complementizer-that-s"
+          ],
+          "phraseResults": [
+            "SBAR"
+          ]
+        },
+        {
+          "ids": [
+            "vp-particle",
+            "inv-vp"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        },
+        {
+          "ids": [
+            "vp-sbar",
+            "inv-vp"
+          ],
+          "phraseResults": [
+            "S"
+          ]
+        }
+      ]
+    }
+  ],
+  "cyclotron": [
+    {
+      "arm": "TREATMENT",
+      "requestedTrials": 2000,
+      "uniqueMolecules": 1350,
+      "shortlisted": 64,
+      "transmuted": 49,
+      "nuclei": 0,
+      "hypotheses": 64
+    },
+    {
+      "arm": "CARBON-FEED",
+      "requestedTrials": 2000,
+      "uniqueMolecules": 15,
+      "shortlisted": 6,
+      "transmuted": 0,
+      "nuclei": 0,
+      "hypotheses": 6
+    }
+  ],
+  "decision": {
+    "fired": [
+      "F1"
+    ],
+    "verdict": "QUIXOTIC"
+  }
+}

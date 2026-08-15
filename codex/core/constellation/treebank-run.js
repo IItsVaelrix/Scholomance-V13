@@ -15,6 +15,7 @@ import { diagnose, frontierSignature, OUTCOME } from './failure-diagnosis.js';
 import { summarize } from './treebank-metrics.js';
 import { compose, projectAnswer, rankByAttraction, guessPos } from './compose.js';
 import { composePacked, projectAnswers } from './compose-packed.js';
+import { pickResonantDerivation } from './resonance-beacon.js';
 import { irregularPos } from '../lexical-analysis/irregular-forms.js';
 import { tokenize } from '../tokenizer.js';
 
@@ -30,7 +31,8 @@ const same = (a, b) => String(a || '').toLowerCase() === String(b || '').toLower
  * @param {Array<object>} options.records   parsed CoNLL-U records, already sliced to the sample
  * @param {Map<string, string[]>} options.posMap  the lexical POS table under test
  * @param {Map<string, object>|null} [options.senseMap] sense counts; without it no decision is taken
- * @param {'classic'|'packed'} [options.parser]
+ * @param {'classic'|'packed'} [options.parser]  default `packed`. `classic`
+ *   is unpacked enumeration — opt in only when you need every tree.
  * @param {number} [options.maxTokens]      sentences longer than this are skipped before compose
  * @returns {object} the summarized report plus every count the report cannot hold
  */
@@ -38,7 +40,7 @@ export function runTreebank({
   records,
   posMap,
   senseMap = null,
-  parser = 'classic',
+  parser = 'packed',
   maxTokens = 28,
   options = {},
 }) {
@@ -54,11 +56,10 @@ export function runTreebank({
     const tokens = record.tokens.map((t) => t.form);
 
     /**
-     * `compose` materialises every parse into `cell[from][to]`; the chart grows
-     * combinatorially with sentence length and does not terminate on some long
-     * sentences. Skip BEFORE calling `compose` rather than hang, and count the
-     * skip — `report.n` is already post-filter, so an uncounted skip would
-     * silently narrow what "coverage" means.
+     * Packed composition is bounded; classic enumeration is not. Skip BEFORE
+     * calling either parser rather than hang, and count the skip — `report.n`
+     * is already post-filter, so an uncounted skip would silently narrow what
+     * "coverage" means.
      */
     if (tokens.length > maxTokens) {
       skippedTooLong += 1;
@@ -100,18 +101,33 @@ export function runTreebank({
     const contained = answers.some((a) => same(a.subject, gold.subject) && same(a.verb, gold.verb));
 
     /**
-     * DECISION IS NOT AVAILABLE FOR THE PACKED PARSER. `rankByAttraction` scores
-     * the leaves of one concrete parse, and a packed node is not one parse. Its
-     * geometric mean is not Viterbi-decomposable because `counted` varies by
-     * derivation, so making it work is a separate, measured decision. Reporting
-     * null is the honest form; substituting a number would print an accuracy for
-     * a measurement nobody made.
+     * Decision is a ranking, never a prune. The beacon field is always present
+     * on a successful compose. Attraction ranking still wins when a sense map
+     * was supplied on the classic chart — that is a different signal, and the
+     * caller asked for it. Otherwise the field picks. Packed nodes stand for
+     * many answers; pickResonantDerivation scores those derivations with
+     * span and head still attached. It does not score {subject, verb} strings.
      */
     let decided = null;
-    if (parser === 'classic' && senseMap) {
-      const ranked = rankByAttraction(result.stable, senseMap);
-      const top = ranked.length > 0 ? projectAnswer(ranked[0].molecule) : null;
-      decided = Boolean(top && same(top.subject, gold.subject) && same(top.verb, gold.verb));
+    if (result.stable.length > 0) {
+      if (parser === 'classic' && senseMap) {
+        const ranked = rankByAttraction(result.stable, senseMap);
+        const top = ranked.length > 0 ? projectAnswer(ranked[0].molecule) : null;
+        decided = Boolean(top && same(top.subject, gold.subject) && same(top.verb, gold.verb));
+      } else if (result.ranked && result.ranked.length > 0) {
+        const top = result.ranked[0].molecule;
+        if (parser === 'packed') {
+          const picked = pickResonantDerivation(top, result.field, options.bonds);
+          decided = Boolean(
+            picked
+            && same(picked.answer.subject, gold.subject)
+            && same(picked.answer.verb, gold.verb),
+          );
+        } else {
+          const picked = projectAnswer(top);
+          decided = Boolean(picked && same(picked.subject, gold.subject) && same(picked.verb, gold.verb));
+        }
+      }
     }
 
     const d = diagnose(record, result, goldResult);

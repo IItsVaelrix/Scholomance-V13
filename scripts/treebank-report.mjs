@@ -1,10 +1,13 @@
 /**
  * THE TREEBANK REPORT.
  *
- * Runs `compose` over UD English-EWT twice per sentence — once with the real
- * lemma_form POS table, once with gold UPOS — and prints what coverage alone
- * could not say: whether the parse is right, and when it is wrong, which gold
- * subtree the chart failed to build.
+ * Runs the packed composer over UD English-EWT twice per sentence — once with
+ * the real lemma_form POS table, once with gold UPOS — and prints what
+ * coverage alone could not say: whether the parse is right, and when it is
+ * wrong, which gold subtree the chart failed to build.
+ *
+ * `--parser classic` is unpacked tree enumeration. Do not use it as the
+ * default measurement: it samples a different complexity object than packed.
  *
  * Usage:
  *   node scripts/treebank-report.mjs [--split dev|test|train] [--limit N] [--max-tokens N]
@@ -13,12 +16,10 @@
  * iterating on the grammar makes "coverage went up" and "the eval set was
  * fitted" indistinguishable.
  *
- * `compose` materialises every parse into `cell[from][to]`, so the chart grows
- * combinatorially with sentence length and does not terminate on some long
- * sentences. `--max-tokens` (default 28) skips a sentence before it ever
- * reaches `compose` rather than hanging the runner. The skip count is printed,
- * not absorbed silently, because `report.n` is already post-filter and a
- * silent skip would quietly narrow what "coverage" means.
+ * `--max-tokens` (default 28) skips a sentence before it reaches the parser.
+ * The skip count is printed, not absorbed silently, because `report.n` is
+ * already post-filter and a silent skip would quietly narrow what "coverage"
+ * means.
  */
 import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
@@ -35,7 +36,7 @@ const argOf = (flag, fallback) => {
 const SPLIT = argOf('--split', 'dev');
 const LIMIT = Number(argOf('--limit', '0')) || Infinity;
 const MAX_TOKENS = Number(argOf('--max-tokens', '28')) || 28;
-const PARSER = argOf('--parser', 'classic');
+const PARSER = argOf('--parser', 'packed');
 if (PARSER !== 'classic' && PARSER !== 'packed') {
   console.error(`--parser must be classic or packed, got ${PARSER}`);
   process.exit(1);

@@ -1,0 +1,59 @@
+{
+  "contract": "PB-ATOM-NUCLEUS-SHIELD-v1",
+  "prereg": "docs/superpowers/evidence/2026-08-14-PREREG-atom-nucleus.md",
+  "open": {
+    "arm": "OPEN",
+    "coverage": 0.2607594936708861,
+    "containment": 0.15949367088607594,
+    "parsed": 103,
+    "grammarFailure": 275,
+    "droppedThrew": 0,
+    "uraniumEvents": 260,
+    "uraniumRecPres": 69,
+    "uraniumPreservative": 315,
+    "uraniumConstructive": 308,
+    "uraniumNuclei": {
+      "nodes": 232,
+      "sealed": 232
+    },
+    "clauseHasS": true,
+    "ms": 1604
+  },
+  "shielded": {
+    "arm": "SHIELDED",
+    "coverage": 0.2607594936708861,
+    "containment": 0.15949367088607594,
+    "parsed": 103,
+    "grammarFailure": 275,
+    "droppedThrew": 0,
+    "uraniumEvents": 91,
+    "uraniumRecPres": 0,
+    "uraniumPreservative": 0,
+    "uraniumConstructive": 41,
+    "uraniumNuclei": {
+      "nodes": 84,
+      "sealed": 84
+    },
+    "clauseHasS": true,
+    "ms": 1236
+  },
+  "predictions": {
+    "P1": {
+      "hold": true,
+      "note": "rec-pres 0 < 69"
+    },
+    "P2": {
+      "hold": true,
+      "note": "coverage 0.2608 vs OPEN 0.2608"
+    },
+    "P3": {
+      "hold": true,
+      "note": "old men ran S=true"
+    },
+    "P4": {
+      "hold": true,
+      "note": "sealed 84/84"
+    }
+  },
+  "stable": true
+}

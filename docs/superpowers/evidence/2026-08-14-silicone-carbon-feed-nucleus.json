@@ -1,0 +1,148 @@
+{
+  "contract": "PB-SILICONE-CARBON-FEED-NUCLEUS-v1",
+  "arms": [
+    {
+      "arm": "CARBON_ONLY",
+      "aura": "shielded",
+      "bonds": 11,
+      "coverage": 0.015189873417721518,
+      "containment": 0.012658227848101266,
+      "parsed": 6,
+      "grammarFailure": 389,
+      "droppedThrew": 0,
+      "uraniumEvents": 71,
+      "uraniumRecursivePreservative": 0,
+      "uraniumPreservative": 0,
+      "uraniumConstructive": 7,
+      "uraniumSealed": {
+        "nodes": 71,
+        "sealed": 71
+      },
+      "clauseHasS": false,
+      "ms": 309
+    },
+    {
+      "arm": "GRADUATED",
+      "aura": "shielded",
+      "bonds": 24,
+      "coverage": 0.017721518987341773,
+      "containment": 0.015189873417721518,
+      "parsed": 7,
+      "grammarFailure": 388,
+      "droppedThrew": 0,
+      "uraniumEvents": 91,
+      "uraniumRecursivePreservative": 0,
+      "uraniumPreservative": 0,
+      "uraniumConstructive": 41,
+      "uraniumSealed": {
+        "nodes": 84,
+        "sealed": 84
+      },
+      "clauseHasS": false,
+      "ms": 335
+    },
+    {
+      "arm": "FULL",
+      "aura": "shielded",
+      "bonds": 83,
+      "coverage": 0.2607594936708861,
+      "containment": 0.15949367088607594,
+      "parsed": 103,
+      "grammarFailure": 275,
+      "droppedThrew": 0,
+      "uraniumEvents": 91,
+      "uraniumRecursivePreservative": 0,
+      "uraniumPreservative": 0,
+      "uraniumConstructive": 41,
+      "uraniumSealed": {
+        "nodes": 84,
+        "sealed": 84
+      },
+      "clauseHasS": true,
+      "ms": 2412
+    },
+    {
+      "arm": "OVERFEED",
+      "aura": "shielded",
+      "bonds": 96,
+      "coverage": 0.3822784810126582,
+      "containment": 0.29620253164556964,
+      "parsed": 151,
+      "grammarFailure": 230,
+      "droppedThrew": 0,
+      "uraniumEvents": 91,
+      "uraniumRecursivePreservative": 0,
+      "uraniumPreservative": 0,
+      "uraniumConstructive": 41,
+      "uraniumSealed": {
+        "nodes": 84,
+        "sealed": 84
+      },
+      "clauseHasS": true,
+      "ms": 94273
+    },
+    {
+      "arm": "FULL_OPEN",
+      "aura": "open",
+      "bonds": 83,
+      "coverage": 0.2607594936708861,
+      "containment": 0.15949367088607594,
+      "parsed": 103,
+      "grammarFailure": 275,
+      "droppedThrew": 0,
+      "uraniumEvents": 260,
+      "uraniumRecursivePreservative": 69,
+      "uraniumPreservative": 315,
+      "uraniumConstructive": 308,
+      "uraniumSealed": {
+        "nodes": 232,
+        "sealed": 232
+      },
+      "clauseHasS": true,
+      "ms": 1250
+    },
+    {
+      "arm": "OVERFEED_OPEN",
+      "aura": "open",
+      "bonds": 96,
+      "coverage": 0.3822784810126582,
+      "containment": 0.29620253164556964,
+      "parsed": 151,
+      "grammarFailure": 230,
+      "droppedThrew": 0,
+      "uraniumEvents": 260,
+      "uraniumRecursivePreservative": 790,
+      "uraniumPreservative": 511,
+      "uraniumConstructive": 308,
+      "uraniumSealed": {
+        "nodes": 232,
+        "sealed": 232
+      },
+      "clauseHasS": true,
+      "ms": 97978
+    }
+  ],
+  "predictions": {
+    "P_COVERAGE": {
+      "hold": true,
+      "note": "FULL shielded 26.08% / 103 vs open 26.08% / 103"
+    },
+    "P_STABILITY": {
+      "hold": true,
+      "note": "FULL rec-pres 0 < open 69"
+    },
+    "P_CLAUSE": {
+      "hold": true,
+      "note": "old men ran S=true"
+    },
+    "P_NUCLEUS": {
+      "hold": true,
+      "note": "sealed 84/84"
+    },
+    "P_OVERFEED_STABLE": {
+      "hold": true,
+      "note": "OVERFEED rec-pres 0 < open 790; cov 38.23% vs open 38.23%"
+    }
+  },
+  "pass": true
+}

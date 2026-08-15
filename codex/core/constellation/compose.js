@@ -1,6 +1,13 @@
 /**
  * COMPOSE — atoms bond into molecules
  *
+ * ☢️  UNPACKED ENUMERATION. `enumerateDerivations` (also exported as
+ * `compose` for callers that already import that name) materialises every
+ * tree. That is a different complexity contract from `composePacked`.
+ * Production and evaluation use `composePacked`. This file is the explicit
+ * enumerator. Pass `maxDerivations` / `maxForestWidth` / `maxEnumerationDepth`
+ * or you have asked for an unbounded forest.
+ *
  * Every reading specialist so far proposes a FLAT claim about one token. Two of
  * them cannot join, so no arrangement of them can describe a clause inside a
  * noun phrase, which is the shape a garden path actually has. This module adds
@@ -46,6 +53,14 @@ import { irregularPos } from '../lexical-analysis/irregular-forms.js';
  * @see codex/core/constellation/grimoire/index.js
  */
 import { BONDS } from './grimoire/index.js';
+import {
+  admitBond,
+  clauseProvenance,
+  imperativeLiftProvenance,
+  isImperativeLift,
+} from './bond-admission.js';
+import { leafNucleus, liftNucleus, bondNucleus } from './atom-nucleus.js';
+import { fieldFromAtoms, rankByResonance } from './resonance-beacon.js';
 
 /**
  * EVERY BOND MUST DECLARE ITS HEAD. Not optional with a default.
@@ -91,6 +106,29 @@ export function validateBonds(bonds) {
   }
 }
 validateBonds(BONDS);
+
+function enumerationLimitError(name, actual, limit) {
+  return new Error(`enumerateDerivations: ${name} ${actual} exceeds ${name} ${limit}`);
+}
+
+function enforceEnumerationBudgets(cell, moleculeCount, tokenCount, options) {
+  const { maxDerivations, maxForestWidth, maxEnumerationDepth } = options;
+  if (maxEnumerationDepth != null && tokenCount > maxEnumerationDepth) {
+    throw enumerationLimitError('maxEnumerationDepth', tokenCount, maxEnumerationDepth);
+  }
+  if (maxDerivations != null && moleculeCount > maxDerivations) {
+    throw enumerationLimitError('maxDerivations', moleculeCount, maxDerivations);
+  }
+  if (maxForestWidth != null) {
+    for (const row of cell) {
+      for (const bucket of row) {
+        if (bucket.length > maxForestWidth) {
+          throw enumerationLimitError('maxForestWidth', bucket.length, maxForestWidth);
+        }
+      }
+    }
+  }
+}
 
 /** Unary lifts: a bare token standing in for a phrase. */
 /**
@@ -328,7 +366,10 @@ function atomsFor(token, index, posMap, options = {}) {
   // `that's better`, so it carries AUX too rather than forcing a choice.
   if (lower === "'s") { out.push('POSS'); out.push('AUX'); }
   else if (/'s$/.test(lower) && lower.length > 2) out.push('POSS');
-  return out.map((type) => ({ type, from: index, to: index, parts: [], token }));
+  return out.map((type) => ({
+    type, from: index, to: index, parts: [], token,
+    nucleus: leafNucleus(token, type, index),
+  }));
 }
 
 /**
@@ -525,7 +566,12 @@ function closeUnderLifts(bucket, from, to) {
       for (const [src, dst] of LIFTS) {
         if (m.type !== src) continue;
         if (bucket.some((x) => x.type === dst && x.parts[0] === m)) continue;
-        bucket.push({ type: dst, from, to, parts: [m], token: m.token });
+        const lifted = {
+          type: dst, from, to, parts: [m], token: m.token,
+          nucleus: liftNucleus(dst, m),
+        };
+        if (isImperativeLift(src, dst)) Object.assign(lifted, imperativeLiftProvenance());
+        bucket.push(lifted);
         grew = true;
       }
     }
@@ -557,7 +603,7 @@ function closeUnderLifts(bucket, from, to) {
  * @returns {{ atoms: object[], molecules: object[], spanning: object[],
  *   stable: object[] }}
  */
-export function compose(tokens, posMap, options = {}) {
+export function enumerateDerivations(tokens, posMap, options = {}) {
   const roots = options.roots || ['S'];
   /**
    * Optional bond table override, honoured identically by composePacked.
@@ -580,7 +626,10 @@ export function compose(tokens, posMap, options = {}) {
   if (options.bonds) validateBonds(bonds);
   const n = (tokens || []).length;
   if (n === 0 || !posMap) {
-    return { atoms: [], molecules: [], spanning: [], stable: [] };
+    return { atoms: [], molecules: [], spanning: [], stable: [], field: [], ranked: [] };
+  }
+  if (options.maxEnumerationDepth != null && n > options.maxEnumerationDepth) {
+    throw enumerationLimitError('maxEnumerationDepth', n, options.maxEnumerationDepth);
   }
 
   /** cell[from][to] = molecules covering exactly that span */
@@ -594,6 +643,11 @@ export function compose(tokens, posMap, options = {}) {
     }
     closeUnderLifts(cell[i][i], i, i);
   }
+  if (options.maxForestWidth != null || options.maxDerivations != null) {
+    let moleculeCount = 0;
+    for (const row of cell) for (const bucket of row) moleculeCount += bucket.length;
+    enforceEnumerationBudgets(cell, moleculeCount, n, options);
+  }
 
   for (let width = 2; width <= n; width += 1) {
     for (let from = 0; from + width - 1 < n; from += 1) {
@@ -601,42 +655,15 @@ export function compose(tokens, posMap, options = {}) {
       for (let split = from; split < to; split += 1) {
         for (const left of cell[from][split]) {
           for (const right of cell[split + 1][to]) {
-            for (const [l, r, result] of bonds) {
-              if (left.type !== l || right.type !== r) continue;
-
-              // -----------------------------------------------------------
-              // MACROPHAGE ANTIGEN MEMBRANE (Contextual Immune Receptors)
-              // -----------------------------------------------------------
-              let phagocytized = false;
-              if (!options.disableMacrophage) {
-                // Pathogen 1: ADJ+S -> S
-                if (l === 'ADJ' && r === 'S' && result === 'S') {
-                  if (left.from !== 0) phagocytized = true;
-                }
-                
-                // Pathogen 2: NP+PART -> NP
-                // Overgrown participles (length > 7) replicating endlessly are quarantined.
-                if (l === 'NP' && r === 'PART' && result === 'NP') {
-                  if (right.to - right.from > 7) phagocytized = true;
-                }
-
-                // Pathogen 3: V+PP -> PART
-                if (l === 'V' && r === 'PP' && result === 'PART') {
-                  if (right.to - right.from > 5) phagocytized = true;
-                }
-
-                // Pathogen 4: VP+INF -> VP
-                // Runaway infinitive adjunctions are structurally dampened.
-                if (l === 'VP' && r === 'INF' && result === 'VP') {
-                  if (right.to - right.from > 8) phagocytized = true;
-                }
-              }
-
-              if (phagocytized) {
-                continue; // REJECT: Phagocytized by Macrophage
-              }
-
-              cell[from][to].push({ type: result, from, to, parts: [left, right] });
+            for (const bond of bonds) {
+              if (!admitBond(left, right, bond, options).ok) continue;
+              const molecule = {
+                type: bond[2], from, to, parts: [left, right],
+                nucleus: bondNucleus(bond[2], left, right, bond),
+              };
+              const provenance = clauseProvenance(left, right, bond);
+              if (provenance) Object.assign(molecule, provenance);
+              cell[from][to].push(molecule);
             }
           }
         }
@@ -649,6 +676,11 @@ export function compose(tokens, posMap, options = {}) {
        * the gap behind every determiner in the corpus.
        */
       closeUnderLifts(cell[from][to], from, to);
+      if (options.maxForestWidth != null || options.maxDerivations != null) {
+        let moleculeCount = 0;
+        for (const row of cell) for (const bucket of row) moleculeCount += bucket.length;
+        enforceEnumerationBudgets(cell, moleculeCount, n, options);
+      }
     }
   }
 
@@ -659,8 +691,10 @@ export function compose(tokens, posMap, options = {}) {
   const spanning = cell[0][n - 1];
   // Stability adds the caller's declared root to that structural test.
   const stable = spanning.filter((m) => roots.includes(m.type));
+  const field = fieldFromAtoms(atoms, tokens, bonds);
+  const ranked = rankByResonance(stable, field, bonds);
 
-  return { atoms, molecules, spanning, stable };
+  return { atoms, molecules, spanning, stable, field, ranked };
 }
 
 /**
@@ -674,4 +708,4 @@ export function compose(tokens, posMap, options = {}) {
  *
  * This is an export-only addition. No logic in this file changes.
  */
-export { BONDS, LIFTS, atomsFor };
+export { BONDS, LIFTS, atomsFor, enumerateDerivations as compose };

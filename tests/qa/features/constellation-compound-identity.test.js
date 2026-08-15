@@ -34,6 +34,14 @@
  * The 151 losses against SPLIT are real, and are the tokenizer question this
  * feature does not settle: whether the reader should fuse at all.
  *
+ * 2026-08-14: `blunt-witted lord ignoble in demeanour` was a spanning S only
+ * because ADJ+S consumed a VP→S lift (`lord` mistyped as V). Imperative
+ * provenance withdrew that privilege. The phrase is an NP, not a clause;
+ * union/fused were re-pinned to false.
+ *
+ * `is there yet another dotes upon rib-breaking` was already non-spanning on
+ * this branch (`yet` is CONJ, inversion never completed). The pin was stale.
+ *
  * The corpus is 1.8GB and not in the repository. The phrases and the lexicon
  * rows they reach are, so this runs anywhere.
  */

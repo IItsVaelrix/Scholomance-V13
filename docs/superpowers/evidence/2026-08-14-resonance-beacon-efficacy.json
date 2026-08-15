@@ -1,0 +1,51 @@
+{
+  "contract": "PB-RESONANCE-BEACON-EFFICACY-v1",
+  "sample": {
+    "sentences": 395,
+    "skipped": 105,
+    "threw": 0,
+    "parsed": 103,
+    "contained": 63,
+    "ambiguous": 26,
+    "tokensScored": 3212,
+    "tokensAmbiguous": 1469
+  },
+  "coverage": 0.2607594936708861,
+  "parse": {
+    "first": 0.5436893203883495,
+    "beacon": 0.5922330097087378,
+    "firstAmbiguous": 0.3076923076923077,
+    "beaconAmbiguous": 0.5,
+    "deltaAmbiguous": 5
+  },
+  "token": {
+    "first": 0.7356787048567871,
+    "beacon": 0.7521793275217933,
+    "firstAmbiguous": 0.5582028590878149,
+    "beaconAmbiguous": 0.59428182437032,
+    "deltaAmbiguous": 53
+  },
+  "tallies": {
+    "sentences": 395,
+    "skipped": 105,
+    "threw": 0,
+    "parsed": 103,
+    "contained": 63,
+    "ambiguous": 26,
+    "firstCorrect": 56,
+    "beaconCorrect": 61,
+    "firstCorrectAmb": 8,
+    "beaconCorrectAmb": 13,
+    "tokensScored": 3212,
+    "tokensAmbiguous": 1469,
+    "firstTypeHit": 2363,
+    "beaconTypeHit": 2416,
+    "firstTypeHitAmb": 820,
+    "beaconTypeHitAmb": 873
+  },
+  "efficacy": {
+    "parseImproves": true,
+    "tokenImproves": true,
+    "coverageUnchanged": true
+  }
+}

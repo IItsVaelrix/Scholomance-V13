@@ -46,9 +46,9 @@ describe('composePacked — the packing invariant', () => {
    * new distinct node, so `molecules.length` does not move with it). See the
    * mutation check below, which proves this on the stacked-PP sentence.
    */
-  it('enqueues each (span, category) exactly once', () => {
+  it('enqueues each (span, category) once, plus licensed clause-promotion wakes', () => {
     const r = composePacked(STACKED, pos);
-    expect(r.events).toBe(r.molecules.length);
+    expect(r.events).toBe(r.molecules.length + (r.promotionWakes || 0));
   });
 
   /**
@@ -74,7 +74,7 @@ describe('composePacked — the packing invariant', () => {
     const totalDerivations = r.molecules.reduce((sum, m) => sum + m.derivations.length, 0);
     // Agenda size drifts when the atom inventory / bond table grows (NC, compounds).
     // Pin the packing invariant: events still equals molecules under the wake rule.
-    expect(r.events).toBe(r.molecules.length);
+    expect(r.events).toBe(r.molecules.length + (r.promotionWakes || 0));
     expect(r.events).toBeGreaterThan(90);
     expect(r.events).toBeLessThan(130);
     expect(totalDerivations).toBeGreaterThanOrEqual(r.molecules.length);

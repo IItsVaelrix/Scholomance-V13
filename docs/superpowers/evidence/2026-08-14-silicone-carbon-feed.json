@@ -1,0 +1,208 @@
+{
+  "contract": "PB-SILICONE-CARBON-FEED-v1",
+  "prereg": "docs/superpowers/evidence/2026-08-14-PREREG-silicone-carbon-feed.md",
+  "queue": [
+    {
+      "id": "det-pron",
+      "status": "approximation",
+      "signature": "DET+PRON->NP",
+      "phaseBefore": "silicone",
+      "phaseAfter": "carbon"
+    },
+    {
+      "id": "verb-pp",
+      "status": "approximation",
+      "signature": "V+PP->VP",
+      "phaseBefore": "silicone",
+      "phaseAfter": "carbon"
+    },
+    {
+      "id": "verb-np-object",
+      "status": "approximation",
+      "signature": "V+NP->VP",
+      "phaseBefore": "silicone",
+      "phaseAfter": "carbon"
+    },
+    {
+      "id": "verb-adj",
+      "status": "approximation",
+      "signature": "V+ADJ->VP",
+      "phaseBefore": "silicone",
+      "phaseAfter": "carbon"
+    },
+    {
+      "id": "cop-adj",
+      "status": "approximation",
+      "signature": "COP+ADJ->VP",
+      "phaseBefore": "silicone",
+      "phaseAfter": "carbon"
+    },
+    {
+      "id": "cop-np",
+      "status": "approximation",
+      "signature": "COP+NP->VP",
+      "phaseBefore": "silicone",
+      "phaseAfter": "carbon"
+    },
+    {
+      "id": "verb-infinitive",
+      "status": "approximation",
+      "signature": "V+INF->VP",
+      "phaseBefore": "silicone",
+      "phaseAfter": "carbon"
+    },
+    {
+      "id": "cop-infinitive",
+      "status": "approximation",
+      "signature": "COP+INF->VP",
+      "phaseBefore": "silicone",
+      "phaseAfter": "carbon"
+    },
+    {
+      "id": "appos-close-comma",
+      "status": "scaffold",
+      "signature": "APPOS+COMMA->NP",
+      "phaseBefore": "silicone",
+      "phaseAfter": "carbon"
+    },
+    {
+      "id": "complementizer-that-s",
+      "status": "approximation",
+      "signature": "REL+S->SBAR",
+      "phaseBefore": "silicone",
+      "phaseAfter": "carbon"
+    },
+    {
+      "id": "verb-sbar",
+      "status": "approximation",
+      "signature": "V+SBAR->VP",
+      "phaseBefore": "silicone",
+      "phaseAfter": "carbon"
+    },
+    {
+      "id": "cop-sbar",
+      "status": "approximation",
+      "signature": "COP+SBAR->VP",
+      "phaseBefore": "silicone",
+      "phaseAfter": "carbon"
+    },
+    {
+      "id": "inv-vp",
+      "status": "approximation",
+      "signature": "INV+VP->S",
+      "phaseBefore": "silicone",
+      "phaseAfter": "carbon"
+    }
+  ],
+  "ontology": {
+    "before": 31,
+    "after": 44
+  },
+  "tableSizes": {
+    "CARBON_ONLY": 11,
+    "GRADUATED": 24,
+    "FULL": 83,
+    "OVERFEED": 96
+  },
+  "arms": [
+    {
+      "arm": "CARBON_ONLY",
+      "bonds": 11,
+      "coverage": 0.015189873417721518,
+      "containment": 0.012658227848101266,
+      "parsedBoth": 1,
+      "vagueOnly": 5,
+      "taggingFailure": 0,
+      "grammarFailure": 389,
+      "parsed": 6,
+      "analyzed": 395,
+      "droppedThrew": 0,
+      "uraniumEvents": 71,
+      "uraniumDerivations": 31,
+      "uraniumRecursivePreservative": 0,
+      "uraniumPreservative": 0,
+      "uraniumConstructive": 7,
+      "ms": 206
+    },
+    {
+      "arm": "GRADUATED",
+      "bonds": 24,
+      "coverage": 0.017721518987341773,
+      "containment": 0.015189873417721518,
+      "parsedBoth": 1,
+      "vagueOnly": 6,
+      "taggingFailure": 0,
+      "grammarFailure": 388,
+      "parsed": 7,
+      "analyzed": 395,
+      "droppedThrew": 0,
+      "uraniumEvents": 91,
+      "uraniumDerivations": 72,
+      "uraniumRecursivePreservative": 0,
+      "uraniumPreservative": 0,
+      "uraniumConstructive": 41,
+      "ms": 180
+    },
+    {
+      "arm": "FULL",
+      "bonds": 83,
+      "coverage": 0.2607594936708861,
+      "containment": 0.15949367088607594,
+      "parsedBoth": 55,
+      "vagueOnly": 48,
+      "taggingFailure": 17,
+      "grammarFailure": 275,
+      "parsed": 103,
+      "analyzed": 395,
+      "droppedThrew": 0,
+      "uraniumEvents": 260,
+      "uraniumDerivations": 800,
+      "uraniumRecursivePreservative": 69,
+      "uraniumPreservative": 315,
+      "uraniumConstructive": 308,
+      "ms": 598
+    },
+    {
+      "arm": "OVERFEED",
+      "bonds": 96,
+      "coverage": 0.3822784810126582,
+      "containment": 0.29620253164556964,
+      "parsedBoth": 85,
+      "vagueOnly": 66,
+      "taggingFailure": 14,
+      "grammarFailure": 230,
+      "parsed": 151,
+      "analyzed": 395,
+      "droppedThrew": 0,
+      "uraniumEvents": 260,
+      "uraniumDerivations": 1717,
+      "uraniumRecursivePreservative": 790,
+      "uraniumPreservative": 511,
+      "uraniumConstructive": 308,
+      "ms": 86271
+    }
+  ],
+  "predictions": {
+    "P0": {
+      "hold": true,
+      "note": "ontology 31 → 44; FULL bonds=83"
+    },
+    "P1": {
+      "hold": true,
+      "note": "coverage 0.0152 vs FULL 0.2608; parsed 6 vs 103"
+    },
+    "P2": {
+      "hold": true,
+      "note": "GRADUATED 0.0177 in (0.0152, 0.2608)"
+    },
+    "P3": {
+      "hold": true,
+      "note": "OVERFEED cov=0.3823 ev=260 recPres=790 vs FULL 0.2608 / 260 / 69"
+    },
+    "P4": {
+      "hold": true,
+      "note": "uranium events C=71 F=260 O=260"
+    }
+  },
+  "promote": false
+}

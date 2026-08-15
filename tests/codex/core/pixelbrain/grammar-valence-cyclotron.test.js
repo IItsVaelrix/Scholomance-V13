@@ -5,6 +5,7 @@ import {
   createGrammarGapAntigenCell,
   runGrammarValenceCyclotron,
   verifyGrammarValenceGapReport,
+  CYCLOTRON_LAWS,
 } from '../../../../codex/core/pixelbrain/grammar-valence-cyclotron.js';
 import { buildInvestigationReport } from '../../../../codex/core/immunity/cleri-probe/canonical-report.js';
 
@@ -49,6 +50,16 @@ const POS_MAP = new Map([
 ]);
 
 describe('Grammar Valence Cyclotron', () => {
+  it('publishes the two chart laws the uranium probe made testable', () => {
+    expect(CYCLOTRON_LAWS.AGENDA_INDEPENDENT_ADMISSION).toMatch(/agenda direction/);
+    expect(CYCLOTRON_LAWS.LIFTING_IS_NOT_A_RECURSIVE_PRIVILEGE).toMatch(/category lifting/);
+    expect(CYCLOTRON_LAWS.EVERY_ATOM_HAS_A_NUCLEUS).toMatch(/nucleus/);
+    expect(CYCLOTRON_LAWS.BEACONS_RANK_ONLY).toMatch(/never removes/);
+    expect(CYCLOTRON_LAWS.LIGHT_IS_MEANING_AGNOSTIC).toMatch(/meaning-agnostic/);
+    expect(CYCLOTRON_LAWS.CHLOROPLAST_SENSES_THE_FIELD).toMatch(/solar-panel/);
+    expect(CYCLOTRON_LAWS.MOLECULES_SELF_ORGANIZE).toMatch(/organizes/);
+  });
+
   it('admits only gold-classified grammar failures and never leaks sentence text', () => {
     const records = [GRAMMAR_RECORD, LEXICAL_RECORD, ROOT_MISMATCH_RECORD];
     const options = { minCount: 1, topPairs: 20, candidateLimit: 20 };

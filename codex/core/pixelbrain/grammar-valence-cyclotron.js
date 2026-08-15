@@ -14,6 +14,7 @@
 import { createHash } from 'node:crypto';
 
 import { BONDS, LIFTS } from '../constellation/compose.js';
+import { CYCLOTRON_LAWS } from '../constellation/bond-admission.js';
 import { buildGapSimulationSlate } from '../constellation/grimoire/gap-simulation.js';
 import {
   fireability,
@@ -40,6 +41,13 @@ import { createSemanticAtom } from './semantic-valence-cyclotron.js';
 export const GRAMMAR_VALENCE_CYCLOTRON_CONTRACT = 'PB-CONSTELLATION-GRAMMAR-GAP-v1';
 export const GRAMMAR_VALENCE_CYCLOTRON_SCHEMA_VERSION = '1.0.0';
 export const GRAMMAR_VALENCE_CYCLOTRON_MODE = 'grammar-valence-vacancy';
+
+/**
+ * Chart laws the cyclotron is bound by. Not part of the sealed gap report —
+ * they do not change with the corpus — but they are the cyclotron's constitution.
+ * A test can read them here; a microscope can cite them without opening compose.
+ */
+export { CYCLOTRON_LAWS };
 
 const VECTOR_DIMENSIONS = 128;
 const LICENSED_PAIRS = new Set(BONDS.map((bond) => `${bond[0]}+${bond[1]}`));

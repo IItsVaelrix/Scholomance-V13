@@ -19,24 +19,32 @@
  * reading look identical.
  */
 import { BONDS, LIFTS, atomsFor, validateBonds } from './compose.js';
+import {
+  admitBond,
+  clauseProvenance,
+  imperativeLiftProvenance,
+  isAdjunctEligible,
+  isImperativeLift,
+} from './bond-admission.js';
+import { leafNucleus, mergeNuclei, nucleusFromDerivation } from './atom-nucleus.js';
+import { fieldFromAtoms, rankByResonance } from './resonance-beacon.js';
+import { censusReactions } from './bond-kind.js';
 
 /**
  * Compose bottom-up over a packed chart.
  *
  * @param {string[]} tokens
  * @param {Map<string, string[]>} posMap
- * @param {{roots?: string[]}} [options] acceptable root types; defaults to a
- *   complete clause, matching `compose`.
+ * @param {{roots?: string[], agenda?: 'stack'|'queue', bonds?: Array,
+ *   disableMacrophage?: boolean, disableClauseProvenance?: boolean}} [options]
+ *   Production parser. `agenda` exists so a test can prove admission does not
+ *   depend on pop order; default is `stack`.
  * @returns {{atoms: object[], molecules: object[], spanning: object[],
- *   stable: object[], events: number}} `events` is how many times a node was
- *   pushed onto the agenda — the termination measurement, exposed so a test
- *   can assert the bound rather than trust it. This is NOT the same as the
- *   number of distinct nodes: it counts agenda activity, and the wake rule
- *   (see `offer` below) is precisely what keeps agenda activity from
- *   exceeding the node count. A counter that only counted node creation would
- *   be blind to a wake-rule leak — incrementing on `agenda.push` is what
- *   makes this the actual termination measurement rather than a tautology
- *   against `molecules.length`.
+ *   stable: object[], events: number, promotionWakes: number,
+ *   reactions: object}} `events` is agenda pops. `promotionWakes` are the
+ *   licensed re-pushes when an imperative S is promoted to a real clause.
+ *   `events === molecules.length + promotionWakes`. `reactions` is the
+ *   constructive / preservative / recursive-preservative / lifting census.
  */
 export function composePacked(tokens, posMap, options = {}) {
   const roots = options.roots || ['S'];
@@ -52,15 +60,27 @@ export function composePacked(tokens, posMap, options = {}) {
    */
   const bonds = options.bonds || BONDS;
   if (options.bonds) validateBonds(bonds);
+  /**
+   * `stack` (default) is LIFO — current production order, rightmost atom
+   * tends to dequeue first. `queue` is FIFO — leftmost dequeues first.
+   * Admission must not depend on which one you pick.
+   */
+  const take = options.agenda === 'queue'
+    ? (agenda) => agenda.shift()
+    : (agenda) => agenda.pop();
   const n = (tokens || []).length;
   if (n === 0 || !posMap) {
-    return { atoms: [], molecules: [], spanning: [], stable: [], events: 0 };
+    return {
+      atoms: [], molecules: [], spanning: [], stable: [], events: 0, promotionWakes: 0,
+      reactions: censusReactions(null), field: [], ranked: [],
+    };
   }
 
   /** cell[from][to] = Map<category, Node>. One node per category, never more. */
   const cell = Array.from({ length: n }, () => Array.from({ length: n }, () => new Map()));
   const agenda = [];
   let events = 0;
+  let promotionWakes = 0;
 
   /**
    * THE WAKE RULE. A derivation for a category the cell already has is
@@ -68,11 +88,26 @@ export function composePacked(tokens, posMap, options = {}) {
    * was, so no neighbour can newly combine with it. Only a genuinely new
    * category wakes the neighbourhood, which is what bounds the agenda by
    * spans x categories regardless of how ambiguous the sentence is.
+   *
+   * One licensed exception: an S that was only an imperative lift and later
+   * gains a constructive clause derivation must re-broadcast, or ADJ+S / ADV+S
+   * would never see the promotion. That re-push is counted in `promotionWakes`
+   * so `events === molecules + promotionWakes` stays an invariant, not a leak.
    */
   const offer = (from, to, type, derivation) => {
     const existing = cell[from][to].get(type);
-    if (existing) { existing.derivations.push(derivation); return; }
-    const node = { type, from, to, derivations: [derivation], token: null };
+    const incoming = nucleusFromDerivation(type, from, to, derivation);
+    if (existing) {
+      const wasEligible = isAdjunctEligible(existing);
+      existing.derivations.push(derivation);
+      existing.nucleus = mergeNuclei(existing.nucleus, incoming);
+      if (type === 'S' && !wasEligible && isAdjunctEligible(existing)) {
+        agenda.push(existing);
+        promotionWakes += 1;
+      }
+      return;
+    }
+    const node = { type, from, to, derivations: [derivation], token: null, nucleus: incoming };
     cell[from][to].set(type, node);
     agenda.push(node);
   };
@@ -86,7 +121,10 @@ export function composePacked(tokens, posMap, options = {}) {
     for (const a of atomsFor(tokens[i], i, posMap, options)) {
       // Two atoms of the same type at the same position ARE the same node.
       if (cell[i][i].has(a.type)) continue;
-      const node = { type: a.type, from: i, to: i, derivations: [], token: a.token };
+      const node = {
+        type: a.type, from: i, to: i, derivations: [], token: a.token,
+        nucleus: a.nucleus || leafNucleus(a.token, a.type, i),
+      };
       cell[i][i].set(a.type, node);
       atoms.push(node);
       agenda.push(node);
@@ -103,7 +141,7 @@ export function composePacked(tokens, posMap, options = {}) {
    * still gets counted, with no separate instrumentation to forget.
    */
   while (agenda.length > 0) {
-    const node = agenda.pop();
+    const node = take(agenda);
     events += 1;
 
     // Unary lifts occupy the same span, so they are offered like any other
@@ -112,7 +150,9 @@ export function composePacked(tokens, posMap, options = {}) {
     // unlike `closeUnderLifts` in compose.js.
     for (const [src, dst] of LIFTS) {
       if (node.type !== src) continue;
-      offer(node.from, node.to, dst, { lift: dst, child: node });
+      const derivation = { lift: dst, child: node };
+      if (isImperativeLift(src, dst)) Object.assign(derivation, imperativeLiftProvenance());
+      offer(node.from, node.to, dst, derivation);
     }
 
     // This node as the LEFT half of a bond. Snapshot the neighbour cell before
@@ -121,31 +161,11 @@ export function composePacked(tokens, posMap, options = {}) {
       for (let k = node.to + 1; k < n; k += 1) {
         for (const right of [...cell[node.to + 1][k].values()]) {
           for (const bond of bonds) {
-            const [l, r, result] = bond;
-            if (node.type !== l || right.type !== r) continue;
-            
-            // -----------------------------------------------------------
-            // MACROPHAGE ANTIGEN MEMBRANE (Contextual Immune Receptors)
-            // -----------------------------------------------------------
-            let phagocytized = false;
-            if (!options.disableMacrophage) {
-              if (l === 'ADJ' && r === 'S' && result === 'S') {
-                if (node.from !== 0) phagocytized = true;
-              }
-              if (l === 'NP' && r === 'PART' && result === 'NP') {
-                if (right.to - right.from > 7) phagocytized = true;
-              }
-              if (l === 'V' && r === 'PP' && result === 'PART') {
-                if (right.to - right.from > 5) phagocytized = true;
-              }
-              if (l === 'VP' && r === 'INF' && result === 'VP') {
-                if (right.to - right.from > 8) phagocytized = true;
-              }
-            }
-
-            if (phagocytized) continue; // REJECT: Phagocytized by Macrophage
-
-            offer(node.from, k, result, { bond, left: node, right });
+            if (!admitBond(node, right, bond, options).ok) continue;
+            const derivation = { bond, left: node, right };
+            const provenance = clauseProvenance(node, right, bond);
+            if (provenance) Object.assign(derivation, provenance);
+            offer(node.from, k, bond[2], derivation);
           }
         }
       }
@@ -158,8 +178,11 @@ export function composePacked(tokens, posMap, options = {}) {
       for (let j = 0; j <= node.from - 1; j += 1) {
         for (const left of [...cell[j][node.from - 1].values()]) {
           for (const bond of bonds) {
-            if (left.type !== bond[0] || node.type !== bond[1]) continue;
-            offer(j, node.to, bond[2], { bond, left, right: node });
+            if (!admitBond(left, node, bond, options).ok) continue;
+            const derivation = { bond, left, right: node };
+            const provenance = clauseProvenance(left, node, bond);
+            if (provenance) Object.assign(derivation, provenance);
+            offer(j, node.to, bond[2], derivation);
           }
         }
       }
@@ -174,8 +197,13 @@ export function composePacked(tokens, posMap, options = {}) {
   }
   const spanning = [...cell[0][n - 1].values()];
   const stable = spanning.filter((m) => roots.includes(m.type));
+  const field = fieldFromAtoms(atoms, tokens, bonds);
+  const ranked = rankByResonance(stable, field, bonds);
 
-  return { atoms, molecules, spanning, stable, events, cell };
+  return {
+    atoms, molecules, spanning, stable, events, promotionWakes, cell,
+    reactions: censusReactions(cell), field, ranked,
+  };
 }
 
 /**

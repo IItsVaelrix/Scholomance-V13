@@ -72,6 +72,11 @@
       "retiredOn": "2026-08-13"
     },
     {
+      "signature": "PRON ? S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-14"
+    },
+    {
       "signature": "PRON ? SBAR TO AUX COMMA SBAR SUB PROPN ADV MODAL PUNCT",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
@@ -102,6 +107,11 @@
       "retiredOn": "2026-08-13"
     },
     {
+      "signature": "PROPN S P DET ? ? NC CONJ DET ? ? NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-14"
+    },
+    {
       "signature": "S ? NC NP COP PUNCT",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
@@ -120,6 +130,16 @@
       "signature": "S NP TO NP",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "S S DET VP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-14"
+    },
+    {
+      "signature": "S SUB ? VP DET S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-14"
     },
     {
       "signature": "S TO ? NC",
@@ -190,6 +210,11 @@
       "signature": "SBAR TO PROPN SBAR TO NP",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "SUB PRON NC S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-14"
     },
     {
       "signature": "V ? S",
