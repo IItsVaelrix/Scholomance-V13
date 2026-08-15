@@ -37,6 +37,11 @@ import {
   evaluateQuenchSurvival,
   measurePostPerturbationPersistence,
   runTopologicalCausalAblation,
+  isolateRingClosureEffect,
+  openRingCounterfactual,
+  exactTwoSidedSignP,
+  calculateCentrifugalBreakage,
+  validateMolecularGraph,
   verifySemanticSiliconeReport,
   mulberry32,
 } from '../../../../codex/core/pixelbrain/semantic-silicone-reactor.js';
@@ -571,7 +576,129 @@ describe('Semantic Silicone Cyclotron (PB-SEMANTIC-SILICONE-CYCLOTRON-REPORT-v1)
       // Rings should substantially outperform chains under rotational stress
       expect(analysis.effects.avgRingSurvival).toBeGreaterThan(analysis.effects.avgChainSurvival);
       expect(analysis.effects.mainEffectTopologyDelta).toBeGreaterThan(20.0);
-      expect(analysis.causalVerdict).toBe('TOPOLOGY_IS_PRIMARY_CAUSAL_MECHANISM');
+
+      // This assertion used to read TOPOLOGY_IS_PRIMARY_CAUSAL_MECHANISM. At this
+      // trialCount kappa helps chains (+20.1) and harms rings (-33.3): an
+      // interaction of -53.4, larger than the 37.5 topology main effect. Neither
+      // main effect summarises a crossover that size, so "topology is primary" is
+      // not a true statement about this data. The previous verdict could not see
+      // it because it tested Math.abs(kappa) and so could not tell a crossover
+      // from a clean main effect.
+      expect(analysis.effects.interactionDelta).toBeLessThan(0);
+      expect(Math.abs(analysis.effects.interactionDelta))
+        .toBeGreaterThan(Math.abs(analysis.effects.mainEffectTopologyDelta));
+      expect(analysis.causalVerdict).toMatch(/^INTERACTION_DOMINATES_MAIN_EFFECTS_NOT_SUMMARISABLE/);
+
+      // An unsummarisable surface must not also publish a pooled number.
+      expect(analysis.aggregateReportable).toBe(false);
+      expect(analysis.suppressionReason).toBeTruthy();
     }, 15000);
+
+    it('reads the SIGN of the kappa effect, never its magnitude', () => {
+      // The defect this pins: a harmful treatment printing as a confirmation.
+      // Same run, both trial counts - kappa's main effect is negative in each,
+      // so no verdict may contain a word implying the treatment helped.
+      for (const trialCount of [120, 300]) {
+        const ablation = runTopologicalCausalAblation({
+          synthesisSpin: 85.0,
+          dmtIntensity: 0.75,
+          trialCount,
+          seed: 0x5111c0,
+        });
+        const analysis = ablation.causalAnalysisAtOperatingSpin80;
+        expect(analysis.effects.mainEffectKappaDelta).toBeLessThan(0);
+        expect(analysis.causalVerdict).not.toMatch(/HELPS|CONFIRMED|ADVANTAGE/);
+      }
+    }, 20000);
+
+    it('suppresses the aggregate when standardising flips its sign', () => {
+      // Simpson check. The arms carry different ring:chain mixes, so the pooled
+      // delta can favour the treatment while both standardised deltas do not
+      // agree with it. When that happens the report must refuse to publish it.
+      const ablation = runTopologicalCausalAblation({
+        synthesisSpin: 85.0,
+        dmtIntensity: 0.75,
+        trialCount: 300,
+        seed: 0x5111c0,
+      });
+      const analysis = ablation.causalAnalysisAtOperatingSpin80;
+      const s = analysis.standardisation;
+      const deltas = [s.observedDelta, s.atControlMix.delta, s.atDmtMix.delta];
+      const signsAgree = deltas.every((d) => d > 0) || deltas.every((d) => d < 0);
+
+      expect(signsAgree).toBe(false);
+      expect(analysis.aggregateReportable).toBe(false);
+      expect(analysis.causalVerdict).toMatch(/^COMPOSITION_ARTIFACT_NOT_TREATMENT_EFFECT/);
+    }, 20000);
+  });
+
+  describe('Ring closure isolation (one-variable topology test)', () => {
+    it('opens a ring by removing exactly one bond, leaving the rest identical', () => {
+      const report = runSemanticSiliconeCyclotron({
+        angularVelocity: 85, dmtIntensity: 0.75, trialCount: 120, seed: 0x5111c0,
+      });
+      const ring = report.molecularAssembly.molecules
+        .find((m) => validateMolecularGraph(m).hasCycle);
+      expect(ring).toBeDefined();
+
+      const opened = openRingCounterfactual(ring);
+      expect(opened).not.toBeNull();
+      expect(opened.bondsRemoved).toBe(1);
+      expect(opened.bonds.length).toBe(ring.bonds.length - 1);
+      expect(validateMolecularGraph(opened).hasCycle).toBe(false);
+
+      // Every surviving bond keeps its exact strength - that is what makes this
+      // a one-variable test rather than another arm comparison.
+      const kept = new Set(opened.bonds.map((b) => `${b.from}|${b.to}|${b.strength}`));
+      const survivors = ring.bonds.filter((b) => kept.has(`${b.from}|${b.to}|${b.strength}`));
+      expect(survivors.length).toBe(opened.bonds.length);
+    }, 20000);
+
+    it('reports discordant counts, not net marginals', () => {
+      const report = runSemanticSiliconeCyclotron({
+        angularVelocity: 85, dmtIntensity: 0.75, trialCount: 120, seed: 0x5111c0,
+      });
+      const iso = isolateRingClosureEffect({ molecules: report.molecularAssembly.molecules });
+      expect(iso.cyclicMoleculesTested).toBeGreaterThan(0);
+      for (const row of iso.bySpin) {
+        // Paired binary data: wins + losses IS the test. A row that reported only
+        // a net difference could not tell 5W/0L from 7W/2L.
+        expect(row.discordant).toBe(row.closureWins + row.closureLosses);
+      }
+      expect(iso.pooled.discordant).toBe(iso.pooled.closureWins + iso.pooled.closureLosses);
+    }, 20000);
+
+    it('exact sign test returns 1 when there is nothing to separate', () => {
+      expect(exactTwoSidedSignP(0, 0)).toBe(1);
+      expect(exactTwoSidedSignP(3, 6)).toBe(1);
+      expect(exactTwoSidedSignP(6, 6)).toBeCloseTo(0.03125, 5);
+      expect(exactTwoSidedSignP(7, 7)).toBeCloseTo(0.015625, 5);
+    });
+
+    it('CHARACTERISES A KNOWN CONFOUND: the two stress branches use different mass models', () => {
+      // calculateCentrifugalBreakage takes the cyclic branch with reduced mass
+      // hardcoded at 10.0, and the acyclic branch with reduced mass derived from
+      // molecularWeight. On a 176-weight molecule that is 10.0 versus ~44, so a
+      // ring-vs-chain comparison is confounded by a literal, not by geometry.
+      //
+      // This test PINS the defect so that making the branches consistent breaks it
+      // deliberately rather than silently moving every ring result. It is not an
+      // endorsement of the current model.
+      const report = runSemanticSiliconeCyclotron({
+        angularVelocity: 85, dmtIntensity: 0.75, trialCount: 120, seed: 0x5111c0,
+      });
+      const ring = report.molecularAssembly.molecules
+        .find((m) => validateMolecularGraph(m).hasCycle && Number(m.molecularWeight) > 100);
+      expect(ring).toBeDefined();
+
+      const opened = openRingCounterfactual(ring);
+      const closedStable = calculateCentrifugalBreakage(ring, 80).isStable;
+      const openedStable = calculateCentrifugalBreakage(opened, 80).isStable;
+
+      // The separation is total, which is the tell: real geometry does not
+      // produce a clean 100%/0% split on molecules sharing every bond strength.
+      expect(closedStable).toBe(true);
+      expect(openedStable).toBe(false);
+    }, 20000);
   });
 });

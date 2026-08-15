@@ -115,6 +115,36 @@ sound summary and the aggregate should not be quoted at all.
 `E_strain(k)·(1 − 0.6κ)` makes DMT produce rings by definition. The causal chain
 from κ to +14.3pp passes through two hardcoded constants and no measurement.
 
+> **AMENDED 2026-08-15, later the same day.** The `0.35 / 1.45` multipliers are
+> **gone**. `calculateCentrifugalBreakage` now derives `isRing` from
+> `graph.hasCycle` — the bond graph, not the topology label, which is the right
+> fix — and scales ring stress by `cycleLength` and chain stress by position and
+> reduced mass. That is real geometry and the criticism above no longer applies
+> as written.
+>
+> **The confound moved rather than closed.** The two branches do not use the same
+> mass model: the cyclic branch hardcodes reduced mass at `10.0` for every
+> molecule, while the acyclic branch derives it from `molecularWeight`. Measured
+> on a 176-weight molecule at ω=80 — ring reduced mass **10.0**, chain reduced
+> mass **44.1**; ring tear stress **8.2**, chain tear stress **81.8**, against a
+> mean bond strength of 30.4. The ring survives and the chain breaks because of a
+> literal, not because of shape.
+>
+> This was found by the new `isolateRingClosureEffect` one-variable test, which
+> returned a suspiciously perfect **348 wins / 0 losses, p ≈ 0** across five
+> quench spins on 143 cyclic molecules. Total separation on molecules sharing
+> every bond strength is not what geometry produces, and chasing it found the
+> cause. Pinned as a characterisation test so that making the branches consistent
+> breaks it deliberately.
+>
+> **Do not fix this by inventing a mass model.** Making the branches consistent
+> is a physics decision, not a bug fix: for a closed ring, cutting any bond leaves
+> two equal halves, so the honest symmetric reduced mass is `totalMass / 4`
+> uniformly — the same value a chain sees at its *midpoint*. Under that model the
+> ring becomes the worst case, not the best, because every ring bond sits at the
+> maximum while a chain has only one bond there. Whether that is the intended
+> physics is Vaelrix's call, not the auditor's.
+
 ---
 
 ## 4. What does hold: transmutation rate

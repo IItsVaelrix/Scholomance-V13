@@ -37,6 +37,7 @@ export const SEMANTIC_SILICONE_MOLECULE_CONTRACT = 'PB-SEMANTIC-SILICONE-MOLECUL
 export const SEMANTIC_SILICONE_CYCLOTRON_REPORT_CONTRACT = 'PB-SEMANTIC-SILICONE-CYCLOTRON-REPORT-v1';
 export const SEMANTIC_SILICONE_PPSP_CONTRACT = 'PB-SEMANTIC-SILICONE-PPSP-v1';
 export const SEMANTIC_SILICONE_CAUSAL_ABLATION_CONTRACT = 'PB-SEMANTIC-SILICONE-CAUSAL-ABLATION-v1';
+export const SEMANTIC_SILICONE_RING_ISOLATION_CONTRACT = 'PB-SEMANTIC-SILICONE-RING-ISOLATION-v1';
 export const SEMANTIC_SILICONE_SCHEMA_VERSION = '1.0.0';
 
 /** Physical and simulation constants */
@@ -44,6 +45,22 @@ export const COULOMB_CONSTANT = 8.9875517923e9; // N·m²/C² (normalized scale)
 export const TRANSMUTATION_THRESHOLD_ENERGY = 45.0; // Energy units required to shatter and transmute
 export const MAX_SAFE_ROTATIONAL_SPEED = 280.0; // rad/s beyond which centrifugal shear dismantles bonds
 export const MIN_TRANSMUTATION_SPIN = 35.0; // rad/s onset of the critical phase transition region
+
+/**
+ * Verdict thresholds. Declared here with their provenance so a verdict that flips
+ * between runs is attributable to the data and not to a moved bar.
+ *
+ * PPSP_PERSISTENCE_MIN_MARGIN — set 2026-08-15. The PPSP verdict was previously
+ *   `dmtArm.ppspRatio >= 0.50`, which never looked at the control arm and so could
+ *   not tell "the treatment persists" from "everything persists". It is now a
+ *   required MARGIN over control, in percentage points.
+ * MIN_FACTORIAL_CELL_COUNT — the 2x2 ran with n=19 in one cell; below this the
+ *   verdict is stamped __UNDERPOWERED rather than silently reported.
+ * CAUSAL_EFFECT_EPSILON — effects smaller than this are not given a direction.
+ */
+export const PPSP_PERSISTENCE_MIN_MARGIN = 5.0;
+export const MIN_FACTORIAL_CELL_COUNT = 20;
+export const CAUSAL_EFFECT_EPSILON = 2.0;
 
 export const CYCLOTRON_REGIMES = Object.freeze({
   SUB_CRITICAL: 'SUB_CRITICAL',
@@ -170,6 +187,25 @@ export const CANONICAL_SILICONE_SEEKS = Object.freeze([
 ]);
 
 export const CANONICAL_TARGET_SUBSTRATE = `offers: ${CANONICAL_SILICONE_OFFERS.join(' ')} seeks: ${CANONICAL_SILICONE_SEEKS.join(' ')}`;
+
+/**
+ * Negative-control population for grounding. A POPULATION, not a single string:
+ * a control fitted to one remembered attack only proves that attack is patched.
+ * Drawn from semantic spaces with no chemical overlap.
+ */
+export const GROUNDING_NOISE_CONTROLS = Object.freeze([
+  'culinary recipe tomato basil pasta baking flour dessert soup',
+  'theatrical stage opera vocal tenor aria orchestra overture drama',
+  'macroeconomic inflation liquidity interest monetary currency exchange deficit',
+  'phonetic babble blorp zorp quux fnord xyzzy widget foobar plugh',
+  'botanical flora chlorophyll photosynthesis pollen stamen petal nectar',
+]);
+
+// Built once at module load. These inputs never vary per molecule, and rebuilding
+// them inside the loop cost six conceptVector calls per evaluation — with the quench
+// sweep that is ~12,000 rebuilds per run, which timed the PPSP suite out at 5s.
+const GROUNDING_TARGET_VECTOR = conceptVector(CANONICAL_TARGET_SUBSTRATE);
+const GROUNDING_NOISE_VECTORS = Object.freeze(GROUNDING_NOISE_CONTROLS.map(conceptVector));
 
 export const DEFAULT_SILICONE_PRECURSORS = Object.freeze([
   Object.freeze({
@@ -654,20 +690,10 @@ export function evaluateSemanticGrounding(molecule, _options = {}) {
   const featureText = `offers: ${uniqueOffers} seeks: ${uniqueSeeks} valence_ratio: ${graph.valenceFulfillment}`;
 
   const vMol = conceptVector(featureText);
-  const vTarget = conceptVector(CANONICAL_TARGET_SUBSTRATE);
-  const targetCosine = Math.max(0, cosine(vTarget, vMol));
-
-  const dynamicNoiseControls = [
-    'culinary recipe tomato basil pasta baking flour dessert soup',
-    'theatrical stage opera vocal tenor aria orchestra overture drama',
-    'macroeconomic inflation liquidity interest monetary currency exchange deficit',
-    'phonetic babble blorp zorp quux fnord xyzzy widget foobar plugh',
-    'botanical flora chlorophyll photosynthesis pollen stamen petal nectar',
-  ];
+  const targetCosine = Math.max(0, cosine(GROUNDING_TARGET_VECTOR, vMol));
 
   let maxNoiseCosine = 0;
-  for (const noiseText of dynamicNoiseControls) {
-    const vNoise = conceptVector(noiseText);
+  for (const vNoise of GROUNDING_NOISE_VECTORS) {
     const noiseCos = Math.max(0, cosine(vNoise, vMol));
     if (noiseCos > maxNoiseCosine) maxNoiseCosine = noiseCos;
   }
@@ -1289,7 +1315,43 @@ export function measurePostPerturbationPersistence({
     controlArm,
     dmtArm,
     quenchSurvivalCurve: Object.freeze(quenchSurvivalCurve),
-    verdict: dmtArm.ppspRatio >= 0.50 ? 'PERSISTENCE_CONFIRMED' : 'HIGH_DECAY_RATE',
+    ...(() => {
+      // The verdict is COMPARATIVE. A DMT-only threshold cannot distinguish
+      // "the treatment persists" from "everything persists", and it reported
+      // PERSISTENCE_CONFIRMED off a bar the control arm was never measured against.
+      const marginPp = Number(((dmtArm.ppspRatio - controlArm.ppspRatio) * 100).toFixed(2));
+      // Two-proportion z on the arm counts, so a margin arrives with its own noise floor.
+      const n1 = controlArm.discoveredMolecules || 0;
+      const n2 = dmtArm.discoveredMolecules || 0;
+      const x1 = controlArm.persistentCount || 0;
+      const x2 = dmtArm.persistentCount || 0;
+      let z = 0;
+      if (n1 > 0 && n2 > 0) {
+        const pooled = (x1 + x2) / (n1 + n2);
+        const se = Math.sqrt(pooled * (1 - pooled) * ((1 / n1) + (1 / n2)));
+        z = se > 0 ? Number(((x2 / n2 - x1 / n1) / se).toFixed(3)) : 0;
+      }
+      const significant = Math.abs(z) >= 1.96;
+      let verdict;
+      if (marginPp >= PPSP_PERSISTENCE_MIN_MARGIN && significant) {
+        verdict = 'DMT_PERSISTENCE_ADVANTAGE';
+      } else if (marginPp <= -PPSP_PERSISTENCE_MIN_MARGIN && significant) {
+        verdict = 'DMT_PERSISTENCE_PENALTY';
+      } else {
+        verdict = 'NO_SEPARATION_FROM_CONTROL';
+      }
+      return {
+        comparison: Object.freeze({
+          controlPpspPercent: controlArm.ppspPercent,
+          dmtPpspPercent: dmtArm.ppspPercent,
+          marginPp,
+          z,
+          significantAt95: significant,
+          minMarginRequired: PPSP_PERSISTENCE_MIN_MARGIN,
+        }),
+        verdict,
+      };
+    })(),
   };
 
   const checksum = `silicone-ppsp1:${sha256Hex(resultBody)}`;
@@ -1424,11 +1486,78 @@ export function runTopologicalCausalAblation({
   const kappaEffectWithinRings = Number((s_dRing - s_cRing).toFixed(2));
   const kappaEffectWithinChains = Number((s_dChain - s_cChain).toFixed(2));
 
-  let causalVerdict = 'TOPOLOGY_IS_PRIMARY_CAUSAL_MECHANISM';
-  if (mainEffectTopology < 15.0 && (Math.abs(kappaEffectWithinRings) > 15.0 || Math.abs(kappaEffectWithinChains) > 15.0)) {
-    causalVerdict = 'TREATMENT_INTRINSIC_BOND_MODIFICATION';
-  } else if (mainEffectTopology >= 20.0 && s_cRing > s_cChain && s_dRing > s_dChain) {
+  // kappa's main effect, computed the SAME way as the topology main effect.
+  // Reading |kappa| instead of its sign is how a harmful treatment prints as a
+  // confirmation, so every branch below tests the signed value.
+  const mainEffectKappa = Number((((s_dRing + s_dChain) / 2) - ((s_cRing + s_cChain) / 2)).toFixed(2));
+  const interaction = Number((kappaEffectWithinRings - kappaEffectWithinChains).toFixed(2));
+
+  // Direct standardisation. The arms carry different ring:chain mixes, so an
+  // unmatched aggregate can favour the treatment purely by moving mass into the
+  // stronger stratum. Score both arms at each arm's mix and see if the sign holds.
+  const nCRing = cellControlRings.count;
+  const nCChain = cellControlChains.count;
+  const nDRing = cellDMTRings.count;
+  const nDChain = cellDMTChains.count;
+  const ringShare = (r, c) => ((r + c) > 0 ? r / (r + c) : 0);
+  const pControlMix = ringShare(nCRing, nCChain);
+  const pDmtMix = ringShare(nDRing, nDChain);
+  const atMix = (p, ring, chain) => Number(((p * ring) + ((1 - p) * chain)).toFixed(2));
+
+  const standardised = {
+    controlMixRingShare: Number(pControlMix.toFixed(4)),
+    dmtMixRingShare: Number(pDmtMix.toFixed(4)),
+    atControlMix: Object.freeze({
+      control: atMix(pControlMix, s_cRing, s_cChain),
+      dmt: atMix(pControlMix, s_dRing, s_dChain),
+      delta: Number((atMix(pControlMix, s_dRing, s_dChain) - atMix(pControlMix, s_cRing, s_cChain)).toFixed(2)),
+    }),
+    atDmtMix: Object.freeze({
+      control: atMix(pDmtMix, s_cRing, s_cChain),
+      dmt: atMix(pDmtMix, s_dRing, s_dChain),
+      delta: Number((atMix(pDmtMix, s_dRing, s_dChain) - atMix(pDmtMix, s_cRing, s_cChain)).toFixed(2)),
+    }),
+  };
+  const observedControl = atMix(pControlMix, s_cRing, s_cChain);
+  const observedDmt = atMix(pDmtMix, s_dRing, s_dChain);
+  standardised.observedDelta = Number((observedDmt - observedControl).toFixed(2));
+
+  // The aggregate is only reportable when standardising does not change the story.
+  const deltas = [standardised.observedDelta, standardised.atControlMix.delta, standardised.atDmtMix.delta];
+  const signsAgree = deltas.every((d) => d > 0) || deltas.every((d) => d < 0);
+  const interactionDominates = Math.abs(interaction) > Math.abs(mainEffectTopology)
+    && Math.abs(interaction) > Math.abs(mainEffectKappa);
+
+  const minCellCount = Math.min(nCRing, nCChain, nDRing, nDChain);
+  const underpowered = minCellCount < MIN_FACTORIAL_CELL_COUNT;
+
+  let causalVerdict;
+  let aggregateReportable = true;
+  let suppressionReason = null;
+
+  if (interactionDominates) {
+    // Neither main effect summarises a surface this bent.
+    causalVerdict = 'INTERACTION_DOMINATES_MAIN_EFFECTS_NOT_SUMMARISABLE';
+    aggregateReportable = false;
+    suppressionReason = `|interaction| ${Math.abs(interaction)} exceeds both main effects`;
+  } else if (!signsAgree) {
+    // Observed gap does not survive holding composition constant.
+    causalVerdict = 'COMPOSITION_ARTIFACT_NOT_TREATMENT_EFFECT';
+    aggregateReportable = false;
+    suppressionReason = `standardised deltas ${deltas.join(' / ')} do not share a sign`;
+  } else if (mainEffectKappa < -CAUSAL_EFFECT_EPSILON) {
+    causalVerdict = 'TREATMENT_HARMS_WITHIN_STRATA';
+  } else if (mainEffectKappa > CAUSAL_EFFECT_EPSILON
+    && kappaEffectWithinRings > 0 && kappaEffectWithinChains > 0) {
+    causalVerdict = 'TREATMENT_HELPS_WITHIN_STRATA';
+  } else if (Math.abs(mainEffectTopology) >= 20.0 && s_cRing > s_cChain && s_dRing > s_dChain) {
     causalVerdict = 'TOPOLOGY_IS_PRIMARY_CAUSAL_MECHANISM';
+  } else {
+    causalVerdict = 'NO_RESOLVABLE_EFFECT';
+  }
+
+  if (underpowered) {
+    causalVerdict = `${causalVerdict}__UNDERPOWERED`;
   }
 
   const resultBody = {
@@ -1460,9 +1589,26 @@ export function runTopologicalCausalAblation({
         avgRingSurvival,
         avgChainSurvival,
         mainEffectTopologyDelta: mainEffectTopology,
+        mainEffectKappaDelta: mainEffectKappa,
+        interactionDelta: interaction,
         kappaEffectWithinRingsDelta: kappaEffectWithinRings,
         kappaEffectWithinChainsDelta: kappaEffectWithinChains,
       }),
+      standardisation: Object.freeze({
+        ...standardised,
+        atControlMix: standardised.atControlMix,
+        atDmtMix: standardised.atDmtMix,
+      }),
+      cellCounts: Object.freeze({
+        controlRings: nCRing,
+        controlChains: nCChain,
+        dmtRings: nDRing,
+        dmtChains: nDChain,
+        minCellCount,
+        underpowered,
+      }),
+      aggregateReportable,
+      suppressionReason,
       causalVerdict,
     }),
   };
@@ -1472,6 +1618,128 @@ export function runTopologicalCausalAblation({
     ...resultBody,
     checksum,
   });
+}
+
+/**
+ * RING CLOSURE ISOLATION — the one-variable test for ring resilience.
+ *
+ * The arm comparison cannot attribute survival to topology, because the arms
+ * differ in bond strength AND composition at the same time. This holds a single
+ * molecule fixed and removes exactly one bond: the one whose deletion breaks the
+ * cycle. Same atoms, same remaining bond strengths, cyclic vs acyclic.
+ *
+ * Honest limit: an opened ring necessarily has one fewer bond, and the acyclic
+ * stress model indexes by position over bondCount, so bond count is not perfectly
+ * held. That is the physical counterfactual (an open ring IS one bond short), not
+ * a controlled one; `bondsRemoved` is reported so the reader can weigh it.
+ *
+ * PURE AND ZERO-I/O.
+ */
+export function openRingCounterfactual(molecule) {
+  const graph = validateMolecularGraph(molecule);
+  if (!graph.valid || !graph.hasCycle) return null;
+  const bonds = molecule.bonds || [];
+  for (let i = 0; i < bonds.length; i += 1) {
+    const trimmed = bonds.filter((_, j) => j !== i);
+    const candidate = {
+      ...molecule,
+      bonds: Object.freeze(trimmed),
+      bondCount: trimmed.length,
+      topology: MOLECULAR_TOPOLOGIES.LINEAR_SILOXANE_CHAIN,
+    };
+    const probe = validateMolecularGraph(candidate);
+    if (probe.valid && !probe.hasCycle) {
+      return Object.freeze({ ...candidate, removedBond: bonds[i], bondsRemoved: 1 });
+    }
+  }
+  return null;
+}
+
+export function isolateRingClosureEffect({
+  molecules = [],
+  quenchSpins = [40, 80, 120, 160, 200],
+} = {}) {
+  const pairs = [];
+  for (const mol of molecules) {
+    const opened = openRingCounterfactual(mol);
+    if (opened) pairs.push({ closed: mol, opened });
+  }
+
+  const bySpin = quenchSpins.map((spin) => {
+    let closedStable = 0;
+    let openedStable = 0;
+    let closedOnly = 0;
+    let openedOnly = 0;
+    for (const { closed, opened } of pairs) {
+      const c = calculateCentrifugalBreakage(closed, spin).isStable;
+      const o = calculateCentrifugalBreakage(opened, spin).isStable;
+      if (c) closedStable += 1;
+      if (o) openedStable += 1;
+      if (c && !o) closedOnly += 1;
+      if (o && !c) openedOnly += 1;
+    }
+    const n = pairs.length;
+    // Paired binary data: the discordant counts ARE the test. Net marginals hide
+    // which direction the disagreements ran.
+    const discordant = closedOnly + openedOnly;
+    return Object.freeze({
+      spin,
+      pairs: n,
+      closedStable,
+      openedStable,
+      closedStablePercent: n > 0 ? Number(((closedStable / n) * 100).toFixed(1)) : 0,
+      openedStablePercent: n > 0 ? Number(((openedStable / n) * 100).toFixed(1)) : 0,
+      closureWins: closedOnly,
+      closureLosses: openedOnly,
+      discordant,
+      exactBinomialP: exactTwoSidedSignP(closedOnly, discordant),
+    });
+  });
+
+  const totalWins = bySpin.reduce((s, r) => s + r.closureWins, 0);
+  const totalLosses = bySpin.reduce((s, r) => s + r.closureLosses, 0);
+  const totalDiscordant = totalWins + totalLosses;
+
+  let verdict;
+  if (pairs.length === 0) {
+    verdict = 'NO_CYCLIC_MOLECULES_TO_TEST';
+  } else if (totalDiscordant === 0) {
+    verdict = 'RING_CLOSURE_HAS_NO_EFFECT_ON_SURVIVAL';
+  } else if (exactTwoSidedSignP(totalWins, totalDiscordant) >= 0.05) {
+    verdict = 'RING_CLOSURE_EFFECT_NOT_SEPARATED_FROM_CHANCE';
+  } else {
+    verdict = totalWins > totalLosses ? 'RING_CLOSURE_IMPROVES_SURVIVAL' : 'RING_CLOSURE_HARMS_SURVIVAL';
+  }
+
+  return Object.freeze({
+    contract: SEMANTIC_SILICONE_RING_ISOLATION_CONTRACT,
+    schemaVersion: SEMANTIC_SILICONE_SCHEMA_VERSION,
+    cyclicMoleculesTested: pairs.length,
+    bySpin: Object.freeze(bySpin),
+    pooled: Object.freeze({
+      closureWins: totalWins,
+      closureLosses: totalLosses,
+      discordant: totalDiscordant,
+      exactBinomialP: exactTwoSidedSignP(totalWins, totalDiscordant),
+    }),
+    verdict,
+  });
+}
+
+/**
+ * Exact two-sided sign test. Reported instead of a z-approximation because the
+ * discordant counts here are small.
+ */
+export function exactTwoSidedSignP(successes, trials) {
+  if (!Number.isFinite(trials) || trials <= 0) return 1;
+  const k = Math.min(successes, trials - successes);
+  let cumulative = 0;
+  for (let i = 0; i <= k; i += 1) {
+    let c = 1;
+    for (let j = 0; j < i; j += 1) c = (c * (trials - j)) / (j + 1);
+    cumulative += c;
+  }
+  return Math.min(1, Number(((2 * cumulative) / (2 ** trials)).toFixed(6)));
 }
 
 /**
