@@ -269,6 +269,70 @@ export function illuminateField(field, bonds = BONDS, sink = null) {
   return stampCharges(field);
 }
 
+/**
+ * DESCENDING LIGHT — emitted from the spanning roots, downward.
+ *
+ * Every other light in this module travels sideways: an atom emits, its
+ * neighbours react, and the field is assembled out of what the atoms already
+ * knew. It can rank them; it cannot tell any of them something new.
+ *
+ * This one comes from above. After the agenda drains and the chart is frozen,
+ * light descends from every spanning root through its derivations. A cell the
+ * light reaches is LIT. An atom learns what it is by being reached, not by
+ * being told.
+ *
+ * IT CANNOT LOSE A PARSE. "Lit" is *defined* as reachable from a spanning root,
+ * so a reading that participates in any complete parse is lit by construction.
+ * That is not a hope about this implementation — it is what the operation
+ * means, and the report checks coverage comes back byte-identical anyway.
+ *
+ * Reachability is over NODE IDENTITY. The aura is the transport encoding only,
+ * so an aura collision can garble the broadcast but never the result.
+ */
+export function descendFromRoots(chart) {
+  const lit = new Set();
+  const stack = [...(chart?.stable || [])];
+  while (stack.length > 0) {
+    const node = stack.pop();
+    if (!node || lit.has(node)) continue;
+    lit.add(node);
+    for (const derivation of node.derivations || []) {
+      if (derivation.child) stack.push(derivation.child);
+      if (derivation.left) stack.push(derivation.left);
+      if (derivation.right) stack.push(derivation.right);
+    }
+  }
+  return lit;
+}
+
+/**
+ * The broadcast. Payload is the set of auras of lit cells; a receiver's key is
+ * its own aura. `lit` travels alongside as the exact identity set, so a caller
+ * can measure where the encoding and the truth disagree instead of assuming
+ * they never do.
+ */
+export function emitDescendingLight(chart) {
+  const lit = descendFromRoots(chart);
+  const auras = new Set();
+  for (const node of lit) {
+    const nucleus = readNucleus(node);
+    if (nucleus?.aura) auras.add(nucleus.aura);
+  }
+  return Object.freeze({ lit, auras, litCells: lit.size });
+}
+
+/** Decryption: the receiver unlocks the broadcast with its own aura. */
+export function decrypt(atom, payload) {
+  if (!atom || !payload?.auras) return false;
+  const nucleus = readNucleus(atom);
+  return Boolean(nucleus?.aura) && payload.auras.has(nucleus.aura);
+}
+
+/** The exact answer, over node identity. Divergence from `decrypt` is collision. */
+export function isLit(node, payload) {
+  return Boolean(payload?.lit?.has(node));
+}
+
 export function encodeBeacon(atom, coresident = []) {
   const nucleus = readNucleus(atom);
   return Object.freeze({

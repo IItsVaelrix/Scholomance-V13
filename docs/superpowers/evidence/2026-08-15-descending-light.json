@@ -1,0 +1,34 @@
+{
+  "contract": "PB-DESCENDING-LIGHT-REPORT-v1",
+  "corpus": {
+    "analysed": 395,
+    "parsed": 103,
+    "maxTokens": 20
+  },
+  "invariant": {
+    "sentencesDiffering": 0,
+    "held": true
+  },
+  "unlit": {
+    "molecules": 22081,
+    "litMolecules": 3776,
+    "atoms": 5129,
+    "litAtoms": 1119
+  },
+  "collapse": {
+    "ambiguous": 440,
+    "collapsedToOne": 258,
+    "collapsedToNone": 0,
+    "rate": 0.586364
+  },
+  "shuffledControl": {
+    "shuffles": 20,
+    "meanRate": 0.293182,
+    "p95": 0.320455,
+    "beaten": true
+  },
+  "encoding": {
+    "auraDisagreements": 0
+  },
+  "verdict": "IDENTITY_COLLAPSE_BEATS_CONTROL"
+}

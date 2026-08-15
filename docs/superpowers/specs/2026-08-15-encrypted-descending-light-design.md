@@ -1,6 +1,8 @@
 # DESIGN — Encrypted descending light (root-reachability identity)
 
-Status: proposed, not implemented. Date: 2026-08-15.
+Status: **IMPLEMENTED AND MEASURED 2026-08-15** (phase 1, annotate-only).
+Result: `docs/superpowers/evidence/2026-08-15-descending-light.json`.
+Repro: `node scripts/descending-light-report.mjs`. Date: 2026-08-15.
 Target: `codex/core/constellation/` — `compose-packed.js`, `resonance-beacon.js`,
 `atom-nucleus.js`.
 Scope: Approach A of three (see §9 for B and C).

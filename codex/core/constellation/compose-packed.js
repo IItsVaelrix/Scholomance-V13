@@ -27,7 +27,7 @@ import {
   isImperativeLift,
 } from './bond-admission.js';
 import { leafNucleus, mergeNuclei, nucleusFromDerivation } from './atom-nucleus.js';
-import { fieldFromAtoms, rankByResonance } from './resonance-beacon.js';
+import { fieldFromAtoms, rankByResonance, emitDescendingLight } from './resonance-beacon.js';
 import { censusReactions } from './bond-kind.js';
 
 /**
@@ -81,6 +81,36 @@ export function composePacked(tokens, posMap, options = {}) {
   const agenda = [];
   let events = 0;
   let promotionWakes = 0;
+
+  /**
+   * REFUSAL LEDGER — opt-in via `options.ledger`.
+   *
+   * The chart is otherwise a record of successes only. `admitBond` already
+   * computes and names every refusal ('aura-collision', receptor names,
+   * 'imperative-not-adjunct-eligible'), and both call sites read `.ok` and
+   * drop `.reason` — so the one thing you cannot reconstruct after the fact
+   * is why a bond did NOT happen. Heat can be re-measured; a refusal leaves
+   * no trace.
+   *
+   * `side` is load-bearing: the macrophage bug was a receptor present on the
+   * left-half loop and absent from the right, which is invisible in any
+   * node-level view because the node existed either way.
+   *
+   * Off by default — refusals are far rarer than derivations (22 aura
+   * collisions against 30,772 derivations on the gate corpus), but the array
+   * is retained by every caller holding the returned chart.
+   */
+  const ledger = options.ledger ? [] : null;
+  const note = (verdict, left, right, bond, side) => {
+    if (!ledger || verdict.reason === 'type-mismatch') return;
+    ledger.push({
+      reason: verdict.reason,
+      side,
+      bond: `${bond[0]}+${bond[1]}->${bond[2]}`,
+      left: { type: left?.type, from: left?.from, to: left?.to },
+      right: { type: right?.type, from: right?.from, to: right?.to },
+    });
+  };
 
   /**
    * THE WAKE RULE. A derivation for a category the cell already has is
@@ -161,7 +191,8 @@ export function composePacked(tokens, posMap, options = {}) {
       for (let k = node.to + 1; k < n; k += 1) {
         for (const right of [...cell[node.to + 1][k].values()]) {
           for (const bond of bonds) {
-            if (!admitBond(node, right, bond, options).ok) continue;
+            const verdict = admitBond(node, right, bond, options);
+            if (!verdict.ok) { note(verdict, node, right, bond, 'left'); continue; }
             const derivation = { bond, left: node, right };
             const provenance = clauseProvenance(node, right, bond);
             if (provenance) Object.assign(derivation, provenance);
@@ -178,7 +209,8 @@ export function composePacked(tokens, posMap, options = {}) {
       for (let j = 0; j <= node.from - 1; j += 1) {
         for (const left of [...cell[j][node.from - 1].values()]) {
           for (const bond of bonds) {
-            if (!admitBond(left, node, bond, options).ok) continue;
+            const verdict = admitBond(left, node, bond, options);
+            if (!verdict.ok) { note(verdict, left, node, bond, 'right'); continue; }
             const derivation = { bond, left, right: node };
             const provenance = clauseProvenance(left, node, bond);
             if (provenance) Object.assign(derivation, provenance);
@@ -197,12 +229,29 @@ export function composePacked(tokens, posMap, options = {}) {
   }
   const spanning = [...cell[0][n - 1].values()];
   const stable = spanning.filter((m) => roots.includes(m.type));
-  const field = fieldFromAtoms(atoms, tokens, bonds);
+  const couplings = options.ledger ? [] : null;
+  const field = fieldFromAtoms(atoms, tokens, bonds, couplings);
   const ranked = rankByResonance(stable, field, bonds);
+
+  /**
+   * DESCENDING LIGHT — opt-in via `options.light`, default OFF.
+   *
+   * Off by default so the frozen gate baseline is untouched until someone
+   * re-freezes it deliberately. It only ANNOTATES: `lit` is attached, nothing
+   * is removed, and no consumer of this chart reads it yet. Three suppression
+   * mechanisms have been measured on this parser and all three destroyed
+   * sentences while reporting success, so consumption is a separate, graded
+   * decision (see the 2026-08-15 descending-light spec, phase 2).
+   */
+  let light = null;
+  if (options.light) {
+    light = emitDescendingLight({ stable });
+    for (const node of molecules) node.lit = light.lit.has(node);
+  }
 
   return {
     atoms, molecules, spanning, stable, events, promotionWakes, cell,
-    reactions: censusReactions(cell), field, ranked,
+    reactions: censusReactions(cell), field, ranked, ledger, couplings, light,
   };
 }
 
