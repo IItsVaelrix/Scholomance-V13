@@ -19,6 +19,8 @@ import {
   sweepCriticalPhaseBoundary,
   measurePostPerturbationPersistence,
   runTopologicalCausalAblation,
+  isolateRingClosureEffect,
+  runSemanticSiliconeCyclotron,
   evaluateSemanticGrounding,
   MOLECULAR_TOPOLOGIES,
 } from '../codex/core/pixelbrain/semantic-silicone-reactor.js';
@@ -195,12 +197,66 @@ function main() {
   console.log(`  • Average Ring Stability:      ${analysis.effects.avgRingSurvival.toFixed(1)}%`);
   console.log(`  • Average Chain Stability:     ${analysis.effects.avgChainSurvival.toFixed(1)}%`);
   console.log(`  ► MAIN EFFECT OF TOPOLOGY:     ${formatDelta(analysis.effects.mainEffectTopologyDelta)}% (Rings vs Chains)`);
+  console.log(`  ► MAIN EFFECT OF κ:            ${formatDelta(analysis.effects.mainEffectKappaDelta)}% (computed the same way as the topology main effect)`);
   console.log(`  • κ Effect within Rings:       ${formatDelta(analysis.effects.kappaEffectWithinRingsDelta)}% (DMT Rings vs Control Rings)`);
   console.log(`  • κ Effect within Chains:      ${formatDelta(analysis.effects.kappaEffectWithinChainsDelta)}% (DMT Chains vs Control Chains)`);
+  console.log(`  ► INTERACTION:                 ${formatDelta(analysis.effects.interactionDelta)}%`);
+
+  // Direct standardisation. The arms carry different ring:chain mixes, so the
+  // pooled delta can favour the treatment purely by moving mass into the
+  // stronger stratum. Print all three so the reader can see whether it survives.
+  const s = analysis.standardisation;
+  console.log('\nCOMPOSITION STANDARDISATION (does the gap survive holding the mix constant?):');
+  const stdRow = (label, control, dmt, delta) => console.log(
+    `  ${label.padEnd(32)}| ${String(control).padStart(7)} | ${String(dmt).padStart(6)} | ${formatDelta(delta)}`,
+  );
+  console.log('  scored at...                    | control | +DMT   | Δ');
+  console.log('  --------------------------------+---------+--------+--------');
+  stdRow(`the control's mix (${(s.controlMixRingShare * 100).toFixed(1)}% rings)`, s.atControlMix.control, s.atControlMix.dmt, s.atControlMix.delta);
+  stdRow(`the DMT arm's mix (${(s.dmtMixRingShare * 100).toFixed(1)}% rings)`, s.atDmtMix.control, s.atDmtMix.dmt, s.atDmtMix.delta);
+  stdRow('unmatched, as observed', '', '', s.observedDelta);
+
+  const cc = analysis.cellCounts;
+  console.log(`\n  smallest factorial cell: n=${cc.minCellCount}${cc.underpowered ? '  ◄── UNDERPOWERED' : ''}`);
+  if (!analysis.aggregateReportable) {
+    console.log(`  ► AGGREGATE SUPPRESSED:        ${analysis.suppressionReason}`);
+  }
   console.log(`  ► CAUSAL VERDICT:              ${analysis.causalVerdict}`);
 
+  // 7. Ring closure isolation — the one-variable test.
+  console.log('\n─── 7. RING CLOSURE ISOLATION (one variable: the bond that closes the cycle) ───\n');
+  const isoPool = [
+    ...runSemanticSiliconeCyclotron({ angularVelocity: 85, dmtIntensity: 0.75, trialCount: 300, seed: 0x5111c0 }).molecularAssembly.molecules,
+    ...runSemanticSiliconeCyclotron({ angularVelocity: 85, dmtIntensity: 0.0, trialCount: 300, seed: 0x5111c0 }).molecularAssembly.molecules,
+  ];
+  const iso = isolateRingClosureEffect({ molecules: isoPool });
+  console.log(`Cyclic molecules tested: ${iso.cyclicMoleculesTested} (same atoms, same bond strengths, one bond removed)\n`);
+  console.log('Quench Spin | closed stable | opened stable | closure wins | losses | exact p');
+  console.log('------------+---------------+---------------+--------------+--------+--------');
+  for (const r of iso.bySpin) {
+    console.log(`${String(r.spin).padStart(11)} | ${`${r.closedStablePercent}%`.padStart(13)} | ${`${r.openedStablePercent}%`.padStart(13)} | ${String(r.closureWins).padStart(12)} | ${String(r.closureLosses).padStart(6)} | ${r.exactBinomialP}`);
+  }
+  console.log(`\n  pooled: ${iso.pooled.closureWins} wins / ${iso.pooled.closureLosses} losses, exact p = ${iso.pooled.exactBinomialP}`);
+  console.log(`  ► VERDICT: ${iso.verdict}`);
+  if (iso.pooled.closureLosses === 0 && iso.pooled.discordant > 20) {
+    console.log('  ⚠  TOTAL SEPARATION. Geometry does not produce a clean split on molecules');
+    console.log('     sharing every bond strength. Known cause: calculateCentrifugalBreakage');
+    console.log('     hardcodes reduced mass at 10.0 on the cyclic branch and derives it from');
+    console.log('     molecularWeight on the acyclic branch. See the 2026-08-15 audit, §3 amendment.');
+  }
+
   console.log('\n══════════════════════════════════════════════════════════════════════════════════════');
-  console.log(`PPSP VERDICT: ${ppspReport.verdict} | ABLATION VERDICT: ${analysis.causalVerdict}`);
+  console.log(`PPSP VERDICT:     ${ppspReport.verdict}`);
+  const cmp = ppspReport.comparison;
+  console.log(`                  control ${cmp.controlPpspPercent}% vs DMT ${cmp.dmtPpspPercent}%, margin ${formatDelta(cmp.marginPp)}pp, z=${cmp.z}, significant=${cmp.significantAt95} (bar: ${cmp.minMarginRequired}pp AND |z|>=1.96)`);
+  console.log(`ABLATION VERDICT: ${analysis.causalVerdict}`);
+  if (!analysis.aggregateReportable && ppspReport.verdict !== 'NO_SEPARATION_FROM_CONTROL') {
+    console.log('');
+    console.log('⚠  THE TWO VERDICTS DISAGREE, AND THE ABLATION OUTRANKS THE PPSP LINE.');
+    console.log('   PPSP compares pooled arm rates. The ablation says that pooled comparison is');
+    console.log('   not attributable, so the PPSP margin above describes a difference in mixture,');
+    console.log('   not a treatment effect. Do not quote it as one.');
+  }
   console.log('══════════════════════════════════════════════════════════════════════════════════════');
 }
 
