@@ -16,10 +16,28 @@
  * score 0 for that pair of types, not deletion of the atom.
  *
  * Light is meaning-agnostic: aura, span, energy. No type, no lemma.
- * Chlorophyll is receiver-local and reactive. The chloroplast is a
- * solar-panel array: one cell per incoming light. Irradiance is flux.
- * Voltage is the reaction. The consumer compares cells. The reaction —
- * not the photon — is the informative state.
+ *
+ * THREE ORGANS, THREE JOBS. Each answers one question and none answers
+ * another's, which is what makes any of them testable alone:
+ *
+ *   CHLOROPLAST INGESTS   `chloroplastIngest` — what arrived. Geometry only:
+ *                         self-light is not incoming, irradiance is the flux
+ *                         that reached the panel. Consults no type, because
+ *                         the photon carries none.
+ *
+ *   AURA REGULATES        `auraRegulate` — who sent it and whether this
+ *                         receiver may react to that sender. The aura is the
+ *                         sealed identity, so admission is its seat. Carries
+ *                         `damping`, the dial for how much of an absorbed
+ *                         photon becomes voltage.
+ *
+ *   CHLOROPHYLL ABSORBS   `chlorophyllAbsorb` — what the pigment makes of it.
+ *                         Receiver-local and type-aware. Type enters the light
+ *                         path here and nowhere upstream.
+ *
+ * `photosynthesize` is their composition and holds no logic of its own. The
+ * consumer compares cells. The reaction — not the photon — is the informative
+ * state.
  *
  * PURE AND ZERO-I/O.
  *
@@ -64,33 +82,106 @@ export function chlorophyll(atom) {
 }
 
 /**
- * Solar-panel array. One cell per incoming light. Every pigment at a
- * span sees the same irradiance on that cell; voltage is the reaction.
- * The array itself has no type — type lives on the pigment.
+ * INGESTION — the chloroplast takes light IN.
+ *
+ * Geometry only. A photon emitted from this atom's own span is not incoming,
+ * and irradiance is the flux that reaches the panel. No type is consulted here
+ * and none can be: the photon does not carry one. Ingestion decides WHAT
+ * ARRIVED, never what it means.
+ *
+ * `distance` is carried on the arrival because attenuation is a property of
+ * the journey, not of the pigment that will later react to it.
+ */
+export function chloroplastIngest(atom, lights = []) {
+  const arrivals = [];
+  let irradiance = 0;
+  for (const light of lights || []) {
+    if (light.from === atom.from) continue;
+    const flux = Number(light.energy) || 0;
+    irradiance += flux;
+    arrivals.push(Object.freeze({
+      aura: light.aura,
+      from: light.from,
+      to: light.to ?? light.from,
+      irradiance: flux,
+      distance: Math.abs((atom.from ?? 0) - (light.from ?? 0)),
+    }));
+  }
+  return Object.freeze({ arrivals: Object.freeze(arrivals), irradiance });
+}
+
+/**
+ * REGULATION — the aura governs what may be reacted to.
+ *
+ * The aura is the sealed identity fingerprint, so it is the seat of admission:
+ * it resolves WHO emitted an arriving photon and whether this receiver is
+ * permitted to react to that sender at all. An unregistered aura is an unknown
+ * sender and nothing is absorbed from it.
+ *
+ * `damping` is the regulator's dial — the fraction of an absorbed photon that
+ * becomes voltage. It is 1 today, which is deliberate: the seat exists and is
+ * inert, so turning regulation on later is a measurable one-line change rather
+ * than a new mechanism smuggled into the absorption maths.
+ */
+export function auraRegulate(atom, arrival, emittersByAura) {
+  const emitter = emittersByAura && emittersByAura.get(arrival.aura);
+  if (!emitter) {
+    return Object.freeze({
+      permitted: false, reason: 'unregistered-aura', emitter: null, damping: 0,
+    });
+  }
+  return Object.freeze({ permitted: true, reason: null, emitter, damping: 1 });
+}
+
+/**
+ * ABSORPTION — the chlorophyll reacts.
+ *
+ * Receiver-local and type-aware: the pigment decides whether an arriving photon
+ * is absorbed and at what voltage. Type enters the light path HERE and nowhere
+ * upstream. Geometry (which side the emitter occupies) selects the bond
+ * direction, so reverse-order bonds do not fire.
+ */
+export function chlorophyllAbsorb(pigment, arrival, emitter, bonds = BONDS, damping = 1) {
+  const leftFirst = arrival.from < (pigment.from ?? 0);
+  const order = leftFirst ? 'emitter-left' : 'emitter-right';
+  const coupling = leftFirst
+    ? directedCoupling(emitter.type, pigment.type, bonds)
+    : directedCoupling(pigment.type, emitter.type, bonds);
+  if (!(coupling > 0)) {
+    return Object.freeze({ absorbed: false, voltage: 0, coupling: 0, order });
+  }
+  const voltage = (arrival.irradiance * coupling * damping) / (1 + arrival.distance);
+  return Object.freeze({ absorbed: true, voltage, coupling, order });
+}
+
+/**
+ * Solar-panel array. One cell per ingested arrival; voltage is what the
+ * chlorophyll made of it. The array itself has no type — type lives on the
+ * pigment.
  */
 export function chloroplast(atom, lights = []) {
   const pigment = atom.chlorophyll || chlorophyll(atom);
   const ingested = atom.ingested || { energy: 0, reactions: Object.freeze([]) };
   const byAura = new Map((ingested.reactions || []).map((row) => [row.aura, row]));
-  const cells = [];
-  let irradiance = 0;
-  const incoming = (lights && lights.length)
-    ? lights.filter((light) => light.from !== atom.from)
-    : (ingested.reactions || []).map((row) => ({
+  const arrivals = (lights && lights.length)
+    ? chloroplastIngest(atom, lights).arrivals
+    : (ingested.reactions || []).map((row) => Object.freeze({
       aura: row.aura,
       from: row.from,
       to: row.from,
-      energy: row.energy,
+      irradiance: Number(row.energy) || 0,
+      distance: Math.abs((atom.from ?? 0) - (row.from ?? 0)),
     }));
-  for (const light of incoming) {
-    const flux = Number(light.energy) || 0;
-    irradiance += flux;
-    const reaction = byAura.get(light.aura);
+  const cells = [];
+  let irradiance = 0;
+  for (const arrival of arrivals) {
+    irradiance += arrival.irradiance;
+    const reaction = byAura.get(arrival.aura);
     cells.push(Object.freeze({
-      aura: light.aura,
-      from: light.from,
-      to: light.to ?? light.from,
-      irradiance: flux,
+      aura: arrival.aura,
+      from: arrival.from,
+      to: arrival.to ?? arrival.from,
+      irradiance: arrival.irradiance,
       voltage: Number(reaction?.energy) || 0,
     }));
   }
@@ -111,36 +202,54 @@ export function panelVoltage(atom) {
 }
 
 /**
- * Photosynthesis: chlorophyll reacts to meaning-agnostic light.
- * The photon has no type. Geometry (which side the emitter occupies)
- * plus the looked-up emitter are the data. Reverse-order bonds do not fire.
- * The product (`reactions`, `energy`) is the informative state.
+ * Photosynthesis is the COMPOSITION of the three organs, in order:
+ *
+ *     chloroplastIngest   what arrived        geometry, no type
+ *     auraRegulate        who sent it, may I  identity, admission
+ *     chlorophyllAbsorb   what I make of it   type, voltage
+ *
+ * Each organ answers one question and can be tested alone. The product
+ * (`reactions`, `energy`) is the informative state; the photon still has no
+ * type, and reverse-order bonds still do not fire.
  */
-export function photosynthesize(atom, lights, emittersByAura, bonds = BONDS) {
+export function photosynthesize(atom, lights, emittersByAura, bonds = BONDS, sink = null) {
   const pigment = chlorophyll(atom);
+  const { arrivals } = chloroplastIngest(atom, lights);
   const reactions = [];
   let energy = 0;
-  for (const light of lights || []) {
-    if (light.from === atom.from) continue;
-    const emitter = emittersByAura && emittersByAura.get(light.aura);
-    if (!emitter) continue;
-    const coupling = light.from < (atom.from ?? 0)
-      ? directedCoupling(emitter.type, pigment.type, bonds)
-      : directedCoupling(pigment.type, emitter.type, bonds);
-    if (!(coupling > 0)) continue;
-    const distance = Math.abs((atom.from ?? 0) - (light.from ?? 0));
-    const gained = light.energy * coupling / (1 + distance);
+  for (const arrival of arrivals) {
+    const gate = auraRegulate(atom, arrival, emittersByAura);
+    if (!gate.permitted) continue;
+    const emitter = gate.emitter;
+    const absorption = chlorophyllAbsorb(pigment, arrival, emitter, bonds, gate.damping);
+    if (!absorption.absorbed) {
+      // NON-COUPLING LEDGER. Same blind spot the refusal ledger closed one
+      // layer down: this case is computed, then dropped, so a photon that
+      // reached a receiver and bonded with nothing leaves no trace. Without
+      // it "which token couples to nothing here" is not answerable after the
+      // fact. Opt-in; silence is the common case and would dwarf `reactions`.
+      if (sink) {
+        sink.push({
+          emitterFrom: emitter.from,
+          emitterType: emitter.type,
+          receiverFrom: atom.from,
+          receiverType: pigment.type,
+          order: absorption.order,
+        });
+      }
+      continue;
+    }
     reactions.push(Object.freeze({
-      aura: light.aura,
-      from: light.from,
-      energy: gained,
+      aura: arrival.aura,
+      from: arrival.from,
+      energy: absorption.voltage,
     }));
-    energy += gained;
+    energy += absorption.voltage;
   }
   return Object.freeze({ energy, reactions: Object.freeze(reactions) });
 }
 
-export function illuminateField(field, bonds = BONDS) {
+export function illuminateField(field, bonds = BONDS, sink = null) {
   const emittersByAura = new Map();
   const lights = [];
   for (const slot of field || []) {
@@ -153,7 +262,7 @@ export function illuminateField(field, bonds = BONDS) {
   }
   for (const slot of field || []) {
     for (const atom of slot.atoms || []) {
-      atom.ingested = photosynthesize(atom, lights, emittersByAura, bonds);
+      atom.ingested = photosynthesize(atom, lights, emittersByAura, bonds, sink);
       atom.chloroplast = chloroplast(atom, lights);
     }
   }
@@ -367,7 +476,7 @@ export function leafTypesInOrder(molecule) {
  * Build the field from atoms the chart already minted. Does not call
  * `atomsFor` again — the transmitters are those atoms, stamped with beacons.
  */
-export function fieldFromAtoms(atoms, tokens, bonds = BONDS) {
+export function fieldFromAtoms(atoms, tokens, bonds = BONDS, sink = null) {
   const n = (tokens || []).length;
   const slots = Array.from({ length: n }, () => []);
   for (const atom of atoms || []) {
@@ -387,7 +496,7 @@ export function fieldFromAtoms(atoms, tokens, bonds = BONDS) {
       atoms: slotAtoms,
     });
   });
-  return illuminateField(field, bonds);
+  return illuminateField(field, bonds, sink);
 }
 
 /**
@@ -659,7 +768,15 @@ function isParallelBranch(candidate, peers, field) {
   ));
 }
 
-export function scoreDerivationCandidate(candidate, field, bonds = BONDS, peers = []) {
+/**
+ * `options.disableElectromagnetism` forces the scalar arm — the `fallback`
+ * branch below, already written for the no-verb-atom case. It is an ABLATION
+ * SWITCH, not a product mode: the electromagnetic path is what consumes
+ * `wonCells`/`explained`, so turning it off is how you measure whether the
+ * solar array earns the derivation ranking. Default off, matching
+ * `disableAura` / `disableMacrophage`.
+ */
+export function scoreDerivationCandidate(candidate, field, bonds = BONDS, peers = [], options = {}) {
   if (!candidate?.verbHead) return 0;
   const scores = readingScores(field, bonds);
   const verbAtom = atomAt(field, candidate.verbHead);
@@ -685,7 +802,7 @@ export function scoreDerivationCandidate(candidate, field, bonds = BONDS, peers 
   const fallback = Math.sqrt(subject * verb) * bondW * coverage;
   // Neutral (organized ≈ induced, maybe small) is still a circuit.
   // Only a missing verb atom falls back to the type table.
-  let score = verbAtom
+  let score = (verbAtom && !options.disableElectromagnetism)
     ? Math.max(organized, 0) * bondW * coverage
     : fallback;
   if (usurpedByLaterVerb(candidate, peers, field)) score *= 0.4;
@@ -697,13 +814,13 @@ export function scoreDerivationCandidate(candidate, field, bonds = BONDS, peers 
  * Pick among a packed (or classic) S node's derivations. Returns the
  * candidate — answer plus the heads that justified it — or null.
  */
-export function pickResonantDerivation(node, field, bonds = BONDS) {
+export function pickResonantDerivation(node, field, bonds = BONDS, options = {}) {
   const candidates = derivationCandidates(node);
   if (candidates.length === 0) return null;
   let best = candidates[0];
-  let bestScore = scoreDerivationCandidate(best, field, bonds, candidates);
+  let bestScore = scoreDerivationCandidate(best, field, bonds, candidates, options);
   for (let i = 1; i < candidates.length; i += 1) {
-    const score = scoreDerivationCandidate(candidates[i], field, bonds, candidates);
+    const score = scoreDerivationCandidate(candidates[i], field, bonds, candidates, options);
     const earlier = (candidates[i].verbHead?.from ?? 99) < (best.verbHead?.from ?? 99);
     if (score > bestScore || (score === bestScore && earlier)) {
       best = candidates[i];
