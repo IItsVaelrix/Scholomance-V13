@@ -328,22 +328,34 @@ describe('rolesComplete for complement rules', () => {
   });
 });
 
-describe('Phase 3A cannot create fires (no COMPAT rows authored)', () => {
-  it('projects relations but diagnoseT1Edge never reaches could-fire on them', () => {
-    const pairs = [
-      { lemma: 'say', type: 'VP', nb: { lemma: 'left', type: 'SBAR', side: 'right' } },
-      { lemma: 'think', type: 'V', nb: { lemma: 'ran', type: 'SBAR', side: 'right' } },
-      { lemma: 'left', type: 'S', nb: { lemma: 'ran', type: 'SBAR', side: 'right' } },
-      { lemma: 'ran', type: 'SBAR', nb: { lemma: 'left', type: 'S', side: 'right' } },
-      { lemma: 'want', type: 'VP', nb: { lemma: 'run', type: 'INF', side: 'right' } },
-      { lemma: 'want', type: 'V', nb: { lemma: 'leave', type: 'INF', side: 'right' } },
-    ];
-    for (const p of pairs) {
-      const edge = diagnoseT1Edge({ lemma: p.lemma, type: p.type }, p.nb, provider);
-      expect(edge.relation, `${p.type}+${p.nb.type}`).not.toBe(null);
-      expect(edge.status, `${p.type}+${p.nb.type}`).not.toBe('could-fire');
-      expect(edge.score).toBe(null);
-    }
+describe('Phase 8 T1 fires only on authored complement pairs', () => {
+  it('want+INF and think+SBAR can fire; S-governed abstract×abstract cannot', () => {
+    const want = diagnoseT1Edge(
+      { lemma: 'want', type: 'V' },
+      { lemma: 'leave', type: 'INF', side: 'right' },
+      provider,
+    );
+    expect(want.relation).toBe('INFINITIVAL_COMPLEMENT');
+    expect(want.status).toBe('could-fire');
+    expect(want.score).toBeGreaterThan(0);
+
+    const think = diagnoseT1Edge(
+      { lemma: 'think', type: 'V' },
+      { lemma: 'left', type: 'SBAR', side: 'right' },
+      provider,
+    );
+    expect(think.relation).toBe('PROPOSITIONAL_COMPLEMENT');
+    expect(think.status).toBe('could-fire');
+    expect(think.score).toBeGreaterThan(0);
+
+    const clause = diagnoseT1Edge(
+      { lemma: 'want', type: 'S' },
+      { lemma: 'ran', type: 'SBAR', side: 'right' },
+      provider,
+    );
+    expect(clause.relation).toBe('PROPOSITIONAL_COMPLEMENT');
+    expect(clause.status).not.toBe('could-fire');
+    expect(clause.score).toBe(null);
   });
 
   it('is deterministic: identical inputs give identical classifications', () => {

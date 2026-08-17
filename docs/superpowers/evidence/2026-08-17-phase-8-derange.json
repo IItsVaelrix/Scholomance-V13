@@ -1,0 +1,248 @@
+{
+  "contract": "PB-PHASE8-COMPLEMENT-DERANGE-v1",
+  "generatedBy": "scripts/phase-8-complement-compat-derange.mjs",
+  "mode": "observe",
+  "testFileOpened": false,
+  "scored": false,
+  "scoreOpened": false,
+  "commit": "b4c07961d7df8403c6a81ca0eb0b932f4ccf4bbf",
+  "maxTokens": 28,
+  "split": "dev",
+  "derangeSeed": "0x50383031",
+  "derangeSeedNumber": 1345859633,
+  "durationMs": 173298,
+  "chamberBaseline": {
+    "analysed": 1824,
+    "parsed": 510,
+    "threw": 0,
+    "eventsMean": 68.61896929824562,
+    "edges": 44634,
+    "relationAvailable": 21621,
+    "leftValueAvailable": 9460,
+    "rightValueAvailable": 8862,
+    "complementMappingFires": 666,
+    "complementMappingAbstains": 2550,
+    "fingerprintsChecked": 8,
+    "fingerprintsIdentical": true
+  },
+  "protection": {
+    "analysed": 1824,
+    "parsed": 510,
+    "threw": 0,
+    "eventsMean": 68.61896929824562,
+    "fingerprintsChecked": 8,
+    "fingerprintsIdentical": true
+  },
+  "chamberMatch": {
+    "analysed": true,
+    "parsed": true,
+    "threw": true,
+    "eventsMean": true,
+    "edges": true,
+    "relationAvailable": true,
+    "leftValueAvailable": true,
+    "rightValueAvailable": true,
+    "complementMappingFires": true,
+    "complementMappingAbstains": true,
+    "fingerprints": true
+  },
+  "knownCount": {
+    "pairsChecked": 10774,
+    "mismatches": 0,
+    "preserved": true
+  },
+  "real": {
+    "counts": {
+      "edges": 44634,
+      "decisionCompetitiveCells": 21512
+    },
+    "funnel": {
+      "relationAvailable": 21621,
+      "leftValueAvailable": 9460,
+      "rightValueAvailable": 8862,
+      "compatMappingAvailable": 1735,
+      "actualCompatFire": 1495
+    },
+    "complementMapping": {
+      "complementEdges": 4799,
+      "complementRelationExists": 4799,
+      "complementBothValuesExist": 3216,
+      "complementMappingExists": 4799,
+      "complementMappingFires": 666,
+      "complementMappingAbstains": 2550,
+      "firesByRelation": {
+        "INFINITIVAL_COMPLEMENT": 503,
+        "PROPOSITIONAL_COMPLEMENT": 163
+      },
+      "nonComplementFires": 829
+    }
+  },
+  "deranged": {
+    "funnel": {
+      "relationAvailable": 21621,
+      "leftValueAvailable": 9460,
+      "rightValueAvailable": 8862,
+      "compatMappingAvailable": 1735,
+      "actualCompatFire": 359
+    },
+    "complementMapping": {
+      "complementEdges": 4799,
+      "complementRelationExists": 4799,
+      "complementBothValuesExist": 3216,
+      "complementMappingExists": 4799,
+      "complementMappingFires": 0,
+      "complementMappingAbstains": 3216,
+      "firesByRelation": {
+        "INFINITIVAL_COMPLEMENT": 0,
+        "PROPOSITIONAL_COMPLEMENT": 0
+      },
+      "nonComplementFires": 359
+    }
+  },
+  "preserve": {
+    "knownCountPerLemma": true,
+    "knownPairsChecked": 10774,
+    "knownMismatches": 0,
+    "relationAvailable": {
+      "real": 21621,
+      "deranged": 21621,
+      "held": true
+    },
+    "leftValueAvailable": {
+      "real": 9460,
+      "deranged": 9460,
+      "held": true
+    },
+    "rightValueAvailable": {
+      "real": 8862,
+      "deranged": 8862,
+      "held": true
+    },
+    "fingerprints": {
+      "checked": 8,
+      "identical": 8,
+      "held": true
+    }
+  },
+  "movement": {
+    "complementMappingFires": {
+      "real": 666,
+      "deranged": 0,
+      "delta": -666,
+      "moved": true
+    },
+    "complementMappingAbstains": {
+      "real": 2550,
+      "deranged": 3216,
+      "delta": 666
+    },
+    "firesByRelation": {
+      "real": {
+        "INFINITIVAL_COMPLEMENT": 503,
+        "PROPOSITIONAL_COMPLEMENT": 163
+      },
+      "deranged": {
+        "INFINITIVAL_COMPLEMENT": 0,
+        "PROPOSITIONAL_COMPLEMENT": 0
+      }
+    },
+    "complementPaired": {
+      "disagree": 666,
+      "realOnly": 666,
+      "derangeOnly": 0,
+      "both": 0
+    },
+    "nonComplementFires": {
+      "note": "Existing T1 FEATURE_COMPAT rows are value-sensitive. Movement is reported, not a preserve-target.",
+      "real": 829,
+      "deranged": 359,
+      "delta": -470,
+      "moved": true,
+      "pairedDisagree": 586,
+      "realOnly": 528,
+      "derangeOnly": 58
+    },
+    "governorClassesFired": {
+      "real": [
+        "cognition",
+        "communication",
+        "creation",
+        "perception",
+        "state"
+      ],
+      "deranged": [],
+      "moved": true
+    },
+    "lemmasFired": {
+      "realCount": 43,
+      "derangedCount": 0,
+      "real": [
+        "announced",
+        "answer",
+        "ask",
+        "believe",
+        "call",
+        "called",
+        "decided",
+        "doing",
+        "feel",
+        "forget",
+        "found",
+        "hope",
+        "know",
+        "like",
+        "look",
+        "looking",
+        "made",
+        "mean",
+        "need",
+        "promises",
+        "remember",
+        "reports",
+        "say",
+        "see",
+        "seem",
+        "seems",
+        "start",
+        "state",
+        "talk",
+        "thanks",
+        "tried",
+        "try",
+        "trying",
+        "understand",
+        "understanding",
+        "use",
+        "want",
+        "wanted",
+        "wants",
+        "wish",
+        "wonder",
+        "work",
+        "writing"
+      ],
+      "deranged": [],
+      "moved": true
+    },
+    "classPairsFired": {
+      "real": [
+        "cognition|abstract-proposition|PROPOSITIONAL_COMPLEMENT",
+        "cognition|infinitival-event|INFINITIVAL_COMPLEMENT",
+        "communication|abstract-proposition|PROPOSITIONAL_COMPLEMENT",
+        "communication|infinitival-event|INFINITIVAL_COMPLEMENT",
+        "creation|infinitival-event|INFINITIVAL_COMPLEMENT",
+        "perception|abstract-proposition|PROPOSITIONAL_COMPLEMENT",
+        "perception|infinitival-event|INFINITIVAL_COMPLEMENT",
+        "state|infinitival-event|INFINITIVAL_COMPLEMENT"
+      ],
+      "deranged": [],
+      "moved": true
+    }
+  },
+  "efficacy": {
+    "realHits": 666,
+    "derangeHits": 0,
+    "verdict": "REAL_BEATS_CONTROLS"
+  },
+  "remainder": "derangeHits=0 is consistent with wiping *::INF / *::S / *::SBAR structural lights; this control does not isolate governor-class semantics. SCORE is not licensed. Task 9 stays blocked."
+}

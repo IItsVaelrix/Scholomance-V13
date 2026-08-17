@@ -54,6 +54,19 @@ export {
 } from './complement-ontology.js';
 
 export {
+  COMPLEMENT_CLASSES,
+  COMPLEMENT_COMPAT,
+  COMPLEMENT_COMPAT_RELATIONS,
+  COMPLEMENT_COMPAT_VERSION,
+  complementClass,
+  diagnoseComplementMapping,
+  governorClasses,
+  isComplementRelation,
+  lookupComplementCompat,
+  scoreComplementCompat,
+} from './complement-compat.js';
+
+export {
   FEATURE_COMPAT,
   edgeCompatibility,
   pickScoredReading,

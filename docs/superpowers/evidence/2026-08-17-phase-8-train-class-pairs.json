@@ -1,0 +1,231 @@
+{
+  "contract": "PB-PHASE8-TRAIN-CLASS-PAIRS-v1",
+  "mode": "observe",
+  "testFileOpened": false,
+  "scored": false,
+  "trainAnalysed": 10763,
+  "threw": 0,
+  "cutoff": 30,
+  "pairs": [
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "governor": "UNKNOWN",
+      "complement": "abstract-proposition",
+      "edges": 29690,
+      "key": "PROPOSITIONAL_COMPLEMENT|UNKNOWN|abstract-proposition",
+      "allowed": false,
+      "forbidden": true
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "governor": "UNKNOWN",
+      "complement": "infinitival-event",
+      "edges": 6943,
+      "key": "INFINITIVAL_COMPLEMENT|UNKNOWN|infinitival-event",
+      "allowed": false,
+      "forbidden": true
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "governor": "cognition",
+      "complement": "infinitival-event",
+      "edges": 2026,
+      "key": "INFINITIVAL_COMPLEMENT|cognition|infinitival-event",
+      "allowed": true,
+      "forbidden": false
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "governor": "motion",
+      "complement": "infinitival-event",
+      "edges": 1079,
+      "key": "INFINITIVAL_COMPLEMENT|motion|infinitival-event",
+      "allowed": false,
+      "forbidden": true
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "governor": "creation",
+      "complement": "infinitival-event",
+      "edges": 959,
+      "key": "INFINITIVAL_COMPLEMENT|creation|infinitival-event",
+      "allowed": true,
+      "forbidden": false
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "governor": "communication",
+      "complement": "infinitival-event",
+      "edges": 880,
+      "key": "INFINITIVAL_COMPLEMENT|communication|infinitival-event",
+      "allowed": true,
+      "forbidden": false
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "governor": "cognition",
+      "complement": "abstract-proposition",
+      "edges": 843,
+      "key": "PROPOSITIONAL_COMPLEMENT|cognition|abstract-proposition",
+      "allowed": true,
+      "forbidden": false
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "governor": "communication",
+      "complement": "abstract-proposition",
+      "edges": 660,
+      "key": "PROPOSITIONAL_COMPLEMENT|communication|abstract-proposition",
+      "allowed": true,
+      "forbidden": false
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "governor": "possession",
+      "complement": "infinitival-event",
+      "edges": 459,
+      "key": "INFINITIVAL_COMPLEMENT|possession|infinitival-event",
+      "allowed": false,
+      "forbidden": true
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "governor": "perception",
+      "complement": "infinitival-event",
+      "edges": 387,
+      "key": "INFINITIVAL_COMPLEMENT|perception|infinitival-event",
+      "allowed": true,
+      "forbidden": false
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "governor": "motion",
+      "complement": "abstract-proposition",
+      "edges": 367,
+      "key": "PROPOSITIONAL_COMPLEMENT|motion|abstract-proposition",
+      "allowed": false,
+      "forbidden": true
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "governor": "possession",
+      "complement": "abstract-proposition",
+      "edges": 339,
+      "key": "PROPOSITIONAL_COMPLEMENT|possession|abstract-proposition",
+      "allowed": false,
+      "forbidden": true
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "governor": "perception",
+      "complement": "abstract-proposition",
+      "edges": 333,
+      "key": "PROPOSITIONAL_COMPLEMENT|perception|abstract-proposition",
+      "allowed": true,
+      "forbidden": false
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "governor": "creation",
+      "complement": "abstract-proposition",
+      "edges": 280,
+      "key": "PROPOSITIONAL_COMPLEMENT|creation|abstract-proposition",
+      "allowed": false,
+      "forbidden": false
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "governor": "state",
+      "complement": "infinitival-event",
+      "edges": 213,
+      "key": "INFINITIVAL_COMPLEMENT|state|infinitival-event",
+      "allowed": true,
+      "forbidden": false
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "governor": "state",
+      "complement": "abstract-proposition",
+      "edges": 135,
+      "key": "PROPOSITIONAL_COMPLEMENT|state|abstract-proposition",
+      "allowed": false,
+      "forbidden": true
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "governor": "change",
+      "complement": "abstract-proposition",
+      "edges": 48,
+      "key": "PROPOSITIONAL_COMPLEMENT|change|abstract-proposition",
+      "allowed": false,
+      "forbidden": true
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "governor": "change",
+      "complement": "infinitival-event",
+      "edges": 44,
+      "key": "INFINITIVAL_COMPLEMENT|change|infinitival-event",
+      "allowed": false,
+      "forbidden": true
+    }
+  ],
+  "authoredRows": [
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "governor": "cognition",
+      "complement": "infinitival-event",
+      "weight": 2,
+      "trainEdges": 2026
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "governor": "creation",
+      "complement": "infinitival-event",
+      "weight": 1.5,
+      "trainEdges": 959
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "governor": "communication",
+      "complement": "infinitival-event",
+      "weight": 2,
+      "trainEdges": 880
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "governor": "cognition",
+      "complement": "abstract-proposition",
+      "weight": 2,
+      "trainEdges": 843
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "governor": "communication",
+      "complement": "abstract-proposition",
+      "weight": 2,
+      "trainEdges": 660
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "governor": "perception",
+      "complement": "infinitival-event",
+      "weight": 1.5,
+      "trainEdges": 387
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "governor": "perception",
+      "complement": "abstract-proposition",
+      "weight": 1.5,
+      "trainEdges": 333
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "governor": "state",
+      "complement": "infinitival-event",
+      "weight": 1.5,
+      "trainEdges": 213
+    }
+  ]
+}

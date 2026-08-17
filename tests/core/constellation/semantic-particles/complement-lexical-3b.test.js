@@ -134,22 +134,27 @@ describe('3B demand-bounded governor authoring (TRAIN mass >= 30, top-80 cells)'
   });
 });
 
-describe('3B waterfall consequence: values light, mappings cannot fire', () => {
-  it('a complement edge with constituent features reaches stage 3 but never stage 4', () => {
-    const governor = featuresFor('want', 'V', P);
-    const complement = featuresFor('zzzzprobe', 'INF', P);
-    const stages = waterfallStages({
-      leftFeats: governor,
-      rightFeats: complement,
+describe('3B waterfall consequence: values light; Phase 8 mapping can fire', () => {
+  it('want + INF reaches stage 5; leave + INF abstains at stage 4/5', () => {
+    const want = waterfallStages({
+      leftFeats: featuresFor('want', 'V', P),
+      rightFeats: featuresFor('zzzzprobe', 'INF', P),
       relation: 'INFINITIVAL_COMPLEMENT',
     });
-    expect(stages.relationAvailable).toBe(true);
-    expect(stages.leftValueAvailable).toBe(true);
-    expect(stages.rightValueAvailable).toBe(true);
-    // No COMPAT rows exist for complement relations: the mapping gate
-    // stays shut by construction until Phase 8 authors them.
-    expect(stages.compatMappingAvailable).toBe(false);
-    expect(stages.actualCompatFire).toBe(false);
+    expect(want.relationAvailable).toBe(true);
+    expect(want.leftValueAvailable).toBe(true);
+    expect(want.rightValueAvailable).toBe(true);
+    expect(want.compatMappingAvailable).toBe(true);
+    expect(want.actualCompatFire).toBe(true);
+
+    const motion = waterfallStages({
+      leftFeats: featuresFor('leave', 'V', P),
+      rightFeats: featuresFor('zzzzprobe', 'INF', P),
+      relation: 'INFINITIVAL_COMPLEMENT',
+    });
+    expect(motion.leftValueAvailable).toBe(true);
+    expect(motion.rightValueAvailable).toBe(true);
+    expect(motion.actualCompatFire).toBe(false);
   });
 });
 
