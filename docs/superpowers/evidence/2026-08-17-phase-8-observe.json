@@ -1,0 +1,332 @@
+{
+  "contract": "PB-PHASE8-COMPLEMENT-OBSERVE-v1",
+  "generatedBy": "scripts/phase-8-complement-compat-observe.mjs",
+  "mode": "observe",
+  "testFileOpened": false,
+  "scored": false,
+  "commit": "66c9ee25ff6e477d2be71375e62d2245a8147d47",
+  "maxTokens": 28,
+  "split": "dev",
+  "trainBondFrequencySource": "train-packed-charts-gold-independent",
+  "trainAnalysed": 10763,
+  "protection": {
+    "analysed": 1824,
+    "parsed": 510,
+    "threw": 0,
+    "eventsMean": 68.61896929824562,
+    "fingerprintsChecked": 8,
+    "fingerprintsIdentical": true
+  },
+  "counts": {
+    "edges": 44634,
+    "silent": 10771,
+    "couldFire": 1495,
+    "namedComplete": 33734,
+    "bothNamed": 11412,
+    "bothT1": 422,
+    "decisionCompetitiveCells": 21512
+  },
+  "funnel": {
+    "relationAvailable": 21621,
+    "leftValueAvailable": 9460,
+    "rightValueAvailable": 8862,
+    "compatMappingAvailable": 1735,
+    "actualCompatFire": 1495
+  },
+  "rates": {
+    "silentCompetitorRate": 0.24131827754626517,
+    "t1DecisionCouldFireRate": 0.033494645337634986,
+    "namedCompleteRate": 0.7557915490433302,
+    "bothAlternativesNamedRate": 0.5304946076608404,
+    "bothAlternativesT1Rate": 0.0196169579769431,
+    "decisionBearingEdges": 44634,
+    "decisionCompetitiveCells": 21512,
+    "waterfall": {
+      "relationAvailable": 0.48440650625084014,
+      "leftValueAvailable": 0.2119460500963391,
+      "rightValueAvailable": 0.19854819196128512,
+      "compatMappingAvailable": 0.0388717121476901,
+      "actualCompatFire": 0.033494645337634986
+    },
+    "silence": {
+      "C3-feature-missing": 15314,
+      "C1-composition-missing": 10900,
+      "C2-lexical-missing": 17054
+    }
+  },
+  "silenceClasses": {
+    "C1-composition-missing": 10900,
+    "C2-lexical-missing": 17054,
+    "C3-feature-missing": 15314
+  },
+  "complementMapping": {
+    "complementEdges": 4799,
+    "complementRelationExists": 4799,
+    "complementBothValuesExist": 3216,
+    "complementMappingExists": 4799,
+    "complementMappingFires": 666,
+    "complementMappingAbstains": 2550,
+    "firesByRelation": {
+      "INFINITIVAL_COMPLEMENT": 503,
+      "PROPOSITIONAL_COMPLEMENT": 163
+    },
+    "nonComplementFires": 829
+  },
+  "topSilentBondsByDecisionCells": [
+    {
+      "bond": "PP+S->S",
+      "family": "clause-attachment",
+      "leftType": "PP",
+      "rightType": "S",
+      "resultType": "S",
+      "silentEdges": 1967,
+      "decisionCellsAffected": 230,
+      "sentencesAffected": 186,
+      "namedAlternateSilentEdges": 307,
+      "trainBondFrequency": 22287
+    },
+    {
+      "bond": "NPCOMMA+NP->NP",
+      "family": "apposition",
+      "leftType": "NPCOMMA",
+      "rightType": "NP",
+      "resultType": "NP",
+      "silentEdges": 1123,
+      "decisionCellsAffected": 187,
+      "sentencesAffected": 102,
+      "namedAlternateSilentEdges": 593,
+      "trainBondFrequency": 9737
+    },
+    {
+      "bond": "INV+NP->S",
+      "family": "argument",
+      "leftType": "INV",
+      "rightType": "NP",
+      "resultType": "S",
+      "silentEdges": 1099,
+      "decisionCellsAffected": 157,
+      "sentencesAffected": 299,
+      "namedAlternateSilentEdges": 154,
+      "trainBondFrequency": 10710
+    },
+    {
+      "bond": "NP+PART->NP",
+      "family": "complement",
+      "leftType": "NP",
+      "rightType": "PART",
+      "resultType": "NP",
+      "silentEdges": 699,
+      "decisionCellsAffected": 155,
+      "sentencesAffected": 148,
+      "namedAlternateSilentEdges": 662,
+      "trainBondFrequency": 7536
+    },
+    {
+      "bond": "AUX+NP->INV",
+      "family": "argument",
+      "leftType": "AUX",
+      "rightType": "NP",
+      "resultType": "INV",
+      "silentEdges": 851,
+      "decisionCellsAffected": 154,
+      "sentencesAffected": 320,
+      "namedAlternateSilentEdges": 0,
+      "trainBondFrequency": 19848
+    },
+    {
+      "bond": "COP+NP->INV",
+      "family": "argument",
+      "leftType": "COP",
+      "rightType": "NP",
+      "resultType": "INV",
+      "silentEdges": 851,
+      "decisionCellsAffected": 154,
+      "sentencesAffected": 320,
+      "namedAlternateSilentEdges": 0,
+      "trainBondFrequency": 12056
+    },
+    {
+      "bond": "INV+VP->S",
+      "family": "argument",
+      "leftType": "INV",
+      "rightType": "VP",
+      "resultType": "S",
+      "silentEdges": 675,
+      "decisionCellsAffected": 149,
+      "sentencesAffected": 210,
+      "namedAlternateSilentEdges": 180,
+      "trainBondFrequency": 6566
+    },
+    {
+      "bond": "FRONTED+S->S",
+      "family": "clause-attachment",
+      "leftType": "FRONTED",
+      "rightType": "S",
+      "resultType": "S",
+      "silentEdges": 329,
+      "decisionCellsAffected": 133,
+      "sentencesAffected": 79,
+      "namedAlternateSilentEdges": 157,
+      "trainBondFrequency": 4925
+    },
+    {
+      "bond": "NPCOMMA+NP->APPOS",
+      "family": "apposition",
+      "leftType": "NPCOMMA",
+      "rightType": "NP",
+      "resultType": "APPOS",
+      "silentEdges": 641,
+      "decisionCellsAffected": 133,
+      "sentencesAffected": 23,
+      "namedAlternateSilentEdges": 0,
+      "trainBondFrequency": 9796
+    },
+    {
+      "bond": "INV+ADJ->S",
+      "family": "argument",
+      "leftType": "INV",
+      "rightType": "ADJ",
+      "resultType": "S",
+      "silentEdges": 236,
+      "decisionCellsAffected": 98,
+      "sentencesAffected": 132,
+      "namedAlternateSilentEdges": 27,
+      "trainBondFrequency": 1684
+    },
+    {
+      "bond": "PROPN+N->N",
+      "family": "modifier",
+      "leftType": "PROPN",
+      "rightType": "N",
+      "resultType": "N",
+      "silentEdges": 620,
+      "decisionCellsAffected": 91,
+      "sentencesAffected": 251,
+      "namedAlternateSilentEdges": 385,
+      "trainBondFrequency": 19498
+    },
+    {
+      "bond": "N+PROPN->N",
+      "family": "modifier",
+      "leftType": "N",
+      "rightType": "PROPN",
+      "resultType": "N",
+      "silentEdges": 632,
+      "decisionCellsAffected": 85,
+      "sentencesAffected": 228,
+      "namedAlternateSilentEdges": 423,
+      "trainBondFrequency": 8997
+    },
+    {
+      "bond": "V+ADJ->VP",
+      "family": "unclassified",
+      "leftType": "V",
+      "rightType": "ADJ",
+      "resultType": "VP",
+      "silentEdges": 472,
+      "decisionCellsAffected": 79,
+      "sentencesAffected": 306,
+      "namedAlternateSilentEdges": 459,
+      "trainBondFrequency": 7738
+    },
+    {
+      "bond": "GEN+N->NP",
+      "family": "unclassified",
+      "leftType": "GEN",
+      "rightType": "N",
+      "resultType": "NP",
+      "silentEdges": 131,
+      "decisionCellsAffected": 70,
+      "sentencesAffected": 32,
+      "namedAlternateSilentEdges": 49,
+      "trainBondFrequency": 1402
+    },
+    {
+      "bond": "ADJ+INF->ADJ",
+      "family": "unclassified",
+      "leftType": "ADJ",
+      "rightType": "INF",
+      "resultType": "ADJ",
+      "silentEdges": 78,
+      "decisionCellsAffected": 56,
+      "sentencesAffected": 19,
+      "namedAlternateSilentEdges": 72,
+      "trainBondFrequency": 4820
+    },
+    {
+      "bond": "VP+THANP->VP",
+      "family": "unclassified",
+      "leftType": "VP",
+      "rightType": "THANP",
+      "resultType": "VP",
+      "silentEdges": 34,
+      "decisionCellsAffected": 33,
+      "sentencesAffected": 9,
+      "namedAlternateSilentEdges": 25,
+      "trainBondFrequency": 290
+    },
+    {
+      "bond": "ADJ+S->S",
+      "family": "unclassified",
+      "leftType": "ADJ",
+      "rightType": "S",
+      "resultType": "S",
+      "silentEdges": 276,
+      "decisionCellsAffected": 17,
+      "sentencesAffected": 87,
+      "namedAlternateSilentEdges": 271,
+      "trainBondFrequency": 2716
+    },
+    {
+      "bond": "P+NPO->PP",
+      "family": "unclassified",
+      "leftType": "P",
+      "rightType": "NPO",
+      "resultType": "PP",
+      "silentEdges": 39,
+      "decisionCellsAffected": 16,
+      "sentencesAffected": 38,
+      "namedAlternateSilentEdges": 39,
+      "trainBondFrequency": 1086
+    },
+    {
+      "bond": "COP+SBAR->VP",
+      "family": "complement",
+      "leftType": "COP",
+      "rightType": "SBAR",
+      "resultType": "VP",
+      "silentEdges": 10,
+      "decisionCellsAffected": 10,
+      "sentencesAffected": 3,
+      "namedAlternateSilentEdges": 10,
+      "trainBondFrequency": 246
+    },
+    {
+      "bond": "POSS+N->N",
+      "family": "unclassified",
+      "leftType": "POSS",
+      "rightType": "N",
+      "resultType": "N",
+      "silentEdges": 7,
+      "decisionCellsAffected": 6,
+      "sentencesAffected": 5,
+      "namedAlternateSilentEdges": 0,
+      "trainBondFrequency": 1262
+    },
+    {
+      "bond": "COP+INF->VP",
+      "family": "unclassified",
+      "leftType": "COP",
+      "rightType": "INF",
+      "resultType": "VP",
+      "silentEdges": 1,
+      "decisionCellsAffected": 1,
+      "sentencesAffected": 1,
+      "namedAlternateSilentEdges": 1,
+      "trainBondFrequency": 248
+    }
+  ],
+  "preregGates": {
+    "note": "Phase 8 P1–P20 live in 2026-08-17-PREREG-phase-8-complement-compat.md. This census measures; it does not gate."
+  }
+}
