@@ -1,0 +1,453 @@
+{
+  "contract": "PB-INCOMPLETE-GRAMMAR-CYCLOTRON-v1",
+  "kind": "cyclotron-plus-sandbox",
+  "elapsedMs": 17280,
+  "hypothesized": [
+    {
+      "left": "P",
+      "right": "NP",
+      "why": "case wrap for silent as/of/after",
+      "deprel": "case",
+      "licensed": true,
+      "signatures": [
+        "P|NP|PP"
+      ]
+    },
+    {
+      "left": "V",
+      "right": "PP",
+      "why": "obl/advmod instead of V+P→V",
+      "deprel": "obl",
+      "licensed": true,
+      "signatures": [
+        "V|PP|VP",
+        "V|PP|PART"
+      ]
+    },
+    {
+      "left": "V",
+      "right": "PRT",
+      "why": "particle instead of V+P→V",
+      "deprel": "compound",
+      "licensed": true,
+      "signatures": [
+        "V|PRT|V"
+      ]
+    },
+    {
+      "left": "NP",
+      "right": "PP",
+      "why": "nmod instead of N+P→N",
+      "deprel": "nmod",
+      "licensed": true,
+      "signatures": [
+        "NP|PP|NP"
+      ]
+    },
+    {
+      "left": "N",
+      "right": "PP",
+      "why": "nmod on bare N",
+      "deprel": "nmod",
+      "licensed": false,
+      "signatures": []
+    },
+    {
+      "left": "V",
+      "right": "NP",
+      "why": "obj instead of V+DET→V",
+      "deprel": "obj",
+      "licensed": true,
+      "signatures": [
+        "V|NP|VP"
+      ]
+    },
+    {
+      "left": "DET",
+      "right": "N",
+      "why": "det instead of DET+V→DET",
+      "deprel": "det",
+      "licensed": true,
+      "signatures": [
+        "DET|N|NP"
+      ]
+    },
+    {
+      "left": "COP",
+      "right": "ADJ",
+      "why": "cop instead of AUX+ADJ→ADJ",
+      "deprel": "cop",
+      "licensed": true,
+      "signatures": [
+        "COP|ADJ|VP"
+      ]
+    },
+    {
+      "left": "ADV",
+      "right": "VP",
+      "why": "advmod instead of ADV+MODAL→ADV",
+      "deprel": "advmod",
+      "licensed": true,
+      "signatures": [
+        "ADV|VP|VP"
+      ]
+    },
+    {
+      "left": "TO",
+      "right": "VP",
+      "why": "infinitive instead of TO+DET→TO",
+      "deprel": "mark",
+      "licensed": true,
+      "signatures": [
+        "TO|VP|INF"
+      ]
+    },
+    {
+      "left": "SUB",
+      "right": "S",
+      "why": "mark instead of SUB+N→N",
+      "deprel": "mark",
+      "licensed": true,
+      "signatures": [
+        "SUB|S|SBAR",
+        "SUB|S|S"
+      ]
+    }
+  ],
+  "alreadyLicensed": 10,
+  "actuallyMissing": [
+    "N+PP"
+  ],
+  "cyclotron": {
+    "contract": "PB-CONSTELLATION-GRAMMAR-GAP-v1",
+    "verdict": "GAPS_DETECTED",
+    "checksum": "grammar-cyclotron1:9889a89f545f3c8c",
+    "recordsInput": 500,
+    "gapTypes": 40,
+    "occurrences": 497,
+    "candidates": 8,
+    "rejectedPairs": 32,
+    "topGaps": [
+      {
+        "pair": "S+P",
+        "n": 38,
+        "verdict": "MISSING_STRUCTURE_UNRESOLVED",
+        "deprels": [
+          "acl",
+          "acl:relcl",
+          "conj",
+          "mark",
+          "nmod"
+        ]
+      },
+      {
+        "pair": "S+NP",
+        "n": 26,
+        "verdict": "CANDIDATE_ONLY",
+        "deprels": [
+          "conj",
+          "obl",
+          "obl",
+          "obl:unmarked",
+          "root",
+          "xcomp"
+        ]
+      },
+      {
+        "pair": "NP+NP",
+        "n": 24,
+        "verdict": "CANDIDATE_ONLY",
+        "deprels": [
+          "advcl",
+          "advcl",
+          "conj",
+          "cop",
+          "obj",
+          "root"
+        ]
+      },
+      {
+        "pair": "S+S",
+        "n": 20,
+        "verdict": "CANDIDATE_ONLY",
+        "deprels": [
+          "root",
+          "advcl",
+          "ccomp",
+          "ccomp",
+          "conj"
+        ]
+      },
+      {
+        "pair": "S+DET",
+        "n": 19,
+        "verdict": "MISSING_STRUCTURE_UNRESOLVED",
+        "deprels": [
+          "advcl",
+          "parataxis",
+          "root"
+        ]
+      },
+      {
+        "pair": "DET+S",
+        "n": 18,
+        "verdict": "MISSING_STRUCTURE_UNRESOLVED",
+        "deprels": [
+          "obj",
+          "advmod",
+          "ccomp",
+          "conj",
+          "nmod",
+          "nsubj:pass",
+          "obl",
+          "root",
+          "xcomp"
+        ]
+      },
+      {
+        "pair": "SUB+NP",
+        "n": 18,
+        "verdict": "MISSING_STRUCTURE_UNRESOLVED",
+        "deprels": [
+          "obl",
+          "advcl",
+          "advcl",
+          "advcl",
+          "advcl",
+          "ccomp",
+          "nmod",
+          "obl"
+        ]
+      },
+      {
+        "pair": "S+SUB",
+        "n": 17,
+        "verdict": "MISSING_STRUCTURE_UNRESOLVED",
+        "deprels": [
+          "case",
+          "case",
+          "nmod:unmarked",
+          "obl"
+        ]
+      },
+      {
+        "pair": "NP+P",
+        "n": 16,
+        "verdict": "MISSING_STRUCTURE_UNRESOLVED",
+        "deprels": [
+          "acl",
+          "conj",
+          "conj"
+        ]
+      },
+      {
+        "pair": "P+S",
+        "n": 16,
+        "verdict": "MISSING_STRUCTURE_UNRESOLVED",
+        "deprels": [
+          "advcl",
+          "acl",
+          "ccomp",
+          "conj",
+          "obl",
+          "obl"
+        ]
+      },
+      {
+        "pair": "S+AUX",
+        "n": 14,
+        "verdict": "MISSING_STRUCTURE_UNRESOLVED",
+        "deprels": [
+          "root",
+          "advcl",
+          "ccomp",
+          "ccomp",
+          "csubj",
+          "parataxis",
+          "root"
+        ]
+      },
+      {
+        "pair": "NP+AUX",
+        "n": 13,
+        "verdict": "MISSING_STRUCTURE_UNRESOLVED",
+        "deprels": [
+          "ccomp",
+          "root"
+        ]
+      }
+    ],
+    "novelFireable": [
+      {
+        "pair": "S+NP",
+        "occurrences": 26,
+        "signature": "S|NP|S",
+        "left": "S",
+        "right": "NP",
+        "result": "S",
+        "head": 0,
+        "verdict": "CANDIDATE_ONLY",
+        "fireable": true,
+        "reason": "Observed inputs can fire and the candidate result remains productive toward S.",
+        "deprels": [
+          "conj",
+          "obl",
+          "obl:unmarked",
+          "root",
+          "xcomp"
+        ]
+      },
+      {
+        "pair": "NP+NP",
+        "occurrences": 24,
+        "signature": "NP|NP|NP",
+        "left": "NP",
+        "right": "NP",
+        "result": "NP",
+        "head": 0,
+        "verdict": "CANDIDATE_ONLY",
+        "fireable": true,
+        "reason": "Observed inputs can fire and the candidate result remains productive toward S.",
+        "deprels": [
+          "advcl",
+          "conj",
+          "cop",
+          "obj",
+          "root"
+        ]
+      },
+      {
+        "pair": "S+S",
+        "occurrences": 20,
+        "signature": "S|S|S",
+        "left": "S",
+        "right": "S",
+        "result": "S",
+        "head": 0,
+        "verdict": "CANDIDATE_ONLY",
+        "fireable": true,
+        "reason": "Observed inputs can fire and the candidate result remains productive toward S.",
+        "deprels": [
+          "advcl",
+          "ccomp",
+          "conj",
+          "root"
+        ]
+      },
+      {
+        "pair": "NP+S",
+        "occurrences": 13,
+        "signature": "NP|S|S",
+        "left": "NP",
+        "right": "S",
+        "result": "S",
+        "head": 1,
+        "verdict": "CANDIDATE_ONLY",
+        "fireable": true,
+        "reason": "Observed inputs can fire and the candidate result remains productive toward S.",
+        "deprels": [
+          "advcl",
+          "advmod",
+          "nsubj",
+          "nsubj:outer",
+          "root"
+        ]
+      },
+      {
+        "pair": "COMMA+S",
+        "occurrences": 12,
+        "signature": "COMMA|S|S",
+        "left": "COMMA",
+        "right": "S",
+        "result": "S",
+        "head": 1,
+        "verdict": "CANDIDATE_ONLY",
+        "fireable": true,
+        "reason": "Observed inputs can fire and the candidate result remains productive toward S.",
+        "deprels": [
+          "advcl:relcl",
+          "conj",
+          "parataxis"
+        ]
+      },
+      {
+        "pair": "S+CONJ",
+        "occurrences": 11,
+        "signature": "S|CONJ|SCOMMA",
+        "left": "S",
+        "right": "CONJ",
+        "result": "SCOMMA",
+        "head": 0,
+        "verdict": "CANDIDATE_ONLY",
+        "fireable": true,
+        "reason": "Observed inputs can fire and the candidate result remains productive toward S.",
+        "deprels": []
+      },
+      {
+        "pair": "S+VP",
+        "occurrences": 8,
+        "signature": "S|VP|S",
+        "left": "S",
+        "right": "VP",
+        "result": "S",
+        "head": 0,
+        "verdict": "CANDIDATE_ONLY",
+        "fireable": true,
+        "reason": "Observed inputs can fire and the candidate result remains productive toward S.",
+        "deprels": [
+          "root"
+        ]
+      },
+      {
+        "pair": "VP+S",
+        "occurrences": 7,
+        "signature": "VP|S|S",
+        "left": "VP",
+        "right": "S",
+        "result": "S",
+        "head": 1,
+        "verdict": "CANDIDATE_ONLY",
+        "fireable": true,
+        "reason": "Observed inputs can fire and the candidate result remains productive toward S.",
+        "deprels": [
+          "ccomp",
+          "root"
+        ]
+      }
+    ],
+    "overfed": [
+      "S|NP|S",
+      "NP|NP|NP",
+      "S|S|S",
+      "NP|S|S",
+      "COMMA|S|S",
+      "S|CONJ|SCOMMA",
+      "S|VP|S",
+      "VP|S|S"
+    ]
+  },
+  "sandbox": {
+    "n": 200,
+    "threw": 0,
+    "parsed": {
+      "baseline": 52,
+      "silicone": 57,
+      "cyclotron": 75
+    },
+    "contain": {
+      "baseline": 42,
+      "silicone": 48,
+      "cyclotron": 62
+    },
+    "containDeltaSi": 6,
+    "containDeltaCy": 20
+  },
+  "falsifiers": {
+    "F1_allHypothesizedAlreadyLicensed": false,
+    "F2_cyclotronNamedNoFireableNovel": false,
+    "F3_cyclotronContainmentNotAboveBaseline": false,
+    "F4_cyclotronDoesNotBeatSiliconeContainment": false
+  },
+  "verdict": "INCOMPLETE GRAMMAR — cyclotron-named bonds beat both baseline and frozen silicone. Still not Grimoire law.",
+  "checksum": "incomplete-grammar-v1:881f3f1ae0bdeeea587185d71f897acfab7110d59cb96d0855ac9ebc9699130c"
+}

@@ -1,0 +1,92 @@
+{
+  "contract": "PB-SEMANTIC-SUBSTRATE-DEV-v1",
+  "testFileOpened": false,
+  "commit": "8495daa2103bf5c00ac65360244fbd79aa20e828",
+  "maxTokens": 28,
+  "t1": {
+    "exposure": {
+      "verdict": "INSUFFICIENT_EXPOSURE",
+      "evaluateEfficacy": false,
+      "failures": [
+        "minEvidenceRate",
+        "maxAllUnknownRate"
+      ],
+      "evidenceRate": 0.4662455097237706,
+      "scoreDisagreementRate": 0.10479375696767002,
+      "allUnknownRate": 0.5337544902762295,
+      "rankDisagreements": 148,
+      "ambiguous": 8073
+    },
+    "ambiguous": 8073,
+    "withEvidence": 3764,
+    "allUnknown": 4309,
+    "scoreDisagreements": 846,
+    "rankDisagreements": 148,
+    "paired": {
+      "wins": 101,
+      "losses": 25,
+      "pValue": 5.027865916342067e-12,
+      "printed": "p < 1e-6",
+      "test": "exact-two-sided-sign"
+    },
+    "accuracy": null
+  },
+  "t2": {
+    "n": 189,
+    "fallback": "first-if-abstain",
+    "rates": {
+      "first": 0.26455026455026454,
+      "unigram": 0.23809523809523808,
+      "forward": 0.2804232804232804,
+      "inverse": 0.2804232804232804,
+      "both": 0.2804232804232804,
+      "roleShuffle": 0.2751322751322751,
+      "predShuffle": 0.2698412698412698,
+      "fillShuffle": 0.2751322751322751,
+      "nullCharge": 0.26455026455026454
+    },
+    "mechanism": {
+      "forwardPresent": 26,
+      "inversePresent": 26,
+      "forwardChangesFirst": 18,
+      "inverseChangesFirst": 18,
+      "bothChangesFirst": 18,
+      "forwardEqualsBoth": 189,
+      "inverseEqualsBoth": 189
+    },
+    "paired": {
+      "vsFirst": {
+        "wins": 8,
+        "losses": 5,
+        "pValue": 0.5810546875,
+        "printed": "p = 0.5811",
+        "test": "exact-two-sided-sign"
+      },
+      "vsUnigram": {
+        "wins": 30,
+        "losses": 22,
+        "pValue": 0.3317497633694906,
+        "printed": "p = 0.3317",
+        "test": "exact-two-sided-sign"
+      },
+      "vsRoleShuffle": {
+        "wins": 6,
+        "losses": 5,
+        "pValue": 1,
+        "printed": "p = 1",
+        "test": "exact-two-sided-sign"
+      }
+    }
+  },
+  "protection": {
+    "analysed": 1824,
+    "parsed": 585,
+    "threw": 0,
+    "goldContained": 379,
+    "coverage": 0.3207236842105263,
+    "containment": 0.20778508771929824,
+    "eventsMean": 77.11677631578948,
+    "recPresMean": 13.100877192982455,
+    "fingerprintsIdentical": true
+  }
+}

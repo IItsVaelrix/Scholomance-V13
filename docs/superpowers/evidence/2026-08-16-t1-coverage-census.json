@@ -1,0 +1,2279 @@
+{
+  "contract": "PB-T1-COVERAGE-CENSUS-v1",
+  "split": "train",
+  "testFileOpened": false,
+  "ambiguousTokens": 89582,
+  "unknownTokens": 67848,
+  "unknownTokenRate": 0.7573842959523118,
+  "totalUnknownMass": 173647,
+  "keys": 16300,
+  "pareto": [
+    {
+      "n": 25,
+      "unknownMass": 49239,
+      "share": 0.28355802288550913
+    },
+    {
+      "n": 100,
+      "unknownMass": 74524,
+      "share": 0.42916952207639636
+    },
+    {
+      "n": 250,
+      "unknownMass": 93355,
+      "share": 0.5376136645032739
+    }
+  ],
+  "top250": [
+    {
+      "key": "to::P",
+      "lemma": "to",
+      "type": "P",
+      "frequency": 5137,
+      "unknownMass": 5137,
+      "cumulativeUnknown": 5137,
+      "cumulativeShare": 0.02958300460128882
+    },
+    {
+      "key": "to::TO",
+      "lemma": "to",
+      "type": "TO",
+      "frequency": 5137,
+      "unknownMass": 5137,
+      "cumulativeUnknown": 10274,
+      "cumulativeShare": 0.05916600920257764
+    },
+    {
+      "key": "in::P",
+      "lemma": "in",
+      "type": "P",
+      "frequency": 3112,
+      "unknownMass": 3112,
+      "cumulativeUnknown": 13386,
+      "cumulativeShare": 0.07708742448760993
+    },
+    {
+      "key": "in::PRT",
+      "lemma": "in",
+      "type": "PRT",
+      "frequency": 3112,
+      "unknownMass": 3112,
+      "cumulativeUnknown": 16498,
+      "cumulativeShare": 0.0950088397726422
+    },
+    {
+      "key": "is::AUX",
+      "lemma": "is",
+      "type": "AUX",
+      "frequency": 2239,
+      "unknownMass": 2239,
+      "cumulativeUnknown": 18737,
+      "cumulativeShare": 0.10790281433022166
+    },
+    {
+      "key": "is::COP",
+      "lemma": "is",
+      "type": "COP",
+      "frequency": 2239,
+      "unknownMass": 2239,
+      "cumulativeUnknown": 20976,
+      "cumulativeShare": 0.12079678888780111
+    },
+    {
+      "key": "you::PRON",
+      "lemma": "you",
+      "type": "PRON",
+      "frequency": 2156,
+      "unknownMass": 2156,
+      "cumulativeUnknown": 23132,
+      "cumulativeShare": 0.13321278225365252
+    },
+    {
+      "key": "you::PRONACC",
+      "lemma": "you",
+      "type": "PRONACC",
+      "frequency": 2156,
+      "unknownMass": 2156,
+      "cumulativeUnknown": 25288,
+      "cumulativeShare": 0.14562877561950394
+    },
+    {
+      "key": "that::DET",
+      "lemma": "that",
+      "type": "DET",
+      "frequency": 2036,
+      "unknownMass": 2036,
+      "cumulativeUnknown": 27324,
+      "cumulativeShare": 0.1573537118406883
+    },
+    {
+      "key": "that::REL",
+      "lemma": "that",
+      "type": "REL",
+      "frequency": 2036,
+      "unknownMass": 2036,
+      "cumulativeUnknown": 29360,
+      "cumulativeShare": 0.16907864806187264
+    },
+    {
+      "key": "it::PRON",
+      "lemma": "it",
+      "type": "PRON",
+      "frequency": 1849,
+      "unknownMass": 1849,
+      "cumulativeUnknown": 31209,
+      "cumulativeShare": 0.17972668689928417
+    },
+    {
+      "key": "it::PRONACC",
+      "lemma": "it",
+      "type": "PRONACC",
+      "frequency": 1849,
+      "unknownMass": 1849,
+      "cumulativeUnknown": 33058,
+      "cumulativeShare": 0.1903747257366957
+    },
+    {
+      "key": "i::PRON",
+      "lemma": "i",
+      "type": "PRON",
+      "frequency": 1732,
+      "unknownMass": 1732,
+      "cumulativeUnknown": 34790,
+      "cumulativeShare": 0.20034898385805686
+    },
+    {
+      "key": "i::PROPN",
+      "lemma": "i",
+      "type": "PROPN",
+      "frequency": 1732,
+      "unknownMass": 1732,
+      "cumulativeUnknown": 36522,
+      "cumulativeShare": 0.210323241979418
+    },
+    {
+      "key": "have::AUX",
+      "lemma": "have",
+      "type": "AUX",
+      "frequency": 1357,
+      "unknownMass": 1357,
+      "cumulativeUnknown": 37879,
+      "cumulativeShare": 0.21813794652369461
+    },
+    {
+      "key": "on::P",
+      "lemma": "on",
+      "type": "P",
+      "frequency": 1273,
+      "unknownMass": 1273,
+      "cumulativeUnknown": 39152,
+      "cumulativeShare": 0.2254689110667043
+    },
+    {
+      "key": "on::PRT",
+      "lemma": "on",
+      "type": "PRT",
+      "frequency": 1273,
+      "unknownMass": 1273,
+      "cumulativeUnknown": 40425,
+      "cumulativeShare": 0.23279987560971396
+    },
+    {
+      "key": "was::AUX",
+      "lemma": "was",
+      "type": "AUX",
+      "frequency": 1244,
+      "unknownMass": 1244,
+      "cumulativeUnknown": 41669,
+      "cumulativeShare": 0.23996383467609575
+    },
+    {
+      "key": "was::COP",
+      "lemma": "was",
+      "type": "COP",
+      "frequency": 1244,
+      "unknownMass": 1244,
+      "cumulativeUnknown": 42913,
+      "cumulativeShare": 0.24712779374247756
+    },
+    {
+      "key": "be::AUX",
+      "lemma": "be",
+      "type": "AUX",
+      "frequency": 1133,
+      "unknownMass": 1133,
+      "cumulativeUnknown": 44046,
+      "cumulativeShare": 0.2536525249500423
+    },
+    {
+      "key": "be::COP",
+      "lemma": "be",
+      "type": "COP",
+      "frequency": 1133,
+      "unknownMass": 1133,
+      "cumulativeUnknown": 45179,
+      "cumulativeShare": 0.2601772561576071
+    },
+    {
+      "key": "are::AUX",
+      "lemma": "are",
+      "type": "AUX",
+      "frequency": 1123,
+      "unknownMass": 1123,
+      "cumulativeUnknown": 46302,
+      "cumulativeShare": 0.26664439926978295
+    },
+    {
+      "key": "are::COP",
+      "lemma": "are",
+      "type": "COP",
+      "frequency": 1123,
+      "unknownMass": 1123,
+      "cumulativeUnknown": 47425,
+      "cumulativeShare": 0.2731115423819588
+    },
+    {
+      "key": "'s::AUX",
+      "lemma": "'s",
+      "type": "AUX",
+      "frequency": 907,
+      "unknownMass": 907,
+      "cumulativeUnknown": 48332,
+      "cumulativeShare": 0.27833478263373396
+    },
+    {
+      "key": "'s::POSS",
+      "lemma": "'s",
+      "type": "POSS",
+      "frequency": 907,
+      "unknownMass": 907,
+      "cumulativeUnknown": 49239,
+      "cumulativeShare": 0.28355802288550913
+    },
+    {
+      "key": "do::AUX",
+      "lemma": "do",
+      "type": "AUX",
+      "frequency": 852,
+      "unknownMass": 852,
+      "cumulativeUnknown": 50091,
+      "cumulativeShare": 0.2884645286126452
+    },
+    {
+      "key": "do::V",
+      "lemma": "do",
+      "type": "V",
+      "frequency": 852,
+      "unknownMass": 852,
+      "cumulativeUnknown": 50943,
+      "cumulativeShare": 0.2933710343397813
+    },
+    {
+      "key": "by::P",
+      "lemma": "by",
+      "type": "P",
+      "frequency": 642,
+      "unknownMass": 642,
+      "cumulativeUnknown": 51585,
+      "cumulativeShare": 0.29706819006375
+    },
+    {
+      "key": "by::PRT",
+      "lemma": "by",
+      "type": "PRT",
+      "frequency": 642,
+      "unknownMass": 642,
+      "cumulativeUnknown": 52227,
+      "cumulativeShare": 0.30076534578771874
+    },
+    {
+      "key": "there::ADV",
+      "lemma": "there",
+      "type": "ADV",
+      "frequency": 571,
+      "unknownMass": 571,
+      "cumulativeUnknown": 52798,
+      "cumulativeShare": 0.30405362603442615
+    },
+    {
+      "key": "so::ADV",
+      "lemma": "so",
+      "type": "ADV",
+      "frequency": 539,
+      "unknownMass": 539,
+      "cumulativeUnknown": 53337,
+      "cumulativeShare": 0.307157624375889
+    },
+    {
+      "key": "so::N",
+      "lemma": "so",
+      "type": "N",
+      "frequency": 539,
+      "unknownMass": 539,
+      "cumulativeUnknown": 53876,
+      "cumulativeShare": 0.31026162271735186
+    },
+    {
+      "key": "out::ADJ",
+      "lemma": "out",
+      "type": "ADJ",
+      "frequency": 449,
+      "unknownMass": 449,
+      "cumulativeUnknown": 54325,
+      "cumulativeShare": 0.3128473282003144
+    },
+    {
+      "key": "out::ADV",
+      "lemma": "out",
+      "type": "ADV",
+      "frequency": 449,
+      "unknownMass": 449,
+      "cumulativeUnknown": 54774,
+      "cumulativeShare": 0.315433033683277
+    },
+    {
+      "key": "out::N",
+      "lemma": "out",
+      "type": "N",
+      "frequency": 449,
+      "unknownMass": 449,
+      "cumulativeUnknown": 55223,
+      "cumulativeShare": 0.3180187391662396
+    },
+    {
+      "key": "out::PRT",
+      "lemma": "out",
+      "type": "PRT",
+      "frequency": 449,
+      "unknownMass": 449,
+      "cumulativeUnknown": 55672,
+      "cumulativeShare": 0.3206044446492021
+    },
+    {
+      "key": "out::V",
+      "lemma": "out",
+      "type": "V",
+      "frequency": 449,
+      "unknownMass": 449,
+      "cumulativeUnknown": 56121,
+      "cumulativeShare": 0.3231901501321647
+    },
+    {
+      "key": "about::P",
+      "lemma": "about",
+      "type": "P",
+      "frequency": 444,
+      "unknownMass": 444,
+      "cumulativeUnknown": 56565,
+      "cumulativeShare": 0.32574706156743277
+    },
+    {
+      "key": "about::PRT",
+      "lemma": "about",
+      "type": "PRT",
+      "frequency": 444,
+      "unknownMass": 444,
+      "cumulativeUnknown": 57009,
+      "cumulativeShare": 0.32830397300270087
+    },
+    {
+      "key": "like::ADJ",
+      "lemma": "like",
+      "type": "ADJ",
+      "frequency": 410,
+      "unknownMass": 410,
+      "cumulativeUnknown": 57419,
+      "cumulativeShare": 0.33066508491364666
+    },
+    {
+      "key": "like::N",
+      "lemma": "like",
+      "type": "N",
+      "frequency": 410,
+      "unknownMass": 410,
+      "cumulativeUnknown": 57829,
+      "cumulativeShare": 0.33302619682459245
+    },
+    {
+      "key": "like::V",
+      "lemma": "like",
+      "type": "V",
+      "frequency": 410,
+      "unknownMass": 410,
+      "cumulativeUnknown": 58239,
+      "cumulativeShare": 0.3353873087355382
+    },
+    {
+      "key": "time::V",
+      "lemma": "time",
+      "type": "V",
+      "frequency": 400,
+      "unknownMass": 400,
+      "cumulativeUnknown": 58639,
+      "cumulativeShare": 0.33769083255109505
+    },
+    {
+      "key": "were::AUX",
+      "lemma": "were",
+      "type": "AUX",
+      "frequency": 397,
+      "unknownMass": 397,
+      "cumulativeUnknown": 59036,
+      "cumulativeShare": 0.3399770799380352
+    },
+    {
+      "key": "were::COP",
+      "lemma": "were",
+      "type": "COP",
+      "frequency": 397,
+      "unknownMass": 397,
+      "cumulativeUnknown": 59433,
+      "cumulativeShare": 0.3422633273249754
+    },
+    {
+      "key": "up::ADJ",
+      "lemma": "up",
+      "type": "ADJ",
+      "frequency": 396,
+      "unknownMass": 396,
+      "cumulativeUnknown": 59829,
+      "cumulativeShare": 0.34454381590237665
+    },
+    {
+      "key": "up::ADV",
+      "lemma": "up",
+      "type": "ADV",
+      "frequency": 396,
+      "unknownMass": 396,
+      "cumulativeUnknown": 60225,
+      "cumulativeShare": 0.34682430447977797
+    },
+    {
+      "key": "up::PRT",
+      "lemma": "up",
+      "type": "PRT",
+      "frequency": 396,
+      "unknownMass": 396,
+      "cumulativeUnknown": 60621,
+      "cumulativeShare": 0.34910479305717923
+    },
+    {
+      "key": "up::V",
+      "lemma": "up",
+      "type": "V",
+      "frequency": 396,
+      "unknownMass": 396,
+      "cumulativeUnknown": 61017,
+      "cumulativeShare": 0.3513852816345805
+    },
+    {
+      "key": "get::N",
+      "lemma": "get",
+      "type": "N",
+      "frequency": 395,
+      "unknownMass": 395,
+      "cumulativeUnknown": 61412,
+      "cumulativeShare": 0.3536600114024429
+    },
+    {
+      "key": "just::ADJ",
+      "lemma": "just",
+      "type": "ADJ",
+      "frequency": 394,
+      "unknownMass": 394,
+      "cumulativeUnknown": 61806,
+      "cumulativeShare": 0.35592898236076637
+    },
+    {
+      "key": "just::ADV",
+      "lemma": "just",
+      "type": "ADV",
+      "frequency": 394,
+      "unknownMass": 394,
+      "cumulativeUnknown": 62200,
+      "cumulativeShare": 0.3581979533190899
+    },
+    {
+      "key": "know::N",
+      "lemma": "know",
+      "type": "N",
+      "frequency": 346,
+      "unknownMass": 346,
+      "cumulativeUnknown": 62546,
+      "cumulativeShare": 0.36019050141954656
+    },
+    {
+      "key": "been::AUX",
+      "lemma": "been",
+      "type": "AUX",
+      "frequency": 341,
+      "unknownMass": 341,
+      "cumulativeUnknown": 62887,
+      "cumulativeShare": 0.3621542554723088
+    },
+    {
+      "key": "been::COP",
+      "lemma": "been",
+      "type": "COP",
+      "frequency": 341,
+      "unknownMass": 341,
+      "cumulativeUnknown": 63228,
+      "cumulativeShare": 0.36411800952507095
+    },
+    {
+      "key": "am::AUX",
+      "lemma": "am",
+      "type": "AUX",
+      "frequency": 335,
+      "unknownMass": 335,
+      "cumulativeUnknown": 63563,
+      "cumulativeShare": 0.3660472107205998
+    },
+    {
+      "key": "am::COP",
+      "lemma": "am",
+      "type": "COP",
+      "frequency": 335,
+      "unknownMass": 335,
+      "cumulativeUnknown": 63898,
+      "cumulativeShare": 0.3679764119161287
+    },
+    {
+      "key": "very::ADJ",
+      "lemma": "very",
+      "type": "ADJ",
+      "frequency": 330,
+      "unknownMass": 330,
+      "cumulativeUnknown": 64228,
+      "cumulativeShare": 0.3698768190639631
+    },
+    {
+      "key": "very::ADV",
+      "lemma": "very",
+      "type": "ADV",
+      "frequency": 330,
+      "unknownMass": 330,
+      "cumulativeUnknown": 64558,
+      "cumulativeShare": 0.3717772262117975
+    },
+    {
+      "key": "more::ADV",
+      "lemma": "more",
+      "type": "ADV",
+      "frequency": 318,
+      "unknownMass": 318,
+      "cumulativeUnknown": 64876,
+      "cumulativeShare": 0.37360852764516517
+    },
+    {
+      "key": "more::N",
+      "lemma": "more",
+      "type": "N",
+      "frequency": 318,
+      "unknownMass": 318,
+      "cumulativeUnknown": 65194,
+      "cumulativeShare": 0.3754398290785329
+    },
+    {
+      "key": "good::ADV",
+      "lemma": "good",
+      "type": "ADV",
+      "frequency": 296,
+      "unknownMass": 296,
+      "cumulativeUnknown": 65490,
+      "cumulativeShare": 0.37714443670204495
+    },
+    {
+      "key": "good::N",
+      "lemma": "good",
+      "type": "N",
+      "frequency": 296,
+      "unknownMass": 296,
+      "cumulativeUnknown": 65786,
+      "cumulativeShare": 0.378849044325557
+    },
+    {
+      "key": "go::ADJ",
+      "lemma": "go",
+      "type": "ADJ",
+      "frequency": 280,
+      "unknownMass": 280,
+      "cumulativeUnknown": 66066,
+      "cumulativeShare": 0.3804615109964468
+    },
+    {
+      "key": "go::N",
+      "lemma": "go",
+      "type": "N",
+      "frequency": 280,
+      "unknownMass": 280,
+      "cumulativeUnknown": 66346,
+      "cumulativeShare": 0.3820739776673366
+    },
+    {
+      "key": "new::ADV",
+      "lemma": "new",
+      "type": "ADV",
+      "frequency": 280,
+      "unknownMass": 280,
+      "cumulativeUnknown": 66626,
+      "cumulativeShare": 0.3836864443382264
+    },
+    {
+      "key": "only::ADJ",
+      "lemma": "only",
+      "type": "ADJ",
+      "frequency": 269,
+      "unknownMass": 269,
+      "cumulativeUnknown": 66895,
+      "cumulativeShare": 0.38523556410418835
+    },
+    {
+      "key": "only::ADV",
+      "lemma": "only",
+      "type": "ADV",
+      "frequency": 269,
+      "unknownMass": 269,
+      "cumulativeUnknown": 67164,
+      "cumulativeShare": 0.38678468387015036
+    },
+    {
+      "key": "if::PROPN",
+      "lemma": "if",
+      "type": "PROPN",
+      "frequency": 267,
+      "unknownMass": 267,
+      "cumulativeUnknown": 67431,
+      "cumulativeShare": 0.38832228601703456
+    },
+    {
+      "key": "if::SUB",
+      "lemma": "if",
+      "type": "SUB",
+      "frequency": 267,
+      "unknownMass": 267,
+      "cumulativeUnknown": 67698,
+      "cumulativeShare": 0.38985988816391876
+    },
+    {
+      "key": "please::ADV",
+      "lemma": "please",
+      "type": "ADV",
+      "frequency": 260,
+      "unknownMass": 260,
+      "cumulativeUnknown": 67958,
+      "cumulativeShare": 0.3913571786440307
+    },
+    {
+      "key": "please::V",
+      "lemma": "please",
+      "type": "V",
+      "frequency": 260,
+      "unknownMass": 260,
+      "cumulativeUnknown": 68218,
+      "cumulativeShare": 0.3928544691241427
+    },
+    {
+      "key": "people::V",
+      "lemma": "people",
+      "type": "V",
+      "frequency": 243,
+      "unknownMass": 243,
+      "cumulativeUnknown": 68461,
+      "cumulativeShare": 0.39425385984209343
+    },
+    {
+      "key": "then::ADJ",
+      "lemma": "then",
+      "type": "ADJ",
+      "frequency": 237,
+      "unknownMass": 237,
+      "cumulativeUnknown": 68698,
+      "cumulativeShare": 0.3956186977028109
+    },
+    {
+      "key": "then::ADV",
+      "lemma": "then",
+      "type": "ADV",
+      "frequency": 237,
+      "unknownMass": 237,
+      "cumulativeUnknown": 68935,
+      "cumulativeShare": 0.39698353556352833
+    },
+    {
+      "key": "then::N",
+      "lemma": "then",
+      "type": "N",
+      "frequency": 237,
+      "unknownMass": 237,
+      "cumulativeUnknown": 69172,
+      "cumulativeShare": 0.3983483734242457
+    },
+    {
+      "key": "back::ADJ",
+      "lemma": "back",
+      "type": "ADJ",
+      "frequency": 236,
+      "unknownMass": 236,
+      "cumulativeUnknown": 69408,
+      "cumulativeShare": 0.3997074524754243
+    },
+    {
+      "key": "back::ADV",
+      "lemma": "back",
+      "type": "ADV",
+      "frequency": 236,
+      "unknownMass": 236,
+      "cumulativeUnknown": 69644,
+      "cumulativeShare": 0.4010665315266028
+    },
+    {
+      "key": "back::N",
+      "lemma": "back",
+      "type": "N",
+      "frequency": 236,
+      "unknownMass": 236,
+      "cumulativeUnknown": 69880,
+      "cumulativeShare": 0.40242561057778137
+    },
+    {
+      "key": "back::PRT",
+      "lemma": "back",
+      "type": "PRT",
+      "frequency": 236,
+      "unknownMass": 236,
+      "cumulativeUnknown": 70116,
+      "cumulativeShare": 0.4037846896289599
+    },
+    {
+      "key": "back::V",
+      "lemma": "back",
+      "type": "V",
+      "frequency": 236,
+      "unknownMass": 236,
+      "cumulativeUnknown": 70352,
+      "cumulativeShare": 0.40514376868013846
+    },
+    {
+      "key": "now::ADV",
+      "lemma": "now",
+      "type": "ADV",
+      "frequency": 236,
+      "unknownMass": 236,
+      "cumulativeUnknown": 70588,
+      "cumulativeShare": 0.406502847731317
+    },
+    {
+      "key": "now::N",
+      "lemma": "now",
+      "type": "N",
+      "frequency": 236,
+      "unknownMass": 236,
+      "cumulativeUnknown": 70824,
+      "cumulativeShare": 0.4078619267824955
+    },
+    {
+      "key": "even::ADJ",
+      "lemma": "even",
+      "type": "ADJ",
+      "frequency": 231,
+      "unknownMass": 231,
+      "cumulativeUnknown": 71055,
+      "cumulativeShare": 0.4091922117859796
+    },
+    {
+      "key": "even::ADV",
+      "lemma": "even",
+      "type": "ADV",
+      "frequency": 231,
+      "unknownMass": 231,
+      "cumulativeUnknown": 71286,
+      "cumulativeShare": 0.4105224967894637
+    },
+    {
+      "key": "even::N",
+      "lemma": "even",
+      "type": "N",
+      "frequency": 231,
+      "unknownMass": 231,
+      "cumulativeUnknown": 71517,
+      "cumulativeShare": 0.41185278179294776
+    },
+    {
+      "key": "even::V",
+      "lemma": "even",
+      "type": "V",
+      "frequency": 231,
+      "unknownMass": 231,
+      "cumulativeUnknown": 71748,
+      "cumulativeShare": 0.41318306679643185
+    },
+    {
+      "key": "work::N",
+      "lemma": "work",
+      "type": "N",
+      "frequency": 221,
+      "unknownMass": 221,
+      "cumulativeUnknown": 71969,
+      "cumulativeShare": 0.414455763704527
+    },
+    {
+      "key": "work::V",
+      "lemma": "work",
+      "type": "V",
+      "frequency": 221,
+      "unknownMass": 221,
+      "cumulativeUnknown": 72190,
+      "cumulativeShare": 0.41572846061262214
+    },
+    {
+      "key": "bush::ADJ",
+      "lemma": "bush",
+      "type": "ADJ",
+      "frequency": 214,
+      "unknownMass": 214,
+      "cumulativeUnknown": 72404,
+      "cumulativeShare": 0.41696084585394505
+    },
+    {
+      "key": "bush::V",
+      "lemma": "bush",
+      "type": "V",
+      "frequency": 214,
+      "unknownMass": 214,
+      "cumulativeUnknown": 72618,
+      "cumulativeShare": 0.41819323109526796
+    },
+    {
+      "key": "want::V",
+      "lemma": "want",
+      "type": "V",
+      "frequency": 213,
+      "unknownMass": 213,
+      "cumulativeUnknown": 72831,
+      "cumulativeShare": 0.419419857527052
+    },
+    {
+      "key": "well::ADJ",
+      "lemma": "well",
+      "type": "ADJ",
+      "frequency": 213,
+      "unknownMass": 213,
+      "cumulativeUnknown": 73044,
+      "cumulativeShare": 0.420646483958836
+    },
+    {
+      "key": "well::ADV",
+      "lemma": "well",
+      "type": "ADV",
+      "frequency": 213,
+      "unknownMass": 213,
+      "cumulativeUnknown": 73257,
+      "cumulativeShare": 0.42187311039062003
+    },
+    {
+      "key": "well::N",
+      "lemma": "well",
+      "type": "N",
+      "frequency": 213,
+      "unknownMass": 213,
+      "cumulativeUnknown": 73470,
+      "cumulativeShare": 0.4230997368224041
+    },
+    {
+      "key": "well::V",
+      "lemma": "well",
+      "type": "V",
+      "frequency": 213,
+      "unknownMass": 213,
+      "cumulativeUnknown": 73683,
+      "cumulativeShare": 0.4243263632541881
+    },
+    {
+      "key": "her::DET",
+      "lemma": "her",
+      "type": "DET",
+      "frequency": 212,
+      "unknownMass": 212,
+      "cumulativeUnknown": 73895,
+      "cumulativeShare": 0.4255472308764332
+    },
+    {
+      "key": "her::PRONACC",
+      "lemma": "her",
+      "type": "PRONACC",
+      "frequency": 212,
+      "unknownMass": 212,
+      "cumulativeUnknown": 74107,
+      "cumulativeShare": 0.42676809849867836
+    },
+    {
+      "key": "great::N",
+      "lemma": "great",
+      "type": "N",
+      "frequency": 211,
+      "unknownMass": 211,
+      "cumulativeUnknown": 74318,
+      "cumulativeShare": 0.4279832073113846
+    },
+    {
+      "key": "way::ADV",
+      "lemma": "way",
+      "type": "ADV",
+      "frequency": 206,
+      "unknownMass": 206,
+      "cumulativeUnknown": 74524,
+      "cumulativeShare": 0.42916952207639636
+    },
+    {
+      "key": "see::N",
+      "lemma": "see",
+      "type": "N",
+      "frequency": 205,
+      "unknownMass": 205,
+      "cumulativeUnknown": 74729,
+      "cumulativeShare": 0.43035007803186925
+    },
+    {
+      "key": "best::ADV",
+      "lemma": "best",
+      "type": "ADV",
+      "frequency": 201,
+      "unknownMass": 201,
+      "cumulativeUnknown": 74930,
+      "cumulativeShare": 0.4315075987491866
+    },
+    {
+      "key": "best::N",
+      "lemma": "best",
+      "type": "N",
+      "frequency": 201,
+      "unknownMass": 201,
+      "cumulativeUnknown": 75131,
+      "cumulativeShare": 0.4326651194665039
+    },
+    {
+      "key": "best::V",
+      "lemma": "best",
+      "type": "V",
+      "frequency": 201,
+      "unknownMass": 201,
+      "cumulativeUnknown": 75332,
+      "cumulativeShare": 0.4338226401838212
+    },
+    {
+      "key": "place::V",
+      "lemma": "place",
+      "type": "V",
+      "frequency": 198,
+      "unknownMass": 198,
+      "cumulativeUnknown": 75530,
+      "cumulativeShare": 0.43496288447252185
+    },
+    {
+      "key": "take::N",
+      "lemma": "take",
+      "type": "N",
+      "frequency": 197,
+      "unknownMass": 197,
+      "cumulativeUnknown": 75727,
+      "cumulativeShare": 0.4360973699516836
+    },
+    {
+      "key": "going::ADJ",
+      "lemma": "going",
+      "type": "ADJ",
+      "frequency": 196,
+      "unknownMass": 196,
+      "cumulativeUnknown": 75923,
+      "cumulativeShare": 0.43722609662130646
+    },
+    {
+      "key": "going::N",
+      "lemma": "going",
+      "type": "N",
+      "frequency": 196,
+      "unknownMass": 196,
+      "cumulativeUnknown": 76119,
+      "cumulativeShare": 0.4383548232909293
+    },
+    {
+      "key": "over::P",
+      "lemma": "over",
+      "type": "P",
+      "frequency": 195,
+      "unknownMass": 195,
+      "cumulativeUnknown": 76314,
+      "cumulativeShare": 0.43947779115101326
+    },
+    {
+      "key": "over::PRT",
+      "lemma": "over",
+      "type": "PRT",
+      "frequency": 195,
+      "unknownMass": 195,
+      "cumulativeUnknown": 76509,
+      "cumulativeShare": 0.44060075901109724
+    },
+    {
+      "key": "service::V",
+      "lemma": "service",
+      "type": "V",
+      "frequency": 195,
+      "unknownMass": 195,
+      "cumulativeUnknown": 76704,
+      "cumulativeShare": 0.44172372687118117
+    },
+    {
+      "key": "need::V",
+      "lemma": "need",
+      "type": "V",
+      "frequency": 190,
+      "unknownMass": 190,
+      "cumulativeUnknown": 76894,
+      "cumulativeShare": 0.4428179006835707
+    },
+    {
+      "key": "thanks::N",
+      "lemma": "thanks",
+      "type": "N",
+      "frequency": 190,
+      "unknownMass": 190,
+      "cumulativeUnknown": 77084,
+      "cumulativeShare": 0.4439120744959602
+    },
+    {
+      "key": "make::N",
+      "lemma": "make",
+      "type": "N",
+      "frequency": 185,
+      "unknownMass": 185,
+      "cumulativeUnknown": 77269,
+      "cumulativeShare": 0.4449774542606552
+    },
+    {
+      "key": "here::ADJ",
+      "lemma": "here",
+      "type": "ADJ",
+      "frequency": 179,
+      "unknownMass": 179,
+      "cumulativeUnknown": 77448,
+      "cumulativeShare": 0.4460082811681169
+    },
+    {
+      "key": "here::ADV",
+      "lemma": "here",
+      "type": "ADV",
+      "frequency": 179,
+      "unknownMass": 179,
+      "cumulativeUnknown": 77627,
+      "cumulativeShare": 0.4470391080755786
+    },
+    {
+      "key": "number::ADJ",
+      "lemma": "number",
+      "type": "ADJ",
+      "frequency": 179,
+      "unknownMass": 179,
+      "cumulativeUnknown": 77806,
+      "cumulativeShare": 0.4480699349830403
+    },
+    {
+      "key": "number::V",
+      "lemma": "number",
+      "type": "V",
+      "frequency": 179,
+      "unknownMass": 179,
+      "cumulativeUnknown": 77985,
+      "cumulativeShare": 0.449100761890502
+    },
+    {
+      "key": "think::N",
+      "lemma": "think",
+      "type": "N",
+      "frequency": 177,
+      "unknownMass": 177,
+      "cumulativeUnknown": 78162,
+      "cumulativeShare": 0.4501200711788859
+    },
+    {
+      "key": "two::ADJ",
+      "lemma": "two",
+      "type": "ADJ",
+      "frequency": 177,
+      "unknownMass": 177,
+      "cumulativeUnknown": 78339,
+      "cumulativeShare": 0.4511393804672698
+    },
+    {
+      "key": "two::N",
+      "lemma": "two",
+      "type": "N",
+      "frequency": 177,
+      "unknownMass": 177,
+      "cumulativeUnknown": 78516,
+      "cumulativeShare": 0.4521586897556537
+    },
+    {
+      "key": "much::ADV",
+      "lemma": "much",
+      "type": "ADV",
+      "frequency": 176,
+      "unknownMass": 176,
+      "cumulativeUnknown": 78692,
+      "cumulativeShare": 0.4531722402344987
+    },
+    {
+      "key": "much::N",
+      "lemma": "much",
+      "type": "N",
+      "frequency": 176,
+      "unknownMass": 176,
+      "cumulativeUnknown": 78868,
+      "cumulativeShare": 0.45418579071334375
+    },
+    {
+      "key": "let::N",
+      "lemma": "let",
+      "type": "N",
+      "frequency": 175,
+      "unknownMass": 175,
+      "cumulativeUnknown": 79043,
+      "cumulativeShare": 0.45519358238264984
+    },
+    {
+      "key": "let::V",
+      "lemma": "let",
+      "type": "V",
+      "frequency": 175,
+      "unknownMass": 175,
+      "cumulativeUnknown": 79218,
+      "cumulativeShare": 0.456201374051956
+    },
+    {
+      "key": "first::ADJ",
+      "lemma": "first",
+      "type": "ADJ",
+      "frequency": 171,
+      "unknownMass": 171,
+      "cumulativeUnknown": 79389,
+      "cumulativeShare": 0.4571861304831065
+    },
+    {
+      "key": "first::ADV",
+      "lemma": "first",
+      "type": "ADV",
+      "frequency": 171,
+      "unknownMass": 171,
+      "cumulativeUnknown": 79560,
+      "cumulativeShare": 0.45817088691425706
+    },
+    {
+      "key": "first::N",
+      "lemma": "first",
+      "type": "N",
+      "frequency": 171,
+      "unknownMass": 171,
+      "cumulativeUnknown": 79731,
+      "cumulativeShare": 0.45915564334540765
+    },
+    {
+      "key": "us::PRONACC",
+      "lemma": "us",
+      "type": "PRONACC",
+      "frequency": 164,
+      "unknownMass": 164,
+      "cumulativeUnknown": 79895,
+      "cumulativeShare": 0.4601000881097859
+    },
+    {
+      "key": "us::PROPN",
+      "lemma": "us",
+      "type": "PROPN",
+      "frequency": 164,
+      "unknownMass": 164,
+      "cumulativeUnknown": 80059,
+      "cumulativeShare": 0.46104453287416425
+    },
+    {
+      "key": "the::DET",
+      "lemma": "the",
+      "type": "DET",
+      "frequency": 163,
+      "unknownMass": 163,
+      "cumulativeUnknown": 80222,
+      "cumulativeShare": 0.4619832188290037
+    },
+    {
+      "key": "the::PROPN",
+      "lemma": "the",
+      "type": "PROPN",
+      "frequency": 163,
+      "unknownMass": 163,
+      "cumulativeUnknown": 80385,
+      "cumulativeShare": 0.4629219047838431
+    },
+    {
+      "key": "call::N",
+      "lemma": "call",
+      "type": "N",
+      "frequency": 162,
+      "unknownMass": 162,
+      "cumulativeUnknown": 80547,
+      "cumulativeShare": 0.4638548319291436
+    },
+    {
+      "key": "2::ADJ",
+      "lemma": "2",
+      "type": "ADJ",
+      "frequency": 160,
+      "unknownMass": 160,
+      "cumulativeUnknown": 80707,
+      "cumulativeShare": 0.46477624145536633
+    },
+    {
+      "key": "2::N",
+      "lemma": "2",
+      "type": "N",
+      "frequency": 160,
+      "unknownMass": 160,
+      "cumulativeUnknown": 80867,
+      "cumulativeShare": 0.4656976509815891
+    },
+    {
+      "key": "does::AUX",
+      "lemma": "does",
+      "type": "AUX",
+      "frequency": 160,
+      "unknownMass": 160,
+      "cumulativeUnknown": 81027,
+      "cumulativeShare": 0.4666190605078118
+    },
+    {
+      "key": "does::V",
+      "lemma": "does",
+      "type": "V",
+      "frequency": 160,
+      "unknownMass": 160,
+      "cumulativeUnknown": 81187,
+      "cumulativeShare": 0.46754047003403454
+    },
+    {
+      "key": "help::V",
+      "lemma": "help",
+      "type": "V",
+      "frequency": 154,
+      "unknownMass": 154,
+      "cumulativeUnknown": 81341,
+      "cumulativeShare": 0.46842732670302395
+    },
+    {
+      "key": "being::AUX",
+      "lemma": "being",
+      "type": "AUX",
+      "frequency": 151,
+      "unknownMass": 151,
+      "cumulativeUnknown": 81492,
+      "cumulativeShare": 0.46929690694339665
+    },
+    {
+      "key": "being::COP",
+      "lemma": "being",
+      "type": "COP",
+      "frequency": 151,
+      "unknownMass": 151,
+      "cumulativeUnknown": 81643,
+      "cumulativeShare": 0.47016648718376935
+    },
+    {
+      "key": "most::ADV",
+      "lemma": "most",
+      "type": "ADV",
+      "frequency": 147,
+      "unknownMass": 147,
+      "cumulativeUnknown": 81790,
+      "cumulativeShare": 0.4710130321859865
+    },
+    {
+      "key": "pm::ADV",
+      "lemma": "pm",
+      "type": "ADV",
+      "frequency": 147,
+      "unknownMass": 147,
+      "cumulativeUnknown": 81937,
+      "cumulativeShare": 0.47185957718820365
+    },
+    {
+      "key": "pm::N",
+      "lemma": "pm",
+      "type": "N",
+      "frequency": 147,
+      "unknownMass": 147,
+      "cumulativeUnknown": 82084,
+      "cumulativeShare": 0.4727061221904208
+    },
+    {
+      "key": "use::N",
+      "lemma": "use",
+      "type": "N",
+      "frequency": 144,
+      "unknownMass": 144,
+      "cumulativeUnknown": 82228,
+      "cumulativeShare": 0.47353539076402124
+    },
+    {
+      "key": "use::V",
+      "lemma": "use",
+      "type": "V",
+      "frequency": 144,
+      "unknownMass": 144,
+      "cumulativeUnknown": 82372,
+      "cumulativeShare": 0.47436465933762173
+    },
+    {
+      "key": "still::ADJ",
+      "lemma": "still",
+      "type": "ADJ",
+      "frequency": 141,
+      "unknownMass": 141,
+      "cumulativeUnknown": 82513,
+      "cumulativeShare": 0.4751766514826055
+    },
+    {
+      "key": "still::ADV",
+      "lemma": "still",
+      "type": "ADV",
+      "frequency": 141,
+      "unknownMass": 141,
+      "cumulativeUnknown": 82654,
+      "cumulativeShare": 0.4759886436275893
+    },
+    {
+      "key": "still::N",
+      "lemma": "still",
+      "type": "N",
+      "frequency": 141,
+      "unknownMass": 141,
+      "cumulativeUnknown": 82795,
+      "cumulativeShare": 0.4768006357725731
+    },
+    {
+      "key": "still::V",
+      "lemma": "still",
+      "type": "V",
+      "frequency": 141,
+      "unknownMass": 141,
+      "cumulativeUnknown": 82936,
+      "cumulativeShare": 0.4776126279175569
+    },
+    {
+      "key": "same::ADJ",
+      "lemma": "same",
+      "type": "ADJ",
+      "frequency": 139,
+      "unknownMass": 139,
+      "cumulativeUnknown": 83075,
+      "cumulativeShare": 0.4784131024434629
+    },
+    {
+      "key": "same::N",
+      "lemma": "same",
+      "type": "N",
+      "frequency": 139,
+      "unknownMass": 139,
+      "cumulativeUnknown": 83214,
+      "cumulativeShare": 0.4792135769693689
+    },
+    {
+      "key": "world::ADJ",
+      "lemma": "world",
+      "type": "ADJ",
+      "frequency": 137,
+      "unknownMass": 137,
+      "cumulativeUnknown": 83351,
+      "cumulativeShare": 0.4800025338761971
+    },
+    {
+      "key": "right::ADV",
+      "lemma": "right",
+      "type": "ADV",
+      "frequency": 133,
+      "unknownMass": 133,
+      "cumulativeUnknown": 83484,
+      "cumulativeShare": 0.48076845554486974
+    },
+    {
+      "key": "right::V",
+      "lemma": "right",
+      "type": "V",
+      "frequency": 133,
+      "unknownMass": 133,
+      "cumulativeUnknown": 83617,
+      "cumulativeShare": 0.4815343772135424
+    },
+    {
+      "key": "say::N",
+      "lemma": "say",
+      "type": "N",
+      "frequency": 132,
+      "unknownMass": 132,
+      "cumulativeUnknown": 83749,
+      "cumulativeShare": 0.4822945400726762
+    },
+    {
+      "key": "give::N",
+      "lemma": "give",
+      "type": "N",
+      "frequency": 127,
+      "unknownMass": 127,
+      "cumulativeUnknown": 83876,
+      "cumulativeShare": 0.48302590888411545
+    },
+    {
+      "key": "last::ADJ",
+      "lemma": "last",
+      "type": "ADJ",
+      "frequency": 127,
+      "unknownMass": 127,
+      "cumulativeUnknown": 84003,
+      "cumulativeShare": 0.48375727769555477
+    },
+    {
+      "key": "last::ADV",
+      "lemma": "last",
+      "type": "ADV",
+      "frequency": 127,
+      "unknownMass": 127,
+      "cumulativeUnknown": 84130,
+      "cumulativeShare": 0.4844886465069941
+    },
+    {
+      "key": "last::N",
+      "lemma": "last",
+      "type": "N",
+      "frequency": 127,
+      "unknownMass": 127,
+      "cumulativeUnknown": 84257,
+      "cumulativeShare": 0.4852200153184334
+    },
+    {
+      "key": "last::V",
+      "lemma": "last",
+      "type": "V",
+      "frequency": 127,
+      "unknownMass": 127,
+      "cumulativeUnknown": 84384,
+      "cumulativeShare": 0.48595138412987265
+    },
+    {
+      "key": "off::P",
+      "lemma": "off",
+      "type": "P",
+      "frequency": 127,
+      "unknownMass": 127,
+      "cumulativeUnknown": 84511,
+      "cumulativeShare": 0.48668275294131197
+    },
+    {
+      "key": "off::PRT",
+      "lemma": "off",
+      "type": "PRT",
+      "frequency": 127,
+      "unknownMass": 127,
+      "cumulativeUnknown": 84638,
+      "cumulativeShare": 0.4874141217527513
+    },
+    {
+      "key": "3::ADJ",
+      "lemma": "3",
+      "type": "ADJ",
+      "frequency": 126,
+      "unknownMass": 126,
+      "cumulativeUnknown": 84764,
+      "cumulativeShare": 0.4881397317546517
+    },
+    {
+      "key": "3::N",
+      "lemma": "3",
+      "type": "N",
+      "frequency": 126,
+      "unknownMass": 126,
+      "cumulativeUnknown": 84890,
+      "cumulativeShare": 0.4888653417565521
+    },
+    {
+      "key": "find::N",
+      "lemma": "find",
+      "type": "N",
+      "frequency": 122,
+      "unknownMass": 122,
+      "cumulativeUnknown": 85012,
+      "cumulativeShare": 0.4895679165202969
+    },
+    {
+      "key": "find::V",
+      "lemma": "find",
+      "type": "V",
+      "frequency": 122,
+      "unknownMass": 122,
+      "cumulativeUnknown": 85134,
+      "cumulativeShare": 0.49027049128404177
+    },
+    {
+      "key": "around::P",
+      "lemma": "around",
+      "type": "P",
+      "frequency": 121,
+      "unknownMass": 121,
+      "cumulativeUnknown": 85255,
+      "cumulativeShare": 0.4909673072382477
+    },
+    {
+      "key": "around::PRT",
+      "lemma": "around",
+      "type": "PRT",
+      "frequency": 121,
+      "unknownMass": 121,
+      "cumulativeUnknown": 85376,
+      "cumulativeShare": 0.4916641231924537
+    },
+    {
+      "key": "put::N",
+      "lemma": "put",
+      "type": "N",
+      "frequency": 121,
+      "unknownMass": 121,
+      "cumulativeUnknown": 85497,
+      "cumulativeShare": 0.4923609391466596
+    },
+    {
+      "key": "put::V",
+      "lemma": "put",
+      "type": "V",
+      "frequency": 121,
+      "unknownMass": 121,
+      "cumulativeUnknown": 85618,
+      "cumulativeShare": 0.4930577551008655
+    },
+    {
+      "key": "sure::ADJ",
+      "lemma": "sure",
+      "type": "ADJ",
+      "frequency": 119,
+      "unknownMass": 119,
+      "cumulativeUnknown": 85737,
+      "cumulativeShare": 0.49374305343599373
+    },
+    {
+      "key": "sure::ADV",
+      "lemma": "sure",
+      "type": "ADV",
+      "frequency": 119,
+      "unknownMass": 119,
+      "cumulativeUnknown": 85856,
+      "cumulativeShare": 0.4944283517711219
+    },
+    {
+      "key": "1::ADJ",
+      "lemma": "1",
+      "type": "ADJ",
+      "frequency": 118,
+      "unknownMass": 118,
+      "cumulativeUnknown": 85974,
+      "cumulativeShare": 0.4951078912967111
+    },
+    {
+      "key": "1::N",
+      "lemma": "1",
+      "type": "N",
+      "frequency": 118,
+      "unknownMass": 118,
+      "cumulativeUnknown": 86092,
+      "cumulativeShare": 0.4957874308223004
+    },
+    {
+      "key": "down::ADJ",
+      "lemma": "down",
+      "type": "ADJ",
+      "frequency": 118,
+      "unknownMass": 118,
+      "cumulativeUnknown": 86210,
+      "cumulativeShare": 0.49646697034788967
+    },
+    {
+      "key": "down::ADV",
+      "lemma": "down",
+      "type": "ADV",
+      "frequency": 118,
+      "unknownMass": 118,
+      "cumulativeUnknown": 86328,
+      "cumulativeShare": 0.49714650987347897
+    },
+    {
+      "key": "down::N",
+      "lemma": "down",
+      "type": "N",
+      "frequency": 118,
+      "unknownMass": 118,
+      "cumulativeUnknown": 86446,
+      "cumulativeShare": 0.4978260493990682
+    },
+    {
+      "key": "down::PRT",
+      "lemma": "down",
+      "type": "PRT",
+      "frequency": 118,
+      "unknownMass": 118,
+      "cumulativeUnknown": 86564,
+      "cumulativeShare": 0.4985055889246575
+    },
+    {
+      "key": "down::V",
+      "lemma": "down",
+      "type": "V",
+      "frequency": 118,
+      "unknownMass": 118,
+      "cumulativeUnknown": 86682,
+      "cumulativeShare": 0.49918512845024676
+    },
+    {
+      "key": "little::ADV",
+      "lemma": "little",
+      "type": "ADV",
+      "frequency": 118,
+      "unknownMass": 118,
+      "cumulativeUnknown": 86800,
+      "cumulativeShare": 0.499864667975836
+    },
+    {
+      "key": "little::N",
+      "lemma": "little",
+      "type": "N",
+      "frequency": 118,
+      "unknownMass": 118,
+      "cumulativeUnknown": 86918,
+      "cumulativeShare": 0.5005442075014253
+    },
+    {
+      "key": "long::ADV",
+      "lemma": "long",
+      "type": "ADV",
+      "frequency": 115,
+      "unknownMass": 115,
+      "cumulativeUnknown": 87033,
+      "cumulativeShare": 0.5012064705983978
+    },
+    {
+      "key": "long::V",
+      "lemma": "long",
+      "type": "V",
+      "frequency": 115,
+      "unknownMass": 115,
+      "cumulativeUnknown": 87148,
+      "cumulativeShare": 0.5018687336953704
+    },
+    {
+      "key": "better::ADV",
+      "lemma": "better",
+      "type": "ADV",
+      "frequency": 114,
+      "unknownMass": 114,
+      "cumulativeUnknown": 87262,
+      "cumulativeShare": 0.5025252379828042
+    },
+    {
+      "key": "better::N",
+      "lemma": "better",
+      "type": "N",
+      "frequency": 114,
+      "unknownMass": 114,
+      "cumulativeUnknown": 87376,
+      "cumulativeShare": 0.5031817422702379
+    },
+    {
+      "key": "better::V",
+      "lemma": "better",
+      "type": "V",
+      "frequency": 114,
+      "unknownMass": 114,
+      "cumulativeUnknown": 87490,
+      "cumulativeShare": 0.5038382465576716
+    },
+    {
+      "key": "price::V",
+      "lemma": "price",
+      "type": "V",
+      "frequency": 114,
+      "unknownMass": 114,
+      "cumulativeUnknown": 87604,
+      "cumulativeShare": 0.5044947508451053
+    },
+    {
+      "key": "pm::PROPN",
+      "lemma": "pm",
+      "type": "PROPN",
+      "frequency": 112,
+      "unknownMass": 112,
+      "cumulativeUnknown": 87716,
+      "cumulativeShare": 0.5051397375134612
+    },
+    {
+      "key": "through::P",
+      "lemma": "through",
+      "type": "P",
+      "frequency": 110,
+      "unknownMass": 110,
+      "cumulativeUnknown": 87826,
+      "cumulativeShare": 0.5057732065627394
+    },
+    {
+      "key": "through::PRT",
+      "lemma": "through",
+      "type": "PRT",
+      "frequency": 110,
+      "unknownMass": 110,
+      "cumulativeUnknown": 87936,
+      "cumulativeShare": 0.5064066756120175
+    },
+    {
+      "key": "next::ADJ",
+      "lemma": "next",
+      "type": "ADJ",
+      "frequency": 109,
+      "unknownMass": 109,
+      "cumulativeUnknown": 88045,
+      "cumulativeShare": 0.5070343858517568
+    },
+    {
+      "key": "next::ADV",
+      "lemma": "next",
+      "type": "ADV",
+      "frequency": 109,
+      "unknownMass": 109,
+      "cumulativeUnknown": 88154,
+      "cumulativeShare": 0.5076620960914959
+    },
+    {
+      "key": "few::N",
+      "lemma": "few",
+      "type": "N",
+      "frequency": 108,
+      "unknownMass": 108,
+      "cumulativeUnknown": 88262,
+      "cumulativeShare": 0.5082840475216963
+    },
+    {
+      "key": "look::N",
+      "lemma": "look",
+      "type": "N",
+      "frequency": 106,
+      "unknownMass": 106,
+      "cumulativeUnknown": 88368,
+      "cumulativeShare": 0.5088944813328189
+    },
+    {
+      "key": "come::N",
+      "lemma": "come",
+      "type": "N",
+      "frequency": 104,
+      "unknownMass": 104,
+      "cumulativeUnknown": 88472,
+      "cumulativeShare": 0.5094933975248637
+    },
+    {
+      "key": "home::ADJ",
+      "lemma": "home",
+      "type": "ADJ",
+      "frequency": 104,
+      "unknownMass": 104,
+      "cumulativeUnknown": 88576,
+      "cumulativeShare": 0.5100923137169084
+    },
+    {
+      "key": "home::ADV",
+      "lemma": "home",
+      "type": "ADV",
+      "frequency": 104,
+      "unknownMass": 104,
+      "cumulativeUnknown": 88680,
+      "cumulativeShare": 0.5106912299089532
+    },
+    {
+      "key": "home::V",
+      "lemma": "home",
+      "type": "V",
+      "frequency": 104,
+      "unknownMass": 104,
+      "cumulativeUnknown": 88784,
+      "cumulativeShare": 0.511290146100998
+    },
+    {
+      "key": "4::ADJ",
+      "lemma": "4",
+      "type": "ADJ",
+      "frequency": 103,
+      "unknownMass": 103,
+      "cumulativeUnknown": 88887,
+      "cumulativeShare": 0.5118833034835039
+    },
+    {
+      "key": "4::N",
+      "lemma": "4",
+      "type": "N",
+      "frequency": 103,
+      "unknownMass": 103,
+      "cumulativeUnknown": 88990,
+      "cumulativeShare": 0.5124764608660097
+    },
+    {
+      "key": "feel::N",
+      "lemma": "feel",
+      "type": "N",
+      "frequency": 102,
+      "unknownMass": 102,
+      "cumulativeUnknown": 89092,
+      "cumulativeShare": 0.5130638594389768
+    },
+    {
+      "key": "used::ADJ",
+      "lemma": "used",
+      "type": "ADJ",
+      "frequency": 102,
+      "unknownMass": 102,
+      "cumulativeUnknown": 89194,
+      "cumulativeShare": 0.5136512580119438
+    },
+    {
+      "key": "used::V",
+      "lemma": "used",
+      "type": "V",
+      "frequency": 102,
+      "unknownMass": 102,
+      "cumulativeUnknown": 89296,
+      "cumulativeShare": 0.5142386565849107
+    },
+    {
+      "key": "5::ADJ",
+      "lemma": "5",
+      "type": "ADJ",
+      "frequency": 97,
+      "unknownMass": 97,
+      "cumulativeUnknown": 89393,
+      "cumulativeShare": 0.5147972611101833
+    },
+    {
+      "key": "5::N",
+      "lemma": "5",
+      "type": "N",
+      "frequency": 97,
+      "unknownMass": 97,
+      "cumulativeUnknown": 89490,
+      "cumulativeShare": 0.5153558656354559
+    },
+    {
+      "key": "name::N",
+      "lemma": "name",
+      "type": "N",
+      "frequency": 96,
+      "unknownMass": 96,
+      "cumulativeUnknown": 89586,
+      "cumulativeShare": 0.5159087113511894
+    },
+    {
+      "key": "name::V",
+      "lemma": "name",
+      "type": "V",
+      "frequency": 96,
+      "unknownMass": 96,
+      "cumulativeUnknown": 89682,
+      "cumulativeShare": 0.5164615570669231
+    },
+    {
+      "key": "such::ADJ",
+      "lemma": "such",
+      "type": "ADJ",
+      "frequency": 96,
+      "unknownMass": 96,
+      "cumulativeUnknown": 89778,
+      "cumulativeShare": 0.5170144027826568
+    },
+    {
+      "key": "such::ADV",
+      "lemma": "such",
+      "type": "ADV",
+      "frequency": 96,
+      "unknownMass": 96,
+      "cumulativeUnknown": 89874,
+      "cumulativeShare": 0.5175672484983904
+    },
+    {
+      "key": "own::ADJ",
+      "lemma": "own",
+      "type": "ADJ",
+      "frequency": 94,
+      "unknownMass": 94,
+      "cumulativeUnknown": 89968,
+      "cumulativeShare": 0.5181085765950463
+    },
+    {
+      "key": "lot::N",
+      "lemma": "lot",
+      "type": "N",
+      "frequency": 93,
+      "unknownMass": 93,
+      "cumulativeUnknown": 90061,
+      "cumulativeShare": 0.5186441458821632
+    },
+    {
+      "key": "lot::V",
+      "lemma": "lot",
+      "type": "V",
+      "frequency": 93,
+      "unknownMass": 93,
+      "cumulativeUnknown": 90154,
+      "cumulativeShare": 0.5191797151692802
+    },
+    {
+      "key": "experience::V",
+      "lemma": "experience",
+      "type": "V",
+      "frequency": 90,
+      "unknownMass": 90,
+      "cumulativeUnknown": 90244,
+      "cumulativeShare": 0.5196980080277805
+    },
+    {
+      "key": "keep::N",
+      "lemma": "keep",
+      "type": "N",
+      "frequency": 90,
+      "unknownMass": 90,
+      "cumulativeUnknown": 90334,
+      "cumulativeShare": 0.5202163008862808
+    },
+    {
+      "key": "when::PROPN",
+      "lemma": "when",
+      "type": "PROPN",
+      "frequency": 90,
+      "unknownMass": 90,
+      "cumulativeUnknown": 90424,
+      "cumulativeShare": 0.520734593744781
+    },
+    {
+      "key": "when::SUB",
+      "lemma": "when",
+      "type": "SUB",
+      "frequency": 90,
+      "unknownMass": 90,
+      "cumulativeUnknown": 90514,
+      "cumulativeShare": 0.5212528866032814
+    },
+    {
+      "key": "love::V",
+      "lemma": "love",
+      "type": "V",
+      "frequency": 89,
+      "unknownMass": 89,
+      "cumulativeUnknown": 90603,
+      "cumulativeShare": 0.5217654206522427
+    },
+    {
+      "key": "something::ADJ",
+      "lemma": "something",
+      "type": "ADJ",
+      "frequency": 89,
+      "unknownMass": 89,
+      "cumulativeUnknown": 90692,
+      "cumulativeShare": 0.5222779547012042
+    },
+    {
+      "key": "something::V",
+      "lemma": "something",
+      "type": "V",
+      "frequency": 89,
+      "unknownMass": 89,
+      "cumulativeUnknown": 90781,
+      "cumulativeShare": 0.5227904887501655
+    },
+    {
+      "key": "states::V",
+      "lemma": "states",
+      "type": "V",
+      "frequency": 89,
+      "unknownMass": 89,
+      "cumulativeUnknown": 90870,
+      "cumulativeShare": 0.523303022799127
+    },
+    {
+      "key": "try::N",
+      "lemma": "try",
+      "type": "N",
+      "frequency": 88,
+      "unknownMass": 88,
+      "cumulativeUnknown": 90958,
+      "cumulativeShare": 0.5238097980385494
+    },
+    {
+      "key": "try::V",
+      "lemma": "try",
+      "type": "V",
+      "frequency": 88,
+      "unknownMass": 88,
+      "cumulativeUnknown": 91046,
+      "cumulativeShare": 0.524316573277972
+    },
+    {
+      "key": "company::V",
+      "lemma": "company",
+      "type": "V",
+      "frequency": 87,
+      "unknownMass": 87,
+      "cumulativeUnknown": 91133,
+      "cumulativeShare": 0.5248175897078556
+    },
+    {
+      "key": "united::ADJ",
+      "lemma": "united",
+      "type": "ADJ",
+      "frequency": 87,
+      "unknownMass": 87,
+      "cumulativeUnknown": 91220,
+      "cumulativeShare": 0.5253186061377392
+    },
+    {
+      "key": "united::V",
+      "lemma": "united",
+      "type": "V",
+      "frequency": 87,
+      "unknownMass": 87,
+      "cumulativeUnknown": 91307,
+      "cumulativeShare": 0.5258196225676228
+    },
+    {
+      "key": "10::ADJ",
+      "lemma": "10",
+      "type": "ADJ",
+      "frequency": 85,
+      "unknownMass": 85,
+      "cumulativeUnknown": 91392,
+      "cumulativeShare": 0.5263091213784287
+    },
+    {
+      "key": "10::N",
+      "lemma": "10",
+      "type": "N",
+      "frequency": 85,
+      "unknownMass": 85,
+      "cumulativeUnknown": 91477,
+      "cumulativeShare": 0.5267986201892345
+    },
+    {
+      "key": "job::N",
+      "lemma": "job",
+      "type": "N",
+      "frequency": 84,
+      "unknownMass": 84,
+      "cumulativeUnknown": 91561,
+      "cumulativeShare": 0.5272823601905015
+    },
+    {
+      "key": "job::V",
+      "lemma": "job",
+      "type": "V",
+      "frequency": 84,
+      "unknownMass": 84,
+      "cumulativeUnknown": 91645,
+      "cumulativeShare": 0.5277661001917684
+    },
+    {
+      "key": "looking::ADJ",
+      "lemma": "looking",
+      "type": "ADJ",
+      "frequency": 84,
+      "unknownMass": 84,
+      "cumulativeUnknown": 91729,
+      "cumulativeShare": 0.5282498401930353
+    },
+    {
+      "key": "looking::N",
+      "lemma": "looking",
+      "type": "N",
+      "frequency": 84,
+      "unknownMass": 84,
+      "cumulativeUnknown": 91813,
+      "cumulativeShare": 0.5287335801943023
+    },
+    {
+      "key": "m::ADJ",
+      "lemma": "m",
+      "type": "ADJ",
+      "frequency": 84,
+      "unknownMass": 84,
+      "cumulativeUnknown": 91897,
+      "cumulativeShare": 0.5292173201955692
+    },
+    {
+      "key": "m::N",
+      "lemma": "m",
+      "type": "N",
+      "frequency": 84,
+      "unknownMass": 84,
+      "cumulativeUnknown": 91981,
+      "cumulativeShare": 0.5297010601968362
+    },
+    {
+      "key": "end::N",
+      "lemma": "end",
+      "type": "N",
+      "frequency": 83,
+      "unknownMass": 83,
+      "cumulativeUnknown": 92064,
+      "cumulativeShare": 0.5301790413885642
+    },
+    {
+      "key": "end::V",
+      "lemma": "end",
+      "type": "V",
+      "frequency": 83,
+      "unknownMass": 83,
+      "cumulativeUnknown": 92147,
+      "cumulativeShare": 0.5306570225802922
+    },
+    {
+      "key": "staff::N",
+      "lemma": "staff",
+      "type": "N",
+      "frequency": 83,
+      "unknownMass": 83,
+      "cumulativeUnknown": 92230,
+      "cumulativeShare": 0.5311350037720203
+    },
+    {
+      "key": "staff::V",
+      "lemma": "staff",
+      "type": "V",
+      "frequency": 83,
+      "unknownMass": 83,
+      "cumulativeUnknown": 92313,
+      "cumulativeShare": 0.5316129849637483
+    },
+    {
+      "key": "under::P",
+      "lemma": "under",
+      "type": "P",
+      "frequency": 83,
+      "unknownMass": 83,
+      "cumulativeUnknown": 92396,
+      "cumulativeShare": 0.5320909661554764
+    },
+    {
+      "key": "under::PRT",
+      "lemma": "under",
+      "type": "PRT",
+      "frequency": 83,
+      "unknownMass": 83,
+      "cumulativeUnknown": 92479,
+      "cumulativeShare": 0.5325689473472044
+    },
+    {
+      "key": "united::PROPN",
+      "lemma": "united",
+      "type": "PROPN",
+      "frequency": 83,
+      "unknownMass": 83,
+      "cumulativeUnknown": 92562,
+      "cumulativeShare": 0.5330469285389324
+    },
+    {
+      "key": "am::PROPN",
+      "lemma": "am",
+      "type": "PROPN",
+      "frequency": 82,
+      "unknownMass": 82,
+      "cumulativeUnknown": 92644,
+      "cumulativeShare": 0.5335191509211216
+    },
+    {
+      "key": "attached::ADJ",
+      "lemma": "attached",
+      "type": "ADJ",
+      "frequency": 80,
+      "unknownMass": 80,
+      "cumulativeUnknown": 92724,
+      "cumulativeShare": 0.533979855684233
+    },
+    {
+      "key": "attached::V",
+      "lemma": "attached",
+      "type": "V",
+      "frequency": 80,
+      "unknownMass": 80,
+      "cumulativeUnknown": 92804,
+      "cumulativeShare": 0.5344405604473443
+    },
+    {
+      "key": "room::V",
+      "lemma": "room",
+      "type": "V",
+      "frequency": 80,
+      "unknownMass": 80,
+      "cumulativeUnknown": 92884,
+      "cumulativeShare": 0.5349012652104557
+    },
+    {
+      "key": "group::N",
+      "lemma": "group",
+      "type": "N",
+      "frequency": 79,
+      "unknownMass": 79,
+      "cumulativeUnknown": 92963,
+      "cumulativeShare": 0.5353562111640282
+    },
+    {
+      "key": "group::V",
+      "lemma": "group",
+      "type": "V",
+      "frequency": 79,
+      "unknownMass": 79,
+      "cumulativeUnknown": 93042,
+      "cumulativeShare": 0.5358111571176006
+    },
+    {
+      "key": "old::N",
+      "lemma": "old",
+      "type": "N",
+      "frequency": 79,
+      "unknownMass": 79,
+      "cumulativeUnknown": 93121,
+      "cumulativeShare": 0.5362661030711732
+    },
+    {
+      "key": "away::ADJ",
+      "lemma": "away",
+      "type": "ADJ",
+      "frequency": 78,
+      "unknownMass": 78,
+      "cumulativeUnknown": 93199,
+      "cumulativeShare": 0.5367152902152067
+    },
+    {
+      "key": "away::ADV",
+      "lemma": "away",
+      "type": "ADV",
+      "frequency": 78,
+      "unknownMass": 78,
+      "cumulativeUnknown": 93277,
+      "cumulativeShare": 0.5371644773592403
+    },
+    {
+      "key": "away::PRT",
+      "lemma": "away",
+      "type": "PRT",
+      "frequency": 78,
+      "unknownMass": 78,
+      "cumulativeUnknown": 93355,
+      "cumulativeShare": 0.5376136645032739
+    }
+  ]
+}

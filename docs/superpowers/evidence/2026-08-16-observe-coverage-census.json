@@ -1,0 +1,179 @@
+{
+  "contract": "PB-OBSERVE-COVERAGE-v1",
+  "mode": "observe",
+  "testFileOpened": false,
+  "scored": false,
+  "commit": "8495daa2103bf5c00ac65360244fbd79aa20e828",
+  "maxTokens": 28,
+  "split": "dev",
+  "protection": {
+    "analysed": 1824,
+    "parsed": 585,
+    "threw": 0,
+    "coverage": 0.3207236842105263,
+    "eventsMean": 77.11677631578948,
+    "fingerprintsChecked": 8,
+    "fingerprintsIdentical": true
+  },
+  "lexical": {
+    "ambiguousAtoms": 18453,
+    "senseHits": 10449,
+    "featureHits": 9639,
+    "lexicalAny": 10449,
+    "senseRate": 0.5662493903430337,
+    "featureRate": 0.5223540887660543
+  },
+  "compositional": {
+    "derivations": 116479,
+    "namedDerivations": 69222,
+    "completeDerivations": 69222,
+    "unknownDerivations": 80275,
+    "namedRate": 0.5942873822749165,
+    "completeRate": 0.5942873822749165,
+    "stableRoots": 585,
+    "stableUnknown": 491,
+    "stableComplete": 85
+  },
+  "t1": {
+    "edges": 33236,
+    "couldFire": 1404,
+    "oneSideMissing": 7555,
+    "bothMissing": 4418,
+    "noRelation": 18410,
+    "noCorrespondence": 1449,
+    "fireRate": 0.04224335058370442,
+    "missingSideRate": 0.22731375616801058,
+    "ambiguousGroups": 8257,
+    "groupsCouldFire": 1075,
+    "groupsOneSideMissing": 4428,
+    "groupsNoT1": 2754
+  },
+  "starvation": {
+    "lexical": 37681,
+    "compositional": 47257,
+    "lexicalShare": 0.4436294709081919,
+    "compositionalShare": 0.5563705290918082
+  },
+  "topUninterpretedBonds": [
+    {
+      "key": "S+PUNCT->S",
+      "count": 5228
+    },
+    {
+      "key": "NP+PUNCT->NP",
+      "count": 3318
+    },
+    {
+      "key": "PP+S->S",
+      "count": 3293
+    },
+    {
+      "key": "SCOMMA+S->S",
+      "count": 2906
+    },
+    {
+      "key": "S+SBAR->S",
+      "count": 2197
+    },
+    {
+      "key": "NPCOMMA+NP->APPOS",
+      "count": 2022
+    },
+    {
+      "key": "NPCOMMA+NP->NP",
+      "count": 1997
+    },
+    {
+      "key": "NC+PUNCT->NC",
+      "count": 1715
+    },
+    {
+      "key": "AUX+NP->INV",
+      "count": 1510
+    },
+    {
+      "key": "INV+NP->S",
+      "count": 1477
+    },
+    {
+      "key": "N+PUNCT->N",
+      "count": 1448
+    },
+    {
+      "key": "V+PP->PART",
+      "count": 1397
+    }
+  ],
+  "topNoRelationPairs": [
+    {
+      "key": "V|P|right",
+      "count": 725
+    },
+    {
+      "key": "N|PUNCT|right",
+      "count": 662
+    },
+    {
+      "key": "V|DET|left",
+      "count": 644
+    },
+    {
+      "key": "V|PUNCT|right",
+      "count": 538
+    },
+    {
+      "key": "ADJ|DET|left",
+      "count": 420
+    },
+    {
+      "key": "ADV|N|right",
+      "count": 388
+    },
+    {
+      "key": "ADJ|P|right",
+      "count": 353
+    },
+    {
+      "key": "V|DET|right",
+      "count": 336
+    },
+    {
+      "key": "V|P|left",
+      "count": 327
+    },
+    {
+      "key": "PRT|N|left",
+      "count": 304
+    },
+    {
+      "key": "ADV|N|left",
+      "count": 268
+    },
+    {
+      "key": "AUX|N|left",
+      "count": 262
+    }
+  ],
+  "milestone": {
+    "senseRate": {
+      "value": 0.5662493903430337,
+      "gate": 0.15,
+      "pass": true
+    },
+    "noRelationRate": {
+      "value": 0.5539174389216512,
+      "gate": 0.5,
+      "pass": false
+    },
+    "couldFireRate": {
+      "value": 0.04224335058370442,
+      "gate": 0.15,
+      "pass": false
+    },
+    "filledRootRate": {
+      "value": 0.1452991452991453,
+      "gate": 0.1,
+      "pass": true
+    }
+  }
+}

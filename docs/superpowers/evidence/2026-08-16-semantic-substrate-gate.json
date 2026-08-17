@@ -1,0 +1,199 @@
+{
+  "contract": "PB-SEMANTIC-SUBSTRATE-GATE-v1",
+  "confirmatory": false,
+  "testFileOpened": false,
+  "prereg": "docs/superpowers/evidence/2026-08-16-PREREG-semantic-substrate-gate.md",
+  "substrate": {
+    "commit": "8495daa2103bf5c00ac65360244fbd79aa20e828",
+    "inventoryVersion": "1.1.0",
+    "derangeSeed": 1397050673,
+    "maxTokens": 28,
+    "exposureThresholds": {
+      "minAmbiguous": 300,
+      "minEvidenceRate": 0.6,
+      "minScoreDisagreementRate": 0.1,
+      "minRankDisagreements": 30,
+      "maxAllUnknownRate": 0.4
+    },
+    "t2Repair": {
+      "minSupport": 0,
+      "scoreCap": null,
+      "direction": "both",
+      "reason": "none"
+    }
+  },
+  "autopsy": {
+    "n": 3,
+    "losses": [
+      {
+        "sentId": "weblog-blogspot.com_thelameduck_20041119192207_ENG_20041119_192207-0009",
+        "text": "Right now that seems to be the US, EU, and IAEA.",
+        "gold": {
+          "subject": "that",
+          "verb": "seems"
+        },
+        "unigramWinner": {
+          "subject": "that",
+          "verb": "seems"
+        },
+        "chargeWinner": {
+          "subject": null,
+          "verb": "Right"
+        },
+        "chargeOnWinner": {
+          "forward": null,
+          "inverse": null,
+          "score": null,
+          "backoff": null
+        },
+        "chargeOnGold": {
+          "forward": null,
+          "inverse": null,
+          "score": null,
+          "backoff": null,
+          "abstain": true
+        }
+      },
+      {
+        "sentId": "email-enronsent29_01-0038",
+        "text": "As you see it was CES acquired by ENA in asset purchase.",
+        "gold": {
+          "subject": "it",
+          "verb": "CES"
+        },
+        "unigramWinner": {
+          "subject": "it",
+          "verb": "CES"
+        },
+        "chargeWinner": {
+          "subject": "was",
+          "verb": "purchase"
+        },
+        "chargeOnWinner": {
+          "forward": null,
+          "inverse": null,
+          "score": null,
+          "backoff": null
+        },
+        "chargeOnGold": {
+          "forward": null,
+          "inverse": null,
+          "score": null,
+          "backoff": null,
+          "abstain": true
+        }
+      },
+      {
+        "sentId": "answers-20111107173110AA0lVuB_ans-0002",
+        "text": "For a field trip with my orchestra, we are going to the Chicago Symphony Orchestra.",
+        "gold": {
+          "subject": "we",
+          "verb": "going"
+        },
+        "unigramWinner": {
+          "subject": "we",
+          "verb": "going"
+        },
+        "chargeWinner": {
+          "subject": "trip",
+          "verb": "going"
+        },
+        "chargeOnWinner": {
+          "forward": null,
+          "inverse": null,
+          "score": null,
+          "backoff": null
+        },
+        "chargeOnGold": {
+          "forward": null,
+          "inverse": null,
+          "score": null,
+          "backoff": null,
+          "abstain": true
+        }
+      }
+    ],
+    "sparseLosses": 0,
+    "inverseDominant": 0
+  },
+  "chamber": {
+    "sentences": 1091,
+    "analysed": 12587,
+    "parsed": 3424,
+    "threw": 0,
+    "goldContained": 2321,
+    "coverage": 0.27202669420831016,
+    "containment": 0.1843965996663224,
+    "eventsMean": 93.3428934615079,
+    "recPresMean": 17.46667196313657,
+    "sources": {
+      "dev": 189,
+      "train": 902
+    }
+  },
+  "protection": {
+    "fingerprintPairsIdentical": true,
+    "fingerprintPairs": 12,
+    "threw": 0
+  },
+  "t1": {
+    "ambiguous": 6933,
+    "withEvidence": 1880,
+    "allUnknown": 5053,
+    "scoreDisagreements": 113,
+    "rankDisagreements": 7,
+    "firstHit": 3621,
+    "realHit": 4147,
+    "derangeHit": 4147,
+    "realVsDerangeWin": 0,
+    "realVsDerangeLoss": 0,
+    "first": 0.5222847252271744,
+    "real": 0.5981537573921824,
+    "derange": 0.5981537573921824,
+    "exposure": {
+      "verdict": "INSUFFICIENT_EXPOSURE",
+      "evaluateEfficacy": false,
+      "failures": [
+        "minEvidenceRate",
+        "minScoreDisagreementRate",
+        "minRankDisagreements",
+        "maxAllUnknownRate"
+      ],
+      "evidenceRate": 0.2711668830232223,
+      "scoreDisagreementRate": 0.01629886052214049,
+      "allUnknownRate": 0.7288331169767778,
+      "rankDisagreements": 7,
+      "ambiguous": 6933
+    },
+    "efficacy": "INSUFFICIENT_EXPOSURE",
+    "paired": {
+      "wins": 0,
+      "losses": 0,
+      "pValue": 1
+    }
+  },
+  "t2": {
+    "n": 537,
+    "first": 187,
+    "unigram": 134,
+    "forward": 206,
+    "inverse": 206,
+    "both": 206,
+    "shuffled": 193,
+    "repaired": 206,
+    "bothVsUniWin": 109,
+    "bothVsUniLoss": 37,
+    "firstRate": 0.34823091247672255,
+    "unigramRate": 0.24953445065176907,
+    "forwardRate": 0.38361266294227186,
+    "inverseRate": 0.38361266294227186,
+    "bothRate": 0.38361266294227186,
+    "shuffledRate": 0.35940409683426444,
+    "repairedRate": 0.38361266294227186,
+    "paired": {
+      "wins": 109,
+      "losses": 37,
+      "pValue": 0
+    }
+  }
+}

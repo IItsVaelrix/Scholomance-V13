@@ -1,0 +1,131 @@
+{
+  "contract": "PB-DECISION-BEARING-COVERAGE-v1",
+  "mode": "observe",
+  "testFileOpened": false,
+  "scored": false,
+  "commit": "8495daa2103bf5c00ac65360244fbd79aa20e828",
+  "maxTokens": 28,
+  "split": "dev",
+  "protection": {
+    "analysed": 1824,
+    "parsed": 585,
+    "threw": 0,
+    "coverage": 0.3207236842105263,
+    "eventsMean": 77.11677631578948,
+    "fingerprintsChecked": 8,
+    "fingerprintsIdentical": true
+  },
+  "cells": {
+    "packedCells": 138016,
+    "competitiveCells": 42461,
+    "decisionCompetitiveCells": 35558,
+    "glueOnlyCompetitive": 6903,
+    "weaklyDistinguishable": 20330,
+    "stronglyDistinguishable": 8648,
+    "liftCompetitors": 29751
+  },
+  "rates": {
+    "decisionBearingGroupRate": 0.24320827943078913,
+    "weakDistinguishRate": 0.5717419427414365,
+    "decisionBearingEdgeCouldFireRate": 0.005998737107977268,
+    "namedCompleteRate": 0.657861502841507
+  },
+  "edges": {
+    "decisionBearingEdges": 57012,
+    "couldFire": 342,
+    "namedComplete": 37506,
+    "silent": 19390
+  },
+  "missingByFamily": [
+    {
+      "key": "complement",
+      "count": 7957
+    },
+    {
+      "key": "argument",
+      "count": 4157
+    },
+    {
+      "key": "clause-attachment",
+      "count": 2868
+    },
+    {
+      "key": "apposition",
+      "count": 1999
+    },
+    {
+      "key": "modifier",
+      "count": 1219
+    },
+    {
+      "key": "unclassified",
+      "count": 1190
+    }
+  ],
+  "topMissingDecisionBonds": [
+    {
+      "key": "PP+S->S",
+      "count": 2359
+    },
+    {
+      "key": "S+SBAR->S",
+      "count": 2034
+    },
+    {
+      "key": "INV+NP->S",
+      "count": 1311
+    },
+    {
+      "key": "VP+INF->VP",
+      "count": 1305
+    },
+    {
+      "key": "NPCOMMA+NP->NP",
+      "count": 1268
+    },
+    {
+      "key": "SBAR+S->S",
+      "count": 1245
+    },
+    {
+      "key": "NP+PART->NP",
+      "count": 903
+    },
+    {
+      "key": "AUX+NP->INV",
+      "count": 886
+    },
+    {
+      "key": "COP+NP->INV",
+      "count": 886
+    },
+    {
+      "key": "VP+SBAR->VP",
+      "count": 882
+    },
+    {
+      "key": "INV+VP->S",
+      "count": 810
+    },
+    {
+      "key": "NPCOMMA+NP->APPOS",
+      "count": 731
+    },
+    {
+      "key": "VP+PRT->VP",
+      "count": 679
+    },
+    {
+      "key": "N+PROPN->N",
+      "count": 627
+    },
+    {
+      "key": "PROPN+N->N",
+      "count": 592
+    },
+    {
+      "key": "V+INF->VP",
+      "count": 579
+    }
+  ]
+}
