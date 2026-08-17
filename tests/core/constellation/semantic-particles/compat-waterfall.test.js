@@ -146,6 +146,24 @@ describe('diagnoseCompetitionEdge on real bond shapes', () => {
     expect(typeof row.leftKnownFeatures).toBe('number');
     expect(typeof row.rightKnownFeatures).toBe('number');
   });
+
+  it('want+INF complement mapping fires; S+SBAR abstains', () => {
+    const inf = diagnoseCompetitionEdge(
+      derivation(['V', 'INF', 'VP'], leaf('V', 'want'), leaf('INF', 'leave')),
+      lexicon,
+      provider,
+    );
+    expect(inf.relation).toBe('INFINITIVAL_COMPLEMENT');
+    expect(inf.stages.actualCompatFire).toBe(true);
+
+    const sbar = diagnoseCompetitionEdge(
+      derivation(['S', 'SBAR', 'S'], leaf('S', 'want'), leaf('SBAR', 'left')),
+      lexicon,
+      provider,
+    );
+    expect(sbar.relation).toBe('PROPOSITIONAL_COMPLEMENT');
+    expect(sbar.stages.actualCompatFire).toBe(false);
+  });
 });
 
 describe('summarizeWaterfall', () => {
