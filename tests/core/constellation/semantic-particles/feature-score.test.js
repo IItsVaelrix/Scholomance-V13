@@ -10,6 +10,7 @@ import { describe, expect, it } from 'vitest';
 import { derangeFeatureValues } from '../../../../codex/core/constellation/semantic-particles/feature-provider.js';
 import { EXPERIMENTAL_FEATURE_PROVIDER } from '../../../../codex/core/constellation/semantic-particles/experimental-inventory.js';
 import {
+  FEATURE_COMPAT,
   edgeCompatibility,
   projectRelation,
   scoreLexicalReading,
@@ -93,6 +94,34 @@ describe('high-frequency neighbors get sheet music', () => {
     expect(projectRelation('ADV', 'V', 'right')).toBe('adverbial');
     expect(projectRelation('V', 'ADV', 'right')).toBe('adverbial');
     expect(projectRelation('N', 'N', 'right')).toBe('compound');
+  });
+});
+
+describe('Phase 8 complement T1', () => {
+  it('keeps FEATURE_COMPAT free of complement-relation rows', () => {
+    const relations = new Set(FEATURE_COMPAT.map((r) => r.relation));
+    expect(relations.has('INFINITIVAL_COMPLEMENT')).toBe(false);
+    expect(relations.has('PROPOSITIONAL_COMPLEMENT')).toBe(false);
+  });
+
+  it('scores want+INF above leave+INF and marks neither illegal', () => {
+    const want = edgeCompatibility({
+      left: { lemma: 'want', type: 'V' },
+      right: { lemma: 'leave', type: 'INF' },
+      relation: 'INFINITIVAL_COMPLEMENT',
+      provider,
+    });
+    const leave = edgeCompatibility({
+      left: { lemma: 'leave', type: 'V' },
+      right: { lemma: 'go', type: 'INF' },
+      relation: 'INFINITIVAL_COMPLEMENT',
+      provider,
+    });
+    expect(want.fired).toBeGreaterThan(0);
+    expect(leave.fired).toBe(0);
+    expect(want.illegal).toBe(false);
+    expect(leave.illegal).toBe(false);
+    expect(want.score).toBeGreaterThan(leave.score);
   });
 });
 

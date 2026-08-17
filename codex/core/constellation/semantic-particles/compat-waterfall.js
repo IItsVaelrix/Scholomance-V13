@@ -17,6 +17,10 @@
 import { UNKNOWN, featuresFor } from './feature-provider.js';
 import { knownFeatureCount } from './experimental-inventory.js';
 import { FEATURE_COMPAT, ends, projectRelation } from './feature-score.js';
+import {
+  isComplementRelation,
+  scoreComplementCompat,
+} from './complement-compat.js';
 import { observeDerivationCoverage, diagnoseT1Edge } from './observe-coverage.js';
 import { leafMeaning } from './compositional-semantics.js';
 import { sensesFor } from './lexical-semantics.js';
@@ -59,6 +63,16 @@ export function waterfallStages({ leftFeats, rightFeats, relation }) {
   }
   const leftLit = knownFeatureCount(leftFeats) > 0;
   const rightLit = knownFeatureCount(rightFeats) > 0;
+  if (isComplementRelation(relation)) {
+    const hit = scoreComplementCompat({ leftFeats, rightFeats, relation });
+    return Object.freeze({
+      relationAvailable: true,
+      leftValueAvailable: leftLit,
+      rightValueAvailable: rightLit,
+      compatMappingAvailable: hit.mappingAvailable,
+      actualCompatFire: hit.fired > 0,
+    });
+  }
   let compatMappingAvailable = false;
   let actualCompatFire = false;
   for (const rule of FEATURE_COMPAT) {

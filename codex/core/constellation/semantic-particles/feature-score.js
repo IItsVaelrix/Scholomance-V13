@@ -13,6 +13,10 @@
 import { UNKNOWN, featuresFor } from './feature-provider.js';
 import { knownFeatureCount } from './experimental-inventory.js';
 import { projectComplementRelation } from './complement-ontology.js';
+import {
+  isComplementRelation,
+  scoreComplementCompat,
+} from './complement-compat.js';
 
 function isNom(type) {
   return type === 'N' || type === 'NP' || type === 'NC' || type === 'PROPN' || type === 'NPO';
@@ -349,6 +353,15 @@ export function ends(selfType, neighborType, selfFeats, otherFeats) {
 export function edgeCompatibility({ left, right, relation, provider }) {
   const leftFeats = featuresFor(left.lemma, left.type, provider);
   const rightFeats = featuresFor(right.lemma, right.type, provider);
+  if (isComplementRelation(relation)) {
+    const hit = scoreComplementCompat({ leftFeats, rightFeats, relation });
+    return Object.freeze({
+      score: hit.score,
+      fired: hit.fired,
+      illegal: false,
+      relation,
+    });
+  }
   let score = 0;
   let fired = 0;
   for (const rule of FEATURE_COMPAT) {
@@ -378,6 +391,18 @@ export function scoreLexicalReading({ lemma, type, neighbors = [], provider }) {
     if (!relation) continue;
     const other = featuresFor(nb.lemma, nb.type, provider);
     const oriented = ends(type, nb.type, self, other);
+    if (isComplementRelation(relation)) {
+      const hit = scoreComplementCompat({
+        leftFeats: oriented.left,
+        rightFeats: oriented.right,
+        relation,
+      });
+      if (hit.fired > 0) {
+        score += hit.score;
+        used = true;
+      }
+      continue;
+    }
     let local = 0;
     let fired = 0;
     for (const rule of FEATURE_COMPAT) {
