@@ -35,6 +35,9 @@ export function rolesComplete(rule, roles = {}) {
   if (rule === 'infinitival-composition' || rule === 'auxiliary-composition' || rule === 'relativization' || rule === 'subordination') {
     return Boolean(roles.Event && roles.Marker);
   }
+  if (rule === 'propositional-complement' || rule === 'infinitival-complement' || rule === 'particle-complement') {
+    return Boolean(roles.Governor && roles.Complement);
+  }
   if (rule === 'coordination') return Boolean(roles.Conjunct);
   return false;
 }

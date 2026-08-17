@@ -140,6 +140,25 @@ function ruleName(leftType, rightType, result) {
   }
   if (leftType === 'NP' && rightType === 'RELC' && result === 'NP') return 'relative-adjunction';
   if (leftType === 'SUB' && (rightType === 'S' || rightType === 'VP')) return 'subordination';
+  // Phase 3A complement naming (complement-ontology.js). Describes what
+  // each derivation means IF chosen; scores stay 0 — no evidence that a
+  // derivation SHOULD be chosen is encoded here. Governor side is a
+  // structural fact of the bond: SBAR+S governs from the right.
+  if ((leftType === 'V' || leftType === 'VP') && rightType === 'SBAR' && result === 'VP') {
+    return 'propositional-complement';
+  }
+  if (leftType === 'S' && rightType === 'SBAR' && result === 'S') {
+    return 'propositional-complement';
+  }
+  if (leftType === 'SBAR' && rightType === 'S' && result === 'S') {
+    return 'propositional-complement';
+  }
+  if ((leftType === 'V' || leftType === 'VP') && rightType === 'INF' && result === 'VP') {
+    return 'infinitival-complement';
+  }
+  if ((leftType === 'V' || leftType === 'VP') && rightType === 'PRT' && result === 'VP') {
+    return 'particle-complement';
+  }
   if (
     (leftType === 'CONJ' && (rightType === 'NP' || rightType === 'VP' || rightType === 'S' || rightType === 'ADJ'))
     || ((leftType === 'NP' || leftType === 'VP' || leftType === 'S' || leftType === 'ADJ')
@@ -155,6 +174,17 @@ function headUnknown(name, left, right, bond) {
   if (name === 'adverbial-modification') {
     const head = bond[2] === bond[0] ? left : right;
     return Boolean(head.unknown);
+  }
+  if (name === 'propositional-complement' && bond[0] === 'SBAR') {
+    // SBAR+S: the governor (semantic head) is the right child.
+    return Boolean(right.unknown);
+  }
+  if (
+    name === 'propositional-complement'
+    || name === 'infinitival-complement'
+    || name === 'particle-complement'
+  ) {
+    return Boolean(left.unknown);
   }
   if (
     name === 'object-predication'
@@ -287,6 +317,27 @@ function applyRule(name, left, right, bond) {
     sense = right.sense;
     features = { ...(right.features || {}) };
     frame = right.frame;
+  } else if (
+    name === 'propositional-complement'
+    || name === 'infinitival-complement'
+    || name === 'particle-complement'
+  ) {
+    // Phase 3A complement ontology: governor / complement / type / the
+    // surviving semantic head (the governor). score stays 0 — this rule
+    // describes the derivation; it does not argue for it.
+    const governorIsLeft = bond[0] !== 'SBAR';
+    const governor = governorIsLeft ? left : right;
+    const complement = governorIsLeft ? right : left;
+    const complementType = name === 'propositional-complement'
+      ? 'PROPOSITIONAL'
+      : name === 'infinitival-complement' ? 'INFINITIVAL' : 'PARTICLE';
+    roles.Governor = governor.lemma;
+    roles.Complement = complement.lemma;
+    roles.ComplementType = complementType;
+    lemma = governor.lemma;
+    sense = governor.sense;
+    features = { ...(governor.features || {}) };
+    frame = governor.frame;
   } else if (name === 'coordination') {
     roles.Conjunct = right.lemma;
     roles.Coordinator = left.lemma;

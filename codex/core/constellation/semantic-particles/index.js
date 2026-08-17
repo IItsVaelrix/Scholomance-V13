@@ -46,6 +46,14 @@ export {
 } from './experimental-inventory.js';
 
 export {
+  COMPLEMENT_ONTOLOGY_VERSION,
+  COMPLEMENT_SLOTS,
+  COMPLEMENT_TYPES,
+  classifyComplement,
+  projectComplementRelation,
+} from './complement-ontology.js';
+
+export {
   FEATURE_COMPAT,
   edgeCompatibility,
   pickScoredReading,

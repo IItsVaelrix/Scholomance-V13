@@ -12,6 +12,7 @@
 
 import { UNKNOWN, featuresFor } from './feature-provider.js';
 import { knownFeatureCount } from './experimental-inventory.js';
+import { projectComplementRelation } from './complement-ontology.js';
 
 function isNom(type) {
   return type === 'N' || type === 'NP' || type === 'NC' || type === 'PROPN' || type === 'NPO';
@@ -286,6 +287,14 @@ export function projectRelation(selfType, neighborType, neighborSide) {
   if (isVerb(selfType) && isPrt(neighborType)) return 'particle-of';
   if (isAdv(selfType) && (isVerb(neighborType) || isAdj(neighborType))) return 'adverbial';
   if ((isVerb(selfType) || isAdj(selfType)) && isAdv(neighborType)) return 'adverbial';
+  // Phase 3A complement projection (complement-ontology.js). PROJECTED
+  // here: PROPOSITIONAL (V/VP/S + SBAR, SBAR + S) and INFINITIVAL
+  // (V/VP + INF). PARTICLE is deliberately NOT re-keyed: 'particle-of'
+  // above already carries authored mappings. OBSERVE-only: projecting a
+  // relation describes the edge; it authors no COMPAT rows and cannot
+  // create fires by itself.
+  const complement = projectComplementRelation(selfType, neighborType);
+  if (complement) return complement;
   if (isNom(selfType) && isNom(neighborType)) return 'compound';
   return null;
 }
@@ -318,6 +327,22 @@ export function ends(selfType, neighborType, selfFeats, otherFeats) {
     return { left: otherFeats, right: selfFeats };
   }
   if (isNom(selfType) && isNom(neighborType)) return { left: selfFeats, right: otherFeats };
+  // Phase 3A complement orientation: the GOVERNOR's features occupy the
+  // left slot, the COMPLEMENT's features the right slot — mirroring the
+  // ontology's slot order. Future COMPAT rows for complement relations
+  // must be authored left=governor kind, right=complement kind.
+  if ((isVerb(selfType) || selfType === 'S') && neighborType === 'SBAR') {
+    return { left: selfFeats, right: otherFeats };
+  }
+  if (selfType === 'SBAR' && neighborType === 'S') {
+    return { left: otherFeats, right: selfFeats };
+  }
+  if (isVerb(selfType) && neighborType === 'INF') {
+    return { left: selfFeats, right: otherFeats };
+  }
+  if (selfType === 'INF' && isVerb(neighborType)) {
+    return { left: otherFeats, right: selfFeats };
+  }
   return { left: selfFeats, right: otherFeats };
 }
 
