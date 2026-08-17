@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { UNKNOWN, featuresFor } from '../../../../codex/core/constellation/semantic-particles/feature-provider.js';
-import { EXPERIMENTAL_FEATURE_PROVIDER } from '../../../../codex/core/constellation/semantic-particles/experimental-inventory.js';
+import { UNKNOWN, featuresFor, derangeFeatureValues } from '../../../../codex/core/constellation/semantic-particles/feature-provider.js';
+import { EXPERIMENTAL_FEATURE_PROVIDER, knownFeatureCount } from '../../../../codex/core/constellation/semantic-particles/experimental-inventory.js';
 import {
   COMPLEMENT_COMPAT,
   COMPLEMENT_COMPAT_RELATIONS,
@@ -144,5 +144,26 @@ describe('authored complement COMPAT (TRAIN-frozen rows)', () => {
     expect(abstain.mappingExists).toBe(true);
     expect(abstain.mappingFires).toBe(false);
     expect(abstain.mappingAbstains).toBe(true);
+  });
+
+  it('deranges complement fire while preserving known-count', () => {
+    const seed = 0x50383031;
+    const fake = derangeFeatureValues(P, seed);
+    const real = scoreComplementCompat({
+      leftFeats: featuresFor('want', 'V', P),
+      rightFeats: featuresFor('leave', 'INF', P),
+      relation: 'INFINITIVAL_COMPLEMENT',
+    });
+    const der = scoreComplementCompat({
+      leftFeats: featuresFor('want', 'V', fake),
+      rightFeats: featuresFor('leave', 'INF', fake),
+      relation: 'INFINITIVAL_COMPLEMENT',
+    });
+    expect(knownFeatureCount(featuresFor('want', 'V', fake)))
+      .toBe(knownFeatureCount(featuresFor('want', 'V', P)));
+    // A single pair may or may not move; the suite-level census is the gate.
+    expect(typeof der.score).toBe('number');
+    expect(real.illegal).toBe(false);
+    expect(der.illegal).toBe(false);
   });
 });
