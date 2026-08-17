@@ -1,0 +1,189 @@
+{
+  "contract": "PB-CLASSIFIER-COMMUTATIVITY-v1",
+  "mode": "observe",
+  "testFileOpened": false,
+  "scored": false,
+  "commit": "9bffa9f4c7c684c20015a0ffd634d649847d37d3",
+  "maxTokens": 28,
+  "split": "dev",
+  "protection": {
+    "analysed": 1824,
+    "parsed": 585,
+    "threw": 0,
+    "eventsMean": 77.11677631578948,
+    "fingerprintsChecked": 8,
+    "fingerprintsIdentical": true
+  },
+  "faithfulness": {
+    "mismatches": 0,
+    "note": "natural-order reconstruction reproduced row.silenceClass for every edge"
+  },
+  "experiment1_classifierCommutativity": {
+    "edges": 57012,
+    "branchOrdersTested": 24,
+    "orderSensitiveEdges": 22542,
+    "commutatorMagnitude": 0.395390444117028,
+    "producibleClassCountDistribution": {
+      "1": 34470,
+      "2": 22542
+    },
+    "verdict": "C>0 — classifier is priority-order-sensitive on the reported region"
+  },
+  "experiment2_latentDeficitCensus": {
+    "observedClassDistribution": {
+      "C1-composition-missing": 12466,
+      "C2-lexical-missing": 22542,
+      "C3-feature-missing": 21295,
+      "null": 709
+    },
+    "latentDeficitCombos": {
+      "C2+C3": 22542,
+      "C3": 21295,
+      "C1": 12466,
+      "none": 709
+    },
+    "overlaps": {
+      "C2_and_C3": 22542,
+      "C1_and_C2": 0,
+      "C1_and_C3": 0,
+      "C1_and_C2_and_C3": 0,
+      "anyMultiDeficit": 22542
+    },
+    "crossTabs": {
+      "observedC2_total": 22542,
+      "observedC2_alsoLatentC3": 22542,
+      "observedC2_alsoLatentC3_rate": 1,
+      "observedC3_total": 21295,
+      "observedC3_constructionNote": "natural-C3 edges have starvation=null, hence unknown=false: single-deficit by construction",
+      "observedC1_total": 12466,
+      "observedNull_total": 709
+    },
+    "silentEdgeView": {
+      "silentEdges": 12348,
+      "silentMultiDeficit": 0,
+      "silentMultiDeficitRate": 0
+    }
+  },
+  "orderSensitiveExamples": [
+    {
+      "sentId": "weblog-blogspot.com_nominations_20041117172713_ENG_20041117_172713-0002",
+      "bond": "NP+VP->S",
+      "named": true,
+      "complete": true,
+      "starvation": "lexical",
+      "couldFire": false,
+      "observed": "C2-lexical-missing",
+      "producible": [
+        "C2-lexical-missing",
+        "C3-feature-missing"
+      ],
+      "leftSenseCount": 1,
+      "rightSenseCount": 0
+    },
+    {
+      "sentId": "weblog-blogspot.com_nominations_20041117172713_ENG_20041117_172713-0002",
+      "bond": "NP+VP->S",
+      "named": true,
+      "complete": true,
+      "starvation": "lexical",
+      "couldFire": false,
+      "observed": "C2-lexical-missing",
+      "producible": [
+        "C2-lexical-missing",
+        "C3-feature-missing"
+      ],
+      "leftSenseCount": 1,
+      "rightSenseCount": 0
+    },
+    {
+      "sentId": "weblog-blogspot.com_nominations_20041117172713_ENG_20041117_172713-0002",
+      "bond": "NP+VP->S",
+      "named": true,
+      "complete": true,
+      "starvation": "lexical",
+      "couldFire": false,
+      "observed": "C2-lexical-missing",
+      "producible": [
+        "C2-lexical-missing",
+        "C3-feature-missing"
+      ],
+      "leftSenseCount": 1,
+      "rightSenseCount": 0
+    },
+    {
+      "sentId": "weblog-blogspot.com_nominations_20041117172713_ENG_20041117_172713-0002",
+      "bond": "NP+VP->S",
+      "named": true,
+      "complete": true,
+      "starvation": "lexical",
+      "couldFire": false,
+      "observed": "C2-lexical-missing",
+      "producible": [
+        "C2-lexical-missing",
+        "C3-feature-missing"
+      ],
+      "leftSenseCount": 1,
+      "rightSenseCount": 0
+    },
+    {
+      "sentId": "weblog-blogspot.com_nominations_20041117172713_ENG_20041117_172713-0002",
+      "bond": "NP+VP->S",
+      "named": true,
+      "complete": true,
+      "starvation": "lexical",
+      "couldFire": false,
+      "observed": "C2-lexical-missing",
+      "producible": [
+        "C2-lexical-missing",
+        "C3-feature-missing"
+      ],
+      "leftSenseCount": 1,
+      "rightSenseCount": 0
+    },
+    {
+      "sentId": "weblog-blogspot.com_nominations_20041117172713_ENG_20041117_172713-0002",
+      "bond": "NP+VP->S",
+      "named": true,
+      "complete": true,
+      "starvation": "lexical",
+      "couldFire": false,
+      "observed": "C2-lexical-missing",
+      "producible": [
+        "C2-lexical-missing",
+        "C3-feature-missing"
+      ],
+      "leftSenseCount": 1,
+      "rightSenseCount": 0
+    },
+    {
+      "sentId": "weblog-blogspot.com_nominations_20041117172713_ENG_20041117_172713-0002",
+      "bond": "NP+VP->S",
+      "named": true,
+      "complete": true,
+      "starvation": "lexical",
+      "couldFire": false,
+      "observed": "C2-lexical-missing",
+      "producible": [
+        "C2-lexical-missing",
+        "C3-feature-missing"
+      ],
+      "leftSenseCount": 1,
+      "rightSenseCount": 0
+    },
+    {
+      "sentId": "weblog-blogspot.com_nominations_20041117172713_ENG_20041117_172713-0002",
+      "bond": "NP+VP->S",
+      "named": true,
+      "complete": true,
+      "starvation": "lexical",
+      "couldFire": false,
+      "observed": "C2-lexical-missing",
+      "producible": [
+        "C2-lexical-missing",
+        "C3-feature-missing"
+      ],
+      "leftSenseCount": 1,
+      "rightSenseCount": 0
+    }
+  ]
+}
