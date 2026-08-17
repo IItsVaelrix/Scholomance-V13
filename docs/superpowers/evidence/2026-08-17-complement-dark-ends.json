@@ -1,0 +1,1000 @@
+{
+  "generatedBy": "scripts/complement-dark-ends-census.mjs",
+  "purpose": "Phase 3B demand census (OBSERVE-only, additive)",
+  "chamber": {
+    "maxTokens": 28,
+    "devSentences": 1824,
+    "trainSentences": 10763
+  },
+  "targetRelations": [
+    "INFINITIVAL_COMPLEMENT",
+    "PROPOSITIONAL_COMPLEMENT"
+  ],
+  "totals": {
+    "complementEdges": 6361,
+    "darkLeftGovernor": 6093,
+    "darkRightComplement": 6361,
+    "darkBoth": 6093,
+    "litBoth": 0,
+    "byRelation": {
+      "INFINITIVAL_COMPLEMENT": {
+        "edges": 1884,
+        "darkLeft": 1700,
+        "darkRight": 1884
+      },
+      "PROPOSITIONAL_COMPLEMENT": {
+        "edges": 4477,
+        "darkLeft": 4393,
+        "darkRight": 4477
+      }
+    },
+    "bondShapes": {
+      "S+SBAR->S": 2034,
+      "VP+INF->VP": 1305,
+      "SBAR+S->S": 1245,
+      "VP+SBAR->VP": 882,
+      "V+INF->VP": 579,
+      "V+SBAR->VP": 316
+    }
+  },
+  "typeAudit": [
+    {
+      "type": "INF",
+      "anyTypeLevelLight": false,
+      "litKinds": []
+    },
+    {
+      "type": "S",
+      "anyTypeLevelLight": false,
+      "litKinds": []
+    },
+    {
+      "type": "SBAR",
+      "anyTypeLevelLight": false,
+      "litKinds": []
+    },
+    {
+      "type": "V",
+      "anyTypeLevelLight": false,
+      "litKinds": []
+    },
+    {
+      "type": "VP",
+      "anyTypeLevelLight": false,
+      "litKinds": []
+    }
+  ],
+  "byType": [
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "edges": 3232,
+      "darkEdges": 3232,
+      "darkRate": 1,
+      "distinctLemmas": 140,
+      "topLemmas": [
+        "have:149",
+        "get:94",
+        "believe:85",
+        "do:73",
+        "drive:72",
+        "well:71",
+        "accurate:66",
+        "attack:64",
+        "feels:60",
+        "looking:58",
+        "out:55",
+        "flew:54"
+      ]
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "S",
+      "edges": 2034,
+      "darkEdges": 2034,
+      "darkRate": 1,
+      "distinctLemmas": 190,
+      "topLemmas": [
+        "have:131",
+        "going:52",
+        "wondering:50",
+        "based:48",
+        "give:48",
+        "want:43",
+        "interest:42",
+        "out:37",
+        "make:29",
+        "like:29",
+        "announced:28",
+        "close:28"
+      ]
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "right",
+      "type": "INF",
+      "edges": 1884,
+      "darkEdges": 1884,
+      "darkRate": 1,
+      "distinctLemmas": 139,
+      "topLemmas": [
+        "do:101",
+        "see:59",
+        "go:55",
+        "have:51",
+        "get:47",
+        "know:45",
+        "drive:43",
+        "come:41",
+        "catch:41",
+        "take:40",
+        "make:35",
+        "determine:31"
+      ]
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "left",
+      "type": "VP",
+      "edges": 1305,
+      "darkEdges": 1305,
+      "darkRate": 1,
+      "distinctLemmas": 182,
+      "topLemmas": [
+        "want:61",
+        "like:56",
+        "going:52",
+        "have:41",
+        "need:37",
+        "place:27",
+        "allowed:26",
+        "time:23",
+        "seems:22",
+        "used:22",
+        "wants:21",
+        "right:20"
+      ]
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "SBAR",
+      "edges": 1245,
+      "darkEdges": 1245,
+      "darkRate": 1,
+      "distinctLemmas": 108,
+      "topLemmas": [
+        "have:163",
+        "see:65",
+        "take:55",
+        "want:38",
+        "prefer:37",
+        "stall:37",
+        "spasms:35",
+        "strengthening:34",
+        "looking:34",
+        "brushing:27",
+        "expensive:27",
+        "check:26"
+      ]
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "S",
+      "edges": 1245,
+      "darkEdges": 1245,
+      "darkRate": 1,
+      "distinctLemmas": 180,
+      "topLemmas": [
+        "naming:42",
+        "need:26",
+        "during:26",
+        "check:24",
+        "help:21",
+        "based:21",
+        "storm:20",
+        "go:19",
+        "notify:18",
+        "contact:18",
+        "up:18",
+        "spot:18"
+      ]
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "VP",
+      "edges": 882,
+      "darkEdges": 882,
+      "darkRate": 1,
+      "distinctLemmas": 154,
+      "topLemmas": [
+        "based:43",
+        "have:28",
+        "get:21",
+        "give:20",
+        "married:19",
+        "know:19",
+        "happen:18",
+        "going:17",
+        "company:16",
+        "play:14",
+        "used:14",
+        "sources:13"
+      ]
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "left",
+      "type": "V",
+      "edges": 579,
+      "darkEdges": 395,
+      "darkRate": 0.6822107081174439,
+      "distinctLemmas": 89,
+      "topLemmas": [
+        "want:50",
+        "like:29",
+        "need:29",
+        "place:23",
+        "have:22",
+        "wants:21",
+        "threatened:20",
+        "going:18",
+        "used:16",
+        "tried:14",
+        "seems:13",
+        "time:12"
+      ]
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "V",
+      "edges": 316,
+      "darkEdges": 232,
+      "darkRate": 0.7341772151898734,
+      "distinctLemmas": 79,
+      "topLemmas": [
+        "company:16",
+        "know:13",
+        "time:10",
+        "sources:10",
+        "play:10",
+        "understand:9",
+        "happen:9",
+        "announced:8",
+        "fire:8",
+        "interest:7",
+        "birding:7",
+        "place:7"
+      ]
+    }
+  ],
+  "darkEndsTop": [
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "have",
+      "darkEdges": 149,
+      "cellsAffected": 124,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "S",
+      "lemma": "have",
+      "darkEdges": 131,
+      "cellsAffected": 102,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "believe",
+      "darkEdges": 85,
+      "cellsAffected": 75,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "drive",
+      "darkEdges": 72,
+      "cellsAffected": 72,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "get",
+      "darkEdges": 94,
+      "cellsAffected": 67,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "right",
+      "type": "INF",
+      "lemma": "do",
+      "darkEdges": 101,
+      "cellsAffected": 65,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "attack",
+      "darkEdges": 64,
+      "cellsAffected": 64,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "do",
+      "darkEdges": 73,
+      "cellsAffected": 63,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "well",
+      "darkEdges": 71,
+      "cellsAffected": 63,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "accurate",
+      "darkEdges": 66,
+      "cellsAffected": 63,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "feels",
+      "darkEdges": 60,
+      "cellsAffected": 56,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "looking",
+      "darkEdges": 58,
+      "cellsAffected": 52,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "S",
+      "lemma": "going",
+      "darkEdges": 52,
+      "cellsAffected": 52,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "heading",
+      "darkEdges": 51,
+      "cellsAffected": 51,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "S",
+      "lemma": "wondering",
+      "darkEdges": 50,
+      "cellsAffected": 50,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "SBAR",
+      "lemma": "have",
+      "darkEdges": 163,
+      "cellsAffected": 49,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "air",
+      "darkEdges": 51,
+      "cellsAffected": 48,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "sort",
+      "darkEdges": 51,
+      "cellsAffected": 48,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "S",
+      "lemma": "give",
+      "darkEdges": 48,
+      "cellsAffected": 48,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "strengthening",
+      "darkEdges": 46,
+      "cellsAffected": 46,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "referred",
+      "darkEdges": 46,
+      "cellsAffected": 46,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "flew",
+      "darkEdges": 54,
+      "cellsAffected": 45,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "out",
+      "darkEdges": 55,
+      "cellsAffected": 44,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "house",
+      "darkEdges": 44,
+      "cellsAffected": 44,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "left",
+      "type": "VP",
+      "lemma": "want",
+      "darkEdges": 61,
+      "cellsAffected": 43,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "left",
+      "type": "VP",
+      "lemma": "going",
+      "darkEdges": 52,
+      "cellsAffected": 42,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "S",
+      "lemma": "interest",
+      "darkEdges": 42,
+      "cellsAffected": 42,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "right",
+      "type": "INF",
+      "lemma": "see",
+      "darkEdges": 59,
+      "cellsAffected": 40,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "got",
+      "darkEdges": 44,
+      "cellsAffected": 40,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "keeps",
+      "darkEdges": 44,
+      "cellsAffected": 40,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "left",
+      "type": "VP",
+      "lemma": "like",
+      "darkEdges": 56,
+      "cellsAffected": 39,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "left",
+      "type": "V",
+      "lemma": "want",
+      "darkEdges": 50,
+      "cellsAffected": 39,
+      "trainTerminalMass": 130
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "right",
+      "type": "INF",
+      "lemma": "go",
+      "darkEdges": 55,
+      "cellsAffected": 37,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "S",
+      "lemma": "want",
+      "darkEdges": 43,
+      "cellsAffected": 37,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "right",
+      "type": "INF",
+      "lemma": "come",
+      "darkEdges": 41,
+      "cellsAffected": 36,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "threatening",
+      "darkEdges": 39,
+      "cellsAffected": 36,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "S",
+      "lemma": "based",
+      "darkEdges": 48,
+      "cellsAffected": 35,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "killed",
+      "darkEdges": 40,
+      "cellsAffected": 32,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "left",
+      "type": "VP",
+      "lemma": "need",
+      "darkEdges": 37,
+      "cellsAffected": 32,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "party",
+      "darkEdges": 34,
+      "cellsAffected": 32,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "recruits",
+      "darkEdges": 34,
+      "cellsAffected": 32,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "travel",
+      "darkEdges": 32,
+      "cellsAffected": 32,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "right",
+      "type": "INF",
+      "lemma": "catch",
+      "darkEdges": 41,
+      "cellsAffected": 31,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "left",
+      "type": "VP",
+      "lemma": "have",
+      "darkEdges": 41,
+      "cellsAffected": 31,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "defend",
+      "darkEdges": 31,
+      "cellsAffected": 31,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "VP",
+      "lemma": "based",
+      "darkEdges": 43,
+      "cellsAffected": 30,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "right",
+      "type": "INF",
+      "lemma": "drive",
+      "darkEdges": 43,
+      "cellsAffected": 30,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "right",
+      "type": "INF",
+      "lemma": "get",
+      "darkEdges": 47,
+      "cellsAffected": 29,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "attacks",
+      "darkEdges": 34,
+      "cellsAffected": 29,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "S",
+      "lemma": "make",
+      "darkEdges": 29,
+      "cellsAffected": 29,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "see",
+      "darkEdges": 29,
+      "cellsAffected": 29,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "right",
+      "type": "INF",
+      "lemma": "have",
+      "darkEdges": 51,
+      "cellsAffected": 28,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "right",
+      "type": "INF",
+      "lemma": "know",
+      "darkEdges": 45,
+      "cellsAffected": 28,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "S",
+      "lemma": "close",
+      "darkEdges": 28,
+      "cellsAffected": 28,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "ferry",
+      "darkEdges": 30,
+      "cellsAffected": 27,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "named",
+      "darkEdges": 30,
+      "cellsAffected": 27,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "VP",
+      "lemma": "have",
+      "darkEdges": 28,
+      "cellsAffected": 27,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "S",
+      "lemma": "happen",
+      "darkEdges": 27,
+      "cellsAffected": 27,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "S",
+      "lemma": "out",
+      "darkEdges": 37,
+      "cellsAffected": 26,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "right",
+      "type": "INF",
+      "lemma": "make",
+      "darkEdges": 35,
+      "cellsAffected": 26,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "presented",
+      "darkEdges": 28,
+      "cellsAffected": 26,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "S",
+      "lemma": "announced",
+      "darkEdges": 28,
+      "cellsAffected": 26,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "phone",
+      "darkEdges": 28,
+      "cellsAffected": 26,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "gets",
+      "darkEdges": 27,
+      "cellsAffected": 26,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "right",
+      "type": "INF",
+      "lemma": "take",
+      "darkEdges": 40,
+      "cellsAffected": 25,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "right",
+      "type": "INF",
+      "lemma": "determine",
+      "darkEdges": 31,
+      "cellsAffected": 25,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "share",
+      "darkEdges": 25,
+      "cellsAffected": 25,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "S",
+      "lemma": "say",
+      "darkEdges": 25,
+      "cellsAffected": 25,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "provide",
+      "darkEdges": 36,
+      "cellsAffected": 24,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "left",
+      "type": "V",
+      "lemma": "need",
+      "darkEdges": 29,
+      "cellsAffected": 24,
+      "trainTerminalMass": 130
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "discussed",
+      "darkEdges": 27,
+      "cellsAffected": 24,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "process",
+      "darkEdges": 26,
+      "cellsAffected": 24,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "S",
+      "lemma": "house",
+      "darkEdges": 24,
+      "cellsAffected": 24,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "S",
+      "lemma": "need",
+      "darkEdges": 24,
+      "cellsAffected": 24,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "expensive",
+      "darkEdges": 24,
+      "cellsAffected": 24,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "left",
+      "type": "S",
+      "lemma": "down",
+      "darkEdges": 24,
+      "cellsAffected": 24,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "use",
+      "darkEdges": 23,
+      "cellsAffected": 23,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "PROPOSITIONAL_COMPLEMENT",
+      "side": "right",
+      "type": "SBAR",
+      "lemma": "subscribed",
+      "darkEdges": 24,
+      "cellsAffected": 22,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "left",
+      "type": "VP",
+      "lemma": "seems",
+      "darkEdges": 22,
+      "cellsAffected": 22,
+      "trainTerminalMass": 0
+    },
+    {
+      "relation": "INFINITIVAL_COMPLEMENT",
+      "side": "left",
+      "type": "VP",
+      "lemma": "used",
+      "darkEdges": 22,
+      "cellsAffected": 22,
+      "trainTerminalMass": 0
+    }
+  ],
+  "darkEndsCount": 1219,
+  "trainMassMethod": "terminal leaf mass; particles off in TRAIN pass (forest identity proven by frozen census fingerprint check); gold-independent"
+}

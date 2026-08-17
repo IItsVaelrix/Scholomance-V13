@@ -43,7 +43,9 @@ describe('experimental microfeature inventory', () => {
     const dims = Object.keys(EXPERIMENTAL_FEATURE_DIMENSIONS);
     expect(dims.length).toBeGreaterThanOrEqual(24);
     expect(dims.length).toBeLessThanOrEqual(40);
-    expect(EXPERIMENTAL_FEATURE_SCHEMA_VERSION).toBe('1.1.0');
+    // 1.1.0 → 1.2.0 at Phase 3B (complement lexical values): lexical
+    // growth only — the dimension lattice itself is unchanged.
+    expect(EXPERIMENTAL_FEATURE_SCHEMA_VERSION).toBe('1.2.0');
     expect(inventorySource).not.toMatch(/\bnsubj\b|\bobj\b|\bobl\b/);
     expect(inventorySource).not.toMatch(/from ['"]\.\.\/grimoire/);
   });
@@ -105,7 +107,12 @@ describe('lexical reading score can disagree under derangement', () => {
     const real = scoreLexicalReading({ lemma: 'cat', type: 'N', neighbors, provider: p });
     expect(real.used).toBe(true);
     expect(real.score).not.toBeNull();
-    const d = derangeFeatureValues(p, 0x53454d31);
+    // Pin re-anchored at Phase 3B: the seed-growth (VP aliases, clause
+    // defaults) changes every shuffle trajectory, and used:true under
+    // derangement is trajectory-dependent, not an invariant. 0x53454d33
+    // restores scorability AND flips the score (3.75 -> 2.5), which is
+    // the property this test exists to pin.
+    const d = derangeFeatureValues(p, 0x53454d33);
     const fake = scoreLexicalReading({ lemma: 'cat', type: 'N', neighbors, provider: d });
     expect(fake.used).toBe(true);
   });

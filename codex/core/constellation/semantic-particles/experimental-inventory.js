@@ -4,6 +4,11 @@
  * Frozen 27-dimension lattice plus an authored lemma map. Not gold syntax.
  * Coverage over common English, not encyclopedic completeness.
  *
+ * Phase 3B (2026-08-17, prereg phase-3b-complement-lexical): lexical
+ * growth only, demand-bounded by the complement dark-ends census —
+ * constituent classes for S/SBAR/INF, the lemma-by-lemma VP alias, and
+ * the want/need cognition authoring. The dimension lattice is unchanged.
+ *
  * PURE AND ZERO-I/O.
  *
  * @module codex/core/constellation/semantic-particles/experimental-inventory
@@ -12,7 +17,7 @@
 import { createFeatureProvider } from './feature-provider.js';
 import { UNKNOWN } from './feature-provider.js';
 
-export const EXPERIMENTAL_FEATURE_SCHEMA_VERSION = '1.1.0';
+export const EXPERIMENTAL_FEATURE_SCHEMA_VERSION = '1.2.0';
 
 export const EXPERIMENTAL_FEATURE_DIMENSIONS = Object.freeze({
   'entity.animate': Object.freeze(['true', 'false']),
@@ -196,6 +201,12 @@ const COGNITION = bag(
   'realize', 'learn', 'guess', 'expect', 'expected', 'hope', 'wish',
   'intend', 'intends', 'intended', 'plan', 'wonder', 'assume',
   'interpret', 'interpreted', 'evaluate', 'calculate', 'mean', 'means',
+  // Phase 3B (TRAIN-demand-bounded): top-ranked dark complement governors
+  // in the 2026-08-17 dark-ends census, TRAIN terminal mass 130 each.
+  // Propositional-attitude verbs, class-consistent with hope/wish/expect.
+  // Inflected forms are literal members (the feature seed is exact-key;
+  // same convention as say/says/said/saying above).
+  'want', 'wants', 'wanted', 'wanting', 'need', 'needs', 'needed',
 );
 
 const PERCEPTION = bag(
@@ -288,6 +299,9 @@ const IRREGULAR = Object.freeze({
   left: 'leave', leaving: 'leave',
   men: 'man', women: 'woman', people: 'person', children: 'child',
   mice: 'mouse', geese: 'goose',
+  // Phase 3B: morphology fix only — 'try' is already bagged (CREATION);
+  // the suffix stemmer maps tried→tri and misses it without this entry.
+  tried: 'try',
 });
 
 function stem(lemma) {
@@ -436,6 +450,21 @@ export function classifyLemma(lemma, type) {
     mark(out, 'function.adverbial');
   }
 
+  // Phase 3B constituent classes (lemma-independent structural facts).
+  // An INF constituent is infinitival by construction — the same fact
+  // `*::TO` carries. A clause composed as a complement denotes
+  // propositional content: abstract, not concrete, not animate. These
+  // describe what the constituent IS, never which parse should win.
+  if (t === 'INF') {
+    mark(out, 'function.infinitival');
+    out['function.adposition'] = false;
+  }
+  if (t === 'S' || t === 'SBAR') {
+    mark(out, 'entity.abstract');
+    out['entity.concrete'] = false;
+    out['entity.animate'] = false;
+  }
+
   if (isAdj(t)) {
     if (hit(COLOR, L)) { mark(out, 'property.color'); out['property.age'] = false; }
     if (hit(SIZE, L)) mark(out, 'property.size');
@@ -467,8 +496,17 @@ function compileSeed() {
       const feats = classifyLemma(lemma, type);
       if (feats) seed[`${lemma}::${type}`] = Object.freeze(feats);
     }
+    // Phase 3B VP alias law: a VP constituent inherits the classification
+    // of its head verb. The lexical layer already aliases VP→V for senses
+    // (TYPE_ALIASES); this makes the feature seed see the same lexicon.
+    // Lemma-by-lemma, NOT a *::VP default — an unclassified head (nouns
+    // mis-tagged as V, participles, cutoff lemmas) must stay dark.
+    const verbal = classifyLemma(lemma, 'V');
+    if (verbal) seed[`${lemma}::VP`] = Object.freeze({ ...verbal });
   }
-  for (const type of ['P', 'TO', 'PRT', 'DET', 'REL', 'AUX', 'COP', 'PRON', 'PRONACC', 'ADV']) {
+  // Phase 3B adds the clause-constituent defaults S / SBAR / INF
+  // (lemma-independent structural classes; see classifyLemma).
+  for (const type of ['P', 'TO', 'PRT', 'DET', 'REL', 'AUX', 'COP', 'PRON', 'PRONACC', 'ADV', 'S', 'SBAR', 'INF']) {
     const feats = classifyLemma('*', type);
     if (feats) seed[`*::${type}`] = Object.freeze(feats);
   }
