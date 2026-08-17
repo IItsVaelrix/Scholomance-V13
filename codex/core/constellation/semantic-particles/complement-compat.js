@@ -47,8 +47,18 @@ export const COMPLEMENT_KIND_BY_CLASS = Object.freeze({
 });
 
 export const COMPLEMENT_COMPAT = Object.freeze({
-  INFINITIVAL_COMPLEMENT: Object.freeze([]),
-  PROPOSITIONAL_COMPLEMENT: Object.freeze([]),
+  INFINITIVAL_COMPLEMENT: Object.freeze([
+    Object.freeze({ governor: 'cognition', complement: 'infinitival-event', weight: 2 }),
+    Object.freeze({ governor: 'communication', complement: 'infinitival-event', weight: 2 }),
+    Object.freeze({ governor: 'creation', complement: 'infinitival-event', weight: 1.5 }),
+    Object.freeze({ governor: 'perception', complement: 'infinitival-event', weight: 1.5 }),
+    Object.freeze({ governor: 'state', complement: 'infinitival-event', weight: 1.5 }),
+  ]),
+  PROPOSITIONAL_COMPLEMENT: Object.freeze([
+    Object.freeze({ governor: 'cognition', complement: 'abstract-proposition', weight: 2 }),
+    Object.freeze({ governor: 'communication', complement: 'abstract-proposition', weight: 2 }),
+    Object.freeze({ governor: 'perception', complement: 'abstract-proposition', weight: 1.5 }),
+  ]),
 });
 
 function valueOf(features, kind) {

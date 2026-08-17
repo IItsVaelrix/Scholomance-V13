@@ -62,41 +62,87 @@ describe('complementClass is structural and relation-scoped', () => {
   });
 });
 
-describe('empty table abstains (Task 2: no rows yet)', () => {
-  it('has empty arrays for both relations', () => {
-    expect(COMPLEMENT_COMPAT.INFINITIVAL_COMPLEMENT).toEqual([]);
-    expect(COMPLEMENT_COMPAT.PROPOSITIONAL_COMPLEMENT).toEqual([]);
+describe('authored complement COMPAT (TRAIN-frozen rows)', () => {
+  it('contains only allow-listed pairs and never a forbidden pair', () => {
+    const forbidden = new Set([
+      'motion|infinitival-event', 'motion|abstract-proposition',
+      'possession|infinitival-event', 'possession|abstract-proposition',
+      'change|infinitival-event', 'change|abstract-proposition',
+      'state|abstract-proposition',
+    ]);
+    for (const relation of COMPLEMENT_COMPAT_RELATIONS) {
+      for (const row of COMPLEMENT_COMPAT[relation]) {
+        expect(forbidden.has(`${row.governor}|${row.complement}`)).toBe(false);
+        expect(row.governor).not.toBe('UNKNOWN');
+        expect(Object.isFrozen(row)).toBe(true);
+      }
+    }
   });
 
-  it('lookup never hits, even on want × infinitival-event', () => {
-    expect(lookupComplementCompat('INFINITIVAL_COMPLEMENT', 'cognition', 'infinitival-event'))
-      .toBe(null);
-    expect(lookupComplementCompat('INFINITIVAL_COMPLEMENT', UNKNOWN, 'infinitival-event'))
-      .toBe(null);
-  });
-
-  it('scoreComplementCompat abstains and never marks illegal', () => {
+  it('fires want × leave on INFINITIVAL_COMPLEMENT and never marks illegal', () => {
     const row = scoreComplementCompat({
       leftFeats: featuresFor('want', 'V', P),
       rightFeats: featuresFor('leave', 'INF', P),
       relation: 'INFINITIVAL_COMPLEMENT',
     });
-    expect(row.fired).toBe(0);
-    expect(row.score).toBe(0);
+    expect(row.fired).toBeGreaterThan(0);
+    expect(row.score).toBeGreaterThan(0);
     expect(row.illegal).toBe(false);
-    expect(row.abstained).toBe(true);
+    expect(row.abstained).toBe(false);
   });
 
-  it('diagnoseComplementMapping reports mappingExists false while values exist', () => {
-    const d = diagnoseComplementMapping({
+  it('abstains on motion × infinitival-event (leave to VP)', () => {
+    const row = scoreComplementCompat({
+      leftFeats: featuresFor('leave', 'V', P),
+      rightFeats: featuresFor('go', 'INF', P),
+      relation: 'INFINITIVAL_COMPLEMENT',
+    });
+    expect(governorClasses(featuresFor('leave', 'V', P))).toEqual(['motion']);
+    expect(row.fired).toBe(0);
+    expect(row.abstained).toBe(true);
+    expect(row.illegal).toBe(false);
+  });
+
+  it('fires think × abstract-proposition and abstains on S-governed abstract×abstract', () => {
+    const live = scoreComplementCompat({
+      leftFeats: featuresFor('think', 'V', P),
+      rightFeats: featuresFor('left', 'SBAR', P),
+      relation: 'PROPOSITIONAL_COMPLEMENT',
+    });
+    expect(live.fired).toBeGreaterThan(0);
+
+    const trap = scoreComplementCompat({
+      leftFeats: featuresFor('want', 'S', P),
+      rightFeats: featuresFor('left', 'SBAR', P),
+      relation: 'PROPOSITIONAL_COMPLEMENT',
+    });
+    expect(governorClasses(featuresFor('want', 'S', P))).toEqual([UNKNOWN]);
+    expect(trap.fired).toBe(0);
+    expect(trap.abstained).toBe(true);
+  });
+
+  it('UNKNOWN never matches a row', () => {
+    expect(lookupComplementCompat('INFINITIVAL_COMPLEMENT', UNKNOWN, 'infinitival-event')).toBe(null);
+    expect(lookupComplementCompat('PROPOSITIONAL_COMPLEMENT', 'cognition', UNKNOWN)).toBe(null);
+  });
+
+  it('diagnoseComplementMapping now reports mappingExists and can abstain', () => {
+    const fire = diagnoseComplementMapping({
       leftFeats: featuresFor('want', 'V', P),
       rightFeats: featuresFor('leave', 'INF', P),
       relation: 'INFINITIVAL_COMPLEMENT',
     });
-    expect(d.relationExists).toBe(true);
-    expect(d.bothValuesExist).toBe(true);
-    expect(d.mappingExists).toBe(false);
-    expect(d.mappingFires).toBe(false);
-    expect(d.mappingAbstains).toBe(false);
+    expect(fire.mappingExists).toBe(true);
+    expect(fire.mappingFires).toBe(true);
+    expect(fire.mappingAbstains).toBe(false);
+
+    const abstain = diagnoseComplementMapping({
+      leftFeats: featuresFor('leave', 'V', P),
+      rightFeats: featuresFor('go', 'INF', P),
+      relation: 'INFINITIVAL_COMPLEMENT',
+    });
+    expect(abstain.mappingExists).toBe(true);
+    expect(abstain.mappingFires).toBe(false);
+    expect(abstain.mappingAbstains).toBe(true);
   });
 });
