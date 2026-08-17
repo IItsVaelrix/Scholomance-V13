@@ -3,33 +3,33 @@
 SCORE was not run. TEST was not opened. No relations or COMPAT rows authored.
 Prereg: `2026-08-17-PREREG-semantic-competition-coverage.md`.
 
-- commit `74e30d33d5893d9df2d3bf01486d3ad5c51c3b56`
+- commit `15d34ce8f382f3de5ba5ec5bd27cbfcc4838da65`
 - DEV sentences ≤ 28 tokens: analysed 1824, parsed 585, threw 0
 - fingerprints identical on 8/8 replay pairs
 - TRAIN pass (gold-independent bond frequencies): 10763 sentences analysed
 
 ## Frozen metrics (this OBSERVE run)
 
-- silentCompetitorRate **21.7%** (12350/57012)
-- t1DecisionCouldFireRate **0.6%** (342/57012)
+- silentCompetitorRate **21.7%** (12348/57012)
+- t1DecisionCouldFireRate **1.5%** (827/57012)
 - namedCompleteRate **78.1%** (44546/57012)
 - bothAlternativesNamedRate **42.4%** (15063/35558)
-- bothAlternativesT1Rate **0.2%** (85/35558)
+- bothAlternativesT1Rate **0.4%** (147/35558)
 - filledStableRootRate 14.5% (cited from frozen 2026-08-16 census; not recomputed here)
 
 ## Where the 0.6% starves (cumulative funnel over decision-bearing edges)
 
 - relationAvailable: 29570 (51.9%)
-- leftValueAvailable: 7305 (12.8%)
-- rightValueAvailable: 1967 (3.5%)
-- compatMappingAvailable: 390 (0.7%)
-- actualCompatFire: 342 (0.6%)
+- leftValueAvailable: 11568 (20.3%)
+- rightValueAvailable: 10989 (19.3%)
+- compatMappingAvailable: 946 (1.7%)
+- actualCompatFire: 827 (1.5%)
 
 ## Silence taxonomy
 
 - C1-composition-missing: 12466
-- C2-lexical-missing: 27777
-- C3-feature-missing: 16543
+- C2-lexical-missing: 22542
+- C3-feature-missing: 21295
 
 ## Top silent bonds, ranked by decision cells affected
 
@@ -46,7 +46,7 @@ Prereg: `2026-08-17-PREREG-semantic-competition-coverage.md`.
 | `NPCOMMA+NP->APPOS` | apposition | 731 | 146 | 23 | 0 | 11527 |
 | `INV+ADJ->S` | argument | 264 | 103 | 136 | 41 | 1785 |
 | `V+ADJ->VP` | unclassified | 524 | 97 | 332 | 511 | 4394 |
-| `PROPN+N->N` | modifier | 592 | 89 | 237 | 398 | 10064 |
+| `PROPN+N->N` | modifier | 590 | 89 | 237 | 398 | 10064 |
 | `N+PROPN->N` | modifier | 627 | 86 | 222 | 424 | 8005 |
 | `GEN+N->NP` | unclassified | 156 | 70 | 46 | 46 | 1447 |
 | `ADJ+INF->ADJ` | unclassified | 110 | 66 | 24 | 82 | 2866 |

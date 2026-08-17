@@ -1,0 +1,89 @@
+{
+  "probe": "phase-3b-attribution",
+  "schemaVersion": "1.2.0",
+  "strippedKeys": {
+    "vpAlias": 310,
+    "clauseDefaults": 3,
+    "governors": 16
+  },
+  "totals": {
+    "pre3B": {
+      "edges": 86763,
+      "fires": 342
+    },
+    "post3B": {
+      "edges": 86763,
+      "fires": 827
+    }
+  },
+  "complementRelationFires": {
+    "INFINITIVAL_COMPLEMENT": 0,
+    "PROPOSITIONAL_COMPLEMENT": 0
+  },
+  "byRelation": [
+    {
+      "relation": "adverbial",
+      "pre3B": 0,
+      "post3B": 290,
+      "delta": 290
+    },
+    {
+      "relation": "auxiliates",
+      "pre3B": 0,
+      "post3B": 124,
+      "delta": 124
+    },
+    {
+      "relation": "compound",
+      "pre3B": 147,
+      "post3B": 149,
+      "delta": 2
+    },
+    {
+      "relation": "copular",
+      "pre3B": 63,
+      "post3B": 63,
+      "delta": 0
+    },
+    {
+      "relation": "determines",
+      "pre3B": 103,
+      "post3B": 103,
+      "delta": 0
+    },
+    {
+      "relation": "modifies",
+      "pre3B": 29,
+      "post3B": 29,
+      "delta": 0
+    },
+    {
+      "relation": "particle-of",
+      "pre3B": 0,
+      "post3B": 69,
+      "delta": 69
+    }
+  ],
+  "mappingsPost": {
+    "adverbial": 317,
+    "auxiliates": 125,
+    "compound": 182,
+    "copular": 63,
+    "determines": 103,
+    "modifies": 44,
+    "particle-of": 112
+  },
+  "mappingsPre": {
+    "compound": 180,
+    "copular": 63,
+    "determines": 103,
+    "modifies": 44
+  },
+  "compoundFireDiff": {
+    "newPost": [
+      "undefined|PROPN+N->N|PROPN:1-1|N:2-3|wants+help",
+      "undefined|PROPN+N->N|PROPN:1-1|N:2-7|wants+way"
+    ],
+    "lostPre": []
+  }
+}

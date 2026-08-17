@@ -3,7 +3,7 @@
   "mode": "observe",
   "testFileOpened": false,
   "scored": false,
-  "commit": "74e30d33d5893d9df2d3bf01486d3ad5c51c3b56",
+  "commit": "15d34ce8f382f3de5ba5ec5bd27cbfcc4838da65",
   "maxTokens": 28,
   "split": "dev",
   "trainBondFrequencySource": "train-packed-charts-gold-independent",
@@ -17,30 +17,30 @@
     "fingerprintsIdentical": true
   },
   "rates": {
-    "silentCompetitorRate": 0.21662106223251246,
-    "t1DecisionCouldFireRate": 0.005998737107977268,
+    "silentCompetitorRate": 0.21658598189854766,
+    "t1DecisionCouldFireRate": 0.014505718094436258,
     "namedCompleteRate": 0.7813442783975303,
     "bothAlternativesNamedRate": 0.42361775127959955,
-    "bothAlternativesT1Rate": 0.0023904606558299117,
+    "bothAlternativesT1Rate": 0.0041340907812587886,
     "decisionBearingEdges": 57012,
     "decisionCompetitiveCells": 35558,
     "waterfall": {
       "relationAvailable": 0.5186627376692626,
-      "leftValueAvailable": 0.12813091980635655,
-      "rightValueAvailable": 0.03450150845436049,
-      "compatMappingAvailable": 0.006840665123131973,
-      "actualCompatFire": 0.005998737107977268
+      "leftValueAvailable": 0.20290465165228372,
+      "rightValueAvailable": 0.1927488949694801,
+      "compatMappingAvailable": 0.01659299796534063,
+      "actualCompatFire": 0.014505718094436258
     },
     "silence": {
-      "C3-feature-missing": 16543,
+      "C3-feature-missing": 21295,
       "C1-composition-missing": 12466,
-      "C2-lexical-missing": 27777
+      "C2-lexical-missing": 22542
     }
   },
   "silenceClasses": {
     "C1-composition-missing": 12466,
-    "C2-lexical-missing": 27777,
-    "C3-feature-missing": 16543
+    "C2-lexical-missing": 22542,
+    "C3-feature-missing": 21295
   },
   "topSilentBondsByDecisionCells": [
     {
@@ -181,7 +181,7 @@
       "leftType": "PROPN",
       "rightType": "N",
       "resultType": "N",
-      "silentEdges": 592,
+      "silentEdges": 590,
       "decisionCellsAffected": 89,
       "sentencesAffected": 237,
       "namedAlternateSilentEdges": 398,
