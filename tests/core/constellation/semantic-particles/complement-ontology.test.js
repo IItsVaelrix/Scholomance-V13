@@ -339,6 +339,15 @@ describe('Phase 8 T1 fires only on authored complement pairs', () => {
     expect(want.status).toBe('could-fire');
     expect(want.score).toBeGreaterThan(0);
 
+    const think = diagnoseT1Edge(
+      { lemma: 'think', type: 'V' },
+      { lemma: 'left', type: 'SBAR', side: 'right' },
+      provider,
+    );
+    expect(think.relation).toBe('PROPOSITIONAL_COMPLEMENT');
+    expect(think.status).toBe('could-fire');
+    expect(think.score).toBeGreaterThan(0);
+
     const clause = diagnoseT1Edge(
       { lemma: 'want', type: 'S' },
       { lemma: 'ran', type: 'SBAR', side: 'right' },
@@ -347,10 +356,6 @@ describe('Phase 8 T1 fires only on authored complement pairs', () => {
     expect(clause.relation).toBe('PROPOSITIONAL_COMPLEMENT');
     expect(clause.status).not.toBe('could-fire');
     expect(clause.score).toBe(null);
-  });
-
-  it('still obeys the no-evidence law on composition scores', () => {
-    // keep the existing composeMeanings score ≡ 0 cases untouched
   });
 
   it('is deterministic: identical inputs give identical classifications', () => {

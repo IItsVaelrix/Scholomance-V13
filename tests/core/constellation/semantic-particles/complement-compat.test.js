@@ -26,6 +26,12 @@ describe('Phase 8 registry surface', () => {
     expect(isComplementRelation('PROPOSITIONAL_COMPLEMENT')).toBe(true);
     expect(isComplementRelation('particle-of')).toBe(false);
     expect(isComplementRelation(null)).toBe(false);
+    expect(COMPLEMENT_COMPAT.INFINITIVAL_COMPLEMENT).toHaveLength(5);
+    expect(COMPLEMENT_COMPAT.PROPOSITIONAL_COMPLEMENT).toHaveLength(3);
+    expect(
+      COMPLEMENT_COMPAT.INFINITIVAL_COMPLEMENT.length
+      + COMPLEMENT_COMPAT.PROPOSITIONAL_COMPLEMENT.length,
+    ).toBe(8);
   });
 });
 

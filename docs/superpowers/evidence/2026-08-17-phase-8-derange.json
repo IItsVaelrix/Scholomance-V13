@@ -244,5 +244,5 @@
     "derangeHits": 0,
     "verdict": "REAL_BEATS_CONTROLS"
   },
-  "remainder": "SCORE is considerable, not licensed. Task 7 failed P1–P20; Task 9 stays blocked."
+  "remainder": "derangeHits=0 is consistent with wiping *::INF / *::S / *::SBAR structural lights; this control does not isolate governor-class semantics. SCORE is not licensed. Task 9 stays blocked."
 }

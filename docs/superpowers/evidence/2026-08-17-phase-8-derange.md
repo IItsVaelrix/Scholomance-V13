@@ -18,7 +18,8 @@ Prereg: `2026-08-17-PREREG-phase-8-complement-compat.md`.
 - realHits (complement mappingFires): **666**
 - derangeHits (complement mappingFires): **0**
 - efficacyVerdict({ realHits, derangeHits }): **REAL_BEATS_CONTROLS**
-- SCORE is considerable, not licensed. Task 7 failed P1–P20; Task 9 stays blocked.
+- `derangeHits=0` is consistent with wiping `*::INF` / `*::S` / `*::SBAR` structural lights (`function.infinitival`, `entity.abstract`). This control does not isolate governor-class semantics.
+- SCORE is not licensed. Task 7 failed P1–P20; Task 9 stays blocked.
 - SCORE not opened. Task 9 was not started.
 
 ## Chamber (real arm vs Task 7)

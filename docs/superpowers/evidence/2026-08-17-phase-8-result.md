@@ -12,7 +12,8 @@ Census artifacts: `2026-08-17-phase-8-observe.{json,md}`.
 chamber is not the frozen 3B forest. Directional complement instruments
 did fire and abstain, but they cannot be scored as a complement-only
 movement on this parse. Task 5 is not rolled back in this commit.
-SCORE is not licensed.
+SCORE is not licensed. Commit `b4c07961`'s subject recites the success
+template while the act verdict is FAIL; this result file is the authority.
 
 ## Headline (predicted signature vs this run)
 

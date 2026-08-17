@@ -1,6 +1,6 @@
 # OBSERVE — Phase 8 complement mapping waterfall
 
-SCORE was not run. TEST was not opened. No relations or COMPAT rows authored.
+SCORE was not run. TEST was not opened. COMPAT rows were authored in a prior task; this script only measures.
 Does not overwrite `2026-08-17-compat-waterfall-census.{md,json}`.
 Prereg: `2026-08-17-PREREG-phase-8-complement-compat.md`.
 
