@@ -28,8 +28,8 @@ describe('computePageBytecode', () => {
     expect(computePageBytecode(basis)).toMatch(/^COS-PAGE-v1-[0-9A-F]+$/);
   });
 
-  it('exposes the v2 contract version', () => {
-    expect(CONSTELLATION_CONTRACT_VERSION).toBe('cos-page-v2');
+  it('exposes the v3 contract version', () => {
+    expect(CONSTELLATION_CONTRACT_VERSION).toBe('cos-page-v3');
   });
 
   describe('every lawful basis field re-keys identity', () => {
@@ -102,11 +102,21 @@ describe('computePageBytecode', () => {
     });
   });
 
-  describe('golden pin — the v2 basis is a sealed identity', () => {
+  describe('golden pin — the v3 basis is a sealed identity', () => {
     it('the canonical basis hashes to a stable value', () => {
-      // If this pin changes, the basis changed — that is a contract event,
-      // not a coincidence. Update the pin deliberately and say why.
-      expect(computePageBytecode(basis)).toBe('COS-PAGE-v1-4922C817');
+      /**
+       * If this pin changes, the basis changed — that is a contract event,
+       * not a coincidence. Update the pin deliberately and say why.
+       *
+       * PIN HISTORY:
+       *   COS-PAGE-v1-4922C817  sealed 2026-08-19 under cos-page-v2
+       *   COS-PAGE-v1-E8DC9244  sealed 2026-08-20: SCHOL-COS-PAGE-v3 bumped
+       *     the contract version (semanticInquiry gained `ballistics` +
+       *     `receiptDigests`, sem-inquiry-2). The contract is a lawful basis
+       *     field, so the re-key is the CORRECT behavior — the same words now
+       *     carry more evidence, which is a different analysis.
+       */
+      expect(computePageBytecode(basis)).toBe('COS-PAGE-v1-E8DC9244');
     });
   });
 });

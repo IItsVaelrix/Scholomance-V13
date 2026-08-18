@@ -3661,6 +3661,21 @@ interface ConstellationPagePacket {
     frameCue: string | null;
     viableWordCount: number | null;
     lexicalEntries: unknown[];
+    /** SCHOL-COS-PAGE-v3: second evidence axis — semantic-ballistics containment. */
+    ballistics: {
+      status: "measured";
+      embedding: { kind: string; version: string; dimensions: number };
+      scores: Array<{ senseId: string; semanticScore: number | null }>;
+      degraded: unknown[];
+    } | {
+      status: "unavailable";
+      reason: string;
+      embedding: null;
+      scores: [];
+      degraded: [];
+    } | null;
+    /** SCHOL-COS-PAGE-v3: one sealed sha256 digest per probe observation. */
+    receiptDigests: string[];
   } | null;
   scaleField: {
     status: string;
@@ -3691,6 +3706,26 @@ interface ConstellationPagePacket {
   provenance: { engineVersions: Record<string, string> };
 }
 ```
+
+---
+
+## SCHEMA CHANGE NOTICE
+
+- Schema: ConstellationOS Page Packet (SCHOL-COS-PAGE-v3)
+- Version: additive revision of SCHOL-COS-PAGE-v2 — `contractVersion` advances `cos-page-v2` → `cos-page-v3`; packet generation stays `version: 2`, `schema_id` unchanged
+- Date: 2026-08-20
+- Changed fields: `semanticInquiry` gains exactly two fields:
+  - `ballistics` — semantic-ballistics containment scores over the probe's candidate senses (second evidence axis, seeded `tq-phoneme-v2` phonotopographic embedding, measured whether or not a sense is selected, **never** influences the selection); `null` when there were no candidates, `{status:'unavailable', reason}` when the instrument failed
+  - `receiptDigests` — one sealed sha256 digest per probe observation (canonical `sha256-canonical-v0`), so the verdict's evidence envelope is replayable and re-verifiable offline
+- Breaking: no. No existing field changed type or meaning. Consumers that ignore unknown fields are unaffected; consumers rendering the semantic inquiry panel MAY surface the axis and the seals.
+- Provenance: `engineVersions.semanticInquiry` advances `sem-inquiry-1` → `sem-inquiry-2`. Both the contract version and the adapter version are lawful pageBytecode basis fields, so identity re-keys: golden pin `COS-PAGE-v1-4922C817` → `COS-PAGE-v1-E8DC9244` (sealed in `tests/qa/features/constellation-pageBytecode.test.js` with pin history).
+- Instrument doctrine: ballistics enters as EVIDENCE, not adjudication. The probe's `f_tie_is_not_a_decision` guarantees a unique gloss-overlap winner under `supported`, so no tie-break wire exists; an anti-usurpation minimal pair (containment favors B, overlap favors A, verdict must stay A) is pinned in `tests/core/constellation/semanticWiring.calculusBallistics.test.js`.
+- TS-loader constraint: production `node codex/server/index.js` has no TS loader; the seal travels via `codex/core/semantic-calculus/receiptSeal.js`, a server-safe `.js` island of `observationReceipt.ts` + `seal.ts#canonicalize`, with algorithmic isomorphism pinned by test (both implementations imported and compared over boundary cases).
+- Owner: Codex
+- Claude impact: `semanticInquiry.ballistics.status === 'unavailable'` arrives in `diagnostics.degradedChannels` as `semanticInquiry.ballistics` — render it as degraded evidence, never as a failed verdict
+- Gemini impact: degradation branch added in `constellationPage.service.js` following the phonology-check pattern; the axis never writes into selection
+- Canonical typedef home: `src/hooks/constellation.types.js` (`ConstellationPagePacket`)
+- Error codes: unchanged; a throwing ballistics scorer degrades to `{status:'unavailable', reason}` inside the channel and records a warning, it never poisons the page
 
 ---
 
@@ -3742,6 +3777,7 @@ interface ConstellationPagePacket {
 | 1.43 | 2026-08-13 | Registered deterministic Constellation grammar-valence vacancy reports with semantic frontier atoms, optional antigen matches, lawful construction candidates, and Cleri evidence references | no |
 | 1.44 | 2026-08-13 | Registered deterministic Gutenberg sanitation packets with contextual segmentation and exhaustive reason-coded quarantine accounting | no |
 | 1.45 | 2026-08-19 | Published the live ConstellationOS Phase-2 page packet (`scholomance/constellation-os-page-phase2`) as SCHOL-COS-PAGE-v2; sealed the emitted shape and declared the stale Phase-1 typedef the drift | no |
+| 1.46 | 2026-08-20 | SCHOL-COS-PAGE-v3: additive — `semanticInquiry` gains `ballistics` (semantic-ballistics evidence axis) and `receiptDigests` (sealed replay envelopes); contractVersion `cos-page-v3`; pageBytecode golden pin re-sealed `4922C817` → `E8DC9244` | no |
 
 ---
 

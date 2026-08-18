@@ -145,6 +145,17 @@ async function buildConstellationPageDirect(rawQuery, deps) {
   }
 
   /**
+   * A dead ballistic instrument is degradation of the evidence, not of the
+   * verdict — the probe can still select on gloss overlap. Same pattern as the
+   * phonology check above: the failure fact surfaces in diagnostics, and the
+   * axis itself carries the reason inside the packet.
+   */
+  if (semanticInquiry?.ballistics?.status === 'unavailable') {
+    degradedChannels.push('semanticInquiry.ballistics');
+    warnings.push(`semantic ballistics unavailable: ${semanticInquiry.ballistics.reason}`);
+  }
+
+  /**
    * TWO WIRES INTO THE SELECTION, BECAUSE THERE ARE TWO KINDS OF EVIDENCE.
    *
    * Gloss overlap is soft lexical evidence and it was, until now, the only thing
@@ -425,6 +436,14 @@ async function buildConstellationPageDirect(rawQuery, deps) {
           frameCue: semanticInquiry.frameCue,
           viableWordCount: semanticInquiry.viableWordCount,
           lexicalEntries: semanticInquiry.lexicalEntries,
+          /**
+           * The sem-inquiry-2 wires (SCHOL-COS-PAGE-v3): ballistic containment
+           * as a second evidence axis, and one sealed receipt digest per probe
+           * observation. Evidence and envelope travel with the verdict; neither
+           * can move it.
+           */
+          ballistics: semanticInquiry.ballistics ?? null,
+          receiptDigests: semanticInquiry.receiptDigests ?? [],
         }
       : null,
     /**

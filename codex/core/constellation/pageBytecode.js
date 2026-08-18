@@ -1,4 +1,10 @@
-export const CONSTELLATION_CONTRACT_VERSION = 'cos-page-v2';
+/**
+ * SCHOL-COS-PAGE-v3 (2026-08-20, sem-inquiry-2): additive schema change — the
+ * semanticInquiry channel gained `ballistics` and `receiptDigests`. The
+ * contract is part of the analysis basis, so the bump legitimately re-keys
+ * page bytecode identity; the QA golden pin was re-sealed with that rationale.
+ */
+export const CONSTELLATION_CONTRACT_VERSION = 'cos-page-v3';
 
 /** FNV-1a 32-bit — the repo's deterministic seed convention. */
 export function fnv1a32(input) {

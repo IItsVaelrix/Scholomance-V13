@@ -16,8 +16,19 @@
  * "SCHOL-COS-PAGE-v2". Any future field addition is a SCHEMA CHANGE NOTICE,
  * not a silent edit.
  *
+ * SCHEMA CHANGE NOTICE — SCHOL-COS-PAGE-v3 (2026-08-20, sem-inquiry-2):
+ *   ADDITIVE. The `semanticInquiry` channel gains exactly two fields:
+ *     - ballistics: semantic-ballistics containment scores (second evidence
+ *       axis; never influences selection) — or null/unavailable-report
+ *     - receiptDigests: one sealed sha256 digest per probe observation
+ *       (sealed replay of the verdict's evidence envelope)
+ *   No existing field changed type or meaning; packet generation stays 2.
+ *   contractVersion advances 'cos-page-v2' -> 'cos-page-v3', which re-keys
+ *   pageBytecode identity (the contract is part of the analysis basis).
+ *   Normative publication: SCHEMA_CONTRACT.md under SCHOL-COS-PAGE-v3.
+ *
  * VERSION VOCABULARY (one coherent set, per feedback report §11 step 2):
- *   - contractVersion  'cos-page-v2'      — the packet contract itself (this file)
+ *   - contractVersion  'cos-page-v3'      — the packet contract itself (this file)
  *   - schema_id        'scholomance/constellation-os-page-phase2'
  *   - version          2                  — integer packet generation
  *   - engineVersions   per-channel adapter/engine versions (provenance)
@@ -66,9 +77,18 @@
  *   hypotheses: object[], selection: object|null, evidence: object[],
  *   isHeteronym: boolean, distinctPronunciations: number|null,
  *   headToken: string|null, framePos: string|null, frameCue: string|null,
- *   viableWordCount: number|null, lexicalEntries: object[] } | null} semanticInquiry
+ *   viableWordCount: number|null, lexicalEntries: object[],
+ *   ballistics: { status: 'measured', embedding: { kind: string, version: string, dimensions: number },
+ *     scores: Array<{ senseId: string, semanticScore: number|null }>, degraded: object[] }
+ *     | { status: 'unavailable', reason: string, embedding: null, scores: [], degraded: [] }
+ *     | null,
+ *   receiptDigests: string[] } | null} semanticInquiry
  *   The probe's verdict travels WITH the page — a reader can see not just which
- *   sense was chosen but whether the choice was evidenced.
+ *   sense was chosen but whether the choice was evidenced. `ballistics` is the
+ *   second evidence axis (semantic-ballistics containment; measured even when
+ *   no sense is selected; NEVER influences the selection). `receiptDigests`
+ *   are sealed sha256 envelopes — one per probe observation — so the verdict's
+ *   evidence can be replayed and re-verified offline (SCHOL-COS-PAGE-v3).
  * @property {{ status: string, anchor: string|null,
  *   scale: { id: string, dimension: string|null, kind: string, memberCount: number,
  *     span: number|null, ladder: Array<{ word: string, rank: number, relative: number, isAnchor: boolean }> }|null,

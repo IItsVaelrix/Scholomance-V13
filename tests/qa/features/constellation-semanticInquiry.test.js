@@ -60,7 +60,22 @@ describe('the channel is actually wired', () => {
     const p = await buildConstellationPage('crane wading bird legs', depsWith(craneAdapter()));
     expect(p.semanticInquiry).toBeTruthy();
     expect(p.semanticInquiry.probeId).toBe('constellation.sense.disambiguation');
-    expect(p.provenance.engineVersions.semanticInquiry).toBe('sem-inquiry-1');
+    /**
+     * sem-inquiry-2 (SCHOL-COS-PAGE-v3, 2026-08-20): the semantic calculus ×
+     * semantic ballistics wiring. The provenance bump is deliberate — this pin
+     * caught it, which is why the pin exists.
+     */
+    expect(p.provenance.engineVersions.semanticInquiry).toBe('sem-inquiry-2');
+    // The two v3 wires pass through the service whitelist end to end: ballistic
+    // containment as a second evidence axis, and one sealed digest per probe
+    // observation. Neither may ever be absent when the channel is bound.
+    expect(p.semanticInquiry.ballistics).toBeTruthy();
+    expect(p.semanticInquiry.ballistics.status).toBe('measured');
+    expect(p.semanticInquiry.ballistics.scores.length).toBeGreaterThan(0);
+    expect(p.semanticInquiry.receiptDigests.length).toBeGreaterThan(0);
+    for (const d of p.semanticInquiry.receiptDigests) {
+      expect(d).toMatch(/^[0-9A-F]{64}$/);
+    }
   });
 
   it('re-keys pageBytecode — the new engine version is part of page identity', async () => {
