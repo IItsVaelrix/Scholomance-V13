@@ -134,6 +134,7 @@ async function synthesizeBible() {
     else if (relPath.startsWith('codex/services/')) layer = 'Services';
     else if (relPath.startsWith('codex/runtime/')) layer = 'Runtime';
     else if (relPath.startsWith('codex/server/')) layer = 'Server';
+    else if (relPath.startsWith('src/hooks/')) layer = 'Hooks';
     else if (relPath.startsWith('src/')) layer = 'UI';
     else if (relPath.startsWith('tests/')) layer = 'Test';
     else if (relPath.startsWith('docs/')) layer = 'Doc';
