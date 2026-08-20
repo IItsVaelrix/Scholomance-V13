@@ -125,9 +125,24 @@ export function inferForest(chart, ctx = {}) {
     best = better(best, viterbi.get(root));
   }
 
+  /**
+   * `viterbi` IS THE READOUT, AND IT USED TO BE THROWN AWAY.
+   *
+   * The map holds the winning derivation for EVERY node; only the root's was
+   * returned. A caller who wanted an answer therefore had to walk down from
+   * `best.derivation`, whose `left`/`right` are still packed chart nodes — so it
+   * landed straight back in the union of alternatives this whole inference
+   * exists to resolve. `headedAtoms` unioning heads across a packed node's
+   * derivations is the same wound, and it is why answer accuracy for
+   * `ADJ+S`-built roots would not move: no scoring function can separate
+   * readings the readout has already merged.
+   *
+   * Returned as the Map itself, by node identity. See `viterbi-answer.js`.
+   */
   return Object.freeze({
     nodes,
     best: best || Object.freeze({ score: null, derivationId: null }),
+    viterbi,
     inside: nodes.map((n) => insideMap.get(n)),
     outside: nodes.map((n) => outsideMap.get(n)),
     incoming,

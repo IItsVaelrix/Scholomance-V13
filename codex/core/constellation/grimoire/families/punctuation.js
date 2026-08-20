@@ -101,6 +101,134 @@ export const PUNCTUATION = [
     flags: ['ud-aligned', 'ruling'],
     grades: { C: 'G', R: 'G', H: 'G', X: 'Y' },
   }),
+  /**
+   * INERT BRACKETING MARKS — `WRAP`.
+   *
+   * Quotes, parentheses, dashes and slashes are not terminal punctuation and
+   * must not be typed as `PUNCT`: every `PUNCT` rule absorbs to the LEFT, and a
+   * bracketing mark's defining property is that it also occurs to the left of
+   * what it marks. `"` opening a quotation has nothing behind it to absorb into.
+   *
+   * So `WRAP` is a separate element with symmetric valence — it bonds on either
+   * side and never takes the head. The chemistry is a noble-gas ligand: it
+   * occupies a site, forms no polar bond, and leaves the host's type and head
+   * exactly as they were.
+   *
+   * MEASURED BEFORE WRITTEN. Deleting these tokens outright raises
+   * truth-reachability on the frozen gate corpus from 32.4% to 40.8%, while a
+   * matched random deletion of the SAME token counts over 5 seeds moves it
+   * 0.0pp. The gain is specific to these marks, not to shorter input.
+   */
+  defineConstruction({
+    id: 's-wrap-right',
+    family: 'punctuation',
+    left: 'S', right: 'WRAP', result: 'S', head: 0,
+    status: S.GRAMMAR,
+    relation: 'punct',
+    construction: 'inert-bracketing-mark',
+    roles: { left: 's', right: 'bracketing-mark' },
+    note: 'S absorbs a following quote / paren / dash — seatbelt, not skeleton',
+    flags: ['ud-aligned', 'punct', 'closure'],
+  }),
+  defineConstruction({
+    id: 's-wrap-left',
+    family: 'punctuation',
+    left: 'WRAP', right: 'S', result: 'S', head: 1,
+    status: S.GRAMMAR,
+    relation: 'punct',
+    construction: 'inert-bracketing-mark',
+    roles: { left: 'bracketing-mark', right: 's' },
+    note: 'A leading quote / paren / dash is absorbed by the S that follows it',
+    flags: ['ud-aligned', 'punct', 'closure'],
+  }),
+  defineConstruction({
+    id: 'np-wrap-right',
+    family: 'punctuation',
+    left: 'NP', right: 'WRAP', result: 'NP', head: 0,
+    status: S.GRAMMAR,
+    relation: 'punct',
+    construction: 'inert-bracketing-mark',
+    roles: { left: 'np', right: 'bracketing-mark' },
+    note: 'NP absorbs a following quote / paren / dash — seatbelt, not skeleton',
+    flags: ['ud-aligned', 'punct', 'closure'],
+  }),
+  defineConstruction({
+    id: 'np-wrap-left',
+    family: 'punctuation',
+    left: 'WRAP', right: 'NP', result: 'NP', head: 1,
+    status: S.GRAMMAR,
+    relation: 'punct',
+    construction: 'inert-bracketing-mark',
+    roles: { left: 'bracketing-mark', right: 'np' },
+    note: 'A leading quote / paren / dash is absorbed by the NP that follows it',
+    flags: ['ud-aligned', 'punct', 'closure'],
+  }),
+  defineConstruction({
+    id: 'n-wrap-right',
+    family: 'punctuation',
+    left: 'N', right: 'WRAP', result: 'N', head: 0,
+    status: S.GRAMMAR,
+    relation: 'punct',
+    construction: 'inert-bracketing-mark',
+    roles: { left: 'n', right: 'bracketing-mark' },
+    note: 'N absorbs a following quote / paren / dash — seatbelt, not skeleton',
+    flags: ['ud-aligned', 'punct', 'closure'],
+  }),
+  defineConstruction({
+    id: 'n-wrap-left',
+    family: 'punctuation',
+    left: 'WRAP', right: 'N', result: 'N', head: 1,
+    status: S.GRAMMAR,
+    relation: 'punct',
+    construction: 'inert-bracketing-mark',
+    roles: { left: 'bracketing-mark', right: 'n' },
+    note: 'A leading quote / paren / dash is absorbed by the N that follows it',
+    flags: ['ud-aligned', 'punct', 'closure'],
+  }),
+  defineConstruction({
+    id: 'nc-wrap-right',
+    family: 'punctuation',
+    left: 'NC', right: 'WRAP', result: 'NC', head: 0,
+    status: S.GRAMMAR,
+    relation: 'punct',
+    construction: 'inert-bracketing-mark',
+    roles: { left: 'nc', right: 'bracketing-mark' },
+    note: 'NC absorbs a following quote / paren / dash — seatbelt, not skeleton',
+    flags: ['ud-aligned', 'punct', 'closure'],
+  }),
+  defineConstruction({
+    id: 'nc-wrap-left',
+    family: 'punctuation',
+    left: 'WRAP', right: 'NC', result: 'NC', head: 1,
+    status: S.GRAMMAR,
+    relation: 'punct',
+    construction: 'inert-bracketing-mark',
+    roles: { left: 'bracketing-mark', right: 'nc' },
+    note: 'A leading quote / paren / dash is absorbed by the NC that follows it',
+    flags: ['ud-aligned', 'punct', 'closure'],
+  }),
+  defineConstruction({
+    id: 'adj-wrap-right',
+    family: 'punctuation',
+    left: 'ADJ', right: 'WRAP', result: 'ADJ', head: 0,
+    status: S.GRAMMAR,
+    relation: 'punct',
+    construction: 'inert-bracketing-mark',
+    roles: { left: 'adj', right: 'bracketing-mark' },
+    note: 'ADJ absorbs a following quote / paren / dash — seatbelt, not skeleton',
+    flags: ['ud-aligned', 'punct', 'closure'],
+  }),
+  defineConstruction({
+    id: 'adj-wrap-left',
+    family: 'punctuation',
+    left: 'WRAP', right: 'ADJ', result: 'ADJ', head: 1,
+    status: S.GRAMMAR,
+    relation: 'punct',
+    construction: 'inert-bracketing-mark',
+    roles: { left: 'bracketing-mark', right: 'adj' },
+    note: 'A leading quote / paren / dash is absorbed by the ADJ that follows it',
+    flags: ['ud-aligned', 'punct', 'closure'],
+  }),
   defineConstruction({
     id: 'terminal-punct',
     family: 'punctuation',
@@ -164,5 +292,27 @@ export const PUNCTUATION = [
     roles: { left: 'compound-noun', right: 'terminal-punct' },
     note: 'Hint nucleus — NC absorbs terminal punct (parity with N)',
     flags: ['ud-aligned', 'punct', 'closure', 'hint-nucleus'],
+  }),
+  defineConstruction({
+    id: 'salutation-s-comma',
+    family: 'punctuation',
+    left: 'S', right: 'COMMA', result: 'S', head: 0,
+    status: S.GRAMMAR,
+    relation: 'punct',
+    construction: 'salutation-closing-comma',
+    roles: { left: 'salutation-clause', right: 'closing-comma' },
+    note: 'Regards , / Visit , — clausal imperative/salutation with closing comma',
+    flags: ['ud-aligned', 'punct', 'closure'],
+  }),
+  defineConstruction({
+    id: 'salutation-adv-comma',
+    family: 'punctuation',
+    left: 'ADV', right: 'COMMA', result: 'S', head: 0,
+    status: S.GRAMMAR,
+    relation: 'punct',
+    construction: 'salutation-closing-comma',
+    roles: { left: 'salutation-adverb', right: 'closing-comma' },
+    note: 'Sincerely , — adverbial discourse sign-off with closing comma',
+    flags: ['ud-aligned', 'punct', 'closure'],
   }),
 ];

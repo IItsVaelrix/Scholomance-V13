@@ -180,6 +180,9 @@ export function annotateSemanticParticles(chart, options = {}) {
     forest: Object.freeze({
       best: inferred.best,
       nodeCount: inferred.nodes.length,
+      // The per-node winning derivation. Not serialised into `reportHash` — it
+      // holds live chart nodes, and the hash covers the report, not the chart.
+      viterbi: inferred.viterbi,
     }),
   };
   const reportHash = sha256Hex(canonicalSerialize({

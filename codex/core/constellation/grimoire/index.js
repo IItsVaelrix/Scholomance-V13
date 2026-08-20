@@ -56,6 +56,7 @@ import { COMPARATIVE } from './families/comparative.js';
 import { POSSESSION } from './families/possession.js';
 import { PUNCTUATION } from './families/punctuation.js';
 import { INVERSION } from './families/inversion.js';
+import { LIST } from './families/list.js';
 
 /** Lookup helpers keyed by bond signature. */
 function byPattern(list) {
@@ -82,6 +83,7 @@ const ALL_BY_FAMILY = {
   possession: POSSESSION,
   punctuation: PUNCTUATION,
   inversion: INVERSION,
+  list: LIST,
 };
 
 const POOL = byPattern(Object.values(ALL_BY_FAMILY).flat());
@@ -121,6 +123,7 @@ const ORDER = [
   'AUX|VP|VP',
   'MODAL|VP|VP',
   'REL|VP|RELC',
+  'REL|VP|S',
   'NP|RELC|NP',
   'CONJ|NP|CONJNP',
   'NP|CONJNP|NP',
@@ -137,6 +140,7 @@ const ORDER = [
   'COP|INF|VP',
   'NP|INF|NP',
   'SUB|S|SBAR',
+  'SUB|S|S',
   'S|SBAR|S',
   'SBAR|S|S',
   'THAN|NP|THANP',
@@ -146,6 +150,7 @@ const ORDER = [
   'NP|POSS|GEN',
   'GEN|N|NP',
   'ADV|COMMA|FRONTED',
+  'ADV|COMMA|S',
   'SBAR|COMMA|FRONTED',
   'PP|COMMA|FRONTED',
   'FRONTED|S|S',
@@ -154,12 +159,23 @@ const ORDER = [
   'APPOS|COMMA|NP',
   'NPCOMMA|NP|NP',
   'S|COMMA|SCOMMA',
+  'S|COMMA|S',
   'SCOMMA|S|S',
   'S|PUNCT|S',
   'NP|PUNCT|NP',
   'ADJ|PUNCT|ADJ',
   'N|PUNCT|N',           // hint: punct-parity N
   'NC|PUNCT|NC',         // hint: punct-parity NC
+  'S|WRAP|S',
+  'WRAP|S|S',
+  'NP|WRAP|NP',
+  'WRAP|NP|NP',
+  'N|WRAP|N',
+  'WRAP|N|N',
+  'NC|WRAP|NC',
+  'WRAP|NC|NC',
+  'ADJ|WRAP|ADJ',
+  'WRAP|ADJ|ADJ',
   'V|PRT|V',
   'VP|PRT|VP',
   'PP|S|S',
@@ -176,6 +192,8 @@ const ORDER = [
   'INV|VP|S',
   'INV|ADJ|S',
   'INV|NP|S',
+  'CLOCK|MERIDIAN|CLOCK',
+  'DATE|CLOCK|DATE',
 ];
 
 /**
@@ -187,6 +205,33 @@ export const CONSTRUCTIONS = Object.freeze(ORDER.map((sig) => {
   if (!c) throw new Error(`Grimoire missing construction for bond signature ${sig}`);
   return c;
 }));
+
+/**
+ * THE OTHER DIRECTION, WHICH USED TO BE SILENT.
+ *
+ * `ORDER` -> `POOL` already throws: a signature with no construction is a loud
+ * error. `POOL` -> `ORDER` was unguarded, so a construction written into a
+ * family file and never listed here was dropped without a word — it never
+ * reached `CONSTRUCTIONS`, never reached `BONDS`, and never fired.
+ *
+ * That failure is expensive precisely because it is quiet. A rule that is absent
+ * from the table produces a clean, plausible, entirely inert experimental arm:
+ * `+0/-0`, no error, no warning, and a result that looks like evidence the idea
+ * does not work. It cost a full measurement cycle on 2026-08-20, when ten WRAP
+ * constructions scored exactly nothing because they were in the book and not the
+ * index. `BONDS.filter(b => b.includes('WRAP')).length` was 0 the whole time.
+ *
+ * So both directions are now errors, and the message names the fix.
+ */
+const ORDERED = new Set(ORDER);
+for (const [sig, construction] of POOL) {
+  if (ORDERED.has(sig)) continue;
+  throw new Error(
+    `Grimoire construction ${construction.id} (${sig}) is defined in family `
+    + `'${construction.family}' but absent from ORDER, so it would never reach BONDS. `
+    + `Add '${sig}' to ORDER, or delete the construction.`,
+  );
+}
 
 validateConstructions(CONSTRUCTIONS);
 

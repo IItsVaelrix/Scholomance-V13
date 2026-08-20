@@ -38,6 +38,7 @@ import {
   PREPOSITION_CUES, DETERMINERS, CONJUNCTIONS, RELATIVIZERS, SUBORDINATORS,
   PRONOUNS_NOMINATIVE, PRONOUNS_ACCUSATIVE, COPULAS, MODALS, AUXILIARY_VERBS,
   INTERROGATIVE_ADVERBS,
+  INDEFINITE_PRONOUNS, MERIDIANS,
   // Unions, used only for the "is this word known at all" test.
   PRONOUNS, AUXILIARIES, PARTICLES,
 } from '../lexical-analysis/closed-class.js';
@@ -138,7 +139,7 @@ function enforceEnumerationBudgets(cell, moleculeCount, tokenCount, options) {
  * subject, which is what stops `him ran` while leaving `the man saw him` intact.
  */
 const LIFTS = [
-  ['N', 'NP'], ['NC', 'N'], ['V', 'VP'], ['PRON', 'NP'], ['PROPN', 'NP'], ['PRONACC', 'NPO'],
+  ['N', 'NP'], ['N', 'NC'], ['NC', 'NP'], ['V', 'VP'], ['PRON', 'NP'], ['PROPN', 'NP'], ['PRONACC', 'NPO'],
   /**
    * THE IMPERATIVE. `speak`, `tell me all about it` — a clause with no subject,
    * so `NP + VP -> S` can never fire and the input could not span. Common enough
@@ -213,6 +214,14 @@ function tagsForForm(lower, posMap) {
 const HYPHEN_COMPOUND = /^[a-z0-9]+(?:-[a-z0-9]+)+$/;
 
 /**
+ * Timestamp numerals. EWT gold `list` on NUM→NUM is date+clock juxtaposition
+ * (175/175 adjacent DATE+CLOCK pairs on train+dev), not two cardinals.
+ * Bare `3`, `2001`, `747` stay untyped so they cannot ride this law.
+ */
+const DATE_NUMERAL = /^\d{1,2}\/\d{1,2}\/\d{2,4}$/;
+const CLOCK_NUMERAL = /^\d{1,2}:\d{2}(:\d{2})?$/;
+
+/**
  * COMPOUND IDENTITY IS THE UNION OF ITS PIECES.
  *
  * The constellation query path splits on whitespace, so a hyphen-declared
@@ -247,7 +256,18 @@ function compoundTags(lower, posMap) {
  * ambiguity is real and resolving it here would be guessing.
  */
 function atomsFor(token, index, posMap, options = {}) {
-  const lower = String(token).toLowerCase();
+  /**
+   * CURLY MARKS ARE THE SAME MARKS. Web text carries `’` `‘` `“` `”` where the
+   * tables all spell `'` and `"`, so `’s` missed the possessive branch and every
+   * curly quote missed WRAP — the token existed and the atom did not. Folded to
+   * the ASCII form before any table is consulted; nothing downstream sees the
+   * difference, and `token` (the surface form the answer is projected from) is
+   * untouched.
+   */
+  const raw = String(token).toLowerCase();
+  const lower = options.closedGaps === true
+    ? raw.replace(/[\u2018\u2019\u02bc\u2032]/g, "'").replace(/[\u201c\u201d\u2033]/g, '"')
+    : raw;
   /**
    * PRECEDENCE: injected lexicon, then irregular forms, then suffix morphology.
    *
@@ -279,7 +299,8 @@ function atomsFor(token, index, posMap, options = {}) {
   const isClosedClass = DETERMINERS.has(lower) || PRONOUNS.has(lower)
     || AUXILIARIES.has(lower) || CONJUNCTIONS.has(lower)
     || RELATIVIZERS.has(lower) || PREPOSITION_CUES.has(lower)
-    || INTERROGATIVE_ADVERBS.has(lower);
+    || INTERROGATIVE_ADVERBS.has(lower)
+    || MERIDIANS.has(lower);
   // A closed-class word is never unknown, even when the content lexicon —
   // which stores nouns, verbs and adjectives — has no row for it.
   //
@@ -289,7 +310,30 @@ function atomsFor(token, index, posMap, options = {}) {
   // unknown-word escape hatch could not fire for any caller that follows the
   // convention, and every capitalised proper noun at index 0 lost its PROPN
   // atom. Line 176 above already asks the question the right way.
-  if (capitalised && (index > 0 || (!known?.length && !isClosedClass))) out.push('PROPN');
+  /**
+   * ALL-CAPS IS A SEPARATE ORTHOGRAPHIC SIGNAL FROM SENTENCE-INITIAL CAPS.
+   *
+   * The rule above lowercases before asking whether the word is closed-class,
+   * which throws away the only thing distinguishing an acronym from its
+   * homograph. `US` is not `us`, but at index 0 the pronoun membership fired
+   * and the country lost every nominal reading: measured as `[PRONACC, NPO]`,
+   * both object-position, so no subject NP could form and both of its
+   * sentences in the gate corpus failed to parse.
+   *
+   * Sentence-initial capitalisation is uninformative because every sentence
+   * has it. Sentence-initial ALL-CAPS is not — no English sentence capitalises
+   * its first word this way by convention. Length >= 2 keeps `I` and a
+   * headline-cased `A` out.
+   *
+   * This is ADDITIVE. `PRONACC`/`NPO` still stand; the accusative reading is
+   * not displaced, it simply stops being the only one. That matters here:
+   * the sibling-atom work showed a losing reading is normal, while a missing
+   * one is a parse failure.
+   */
+  const allCapsAcronym = /^[A-Z]{2,}$/.test(String(token));
+  if (capitalised && (index > 0 || allCapsAcronym || (!known?.length && !isClosedClass))) {
+    out.push('PROPN');
+  }
 
   if (DETERMINERS.has(lower)) out.push('DET');
   if (PREPOSITION_CUES.has(lower)) out.push('P');
@@ -306,18 +350,18 @@ function atomsFor(token, index, posMap, options = {}) {
     || SUBORDINATORS.has(lower)
     || COPULAS.has(lower)
     || MODALS.has(lower)
-    || AUXILIARY_VERBS.has(lower)
     || PRONOUNS.has(lower)
     || lower === 'to'
-    || lower === 'than';
+    || lower === 'than'
+    || MERIDIANS.has(lower);
   /**
-   * Pure nouns → NC only (lift NC→N→NP). Dual n+v → N only (subjects/objects
-   * without entering compound chemistry). That split stops barn+fell and avoids
-   * doubling every noun as both N and NC (which exploded stable counts).
+   * Content nouns emit N. The unary lifts N→NC (for compound chemistry) and
+   * N→NP (for argument positions) allow all nouns, including dual n+v words
+   * (e.g. search, press, air, deal, price), to participate in both compound
+   * and clausal syntax lawfully.
    */
-  if (tags.includes('n') && !closedForContent) {
-    if (tags.includes('v')) out.push('N');
-    else out.push('NC');
+  if (tags.includes('n') && !closedForContent && !AUXILIARY_VERBS.has(lower)) {
+    out.push('N');
   }
   if (tags.includes('v') && !closedForContent) out.push('V');
   if ((tags.includes('a') || tags.includes('s')) && !closedForContent) out.push('ADJ');
@@ -342,6 +386,31 @@ function atomsFor(token, index, posMap, options = {}) {
   if (RELATIVIZERS.has(lower)) out.push('REL');
   if (SUBORDINATORS.has(lower)) out.push('SUB');
   if (INTERROGATIVE_ADVERBS.has(lower)) out.push('ADV');
+  /**
+   * CLITICS. UD splits `isn't` into `is` + `n't` and `I'm` into `I` + `'m`, so
+   * the clitic arrives as its own token — and none of the closed-class tables
+   * had heard of it. Census on the frozen gate corpus: `n't` x11, `'m` x3,
+   * `'ve` x2, all atomless, each one a hole no molecule can span.
+   *
+   * The forms are given the identity their full spelling already has here:
+   * `'m`/`'re` are copulas, `'ve`/`'d`/`'ll` auxiliaries (`'d` and `'ll` also
+   * modal), and `n't` is the negation adverb — UD advmod, the same analysis
+   * `not` gets, which was also missing.
+   *
+   * `when` is NOT added to the interrogatives here. It is already a
+   * SUBORDINATOR and the note on that table records the reason: a second
+   * identity buys readings without buying parses.
+   *
+   * Gated: `clitics` defaults OFF, measured separately from `inertPunct` so the
+   * two effects can be attributed apart.
+   */
+  if (options.clitics === true) {
+    if (lower === "'m" || lower === "'re") { out.push('COP'); out.push('AUX'); }
+    if (lower === "'ve") out.push('AUX');
+    if (lower === "'ll" || lower === "'d") { out.push('AUX'); out.push('MODAL'); }
+    if (lower === "n't" || lower === 'not') out.push('ADV');
+    if (lower === 'what') out.push('PRON');
+  }
   if (lower === 'to') out.push('TO');
   if (lower === 'than') out.push('THAN');
   if (lower === ',') out.push('COMMA');
@@ -360,13 +429,68 @@ function atomsFor(token, index, posMap, options = {}) {
    * so S+PUNCT could never fire. Still not COMMA.
    */
   if (/^[.!?…;:]+$/.test(lower)) out.push('PUNCT');
+  /**
+   * INERT BRACKETING MARKS. Quotes, parens, brackets, dashes and slashes carry
+   * no predicate content, but until now they carried no ATOM either — and a
+   * token with no atom is a hole in the chart that no molecule can span across.
+   * Census on the frozen gate corpus: 196 such tokens, in 127 of 232 failures.
+   * They are not rare vocabulary; the top five are `"` (22), `-` (14), `(` (10),
+   * `)` (10) and `'` (6).
+   *
+   * Typed `WRAP`, not `PUNCT`: every PUNCT rule absorbs leftward, and these
+   * marks occur on both sides of what they mark. See `families/punctuation.js`.
+   *
+   * Gated: `inertPunct` defaults OFF so the frozen gate keeps measuring the
+   * grammar it was frozen against. Flip it in one commit, with the numbers.
+   */
+  if (options.inertPunct === true && /^[-–—"'`(){}[\]<>/\\*_|~]+$/.test(lower)) out.push('WRAP');
+  /**
+   * WHAT WAS LEFT AFTER THE PUNCTUATION HOLE CLOSED.
+   *
+   * Re-censusing the atomless tokens with `inertPunct` and `clitics` on dropped
+   * them 196 -> 87, and the survivors had changed character completely: no
+   * punctuation at all. What remained was indefinite pronouns (`anyone` x5,
+   * `else` x2, `everyone`), bare years, and web tokens (emails, URLs, newsgroup
+   * names). The first and third are closed or mechanically recognisable; the
+   * rest is genuine vocabulary and belongs in a lexicon, not in a rule.
+   *
+   * INDEFINITE PRONOUNS head a phrase and take a postmodifier (`anyone here`,
+   * `something else`), so they are typed as the nominals they are, not as a new
+   * category with no constructions to fire.
+   *
+   * Gated on `closedGaps`, measured apart from the other two arms.
+   */
+  if (options.closedGaps === true) {
+    if (INDEFINITE_PRONOUNS.has(lower)) { out.push('PRON'); out.push('N'); }
+    if (lower === 'else') out.push('ADJ');
+    // A bare four-digit year is a nominal, not a date construction: EWT heads
+    // `2005` as a NOUN/NUM and there is no `Y/M/D` shape to read.
+    if (/^(1[0-9]|20)\d{2}$/.test(lower)) out.push('N');
+    // Emails, URLs and newsgroup paths are names of things. One shape, not a list.
+    if (/@[\w.-]+\.\w{2,}$/.test(lower) || /^\w+:\/\//.test(lower)
+      || /^(www|https?)\b/.test(lower) || /^[a-z]+(\.[a-z]{2,})+$/.test(lower)) out.push('PROPN');
+  }
+  if (DATE_NUMERAL.test(lower)) out.push('DATE');
+  if (CLOCK_NUMERAL.test(lower)) out.push('CLOCK');
+  if (MERIDIANS.has(lower)) out.push('MERIDIAN');
   if (PARTICLES.has(lower)) out.push('PRT');
   // The clitic either arrives glued (`man's`) or split off by the tokenizer
   // (`'s`); both are possessive, and the split form is also the copula in
   // `that's better`, so it carries AUX too rather than forcing a choice.
   if (lower === "'s") { out.push('POSS'); out.push('AUX'); }
   else if (/'s$/.test(lower) && lower.length > 2) out.push('POSS');
-  return out.map((type) => ({
+  /**
+   * ONE ATOM PER TYPE. The emission blocks above are independent membership
+   * tests and several tables legitimately overlap — `none`, `each` and `both`
+   * are indefinite pronouns AND determiners, and `'s` is possessive AND
+   * auxiliary. Without this, such a word emitted the same type twice.
+   *
+   * `composePacked` happens to absorb it (`if (cell[i][i].has(a.type)) continue`)
+   * but `compose` does not, so the duplicate reached the classic chart as a
+   * second identical node. Deduplicated at the source rather than relying on one
+   * of two parsers to clean up after the other.
+   */
+  return [...new Set(out)].map((type) => ({
     type, from: index, to: index, parts: [], token,
     nucleus: leafNucleus(token, type, index),
   }));
@@ -442,7 +566,10 @@ export function projectAnswer(molecule, bonds = BONDS) {
       + ` (received ${typeof bonds}) — a point-free \`.map(projectAnswer)\` passes the index here`,
     );
   }
-  if (!molecule || molecule.type !== 'S') return { subject: null, verb: null };
+  if (!molecule) return { subject: null, verb: null };
+  if (molecule.type !== 'S') {
+    return { subject: null, verb: headOf(molecule, bonds) };
+  }
   /**
    * An IMPERATIVE has one child, not two — `speak`, `tell me all about it`. The
    * subject is genuinely absent, so it projects as null. Supplying the implied
@@ -461,6 +588,10 @@ export function projectAnswer(molecule, bonds = BONDS) {
    * already projects to, and the punctuation contributes nothing of its own.
    */
   if (second.type === 'PUNCT') return projectAnswer(first, bonds);
+  if (second.type === 'COMMA') {
+    if (first.type === 'S') return projectAnswer(first, bonds);
+    return { subject: null, verb: headOf(first, bonds) };
+  }
   /**
    * MATRIX-PRESERVING ADJUNCTION. Fronted ADV/PP/ADJ/FRONTED/CONJ + S declare
    * head on the matrix. Positional [subj, pred] would report the adjunct head

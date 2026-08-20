@@ -2,9 +2,24 @@
   "contract": "SCHOL-TREEBANK-ANTIGEN-v1",
   "retired": [
     {
+      "signature": "? N PRON NC NP ? DET S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
       "signature": "? N PRON NC NP ? DET S TO NP",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "? N PRON NC NP ? DET VP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "? NC ?",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
     },
     {
       "signature": "? S NC ? NP",
@@ -12,9 +27,44 @@
       "retiredOn": "2026-08-13"
     },
     {
+      "signature": "? S VP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
       "signature": "ADJ ? TO ? S",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "ADJ FRONTED SUB NC COP ADV NP NP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "ADJ SBAR ? CONJADJ ? VP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "ADJ SUB PRON S ADJ",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "ADV P ? NC CONJADJ ? PP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "APPOS NC DET V CONJ COP PP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "APPOS S N",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
     },
     {
       "signature": "AUX ? INV ? N ? VP",
@@ -22,9 +72,49 @@
       "retiredOn": "2026-08-13"
     },
     {
+      "signature": "AUX ? S N ? VP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "CONJ FRONTED FRONTED SBAR SUB PROPN PRON COP SUB PP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "CONJNP AUX ? VP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "CONJNP P FRONTED COP REL AUX PRONACC COMMA CONJ RELC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
       "signature": "COP DET ? S",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "DET ? NP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "DET S ? NC SUB N",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "FRONTED",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "INF P DET ADJ ? NC ? COMMA PP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
     },
     {
       "signature": "INF TO DET ADJ ? NC ? COMMA PP",
@@ -32,14 +122,54 @@
       "retiredOn": "2026-08-13"
     },
     {
+      "signature": "INV",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
       "signature": "MODAL ? ? VP ? S",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
     },
     {
+      "signature": "N ? APPOS CONJ ? PROPN ? NC ? P DET ADJ ? ? PUNCT",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "N ? NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "N ? NC ? S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "N ? NC ? VP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
       "signature": "N ? PROPN ? ? VP",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "N NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "N NP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "N P DET SBAR",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
     },
     {
       "signature": "N TO APPOS ? S",
@@ -57,9 +187,84 @@
       "retiredOn": "2026-08-13"
     },
     {
+      "signature": "NC ?",
+      "wasFailing": 5,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "NC ? ?",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "NC ? ? ? ?",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "NC ? ADV NC CONJ ADV NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "NC ? APPOS CONJ ? PROPN ? NC ? P DET ADJ ? ? PUNCT",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "NC ? N ? ? ? ?",
+      "wasFailing": 2,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "NC ? PROPN ? ? ? ?",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "NC ? PUNCT",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "NC ? S NC NP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "NC AUX ? S ?",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "NC COP P DET ? NP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
       "signature": "NC COP P DET ? NP TO NP",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "NC P ?",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "NC P DET S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "NC P PP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "NC S",
+      "wasFailing": 2,
+      "retiredOn": "2026-08-15"
     },
     {
       "signature": "NP ? INF PUNCT",
@@ -67,14 +272,64 @@
       "retiredOn": "2026-08-13"
     },
     {
+      "signature": "NP AUX INF S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "NP CONJVP VP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "NP COP ?",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "NP COP ? PUNCT",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "NP NP PRON NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "NP P DET NP ? ?",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "NP P PP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "NP S S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "PP P ? NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "PP P DET ADJ ? NC ? COMMA PP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
       "signature": "PP TO S P VP N",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
     },
     {
-      "signature": "PRON ? S",
+      "signature": "PRON ? SBAR P AUX COMMA SBAR SUB PROPN ADV MODAL PUNCT",
       "wasFailing": 1,
-      "retiredOn": "2026-08-14"
+      "retiredOn": "2026-08-15"
     },
     {
       "signature": "PRON ? SBAR TO AUX COMMA SBAR SUB PROPN ADV MODAL PUNCT",
@@ -82,9 +337,29 @@
       "retiredOn": "2026-08-13"
     },
     {
+      "signature": "PRON ? VP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
       "signature": "PRON ? VP ? S",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "PRON APPOS SUB PRON AUX ? VP S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "PRON AUX ? ADJ PP P DET SUB PUNCT",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "PRON AUX ? N ? NP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
     },
     {
       "signature": "PRON AUX ? V ? NC ? N ? S NC",
@@ -92,9 +367,44 @@
       "retiredOn": "2026-08-13"
     },
     {
+      "signature": "PRON AUX ? VP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "PRON AUX ? VP ? NC ? S NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
       "signature": "PRON COP PP TO SCOMMA ADV PUNCT ?",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "PRON COP S S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "PRON INV S NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "PRON NC ? NC NP ? COMMA VP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "PRON NC NP S N",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "PRON NC NP S NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
     },
     {
       "signature": "PRON NC TO S",
@@ -102,9 +412,49 @@
       "retiredOn": "2026-08-13"
     },
     {
+      "signature": "PRON NP CONJ ? COMMA APPOS ? PUNCT",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "PRON S VP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "PRONACC S P S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "PRONACC VP NP PRON NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "PROPN ADJ S P DET ? ? NC CONJ DET ? ? NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "PROPN P ? ? PROPN",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-18"
+    },
+    {
       "signature": "PROPN P ? NC CONJADJ ? PP",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "PROPN PRON INV COMMA VP P ? PUNCT",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "PROPN PRON INV MODAL ? VP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
     },
     {
       "signature": "PROPN S P DET ? ? NC CONJ DET ? ? NC",
@@ -112,9 +462,64 @@
       "retiredOn": "2026-08-14"
     },
     {
+      "signature": "PROPN SBAR",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "PUNCT S SUB NP S DET CONJ PUNCT",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "RELC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S ? CONJADJ ? VP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S ? NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S ? NC ? NP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S ? NC ? PP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
       "signature": "S ? NC NP COP PUNCT",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "S ? NP ? NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S ? NP DET AUX ? N",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S ? PP COP ADV NP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S ? S N",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
     },
     {
       "signature": "S ? S TO S",
@@ -122,9 +527,59 @@
       "retiredOn": "2026-08-13"
     },
     {
+      "signature": "S ADJ VP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S CONJADJ COMMA P ?",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S DET SBAR",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S N ? NP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S N SUB NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
       "signature": "S N TO INV",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "S NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S NC ? NP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S NC NP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S NP MODAL SBAR COP PP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S NP NC MODAL SBAR COP PP NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
     },
     {
       "signature": "S NP TO NP",
@@ -132,14 +587,69 @@
       "retiredOn": "2026-08-13"
     },
     {
+      "signature": "S P ? NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S P INV",
+      "wasFailing": 2,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S P INV ? S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S P VP N",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S PRON AUX ? VP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S PRON NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S S ? RELC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
       "signature": "S S DET VP",
       "wasFailing": 1,
       "retiredOn": "2026-08-14"
     },
     {
-      "signature": "S SUB ? VP DET S",
+      "signature": "S SUB ? VP DET VP",
       "wasFailing": 1,
-      "retiredOn": "2026-08-14"
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S SUB N",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S SUB N COP ADV NP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S SUB NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "S SUB NC COP ADV NP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
     },
     {
       "signature": "S TO ? NC",
@@ -202,14 +712,54 @@
       "retiredOn": "2026-08-13"
     },
     {
+      "signature": "S VP ? PP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
       "signature": "S VP TO NC",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
     },
     {
+      "signature": "SBAR",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
       "signature": "SBAR TO PROPN SBAR TO NP",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "SCOMMA",
+      "wasFailing": 2,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "SUB PRON N NP PRON NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "SUB PRON NC ADJ S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "SUB PRON NC ADJ VP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "SUB PRON NC NP NC PRON NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "SUB PRON NC NP PRON NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
     },
     {
       "signature": "SUB PRON NC S",
@@ -220,6 +770,81 @@
       "signature": "V ? S",
       "wasFailing": 1,
       "retiredOn": "2026-08-13"
+    },
+    {
+      "signature": "V ? VP N ? NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "VP ?",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "VP ? DET ? S ? PP SBAR",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "VP ? NC P DET COMMA PROPN AUX ? N",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "VP ? NC P DET COMMA S ? NC",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "VP N SUB NP FRONTED CONJ SUB PRON INV COMMA S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "VP N SUB NPCOMMA S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "VP NC",
+      "wasFailing": 2,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "VP NC ? S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "VP NC SUB ADJ S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "VP NC SUB NPCOMMA S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "VP P ? ? PROPN",
+      "wasFailing": 2,
+      "retiredOn": "2026-08-18"
+    },
+    {
+      "signature": "VP P ? COMMA S",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "VP P VP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
+    },
+    {
+      "signature": "VP REL COP ? COMMA VP",
+      "wasFailing": 1,
+      "retiredOn": "2026-08-15"
     },
     {
       "signature": "VP S TO CONJADJ TO",

@@ -5,6 +5,20 @@ import { defineConstruction, CONSTRUCTION_STATUS as S } from '../schemas.js';
  * then takes the predicate. INV is not a free-standing linguistic constituent.
  */
 export const INVERSION = [
+  /**
+   * INVERSION SCAFFOLD HEADS ON THE NOMINAL, NOT THE AUXILIARY.
+   *
+   * `head: 0` put the auxiliary at the head of the INV, so `headedAtoms(INV)`
+   * returned `are` for `are you kidding ?` and the answer came out
+   * {subject: are, verb: kidding}. Measured 2026-08-20: every sentence whose
+   * root S was built through INV was wrong — 0 correct out of 9 on the gate
+   * corpus.
+   *
+   * UD makes the inverted nominal the `nsubj` of the main predicate and the
+   * auxiliary its `aux` dependent. INV is a parser-assembly scaffold; the thing
+   * inside it that a later `INV+VP -> S` needs is the SUBJECT. So the head is
+   * the NP.
+   */
   defineConstruction({
     id: 'modal-np-inv',
     family: 'inversion',
@@ -12,7 +26,7 @@ export const INVERSION = [
     status: S.SCAFFOLD,
     construction: 'subject-aux-inversion-bridge',
     roles: { left: 'modal', right: 'subject' },
-    note: 'SHALL WE … — INV bundles aux+subject; subject heads INV by ruling',
+    note: 'SHALL WE … — INV bundles aux+subject; aux heads INV by ruling',
     flags: ['scaffold-result', 'ruling', 'inversion'],
     grades: { C: 'Y', R: 'Y', H: 'Y', X: 'G' },
   }),

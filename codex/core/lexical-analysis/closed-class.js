@@ -147,6 +147,18 @@ export const RELATIVIZERS = new Set(['who', 'which', 'that', 'whom', 'whose']);
 export const INTERROGATIVE_ADVERBS = new Set(['how', 'where', 'why']);
 
 /**
+ * Clock meridians. AM/PM are dependents of a clock numeral (UD nmod:unmarked
+ * on EWT timestamps), not list items and not the copula `am`.
+ *
+ * Membership is additive: `am` remains COP/AUX. The meridian atom is what
+ * lets a clock absorb `05:17 PM` without typing every capitalized PM as a
+ * partner for arbitrary NUM adjacency.
+ */
+export const MERIDIANS = new Set([
+  'am', 'pm', 'a.m.', 'p.m.',
+]);
+
+/**
  * VERB PARTICLES — the second half of a phrasal verb.
  *
  * A particle is not a preposition, and the difference is whether an object is
@@ -172,4 +184,22 @@ export const PARTICLES = new Set([
 export const SUBORDINATORS = new Set([
   'because', 'although', 'though', 'when', 'while', 'if', 'since', 'unless',
   'until', 'before', 'after', 'as', 'whether', 'lest', 'once', 'whenever',
+]);
+
+/**
+ * Indefinite pronouns. Closed class, and every one of them was unknown to every
+ * table here — `anyone` was the single most frequent atomless token left in the
+ * treebank-gate corpus once the punctuation hole was closed.
+ *
+ * They head a phrase and accept a postmodifier (`anyone here`, `something else`,
+ * `nothing new`), which is why `atomsFor` gives them a nominal atom as well as a
+ * pronominal one rather than inventing a category with no constructions.
+ */
+export const INDEFINITE_PRONOUNS = new Set([
+  'anyone', 'anybody', 'anything', 'everyone', 'everybody', 'everything',
+  // `no one` is deliberately absent: the tokenizer splits on whitespace, so a
+  // two-word member could never be looked up and would be dead data in a table
+  // whose whole contract is membership.
+  'someone', 'somebody', 'something', 'nobody', 'nothing',
+  'none', 'each', 'either', 'neither', 'both', 'few', 'many', 'several',
 ]);

@@ -17,6 +17,10 @@
  *
  * Light is meaning-agnostic: aura, span, energy. No type, no lemma.
  *
+ * Color operators that tried to name, lock-replace, or predict a construction
+ * from that energy are dead. See `spectral-rejections.js`. The reaction is
+ * still legal to look at. It is not a rule, a barcode, or a forecast.
+ *
  * THREE ORGANS, THREE JOBS. Each answers one question and none answers
  * another's, which is what makes any of them testable alone:
  *
@@ -46,6 +50,7 @@
 
 import { atomsFor, BONDS, LIFTS } from './compose.js';
 import { BOND_REACTION, classifyBond } from './bond-kind.js';
+import { ATOM_VALENCE } from './atom-valence.js';
 import { readNucleus } from './atom-nucleus.js';
 import { isLoad, organizeDerivation, stampCharges } from './electromagnetism.js';
 
@@ -695,12 +700,66 @@ export function headedAtoms(node, memo = new Map()) {
 }
 
 /**
+ * Heads of `node` that could lawfully BE a subject.
+ *
+ * `ATOM_VALENCE.V.subject.accept` has said `['NP', 'N', 'PRON']` since the typed
+ * valence table was written, and nothing ever read it. Unfiltered,
+ * `headedAtoms` happily offered a verb as the subject of another verb —
+ * `{subject: have, verb: contact}` for `If you have any questions , please
+ * contact us` — and an auxiliary as the subject of its own participle.
+ *
+ * PROPN, NC and GEN are admitted alongside the declared three: they are nominal
+ * heads the table predates rather than nominal heads it excludes.
+ *
+ * Returns [] rather than a wrong answer when nothing nominal is available; the
+ * caller then emits `subject: null`, which is a reading the projection already
+ * has a shape for.
+ */
+const SUBJECT_TYPES = new Set([
+  ...(ATOM_VALENCE.V?.subject?.accept || ['NP', 'N', 'PRON']),
+  'PROPN', 'NC', 'GEN', 'PRONACC',
+]);
+
+function subjectCandidates(node, memo) {
+  return headedAtoms(node, memo).filter((h) => SUBJECT_TYPES.has(h.type));
+}
+
+/**
  * One candidate per derivation path that can project an answer, with the
  * subject/verb *heads* still carrying from/to/type. PUNCT absorb and
  * matrix-preserving adjunction recurse, matching projectAnswers.
  */
+/**
+ * Node types this module can rank.
+ *
+ * `derivationCandidates` builds `{subject, verb}` candidates, and only a clause
+ * has that shape — an `NP` utterance has a head and no predicate. So the ranker
+ * abstains on everything else.
+ *
+ * EXPORTED BECAUSE THE ABSTENTION USED TO BE INVISIBLE. `pickResonantDerivation`
+ * returns `null` both when it examined the candidates and found none, and when it
+ * was never able to look at all, and callers wrote `Boolean(picked && ...)` —
+ * which scores an abstention as a WRONG ANSWER. On 2026-08-20 that turned a root
+ * doorway widening into +61 parses and exactly 0 correct answers, and the number
+ * looked like the doorway had failed rather than like the ranker had never run.
+ *
+ * Ask this before interpreting a `null`.
+ */
+export const RANKABLE_TYPES = Object.freeze(['S']);
+
+/**
+ * Whether `pickResonantDerivation` is able to express an opinion about `node`.
+ * A `false` here means a following `null` is an ABSTENTION, not a rejection.
+ *
+ * @param {object} node
+ * @returns {boolean}
+ */
+export function canRankDerivations(node) {
+  return Boolean(node) && RANKABLE_TYPES.includes(node.type);
+}
+
 export function derivationCandidates(node, visiting = new Set(), memo = new Map()) {
-  if (!node || node.type !== 'S' || visiting.has(node)) return [];
+  if (!canRankDerivations(node) || visiting.has(node)) return [];
   visiting.add(node);
   const out = [];
   const derivations = Array.isArray(node.derivations)
@@ -735,11 +794,21 @@ export function derivationCandidates(node, visiting = new Set(), memo = new Map(
       out.push(...derivationCandidates(d.right, visiting, memo));
       continue;
     }
-    if (headIdx === 0 && d.left.type === 'S') {
+    if (headIdx === 0 && (d.left.type === 'S' || d.left.type === 'SCOMMA')) {
+      /**
+       * SCOMMA IS A CLAUSE WEARING A COMMA. `S+COMMA -> SCOMMA` then
+       * `SCOMMA+S -> S` head 0 means the FIRST clause heads the sentence (the
+       * Grimoire's UD ruling for `he ran , she fell`). Without this branch the
+       * pair fell through to the positional reading below and answered
+       * {subject: <first clause's VERB>, verb: <second clause's verb>} —
+       * `{received, notify}` for `If you have received it in error , please
+       * notify the sender`. `projectAnswers` already recurses on COMMA; this is
+       * the same law, restored to the ranking path so the two agree.
+       */
       out.push(...derivationCandidates(d.left, visiting, memo));
       continue;
     }
-    const subjects = headedAtoms(d.left, memo);
+    const subjects = subjectCandidates(d.left, memo);
     const verbs = headedAtoms(d.right, memo);
     const verbSpan = { from: d.right.from, to: d.right.to };
     const subjectSpan = { from: d.left.from, to: d.left.to };
@@ -878,13 +947,81 @@ export function scoreDerivationCandidate(candidate, field, bonds = BONDS, peers 
  * Pick among a packed (or classic) S node's derivations. Returns the
  * candidate — answer plus the heads that justified it — or null.
  */
+/**
+ * LEXICAL POSITION — the derivation score that survived measurement.
+ *
+ * Half predicate-span coverage, half verb earliness. That is the whole thing.
+ *
+ * WHY THIS REPLACED THE FIELD SCORE. Measured 2026-08-20 on decidable cases —
+ * an `S` root whose candidates disagree about the ANSWER (deduped by
+ * {subject, verb}) with gold reachable among them. Fitted on the treebank-gate
+ * slice, held out on the rest of UD EWT dev and on all of EWT test:
+ *
+ *     chance                        43.4%    45.8%
+ *     scoreDerivationCandidate      41.3%    41.7%   <- at or below chance
+ *     this function                 65.2%    70.8%
+ *
+ * A four-tier score was built and rejected in the same run. Lexicalised valence
+ * frames counted off EWT train (851 lemmas, 34,144 verb tokens) scored BELOW
+ * chance alone on all three splits — 21.7 / 37.0 / 22.9 — and a weight sweep set
+ * their coefficient to zero, after which a shuffled-frames control scored
+ * byte-identical to the real frames. The mechanism: candidates inside one `S`
+ * differ by WHICH WORD IS THE VERB, and a lemma's argument profile describes how
+ * it behaves once it is the head, not whether it is one.
+ *
+ * SCOPE, HONESTLY. Only 48 of 2077 EWT test sentences are decidable at all; the
+ * rest offer one answer or no reachable truth. This is worth under 1pp end to
+ * end. It is here because it is six lines and beats chance, not because ranking
+ * is where the parser is losing.
+ *
+ * NOT THE DEFAULT. Selected by `options.positionRanking === true`; see the note
+ * on `pickResonantDerivation` for the three results that sent it behind a flag.
+ *
+ * @param {object} candidate from `derivationCandidates`
+ * @param {Array} field the beacon field; `field.length` is the token count
+ * @returns {number}
+ */
+export function scoreDerivationPosition(candidate, field) {
+  if (!candidate?.verbHead) return 0;
+  const n = Math.max((field || []).length, 1);
+  const span = candidate.verbSpan || candidate.verbHead;
+  const width = Math.max(1, (span.to ?? span.from) - (span.from ?? 0) + 1);
+  const coverage = width / n;
+  const earliness = 1 - ((candidate.verbHead.from ?? 0) / n);
+  return Math.max(0, Math.min(1, 0.5 * coverage + 0.5 * earliness));
+}
+
 export function pickResonantDerivation(node, field, bonds = BONDS, options = {}) {
   const candidates = derivationCandidates(node);
   if (candidates.length === 0) return null;
+  /**
+   * DEFAULT REVERTED TO THE FIELD SCORE, 2026-08-20, SAME DAY IT WAS CHANGED.
+   *
+   * `scoreDerivationPosition` won on held-out contested cases (70.8% vs 41.7%)
+   * under the frozen gate lexicon, which is what put it here. Under the PRODUCT
+   * lexicon it is worth +6 on test and -5 on dev, and two further signals landed
+   * against it:
+   *
+   *   1. On roots built by left-adjunction onto a clause it scores 26% against
+   *      the field score's 30%, choosing a verb EARLIER than gold 8 times to 3.
+   *   2. `tests/core/constellation/resonance-derivation.test.js` — which predates
+   *      this change and encodes a plain fact about English — asserts the verb of
+   *      `Please forward a copy` is `forward` and that `verbHead.from > 0`. The
+   *      earliness term is `1 - from/n`, so it structurally prefers position 0
+   *      and answers `please`. That is not a tuning miss; it is the wrong shape
+   *      for fronted material and imperatives.
+   *
+   * So it goes behind a flag, like every other unearned change today, and the
+   * incumbent keeps the default until position ranking is measured on
+   * construction families rather than on an aggregate.
+   */
+  const score1 = (c) => (options.positionRanking === true
+    ? scoreDerivationPosition(c, field)
+    : scoreDerivationCandidate(c, field, bonds, candidates, options));
   let best = candidates[0];
-  let bestScore = scoreDerivationCandidate(best, field, bonds, candidates, options);
+  let bestScore = score1(best);
   for (let i = 1; i < candidates.length; i += 1) {
-    const score = scoreDerivationCandidate(candidates[i], field, bonds, candidates, options);
+    const score = score1(candidates[i]);
     const earlier = (candidates[i].verbHead?.from ?? 99) < (best.verbHead?.from ?? 99);
     if (score > bestScore || (score === bestScore && earlier)) {
       best = candidates[i];

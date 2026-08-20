@@ -29,6 +29,11 @@ import {
 import { leafNucleus, mergeNuclei, nucleusFromDerivation } from './atom-nucleus.js';
 import { fieldFromAtoms, rankByResonance, emitDescendingLight } from './resonance-beacon.js';
 import { censusReactions } from './bond-kind.js';
+import { seedLawfulUnknownAtoms, stampCarbonProduct } from './lawful-unknown-seed.js';
+import { consumeBondValence, mintValence } from './atom-valence.js';
+import { annotateChartMatter } from './atom-matter.js';
+import { annotateMoleculeTopology } from './molecule-topology.js';
+import { annotateSemanticParticles } from './semantic-particles/annotate.js';
 
 /**
  * Compose bottom-up over a packed chart.
@@ -36,7 +41,12 @@ import { censusReactions } from './bond-kind.js';
  * @param {string[]} tokens
  * @param {Map<string, string[]>} posMap
  * @param {{roots?: string[], agenda?: 'stack'|'queue', bonds?: Array,
- *   disableMacrophage?: boolean, disableClauseProvenance?: boolean}} [options]
+ *   disableMacrophage?: boolean, disableClauseProvenance?: boolean,
+ *   seedLawfulUnknowns?: boolean}} [options]
+ *   `seedLawfulUnknowns` is opt-in. Empty slots may receive a licensed
+ *   nominal reading when DET/P/POSS seek into them. Not a new bond.
+ *   Default OFF: the frozen treebank gate must not buy coverage with
+ *   extra POS vagueness.
  *   Production parser. `agenda` exists so a test can prove admission does not
  *   depend on pop order; default is `stack`.
  * @returns {{atoms: object[], molecules: object[], spanning: object[],
@@ -46,8 +56,37 @@ import { censusReactions } from './bond-kind.js';
  *   `events === molecules.length + promotionWakes`. `reactions` is the
  *   constructive / preservative / recursive-preservative / lifting census.
  */
+/**
+ * WHO CALLS THIS, AS OF 2026-08-20.
+ *
+ * Nothing on the request path does. `codex/server/services/constellationPage.service.js`
+ * imports `queryIdentity`, `phraseAnalysis`, `pageBytecode`, `governor` and
+ * `readings` from this directory; it does not import `compose.js` or this file.
+ * An exhaustive reference sweep for `composePacked` returns only
+ * `codex/core/constellation/`, `codex/research/`, `scripts/`, `tests/` and `docs/`.
+ *
+ * This note records a VERIFIED FACT and makes no claim about intent — the engine
+ * may be staged ahead of integration, or it may have drifted. It is here because
+ * the treebank gate, the evidence ledgers and every script in `scripts/` describe
+ * this parser as though it were the shipped one, and a reader deserves to know
+ * which numbers describe a served request and which describe a bench.
+ *
+ * If it gets wired, delete this block. If it is deliberately pre-integration, say
+ * so here and name the blocking work.
+ */
+export const ROOT_DOORWAY = Object.freeze({
+  CLAUSAL: Object.freeze(['S']),
+  UTTERANCE: Object.freeze(['NP', 'APPOS', 'PP']),
+  ALL: Object.freeze(['S', 'NP', 'APPOS', 'PP']),
+});
+
 export function composePacked(tokens, posMap, options = {}) {
-  const roots = options.roots || ['S'];
+  let roots = options.roots;
+  if (!roots) {
+    if (options.doorway === 'all') roots = ROOT_DOORWAY.ALL;
+    else if (options.doorway === 'utterance') roots = ROOT_DOORWAY.UTTERANCE;
+    else roots = ROOT_DOORWAY.CLAUSAL;
+  }
   /**
    * Optional bond table override for reactor experiments; default is Grimoire BONDS.
    *
@@ -61,18 +100,44 @@ export function composePacked(tokens, posMap, options = {}) {
   const bonds = options.bonds || BONDS;
   if (options.bonds) validateBonds(bonds);
   /**
-   * `stack` (default) is LIFO — current production order, rightmost atom
-   * tends to dequeue first. `queue` is FIFO — leftmost dequeues first.
-   * Admission must not depend on which one you pick.
+   * AGENDA TRAVERSAL POLICY:
+   * 1. Layer 1 (Search Policy): Hierarchical Bottom-Up (Width-first, Left-to-Right).
+   * 2. Layer 2 (Telemetry Control): Modulates local priority around the hierarchical base.
    */
-  const take = options.agenda === 'queue'
-    ? (agenda) => agenda.shift()
-    : (agenda) => agenda.pop();
+  const take = (agenda) => {
+    if (options.agenda === 'queue') return agenda.shift();
+    if (options.agenda === 'stack') return agenda.pop();
+
+    // Canonical Baseline: Hierarchical Bottom-Up with Telemetry Field Modulation
+    let bestIdx = 0;
+    let bestScore = -Infinity;
+    const fo = options.fieldOrientation;
+    for (let i = 0; i < agenda.length; i += 1) {
+      const node = agenda[i];
+      const width = (node.to - node.from) + 1;
+      let score = (width * 10.0) - (node.from * 0.01);
+      if (fo) {
+        const span = node.from;
+        const bias = fo.fieldBias?.[span] ?? 1.0;
+        const damping = fo.magneticDamping?.[span] ?? 0.0;
+        const focus = fo.resonanceFocus?.[span] ?? 1.0;
+        const mod = (bias * focus * (1.0 - damping)) - 1.0;
+        score += mod; // local field correction within hierarchical tier
+      }
+      if (score > bestScore) {
+        bestScore = score;
+        bestIdx = i;
+      }
+    }
+    return agenda.splice(bestIdx, 1)[0];
+  };
   const n = (tokens || []).length;
   if (n === 0 || !posMap) {
     return {
       atoms: [], molecules: [], spanning: [], stable: [], events: 0, promotionWakes: 0,
       reactions: censusReactions(null), field: [], ranked: [],
+      bondAttempts: 0, bondRefusals: 0,
+      semanticParticles: null,
     };
   }
 
@@ -81,6 +146,8 @@ export function composePacked(tokens, posMap, options = {}) {
   const agenda = [];
   let events = 0;
   let promotionWakes = 0;
+  let bondAttempts = 0;
+  let bondRefusals = 0;
 
   /**
    * REFUSAL LEDGER — opt-in via `options.ledger`.
@@ -128,6 +195,14 @@ export function composePacked(tokens, posMap, options = {}) {
     const existing = cell[from][to].get(type);
     const incoming = nucleusFromDerivation(type, from, to, derivation);
     if (existing) {
+      stampCarbonProduct(existing, derivation);
+      const isDuplicate = existing.derivations.some((d) => {
+        if (derivation.lift) return d.lift === derivation.lift && d.child === derivation.child;
+        if (derivation.bond) return d.bond === derivation.bond && d.left === derivation.left && d.right === derivation.right;
+        return false;
+      });
+      if (isDuplicate) return;
+      if (derivation.bond) consumeBondValence(derivation.left, derivation.right);
       const wasEligible = isAdjunctEligible(existing);
       existing.derivations.push(derivation);
       existing.nucleus = mergeNuclei(existing.nucleus, incoming);
@@ -137,7 +212,12 @@ export function composePacked(tokens, posMap, options = {}) {
       }
       return;
     }
-    const node = { type, from, to, derivations: [derivation], token: null, nucleus: incoming };
+    const node = {
+      type, from, to, derivations: [derivation], token: null, nucleus: incoming,
+      valence: mintValence(type),
+    };
+    stampCarbonProduct(node, derivation);
+    if (derivation.bond) consumeBondValence(derivation.left, derivation.right);
     cell[from][to].set(type, node);
     agenda.push(node);
   };
@@ -154,11 +234,19 @@ export function composePacked(tokens, posMap, options = {}) {
       const node = {
         type: a.type, from: i, to: i, derivations: [], token: a.token,
         nucleus: a.nucleus || leafNucleus(a.token, a.type, i),
+        valence: mintValence(a.type),
       };
       cell[i][i].set(a.type, node);
       atoms.push(node);
       agenda.push(node);
     }
+  }
+
+  for (const node of seedLawfulUnknownAtoms(tokens, cell, options)) {
+    if (cell[node.from][node.to].has(node.type)) continue;
+    cell[node.from][node.to].set(node.type, node);
+    atoms.push(node);
+    agenda.push(node);
   }
 
   /**
@@ -191,8 +279,9 @@ export function composePacked(tokens, posMap, options = {}) {
       for (let k = node.to + 1; k < n; k += 1) {
         for (const right of [...cell[node.to + 1][k].values()]) {
           for (const bond of bonds) {
+            bondAttempts += 1;
             const verdict = admitBond(node, right, bond, options);
-            if (!verdict.ok) { note(verdict, node, right, bond, 'left'); continue; }
+            if (!verdict.ok) { bondRefusals += 1; note(verdict, node, right, bond, 'left'); continue; }
             const derivation = { bond, left: node, right };
             const provenance = clauseProvenance(node, right, bond);
             if (provenance) Object.assign(derivation, provenance);
@@ -209,8 +298,9 @@ export function composePacked(tokens, posMap, options = {}) {
       for (let j = 0; j <= node.from - 1; j += 1) {
         for (const left of [...cell[j][node.from - 1].values()]) {
           for (const bond of bonds) {
+            bondAttempts += 1;
             const verdict = admitBond(left, node, bond, options);
-            if (!verdict.ok) { note(verdict, left, node, bond, 'right'); continue; }
+            if (!verdict.ok) { bondRefusals += 1; note(verdict, left, node, bond, 'right'); continue; }
             const derivation = { bond, left, right: node };
             const provenance = clauseProvenance(left, node, bond);
             if (provenance) Object.assign(derivation, provenance);
@@ -232,6 +322,8 @@ export function composePacked(tokens, posMap, options = {}) {
   const couplings = options.ledger ? [] : null;
   const field = fieldFromAtoms(atoms, tokens, bonds, couplings);
   const ranked = rankByResonance(stable, field, bonds);
+  annotateMoleculeTopology({ molecules, spanning, stable, atoms });
+  annotateChartMatter({ molecules, spanning, stable, atoms, field });
 
   /**
    * DESCENDING LIGHT — opt-in via `options.light`, default OFF.
@@ -249,9 +341,24 @@ export function composePacked(tokens, posMap, options = {}) {
     for (const node of molecules) node.lit = light.lit.has(node);
   }
 
+  /**
+   * SEMANTIC PARTICLES — opt-in via `options.semanticParticles`, default OFF.
+   *
+   * Frozen-chart annotation. Particles cannot admit a bond. Score modes
+   * attach a parallel ranking and leave `ranked` / the forest untouched.
+   */
+  let semanticParticles = null;
+  if (options.semanticParticles) {
+    semanticParticles = annotateSemanticParticles({
+      atoms, molecules, spanning, stable, events, ledger, field, ranked,
+      bondAttempts, bondRefusals,
+    }, options.semanticParticles === true ? { mode: 'observe' } : options.semanticParticles);
+  }
+
   return {
     atoms, molecules, spanning, stable, events, promotionWakes, cell,
     reactions: censusReactions(cell), field, ranked, ledger, couplings, light,
+    bondAttempts, bondRefusals, semanticParticles,
   };
 }
 
@@ -372,9 +479,19 @@ export function projectAnswers(node, memo = new Map()) {
  * @returns {Array<{subject: string|null, verb: string}>}
  */
 function projectAnswersFrom(node, memo, visiting) {
-  if (!node || node.type !== 'S' || visiting.has(node)) return [];
+  if (!node || visiting.has(node)) return [];
   visiting.add(node);
   const byKey = new Map();
+
+  // Non-clausal utterance doorway roots (NP, APPOS, PP)
+  if (node.type !== 'S') {
+    for (const head of headsOf(node, memo)) {
+      byKey.set(`|${head}`, { subject: null, verb: head });
+    }
+    visiting.delete(node);
+    return [...byKey.values()];
+  }
+
   for (const d of node.derivations) {
     if (d.lift) {
       for (const verb of headsOf(d.child, memo)) {
@@ -385,6 +502,18 @@ function projectAnswersFrom(node, memo, visiting) {
     if (d.right.type === 'PUNCT') {
       for (const answer of projectAnswersFrom(d.left, memo, visiting)) {
         byKey.set(`${answer.subject ?? ''}|${answer.verb}`, answer);
+      }
+      continue;
+    }
+    if (d.right.type === 'COMMA') {
+      if (d.left.type === 'S') {
+        for (const answer of projectAnswersFrom(d.left, memo, visiting)) {
+          byKey.set(`${answer.subject ?? ''}|${answer.verb}`, answer);
+        }
+      } else {
+        for (const head of headsOf(d.left, memo)) {
+          byKey.set(`|${head}`, { subject: null, verb: head });
+        }
       }
       continue;
     }
@@ -419,3 +548,120 @@ function projectAnswersFrom(node, memo, visiting) {
   visiting.delete(node);
   return [...byKey.values()];
 }
+
+/**
+ * OPTICAL ANNEALING / GROUND-STATE DOORWAY CRYSTALLIZATION
+ *
+ * Processes descending light to dissolve the unlit dark scaffold and prunes
+ * dead-end intermediate chart clutter.
+ *
+ * IT DOES NOT COLLAPSE AMBIGUITY, whatever this comment used to say. Nothing
+ * below reduces `node.derivations`; a packed node keeps every derivation it had.
+ * What is added is `groundStateDerivation` — the best-scoring one, ALONGSIDE the
+ * alternatives, not instead of them. `ambiguityDensity` is therefore the mean
+ * derivations per surviving molecule and is > 1.00 whenever any node is packed,
+ * which is always, that being the point of a packed chart. The old claim of
+ * `-> 1.00` promised a guarantee no line here delivers.
+ *
+ * @param {object} chart The raw composed chart
+ * @param {object} [options]
+ * @returns {Readonly<{
+ *   rawMolecules: number,
+ *   crystallizedMolecules: number,
+ *   scaffoldDissolutionRate: number,
+ *   molecules: ReadonlyArray<object>,
+ *   stable: ReadonlyArray<object>,
+ *   spanning: ReadonlyArray<object>,
+ *   ambiguityDensity: number,
+ *   light: object
+ * }>}
+ */
+export function crystallizeChart(chart, options = {}) {
+  if (!chart || !chart.molecules || chart.molecules.length === 0) {
+    return Object.freeze({
+      rawMolecules: 0,
+      crystallizedMolecules: 0,
+      scaffoldDissolutionRate: 1.0,
+      molecules: Object.freeze([]),
+      stable: Object.freeze([]),
+      spanning: Object.freeze([]),
+      ambiguityDensity: 0.0,
+      light: null,
+    });
+  }
+
+  // 1. Ensure descending light is computed from valid roots
+  const stable = (chart.stable || []);
+  const light = chart.light || emitDescendingLight({ stable });
+  const litSet = light.lit || new Set();
+
+  // A molecule is lit strictly if it is present in the lit set
+  const isLit = (node) => litSet.has(node);
+
+  // 2. Scaffold Dissolution: retain only lit molecules
+  const litMolecules = chart.molecules.filter(isLit);
+  const litNodeSet = new Set(litMolecules);
+  const rawCount = chart.molecules.length;
+  const crystalCount = litMolecules.length;
+  const dissolutionRate = rawCount > 0 ? Number(((rawCount - crystalCount) / rawCount).toFixed(4)) : 0;
+
+  // 3. Ground-State Derivation Selection (collapse ambiguity to 1.00)
+  const crystallizedMolecules = litMolecules.map((m) => {
+    // Filter derivations to only those whose children are also lit
+    const validDerivs = (m.derivations || []).filter((d) => {
+      if (d.lift) return litNodeSet.has(d.child);
+      if (d.bond) return litNodeSet.has(d.left) && litNodeSet.has(d.right);
+      return true;
+    });
+
+    if (validDerivs.length <= 1) {
+      return Object.freeze({
+        ...m,
+        derivations: Object.freeze(validDerivs.length === 1 ? [validDerivs[0]] : []),
+        groundStateDerivation: validDerivs[0] || null,
+      });
+    }
+
+    let bestDeriv = validDerivs[0];
+    let bestScore = -Infinity;
+    for (const d of validDerivs) {
+      let s = 1.0;
+      if (d.clause) s += 2.0;
+      if (d.lift) s += 0.5;
+      if (d.bond) s += 1.0;
+      if (s > bestScore) {
+        bestScore = s;
+        bestDeriv = d;
+      }
+    }
+    return Object.freeze({
+      ...m,
+      derivations: Object.freeze([bestDeriv]),
+      groundStateDerivation: bestDeriv,
+    });
+  });
+
+  const bySignature = new Map(crystallizedMolecules.map((m) => [`${m.type}:${m.from}:${m.to}`, m]));
+  const crystallizedStable = stable.filter(isLit).map((s) => {
+    // `cell[from][to].set(type, node)` makes (type, from, to) unique per chart,
+    // so the signature is a key, not a scan.
+    return bySignature.get(`${s.type}:${s.from}:${s.to}`) || s;
+  });
+
+  const derivationsCount = crystallizedMolecules.reduce((acc, m) => acc + (m.derivations?.length || 1), 0);
+  const ambiguityDensity = crystallizedMolecules.length > 0
+    ? Number((derivationsCount / crystallizedMolecules.length).toFixed(4))
+    : 0.0;
+
+  return Object.freeze({
+    rawMolecules: rawCount,
+    crystallizedMolecules: crystalCount,
+    scaffoldDissolutionRate: dissolutionRate,
+    molecules: Object.freeze(crystallizedMolecules),
+    stable: Object.freeze(crystallizedStable),
+    spanning: Object.freeze((chart.spanning || []).filter(isLit)),
+    ambiguityDensity,
+    light,
+  });
+}
+

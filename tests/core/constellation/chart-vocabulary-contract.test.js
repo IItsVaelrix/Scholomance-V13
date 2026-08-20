@@ -85,12 +85,25 @@ const missingFromInventory = (used) => [...used].filter((c) => !inventory.has(c)
  *            pattern the theory already commits to — but it is ALSO the label a
  *            gold construction uses, so adding it edges closest to reading the
  *            answer key. Left to a human.
+ * `WRAP`   — inert bracketing marks: quotes, parens, brackets, dashes, slashes.
+ *            Added 2026-08-20 because those tokens produced NO atom at all — 196
+ *            of them across 127 of 232 failures on the gate corpus — and a token
+ *            with no atom is a hole no molecule can span across.
+ *
+ *            It is pinned here rather than added to the inventory ON PURPOSE.
+ *            `WRAP` is parser assembly, not a semantic category: it takes no
+ *            head, carries no content, and bonds symmetrically (`X+WRAP -> X`
+ *            and `WRAP+X -> X`) precisely because a bracketing mark stands on
+ *            BOTH sides of what it marks — which is also why it could not be
+ *            typed `PUNCT`, every PUNCT rule absorbing leftward. A theory of
+ *            semantic atoms is right not to have predicted it, and this test is
+ *            right to make its absence explicit rather than silent.
  */
-const KNOWN_ABSENT_FROM_INVENTORY = ['CONJADJ', 'PRON', 'PRONACC'];
+const KNOWN_ABSENT_FROM_INVENTORY = ['CONJADJ', 'PRON', 'PRONACC', 'WRAP'];
 
 describe('chart vocabulary contract', () => {
   it('pins exactly which categories the grammar uses that the theory has no atom for', () => {
-    expect(missingFromInventory(constructionCategories())).toEqual(['CONJADJ', 'PRON']);
+    expect(missingFromInventory(constructionCategories())).toEqual(['CONJADJ', 'PRON', 'WRAP']);
   });
 
   it('pins the projection spine divergence', () => {
@@ -101,7 +114,7 @@ describe('chart vocabulary contract', () => {
     expect(missingFromInventory(liftCategories())).toEqual(['PRON', 'PRONACC']);
   });
 
-  it('admits no category beyond the three that were measured', () => {
+  it('admits no category beyond the four that were measured', () => {
     const all = new Set([
       ...missingFromInventory(constructionCategories()),
       ...missingFromInventory(projectionCategories()),
@@ -133,9 +146,18 @@ describe('chart vocabulary contract', () => {
       (c) => ![c.left, c.right, c.result].every((x) => inventory.has(x))
     );
     expect(unreachable.map((c) => c.id).sort()).toEqual([
+      // The ten WRAP constructions are unreachable by synthesis BY DESIGN, and
+      // they do not cost the theory a fact the way `coord-adj-complete` does.
+      // Synthesis enumerates semantic atoms; a bracketing mark is not one. Their
+      // presence here measures the vocabulary gap honestly instead of hiding it.
+      'adj-wrap-left', 'adj-wrap-right',
       'coord-adj-bridge',
       'coord-adj-complete',
       'det-pron',
+      'n-wrap-left', 'n-wrap-right',
+      'nc-wrap-left', 'nc-wrap-right',
+      'np-wrap-left', 'np-wrap-right',
+      's-wrap-left', 's-wrap-right',
     ]);
     // At least one is claimed grammar, not scaffold — the gap costs a real fact.
     expect(unreachable.some((c) => c.status === 'grammar')).toBe(true);
