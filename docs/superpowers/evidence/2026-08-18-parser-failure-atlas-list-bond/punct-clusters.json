@@ -1,0 +1,303 @@
+{
+  "QUOTE_FINAL": {
+    "family": "QUOTE_FINAL",
+    "cases": 197,
+    "promisedUnblock": 197,
+    "lemmas": 139,
+    "examples": [
+      {
+        "caseId": "pfa-e27912435673d698",
+        "text": "' Bush fails reporter's pop quiz on international leaders",
+        "label": "punct (PUNCT -> VERB)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-e2015650cf7a7b83",
+        "text": "Hiller replied: \"No, it's four questions of four leaders in four hot spots.\" . . .",
+        "label": "punct (PUNCT -> NOUN)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-efb2821f5d81cfe1",
+        "text": "It appears this guy is going to bring stability to the country and I think that's good news for the subcontinent.\"",
+        "label": "punct (PUNCT -> VERB)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-5fe8f58ae23fa3c6",
+        "text": "I still remember him stuttering about \"the General,\" unable to remember Musharraf's name.",
+        "label": "punct (PUNCT -> NOUN)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-fa6fbefbc6511f74",
+        "text": "He obviously liked authoritarian rule better than democracy, equating dictatorship with \"stability.\"",
+        "label": "punct (PUNCT -> NOUN)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-8f6f82badc74683c",
+        "text": "In fact, you were helping them solve their problem.”",
+        "label": "punct (PUNCT -> VERB)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-adc0fc69be2904e4",
+        "text": "Earlier, Kerry said, “Just because you get an honorable discharge does not, in fact, answer that question.”",
+        "label": "punct (PUNCT -> VERB)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-5903598d35b4c604",
+        "text": "Meiring's crimes are fresh, and wave the false flag which is the \"War on Terror.\"",
+        "label": "punct (PUNCT -> NOUN)",
+        "split": "train"
+      }
+    ]
+  },
+  "APPOSITION": {
+    "family": "APPOSITION",
+    "cases": 0,
+    "promisedUnblock": 0,
+    "lemmas": 0,
+    "examples": []
+  },
+  "FRAGMENT": {
+    "family": "FRAGMENT",
+    "cases": 0,
+    "promisedUnblock": 0,
+    "lemmas": 0,
+    "examples": []
+  },
+  "PARENTHETICAL": {
+    "family": "PARENTHETICAL",
+    "cases": 213,
+    "promisedUnblock": 213,
+    "lemmas": 176,
+    "examples": [
+      {
+        "caseId": "pfa-fee6b602005a43d7",
+        "text": "[This killing of a respected cleric will be causing us trouble for years to come.]",
+        "label": "punct (PUNCT -> VERB)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-35542590fb2daffc",
+        "text": "The Chernobyl Children's Project (http://www.adiccp.org/home/default.asp) offers several ways to help the children of that region.",
+        "label": "punct (PUNCT -> PROPN)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-d2bef03b880b0606",
+        "text": "WASHINGTON (CNN) --",
+        "label": "punct (PUNCT -> PROPN)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-1e25c0000e92cc2b",
+        "text": "NEW DELHI -",
+        "label": "punct (PUNCT -> PROPN)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-ef3bf5963f050f91",
+        "text": "( Click here for source. )",
+        "label": "punct (PUNCT -> VERB)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-4dfa5576fdb6e113",
+        "text": "First driving out the Americans, then fighting the Shia back into submission (as in 1991).",
+        "label": "punct (PUNCT -> NUM)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-15736f2472c21ecc",
+        "text": "(\"At first I hid a lot.",
+        "label": "punct (PUNCT -> VERB)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-0b2e92d623e94546",
+        "text": "(Ask Terry Nichols about the Philippines.)",
+        "label": "punct (PUNCT -> VERB)",
+        "split": "train"
+      }
+    ]
+  },
+  "LIST_PUNCT": {
+    "family": "LIST_PUNCT",
+    "cases": 45,
+    "promisedUnblock": 45,
+    "lemmas": 40,
+    "examples": [
+      {
+        "caseId": "pfa-1439a6e55c3ae49e",
+        "text": "- acd]",
+        "label": "punct (PUNCT -> PROPN)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-abf051df056eab87",
+        "text": "- Simone Weil",
+        "label": "punct (PUNCT -> PROPN)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-c36a34f781bfb3b1",
+        "text": "- er",
+        "label": "punct (PUNCT -> PROPN)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-a21dd94174b3e430",
+        "text": "- redvepco.doc",
+        "label": "punct (PUNCT -> NOUN)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-cdff0c0ffb14f913",
+        "text": "- SAMPLE.DOC",
+        "label": "punct (PUNCT -> NOUN)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-22ebfe8884df9de4",
+        "text": "-Mary Little",
+        "label": "punct (PUNCT -> PROPN)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-833d24b9997cf839",
+        "text": "- Arrv. Nice around noon?",
+        "label": "punct (PUNCT -> VERB)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-ed3da20225302ba9",
+        "text": "- ld2d-#69366-1.DOC",
+        "label": "punct (PUNCT -> NOUN)",
+        "split": "train"
+      }
+    ]
+  },
+  "SENTENCE_FINAL": {
+    "family": "SENTENCE_FINAL",
+    "cases": 0,
+    "promisedUnblock": 0,
+    "lemmas": 0,
+    "examples": []
+  },
+  "HYPHEN_COMPOUND": {
+    "family": "HYPHEN_COMPOUND",
+    "cases": 241,
+    "promisedUnblock": 241,
+    "lemmas": 200,
+    "examples": [
+      {
+        "caseId": "pfa-e61840927181e91f",
+        "text": "The cells were operating in the Ghazaliyah and al-Jihad districts of the capital.",
+        "label": "punct (PUNCT -> PROPN)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-2cf24c8c0f8d9da6",
+        "text": "Speaking of Fallujah, we have only Al-Jazeera to rely on for our news from there.",
+        "label": "punct (PUNCT -> PROPN)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-cfe8b444fdcbb462",
+        "text": "This is not a post about fault-finding or assigning blame.",
+        "label": "punct (PUNCT -> NOUN)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-117cea41fa064db4",
+        "text": "Being well-informed will give you certainty and that is desirable in a world of conflicting reports.",
+        "label": "punct (PUNCT -> ADV)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-41007b71ab9c5ce0",
+        "text": "On the other hand, the US should strong-arm India and Pakistan into a final settlement of the Kashmir issue.",
+        "label": "punct (PUNCT -> ADJ)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-d28a69ecb126fc5f",
+        "text": "Of course, the sooner the US soldiers can be withdrawn in favor of less-provocative local or international forces, the better.",
+        "label": "punct (PUNCT -> ADV)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-d8f26cdf323028d0",
+        "text": "He obviously had no idea what he was talking about, though he demonstrated a number of ill-fated instincts.",
+        "label": "punct (PUNCT -> ADJ)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-ae947334b3c0e5e5",
+        "text": "The derailing of the Oslo peace process by the hard-line policies of Sharon and the Palestinian intifada has encouraged suicide bombings.",
+        "label": "punct (PUNCT -> ADJ)",
+        "split": "train"
+      }
+    ]
+  },
+  "OTHER": {
+    "family": "OTHER",
+    "cases": 62,
+    "promisedUnblock": 62,
+    "lemmas": 52,
+    "examples": [
+      {
+        "caseId": "pfa-84e4c3500ed9cc8d",
+        "text": "Judge Hughes wrote: `government knowingly used false evidence against him,' concluding `honesty comes hard to government.'",
+        "label": "punct (PUNCT -> VERB)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-4e838db8821d86ad",
+        "text": "+ As the implications of the Andaman Islands situation sink in, Indian intelligence has inevitably come under scrutiny.",
+        "label": "punct (PUNCT -> VERB)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-bbc454ee424881af",
+        "text": "An Afghan official at the meeting added, ‘’The Americans now realise that the Taliban are a bigger threat to our security than Al Qaeda.’’",
+        "label": "punct (PUNCT -> VERB)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-27dfa39c25236460",
+        "text": "‘’President Musharraf promised to help us and cooperate with us on curbing terrorist activity by the Taliban,’’ says Karzai.",
+        "label": "punct (PUNCT -> VERB)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-47d87aa0ddf2fc36",
+        "text": "‘’We have a very small number of forces in Shindand with a few helicopters,’’ says Barno.",
+        "label": "punct (PUNCT -> VERB)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-4871210c69224454",
+        "text": "=Executive Orders -",
+        "label": "punct (PUNCT -> NOUN)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-ee07a5a22e797116",
+        "text": "Second, hindsight is 20/20.",
+        "label": "punct (PUNCT -> NUM)",
+        "split": "train"
+      },
+      {
+        "caseId": "pfa-887d98edaa3ce75d",
+        "text": "<Embedded Picture (Device Independent Bitmap)>",
+        "label": "punct (PUNCT -> NOUN)",
+        "split": "train"
+      }
+    ]
+  }
+}

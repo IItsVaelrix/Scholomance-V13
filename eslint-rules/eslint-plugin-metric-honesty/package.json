@@ -1,0 +1,7 @@
+{
+  "name": "eslint-plugin-metric-honesty",
+  "version": "1.0.0",
+  "description": "Rules that stop a measurement being reported as something it is not.",
+  "main": "index.js",
+  "private": true
+}

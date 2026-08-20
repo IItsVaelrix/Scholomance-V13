@@ -58,6 +58,11 @@ describe('Grammar Valence Cyclotron', () => {
     expect(CYCLOTRON_LAWS.LIGHT_IS_MEANING_AGNOSTIC).toMatch(/meaning-agnostic/);
     expect(CYCLOTRON_LAWS.CHLOROPLAST_SENSES_THE_FIELD).toMatch(/solar-panel/);
     expect(CYCLOTRON_LAWS.MOLECULES_SELF_ORGANIZE).toMatch(/organizes/);
+    expect(CYCLOTRON_LAWS.LIGHT_ENERGY_IS_A_SHADOW).toMatch(/shadow/);
+    expect(CYCLOTRON_LAWS.COLOR_IS_NOT_A_RULE).toMatch(/not a grammatical rule/);
+    expect(CYCLOTRON_LAWS.SYNC_MUST_NOT_ERASE_LINES).toMatch(/must not replace/);
+    expect(CYCLOTRON_LAWS.COLOR_IS_NOT_A_PREDICTOR).toMatch(/does not forecast/);
+    expect(CYCLOTRON_LAWS.VACANCY_LOCK).toMatch(/locked to the vacancy/);
   });
 
   it('admits only gold-classified grammar failures and never leaks sentence text', () => {

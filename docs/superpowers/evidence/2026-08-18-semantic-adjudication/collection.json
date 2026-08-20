@@ -1,0 +1,16 @@
+{
+  "contract": "PB-SEMANTIC-ADJUDICATION-v1",
+  "seedCount": 656,
+  "opportunityCount": 560,
+  "rejected": {
+    "unbound": 1,
+    "notOpportunity": 95,
+    "byKind": {
+      "warranted": 60,
+      "unexposed-measurement": 23,
+      "flat-unwarranted": 10,
+      "dark": 2
+    }
+  },
+  "minCoverageSplit": 0.01
+}

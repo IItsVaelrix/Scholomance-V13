@@ -1,0 +1,25 @@
+{
+  "recoverable": 13,
+  "byBand": {
+    "weak": {
+      "n": 1,
+      "aligned": 1,
+      "pTopEqualsGold": 1
+    },
+    "moderate": {
+      "n": 3,
+      "aligned": 2,
+      "pTopEqualsGold": 0.6666666666666666
+    },
+    "strong": {
+      "n": 8,
+      "aligned": 1,
+      "pTopEqualsGold": 0.125
+    },
+    "very-strong": {
+      "n": 1,
+      "aligned": 0,
+      "pTopEqualsGold": 0
+    }
+  }
+}

@@ -48,6 +48,7 @@
     "build:app": "node scripts/build-production.js",
     "deploy": "bash scripts/deploy.sh",
     "lint": "eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives --quiet",
+    "lint:evidence": "eslint --no-eslintrc -c .eslintrc.evidence.json --rulesdir eslint-rules/eslint-plugin-metric-honesty/rules --no-error-on-unmatched-pattern scripts/reproduce-whitepaper-results.mjs scripts/*assay*.mjs scripts/*ablation*.mjs scripts/*falsifier*.mjs scripts/*beam*.mjs scripts/*census*.mjs scripts/*sweep*.mjs scripts/*ladder*.mjs scripts/*benchmark*.mjs scripts/*forensics*.mjs scripts/*dissection*.mjs scripts/*-report.mjs",
     "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.checkjs.json && tsc -p tsconfig.ide-targets.json",
     "test:visual": "playwright test tests/visual --project=chromium --workers=1 --reporter=line",
     "test:visual:full": "node --input-type=module -e \"import { spawnSync } from 'node:child_process'; const cmd = process.platform === 'win32' ? 'npx.cmd' : 'npx'; const result = spawnSync(cmd, ['playwright', 'test', 'tests/visual'], { stdio: 'inherit', env: { ...process.env, PW_FULL_MATRIX: 'true' } }); process.exit(result.status ?? 1);\"",

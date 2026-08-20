@@ -1,0 +1,42 @@
+{
+  "contract": "PB-TELEMETRY-HANDSHAKE-CENSUS-v1",
+  "kind": "annotate-only-spike",
+  "throwaway": true,
+  "elapsedMs": 4280,
+  "composed": 367,
+  "tally": {
+    "pairs": 2780,
+    "match": 1633,
+    "licensed": 1633,
+    "gold": 1182,
+    "attract": 1808,
+    "matchAndLicensed": 1633,
+    "matchNotLicensed": 0,
+    "licensedNotMatch": 0,
+    "matchAndGold": 1042,
+    "matchNotGold": 591,
+    "goldNotMatch": 140,
+    "attractAndGold": 1042,
+    "attractNotGold": 766,
+    "goldNotAttract": 140,
+    "matchAndAttract": 1388
+  },
+  "identity": {
+    "matchGivenLicensed": 1,
+    "licensedGivenMatch": 1,
+    "matchWithoutLicense": 0
+  },
+  "gold": {
+    "precisionMatch": 0.6381,
+    "recallMatch": 0.8816,
+    "precisionAttract": 0.5763,
+    "recallAttract": 0.8816,
+    "precisionLicensed": 0.6381,
+    "baseRate": 0.4252
+  },
+  "law": {
+    "immediatelyBond": "refused — fields may attract; admitBond remains the only bond",
+    "agendaIndependent": "reordering matching pairs cannot change admission"
+  },
+  "verdict": "RESTATEMENT — handshake match is the licensed type pair. Immediate bond would replay CKY. EM attraction is not a second grammar."
+}

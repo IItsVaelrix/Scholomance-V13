@@ -1,0 +1,283 @@
+{
+  "seed": 20260819,
+  "frozenHead": "48d31119eb80f9a1967e44e878eed9d1f7ed348e",
+  "denominator": 914,
+  "seedRegimes": {
+    "prefix": {
+      "n": 387,
+      "reach": 1429,
+      "note": "the cell's own list — shared feature, NOT independent"
+    },
+    "execution": {
+      "n": 7,
+      "reach": 1260,
+      "provenance": [
+        {
+          "file": "src/main.jsx",
+          "evidence": "index.html <script src>"
+        },
+        {
+          "file": "scripts/dev-with-collab-reuse.js",
+          "evidence": "package.json scripts.dev"
+        },
+        {
+          "file": "scripts/dev-kill.js",
+          "evidence": "package.json scripts.dev:kill"
+        },
+        {
+          "file": "codex/server/index.js",
+          "evidence": "package.json scripts.dev:server"
+        },
+        {
+          "file": "scripts/combat-relay.js",
+          "evidence": "package.json scripts.dev:relay"
+        },
+        {
+          "file": "scripts/ritual-init.js",
+          "evidence": "package.json scripts.start"
+        },
+        {
+          "file": "scripts/collab-daemon.js",
+          "evidence": "package.json scripts.start:collab-daemon"
+        }
+      ]
+    }
+  },
+  "stratifiedSample": {
+    "prefix+forward": {
+      "n": 41,
+      "agree": 41,
+      "agreement": 1,
+      "clusters": 25,
+      "clusteredCI95": [
+        1,
+        1
+      ],
+      "disagreements": []
+    },
+    "exec+forward": {
+      "n": 41,
+      "agree": 40,
+      "agreement": 0.976,
+      "clusters": 25,
+      "clusteredCI95": [
+        0.912,
+        1
+      ],
+      "disagreements": [
+        {
+          "module": "codex/core/combat.session.js",
+          "cell": "PRODUCTION_UNTESTED",
+          "indep": "STRANDED"
+        }
+      ]
+    },
+    "prefix+backward": {
+      "n": 41,
+      "agree": 41,
+      "agreement": 1,
+      "clusters": 25,
+      "clusteredCI95": [
+        1,
+        1
+      ],
+      "disagreements": []
+    },
+    "exec+backward": {
+      "n": 41,
+      "agree": 40,
+      "agreement": 0.976,
+      "clusters": 25,
+      "clusteredCI95": [
+        0.912,
+        1
+      ],
+      "disagreements": [
+        {
+          "module": "codex/core/combat.session.js",
+          "cell": "PRODUCTION_UNTESTED",
+          "indep": "STRANDED"
+        }
+      ]
+    }
+  },
+  "populationSample": {
+    "prefix+forward": {
+      "n": 120,
+      "agree": 120,
+      "agreement": 1,
+      "clusters": 46,
+      "clusteredCI95": [
+        1,
+        1
+      ],
+      "disagreements": []
+    },
+    "exec+forward": {
+      "n": 120,
+      "agree": 118,
+      "agreement": 0.983,
+      "clusters": 46,
+      "clusteredCI95": [
+        0.949,
+        1
+      ],
+      "disagreements": [
+        {
+          "module": "codex/core/immunity/cleri-probe/planner.js",
+          "cell": "DIRECTLY_PINNED",
+          "indep": "EXPERIMENTAL_UNDECLARED"
+        },
+        {
+          "module": "codex/server/services/constellation/precedent.adapter.js",
+          "cell": "DIRECTLY_PINNED",
+          "indep": "EXPERIMENTAL_UNDECLARED"
+        }
+      ]
+    },
+    "prefix+backward": {
+      "n": 120,
+      "agree": 116,
+      "agreement": 0.967,
+      "clusters": 46,
+      "clusteredCI95": [
+        0.917,
+        0.994
+      ],
+      "disagreements": [
+        {
+          "module": "codex/core/animation/presets/presetRegistry.ts",
+          "cell": "DIRECTLY_PINNED",
+          "indep": "TRANSITIVELY_EXERCISED"
+        },
+        {
+          "module": "codex/core/jit/index.js",
+          "cell": "STRANDED",
+          "indep": "EXPERIMENTAL_UNDECLARED"
+        },
+        {
+          "module": "codex/core/shared/syntax.layer.js",
+          "cell": "TRANSITIVELY_EXERCISED",
+          "indep": "DIRECTLY_PINNED"
+        },
+        {
+          "module": "codex/core/pixelbrain/semantic/index.js",
+          "cell": "TRANSITIVELY_EXERCISED",
+          "indep": "DIRECTLY_PINNED"
+        }
+      ]
+    },
+    "exec+backward": {
+      "n": 120,
+      "agree": 114,
+      "agreement": 0.95,
+      "clusters": 46,
+      "clusteredCI95": [
+        0.885,
+        0.986
+      ],
+      "disagreements": [
+        {
+          "module": "codex/core/animation/presets/presetRegistry.ts",
+          "cell": "DIRECTLY_PINNED",
+          "indep": "TRANSITIVELY_EXERCISED"
+        },
+        {
+          "module": "codex/core/jit/index.js",
+          "cell": "STRANDED",
+          "indep": "EXPERIMENTAL_UNDECLARED"
+        },
+        {
+          "module": "codex/core/immunity/cleri-probe/planner.js",
+          "cell": "DIRECTLY_PINNED",
+          "indep": "EXPERIMENTAL_UNDECLARED"
+        },
+        {
+          "module": "codex/server/services/constellation/precedent.adapter.js",
+          "cell": "DIRECTLY_PINNED",
+          "indep": "EXPERIMENTAL_UNDECLARED"
+        },
+        {
+          "module": "codex/core/shared/syntax.layer.js",
+          "cell": "TRANSITIVELY_EXERCISED",
+          "indep": "DIRECTLY_PINNED"
+        },
+        {
+          "module": "codex/core/pixelbrain/semantic/index.js",
+          "cell": "TRANSITIVELY_EXERCISED",
+          "indep": "DIRECTLY_PINNED"
+        }
+      ]
+    }
+  },
+  "F2_productionAxisOnly": {
+    "prefixSeeds": {
+      "n": 120,
+      "agree": 120,
+      "agreement": 1
+    },
+    "execSeeds": {
+      "n": 120,
+      "agree": 117,
+      "agreement": 0.975
+    }
+  },
+  "F3_audition": [
+    {
+      "module": "codex/core/constellation/audition/audition.adapter.js",
+      "cellProduction": false,
+      "execReachLive": false
+    },
+    {
+      "module": "codex/core/constellation/audition/candidates/from-compose.candidate.generator.js",
+      "cellProduction": false,
+      "execReachLive": false
+    },
+    {
+      "module": "codex/core/constellation/audition/candidates/index.js",
+      "cellProduction": false,
+      "execReachLive": false
+    },
+    {
+      "module": "codex/core/constellation/audition/index.js",
+      "cellProduction": false,
+      "execReachLive": false
+    },
+    {
+      "module": "codex/core/constellation/audition/jurors/clause-shape.juror.js",
+      "cellProduction": false,
+      "execReachLive": false
+    },
+    {
+      "module": "codex/core/constellation/audition/jurors/content-head.juror.js",
+      "cellProduction": false,
+      "execReachLive": false
+    },
+    {
+      "module": "codex/core/constellation/audition/jurors/coverage.juror.js",
+      "cellProduction": false,
+      "execReachLive": false
+    },
+    {
+      "module": "codex/core/constellation/audition/jurors/ensemble.juror.js",
+      "cellProduction": false,
+      "execReachLive": false
+    },
+    {
+      "module": "codex/core/constellation/audition/jurors/index.js",
+      "cellProduction": false,
+      "execReachLive": false
+    },
+    {
+      "module": "codex/core/constellation/audition/jurors/order.juror.js",
+      "cellProduction": false,
+      "execReachLive": false
+    },
+    {
+      "module": "codex/core/constellation/audition/schemas.js",
+      "cellProduction": false,
+      "execReachLive": false
+    }
+  ],
+  "checksum": "c96c8a4ba646c49a"
+}

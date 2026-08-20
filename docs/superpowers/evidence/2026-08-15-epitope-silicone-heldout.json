@@ -1,0 +1,165 @@
+{
+  "contract": "PB-EPITOPE-SILICONE-HELDOUT-v1",
+  "kind": "held-out-generalization",
+  "frozen": "PB-FROZEN-EPITOPE-SILICONE-v1",
+  "placeboSeed": 1397312585,
+  "placeboBonds": [
+    "V|V|V",
+    "N|ADV|N",
+    "ADV|P|ADV",
+    "V|ADJ|V",
+    "TO|MODAL|TO",
+    "DET|P|DET",
+    "DET|DET|DET",
+    "AUX|DET|DET"
+  ],
+  "corpus": {
+    "split": "UD English-EWT test",
+    "maxTokens": 20,
+    "eligible": 1715,
+    "analyzed": 1665,
+    "overlapGateSkipped": 50,
+    "threw": 0
+  },
+  "parsed": {
+    "baseline": "545/1665",
+    "treatment": "595/1665",
+    "placebo": "569/1665",
+    "failToParseTreat": 50,
+    "parseToFailTreat": 0,
+    "treatNet": 50,
+    "failToParsePlacebo": 24,
+    "parseToFailPlacebo": 0,
+    "placeboNet": 24
+  },
+  "gold": {
+    "containBase": 412,
+    "containTreat": 448,
+    "containPlacebo": 430,
+    "containDeltaTreat": 36,
+    "containDeltaPlacebo": 18,
+    "top1Base": 440,
+    "top1Treat": 480,
+    "top1Placebo": 465,
+    "top1DeltaTreat": 40,
+    "top1DeltaPlacebo": 25
+  },
+  "pressure": {
+    "eventsMedianBase": 45,
+    "eventsMedianTreat": 49,
+    "eventsMedianPlacebo": 47,
+    "eventRatio": 1.0888888888888888,
+    "moleculesMedianBase": 44,
+    "moleculesMedianTreat": 49,
+    "recPresBase": 13433,
+    "recPresTreat": 16808,
+    "recPresPlacebo": 14276,
+    "presBase": 31765,
+    "presTreat": 46928
+  },
+  "firings": {
+    "treat": 4665,
+    "treatGolded": 1883,
+    "treatFalseAttach": 2782,
+    "treatFalseAttachRate": 0.5964,
+    "placebo": 2334,
+    "placeboGolded": 1385,
+    "placeboFalseAttachRate": 0.4066,
+    "signaturesFired": 8,
+    "perSignature": {
+      "V|P|V": {
+        "sentences": 474,
+        "firings": 709,
+        "golded": 38
+      },
+      "N|P|N": {
+        "sentences": 514,
+        "firings": 1043,
+        "golded": 39
+      },
+      "ADV|MODAL|ADV": {
+        "sentences": 15,
+        "firings": 15,
+        "golded": 0
+      },
+      "V|DET|V": {
+        "sentences": 394,
+        "firings": 1053,
+        "golded": 404
+      },
+      "TO|DET|TO": {
+        "sentences": 34,
+        "firings": 51,
+        "golded": 10
+      },
+      "DET|ADV|DET": {
+        "sentences": 173,
+        "firings": 214,
+        "golded": 77
+      },
+      "DET|V|DET": {
+        "sentences": 424,
+        "firings": 1013,
+        "golded": 829
+      },
+      "AUX|ADJ|ADJ": {
+        "sentences": 266,
+        "firings": 567,
+        "golded": 486
+      }
+    },
+    "placeboPerSignature": {
+      "V|V|V": {
+        "sentences": 421,
+        "firings": 883,
+        "golded": 729
+      },
+      "N|ADV|N": {
+        "sentences": 228,
+        "firings": 444,
+        "golded": 233
+      },
+      "ADV|P|ADV": {
+        "sentences": 126,
+        "firings": 131,
+        "golded": 10
+      },
+      "V|ADJ|V": {
+        "sentences": 301,
+        "firings": 655,
+        "golded": 408
+      },
+      "TO|MODAL|TO": {
+        "sentences": 0,
+        "firings": 0,
+        "golded": 0
+      },
+      "DET|P|DET": {
+        "sentences": 23,
+        "firings": 24,
+        "golded": 0
+      },
+      "DET|DET|DET": {
+        "sentences": 49,
+        "firings": 51,
+        "golded": 3
+      },
+      "AUX|DET|DET": {
+        "sentences": 142,
+        "firings": 146,
+        "golded": 2
+      }
+    }
+  },
+  "falsifiers": {
+    "F1_treatNetNotAbovePlacebo": false,
+    "F2_containmentDeltaNonPositive": false,
+    "F3_top1DeltaNonPositive": false,
+    "F4_falseAttachAtLeastHalf": true,
+    "F5_fewerThanFourSignaturesSurvive": false,
+    "F6_eventMedianMoreThanDouble": false
+  },
+  "verdict": "MIXED — 1/6 falsifiers fired. Provisional only. Still not Grimoire law.",
+  "elapsedMs": 64126,
+  "checksum": "epitope-silicone-heldout-v1:33d1ff408d2d816e56913f6e3c66af4863ced82d83e66fc5fb0f8365a5385c5f"
+}

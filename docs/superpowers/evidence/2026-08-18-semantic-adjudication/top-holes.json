@@ -1,0 +1,36 @@
+{
+  "contract": "PB-SEMANTIC-ADJUDICATION-v1",
+  "note": "Stop here. Do not implement these predicates in this phase.",
+  "holes": [
+    {
+      "predicateFamily": "LOCATION",
+      "cases": 4,
+      "lemmas": [
+        "harbor",
+        "lie",
+        "mole",
+        "seal"
+      ],
+      "opportunity": 4.5
+    },
+    {
+      "predicateFamily": "MATERIALITY",
+      "cases": 4,
+      "lemmas": [
+        "fold",
+        "glass",
+        "mine"
+      ],
+      "opportunity": 3.25
+    },
+    {
+      "predicateFamily": "ENTITY_TYPE",
+      "cases": 2,
+      "lemmas": [
+        "bank",
+        "court"
+      ],
+      "opportunity": 2.4000000000000004
+    }
+  ]
+}

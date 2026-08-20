@@ -1,0 +1,123 @@
+{
+  "contract": "PB-UNKNOWN-KNOWN-HANDSHAKE-v1",
+  "kind": "annotate-only-spike",
+  "throwaway": true,
+  "elapsedMs": 4312,
+  "composed": 367,
+  "tally": {
+    "slots": 3472,
+    "knownSlots": 3212,
+    "silentSlots": 52,
+    "atomlessSlots": 208,
+    "unnameableSlots": 940,
+    "silentAtoms": 202,
+    "silentWithIrradiance": 169,
+    "silentWithInduced": 164,
+    "adj": 3105,
+    "knownKnown": 2732,
+    "knownUnknown": 303,
+    "unknownUnknown": 70,
+    "knownUnknownGold": 103,
+    "knownKnownGold": 1169,
+    "unknownUnknownGold": 59,
+    "knownSilent": 44,
+    "knownSilentGold": 11,
+    "knownAtomless": 259,
+    "knownAtomlessGold": 92,
+    "silentHeardKnownCall": 44,
+    "silentHeardKnownCallGold": 11
+  },
+  "rates": {
+    "pGoldKnownKnown": 0.4279,
+    "pGoldKnownUnknown": 0.3399,
+    "pGoldUnknownUnknown": 0.8429,
+    "pGoldKnownSilent": 0.25,
+    "pGoldKnownAtomless": 0.3552,
+    "silentHearRate": 0.8366,
+    "silentInducedRate": 0.8119,
+    "heardCallGold": 0.25
+  },
+  "examples": [
+    {
+      "text": "The hymn was sung at my first inaugural church service as governor .",
+      "pair": "as|governor",
+      "kinds": "silent-known",
+      "gold": [
+        "case"
+      ]
+    },
+    {
+      "text": "I -- which I try to do , as best as I possibly can .",
+      "pair": "possibly|can",
+      "kinds": "known-silent",
+      "gold": [
+        "advmod"
+      ]
+    },
+    {
+      "text": "But sometimes , of course , when Z happens after X it is because of X .",
+      "pair": "after|X",
+      "kinds": "silent-known",
+      "gold": [
+        "case"
+      ]
+    },
+    {
+      "text": "But sometimes , of course , when Z happens after X it is because of X .",
+      "pair": "because|of",
+      "kinds": "silent-known",
+      "gold": [
+        "fixed"
+      ]
+    },
+    {
+      "text": "Are you still chasing that ?",
+      "pair": "chasing|that",
+      "kinds": "known-silent",
+      "gold": [
+        "obj"
+      ]
+    },
+    {
+      "text": "Thanks to all who volunteered .",
+      "pair": "to|all",
+      "kinds": "known-silent",
+      "gold": [
+        "case"
+      ]
+    },
+    {
+      "text": "How are you ?",
+      "pair": "How|are",
+      "kinds": "silent-known",
+      "gold": [
+        "cop"
+      ]
+    },
+    {
+      "text": "So please update whatever you need to and go to",
+      "pair": "go|to",
+      "kinds": "known-silent",
+      "gold": [
+        "obl"
+      ]
+    },
+    {
+      "text": "... Nope and I am proud of it ... because my teacher have nt taught us that yet ...",
+      "pair": "...|Nope",
+      "kinds": "silent-known",
+      "gold": [
+        "punct"
+      ]
+    },
+    {
+      "text": "Sciences - principally biology but also chemistry .",
+      "pair": "principally|biology",
+      "kinds": "silent-known",
+      "gold": [
+        "advmod"
+      ]
+    }
+  ],
+  "verdict": "CONTACT — 103 gold edges sit on known↔unknown adjacencies. Silent atoms already hear (0.8366 irradiance). The missing operator is a match that is not the bond table."
+}

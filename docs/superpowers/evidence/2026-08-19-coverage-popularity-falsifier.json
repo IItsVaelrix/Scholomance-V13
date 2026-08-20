@@ -1,0 +1,74 @@
+{
+  "falsifier": "F1 — is module state a function of inbound degree (popularity) or consumer kind?",
+  "control": "degree-preserving KIND shuffle: import graph and every inbound degree held EXACTLY fixed; file->kind and file->prodSeed assignments permuted with counts preserved",
+  "seeds": 20,
+  "baseSeed": 20260819,
+  "denominator": 914,
+  "kindCounts": {
+    "PRODUCTION": 1963,
+    "DIAGNOSTIC": 28,
+    "TEST": 1124,
+    "RESEARCH": 364
+  },
+  "prodSeedCount": 387,
+  "inboundDegreeChecksum_identicalAcrossAllArms": "9ed408ee71ff5194",
+  "perState": {
+    "DIRECTLY_PINNED": {
+      "observed": 386,
+      "shuffledMean": 468.7,
+      "shuffledSD": 30.42,
+      "R_excess": -82.7,
+      "z": -2.72
+    },
+    "STRANDED": {
+      "observed": 63,
+      "shuffledMean": 55,
+      "shuffledSD": 9.4,
+      "R_excess": 8,
+      "z": 0.85
+    },
+    "TRANSITIVELY_EXERCISED": {
+      "observed": 254,
+      "shuffledMean": 273.4,
+      "shuffledSD": 24.79,
+      "R_excess": -19.4,
+      "z": -0.78
+    },
+    "EXPERIMENTAL_UNDECLARED": {
+      "observed": 174,
+      "shuffledMean": 68.6,
+      "shuffledSD": 14.52,
+      "R_excess": 105.4,
+      "z": 7.26
+    },
+    "PRODUCTION_UNTESTED": {
+      "observed": 2,
+      "shuffledMean": 18,
+      "shuffledSD": 4.29,
+      "R_excess": -16,
+      "z": -3.73
+    },
+    "WIP": {
+      "observed": 27,
+      "shuffledMean": 27,
+      "shuffledSD": 0,
+      "R_excess": 0,
+      "z": null
+    },
+    "RESEARCH_ONLY": {
+      "observed": 8,
+      "shuffledMean": 3.3,
+      "shuffledSD": 2.02,
+      "R_excess": 4.8,
+      "z": 2.35
+    }
+  },
+  "wiredFraction_DP_over_directTested": {
+    "observed": 0.6893,
+    "shuffledMean": 0.872,
+    "shuffledSD": 0.0276,
+    "R_excess": -0.1827,
+    "z": -6.61
+  },
+  "verdict_threshold": "prereg: |z| > 3 on the DP/EU split for F1 to survive"
+}

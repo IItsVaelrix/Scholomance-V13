@@ -29,6 +29,7 @@
  */
 
 import { auraCollision } from './atom-nucleus.js';
+import { vacancyLockReject } from './lawful-unknown-seed.js';
 
 export const CYCLOTRON_LAWS = Object.freeze({
   AGENDA_INDEPENDENT_ADMISSION:
@@ -45,6 +46,16 @@ export const CYCLOTRON_LAWS = Object.freeze({
     'The chloroplast is a solar-panel array. Irradiance is meaning-agnostic. Voltage is the reaction. The consumer reads who won each cell.',
   MOLECULES_SELF_ORGANIZE:
     'Voltage is charge. Rivals at one span repel. Complementary cell-winners attract. The field organizes; it does not prune.',
+  LIGHT_ENERGY_IS_A_SHADOW:
+    'Chloroplast energy is a shadow of types and the bond table. It may be inspected. It may not name, lock-replace, or predict a construction.',
+  COLOR_IS_NOT_A_RULE:
+    'A spectral fingerprint is not a grammatical rule. Type-only beat paint. Do not promote color into ranking or the bond table.',
+  SYNC_MUST_NOT_ERASE_LINES:
+    'Phase-lock and bonding/antibonding split must not replace child pigment lines. Kappa-zero beat lock/split on NP-internal family. Sync is a feature, not the paint.',
+  COLOR_IS_NOT_A_PREDICTOR:
+    'Field color does not forecast residual gold structure once the type pair is known. Type-pair plus color broke more ties than it fixed.',
+  VACANCY_LOCK:
+    'A seeded complement is locked to the vacancy that called it. The carbon product of that crystallization is an ordinary molecule.',
 });
 
 /**
@@ -162,5 +173,7 @@ export function admitBond(left, right, bond, options = {}) {
     const collision = auraCollision(left, right, bond);
     if (collision) return { ok: false, reason: collision };
   }
+  const locked = vacancyLockReject(left, right);
+  if (locked) return { ok: false, reason: locked };
   return { ok: true };
 }

@@ -20,9 +20,10 @@
 export const ATOM_INVENTORY = Object.freeze([
   // lexical / phrase
   'N', 'NC', 'NP', 'NPO', 'V', 'VP', 'ADJ', 'ADV', 'PROPN',
+  'DATE', 'CLOCK',
   // closed class
   'DET', 'P', 'CONJ', 'AUX', 'COP', 'MODAL', 'TO', 'SUB', 'REL', 'THAN',
-  'POSS', 'PRT', 'COMMA', 'PUNCT',
+  'POSS', 'PRT', 'COMMA', 'PUNCT', 'MERIDIAN',
   // derived / intermediate phrase labels the physics allows naming
   'PP', 'S', 'SBAR', 'INF', 'RELC', 'PART',
   'CONJNP', 'CONJVP', 'CONJS',
@@ -32,13 +33,13 @@ export const ATOM_INVENTORY = Object.freeze([
 /** Typically dependents when combining with content (UD content-head prior). */
 export const FUNCTION_TYPES = Object.freeze(new Set([
   'DET', 'P', 'CONJ', 'AUX', 'COP', 'MODAL', 'TO', 'SUB', 'REL', 'THAN',
-  'POSS', 'PRT', 'COMMA', 'PUNCT',
+  'POSS', 'PRT', 'COMMA', 'PUNCT', 'MERIDIAN',
 ]));
 
 /** Content / open-class projectors. */
 export const CONTENT_TYPES = Object.freeze(new Set([
   'N', 'NP', 'NPO', 'V', 'VP', 'ADJ', 'ADV', 'PROPN', 'S', 'SBAR', 'INF',
-  'RELC', 'PART', 'PP', 'APPOS',
+  'RELC', 'PART', 'PP', 'APPOS', 'DATE', 'CLOCK',
 ]));
 
 /**
@@ -109,6 +110,8 @@ const ORDER_PRIORS = [
   ['NPCOMMA', 'NP'],
   ['APPOS', 'COMMA'],
   ['SCOMMA', 'S'],
+  ['DATE', 'CLOCK'],
+  ['CLOCK', 'MERIDIAN'],
 ];
 
 /**
@@ -144,8 +147,9 @@ export function predictHead(left, right, result) {
   if (left === 'CONJ' && right === result) return 1; // discourse-initial And S
   if (left === 'CONJ') return 1; // CONJ + X → bridge headed by X
 
-  // Inversion complete: predicate heads the clause.
+  // Inversion complete: predicate heads the clause; bridge roots on auxiliary.
   if (left === 'INV') return 1;
+  if (result === 'INV') return 0;
 
   // Clause: subject + predicate → S roots on predicate.
   if (left === 'NP' && right === 'VP' && result === 'S') return 1;
@@ -208,7 +212,10 @@ export function predictResults(left, right, headIndex) {
   if (left === 'TO' && right === 'VP') out.add('INF');
 
   // Subordinator.
-  if (left === 'SUB' && right === 'S') out.add('SBAR');
+  if (left === 'SUB' && right === 'S') {
+    out.add('SBAR');
+    out.add('S');
+  }
 
   // Comparative.
   if (left === 'THAN' && right === 'NP') out.add('THANP');

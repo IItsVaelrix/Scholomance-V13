@@ -1,0 +1,10 @@
+{
+  "root": true,
+  "env": { "node": true, "es2022": true },
+  "parserOptions": { "ecmaVersion": "latest", "sourceType": "module" },
+  "rules": {
+    "containment-not-accuracy": "error",
+    "no-constant-baseline": "error",
+    "verdict-needs-dispersion": "error"
+  }
+}

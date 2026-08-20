@@ -1,0 +1,457 @@
+{
+  "contract": "PB-SEMANTIC-ADJUDICATION-v1",
+  "sealed": true,
+  "note": "Gold labels on holdout are truth, not design. Do not use to choose predicates.",
+  "rows": [
+    {
+      "caseId": "adj-bee4cfb1175509e1",
+      "gold": "current.a.3",
+      "agreement": true,
+      "failureLayer": "TYPE_I_PROBE_HOLE",
+      "predicateFamily": "LOCATION",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-6fb20ccc257af878",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-04e4f7c14bfd8039",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "strong"
+    },
+    {
+      "caseId": "adj-a48f7e126fb6606b",
+      "gold": "glass.n.2",
+      "agreement": true,
+      "failureLayer": "TYPE_I_PROBE_HOLE",
+      "predicateFamily": "MATERIALITY",
+      "ballisticsAligned": false,
+      "splitBand": "strong"
+    },
+    {
+      "caseId": "adj-2bb8234d1f827e6d",
+      "gold": "INSUFFICIENT_CONTEXT",
+      "agreement": true,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-63220a22748cf537",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-c0770db47a5d8ef8",
+      "gold": "INSUFFICIENT_CONTEXT",
+      "agreement": true,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "very-strong"
+    },
+    {
+      "caseId": "adj-dfa9c15937d36aee",
+      "gold": "INSUFFICIENT_CONTEXT",
+      "agreement": true,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-7767f6b7f69af818",
+      "gold": "oewn-03443167-n",
+      "agreement": true,
+      "failureLayer": "TYPE_I_PROBE_HOLE",
+      "predicateFamily": "MATERIALITY",
+      "ballisticsAligned": false,
+      "splitBand": "strong"
+    },
+    {
+      "caseId": "adj-4bd4c06752ae23af",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-bc7bac3a7ba93492",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-be38ec5583f0497e",
+      "gold": "INSUFFICIENT_CONTEXT",
+      "agreement": true,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "strong"
+    },
+    {
+      "caseId": "adj-1b930a164f1b09a8",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-1f13567dd2b7c396",
+      "gold": "INSUFFICIENT_CONTEXT",
+      "agreement": true,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "strong"
+    },
+    {
+      "caseId": "adj-732b184b496567c6",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "strong"
+    },
+    {
+      "caseId": "adj-27d04470df64c747",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "strong"
+    },
+    {
+      "caseId": "adj-4971fb204c78a5ed",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "weak"
+    },
+    {
+      "caseId": "adj-bb720b6a04bd98c4",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-1f01e98960d59a78",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-5af0e49cd179cb6f",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "strong"
+    },
+    {
+      "caseId": "adj-1a294bfc24ae66fc",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-0ce94c936cf655f5",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-e2e5ee3b1c1d65d2",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-7be359a35ada0593",
+      "gold": "INSUFFICIENT_CONTEXT",
+      "agreement": true,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-d655918e29d72d98",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-70bb4e78505d5a11",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-ed6082aa47ee6445",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "strong"
+    },
+    {
+      "caseId": "adj-381cf25182080549",
+      "gold": "INSUFFICIENT_CONTEXT",
+      "agreement": true,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "strong"
+    },
+    {
+      "caseId": "adj-20211325a8e63532",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "weak"
+    },
+    {
+      "caseId": "adj-1663cc7abcf34e03",
+      "gold": "oewn-01725954-v",
+      "agreement": true,
+      "failureLayer": "TYPE_IV_UNUSED_EVIDENCE",
+      "predicateFamily": "SYNTACTIC_FRAME",
+      "ballisticsAligned": true,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-f1a1588b4d72a403",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "strong"
+    },
+    {
+      "caseId": "adj-42008ecb37c54cd8",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-aa9492f5e0c80310",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "weak"
+    },
+    {
+      "caseId": "adj-a66251b427ed4dbb",
+      "gold": "INSUFFICIENT_CONTEXT",
+      "agreement": true,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-7c3840eab72b19bd",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-d2715803e02b0611",
+      "gold": "race.n.4",
+      "agreement": true,
+      "failureLayer": "TYPE_I_PROBE_HOLE",
+      "predicateFamily": "HUMANNESS",
+      "ballisticsAligned": false,
+      "splitBand": "strong"
+    },
+    {
+      "caseId": "adj-c1f736f9c218ac8c",
+      "gold": "INSUFFICIENT_CONTEXT",
+      "agreement": true,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-9e4d3426cb78c2d0",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-e07bb61a8b176cb1",
+      "gold": "INSUFFICIENT_CONTEXT",
+      "agreement": true,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "strong"
+    },
+    {
+      "caseId": "adj-10ac4bfd7a657ae8",
+      "gold": "INSUFFICIENT_CONTEXT",
+      "agreement": true,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-2e39f305601046e8",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-9c82cd184418981e",
+      "gold": "AMBIGUOUS",
+      "agreement": true,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-b53dfd729145d6b5",
+      "gold": "INSUFFICIENT_CONTEXT",
+      "agreement": true,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "strong"
+    },
+    {
+      "caseId": "adj-4951fd2bd4ee307f",
+      "gold": "INSUFFICIENT_CONTEXT",
+      "agreement": true,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-1c4eea7e00dca052",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-04e6e470bee5b115",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-8ed7beffa0eefb11",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "strong"
+    },
+    {
+      "caseId": "adj-57638ce7400194b2",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-6e9a0062e155549a",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    },
+    {
+      "caseId": "adj-8f5cdc917304eddc",
+      "gold": "AMBIGUOUS",
+      "agreement": false,
+      "failureLayer": "TYPE_II_BALLISTICS_ARTIFACT",
+      "predicateFamily": "OTHER",
+      "ballisticsAligned": false,
+      "splitBand": "moderate"
+    }
+  ]
+}

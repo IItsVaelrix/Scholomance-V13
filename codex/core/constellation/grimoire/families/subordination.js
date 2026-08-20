@@ -36,4 +36,16 @@ export const SUBORDINATION = [
     note: 'BECAUSE SHE CAME, he left — matrix heads',
     flags: ['ud-aligned'],
   }),
+  defineConstruction({
+    id: 'matrix-subordinate-fragment',
+    family: 'subordination',
+    left: 'SUB', right: 'S', result: 'S', head: 1,
+    status: S.APPROXIMATION,
+    relation: 'mark',
+    construction: 'matrix-subordinate-fragment',
+    roles: { left: 'subordinator', right: 'clause' },
+    note: 'IF SHE CONTINUES ! — Standalone insubordinate conditional / matrix fragment; content clause heads',
+    flags: ['matrix-fragment', 'discourse-initial'],
+    grades: { C: 'Y', R: 'G', H: 'G', X: 'Y' },
+  }),
 ];

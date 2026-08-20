@@ -1,0 +1,96 @@
+{
+  "contract": "PB-PARSER-FAILURE-ATLAS-v1",
+  "note": "Stop here. Do not implement these bonds in this phase. Interior ranking excludes root (* -> ROOT).",
+  "holes": [
+    {
+      "label": "root (VERB -> ROOT)",
+      "deprel": "root",
+      "failures": 539,
+      "soleCause": 473,
+      "promisedUnblock": 473,
+      "lemmas": 262
+    },
+    {
+      "label": "punct (PUNCT -> NOUN)",
+      "deprel": "punct",
+      "failures": 765,
+      "soleCause": 277,
+      "promisedUnblock": 277,
+      "lemmas": 522
+    },
+    {
+      "label": "punct (PUNCT -> PROPN)",
+      "deprel": "punct",
+      "failures": 368,
+      "soleCause": 178,
+      "promisedUnblock": 178,
+      "lemmas": 291
+    }
+  ],
+  "interiors": [
+    {
+      "label": "punct (PUNCT -> NOUN)",
+      "deprel": "punct",
+      "failures": 765,
+      "soleCause": 277,
+      "promisedUnblock": 277,
+      "lemmas": 522
+    },
+    {
+      "label": "punct (PUNCT -> PROPN)",
+      "deprel": "punct",
+      "failures": 368,
+      "soleCause": 178,
+      "promisedUnblock": 178,
+      "lemmas": 291
+    },
+    {
+      "label": "list (NUM -> NUM)",
+      "deprel": "list",
+      "failures": 182,
+      "soleCause": 172,
+      "promisedUnblock": 172,
+      "lemmas": 100
+    },
+    {
+      "label": "advmod (PART -> VERB)",
+      "deprel": "advmod",
+      "failures": 451,
+      "soleCause": 154,
+      "promisedUnblock": 154,
+      "lemmas": 231
+    },
+    {
+      "label": "punct (PUNCT -> VERB)",
+      "deprel": "punct",
+      "failures": 463,
+      "soleCause": 130,
+      "promisedUnblock": 130,
+      "lemmas": 300
+    },
+    {
+      "label": "obl (NOUN -> VERB)",
+      "deprel": "obl",
+      "failures": 321,
+      "soleCause": 130,
+      "promisedUnblock": 130,
+      "lemmas": 237
+    },
+    {
+      "label": "aux (AUX -> VERB)",
+      "deprel": "aux",
+      "failures": 345,
+      "soleCause": 120,
+      "promisedUnblock": 120,
+      "lemmas": 208
+    },
+    {
+      "label": "obj (NOUN -> VERB)",
+      "deprel": "obj",
+      "failures": 277,
+      "soleCause": 118,
+      "promisedUnblock": 118,
+      "lemmas": 184
+    }
+  ]
+}

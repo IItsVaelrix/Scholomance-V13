@@ -1,0 +1,359 @@
+{
+  "contract": "PB-EPITOPE-SILICONE-ASSAY-v1",
+  "kind": "sandbox-overfeed",
+  "throwaway": true,
+  "seed": 1397312585,
+  "elapsedMs": 4979,
+  "composed": 367,
+  "population": {
+    "proposals": 91,
+    "siliconeShaped": 83,
+    "carbonShaped": 8,
+    "siliconeGold": 11,
+    "carbonGold": 1,
+    "novelSiliconeSignatures": 8,
+    "alreadyLicensed": 17
+  },
+  "purity": {
+    "siliconeMean": 1,
+    "shuffledMean": 0.8889,
+    "promotionBar": 0.901
+  },
+  "signatures": [
+    {
+      "signature": "AUX|VP|VP",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": false,
+      "n": 8,
+      "gold": 2,
+      "deprels": {
+        "cop": 2
+      },
+      "modal": "cop",
+      "purity": 1
+    },
+    {
+      "signature": "V|P|V",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 4,
+      "gold": 2,
+      "deprels": {
+        "advmod": 2
+      },
+      "modal": "advmod",
+      "purity": 1
+    },
+    {
+      "signature": "DET|N|NP",
+      "shape": "carbon-shaped",
+      "reaction": "constructive",
+      "novel": false,
+      "n": 6,
+      "gold": 1,
+      "deprels": {
+        "punct": 1
+      },
+      "modal": "punct",
+      "purity": 1
+    },
+    {
+      "signature": "N|P|N",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 5,
+      "gold": 1,
+      "deprels": {
+        "obl": 1
+      },
+      "modal": "obl",
+      "purity": 1
+    },
+    {
+      "signature": "ADV|MODAL|ADV",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 1,
+      "gold": 1,
+      "deprels": {
+        "advmod": 1
+      },
+      "modal": "advmod",
+      "purity": 1
+    },
+    {
+      "signature": "V|DET|V",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 1,
+      "gold": 1,
+      "deprels": {
+        "obj": 1
+      },
+      "modal": "obj",
+      "purity": 1
+    },
+    {
+      "signature": "TO|DET|TO",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 1,
+      "gold": 1,
+      "deprels": {
+        "case": 1
+      },
+      "modal": "case",
+      "purity": 1
+    },
+    {
+      "signature": "DET|ADV|DET",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 1,
+      "gold": 1,
+      "deprels": {
+        "nsubj": 1
+      },
+      "modal": "nsubj",
+      "purity": 1
+    },
+    {
+      "signature": "DET|V|DET",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 1,
+      "gold": 1,
+      "deprels": {
+        "det": 1
+      },
+      "modal": "det",
+      "purity": 1
+    },
+    {
+      "signature": "AUX|ADJ|ADJ",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 1,
+      "gold": 1,
+      "deprels": {
+        "cop": 1
+      },
+      "modal": "cop",
+      "purity": 1
+    },
+    {
+      "signature": "AUX|PRONACC|AUX",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 6,
+      "gold": 0,
+      "deprels": {},
+      "modal": null,
+      "purity": 0
+    },
+    {
+      "signature": "SUB|PRONACC|SUB",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 6,
+      "gold": 0,
+      "deprels": {},
+      "modal": null,
+      "purity": 0
+    },
+    {
+      "signature": "ADJ|TO|ADJ",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 5,
+      "gold": 0,
+      "deprels": {},
+      "modal": null,
+      "purity": 0
+    },
+    {
+      "signature": "AUX|PRT|AUX",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 3,
+      "gold": 0,
+      "deprels": {},
+      "modal": null,
+      "purity": 0
+    },
+    {
+      "signature": "N|TO|N",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 3,
+      "gold": 0,
+      "deprels": {},
+      "modal": null,
+      "purity": 0
+    },
+    {
+      "signature": "PROPN|TO|PROPN",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 3,
+      "gold": 0,
+      "deprels": {},
+      "modal": null,
+      "purity": 0
+    }
+  ],
+  "novelSilicone": [
+    {
+      "signature": "V|P|V",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 4,
+      "gold": 2,
+      "deprels": {
+        "advmod": 2
+      },
+      "modal": "advmod",
+      "purity": 1
+    },
+    {
+      "signature": "N|P|N",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 5,
+      "gold": 1,
+      "deprels": {
+        "obl": 1
+      },
+      "modal": "obl",
+      "purity": 1
+    },
+    {
+      "signature": "ADV|MODAL|ADV",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 1,
+      "gold": 1,
+      "deprels": {
+        "advmod": 1
+      },
+      "modal": "advmod",
+      "purity": 1
+    },
+    {
+      "signature": "V|DET|V",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 1,
+      "gold": 1,
+      "deprels": {
+        "obj": 1
+      },
+      "modal": "obj",
+      "purity": 1
+    },
+    {
+      "signature": "TO|DET|TO",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 1,
+      "gold": 1,
+      "deprels": {
+        "case": 1
+      },
+      "modal": "case",
+      "purity": 1
+    },
+    {
+      "signature": "DET|ADV|DET",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 1,
+      "gold": 1,
+      "deprels": {
+        "nsubj": 1
+      },
+      "modal": "nsubj",
+      "purity": 1
+    },
+    {
+      "signature": "DET|V|DET",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 1,
+      "gold": 1,
+      "deprels": {
+        "det": 1
+      },
+      "modal": "det",
+      "purity": 1
+    },
+    {
+      "signature": "AUX|ADJ|ADJ",
+      "shape": "silicone-shaped",
+      "reaction": "preservative",
+      "novel": true,
+      "n": 1,
+      "gold": 1,
+      "deprels": {
+        "cop": 1
+      },
+      "modal": "cop",
+      "purity": 1
+    }
+  ],
+  "sandbox": {
+    "extraBonds": [
+      "V|P|V",
+      "N|P|N",
+      "ADV|MODAL|ADV",
+      "V|DET|V",
+      "TO|DET|TO",
+      "DET|ADV|DET",
+      "DET|V|DET",
+      "AUX|ADJ|ADJ"
+    ],
+    "sentences": 9,
+    "baselineParsed": 3,
+    "sandboxParsed": 5,
+    "sentencesThatFired": 9,
+    "firings": {
+      "V+P->V": 7,
+      "N+P->N": 9,
+      "ADV+MODAL->ADV": 1,
+      "V+DET->V": 5,
+      "TO+DET->TO": 1,
+      "DET+ADV->DET": 1,
+      "DET+V->DET": 5,
+      "AUX+ADJ->ADJ": 2
+    }
+  },
+  "falsifiers": {
+    "noGoldSilicone": false,
+    "siliconePurityNotAboveShuffle": false,
+    "novelSiliconeDidNotFire": false,
+    "carbonGoldDominates": false
+  },
+  "verdict": "SILICONE FORMED — novel preservative proposals fired in the sandbox and beat shuffled purity. Still not Grimoire law."
+}

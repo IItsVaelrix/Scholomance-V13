@@ -1,0 +1,110 @@
+{
+  "contract": "PB-SILICONE-SUPERPOSITION-ASSAY-v1",
+  "margin": 1.5,
+  "elapsedMs": 37144,
+  "n": 1665,
+  "threw": 0,
+  "parsed": {
+    "baseline": 545,
+    "raw": 595,
+    "purified": 595
+  },
+  "gold": {
+    "containBase": 412,
+    "containRaw": 448,
+    "containPure": 447,
+    "top1Base": 440,
+    "top1Raw": 480,
+    "top1Pure": 479
+  },
+  "collapse": {
+    "loci": 2971,
+    "collapsed": 579,
+    "dropped": 950,
+    "collapseRate": 0.1949
+  },
+  "firings": {
+    "raw": 4665,
+    "rawGolded": 1883,
+    "rawFalseAttach": 0.5964,
+    "pure": 3715,
+    "pureGolded": 1337,
+    "pureFalseAttach": 0.6401,
+    "rawPer": {
+      "N|P|N": {
+        "firings": 1043,
+        "golded": 39
+      },
+      "V|P|V": {
+        "firings": 709,
+        "golded": 38
+      },
+      "V|DET|V": {
+        "firings": 1053,
+        "golded": 404
+      },
+      "DET|V|DET": {
+        "firings": 1013,
+        "golded": 829
+      },
+      "DET|ADV|DET": {
+        "firings": 214,
+        "golded": 77
+      },
+      "AUX|ADJ|ADJ": {
+        "firings": 567,
+        "golded": 486
+      },
+      "TO|DET|TO": {
+        "firings": 51,
+        "golded": 10
+      },
+      "ADV|MODAL|ADV": {
+        "firings": 15,
+        "golded": 0
+      }
+    },
+    "purePer": {
+      "N|P|N": {
+        "firings": 774,
+        "golded": 33
+      },
+      "V|P|V": {
+        "firings": 684,
+        "golded": 35
+      },
+      "V|DET|V": {
+        "firings": 767,
+        "golded": 206
+      },
+      "DET|V|DET": {
+        "firings": 796,
+        "golded": 630
+      },
+      "DET|ADV|DET": {
+        "firings": 201,
+        "golded": 67
+      },
+      "AUX|ADJ|ADJ": {
+        "firings": 443,
+        "golded": 366
+      },
+      "TO|DET|TO": {
+        "firings": 35,
+        "golded": 0
+      },
+      "ADV|MODAL|ADV": {
+        "firings": 15,
+        "golded": 0
+      }
+    }
+  },
+  "falsifiers": {
+    "F1_falseAttachDidNotDrop": true,
+    "F2_containmentBelowBaseline": false,
+    "F3_nothingCollapsed": false,
+    "F4_parseBelowBaseline": false
+  },
+  "verdict": "FAILS — 1/4 falsifiers fired; superposition is not yet a purifier",
+  "checksum": "silicone-superposition-v1:65b86dea816a985597c699096abfcaeea51966ab1af4aca540491855b8afb79f"
+}

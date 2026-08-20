@@ -1,0 +1,116 @@
+{
+  "contract": "PB-GAP-ZERO-CENSUS-v1",
+  "corpus": {
+    "analysed": 395,
+    "parsed": 103,
+    "maxTokens": 20
+  },
+  "gapZeroSentences": 62,
+  "census": [
+    {
+      "type": "NP",
+      "sentences": 43,
+      "headRight": 30,
+      "headWrong": 13,
+      "noGold": 0,
+      "headAccuracy": 0.6977
+    },
+    {
+      "type": "N",
+      "sentences": 21,
+      "headRight": 10,
+      "headWrong": 11,
+      "noGold": 0,
+      "headAccuracy": 0.4762
+    },
+    {
+      "type": "NC",
+      "sentences": 11,
+      "headRight": 10,
+      "headWrong": 1,
+      "noGold": 0,
+      "headAccuracy": 0.9091
+    },
+    {
+      "type": "NPCOMMA",
+      "sentences": 11,
+      "headRight": 10,
+      "headWrong": 1,
+      "noGold": 0,
+      "headAccuracy": 0.9091
+    },
+    {
+      "type": "PROPN",
+      "sentences": 9,
+      "headRight": 9,
+      "headWrong": 0,
+      "noGold": 0,
+      "headAccuracy": 1
+    },
+    {
+      "type": "PUNCT",
+      "sentences": 2,
+      "headRight": 2,
+      "headWrong": 0,
+      "noGold": 0,
+      "headAccuracy": 1
+    },
+    {
+      "type": "PP",
+      "sentences": 2,
+      "headRight": 2,
+      "headWrong": 0,
+      "noGold": 0,
+      "headAccuracy": 1
+    },
+    {
+      "type": "SCOMMA",
+      "sentences": 2,
+      "headRight": 2,
+      "headWrong": 0,
+      "noGold": 0,
+      "headAccuracy": 1
+    },
+    {
+      "type": "SBAR",
+      "sentences": 2,
+      "headRight": 2,
+      "headWrong": 0,
+      "noGold": 0,
+      "headAccuracy": 1
+    },
+    {
+      "type": "APPOS",
+      "sentences": 3,
+      "headRight": 1,
+      "headWrong": 2,
+      "noGold": 0,
+      "headAccuracy": 0.3333
+    },
+    {
+      "type": "FRONTED",
+      "sentences": 1,
+      "headRight": 1,
+      "headWrong": 0,
+      "noGold": 0,
+      "headAccuracy": 1
+    },
+    {
+      "type": "RELC",
+      "sentences": 1,
+      "headRight": 1,
+      "headWrong": 0,
+      "noGold": 0,
+      "headAccuracy": 1
+    },
+    {
+      "type": "INV",
+      "sentences": 1,
+      "headRight": 0,
+      "headWrong": 1,
+      "noGold": 0,
+      "headAccuracy": 0
+    }
+  ],
+  "verdict": "ROOT_TYPE_GAP_PRESENT"
+}

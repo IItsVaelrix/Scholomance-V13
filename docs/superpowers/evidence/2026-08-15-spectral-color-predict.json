@@ -1,0 +1,532 @@
+{
+  "contract": "PB-SPECTRAL-COLOR-PREDICT-v1",
+  "kind": "annotate-only-spike",
+  "throwaway": true,
+  "seed": 6045712,
+  "elapsedMs": 13786,
+  "corpus": {
+    "fixture": "tests/qa/fixtures/constellation/treebank-gate.conllu",
+    "eligible": 367,
+    "composed": 367,
+    "threw": 0,
+    "maxTokens": 20
+  },
+  "population": {
+    "adjacent": 3105,
+    "pairs": 3105,
+    "ambiguousPairs": 2506,
+    "ambiguousTypePairs": 108,
+    "goldEdges": 1331
+  },
+  "topAmbiguousTypePairs": [
+    {
+      "typePair": "DET|N",
+      "n": 218,
+      "labels": {
+        "det": 125,
+        "flat": 1,
+        "none": 47,
+        "nsubj": 4,
+        "nmod": 38,
+        "advmod": 3
+      },
+      "majorityShare": 0.573
+    },
+    {
+      "typePair": "N|PUNCT",
+      "n": 169,
+      "labels": {
+        "none": 141,
+        "punct": 28
+      },
+      "majorityShare": 0.834
+    },
+    {
+      "typePair": "N|N",
+      "n": 158,
+      "labels": {
+        "amod": 42,
+        "none": 30,
+        "compound": 50,
+        "advmod": 5,
+        "obj": 8,
+        "nummod": 6,
+        "nmod": 4,
+        "flat": 2,
+        "obl": 3,
+        "advcl": 1,
+        "nsubj": 2,
+        "appos": 1,
+        "cop": 1,
+        "case": 2,
+        "conj": 1
+      },
+      "majorityShare": 0.316
+    },
+    {
+      "typePair": "N|P",
+      "n": 125,
+      "labels": {
+        "none": 124,
+        "obl": 1
+      },
+      "majorityShare": 0.992
+    },
+    {
+      "typePair": "P|DET",
+      "n": 89,
+      "labels": {
+        "none": 87,
+        "case": 2
+      },
+      "majorityShare": 0.978
+    },
+    {
+      "typePair": "P|N",
+      "n": 74,
+      "labels": {
+        "case": 38,
+        "none": 22,
+        "fixed": 1,
+        "mark": 12,
+        "advmod": 1
+      },
+      "majorityShare": 0.514
+    },
+    {
+      "typePair": "V|N",
+      "n": 70,
+      "labels": {
+        "advmod": 6,
+        "amod": 9,
+        "obj": 11,
+        "none": 21,
+        "case": 1,
+        "compound": 5,
+        "discourse": 8,
+        "csubj": 1,
+        "xcomp": 6,
+        "flat": 1,
+        "acl": 1
+      },
+      "majorityShare": 0.3
+    },
+    {
+      "typePair": "PRON|V",
+      "n": 69,
+      "labels": {
+        "nsubj": 57,
+        "none": 9,
+        "expl": 3
+      },
+      "majorityShare": 0.826
+    },
+    {
+      "typePair": "V|P",
+      "n": 68,
+      "labels": {
+        "none": 65,
+        "advmod": 1,
+        "xcomp": 1,
+        "compound": 1
+      },
+      "majorityShare": 0.956
+    },
+    {
+      "typePair": "PROPN|PROPN",
+      "n": 62,
+      "labels": {
+        "compound": 15,
+        "flat": 30,
+        "det": 2,
+        "none": 10,
+        "amod": 1,
+        "discourse": 1,
+        "vocative": 1,
+        "nmod": 2
+      },
+      "majorityShare": 0.484
+    },
+    {
+      "typePair": "V|DET",
+      "n": 60,
+      "labels": {
+        "none": 56,
+        "obj": 2,
+        "case": 1,
+        "advmod": 1
+      },
+      "majorityShare": 0.933
+    },
+    {
+      "typePair": "N|V",
+      "n": 58,
+      "labels": {
+        "none": 23,
+        "compound": 6,
+        "amod": 2,
+        "acl": 4,
+        "advmod": 5,
+        "nsubj": 13,
+        "nmod": 1,
+        "nummod": 1,
+        "aux": 1,
+        "obj": 1,
+        "obl": 1
+      },
+      "majorityShare": 0.397
+    }
+  ],
+  "assays": {
+    "allTypePair": {
+      "name": "all/type-pair",
+      "n": 3105,
+      "classes": 31,
+      "classCounts": {
+        "none": 1774,
+        "punct": 156,
+        "det": 149,
+        "nsubj": 119,
+        "case": 114,
+        "compound": 105,
+        "amod": 99,
+        "advmod": 96,
+        "obj": 73,
+        "nmod": 66,
+        "aux": 64,
+        "mark": 50
+      },
+      "majorityChance": 0.5713,
+      "losoCorrect": 2124,
+      "losoTotal": 3105,
+      "losoAccuracy": 0.6841,
+      "topConfusion": [
+        "none→none (1497)",
+        "punct→none (135)",
+        "det→det (126)",
+        "case→case (89)",
+        "nsubj→nsubj (77)",
+        "compound→compound (60)"
+      ]
+    },
+    "allColor": {
+      "name": "all/color-only",
+      "n": 3105,
+      "classes": 31,
+      "classCounts": {
+        "none": 1774,
+        "punct": 156,
+        "det": 149,
+        "nsubj": 119,
+        "case": 114,
+        "compound": 105,
+        "amod": 99,
+        "advmod": 96,
+        "obj": 73,
+        "nmod": 66,
+        "aux": 64,
+        "mark": 50
+      },
+      "majorityChance": 0.5713,
+      "losoCorrect": 794,
+      "losoTotal": 3105,
+      "losoAccuracy": 0.2557,
+      "topConfusion": [
+        "none→none (476)",
+        "none→punct (216)",
+        "none→expl (207)",
+        "none→fixed (116)",
+        "none→acl (81)",
+        "none→discourse (79)"
+      ]
+    },
+    "allHybrid": {
+      "name": "all/type-pair+color",
+      "n": 3105,
+      "classes": 31,
+      "classCounts": {
+        "none": 1774,
+        "punct": 156,
+        "det": 149,
+        "nsubj": 119,
+        "case": 114,
+        "compound": 105,
+        "amod": 99,
+        "advmod": 96,
+        "obj": 73,
+        "nmod": 66,
+        "aux": 64,
+        "mark": 50
+      },
+      "majorityChance": 0.5713,
+      "losoCorrect": 1839,
+      "losoTotal": 3105,
+      "losoAccuracy": 0.5923,
+      "topConfusion": [
+        "none→none (1344)",
+        "punct→punct (74)",
+        "none→punct (66)",
+        "punct→none (65)",
+        "none→case (62)",
+        "none→advmod (62)"
+      ]
+    },
+    "allShuffled": {
+      "name": "all/type-pair+shuffled",
+      "n": 3105,
+      "classes": 31,
+      "classCounts": {
+        "none": 1774,
+        "punct": 156,
+        "det": 149,
+        "nsubj": 119,
+        "case": 114,
+        "compound": 105,
+        "amod": 99,
+        "advmod": 96,
+        "obj": 73,
+        "nmod": 66,
+        "aux": 64,
+        "mark": 50
+      },
+      "majorityChance": 0.5713,
+      "losoCorrect": 1815,
+      "losoTotal": 3105,
+      "losoAccuracy": 0.5845,
+      "topConfusion": [
+        "none→none (1347)",
+        "none→punct (113)",
+        "punct→none (87)",
+        "nsubj→nsubj (56)",
+        "case→case (50)",
+        "punct→punct (49)"
+      ]
+    },
+    "ambigTypePair": {
+      "name": "ambig/type-pair",
+      "n": 2506,
+      "classes": 31,
+      "classCounts": {
+        "none": 1222,
+        "punct": 153,
+        "det": 148,
+        "nsubj": 119,
+        "compound": 105,
+        "amod": 99,
+        "advmod": 94,
+        "case": 92,
+        "obj": 68,
+        "nmod": 66,
+        "aux": 64,
+        "cc": 47
+      },
+      "majorityChance": 0.4876,
+      "losoCorrect": 1543,
+      "losoTotal": 2506,
+      "losoAccuracy": 0.6157,
+      "topConfusion": [
+        "none→none (945)",
+        "punct→none (132)",
+        "det→det (126)",
+        "nsubj→nsubj (77)",
+        "case→case (72)",
+        "compound→compound (60)"
+      ]
+    },
+    "ambigColor": {
+      "name": "ambig/color-only",
+      "n": 2506,
+      "classes": 31,
+      "classCounts": {
+        "none": 1222,
+        "punct": 153,
+        "det": 148,
+        "nsubj": 119,
+        "compound": 105,
+        "amod": 99,
+        "advmod": 94,
+        "case": 92,
+        "obj": 68,
+        "nmod": 66,
+        "aux": 64,
+        "cc": 47
+      },
+      "majorityChance": 0.4876,
+      "losoCorrect": 506,
+      "losoTotal": 2506,
+      "losoAccuracy": 0.2019,
+      "topConfusion": [
+        "none→none (190)",
+        "none→punct (182)",
+        "none→expl (155)",
+        "none→acl (73)",
+        "none→iobj (59)",
+        "none→discourse (54)"
+      ]
+    },
+    "ambigHybrid": {
+      "name": "ambig/type-pair+color",
+      "n": 2506,
+      "classes": 31,
+      "classCounts": {
+        "none": 1222,
+        "punct": 153,
+        "det": 148,
+        "nsubj": 119,
+        "compound": 105,
+        "amod": 99,
+        "advmod": 94,
+        "case": 92,
+        "obj": 68,
+        "nmod": 66,
+        "aux": 64,
+        "cc": 47
+      },
+      "majorityChance": 0.4876,
+      "losoCorrect": 1258,
+      "losoTotal": 2506,
+      "losoAccuracy": 0.502,
+      "topConfusion": [
+        "none→none (792)",
+        "punct→punct (74)",
+        "none→punct (66)",
+        "none→case (62)",
+        "punct→none (62)",
+        "none→advmod (62)"
+      ]
+    },
+    "ambigShuffled": {
+      "name": "ambig/type-pair+shuffled",
+      "n": 2506,
+      "classes": 31,
+      "classCounts": {
+        "none": 1222,
+        "punct": 153,
+        "det": 148,
+        "nsubj": 119,
+        "compound": 105,
+        "amod": 99,
+        "advmod": 94,
+        "case": 92,
+        "obj": 68,
+        "nmod": 66,
+        "aux": 64,
+        "cc": 47
+      },
+      "majorityChance": 0.4876,
+      "losoCorrect": 1234,
+      "losoTotal": 2506,
+      "losoAccuracy": 0.4924,
+      "topConfusion": [
+        "none→none (795)",
+        "none→punct (113)",
+        "punct→none (84)",
+        "nsubj→nsubj (56)",
+        "punct→punct (49)",
+        "det→det (47)"
+      ]
+    },
+    "edgeTypePair": {
+      "name": "edge/type-pair",
+      "n": 3105,
+      "classes": 2,
+      "classCounts": {
+        "none": 1774,
+        "edge": 1331
+      },
+      "majorityChance": 0.5713,
+      "losoCorrect": 2474,
+      "losoTotal": 3105,
+      "losoAccuracy": 0.7968,
+      "topConfusion": [
+        "none→none (1380)",
+        "edge→edge (1094)",
+        "none→edge (394)",
+        "edge→none (237)"
+      ]
+    },
+    "edgeHybrid": {
+      "name": "edge/type-pair+color",
+      "n": 3105,
+      "classes": 2,
+      "classCounts": {
+        "none": 1774,
+        "edge": 1331
+      },
+      "majorityChance": 0.5713,
+      "losoCorrect": 2290,
+      "losoTotal": 3105,
+      "losoAccuracy": 0.7375,
+      "topConfusion": [
+        "none→none (1440)",
+        "edge→edge (850)",
+        "edge→none (481)",
+        "none→edge (334)"
+      ]
+    },
+    "ambigEdgeTypePair": {
+      "name": "ambig-edge/type-pair",
+      "n": 2506,
+      "classes": 2,
+      "classCounts": {
+        "edge": 1284,
+        "none": 1222
+      },
+      "majorityChance": 0.5124,
+      "losoCorrect": 1893,
+      "losoTotal": 2506,
+      "losoAccuracy": 0.7554,
+      "topConfusion": [
+        "edge→edge (1065)",
+        "none→none (828)",
+        "none→edge (394)",
+        "edge→none (219)"
+      ]
+    },
+    "ambigEdgeHybrid": {
+      "name": "ambig-edge/type-pair+color",
+      "n": 2506,
+      "classes": 2,
+      "classCounts": {
+        "edge": 1284,
+        "none": 1222
+      },
+      "majorityChance": 0.5124,
+      "losoCorrect": 1709,
+      "losoTotal": 2506,
+      "losoAccuracy": 0.682,
+      "topConfusion": [
+        "none→none (888)",
+        "edge→edge (821)",
+        "edge→none (463)",
+        "none→edge (334)"
+      ]
+    }
+  },
+  "residuals": {
+    "all": {
+      "total": 3105,
+      "agree": 1506,
+      "colorFixes": 333,
+      "colorBreaks": 618,
+      "bothWrong": 648,
+      "net": -285
+    },
+    "ambig": {
+      "total": 2506,
+      "agree": 925,
+      "colorFixes": 333,
+      "colorBreaks": 618,
+      "bothWrong": 630,
+      "net": -285
+    }
+  },
+  "falsifiers": {
+    "typePairBeatsOrTiesHybridOnAmbig": true,
+    "shuffledBeatsOrTiesRealOnAmbig": false,
+    "colorOnlyBeatsOrTiesTypePair": false,
+    "hybridDoesNotRaiseGoldEdge": true
+  },
+  "verdict": "DEAD — color does not predict residual gold structure once the type pair is known",
+  "checksum": "color-predict-v1:b580b119077837da1443ddd9ed4cc660ffa44bb70b1e82cd7777a5b7e4fd8372"
+}

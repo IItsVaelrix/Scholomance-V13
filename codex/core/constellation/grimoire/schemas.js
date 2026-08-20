@@ -45,6 +45,7 @@ export const CONSTRUCTION_FAMILIES = Object.freeze([
   'possession',
   'punctuation',
   'inversion',
+  'list',
   'complement',
 ]);
 

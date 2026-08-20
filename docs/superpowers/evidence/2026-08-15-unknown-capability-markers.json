@@ -1,0 +1,218 @@
+{
+  "contract": "PB-UNKNOWN-CAPABILITY-ASSAY-v1",
+  "kind": "annotate-only",
+  "seed": 6045712,
+  "elapsedMs": 4586,
+  "composed": 367,
+  "population": {
+    "unknownsNextToKnown": 311,
+    "gold": 164,
+    "seeded": 158,
+    "silent": 153,
+    "epitopes": 28
+  },
+  "assay": {
+    "marker": {
+      "n": 311,
+      "gold": 164,
+      "predicted": 145,
+      "tp": 83,
+      "fp": 62,
+      "fn": 81,
+      "tn": 85,
+      "precision": 0.5724,
+      "recall": 0.5061,
+      "f1": 0.5372
+    },
+    "hearsOnly": {
+      "n": 311,
+      "gold": 164,
+      "predicted": 311,
+      "tp": 164,
+      "fp": 147,
+      "fn": 0,
+      "tn": 0,
+      "precision": 0.5273,
+      "recall": 1,
+      "f1": 0.6905
+    },
+    "shuffle": {
+      "n": 311,
+      "gold": 164,
+      "predicted": 145,
+      "tp": 74,
+      "fp": 71,
+      "fn": 90,
+      "tn": 76,
+      "precision": 0.5103,
+      "recall": 0.4512,
+      "f1": 0.479
+    },
+    "always": {
+      "n": 311,
+      "gold": 164,
+      "predicted": 311,
+      "tp": 164,
+      "fp": 147,
+      "fn": 0,
+      "tn": 0,
+      "precision": 0.5273,
+      "recall": 1,
+      "f1": 0.6905
+    },
+    "seeded": {
+      "n": 158,
+      "gold": 90,
+      "predicted": 63,
+      "tp": 42,
+      "fp": 21,
+      "fn": 48,
+      "tn": 47,
+      "precision": 0.6667,
+      "recall": 0.4667,
+      "f1": 0.549
+    },
+    "silent": {
+      "n": 153,
+      "gold": 74,
+      "predicted": 82,
+      "tp": 41,
+      "fp": 41,
+      "fn": 33,
+      "tn": 38,
+      "precision": 0.5,
+      "recall": 0.5541,
+      "f1": 0.5256
+    }
+  },
+  "topEpitopes": [
+    {
+      "id": "cap1:e2662809",
+      "tags": [
+        "hears",
+        "left-socket",
+        "answer:V:right",
+        "right-socket"
+      ],
+      "n": 19,
+      "gold": 12,
+      "purity": 0.632
+    },
+    {
+      "id": "cap1:8a5c46f9",
+      "tags": [
+        "hears",
+        "left-socket",
+        "answer:V:right",
+        "answer:AUX:right",
+        "right-socket"
+      ],
+      "n": 11,
+      "gold": 10,
+      "purity": 0.909
+    },
+    {
+      "id": "cap1:466c4721",
+      "tags": [
+        "hears",
+        "left-socket",
+        "answer:COP:right",
+        "answer:AUX:right",
+        "right-socket"
+      ],
+      "n": 15,
+      "gold": 8,
+      "purity": 0.533
+    },
+    {
+      "id": "cap1:cd9cfda7",
+      "tags": [
+        "hears",
+        "left-socket",
+        "answer:P:right",
+        "right-socket"
+      ],
+      "n": 14,
+      "gold": 8,
+      "purity": 0.571
+    },
+    {
+      "id": "cap1:1d4490e8",
+      "tags": [
+        "hears",
+        "left-socket",
+        "answer:DET:right",
+        "right-socket"
+      ],
+      "n": 10,
+      "gold": 7,
+      "purity": 0.7
+    },
+    {
+      "id": "cap1:89ffb761",
+      "tags": [
+        "hears",
+        "left-socket",
+        "answer:SUB:right",
+        "right-socket"
+      ],
+      "n": 12,
+      "gold": 5,
+      "purity": 0.417
+    },
+    {
+      "id": "cap1:62793254",
+      "tags": [
+        "hears",
+        "left-socket",
+        "answer:V:right",
+        "right-socket",
+        "answer:TO:right"
+      ],
+      "n": 8,
+      "gold": 5,
+      "purity": 0.625
+    },
+    {
+      "id": "cap1:679350b5",
+      "tags": [
+        "hears",
+        "left-socket",
+        "answer:AUX:right",
+        "right-socket"
+      ],
+      "n": 6,
+      "gold": 5,
+      "purity": 0.833
+    },
+    {
+      "id": "cap1:616ca473",
+      "tags": [
+        "hears",
+        "left-socket",
+        "answer:V:right"
+      ],
+      "n": 10,
+      "gold": 3,
+      "purity": 0.3
+    },
+    {
+      "id": "cap1:2527bf18",
+      "tags": [
+        "hears",
+        "left-socket",
+        "right-socket",
+        "answer:MODAL:right"
+      ],
+      "n": 4,
+      "gold": 3,
+      "purity": 0.75
+    }
+  ],
+  "falsifiers": {
+    "hearsOnlyF1BeatsOrTiesMarker": true,
+    "shuffleF1BeatsOrTiesMarker": false,
+    "alwaysF1BeatsOrTiesMarker": true
+  },
+  "verdict": "WEAK — markers do not beat the cheap controls; do not promote into admission"
+}

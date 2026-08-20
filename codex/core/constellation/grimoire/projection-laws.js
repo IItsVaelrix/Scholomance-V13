@@ -32,6 +32,8 @@ export const PROJECTION_TRANSITIONS = Object.freeze([
   { head: 'VP', operation: 'modify', result: 'VP', kind: 'preserve' },
   { head: 'ADJ', operation: 'modify', result: 'ADJ', kind: 'preserve' },
   { head: 'ADV', operation: 'modify', result: 'ADV', kind: 'preserve' },
+  { head: 'CLOCK', operation: 'modify', result: 'CLOCK', kind: 'preserve' },
+  { head: 'DATE', operation: 'list-append', result: 'DATE', kind: 'preserve' },
   { head: 'S', operation: 'modify', result: 'S', kind: 'preserve' },
   { head: 'PP', operation: 'modify', result: 'PP', kind: 'preserve' },
   { head: 'SBAR', operation: 'modify', result: 'SBAR', kind: 'preserve' },
@@ -160,6 +162,10 @@ export const PAIR_OPERATIONS = Object.freeze({
   'PP+S': { operation: 'front-attach', head: 1 },
   'ADV+S': { operation: 'front-attach', head: 1 },
   'FRONTED+S': { operation: 'front-attach', head: 1 },
+
+  // Timestamp list: date-shaped NUM lists clock-shaped NUM. Not NUM+NUM.
+  'CLOCK+MERIDIAN': { operation: 'modify', head: 0 },
+  'DATE+CLOCK': { operation: 'list-append', head: 0 },
 });
 
 /**
@@ -175,9 +181,11 @@ export const CONSTRUCTION_SCHEMAS = Object.freeze([
   { left: 'VP', right: 'CONJVP', result: 'VP', head: 0, construction: 'coord-complete', special: true },
   { left: 'S', right: 'CONJS', result: 'S', head: 0, construction: 'coord-complete', special: true },
   { left: 'CONJ', right: 'S', result: 'S', head: 1, construction: 'discourse-initial-and', special: true },
+  { left: 'SUB', right: 'S', result: 'S', head: 1, construction: 'matrix-subordinate-fragment', special: true },
 
   // relative / participial
   { left: 'REL', right: 'VP', result: 'RELC', head: 1, construction: 'subject-gap-relative', special: true },
+  { left: 'REL', right: 'VP', result: 'S', head: 1, construction: 'wh-subject-question', special: true },
   { left: 'NP', right: 'RELC', result: 'NP', head: 0, construction: 'noun-relative', special: true },
   { left: 'REL', right: 'S', result: 'SBAR', head: 1, construction: 'that-complement', special: true },
   { left: 'V', right: 'PP', result: 'PART', head: 0, construction: 'participial-isomer', special: true },
@@ -189,22 +197,28 @@ export const CONSTRUCTION_SCHEMAS = Object.freeze([
 
   // comma scaffolds
   { left: 'ADV', right: 'COMMA', result: 'FRONTED', head: 0, construction: 'comma-front', special: true },
+  { left: 'ADV', right: 'COMMA', result: 'S', head: 0, construction: 'salutation-closing-comma', special: true },
   { left: 'SBAR', right: 'COMMA', result: 'FRONTED', head: 0, construction: 'comma-front', special: true },
   { left: 'PP', right: 'COMMA', result: 'FRONTED', head: 0, construction: 'comma-front', special: true },
   { left: 'NP', right: 'COMMA', result: 'NPCOMMA', head: 0, construction: 'comma-np', special: true },
   { left: 'S', right: 'COMMA', result: 'SCOMMA', head: 0, construction: 'comma-s', special: true },
+  { left: 'S', right: 'COMMA', result: 'S', head: 0, construction: 'salutation-closing-comma', special: true },
   { left: 'NPCOMMA', right: 'NP', result: 'APPOS', head: 0, construction: 'apposition', special: true },
   { left: 'NPCOMMA', right: 'NP', result: 'NP', head: 0, construction: 'np-list', special: true },
   { left: 'APPOS', right: 'COMMA', result: 'NP', head: 0, construction: 'appos-close', special: true },
   { left: 'SCOMMA', right: 'S', result: 'S', head: 0, construction: 'clausal-comma-conj', special: true },
 
   // inversion
-  { left: 'MODAL', right: 'NP', result: 'INV', head: 1, construction: 'inv-bridge', special: true },
-  { left: 'AUX', right: 'NP', result: 'INV', head: 1, construction: 'inv-bridge', special: true },
-  { left: 'COP', right: 'NP', result: 'INV', head: 1, construction: 'inv-bridge', special: true },
+  { left: 'MODAL', right: 'NP', result: 'INV', head: 0, construction: 'inv-bridge', special: true },
+  { left: 'AUX', right: 'NP', result: 'INV', head: 0, construction: 'inv-bridge', special: true },
+  { left: 'COP', right: 'NP', result: 'INV', head: 0, construction: 'inv-bridge', special: true },
   { left: 'INV', right: 'VP', result: 'S', head: 1, construction: 'inv-predicate', special: true },
   { left: 'INV', right: 'ADJ', result: 'S', head: 1, construction: 'inv-predicate', special: true },
   { left: 'INV', right: 'NP', result: 'S', head: 1, construction: 'inv-predicate', special: true },
+
+  // Timestamp list. Special so a generic NUM+NUM cannot be derived.
+  { left: 'CLOCK', right: 'MERIDIAN', result: 'CLOCK', head: 0, construction: 'clock-meridian', special: true },
+  { left: 'DATE', right: 'CLOCK', result: 'DATE', head: 0, construction: 'date-clock-timestamp', special: true },
 ]);
 
 const TRANSITION_INDEX = new Map();

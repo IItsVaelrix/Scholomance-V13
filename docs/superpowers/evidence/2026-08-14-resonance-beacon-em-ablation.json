@@ -1,0 +1,58 @@
+{
+  "contract": "PB-RESONANCE-BEACON-EM-ABLATION-v1",
+  "corpus": "UD English-EWT dev (full), frozen gate lexicon",
+  "sample": {
+    "sentences": 1629,
+    "skipped": 372,
+    "threw": 0,
+    "parsed": 302,
+    "contained": 201,
+    "ambiguous": 73
+  },
+  "comparisons": [
+    {
+      "label": "ORGANIZED vs FIRST",
+      "n": 73,
+      "baseHits": 31,
+      "armHits": 30,
+      "net": -1,
+      "wins": 12,
+      "losses": 13,
+      "discordant": 25,
+      "p": 1
+    },
+    {
+      "label": "FALLBACK  vs FIRST",
+      "n": 73,
+      "baseHits": 31,
+      "armHits": 24,
+      "net": -7,
+      "wins": 12,
+      "losses": 19,
+      "discordant": 31,
+      "p": 0.28104
+    },
+    {
+      "label": "RANDOM    vs FIRST",
+      "n": 73,
+      "baseHits": 31,
+      "armHits": 23.19,
+      "net": -7.81,
+      "wins": 0,
+      "losses": 0,
+      "discordant": 0,
+      "p": 1
+    },
+    {
+      "label": "ORGANIZED vs FALLBACK",
+      "n": 73,
+      "baseHits": 24,
+      "armHits": 30,
+      "net": 6,
+      "wins": 10,
+      "losses": 4,
+      "discordant": 14,
+      "p": 0.17957
+    }
+  ]
+}

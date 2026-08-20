@@ -1,0 +1,4788 @@
+{
+  "contract": "PB-PARSER-FAILURE-ATLAS-v1",
+  "cases": 11188,
+  "plates": {
+    "LEXICAL": 234,
+    "GRAMMAR": 7801,
+    "ROOT_TYPE_MISMATCH": 1128,
+    "CONTAINMENT_MISS": 411,
+    "OVERGENERATED": 1614
+  },
+  "constructions": [
+    {
+      "label": "root (VERB -> ROOT)",
+      "deprel": "root",
+      "failures": 539,
+      "soleCause": 473,
+      "promisedUnblock": 473,
+      "lemmas": 262
+    },
+    {
+      "label": "punct (PUNCT -> NOUN)",
+      "deprel": "punct",
+      "failures": 765,
+      "soleCause": 277,
+      "promisedUnblock": 277,
+      "lemmas": 522
+    },
+    {
+      "label": "punct (PUNCT -> PROPN)",
+      "deprel": "punct",
+      "failures": 368,
+      "soleCause": 178,
+      "promisedUnblock": 178,
+      "lemmas": 291
+    },
+    {
+      "label": "root (NOUN -> ROOT)",
+      "deprel": "root",
+      "failures": 178,
+      "soleCause": 176,
+      "promisedUnblock": 176,
+      "lemmas": 150
+    },
+    {
+      "label": "list (NUM -> NUM)",
+      "deprel": "list",
+      "failures": 182,
+      "soleCause": 172,
+      "promisedUnblock": 172,
+      "lemmas": 100
+    },
+    {
+      "label": "advmod (PART -> VERB)",
+      "deprel": "advmod",
+      "failures": 451,
+      "soleCause": 154,
+      "promisedUnblock": 154,
+      "lemmas": 231
+    },
+    {
+      "label": "root (PROPN -> ROOT)",
+      "deprel": "root",
+      "failures": 138,
+      "soleCause": 135,
+      "promisedUnblock": 135,
+      "lemmas": 133
+    },
+    {
+      "label": "punct (PUNCT -> VERB)",
+      "deprel": "punct",
+      "failures": 463,
+      "soleCause": 130,
+      "promisedUnblock": 130,
+      "lemmas": 300
+    },
+    {
+      "label": "obl (NOUN -> VERB)",
+      "deprel": "obl",
+      "failures": 321,
+      "soleCause": 130,
+      "promisedUnblock": 130,
+      "lemmas": 237
+    },
+    {
+      "label": "aux (AUX -> VERB)",
+      "deprel": "aux",
+      "failures": 345,
+      "soleCause": 120,
+      "promisedUnblock": 120,
+      "lemmas": 208
+    },
+    {
+      "label": "obj (NOUN -> VERB)",
+      "deprel": "obj",
+      "failures": 277,
+      "soleCause": 118,
+      "promisedUnblock": 118,
+      "lemmas": 184
+    },
+    {
+      "label": "root (ADJ -> ROOT)",
+      "deprel": "root",
+      "failures": 110,
+      "soleCause": 105,
+      "promisedUnblock": 105,
+      "lemmas": 78
+    },
+    {
+      "label": "conj (VERB -> VERB)",
+      "deprel": "conj",
+      "failures": 248,
+      "soleCause": 96,
+      "promisedUnblock": 96,
+      "lemmas": 178
+    },
+    {
+      "label": "nmod (NOUN -> NOUN)",
+      "deprel": "nmod",
+      "failures": 186,
+      "soleCause": 91,
+      "promisedUnblock": 91,
+      "lemmas": 153
+    },
+    {
+      "label": "advcl (VERB -> VERB)",
+      "deprel": "advcl",
+      "failures": 196,
+      "soleCause": 80,
+      "promisedUnblock": 80,
+      "lemmas": 144
+    },
+    {
+      "label": "punct (PUNCT -> ADJ)",
+      "deprel": "punct",
+      "failures": 191,
+      "soleCause": 65,
+      "promisedUnblock": 65,
+      "lemmas": 156
+    },
+    {
+      "label": "conj (NOUN -> NOUN)",
+      "deprel": "conj",
+      "failures": 188,
+      "soleCause": 62,
+      "promisedUnblock": 62,
+      "lemmas": 151
+    },
+    {
+      "label": "acl (VERB -> NOUN)",
+      "deprel": "acl",
+      "failures": 122,
+      "soleCause": 61,
+      "promisedUnblock": 61,
+      "lemmas": 82
+    },
+    {
+      "label": "obj (PRON -> VERB)",
+      "deprel": "obj",
+      "failures": 137,
+      "soleCause": 59,
+      "promisedUnblock": 59,
+      "lemmas": 100
+    },
+    {
+      "label": "obl (PRON -> VERB)",
+      "deprel": "obl",
+      "failures": 108,
+      "soleCause": 54,
+      "promisedUnblock": 54,
+      "lemmas": 84
+    },
+    {
+      "label": "ccomp (VERB -> VERB)",
+      "deprel": "ccomp",
+      "failures": 101,
+      "soleCause": 46,
+      "promisedUnblock": 46,
+      "lemmas": 58
+    },
+    {
+      "label": "xcomp (VERB -> VERB)",
+      "deprel": "xcomp",
+      "failures": 93,
+      "soleCause": 46,
+      "promisedUnblock": 46,
+      "lemmas": 64
+    },
+    {
+      "label": "acl:relcl (VERB -> NOUN)",
+      "deprel": "acl:relcl",
+      "failures": 93,
+      "soleCause": 45,
+      "promisedUnblock": 45,
+      "lemmas": 75
+    },
+    {
+      "label": "punct (PUNCT -> NUM)",
+      "deprel": "punct",
+      "failures": 161,
+      "soleCause": 43,
+      "promisedUnblock": 43,
+      "lemmas": 135
+    },
+    {
+      "label": "root (PUNCT -> ROOT)",
+      "deprel": "root",
+      "failures": 39,
+      "soleCause": 39,
+      "promisedUnblock": 39,
+      "lemmas": 20
+    },
+    {
+      "label": "nsubj (NOUN -> VERB)",
+      "deprel": "nsubj",
+      "failures": 110,
+      "soleCause": 35,
+      "promisedUnblock": 35,
+      "lemmas": 93
+    },
+    {
+      "label": "cop (AUX -> ADJ)",
+      "deprel": "cop",
+      "failures": 99,
+      "soleCause": 34,
+      "promisedUnblock": 34,
+      "lemmas": 68
+    },
+    {
+      "label": "root (ADV -> ROOT)",
+      "deprel": "root",
+      "failures": 37,
+      "soleCause": 33,
+      "promisedUnblock": 33,
+      "lemmas": 18
+    },
+    {
+      "label": "advmod (ADV -> VERB)",
+      "deprel": "advmod",
+      "failures": 158,
+      "soleCause": 30,
+      "promisedUnblock": 30,
+      "lemmas": 124
+    },
+    {
+      "label": "compound (NOUN -> NOUN)",
+      "deprel": "compound",
+      "failures": 89,
+      "soleCause": 30,
+      "promisedUnblock": 30,
+      "lemmas": 80
+    },
+    {
+      "label": "root (PRON -> ROOT)",
+      "deprel": "root",
+      "failures": 32,
+      "soleCause": 30,
+      "promisedUnblock": 30,
+      "lemmas": 11
+    },
+    {
+      "label": "nmod:unmarked (NUM -> NUM)",
+      "deprel": "nmod:unmarked",
+      "failures": 68,
+      "soleCause": 29,
+      "promisedUnblock": 29,
+      "lemmas": 53
+    },
+    {
+      "label": "obl (NUM -> VERB)",
+      "deprel": "obl",
+      "failures": 100,
+      "soleCause": 28,
+      "promisedUnblock": 28,
+      "lemmas": 81
+    },
+    {
+      "label": "conj (ADJ -> ADJ)",
+      "deprel": "conj",
+      "failures": 72,
+      "soleCause": 28,
+      "promisedUnblock": 28,
+      "lemmas": 67
+    },
+    {
+      "label": "nummod (NUM -> SYM)",
+      "deprel": "nummod",
+      "failures": 73,
+      "soleCause": 27,
+      "promisedUnblock": 27,
+      "lemmas": 51
+    },
+    {
+      "label": "advcl (VERB -> ADJ)",
+      "deprel": "advcl",
+      "failures": 44,
+      "soleCause": 26,
+      "promisedUnblock": 26,
+      "lemmas": 38
+    },
+    {
+      "label": "cc (SYM -> NOUN)",
+      "deprel": "cc",
+      "failures": 46,
+      "soleCause": 25,
+      "promisedUnblock": 25,
+      "lemmas": 43
+    },
+    {
+      "label": "root (SYM -> ROOT)",
+      "deprel": "root",
+      "failures": 25,
+      "soleCause": 25,
+      "promisedUnblock": 25,
+      "lemmas": 16
+    },
+    {
+      "label": "case (SYM -> NUM)",
+      "deprel": "case",
+      "failures": 83,
+      "soleCause": 24,
+      "promisedUnblock": 24,
+      "lemmas": 52
+    },
+    {
+      "label": "nmod (PRON -> NOUN)",
+      "deprel": "nmod",
+      "failures": 50,
+      "soleCause": 24,
+      "promisedUnblock": 24,
+      "lemmas": 43
+    },
+    {
+      "label": "amod (ADJ -> NOUN)",
+      "deprel": "amod",
+      "failures": 71,
+      "soleCause": 23,
+      "promisedUnblock": 23,
+      "lemmas": 64
+    },
+    {
+      "label": "obl (NOUN -> ADJ)",
+      "deprel": "obl",
+      "failures": 52,
+      "soleCause": 22,
+      "promisedUnblock": 22,
+      "lemmas": 48
+    },
+    {
+      "label": "nmod:unmarked (NUM -> PROPN)",
+      "deprel": "nmod:unmarked",
+      "failures": 61,
+      "soleCause": 21,
+      "promisedUnblock": 21,
+      "lemmas": 52
+    },
+    {
+      "label": "nsubj (PRON -> VERB)",
+      "deprel": "nsubj",
+      "failures": 55,
+      "soleCause": 21,
+      "promisedUnblock": 21,
+      "lemmas": 47
+    },
+    {
+      "label": "discourse (SYM -> VERB)",
+      "deprel": "discourse",
+      "failures": 48,
+      "soleCause": 21,
+      "promisedUnblock": 21,
+      "lemmas": 39
+    },
+    {
+      "label": "parataxis (VERB -> VERB)",
+      "deprel": "parataxis",
+      "failures": 78,
+      "soleCause": 20,
+      "promisedUnblock": 20,
+      "lemmas": 65
+    },
+    {
+      "label": "advcl (NOUN -> VERB)",
+      "deprel": "advcl",
+      "failures": 44,
+      "soleCause": 20,
+      "promisedUnblock": 20,
+      "lemmas": 41
+    },
+    {
+      "label": "advmod (ADV -> PRON)",
+      "deprel": "advmod",
+      "failures": 44,
+      "soleCause": 20,
+      "promisedUnblock": 20,
+      "lemmas": 31
+    },
+    {
+      "label": "nsubj (NOUN -> ADJ)",
+      "deprel": "nsubj",
+      "failures": 38,
+      "soleCause": 19,
+      "promisedUnblock": 19,
+      "lemmas": 35
+    },
+    {
+      "label": "root (NUM -> ROOT)",
+      "deprel": "root",
+      "failures": 23,
+      "soleCause": 19,
+      "promisedUnblock": 19,
+      "lemmas": 19
+    },
+    {
+      "label": "nummod (NUM -> NOUN)",
+      "deprel": "nummod",
+      "failures": 62,
+      "soleCause": 18,
+      "promisedUnblock": 18,
+      "lemmas": 56
+    },
+    {
+      "label": "nmod (NUM -> NOUN)",
+      "deprel": "nmod",
+      "failures": 47,
+      "soleCause": 18,
+      "promisedUnblock": 18,
+      "lemmas": 41
+    },
+    {
+      "label": "nmod (PROPN -> NOUN)",
+      "deprel": "nmod",
+      "failures": 40,
+      "soleCause": 18,
+      "promisedUnblock": 18,
+      "lemmas": 36
+    },
+    {
+      "label": "conj (PROPN -> PROPN)",
+      "deprel": "conj",
+      "failures": 62,
+      "soleCause": 17,
+      "promisedUnblock": 17,
+      "lemmas": 58
+    },
+    {
+      "label": "conj (ADJ -> VERB)",
+      "deprel": "conj",
+      "failures": 45,
+      "soleCause": 17,
+      "promisedUnblock": 17,
+      "lemmas": 39
+    },
+    {
+      "label": "conj (VERB -> ADJ)",
+      "deprel": "conj",
+      "failures": 44,
+      "soleCause": 17,
+      "promisedUnblock": 17,
+      "lemmas": 41
+    },
+    {
+      "label": "obl:unmarked (NOUN -> VERB)",
+      "deprel": "obl:unmarked",
+      "failures": 39,
+      "soleCause": 17,
+      "promisedUnblock": 17,
+      "lemmas": 38
+    },
+    {
+      "label": "ccomp (NOUN -> VERB)",
+      "deprel": "ccomp",
+      "failures": 35,
+      "soleCause": 17,
+      "promisedUnblock": 17,
+      "lemmas": 29
+    },
+    {
+      "label": "root (INTJ -> ROOT)",
+      "deprel": "root",
+      "failures": 17,
+      "soleCause": 17,
+      "promisedUnblock": 17,
+      "lemmas": 10
+    },
+    {
+      "label": "obl (PROPN -> VERB)",
+      "deprel": "obl",
+      "failures": 47,
+      "soleCause": 16,
+      "promisedUnblock": 16,
+      "lemmas": 37
+    },
+    {
+      "label": "advcl (ADJ -> VERB)",
+      "deprel": "advcl",
+      "failures": 36,
+      "soleCause": 16,
+      "promisedUnblock": 16,
+      "lemmas": 33
+    },
+    {
+      "label": "obl (PRON -> ADJ)",
+      "deprel": "obl",
+      "failures": 35,
+      "soleCause": 16,
+      "promisedUnblock": 16,
+      "lemmas": 33
+    },
+    {
+      "label": "conj (ADV -> ADV)",
+      "deprel": "conj",
+      "failures": 26,
+      "soleCause": 16,
+      "promisedUnblock": 16,
+      "lemmas": 22
+    },
+    {
+      "label": "case (ADP -> NOUN)",
+      "deprel": "case",
+      "failures": 77,
+      "soleCause": 15,
+      "promisedUnblock": 15,
+      "lemmas": 62
+    },
+    {
+      "label": "cop (AUX -> NOUN)",
+      "deprel": "cop",
+      "failures": 51,
+      "soleCause": 15,
+      "promisedUnblock": 15,
+      "lemmas": 49
+    },
+    {
+      "label": "det (DET -> NOUN)",
+      "deprel": "det",
+      "failures": 38,
+      "soleCause": 15,
+      "promisedUnblock": 15,
+      "lemmas": 32
+    },
+    {
+      "label": "conj (VERB -> NOUN)",
+      "deprel": "conj",
+      "failures": 33,
+      "soleCause": 15,
+      "promisedUnblock": 15,
+      "lemmas": 31
+    },
+    {
+      "label": "parataxis (VERB -> NOUN)",
+      "deprel": "parataxis",
+      "failures": 32,
+      "soleCause": 15,
+      "promisedUnblock": 15,
+      "lemmas": 30
+    },
+    {
+      "label": "ccomp (ADJ -> VERB)",
+      "deprel": "ccomp",
+      "failures": 28,
+      "soleCause": 15,
+      "promisedUnblock": 15,
+      "lemmas": 18
+    },
+    {
+      "label": "advmod (PART -> ADJ)",
+      "deprel": "advmod",
+      "failures": 31,
+      "soleCause": 14,
+      "promisedUnblock": 14,
+      "lemmas": 30
+    },
+    {
+      "label": "obl (DET -> VERB)",
+      "deprel": "obl",
+      "failures": 28,
+      "soleCause": 14,
+      "promisedUnblock": 14,
+      "lemmas": 28
+    },
+    {
+      "label": "cc (CCONJ -> NOUN)",
+      "deprel": "cc",
+      "failures": 34,
+      "soleCause": 13,
+      "promisedUnblock": 13,
+      "lemmas": 34
+    },
+    {
+      "label": "nsubj (NOUN -> NOUN)",
+      "deprel": "nsubj",
+      "failures": 25,
+      "soleCause": 13,
+      "promisedUnblock": 13,
+      "lemmas": 24
+    },
+    {
+      "label": "root (AUX -> ROOT)",
+      "deprel": "root",
+      "failures": 13,
+      "soleCause": 13,
+      "promisedUnblock": 13,
+      "lemmas": 9
+    },
+    {
+      "label": "punct (PUNCT -> ADV)",
+      "deprel": "punct",
+      "failures": 52,
+      "soleCause": 12,
+      "promisedUnblock": 12,
+      "lemmas": 48
+    },
+    {
+      "label": "appos (PROPN -> NOUN)",
+      "deprel": "appos",
+      "failures": 47,
+      "soleCause": 12,
+      "promisedUnblock": 12,
+      "lemmas": 37
+    },
+    {
+      "label": "punct (PUNCT -> ADP)",
+      "deprel": "punct",
+      "failures": 40,
+      "soleCause": 12,
+      "promisedUnblock": 12,
+      "lemmas": 33
+    },
+    {
+      "label": "obj (DET -> VERB)",
+      "deprel": "obj",
+      "failures": 33,
+      "soleCause": 12,
+      "promisedUnblock": 12,
+      "lemmas": 30
+    },
+    {
+      "label": "conj (NOUN -> VERB)",
+      "deprel": "conj",
+      "failures": 29,
+      "soleCause": 12,
+      "promisedUnblock": 12,
+      "lemmas": 23
+    },
+    {
+      "label": "nsubj:pass (NOUN -> VERB)",
+      "deprel": "nsubj:pass",
+      "failures": 28,
+      "soleCause": 12,
+      "promisedUnblock": 12,
+      "lemmas": 28
+    },
+    {
+      "label": "cc (CCONJ -> PROPN)",
+      "deprel": "cc",
+      "failures": 26,
+      "soleCause": 12,
+      "promisedUnblock": 12,
+      "lemmas": 24
+    },
+    {
+      "label": "acl:relcl (VERB -> PRON)",
+      "deprel": "acl:relcl",
+      "failures": 21,
+      "soleCause": 12,
+      "promisedUnblock": 12,
+      "lemmas": 17
+    },
+    {
+      "label": "conj (ADJ -> NOUN)",
+      "deprel": "conj",
+      "failures": 19,
+      "soleCause": 12,
+      "promisedUnblock": 12,
+      "lemmas": 18
+    },
+    {
+      "label": "flat (NUM -> NOUN)",
+      "deprel": "flat",
+      "failures": 35,
+      "soleCause": 11,
+      "promisedUnblock": 11,
+      "lemmas": 29
+    },
+    {
+      "label": "punct (PUNCT -> INTJ)",
+      "deprel": "punct",
+      "failures": 19,
+      "soleCause": 11,
+      "promisedUnblock": 11,
+      "lemmas": 14
+    },
+    {
+      "label": "appos (NOUN -> NOUN)",
+      "deprel": "appos",
+      "failures": 51,
+      "soleCause": 10,
+      "promisedUnblock": 10,
+      "lemmas": 40
+    },
+    {
+      "label": "case (ADP -> PROPN)",
+      "deprel": "case",
+      "failures": 47,
+      "soleCause": 10,
+      "promisedUnblock": 10,
+      "lemmas": 23
+    },
+    {
+      "label": "list (NUM -> PROPN)",
+      "deprel": "list",
+      "failures": 38,
+      "soleCause": 10,
+      "promisedUnblock": 10,
+      "lemmas": 32
+    },
+    {
+      "label": "punct (PUNCT -> X)",
+      "deprel": "punct",
+      "failures": 35,
+      "soleCause": 10,
+      "promisedUnblock": 10,
+      "lemmas": 21
+    },
+    {
+      "label": "discourse (INTJ -> VERB)",
+      "deprel": "discourse",
+      "failures": 33,
+      "soleCause": 10,
+      "promisedUnblock": 10,
+      "lemmas": 31
+    },
+    {
+      "label": "xcomp (ADJ -> VERB)",
+      "deprel": "xcomp",
+      "failures": 28,
+      "soleCause": 10,
+      "promisedUnblock": 10,
+      "lemmas": 24
+    },
+    {
+      "label": "root (DET -> ROOT)",
+      "deprel": "root",
+      "failures": 11,
+      "soleCause": 10,
+      "promisedUnblock": 10,
+      "lemmas": 3
+    },
+    {
+      "label": "conj (NOUN -> ADJ)",
+      "deprel": "conj",
+      "failures": 27,
+      "soleCause": 9,
+      "promisedUnblock": 9,
+      "lemmas": 24
+    },
+    {
+      "label": "appos (NUM -> NOUN)",
+      "deprel": "appos",
+      "failures": 23,
+      "soleCause": 9,
+      "promisedUnblock": 9,
+      "lemmas": 19
+    },
+    {
+      "label": "case (PART -> PROPN)",
+      "deprel": "case",
+      "failures": 22,
+      "soleCause": 9,
+      "promisedUnblock": 9,
+      "lemmas": 19
+    },
+    {
+      "label": "parataxis (ADJ -> VERB)",
+      "deprel": "parataxis",
+      "failures": 20,
+      "soleCause": 9,
+      "promisedUnblock": 9,
+      "lemmas": 18
+    },
+    {
+      "label": "discourse (INTJ -> NOUN)",
+      "deprel": "discourse",
+      "failures": 18,
+      "soleCause": 9,
+      "promisedUnblock": 9,
+      "lemmas": 18
+    },
+    {
+      "label": "advmod (PART -> AUX)",
+      "deprel": "advmod",
+      "failures": 14,
+      "soleCause": 9,
+      "promisedUnblock": 9,
+      "lemmas": 10
+    },
+    {
+      "label": "obj (SYM -> VERB)",
+      "deprel": "obj",
+      "failures": 14,
+      "soleCause": 9,
+      "promisedUnblock": 9,
+      "lemmas": 13
+    },
+    {
+      "label": "appos (NOUN -> PROPN)",
+      "deprel": "appos",
+      "failures": 36,
+      "soleCause": 8,
+      "promisedUnblock": 8,
+      "lemmas": 32
+    },
+    {
+      "label": "cc (CCONJ -> VERB)",
+      "deprel": "cc",
+      "failures": 29,
+      "soleCause": 8,
+      "promisedUnblock": 8,
+      "lemmas": 29
+    },
+    {
+      "label": "parataxis (NOUN -> VERB)",
+      "deprel": "parataxis",
+      "failures": 28,
+      "soleCause": 8,
+      "promisedUnblock": 8,
+      "lemmas": 25
+    },
+    {
+      "label": "advmod (ADV -> NOUN)",
+      "deprel": "advmod",
+      "failures": 19,
+      "soleCause": 8,
+      "promisedUnblock": 8,
+      "lemmas": 19
+    },
+    {
+      "label": "nsubj (PROPN -> VERB)",
+      "deprel": "nsubj",
+      "failures": 16,
+      "soleCause": 8,
+      "promisedUnblock": 8,
+      "lemmas": 15
+    },
+    {
+      "label": "xcomp (NOUN -> VERB)",
+      "deprel": "xcomp",
+      "failures": 16,
+      "soleCause": 8,
+      "promisedUnblock": 8,
+      "lemmas": 14
+    },
+    {
+      "label": "cc (CCONJ -> ADJ)",
+      "deprel": "cc",
+      "failures": 14,
+      "soleCause": 8,
+      "promisedUnblock": 8,
+      "lemmas": 13
+    },
+    {
+      "label": "discourse (SYM -> ADJ)",
+      "deprel": "discourse",
+      "failures": 14,
+      "soleCause": 8,
+      "promisedUnblock": 8,
+      "lemmas": 11
+    },
+    {
+      "label": "mark (SCONJ -> VERB)",
+      "deprel": "mark",
+      "failures": 28,
+      "soleCause": 7,
+      "promisedUnblock": 7,
+      "lemmas": 28
+    },
+    {
+      "label": "advcl (AUX -> VERB)",
+      "deprel": "advcl",
+      "failures": 23,
+      "soleCause": 7,
+      "promisedUnblock": 7,
+      "lemmas": 21
+    },
+    {
+      "label": "obl (ADJ -> VERB)",
+      "deprel": "obl",
+      "failures": 22,
+      "soleCause": 7,
+      "promisedUnblock": 7,
+      "lemmas": 22
+    },
+    {
+      "label": "advcl (AUX -> ADJ)",
+      "deprel": "advcl",
+      "failures": 12,
+      "soleCause": 7,
+      "promisedUnblock": 7,
+      "lemmas": 11
+    },
+    {
+      "label": "ccomp (VERB -> ADJ)",
+      "deprel": "ccomp",
+      "failures": 12,
+      "soleCause": 7,
+      "promisedUnblock": 7,
+      "lemmas": 9
+    },
+    {
+      "label": "punct (PUNCT -> PUNCT)",
+      "deprel": "punct",
+      "failures": 8,
+      "soleCause": 7,
+      "promisedUnblock": 7,
+      "lemmas": 5
+    },
+    {
+      "label": "flat (PROPN -> PROPN)",
+      "deprel": "flat",
+      "failures": 24,
+      "soleCause": 6,
+      "promisedUnblock": 6,
+      "lemmas": 22
+    },
+    {
+      "label": "nmod:poss (NOUN -> NOUN)",
+      "deprel": "nmod:poss",
+      "failures": 21,
+      "soleCause": 6,
+      "promisedUnblock": 6,
+      "lemmas": 21
+    },
+    {
+      "label": "compound (SYM -> NOUN)",
+      "deprel": "compound",
+      "failures": 18,
+      "soleCause": 6,
+      "promisedUnblock": 6,
+      "lemmas": 16
+    },
+    {
+      "label": "nsubj (PRON -> ADJ)",
+      "deprel": "nsubj",
+      "failures": 17,
+      "soleCause": 6,
+      "promisedUnblock": 6,
+      "lemmas": 15
+    },
+    {
+      "label": "aux (AUX -> ADJ)",
+      "deprel": "aux",
+      "failures": 16,
+      "soleCause": 6,
+      "promisedUnblock": 6,
+      "lemmas": 15
+    },
+    {
+      "label": "cc (SYM -> PROPN)",
+      "deprel": "cc",
+      "failures": 15,
+      "soleCause": 6,
+      "promisedUnblock": 6,
+      "lemmas": 15
+    },
+    {
+      "label": "obl (NOUN -> NOUN)",
+      "deprel": "obl",
+      "failures": 14,
+      "soleCause": 6,
+      "promisedUnblock": 6,
+      "lemmas": 14
+    },
+    {
+      "label": "cc (SYM -> VERB)",
+      "deprel": "cc",
+      "failures": 11,
+      "soleCause": 6,
+      "promisedUnblock": 6,
+      "lemmas": 11
+    },
+    {
+      "label": "advmod (SYM -> NUM)",
+      "deprel": "advmod",
+      "failures": 9,
+      "soleCause": 6,
+      "promisedUnblock": 6,
+      "lemmas": 8
+    },
+    {
+      "label": "compound (NUM -> PROPN)",
+      "deprel": "compound",
+      "failures": 7,
+      "soleCause": 6,
+      "promisedUnblock": 6,
+      "lemmas": 7
+    },
+    {
+      "label": "nmod:unmarked (NOUN -> NOUN)",
+      "deprel": "nmod:unmarked",
+      "failures": 7,
+      "soleCause": 6,
+      "promisedUnblock": 6,
+      "lemmas": 7
+    },
+    {
+      "label": "nmod:unmarked (NUM -> NOUN)",
+      "deprel": "nmod:unmarked",
+      "failures": 7,
+      "soleCause": 6,
+      "promisedUnblock": 6,
+      "lemmas": 6
+    },
+    {
+      "label": "flat (NUM -> PROPN)",
+      "deprel": "flat",
+      "failures": 34,
+      "soleCause": 5,
+      "promisedUnblock": 5,
+      "lemmas": 15
+    },
+    {
+      "label": "nmod (NUM -> PROPN)",
+      "deprel": "nmod",
+      "failures": 25,
+      "soleCause": 5,
+      "promisedUnblock": 5,
+      "lemmas": 23
+    },
+    {
+      "label": "punct (PUNCT -> SYM)",
+      "deprel": "punct",
+      "failures": 21,
+      "soleCause": 5,
+      "promisedUnblock": 5,
+      "lemmas": 16
+    },
+    {
+      "label": "advmod (PART -> NOUN)",
+      "deprel": "advmod",
+      "failures": 15,
+      "soleCause": 5,
+      "promisedUnblock": 5,
+      "lemmas": 13
+    },
+    {
+      "label": "aux (AUX -> NOUN)",
+      "deprel": "aux",
+      "failures": 15,
+      "soleCause": 5,
+      "promisedUnblock": 5,
+      "lemmas": 15
+    },
+    {
+      "label": "obj (PROPN -> VERB)",
+      "deprel": "obj",
+      "failures": 15,
+      "soleCause": 5,
+      "promisedUnblock": 5,
+      "lemmas": 15
+    },
+    {
+      "label": "advcl (PROPN -> VERB)",
+      "deprel": "advcl",
+      "failures": 11,
+      "soleCause": 5,
+      "promisedUnblock": 5,
+      "lemmas": 11
+    },
+    {
+      "label": "advcl (VERB -> NOUN)",
+      "deprel": "advcl",
+      "failures": 10,
+      "soleCause": 5,
+      "promisedUnblock": 5,
+      "lemmas": 10
+    },
+    {
+      "label": "compound (PROPN -> PROPN)",
+      "deprel": "compound",
+      "failures": 10,
+      "soleCause": 5,
+      "promisedUnblock": 5,
+      "lemmas": 9
+    },
+    {
+      "label": "list (NOUN -> PROPN)",
+      "deprel": "list",
+      "failures": 10,
+      "soleCause": 5,
+      "promisedUnblock": 5,
+      "lemmas": 5
+    },
+    {
+      "label": "obl (ADJ -> ADJ)",
+      "deprel": "obl",
+      "failures": 10,
+      "soleCause": 5,
+      "promisedUnblock": 5,
+      "lemmas": 10
+    },
+    {
+      "label": "acl:relcl (AUX -> PRON)",
+      "deprel": "acl:relcl",
+      "failures": 9,
+      "soleCause": 5,
+      "promisedUnblock": 5,
+      "lemmas": 8
+    },
+    {
+      "label": "advcl (ADJ -> ADV)",
+      "deprel": "advcl",
+      "failures": 9,
+      "soleCause": 5,
+      "promisedUnblock": 5,
+      "lemmas": 9
+    },
+    {
+      "label": "parataxis (NOUN -> NOUN)",
+      "deprel": "parataxis",
+      "failures": 9,
+      "soleCause": 5,
+      "promisedUnblock": 5,
+      "lemmas": 9
+    },
+    {
+      "label": "ccomp (PROPN -> VERB)",
+      "deprel": "ccomp",
+      "failures": 6,
+      "soleCause": 5,
+      "promisedUnblock": 5,
+      "lemmas": 5
+    },
+    {
+      "label": "nmod:unmarked (NOUN -> NUM)",
+      "deprel": "nmod:unmarked",
+      "failures": 6,
+      "soleCause": 5,
+      "promisedUnblock": 5,
+      "lemmas": 6
+    },
+    {
+      "label": "compound (SYM -> SYM)",
+      "deprel": "compound",
+      "failures": 5,
+      "soleCause": 5,
+      "promisedUnblock": 5,
+      "lemmas": 1
+    },
+    {
+      "label": "advmod (ADV -> ADJ)",
+      "deprel": "advmod",
+      "failures": 25,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 23
+    },
+    {
+      "label": "conj (NUM -> NUM)",
+      "deprel": "conj",
+      "failures": 18,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 18
+    },
+    {
+      "label": "discourse (SYM -> NOUN)",
+      "deprel": "discourse",
+      "failures": 14,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 14
+    },
+    {
+      "label": "nmod (DET -> NOUN)",
+      "deprel": "nmod",
+      "failures": 14,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 13
+    },
+    {
+      "label": "conj (NOUN -> PROPN)",
+      "deprel": "conj",
+      "failures": 13,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 13
+    },
+    {
+      "label": "obl (ADV -> VERB)",
+      "deprel": "obl",
+      "failures": 12,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 12
+    },
+    {
+      "label": "acl:relcl (ADJ -> NOUN)",
+      "deprel": "acl:relcl",
+      "failures": 11,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 11
+    },
+    {
+      "label": "case (SYM -> NOUN)",
+      "deprel": "case",
+      "failures": 10,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 10
+    },
+    {
+      "label": "nmod (ADJ -> NOUN)",
+      "deprel": "nmod",
+      "failures": 10,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 10
+    },
+    {
+      "label": "nsubj (DET -> VERB)",
+      "deprel": "nsubj",
+      "failures": 10,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 9
+    },
+    {
+      "label": "nsubj:outer (NOUN -> VERB)",
+      "deprel": "nsubj:outer",
+      "failures": 10,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 8
+    },
+    {
+      "label": "obj (NUM -> VERB)",
+      "deprel": "obj",
+      "failures": 10,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 10
+    },
+    {
+      "label": "acl:relcl (VERB -> PROPN)",
+      "deprel": "acl:relcl",
+      "failures": 9,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 9
+    },
+    {
+      "label": "cc (ADV -> NOUN)",
+      "deprel": "cc",
+      "failures": 9,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 9
+    },
+    {
+      "label": "obl (NOUN -> ADV)",
+      "deprel": "obl",
+      "failures": 9,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 7
+    },
+    {
+      "label": "aux (AUX -> ADV)",
+      "deprel": "aux",
+      "failures": 8,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 6
+    },
+    {
+      "label": "parataxis (ADJ -> NOUN)",
+      "deprel": "parataxis",
+      "failures": 7,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 7
+    },
+    {
+      "label": "appos (VERB -> NOUN)",
+      "deprel": "appos",
+      "failures": 6,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 5
+    },
+    {
+      "label": "nmod (NOUN -> NUM)",
+      "deprel": "nmod",
+      "failures": 6,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 6
+    },
+    {
+      "label": "nsubj (PRON -> NOUN)",
+      "deprel": "nsubj",
+      "failures": 6,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 6
+    },
+    {
+      "label": "advcl (NOUN -> ADJ)",
+      "deprel": "advcl",
+      "failures": 5,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 5
+    },
+    {
+      "label": "conj (ADV -> NOUN)",
+      "deprel": "conj",
+      "failures": 5,
+      "soleCause": 4,
+      "promisedUnblock": 4,
+      "lemmas": 5
+    },
+    {
+      "label": "compound (NUM -> NUM)",
+      "deprel": "compound",
+      "failures": 33,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 6
+    },
+    {
+      "label": "case (ADJ -> NOUN)",
+      "deprel": "case",
+      "failures": 29,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 27
+    },
+    {
+      "label": "cc (SYM -> CCONJ)",
+      "deprel": "cc",
+      "failures": 14,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 12
+    },
+    {
+      "label": "advmod (ADV -> ADV)",
+      "deprel": "advmod",
+      "failures": 12,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 11
+    },
+    {
+      "label": "compound (PROPN -> NOUN)",
+      "deprel": "compound",
+      "failures": 12,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 12
+    },
+    {
+      "label": "obj (ADJ -> VERB)",
+      "deprel": "obj",
+      "failures": 12,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 12
+    },
+    {
+      "label": "parataxis (VERB -> ADJ)",
+      "deprel": "parataxis",
+      "failures": 12,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 12
+    },
+    {
+      "label": "cop (AUX -> ADV)",
+      "deprel": "cop",
+      "failures": 11,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 9
+    },
+    {
+      "label": "advcl (ADJ -> ADJ)",
+      "deprel": "advcl",
+      "failures": 10,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 10
+    },
+    {
+      "label": "case (ADP -> NUM)",
+      "deprel": "case",
+      "failures": 10,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 9
+    },
+    {
+      "label": "nmod (PRON -> PRON)",
+      "deprel": "nmod",
+      "failures": 10,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 10
+    },
+    {
+      "label": "appos (PROPN -> PROPN)",
+      "deprel": "appos",
+      "failures": 9,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 9
+    },
+    {
+      "label": "punct (PUNCT -> DET)",
+      "deprel": "punct",
+      "failures": 9,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 9
+    },
+    {
+      "label": "conj (PRON -> PROPN)",
+      "deprel": "conj",
+      "failures": 8,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 6
+    },
+    {
+      "label": "obl:unmarked (SYM -> ADJ)",
+      "deprel": "obl:unmarked",
+      "failures": 8,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 8
+    },
+    {
+      "label": "advcl (VERB -> ADV)",
+      "deprel": "advcl",
+      "failures": 7,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 7
+    },
+    {
+      "label": "nmod (PRON -> DET)",
+      "deprel": "nmod",
+      "failures": 7,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 7
+    },
+    {
+      "label": "obl:agent (NOUN -> VERB)",
+      "deprel": "obl:agent",
+      "failures": 7,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 7
+    },
+    {
+      "label": "advmod (ADV -> NUM)",
+      "deprel": "advmod",
+      "failures": 6,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 5
+    },
+    {
+      "label": "ccomp (ADV -> VERB)",
+      "deprel": "ccomp",
+      "failures": 6,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 5
+    },
+    {
+      "label": "discourse (INTJ -> ADJ)",
+      "deprel": "discourse",
+      "failures": 6,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 6
+    },
+    {
+      "label": "nmod (NOUN -> PRON)",
+      "deprel": "nmod",
+      "failures": 6,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 6
+    },
+    {
+      "label": "nmod (NOUN -> PROPN)",
+      "deprel": "nmod",
+      "failures": 6,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 5
+    },
+    {
+      "label": "nsubj (DET -> ADJ)",
+      "deprel": "nsubj",
+      "failures": 6,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 6
+    },
+    {
+      "label": "advcl (PRON -> VERB)",
+      "deprel": "advcl",
+      "failures": 5,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 5
+    },
+    {
+      "label": "appos (NUM -> SYM)",
+      "deprel": "appos",
+      "failures": 5,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 1
+    },
+    {
+      "label": "conj (AUX -> VERB)",
+      "deprel": "conj",
+      "failures": 5,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 5
+    },
+    {
+      "label": "cop (AUX -> VERB)",
+      "deprel": "cop",
+      "failures": 5,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 5
+    },
+    {
+      "label": "discourse (INTJ -> ADV)",
+      "deprel": "discourse",
+      "failures": 5,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 5
+    },
+    {
+      "label": "acl (VERB -> PRON)",
+      "deprel": "acl",
+      "failures": 4,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 4
+    },
+    {
+      "label": "acl:relcl (ADP -> NOUN)",
+      "deprel": "acl:relcl",
+      "failures": 4,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 4
+    },
+    {
+      "label": "advmod (ADV -> AUX)",
+      "deprel": "advmod",
+      "failures": 3,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 3
+    },
+    {
+      "label": "appos (NOUN -> ADV)",
+      "deprel": "appos",
+      "failures": 3,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 2
+    },
+    {
+      "label": "aux (AUX -> ADP)",
+      "deprel": "aux",
+      "failures": 3,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 3
+    },
+    {
+      "label": "ccomp (NUM -> VERB)",
+      "deprel": "ccomp",
+      "failures": 3,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 3
+    },
+    {
+      "label": "conj (AUX -> AUX)",
+      "deprel": "conj",
+      "failures": 3,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 3
+    },
+    {
+      "label": "goeswith (X -> PROPN)",
+      "deprel": "goeswith",
+      "failures": 3,
+      "soleCause": 3,
+      "promisedUnblock": 3,
+      "lemmas": 1
+    },
+    {
+      "label": "list (PROPN -> PROPN)",
+      "deprel": "list",
+      "failures": 31,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 16
+    },
+    {
+      "label": "flat (X -> X)",
+      "deprel": "flat",
+      "failures": 25,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 13
+    },
+    {
+      "label": "compound (NUM -> NOUN)",
+      "deprel": "compound",
+      "failures": 23,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 15
+    },
+    {
+      "label": "punct (PUNCT -> PRON)",
+      "deprel": "punct",
+      "failures": 18,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 17
+    },
+    {
+      "label": "advmod (ADJ -> NUM)",
+      "deprel": "advmod",
+      "failures": 11,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 11
+    },
+    {
+      "label": "obl (SYM -> VERB)",
+      "deprel": "obl",
+      "failures": 11,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 11
+    },
+    {
+      "label": "acl:relcl (NOUN -> NOUN)",
+      "deprel": "acl:relcl",
+      "failures": 10,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 9
+    },
+    {
+      "label": "case (PART -> NOUN)",
+      "deprel": "case",
+      "failures": 10,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 10
+    },
+    {
+      "label": "parataxis (PROPN -> VERB)",
+      "deprel": "parataxis",
+      "failures": 8,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 8
+    },
+    {
+      "label": "advcl (AUX -> ADV)",
+      "deprel": "advcl",
+      "failures": 7,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 6
+    },
+    {
+      "label": "aux:pass (AUX -> VERB)",
+      "deprel": "aux:pass",
+      "failures": 7,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 7
+    },
+    {
+      "label": "conj (ADV -> VERB)",
+      "deprel": "conj",
+      "failures": 7,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 7
+    },
+    {
+      "label": "conj (PRON -> VERB)",
+      "deprel": "conj",
+      "failures": 7,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 6
+    },
+    {
+      "label": "cop (AUX -> PROPN)",
+      "deprel": "cop",
+      "failures": 7,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 6
+    },
+    {
+      "label": "list (NOUN -> NOUN)",
+      "deprel": "list",
+      "failures": 7,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 6
+    },
+    {
+      "label": "obl (NUM -> ADJ)",
+      "deprel": "obl",
+      "failures": 7,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 7
+    },
+    {
+      "label": "xcomp (VERB -> ADJ)",
+      "deprel": "xcomp",
+      "failures": 7,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 7
+    },
+    {
+      "label": "acl (ADJ -> NOUN)",
+      "deprel": "acl",
+      "failures": 6,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 6
+    },
+    {
+      "label": "advmod (ADV -> PROPN)",
+      "deprel": "advmod",
+      "failures": 6,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 6
+    },
+    {
+      "label": "csubj (VERB -> ADJ)",
+      "deprel": "csubj",
+      "failures": 6,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 5
+    },
+    {
+      "label": "flat (NUM -> SYM)",
+      "deprel": "flat",
+      "failures": 6,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 5
+    },
+    {
+      "label": "nsubj:pass (PRON -> VERB)",
+      "deprel": "nsubj:pass",
+      "failures": 6,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 6
+    },
+    {
+      "label": "obl (PRON -> ADV)",
+      "deprel": "obl",
+      "failures": 6,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 5
+    },
+    {
+      "label": "obl:unmarked (PRON -> VERB)",
+      "deprel": "obl:unmarked",
+      "failures": 6,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 5
+    },
+    {
+      "label": "advcl (ADV -> VERB)",
+      "deprel": "advcl",
+      "failures": 5,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 5
+    },
+    {
+      "label": "cc (SYM -> ADJ)",
+      "deprel": "cc",
+      "failures": 5,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 4
+    },
+    {
+      "label": "conj (NOUN -> ADV)",
+      "deprel": "conj",
+      "failures": 5,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 5
+    },
+    {
+      "label": "nmod:poss (PRON -> NOUN)",
+      "deprel": "nmod:poss",
+      "failures": 5,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 4
+    },
+    {
+      "label": "parataxis (ADJ -> ADJ)",
+      "deprel": "parataxis",
+      "failures": 5,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 5
+    },
+    {
+      "label": "vocative (PROPN -> NOUN)",
+      "deprel": "vocative",
+      "failures": 5,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 5
+    },
+    {
+      "label": "cc (ADV -> PROPN)",
+      "deprel": "cc",
+      "failures": 4,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 4
+    },
+    {
+      "label": "conj (DET -> DET)",
+      "deprel": "conj",
+      "failures": 4,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 3
+    },
+    {
+      "label": "discourse (SYM -> PROPN)",
+      "deprel": "discourse",
+      "failures": 4,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 4
+    },
+    {
+      "label": "nsubj (NOUN -> PROPN)",
+      "deprel": "nsubj",
+      "failures": 4,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 4
+    },
+    {
+      "label": "obl:unmarked (NOUN -> ADJ)",
+      "deprel": "obl:unmarked",
+      "failures": 4,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 4
+    },
+    {
+      "label": "obl:unmarked (NOUN -> ADV)",
+      "deprel": "obl:unmarked",
+      "failures": 4,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 4
+    },
+    {
+      "label": "obl:unmarked (NUM -> VERB)",
+      "deprel": "obl:unmarked",
+      "failures": 4,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 4
+    },
+    {
+      "label": "parataxis (NOUN -> ADJ)",
+      "deprel": "parataxis",
+      "failures": 4,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 4
+    },
+    {
+      "label": "acl (AUX -> NOUN)",
+      "deprel": "acl",
+      "failures": 3,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 3
+    },
+    {
+      "label": "acl:relcl (ADV -> NOUN)",
+      "deprel": "acl:relcl",
+      "failures": 3,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 3
+    },
+    {
+      "label": "acl:relcl (VERB -> DET)",
+      "deprel": "acl:relcl",
+      "failures": 3,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 3
+    },
+    {
+      "label": "advcl (PROPN -> NOUN)",
+      "deprel": "advcl",
+      "failures": 3,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 3
+    },
+    {
+      "label": "appos (NOUN -> PRON)",
+      "deprel": "appos",
+      "failures": 3,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 3
+    },
+    {
+      "label": "aux (AUX -> PROPN)",
+      "deprel": "aux",
+      "failures": 3,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 3
+    },
+    {
+      "label": "mark (SCONJ -> NOUN)",
+      "deprel": "mark",
+      "failures": 3,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 3
+    },
+    {
+      "label": "nmod (NOUN -> DET)",
+      "deprel": "nmod",
+      "failures": 3,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 3
+    },
+    {
+      "label": "nmod (PROPN -> NUM)",
+      "deprel": "nmod",
+      "failures": 3,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 2
+    },
+    {
+      "label": "nsubj (ADJ -> NOUN)",
+      "deprel": "nsubj",
+      "failures": 3,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 3
+    },
+    {
+      "label": "nsubj (PRON -> ADV)",
+      "deprel": "nsubj",
+      "failures": 3,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 2
+    },
+    {
+      "label": "obj (VERB -> VERB)",
+      "deprel": "obj",
+      "failures": 3,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 3
+    },
+    {
+      "label": "orphan (NOUN -> NOUN)",
+      "deprel": "orphan",
+      "failures": 3,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 2
+    },
+    {
+      "label": "parataxis (VERB -> ADV)",
+      "deprel": "parataxis",
+      "failures": 3,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 3
+    },
+    {
+      "label": "appos (PROPN -> PRON)",
+      "deprel": "appos",
+      "failures": 2,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 2
+    },
+    {
+      "label": "appos (SYM -> PROPN)",
+      "deprel": "appos",
+      "failures": 2,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 2
+    },
+    {
+      "label": "conj (DET -> ADJ)",
+      "deprel": "conj",
+      "failures": 2,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 2
+    },
+    {
+      "label": "conj (DET -> PRON)",
+      "deprel": "conj",
+      "failures": 2,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 2
+    },
+    {
+      "label": "nmod (PRON -> NUM)",
+      "deprel": "nmod",
+      "failures": 2,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 2
+    },
+    {
+      "label": "parataxis (NUM -> VERB)",
+      "deprel": "parataxis",
+      "failures": 2,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 2
+    },
+    {
+      "label": "vocative (NOUN -> INTJ)",
+      "deprel": "vocative",
+      "failures": 2,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 2
+    },
+    {
+      "label": "vocative (NOUN -> NOUN)",
+      "deprel": "vocative",
+      "failures": 2,
+      "soleCause": 2,
+      "promisedUnblock": 2,
+      "lemmas": 2
+    },
+    {
+      "label": "appos (NUM -> PROPN)",
+      "deprel": "appos",
+      "failures": 31,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 13
+    },
+    {
+      "label": "conj (PRON -> PRON)",
+      "deprel": "conj",
+      "failures": 10,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 8
+    },
+    {
+      "label": "conj (ADP -> ADP)",
+      "deprel": "conj",
+      "failures": 8,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 8
+    },
+    {
+      "label": "conj (PROPN -> NOUN)",
+      "deprel": "conj",
+      "failures": 8,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 8
+    },
+    {
+      "label": "nsubj (ADJ -> VERB)",
+      "deprel": "nsubj",
+      "failures": 7,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 7
+    },
+    {
+      "label": "obl (DET -> ADJ)",
+      "deprel": "obl",
+      "failures": 7,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 7
+    },
+    {
+      "label": "obl (DET -> ADV)",
+      "deprel": "obl",
+      "failures": 7,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 7
+    },
+    {
+      "label": "punct (PUNCT -> AUX)",
+      "deprel": "punct",
+      "failures": 7,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 7
+    },
+    {
+      "label": "case (ADV -> NOUN)",
+      "deprel": "case",
+      "failures": 6,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 6
+    },
+    {
+      "label": "conj (PRON -> NOUN)",
+      "deprel": "conj",
+      "failures": 6,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 6
+    },
+    {
+      "label": "nmod (PROPN -> PROPN)",
+      "deprel": "nmod",
+      "failures": 6,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 6
+    },
+    {
+      "label": "punct (PUNCT -> CCONJ)",
+      "deprel": "punct",
+      "failures": 6,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 6
+    },
+    {
+      "label": "cc (CCONJ -> NUM)",
+      "deprel": "cc",
+      "failures": 5,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 5
+    },
+    {
+      "label": "conj (PART -> ADJ)",
+      "deprel": "conj",
+      "failures": 5,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 5
+    },
+    {
+      "label": "nsubj (NUM -> VERB)",
+      "deprel": "nsubj",
+      "failures": 5,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 5
+    },
+    {
+      "label": "obl (PROPN -> ADJ)",
+      "deprel": "obl",
+      "failures": 5,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 5
+    },
+    {
+      "label": "advcl (NOUN -> NOUN)",
+      "deprel": "advcl",
+      "failures": 4,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 4
+    },
+    {
+      "label": "advmod (ADP -> NUM)",
+      "deprel": "advmod",
+      "failures": 4,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 4
+    },
+    {
+      "label": "case (ADP -> PRON)",
+      "deprel": "case",
+      "failures": 4,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 4
+    },
+    {
+      "label": "cc (SYM -> PRON)",
+      "deprel": "cc",
+      "failures": 4,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 4
+    },
+    {
+      "label": "iobj (NOUN -> VERB)",
+      "deprel": "iobj",
+      "failures": 4,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 4
+    },
+    {
+      "label": "nmod (NUM -> NUM)",
+      "deprel": "nmod",
+      "failures": 4,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 4
+    },
+    {
+      "label": "obl (NUM -> NOUN)",
+      "deprel": "obl",
+      "failures": 4,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 4
+    },
+    {
+      "label": "vocative (PROPN -> VERB)",
+      "deprel": "vocative",
+      "failures": 4,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 4
+    },
+    {
+      "label": "acl:relcl (AUX -> NOUN)",
+      "deprel": "acl:relcl",
+      "failures": 3,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 3
+    },
+    {
+      "label": "advcl (ADV -> ADV)",
+      "deprel": "advcl",
+      "failures": 3,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "amod (ADJ -> PROPN)",
+      "deprel": "amod",
+      "failures": 3,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 3
+    },
+    {
+      "label": "appos (ADJ -> NOUN)",
+      "deprel": "appos",
+      "failures": 3,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "case (VERB -> PROPN)",
+      "deprel": "case",
+      "failures": 3,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 3
+    },
+    {
+      "label": "compound (SYM -> NUM)",
+      "deprel": "compound",
+      "failures": 3,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 3
+    },
+    {
+      "label": "conj (ADJ -> PROPN)",
+      "deprel": "conj",
+      "failures": 3,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 3
+    },
+    {
+      "label": "cop (AUX -> NUM)",
+      "deprel": "cop",
+      "failures": 3,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 3
+    },
+    {
+      "label": "discourse (INTJ -> AUX)",
+      "deprel": "discourse",
+      "failures": 3,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "nsubj (NOUN -> ADV)",
+      "deprel": "nsubj",
+      "failures": 3,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "nsubj (NUM -> ADJ)",
+      "deprel": "nsubj",
+      "failures": 3,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 3
+    },
+    {
+      "label": "obl (ADV -> ADJ)",
+      "deprel": "obl",
+      "failures": 3,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 3
+    },
+    {
+      "label": "obl (PRON -> NOUN)",
+      "deprel": "obl",
+      "failures": 3,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 3
+    },
+    {
+      "label": "parataxis (VERB -> PROPN)",
+      "deprel": "parataxis",
+      "failures": 3,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 3
+    },
+    {
+      "label": "xcomp (AUX -> VERB)",
+      "deprel": "xcomp",
+      "failures": 3,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 3
+    },
+    {
+      "label": "acl (NOUN -> NOUN)",
+      "deprel": "acl",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "acl (NOUN -> PROPN)",
+      "deprel": "acl",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "acl:relcl (ADJ -> PRON)",
+      "deprel": "acl:relcl",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "acl:relcl (VERB -> ADJ)",
+      "deprel": "acl:relcl",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "advcl (ADJ -> NOUN)",
+      "deprel": "advcl",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "advmod (ADJ -> VERB)",
+      "deprel": "advmod",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "advmod (ADP -> VERB)",
+      "deprel": "advmod",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "advmod (NOUN -> ADJ)",
+      "deprel": "advmod",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "advmod (PART -> ADV)",
+      "deprel": "advmod",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "advmod (PART -> PRON)",
+      "deprel": "advmod",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "amod (ADJ -> PRON)",
+      "deprel": "amod",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "amod (NUM -> PROPN)",
+      "deprel": "amod",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "amod (SYM -> SYM)",
+      "deprel": "amod",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "aux (AUX -> AUX)",
+      "deprel": "aux",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "case (SYM -> PROPN)",
+      "deprel": "case",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "cc (CCONJ -> ADV)",
+      "deprel": "cc",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "ccomp (NOUN -> ADV)",
+      "deprel": "ccomp",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "compound (NOUN -> SYM)",
+      "deprel": "compound",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "compound (X -> X)",
+      "deprel": "compound",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "conj (ADJ -> ADV)",
+      "deprel": "conj",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "conj (DET -> PROPN)",
+      "deprel": "conj",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "conj (DET -> VERB)",
+      "deprel": "conj",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "conj (PROPN -> VERB)",
+      "deprel": "conj",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "conj (SYM -> SYM)",
+      "deprel": "conj",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "det:predet (DET -> NOUN)",
+      "deprel": "det:predet",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "discourse (INTJ -> INTJ)",
+      "deprel": "discourse",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "flat (NOUN -> NOUN)",
+      "deprel": "flat",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "mark (ADJ -> NOUN)",
+      "deprel": "mark",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "nmod (DET -> PRON)",
+      "deprel": "nmod",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "nsubj (PRON -> AUX)",
+      "deprel": "nsubj",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "nsubj (PROPN -> ADJ)",
+      "deprel": "nsubj",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "nsubj:outer (PRON -> VERB)",
+      "deprel": "nsubj:outer",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "nsubj:pass (SYM -> VERB)",
+      "deprel": "nsubj:pass",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "nummod (NUM -> PROPN)",
+      "deprel": "nummod",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "obj (PRON -> ADJ)",
+      "deprel": "obj",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "obl (ADV -> NOUN)",
+      "deprel": "obl",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "obl (PROPN -> NOUN)",
+      "deprel": "obl",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "obl (SYM -> ADV)",
+      "deprel": "obl",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "obl:unmarked (ADJ -> ADJ)",
+      "deprel": "obl:unmarked",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "parataxis (ADV -> VERB)",
+      "deprel": "parataxis",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "parataxis (AUX -> ADJ)",
+      "deprel": "parataxis",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "parataxis (NOUN -> PROPN)",
+      "deprel": "parataxis",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "parataxis (VERB -> NUM)",
+      "deprel": "parataxis",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "punct (PUNCT -> SCONJ)",
+      "deprel": "punct",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "xcomp (ADV -> VERB)",
+      "deprel": "xcomp",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "xcomp (PROPN -> VERB)",
+      "deprel": "xcomp",
+      "failures": 2,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 2
+    },
+    {
+      "label": "acl (VERB -> NUM)",
+      "deprel": "acl",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "acl (VERB -> SYM)",
+      "deprel": "acl",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "acl:relcl (ADP -> ADJ)",
+      "deprel": "acl:relcl",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "acl:relcl (ADP -> PRON)",
+      "deprel": "acl:relcl",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "acl:relcl (ADV -> PRON)",
+      "deprel": "acl:relcl",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "acl:relcl (NOUN -> NUM)",
+      "deprel": "acl:relcl",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "acl:relcl (NOUN -> PRON)",
+      "deprel": "acl:relcl",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "advcl (ADV -> ADJ)",
+      "deprel": "advcl",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "advcl (INTJ -> PRON)",
+      "deprel": "advcl",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "advcl (NOUN -> PROPN)",
+      "deprel": "advcl",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "advcl:relcl (VERB -> ADJ)",
+      "deprel": "advcl:relcl",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "advmod (ADP -> NOUN)",
+      "deprel": "advmod",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "appos (PROPN -> ADV)",
+      "deprel": "appos",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "appos (VERB -> ADJ)",
+      "deprel": "appos",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "case (ADP -> ADJ)",
+      "deprel": "case",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "case (ADP -> ADV)",
+      "deprel": "case",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "case (ADP -> SYM)",
+      "deprel": "case",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "cc (ADV -> ADV)",
+      "deprel": "cc",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "cc (CCONJ -> PRON)",
+      "deprel": "cc",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "cc (SYM -> ADV)",
+      "deprel": "cc",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "ccomp (VERB -> AUX)",
+      "deprel": "ccomp",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "compound (VERB -> NOUN)",
+      "deprel": "compound",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "compound (X -> PROPN)",
+      "deprel": "compound",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "conj (ADP -> PROPN)",
+      "deprel": "conj",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "conj (AUX -> NOUN)",
+      "deprel": "conj",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "conj (AUX -> PRON)",
+      "deprel": "conj",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "conj (INTJ -> INTJ)",
+      "deprel": "conj",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "conj (NOUN -> SYM)",
+      "deprel": "conj",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "conj (PRON -> ADV)",
+      "deprel": "conj",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "conj (PROPN -> NUM)",
+      "deprel": "conj",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "conj (VERB -> AUX)",
+      "deprel": "conj",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "cop (AUX -> SYM)",
+      "deprel": "cop",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "csubj (NOUN -> ADJ)",
+      "deprel": "csubj",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "csubj (VERB -> NOUN)",
+      "deprel": "csubj",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "discourse (ADJ -> ADJ)",
+      "deprel": "discourse",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "discourse (ADV -> NUM)",
+      "deprel": "discourse",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "discourse (INTJ -> DET)",
+      "deprel": "discourse",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "discourse (SYM -> ADV)",
+      "deprel": "discourse",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "discourse (SYM -> SYM)",
+      "deprel": "discourse",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "goeswith (X -> PRON)",
+      "deprel": "goeswith",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "mark (ADP -> ADJ)",
+      "deprel": "mark",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "mark (SCONJ -> ADJ)",
+      "deprel": "mark",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "mark (SCONJ -> PRON)",
+      "deprel": "mark",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "mark (VERB -> VERB)",
+      "deprel": "mark",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "nmod (ADJ -> NUM)",
+      "deprel": "nmod",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "nmod (DET -> ADV)",
+      "deprel": "nmod",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "nmod (DET -> DET)",
+      "deprel": "nmod",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "nmod (NOUN -> ADJ)",
+      "deprel": "nmod",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "nmod (NUM -> PRON)",
+      "deprel": "nmod",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "nmod:unmarked (PRON -> NOUN)",
+      "deprel": "nmod:unmarked",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "nmod:unmarked (SYM -> NOUN)",
+      "deprel": "nmod:unmarked",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "nsubj (ADJ -> AUX)",
+      "deprel": "nsubj",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "nsubj (DET -> PRON)",
+      "deprel": "nsubj",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "nsubj (PRON -> NUM)",
+      "deprel": "nsubj",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "nsubj (PROPN -> ADV)",
+      "deprel": "nsubj",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "nsubj:outer (ADJ -> VERB)",
+      "deprel": "nsubj:outer",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "obl (NOUN -> NUM)",
+      "deprel": "obl",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "obl (NUM -> ADV)",
+      "deprel": "obl",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "obl (NUM -> NUM)",
+      "deprel": "obl",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "obl (PRON -> PRON)",
+      "deprel": "obl",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "obl (PROPN -> ADV)",
+      "deprel": "obl",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "obl:unmarked (NUM -> ADJ)",
+      "deprel": "obl:unmarked",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "obl:unmarked (NUM -> NUM)",
+      "deprel": "obl:unmarked",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "orphan (ADV -> NOUN)",
+      "deprel": "orphan",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "parataxis (ADV -> ADJ)",
+      "deprel": "parataxis",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "parataxis (AUX -> VERB)",
+      "deprel": "parataxis",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "parataxis (NOUN -> NUM)",
+      "deprel": "parataxis",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "parataxis (PROPN -> PROPN)",
+      "deprel": "parataxis",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "parataxis (SYM -> VERB)",
+      "deprel": "parataxis",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "root (PART -> ROOT)",
+      "deprel": "root",
+      "failures": 1,
+      "soleCause": 1,
+      "promisedUnblock": 1,
+      "lemmas": 1
+    },
+    {
+      "label": "nmod:unmarked (PROPN -> PROPN)",
+      "deprel": "nmod:unmarked",
+      "failures": 49,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 45
+    },
+    {
+      "label": "flat (NUM -> NUM)",
+      "deprel": "flat",
+      "failures": 16,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 12
+    },
+    {
+      "label": "advmod (ADJ -> NOUN)",
+      "deprel": "advmod",
+      "failures": 6,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 6
+    },
+    {
+      "label": "case (VERB -> NOUN)",
+      "deprel": "case",
+      "failures": 6,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 6
+    },
+    {
+      "label": "parataxis (PRON -> VERB)",
+      "deprel": "parataxis",
+      "failures": 6,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 6
+    },
+    {
+      "label": "advmod (NOUN -> VERB)",
+      "deprel": "advmod",
+      "failures": 5,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 5
+    },
+    {
+      "label": "ccomp (PRON -> VERB)",
+      "deprel": "ccomp",
+      "failures": 5,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 5
+    },
+    {
+      "label": "discourse (INTJ -> PROPN)",
+      "deprel": "discourse",
+      "failures": 5,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 5
+    },
+    {
+      "label": "advcl:relcl (VERB -> VERB)",
+      "deprel": "advcl:relcl",
+      "failures": 4,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 4
+    },
+    {
+      "label": "advmod (ADJ -> SYM)",
+      "deprel": "advmod",
+      "failures": 4,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 4
+    },
+    {
+      "label": "advmod (NOUN -> NOUN)",
+      "deprel": "advmod",
+      "failures": 4,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 3
+    },
+    {
+      "label": "ccomp (AUX -> VERB)",
+      "deprel": "ccomp",
+      "failures": 4,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 4
+    },
+    {
+      "label": "conj (PART -> VERB)",
+      "deprel": "conj",
+      "failures": 4,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 4
+    },
+    {
+      "label": "nsubj:pass (PROPN -> VERB)",
+      "deprel": "nsubj:pass",
+      "failures": 4,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 4
+    },
+    {
+      "label": "nummod (NUM -> NUM)",
+      "deprel": "nummod",
+      "failures": 4,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "obl (NOUN -> PROPN)",
+      "deprel": "obl",
+      "failures": 4,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 4
+    },
+    {
+      "label": "advcl:relcl (VERB -> ADV)",
+      "deprel": "advcl:relcl",
+      "failures": 3,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 3
+    },
+    {
+      "label": "cc (ADV -> VERB)",
+      "deprel": "cc",
+      "failures": 3,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 3
+    },
+    {
+      "label": "ccomp (AUX -> ADJ)",
+      "deprel": "ccomp",
+      "failures": 3,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 3
+    },
+    {
+      "label": "conj (NOUN -> PRON)",
+      "deprel": "conj",
+      "failures": 3,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 3
+    },
+    {
+      "label": "conj (SYM -> VERB)",
+      "deprel": "conj",
+      "failures": 3,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 3
+    },
+    {
+      "label": "csubj (VERB -> VERB)",
+      "deprel": "csubj",
+      "failures": 3,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 3
+    },
+    {
+      "label": "discourse (NOUN -> VERB)",
+      "deprel": "discourse",
+      "failures": 3,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 3
+    },
+    {
+      "label": "list (NOUN -> ADJ)",
+      "deprel": "list",
+      "failures": 3,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 3
+    },
+    {
+      "label": "mark (ADJ -> VERB)",
+      "deprel": "mark",
+      "failures": 3,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 3
+    },
+    {
+      "label": "mark (ADP -> VERB)",
+      "deprel": "mark",
+      "failures": 3,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 3
+    },
+    {
+      "label": "nmod (ADV -> NOUN)",
+      "deprel": "nmod",
+      "failures": 3,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 3
+    },
+    {
+      "label": "nmod (PRON -> ADJ)",
+      "deprel": "nmod",
+      "failures": 3,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 3
+    },
+    {
+      "label": "obl:unmarked (ADJ -> VERB)",
+      "deprel": "obl:unmarked",
+      "failures": 3,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 3
+    },
+    {
+      "label": "xcomp (PRON -> VERB)",
+      "deprel": "xcomp",
+      "failures": 3,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 3
+    },
+    {
+      "label": "acl (VERB -> PROPN)",
+      "deprel": "acl",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "acl:relcl (NOUN -> PROPN)",
+      "deprel": "acl:relcl",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "advcl (PART -> VERB)",
+      "deprel": "advcl",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "advcl:relcl (PRON -> VERB)",
+      "deprel": "advcl:relcl",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "advmod (PRON -> ADJ)",
+      "deprel": "advmod",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "appos (ADJ -> ADJ)",
+      "deprel": "appos",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "appos (DET -> NOUN)",
+      "deprel": "appos",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "case (ADJ -> PROPN)",
+      "deprel": "case",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "cc (X -> X)",
+      "deprel": "cc",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "ccomp (ADJ -> ADJ)",
+      "deprel": "ccomp",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "conj (DET -> NOUN)",
+      "deprel": "conj",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "conj (PRON -> ADJ)",
+      "deprel": "conj",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "conj (PROPN -> ADV)",
+      "deprel": "conj",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "conj (PROPN -> PRON)",
+      "deprel": "conj",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "cop (AUX -> PRON)",
+      "deprel": "cop",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "discourse (VERB -> VERB)",
+      "deprel": "discourse",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "goeswith (X -> NOUN)",
+      "deprel": "goeswith",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "iobj (PRON -> VERB)",
+      "deprel": "iobj",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "list (ADJ -> ADJ)",
+      "deprel": "list",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "list (ADJ -> NOUN)",
+      "deprel": "list",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "list (NOUN -> NUM)",
+      "deprel": "list",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "list (NUM -> NOUN)",
+      "deprel": "list",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "mark (ADV -> VERB)",
+      "deprel": "mark",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "mark (SCONJ -> ADV)",
+      "deprel": "mark",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "nmod (SYM -> NOUN)",
+      "deprel": "nmod",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "nmod:desc (PROPN -> PROPN)",
+      "deprel": "nmod:desc",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "nsubj (DET -> NOUN)",
+      "deprel": "nsubj",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "nsubj (NOUN -> PRON)",
+      "deprel": "nsubj",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "nsubj (NUM -> NOUN)",
+      "deprel": "nsubj",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "nsubj:pass (DET -> VERB)",
+      "deprel": "nsubj:pass",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "obl (ADJ -> ADV)",
+      "deprel": "obl",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "obl (DET -> NOUN)",
+      "deprel": "obl",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "obl (SYM -> NOUN)",
+      "deprel": "obl",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "parataxis (NOUN -> ADV)",
+      "deprel": "parataxis",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "vocative (NOUN -> VERB)",
+      "deprel": "vocative",
+      "failures": 2,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 2
+    },
+    {
+      "label": "acl (ADP -> NOUN)",
+      "deprel": "acl",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "acl (ADV -> NOUN)",
+      "deprel": "acl",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "acl (NUM -> PROPN)",
+      "deprel": "acl",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "acl (PRON -> NOUN)",
+      "deprel": "acl",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "acl (VERB -> VERB)",
+      "deprel": "acl",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "acl:relcl (NUM -> NOUN)",
+      "deprel": "acl:relcl",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "acl:relcl (PROPN -> PRON)",
+      "deprel": "acl:relcl",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "acl:relcl (SYM -> NOUN)",
+      "deprel": "acl:relcl",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "advcl (AUX -> NOUN)",
+      "deprel": "advcl",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "advcl (INTJ -> VERB)",
+      "deprel": "advcl",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "advcl (PART -> ADJ)",
+      "deprel": "advcl",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "advcl (PROPN -> ADJ)",
+      "deprel": "advcl",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "advcl (VERB -> PRON)",
+      "deprel": "advcl",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "advcl (VERB -> SYM)",
+      "deprel": "advcl",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "advcl:relcl (AUX -> ADV)",
+      "deprel": "advcl:relcl",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "advcl:relcl (NOUN -> VERB)",
+      "deprel": "advcl:relcl",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "advmod (ADJ -> ADJ)",
+      "deprel": "advmod",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "advmod (ADJ -> DET)",
+      "deprel": "advmod",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "advmod (PART -> PROPN)",
+      "deprel": "advmod",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "amod (ADJ -> ADJ)",
+      "deprel": "amod",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "amod (SYM -> NOUN)",
+      "deprel": "amod",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "appos (ADJ -> SYM)",
+      "deprel": "appos",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "appos (NOUN -> NUM)",
+      "deprel": "appos",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "appos (NOUN -> SYM)",
+      "deprel": "appos",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "appos (PRON -> PRON)",
+      "deprel": "appos",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "appos (X -> NOUN)",
+      "deprel": "appos",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "case (ADJ -> ADJ)",
+      "deprel": "case",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "case (ADJ -> PRON)",
+      "deprel": "case",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "case (ADV -> NUM)",
+      "deprel": "case",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "case (SCONJ -> ADJ)",
+      "deprel": "case",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "case (SCONJ -> NOUN)",
+      "deprel": "case",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "case (SYM -> SYM)",
+      "deprel": "case",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "case (VERB -> PRON)",
+      "deprel": "case",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "cc (CCONJ -> SYM)",
+      "deprel": "cc",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "cc (PART -> ADJ)",
+      "deprel": "cc",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "cc (PART -> NOUN)",
+      "deprel": "cc",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "cc (SYM -> AUX)",
+      "deprel": "cc",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "ccomp (ADV -> ADJ)",
+      "deprel": "ccomp",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "ccomp (PRON -> ADJ)",
+      "deprel": "ccomp",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "compound (ADJ -> VERB)",
+      "deprel": "compound",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "compound (SYM -> PROPN)",
+      "deprel": "compound",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "compound (X -> NOUN)",
+      "deprel": "compound",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "conj (ADJ -> NUM)",
+      "deprel": "conj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "conj (ADJ -> PRON)",
+      "deprel": "conj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "conj (ADV -> INTJ)",
+      "deprel": "conj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "conj (NOUN -> DET)",
+      "deprel": "conj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "conj (NOUN -> NUM)",
+      "deprel": "conj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "conj (NUM -> VERB)",
+      "deprel": "conj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "conj (PART -> AUX)",
+      "deprel": "conj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "conj (VERB -> ADV)",
+      "deprel": "conj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "conj (VERB -> INTJ)",
+      "deprel": "conj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "conj (VERB -> PRON)",
+      "deprel": "conj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "conj (VERB -> SYM)",
+      "deprel": "conj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "csubj (ADJ -> ADJ)",
+      "deprel": "csubj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "csubj (PRON -> VERB)",
+      "deprel": "csubj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "dep (ADV -> AUX)",
+      "deprel": "dep",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "det:predet (PRON -> NOUN)",
+      "deprel": "det:predet",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "discourse (NOUN -> PROPN)",
+      "deprel": "discourse",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "discourse (SYM -> AUX)",
+      "deprel": "discourse",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "flat (NOUN -> PROPN)",
+      "deprel": "flat",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "flat (NOUN -> X)",
+      "deprel": "flat",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "flat (SYM -> PROPN)",
+      "deprel": "flat",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "iobj (PROPN -> VERB)",
+      "deprel": "iobj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "list (PROPN -> NOUN)",
+      "deprel": "list",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "list (SYM -> PROPN)",
+      "deprel": "list",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "list (VERB -> ADJ)",
+      "deprel": "list",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "nmod (CCONJ -> NOUN)",
+      "deprel": "nmod",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "nmod (DET -> NUM)",
+      "deprel": "nmod",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "nmod (DET -> SYM)",
+      "deprel": "nmod",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "nmod (NUM -> ADJ)",
+      "deprel": "nmod",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "nmod (PRON -> PROPN)",
+      "deprel": "nmod",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "nmod:poss (NUM -> NOUN)",
+      "deprel": "nmod:poss",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "nmod:unmarked (NOUN -> X)",
+      "deprel": "nmod:unmarked",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "nmod:unmarked (NUM -> SYM)",
+      "deprel": "nmod:unmarked",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "nmod:unmarked (PROPN -> NUM)",
+      "deprel": "nmod:unmarked",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "nsubj (ADJ -> ADJ)",
+      "deprel": "nsubj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "nsubj (ADJ -> ADV)",
+      "deprel": "nsubj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "nsubj (ADJ -> PROPN)",
+      "deprel": "nsubj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "nsubj (DET -> AUX)",
+      "deprel": "nsubj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "nsubj (NOUN -> AUX)",
+      "deprel": "nsubj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "nsubj (NOUN -> SYM)",
+      "deprel": "nsubj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "nsubj (PRON -> PROPN)",
+      "deprel": "nsubj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "nsubj (PRON -> SYM)",
+      "deprel": "nsubj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "nsubj (PROPN -> NOUN)",
+      "deprel": "nsubj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "nsubj:pass (ADJ -> VERB)",
+      "deprel": "nsubj:pass",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "obj (ADV -> VERB)",
+      "deprel": "obj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "obj (NUM -> SYM)",
+      "deprel": "obj",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "obl (ADV -> ADV)",
+      "deprel": "obl",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "obl (DET -> PRON)",
+      "deprel": "obl",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "obl (NOUN -> AUX)",
+      "deprel": "obl",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "obl:agent (DET -> VERB)",
+      "deprel": "obl:agent",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "obl:unmarked (PRON -> PRON)",
+      "deprel": "obl:unmarked",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "obl:unmarked (SYM -> ADV)",
+      "deprel": "obl:unmarked",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "obl:unmarked (SYM -> VERB)",
+      "deprel": "obl:unmarked",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "orphan (NUM -> PROPN)",
+      "deprel": "orphan",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "parataxis (ADJ -> AUX)",
+      "deprel": "parataxis",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "parataxis (SYM -> NOUN)",
+      "deprel": "parataxis",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "parataxis (VERB -> AUX)",
+      "deprel": "parataxis",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "punct (PUNCT -> PART)",
+      "deprel": "punct",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "reparandum (AUX -> VERB)",
+      "deprel": "reparandum",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "reparandum (VERB -> NOUN)",
+      "deprel": "reparandum",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "vocative (NUM -> VERB)",
+      "deprel": "vocative",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "vocative (PRON -> NOUN)",
+      "deprel": "vocative",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "vocative (PROPN -> ADJ)",
+      "deprel": "vocative",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "vocative (PROPN -> ADV)",
+      "deprel": "vocative",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    },
+    {
+      "label": "xcomp (NOUN -> ADJ)",
+      "deprel": "xcomp",
+      "failures": 1,
+      "soleCause": 0,
+      "promisedUnblock": 0,
+      "lemmas": 1
+    }
+  ],
+  "leftovers": [
+    {
+      "type": "NP",
+      "cases": 959
+    },
+    {
+      "type": "NC",
+      "cases": 489
+    },
+    {
+      "type": "N",
+      "cases": 480
+    },
+    {
+      "type": "PROPN",
+      "cases": 248
+    },
+    {
+      "type": "NPCOMMA",
+      "cases": 102
+    },
+    {
+      "type": "ADJ",
+      "cases": 71
+    },
+    {
+      "type": "APPOS",
+      "cases": 51
+    },
+    {
+      "type": "PP",
+      "cases": 16
+    },
+    {
+      "type": "PUNCT",
+      "cases": 13
+    },
+    {
+      "type": "INF",
+      "cases": 3
+    },
+    {
+      "type": "SBAR",
+      "cases": 3
+    },
+    {
+      "type": "CONJNP",
+      "cases": 2
+    },
+    {
+      "type": "DET",
+      "cases": 2
+    },
+    {
+      "type": "ADV",
+      "cases": 1
+    },
+    {
+      "type": "CONJADJ",
+      "cases": 1
+    },
+    {
+      "type": "FRONTED",
+      "cases": 1
+    },
+    {
+      "type": "MODAL",
+      "cases": 1
+    },
+    {
+      "type": "PRON",
+      "cases": 1
+    }
+  ],
+  "classifier": {
+    "grammar": 7801,
+    "withFrontier": 7766
+  },
+  "testOpened": false
+}

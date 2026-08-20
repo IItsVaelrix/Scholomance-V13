@@ -17,6 +17,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const LOGIC_EXT = /\.(m?[jt]sx?|cjs)$/;
@@ -115,6 +116,36 @@ const prodSeeds = ALL.filter(f =>
 );
 const prodReach = forwardReach(prodSeeds);
 
+// ---------- Phase 5b: EXECUTION-DERIVED production reach (annotate-only, §28 Step 6) ----------
+// The prefix rule above seeds whole directories, so anything under codex/server/ or
+// codex/runtime/ is live BY CONSTRUCTION. An orthogonal seed set derived from how the app
+// actually boots (index.html script srcs + package.json launch scripts) disagrees on
+// exactly the modules where that construction over-claims: server orphans nothing imports,
+// and codex/runtime/ subtrees that are CLI tools rather than booted services.
+// This is recorded as EVIDENCE, not as a state change. `state` is untouched.
+const execSeeds = (() => {
+  const seeds = new Set();
+  try {
+    for (const html of fs.readdirSync(ROOT).filter(f => f.endsWith('.html'))) {
+      const h = fs.readFileSync(path.join(ROOT, html), 'utf8');
+      for (const m of h.matchAll(/<script[^>]*\ssrc\s*=\s*["']([^"']+)["']/g)) {
+        const rel = m[1].replace(/^\//, '');
+        for (const t of [rel, rel + '.js', rel + '.jsx']) if (fileSet.has(t)) seeds.add(t);
+      }
+    }
+    const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
+    for (const [name, cmd] of Object.entries(pkg.scripts || {})) {
+      if (!/^(dev|start|serve|preview)(:|$)/.test(name)) continue;
+      for (const m of String(cmd).matchAll(/\b(?:node|tsx|ts-node)\s+((?:--[^\s]+\s+)*)([\w./@-]+\.(?:m?[jt]sx?|cjs))/g)) {
+        const f = m[2].replace(/^\.\//, '');
+        if (fileSet.has(f)) seeds.add(f);
+      }
+    }
+  } catch { /* evidence unavailable */ }
+  return [...seeds];
+})();
+const execReach = forwardReach(execSeeds);
+
 // ---------- Phase 6: WIP detection via git ----------
 import { execSync } from 'node:child_process';
 let dirtySet = new Set();
@@ -187,6 +218,9 @@ for (const p of denom) {
     directTest: directTestFiles.length,
     transitiveTest: testReach.has(p) && directTestFiles.length === 0,
     productionInbound: count('PRODUCTION'),
+    // annotate-only evidence columns — do NOT feed `state`
+    executionReachable: execReach.has(p),
+    prodSeedOrphan: prodSeeds.includes(p) && count('PRODUCTION') === 0,
     researchInbound: count('RESEARCH'),
     diagnosticInbound: count('DIAGNOSTIC'),
     state: deriveState(p),
@@ -196,16 +230,41 @@ for (const p of denom) {
 const byState = {};
 for (const r of ledger) byState[r.state] = (byState[r.state] || 0) + 1;
 
+// ---------- Phase 10: provenance (§25 measurement discipline) ----------
+// 27 rows are WIP purely because those files are uncommitted. `frozenHead` alone does
+// NOT regenerate this ledger: a clean checkout of that commit re-sorts every dirty
+// module into another state. Record the dirty set so the run is replayable.
+const dirtyInDenominator = denom.filter(p => dirtySet.has(p)).sort();
+const seedProvenance = {
+  productionSeedRule: "path prefix: codex/server/ | codex/runtime/ | src/pages/ | src/hooks/ | src/{App,main,index}.*",
+  productionSeedCaveat: "seeds are live BY CONSTRUCTION; a seed with productionInbound=0 is an orphan entry point, not a verified live module",
+  testSeedRule: "kindOf(p) === 'TEST' i.e. tests/ prefix or .test./.spec. infix",
+  independentlyChecked: "scripts/coverage-calibration-labeler-v2.mjs (execution-derived seeds)",
+  executionSeedRule: "orthogonal: index.html <script src> + package.json dev/start/serve/preview scripts",
+  executionSeeds: execSeeds,
+};
+
 const report = {
   frozenHead: execSync('git rev-parse HEAD', { cwd: ROOT }).toString().trim(),
+  worktreeDirtyFilesTotal: dirtySet.size,
+  dirtyModulesInDenominator: dirtyInDenominator.length,
+  dirtyModulesInDenominatorList: dirtyInDenominator,
+  regenerableFromFrozenHeadAlone: dirtyInDenominator.length === 0,
+  seedProvenance,
   denominatorModules: denom.length,
   testSeedFiles: testSeeds.length,
   prodSeedFiles: prodSeeds.length,
   testReachSize: testReach.size,
   prodReachSize: prodReach.size,
   stateDistribution: byState,
+  execReachSize: execReach.size,
+  productionOverclaim: ledger.filter(r => r.production && !r.executionReachable).map(r => r.module),
+  prodSeedOrphans: ledger.filter(r => r.prodSeedOrphan).map(r => r.module),
   ledger,
 };
+report.ledgerChecksum = createHash('sha256')
+  .update(ledger.map(r => `${r.module}:${r.state}:${r.production}:${r.directTest}`).join('\n'))
+  .digest('hex').slice(0, 16);
 
 const outPath = path.join(ROOT, 'docs/superpowers/evidence/consumer-coverage-ledger.json');
 fs.writeFileSync(outPath, JSON.stringify(report, null, 2));

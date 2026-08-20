@@ -1,0 +1,28 @@
+{
+  "sealed": true,
+  "calibration": {
+    "recoverable": 5,
+    "byBand": {
+      "weak": {
+        "n": 0,
+        "aligned": 0,
+        "pTopEqualsGold": null
+      },
+      "moderate": {
+        "n": 2,
+        "aligned": 1,
+        "pTopEqualsGold": 0.5
+      },
+      "strong": {
+        "n": 3,
+        "aligned": 0,
+        "pTopEqualsGold": 0
+      },
+      "very-strong": {
+        "n": 0,
+        "aligned": 0,
+        "pTopEqualsGold": null
+      }
+    }
+  }
+}

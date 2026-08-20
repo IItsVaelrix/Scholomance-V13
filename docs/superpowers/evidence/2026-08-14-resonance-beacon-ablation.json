@@ -1,0 +1,87 @@
+{
+  "contract": "PB-RESONANCE-BEACON-ABLATION-v1",
+  "sample": {
+    "sentences": 395,
+    "skipped": 105,
+    "threw": 0,
+    "parsed": 103,
+    "contained": 63,
+    "tokensScored": 3212
+  },
+  "sentence": {
+    "ambiguous": 26,
+    "vsFirst": [
+      {
+        "label": "BEACON vs FIRST",
+        "n": 26,
+        "baseHits": 8,
+        "armHits": 13,
+        "net": 5,
+        "wins": 6,
+        "losses": 1,
+        "discordant": 7,
+        "p": 0.125
+      },
+      {
+        "label": "RANDOM vs FIRST",
+        "n": 26,
+        "baseHits": 8,
+        "armHits": 6.74,
+        "net": -1.26,
+        "wins": 0,
+        "losses": 0,
+        "discordant": 0,
+        "p": 1
+      }
+    ]
+  },
+  "token": {
+    "ambiguous": 1469,
+    "vsFirst": [
+      {
+        "label": "WTA vs FIRST",
+        "n": 1469,
+        "baseHits": 820,
+        "armHits": 873,
+        "net": 53,
+        "wins": 213,
+        "losses": 160,
+        "discordant": 373,
+        "p": 0.00701
+      },
+      {
+        "label": "SUM vs FIRST",
+        "n": 1469,
+        "baseHits": 820,
+        "armHits": 882,
+        "net": 62,
+        "wins": 221,
+        "losses": 159,
+        "discordant": 380,
+        "p": 0.00172
+      },
+      {
+        "label": "RANDOM vs FIRST",
+        "n": 1469,
+        "baseHits": 820,
+        "armHits": 810.82,
+        "net": -9.18,
+        "wins": 0,
+        "losses": 0,
+        "discordant": 0,
+        "p": 1
+      }
+    ],
+    "wtaVsSum": {
+      "label": "WTA vs SUM",
+      "n": 1469,
+      "baseHits": 882,
+      "armHits": 873,
+      "net": -9,
+      "wins": 39,
+      "losses": 48,
+      "discordant": 87,
+      "p": 0.39119
+    }
+  }
+}

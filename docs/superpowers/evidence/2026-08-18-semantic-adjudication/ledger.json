@@ -1,0 +1,52 @@
+{
+  "contract": "PB-SEMANTIC-ADJUDICATION-v1",
+  "cases": 16,
+  "families": [
+    {
+      "predicateFamily": "LOCATION",
+      "cases": 5,
+      "goldRecoverable": 5,
+      "ballisticsAligned": 2,
+      "existingProbeSupport": 0
+    },
+    {
+      "predicateFamily": "MATERIALITY",
+      "cases": 4,
+      "goldRecoverable": 4,
+      "ballisticsAligned": 1,
+      "existingProbeSupport": 0
+    },
+    {
+      "predicateFamily": "ENTITY_TYPE",
+      "cases": 2,
+      "goldRecoverable": 2,
+      "ballisticsAligned": 0,
+      "existingProbeSupport": 0
+    },
+    {
+      "predicateFamily": "CONCRETENESS",
+      "cases": 1,
+      "goldRecoverable": 1,
+      "ballisticsAligned": 0,
+      "existingProbeSupport": 0
+    },
+    {
+      "predicateFamily": "DOMAIN",
+      "cases": 2,
+      "goldRecoverable": 2,
+      "ballisticsAligned": 1,
+      "existingProbeSupport": 0
+    },
+    {
+      "predicateFamily": "SYNTACTIC_FRAME",
+      "cases": 2,
+      "goldRecoverable": 2,
+      "ballisticsAligned": 1,
+      "existingProbeSupport": 2
+    }
+  ],
+  "layers": {
+    "TYPE_I_PROBE_HOLE": 14,
+    "TYPE_IV_UNUSED_EVIDENCE": 2
+  }
+}

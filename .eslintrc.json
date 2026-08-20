@@ -40,6 +40,18 @@
   "overrides": [
     {
       "files": [
+        "eslint-rules/**/*.js"
+      ],
+      "env": {
+        "node": true,
+        "es2022": true
+      },
+      "parserOptions": {
+        "sourceType": "script"
+      }
+    },
+    {
+      "files": [
         "codex/**/*.js",
         "scripts/**/*.js",
         "scripts/**/*.mjs",

@@ -1,0 +1,210 @@
+{
+  "experiment": "SEAM-1 — sentence layer vs phrase layer on the PRODUCT objective (nominal anchor)",
+  "prereg": "docs/superpowers/evidence/2026-08-19-PREREG-seam-1-phrase-vs-sentence-layer.md",
+  "seed": 20260819,
+  "frozenHead": "48d31119eb80f9a1967e44e878eed9d1f7ed348e",
+  "corpus": {
+    "file": "cache/ud/en_ewt-ud-test.conllu",
+    "totalSentences": 2077,
+    "heldOutFromGate": true
+  },
+  "population": {
+    "eligible": 357,
+    "skippedNoSubject": 985,
+    "skippedTooLong": 140,
+    "skippedPronounSubject": 595,
+    "sampled": 357,
+    "nominalOnly": true
+  },
+  "freqSource": {
+    "file": "cache/ud/en_ewt-ud-train.conllu",
+    "types": 16654
+  },
+  "goldPosUsed": false,
+  "livePosError": null,
+  "wipProvenance": [
+    {
+      "file": "codex/core/constellation/compose-packed.js",
+      "git": "DIRTY",
+      "sha256": "d8c13d1ca35fea63"
+    },
+    {
+      "file": "codex/core/constellation/compose.js",
+      "git": "DIRTY",
+      "sha256": "f7e0e4f29c3923c2"
+    },
+    {
+      "file": "codex/core/constellation/grimoire/index.js",
+      "git": "DIRTY",
+      "sha256": "e6a0ac82e3fe6f80"
+    },
+    {
+      "file": "codex/core/constellation/resonance-beacon.js",
+      "git": "DIRTY",
+      "sha256": "09f0bfc2a3fc94f3"
+    }
+  ],
+  "P1_gateLexicon_asPreregistered": {
+    "posTypeCoverage": 0.3303,
+    "arms": {
+      "A_phraseLayer_selectHeadToken": {
+        "correct": 76,
+        "n": 357,
+        "accuracy": 0.2129,
+        "ci95": [
+          0.1737,
+          0.2549
+        ]
+      },
+      "B_sentenceLayer_decided": {
+        "correct": 28,
+        "n": 357,
+        "accuracy": 0.0784,
+        "ci95": [
+          0.0504,
+          0.1064
+        ]
+      },
+      "B_canonical_resonantDerivation": {
+        "correct": 28,
+        "n": 357,
+        "accuracy": 0.0784,
+        "ci95": [
+          0.0532,
+          0.1064
+        ],
+        "note": "runTreebank's packed decision rule"
+      },
+      "B_sentenceLayer_contained": {
+        "correct": 28,
+        "n": 357,
+        "accuracy": 0.0784,
+        "note": "upper bound: any derivation carries the right subject"
+      },
+      "parseRate": {
+        "parsed": 37,
+        "n": 357,
+        "rate": 0.1036
+      }
+    },
+    "nullBaselines": {
+      "firstTaggedNoun": 0.2661,
+      "lastContentToken": 0.014,
+      "randomContentToken": 0.1849
+    },
+    "F2_complementarity": {
+      "aWrong_n": 281,
+      "B_correct_where_A_wrong": 16,
+      "B_accuracy_where_A_wrong": 0.0569,
+      "B_accuracy_where_A_right": 0.1579,
+      "B_overall_baseRate": 0.0784,
+      "discordant_B_rescues_A": 16,
+      "discordant_B_loses_what_A_had": 64,
+      "mcnemar_chi2_cc": 27.613,
+      "unionCeiling": 0.2577
+    },
+    "F3_shuffledPosControl": [
+      {
+        "tag": "P1-shuffled-0",
+        "A_accuracy": 0.1457,
+        "B_decided_accuracy": 0.0504,
+        "B_parseRate": 0.07
+      },
+      {
+        "tag": "P1-shuffled-1",
+        "A_accuracy": 0.1597,
+        "B_decided_accuracy": 0.0504,
+        "B_parseRate": 0.0728
+      },
+      {
+        "tag": "P1-shuffled-2",
+        "A_accuracy": 0.1541,
+        "B_decided_accuracy": 0.0504,
+        "B_parseRate": 0.07
+      }
+    ],
+    "threw": 0
+  },
+  "P2_liveDict_productFaithful": {
+    "posTypeCoverage": 0.8213,
+    "arms": {
+      "A_phraseLayer_selectHeadToken": {
+        "correct": 104,
+        "n": 357,
+        "accuracy": 0.2913,
+        "ci95": [
+          0.2437,
+          0.3389
+        ]
+      },
+      "B_sentenceLayer_decided": {
+        "correct": 66,
+        "n": 357,
+        "accuracy": 0.1849,
+        "ci95": [
+          0.1457,
+          0.2241
+        ]
+      },
+      "B_canonical_resonantDerivation": {
+        "correct": 68,
+        "n": 357,
+        "accuracy": 0.1905,
+        "ci95": [
+          0.1513,
+          0.2325
+        ],
+        "note": "runTreebank's packed decision rule"
+      },
+      "B_sentenceLayer_contained": {
+        "correct": 73,
+        "n": 357,
+        "accuracy": 0.2045,
+        "note": "upper bound: any derivation carries the right subject"
+      },
+      "parseRate": {
+        "parsed": 102,
+        "n": 357,
+        "rate": 0.2857
+      }
+    },
+    "nullBaselines": {
+      "firstTaggedNoun": 0.493,
+      "lastContentToken": 0.014,
+      "randomContentToken": 0.1849
+    },
+    "F2_complementarity": {
+      "aWrong_n": 253,
+      "B_correct_where_A_wrong": 40,
+      "B_accuracy_where_A_wrong": 0.1581,
+      "B_accuracy_where_A_right": 0.25,
+      "B_overall_baseRate": 0.1849,
+      "discordant_B_rescues_A": 40,
+      "discordant_B_loses_what_A_had": 78,
+      "mcnemar_chi2_cc": 11.602,
+      "unionCeiling": 0.4034
+    },
+    "F3_shuffledPosControl": [
+      {
+        "tag": "P2-shuffled-0",
+        "A_accuracy": 0.2129,
+        "B_decided_accuracy": 0.0924,
+        "B_parseRate": 0.1765
+      },
+      {
+        "tag": "P2-shuffled-1",
+        "A_accuracy": 0.1905,
+        "B_decided_accuracy": 0.1008,
+        "B_parseRate": 0.1905
+      },
+      {
+        "tag": "P2-shuffled-2",
+        "A_accuracy": 0.1905,
+        "B_decided_accuracy": 0.0952,
+        "B_parseRate": 0.1541
+      }
+    ],
+    "threw": 0
+  },
+  "checksum": "cd875cd50f658541"
+}

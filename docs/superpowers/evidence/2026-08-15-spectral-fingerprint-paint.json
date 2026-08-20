@@ -1,0 +1,880 @@
+{
+  "contract": "PB-SPECTRAL-FINGERPRINT-PAINT-v1",
+  "kind": "annotate-only-spike",
+  "throwaway": true,
+  "seed": 6045712,
+  "elapsedMs": 5613,
+  "corpus": {
+    "fixture": "tests/qa/fixtures/constellation/treebank-gate.conllu",
+    "eligible": 395,
+    "composed": 395,
+    "threw": 0,
+    "maxTokens": 20
+  },
+  "population": {
+    "leafAtoms": 5168,
+    "paintedLeaves": 5168,
+    "bondedSeen": 11677,
+    "bondedKept": 8402,
+    "familyItems": 8402,
+    "deprelItems": 7329,
+    "rivalPairs": 2291,
+    "maxBondedPerSentence": 48
+  },
+  "bands": [
+    "carbon",
+    "silicone",
+    "recursive",
+    "left",
+    "right",
+    "near",
+    "mid",
+    "far",
+    "lock",
+    "contest",
+    "absorption",
+    "silence",
+    "comboCarbon",
+    "comboSilicone",
+    "comboRecursive"
+  ],
+  "examples": [
+    {
+      "text": "From the AP comes this story :",
+      "rootType": "S",
+      "family": "punctuation",
+      "color": "gold/blue",
+      "topBands": [
+        {
+          "b": "lock",
+          "v": 0.5555
+        },
+        {
+          "b": "carbon",
+          "v": 0.4481
+        },
+        {
+          "b": "right",
+          "v": 0.3356
+        },
+        {
+          "b": "near",
+          "v": 0.3212
+        },
+        {
+          "b": "left",
+          "v": 0.294
+        }
+      ]
+    },
+    {
+      "text": "Right now that seems to be the US , EU , and IAEA .",
+      "rootType": "S",
+      "family": null,
+      "color": "blue/gold",
+      "topBands": [
+        {
+          "b": "carbon",
+          "v": 0.5013
+        },
+        {
+          "b": "lock",
+          "v": 0.4331
+        },
+        {
+          "b": "left",
+          "v": 0.3746
+        },
+        {
+          "b": "right",
+          "v": 0.3137
+        },
+        {
+          "b": "near",
+          "v": 0.2652
+        }
+      ]
+    },
+    {
+      "text": "My life is too complicated right now trying to do my job .",
+      "rootType": "S",
+      "family": "punctuation",
+      "color": "gold/amber",
+      "topBands": [
+        {
+          "b": "lock",
+          "v": 0.475
+        },
+        {
+          "b": "right",
+          "v": 0.3815
+        },
+        {
+          "b": "carbon",
+          "v": 0.3415
+        },
+        {
+          "b": "silicone",
+          "v": 0.3263
+        },
+        {
+          "b": "left",
+          "v": 0.3228
+        }
+      ]
+    },
+    {
+      "text": "Ben Goodger is the lead engineer for Mozilla Firefox .",
+      "rootType": "S",
+      "family": "clause",
+      "color": "gold/blue",
+      "topBands": [
+        {
+          "b": "lock",
+          "v": 0.5249
+        },
+        {
+          "b": "carbon",
+          "v": 0.4626
+        },
+        {
+          "b": "left",
+          "v": 0.3503
+        },
+        {
+          "b": "right",
+          "v": 0.3403
+        },
+        {
+          "b": "near",
+          "v": 0.2365
+        }
+      ]
+    },
+    {
+      "text": "Welcome Darin !",
+      "rootType": "S",
+      "family": "punctuation",
+      "color": "gold/cyan",
+      "topBands": [
+        {
+          "b": "lock",
+          "v": 0.5006
+        },
+        {
+          "b": "near",
+          "v": 0.4773
+        },
+        {
+          "b": "left",
+          "v": 0.4191
+        },
+        {
+          "b": "silicone",
+          "v": 0.3531
+        },
+        {
+          "b": "carbon",
+          "v": 0.2328
+        }
+      ]
+    },
+    {
+      "text": "I want to use this opportunity to welcome Brian Ryner to Google !",
+      "rootType": "S",
+      "family": "clause",
+      "color": "gold/blue",
+      "topBands": [
+        {
+          "b": "lock",
+          "v": 0.507
+        },
+        {
+          "b": "carbon",
+          "v": 0.4865
+        },
+        {
+          "b": "left",
+          "v": 0.3463
+        },
+        {
+          "b": "right",
+          "v": 0.3447
+        },
+        {
+          "b": "far",
+          "v": 0.2471
+        }
+      ]
+    },
+    {
+      "text": "The civilians in the Department of Defense only know how to blow things up .",
+      "rootType": "S",
+      "family": "punctuation",
+      "color": "blue/gold",
+      "topBands": [
+        {
+          "b": "carbon",
+          "v": 0.4549
+        },
+        {
+          "b": "lock",
+          "v": 0.4435
+        },
+        {
+          "b": "right",
+          "v": 0.3933
+        },
+        {
+          "b": "left",
+          "v": 0.3067
+        },
+        {
+          "b": "contest",
+          "v": 0.2565
+        }
+      ]
+    },
+    {
+      "text": "Anybody up for happy hour after work ?",
+      "rootType": "S",
+      "family": "punctuation",
+      "color": "gold/violet",
+      "topBands": [
+        {
+          "b": "lock",
+          "v": 0.5577
+        },
+        {
+          "b": "left",
+          "v": 0.346
+        },
+        {
+          "b": "right",
+          "v": 0.3336
+        },
+        {
+          "b": "carbon",
+          "v": 0.3067
+        },
+        {
+          "b": "silence",
+          "v": 0.2983
+        }
+      ]
+    }
+  ],
+  "familyColors": [
+    {
+      "family": "punctuation",
+      "n": 1702,
+      "dominantColor": "gold/blue",
+      "dominantShare": 0.266,
+      "uniqueColors": 46
+    },
+    {
+      "family": "clause",
+      "n": 1609,
+      "dominantColor": "gold/blue",
+      "dominantShare": 0.254,
+      "uniqueColors": 37
+    },
+    {
+      "family": "adposition",
+      "n": 395,
+      "dominantColor": "blue/gold",
+      "dominantShare": 0.246,
+      "uniqueColors": 26
+    },
+    {
+      "family": "verb",
+      "n": 1190,
+      "dominantColor": "gold/blue",
+      "dominantShare": 0.227,
+      "uniqueColors": 43
+    },
+    {
+      "family": "determination",
+      "n": 212,
+      "dominantColor": "gold/blue",
+      "dominantShare": 0.259,
+      "uniqueColors": 26
+    },
+    {
+      "family": "compound",
+      "n": 344,
+      "dominantColor": "violet/gold",
+      "dominantShare": 0.11,
+      "uniqueColors": 40
+    },
+    {
+      "family": "subordination",
+      "n": 355,
+      "dominantColor": "gold/blue",
+      "dominantShare": 0.406,
+      "uniqueColors": 21
+    },
+    {
+      "family": "participial",
+      "n": 225,
+      "dominantColor": "gold/blue",
+      "dominantShare": 0.262,
+      "uniqueColors": 17
+    },
+    {
+      "family": "modifier",
+      "n": 838,
+      "dominantColor": "gold/blue",
+      "dominantShare": 0.199,
+      "uniqueColors": 52
+    },
+    {
+      "family": "possession",
+      "n": 44,
+      "dominantColor": "gold/blue",
+      "dominantShare": 0.273,
+      "uniqueColors": 14
+    },
+    {
+      "family": "inversion",
+      "n": 397,
+      "dominantColor": "blue/gold",
+      "dominantShare": 0.249,
+      "uniqueColors": 34
+    },
+    {
+      "family": "copular",
+      "n": 137,
+      "dominantColor": "blue/gold",
+      "dominantShare": 0.204,
+      "uniqueColors": 28
+    },
+    {
+      "family": "nonfinite",
+      "n": 125,
+      "dominantColor": "blue/gold",
+      "dominantShare": 0.36,
+      "uniqueColors": 11
+    },
+    {
+      "family": "auxiliary",
+      "n": 98,
+      "dominantColor": "gold/blue",
+      "dominantShare": 0.224,
+      "uniqueColors": 24
+    },
+    {
+      "family": "coordination",
+      "n": 557,
+      "dominantColor": "blue/gold",
+      "dominantShare": 0.316,
+      "uniqueColors": 27
+    },
+    {
+      "family": "relative-clause",
+      "n": 174,
+      "dominantColor": "gold/blue",
+      "dominantShare": 0.293,
+      "uniqueColors": 21
+    }
+  ],
+  "assays": {
+    "familyFull": {
+      "name": "family/full",
+      "n": 8402,
+      "classes": 16,
+      "classCounts": {
+        "punctuation": 1702,
+        "clause": 1609,
+        "verb": 1190,
+        "modifier": 838,
+        "coordination": 557,
+        "inversion": 397,
+        "adposition": 395,
+        "subordination": 355,
+        "compound": 344,
+        "participial": 225,
+        "determination": 212,
+        "relative-clause": 174,
+        "copular": 137,
+        "nonfinite": 125,
+        "auxiliary": 98,
+        "possession": 44
+      },
+      "eligibleClasses": 16,
+      "withinN": 800,
+      "betweenN": 2000,
+      "withinMean": 0.9038,
+      "betweenMean": 0.8924,
+      "gap": 0.0115,
+      "cohensD": 0.1469,
+      "losoCorrect": 1541,
+      "losoTotal": 8402,
+      "losoAccuracy": 0.1834,
+      "majorityChance": 0.2026,
+      "uniformChance": 0.0625,
+      "topConfusion": [
+        "punctuation→punctuation (647)",
+        "clause→inversion (261)",
+        "punctuation→compound (216)",
+        "compound→compound (202)",
+        "modifier→compound (195)",
+        "clause→determination (177)",
+        "verb→punctuation (174)",
+        "clause→clause (172)"
+      ]
+    },
+    "familyShuffle": {
+      "name": "family/shuffle",
+      "n": 8402,
+      "classes": 16,
+      "classCounts": {
+        "punctuation": 1702,
+        "clause": 1609,
+        "verb": 1190,
+        "modifier": 838,
+        "coordination": 557,
+        "inversion": 397,
+        "adposition": 395,
+        "subordination": 355,
+        "compound": 344,
+        "participial": 225,
+        "determination": 212,
+        "relative-clause": 174,
+        "copular": 137,
+        "nonfinite": 125,
+        "auxiliary": 98,
+        "possession": 44
+      },
+      "eligibleClasses": 16,
+      "withinN": 800,
+      "betweenN": 2000,
+      "withinMean": 0.6093,
+      "betweenMean": 0.6149,
+      "gap": -0.0056,
+      "cohensD": -0.052,
+      "losoCorrect": 212,
+      "losoTotal": 8402,
+      "losoAccuracy": 0.0252,
+      "majorityChance": 0.2026,
+      "uniformChance": 0.0625,
+      "topConfusion": [
+        "punctuation→possession (300)",
+        "clause→possession (289)",
+        "punctuation→auxiliary (231)",
+        "punctuation→nonfinite (196)",
+        "clause→auxiliary (192)",
+        "punctuation→copular (190)",
+        "verb→possession (190)",
+        "clause→nonfinite (179)"
+      ]
+    },
+    "familyType": {
+      "name": "family/type-only",
+      "n": 8402,
+      "classes": 16,
+      "classCounts": {
+        "punctuation": 1702,
+        "clause": 1609,
+        "verb": 1190,
+        "modifier": 838,
+        "coordination": 557,
+        "inversion": 397,
+        "adposition": 395,
+        "subordination": 355,
+        "compound": 344,
+        "participial": 225,
+        "determination": 212,
+        "relative-clause": 174,
+        "copular": 137,
+        "nonfinite": 125,
+        "auxiliary": 98,
+        "possession": 44
+      },
+      "eligibleClasses": 16,
+      "withinN": 800,
+      "betweenN": 2000,
+      "withinMean": 0.64,
+      "betweenMean": 0.1415,
+      "gap": 0.4985,
+      "cohensD": 1.2757,
+      "losoCorrect": 3990,
+      "losoTotal": 8402,
+      "losoAccuracy": 0.4749,
+      "majorityChance": 0.2026,
+      "uniformChance": 0.0625,
+      "topConfusion": [
+        "clause→clause (1609)",
+        "verb→auxiliary (1158)",
+        "punctuation→clause (833)",
+        "modifier→determination (503)",
+        "adposition→adposition (395)",
+        "compound→compound (344)",
+        "punctuation→punctuation (334)",
+        "punctuation→determination (282)"
+      ]
+    },
+    "familyKind": {
+      "name": "family/kind-only",
+      "n": 8402,
+      "classes": 16,
+      "classCounts": {
+        "punctuation": 1702,
+        "clause": 1609,
+        "verb": 1190,
+        "modifier": 838,
+        "coordination": 557,
+        "inversion": 397,
+        "adposition": 395,
+        "subordination": 355,
+        "compound": 344,
+        "participial": 225,
+        "determination": 212,
+        "relative-clause": 174,
+        "copular": 137,
+        "nonfinite": 125,
+        "auxiliary": 98,
+        "possession": 44
+      },
+      "eligibleClasses": 16,
+      "withinN": 800,
+      "betweenN": 2000,
+      "withinMean": 0.9309,
+      "betweenMean": 0.9027,
+      "gap": 0.0282,
+      "cohensD": 0.224,
+      "losoCorrect": 966,
+      "losoTotal": 8402,
+      "losoAccuracy": 0.115,
+      "majorityChance": 0.2026,
+      "uniformChance": 0.0625,
+      "topConfusion": [
+        "punctuation→compound (391)",
+        "clause→nonfinite (330)",
+        "modifier→compound (259)",
+        "punctuation→subordination (254)",
+        "compound→compound (221)",
+        "coordination→nonfinite (208)",
+        "verb→nonfinite (205)",
+        "punctuation→nonfinite (193)"
+      ]
+    },
+    "familyGeom": {
+      "name": "family/geometry-only",
+      "n": 8402,
+      "classes": 16,
+      "classCounts": {
+        "punctuation": 1702,
+        "clause": 1609,
+        "verb": 1190,
+        "modifier": 838,
+        "coordination": 557,
+        "inversion": 397,
+        "adposition": 395,
+        "subordination": 355,
+        "compound": 344,
+        "participial": 225,
+        "determination": 212,
+        "relative-clause": 174,
+        "copular": 137,
+        "nonfinite": 125,
+        "auxiliary": 98,
+        "possession": 44
+      },
+      "eligibleClasses": 16,
+      "withinN": 800,
+      "betweenN": 2000,
+      "withinMean": 0.9014,
+      "betweenMean": 0.8893,
+      "gap": 0.0121,
+      "cohensD": 0.1392,
+      "losoCorrect": 1342,
+      "losoTotal": 8402,
+      "losoAccuracy": 0.1597,
+      "majorityChance": 0.2026,
+      "uniformChance": 0.0625,
+      "topConfusion": [
+        "punctuation→punctuation (713)",
+        "clause→auxiliary (231)",
+        "clause→compound (228)",
+        "clause→inversion (225)",
+        "verb→compound (224)",
+        "punctuation→compound (212)",
+        "verb→punctuation (206)",
+        "compound→compound (187)"
+      ]
+    },
+    "familyNoKind": {
+      "name": "family/no-kind",
+      "n": 8402,
+      "classes": 16,
+      "classCounts": {
+        "punctuation": 1702,
+        "clause": 1609,
+        "verb": 1190,
+        "modifier": 838,
+        "coordination": 557,
+        "inversion": 397,
+        "adposition": 395,
+        "subordination": 355,
+        "compound": 344,
+        "participial": 225,
+        "determination": 212,
+        "relative-clause": 174,
+        "copular": 137,
+        "nonfinite": 125,
+        "auxiliary": 98,
+        "possession": 44
+      },
+      "eligibleClasses": 16,
+      "withinN": 800,
+      "betweenN": 2000,
+      "withinMean": 0.898,
+      "betweenMean": 0.8923,
+      "gap": 0.0057,
+      "cohensD": 0.0697,
+      "losoCorrect": 1342,
+      "losoTotal": 8402,
+      "losoAccuracy": 0.1597,
+      "majorityChance": 0.2026,
+      "uniformChance": 0.0625,
+      "topConfusion": [
+        "punctuation→punctuation (713)",
+        "clause→auxiliary (231)",
+        "clause→compound (228)",
+        "clause→inversion (225)",
+        "verb→compound (224)",
+        "punctuation→compound (212)",
+        "verb→punctuation (206)",
+        "compound→compound (187)"
+      ]
+    },
+    "deprelFull": {
+      "name": "deprel/full",
+      "n": 7329,
+      "classes": 26,
+      "classCounts": {
+        "no-gold-link": 2201,
+        "nsubj": 709,
+        "punct": 585,
+        "nmod": 454,
+        "case": 363,
+        "obl": 339,
+        "mark": 279,
+        "cc": 277,
+        "compound": 222,
+        "aux": 218,
+        "advmod": 204,
+        "obj": 200,
+        "xcomp": 179,
+        "advcl": 166,
+        "acl": 152,
+        "amod": 137,
+        "cop": 136,
+        "conj": 134,
+        "det": 133,
+        "ccomp": 59,
+        "expl": 59,
+        "discourse": 50,
+        "flat": 31,
+        "csubj": 23,
+        "nummod": 11,
+        "fixed": 8
+      },
+      "eligibleClasses": 26,
+      "withinN": 1278,
+      "betweenN": 2000,
+      "withinMean": 0.8981,
+      "betweenMean": 0.8885,
+      "gap": 0.0096,
+      "cohensD": 0.1139,
+      "losoCorrect": 539,
+      "losoTotal": 7329,
+      "losoAccuracy": 0.0735,
+      "majorityChance": 0.3003,
+      "uniformChance": 0.0385,
+      "topConfusion": [
+        "no-gold-link→punct (345)",
+        "no-gold-link→nmod (178)",
+        "no-gold-link→amod (156)",
+        "no-gold-link→ccomp (153)",
+        "no-gold-link→csubj (150)",
+        "no-gold-link→compound (138)",
+        "no-gold-link→aux (136)",
+        "no-gold-link→cc (117)"
+      ]
+    },
+    "deprelShuffle": {
+      "name": "deprel/shuffle",
+      "n": 7329,
+      "classes": 26,
+      "classCounts": {
+        "no-gold-link": 2201,
+        "nsubj": 709,
+        "punct": 585,
+        "nmod": 454,
+        "case": 363,
+        "obl": 339,
+        "mark": 279,
+        "cc": 277,
+        "compound": 222,
+        "aux": 218,
+        "advmod": 204,
+        "obj": 200,
+        "xcomp": 179,
+        "advcl": 166,
+        "acl": 152,
+        "amod": 137,
+        "cop": 136,
+        "conj": 134,
+        "det": 133,
+        "ccomp": 59,
+        "expl": 59,
+        "discourse": 50,
+        "flat": 31,
+        "csubj": 23,
+        "nummod": 11,
+        "fixed": 8
+      },
+      "eligibleClasses": 26,
+      "withinN": 1278,
+      "betweenN": 2000,
+      "withinMean": 0.6166,
+      "betweenMean": 0.6154,
+      "gap": 0.0012,
+      "cohensD": 0.0104,
+      "losoCorrect": 94,
+      "losoTotal": 7329,
+      "losoAccuracy": 0.0128,
+      "majorityChance": 0.3003,
+      "uniformChance": 0.0385,
+      "topConfusion": [
+        "no-gold-link→csubj (282)",
+        "no-gold-link→fixed (273)",
+        "no-gold-link→nummod (272)",
+        "no-gold-link→flat (225)",
+        "no-gold-link→expl (167)",
+        "no-gold-link→ccomp (167)",
+        "no-gold-link→conj (111)",
+        "nsubj→fixed (108)"
+      ]
+    },
+    "deprelType": {
+      "name": "deprel/type-only",
+      "n": 7329,
+      "classes": 26,
+      "classCounts": {
+        "no-gold-link": 2201,
+        "nsubj": 709,
+        "punct": 585,
+        "nmod": 454,
+        "case": 363,
+        "obl": 339,
+        "mark": 279,
+        "cc": 277,
+        "compound": 222,
+        "aux": 218,
+        "advmod": 204,
+        "obj": 200,
+        "xcomp": 179,
+        "advcl": 166,
+        "acl": 152,
+        "amod": 137,
+        "cop": 136,
+        "conj": 134,
+        "det": 133,
+        "ccomp": 59,
+        "expl": 59,
+        "discourse": 50,
+        "flat": 31,
+        "csubj": 23,
+        "nummod": 11,
+        "fixed": 8
+      },
+      "eligibleClasses": 26,
+      "withinN": 1278,
+      "betweenN": 2000,
+      "withinMean": 0.4624,
+      "betweenMean": 0.163,
+      "gap": 0.2994,
+      "cohensD": 0.7053,
+      "losoCorrect": 1757,
+      "losoTotal": 7329,
+      "losoAccuracy": 0.2397,
+      "majorityChance": 0.3003,
+      "uniformChance": 0.0385,
+      "topConfusion": [
+        "no-gold-link→nsubj (721)",
+        "nsubj→nsubj (624)",
+        "no-gold-link→det (448)",
+        "no-gold-link→discourse (359)",
+        "punct→nsubj (337)",
+        "case→case (310)",
+        "nmod→det (244)",
+        "cc→cc (203)"
+      ]
+    },
+    "atomTypes": {
+      "name": "atom-type/full",
+      "n": 5168,
+      "classes": 20,
+      "classCounts": {
+        "N": 1127,
+        "V": 811,
+        "ADJ": 440,
+        "PROPN": 375,
+        "DET": 320,
+        "P": 320,
+        "PUNCT": 290,
+        "ADV": 270,
+        "PRON": 214,
+        "AUX": 199,
+        "PRONACC": 154,
+        "COP": 133,
+        "PRT": 115,
+        "COMMA": 86,
+        "CONJ": 83,
+        "TO": 80,
+        "SUB": 51,
+        "MODAL": 45,
+        "REL": 41,
+        "POSS": 14
+      },
+      "eligibleClasses": 20,
+      "withinN": 1000,
+      "betweenN": 2000,
+      "withinMean": 0.8037,
+      "betweenMean": 0.6104,
+      "gap": 0.1933,
+      "cohensD": 0.9486,
+      "losoCorrect": 2463,
+      "losoTotal": 5168,
+      "losoAccuracy": 0.4766,
+      "majorityChance": 0.2181,
+      "uniformChance": 0.05,
+      "topConfusion": [
+        "N→N (486)",
+        "V→V (397)",
+        "PUNCT→PUNCT (273)",
+        "ADJ→ADJ (225)",
+        "N→PROPN (145)",
+        "DET→CONJ (142)",
+        "PROPN→PROPN (142)",
+        "ADV→ADV (137)"
+      ]
+    }
+  },
+  "rivals": {
+    "n": 2291,
+    "meanCosine": 0.8137,
+    "cosineAbove095": 498,
+    "shareAbove095": 0.2174
+  },
+  "falsifiers": {
+    "shuffleBeatsOrTiesGap": false,
+    "typeOnlyBeatsOrTiesAccuracy": true,
+    "rivalPigmentsCollapse": false
+  },
+  "verdict": "FAILS — at least one preregistered falsifier fired; do not promote paint into production ranking",
+  "checksum": "spectral-paint-v1:4c6b3346c5636b0fd6d9d5f22cc6a24724e38ab761d05c240c0688288e6f2ec9"
+}

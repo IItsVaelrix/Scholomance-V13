@@ -1,0 +1,87 @@
+{
+  "topK": 8,
+  "watchlist": [
+    {
+      "label": "punct (PUNCT -> NOUN)",
+      "recurred": true,
+      "dev": {
+        "rank": 1,
+        "promisedUnblock": 38,
+        "failures": 82,
+        "share": 0.07129455909943715
+      },
+      "train": {
+        "rank": 1,
+        "promisedUnblock": 239,
+        "failures": 683,
+        "share": 0.07119451891569854
+      }
+    },
+    {
+      "label": "punct (PUNCT -> PROPN)",
+      "recurred": true,
+      "dev": {
+        "rank": 2,
+        "promisedUnblock": 30,
+        "failures": 45,
+        "share": 0.05628517823639775
+      },
+      "train": {
+        "rank": 3,
+        "promisedUnblock": 148,
+        "failures": 323,
+        "share": 0.04408698242478403
+      }
+    },
+    {
+      "label": "list (NUM -> NUM)",
+      "recurred": true,
+      "dev": {
+        "rank": 3,
+        "promisedUnblock": 21,
+        "failures": 23,
+        "share": 0.039399624765478425
+      },
+      "train": {
+        "rank": 2,
+        "promisedUnblock": 151,
+        "failures": 159,
+        "share": 0.04498063747393506
+      }
+    },
+    {
+      "label": "nmod (NOUN -> NOUN)",
+      "recurred": false,
+      "dev": {
+        "rank": 4,
+        "promisedUnblock": 19,
+        "failures": 30,
+        "share": 0.03564727954971857
+      },
+      "train": {
+        "rank": 10,
+        "promisedUnblock": 72,
+        "failures": 156,
+        "share": 0.021447721179624665
+      }
+    },
+    {
+      "label": "advmod (PART -> VERB)",
+      "recurred": true,
+      "dev": {
+        "rank": 5,
+        "promisedUnblock": 17,
+        "failures": 54,
+        "share": 0.03189493433395872
+      },
+      "train": {
+        "rank": 4,
+        "promisedUnblock": 137,
+        "failures": 397,
+        "share": 0.0408102472445636
+      }
+    }
+  ],
+  "recurredCount": 4,
+  "testOpened": false
+}

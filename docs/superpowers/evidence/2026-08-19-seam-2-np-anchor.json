@@ -1,0 +1,145 @@
+{
+  "experiment": "SEAM-2 — nominal anchor on short NPs (the product envelope)",
+  "prereg": "docs/superpowers/evidence/2026-08-19-PREREG-seam-2-np-anchor.md",
+  "seed": 20260819,
+  "frozenHead": "48d31119eb80f9a1967e44e878eed9d1f7ed348e",
+  "goldSet": {
+    "builtFrom": "cache/ud/en_ewt-ud-test.conllu (held out)",
+    "rule": "contiguous subtree of a NOUN/PROPN head, 2-6 tokens, UPOS in {DET,ADJ,NOUN,PROPN,NUM}, deduped",
+    "items": 809,
+    "sample": [
+      {
+        "phrase": "This BuzzMachine post",
+        "anchor": "post"
+      },
+      {
+        "phrase": "the flags",
+        "anchor": "flags"
+      },
+      {
+        "phrase": "these slides",
+        "anchor": "slides"
+      },
+      {
+        "phrase": "This Fallujah operation",
+        "anchor": "operation"
+      },
+      {
+        "phrase": "an online marketer",
+        "anchor": "marketer"
+      },
+      {
+        "phrase": "a few new ones",
+        "anchor": "ones"
+      },
+      {
+        "phrase": "an excerpt",
+        "anchor": "excerpt"
+      },
+      {
+        "phrase": "this toolbar",
+        "anchor": "toolbar"
+      }
+    ]
+  },
+  "goldPosUsed": false,
+  "P1_gateLexicon": {
+    "posTypeCoverage": 0.3114,
+    "n": 809,
+    "arms": {
+      "A_phraseLayer": {
+        "accuracy": 0.7033,
+        "ci95": [
+          0.6724,
+          0.7342
+        ]
+      },
+      "B_clauseProjection": {
+        "accuracy": 0.0074,
+        "ci95": [
+          0.0025,
+          0.0136
+        ],
+        "note": "the SEAM-1b path"
+      },
+      "B_npAnchor": {
+        "accuracy": 0.4747,
+        "ci95": [
+          0.4388,
+          0.508
+        ],
+        "answerRate": 0.5389
+      }
+    },
+    "nullBaselines": {
+      "lastTaggedNoun": 0.4116,
+      "firstTaggedNoun": 0.2386,
+      "randomContentToken": 0.4388
+    },
+    "F1_vs_lastTaggedNoun": {
+      "B_np_wins": 125,
+      "lastNoun_wins": 74,
+      "chi2_cc": 12.563
+    },
+    "F2_vs_phraseLayer": {
+      "B_np_wins": 35,
+      "A_wins": 220,
+      "chi2_cc": 132.769
+    },
+    "F3_shuffledPos_B_np": [
+      0.3733,
+      0.3857,
+      0.3733
+    ]
+  },
+  "P2_liveDict": {
+    "posTypeCoverage": 0.852,
+    "n": 809,
+    "arms": {
+      "A_phraseLayer": {
+        "accuracy": 0.7676,
+        "ci95": [
+          0.7392,
+          0.7973
+        ]
+      },
+      "B_clauseProjection": {
+        "accuracy": 0.0099,
+        "ci95": [
+          0.0037,
+          0.0173
+        ],
+        "note": "the SEAM-1b path"
+      },
+      "B_npAnchor": {
+        "accuracy": 0.7874,
+        "ci95": [
+          0.7577,
+          0.8158
+        ],
+        "answerRate": 0.8603
+      }
+    },
+    "nullBaselines": {
+      "lastTaggedNoun": 0.8616,
+      "firstTaggedNoun": 0.3832,
+      "randomContentToken": 0.4388
+    },
+    "F1_vs_lastTaggedNoun": {
+      "B_np_wins": 29,
+      "lastNoun_wins": 89,
+      "chi2_cc": 29.5
+    },
+    "F2_vs_phraseLayer": {
+      "B_np_wins": 84,
+      "A_wins": 68,
+      "chi2_cc": 1.48
+    },
+    "F3_shuffledPos_B_np": [
+      0.6774,
+      0.6724,
+      0.6972
+    ]
+  },
+  "checksum": "24f1bb7708aadf71"
+}

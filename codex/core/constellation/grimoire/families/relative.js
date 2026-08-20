@@ -37,4 +37,16 @@ export const RELATIVE = [
     flags: ['rel-token-overload', 'construction-bundle'],
     grades: { C: 'Y', R: 'Y', H: 'G', X: 'Y' },
   }),
+  defineConstruction({
+    id: 'wh-subject-question',
+    family: 'relative-clause',
+    left: 'REL', right: 'VP', result: 'S', head: 1,
+    status: S.GRAMMAR,
+    relation: 'root',
+    construction: 'wh-subject-question',
+    roles: { left: 'wh-subject', right: 'matrix-predicate' },
+    note: 'who fought the wars ? — matrix wh-question with subject extraction',
+    flags: ['ud-aligned', 'matrix-question'],
+    grades: { C: 'G', R: 'G', H: 'G', X: 'G' },
+  }),
 ];
