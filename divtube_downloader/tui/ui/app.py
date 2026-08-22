@@ -466,6 +466,7 @@ class DivTubeAgentApp(App):
         ("q", "quit", "Quit"),
         ("c", "clear", "Clear"),
         ("escape", "stop_agents", "Stop"),
+        ("ctrl+b", "toggle_sidebar", "Sidebar"),
     ]
 
     def __init__(self):
@@ -569,6 +570,19 @@ class DivTubeAgentApp(App):
             pass
         suffix = f" [{MUTED}](killed {killed} process{'es' if killed != 1 else ''})[/]" if killed else ""
         self.log_msg(f"[{WARNING}]⛔ Stopped agent[/]{suffix}")
+
+    def action_toggle_sidebar(self) -> None:
+        """ctrl+b: show/hide the command sidebar.
+
+        Responsive relief for narrow terminals — hiding the sidebar reclaims
+        its 33 columns for the conversation. The display state IS the visual
+        state (Law: interaction state must explain the visual change).
+        """
+        try:
+            sidebar = self.query_one("#sidebar")
+        except Exception:
+            return
+        sidebar.toggle_class("sidebar-hidden")
 
     def setup_commands(self):
         def handle_download(ui, args):

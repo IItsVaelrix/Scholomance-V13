@@ -1,40 +1,50 @@
-"""Right-panel TEST RUN board — replaces QBIT Field Radar."""
+"""Right-panel TEST RUN board — replaces QBIT Field Radar.
+
+All colours resolve through theme.palette(); glyphs carry pass/fail meaning
+so state is never conveyed by colour alone (Professional UI Architect Law 5).
+"""
 
 from __future__ import annotations
 
 from textual.widgets import Static
 
 from tui.ui.sigils import title
+from tui.ui.theme import palette
 
-_IDLE = "[#6A5A6A]◦ awaiting test_run[/]\n[#6A5A6A]no suite in flight[/]"
-
+# status -> (glyph, palette role). Glyph + colour both encode the state.
 _STATUS_GLYPH = {
-    "pass": ("✓", "#7CFF8B"),
-    "fail": ("✗", "#FF5C7A"),
-    "skip": ("○", "#6A5A6A"),
-    "pending": ("…", "#FFD700"),
+    "pass": ("✓", "success"),
+    "fail": ("✗", "error"),
+    "skip": ("○", "muted"),
+    "pending": ("…", "warning"),
 }
 
 
-def format_test_row(name: str, status: str, max_name: int = 28) -> str:
-    glyph, color = _STATUS_GLYPH.get(status, ("·", "#6A5A6A"))
+def _idle_markup(p: dict) -> str:
+    return f"[{p['muted']}]◦ awaiting test_run[/]\n[{p['muted']}]no suite in flight[/]"
+
+
+def format_test_row(name: str, status: str, max_name: int = 28, p: dict | None = None) -> str:
+    p = p or palette(None)
+    glyph, role = _STATUS_GLYPH.get(status, ("·", "muted"))
     label = name if len(name) <= max_name else name[: max_name - 1] + "…"
-    return f"[{color}]{glyph}[/] {label}"
+    return f"[{p[role]}]{glyph}[/] {label}"
 
 
-def format_progress_bar(fraction: float, width: int = 16) -> str:
+def format_progress_bar(fraction: float, width: int = 16, p: dict | None = None) -> str:
+    p = p or palette(None)
     fraction = max(0.0, min(1.0, fraction))
     filled = int(round(fraction * width))
     bar = "█" * filled + "░" * (width - filled)
     pct = int(fraction * 100)
-    return f"[#FFD700]{bar}[/] [#6A5A6A]{pct:3d}%[/]"
+    return f"[{p['warning']}]{bar}[/] [{p['muted']}]{pct:3d}%[/]"
 
 
 class TestRunPanel(Static):
     """Animated test board: running progress, then staggered result cascade."""
 
     def __init__(self, **kwargs):
-        super().__init__(_IDLE, **kwargs)
+        super().__init__(_idle_markup(palette(None)), **kwargs)
         self.border_title = title("TEST RUN")
         self._state = "idle"  # idle | running | playing | done | error
         self._runner = ""
@@ -53,6 +63,10 @@ class TestRunPanel(Static):
         self._timer = None
         self._spin_timer = None
         self._run_gen = 0
+
+    def _p(self) -> dict:
+        """Active palette (falls back to the default theme off-app)."""
+        return palette(getattr(self.app, "THEME_NAME", None))
 
     def _cancel_timers(self):
         for attr in ("_timer", "_spin_timer"):
@@ -159,50 +173,48 @@ class TestRunPanel(Static):
         Must NOT be named ``_render`` — that shadows Textual Widget._render()
         and crashes the compositor with a None visual.
         """
+        p = self._p()
         if self._state == "idle":
-            self.update(_IDLE)
+            self.update(_idle_markup(p))
             return
         if self._state == "error":
             self.update(
-                f"[#FF5C7A]✗ run failed[/]\n[#6A5A6A]{self._error}[/]"
+                f"[{p['error']}]✗ run failed[/]\n[{p['muted']}]{self._error}[/]"
             )
             return
 
         spin = "⠋⠙⠹⠸"[self._spin_i % 4]
-        header_bits = [f"[#FFD700]{self._runner}[/]"]
+        header_bits = [f"[{p['warning']}]{self._runner}[/]"]
         if self._suite:
-            header_bits.append(f"[#6A5A6A]{self._suite}[/]")
+            header_bits.append(f"[{p['muted']}]{self._suite}[/]")
         if self._target:
             t = self._target if len(self._target) <= 22 else "…" + self._target[-21:]
-            header_bits.append(f"[#6A5A6A]{t}[/]")
+            header_bits.append(f"[{p['muted']}]{t}[/]")
         lines = [" ".join(header_bits)]
 
         if self._state == "running":
-            lines.append(f"[#FFD700]{spin}[/] {format_progress_bar(self._fraction)}")
+            lines.append(f"[{p['warning']}]{spin}[/] {format_progress_bar(self._fraction, p=p)}")
             if self._line:
-                lines.append(f"[#6A5A6A]{self._line}[/]")
+                lines.append(f"[{p['muted']}]{self._line}[/]")
             else:
-                lines.append("[#6A5A6A]collecting / executing…[/]")
+                lines.append(f"[{p['muted']}]collecting / executing…[/]")
         else:
-            lines.append(format_progress_bar(1.0))
+            lines.append(format_progress_bar(1.0, p=p))
             for i, t in enumerate(self._tests):
                 name = t.get("name") or t.get("title") or "?"
                 status = t.get("status") or "pending"
-                if i >= self._revealed:
-                    status = "pending"
-                lines.append(format_test_row(str(name), status))
-            if self._state == "done":
-                mark = "#7CFF8B" if self._ok else "#FF5C7A"
-                lines.append("")
-                lines.append(
-                    f"[{mark}]{'✔' if self._ok else '✗'}[/] "
-                    f"[#7CFF8B]{self._passed} pass[/] "
-                    f"[#FF5C7A]{self._failed} fail[/] "
-                    f"[#6A5A6A]{self._skipped} skip[/]"
-                )
-            elif self._state == "playing":
-                lines.append(
-                    f"[#6A5A6A]revealing {self._revealed}/{len(self._tests)}…[/]"
-                )
+                if i < self._revealed or self._state == "done":
+                    lines.append(format_test_row(name, status, p=p))
+                else:
+                    lines.append(format_test_row(name, "pending", p=p))
+
+            verdict = "PASS" if self._ok else "FAIL"
+            vcolor = p["success"] if self._ok else p["error"]
+            lines.append(
+                f"[{vcolor}]✓ {self._passed}[/] "
+                f"[{p['error']}]✗ {self._failed}[/] "
+                f"[{p['muted']}]○ {self._skipped}[/] "
+                f"[bold {vcolor}]{verdict}[/]"
+            )
 
         self.update("\n".join(lines))

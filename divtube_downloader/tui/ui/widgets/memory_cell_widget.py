@@ -8,6 +8,9 @@ Each cell is a small coloured square reflecting its status:
 
 The grid is 8×8 = 64 slots, matching the capacity of the MemoryService.
 Clicking a cell shows its contents + osmosis state in the chat log.
+
+All colours resolve through theme.palette() via semantic ROLES — the widget
+never names a hex value (Professional UI Architect Law 2).
 """
 
 import hashlib
@@ -15,30 +18,25 @@ from textual.widgets import Static, Button
 from textual.containers import Grid
 from textual import on
 from tui.ui.sigils import title
+from tui.ui.theme import palette
 
-# ── Scholomance palette (matches app.py) ────────────────────────────
-CRIMSON    = "#DC143C"
-GOLD       = "#FFD700"
-INDIGO     = "#8B5CF6"
-PURPLE     = "#8B5CF6"
-PURPLE_LT  = "#B388FF"
-SUCCESS    = "#7CFF8B"
-WARNING    = "#FFD166"
-ERROR      = "#FF5C7A"
-MUTED      = "#6A5A6A"
-BG         = "#0D0D0D"
-SURFACE    = "#161616"
-CYAN       = "#00E5FF"
-
-# ── Anomaly colors ──────────────────────────────────────────────────
-ANOMALY_COLORS = {
-    "none":              None,       # Use normal status color
-    "baseline_drift":    WARNING,
-    "antigen_match":     ERROR,
-    "concentration":     "#FF6F00",
+# status -> palette ROLE (resolved against the active palette at render time)
+_STATUS_ROLES = {
+    "hot": "highlight",        # reads > 10
+    "warm": "accent_tertiary", # reads > 3
+    "live": "accent_secondary",
+    "clean": "success",
 }
 
-ANOMALY_GLYPHS = {
+# ── Anomaly roles ───────────────────────────────────────────────────
+_ANOMALY_ROLES = {
+    "none":              None,       # Use normal status color
+    "baseline_drift":    "warning",
+    "antigen_match":     "error",
+    "concentration":     "warning",
+}
+
+_ANOMALY_GLYPHS = {
     "none":              None,
     "baseline_drift":    "⚠",
     "antigen_match":     "☣",
@@ -60,6 +58,9 @@ class MemoryCellWidget(Static):
         self._cell_map = {}       # btn_id -> (key, preview, reads, status, osmosis)
         self._auto_refresh = None
 
+    def _p(self) -> dict:
+        return palette(getattr(self.app, "THEME_NAME", None))
+
     def on_mount(self):
         self.border_title = title("MEMORY CELLS")
         self.styles.height = "22"
@@ -75,6 +76,7 @@ class MemoryCellWidget(Static):
         """Populate the grid from the memory service + substrate osmosis state."""
         if not self._memory:
             return
+        p = self._p()
         cells = {r["cell_id"]: r for r in self._memory.list_cells()}
 
         # Load osmosis state if substrate is available
@@ -109,22 +111,23 @@ class MemoryCellWidget(Static):
 
                 # Pick color: anomaly overrides normal status
                 if is_anomaly:
-                    color = ANOMALY_COLORS.get(anomaly_kind, ERROR)
-                    glyph = ANOMALY_GLYPHS.get(anomaly_kind, "⚠")
+                    role = _ANOMALY_ROLES.get(anomaly_kind, "error")
+                    color = p[role]
+                    glyph = _ANOMALY_GLYPHS.get(anomaly_kind, "⚠")
                 elif reads > 10:
-                    color = GOLD
+                    color = p[_STATUS_ROLES["hot"]]
                     glyph = "◆"
                 elif reads > 3:
-                    color = PURPLE_LT
+                    color = p[_STATUS_ROLES["warm"]]
                     glyph = "◈"
                 else:
-                    color = PURPLE
+                    color = p[_STATUS_ROLES["live"]]
                     glyph = "◇"
 
                 # If scanned and clean, show a subtle checkmark
                 if osm and not is_anomaly and osm.get("scan_count", 0) > 0:
                     glyph = "✓"
-                    color = SUCCESS if reads > 3 else PURPLE
+                    color = p["success"] if reads > 3 else p["accent_secondary"]
 
                 label = assigned["preview"][:6]
                 btn.styles.background = color + "30"
@@ -147,9 +150,9 @@ class MemoryCellWidget(Static):
                 btn.tooltip = "\n".join(tooltip_lines)
             else:
                 # Empty slot
-                btn.styles.background = SURFACE
-                btn.styles.color = MUTED
-                btn.styles.border = ("solid", MUTED + "40")
+                btn.styles.background = p["surface"]
+                btn.styles.color = p["muted"]
+                btn.styles.border = ("solid", p["muted"] + "40")
                 btn.label = "·"
                 btn.tooltip = "Empty slot"
 
@@ -169,43 +172,47 @@ class MemoryCellWidget(Static):
     @on(Button.Pressed)
     def _on_cell_click(self, event: Button.Pressed):
         """Show cell contents + osmosis state in the chat log."""
+        p = self._p()
         btn_id = event.button.id
         if btn_id not in self._cell_map:
             if self._log:
-                self._log(f"[{MUTED}]Empty memory cell — nothing stored here.[/]")
+                self._log(f"[{p['muted']}]Empty memory cell — nothing stored here.[/]")
             return
         cdata = self._cell_map[btn_id]
         osm = cdata.get("osmosis")
 
         lines = [
-            f"\n[{GOLD}]❖ MEMORY CELL ❖[/]  [{PURPLE_LT}]{cdata['cell_id']}[/]",
-            f"  [{MUTED}]Key:[/]    [{SUCCESS}]{cdata['key']}[/]",
-            f"  [{MUTED}]Reads:[/]  {cdata['reads']}",
-            f"  [{MUTED}]Status:[/] [{PURPLE}]{cdata['status']}[/]",
-            f"  [{MUTED}]Value:[/]  {cdata['preview']}",
+            f"\n[{p['highlight']}]❖ MEMORY CELL ❖[/]  [{p['accent_tertiary']}]{cdata['cell_id']}[/]",
+            f"  [{p['muted']}]Key:[/]    [{p['success']}]{cdata['key']}[/]",
+            f"  [{p['muted']}]Reads:[/]  {cdata['reads']}",
+            f"  [{p['muted']}]Status:[/] [{p['accent_secondary']}]{cdata['status']}[/]",
+            f"  [{p['muted']}]Value:[/]  {cdata['preview']}",
         ]
 
         if osm:
             anomaly_kind = osm.get("anomaly_kind", "none")
             is_anomaly = osm.get("status") == "anomaly"
-            anomaly_color = ANOMALY_COLORS.get(anomaly_kind, MUTED) if is_anomaly else SUCCESS
-            anomaly_glyph = ANOMALY_GLYPHS.get(anomaly_kind, "◇") if is_anomaly else "✓"
+            if is_anomaly:
+                anomaly_color = p[_ANOMALY_ROLES.get(anomaly_kind, "muted")]
+            else:
+                anomaly_color = p["success"]
+            anomaly_glyph = _ANOMALY_GLYPHS.get(anomaly_kind, "◇") if is_anomaly else "✓"
 
             lines.append("")
-            lines.append(f"  [{CYAN}]⬡ SUBSTRATE OSMOSIS[/]")
+            lines.append(f"  [{p['accent_tertiary']}]⬡ SUBSTRATE OSMOSIS[/]")
             lines.append(
                 f"  [{anomaly_color}]{anomaly_glyph}[/] Status: "
                 f"[{anomaly_color}]{osm.get('status', '?')}[/]"
                 + (f"  ({anomaly_kind})" if is_anomaly else "")
             )
             lines.append(
-                f"  [{MUTED}]  Similarity:[/] {osm.get('similarity', 0):.4f}  "
-                f"[{MUTED}]Drift:[/] {osm.get('drift', 0):.4f}  "
-                f"[{MUTED}]Confidence:[/] {osm.get('confidence', 0):.4f}"
+                f"  [{p['muted']}]  Similarity:[/] {osm.get('similarity', 0):.4f}  "
+                f"[{p['muted']}]Drift:[/] {osm.get('drift', 0):.4f}  "
+                f"[{p['muted']}]Confidence:[/] {osm.get('confidence', 0):.4f}"
             )
             lines.append(
-                f"  [{MUTED}]  Scans:[/] {osm.get('scan_count', 0)}  "
-                f"[{MUTED}]Last:[/] {osm.get('last_scan', 'never')}"
+                f"  [{p['muted']}]  Scans:[/] {osm.get('scan_count', 0)}  "
+                f"[{p['muted']}]Last:[/] {osm.get('last_scan', 'never')}"
             )
 
         if self._log:

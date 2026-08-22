@@ -102,6 +102,26 @@ FooterKey:hover {
 }
 
 /* ── sidebar: identity kept as TEXT colour, never a second border ───────── */
+#sidebar.sidebar-hidden { display: none; }   /* ctrl+b — reclaims 33 columns */
+
+#sidebar-filter {
+    width: 100%;
+    height: 3;
+    margin-bottom: 1;
+    background: $background;
+    color: $text-bright;
+    border: round $panel-border;
+}
+#sidebar-filter:focus {
+    border: round $accent-primary;
+}
+#sidebar-no-match {
+    display: none;
+    color: $muted;
+    text-style: italic;
+    padding: 1 1;
+}
+
 .sidebar-heading {
     margin-top: 1;
     margin-bottom: 0;
@@ -150,6 +170,7 @@ FooterKey:hover {
 
 .cmd-list { padding: 1 0 0 1; }
 .muted { color: $muted; }
+.inspector-caption { margin-top: 1; margin-bottom: 0; }
 .glyph-container {
     dock: bottom;
     content-align: center middle;

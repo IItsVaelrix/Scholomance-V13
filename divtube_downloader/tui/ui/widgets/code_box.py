@@ -1,7 +1,16 @@
+"""Code viewer panel — Rich syntax highlighting, palette-resolved.
+
+DEFAULT_CSS uses $tokens (resolved from theme.py via App.get_css_variables),
+and the Rich Syntax background is read from the live palette at render time,
+so a theme swap re-skins the viewer without touching this file.
+"""
+
 from textual.widgets import Static
 from textual.containers import VerticalScroll
 from textual.app import ComposeResult
 from rich.syntax import Syntax
+
+from tui.ui.theme import palette
 
 
 EXT_LANG = {
@@ -25,7 +34,7 @@ def _guess_language(filename: str) -> str:
 class CodeBox(VerticalScroll):
     """A scrollable panel that renders source code with Rich syntax highlighting.
 
-    Each code block is wrapped with line numbers and a dark theme so it
+    Each code block is wrapped with line numbers and the theme background so it
     stands out from the chat log.  Pass a *filename* to enable automatic
     language detection, or supply *language* explicitly.
     """
@@ -34,23 +43,23 @@ class CodeBox(VerticalScroll):
     CodeBox {
         width: 1fr;
         height: 1fr;
-        background: #0D0D0D;
-        border: round #8B5CF6;
-        border-title-color: #FFD700;
+        background: $background;
+        border: round $panel-border;
+        border-title-color: $text-secondary;
         border-title-align: center;
         padding: 0 1;
     }
     CodeBox > .code-title {
         text-align: center;
         text-style: bold;
-        color: #B388FF;
+        color: $accent-tertiary;
         padding: 0 1;
         height: 1;
     }
     CodeBox > .code-content {
         width: 1fr;
         height: 1fr;
-        background: #0D0D0D;
+        background: $background;
         padding: 0 1;
     }
     """
@@ -61,15 +70,23 @@ class CodeBox(VerticalScroll):
         self._language = language if language != "text" else _guess_language(filename)
         self._container = None
 
-    # Shown when no source is loaded, so the panel invites use instead of
-    # reading as a blank/broken box.
-    _EMPTY = ("[#6A5A6A]no scroll open[/]\n"
-              "[#6A5A6A]code surfaces here when you /analyze or open a file[/]")
+    def _p(self) -> dict:
+        return palette(getattr(self.app, "THEME_NAME", None))
+
+    def _empty_markup(self) -> str:
+        m = self._p()["muted"]
+        # Shown when no source is loaded, so the panel invites use instead of
+        # reading as a blank/broken box.
+        return (f"[{m}]no scroll open[/]\n"
+                f"[{m}]code surfaces here when you /analyze or open a file[/]")
+
+    def _title_markup(self) -> str:
+        return f"[{self._p()['accent_tertiary']}]📄 {self._filename}[/]"
 
     def compose(self) -> ComposeResult:
         if self._filename:
-            yield Static(f"[#B388FF]📄 {self._filename}[/]", classes="code-title")
-        self._container = Static(self._EMPTY, classes="code-content")
+            yield Static(self._title_markup(), classes="code-title")
+        self._container = Static(self._empty_markup(), classes="code-content")
         yield self._container
 
     def set_code(self, code: str, filename: str = "", language: str | None = None):
@@ -85,7 +102,7 @@ class CodeBox(VerticalScroll):
             return
 
         if not code.strip():
-            self._container.update(self._EMPTY)
+            self._container.update(self._empty_markup())
             return
 
         try:
@@ -95,7 +112,7 @@ class CodeBox(VerticalScroll):
                 theme="monokai",
                 line_numbers=True,
                 word_wrap=False,
-                background_color="#0D0D0D",
+                background_color=self._p()["background"],
             )
             self._container.update(rich_syntax)
         except Exception:
@@ -104,9 +121,9 @@ class CodeBox(VerticalScroll):
         if self._filename:
             title_nodes = self.query(".code-title")
             if title_nodes:
-                title_nodes[0].update(f"[#B388FF]📄 {self._filename}[/]")
+                title_nodes[0].update(self._title_markup())
             else:
-                self.mount(Static(f"[#B388FF]📄 {self._filename}[/]", classes="code-title"), before=self._container)
+                self.mount(Static(self._title_markup(), classes="code-title"), before=self._container)
 
     @property
     def code(self) -> str:

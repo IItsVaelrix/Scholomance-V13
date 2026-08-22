@@ -45,3 +45,17 @@ THEMES = {
         "highlight": "#FFD700"
     }
 }
+
+# Default theme used as fallback when a widget renders off-app or with an
+# unknown THEME_NAME. Kept in ONE place so the fallback can never drift.
+DEFAULT_THEME = "obsidian_crimson"
+
+
+def palette(name: str | None = None) -> dict:
+    """Return the palette dict for a theme name.
+
+    Widgets call ``palette(getattr(self.app, "THEME_NAME", None))`` so every
+    colour they render resolves through theme.py — the single source of truth.
+    Unknown/absent names fall back to DEFAULT_THEME rather than raising.
+    """
+    return THEMES.get(name or DEFAULT_THEME, THEMES[DEFAULT_THEME])

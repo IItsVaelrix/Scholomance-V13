@@ -12,7 +12,7 @@ matters. Colours come from theme.py (the active app theme), never hardcoded.
 from textual.widgets import Static
 
 from tui.services.token_meter import meter
-from tui.ui.theme import THEMES
+from tui.ui.theme import palette
 from tui.ui.sigils import title
 
 _BAR_WIDTH = 18
@@ -21,9 +21,8 @@ _EMPTY = "▱"
 
 
 def _palette(widget):
-    """The active app palette, falling back to obsidian_crimson off-app."""
-    name = getattr(widget.app, "THEME_NAME", "obsidian_crimson")
-    return THEMES.get(name, THEMES["obsidian_crimson"])
+    """The active app palette, falling back to the default theme off-app."""
+    return palette(getattr(widget.app, "THEME_NAME", None))
 
 
 def _bar_color(ratio, p):
