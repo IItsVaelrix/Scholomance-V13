@@ -14,7 +14,7 @@ import os
 import asyncio
 
 from tui.ui.layout import get_layout
-from tui.ui.theme import THEMES
+from tui.ui.theme import THEMES, DEFAULT_THEME, palette
 from tui.ui.sigils import title as _sigil_title
 from tui.core.command_parser import CommandRegistry
 from tui.ui.widgets.command_area import CommandSubmitted
@@ -42,19 +42,22 @@ from tui.widgets.log_tail_widget import LogTailWidget
 from tui.widgets.registry_inspector_widget import RegistryInspectorWidget
 
 # ── Scholomance palette ──────────────────────────────────────────────
-# Obsidian · Purple · Crimson
-BACKGROUND = "#0D0D0D"   # obsidian black
-SURFACE    = "#161616"   # obsidian surface
-PANEL      = "#1C1818"   # obsidian panel (crimson warmth)
-CRIMSON    = "#DC143C"   # primary accent
-GOLD       = "#FFD700"   # highlight
-PURPLE     = "#8B5CF6"   # secondary accent (royal purple)
-PURPLE_LT  = "#B388FF"   # light purple
-SUCCESS    = "#7CFF8B"
-WARNING    = "#FFD166"
-ERROR      = "#FF5C7A"
-MUTED      = "#6A5A6A"   # muted purple-gray
-FOREGROUND = "#E2E8F0"
+# Obsidian · Purple · Crimson — derived from the ONE source of truth
+# (tui/ui/theme.py) so chat markup can never drift from the app theme.
+# DEFAULT_THEME matches App.THEME_NAME below.
+_P = palette(DEFAULT_THEME)
+BACKGROUND = _P["background"]
+SURFACE    = _P["surface"]
+PANEL      = _P["surface"]        # panel fill IS the surface role
+CRIMSON    = _P["accent_primary"]
+GOLD       = _P["highlight"]
+PURPLE     = _P["accent_secondary"]
+PURPLE_LT  = _P["accent_tertiary"]
+SUCCESS    = _P["success"]
+WARNING    = _P["warning"]
+ERROR      = _P["error"]
+MUTED      = _P["muted"]
+FOREGROUND = _P["text_primary"]
 
 
 EXT_LANG = {
@@ -244,7 +247,7 @@ class FileSelectScreen(ModalScreen[str]):
             placeholder = "Type to filter…"
             options = [Option(f) for f in self.files[:100]]
         yield Vertical(
-            Static(f"[bold #DC143C]{title}[/]", classes="modal-title"),
+            Static(f"[bold {CRIMSON}]{title}[/]", classes="modal-title"),
             Input(placeholder=placeholder, id="file-filter"),
             OptionList(*options, id="file-list"),
             id="file-select-container"
@@ -368,7 +371,7 @@ class WidgetModalScreen(ModalScreen):
     def compose(self):
         children = []
         if self._title:
-            children.append(Static(f"[bold #DC143C]{self._title}[/]", classes="modal-title"))
+            children.append(Static(f"[bold {CRIMSON}]{self._title}[/]", classes="modal-title"))
         children.append(self._widget)
         yield Vertical(*children, id="widget-modal-container")
 
@@ -397,7 +400,7 @@ class ModelSelectScreen(ModalScreen[str]):
                 options.append(Option(m))
                 
         yield Vertical(
-            Static("[bold #FFD700]❖ SELECT ACTIVE MODEL ❖[/]\n", id="model-title"),
+            Static(f"[bold {GOLD}]❖ SELECT ACTIVE MODEL ❖[/]\n", id="model-title"),
             OptionList(*options, id="model-options"),
             id="model-dialog"
         )
@@ -588,7 +591,7 @@ class DivTubeAgentApp(App):
         def handle_download(ui, args):
             url, audio = parse_download_args(args)
             if not url:
-                ui.log_msg("[#FF5C7A]Usage:[/] /download <url> [--audio]")
+                ui.log_msg(f"[{ERROR}]Usage:[/] /download <url> [--audio]")
                 return
             cmd = CMD_DOWNLOAD_AUDIO if audio else CMD_DOWNLOAD_VIDEO
 
@@ -635,23 +638,23 @@ class DivTubeAgentApp(App):
         def handle_code(ui, args):
             if not args:
                 ui.show_code("", "")
-                ui.log_msg("[#6A5A6A]Code viewer cleared.[/]")
+                ui.log_msg(f"[{MUTED}]Code viewer cleared.[/]")
                 return
             path = args[0]
             try:
                 with open(path, "r", encoding="utf-8", errors="replace") as f:
                     source = f.read()
                 ui.show_code(source, filename=path)
-                ui.log_msg(f"[#7CFF8B]✔ Code loaded:[/] {path}")
+                ui.log_msg(f"[{SUCCESS}]✔ Code loaded:[/] {path}")
             except Exception as e:
-                ui.log_msg(f"[#FF5C7A]✗ Failed to read {path}:[/] {e}")
+                ui.log_msg(f"[{ERROR}]✗ Failed to read {path}:[/] {e}")
 
         def handle_undo_replace(ui, args):
             from tui.services.tool_service import undo_replace, list_undoable
             if args and args[0] in ("--list", "-l", "list"):
                 stack = list_undoable()
                 if not stack:
-                    ui.log_msg("[#6A5A6A]Nothing to undo — undo stack is empty.[/]")
+                    ui.log_msg(f"[{MUTED}]Nothing to undo — undo stack is empty.[/]")
                     return
                 ui.log_msg(f"[bold {GOLD}]◀ UNDO STACK[/] [dim](newest last)[/]")
                 for entry in stack:
@@ -696,7 +699,7 @@ class DivTubeAgentApp(App):
             sub = args[0].lower() if args else ""
 
             if sub == "scan":
-                ui.log_msg(f"[bold #00E5FF]⬡ Running substrate osmosis scan...[/]")
+                ui.log_msg(f"[bold {PURPLE_LT}]⬡ Running substrate osmosis scan...[/]")
                 ui.substrate.scan_all_async(ui.log_msg)
                 return
 
@@ -704,7 +707,7 @@ class DivTubeAgentApp(App):
                 summary = ui.substrate.anomaly_summary()
                 states = ui.substrate.get_all_osmosis_states()
                 lines = [
-                    f"\n[bold #00E5FF]⬡ SUBSTRATE STATUS ⬡[/]",
+                    f"\n[bold {PURPLE_LT}]⬡ SUBSTRATE STATUS ⬡[/]",
                     f"  [{SUCCESS}]●[/] Tracked cells: [{PURPLE_LT}]{summary['total_cells']}[/]",
                     f"  [{SUCCESS}]●[/] Silent: [{SUCCESS}]{summary['silent']}[/]  Anomalous: [{ERROR}]{summary['anomalies']}[/]",
                     f"  [{MUTED}]   Total scans: {summary['total_scans']}  Last: {summary['last_scan']}[/]",
@@ -750,7 +753,7 @@ class DivTubeAgentApp(App):
                 f"| [dim]{stats['dormant']} dormant[/]  "
                 f"| [dim]{stats['total_reads']} total reads[/]  "
                 f"| [dim]{stats['critiques']} critiques[/]\n"
-                f"  [bold #00E5FF]Substrate:[/] {osm_summary['total_cells']} tracked  "
+                f"  [bold {PURPLE_LT}]Substrate:[/] {osm_summary['total_cells']} tracked  "
                 f"| [{ERROR}]{osm_summary['anomalies']}[/] anomalies  "
                 f"| {osm_summary['total_scans']} scans\n"
                 f"  [{MUTED}]Use /memory scan · /memory status · /memory list[/]"
@@ -758,7 +761,7 @@ class DivTubeAgentApp(App):
         self.registry.register("/memory", handle_memory, "Show memory & substrate", "/memory [scan|status|list]")
 
         def handle_deploy(ui, args):
-            ui.log_msg("\n[bold #B388FF]⚡ Deploying...[/]")
+            ui.log_msg(f"\n[bold {PURPLE_LT}]⚡ Deploying...[/]")
             def run():
                 import subprocess
                 import os
@@ -769,18 +772,18 @@ class DivTubeAgentApp(App):
                     output = result.stdout + "\n" + result.stderr
                     output = output.replace("[", "\\[")
                     if result.returncode == 0:
-                        ui.log_msg(f"\n[bold #7CFF8B]✓ Deployment successful[/]\n{output[-1000:]}")
+                        ui.log_msg(f"\n[bold {SUCCESS}]✓ Deployment successful[/]\n{output[-1000:]}")
                     else:
-                        ui.log_msg(f"\n[bold #FF5C7A]✗ Deployment failed (code {result.returncode})[/]\n{output[-1000:]}")
+                        ui.log_msg(f"\n[bold {ERROR}]✗ Deployment failed (code {result.returncode})[/]\n{output[-1000:]}")
                 except Exception as e:
-                    ui.log_msg(f"\n[bold #FF5C7A]✗ Deployment error: {e}[/]")
+                    ui.log_msg(f"\n[bold {ERROR}]✗ Deployment error: {e}[/]")
             import threading
             threading.Thread(target=run, daemon=True).start()
 
         self.registry.register("/deploy", handle_deploy, "Deploy app (npm run deploy)", "/deploy")
 
         def handle_polish(ui, args):
-            ui.log_msg("\n[bold #B388FF]✨ Running Production Polish...[/]")
+            ui.log_msg(f"\n[bold {PURPLE_LT}]✨ Running Production Polish...[/]")
             def run():
                 import subprocess
                 import os
@@ -798,11 +801,11 @@ class DivTubeAgentApp(App):
                     if len(output) > 4000:
                         output = "... [truncated] ...\n" + output[-4000:]
                     if result.returncode == 0:
-                        ui.log_msg(f"\n[bold #7CFF8B]✓ Polish complete[/]\n{output}")
+                        ui.log_msg(f"\n[bold {SUCCESS}]✓ Polish complete[/]\n{output}")
                     else:
-                        ui.log_msg(f"\n[bold #FF5C7A]✗ Polish failed (code {result.returncode})[/]\n{output}")
+                        ui.log_msg(f"\n[bold {ERROR}]✗ Polish failed (code {result.returncode})[/]\n{output}")
                 except Exception as e:
-                    ui.log_msg(f"\n[bold #FF5C7A]✗ Polish error: {e}[/]")
+                    ui.log_msg(f"\n[bold {ERROR}]✗ Polish error: {e}[/]")
             import threading
             threading.Thread(target=run, daemon=True).start()
 
@@ -810,7 +813,7 @@ class DivTubeAgentApp(App):
 
         def create_python_check_command(name, python_cmd, desc, usage_text):
             def handler(ui, args):
-                ui.log_msg(f"\n[bold #B388FF]⚡ Running {name}...[/]")
+                ui.log_msg(f"\n[bold {PURPLE_LT}]⚡ Running {name}...[/]")
                 def run():
                     import subprocess
                     import os
@@ -827,11 +830,11 @@ class DivTubeAgentApp(App):
                         if len(output) > 4000:
                             output = "... [truncated] ...\n" + output[-4000:]
                         if result.returncode == 0:
-                            ui.log_msg(f"\n[bold #7CFF8B]✓ {name} complete[/]\n{output}")
+                            ui.log_msg(f"\n[bold {SUCCESS}]✓ {name} complete[/]\n{output}")
                         else:
-                            ui.log_msg(f"\n[bold #FF5C7A]✗ {name} failed (code {result.returncode})[/]\n{output}")
+                            ui.log_msg(f"\n[bold {ERROR}]✗ {name} failed (code {result.returncode})[/]\n{output}")
                     except Exception as e:
-                        ui.log_msg(f"\n[bold #FF5C7A]✗ {name} error: {e}[/]")
+                        ui.log_msg(f"\n[bold {ERROR}]✗ {name} error: {e}[/]")
                 import threading
                 threading.Thread(target=run, daemon=True).start()
             self.registry.register(f"/{name}", handler, desc, usage_text)
@@ -1089,18 +1092,18 @@ class DivTubeAgentApp(App):
                     result = analyze_thumbnail(None, thumbnail_bytes)
                     score = result.score or 0
                     
-                    color = "#FF5C7A" if score < 50 else "#FFD166" if score < 75 else "#7CFF8B"
+                    color = ERROR if score < 50 else WARNING if score < 75 else SUCCESS
                     
                     msg = "\n[bold magenta]❖ THUMBNAIL INTEL GRADE ❖[/]\n"
                     msg += f"File: {os.path.basename(path)}\n"
                     msg += f"Score: [bold {color}]{score}/100[/]\n"
                     
                     if result.flags:
-                        msg += "\n[bold #FFD166]Warnings & Flags:[/]\n"
+                        msg += f"\n[bold {WARNING}]Warnings & Flags:[/]\n"
                         for flag in result.flags:
                             msg += f"  - [{flag.code}] {flag.message}\n"
                     else:
-                        msg += "\n[bold #7CFF8B]✔ No critical warnings. Composition is solid![/]\n"
+                        msg += f"\n[bold {SUCCESS}]✔ No critical warnings. Composition is solid![/]\n"
                         
                     msg += f"\n[dim]Metrics: Silhouette ({result.metrics.get('silhouette', 0)}), Contrast ({result.metrics.get('contrast', 0)}), Color Sep ({result.metrics.get('colorSeparation', 0)})[/]"
                         
@@ -1124,12 +1127,12 @@ class DivTubeAgentApp(App):
                 analysis = VideoAnalysis(overview=VideoOverview(title=title_text))
                 result = analyze_title(analysis)
                 score = result.score or 0
-                color = "#FF5C7A" if score < 50 else "#FFD166" if score < 75 else "#7CFF8B"
+                color = ERROR if score < 50 else WARNING if score < 75 else SUCCESS
                 msg = "\n[bold magenta]❖ TITLE INTEL GRADE ❖[/]\n"
                 msg += f"Title: \"{title_text}\"\n"
                 msg += f"Score: [bold {color}]{score}/100[/]\n"
                 m = result.metrics
-                msg += "\n[bold #B388FF]Breakdown:[/]\n"
+                msg += f"\n[bold {PURPLE_LT}]Breakdown:[/]\n"
                 msg += f"  Length: {m.get('length', '?')} chars ({'✓' if m.get('length', 99) <= 50 else '⚠ over 60 → mobile truncation'})\n"
                 hook = m.get('hasHook', False)
                 msg += f"  Hook: {'✓' if hook else '✗'} in first 3 words\n"
@@ -1140,11 +1143,11 @@ class DivTubeAgentApp(App):
                 msg += f"  Clarity: {m.get('clarity', 0):.0%}\n"
                 msg += f"  Uniqueness: {m.get('uniqueness', 0):.0%}\n"
                 if result.flags:
-                    msg += "\n[bold #FFD166]Flags:[/]\n"
+                    msg += f"\n[bold {WARNING}]Flags:[/]\n"
                     for flag in result.flags:
                         msg += f"  - [{flag.code}] {flag.message}\n"
                 else:
-                    msg += "\n[bold #7CFF8B]✔ No issues detected.[/]\n"
+                    msg += f"\n[bold {SUCCESS}]✔ No issues detected.[/]\n"
                 ui.log_msg(msg)
             except Exception as e:
                 ui.log_msg(f"[{ERROR}]Title analysis failed:[/] {e}")
@@ -1260,14 +1263,14 @@ class DivTubeAgentApp(App):
             if any(isinstance(s, VideoForgeScreen) for s in ui.screen_stack):
                 ui.pop_screen()
             else:
-                ui.log_msg("[#6A5A6A]Already on DivTube home. Use /forge to open the Video Forge editor.[/]")
+                ui.log_msg(f"[{MUTED}]Already on DivTube home. Use /forge to open the Video Forge editor.[/]")
 
         self.registry.register("/divtube", handle_divtube, "Return to DivTube", "/divtube")
 
         def handle_prompt(ui, args):
             text = " ".join(args)
             if not text:
-                ui.log_msg("[#FF5C7A]Usage: /prompt <your message>[/]")
+                ui.log_msg(f"[{ERROR}]Usage: /prompt <your message>[/]")
                 return
             try:
                 active_tab = ui.query_one("#agent-tabs").active
@@ -1291,7 +1294,7 @@ class DivTubeAgentApp(App):
         def handle_prompt_model(ui, args):
             model = " ".join(args).strip()
             if not model:
-                ui.log_msg("[#FF5C7A]Usage: /prompt-model <model_name>[/]")
+                ui.log_msg(f"[{ERROR}]Usage: /prompt-model <model_name>[/]")
                 return
             import os
             ui.prompt.set_model(model)
@@ -1299,7 +1302,7 @@ class DivTubeAgentApp(App):
             os.environ["OPENCODE_MODEL"] = model
             with open(".env", "a") as f:
                 f.write(f"\nOPENCODE_MODEL={model}\n")
-            ui.log_msg(f"[bold #7CFF8B]✔ AI model set to:[/] {model}")
+            ui.log_msg(f"[bold {SUCCESS}]✔ AI model set to:[/] {model}")
 
         def handle_prompt_clear(ui, args):
             try:
@@ -1308,7 +1311,7 @@ class DivTubeAgentApp(App):
             except Exception:
                 agent_id = "divtube"
             ui.prompt.clear_history(agent_id=agent_id)
-            ui.log_msg(f"[#7CFF8B]✔ Conversation history cleared for {agent_id}.[/]")
+            ui.log_msg(f"[{SUCCESS}]✔ Conversation history cleared for {agent_id}.[/]")
 
         self.registry.register("/prompt",        handle_prompt,       "Chat with AI agent",        "/prompt <message>")
         self.registry.register("/prompt-model",  handle_prompt_model, "Set AI model for /prompt",  "/prompt-model <name>")
@@ -1388,7 +1391,7 @@ class DivTubeAgentApp(App):
                     def _write():
                         bar.progress = 100
                         ui.set_timer(2.0, lambda: setattr(bar.styles, "display", "none"))
-                        ui.log_msg(f"[{ERROR}]Vaelrix unreachable: {e}\n[#6A5A6A]Is the daemon running on :9090?[/]")
+                        ui.log_msg(f"[{ERROR}]Vaelrix unreachable: {e}\n[{MUTED}]Is the daemon running on :9090?[/]")
                     ui.call_from_thread(_write)
 
             threading.Thread(target=run, daemon=True).start()
@@ -1599,7 +1602,7 @@ class DivTubeAgentApp(App):
         """TurboQuant SEO plugin commands (spec v1.0, phases 0-3)."""
 
         def usage(ui, text):
-            ui.log_msg(f"[#6A5A6A]usage:[/] {text}")
+            ui.log_msg(f"[{MUTED}]usage:[/] {text}")
 
         def register_golden(ui, args):
             pos, flags = _flags(args, {"--name"})
@@ -1701,21 +1704,21 @@ class DivTubeAgentApp(App):
         def handle_cleri_scan(ui, args):
             text = " ".join(args).strip()
             if not text:
-                ui.log_msg("[#FF5C7A]Usage: /cleri-scan \"symptom text\"[/]")
+                ui.log_msg(f"[{ERROR}]Usage: /cleri-scan \"symptom text\"[/]")
                 return
             ui.cleri.scan(text, ui.log_msg)
 
         def handle_cleri_diagnose(ui, args):
             report = args[0] if args else None
             if not report:
-                ui.log_msg("[#FF5C7A]Usage: /cleri-diagnose <bug.json>[/]")
+                ui.log_msg(f"[{ERROR}]Usage: /cleri-diagnose <bug.json>[/]")
                 return
             ui.cleri.diagnose(report, ui.log_msg)
 
         def handle_cleri_train(ui, args):
             pattern = args[0] if args else None
             if not pattern:
-                ui.log_msg("[#FF5C7A]Usage: /cleri-train <pattern.json>[/]")
+                ui.log_msg(f"[{ERROR}]Usage: /cleri-train <pattern.json>[/]")
                 return
             ui.cleri.train(pattern, ui.log_msg)
 
@@ -1725,19 +1728,19 @@ class DivTubeAgentApp(App):
         def handle_cleri_probe(ui, args):
             text = " ".join(args).strip()
             if not text:
-                ui.log_msg("[#FF5C7A]Usage: /cleri-probe \"text\" [--mode prion][/]")
+                ui.log_msg(f"[{ERROR}]Usage: /cleri-probe \"text\" [--mode prion][/]")
                 return
             ui.cleri.probe(text, ui.log_msg)
 
         def handle_cleri_agent_query(ui, args):
             if len(args) < 2:
-                ui.log_msg("[#FF5C7A]Usage: /cleri-agent-query <codex|claude|gemini|merlin> <bug.json>[/]")
+                ui.log_msg(f"[{ERROR}]Usage: /cleri-agent-query <codex|claude|gemini|merlin> <bug.json>[/]")
                 return
             ui.cleri.agent_query(args[0], args[1], ui.log_msg)
 
         def handle_cleri_merlin_ingest(ui, args):
             if not args:
-                ui.log_msg("[#FF5C7A]Usage: /cleri-merlin-ingest <bug.json> [--no-train][/]")
+                ui.log_msg(f"[{ERROR}]Usage: /cleri-merlin-ingest <bug.json> [--no-train][/]")
                 return
             no_train = "--no-train" in args
             report = [a for a in args if not a.startswith("--")]
@@ -1768,13 +1771,13 @@ class DivTubeAgentApp(App):
 
         def handle_cleri_feedback(ui, args):
             if len(args) < 2:
-                ui.log_msg("[#FF5C7A]Usage: /cleri-feedback <pattern-id> --confirm|--reject[/]")
+                ui.log_msg(f"[{ERROR}]Usage: /cleri-feedback <pattern-id> --confirm|--reject[/]")
                 return
             pid = args[0]
             confirm = "--confirm" in args
             reject = "--reject" in args
             if confirm == reject:
-                ui.log_msg("[#FF5C7A]Specify exactly one: --confirm or --reject[/]")
+                ui.log_msg(f"[{ERROR}]Specify exactly one: --confirm or --reject[/]")
                 return
             ui.cleri.feedback(pid, confirm, ui.log_msg)
 
@@ -1782,7 +1785,7 @@ class DivTubeAgentApp(App):
             ui.cleri.rebuild_index(ui.log_msg)
 
         def handle_cleri_repl(ui, args):
-            ui.log_msg("[#FFD700]CLERI REPL[/] [#6A5A6A]— enter symptom text, blank to exit.[/]")
+            ui.log_msg(f"[{GOLD}]CLERI REPL[/] [{MUTED}]— enter symptom text, blank to exit.[/]")
             text = " ".join(args).strip()
             if text:
                 ui.cleri.scan(text, ui.log_msg)
@@ -1812,14 +1815,14 @@ class DivTubeAgentApp(App):
         def handle_archive_search(ui, args):
             query = " ".join(args).strip()
             if not query:
-                ui.log_msg("[#FF5C7A]Usage: /archive-search <query>[/]")
+                ui.log_msg(f"[{ERROR}]Usage: /archive-search <query>[/]")
                 return
             ui.archive.search(query, ui.log_msg)
 
         def handle_archive_neighbors(ui, args):
             path = " ".join(args).strip()
             if not path:
-                ui.log_msg("[#FF5C7A]Usage: /archive-neighbors <file_path>[/]")
+                ui.log_msg(f"[{ERROR}]Usage: /archive-neighbors <file_path>[/]")
                 return
             ui.archive.neighbors(path, ui.log_msg)
 
@@ -1839,7 +1842,7 @@ class DivTubeAgentApp(App):
 
         def handle_health_emit(ui, args):
             if len(args) < 2:
-                ui.log_msg("[#FF5C7A]Usage: /health-emit <cellId> <checkId> [--module <mod>][/]")
+                ui.log_msg(f"[{ERROR}]Usage: /health-emit <cellId> <checkId> [--module <mod>][/]")
                 return
             cell_id = args[0]
             check_id = args[1]
@@ -2134,7 +2137,7 @@ class DivTubeAgentApp(App):
             _origin_chat = f"chat-{_active.split('-')[1]}" if _active else "chat-divtube"
         except Exception:
             _origin_chat = "chat-divtube"
-        self.log_msg_to(_origin_chat, f"\n[bold #FFD700]▸[/] [bold #FFFFFF]{_escape_markup(val)}[/]")
+        self.log_msg_to(_origin_chat, f"\n[bold {GOLD}]▸[/] [bold {FOREGROUND}]{_escape_markup(val)}[/]")
 
         # ── bare @file reference (no command) ────────────────────────
         if val.startswith("@") and not val.startswith("/"):
@@ -2147,18 +2150,18 @@ class DivTubeAgentApp(App):
                     with open(full, "r", encoding="utf-8", errors="replace") as fh:
                         content = fh.read()
                 except Exception as exc:
-                    self.log_msg(f"[#FF5C7A]✗ Cannot read {full}: {exc}[/]")
+                    self.log_msg(f"[{ERROR}]✗ Cannot read {full}: {exc}[/]")
                     return
                 os.path.splitext(full)[1].lower()
                 short = os.path.relpath(full, project_root)
-                self.log_msg(f"\n[bold #B388FF]📎 @{short}[/] [#6A5A6A]({len(content)} B)[/]")
-                self.log_msg("[#8B5CF6]━━━ file ──────────────────[/]")
-                self.log_msg(f"[#E2E8F0]{content[:5000]}[/]")
+                self.log_msg(f"\n[bold {PURPLE_LT}]📎 @{short}[/] [{MUTED}]({len(content)} B)[/]")
+                self.log_msg(f"[{PURPLE}]━━━ file ──────────────────[/]")
+                self.log_msg(f"[{FOREGROUND}]{content[:5000]}[/]")
                 if len(content) > 5000:
-                    self.log_msg(f"[#6A5A6A]… ({len(content) - 5000} more bytes)[/]")
-                self.log_msg("[#8B5CF6]━━━━━━━━━━━━━━━━━━━━━━━━━[/]\n")
+                    self.log_msg(f"[{MUTED}]… ({len(content) - 5000} more bytes)[/]")
+                self.log_msg(f"[{PURPLE}]━━━━━━━━━━━━━━━━━━━━━━━━━[/]\n")
             else:
-                self.log_msg(f"[#FF5C7A]✗ File not found: {full}[/]")
+                self.log_msg(f"[{ERROR}]✗ File not found: {full}[/]")
             return
 
         # ── command dispatch ─────────────────────────────────────────
@@ -2166,7 +2169,7 @@ class DivTubeAgentApp(App):
             self.registry.parse_and_execute(val, self)
         else:
             if "youtube.com" in val or "youtu.be" in val:
-                self.log_msg("[#6A5A6A]Auto-detecting URL… running analysis.[/]")
+                self.log_msg(f"[{MUTED}]Auto-detecting URL… running analysis.[/]")
                 self.agent.run_command("1", val, self.log_msg, self)
             else:
                 self.registry.parse_and_execute(f"/prompt {val}", self)
@@ -2296,7 +2299,7 @@ class DivTubeAgentApp(App):
             input_widget.cursor_location = (row, start + len("@" + (dir_part + "/" if dir_part else "") + matches[0].rstrip("/")))
         else:
             # show options in chat
-            self.log_msg(f"[#6A5A6A]@{prefix} → {', '.join(matches)}[/]")
+            self.log_msg(f"[{MUTED}]@{prefix} → {', '.join(matches)}[/]")
 
 def _persist_crash(header, exc_text):
     """Append a crash traceback to error.log + a timestamped crash file.

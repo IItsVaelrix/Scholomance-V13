@@ -8,8 +8,7 @@ Covers, with headless Textual pilot runs:
   * activity glyph: state-driven pulse + reduced-motion static fallback
   * theme token parallelism (both palettes key-for-key)
   * LAW 2 guard: no raw hex in tui/ui/**/*.py outside theme.py
-    (app.py is the one documented legacy exemption — its chat markup uses
-    module-level named constants; inline sweep is tracked separately)
+    (zero exemptions — app.py's chat markup is palette-derived)
 
 Runs under PLAIN pytest (no asyncio plugin): each scenario drives the
 Textual pilot inside asyncio.run().
@@ -207,12 +206,10 @@ _HEX = re.compile(r"#[0-9a-fA-F]{6}\b")
 
 # Documented legacy exemptions. Every entry is debt with a reason, not a
 # permission slip — shrink this list, never grow it.
-HEX_EXEMPT = {
-    # 2358-line app shell: chat markup uses inline hex that mirrors the
-    # module-level named constants (BACKGROUND..FOREGROUND). Inline sweep
-    # is a dedicated follow-up (71 sites, f-string conversion risk).
-    "app.py",
-}
+HEX_EXEMPT: set = set()
+# Zero exemptions remain: app.py's chat markup was swept to palette-derived
+# constants (follow-up to 72660737, 66 inline sites + ternaries). theme.py
+# is the ONLY file permitted to carry raw hex, enforced by the test below.
 
 
 def test_no_raw_hex_in_ui_outside_theme():
