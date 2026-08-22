@@ -46,13 +46,15 @@ const conllu = read('treebank-gate.conllu');
 const lexiconText = read('treebank-gate-lexicon.json');
 const baseline = JSON.parse(read('treebank-gate-baseline.json'));
 const antigens = JSON.parse(read('treebank-gate-antigens.json'));
+const decisionFloor = JSON.parse(read('treebank-gate-decision.json'));
 
 function runGate() {
   return runTreebank({
     records: parseConllu(conllu),
     posMap: new Map(Object.entries(JSON.parse(lexiconText))),
-    // The packed parser takes no decision, so a sense source would change
-    // nothing here; passing one would freeze an input the run never reads.
+    // No sense source: the packed parser's decision comes from the resonance
+    // field and, for nominal roots, from the head the bond table declared —
+    // neither reads senses, so passing one would freeze an unread input.
     senseMap: null,
     parser: baseline.run.parser,
     maxTokens: baseline.run.maxTokens,
@@ -212,4 +214,59 @@ describe('treebank regression gate', () => {
     runGate();
     expect(Date.now() - startedAt).toBeLessThanOrEqual(BUDGET_MS);
   }, BUDGET_MS * 2);
+});
+
+/**
+ * THE DECISION ENDPOINT — what `coverage` and `containment` cannot see.
+ *
+ * Both of those are RECALL: "a spanning derivation existed", "the right answer was
+ * somewhere in the set". Neither moves when the parser picks correctly, and neither
+ * moved when `nominalRootAnswer` landed — `stable` is untouched, so acceptance is
+ * untouched. The endpoint that moved is the one that means "the parser answered",
+ * and `treebank-metrics.decision` returns null whenever ANY row is undecidable,
+ * which on a 395-sentence corpus is always. So it is guarded by row counts here.
+ */
+describe('treebank gate — the decision endpoint', () => {
+  it('answers at least as many sentences, at least as often right', () => {
+    const run = runGate();
+    const answered = run.rows.filter((r) => r.decided !== null).length;
+    const right = run.rows.filter((r) => r.decided === true).length;
+
+    expect(
+      answered,
+      `answered ${answered}, floor ${decisionFloor.metrics.answered}. A FALL means the parser `
+      + 'went quiet on sentences it used to speak about — most likely nominalRootAnswer '
+      + 'abstaining. A RISE is good: re-freeze treebank-gate-decision.json and say why.',
+    ).toBeGreaterThanOrEqual(decisionFloor.metrics.answered);
+
+    expect(
+      right,
+      `right ${right}, floor ${decisionFloor.metrics.right}.`,
+    ).toBeGreaterThanOrEqual(decisionFloor.metrics.right);
+  }, BUDGET_MS);
+
+  it('does not buy answers by lowering precision', () => {
+    const run = runGate();
+    const answered = run.rows.filter((r) => r.decided !== null).length;
+    const right = run.rows.filter((r) => r.decided === true).length;
+    const precision = right / answered;
+
+    /**
+     * The floor is the precision BEFORE the nominal fallback (68/118 = 0.5763).
+     * Answering more is only worth having if it is not bought by guessing: this
+     * refuses a future change that raises `right` purely by answering everything.
+     */
+    expect(
+      precision,
+      `precision ${(precision * 100).toFixed(1)}% fell below the pre-fallback 57.6%. `
+      + 'More answers bought with worse aim is not an improvement.',
+    ).toBeGreaterThanOrEqual(0.576);
+  }, BUDGET_MS);
+
+  it('leaves acceptance alone — coverage and containment are unmoved', () => {
+    const run = runGate();
+    // nominalRootAnswer READS `spanning`; it must never write `stable`.
+    expect(run.report.coverage).toBe(baseline.metrics.coverage);
+    expect(run.report.containment).toBe(baseline.metrics.containment);
+  }, BUDGET_MS);
 });

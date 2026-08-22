@@ -1,0 +1,10 @@
+{
+  "contract": "SCHOL-NOMINAL-ROOT-ANSWER-v1",
+  "frozenAt": "2026-08-22",
+  "why": "The packed parser now answers nominal-rooted sentences. `decision` in treebank-metrics is null whenever ANY row is undecidable, which on this corpus is always, so the aggregate cannot guard this endpoint. These row counts can.",
+  "corpus": "treebank-gate.conllu (same slice as treebank-gate-baseline.json)",
+  "lexicon": "treebank-gate-lexicon.json — the 1,659-entry FIXTURE, not the 351,501-form product table. Absolute numbers here are NOT product performance.",
+  "before": { "answered": 118, "right": 68, "note": "commit 2e42ea2e, nominal roots reached no decision at all" },
+  "metrics": { "answered": 176, "right": 113 },
+  "ratchet": "both may only rise; a fall is a regression, a rise means re-freeze deliberately"
+}

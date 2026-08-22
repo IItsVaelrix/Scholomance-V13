@@ -40,8 +40,23 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
+import { headsOf } from './compose-packed.js';
+
 /** Molecule types that name a nominal constituent, most specific first. */
 const NOMINAL_TYPES = ['NP', 'NC', 'N'];
+
+/**
+ * Molecule types that can head a whole UTTERANCE, phrase-level before atom-level.
+ *
+ * Wider than `NOMINAL_TYPES` because this list answers a different question. A bare
+ * `PROPN`, a `DATE` and an `APPOS` are not noun phrases, but they are perfectly good
+ * sentence roots — `Tayib Rauf , 21 , Birmingham` and `07/06/2000 14:57` are both
+ * complete UD sentences with a nominal gold root.
+ *
+ * Ordered, and the order is load-bearing: a full-span `NP` is a more committed
+ * reading than the bare `N` sitting under it, and both are in `spanning`.
+ */
+const NOMINAL_ROOT_TYPES = ['NP', 'NPCOMMA', 'NC', 'APPOS', 'GEN', 'NPO', 'DATE', 'PROPN', 'N'];
 
 /**
  * The nominal anchor of a chart: the head of the widest nominal molecule that spans
@@ -82,4 +97,67 @@ export function npAnchor(chart, tokenCount) {
     return { anchor: candidates[0], type, ambiguous: candidates.length > 1, candidates };
   }
   return empty;
+}
+
+/**
+ * The answer a chart states when its root is NOMINAL, in `projectAnswers` shape.
+ *
+ * ─── A DIFFERENT ENDPOINT FROM DENY-0002 ─────────────────────────────────────
+ * The refutation above is about SHORT NOUN PHRASES, where `lastTaggedNoun` beat the
+ * chart 0.8616 to 0.7874. This function answers SENTENCES WHOSE CLAUSAL PARSE
+ * ABSTAINED — a population the phrase study never contained. On that population the
+ * ranking inverts, measured on held-out `en_ewt-ud-test` with the product lexicon:
+ * the chart head is right 63.8% against `lastTaggedNoun`'s 41.5%, and on the 50 of 94
+ * rows where the two disagree the chart wins 25 to 4. DENY-0002 stands where it was
+ * issued; it does not reach here.
+ *
+ * WHY THE CHART ALREADY KNOWS. 43% of UD English-EWT sentences have a non-verb gold
+ * root. `composePacked` composes them fine — `chart.spanning` holds the full-span
+ * nominal — but `ROOT_DOORWAY.CLAUSAL` filters `stable` down to `S`, so nothing
+ * downstream ever sees it and `pickResonantDerivation` abstains. This reads that
+ * molecule and asks `headsOf` for the head the bond table already declared. It does
+ * NOT widen the doorway: what the parser ACCEPTS is unchanged, only what it REPORTS
+ * when it would otherwise say nothing. Opening the doorway instead was measured and
+ * is worse on its own (right answers 11.2% -> 10.6% held-out).
+ *
+ * Pure, zero-I/O. No chart is mutated.
+ *
+ * @param {object} chart        a chart from `composePacked`
+ * @param {number} tokenCount   how many tokens were composed
+ * @returns {{subject: string|null, verb: string}|null} null is an ABSTENTION
+ */
+export function nominalRootAnswer(chart, tokenCount) {
+  if (!chart || !Number.isInteger(tokenCount) || tokenCount < 1) return null;
+
+  const pool = [
+    ...(Array.isArray(chart.spanning) ? chart.spanning : []),
+    ...(Array.isArray(chart.molecules) ? chart.molecules : []),
+  ];
+  /**
+   * Full span only. A nominal covering part of the input is the right answer to a
+   * question nobody asked — the same trap `npAnchor` refuses above.
+   */
+  const fullSpan = pool.filter((m) => m && m.from === 0 && m.to === tokenCount - 1);
+  if (fullSpan.length === 0) return null;
+
+  for (const type of NOMINAL_ROOT_TYPES) {
+    const node = fullSpan.find((m) => m.type === type);
+    if (!node) continue;
+    /**
+     * `headsOf` unions heads across a packed node's derivations. That union is a real
+     * wound elsewhere, but it is not one here: on the 164 dev+test rows this function
+     * fires on, the set came back a SINGLETON every time, because a nominal root's
+     * derivations agree about which child is the head even when they disagree about
+     * structure. A set that is not a singleton is a genuine ambiguity the chart is
+     * reporting, and guessing inside it would be exactly the coin-flip this function
+     * exists to replace — so it abstains instead.
+     */
+    const heads = Array.isArray(node.derivations)
+      ? [...headsOf(node)]
+      : [...((node.nucleus && node.nucleus.headLemmas) || [])];
+    if (heads.length !== 1) continue;
+    if (heads[0] == null) continue;
+    return { subject: null, verb: heads[0] };
+  }
+  return null;
 }
