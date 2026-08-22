@@ -608,42 +608,100 @@ const VERBAL = new Set(['V', 'VP']);
  * Score a projected {subject, verb} against the field. Used when a packed
  * node stands for many answers and we must pick one without unpacking.
  */
+/**
+ * ─── A NAME IS NOT AN ATOM ────────────────────────────────────────────────
+ *
+ * This used to locate a token with `field.findIndex(slot => slot.lemma === …)`
+ * — the FIRST match. A word occurring twice therefore collapsed onto one
+ * identity and the second occurrence was unreachable: in `round the round
+ * fell` the leftmost `round` scores 0.583 as a nominal and the second scores
+ * 1.233, and the beacon could only ever see the first.
+ *
+ * `projectAnswer` carries tokens, not spans, so an answer usually cannot say
+ * WHICH occurrence it means. Two honest options follow, and both are here:
+ *
+ *   - a caller that knows the span passes `subjectIndex` / `verbIndex`, and
+ *     that atom is scored — exactly, or not at all. An index that does not
+ *     name a slot carrying that lemma is an abstention, never a quiet slide
+ *     back to the leftmost.
+ *   - a caller that does not know asks the field about EVERY occurrence and
+ *     takes the best. That is a real answer to "does this word support this
+ *     category anywhere in this sentence"; privileging the leftmost was not
+ *     an answer to anything, it was an artefact of array order.
+ *
+ * A lemma occurring once — the overwhelmingly common case — scores identically
+ * under both paths and identically to the old code.
+ */
 export function scoreAnswer(answer, field, bonds = BONDS) {
   if (!answer || !field) return 0;
   const scores = readingScores(field, bonds);
   const want = [
-    [answer.subject, NOMINAL],
-    [answer.verb, VERBAL],
+    [answer.subject, NOMINAL, answer.subjectIndex],
+    [answer.verb, VERBAL, answer.verbIndex],
   ];
   let logSum = 0;
   let counted = 0;
-  for (const [token, allow] of want) {
+  for (const [token, allow, declaredIndex] of want) {
     if (token == null) continue;
-    const idx = field.findIndex((slot) => slot.lemma === String(token).toLowerCase());
-    if (idx < 0) continue;
-    const best = Math.max(0, ...(scores[idx] || [])
-      .filter((row) => allow.has(row.type))
-      .map((row) => row.score));
+    const lemma = String(token).toLowerCase();
+    const slots = [];
+    if (declaredIndex != null) {
+      const slot = field[declaredIndex];
+      if (slot && slot.lemma === lemma) slots.push(declaredIndex);
+    } else {
+      for (let i = 0; i < field.length; i += 1) {
+        if (field[i] && field[i].lemma === lemma) slots.push(i);
+      }
+    }
+    if (slots.length === 0) continue;
+    let best = 0;
+    for (const idx of slots) {
+      const local = Math.max(0, ...(scores[idx] || [])
+        .filter((row) => allow.has(row.type))
+        .map((row) => row.score));
+      if (local > best) best = local;
+    }
     logSum += Math.log(Math.max(best, 0.05));
     counted += 1;
   }
   return counted === 0 ? 0 : Math.exp(logSum / counted);
 }
 
-export function pickResonantAnswer(answers, field, bonds = BONDS) {
+/**
+ * Pick the most resonant answer AND say whether the pick was earned.
+ *
+ * The winner-take-all pick used to be silent about ties: `score > bestScore`
+ * keeps the first candidate, so a dead heat was crowned exactly like a clear
+ * win and no caller could tell them apart. The choice of the first candidate
+ * is still made — it is deterministic and callers depend on getting an answer
+ * — but it is now REPORTED as a tie, which is what the rest of this codebase
+ * means by `contested`.
+ *
+ * @param {Array<{subject: string|null, verb: string}>} answers
+ * @param {object[]} field
+ * @param {Array} [bonds]
+ * @returns {{answer: object|null, score: number, tied: boolean, tiedCount: number}}
+ */
+export function pickResonantAnswerDetailed(answers, field, bonds = BONDS) {
   const list = answers || [];
-  if (list.length === 0) return null;
-  if (list.length === 1) return list[0];
-  let best = list[0];
-  let bestScore = scoreAnswer(best, field, bonds);
-  for (let i = 1; i < list.length; i += 1) {
-    const score = scoreAnswer(list[i], field, bonds);
-    if (score > bestScore) {
-      best = list[i];
-      bestScore = score;
-    }
+  if (list.length === 0) {
+    return Object.freeze({ answer: null, score: 0, tied: false, tiedCount: 0 });
   }
-  return best;
+  const scored = list.map((a) => scoreAnswer(a, field, bonds));
+  let best = 0;
+  for (let i = 1; i < list.length; i += 1) {
+    if (scored[i] > scored[best]) best = i;
+  }
+  const top = scored[best];
+  const tiedCount = scored.reduce((n, s) => (s === top ? n + 1 : n), 0);
+  return Object.freeze({
+    answer: list[best], score: top, tied: tiedCount > 1, tiedCount,
+  });
+}
+
+/** The winner alone. `pickResonantAnswerDetailed` if you need to know it tied. */
+export function pickResonantAnswer(answers, field, bonds = BONDS) {
+  return pickResonantAnswerDetailed(answers, field, bonds).answer;
 }
 
 /**

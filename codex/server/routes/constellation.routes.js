@@ -1,4 +1,7 @@
-import { buildConstellationPage } from '../services/constellationPage.service.js';
+import {
+  buildConstellationPage,
+  getConstellationRuntimeStats,
+} from '../services/constellationPage.service.js';
 
 const MAX_QUERY_GRAPHEMES = 600;
 /**
@@ -89,5 +92,21 @@ export async function constellationRoutes(fastify, opts) {
         return reply.status(500).send({ error: 'constellation page build failed' });
       }
     },
+  });
+
+  /**
+   * RUNTIME TELEMETRY — the counters the page runtime already keeps.
+   *
+   * Audit 2026-08-20: `getConstellationRuntimeStats` was exported and read by
+   * nothing but the test suite. Channel degradation and coalescing hits were
+   * being counted into a room with no door. The PDR puts diagnostics with the
+   * Runtime, so this is where they leave the process.
+   *
+   * Deterministic by construction: counters only, no wall-clock, no query
+   * text, no per-request identity — so it is safe to poll and safe to cache.
+   */
+  fastify.get('/api/constellation/runtime', {
+    config: { rateLimit: { max: 60, timeWindow: '1 minute' } },
+    handler: async () => getConstellationRuntimeStats(),
   });
 }

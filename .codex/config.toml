@@ -1,0 +1,6 @@
+[mcp_servers.scholomance-collab]
+command = "node"
+args = [
+    "--env-file=.env",
+    "codex/server/collab/mcp-bridge-entry.js",
+]

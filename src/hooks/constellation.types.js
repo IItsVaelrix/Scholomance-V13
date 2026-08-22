@@ -27,8 +27,15 @@
  *   pageBytecode identity (the contract is part of the analysis basis).
  *   Normative publication: SCHEMA_CONTRACT.md under SCHOL-COS-PAGE-v3.
  *
+ * SCHOL-COS-PAGE-v4 (2026-08-20, audit repair):
+ *   BASIS-ONLY. No packet field changed. `degradedChannels` — already on the
+ *   packet under `diagnostics` — joined the pageBytecode BASIS, because a
+ *   channel that threw or timed out produced a different analysis under an
+ *   unchanged seal, and the scene projection seeds the sky off that seal.
+ *   contractVersion advances 'cos-page-v3' -> 'cos-page-v4'.
+ *
  * VERSION VOCABULARY (one coherent set, per feedback report §11 step 2):
- *   - contractVersion  'cos-page-v3'      — the packet contract itself (this file)
+ *   - contractVersion  'cos-page-v4'      — the packet contract itself (this file)
  *   - schema_id        'scholomance/constellation-os-page-phase2'
  *   - version          2                  — integer packet generation
  *   - engineVersions   per-channel adapter/engine versions (provenance)

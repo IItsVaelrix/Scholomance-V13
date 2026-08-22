@@ -1,0 +1,337 @@
+{
+  "contract": "PB-ATLAS-CYCLOTRON-GATE-v1",
+  "date": "2026-08-20",
+  "corpus": "treebank-gate.conllu (design split)",
+  "maxTokens": 20,
+  "seed": 6045712,
+  "feed": {
+    "recordsIn": 250,
+    "atlasCases": 217,
+    "recordsFed": 217,
+    "plates": {
+      "LEXICAL": 6,
+      "GRAMMAR": 128,
+      "ROOT_TYPE_MISMATCH": 47,
+      "CONTAINMENT_MISS": 8,
+      "OVERGENERATED": 28
+    },
+    "topConstructions": [
+      {
+        "label": "punct (PUNCT -> PROPN)",
+        "deprel": "punct",
+        "failures": 11,
+        "soleCause": 10,
+        "promisedUnblock": 10,
+        "lemmas": 9
+      },
+      {
+        "label": "root (VERB -> ROOT)",
+        "deprel": "root",
+        "failures": 10,
+        "soleCause": 10,
+        "promisedUnblock": 10,
+        "lemmas": 8
+      },
+      {
+        "label": "punct (PUNCT -> NOUN)",
+        "deprel": "punct",
+        "failures": 15,
+        "soleCause": 9,
+        "promisedUnblock": 9,
+        "lemmas": 15
+      },
+      {
+        "label": "root (PROPN -> ROOT)",
+        "deprel": "root",
+        "failures": 6,
+        "soleCause": 6,
+        "promisedUnblock": 6,
+        "lemmas": 6
+      },
+      {
+        "label": "aux (AUX -> VERB)",
+        "deprel": "aux",
+        "failures": 3,
+        "soleCause": 3,
+        "promisedUnblock": 3,
+        "lemmas": 3
+      },
+      {
+        "label": "advmod (PART -> VERB)",
+        "deprel": "advmod",
+        "failures": 6,
+        "soleCause": 2,
+        "promisedUnblock": 2,
+        "lemmas": 6
+      },
+      {
+        "label": "advmod (ADV -> VERB)",
+        "deprel": "advmod",
+        "failures": 4,
+        "soleCause": 2,
+        "promisedUnblock": 2,
+        "lemmas": 4
+      },
+      {
+        "label": "advcl (NOUN -> VERB)",
+        "deprel": "advcl",
+        "failures": 2,
+        "soleCause": 2,
+        "promisedUnblock": 2,
+        "lemmas": 2
+      }
+    ],
+    "cyclotronCandidates": 7,
+    "novelFireable": 7
+  },
+  "calibration": {
+    "source": "leave-one-out on the shipped BONDS table",
+    "percentile": 0.5,
+    "sampled": 99,
+    "active": 53,
+    "inert": 46,
+    "netFloor": 1,
+    "labelSpanFloor": 1,
+    "licensedWithZeroOvergeneration": 21,
+    "topTrades": [
+      {
+        "signature": "P|NP|PP",
+        "explained": 12,
+        "overgenerated": 7,
+        "regressed": 0,
+        "labelsSpanned": 7,
+        "net": 5
+      },
+      {
+        "signature": "V|NP|VP",
+        "explained": 11,
+        "overgenerated": 6,
+        "regressed": 0,
+        "labelsSpanned": 3,
+        "net": 5
+      },
+      {
+        "signature": "DET|N|NP",
+        "explained": 14,
+        "overgenerated": 10,
+        "regressed": 0,
+        "labelsSpanned": 6,
+        "net": 4
+      },
+      {
+        "signature": "NP|VP|S",
+        "explained": 18,
+        "overgenerated": 15,
+        "regressed": 0,
+        "labelsSpanned": 6,
+        "net": 3
+      },
+      {
+        "signature": "INV|VP|S",
+        "explained": 3,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 3
+      },
+      {
+        "signature": "DET|PROPN|NP",
+        "explained": 2,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 2,
+        "net": 2
+      }
+    ]
+  },
+  "gate": {
+    "checksum": "overgen-gate1:b07b5199fc7c01b6",
+    "netFloor": 1,
+    "minLabelSpan": 1,
+    "baselinePlates": {
+      "CONTAINMENT_MISS": 8,
+      "GRAMMAR": 128,
+      "LEXICAL": 6,
+      "ROOT_TYPE_MISMATCH": 47,
+      "CLEAN": 33,
+      "OVERGENERATED": 28
+    },
+    "admitted": [
+      "S|VP|S"
+    ],
+    "byVerdict": {
+      "REJECTED_REDUNDANT": 1,
+      "ADMITTED": 1,
+      "REJECTED_OVERGENERATION": 4,
+      "REJECTED_INERT": 1
+    },
+    "candidates": [
+      {
+        "signature": "S|S|S",
+        "verdict": "REJECTED_REDUNDANT",
+        "stage": "cumulative",
+        "explained": 7,
+        "overgenerated": 6,
+        "net": 1,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "plates": [
+          "CONTAINMENT_MISS",
+          "GRAMMAR",
+          "OVERGENERATED"
+        ]
+      },
+      {
+        "signature": "S|VP|S",
+        "verdict": "ADMITTED",
+        "stage": "cumulative",
+        "explained": 7,
+        "overgenerated": 5,
+        "net": 2,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "plates": [
+          "CONTAINMENT_MISS",
+          "GRAMMAR",
+          "OVERGENERATED"
+        ]
+      },
+      {
+        "signature": "NP|NP|NP",
+        "verdict": "REJECTED_OVERGENERATION",
+        "stage": "solo",
+        "explained": 2,
+        "overgenerated": 11,
+        "net": -9,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "plates": [
+          "CONTAINMENT_MISS",
+          "GRAMMAR"
+        ]
+      },
+      {
+        "signature": "S|NP|S",
+        "verdict": "REJECTED_OVERGENERATION",
+        "stage": "solo",
+        "explained": 2,
+        "overgenerated": 8,
+        "net": -6,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "plates": [
+          "CONTAINMENT_MISS",
+          "GRAMMAR"
+        ]
+      },
+      {
+        "signature": "VP|S|S",
+        "verdict": "REJECTED_OVERGENERATION",
+        "stage": "solo",
+        "explained": 0,
+        "overgenerated": 5,
+        "net": -5,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "plates": []
+      },
+      {
+        "signature": "NP|S|S",
+        "verdict": "REJECTED_OVERGENERATION",
+        "stage": "solo",
+        "explained": 5,
+        "overgenerated": 10,
+        "net": -5,
+        "regressed": 0,
+        "labelsSpanned": 2,
+        "plates": [
+          "CONTAINMENT_MISS",
+          "GRAMMAR",
+          "OVERGENERATED"
+        ]
+      },
+      {
+        "signature": "COMMA|S|S",
+        "verdict": "REJECTED_INERT",
+        "stage": "solo",
+        "explained": 0,
+        "overgenerated": 0,
+        "net": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "plates": []
+      }
+    ]
+  },
+  "admittedSet": {
+    "bonds": [
+      "S|VP|S"
+    ],
+    "explained": 7,
+    "overgenerated": 5,
+    "regressed": 0,
+    "labelsSpanned": 1,
+    "plates": [
+      "CONTAINMENT_MISS",
+      "GRAMMAR",
+      "OVERGENERATED"
+    ]
+  },
+  "control": {
+    "runs": [
+      {
+        "bonds": [
+          "PUNCT|MODAL|PRT"
+        ],
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "verdict": "REJECTED_INERT"
+      },
+      {
+        "bonds": [
+          "PP|CONJVP|S"
+        ],
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "verdict": "REJECTED_INERT"
+      },
+      {
+        "bonds": [
+          "INV|MODAL|PRON"
+        ],
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "verdict": "REJECTED_INERT"
+      },
+      {
+        "bonds": [
+          "VP|COMMA|CONJADJ"
+        ],
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "verdict": "REJECTED_INERT"
+      },
+      {
+        "bonds": [
+          "CONJ|NPO|DET"
+        ],
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "verdict": "REJECTED_INERT"
+      }
+    ],
+    "bestExplained": 0
+  },
+  "falsifiers": {
+    "F1_gateAdmittedSNpS": false,
+    "F2_gateAdmittedNothing": false,
+    "F3_verdictIgnoresLabels": false,
+    "F4_admittedNotAboveRandomControl": false
+  },
+  "checksum": "atlas-gate1:c6dc6acd257851e6"
+}

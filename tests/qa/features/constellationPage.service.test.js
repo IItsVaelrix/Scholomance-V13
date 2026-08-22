@@ -211,6 +211,27 @@ describe('buildConstellationPage — runtime orchestration (feedback P1)', () =>
     expect(p.diagnostics.degradedChannels).toEqual([]);
   });
 
+  /**
+   * Audit 2026-08-20: identical inputs produced different packets under the
+   * SAME seal when a channel died, and the scene projection seeds the sky off
+   * that seal. A degraded page is a different analysis and must say so.
+   */
+  it('a degraded page does not wear a healthy page\'s seal', async () => {
+    const brokenDeps = { ...deps, rhymeQueryEngine: { async query() { throw new Error('index offline'); } } };
+    const whole = await buildConstellationPage('morning', deps);
+    const degraded = await buildConstellationPage('morning', brokenDeps);
+    expect(whole.diagnostics.degradedChannels).toEqual([]);
+    expect(degraded.diagnostics.degradedChannels).toContain('rhymeAstrology');
+    expect(degraded.pageBytecode).not.toBe(whole.pageBytecode);
+  });
+
+  it('two pages degraded the same way share a seal', async () => {
+    const brokenDeps = { ...deps, rhymeQueryEngine: { async query() { throw new Error('index offline'); } } };
+    const a = await buildConstellationPage('morning', brokenDeps);
+    const b = await buildConstellationPage('morning', brokenDeps);
+    expect(a.pageBytecode).toBe(b.pageBytecode);
+  });
+
   it('exposes deterministic runtime telemetry', async () => {
     await buildConstellationPage('morning', deps);
     const stats = getConstellationRuntimeStats();

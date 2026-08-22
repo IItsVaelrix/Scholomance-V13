@@ -1,0 +1,4 @@
+interface:
+  display_name: "GrimDesign"
+  short_description: "Generate Scholomance UI specs from phonemic design intent."
+  default_prompt: "Use GrimDesign to generate a world-law UI spec for \"VOID cooldown indicator\"."

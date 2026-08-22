@@ -346,6 +346,16 @@ async function buildConstellationPageDirect(rawQuery, deps) {
       corpus: deps.corpusVectors ? 'on' : 'off',
       scaleOrders: deps.scaleOrders ? 'on' : 'off',
     },
+    /**
+     * WHAT DIED IS PART OF WHAT THIS PAGE IS (SCHOL-COS-PAGE-v4).
+     *
+     * Every channel above has already run by this line, so the degradation
+     * list is complete and deterministic here. Until it entered the basis, two
+     * identical queries — one whole, one that lost a channel to a throw or the
+     * runtime's 30s timeout — carried the SAME seal, and the scene projection
+     * seeds its sky phase and its scene id off exactly that seal.
+     */
+    degradedChannels,
   });
 
   return {

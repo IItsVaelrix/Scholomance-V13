@@ -403,6 +403,11 @@ const t1Efficacy = exposure.evaluateEfficacy
     realHits: t1.realHit,
     derangeHits: t1.derangeHit,
     nullHits: t1.firstHit,
+    // The discordant pairs this script has always computed and printed three
+    // lines below. Until 2026-08-20 the verdict did not consult them, so the
+    // headline could crown a margin the p-value beside it called noise.
+    pairedWins: t1.realVsDerangeWin,
+    pairedLosses: t1.realVsDerangeLoss,
   })
   : exposure.verdict;
 

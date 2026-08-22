@@ -361,7 +361,13 @@ const vsUni = formatPValue(exactTwoSidedSignP(t2.bothVsUniWin, t2.bothVsUniWin +
 const vsRole = formatPValue(exactTwoSidedSignP(t2.bothVsRoleWin, t2.bothVsRoleWin + t2.bothVsRoleLoss));
 
 const t1Efficacy = exposure.evaluateEfficacy
-  ? efficacyVerdict({ realHits: t1.realHit, derangeHits: t1.derangeHit, nullHits: t1.firstHit })
+  ? efficacyVerdict({
+    realHits: t1.realHit,
+    derangeHits: t1.derangeHit,
+    nullHits: t1.firstHit,
+    pairedWins: t1.realVsDerangeWin,
+    pairedLosses: t1.realVsDerangeLoss,
+  })
   : null;
 
 const report = {

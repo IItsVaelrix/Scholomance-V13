@@ -28,8 +28,8 @@ describe('computePageBytecode', () => {
     expect(computePageBytecode(basis)).toMatch(/^COS-PAGE-v1-[0-9A-F]+$/);
   });
 
-  it('exposes the v3 contract version', () => {
-    expect(CONSTELLATION_CONTRACT_VERSION).toBe('cos-page-v3');
+  it('exposes the v4 contract version', () => {
+    expect(CONSTELLATION_CONTRACT_VERSION).toBe('cos-page-v4');
   });
 
   describe('every lawful basis field re-keys identity', () => {
@@ -80,6 +80,28 @@ describe('computePageBytecode', () => {
         computePageBytecode({ ...basis, flags: { ...basis.flags, phonology: 'pending' } }),
       );
     });
+
+    /**
+     * DEGRADATION IS PART OF THE ANALYSIS, NOT WEATHER AROUND IT.
+     *
+     * Audit 2026-08-20: a channel that threw or timed out changed the packet
+     * and left the seal untouched, so a page missing its rhyme channel drew the
+     * same sky as a whole one (the seal's only live consumers are the scene
+     * projection's `stablePhase` seed and its scene id). `flags` already
+     * records which optional channels were MEASURABLE; a channel that died is
+     * precisely one that was not.
+     */
+    it('a degraded channel', () => {
+      expect(computePageBytecode(basis)).not.toBe(
+        computePageBytecode({ ...basis, degradedChannels: ['rhymeAstrology'] }),
+      );
+    });
+
+    it('a SECOND degraded channel', () => {
+      expect(computePageBytecode({ ...basis, degradedChannels: ['rhymeAstrology'] })).not.toBe(
+        computePageBytecode({ ...basis, degradedChannels: ['rhymeAstrology', 'scaleField'] }),
+      );
+    });
   });
 
   describe('excluded inputs never re-key identity (PDR §16)', () => {
@@ -100,6 +122,18 @@ describe('computePageBytecode', () => {
         computePageBytecode({ ...basis, intent: undefined }),
       );
     });
+
+    it('degraded-channel ORDER is irrelevant — the set is what happened', () => {
+      expect(computePageBytecode({ ...basis, degradedChannels: ['a', 'b'] })).toBe(
+        computePageBytecode({ ...basis, degradedChannels: ['b', 'a'] }),
+      );
+    });
+
+    it('an empty degradation list is the same page as no list at all', () => {
+      expect(computePageBytecode({ ...basis, degradedChannels: [] })).toBe(
+        computePageBytecode(basis),
+      );
+    });
   });
 
   describe('golden pin — the v3 basis is a sealed identity', () => {
@@ -115,8 +149,14 @@ describe('computePageBytecode', () => {
        *     `receiptDigests`, sem-inquiry-2). The contract is a lawful basis
        *     field, so the re-key is the CORRECT behavior — the same words now
        *     carry more evidence, which is a different analysis.
+       *   COS-PAGE-v1-7C3EDCB1  sealed 2026-08-20: SCHOL-COS-PAGE-v4 added
+       *     `degradedChannels` to the basis (audit repair). A channel that
+       *     threw left the seal untouched while changing the packet, so a
+       *     degraded page seeded the same sky as a whole one. This basis
+       *     declares no degradation, so the pin moved only because the
+       *     contract version did — which is the v3 event repeating, lawfully.
        */
-      expect(computePageBytecode(basis)).toBe('COS-PAGE-v1-E8DC9244');
+      expect(computePageBytecode(basis)).toBe('COS-PAGE-v1-7C3EDCB1');
     });
   });
 });

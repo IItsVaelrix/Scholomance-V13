@@ -56,3 +56,34 @@ describe('GET /api/constellation/page', () => {
     expect(res.statusCode).toBe(400);
   });
 });
+
+/**
+ * Audit 2026-08-20: `getConstellationRuntimeStats` was exported and read by
+ * nothing outside the test suite — telemetry written and never surfaced. The
+ * runtime owns diagnostics (PDR), so the server has to offer them.
+ */
+describe('GET /api/constellation/runtime', () => {
+  let app;
+  beforeAll(async () => { app = await buildApp(); });
+  afterAll(async () => { await app.close(); });
+
+  it('reports the runtime counters', async () => {
+    await app.inject({ method: 'GET', url: '/api/constellation/page?query=morning' });
+    const res = await app.inject({ method: 'GET', url: '/api/constellation/runtime' });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.version).toBe('constellation-runtime-1');
+    expect(body.channelsRun).toBeGreaterThan(0);
+    expect(typeof body.channelsDegraded).toBe('number');
+    expect(typeof body.coalescedHits).toBe('number');
+    expect(typeof body.inflightCoalesced).toBe('number');
+  });
+
+  it('carries no wall-clock, so it stays deterministic to read', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/constellation/runtime' });
+    const body = res.json();
+    expect(Object.keys(body).sort()).toEqual([
+      'channelsDegraded', 'channelsRun', 'coalescedHits', 'inflightCoalesced', 'version',
+    ]);
+  });
+});

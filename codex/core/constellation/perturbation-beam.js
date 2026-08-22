@@ -284,6 +284,31 @@ export function litHeadMatchesGold(after, goldVerb) {
 }
 
 /**
+ * Whether any lit root PROJECTS an answer whose subject is the gold subject.
+ *
+ * `litHeadMatchesGold` asks about the verb via `headsOf`; a subject is not a
+ * head, so it is only visible through `projectAnswers`. Until this existed,
+ * `tomographicScan` accepted a `goldSubject` and never read it — the caller
+ * (`scripts/dark-matter-beam.mjs`) has been supplying gold that went nowhere.
+ *
+ * `goldSubject == null` yields `null`, never `false`: the same discipline as
+ * the verb check. Absence of gold is not a failed match.
+ *
+ * @param {{stable: object[]}} after
+ * @param {string|null} goldSubject
+ * @returns {boolean|null}
+ */
+export function litSubjectMatchesGold(after, goldSubject) {
+  if (goldSubject == null) return null;
+  for (const molecule of ((after && after.stable) || [])) {
+    let answers = [];
+    try { answers = projectAnswers(molecule) || []; } catch { answers = []; }
+    if (answers.some((a) => a && a.subject === goldSubject)) return true;
+  }
+  return false;
+}
+
+/**
  * FIRE EVERY BEAM. One compose per perturbation; the unperturbed chart is
  * composed once and passed in, because the sweep already has it.
  *
@@ -297,7 +322,18 @@ export function litHeadMatchesGold(after, goldVerb) {
 export function fireBeam(tokens, posMap, darkChart, goldVerb = null, options = {}) {
   const n = (tokens || []).length;
   const edgeK = Math.max(0, Math.min(3, options.edgeK ?? 3));
-  const compose = (list) => composePacked(list, posMap, {});
+  /**
+   * THE BEAM AND THE DARK CHART MUST READ THE SAME GRAMMAR.
+   *
+   * This used to be `composePacked(list, posMap, {})`, which meant a caller
+   * that composed its dark chart with a root doorway, a bond override or a
+   * ledger got a beam composed WITHOUT them. Every effect classification is a
+   * before/after comparison, so composing the two sides under different
+   * settings changes the medium between exposures and reports the difference
+   * as physics. The beam's own keys (`probes`, `edgeK`) are not composition
+   * options and are ignored downstream.
+   */
+  const compose = (list) => composePacked(list, posMap, options);
 
   const row = (kind, detail, after) => {
     const effect = classifyEffect(darkChart, after);
@@ -633,34 +669,90 @@ export function counterfactualExcess(probeVector, controlVector) {
   });
 }
 
+/** Nearest row to `i` by an integer field, ties broken by lower value. */
+function nearestBy(rows, key, i) {
+  if (rows.length === 0) return null;
+  return rows.slice().sort((a, b) => {
+    const da = Math.abs(a.detail[key] - i);
+    const db = Math.abs(b.detail[key] - i);
+    return da - db || a.detail[key] - b.detail[key];
+  })[0] || null;
+}
+
 /**
  * Select a structurally matched counterfactual control perturbation for a probe.
  *
- * For single-token deletion at index i, picks a distinct token j with matching
- * tag class if available, or the nearest neighbor of equal token span.
+ * ─── EVERY PROBE KIND, NOT ONLY DELETIONS ────────────────────────────────
+ *
+ * This used to return `null` for anything that was not a single-token
+ * deletion, so edge and substitution illuminations entered
+ * `tomographicScan`'s projections with `control: null` and `excess: null` —
+ * a glow with no counterfactual beside it, which is exactly the shape of
+ * evidence this module exists to refuse. The control for each kind is the
+ * perturbation that differs in the ONE respect under test:
+ *
+ *   delete i        -> deletion of the nearest OTHER token. Same operation,
+ *                      different identity.
+ *   delete-prefix k -> delete-suffix of the same width, and vice versa. Same
+ *                      number of tokens removed, opposite side, which is the
+ *                      question an edge beam asks.
+ *   substitute-C i  -> the SAME probe class at the nearest other index. Same
+ *                      injected type, different position — type vs position
+ *                      is the substitution beam's whole question, so a
+ *                      control of a different class would confound it.
+ *
+ * `allRows` may be the full row set or a single-kind subset; rows of the
+ * wrong kind are filtered out here rather than trusted from the caller.
+ *
+ * ─── ONE PROMISE DELIBERATELY NOT KEPT ───────────────────────────────────
+ *
+ * The header this replaces said the deletion control "picks a distinct token j
+ * with matching tag class if available" and took `tokens` and `posMap` to do
+ * it. It never did — both arguments were accepted and never read, which is the
+ * same defect as the `goldSubject` one repaired above it. Tag-class matching
+ * would be a BETTER matched control and it is not implemented here, because
+ * changing which control a deletion draws changes every excess this module has
+ * ever reported and that is a measurement question, not a repair. The
+ * parameters are gone rather than left sitting there looking honoured; extra
+ * positional arguments from existing callers are ignored harmlessly.
  *
  * @param {object} row
- * @param {Array<object>} allDeletions
- * @param {string[]} tokens
- * @param {Map|object} posMap
+ * @param {Array<object>} allRows every beam row available as a control pool
  * @returns {object|null}
  */
-export function findMatchedControlProbe(row, allDeletions = [], tokens = [], posMap = null) {
-  if (!row || row.kind !== 'delete' || !row.detail || row.detail.index == null) {
-    return null;
+export function findMatchedControlProbe(row, allRows = []) {
+  if (!row || !row.detail) return null;
+  const rows = (allRows || []).filter((d) => d && d !== row && d.detail);
+  const kind = String(row.kind);
+
+  if (kind === 'delete') {
+    const i = row.detail.index;
+    if (i == null) return null;
+    return nearestBy(
+      rows.filter((d) => d.kind === 'delete' && d.detail.index != null && d.detail.index !== i),
+      'index', i,
+    );
   }
-  const i = row.detail.index;
-  const otherDeletions = allDeletions.filter((d) => d.detail && d.detail.index !== i);
-  if (otherDeletions.length === 0) return null;
 
-  // Prefer deletion on nearest distinct token
-  const candidates = otherDeletions.slice().sort((a, b) => {
-    const distA = Math.abs(a.detail.index - i);
-    const distB = Math.abs(b.detail.index - i);
-    return distA - distB;
-  });
+  if (kind === 'delete-prefix' || kind === 'delete-suffix') {
+    const k = row.detail.k;
+    if (k == null) return null;
+    const mirror = kind === 'delete-prefix' ? 'delete-suffix' : 'delete-prefix';
+    const mirrors = rows.filter((d) => d.kind === mirror && d.detail.k != null);
+    // Exact-width mirror first; failing that, the nearest width on that side.
+    return mirrors.find((d) => d.detail.k === k) || nearestBy(mirrors, 'k', k);
+  }
 
-  return candidates[0] || null;
+  if (kind.startsWith('substitute-')) {
+    const i = row.detail.index;
+    if (i == null) return null;
+    return nearestBy(
+      rows.filter((d) => d.kind === kind && d.detail.index != null && d.detail.index !== i),
+      'index', i,
+    );
+  }
+
+  return null;
 }
 
 /**
@@ -668,7 +760,8 @@ export function findMatchedControlProbe(row, allDeletions = [], tokens = [], pos
  *
  * Integrates:
  * 1. Multi-frequency beam probes with 6D response vectors
- * 2. Paired counterfactual controls and excess responses
+ * 2. Paired counterfactual controls and excess responses, for EVERY probe
+ *    kind — deletion, edge and substitution alike
  * 3. Residual-trace accumulation and focal obstruction localization
  * 4. Two-stage optical fusion via descending-light back-projection
  *
@@ -689,17 +782,17 @@ export function tomographicScan(tokens, posMap, darkChart, goldVerb = null, gold
   const tomographicProjections = [];
 
   for (const row of illuminations) {
-    let control = null;
-    let excess = null;
-    if (row.kind === 'delete') {
-      control = findMatchedControlProbe(row, beam.deletions, tokens, posMap);
-      if (control) {
-        excess = counterfactualExcess(row.vector, control.vector);
-      }
-    }
+    /**
+     * The control pool is EVERY row, not just the deletions. Which of them can
+     * legitimately control this probe is `findMatchedControlProbe`'s judgement,
+     * not the caller's — see its header for the per-kind pairing.
+     */
+    const control = findMatchedControlProbe(row, allRows, tokens, posMap);
+    const excess = control ? counterfactualExcess(row.vector, control.vector) : null;
 
     const afterTokensList = (row.after && row.after.tokens) || afterTokens(row.kind, row.detail, tokens);
-    const afterChart = composePacked(afterTokensList, posMap, {});
+    // Same composition options as the beam and the dark chart — see fireBeam.
+    const afterChart = composePacked(afterTokensList, posMap, options);
     const projection = backProjectDescendingLight(tokens, row.kind, row.detail, afterChart, goldVerb);
 
     tomographicProjections.push(Object.freeze({
@@ -709,6 +802,12 @@ export function tomographicScan(tokens, posMap, darkChart, goldVerb = null, gold
       vector: row.vector,
       control: control ? Object.freeze({ kind: control.kind, detail: control.detail, vector: control.vector }) : null,
       excess,
+      /**
+       * The gold SUBJECT verdict — `null` when the caller supplied no gold
+       * subject, which is an abstention and not a failed match. This is the
+       * argument `tomographicScan` accepted and ignored until 2026-08-20.
+       */
+      goldSubjectMatch: litSubjectMatchesGold(afterChart, goldSubject),
       projection,
     }));
   }

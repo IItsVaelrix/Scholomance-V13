@@ -1,10 +1,17 @@
 /**
+ * SCHOL-COS-PAGE-v4 (2026-08-20, audit repair): `degradedChannels` joined the
+ * basis. A channel that threw or timed out changes the packet, and the seal
+ * did not move — so a page that lost its rhyme channel produced the same
+ * `stablePhase` seed and the same scene id as a whole one. The seal's job is
+ * to identify the analysis, and an analysis that lost a channel is a different
+ * analysis. The QA golden pin was re-sealed with that rationale.
+ *
  * SCHOL-COS-PAGE-v3 (2026-08-20, sem-inquiry-2): additive schema change — the
  * semanticInquiry channel gained `ballistics` and `receiptDigests`. The
  * contract is part of the analysis basis, so the bump legitimately re-keys
  * page bytecode identity; the QA golden pin was re-sealed with that rationale.
  */
-export const CONSTELLATION_CONTRACT_VERSION = 'cos-page-v3';
+export const CONSTELLATION_CONTRACT_VERSION = 'cos-page-v4';
 
 /** FNV-1a 32-bit — the repo's deterministic seed convention. */
 export function fnv1a32(input) {
@@ -15,6 +22,17 @@ export function fnv1a32(input) {
     hash = Math.imul(hash, 0x01000193);
   }
   return hash >>> 0;
+}
+
+/**
+ * Sorted, canonical serialization of a channel list. A degradation is a SET of
+ * facts, so order and repetition carry nothing; the `degraded:` prefix keeps
+ * "no channel died" from serializing as the same empty string a missing field
+ * would.
+ */
+function serializeChannelSet(list) {
+  const unique = [...new Set(list || [])].map(String).sort();
+  return unique.length === 0 ? 'degraded:none' : `degraded:${unique.join(',')}`;
 }
 
 /** Sorted, canonical serialization of a version map — key order never matters. */
@@ -45,6 +63,11 @@ function serializeVersionMap(map) {
  *   - deterministic option flags  (flags — which optional channels were
  *                                  measurable: phonology readiness, wordnet,
  *                                  corpus, scale orders)
+ *   - degraded channels           (degradedChannels — which channels threw or
+ *                                  timed out. NEW in v4. A timeout is not an
+ *                                  input, but the analysis it produced is a
+ *                                  different analysis, and the seal names the
+ *                                  analysis. Order-blind: it is a set.)
  *
  * Deliberately EXCLUDED (PDR §16): request time, cache status, measured
  * duration, user identity, animation state, random values, temporary
@@ -52,7 +75,8 @@ function serializeVersionMap(map) {
  *
  * @param {{ normalized: string, kind: string, intent?: string|null,
  *   engineVersions: Record<string,string>, scoringProfiles?: Record<string,string>,
- *   corpusChecksum?: string|null, flags?: Record<string,string> }} basis
+ *   corpusChecksum?: string|null, flags?: Record<string,string>,
+ *   degradedChannels?: string[] }} basis
  * @returns {string}
  */
 export function computePageBytecode(basis) {
@@ -65,6 +89,7 @@ export function computePageBytecode(basis) {
     serializeVersionMap(basis.scoringProfiles),
     basis.corpusChecksum || 'corpus:off',
     serializeVersionMap(basis.flags),
+    serializeChannelSet(basis.degradedChannels),
   ].join('::');
   const hex = fnv1a32(material).toString(16).toUpperCase().padStart(8, '0');
   return `COS-PAGE-v1-${hex}`;

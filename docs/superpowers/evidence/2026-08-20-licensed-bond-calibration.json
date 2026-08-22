@@ -1,0 +1,811 @@
+{
+  "key": {
+    "corpus": "treebank-gate",
+    "limit": 250,
+    "maxTokens": 20,
+    "sample": 99,
+    "percentile": 0.5
+  },
+  "calibration": {
+    "percentile": 0.5,
+    "sampled": 99,
+    "active": 53,
+    "inert": 46,
+    "netFloor": 1,
+    "labelSpanFloor": 1,
+    "scored": [
+      {
+        "signature": "DET|N|NP",
+        "explained": 14,
+        "overgenerated": 10,
+        "regressed": 0,
+        "labelsSpanned": 6,
+        "net": 4
+      },
+      {
+        "signature": "DET|PROPN|NP",
+        "explained": 2,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 2,
+        "net": 2
+      },
+      {
+        "signature": "DET|PRON|NP",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "P|NP|PP",
+        "explained": 12,
+        "overgenerated": 7,
+        "regressed": 0,
+        "labelsSpanned": 7,
+        "net": 5
+      },
+      {
+        "signature": "V|PP|VP",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "NP|VP|S",
+        "explained": 18,
+        "overgenerated": 15,
+        "regressed": 0,
+        "labelsSpanned": 6,
+        "net": 3
+      },
+      {
+        "signature": "V|PP|PART",
+        "explained": 1,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 1
+      },
+      {
+        "signature": "NP|PART|NP",
+        "explained": 1,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 1
+      },
+      {
+        "signature": "V|NP|VP",
+        "explained": 11,
+        "overgenerated": 6,
+        "regressed": 0,
+        "labelsSpanned": 3,
+        "net": 5
+      },
+      {
+        "signature": "V|NPO|VP",
+        "explained": 2,
+        "overgenerated": 1,
+        "regressed": 0,
+        "labelsSpanned": 2,
+        "net": 1
+      },
+      {
+        "signature": "P|NPO|PP",
+        "explained": 0,
+        "overgenerated": 2,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": -2
+      },
+      {
+        "signature": "V|ADJ|VP",
+        "explained": 1,
+        "overgenerated": 1,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "VP|PP|VP",
+        "explained": 2,
+        "overgenerated": 1,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 1
+      },
+      {
+        "signature": "NP|PP|NP",
+        "explained": 1,
+        "overgenerated": 1,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 0
+      },
+      {
+        "signature": "ADJ|N|N",
+        "explained": 3,
+        "overgenerated": 1,
+        "regressed": 0,
+        "labelsSpanned": 2,
+        "net": 2
+      },
+      {
+        "signature": "ADJ|NC|NC",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "NC|NC|NC",
+        "explained": 2,
+        "overgenerated": 1,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 1
+      },
+      {
+        "signature": "PROPN|PROPN|N",
+        "explained": 2,
+        "overgenerated": 1,
+        "regressed": 0,
+        "labelsSpanned": 2,
+        "net": 1
+      },
+      {
+        "signature": "PROPN|N|N",
+        "explained": 1,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 1
+      },
+      {
+        "signature": "N|PROPN|N",
+        "explained": 1,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 1
+      },
+      {
+        "signature": "ADV|ADJ|ADJ",
+        "explained": 0,
+        "overgenerated": 2,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": -2
+      },
+      {
+        "signature": "ADV|VP|VP",
+        "explained": 4,
+        "overgenerated": 2,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 2
+      },
+      {
+        "signature": "VP|ADV|VP",
+        "explained": 2,
+        "overgenerated": 1,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 1
+      },
+      {
+        "signature": "COP|ADJ|VP",
+        "explained": 2,
+        "overgenerated": 1,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 1
+      },
+      {
+        "signature": "COP|NP|VP",
+        "explained": 2,
+        "overgenerated": 2,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 0
+      },
+      {
+        "signature": "AUX|VP|VP",
+        "explained": 3,
+        "overgenerated": 3,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 0
+      },
+      {
+        "signature": "MODAL|VP|VP",
+        "explained": 3,
+        "overgenerated": 1,
+        "regressed": 0,
+        "labelsSpanned": 2,
+        "net": 2
+      },
+      {
+        "signature": "REL|VP|RELC",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "REL|VP|S",
+        "explained": 1,
+        "overgenerated": 1,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "NP|RELC|NP",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "CONJ|NP|CONJNP",
+        "explained": 2,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 2
+      },
+      {
+        "signature": "NP|CONJNP|NP",
+        "explained": 2,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 2,
+        "net": 2
+      },
+      {
+        "signature": "CONJ|VP|CONJVP",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "VP|CONJVP|VP",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "CONJ|S|CONJS",
+        "explained": 1,
+        "overgenerated": 1,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 0
+      },
+      {
+        "signature": "S|CONJS|S",
+        "explained": 1,
+        "overgenerated": 1,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 0
+      },
+      {
+        "signature": "CONJ|S|S",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "CONJ|ADJ|CONJADJ",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "ADJ|CONJADJ|ADJ",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "TO|VP|INF",
+        "explained": 5,
+        "overgenerated": 4,
+        "regressed": 0,
+        "labelsSpanned": 2,
+        "net": 1
+      },
+      {
+        "signature": "V|INF|VP",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "VP|INF|VP",
+        "explained": 1,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 1
+      },
+      {
+        "signature": "COP|INF|VP",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "NP|INF|NP",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "SUB|S|SBAR",
+        "explained": 3,
+        "overgenerated": 2,
+        "regressed": 0,
+        "labelsSpanned": 2,
+        "net": 1
+      },
+      {
+        "signature": "SUB|S|S",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "S|SBAR|S",
+        "explained": 0,
+        "overgenerated": 1,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": -1
+      },
+      {
+        "signature": "SBAR|S|S",
+        "explained": 1,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 1
+      },
+      {
+        "signature": "THAN|NP|THANP",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "ADJ|THANP|ADJ",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "VP|THANP|VP",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "POSS|N|N",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "NP|POSS|GEN",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "GEN|N|NP",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "ADV|COMMA|FRONTED",
+        "explained": 1,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 1
+      },
+      {
+        "signature": "ADV|COMMA|S",
+        "explained": 1,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 1
+      },
+      {
+        "signature": "SBAR|COMMA|FRONTED",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "PP|COMMA|FRONTED",
+        "explained": 1,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 1
+      },
+      {
+        "signature": "FRONTED|S|S",
+        "explained": 2,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 2
+      },
+      {
+        "signature": "NP|COMMA|NPCOMMA",
+        "explained": 2,
+        "overgenerated": 1,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 1
+      },
+      {
+        "signature": "NPCOMMA|NP|APPOS",
+        "explained": 2,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 2
+      },
+      {
+        "signature": "APPOS|COMMA|NP",
+        "explained": 2,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 2
+      },
+      {
+        "signature": "NPCOMMA|NP|NP",
+        "explained": 0,
+        "overgenerated": 1,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": -1
+      },
+      {
+        "signature": "S|COMMA|SCOMMA",
+        "explained": 1,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 1
+      },
+      {
+        "signature": "S|COMMA|S",
+        "explained": 0,
+        "overgenerated": 2,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": -2
+      },
+      {
+        "signature": "SCOMMA|S|S",
+        "explained": 1,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 1
+      },
+      {
+        "signature": "S|PUNCT|S",
+        "explained": 9,
+        "overgenerated": 8,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 1
+      },
+      {
+        "signature": "NP|PUNCT|NP",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "ADJ|PUNCT|ADJ",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "N|PUNCT|N",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "NC|PUNCT|NC",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "S|WRAP|S",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "WRAP|S|S",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "NP|WRAP|NP",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "WRAP|NP|NP",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "N|WRAP|N",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "WRAP|N|N",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "NC|WRAP|NC",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "WRAP|NC|NC",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "ADJ|WRAP|ADJ",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "WRAP|ADJ|ADJ",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "V|PRT|V",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "VP|PRT|VP",
+        "explained": 2,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 2
+      },
+      {
+        "signature": "PP|S|S",
+        "explained": 1,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 1
+      },
+      {
+        "signature": "ADV|S|S",
+        "explained": 3,
+        "overgenerated": 1,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 2
+      },
+      {
+        "signature": "ADJ|S|S",
+        "explained": 1,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 1
+      },
+      {
+        "signature": "REL|S|SBAR",
+        "explained": 0,
+        "overgenerated": 1,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": -1
+      },
+      {
+        "signature": "V|SBAR|VP",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "VP|SBAR|VP",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "COP|SBAR|VP",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "ADJ|INF|ADJ",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "MODAL|NP|INV",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "AUX|NP|INV",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "COP|NP|INV",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "INV|VP|S",
+        "explained": 3,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 1,
+        "net": 3
+      },
+      {
+        "signature": "INV|ADJ|S",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "INV|NP|S",
+        "explained": 0,
+        "overgenerated": 1,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": -1
+      },
+      {
+        "signature": "CLOCK|MERIDIAN|CLOCK",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      },
+      {
+        "signature": "DATE|CLOCK|DATE",
+        "explained": 0,
+        "overgenerated": 0,
+        "regressed": 0,
+        "labelsSpanned": 0,
+        "net": 0
+      }
+    ]
+  }
+}
