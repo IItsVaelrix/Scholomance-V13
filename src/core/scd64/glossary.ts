@@ -1,8 +1,8 @@
 import crypto from 'node:crypto';
 import type { SCD64RemediationHint } from './types';
-import { SCD64_SLOT_NAMES, ART_SLOT_ALIASES } from './constants';
+import { SCD64_SLOT_NAMES, ART_SLOT_ALIASES, MEMORY_SLOT_ALIASES } from './constants';
 
-export { SCD64_SLOT_NAMES, ART_SLOT_ALIASES };
+export { SCD64_SLOT_NAMES, ART_SLOT_ALIASES, MEMORY_SLOT_ALIASES };
 
 export const BUG_FAMILIES = Object.freeze({
   COLOR_DRAGON: Object.freeze({
@@ -259,6 +259,71 @@ function _humanMeaningForSlot(familyName: string, slotName: string): string {
   return BUG_FAMILIES[familyName]?.description || 'See glossary.';
 }
 
+
+/**
+ * MEMORY families — one SCD64 encodes one memory record.
+ *
+ * A family names the SHAPE of the claim, exactly as a bug family names the shape
+ * of a bug. Three shapes are enough to exercise every slot and to make the two
+ * drift cases this domain exists to prevent representable as wire differences:
+ *
+ *   MEM_RULE_MANDATORY   vs  MEM_PREF_DEFEASIBLE   differ in MODALITY
+ *   MEM_RULE_MANDATORY   vs  MEM_CLAIM_REFUTED     differ in CLAIM_KIND
+ *
+ * In prose those distinctions erode silently across compressions. Here erosion is
+ * a changed hex block that `compareSCD64ByBlocks` reports by slot name.
+ */
+export const MEMORY_FAMILIES = Object.freeze({
+  MEM_RULE_MANDATORY: Object.freeze({
+    versionByte: 'B1',
+    predictedVersionByte: 'C1',
+    domain: 'MEMORY',
+    description: 'A binding rule: violation is an error, not a preference miss.',
+    canonicals: Object.freeze([
+      { slot: 'BUGCLASS',  canonical: 'CLAIM_KIND:RULE' },
+      { slot: 'COORDSYS',  canonical: 'SCOPE:repo-global' },
+      { slot: 'INVARIANT', canonical: 'MODALITY:mandatory' },
+      { slot: 'MAGNITUDE', canonical: 'EVIDENCE:count>=5+confidence-stable' },
+      { slot: 'MASKING',   canonical: 'EXCEPTION:none-declared' },
+      { slot: 'GATE',      canonical: 'ADMISSION:stable+threshold-met' },
+      { slot: 'PROPAGATE', canonical: 'TARGETS:procedure+source-episodes' },
+      { slot: 'VERDICT',   canonical: 'UNBINDS_IF:counterexample-observed-under-declared-scope' },
+    ]),
+  }),
+  MEM_PREF_DEFEASIBLE: Object.freeze({
+    versionByte: 'B2',
+    predictedVersionByte: 'C2',
+    domain: 'MEMORY',
+    description: 'A preference with declared exceptions. NOT a mandate — the distinction prose loses.',
+    canonicals: Object.freeze([
+      { slot: 'BUGCLASS',  canonical: 'CLAIM_KIND:PREF' },
+      { slot: 'COORDSYS',  canonical: 'SCOPE:repo-global' },
+      { slot: 'INVARIANT', canonical: 'MODALITY:preferred' },
+      { slot: 'MAGNITUDE', canonical: 'EVIDENCE:count>=3+confidence-tentative' },
+      { slot: 'MASKING',   canonical: 'EXCEPTION:harmful-structure+explicit-user-override' },
+      { slot: 'GATE',      canonical: 'ADMISSION:experimental+below-stable-threshold' },
+      { slot: 'PROPAGATE', canonical: 'TARGETS:semantic-pattern+source-episodes' },
+      { slot: 'VERDICT',   canonical: 'UNBINDS_IF:interceptions-zero-across-20-confirmations' },
+    ]),
+  }),
+  MEM_CLAIM_REFUTED: Object.freeze({
+    versionByte: 'B3',
+    predictedVersionByte: 'C3',
+    domain: 'MEMORY',
+    description: 'A claim that was measured and did not hold. Retained, not deleted — the refutation is the finding.',
+    canonicals: Object.freeze([
+      { slot: 'BUGCLASS',  canonical: 'CLAIM_KIND:REFUTED' },
+      { slot: 'COORDSYS',  canonical: 'SCOPE:held-out-split' },
+      { slot: 'INVARIANT', canonical: 'MODALITY:forbidden' },
+      { slot: 'MAGNITUDE', canonical: 'EVIDENCE:contradiction-rate-above-threshold' },
+      { slot: 'MASKING',   canonical: 'EXCEPTION:context-differs-split-pending' },
+      { slot: 'GATE',      canonical: 'ADMISSION:retired+provenance-preserved' },
+      { slot: 'PROPAGATE', canonical: 'TARGETS:superseding-pattern+original-episodes' },
+      { slot: 'VERDICT',   canonical: 'UNBINDS_IF:replication-clears-chance-on-a-matched-control' },
+    ]),
+  }),
+});
+
 export function buildSCD64Glossary() {
   const out = [];
 
@@ -340,6 +405,55 @@ export function buildSCD64Glossary() {
         canonicalDerivationString: entry.canonical,
         humanMeaning: _humanMeaningForSlot(familyName, entry.slot),
         jsonFormulaTemplate: { name: artAlias.toLowerCase() },
+        fixedForever: true,
+        categoryChecksum: ""
+      };
+      glossaryEntry.categoryChecksum = crypto.createHash('sha256')
+        .update(JSON.stringify({
+          family: familyName,
+          slotName: entry.slot,
+          hexCode: hex,
+          canonical: entry.canonical,
+        }))
+        .digest('hex')
+        .slice(0, 16)
+        .toUpperCase();
+      out.push(Object.freeze(glossaryEntry));
+    }
+  }
+
+  // MEMORY families — same wire contract, memory-domain interpretation
+  for (const [familyName, family] of Object.entries(MEMORY_FAMILIES)) {
+    const deriveHex = (canonical: string, isClaimKind: boolean) => {
+      const hash = crypto.createHash('sha256').update(canonical).digest('hex').toUpperCase();
+      if (isClaimKind) {
+        return family.versionByte + hash.slice(0, 6);
+      }
+      return hash.slice(0, 8);
+    };
+
+    for (let i = 0; i < family.canonicals.length; i += 1) {
+      const entry = family.canonicals[i];
+      const isClaimKind = entry.slot === 'BUGCLASS'; // CLAIM_KIND maps to BUGCLASS slot
+      const hex = deriveHex(entry.canonical, isClaimKind);
+      const memAlias = MEMORY_SLOT_ALIASES[entry.slot as keyof typeof MEMORY_SLOT_ALIASES] ?? entry.slot;
+
+      const glossaryEntry = {
+        schema: 'SCD64_GLOSSARY_ENTRY',
+        schemaVersion: 1,
+        family: familyName,
+        domain: 'MEMORY' as const,
+        slotIndex: isClaimKind ? 0 : i,
+        slotName: entry.slot,
+        memorySlotAlias: memAlias,
+        hexCode: hex,
+        versionByte: isClaimKind ? family.versionByte : undefined,
+        predictedVersionByte: isClaimKind ? family.predictedVersionByte : undefined,
+        category: familyName,
+        canonicalMeaning: entry.canonical.split(':').slice(1).join(':'),
+        canonicalDerivationString: entry.canonical,
+        humanMeaning: _humanMeaningForSlot(familyName, entry.slot),
+        jsonFormulaTemplate: { name: memAlias.toLowerCase() },
         fixedForever: true,
         categoryChecksum: ""
       };

@@ -1,11 +1,27 @@
 import crypto from 'node:crypto';
-import { BUG_FAMILIES } from './glossary';
+import { BUG_FAMILIES, ART_FAMILIES, MEMORY_FAMILIES } from './glossary';
+
+/**
+ * Resolve a family name across every domain registry on the eight-slot wire.
+ *
+ * Bug families are searched FIRST so their resolution — and therefore every hex
+ * value they have ever produced — is unchanged by the addition of a domain.
+ * ART and MEMORY reuse the same physical contract, so once resolved they derive
+ * through the identical code path below.
+ */
+function resolveFamily(name: string): any {
+  const registries: Record<string, any>[] = [BUG_FAMILIES, ART_FAMILIES, MEMORY_FAMILIES];
+  for (const registry of registries) {
+    const hit = registry[name];
+    if (hit) return hit;
+  }
+  return undefined;
+}
 
 export function generateSCD64(bugFamily: string, isPredicted: boolean = false): string {
-  // @ts-expect-error - indexing object with string
-  const family = BUG_FAMILIES[bugFamily];
+  const family = resolveFamily(bugFamily);
   if (!family) {
-    throw new Error(`[SCD64] Unknown bug family: ${bugFamily}`);
+    throw new Error(`[SCD64] Unknown family: ${bugFamily}`);
   }
 
   const deriveHex = (canonical: string, isBugClass: boolean) => {

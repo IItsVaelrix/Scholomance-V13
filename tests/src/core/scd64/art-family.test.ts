@@ -55,14 +55,18 @@ describe('ART_SLOT_ALIASES', () => {
 
 describe('SCD64_GLOSSARY', () => {
   it('includes both bug families and art families', () => {
-    const bugEntries = SCD64_GLOSSARY.filter((e) => !e.domain || e.domain !== 'ART');
+    // Bug-family entries carry NO `domain` key; every later domain sets one.
+    // The previous predicate here was `!e.domain || e.domain !== 'ART'`, which
+    // reads as "not ART" and silently absorbed any new domain into the bug count.
+    const bugEntries = SCD64_GLOSSARY.filter((e) => !e.domain);
     const artEntries = SCD64_GLOSSARY.filter((e) => e.domain === 'ART');
 
     // 6 bug families × 8 slots = 48
     expect(bugEntries.length).toBe(48);
     // 3 art families × 8 slots = 24
     expect(artEntries.length).toBe(24);
-    expect(SCD64_GLOSSARY.length).toBe(72);
+    // 48 bug + 24 art + 24 memory
+    expect(SCD64_GLOSSARY.length).toBe(96);
   });
 
   it('art entries carry artSlotAlias', () => {
@@ -105,8 +109,8 @@ describe('wire compatibility', () => {
   it('existing bug-family output remains byte-identical after ART addition', () => {
     // Rebuild glossary and verify bug entries are unchanged
     const rebuilt = buildSCD64Glossary();
-    const bugEntriesOriginal = SCD64_GLOSSARY.filter((e) => !e.domain || e.domain !== 'ART');
-    const bugEntriesRebuilt = rebuilt.filter((e) => !e.domain || e.domain !== 'ART');
+    const bugEntriesOriginal = SCD64_GLOSSARY.filter((e) => !e.domain);
+    const bugEntriesRebuilt = rebuilt.filter((e) => !e.domain);
 
     expect(bugEntriesRebuilt.length).toBe(bugEntriesOriginal.length);
     for (let i = 0; i < bugEntriesOriginal.length; i++) {
