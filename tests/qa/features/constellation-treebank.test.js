@@ -1,7 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { parseConllu, goldAnswer, goldPosMap } from '../../../codex/core/constellation/treebank.js';
 import { runTreebank } from '../../../codex/core/constellation/treebank-run.js';
 
@@ -38,6 +35,13 @@ const NOMINAL_ROOT = `# sent_id = ewt-0003
 1\tGreat\tgreat\tADJ\tJJ\t_\t2\tamod\t2:amod\t_
 2\tfood\tfood\tNOUN\tNN\t_\t0\troot\t0:root\t_
 3\t!\t!\tPUNCT\t.\t_\t2\tpunct\t2:punct\t_
+`;
+
+/** A deliberately tiny compatibility probe for the materialising parser. */
+const CLASSIC_SMOKE = `# sent_id = classic-smoke
+# text = Birds sing
+1\tBirds\tbird\tNOUN\tNNS\t_\t2\tnsubj\t2:nsubj\t_
+2\tsing\tsing\tVERB\tVBP\t_\t0\troot\t0:root\t_
 `;
 
 describe('parseConllu', () => {
@@ -101,37 +105,24 @@ describe('goldPosMap', () => {
 });
 
 /**
- * THE DEFAULT PARSER HAD NO TEST. `runTreebank`'s `parser` defaults to
- * `'classic'`, and the gate freezes `'packed'` — so the classic corpus path,
- * the one every caller gets by omission, was executed by nothing. It broke
- * silently the moment `projectAnswer` grew an optional second parameter,
- * because `stable.map(projectAnswer)` feeds it the array index.
- *
- * This asserts the path RUNS and reports, not what it reports: the numbers
- * belong to the gate's ratchet, and duplicating them here would create a second
- * baseline to keep in sync.
+ * `runTreebank` defaults to the packed evaluator. Classic remains an explicit
+ * compatibility/differential path, and its chart materialises every parse.
+ * Keep that path bounded here; corpus numbers belong to the packed gate.
  */
 describe('runTreebank — the classic parser path executes', () => {
-  const FIXTURES = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../fixtures/constellation');
-  const read = (name) => fs.readFileSync(path.join(FIXTURES, name), 'utf8');
-
   it('completes a classic run and returns a populated report', () => {
-    // A slice, not the corpus: the classic chart materialises every parse, so
-    // the full fixture costs ~20s. Executing the path is the point here — the
-    // gate owns the numbers and the budget.
-    const records = parseConllu(read('treebank-gate.conllu')).slice(0, 40);
     const out = runTreebank({
-      records,
-      posMap: new Map(Object.entries(JSON.parse(read('treebank-gate-lexicon.json')))),
+      records: parseConllu(CLASSIC_SMOKE),
+      posMap: new Map([
+        ['birds', ['n']],
+        ['sing', ['v']],
+      ]),
       senseMap: null,
       parser: 'classic',
-      maxTokens: 20,
+      maxTokens: 4,
     });
-    expect(out.report.n).toBeGreaterThan(0);
-    // Coverage above zero is the load-bearing assertion: it means at least one
-    // sentence produced a stable molecule, which means `projectAnswer` actually
-    // RAN. `containment` is left alone — it is a property of the corpus, and a
-    // second copy of the gate's numbers is a second baseline to keep in sync.
+    expect(out.report.n).toBe(1);
     expect(out.report.coverage).toBeGreaterThan(0);
-  }, 20_000);
+    expect(out.rows[0].decided).toBe(true);
+  });
 });

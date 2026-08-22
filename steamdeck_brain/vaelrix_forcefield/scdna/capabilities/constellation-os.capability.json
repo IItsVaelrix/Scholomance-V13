@@ -1,0 +1,72 @@
+{
+  "contract": "SCDNA-CAPABILITY-v1",
+  "version": "1.0.0",
+  "domain": "constellation-os",
+  "surfaces": [
+    "codex/core/constellation/**",
+    "codex/runtime/constellationRuntime.js",
+    "codex/server/services/constellation/**",
+    "codex/server/services/constellationPage.service.js",
+    "tests/core/constellation/**",
+    "tests/qa/features/constellation-*.test.js"
+  ],
+  "capabilities": [
+    {
+      "need": "production page orchestration",
+      "canonical": "buildConstellationPage in codex/server/services/constellationPage.service.js composes the server-authoritative page through runtime-isolated channels and deterministic packet assembly",
+      "path": "codex/server/services/constellationPage.service.js",
+      "evidence": "rhyme and leximancy may overlap, while genome remains downstream of rhyme and semantic inquiry remains downstream of leximancy",
+      "forbidden": [
+        "wiring composePacked or runTreebank into the live request path",
+        "moving server-authoritative channel selection into the client"
+      ]
+    },
+    {
+      "need": "runtime isolation timeout policy and request coalescing",
+      "canonical": "createConstellationRuntime in codex/runtime/constellationRuntime.js owns channel isolation, timeout mechanism, coalescing, and deterministic counters",
+      "path": "codex/runtime/constellationRuntime.js",
+      "forbidden": [
+        "duplicating timeout or coalescing policy in page services",
+        "letting runtime mechanism decide analysis meaning"
+      ]
+    },
+    {
+      "need": "packed structural parser for bounded offline evaluation",
+      "canonical": "composePacked in codex/core/constellation/compose-packed.js provides bounded packed composition and derivation projection for evaluation",
+      "path": "codex/core/constellation/compose-packed.js",
+      "evidence": "the packed chart supports spanning and derivation measurements without materialising every classic parse",
+      "forbidden": [
+        "claiming coverage is parse accuracy",
+        "claiming offline packed results are shipped page behavior"
+      ]
+    },
+    {
+      "need": "deterministic treebank evaluation with exhaustive accounting",
+      "canonical": "runTreebank in codex/core/constellation/treebank-run.js evaluates supplied records without file or clock access and returns metrics, rows, skips, drops, oracle counts, tokenizer counts, and signatures",
+      "path": "codex/core/constellation/treebank-run.js",
+      "forbidden": [
+        "hiding skipped or throwing records outside the accounting",
+        "using the materialising classic parser for a broad corpus gate"
+      ]
+    },
+    {
+      "need": "parser failure taxonomy and frontier signatures",
+      "canonical": "diagnose and frontierSignature in codex/core/constellation/failure-diagnosis.js classify lexical, grammar, root-shape, and parsed outcomes from supplied structures",
+      "path": "codex/core/constellation/failure-diagnosis.js",
+      "forbidden": [
+        "collapsing distinct failure categories into one coverage number"
+      ]
+    },
+    {
+      "need": "deterministic text-free evaluation evidence",
+      "canonical": "buildConstellationEvaluationEvidence in codex/core/constellation/evaluation-evidence.js seals parser identity, fixture hashes, metrics, accounting, rows, and sorted signatures into a recursively frozen checksum packet",
+      "path": "codex/core/constellation/evaluation-evidence.js",
+      "evidence": "the adapter whitelists fields and emits no sentence text, query text, timestamp, or environment value",
+      "forbidden": [
+        "placing raw corpus or user text in the evidence packet",
+        "treating the evidence checksum as proof of correctness rather than stable identity"
+      ]
+    }
+  ],
+  "checksum": "scd64:be2bdd01dabaeb8c7a5a068a4f187c3e83d5466e5a5390c1a668b70c4d04d99a"
+}

@@ -11,6 +11,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { collabPersistence } from '../collab/collab.persistence.js';
 import { embedFloat, cosineSimilarity } from '../../core/semantic/amp/runVectorAmp.js';
+import { shouldIgnoreCodebaseDirectory } from '../../core/codebase-path-policy.js';
 import { rgPath } from '@vscode/ripgrep';
 
 const require = createRequire(import.meta.url);
@@ -26,12 +27,10 @@ const SEARCH_LIMIT = 10;
 const PROBE_MIN_RESONANCE = 0.18; // resonance floor for the hypothesis probe
 const DEFAULT_FORENSIC_LIMIT = 75; // total matches returned (a wide-but-bounded window)
 
-const IGNORED_DIRS = new Set(['node_modules', '.git', 'dist', 'build', '.cache', 'coverage']);
-
 function* walkFiles(dir, rootDir = dir) {
   const entries = readdirSync(dir, { withFileTypes: true });
   for (const entry of entries) {
-    if (IGNORED_DIRS.has(entry.name)) continue;
+    if (entry.isDirectory() && shouldIgnoreCodebaseDirectory(entry.name)) continue;
     const fullPath = join(dir, entry.name);
     if (entry.isDirectory()) {
       yield* walkFiles(fullPath, rootDir);

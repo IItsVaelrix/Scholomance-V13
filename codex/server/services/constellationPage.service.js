@@ -98,13 +98,28 @@ async function buildConstellationPageDirect(rawQuery, deps) {
   const degradedChannels = [];
   const warnings = [];
 
-  let leximancy = emptyLeximancy();
-  const leximancyResult = await pageRuntime.run(() => analyzeLeximancy(
+  /**
+   * RHYME + LEXIMANCY ARE INDEPENDENT AT THIS STAGE.
+   *
+   * Start the asynchronous index query first so it can make progress while
+   * leximancy performs its synchronous local lookups. Await both as one fixed
+   * pair, then apply results in the historical leximancy -> rhyme order so
+   * diagnostics and bytecode stay deterministic when both channels degrade.
+   */
+  const rhymePromise = pageRuntime.run(() =>
+    analyzeRhyme(deps.rhymeQueryEngine, deps.rhymeLexiconRepo, identity));
+  const leximancyPromise = pageRuntime.run(() => analyzeLeximancy(
     deps.lexiconAdapter, identity.primaryContentToken, {
       compounds: phraseStructure.compounds,
       intent: phraseStructure.intent,
     }, deps.lemmaAdapter,
   ));
+  const [leximancyResult, rhymeResult] = await Promise.all([
+    leximancyPromise,
+    rhymePromise,
+  ]);
+
+  let leximancy = emptyLeximancy();
   if (leximancyResult.ok) leximancy = leximancyResult.value;
   else degrade('leximancy', leximancyResult, degradedChannels, warnings);
 
@@ -114,7 +129,6 @@ async function buildConstellationPageDirect(rawQuery, deps) {
   }
 
   let rhyme = null;
-  const rhymeResult = await pageRuntime.run(() => analyzeRhyme(deps.rhymeQueryEngine, deps.rhymeLexiconRepo, identity));
   if (rhymeResult.ok) rhyme = rhymeResult.value;
   else degrade('rhymeAstrology', rhymeResult, degradedChannels, warnings);
 

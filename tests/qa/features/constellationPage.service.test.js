@@ -211,6 +211,29 @@ describe('buildConstellationPage — runtime orchestration (feedback P1)', () =>
     expect(p.diagnostics.degradedChannels).toEqual([]);
   });
 
+  it('starts async rhyme work before independent synchronous leximancy lookup', async () => {
+    const starts = [];
+    const observedDeps = {
+      ...deps,
+      lexiconAdapter: {
+        ...lexiconAdapter,
+        lookupWord(word) {
+          starts.push('leximancy-start');
+          return lexiconAdapter.lookupWord(word);
+        },
+      },
+      rhymeQueryEngine: {
+        async query(...args) {
+          starts.push('rhyme-start');
+          return rhymeQueryEngine.query(...args);
+        },
+      },
+    };
+
+    await buildConstellationPage('morning', observedDeps);
+    expect(starts.slice(0, 2)).toEqual(['rhyme-start', 'leximancy-start']);
+  });
+
   /**
    * Audit 2026-08-20: identical inputs produced different packets under the
    * SAME seal when a channel died, and the scene projection seeds the sky off

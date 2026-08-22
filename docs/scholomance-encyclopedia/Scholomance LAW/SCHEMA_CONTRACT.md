@@ -3709,6 +3709,65 @@ interface ConstellationPagePacket {
 
 ---
 
+## Constellation Evaluation Evidence (SCHOL-CONSTELLATION-EVALUATION-EVIDENCE-v1)
+
+**Canonical producer:** `codex/core/constellation/evaluation-evidence.js`
+**Scope:** offline parser/treebank evaluation only; never a ConstellationOS page request or response payload
+
+```typescript
+interface ConstellationEvaluationEvidenceV1 {
+  contract: 'SCHOL-CONSTELLATION-EVALUATION-EVIDENCE-v1';
+  schemaVersion: '1.0.0';
+  mode: 'offline-evaluation';
+  parser: { id: 'classic' | 'packed'; maxTokens: number };
+  fixture: { corpusSha256: string; lexiconSha256: string };
+  accounting: {
+    sampled: number;
+    analyzed: number;
+    skippedTooLong: number;
+    droppedThrew: number;
+    oracleLeaks: number;
+    oracleTokens: number;
+    tokenizerAgree: number;
+    tokenizerTotal: number;
+  };
+  metrics: {
+    n: number;
+    coverage: number;
+    containment: number;
+    decision: number | null;
+    byRootUpos: Array<{ upos: string; n: number; coverage: number; containment: number }>;
+    ablation: { bothFine: number; overGenerated: number; tagging: number; grammar: number };
+    categories: Array<{ label: string; deprel: string; failures: number; soleCause: number }>;
+    classifier: { failures: number; withCategory: number; meanCauses: number };
+    nonProjective: number;
+  };
+  rows: Array<{
+    index: number;
+    outcome: string;
+    overGenerated: boolean;
+    categories: Array<{ label: string; deprel: string }>;
+    nonProjective: number;
+    rootUpos: string;
+    contained: boolean;
+    decided: boolean | null;
+  }>;
+  signatures: Array<{ signature: string; count: number }>;
+  checksum: `constellation-evidence1:sha256:${string}`;
+}
+```
+
+### Invariants
+
+1. The producer is pure: it reads no files, clock, process state, or network.
+2. The packet contains no sentence text, token text, user query, environment value, or timestamp. Row identity is the stable post-filter array index only.
+3. Signature entries sort lexicographically by signature. Canonical checksum serialization recursively sorts object keys and preserves array order.
+4. The checksum covers every field except itself. The returned packet and every descendant are recursively frozen.
+5. `composePacked` and `runTreebank` remain offline evaluation machinery. This schema does not authorize either one in `buildConstellationPage`, and its coverage fields are not parse-accuracy or shipped-product claims.
+6. `accounting.sampled = accounting.analyzed + accounting.skippedTooLong + accounting.droppedThrew` for a complete `runTreebank` execution.
+
+---
+
 ## SCHEMA CHANGE NOTICE
 
 - Schema: ConstellationOS Page Packet (SCHOL-COS-PAGE-v3)
@@ -3778,6 +3837,7 @@ interface ConstellationPagePacket {
 | 1.44 | 2026-08-13 | Registered deterministic Gutenberg sanitation packets with contextual segmentation and exhaustive reason-coded quarantine accounting | no |
 | 1.45 | 2026-08-19 | Published the live ConstellationOS Phase-2 page packet (`scholomance/constellation-os-page-phase2`) as SCHOL-COS-PAGE-v2; sealed the emitted shape and declared the stale Phase-1 typedef the drift | no |
 | 1.46 | 2026-08-20 | SCHOL-COS-PAGE-v3: additive — `semanticInquiry` gains `ballistics` (semantic-ballistics evidence axis) and `receiptDigests` (sealed replay envelopes); contractVersion `cos-page-v3`; pageBytecode golden pin re-sealed `4922C817` → `E8DC9244` | no |
+| 1.47 | 2026-08-22 | Registered `SCHOL-CONSTELLATION-EVALUATION-EVIDENCE-v1`: deterministic, text-free, recursively frozen offline parser evidence with fixture identity, exhaustive accounting, row outcomes, sorted failure signatures, and canonical SHA-256 checksum | no |
 
 ---
 

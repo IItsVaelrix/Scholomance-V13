@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 import crypto from 'node:crypto';
 import { collabPersistence } from '../codex/server/collab/collab.persistence.js';
 import { embedFloat } from '../codex/core/semantic/amp/runVectorAmp.js';
+import { shouldIgnoreCodebaseDirectory } from '../codex/core/codebase-path-policy.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,15 +19,6 @@ const ROOT = path.resolve(__dirname, '..');
 
 const TARGET_DIM = 256;
 const CHUNK_SIZE = 2000; // chars
-
-// Regenerable build artifacts / vendored deps — never semantically indexed.
-// (ripgrep honours .gitignore for forensic search; the indexer needs its own
-// list since it walks the tree directly.) Any dir starting with `.venv` is also
-// skipped. Mirrors .gitignore: build, dist, coverage, target, .venv-align, etc.
-const IGNORED_DIRS = new Set([
-    'node_modules', '.git', 'dist', 'dist-ssr', 'build', '.tmp', 'output',
-    '.claude', 'coverage', 'target', '.cache',
-]);
 
 async function indexFile(filePath) {
     try {
@@ -71,7 +63,7 @@ async function walk(dir, callback) {
     for (const entry of entries) {
         const fullPath = path.join(dir, entry.name);
         if (entry.isDirectory()) {
-            if (IGNORED_DIRS.has(entry.name) || entry.name.startsWith('.venv')) continue;
+            if (shouldIgnoreCodebaseDirectory(entry.name)) continue;
             await walk(fullPath, callback);
         } else if (/\.(js|jsx|ts|tsx|py|md|toml|jsonc)$/.test(entry.name)) {
             // NOTE: .py added so steamdeck_brain/, blender addons, and the
