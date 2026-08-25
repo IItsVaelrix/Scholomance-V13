@@ -141,6 +141,17 @@ class CommandRegistry:
         cmd = parts[0]
         args = parts[1:]
 
+        if cmd == "/":
+            # A bare slash is "what can I type?" — surface the command
+            # palette instead of forwarding a meaningless "/" prompt to
+            # the agent. Falls back to a plain listing when no /help is
+            # registered so the affordance never silently dies.
+            if "/help" in self.commands:
+                self.commands["/help"]["handler"](ui_context, [])
+            else:
+                ui_context.log_msg("Available commands: " + ", ".join(sorted(self.commands)))
+            return
+
         if cmd in self.commands:
             try:
                 self.commands[cmd]["handler"](ui_context, args)
