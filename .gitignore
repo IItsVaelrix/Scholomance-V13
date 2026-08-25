@@ -219,3 +219,6 @@ PolarisOS/
 
 # Superpowers skill/brainstorm artifacts — regenerable, 277MB.
 .superpowers/
+
+# Derived sqlite index — rebuildable from .atlas/code-atlas.json
+.atlas/code-atlas.sqlite3
