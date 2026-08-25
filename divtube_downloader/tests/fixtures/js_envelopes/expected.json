@@ -1,0 +1,602 @@
+{
+  "oracle": "@babel/parser",
+  "generator": "scripts/gen-envelope-fixture.mjs",
+  "note": "Regenerate after editing a fixture. Never hand-edit these line numbers.",
+  "files": {
+    "arrow_and_class.js": [
+      {
+        "name": "buildReport",
+        "kind": "function",
+        "exported": true,
+        "line": 1,
+        "endLine": 7
+      },
+      {
+        "name": "LensRegistry",
+        "kind": "class",
+        "exported": true,
+        "line": 9,
+        "endLine": 18
+      },
+      {
+        "name": "memoized",
+        "kind": "const",
+        "exported": true,
+        "line": 20,
+        "endLine": 22
+      }
+    ],
+    "asi_no_semicolons.js": [
+      {
+        "name": "FIRST",
+        "kind": "const",
+        "exported": true,
+        "line": 4,
+        "endLine": 7
+      },
+      {
+        "name": "SECOND",
+        "kind": "const",
+        "exported": true,
+        "line": 9,
+        "endLine": 11
+      },
+      {
+        "name": "third",
+        "kind": "function",
+        "exported": true,
+        "line": 13,
+        "endLine": 15
+      }
+    ],
+    "corpus/ast-topography.js": [
+      {
+        "name": "AST_BAND_COUNT",
+        "kind": "const",
+        "exported": true,
+        "line": 39,
+        "endLine": 39
+      },
+      {
+        "name": "BAND_WIDTH",
+        "kind": "const",
+        "exported": false,
+        "line": 40,
+        "endLine": 40
+      },
+      {
+        "name": "DIM",
+        "kind": "const",
+        "exported": false,
+        "line": 41,
+        "endLine": 41
+      },
+      {
+        "name": "FACT_KINDS",
+        "kind": "const",
+        "exported": false,
+        "line": 47,
+        "endLine": 59
+      },
+      {
+        "name": "BINDING_KINDS",
+        "kind": "const",
+        "exported": false,
+        "line": 61,
+        "endLine": 70
+      },
+      {
+        "name": "ARGUMENT_KINDS",
+        "kind": "const",
+        "exported": false,
+        "line": 72,
+        "endLine": 88
+      },
+      {
+        "name": "SHAPE_KINDS",
+        "kind": "const",
+        "exported": false,
+        "line": 90,
+        "endLine": 97
+      },
+      {
+        "name": "NONDETERMINISM_CALLEES",
+        "kind": "const",
+        "exported": true,
+        "line": 118,
+        "endLine": 124
+      },
+      {
+        "name": "CALLEE_KINDS",
+        "kind": "const",
+        "exported": false,
+        "line": 126,
+        "endLine": 126
+      },
+      {
+        "name": "CALLEE_KIND_SET",
+        "kind": "const",
+        "exported": false,
+        "line": 127,
+        "endLine": 127
+      },
+      {
+        "name": "assertInventoryFenced",
+        "kind": "function",
+        "exported": true,
+        "line": 136,
+        "endLine": 150
+      },
+      {
+        "name": "AST_INVENTORY",
+        "kind": "const",
+        "exported": true,
+        "line": 154,
+        "endLine": 160
+      },
+      {
+        "name": "AST_INDEX",
+        "kind": "const",
+        "exported": true,
+        "line": 164,
+        "endLine": 164
+      },
+      {
+        "name": "fnv1aHash",
+        "kind": "function",
+        "exported": false,
+        "line": 168,
+        "endLine": 175
+      },
+      {
+        "name": "bucketOf",
+        "kind": "function",
+        "exported": false,
+        "line": 177,
+        "endLine": 179
+      },
+      {
+        "name": "inventoryOr",
+        "kind": "function",
+        "exported": false,
+        "line": 181,
+        "endLine": 184
+      },
+      {
+        "name": "resolveAstKinds",
+        "kind": "function",
+        "exported": true,
+        "line": 197,
+        "endLine": 263
+      },
+      {
+        "name": "generateAstTopographicVector",
+        "kind": "function",
+        "exported": true,
+        "line": 273,
+        "endLine": 348
+      },
+      {
+        "name": "astTopographicSimilarity",
+        "kind": "function",
+        "exported": true,
+        "line": 360,
+        "endLine": 368
+      }
+    ],
+    "corpus/character-to-svg.js": [
+      {
+        "name": "darkenHex",
+        "kind": "function",
+        "exported": false,
+        "line": 24,
+        "endLine": 70
+      },
+      {
+        "name": "cellsToKeySet",
+        "kind": "function",
+        "exported": false,
+        "line": 75,
+        "endLine": 81
+      },
+      {
+        "name": "getFillColor",
+        "kind": "function",
+        "exported": false,
+        "line": 86,
+        "endLine": 89
+      },
+      {
+        "name": "buildContourPathElements",
+        "kind": "function",
+        "exported": false,
+        "line": 91,
+        "endLine": 97
+      },
+      {
+        "name": "buildShaderDefs",
+        "kind": "function",
+        "exported": false,
+        "line": 99,
+        "endLine": 125
+      },
+      {
+        "name": "SHADER_FILTERS",
+        "kind": "const",
+        "exported": false,
+        "line": 127,
+        "endLine": 130
+      },
+      {
+        "name": "PART_SHADER_FALLBACK",
+        "kind": "const",
+        "exported": false,
+        "line": 138,
+        "endLine": 143
+      },
+      {
+        "name": "shaderForPart",
+        "kind": "function",
+        "exported": false,
+        "line": 145,
+        "endLine": 150
+      },
+      {
+        "name": "characterToSVG",
+        "kind": "function",
+        "exported": true,
+        "line": 165,
+        "endLine": 298
+      }
+    ],
+    "corpus/construction-autopsy.mjs": [
+      {
+        "name": "DATE",
+        "kind": "const",
+        "exported": false,
+        "line": 31,
+        "endLine": 31
+      },
+      {
+        "name": "DEFAULT_TARGETS",
+        "kind": "const",
+        "exported": false,
+        "line": 33,
+        "endLine": 39
+      },
+      {
+        "name": "slug",
+        "kind": "function",
+        "exported": false,
+        "line": 41,
+        "endLine": 42
+      },
+      {
+        "name": "targetPath",
+        "kind": "function",
+        "exported": false,
+        "line": 44,
+        "endLine": 45
+      },
+      {
+        "name": "pct",
+        "kind": "function",
+        "exported": false,
+        "line": 47,
+        "endLine": 47
+      },
+      {
+        "name": "num",
+        "kind": "function",
+        "exported": false,
+        "line": 48,
+        "endLine": 48
+      },
+      {
+        "name": "printAutopsy",
+        "kind": "function",
+        "exported": false,
+        "line": 50,
+        "endLine": 94
+      },
+      {
+        "name": "targetMarkdown",
+        "kind": "function",
+        "exported": false,
+        "line": 96,
+        "endLine": 199
+      },
+      {
+        "name": "indexMarkdown",
+        "kind": "function",
+        "exported": false,
+        "line": 201,
+        "endLine": 262
+      },
+      {
+        "name": "args",
+        "kind": "const",
+        "exported": false,
+        "line": 265,
+        "endLine": 265
+      },
+      {
+        "name": "singleTarget",
+        "kind": "const",
+        "exported": false,
+        "line": 266,
+        "endLine": 266
+      },
+      {
+        "name": "targets",
+        "kind": "const",
+        "exported": false,
+        "line": 267,
+        "endLine": 269
+      },
+      {
+        "name": "posMap",
+        "kind": "const",
+        "exported": false,
+        "line": 271,
+        "endLine": 271
+      },
+      {
+        "name": "recs",
+        "kind": "const",
+        "exported": false,
+        "line": 272,
+        "endLine": 272
+      },
+      {
+        "name": "baseCharts",
+        "kind": "const",
+        "exported": false,
+        "line": 280,
+        "endLine": 280
+      },
+      {
+        "name": "reports",
+        "kind": "const",
+        "exported": false,
+        "line": 281,
+        "endLine": 281
+      },
+      {
+        "name": "written",
+        "kind": "const",
+        "exported": false,
+        "line": 282,
+        "endLine": 282
+      }
+    ],
+    "corpus/encodeMotionBytecode.ts": [
+      {
+        "name": "encodeMotionBytecode",
+        "kind": "function",
+        "exported": true,
+        "line": 47,
+        "endLine": 130
+      },
+      {
+        "name": "formatInstruction",
+        "kind": "function",
+        "exported": false,
+        "line": 135,
+        "endLine": 186
+      },
+      {
+        "name": "decodeMotionBytecode",
+        "kind": "function",
+        "exported": true,
+        "line": 193,
+        "endLine": 263
+      },
+      {
+        "name": "hashMotionBytecode",
+        "kind": "function",
+        "exported": true,
+        "line": 270,
+        "endLine": 280
+      },
+      {
+        "name": "prettyPrintBytecode",
+        "kind": "function",
+        "exported": true,
+        "line": 287,
+        "endLine": 289
+      }
+    ],
+    "corpus/json-schemas.ts": [
+      {
+        "name": "componentRoleSchema",
+        "kind": "const",
+        "exported": true,
+        "line": 16,
+        "endLine": 30
+      },
+      {
+        "name": "componentStateSchema",
+        "kind": "const",
+        "exported": true,
+        "line": 35,
+        "endLine": 62
+      },
+      {
+        "name": "componentAnatomySchema",
+        "kind": "const",
+        "exported": true,
+        "line": 67,
+        "endLine": 87
+      },
+      {
+        "name": "componentSchemaSchema",
+        "kind": "const",
+        "exported": true,
+        "line": 92,
+        "endLine": 131
+      },
+      {
+        "name": "componentInstanceSchema",
+        "kind": "const",
+        "exported": true,
+        "line": 136,
+        "endLine": 149
+      },
+      {
+        "name": "validateSchema",
+        "kind": "function",
+        "exported": true,
+        "line": 155,
+        "endLine": 205
+      },
+      {
+        "name": "validateComponentSchema",
+        "kind": "function",
+        "exported": true,
+        "line": 210,
+        "endLine": 214
+      },
+      {
+        "name": "validateComponentState",
+        "kind": "function",
+        "exported": true,
+        "line": 219,
+        "endLine": 223
+      }
+    ],
+    "corpus/visemeMapping.js": [
+      {
+        "name": "clamp",
+        "kind": "function",
+        "exported": false,
+        "line": 17,
+        "endLine": 17
+      },
+      {
+        "name": "mapFormantsToMetrics",
+        "kind": "function",
+        "exported": true,
+        "line": 19,
+        "endLine": 43
+      },
+      {
+        "name": "getVisemeStyles",
+        "kind": "function",
+        "exported": true,
+        "line": 45,
+        "endLine": 74
+      }
+    ],
+    "default_brace_param.js": [
+      {
+        "name": "withOptions",
+        "kind": "function",
+        "exported": true,
+        "line": 3,
+        "endLine": 6
+      },
+      {
+        "name": "withDestructuredDefault",
+        "kind": "function",
+        "exported": true,
+        "line": 8,
+        "endLine": 10
+      }
+    ],
+    "expression_arrow.js": [
+      {
+        "name": "double",
+        "kind": "function",
+        "exported": true,
+        "line": 4,
+        "endLine": 4
+      },
+      {
+        "name": "clamp",
+        "kind": "function",
+        "exported": true,
+        "line": 6,
+        "endLine": 6
+      },
+      {
+        "name": "label",
+        "kind": "function",
+        "exported": true,
+        "line": 8,
+        "endLine": 8
+      },
+      {
+        "name": "afterwards",
+        "kind": "function",
+        "exported": true,
+        "line": 10,
+        "endLine": 12
+      }
+    ],
+    "freeze_wrapper.js": [
+      {
+        "name": "PHRASE_BANK",
+        "kind": "const",
+        "exported": true,
+        "line": 3,
+        "endLine": 13
+      },
+      {
+        "name": "SCHOOLS",
+        "kind": "const",
+        "exported": true,
+        "line": 15,
+        "endLine": 23
+      }
+    ],
+    "long_destructure.js": [
+      {
+        "name": "AnalyzePanel",
+        "kind": "function",
+        "exported": true,
+        "line": 3,
+        "endLine": 18
+      }
+    ],
+    "template_and_regex.js": [
+      {
+        "name": "renderBlock",
+        "kind": "function",
+        "exported": true,
+        "line": 1,
+        "endLine": 7
+      },
+      {
+        "name": "SPLITTER",
+        "kind": "const",
+        "exported": true,
+        "line": 9,
+        "endLine": 9
+      }
+    ],
+    "unbalanced_in_lexed_regions.js": [
+      {
+        "name": "openers",
+        "kind": "function",
+        "exported": true,
+        "line": 5,
+        "endLine": 11
+      },
+      {
+        "name": "CLOSERS",
+        "kind": "const",
+        "exported": true,
+        "line": 13,
+        "endLine": 17
+      },
+      {
+        "name": "afterUnbalanced",
+        "kind": "function",
+        "exported": true,
+        "line": 19,
+        "endLine": 21
+      }
+    ]
+  }
+}
