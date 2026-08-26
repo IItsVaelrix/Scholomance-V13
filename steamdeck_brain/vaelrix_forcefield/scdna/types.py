@@ -78,6 +78,14 @@ class GeneDomain:
     primary: PrimaryDomain = "code"
     secondary: list[str] = field(default_factory=list)
     activationBrains: list[str] = field(default_factory=list)
+    # The code this gene governs, as fnmatch globs -- the same shape a
+    # capability packet's `surfaces` uses, so the same machinery can date it.
+    #
+    # Without this the gene named no code, so `retrieval.freshness` could only
+    # ever be the literal written in registry.py and inject.py's MIN_FRESHNESS
+    # gate could never fire. Declaring surfaces is what makes that gate real.
+    # Empty is legitimate and means "cannot be dated", never "fresh".
+    surfaces: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -160,6 +168,7 @@ class RetrievalGene:
                 "primary": self.domain.primary,
                 "secondary": list(self.domain.secondary),
                 "activationBrains": list(self.domain.activationBrains),
+                "surfaces": list(self.domain.surfaces),
             },
             "retrieval": {
                 "lookupMode": self.retrieval.lookupMode,
@@ -212,6 +221,9 @@ class RetrievalGene:
                 primary=data["domain"]["primary"],
                 secondary=list(data["domain"].get("secondary", [])),
                 activationBrains=list(data["domain"].get("activationBrains", [])),
+                # .get, not [] -- every gene serialized before this field
+                # existed must still load rather than raising.
+                surfaces=list(data["domain"].get("surfaces", [])),
             ),
             retrieval=GeneRetrieval(
                 lookupMode=data["retrieval"]["lookupMode"],

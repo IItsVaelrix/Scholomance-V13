@@ -79,8 +79,32 @@ def load_injection_registry() -> GeneRegistry:
     return registry
 
 
-def select_genes(task: str, registry: GeneRegistry | None = None) -> list[RetrievalGene]:
-    """Distill the task, match genes, and apply forcefield-equivalent gating."""
+def passes_freshness(gene: RetrievalGene, *, repo_root: str | None = None,
+                     stamp: str | None = None) -> bool:
+    """Gate on the MEASURED value when the gene declares surfaces.
+
+    A gene that declares no surfaces cannot be dated, and "undatable" must not
+    become "blocked": that would mute every gene written before surfaces
+    existed. It falls back to the declared literal, exactly as before, and
+    `effective_freshness` reports `basis` so the difference stays visible.
+    """
+    from .gene_freshness import effective_freshness
+    try:
+        eff = effective_freshness(gene, repo_root, stamp=stamp)
+    except Exception:
+        return gene.retrieval.freshness >= MIN_FRESHNESS
+    return eff["value"] >= MIN_FRESHNESS
+
+
+def select_genes(task: str, registry: GeneRegistry | None = None, *,
+                 repo_root: str | None = None,
+                 stamp: str | None = None) -> list[RetrievalGene]:
+    """Distill the task, match genes, and apply forcefield-equivalent gating.
+
+    `repo_root`/`stamp` exist so the freshness gate can be exercised end to end
+    against a fixture repo. Testing passes_freshness alone would leave the
+    wiring here unguarded, and the wiring is the part that carries the fix.
+    """
     if registry is None:
         registry = load_injection_registry()
 
@@ -96,7 +120,7 @@ def select_genes(task: str, registry: GeneRegistry | None = None) -> list[Retrie
             continue
         if gene.retrieval.confidence < gene.retrieval.minConfidence:
             continue
-        if gene.retrieval.freshness < MIN_FRESHNESS:
+        if not passes_freshness(gene, repo_root=repo_root, stamp=stamp):
             continue
         gated.append(gene)
         if len(gated) >= MAX_GENES:

@@ -155,14 +155,24 @@ class TestGeneResolution(unittest.TestCase):
                          "BUGPATTERN_COLOR_DRAGON_FRONTEND_FALLBACK")
         self.assertTrue(v["module"]["requiredChecks"])
 
-    def test_gene_freshness_is_declared_not_measured(self):
-        """The number in registry.py is a literal. Serving it as measured would
-        be the check that cannot fail: genes declare no surfaces, so nothing
-        about the repo can ever lower it."""
-        v = R.resolve("BUGPATTERN_COLOR_DRAGON_FRONTEND_FALLBACK", str(REPO_ROOT))
-        self.assertEqual(v["freshness"]["basis"], "declared")
-        self.assertTrue(v["freshness"]["unverifiable"])
-        self.assertIn("surface", v["freshness"]["reason"].lower())
+    def test_gene_freshness_basis_follows_whether_it_declares_surfaces(self):
+        """Tied to the CAUSE, not to today's registry contents.
+
+        A gene with no surfaces cannot be dated, so its freshness is the literal
+        from registry.py and must be labelled `declared`. The moment a gene
+        declares surfaces the basis must become `measured` — asserting
+        "declared" unconditionally would turn this test into a brake on the fix.
+        """
+        from vaelrix_forcefield.scdna.registry import DEFAULT_GENE_REGISTRY
+        for gene_id, gene in DEFAULT_GENE_REGISTRY.items():
+            v = R.resolve(gene_id, str(REPO_ROOT))
+            fr = v["freshness"]
+            if gene.domain.surfaces:
+                self.assertEqual(fr["basis"], "measured", (gene_id, fr))
+            else:
+                self.assertEqual(fr["basis"], "declared", (gene_id, fr))
+                self.assertTrue(fr["unverifiable"])
+                self.assertIn("surface", fr["reason"].lower())
 
     def test_gene_does_not_bind_to_a_capability_by_name_similarity(self):
         """gene.domain 'phoneme' must not silently become capability 'phonology'."""

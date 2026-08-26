@@ -200,17 +200,21 @@ def resolve(query, repo_root: str | None = None, *,
                 # guess into every downstream answer.
                 "boundCapability": None,
             }
+            from . import gene_freshness as _gf
+            gv = _gf.gene_freshness(gene, root)
+            module["surfaces"] = gv["surfaces"]
             fr = {
-                "basis": "declared",
-                "unverifiable": True,
-                "stale": False,
+                "basis": gv["basis"],
+                "unverifiable": gv["unverifiable"],
+                "stale": gv["stale"],
                 "declaredFreshness": d["retrieval"].get("freshness"),
-                "reason": ("gene declares no surfaces, so freshness cannot be "
-                           "measured; the value is a literal in registry.py and "
-                           "nothing in the repo can lower it"),
+                "measuredFreshness": gv["measured"],
+                "commitsBehind": gv["commitsBehind"],
+                "reason": gv["reason"],
             }
-            return _verdict(q, RESOLVED, "gene", module, fr,
-                            reason=f"gene {q} found in the registry")
+            kind = CLARIFY if gv["stale"] else RESOLVED
+            return _verdict(q, kind, "gene", module, fr,
+                            reason=f"gene {q} found in the registry; " + gv["reason"])
         return _verdict(q, THEORY, reason="no gene with that stableId is registered")
 
     # -- repo-relative path -------------------------------------------------
