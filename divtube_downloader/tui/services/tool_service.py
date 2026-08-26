@@ -20,6 +20,31 @@ from tui.services.bridge_dispatch import (
     _safe_path,
 )
 
+import hashlib
+_NAV_HEX_PATH = os.path.join(os.path.dirname(__file__), "nav_hex.json")
+try:
+    with open(_NAV_HEX_PATH, "r", encoding="utf-8") as _f:
+        NAV_HEX = json.load(_f)
+except (OSError, json.JSONDecodeError, ValueError):
+    NAV_HEX = {}
+
+
+def _toolcall_bytecode(tool_name, target_path, args_hash, why_family, staleness_kind, staleness_key):
+    """A PB-XP-v1-TCL-... identity string, format-compatible with (not
+    byte-identical to) BytecodeXPVaccine.js's TOOLCALL kind — see PDR §11 Q7
+    and this plan's ruling on JS/Python bytecode parity."""
+    title = f"toolcall {tool_name} {why_family} {target_path or ''}"
+    slug_src = "".join(ch for ch in title.upper() if ch.isalnum())
+    slug = slug_src[:8] if len(slug_src) >= 4 else hashlib.sha256(title.encode("utf-8")).hexdigest()[:8].upper()
+    stable = json.dumps(
+        {"argsHash": args_hash, "stalenessKey": staleness_key, "stalenessKind": staleness_kind,
+         "targetPath": target_path, "toolName": tool_name, "whyFamily": why_family},
+        sort_keys=True, separators=(",", ":"),
+    )
+    fingerprint = hashlib.sha256(stable.encode("utf-8")).hexdigest()[:12]
+    checksum = hashlib.sha256((stable + fingerprint).encode("utf-8")).hexdigest()[:12]
+    return f"PB-XP-v1-TCL-{slug}-{fingerprint}-{checksum}"
+
 
 def _fuzzy_find_target(content, target, threshold):
     """Find the best fuzzy match of `target` inside `content`.
@@ -158,6 +183,10 @@ def _push_undo(path, before_content):
     return wid
 
 
+def _recently_written():
+    return frozenset(e["path"] for e in _UNDO_STACK if e.get("path"))
+
+
 def list_undoable():
     """Return a snapshot of the undo stack (newest last), without the blob."""
     return [
@@ -267,6 +296,9 @@ def _gate_check(tool_name, kwargs, callback=None):
 class ToolService:
     def __init__(self):
         self._persistence = self._init_persistence()
+        from tui.services import episode_store
+        _db_path = os.environ.get("COLLAB_DB_PATH") or os.path.join(PROJECT_ROOT, "scholomance_collab.sqlite")
+        self._episodes = episode_store.EpisodeStore(_db_path)
         self.tools = [
             {
                 "type": "function",
@@ -1747,7 +1779,109 @@ class ToolService:
             return self._substrate_recent(kwargs, callback)
         return "Tool not found."
 
+    def _episode_recall(self, tool_name, kwargs, callback):
+        """Return (hit_text, record_fn). hit_text is None unless a sound recall
+        exists AND the ledger is in MODE_ON (shadow mode never returns a
+        stored result — see the module ruling below). record_fn(result)
+        stores the episode; it is a no-op when the ledger is off or
+        unavailable.
+
+        Never raises. A ledger failure must be invisible to the tool. Every
+        closure returned from here (record_fn) is ALSO internally
+        failure-swallowing, because the wrapper calls it after this method
+        has already returned — an exception raised from inside the closure
+        would not be caught by this method's own try/except.
+        """
+        noop = (None, lambda _result: None)
+        try:
+            # Imported inside the try, not at module scope: an import failure
+            # here (however unlikely for modules that ship with this repo)
+            # must degrade to "ledger off" like any other failure, not
+            # propagate out of a tool call.
+            from tui.services import episode_staleness, episode_store
+            from tui.services.nav_classifier import classify_nav
+
+            mode = episode_store.current_mode()
+            if mode == episode_store.MODE_OFF or self._episodes is None:
+                return noop
+
+            rel_path = kwargs.get("path") or kwargs.get("entry") or ""
+            args_hash = episode_store.args_hash_for(tool_name, kwargs)
+            why = classify_nav(tool_name, kwargs, _recently_written())
+            # staleness_for takes kwargs too: is_recallable(tool_name, args)
+            # inside it is what actually refuses microscope(eval=true) and
+            # evaluate, and routes microscope(refs=true) to repo-clean-head.
+            kind, key = episode_staleness.staleness_for(tool_name, kwargs, PROJECT_ROOT, rel_path)
+
+            def record(result):
+                try:
+                    self._episodes.record(
+                        tool_name=tool_name, target_path=rel_path or None,
+                        target_symbol=kwargs.get("symbol"), args_hash=args_hash,
+                        why_family=why, why_hex=NAV_HEX.get(why, ""),
+                        staleness_kind=kind, staleness_key=key,
+                        result_text=str(result),
+                        bytecode=_toolcall_bytecode(tool_name, rel_path, args_hash, why, kind, key),
+                    )
+                except Exception:
+                    pass
+
+            def safe_lookup():
+                try:
+                    return self._episodes.lookup(args_hash, kind, key)
+                except Exception:
+                    return None
+
+            if mode == episode_store.MODE_ON:
+                hit = safe_lookup()
+                if hit:
+                    try:
+                        if callback:
+                            callback(f"  [#7CFF8B]✓[/] {tool_name}: recalled (unchanged since {hit['created_at']})")
+                    except Exception:
+                        pass
+                    return hit["result_text"], lambda _r: None
+                return None, record
+
+            if mode == episode_store.MODE_SHADOW:
+                # Shadow mode: compute-and-compare, but NEVER serve a stored
+                # result — the wrapper always executes the real lens. This
+                # closure runs after the fresh result exists, so it both
+                # records the fresh episode (F1: one row per call, on or
+                # shadow) and reports what a real recall would have done,
+                # without ever changing what the caller receives.
+                hit = safe_lookup()
+
+                def shadow_record(result):
+                    record(result)
+                    try:
+                        if hit is None:
+                            return  # miss during shadow soak is the common
+                                    # case and would be noise — no callback.
+                        if str(result) == hit["result_text"]:
+                            if callback:
+                                callback(f"  [#7CFF8B]○[/] {tool_name}: would have recalled (match)")
+                        else:
+                            if callback:
+                                callback(f"  [#FF5C7A]⚠[/] {tool_name}: would-have-hit MISMATCH — staleness key was unsound")
+                    except Exception:
+                        pass
+
+                return None, shadow_record
+
+            return noop
+        except Exception:
+            return noop
+
     def _read_file(self, kwargs, callback):
+        hit, record = self._episode_recall("read_file", kwargs, callback)
+        if hit is not None:
+            return hit
+        result = self._read_file_uncached(kwargs, callback)
+        record(result)
+        return result
+
+    def _read_file_uncached(self, kwargs, callback):
         raw_path = kwargs.get("path", "")
         max_lines = min(kwargs.get("max_lines", 100), 500)
         safe = _safe_path(raw_path)
@@ -2893,6 +3027,14 @@ class ToolService:
         return json.dumps(result, indent=2, default=str)[:6000]
 
     def _telescope(self, kwargs, callback):
+        hit, record = self._episode_recall("telescope", kwargs, callback)
+        if hit is not None:
+            return hit
+        result = self._telescope_uncached(kwargs, callback)
+        record(result)
+        return result
+
+    def _telescope_uncached(self, kwargs, callback):
         path = kwargs.get("path") or "."
         max_depth = int(kwargs.get("max_depth") or 2)
         with_symbols = kwargs.get("with_symbols")
@@ -2916,6 +3058,14 @@ class ToolService:
         return code_lens.serialize_for_agent(result)
 
     def _microscope(self, kwargs, callback):
+        hit, record = self._episode_recall("microscope", kwargs, callback)
+        if hit is not None:
+            return hit
+        result = self._microscope_uncached(kwargs, callback)
+        record(result)
+        return result
+
+    def _microscope_uncached(self, kwargs, callback):
         path = kwargs.get("path") or ""
         if not path:
             return "Error: path is required."
@@ -2967,6 +3117,14 @@ class ToolService:
         return code_lens.serialize_for_agent(result)
 
     def _atlas(self, kwargs, callback):
+        hit, record = self._episode_recall("atlas", kwargs, callback)
+        if hit is not None:
+            return hit
+        result = self._atlas_uncached(kwargs, callback)
+        record(result)
+        return result
+
+    def _atlas_uncached(self, kwargs, callback):
         action = (kwargs.get("action") or "").strip()
         if action not in {"rollup", "refs", "prefix", "stale"}:
             return "Error: action must be one of rollup, refs, prefix, stale."
@@ -3006,6 +3164,18 @@ class ToolService:
         return code_lens.serialize_for_agent(result)
 
     def _evaluate(self, kwargs, callback):
+        # is_recallable("evaluate", ...) is always False (episode_staleness.py,
+        # Task 4), so staleness_for always returns (KIND_NONE, None) here and
+        # EpisodeStore.lookup always misses on that key — evaluate is
+        # un-cacheable by that gate, not by a branch in this wrapper (PDR F9).
+        hit, record = self._episode_recall("evaluate", kwargs, callback)
+        if hit is not None:
+            return hit
+        result = self._evaluate_uncached(kwargs, callback)
+        record(result)
+        return result
+
+    def _evaluate_uncached(self, kwargs, callback):
         path = kwargs.get("path") or ""
         symbol = kwargs.get("symbol") or ""
         if not path or not symbol:
