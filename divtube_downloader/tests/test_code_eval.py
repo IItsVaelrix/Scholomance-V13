@@ -10,7 +10,9 @@ itself. `projection-laws.js` documents `synthesizeByProjection()` as sweeping
 it shows that.
 """
 
+import json
 import os
+import subprocess
 import unittest
 
 from tui.services import code_eval
@@ -36,26 +38,55 @@ class TestPathSafety(unittest.TestCase):
         self.assertFalse(result["ok"])
 
 
+def _node_truth(expression: str):
+    """Evaluate `expression` against the projection module with plain node.
+
+    Ground truth for the JS shape assertions. These used to be literals (79
+    laws, 44 transitions, 50 pair operations) counted by hand when the tests
+    were written; commit 2e42ea2e then added laws to the grimoire and all
+    three tests went red although the lens was reporting correctly. Pinning
+    another team's data counts inside the LENS suite is the wrong coupling —
+    what belongs here is "the lens reports the same shape a direct node run
+    sees". A law-count regression gate, if one is wanted, belongs with the
+    constellation suite that owns the grimoire.
+
+    This is still an independent check: it never consults code_eval, so a lens
+    that miscounts, fails to call, or reports a stale cached shape still fails.
+    """
+    script = (
+        f"const m = require({json.dumps(os.path.join(PROJECT_ROOT, PROJECTION))});"
+        f"process.stdout.write(String({expression}));"
+    )
+    out = subprocess.run(
+        ["node", "-e", script], capture_output=True, text=True, timeout=30, cwd=PROJECT_ROOT
+    )
+    if out.returncode != 0:
+        raise AssertionError(f"node ground-truth probe failed: {out.stderr.strip()}")
+    return int(out.stdout.strip())
+
+
 class TestJavaScript(unittest.TestCase):
     def test_calls_a_zero_arg_export_and_reports_its_length(self):
-        """The motivating case: the doc says 'every licensed law', it returns 79."""
+        """The motivating case: the doc says 'every licensed law'; only running it counts."""
         result = code_eval.evaluate(PROJECT_ROOT, PROJECTION, "synthesizeByProjection")
         self.assertTrue(result["ok"], result.get("error"))
         self.assertTrue(result["called"])
         self.assertEqual(result["shape"]["type"], "array")
-        self.assertEqual(result["shape"]["length"], 79)
+        self.assertEqual(result["shape"]["length"], _node_truth("m.synthesizeByProjection().length"))
 
     def test_reads_a_non_function_export_without_calling_it(self):
         result = code_eval.evaluate(PROJECT_ROOT, PROJECTION, "PROJECTION_TRANSITIONS")
         self.assertTrue(result["ok"], result.get("error"))
         self.assertFalse(result["called"])
-        self.assertEqual(result["shape"]["length"], 44)
+        self.assertEqual(result["shape"]["length"], _node_truth("m.PROJECTION_TRANSITIONS.length"))
 
     def test_counts_keys_of_an_exported_object(self):
         result = code_eval.evaluate(PROJECT_ROOT, PROJECTION, "PAIR_OPERATIONS")
         self.assertTrue(result["ok"], result.get("error"))
         self.assertEqual(result["shape"]["type"], "object")
-        self.assertEqual(result["shape"]["keys"], 50)
+        self.assertEqual(
+            result["shape"]["keys"], _node_truth("Object.keys(m.PAIR_OPERATIONS).length")
+        )
 
     def test_surfaces_the_modules_own_purity_declaration(self):
         """The lens shows the claim next to the behaviour, which is its whole point."""

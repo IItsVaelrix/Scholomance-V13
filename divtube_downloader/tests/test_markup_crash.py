@@ -37,5 +37,44 @@ class TestMarkupCrash(unittest.TestCase):
         asyncio.run(run())
 
 
+class TestLogTailMarkupSafety(unittest.TestCase):
+    """The log tail renders raw log lines (which echo user/LLM text).
+
+    Regression: a line like ``mismatched [bold]hi[/italic] tags`` reached the
+    log file via chat echo, was interpolated raw into markup by
+    LogTailWidget._tail_loop, and the resulting MarkupError killed the TUI.
+    """
+
+    def test_render_line_escapes_crashers(self):
+        from rich.text import Text
+        from tui.widgets.log_tail_widget import LogTailWidget
+
+        for msg in CRASHERS:
+            rendered = LogTailWidget._format_line("app.log", msg)
+            # Must parse as valid markup without raising MarkupError.
+            text = Text.from_markup(rendered)
+            # And the visible content must still contain the user's words.
+            assert msg in text.plain
+
+    def test_safe_write_survives_crashers(self):
+        async def run():
+            from tui.widgets.log_tail_widget import LogTailWidget
+
+            # Instantiate DivTubeAgentApp directly, never a local subclass:
+            # Textual resolves CSS_PATH relative to the module that DEFINES the
+            # App class, so subclassing here made it look for tests/app.tcss and
+            # raise StylesheetError before the test body ever ran.
+            app = DivTubeAgentApp()
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause(0.1)
+                widget = LogTailWidget()
+                await app.screen.mount(widget)
+                for msg in CRASHERS:
+                    widget._safe_write(widget._format_line("app.log", msg), msg)
+                await pilot.pause(0.1)
+
+        asyncio.run(run())
+
+
 if __name__ == "__main__":
     unittest.main()

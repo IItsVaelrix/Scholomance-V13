@@ -9,6 +9,8 @@ Design contract (Professional UI Architect, Laws 1/2/5):
     list live (case-insensitive substring) and Escape clears it.
 """
 
+import re
+
 from textual.widgets import Static, Button, Input
 from textual.binding import Binding
 from textual.app import ComposeResult
@@ -18,7 +20,10 @@ from tui.ui.sigils import title
 from tui.ui.theme import palette
 
 SECTIONS = [
-    ("AGENT", ["/prompt", "/analyze", "/download", "/critique", "/apply-patch", "/thumbnail", "/scholomance", "/model"]),
+    ("AGENT", ["/prompt", "/analyze", "/download", "/critique", "/apply-patch", "/thumbnail", "/scholomance", "/model",
+               "/vaelrix", "/prompt-model", "/prompt-clear"]),
+    ("PRODUCTION", ["/forge", "/divtube", "/deploy", "/polish", "/intel", "/niche"]),
+    ("EDITING", ["/code", "/copy", "/write-file", "/refactor-all", "/undo-list", "/undo-replace"]),
     ("CLERICAL RAID", ["/cleri-scan", "/cleri-diagnose", "/cleri-train", "/cleri-stats",
                        "/cleri-probe", "/cleri-query", "/cleri-ingest", "/cleri-cluster",
                        "/cleri-dupes", "/cleri-maint", "/cleri-feedback", "/cleri-rebuild"]),
@@ -27,10 +32,22 @@ SECTIONS = [
                 "/collab-locks", "/collab-grep", "/collab-feedback", "/collab-knowledge"]),
     ("ARCHIVE", ["/archive", "/archive-search", "/archive-neighbors", "/archive-status"]),
     ("HEALTH", ["/health", "/health-emit", "/health-verify"]),
-    ("TURBOQUANT", ["/register-golden", "/list-curves", "/score-title", "/test-titles",
-                    "/analyze-gaps", "/search-similar"]),
+    ("TURBOQUANT", ["/register-golden", "/list-curves", "/delete-curve", "/score-title",
+                    "/rate-title", "/test-titles", "/analyze-gaps", "/search-similar",
+                    "/export-pack", "/import-pack", "/registry"]),
+    ("DEV & OPS", ["/lint", "/test", "/typecheck", "/health-status", "/log",
+                   "/daemon-start", "/daemon-stop"]),
     ("SESSION", ["/provider", "/apikey", "/budget", "/release", "/help", "/memory", "/clear", "/exit"]),
 ]
+
+# Registered commands that deliberately have NO button: true aliases whose
+# canonical command carries the button. Pinned by test_sidebar_command_parity:
+# alias and canonical must share the same handler in app.py, and the
+# canonical must be visible.
+EXEMPT_ALIASES: dict[str, str] = {
+    "/cleri": "/cleri-scan",           # same handle_cleri_scan handler
+    "/archive-files": "/archive",      # same handle_archive_files handler
+}
 
 # One truthful line per command — surfaced as the button tooltip so the user
 # never has to run /help to know what a button does. Missing key = generic hint.
@@ -43,6 +60,33 @@ COMMAND_HINTS = {
     "/thumbnail": "Analyze or critique a thumbnail",
     "/scholomance": "Query the Scholomance encyclopedia",
     "/model": "Choose the active model",
+    "/vaelrix": "Ask Vaelrix (SteamDeck brain)",
+    "/prompt-model": "Set the AI model",
+    "/prompt-clear": "Clear conversation history",
+    "/forge": "Open the Video Forge editor",
+    "/divtube": "Return to DivTube home",
+    "/deploy": "Deploy app (npm run deploy)",
+    "/polish": "Run production polish script",
+    "/intel": "Full YouTube intel report — /intel <url>",
+    "/niche": "Niche registry: list/show/import/export",
+    "/code": "View code in the editor — /code <path>",
+    "/copy": "Copy active chat log to clipboard",
+    "/write-file": "Create or overwrite a file",
+    "/refactor-all": "Batch search/replace across files",
+    "/undo-list": "List pending undos",
+    "/undo-replace": "Roll back last write — /undo-replace [id]",
+    "/delete-curve": "Delete a Golden Curve",
+    "/rate-title": 'Rate title (curve-free SEO) — /rate-title "Title"',
+    "/export-pack": "Export curves to a .goldenpack",
+    "/import-pack": "Import curves from a .goldenpack",
+    "/registry": "Inspect TurboQuant registry",
+    "/lint": "Run Ruff (Python Linter)",
+    "/test": "Run Pytest",
+    "/typecheck": "Run Mypy",
+    "/health-status": "Show health signal stats",
+    "/log": "Live tail of app/error logs",
+    "/daemon-start": "Start brain daemon for persistent queries",
+    "/daemon-stop": "Stop brain daemon",
     "/cleri-scan": "Scan sources for pathogens",
     "/cleri-diagnose": "Diagnose a symptom set",
     "/cleri-train": "Train the registry on new evidence",
@@ -93,13 +137,26 @@ COMMAND_HINTS = {
 _ALL_CMD_COUNT = sum(len(cmds) for _, cmds in SECTIONS)
 
 
+def _slug(text: str) -> str:
+    """Reduce arbitrary text to a Textual-legal id fragment.
+
+    Textual ids admit only letters, digits, underscores and hyphens. A heading
+    like "DEV & OPS" would otherwise raise BadIdentifier during compose and take
+    the entire cockpit down — a section title is user-facing prose and must never
+    be load-bearing for widget identity. Runs of illegal characters collapse to a
+    single hyphen so "DEV & OPS" and "DEV  OPS" do not collide silently.
+    """
+    slug = re.sub(r"[^a-z0-9_]+", "-", text.lower()).strip("-")
+    return slug or "x"
+
+
 def _btn_id(cmd: str) -> str:
     """Deterministic widget id per command: /cleri-scan -> cmd-cleri-scan."""
-    return "cmd-" + cmd.lstrip("/").replace("/", "-")
+    return "cmd-" + _slug(cmd.lstrip("/"))
 
 
 def _heading_id(heading: str) -> str:
-    return "sb-head-" + heading.lower().replace(" ", "-")
+    return "sb-head-" + _slug(heading)
 
 
 class SidebarFilter(Input):

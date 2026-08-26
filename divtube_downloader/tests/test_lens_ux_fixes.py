@@ -12,7 +12,7 @@ import sys
 import tempfile
 import unittest
 
-from tui.services import code_atlas, code_lens
+from tui.services import code_atlas, code_eval, code_lens
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DIVTUBE_ROOT = os.path.abspath(os.path.join(HERE, ".."))
@@ -298,7 +298,20 @@ class TestLensCli(unittest.TestCase):
         self.assertEqual(proc.returncode, 0, proc.stderr)
         payload = json.loads(proc.stdout)
         self.assertTrue(payload["ok"], payload)
-        self.assertEqual(payload["shape"]["length"], 79)
+        self.assertTrue(payload["called"], payload)
+        self.assertEqual(payload["shape"]["type"], "array")
+        # What this test owns is the CLI plumbing, so compare the CLI against the
+        # library it wraps rather than against a literal. This used to assert 79,
+        # counted by hand when the test was written; commit 2e42ea2e added laws to
+        # the grimoire and the test went red although the CLI was correct. The
+        # law count belongs to the constellation suite, not to the lens CLI suite.
+        direct = code_eval.evaluate(
+            PROJECT_ROOT,
+            "codex/core/constellation/grimoire/projection-laws.js",
+            "synthesizeByProjection",
+        )
+        self.assertTrue(direct["ok"], direct)
+        self.assertEqual(payload["shape"], direct["shape"])
 
 
 class TestMcpBridgeExposesLenses(unittest.TestCase):
