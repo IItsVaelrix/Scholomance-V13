@@ -84,5 +84,6 @@
     }
   ],
   "mnemonic": "When editing a .scdl asset or working with pixel art direction: art genes are human-curated (never auto-generated), projection is deterministic (pure function, no I/O), commit requires interactive human approval (agent strings refused), and the durable ledger is the memory (event emission alone is not enough). SCD64 is an address, not a payload. Feel is warn-only.",
-  "retrievalTrigger": "file surface matches *.scdl, scdna-art-gene*, project-genes*, art-gene-ledger*, or pixel-art-direction capability queries"
+  "retrievalTrigger": "file surface matches *.scdl, scdna-art-gene*, project-genes*, art-gene-ledger*, or pixel-art-direction capability queries",
+  "checksum": "scd64:16cdf7f5561154d59b214ba7cc21bc49e34a955aa079da02d2006ec7b93d801a"
 }
