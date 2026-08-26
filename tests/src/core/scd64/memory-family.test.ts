@@ -84,8 +84,10 @@ describe('SCD64_GLOSSARY with MEMORY', () => {
     const memory = SCD64_GLOSSARY.filter((e) => e.domain === 'MEMORY');
     expect(memory.length).toBe(Object.keys(MEMORY_FAMILIES).length * 8);
     // The invariant worth pinning is that the memory domain leaves the other two
-    // alone. Freezing the grand total instead just makes every new family edit it.
-    expect(SCD64_GLOSSARY.length - memory.length).toBe(72);
+    // alone. Freezing the grand total instead just makes every new family edit
+    // it — so subtract NAV as well rather than re-pinning a grand total.
+    const nav = SCD64_GLOSSARY.filter((e) => e.domain === 'NAV');
+    expect(SCD64_GLOSSARY.length - memory.length - nav.length).toBe(72);
   });
 
   it('memory entries carry memorySlotAlias and valid hex', () => {
@@ -121,7 +123,11 @@ describe('wire compatibility', () => {
     const before = priorOf(SCD64_GLOSSARY);
     const after = priorOf(rebuilt);
 
-    expect(after.length).toBe(72);
+    // Domain-relative, same reasoning as the R1 fix above: pinning a literal
+    // count here means every future domain (NAV included) has to come back
+    // and edit it. The invariant that matters is "rebuild changes nothing",
+    // which comparing the two live-computed lengths already proves.
+    expect(after.length).toBe(before.length);
     for (let i = 0; i < before.length; i++) {
       expect(after[i].hexCode).toBe(before[i].hexCode);
       expect(after[i].family).toBe(before[i].family);

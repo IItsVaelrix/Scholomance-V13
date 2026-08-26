@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { BUG_FAMILIES, ART_FAMILIES, MEMORY_FAMILIES, SCD64_GLOSSARY, buildSCD64Glossary } from '../../../../src/core/scd64/glossary';
+import { BUG_FAMILIES, ART_FAMILIES, MEMORY_FAMILIES, NAV_FAMILIES, SCD64_GLOSSARY, buildSCD64Glossary } from '../../../../src/core/scd64/glossary';
 import { SCD64_SLOT_NAMES, ART_SLOT_ALIASES, SCD64_REGEX } from '../../../../src/core/scd64/constants';
 
 // ─── ART Family Structure ────────────────────────────────────────────────────
@@ -65,12 +65,15 @@ describe('SCD64_GLOSSARY', () => {
     expect(bugEntries.length).toBe(48);
     // 3 art families × 8 slots = 24
     expect(artEntries.length).toBe(24);
-    // 48 bug + 24 art + 8 per memory family. Bug and ART counts are pinned above;
-    // the memory domain is still growing, so assert it does not disturb them
-    // rather than freezing a total that every new family has to come back and edit.
+    // 48 bug + 24 art + 8 per memory family + 8 per nav family. Bug and ART
+    // counts are pinned above; the memory and nav domains are still growing,
+    // so assert they do not disturb them rather than freezing a total that
+    // every new family has to come back and edit.
     const memoryEntries = SCD64_GLOSSARY.filter((e) => e.domain === 'MEMORY');
+    const navEntries = SCD64_GLOSSARY.filter((e) => e.domain === 'NAV');
     expect(memoryEntries.length).toBe(Object.keys(MEMORY_FAMILIES).length * 8);
-    expect(SCD64_GLOSSARY.length).toBe(48 + 24 + memoryEntries.length);
+    expect(navEntries.length).toBe(Object.keys(NAV_FAMILIES).length * 8);
+    expect(SCD64_GLOSSARY.length).toBe(48 + 24 + memoryEntries.length + navEntries.length);
   });
 
   it('art entries carry artSlotAlias', () => {
