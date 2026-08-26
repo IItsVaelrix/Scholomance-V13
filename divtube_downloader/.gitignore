@@ -25,6 +25,12 @@ niche_database.sqlite
 # Per-tab /prompt conversation memory (DivTube, Mother, …)
 .tui_prompt_history.json
 
+# Local DivTube Android companion state and Android-generated configuration.
+.divtube-remote/
+android/local.properties
+android/.gradle/
+android/app/build/
+
 # Backups
 *.bak
 .blackboxcli/
