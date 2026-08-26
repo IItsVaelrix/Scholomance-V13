@@ -23,6 +23,10 @@ ERROR   = "#FF5C7A"
 MUTED   = "#6A5A6A"
 
 
+class RemoteToolPolicyError(RuntimeError):
+    """Raised before execution when a provider calls an unadvertised tool."""
+
+
 class PromptService:
     # Per-tab conversation memory, persisted so each cockpit tab (DivTube work,
     # Mother commentary, …) keeps its own thread across restarts. Same cwd
@@ -160,11 +164,25 @@ class PromptService:
             return base + "\n\n" + law_ctx
         return base
 
-    def _call_api(self, messages, model_name, base_url, api_key, use_tools=True):
+    def _select_tools(self, tools):
+        return list(self.tools.tools if tools is None else tools)
+
+    def _execute_selected_tool(self, name, arguments, callback, selected_tools):
+        allowed = {
+            item.get("function", {}).get("name")
+            for item in selected_tools
+            if isinstance(item, dict) and isinstance(item.get("function"), dict)
+        }
+        if name not in allowed:
+            raise RemoteToolPolicyError(f"Tool {name!r} was not advertised for this request.")
+        return self.tools.execute_tool(name, arguments, callback)
+
+    def _call_api(self, messages, model_name, base_url, api_key, use_tools=True, tools=None):
         kwargs = {"model": model_name, "messages": messages}
-        if use_tools and self.tools.tools:
+        selected_tools = self._select_tools(tools)
+        if use_tools and selected_tools:
             import copy
-            safe_tools = copy.deepcopy(self.tools.tools)
+            safe_tools = copy.deepcopy(selected_tools)
             def remove_defaults(d):
                 if isinstance(d, dict):
                     d.pop("default", None)
@@ -210,13 +228,15 @@ class PromptService:
             pass  # rate accounting must never break the agent turn
         return res_json
 
-    def prompt(self, text, callback, system_hint=None, model=None, state_callback=None, controller=None, agent_id="divtube"):
+    def prompt(self, text, callback, system_hint=None, model=None, state_callback=None, controller=None, agent_id="divtube", tools=None, on_finished=None):
         def set_state(s):
             if state_callback:
                 state_callback(s)
 
         def run():
             token = controller.begin_agent() if controller else None
+            terminal_ok = False
+            terminal_detail = "failed"
             try:
                 if agent_id == "vaelrix":
                     import sys
@@ -321,6 +341,7 @@ class PromptService:
 
                 MAX_TURNS = 150
                 use_tools = True
+                selected_tools = self._select_tools(tools)
 
                 # We are already in the try block
                 for turn in range(MAX_TURNS):
@@ -331,7 +352,7 @@ class PromptService:
                     set_state("thinking")
                     llm_throttle.wait()
                     try:
-                        res_json = self._call_api(messages, model_name, base_url, api_key, use_tools)
+                        res_json = self._call_api(messages, model_name, base_url, api_key, use_tools, selected_tools)
                     except urllib.error.HTTPError as e:
                         err_body = e.read().decode("utf-8", errors="replace")
                         if use_tools and (e.code in (400, 501) or "support" in err_body.lower() or "tool" in err_body.lower() or "not implemented" in err_body.lower()):
@@ -339,7 +360,7 @@ class PromptService:
                             use_tools = False
                             llm_throttle.wait()
                             try:
-                                res_json = self._call_api(messages, model_name, base_url, api_key, use_tools)
+                                res_json = self._call_api(messages, model_name, base_url, api_key, use_tools, selected_tools)
                             except urllib.error.HTTPError as e2:
                                 err_body2 = e2.read().decode("utf-8", errors="replace")
                                 if e2.code == 503:
@@ -378,7 +399,7 @@ class PromptService:
                             func_name = tc["function"]["name"]
                             try:
                                 func_args = json.loads(tc["function"]["arguments"])
-                                tool_result = self.tools.execute_tool(func_name, func_args, callback)
+                                tool_result = self._execute_selected_tool(func_name, func_args, callback, selected_tools)
                             except json.JSONDecodeError as e:
                                 func_args = None
                                 tool_result = f"Error: Invalid JSON arguments provided. {str(e)}"
@@ -483,22 +504,31 @@ class PromptService:
                     else:
                         callback("(empty response)\n")
                     set_state("idle")
+                    terminal_ok = True
+                    terminal_detail = "complete"
                     return
 
                 callback(f"[{ERROR}]Exceeded maximum tool iterations ({MAX_TURNS} turns).[/]")
                 set_state("idle")
 
             except urllib.error.HTTPError as e:
+                terminal_detail = f"http_{e.code}"
                 err_body = e.read().decode("utf-8", errors="replace").replace("[", "\\[")
                 callback(f"[{ERROR}]API Error ({e.code}):[/] {err_body}")
                 set_state("idle")
             except Exception as e:
+                terminal_detail = "exception"
                 err_str = str(e).replace("[", "\\[")
                 callback(f"[{ERROR}]Request Error:[/] {err_str}")
                 set_state("idle")
             finally:
                 if controller:
                     controller.end_agent()
+                if on_finished:
+                    try:
+                        on_finished(terminal_ok, terminal_detail)
+                    except Exception:
+                        pass
 
         threading.Thread(target=run).start()
 
@@ -624,4 +654,3 @@ def _render_diff_review(callback, write_id):
         f"  [{GOLD}]↪ Apply?[/] Press [{SUCCESS}]Enter[/] to keep, or type "
         f"[{ERROR}]/undo-replace {write_id}[/] to roll back this write."
     )
-
