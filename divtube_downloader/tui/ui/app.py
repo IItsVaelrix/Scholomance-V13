@@ -12,6 +12,10 @@ from rich.errors import MarkupError
 import threading
 import os
 import asyncio
+import socket
+import uuid
+from pathlib import Path
+from urllib.parse import urlencode
 
 from tui.ui.layout import get_layout
 from tui.ui.theme import THEMES, DEFAULT_THEME, palette
@@ -34,6 +38,13 @@ from tui.services.cleri_bridge import CleriBridge
 from tui.services.bytecode_bridge import BytecodeHealthBridge
 from tui.services.archive_bridge import ArchiveBridge
 from tui.services.prompt_service import PromptService
+from tui.remote.config import RemoteCompanionConfig
+from tui.remote.event_hub import RemoteEventHub
+from tui.remote.gateway import RemoteGateway
+from tui.remote.pairing import PairingStore
+from tui.services.remote_cockpit_adapter import RemoteCockpitAdapter
+from tui.services.remote_download_queue import RemoteDownloadQueue
+from tui.ui.widgets.remote_companion_status import pairing_qr_text
 from tui.services.scd64_service import scd64_service
 from tui.services.substrate_osmosis_service import SubstrateOsmosisService
 from tui.services.env_config import write_key, set_active_key, set_provider, get_active_provider
@@ -487,6 +498,25 @@ class DivTubeAgentApp(App):
         self.substrate = SubstrateOsmosisService(self.memory)
         self.archive = ArchiveBridge()
         self.prompt = PromptService()
+        self.remote_config = RemoteCompanionConfig.from_env()
+        self.remote_gateway = None
+        self.remote_pairing = None
+        self.remote_hub = None
+        self.remote_adapter = None
+        self.remote_downloads = None
+        if self.remote_config.listener_enabled:
+            remote_state = Path(".divtube-remote")
+            self.remote_pairing = PairingStore(remote_state)
+            self.remote_hub = RemoteEventHub("pc-" + uuid.uuid4().hex)
+            self.remote_downloads = RemoteDownloadQueue(self.agent, self.remote_hub)
+            self.remote_adapter = RemoteCockpitAdapter(self.prompt, self.remote_hub, self.remote_downloads)
+            self.remote_gateway = RemoteGateway(
+                self.remote_config,
+                self.remote_pairing,
+                self.remote_hub,
+                remote_state,
+                dispatcher=self.remote_adapter.dispatch,
+            )
         self.cmd_history = []
         self.cmd_index = 0
         # ── plain-text mirror of each chat log (for /copy) ──────────
@@ -681,6 +711,9 @@ class DivTubeAgentApp(App):
         r("/code",    handle_code,                                             "View code in editor",    "/code <path>")
         r("/undo-replace", handle_undo_replace,                                 "Roll back last write",   "/undo-replace [write_id|--list]")
         r("/undo-list",    handle_undo_list,                                    "List pending undos",     "/undo-list")
+        r("/remote-status", lambda ui, args: ui._remote_status(),               "Remote companion status", "/remote-status")
+        r("/remote-pair", lambda ui, args: ui._remote_pair(),                   "Create pairing QR",       "/remote-pair")
+        r("/remote-revoke", lambda ui, args: ui._remote_revoke(args),           "Revoke paired device",    "/remote-revoke <device-id>")
         self.registry.register("/analyze", lambda ui, args: ui.agent.run_command("1", args[0] if args else "", ui.log_msg, ui), "Analyze URL", "/analyze <url>")
         self.registry.register("/download", handle_download, "Download URL (--audio = MP3)", "/download <url> [--audio]")
         def handle_memory(ui, args):
@@ -1916,7 +1949,7 @@ class DivTubeAgentApp(App):
     def compose(self):
         return get_layout()
 
-    def on_mount(self):
+    async def on_mount(self):
         self.register_theme(SCHOLOMANCE_THEME)
         self.theme = "scholomance"
         self.title = "DivTube Cockpit"
@@ -1929,6 +1962,58 @@ class DivTubeAgentApp(App):
         else:
             self.log_msg(f"[{WARNING}]●[/] TurboQuant plugin offline [{MUTED}](Node not found — SEO commands disabled).[/]")
         self.log_msg(f"Type [bold {GOLD}]/help[/] for commands.\n")
+        try:
+            from tui.services.exec_session_service import get_exec_session
+            get_exec_session().bind_app(self)
+        except Exception:
+            pass
+        await scd64_service.start()
+        if self.remote_gateway is not None:
+            try:
+                await self.remote_gateway.start()
+                self.query_one("#remote-companion-status").set_state("listening")
+            except Exception as exc:
+                self.query_one("#remote-companion-status").set_state("offline")
+                self.log_msg(f"[{ERROR}]Remote companion failed to start:[/] {_escape_markup(str(exc))}")
+
+    def _remote_status(self):
+        if self.remote_gateway is None:
+            self.log_msg(f"[{MUTED}]Remote companion: Disabled (default-off).[/]")
+            return
+        port = self.remote_gateway.bound_port
+        state = "Listening" if port else "Offline"
+        self.log_msg(f"[{MUTED}]Remote companion: {state} · mode={self.remote_config.mode} · port={port or 'none'}[/]")
+
+    def _remote_pair(self):
+        if self.remote_gateway is None or self.remote_gateway.bound_port is None:
+            self.log_msg(f"[{WARNING}]Remote companion is disabled or offline.[/]")
+            return
+        host = socket.gethostname() if self.remote_config.lan_enabled else "127.0.0.1"
+        offer = self.remote_pairing.create_offer(
+            host,
+            self.remote_gateway.bound_port,
+            self.remote_gateway.tls_identity.fingerprint,
+        )
+        uri = "divtube://pair?" + urlencode({
+            "host": offer.host,
+            "port": offer.port,
+            "fingerprint": offer.certificate_fingerprint,
+            "offer": offer.token,
+            "protocol": "divtube-remote-v1",
+        })
+        self.log_msg(f"[bold {GOLD}]DivTube companion pairing[/]\n{pairing_qr_text(uri, '10 minutes')}")
+        self.log_msg(f"[{MUTED}]{_escape_markup(uri)}[/]")
+
+    def _remote_revoke(self, args):
+        if self.remote_pairing is None or not args:
+            self.log_msg(f"[{WARNING}]Usage: /remote-revoke <device-id>[/]")
+            return
+        if self.remote_pairing.revoke(args[0]):
+            if self.remote_hub:
+                self.remote_hub.detach(args[0])
+            self.log_msg(f"[{SUCCESS}]Remote device revoked.[/]")
+        else:
+            self.log_msg(f"[{WARNING}]Device not found or already revoked.[/]")
 
     def _render_banner(self):
         # Typographic masthead — no border box. The chat panel already owns the
@@ -2114,7 +2199,9 @@ class DivTubeAgentApp(App):
         else:
             self.call_from_thread(_hide)
 
-    def on_unmount(self):
+    async def on_unmount(self):
+        if self.remote_gateway is not None:
+            await self.remote_gateway.stop()
         if getattr(self, "turbo", None):
             self.turbo.shutdown()
     @on(CommandSubmitted)

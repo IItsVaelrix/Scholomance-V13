@@ -37,7 +37,7 @@ SECTIONS = [
                     "/export-pack", "/import-pack", "/registry"]),
     ("DEV & OPS", ["/lint", "/test", "/typecheck", "/health-status", "/log",
                    "/daemon-start", "/daemon-stop"]),
-    ("SESSION", ["/provider", "/apikey", "/budget", "/release", "/help", "/memory", "/clear", "/exit"]),
+    ("SESSION", ["/remote-status", "/remote-pair", "/remote-revoke", "/provider", "/apikey", "/budget", "/release", "/help", "/memory", "/clear", "/exit"]),
 ]
 
 # Registered commands that deliberately have NO button: true aliases whose
@@ -52,6 +52,9 @@ EXEMPT_ALIASES: dict[str, str] = {
 # One truthful line per command — surfaced as the button tooltip so the user
 # never has to run /help to know what a button does. Missing key = generic hint.
 COMMAND_HINTS = {
+    "/remote-status": "Show companion listener and pairing status",
+    "/remote-pair": "Create a one-use 10-minute pairing QR",
+    "/remote-revoke": "Revoke a paired device — /remote-revoke <device-id>",
     "/prompt": "Compose or edit the agent prompt",
     "/analyze": "Analyze code or a file",
     "/download": "Download media — /download <url> [--audio]",

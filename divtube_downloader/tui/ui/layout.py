@@ -8,6 +8,7 @@ from tui.ui.widgets.test_run_panel import TestRunPanel
 from tui.ui.widgets.command_area import CommandArea
 from tui.ui.widgets.resize_handle import CommandResizeHandle
 from tui.ui.widgets.token_meter import AetherMeter
+from tui.ui.widgets.remote_companion_status import RemoteCompanionStatus
 from tui.ui.sigils import title
 
 def get_layout() -> ComposeResult:
@@ -36,10 +37,10 @@ def get_layout() -> ComposeResult:
             yield CommandArea(placeholder="▸ command (/help) or paste a URL…", id="command-input")
         
         with Vertical(id="right-panel"):
+            yield RemoteCompanionStatus()
             yield AetherMeter(id="aether-meter")
             yield Inspector(id="inspector")
             yield TestRunPanel(id="test-run")
             yield CodeBox(id="code-viewer", filename="")
 
     yield Footer()
-

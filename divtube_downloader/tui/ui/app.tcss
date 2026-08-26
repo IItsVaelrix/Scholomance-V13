@@ -47,7 +47,7 @@ FooterKey:hover {
 }
 
 /* ── resting panels: ONE uniform muted boundary, no per-panel colour ────── */
-#sidebar, #aether-meter, #inspector, #test-run, #code-viewer {
+#sidebar, #remote-companion-status, #aether-meter, #inspector, #test-run, #code-viewer {
     background: $surface;
     border: round $panel-border;
     border-title-color: $text-secondary;
@@ -56,6 +56,7 @@ FooterKey:hover {
 /* per-panel geometry only — colour is inherited from the rule above */
 #sidebar      { width: 32;    padding: 1 1; margin: 1 0 1 1; }
 #aether-meter { height: 6;    padding: 0 1; margin: 1 1 0 0; }
+#remote-companion-status { height: 3; padding: 0 1; margin: 1 1 0 0; color: $text-secondary; }
 #inspector    { height: 1fr;  padding: 1 1; margin: 1 1 1 0; }
 #test-run     { height: 1fr;  padding: 1 1; margin: 0 1 1 0;
                 background: $background; text-align: left;

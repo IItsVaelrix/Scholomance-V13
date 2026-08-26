@@ -101,8 +101,8 @@ def parse_progress_line(line):
 
 
 class AgentService:
-    def __init__(self):
-        pass
+    def __init__(self, process_factory=None):
+        self._process_factory = process_factory or subprocess.Popen
 
     def run_command(self, cmd_num, url, callback, controller=None,
                     on_progress=None, on_done=None):
@@ -121,13 +121,15 @@ class AgentService:
                     )
                 if controller:
                     controller.end_agent()
+                if on_done:
+                    on_done(False)
                 return
             env["JAVA_HOME"] = java_home
             env["PATH"] = os.path.join(java_home, "bin") + os.pathsep + env.get("PATH", "")
 
             proc = None
             try:
-                proc = subprocess.Popen(["./gradle-8.5/bin/gradle", "run", "-q"],
+                proc = self._process_factory(["./gradle-8.5/bin/gradle", "run", "-q"],
                     stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                     text=True, env=env)
                 if controller:
