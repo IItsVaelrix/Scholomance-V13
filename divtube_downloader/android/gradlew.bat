@@ -70,6 +70,12 @@ goto fail
 
 set CLASSPATH=%APP_HOME%\gradle\wrapper\gradle-wrapper.jar
 
+@rem Repository hygiene forbids committed binary JARs; fetch the pinned official wrapper.
+if not exist "%CLASSPATH%" (
+  powershell -NoProfile -Command "$u='https://raw.githubusercontent.com/gradle/gradle/v9.4.1/gradle/wrapper/gradle-wrapper.jar'; $p='%CLASSPATH%'; New-Item -ItemType Directory -Force (Split-Path $p) ^| Out-Null; Invoke-WebRequest -UseBasicParsing $u -OutFile $p; if ((Get-FileHash $p -Algorithm SHA256).Hash.ToLower() -ne '55243ef57851f12b070ad14f7f5bb8302daceeebc5bce5ece5fa6edb23e1145c') { Remove-Item $p; exit 1 }"
+  if errorlevel 1 goto fail
+)
+
 
 @rem Execute Gradle
 "%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -classpath "%CLASSPATH%" org.gradle.wrapper.GradleWrapperMain %*

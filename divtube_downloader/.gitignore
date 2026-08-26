@@ -30,6 +30,7 @@ niche_database.sqlite
 android/local.properties
 android/.gradle/
 android/app/build/
+android/gradle/wrapper/gradle-wrapper.jar
 
 # Backups
 *.bak

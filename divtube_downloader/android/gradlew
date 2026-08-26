@@ -114,6 +114,23 @@ esac
 
 CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
 
+# Repository hygiene forbids committed binary JARs. Bootstrap the official,
+# checksum-pinned Gradle 9.4.1 wrapper on first use.
+if [ ! -f "$CLASSPATH" ]; then
+    WRAPPER_URL=https://raw.githubusercontent.com/gradle/gradle/v9.4.1/gradle/wrapper/gradle-wrapper.jar
+    WRAPPER_SHA=55243ef57851f12b070ad14f7f5bb8302daceeebc5bce5ece5fa6edb23e1145c
+    mkdir -p "$APP_HOME/gradle/wrapper" || exit 1
+    if command -v curl >/dev/null 2>&1; then
+        curl -fsSL "$WRAPPER_URL" -o "$CLASSPATH.tmp" || exit 1
+    elif command -v wget >/dev/null 2>&1; then
+        wget -q "$WRAPPER_URL" -O "$CLASSPATH.tmp" || exit 1
+    else
+        die "curl or wget is required to bootstrap the Gradle wrapper"
+    fi
+    printf '%s  %s\n' "$WRAPPER_SHA" "$CLASSPATH.tmp" | sha256sum -c - >/dev/null || die "Gradle wrapper checksum mismatch"
+    mv "$CLASSPATH.tmp" "$CLASSPATH"
+fi
+
 
 # Determine the Java command to use to start the JVM.
 if [ -n "$JAVA_HOME" ] ; then
