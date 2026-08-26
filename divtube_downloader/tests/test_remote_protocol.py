@@ -162,6 +162,50 @@ def test_server_envelope_revalidates_payload_if_a_caller_mutates_it_after_constr
         envelope.to_json()
 
 
+@pytest.mark.parametrize("event_type,payload,field", [
+    ("status.snapshot", {"cockpit": {"state": []}, "activeJobs": []}, ("cockpit", "state")),
+    ("status.snapshot", {"cockpit": {"state": "idle"}, "activeJobs": [{
+        "jobId": "job-1", "mediaType": {}, "percent": 0, "state": "queued",
+    }]}, ("activeJobs", 0, "mediaType")),
+    ("status.snapshot", {"cockpit": {"state": "idle"}, "activeJobs": [{
+        "jobId": "job-1", "mediaType": "video", "percent": 0, "state": [],
+    }]}, ("activeJobs", 0, "state")),
+    ("chat.activity", {"state": {}}, ("state",)),
+    ("download.accepted", {"jobId": "job-1", "mediaType": [], "sourceHost": "youtube.com"}, ("mediaType",)),
+    ("download.accepted", {"jobId": "job-1", "mediaType": "video", "sourceHost": {}}, ("sourceHost",)),
+    ("download.progress", {
+        "jobId": "job-1", "percent": 0, "speed": "0 MiB/s", "eta": "00:00", "state": [],
+    }, ("state",)),
+    ("download.completed", {"jobId": "job-1", "state": {}, "filename": "clip.mp4"}, ("state",)),
+])
+def test_server_enum_fields_reject_unhashable_values_during_construction(event_type, payload, field):
+    with pytest.raises(ProtocolError):
+        ServerEnvelope(type=event_type, instance_id="pc-1", seq=1, request_id=None, payload=payload)
+
+
+@pytest.mark.parametrize("event_type,payload,mutate", [
+    ("status.snapshot", {"cockpit": {"state": "idle"}, "activeJobs": []}, lambda p: p["cockpit"].update(state=[])),
+    ("status.snapshot", {"cockpit": {"state": "idle"}, "activeJobs": [{
+        "jobId": "job-1", "mediaType": "video", "percent": 0, "state": "queued",
+    }]}, lambda p: p["activeJobs"][0].update(mediaType={})),
+    ("status.snapshot", {"cockpit": {"state": "idle"}, "activeJobs": [{
+        "jobId": "job-1", "mediaType": "video", "percent": 0, "state": "queued",
+    }]}, lambda p: p["activeJobs"][0].update(state=[])),
+    ("chat.activity", {"state": "thinking"}, lambda p: p.update(state={})),
+    ("download.accepted", {"jobId": "job-1", "mediaType": "video", "sourceHost": "youtube.com"}, lambda p: p.update(mediaType=[])),
+    ("download.accepted", {"jobId": "job-1", "mediaType": "video", "sourceHost": "youtube.com"}, lambda p: p.update(sourceHost={})),
+    ("download.progress", {
+        "jobId": "job-1", "percent": 0, "speed": "0 MiB/s", "eta": "00:00", "state": "queued",
+    }, lambda p: p.update(state=[])),
+    ("download.completed", {"jobId": "job-1", "state": "completed", "filename": "clip.mp4"}, lambda p: p.update(state={})),
+])
+def test_server_enum_fields_reject_unhashable_values_during_serialization(event_type, payload, mutate):
+    envelope = ServerEnvelope(type=event_type, instance_id="pc-1", seq=1, request_id=None, payload=payload)
+    mutate(envelope.payload)
+    with pytest.raises(ProtocolError):
+        envelope.to_json()
+
+
 def test_server_envelope_uses_stable_sorted_json_and_validates_sequence():
     envelope = ServerEnvelope(
         type="status.snapshot",

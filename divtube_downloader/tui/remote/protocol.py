@@ -159,10 +159,10 @@ def _payload(data: dict[str, Any], message_type: str) -> None:
 def _job_summary(value: Any) -> dict[str, Any]:
     data = _exact_object(value, {"jobId", "mediaType", "percent", "state"}, "activeJobs entry")
     job_id = _identifier(data["jobId"], "jobId")
-    if data["mediaType"] not in {"video", "audio"}:
+    if not isinstance(data["mediaType"], str) or data["mediaType"] not in {"video", "audio"}:
         _fail("Media type must be video or audio.", "invalid_media_type")
     percent = _bounded_percent(data["percent"])
-    if data["state"] not in _JOB_STATES:
+    if not isinstance(data["state"], str) or data["state"] not in _JOB_STATES:
         _fail("Invalid download state.", "invalid_state")
     return {"jobId": job_id, "mediaType": data["mediaType"], "percent": percent, "state": data["state"]}
 
@@ -175,7 +175,7 @@ def _server_payload(data: Any, message_type: str) -> dict[str, Any]:
     if message_type == "status.snapshot":
         payload = _exact_object(data, {"cockpit", "activeJobs"}, "status snapshot payload")
         cockpit = _exact_object(payload["cockpit"], {"state"}, "cockpit")
-        if cockpit["state"] not in _COCKPIT_STATES:
+        if not isinstance(cockpit["state"], str) or cockpit["state"] not in _COCKPIT_STATES:
             _fail("Invalid cockpit state.", "invalid_state")
         if not isinstance(payload["activeJobs"], list) or len(payload["activeJobs"]) > 100:
             _fail("activeJobs must contain at most 100 summaries.", "invalid_activeJobs")
@@ -183,7 +183,7 @@ def _server_payload(data: Any, message_type: str) -> dict[str, Any]:
 
     if message_type == "chat.activity":
         payload = _exact_object(data, {"state"}, "chat activity payload")
-        if payload["state"] not in _CHAT_ACTIVITY_STATES:
+        if not isinstance(payload["state"], str) or payload["state"] not in _CHAT_ACTIVITY_STATES:
             _fail("Invalid chat activity state.", "invalid_state")
         return {"state": payload["state"]}
 
@@ -202,15 +202,15 @@ def _server_payload(data: Any, message_type: str) -> dict[str, Any]:
 
     if message_type == "download.accepted":
         payload = _exact_object(data, {"jobId", "mediaType", "sourceHost"}, "download accepted payload")
-        if payload["mediaType"] not in {"video", "audio"}:
+        if not isinstance(payload["mediaType"], str) or payload["mediaType"] not in {"video", "audio"}:
             _fail("Media type must be video or audio.", "invalid_media_type")
-        if payload["sourceHost"] not in _YOUTUBE_HOSTS:
+        if not isinstance(payload["sourceHost"], str) or payload["sourceHost"] not in _YOUTUBE_HOSTS:
             _fail("Invalid source host.", "invalid_sourceHost")
         return {"jobId": _identifier(payload["jobId"], "jobId"), "mediaType": payload["mediaType"], "sourceHost": payload["sourceHost"]}
 
     if message_type == "download.progress":
         payload = _exact_object(data, {"jobId", "percent", "speed", "eta", "state"}, "download progress payload")
-        if payload["state"] not in _JOB_STATES:
+        if not isinstance(payload["state"], str) or payload["state"] not in _JOB_STATES:
             _fail("Invalid download state.", "invalid_state")
         return {
             "jobId": _identifier(payload["jobId"], "jobId"),
@@ -225,7 +225,7 @@ def _server_payload(data: Any, message_type: str) -> dict[str, Any]:
         filename = _display_text(payload["filename"], "filename", max_length=255)
         if "/" in filename or "\\" in filename or filename in {".", ".."}:
             _fail("filename must be display-safe and not a path.", "invalid_filename")
-        if payload["state"] not in _COMPLETED_JOB_STATES:
+        if not isinstance(payload["state"], str) or payload["state"] not in _COMPLETED_JOB_STATES:
             _fail("Invalid completed download state.", "invalid_state")
         return {"jobId": _identifier(payload["jobId"], "jobId"), "state": payload["state"], "filename": filename}
 
