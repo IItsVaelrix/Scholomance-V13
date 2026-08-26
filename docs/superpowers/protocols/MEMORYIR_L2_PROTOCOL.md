@@ -69,11 +69,34 @@ CLAIM_KIND  RULE | PREF | REFUTED | MEASURED_WITH | CAUSES | UNBOUND
 SCOPE       repo-global | module | file | corpus | held-out-split | session | UNBOUND
 MODALITY    mandatory | preferred | forbidden | UNBOUND
 EVIDENCE    none | weak | tentative | strong | contradicted | UNBOUND
-EXCEPTION   none-declared | user-override | harmful-structure | context-differs | UNBOUND
+EXCEPTION   none-declared | never-considered | user-override | harmful-structure | context-differs | UNBOUND
 ADMISSION   experimental | stable | retired | UNBOUND
 TARGETS     source-episodes | semantic-pattern | procedure | superseding-pattern | UNBOUND
 UNBINDS_IF  counterexample-observed | matched-control-clears-chance | interceptions-zero | never-stated | UNBOUND
 ```
+
+### The one pair that must not be merged
+
+`none-declared` and `never-considered` are different records, and silence is a third
+thing again:
+
+| the text says | answer |
+|---|---|
+| carve-outs were looked for and there are none | `none-declared` |
+| the question of carve-outs was not examined | `never-considered` |
+| nothing about carve-outs at all | `UNBOUND` |
+
+Silence is the third row. It is **not** evidence that carve-outs were sought and none
+found — reading it that way fabricates an examination that never happened. Measured
+2026-08-22: without this distinction spelled out, one reader given the same silent
+paragraph five times answered `none-declared` three times and `UNBOUND` twice. With
+it spelled out, the same paragraph returned `UNBOUND` 5/5, prose that declares
+non-examination returned `never-considered` 3/3, and prose that declares an absence
+returned `none-declared` 3/3. All three are separable; they just have to be told
+apart on purpose.
+
+`UNBINDS_IF` carries the same shape in `never-stated`. Any slot whose affirmative
+value a reader could reach from silence needs one.
 
 Get the live list any time with `npx tsx scripts/memoryir-l2.ts vocab`. The
 vocabulary is capped at 64 values total, so encoded memory stays cheaper than
@@ -209,8 +232,43 @@ agent will later read back — you want to know the paragraph is recoverable *be
 you commit it. That check is a blind round trip:
 
 ```
-Model A renders → a reader that has NOT seen the slot values encodes → score
+Model A renders → three or more readers that have NOT seen the slot values encode → score
 ```
+
+Run it with the driver:
+
+```
+npx tsx scripts/memoryir-l2.ts lint <FAMILY> '<paragraph>'                    # prompt
+npx tsx scripts/memoryir-l2.ts lint <FAMILY> '<paragraph>' '<j1>' '<j2>' '<j3>'
+```
+
+**One read is not a lint.** A single reader can return 8/8 by luck, and the luck is
+not evenly spread: it concentrates on whichever value a reader can produce from
+*silence*. In the 2026-08-22 calibration the same reader, given the same paragraph
+five times, answered `EXCEPTION: none-declared` three times and `UNBOUND` twice —
+because the paragraph never mentioned carve-outs and "nothing was said" is
+indistinguishable from "nothing exists". Adding one clause that states the absence
+took it to 3/3 agreement. So `none-declared` is the slot value most likely to give a
+false CLEAN, and resampling is what catches it. The driver reports each slot as one of:
+
+| verdict | what the readers did | what it means |
+|---|---|---|
+| ` ok ` | unanimous, correct | the prose carries it |
+| `SILENT` | unanimous `UNBOUND` | the prose never raises the slot |
+| `HALF-SAID` | some abstained, the rest agreed on one value | the prose half-raises it |
+| `MISSTATED` | unanimous, wrong value | the prose says something else |
+| `AMBIGUOUS` | readers disagree between values | the prose is unclear |
+
+`SILENT` and `HALF-SAID` are the never-considered detector. On a slot that has a
+`never-*` value, the driver states the positive reading rather than just flagging a
+gap: *this prose encodes `never-considered`, not `none-declared`*. That is the whole
+point of separating the two — a silent paragraph is not an incomplete record of an
+examination, it is a faithful record of a record that never examined anything.
+
+Which means there are two fixes and the lint cannot choose between them. If the
+record did examine the question, state the finding in the prose. If it never did,
+change the slot to the `never-*` value and render that. Reaching for the affirmative
+value because it clears the lint is the failure the separation exists to prevent.
 
 If it returns 8/8, the prose carries the record. If a slot drifts or abstains, the
 prose is underspecified at that slot; fix the paragraph, not the vocabulary. This is
@@ -219,6 +277,11 @@ that does not determine its own result.
 
 **Two ways to get this wrong, both of which produce a check that cannot fail:**
 
+- **Using a reader that can look the answer up.** "Has not seen the values" is not
+  enough if the reader has tools and a filesystem. In the 2026-08-22 calibration a
+  reader announced it would go and find "any gold encodings" before answering, and
+  returned a perfect score on a paragraph that a clean read had failed. Give the
+  reader the prompt and nothing else — no repo access, no prior session.
 - **Linting with yourself.** If the model that rendered the prose also encodes it,
   it already knows the answers and will recover all eight every time. The lint then
   passes unconditionally and measures nothing. This is precisely the contamination

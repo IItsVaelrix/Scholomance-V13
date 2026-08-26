@@ -32,11 +32,15 @@ import { compareSCD64ByBlocks } from '../../../../src/core/scd64/compareSCD64';
 // ─── Family structure ────────────────────────────────────────────────────────
 
 describe('MEMORY_FAMILIES', () => {
-  it('defines three memory families', () => {
+  it('defines the memory families, including the two that differ only in EXCEPTION', () => {
     expect(Object.keys(MEMORY_FAMILIES)).toEqual([
       'MEM_RULE_MANDATORY',
       'MEM_PREF_DEFEASIBLE',
       'MEM_CLAIM_REFUTED',
+      // Same record as MEM_RULE_MANDATORY but its carve-outs were never examined,
+      // rather than examined and found absent. Prose silent on carve-outs reads as
+      // this one; snapping that silence to none-declared fabricates the examination.
+      'MEM_RULE_UNEXAMINED',
     ]);
   });
 
@@ -76,16 +80,19 @@ describe('MEMORY_SLOT_ALIASES', () => {
 // ─── Glossary integration ────────────────────────────────────────────────────
 
 describe('SCD64_GLOSSARY with MEMORY', () => {
-  it('adds 24 memory entries without disturbing the existing 72', () => {
+  it('adds 8 entries per memory family without disturbing the existing 72', () => {
     const memory = SCD64_GLOSSARY.filter((e) => e.domain === 'MEMORY');
-    expect(memory.length).toBe(24);
-    expect(SCD64_GLOSSARY.length).toBe(96);
+    expect(memory.length).toBe(Object.keys(MEMORY_FAMILIES).length * 8);
+    // The invariant worth pinning is that the memory domain leaves the other two
+    // alone. Freezing the grand total instead just makes every new family edit it.
+    expect(SCD64_GLOSSARY.length - memory.length).toBe(72);
   });
 
   it('memory entries carry memorySlotAlias and valid hex', () => {
     const entries = SCD64_GLOSSARY.filter((e) => e.domain === 'MEMORY');
     // Without this the loop below passes on an empty array and proves nothing.
-    expect(entries.length).toBe(24);
+    expect(entries.length).toBe(Object.keys(MEMORY_FAMILIES).length * 8);
+    expect(entries.length).toBeGreaterThan(0);
     for (const entry of entries) {
       expect(typeof entry.memorySlotAlias).toBe('string');
       expect(entry.hexCode).toMatch(/^[0-9A-F]{8}$/);
@@ -98,7 +105,7 @@ describe('SCD64_GLOSSARY with MEMORY', () => {
     const claimKind = SCD64_GLOSSARY.filter(
       (e) => e.domain === 'MEMORY' && e.slotName === 'BUGCLASS',
     );
-    expect(claimKind.length).toBe(3);
+    expect(claimKind.length).toBe(Object.keys(MEMORY_FAMILIES).length);
     for (const entry of claimKind) {
       expect(entry.hexCode.slice(0, 2)).toMatch(/^B\d$/);
     }

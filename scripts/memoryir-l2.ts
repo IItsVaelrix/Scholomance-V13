@@ -12,7 +12,7 @@
  *   npx tsx scripts/memoryir-l2.ts score MEM_PREF_DEFEASIBLE '<json from model B>'
  *
  *   npx tsx scripts/memoryir-l2.ts lint MEM_PREF_DEFEASIBLE '<prose>'          # -> blind-reader prompt
- *   npx tsx scripts/memoryir-l2.ts lint MEM_PREF_DEFEASIBLE '<prose>' '<json>' # -> which slots the prose dropped
+ *   npx tsx scripts/memoryir-l2.ts lint MEM_PREF_DEFEASIBLE '<prose>' '<j1>' '<j2>' '<j3>'
  *
  * `lint` is the PRODUCTION check of §10, not a trial instrument. It asks whether a
  * paragraph carries its record; `score` asks whether a representation survives a
@@ -37,6 +37,33 @@ function vocabBlock(): string {
   return SCD64_SLOT_NAMES
     .map((s) => `  ${alias(s).padEnd(11)} ${MEMORY_SLOT_VOCAB[s].join(' | ')}`)
     .join('\n');
+}
+
+/**
+ * The one pair a reader cannot separate without being told. Silence is not a
+ * declaration: a record that never mentions carve-outs is UNBOUND, not
+ * none-declared. Without this gloss readers snap silence to none-declared about
+ * 60% of the time (measured 2026-08-22, 3 of 5 on identical prose).
+ */
+/**
+ * Slots that carry an explicit "the question was not examined" value. These are
+ * the slots where silence is dangerous: a reader can reach the affirmative value
+ * without the text supporting it, so the record needs a way to say "we did not
+ * look" that is distinct from both the finding and the reader's abstention.
+ */
+const NOT_EXAMINED_VALUE: Record<string, string> = {
+  MASKING: 'never-considered',
+  VERDICT: 'never-stated',
+};
+
+function maskingGloss(): string {
+  return [
+    'On EXCEPTION, these three are different answers and must not be merged:',
+    '  none-declared    the text says carve-outs were looked for and there are none',
+    '  never-considered the text says the question was not examined',
+    `  ${MEMORY_UNBOUND}          the text simply does not raise carve-outs at all`,
+    'Silence is the third one. Do not read it as either of the first two.',
+  ].join('\n');
 }
 
 function die(msg: string): never {
@@ -77,6 +104,7 @@ switch (command) {
     console.log(`  "${prose}"\n`);
     console.log('Encode it as MemoryIR v1. Choose EXACTLY ONE value per slot from these lists:\n');
     console.log(vocabBlock());
+    console.log(`\n${maskingGloss()}`);
     console.log(`\nIf the memory does not determine a slot, answer ${MEMORY_UNBOUND} for it. Do NOT`);
     console.log('guess a plausible value — an abstention is scored separately and is not a');
     console.log('penalty. Reply with ONLY a JSON object keyed by the WIRE slot names:\n');
@@ -119,10 +147,11 @@ switch (command) {
     const [family, paragraph, json] = rest;
     if (!family || !(MEMORY_FAMILIES as any)[family] || !paragraph) {
       die(
-        `usage: lint <family> '<paragraph>' ['<json from a BLIND reader>']\n` +
+        `usage: lint <family> '<paragraph>' ['<json>' '<json>' '<json>' ...]\n` +
         `families: ${Object.keys(MEMORY_FAMILIES).join(', ')}\n\n` +
-        `  without json — prints the prompt to hand a blind reader\n` +
-        `  with json    — names the slots the prose failed to carry`,
+        `  without replies — prints the prompt to hand a blind reader\n` +
+        `  with replies    — names the slots the prose failed to carry;\n` +
+        `                    pass 3+ independent reads, one read is not a lint`,
       );
     }
 
@@ -139,55 +168,110 @@ switch (command) {
       console.log(`  "${paragraph}"\n`);
       console.log('Encode it as MemoryIR v1. Choose EXACTLY ONE value per slot from these lists:\n');
       console.log(vocabBlock());
+      console.log(`\n${maskingGloss()}`);
       console.log(`\nIf the memory does not determine a slot, answer ${MEMORY_UNBOUND} for it. Do NOT`);
       console.log('guess a plausible value — an abstention is scored separately and is not a');
       console.log('penalty. Reply with ONLY a JSON object keyed by the WIRE slot names:\n');
       console.log(`  {${SCD64_SLOT_NAMES.map((s) => `"${s}":"…"`).join(',')}}`);
       console.log('\n--- then feed the reply back ---\n');
-      console.log(`  npx tsx scripts/memoryir-l2.ts lint ${family} '<the same paragraph>' '<json>'`);
+      console.log(`  npx tsx scripts/memoryir-l2.ts lint ${family} '<the same paragraph>' '<json>' '<json>' '<json>'`);
+      console.log('');
+      console.log('Ask at least three independent readers. A value a reader can produce from');
+      console.log('silence — `none-declared` above all — will not come back the same every time.');
       break;
     }
 
-    let returned: Record<string, string>;
-    try {
-      returned = JSON.parse(json);
-    } catch {
-      die('[MemoryIR] the reader did not return parseable JSON — the render is unlinted, which is not the same as clean');
+    const replies = [json, ...rest.slice(3)];
+    const parsed: Record<string, string>[] = [];
+    for (const [i, raw] of replies.entries()) {
+      let obj: Record<string, string>;
+      try {
+        obj = JSON.parse(raw);
+      } catch {
+        die(`[MemoryIR] reader ${i + 1} did not return parseable JSON — the render is unlinted, which is not the same as clean`);
+      }
+      try {
+        scoreTransport(family, obj as any);
+      } catch (err) {
+        die(`[MemoryIR] reader ${i + 1} answered outside the closed vocabulary — ${(err as Error).message}`);
+      }
+      parsed.push(obj);
     }
 
-    let result;
-    try {
-      result = scoreTransport(family, returned as any);
-    } catch (err) {
-      die(`[MemoryIR] the reader answered outside the closed vocabulary — ${(err as Error).message}`);
-    }
     const expected = familyRecord(family);
-
     console.log(`lint        ${family}`);
     console.log(`paragraph   "${paragraph.length > 92 ? `${paragraph.slice(0, 89)}…` : paragraph}"`);
-    console.log('');
-    for (const s of SCD64_SLOT_NAMES) {
-      const same = returned[s] === expected[s];
-      const abstained = returned[s] === MEMORY_UNBOUND && !same;
-      const mark = same ? ' ok ' : abstained ? 'DROPPED' : 'MISSTATED';
-      const note = same ? '' : abstained
-        ? '— the prose never states this'
-        : `— the prose reads as \`${returned[s]}\``;
-      console.log(`  ${mark.padEnd(10)} ${alias(s).padEnd(11)} ${expected[s].padEnd(26)} ${note}`);
+    console.log(`readers     ${parsed.length}`);
+    if (parsed.length < 3) {
+      console.log('');
+      console.log('  ! one or two reads is not a lint. On 2026-08-22 the same reader returned');
+      console.log('    `none-declared` 3 times and UNBOUND 2 times for the SAME paragraph — the');
+      console.log('    value a reader can produce from silence is the one that will not hold');
+      console.log('    still. Pass at least three independent replies.');
     }
     console.log('');
-    if (result.pass) {
-      console.log('CLEAN — a blind reader recovered all eight slots; the prose carries the record.');
-      console.log('        One paragraph, one reader. This licenses no claim about transport (§9).');
+
+    let failures = 0;
+    for (const slot of SCD64_SLOT_NAMES) {
+      const votes = parsed.map((r) => r[slot]);
+      const tally = new Map<string, number>();
+      for (const v of votes) tally.set(v, (tally.get(v) ?? 0) + 1);
+
+      const split = [...tally.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .map(([v, n]) => `${v} x${n}`)
+        .join(', ');
+      const affirmative = [...tally.keys()].filter((v) => v !== MEMORY_UNBOUND);
+
+      // What the prose actually encodes when it does not raise the slot. This is
+      // the detection device: silence is not an absence of information, it is a
+      // positive reading — the record reads as one that never examined this.
+      const notExamined = NOT_EXAMINED_VALUE[slot];
+      const silenceNote = notExamined && expected[slot] !== notExamined
+        ? ` → this prose encodes \`${notExamined}\`, not \`${expected[slot]}\``
+        : '';
+
+      let mark: string;
+      let note = '';
+      if (tally.size === 1 && votes[0] === expected[slot]) {
+        mark = ' ok ';
+      } else if (tally.size === 1 && votes[0] === MEMORY_UNBOUND) {
+        mark = 'SILENT';
+        note = `— every reader abstained; the prose does not raise this${silenceNote}`;
+      } else if (tally.size === 1) {
+        mark = 'MISSTATED';
+        note = `— the prose reads as \`${votes[0]}\``;
+      } else if (tally.has(MEMORY_UNBOUND) && affirmative.length === 1) {
+        mark = 'HALF-SAID';
+        note = `— ${split}; some readers abstained, the rest inferred it${silenceNote}`;
+      } else {
+        mark = 'AMBIGUOUS';
+        note = `— readers disagree on what the prose says: ${split}`;
+      }
+      if (mark !== ' ok ') failures += 1;
+      console.log(`  ${mark.padEnd(15)} ${alias(slot).padEnd(11)} ${expected[slot].padEnd(18)} ${note}`);
+    }
+
+    console.log('');
+    if (failures === 0) {
+      console.log(`CLEAN — ${parsed.length} blind readers independently recovered all eight slots.`);
+      console.log('        The prose carries the record. This is one paragraph and this many');
+      console.log('        readers; it licenses no claim about transport in general (§9).');
     } else {
-      const bad = result.drifted.length + result.abstained.length;
-      console.log(`UNDERSPECIFIED — the prose failed to carry ${bad} slot${bad === 1 ? '' : 's'}.`);
+      console.log(`UNDERSPECIFIED — ${failures} slot${failures === 1 ? '' : 's'} did not survive.`);
       console.log('        Fix the PARAGRAPH, not the vocabulary. A slot the prose never carried');
       console.log('        cannot be recovered by any reader, and calling that a vocabulary defect');
-      console.log('        hides the real one (§5.6). Restate the missing information and lint');
-      console.log('        again with a reader that has not seen this attempt.');
+      console.log('        hides the real one (§5.6).');
+      console.log('');
+      console.log('        SILENT and HALF-SAID are the ones to read carefully. Neither means the');
+      console.log('        readers failed. They mean the prose does not raise the slot, so it reads');
+      console.log('        as a record that never examined it — which for EXCEPTION and UNBINDS_IF');
+      console.log('        is a real, different record, not a gap. Two fixes, and only you know');
+      console.log('        which applies: if the record DID examine it, state the finding outright;');
+      console.log('        if it never did, set the slot to that `never-*` value and render THAT.');
+      console.log('        Do not reach for the affirmative value just because it clears the lint.');
     }
-    process.exit(result.pass ? 0 : 1);
+    process.exit(failures === 0 ? 0 : 1);
   }
 
   case 'selftest': {

@@ -322,6 +322,30 @@ export const MEMORY_FAMILIES = Object.freeze({
       { slot: 'VERDICT',   canonical: 'UNBINDS_IF:matched-control-clears-chance' },
     ]),
   }),
+  /**
+   * Identical to MEM_RULE_MANDATORY in seven slots. The eighth is the whole point:
+   * this rule's carve-outs were never examined, where MEM_RULE_MANDATORY's were
+   * examined and found absent. Two different records. Prose loses the difference
+   * unless it is stated — a paragraph silent on carve-outs reads as THIS one, and
+   * a reader that snaps silence to none-declared has fabricated the examination.
+   * versionByte is B1 because it is a function of CLAIM_KIND, not of the family.
+   */
+  MEM_RULE_UNEXAMINED: Object.freeze({
+    versionByte: 'B1',
+    predictedVersionByte: 'C1',
+    domain: 'MEMORY',
+    description: 'A binding rule whose exceptions were never examined. Distinct from one that has none.',
+    canonicals: Object.freeze([
+      { slot: 'BUGCLASS',  canonical: 'CLAIM_KIND:RULE' },
+      { slot: 'COORDSYS',  canonical: 'SCOPE:repo-global' },
+      { slot: 'INVARIANT', canonical: 'MODALITY:mandatory' },
+      { slot: 'MAGNITUDE', canonical: 'EVIDENCE:strong' },
+      { slot: 'MASKING',   canonical: 'EXCEPTION:never-considered' },
+      { slot: 'GATE',      canonical: 'ADMISSION:stable' },
+      { slot: 'PROPAGATE', canonical: 'TARGETS:procedure' },
+      { slot: 'VERDICT',   canonical: 'UNBINDS_IF:counterexample-observed' },
+    ]),
+  }),
 });
 
 export function buildSCD64Glossary() {

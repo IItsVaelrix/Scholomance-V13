@@ -83,7 +83,15 @@ export const MEMORY_SLOT_VOCAB: Record<string, readonly string[]> = Object.freez
   // mandatory vs preferred is the other recorded drift.
   INVARIANT: Object.freeze(["mandatory", "preferred", "forbidden", MEMORY_UNBOUND]),
   MAGNITUDE: Object.freeze(["none", "weak", "tentative", "strong", "contradicted", MEMORY_UNBOUND]),
-  MASKING:   Object.freeze(["none-declared", "user-override", "harmful-structure", "context-differs", MEMORY_UNBOUND]),
+  // none-declared vs never-considered is a REAL distinction, not a shade of one.
+  // none-declared  = the record looked for carve-outs and states there are none.
+  // never-considered = the record states the question was not examined.
+  // Silence is NEITHER — it is UNBOUND. Collapsing silence into none-declared is
+  // the measured failure: on 2026-08-22 one reader given the same silent prose
+  // five times answered none-declared x3 and UNBOUND x2, because "nothing was
+  // said" and "nothing exists" are the same input. See the NOT-CONSIDERED
+  // detector in scripts/memoryir-l2.ts.
+  MASKING:   Object.freeze(["none-declared", "never-considered", "user-override", "harmful-structure", "context-differs", MEMORY_UNBOUND]),
   GATE:      Object.freeze(["experimental", "stable", "retired", MEMORY_UNBOUND]),
   PROPAGATE: Object.freeze(["source-episodes", "semantic-pattern", "procedure", "superseding-pattern", MEMORY_UNBOUND]),
   VERDICT:   Object.freeze(["counterexample-observed", "matched-control-clears-chance", "interceptions-zero", "never-stated", MEMORY_UNBOUND]),
