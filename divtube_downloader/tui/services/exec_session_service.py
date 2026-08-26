@@ -77,14 +77,19 @@ class RuntimeExecSession:
         )
 
     def _kill_bash(self):
-        if self._bash is not None:
+        process = self._bash
+        if process is not None:
             try:
-                os.killpg(os.getpgid(self._bash.pid), signal.SIGKILL)
+                os.killpg(os.getpgid(process.pid), signal.SIGKILL)
             except Exception:
                 try:
-                    self._bash.kill()
+                    process.kill()
                 except Exception:
                     pass
+            try:
+                process.wait(timeout=2)
+            except Exception:
+                pass
             self._bash = None
 
     def run_bash(self, command, timeout=30):
@@ -128,7 +133,9 @@ class RuntimeExecSession:
                 if not done.wait(2):
                     self._kill_bash()
                     return "(bash timed out after %ss; session restarted)" % timeout
-                return self._format_bash("".join(lines), exit_code[0], note="interrupted after %ss" % timeout)
+                result = self._format_bash("".join(lines), exit_code[0], note="interrupted after %ss" % timeout)
+                self._kill_bash()
+                return result
 
             return self._format_bash("".join(lines), exit_code[0])
 

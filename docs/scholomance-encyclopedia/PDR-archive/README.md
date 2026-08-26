@@ -139,6 +139,7 @@ All Product Design Requirements (PDRs) for Scholomance are archived here. Each P
 | [`2026-07-03-qbit-immune-self-audit-pdr.md`](./2026-07-03-qbit-immune-self-audit-pdr.md) | Draft | Architectural \| Immune System \| Diagnostic Memory \| QBIT Substrate \| Meta-Checkpoint | High |
 | [`2026-07-13-cleri-probe-evidence-microscope-overhaul-pdr.md`](./2026-07-13-cleri-probe-evidence-microscope-overhaul-pdr.md) | Implemented | Architectural \| Developer Tooling \| Immune System \| Diagnostic Evidence \| CLI | High |
 | [`2026-07-25-geometric-construction-solver-pdr.md`](./2026-07-25-geometric-construction-solver-pdr.md) | Implemented | PixelBrain \| Geometry \| Constraint Solver \| Wand Integration | High |
+| [`2026-08-26-divtube-cockpit-android-companion-pdr.md`](./2026-08-26-divtube-cockpit-android-companion-pdr.md) | Implementation complete — release gate pending device instrumentation | Architectural \| Behavioral \| Security \| Native Android UI | High |
 | [`SCD64-robust-pass.md`](./SCD64-robust-pass.md) | Draft | SCD64 + Robust Pass | High |
 | [`Polarity PDR.md`](./Polarity%20PDR.md) | Draft | Polarity Music Video + PixelBrain Cinematic Lyric Video | High |
 | [`Polarity Spec PDR.md`](./Polarity%20Spec%20PDR.md) | Draft | Polarity Music Video + Technical Implementation Spec | High |
@@ -208,7 +209,7 @@ The audit fails if a PDR is missing from this index or if an indexed PDR no long
 
 ---
 
-*Last Updated: 2026-07-29 - Added the implemented geometric construction solver contract.*
+*Last Updated: 2026-08-26 - Added the DivTube Cockpit Android Companion PDR.*
 
 - [`PDR-2026-05-28-GRIMOIRE-LANDING-PAGE.md`](./PDR-2026-05-28-GRIMOIRE-LANDING-PAGE.md)
 - [`Photonic Quantization Bridge PDR.md`](./Photonic%20Quantization%20Bridge%20PDR.md)

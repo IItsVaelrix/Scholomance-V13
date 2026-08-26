@@ -173,4 +173,4 @@ class AgentService:
                         controller.unregister_agent_proc(proc)
                     controller.end_agent()
 
-        threading.Thread(target=run).start()
+        threading.Thread(target=run, name="divtube-agent", daemon=True).start()

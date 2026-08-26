@@ -19,6 +19,47 @@ It transforms the CLI tool into a modern AI agent dashboard!
 2. Launch the TUI:
 `python3 -m tui.ui.app`
 
+## Android companion (private LAN, default-off)
+
+The companion is disabled unless all required flags are set. Loopback status mode:
+
+```bash
+export DIVTUBE_REMOTE_COMPANION_ENABLED=true
+export DIVTUBE_REMOTE_COMPANION_MODE=status_only
+python3 -m tui.ui.app
+```
+
+For a phone on the same trusted LAN, also set
+`DIVTUBE_REMOTE_COMPANION_LAN_ENABLED=true`. This binds HTTPS to the LAN; keep
+the firewall scoped to the private subnet and do not port-forward the listener.
+Available modes are `status_only`, `chat_read_only`, and
+`downloads_confirmed`. There is no plaintext HTTP fallback.
+
+Inside the Cockpit:
+
+- `/remote-status` shows listener mode and port without credentials.
+- `/remote-pair` creates a one-use QR/URI that expires in ten minutes.
+- `/remote-revoke <device-id>` invalidates a device credential.
+
+Install exact Python dependencies with
+`uv run --with-requirements requirements-remote.txt ...`. Build Android with a
+full JDK 21 (including `jlink`):
+
+```bash
+cd android
+JAVA_HOME=/path/to/jdk-21 JAVA_TOOL_OPTIONS=-XX:-UseContainerSupport \
+  ./gradlew testDebugUnitTest lintDebug assembleDebug
+```
+
+The first `gradlew` run downloads a checksum-pinned official wrapper JAR; the
+binary is deliberately ignored by repository hygiene. The debug APK is under
+`android/app/build/outputs/apk/debug/` and is also ignored.
+
+Rollback is immediate: unset the three `DIVTUBE_REMOTE_COMPANION_*` flags (or
+set mode to `off`) and restart the Cockpit. Remove `.divtube-remote/` only if
+you also intend to revoke all local pairing state and regenerate the PC TLS
+identity.
+
 ## TurboQuant SEO Plugin (spec v1.0)
 
 Zero-GPU local semantic SEO intelligence. The cockpit spawns the Node.js

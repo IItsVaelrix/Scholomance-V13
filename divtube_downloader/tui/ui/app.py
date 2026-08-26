@@ -537,8 +537,15 @@ class DivTubeAgentApp(App):
     # RuntimeError("Event loop is closed").  Overriding here protects
     # every call site with a single guard instead of 20+ try/excepts.
     def call_from_thread(self, callback, *args, **kwargs):
+        loop = getattr(self, "_loop", None)
+        if not self.is_running or loop is None or loop.is_closed():
+            return None
         try:
-            return super().call_from_thread(callback, *args, **kwargs)
+            result = super().call_from_thread(callback, *args, **kwargs)
+            if asyncio.iscoroutine(result):
+                result.close()
+                return None
+            return result
         except Exception:
             # App/loop already torn down — silently discard the stale
             # UI update.  The thread will exit on its own (daemon=True).
@@ -2082,7 +2089,10 @@ class DivTubeAgentApp(App):
         feeds /copy + history) always lands in the tab that owns the turn.
         """
         def _task():
-            box = self.query_one("#typewriter-box")
+            try:
+                box = self.query_one("#typewriter-box")
+            except Exception:
+                return
             self.call_from_thread(lambda: box.add_class("-active"))
             self.call_from_thread(lambda: setattr(box, "border_title", _sigil_title("AI IS TYPING…")))
 

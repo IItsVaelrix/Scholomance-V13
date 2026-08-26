@@ -5,6 +5,8 @@ from __future__ import annotations
 import asyncio
 import inspect
 import json
+import time
+from collections import defaultdict, deque
 from pathlib import Path
 from typing import Any, Awaitable, Callable
 
@@ -31,6 +33,7 @@ class RemoteGateway:
         *,
         port: int = 0,
         dispatcher: Dispatcher | None = None,
+        clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self.config = config
         self.pairing = pairing
@@ -38,11 +41,13 @@ class RemoteGateway:
         self.state_dir = Path(state_dir)
         self.port = port
         self.dispatcher = dispatcher
+        self.clock = clock
         self.runner: web.AppRunner | None = None
         self.site: web.TCPSite | None = None
         self.bound_port: int | None = None
         self.tls_identity: TLSIdentity | None = None
         self._websockets: set[web.WebSocketResponse] = set()
+        self._request_times: dict[tuple[str, str], deque[float]] = defaultdict(deque)
 
     @property
     def base_url(self) -> str:
@@ -146,6 +151,7 @@ class RemoteGateway:
             envelope = ClientEnvelope.from_json(raw)
             if not self._type_allowed(envelope.type):
                 raise ProtocolError("mode_forbidden", "Request is disabled by the companion mode.")
+            self._enforce_rate_limit(device_id, envelope.type)
             if envelope.type == "status.snapshot.request":
                 self.event_hub.snapshot(cockpit={"state": "idle"}, active_jobs=[], request_id=envelope.requestId)
                 return
@@ -172,6 +178,18 @@ class RemoteGateway:
         if message_type == "download.request":
             return self.config.mode == "downloads_confirmed"
         return False
+
+    def _enforce_rate_limit(self, device_id: str, message_type: str) -> None:
+        limit = 30 if message_type == "chat.turn.request" else 6 if message_type == "download.request" else None
+        if limit is None:
+            return
+        now = self.clock()
+        entries = self._request_times[(device_id, message_type)]
+        while entries and entries[0] <= now - 60:
+            entries.popleft()
+        if len(entries) >= limit:
+            raise ProtocolError("rate_limited", "Remote request rate limit exceeded.")
+        entries.append(now)
 
     def _authenticate(self, request: web.Request) -> str:
         header = request.headers.get("Authorization", "")

@@ -8,6 +8,7 @@ from tui.remote.config import RemoteCompanionConfig
 from tui.remote.event_hub import RemoteEventHub
 from tui.remote.gateway import RemoteGateway
 from tui.remote.pairing import PairingStore
+from tui.remote.protocol import ProtocolError
 
 
 def config(mode="status_only", enabled=True):
@@ -82,3 +83,15 @@ async def _mode_gates_requests_and_body_limit(tmp_path):
             assert too_large.status == 413
     finally:
         await gateway.stop()
+
+
+def test_per_device_chat_and_download_rate_limits(tmp_path):
+    gateway = RemoteGateway(config("downloads_confirmed"), PairingStore(tmp_path / "pair"), RemoteEventHub("pc-1"), tmp_path / "tls", clock=lambda: 100.0)
+    for _ in range(30):
+        gateway._enforce_rate_limit("phone-a", "chat.turn.request")
+    with pytest.raises(ProtocolError, match="rate limit"):
+        gateway._enforce_rate_limit("phone-a", "chat.turn.request")
+    for _ in range(6):
+        gateway._enforce_rate_limit("phone-b", "download.request")
+    with pytest.raises(ProtocolError, match="rate limit"):
+        gateway._enforce_rate_limit("phone-b", "download.request")

@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonArray
@@ -43,6 +44,8 @@ class CockpitViewModel : ViewModel() {
     val state: StateFlow<CockpitUiState> = mutableState.asStateFlow()
     private var client: PinnedCockpitClient? = null
     private var socket: WebSocket? = null
+    private var pairedRecord: PairingRecord? = null
+    private var reconnectAttempt = 0
 
     fun reduce(envelope: ServerEnvelope) {
         val current = mutableState.value
@@ -81,15 +84,20 @@ class CockpitViewModel : ViewModel() {
     }
 
     fun connect(record: PairingRecord) {
+        pairedRecord = record
         val connection = PinnedCockpitClient(record)
         client = connection
         socket = connection.events(object : WebSocketListener() {
-            override fun onOpen(webSocket: WebSocket, response: Response) { mutableState.value = mutableState.value.copy(connection = ConnectionState.CONNECTED) }
+            override fun onOpen(webSocket: WebSocket, response: Response) { reconnectAttempt = 0; mutableState.value = mutableState.value.copy(connection = ConnectionState.CONNECTED) }
             override fun onMessage(webSocket: WebSocket, text: String) {
+                if (text.toByteArray().size > 32 * 1024) { webSocket.close(1009, "message too large"); return }
                 runCatching { RemoteProtocol.decodeServer(text, mutableState.value.instanceId, mutableState.value.lastSeq) }.onSuccess(::reduce)
             }
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                 mutableState.value = mutableState.value.copy(connection = ConnectionState.OFFLINE, error = "Connection lost")
+                val retry = pairedRecord ?: return
+                val waitSeconds = minOf(30, 1 shl minOf(reconnectAttempt++, 5))
+                viewModelScope.launch { delay(waitSeconds * 1000L); if (mutableState.value.connection == ConnectionState.OFFLINE) connect(retry) }
             }
         })
     }
@@ -103,7 +111,7 @@ class CockpitViewModel : ViewModel() {
     }
 
     fun setRightsConfirmed(value: Boolean) { mutableState.value = mutableState.value.copy(rightsConfirmed = value) }
-    fun revokeLocal() { socket?.close(1000, "revoked"); socket = null; client = null; mutableState.value = CockpitUiState() }
+    fun revokeLocal() { pairedRecord = null; socket?.close(1000, "revoked"); socket = null; client = null; mutableState.value = CockpitUiState() }
 
     private fun send(type: String, payload: JsonObject) {
         val activeClient = client ?: return

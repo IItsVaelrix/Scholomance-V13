@@ -530,7 +530,7 @@ class PromptService:
                     except Exception:
                         pass
 
-        threading.Thread(target=run).start()
+        threading.Thread(target=run, name="divtube-prompt", daemon=True).start()
 
     def set_model(self, model_name):
         self.active_model = model_name
