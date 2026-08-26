@@ -7,11 +7,70 @@
 
 ## Living Document - Owned by Codex, Read by All Agents
 
-**Version: 1.45** | Last updated: 2026-08-19
+**Version: 1.46** | Last updated: 2026-08-26
 
 > Bump the version on every schema change.
 > Notify Claude for UI-consumed field changes.
 > Notify Gemini for fixture, regression-test, and backend implementation changes.
+
+---
+
+## SCHEMA CHANGE NOTICE
+
+- Schema: DivTube Cockpit Android Companion Protocol
+- Version: 1.45 -> 1.46
+- Date: 2026-08-26
+- Changed fields: registered `DivTubeRemoteProtocolV1` for the authenticated,
+  LAN-only Android companion's typed client requests and server events
+- Breaking: no; additive protocol contract
+- Owner: Codex
+- Claude impact: Android decoder and companion UI must consume only the named
+  v1 message types and display sanitized payloads
+- Gemini impact: gateway, adapter, event hub, and service tests must preserve
+  the validation and sequencing invariants below
+- Error codes: malformed JSON, missing or extra keys, protocol mismatch,
+  unknown type, invalid identifier, invalid URL, invalid media type, rights
+  not confirmed, and invalid server sequence fail before service dispatch
+
+### DivTubeRemoteProtocolV1
+
+Every frame uses the exact envelope keys `protocolVersion`, `instanceId`,
+`seq`, `type`, `requestId`, and `payload` on the server-to-Android path. Client
+requests omit `instanceId` and `seq`, and use the exact keys
+`protocolVersion`, `type`, `requestId`, and `payload`. The protocol version is
+`divtube-remote-v1`.
+
+Client message types are exactly:
+
+`session.hello`, `chat.turn.request`, `download.request`, and
+`status.snapshot.request`.
+
+Server message types are exactly:
+
+`status.snapshot`, `chat.activity`, `chat.message`, `download.accepted`,
+`download.progress`, `download.completed`, and `error`.
+
+Protocol invariants:
+
+- Client and server envelopes reject missing or extra keys, unknown message
+  types, invalid identifiers, wrong JSON types (including booleans where
+  integers are required), and unknown payload keys before dispatch.
+- Chat text is limited to 1–8,000 Unicode scalar values. The conversation is
+  a named remote conversation and is isolated from desktop history.
+- Download requests accept only HTTPS YouTube hosts, `video` or `audio`, and
+  an actual boolean `rightsConfirmed: true`. Rights confirmation is never
+  inferred from chat text or delegated to an LLM tool call.
+- Server `seq` is a nonnegative integer strictly increasing for each
+  `instanceId`; reconnect snapshots precede events with larger sequence
+  values. JSON serialization is UTF-8, recursively key-sorted, compact, and
+  preserves non-ASCII characters.
+- `REMOTE_READ_ONLY` is a server-selected capability profile with an explicit
+  positive allow-list of `read_file`, `find_symbol`, `list_project_tree`, and
+  `read_import_graph`. Shell, Python, filesystem-write, and future unknown
+  tools are excluded regardless of coding-action metadata.
+- `REMOTE_DOWNLOAD_CONFIRM` is a gateway action rather than a model tool. The
+  PC remains authoritative for credentials, filesystem access, downloads, and
+  all emitted sanitized state.
 
 ---
 
