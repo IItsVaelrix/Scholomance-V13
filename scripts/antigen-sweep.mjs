@@ -37,6 +37,7 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { INFUSED_ANTIGENS } from '../codex/core/immunity/clerical-raid.substrate.js';
 import { compileInvestigationPlan } from '../codex/core/immunity/cleri-probe/planner.js';
+import { witnessSweep } from './antigen-witness.mjs';
 
 const ROOT = resolve(fileURLToPath(import.meta.url), '../..');
 const DEFAULT_ROOTS = ['codex/core', 'codex/server', 'codex/runtime', 'codex/cli', 'src/lib', 'src/pages', 'src/components'];
@@ -136,9 +137,21 @@ export function sweep({ antigens = INFUSED_ANTIGENS, chunks = buildChunks(), log
   return { results, unhuntable: unhuntable.map((u) => ({ title: u.antigen.title, why: u.why })) };
 }
 
-function main() {
+async function main() {
   const outIndex = process.argv.indexOf('--output');
-  const summary = sweep();
+  let summary = sweep();
+
+  // A verified finding is still only cleri-probe's BELIEF that a site is sick.
+  // --witness breaks each cited line and lets the covering tests answer, so a
+  // finding leaves here as a provable artifact or as INCONCLUSIVE, never as an
+  // opinion wearing a number.
+  if (process.argv.includes('--witness')) {
+    summary = await witnessSweep(summary);
+    console.log('\n──── witness ────');
+    console.log(`WITNESSED    : ${summary.witnessTally.WITNESSED}  (raw material for a rule)`);
+    console.log(`PROTECTED    : ${summary.witnessTally.PROTECTED}  (already covered — a scar, not a wound)`);
+    console.log(`INCONCLUSIVE : ${summary.witnessTally.INCONCLUSIVE}  (never asked, NOT clean)`);
+  }
 
   const totalFindings = summary.results.reduce((n, r) => n + r.findings.length, 0);
   const totalUncleared = summary.results.reduce((n, r) => n + r.uncleared.length, 0);
@@ -153,4 +166,4 @@ function main() {
   }
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) main();
+if (import.meta.url === pathToFileURL(process.argv[1]).href) await main();
