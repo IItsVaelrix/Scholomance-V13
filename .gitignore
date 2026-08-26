@@ -222,3 +222,6 @@ PolarisOS/
 
 # Derived sqlite index — rebuildable from .atlas/code-atlas.json
 .atlas/code-atlas.sqlite3
+
+# Derived SCD64 glossary index — rebuildable via scripts/scd64-glossary-export.mjs
+.atlas/scd64-glossary.json
