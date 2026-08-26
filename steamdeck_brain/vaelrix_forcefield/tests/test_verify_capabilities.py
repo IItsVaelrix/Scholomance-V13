@@ -193,6 +193,89 @@ def test_the_two_real_dead_symbols_are_still_caught():
             f"the engine exposes {sym} for callers"), f"{sym} no longer extracted"
 
 
+def test_symbol_matches_case_insensitively_inside_a_longer_identifier():
+    """MEASURED false positive: the career-ats packet says "per-token logProb
+    signals" and ats-hmm/index.js returns `perTokenLogProbByLine`.
+
+    A case-SENSITIVE substring test missed it by one capital and reported the
+    claim dead while the thing sat in the return statement. A miss that a
+    change of case would resolve is not a confident miss.
+    """
+    assert verify_capabilities.check_symbols([_symbol_packet(
+        "analyzeResumeLegibility — real HMM arbiter (runAtsHmmPass), "
+        "per-token logProb signals",
+        "codex/core/career/ats-hmm/index.js")]) == []
+
+
+def test_symbol_is_found_via_a_bare_module_name_in_the_prose():
+    """MEASURED false positive: the career-ats packet says "build-suggestions
+    produces requiresUserApproval:true objects".
+
+    `build-suggestions` is a real sibling module, but written without an
+    extension it did not match the path token pattern, so the gate searched
+    only the packet's own path and declared a live symbol dead.
+    """
+    assert verify_capabilities.check_symbols([_symbol_packet(
+        "applyAcceptedSuggestions — applies accepted edits; build-suggestions "
+        "produces requiresUserApproval:true objects",
+        "src/lib/career/suggestions/apply-suggestions.ts")]) == []
+
+
+def test_bare_module_names_need_two_segments():
+    """Widening the file search is how a gate quietly stops failing.
+
+    A single lowercase word is ordinary prose. If "the", "reads" or "parser"
+    counted as a module name, the gate would open whatever sibling file
+    happened to share the name and could find the symbol there — masking a
+    genuinely dead claim. Two segments is the floor.
+    """
+    matches = verify_capabilities._BARE_MODULE.findall(
+        "the parser reads this file and returns a grid of build-suggestions "
+        "plus apply_suggestions output")
+    assert "build-suggestions" in matches
+    assert "apply_suggestions" in matches
+    for word in ("the", "parser", "reads", "file", "grid", "plus", "output"):
+        assert word not in matches, f"single prose word {word!r} taken as a module"
+
+
+def test_bare_module_search_does_not_fall_back_to_the_repo_root():
+    """Sibling resolution is scoped to the packet's own directory.
+
+    Falling back to the repo root would let a bare word in prose match any
+    top-level file, quietly widening every search.
+
+    Probed with a name that DOES exist at the repo root (debug-truesight.js),
+    so a fallback would visibly resolve it. A probe naming only files absent
+    from the root would pass whether the scoping held or not.
+    """
+    assert (verify_capabilities.REPO_ROOT / "debug-truesight.js").is_file(), (
+        "fixture assumption changed: pick another root-level two-segment module"
+    )
+    files = verify_capabilities._search_files({
+        "path": "no/such/directory/here.ts",
+        "canonical": "delegates to debug-truesight for the heavy lifting",
+    })
+    assert files == [], f"resolved files off a nonexistent directory: {files}"
+
+    # And with a REAL packet dir, a root-level module must still not be pulled in.
+    files = verify_capabilities._search_files({
+        "path": "src/lib/career/suggestions/apply-suggestions.ts",
+        "canonical": "delegates to debug-truesight for the heavy lifting",
+    })
+    names = [f.name for f in files]
+    assert "debug-truesight.js" not in names, (
+        f"root-level module resolved from an unrelated package dir: {names}")
+
+
+def test_a_truly_absent_symbol_still_fails_both_relaxations():
+    """Precision must not be bought by making the gate unfalsifiable."""
+    errs = verify_capabilities.check_symbols([_symbol_packet(
+        "analyzeResumeLegibility uses zzzNotARealSymbolAnywhere for scoring",
+        "codex/core/career/ats-hmm/index.js")])
+    assert len(errs) == 1
+    assert "zzzNotARealSymbolAnywhere" in errs[0]
+
+
 def test_symbol_extraction_is_conservative_about_unreadable_paths():
     """No searchable source file -> say nothing rather than guess."""
     assert verify_capabilities.check_symbols(

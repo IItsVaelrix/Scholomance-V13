@@ -174,6 +174,13 @@ PROSE_NOUNS = frozenset({
 # the prose points at, NOT in the packet's `path` (which is a cmudict data
 # file). Searching only `path` would fire on every capability of that shape.
 _PATH_TOKEN = re.compile(r"\b[\w./-]+\.(?:py|js|mjs|cjs|ts|tsx|jsx)\b")
+# Prose also names sibling modules WITHOUT an extension: the career-ats packet
+# says "build-suggestions produces requiresUserApproval:true objects", and
+# build-suggestions.ts is a real file next to the packet's own path. Because a
+# bare name does not match _PATH_TOKEN, the gate searched only the packet path
+# and reported a live symbol dead. A kebab/snake name of two or more segments is
+# specific enough to resolve without dragging in ordinary prose words.
+_BARE_MODULE = re.compile(r"\b[a-z][a-z0-9]*(?:[-_][a-z0-9]+)+\b")
 _TEXT_SUFFIXES = {".py", ".js", ".mjs", ".cjs", ".ts", ".tsx", ".jsx"}
 
 
@@ -206,6 +213,20 @@ def _search_files(cap: dict) -> list[Path]:
         if "/" not in name and Path(name).suffix in _TEXT_SUFFIXES:
             files.extend(p for p in REPO_ROOT.rglob(name)
                          if not any(part in _WALK_SKIP for part in p.parts))
+
+    # Sibling modules the prose names without an extension. Resolved next to the
+    # packet's own path first -- "build-suggestions" in a capability about
+    # apply-suggestions.ts means the file beside it, not a same-named module in
+    # some unrelated tree.
+    own = cap.get("path", "")
+    sibling_dir = (REPO_ROOT / own).parent if own else None
+    for bare in _BARE_MODULE.findall(cap.get("canonical", "")):
+        if sibling_dir is None or not sibling_dir.is_dir():
+            break
+        for suffix in _TEXT_SUFFIXES:
+            candidate = sibling_dir / f"{bare}{suffix}"
+            if candidate.is_file() and candidate not in files:
+                files.append(candidate)
     return files
 
 
@@ -234,8 +255,14 @@ def check_symbols(packets: list[dict]) -> list[str]:
                     continue
             if not blobs:
                 continue
+            # Case-insensitive, because prose names a concept while code names
+            # an identifier: the career-ats packet says "per-token logProb
+            # signals" and index.js returns `perTokenLogProbByLine`. A miss that
+            # a single capital would resolve is not a confident miss, and this
+            # gate reports only confident misses.
+            lowered = [b.lower() for b in blobs]
             for symbol in sorted(symbols):
-                if not any(symbol in blob for blob in blobs):
+                if not any(symbol.lower() in blob for blob in lowered):
                     where = ", ".join(str(f.relative_to(REPO_ROOT)) for f in files)
                     errors.append(
                         f"{packet.get('domain', '?')}: '{cap.get('need')}' tells the reader to "
