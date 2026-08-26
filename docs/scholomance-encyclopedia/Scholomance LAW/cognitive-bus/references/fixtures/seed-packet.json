@@ -1,0 +1,68 @@
+{
+  "assumptions": [
+    "The referenced artifact bytes are available to the verifier"
+  ],
+  "authority": {
+    "authorization_ref": null,
+    "mutation_requested": false,
+    "risk": "READ_ONLY"
+  },
+  "diagnostics": {
+    "bytecode_health": "PASS",
+    "codes": [
+      "CBUS-SEED"
+    ],
+    "scd64_confirmed_runtime": null,
+    "scd64_predicted_static": null
+  },
+  "epistemic": {
+    "basis": "DIRECT",
+    "confidence_milli": 800,
+    "status": "SUPPORTED",
+    "uncertainty_codes": [
+      "AWAITING-INDEPENDENT-VERIFICATION"
+    ]
+  },
+  "evidence": [
+    {
+      "claim": "The artifact contains the requested field",
+      "digest_sha256": null,
+      "evidence_id": "artifact-001",
+      "independence_key": "artifact-001-bytes",
+      "kind": "ARTIFACT",
+      "reference": "sandbox:/absolute/path/to/artifact",
+      "verification": "VERIFIED"
+    }
+  ],
+  "integrity": {
+    "algorithm": "sha256",
+    "content_sha256": "37dbb2ead77c86d873452713935f9489d3c92d1d421e3deaca58f6e248dd9ed1",
+    "signature": null
+  },
+  "intent": "PROPOSE",
+  "logical_clock": 1,
+  "memory": {
+    "candidate_id": "episode-task-example-1",
+    "operation": "STAGE",
+    "retention_basis": [
+      "Useful for resuming this task"
+    ],
+    "stratum": "EPISODIC"
+  },
+  "packet_id": "cbp-37dbb2ead77c86d873452713",
+  "parent_ids": [],
+  "proposition": {
+    "method": "Inspected the authoritative artifact",
+    "result": "Field observed",
+    "scope": "artifact version supplied in task contract",
+    "statement": "The artifact contains the requested field"
+  },
+  "schema_version": "cognitive-bus.packet.v2",
+  "sender": {
+    "agent_id": "investigator-a",
+    "model_family": "example-model-family",
+    "role": "INVESTIGATOR",
+    "run_id": "task-example-run-1"
+  },
+  "task_id": "task-example"
+}

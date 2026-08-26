@@ -103,6 +103,7 @@ export function encodeBytecodeXPVaccineFromError(error, options = {}) {
       layer: context.layer || null,
       ruleId: context.ruleId || null,
       checkId: context.checkId || null,
+      ...options.stableContext,
     }),
   });
 }
@@ -127,6 +128,7 @@ export function encodeBytecodeXPVaccineFromHealth(health, options = {}) {
       code: source?.code || null,
       cellId: source?.cellId || null,
       checkId: source?.checkId || null,
+      ...options.stableContext,
       moduleId: source?.moduleId || null,
       contextModuleId: context.moduleId || null,
       path: context.path || null,

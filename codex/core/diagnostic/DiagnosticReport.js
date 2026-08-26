@@ -58,6 +58,11 @@ function generateReportId() {
  * @returns {string}
  */
 export function checksumReport(report) {
+  return digestReport(report).slice(0, 16);
+}
+
+/** Full canonical digest for cryptographic bindings; checksumReport is display-sized. */
+export function digestReport(report) {
   // reportId is excluded — it embeds a timestamp and random suffix,
   // both of which are envelope metadata per VAELRIX_LAW §6 (white paper §5.1).
   const stable = {
@@ -90,8 +95,7 @@ export function checksumReport(report) {
   return crypto
     .createHash('sha256')
     .update(JSON.stringify(stable))
-    .digest('hex')
-    .slice(0, 16);
+    .digest('hex');
 }
 
 /**

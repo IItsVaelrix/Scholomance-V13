@@ -1,0 +1,811 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scholomance.local/schemas/cognitive-bus.packet.v2.json",
+  "title": "Cognitive Bus Packet v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "task_id",
+    "packet_id",
+    "logical_clock",
+    "parent_ids",
+    "sender",
+    "intent",
+    "proposition",
+    "epistemic",
+    "evidence",
+    "assumptions",
+    "memory",
+    "authority",
+    "diagnostics",
+    "integrity"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "cognitive-bus.packet.v2"
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "packet_id": {
+      "type": "string",
+      "pattern": "^cbp-[0-9a-f]{24}$"
+    },
+    "logical_clock": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "parent_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^cbp-[0-9a-f]{24}$"
+      },
+      "uniqueItems": true
+    },
+    "sender": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "agent_id",
+        "role",
+        "model_family",
+        "run_id"
+      ],
+      "properties": {
+        "agent_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "enum": [
+            "ORCHESTRATOR",
+            "INVESTIGATOR",
+            "CHALLENGER",
+            "VERIFIER",
+            "CURATOR",
+            "EXECUTOR"
+          ]
+        },
+        "model_family": {
+          "type": "string",
+          "minLength": 1
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "intent": {
+      "enum": [
+        "OBSERVE",
+        "PROPOSE",
+        "CHALLENGE",
+        "VERIFY",
+        "DECIDE",
+        "HANDOFF",
+        "MEMORY_PROPOSAL",
+        "RETRACT",
+        "ABSTAIN",
+        "SNAPSHOT"
+      ]
+    },
+    "proposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement",
+        "scope",
+        "method",
+        "result"
+      ],
+      "properties": {
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "method": {
+          "type": "string"
+        },
+        "result": {
+          "type": "string"
+        }
+      }
+    },
+    "epistemic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "basis",
+        "confidence_milli",
+        "uncertainty_codes"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "UNVERIFIED",
+            "SUPPORTED",
+            "CONTESTED",
+            "REFUTED",
+            "CONFIRMED"
+          ]
+        },
+        "basis": {
+          "enum": [
+            "MODEL_ONLY",
+            "USER_SUPPLIED",
+            "RETRIEVED",
+            "INFERRED",
+            "DIRECT",
+            "CORROBORATED",
+            "CONTRADICTED"
+          ]
+        },
+        "confidence_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "uncertainty_codes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "evidence_id",
+          "kind",
+          "reference",
+          "claim",
+          "independence_key",
+          "verification"
+        ],
+        "properties": {
+          "evidence_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "SOURCE",
+              "ARTIFACT",
+              "EXECUTION",
+              "OBSERVATION",
+              "MEMORY",
+              "MODEL_OUTPUT"
+            ]
+          },
+          "reference": {
+            "type": "string",
+            "minLength": 1
+          },
+          "claim": {
+            "type": "string",
+            "minLength": 1
+          },
+          "independence_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "verification": {
+            "enum": [
+              "UNVERIFIED",
+              "VERIFIED",
+              "FAILED",
+              "STALE"
+            ]
+          },
+          "digest_sha256": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "memory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stratum",
+        "operation",
+        "candidate_id",
+        "retention_basis"
+      ],
+      "properties": {
+        "stratum": {
+          "enum": [
+            "NONE",
+            "EPISODIC",
+            "SEMANTIC",
+            "MNEMONIC",
+            "PROCEDURAL"
+          ]
+        },
+        "operation": {
+          "enum": [
+            "NONE",
+            "STAGE",
+            "PROMOTE",
+            "REVISE",
+            "RETIRE"
+          ]
+        },
+        "candidate_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "retention_basis": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mutation_requested",
+        "risk",
+        "authorization_ref"
+      ],
+      "properties": {
+        "mutation_requested": {
+          "type": "boolean"
+        },
+        "risk": {
+          "enum": [
+            "READ_ONLY",
+            "REVERSIBLE",
+            "MATERIAL",
+            "DESTRUCTIVE"
+          ]
+        },
+        "authorization_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      }
+    },
+    "diagnostics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bytecode_health",
+        "codes",
+        "scd64_predicted_static",
+        "scd64_confirmed_runtime"
+      ],
+      "properties": {
+        "bytecode_health": {
+          "enum": [
+            "UNKNOWN",
+            "PASS",
+            "WARN",
+            "FAIL"
+          ]
+        },
+        "codes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "scd64_predicted_static": {
+          "description": "Predicted fingerprint from static analysis. The provenance tag is required so a bare 64-hex value -- a query hash, for instance -- cannot occupy this slot unremarked.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "fingerprint",
+                "provenance"
+              ],
+              "properties": {
+                "fingerprint": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "provenance": {
+                  "const": "STATIC_ANALYSIS"
+                }
+              }
+            }
+          ]
+        },
+        "scd64_confirmed_runtime": {
+          "description": "Confirmed fingerprint observed at runtime. A static prediction copied into this field fails validation because its provenance tag is wrong.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "fingerprint",
+                "provenance"
+              ],
+              "properties": {
+                "fingerprint": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "provenance": {
+                  "const": "RUNTIME_TRACE"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm",
+        "content_sha256",
+        "signature"
+      ],
+      "description": "content_sha256 is a plain digest: it gives content addressing and catches corruption, but anyone can recompute it, so on its own it is not tamper detection. signature is the tamper-evident layer and is only meaningful to a validator holding the key.",
+      "properties": {
+        "algorithm": {
+          "const": "sha256"
+        },
+        "content_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "signature": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "algorithm",
+                "key_id",
+                "mac"
+              ],
+              "properties": {
+                "algorithm": {
+                  "const": "hmac-sha256"
+                },
+                "key_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "mac": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "title": "material and destructive mutation require authorization",
+      "if": {
+        "properties": {
+          "authority": {
+            "properties": {
+              "mutation_requested": {
+                "const": true
+              },
+              "risk": {
+                "enum": [
+                  "MATERIAL",
+                  "DESTRUCTIVE"
+                ]
+              }
+            },
+            "required": [
+              "mutation_requested",
+              "risk"
+            ]
+          }
+        },
+        "required": [
+          "authority"
+        ]
+      },
+      "then": {
+        "properties": {
+          "authority": {
+            "properties": {
+              "authorization_ref": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "no mutation requested means read-only risk",
+      "if": {
+        "properties": {
+          "authority": {
+            "properties": {
+              "mutation_requested": {
+                "const": false
+              }
+            },
+            "required": [
+              "mutation_requested"
+            ]
+          }
+        },
+        "required": [
+          "authority"
+        ]
+      },
+      "then": {
+        "properties": {
+          "authority": {
+            "properties": {
+              "risk": {
+                "const": "READ_ONLY"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "a requested mutation must declare mutation risk",
+      "if": {
+        "properties": {
+          "authority": {
+            "properties": {
+              "mutation_requested": {
+                "const": true
+              }
+            },
+            "required": [
+              "mutation_requested"
+            ]
+          }
+        },
+        "required": [
+          "authority"
+        ]
+      },
+      "then": {
+        "properties": {
+          "authority": {
+            "properties": {
+              "risk": {
+                "not": {
+                  "const": "READ_ONLY"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "SUPPORTED, CONFIRMED and REFUTED need an externally grounded basis",
+      "$comment": "The evidence-count half of this rule -- at least one VERIFIED item of a decisive kind, and for CONFIRMED either EXECUTION evidence or two distinct independence_key lineages -- is not expressible in JSON Schema. scripts/cognitive_packet.py enforces it and tests/test_invariants.py proves it. A JSON Schema validator alone is NOT sufficient to admit a packet.",
+      "if": {
+        "properties": {
+          "epistemic": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "SUPPORTED",
+                  "CONFIRMED",
+                  "REFUTED"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          }
+        },
+        "required": [
+          "epistemic"
+        ]
+      },
+      "then": {
+        "properties": {
+          "epistemic": {
+            "properties": {
+              "basis": {
+                "not": {
+                  "enum": [
+                    "MODEL_ONLY",
+                    "INFERRED"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "REFUTED must cite the packet it refutes",
+      "if": {
+        "properties": {
+          "epistemic": {
+            "properties": {
+              "status": {
+                "const": "REFUTED"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          }
+        },
+        "required": [
+          "epistemic"
+        ]
+      },
+      "then": {
+        "properties": {
+          "parent_ids": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "title": "CONTESTED must declare a contradicted basis",
+      "$comment": "The requirement for two distinct decisive independence_key lineages is enforced by scripts/cognitive_packet.py because JSON Schema cannot count distinct values projected from evidence objects.",
+      "if": {
+        "properties": {
+          "epistemic": {
+            "properties": {
+              "status": {
+                "const": "CONTESTED"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          }
+        },
+        "required": [
+          "epistemic"
+        ]
+      },
+      "then": {
+        "properties": {
+          "epistemic": {
+            "properties": {
+              "basis": {
+                "const": "CONTRADICTED"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "promotion to mnemonic, semantic or procedural memory needs external grounding",
+      "if": {
+        "properties": {
+          "memory": {
+            "properties": {
+              "operation": {
+                "const": "PROMOTE"
+              },
+              "stratum": {
+                "enum": [
+                  "SEMANTIC",
+                  "MNEMONIC",
+                  "PROCEDURAL"
+                ]
+              }
+            },
+            "required": [
+              "operation",
+              "stratum"
+            ]
+          }
+        },
+        "required": [
+          "memory"
+        ]
+      },
+      "then": {
+        "properties": {
+          "epistemic": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "SUPPORTED",
+                  "CONFIRMED"
+                ]
+              },
+              "basis": {
+                "not": {
+                  "enum": [
+                    "MODEL_ONLY",
+                    "INFERRED",
+                    "USER_SUPPLIED"
+                  ]
+                }
+              }
+            }
+          },
+          "memory": {
+            "properties": {
+              "candidate_id": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "episodic memory is staged rather than promoted",
+      "if": {
+        "properties": {
+          "memory": {
+            "properties": {
+              "operation": {
+                "const": "PROMOTE"
+              }
+            },
+            "required": [
+              "operation"
+            ]
+          }
+        },
+        "required": [
+          "memory"
+        ]
+      },
+      "then": {
+        "properties": {
+          "memory": {
+            "properties": {
+              "stratum": {
+                "not": {
+                  "enum": [
+                    "NONE",
+                    "EPISODIC"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "a memory operation and its stratum must agree",
+      "if": {
+        "properties": {
+          "memory": {
+            "properties": {
+              "operation": {
+                "const": "NONE"
+              }
+            },
+            "required": [
+              "operation"
+            ]
+          }
+        },
+        "required": [
+          "memory"
+        ]
+      },
+      "then": {
+        "properties": {
+          "memory": {
+            "properties": {
+              "stratum": {
+                "const": "NONE"
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "memory": {
+            "properties": {
+              "stratum": {
+                "not": {
+                  "const": "NONE"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "an ABSTAIN packet cannot claim support",
+      "if": {
+        "properties": {
+          "intent": {
+            "const": "ABSTAIN"
+          }
+        },
+        "required": [
+          "intent"
+        ]
+      },
+      "then": {
+        "properties": {
+          "epistemic": {
+            "properties": {
+              "status": {
+                "not": {
+                  "enum": [
+                    "SUPPORTED",
+                    "CONFIRMED"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

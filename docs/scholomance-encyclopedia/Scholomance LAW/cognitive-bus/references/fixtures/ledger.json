@@ -1,0 +1,227 @@
+[
+  {
+    "assumptions": [
+      "The referenced artifact bytes are available to the verifier"
+    ],
+    "authority": {
+      "authorization_ref": null,
+      "mutation_requested": false,
+      "risk": "READ_ONLY"
+    },
+    "diagnostics": {
+      "bytecode_health": "PASS",
+      "codes": [
+        "CBUS-SEED"
+      ],
+      "scd64_confirmed_runtime": null,
+      "scd64_predicted_static": null
+    },
+    "epistemic": {
+      "basis": "DIRECT",
+      "confidence_milli": 800,
+      "status": "SUPPORTED",
+      "uncertainty_codes": [
+        "AWAITING-INDEPENDENT-VERIFICATION"
+      ]
+    },
+    "evidence": [
+      {
+        "claim": "The artifact contains the requested field",
+        "digest_sha256": null,
+        "evidence_id": "artifact-001",
+        "independence_key": "artifact-001-bytes",
+        "kind": "ARTIFACT",
+        "reference": "sandbox:/absolute/path/to/artifact",
+        "verification": "VERIFIED"
+      }
+    ],
+    "integrity": {
+      "algorithm": "sha256",
+      "content_sha256": "37dbb2ead77c86d873452713935f9489d3c92d1d421e3deaca58f6e248dd9ed1",
+      "signature": null
+    },
+    "intent": "PROPOSE",
+    "logical_clock": 1,
+    "memory": {
+      "candidate_id": "episode-task-example-1",
+      "operation": "STAGE",
+      "retention_basis": [
+        "Useful for resuming this task"
+      ],
+      "stratum": "EPISODIC"
+    },
+    "packet_id": "cbp-37dbb2ead77c86d873452713",
+    "parent_ids": [],
+    "proposition": {
+      "method": "Inspected the authoritative artifact",
+      "result": "Field observed",
+      "scope": "artifact version supplied in task contract",
+      "statement": "The artifact contains the requested field"
+    },
+    "schema_version": "cognitive-bus.packet.v2",
+    "sender": {
+      "agent_id": "investigator-a",
+      "model_family": "example-model-family",
+      "role": "INVESTIGATOR",
+      "run_id": "task-example-run-1"
+    },
+    "task_id": "task-example"
+  },
+  {
+    "assumptions": [
+      "The artifact bytes did not change between seed and verification"
+    ],
+    "authority": {
+      "authorization_ref": null,
+      "mutation_requested": false,
+      "risk": "READ_ONLY"
+    },
+    "diagnostics": {
+      "bytecode_health": "PASS",
+      "codes": [
+        "CBUS-VERIFY"
+      ],
+      "scd64_confirmed_runtime": {
+        "fingerprint": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "provenance": "RUNTIME_TRACE"
+      },
+      "scd64_predicted_static": null
+    },
+    "epistemic": {
+      "basis": "CORROBORATED",
+      "confidence_milli": 950,
+      "status": "CONFIRMED",
+      "uncertainty_codes": []
+    },
+    "evidence": [
+      {
+        "claim": "claim from artifact-001",
+        "digest_sha256": null,
+        "evidence_id": "artifact-001",
+        "independence_key": "artifact-001-bytes",
+        "kind": "ARTIFACT",
+        "reference": "sandbox:/artifact-001",
+        "verification": "VERIFIED"
+      },
+      {
+        "claim": "claim from check-001",
+        "digest_sha256": null,
+        "evidence_id": "check-001",
+        "independence_key": "field-presence-check-run",
+        "kind": "EXECUTION",
+        "reference": "sandbox:/check-001",
+        "verification": "VERIFIED"
+      }
+    ],
+    "integrity": {
+      "algorithm": "sha256",
+      "content_sha256": "83c3e299dd3b9bab3679a1e22eb2aac7b53e99a9c04972a0c6ba0bb5df1e3b69",
+      "signature": null
+    },
+    "intent": "VERIFY",
+    "logical_clock": 2,
+    "memory": {
+      "candidate_id": "episode-task-example-2",
+      "operation": "STAGE",
+      "retention_basis": [
+        "Verification trace for this task"
+      ],
+      "stratum": "EPISODIC"
+    },
+    "packet_id": "cbp-83c3e299dd3b9bab3679a1e2",
+    "parent_ids": [
+      "cbp-37dbb2ead77c86d873452713"
+    ],
+    "proposition": {
+      "method": "Re-read the artifact bytes and executed the field-presence check",
+      "result": "Check passed",
+      "scope": "artifact version supplied in task contract",
+      "statement": "The artifact contains the requested field"
+    },
+    "schema_version": "cognitive-bus.packet.v2",
+    "sender": {
+      "agent_id": "verifier-a",
+      "model_family": "example-model-family",
+      "role": "VERIFIER",
+      "run_id": "task-example-run-2"
+    },
+    "task_id": "task-example"
+  },
+  {
+    "assumptions": [
+      "The contract hash is unchanged on resume"
+    ],
+    "authority": {
+      "authorization_ref": null,
+      "mutation_requested": false,
+      "risk": "READ_ONLY"
+    },
+    "diagnostics": {
+      "bytecode_health": "PASS",
+      "codes": [
+        "CBUS-SNAPSHOT"
+      ],
+      "scd64_confirmed_runtime": null,
+      "scd64_predicted_static": null
+    },
+    "epistemic": {
+      "basis": "CORROBORATED",
+      "confidence_milli": 950,
+      "status": "CONFIRMED",
+      "uncertainty_codes": []
+    },
+    "evidence": [
+      {
+        "claim": "claim from artifact-001",
+        "digest_sha256": null,
+        "evidence_id": "artifact-001",
+        "independence_key": "artifact-001-bytes",
+        "kind": "ARTIFACT",
+        "reference": "sandbox:/artifact-001",
+        "verification": "VERIFIED"
+      },
+      {
+        "claim": "claim from check-001",
+        "digest_sha256": null,
+        "evidence_id": "check-001",
+        "independence_key": "field-presence-check-run",
+        "kind": "EXECUTION",
+        "reference": "sandbox:/check-001",
+        "verification": "VERIFIED"
+      }
+    ],
+    "integrity": {
+      "algorithm": "sha256",
+      "content_sha256": "a07d5f98e65fd74183a07e2c79a03d58442c1ae6deb8f3085cd9f09dfd2fbc7f",
+      "signature": null
+    },
+    "intent": "SNAPSHOT",
+    "logical_clock": 3,
+    "memory": {
+      "candidate_id": "episode-task-example-3",
+      "operation": "STAGE",
+      "retention_basis": [
+        "Resume point"
+      ],
+      "stratum": "EPISODIC"
+    },
+    "packet_id": "cbp-a07d5f98e65fd74183a07e2c",
+    "parent_ids": [
+      "cbp-83c3e299dd3b9bab3679a1e2"
+    ],
+    "proposition": {
+      "method": "Collected verified state, contested state, and next safe action",
+      "result": "1 verified proposition, 0 contested, next action: report to output owner",
+      "scope": "task-example contract hash 0000-example",
+      "statement": "Resume point after verification of the artifact field claim"
+    },
+    "schema_version": "cognitive-bus.packet.v2",
+    "sender": {
+      "agent_id": "orchestrator",
+      "model_family": "example-model-family",
+      "role": "ORCHESTRATOR",
+      "run_id": "task-example-run-2"
+    },
+    "task_id": "task-example"
+  }
+]

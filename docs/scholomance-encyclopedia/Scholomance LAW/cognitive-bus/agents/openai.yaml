@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cognitive Bus"
+  short_description: "Coordinate AI teams through verified shared memory"
+  default_prompt: "Use $cognitive-bus to coordinate this task across an AI team with typed evidence-backed memory packets."
