@@ -1087,8 +1087,8 @@ async function insertEpisode(row) {
             `SELECT COUNT(*) AS count FROM collab_toolcall_episodes WHERE args_hash = ?`,
             [argsHash],
         );
-        const repeatIndex = Number(countResult.rows[0]?.count || 0);
-        const insertResult = await tx.execute(`
+        const txRepeatIndex = Number(countResult.rows[0]?.count || 0);
+        const txInsertResult = await tx.execute(`
             INSERT INTO collab_toolcall_episodes
               (session_id, agent_id, tool_name, target_path, target_symbol,
                args_hash, why_family, why_hex, staleness_kind, staleness_key,
@@ -1099,9 +1099,9 @@ async function insertEpisode(row) {
             sessionId, agentId, toolName, targetPath, targetSymbol,
             argsHash, whyFamily, whyHex, stalenessKind, stalenessKey,
             resultText, resultDigest, resultBytes, truncated ? 1 : 0,
-            repeatIndex, bytecode,
+            txRepeatIndex, bytecode,
         ]);
-        return { repeatIndex, insertResult };
+        return { repeatIndex: txRepeatIndex, insertResult: txInsertResult };
     });
 
     return {
