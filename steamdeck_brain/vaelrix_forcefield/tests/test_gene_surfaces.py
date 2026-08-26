@@ -24,6 +24,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import uuid
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -294,13 +295,277 @@ class TestInjectionGateUsesMeasurement(unittest.TestCase):
                 "undatable gene was blocked; this would mute the whole registry")
 
 
+class TestUnverifiableIsNotUndatable(unittest.TestCase):
+    """Three states the gate must keep apart.
+
+      * UNDATABLE  -- the gene declares no surfaces. A deliberate, backward
+        compatible state: freshness is the literal, and the gate passes,
+        because blocking here would mute every gene written before surfaces
+        existed.
+      * MEASURED   -- every probe ran. Use the number they produced.
+      * UNVERIFIABLE -- the gene DOES name code, but the measurement could not
+        be completed: no git, no stamp, a probe that failed, an exception.
+
+    Collapsing the third into the first is a fail-open. The gene is claiming
+    authority over code nobody could date, and its declared 0.9 then walks it
+    straight past MIN_FRESHNESS. "We could not check" must never be served as
+    "we checked and it was fine".
+    """
+
+    def _gene(self, surfaces, declared=0.9):
+        g = RetrievalGene()
+        g.identity.stableId = "TEST_GENE"
+        g.domain.surfaces = list(surfaces)
+        g.retrieval.freshness = declared
+        return g
+
+    def test_surfaces_outside_a_git_repo_are_unverifiable_not_declared(self):
+        with tempfile.TemporaryDirectory() as d:
+            v = GF.gene_freshness(self._gene(["src/**"]), d, stamp="deadbeef")
+            self.assertEqual(v["basis"], "unverifiable", v)
+            self.assertTrue(v["unverifiable"])
+
+    def test_the_gate_refuses_a_gene_it_could_not_date(self):
+        from vaelrix_forcefield.scdna import inject
+        with tempfile.TemporaryDirectory() as d:
+            g = self._gene(["src/**"], declared=0.99)
+            self.assertFalse(
+                inject.passes_freshness(g, repo_root=d, stamp="deadbeef"),
+                "a gene naming code nobody could date rode its declared "
+                "literal past the gate")
+
+    def test_a_crash_in_the_measurement_does_not_fall_back_to_the_literal(self):
+        """The exact fail-open: a broken instrument re-admits every gene.
+
+        `except Exception: return declared >= MIN` means any defect in
+        gene_freshness silently restores the pre-surfaces behaviour, and the
+        gate this work exists to build stops existing again -- with the
+        machinery still in place to make it look present.
+        """
+        from vaelrix_forcefield.scdna import inject
+
+        def boom(*a, **kw):
+            raise RuntimeError("instrument defect")
+
+        orig = GF.effective_freshness
+        GF.effective_freshness = boom
+        try:
+            g = self._gene(["src/**"], declared=0.99)
+            self.assertFalse(inject.passes_freshness(g, repo_root=str(REPO_ROOT)),
+                             "measurement crashed and the gene was admitted anyway")
+        finally:
+            GF.effective_freshness = orig
+
+    def test_a_crash_is_not_silent(self):
+        from vaelrix_forcefield.scdna import inject
+
+        def boom(*a, **kw):
+            raise RuntimeError("instrument defect")
+
+        orig = GF.effective_freshness
+        GF.effective_freshness = boom
+        try:
+            g = self._gene(["src/**"])
+            with self.assertLogs("vaelrix_forcefield.scdna.inject", "ERROR") as cm:
+                inject.passes_freshness(g, repo_root=str(REPO_ROOT))
+            self.assertIn("TEST_GENE", "\n".join(cm.output))
+        finally:
+            GF.effective_freshness = orig
+
+    def _probe_fails_on(self, needle):
+        """A `_git` that works until the named subcommand, then fails.
+
+        Every other fixture in this file shares one habit: git works for the
+        whole run. That habit is why "report the surviving probes as MEASURED"
+        survived a mutation sweep -- no test could reach the branch. A probe
+        can die partway (a lock, a timeout, a huge status) and the answer that
+        comes back is then a PARTIAL check wearing a complete check's label.
+        """
+        real = GF._git
+
+        def flaky(root, *args):
+            if needle in args:
+                return None
+            return real(root, *args)
+        return real, flaky
+
+    def test_a_failed_surface_probe_is_not_a_measurement(self):
+        with TempRepo() as r:
+            real, flaky = self._probe_fails_on("log")
+            GF._git = flaky
+            try:
+                v = GF.gene_freshness(self._gene(["src/**"]), str(r.root),
+                                      stamp=r.stamp)
+            finally:
+                GF._git = real
+            self.assertEqual(v["basis"], "unverifiable", v)
+            self.assertIn("could not be run", v["reason"])
+
+    def test_a_failed_worktree_probe_is_not_a_measurement(self):
+        """The log can say "no commits touched it" while an uncommitted edit
+        sits under the same surface. If `git status` did not run, the clean
+        log is half an answer, not a clean bill of health."""
+        with TempRepo() as r:
+            real, flaky = self._probe_fails_on("status")
+            GF._git = flaky
+            try:
+                v = GF.gene_freshness(self._gene(["src/**"]), str(r.root),
+                                      stamp=r.stamp)
+            finally:
+                GF._git = real
+            self.assertEqual(v["basis"], "unverifiable", v)
+            self.assertFalse(v["stale"], "log saw no drift; that part is true")
+
+    def test_the_gate_refuses_a_partially_probed_gene(self):
+        from vaelrix_forcefield.scdna import inject
+        with TempRepo() as r:
+            real, flaky = self._probe_fails_on("status")
+            GF._git = flaky
+            try:
+                ok = inject.passes_freshness(self._gene(["src/**"], declared=0.99),
+                                             repo_root=str(r.root), stamp=r.stamp)
+            finally:
+                GF._git = real
+            self.assertFalse(ok, "a half-run measurement passed as a clean one")
+
+    def test_undatable_by_design_is_still_admitted(self):
+        """The other half of the law: no surfaces must NOT become blocked."""
+        from vaelrix_forcefield.scdna import inject
+        with tempfile.TemporaryDirectory() as d:
+            self.assertTrue(
+                inject.passes_freshness(self._gene([]), repo_root=d),
+                "a gene with no surfaces was blocked; that mutes the registry")
+
+    def test_resolver_does_not_call_an_undated_gene_resolved(self):
+        """RESOLVED asserts the answer was checked. Unverifiable was not."""
+        from vaelrix_forcefield.scdna import resolver as R
+        g = self._gene(["src/**"])
+        g.identity.stableId = "UNVERIFIABLE_GENE_UNDER_TEST"
+        with tempfile.TemporaryDirectory() as d:
+            v = R.resolve(g.identity.stableId, d,
+                          registry={g.identity.stableId: g})
+            self.assertEqual(v["kind"], "CLARIFY", v)
+            self.assertEqual(v["freshness"]["basis"], "unverifiable")
+
+
+class TestPerGeneStamp(unittest.TestCase):
+    """A registry-wide stamp launders staleness.
+
+    Genes live together in registry.py, so "the last commit touching
+    registry.py" is shared by all of them. Edit gene B for any reason -- fix a
+    typo, add a gene -- and gene A's baseline jumps forward past drift that
+    already happened under gene A's surfaces. The drift is still there; the
+    measurement just stops being able to see it, and gene A silently reads
+    fresh again. A stamp has to belong to the gene it dates.
+    """
+
+    REG = Path("steamdeck_brain") / "vaelrix_forcefield" / "scdna" / "registry.py"
+    JSON = Path("steamdeck_brain") / "vaelrix_forcefield" / "scdna" / "compiler.json"
+
+    def _repo(self, tmp):
+        root = Path(tmp)
+        git(root, "init", "-q")
+        git(root, "config", "user.email", "t@t.t")
+        git(root, "config", "user.name", "t")
+        (root / "src").mkdir()
+        (root / "src" / "paint.js").write_text("// paint\n")
+        (root / self.REG).parent.mkdir(parents=True)
+        (root / self.REG).write_text(
+            'GENE_A = "TEST_GENE_ALPHA"\nGENE_B = "TEST_GENE_BETA"\n')
+        # Most genes live HERE, not in registry.py -- load_injection_registry
+        # merges both, and only 3 of the 13 it yields are Python defaults.
+        (root / self.JSON).write_text('{"TEST_GENE_GAMMA": {}}\n')
+        git(root, "add", "-A")
+        git(root, "commit", "-qm", "init")
+        return root
+
+    def _gene(self, stable_id, surfaces):
+        g = RetrievalGene()
+        g.identity.stableId = stable_id
+        g.domain.surfaces = list(surfaces)
+        g.retrieval.freshness = 0.9
+        return g
+
+    def test_editing_another_gene_does_not_relaunder_this_ones_drift(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self._repo(tmp)
+            gene_a = self._gene("TEST_GENE_ALPHA", ["src/**"])
+
+            # Drift under GENE_A's surface.
+            (root / "src" / "paint.js").write_text("// drifted\n")
+            git(root, "add", "-A")
+            git(root, "commit", "-qm", "drift under alpha")
+
+            v = GF.gene_freshness(gene_a, str(root))
+            self.assertTrue(v["stale"], f"fixture never went stale: {v}")
+
+            # Now touch GENE_B only. Nothing about GENE_A changed, and the
+            # drift under src/ is still there and still unreviewed.
+            (root / self.REG).write_text(
+                'GENE_A = "TEST_GENE_ALPHA"\nGENE_B = "TEST_GENE_BETA"  # note\n')
+            git(root, "add", "-A")
+            git(root, "commit", "-qm", "unrelated edit to gene B")
+
+            v = GF.gene_freshness(gene_a, str(root))
+            self.assertTrue(
+                v["stale"],
+                "an unrelated edit to another gene reset this gene's baseline "
+                f"and hid its drift: {v}")
+
+    def test_a_json_only_gene_can_still_be_dated(self):
+        """The registry is two files, so the stamp has to look at both.
+
+        `load_injection_registry` merges compiler.json with the Python
+        defaults; 10 of the 13 genes it yields are named ONLY in the JSON.
+        Dating those against registry.py alone reports "no assertion point"
+        for a gene that plainly has one -- refusing it for a reason that is
+        an artefact of where the search looked.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self._repo(tmp)
+            gamma = self._gene("TEST_GENE_GAMMA", ["src/**"])
+
+            v = GF.gene_freshness(gamma, str(root))
+            self.assertEqual(v["basis"], "measured", v)
+            self.assertFalse(v["stale"], v)
+
+            (root / "src" / "paint.js").write_text("// drifted\n")
+            git(root, "add", "-A")
+            git(root, "commit", "-qm", "drift under gamma")
+            v = GF.gene_freshness(gamma, str(root))
+            self.assertTrue(v["stale"], v)
+
+    def test_a_gene_absent_from_the_registry_is_unverifiable(self):
+        """No assertion point means no measurement, and no measurement is
+        not the same as a clean one."""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self._repo(tmp)
+            ghost = self._gene("TEST_GENE_" + uuid.uuid4().hex.upper(), ["src/**"])
+            v = GF.gene_freshness(ghost, str(root))
+            self.assertEqual(v["basis"], "unverifiable", v)
+            self.assertIn("stamp", v["reason"].lower())
+
+    def test_an_explicit_stamp_still_wins(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self._repo(tmp)
+            stamp = git(root, "rev-parse", "HEAD")
+            gene_a = self._gene("TEST_GENE_ALPHA", ["src/**"])
+            (root / "src" / "paint.js").write_text("// drifted\n")
+            git(root, "add", "-A")
+            git(root, "commit", "-qm", "drift")
+            v = GF.gene_freshness(gene_a, str(root), stamp=stamp)
+            self.assertEqual(v["stampedAt"], stamp)
+            self.assertTrue(v["stale"], v)
+
+
 class TestRegistryReality(unittest.TestCase):
 
     def test_every_registry_gene_reports_its_surface_state(self):
         """No gene may be silent about whether it can be dated."""
         for gene_id, gene in DEFAULT_GENE_REGISTRY.items():
             v = GF.gene_freshness(gene, str(REPO_ROOT))
-            self.assertIn(v["basis"], ("measured", "declared"), (gene_id, v))
+            self.assertIn(v["basis"], ("measured", "declared", "unverifiable"),
+                          (gene_id, v))
             if not gene.domain.surfaces:
                 self.assertTrue(v["unverifiable"],
                                 f"{gene_id} has no surfaces but is not unverifiable")

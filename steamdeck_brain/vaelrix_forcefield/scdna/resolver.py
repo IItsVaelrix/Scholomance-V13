@@ -125,7 +125,8 @@ def _measured(packet, repo_root, directory):
 
 def resolve(query, repo_root: str | None = None, *,
             glossary_path: str | None = None,
-            capability_dir: str | None = None) -> dict:
+            capability_dir: str | None = None,
+            registry: dict | None = None) -> dict:
     """Resolve one identifier. Never guesses; never answers without a basis."""
     root = os.path.abspath(repo_root or REPO_ROOT)
     directory = Path(capability_dir) if capability_dir else CAPABILITY_DIR
@@ -184,7 +185,7 @@ def resolve(query, repo_root: str | None = None, *,
 
     # -- gene stableId ------------------------------------------------------
     if _GENE_ID.match(q):
-        genes = _load_genes()
+        genes = _load_genes() if registry is None else registry
         gene = genes.get(q)
         if gene is not None:
             d = gene.to_dict() if hasattr(gene, "to_dict") else dict(gene)
@@ -212,7 +213,11 @@ def resolve(query, repo_root: str | None = None, *,
                 "commitsBehind": gv["commitsBehind"],
                 "reason": gv["reason"],
             }
-            kind = CLARIFY if gv["stale"] else RESOLVED
+            # RESOLVED asserts the answer was checked. A gene that names code
+            # nobody could date was not checked, so it gets the same verdict as
+            # one known to have drifted: a bounded question, not an answer.
+            kind = (CLARIFY if gv["stale"] or gv["basis"] == _gf.UNVERIFIABLE
+                    else RESOLVED)
             return _verdict(q, kind, "gene", module, fr,
                             reason=f"gene {q} found in the registry; " + gv["reason"])
         return _verdict(q, THEORY, reason="no gene with that stableId is registered")

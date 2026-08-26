@@ -13,12 +13,15 @@ shrinks the prompt to domain-salient tokens first.
 from __future__ import annotations
 
 import json
+import logging
 import sys
 
 from .compiler import DEFAULT_REGISTRY_PATH, _load_json_registry
 from .detector import detect_gene_matches, normalize_text, tokenize
 from .registry import DEFAULT_GENE_REGISTRY, GeneRegistry
 from .types import RetrievalGene
+
+_log = logging.getLogger(__name__)
 
 STOPWORDS: frozenset[str] = frozenset({
     "the", "and", "for", "with", "this", "that", "you", "your", "our", "can",
@@ -83,16 +86,34 @@ def passes_freshness(gene: RetrievalGene, *, repo_root: str | None = None,
                      stamp: str | None = None) -> bool:
     """Gate on the MEASURED value when the gene declares surfaces.
 
-    A gene that declares no surfaces cannot be dated, and "undatable" must not
-    become "blocked": that would mute every gene written before surfaces
-    existed. It falls back to the declared literal, exactly as before, and
-    `effective_freshness` reports `basis` so the difference stays visible.
+    Three states, three answers:
+
+      * UNDATABLE (no surfaces) -- the declared literal stands and the gate
+        passes. "Undatable" must not become "blocked": that would mute every
+        gene written before surfaces existed.
+      * MEASURED -- gate on the number the probes produced.
+      * UNVERIFIABLE -- the gene names code that could not be dated. REFUSE.
+        Falling back to the literal here is the whole defect this gate exists
+        to remove: a broken probe would silently restore the pre-surfaces
+        behaviour while leaving the machinery in place to make the gate look
+        present. A crash is the loudest version of the same thing, so it is
+        refused too, and logged -- a refusal nobody can see is its own defect.
     """
-    from .gene_freshness import effective_freshness
+    from . import gene_freshness as _gf
     try:
-        eff = effective_freshness(gene, repo_root, stamp=stamp)
+        eff = _gf.effective_freshness(gene, repo_root, stamp=stamp)
     except Exception:
-        return gene.retrieval.freshness >= MIN_FRESHNESS
+        _log.exception(
+            "freshness measurement failed for gene %s; refusing to inject it, "
+            "because a broken instrument must not read as a clean bill of health",
+            getattr(getattr(gene, "identity", None), "stableId", "<unknown>"))
+        return False
+    if not eff["gateable"]:
+        _log.warning("gene %s declares surfaces but could not be dated (%s); "
+                     "refusing to inject it",
+                     getattr(getattr(gene, "identity", None), "stableId", "<unknown>"),
+                     eff["reason"])
+        return False
     return eff["value"] >= MIN_FRESHNESS
 
 

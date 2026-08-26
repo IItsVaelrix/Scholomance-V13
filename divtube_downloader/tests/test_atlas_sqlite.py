@@ -19,6 +19,7 @@ import os
 import random
 import tempfile
 import unittest
+import uuid
 
 from tui.services import code_atlas
 
@@ -148,8 +149,20 @@ class TestSqliteMatchesJson(unittest.TestCase):
         # A run that is absent from the postings must kill the whole query.
         # With a project root the literal check would hide a backend that
         # merely skips the missing run; rootless, nothing hides it.
-        absent = "qqzzxx_not_a_token_in_this_repo"
-        self.assertNotIn(absent, postings)
+        #
+        # The token is MINTED, not written down. A literal like
+        # "not_a_token_in_this_repo" is a claim about the repo that the act of
+        # making it falsifies: this file is inside the corpus the atlas
+        # indexes, so the next rebuild puts the sentinel into `postings` and
+        # the assertion below goes red for a reason that has nothing to do
+        # with either backend. A uuid never touches disk, so it cannot be
+        # indexed, and the guard becomes a fact instead of a promise.
+        absent = "absent_" + uuid.uuid4().hex
+        # Not assertNotIn: on failure it renders all 201,953 postings.
+        self.assertTrue(absent not in postings,
+                        f"minted sentinel {absent!r} collided with a real token")
+        self.assertTrue(code_atlas._HYPHEN_QUERY_RE.match(absent),
+                        f"sentinel {absent!r} is not a legal query token")
         for q in (f"{common[0]}-{absent}", f"{absent}-{common[0]}", f"{absent}-{absent}"):
             self.assertEqual(
                 rootless_json.refs(q, max_files=10_000),
