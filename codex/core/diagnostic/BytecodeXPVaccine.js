@@ -7,15 +7,17 @@ export const BYTECODE_XP_SOURCE_KINDS = Object.freeze({
   ERROR: 'error',
   HEALTH: 'health',
   CCCB: 'cccb',
+  TOOLCALL: 'toolcall',
 });
 
 const BYTECODE_SOURCE_SEGMENTS = Object.freeze({
   error: 'ERR',
   health: 'HLTH',
   cccb: 'CCCB',
+  toolcall: 'TCL',
 });
 
-const BYTECODE_PATTERN = /^PB-XP-v1-(ERR|HLTH|CCCB)-([A-Z0-9]{4,8})-([0-9a-f]{12})-([0-9a-f]{12})$/;
+const BYTECODE_PATTERN = /^PB-XP-v1-(ERR|HLTH|CCCB|TCL)-([A-Z0-9]{4,8})-([0-9a-f]{12})-([0-9a-f]{12})$/;
 
 export class BytecodeXPVaccine {
   constructor({ sourceKind, sourceBytecode = null, semanticSlug, fingerprint, recoveryKey = null, stableContext = {} }) {
@@ -158,6 +160,43 @@ export function encodeBytecodeXPVaccineFromCccb(blockOrId, options = {}) {
     semanticSlug: options.semanticSlug || parsed.semanticSlug,
     recoveryKey: options.recoveryKey || `PDR_CCCB_${parsed.domain}_${parsed.phaseId}_${parsed.stepNum}`,
     stableContext,
+  });
+}
+
+/**
+ * A navigation tool call is an EPISODE, not a diagnosis: it records that the
+ * agent looked, at what, and why. The vaccine gives that record a tamper-evident
+ * identity on the same wire as errors and health checks.
+ *
+ * `createdAt` is deliberately NOT in stableContext. Two identical looks at an
+ * identical target must produce an identical fingerprint, or repeat detection
+ * (the whole point) cannot work.
+ */
+export function encodeBytecodeXPVaccineFromToolCall(episode, options = {}) {
+  const title = options.title || [
+    'toolcall',
+    episode?.toolName || 'tool',
+    episode?.whyFamily || 'NAV',
+    episode?.targetPath || '',
+    episode?.targetSymbol || '',
+  ].join(' ');
+
+  return new BytecodeXPVaccine({
+    sourceKind: BYTECODE_XP_SOURCE_KINDS.TOOLCALL,
+    sourceBytecode: null,
+    semanticSlug: options.semanticSlug || safeSemanticSlug(title),
+    recoveryKey: options.recoveryKey || episode?.whyFamily || null,
+    stableContext: pickStableKeys({
+      toolName: episode?.toolName || null,
+      targetPath: episode?.targetPath || null,
+      targetSymbol: episode?.targetSymbol || null,
+      argsHash: episode?.argsHash || null,
+      whyFamily: episode?.whyFamily || null,
+      whyHex: episode?.whyHex || null,
+      stalenessKind: episode?.stalenessKind || null,
+      stalenessKey: episode?.stalenessKey || null,
+      ...options.stableContext,
+    }),
   });
 }
 
