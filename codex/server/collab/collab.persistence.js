@@ -344,6 +344,38 @@ const COLLAB_MIGRATIONS = [
             }
         },
     },
+    {
+        version: 17,
+        name: 'create_toolcall_episodes',
+        up(database) {
+            database.exec(`
+                CREATE TABLE IF NOT EXISTS collab_toolcall_episodes (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    session_id TEXT NOT NULL,
+                    agent_id TEXT NOT NULL DEFAULT '',
+                    tool_name TEXT NOT NULL,
+                    target_path TEXT,
+                    target_symbol TEXT,
+                    args_hash TEXT NOT NULL,
+                    why_family TEXT NOT NULL,
+                    why_hex TEXT NOT NULL,
+                    staleness_kind TEXT NOT NULL DEFAULT 'none',
+                    staleness_key TEXT,
+                    result_text TEXT,
+                    result_digest TEXT NOT NULL,
+                    result_bytes INTEGER NOT NULL DEFAULT 0,
+                    truncated INTEGER NOT NULL DEFAULT 0,
+                    repeat_index INTEGER NOT NULL DEFAULT 0,
+                    bytecode TEXT NOT NULL,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                );
+                CREATE INDEX IF NOT EXISTS idx_episodes_args ON collab_toolcall_episodes(args_hash);
+                CREATE INDEX IF NOT EXISTS idx_episodes_tool_path ON collab_toolcall_episodes(tool_name, target_path);
+                CREATE INDEX IF NOT EXISTS idx_episodes_session ON collab_toolcall_episodes(session_id, created_at);
+                CREATE INDEX IF NOT EXISTS idx_episodes_created ON collab_toolcall_episodes(created_at);
+            `);
+        },
+    },
 ];
 
 let db; // The wrapper
@@ -1019,6 +1051,85 @@ async function deleteMemory(agentId, key) {
     return result.rowsAffected > 0;
 }
 
+// --- Toolcall Episodes ---
+
+// Mirrors episode_store.py's record(): repeat_index is COUNT(*) of prior rows
+// sharing args_hash, computed and inserted inside one transaction so the
+// count-then-insert pair cannot interleave with another concurrent insert.
+// db.transaction() (persistence.wrapper.js) funnels its whole callback through
+// the single-file write queue (sqliteWriteQueue.js) as ONE enqueued job — the
+// queue never starts the next job until this one's promise has fully settled
+// — which is this file's process-local analogue of Python's BEGIN IMMEDIATE:
+// two concurrent insertEpisode() calls are strictly serialized end-to-end,
+// so no two rows for the same args_hash can ever be allocated the same
+// repeat_index.
+async function insertEpisode(row) {
+    const {
+        sessionId,
+        agentId = '',
+        toolName,
+        targetPath = null,
+        targetSymbol = null,
+        argsHash,
+        whyFamily,
+        whyHex,
+        stalenessKind = 'none',
+        stalenessKey = null,
+        resultText = null,
+        resultDigest,
+        resultBytes = 0,
+        truncated = 0,
+        bytecode,
+    } = row || {};
+
+    const [{ repeatIndex, insertResult }] = await db.transaction(async (tx) => {
+        const countResult = await tx.execute(
+            `SELECT COUNT(*) AS count FROM collab_toolcall_episodes WHERE args_hash = ?`,
+            [argsHash],
+        );
+        const txRepeatIndex = Number(countResult.rows[0]?.count || 0);
+        const txInsertResult = await tx.execute(`
+            INSERT INTO collab_toolcall_episodes
+              (session_id, agent_id, tool_name, target_path, target_symbol,
+               args_hash, why_family, why_hex, staleness_kind, staleness_key,
+               result_text, result_digest, result_bytes, truncated,
+               repeat_index, bytecode)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [
+            sessionId, agentId, toolName, targetPath, targetSymbol,
+            argsHash, whyFamily, whyHex, stalenessKind, stalenessKey,
+            resultText, resultDigest, resultBytes, truncated ? 1 : 0,
+            txRepeatIndex, bytecode,
+        ]);
+        return { repeatIndex: txRepeatIndex, insertResult: txInsertResult };
+    });
+
+    return {
+        id: insertResult.lastInsertRowid ?? null,
+        repeatIndex,
+    };
+}
+
+async function lookupEpisode(argsHash, stalenessKind, stalenessKey) {
+    if (stalenessKey == null || stalenessKind === 'none') return null;
+    const result = await db.execute(`
+        SELECT * FROM collab_toolcall_episodes
+        WHERE args_hash = ? AND staleness_kind = ? AND staleness_key = ?
+          AND result_text IS NOT NULL
+        ORDER BY id DESC LIMIT 1
+    `, [argsHash, stalenessKind, stalenessKey]);
+    return result.rows[0] || null;
+}
+
+async function getEpisodesForSession(sessionId) {
+    const result = await db.execute(`
+        SELECT * FROM collab_toolcall_episodes
+        WHERE session_id = ?
+        ORDER BY id ASC
+    `, [sessionId]);
+    return result.rows;
+}
+
 // --- Bug Reports ---
 
 async function createBugReport(input) {
@@ -1563,6 +1674,11 @@ const collabPersistence = {
         get: getMemory,
         getAll: getAllMemories,
         delete: deleteMemory,
+    },
+    episodes: {
+        insert: insertEpisode,
+        lookup: lookupEpisode,
+        getForSession: getEpisodesForSession,
     },
     agent_keys: {
         create: createAgentKey,

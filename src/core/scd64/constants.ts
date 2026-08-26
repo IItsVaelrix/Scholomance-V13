@@ -110,3 +110,29 @@ export const CLAIM_KIND_VERSION_BYTE: Record<string, string> = Object.freeze({
   CAUSES: "B5",
   [MEMORY_UNBOUND]: "B0",
 });
+
+// ─── NAV Domain (Tool-Call Episodic Ledger) ─────────────────────────────────
+// The fourth domain on the eight-slot wire. A NAV record encodes one act of
+// LOOKING — which tool, at what, why, and what the target looked like at the
+// time. Each alias inherits its slot's structural role, exactly as MEMORY's do:
+//   BUGCLASS  names WHAT KIND of thing this is    -> NAV_INTENT
+//   COORDSYS  names the frame it was measured in  -> NAV_SCOPE
+//   INVARIANT names what must hold                -> NAV_FRESHNESS
+//   MAGNITUDE names how much                      -> NAV_BREADTH
+//   MASKING   names what is excluded / hidden     -> NAV_BLINDSPOT
+//   GATE      names the admission decision        -> NAV_ADMISSION
+//   PROPAGATE names how it reaches other things   -> NAV_FEEDS
+//   VERDICT   names the call, and what undoes it  -> NAV_INVALIDATES_IF
+
+export const NAV_SLOT_ALIASES = Object.freeze({
+  BUGCLASS:  "NAV_INTENT",
+  COORDSYS:  "NAV_SCOPE",
+  INVARIANT: "NAV_FRESHNESS",
+  MAGNITUDE: "NAV_BREADTH",
+  MASKING:   "NAV_BLINDSPOT",
+  GATE:      "NAV_ADMISSION",
+  PROPAGATE: "NAV_FEEDS",
+  VERDICT:   "NAV_INVALIDATES_IF",
+} as const);
+
+export type NavSlotAlias = typeof NAV_SLOT_ALIASES[keyof typeof NAV_SLOT_ALIASES];

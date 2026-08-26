@@ -6,6 +6,7 @@ import {
   encodeBytecodeXPVaccineFromCccb,
   encodeBytecodeXPVaccineFromError,
   encodeBytecodeXPVaccineFromHealth,
+  encodeBytecodeXPVaccineFromToolCall,
   parseBytecodeXPVaccineBytecode,
 } from '../../codex/core/diagnostic/BytecodeXPVaccine.js';
 
@@ -129,6 +130,98 @@ describe('BytecodeXPVaccine', () => {
     expect(a.semanticSlug).toMatch(/^[A-Z0-9]{4,8}$/);
     expect(a.semanticSlug).toBe(b.semanticSlug);
     expect(a.bytecode).toMatch(/^PB-XP-v1-ERR-[A-Z0-9]{4,8}-[0-9a-f]{12}-[0-9a-f]{12}$/);
+  });
+
+  it('encodes deterministic vaccines from a tool-call episode', () => {
+    const episode = {
+      toolName: 'Read',
+      targetPath: 'codex/core/example.js',
+      targetSymbol: 'exampleFn',
+      argsHash: 'abc123',
+      whyFamily: 'NAV',
+      whyHex: '0x1A',
+      stalenessKind: 'fresh',
+      stalenessKey: 'k1',
+    };
+
+    const a = encodeBytecodeXPVaccineFromToolCall(episode);
+    const b = encodeBytecodeXPVaccineFromToolCall(episode);
+
+    expect(a.toJSON()).toEqual(b.toJSON());
+    expect(a.bytecode).toMatch(/^PB-XP-v1-TCL-[A-Z0-9]{4,8}-[0-9a-f]{12}-[0-9a-f]{12}$/);
+    expect(a.sourceKind).toBe('toolcall');
+    expect(a.sourceBytecode).toBeNull();
+    expect(a.recoveryKey).toBe('NAV');
+    expect(a.stableContext).toMatchObject({
+      toolName: 'Read',
+      targetPath: 'codex/core/example.js',
+      targetSymbol: 'exampleFn',
+      argsHash: 'abc123',
+      whyFamily: 'NAV',
+      whyHex: '0x1A',
+      stalenessKind: 'fresh',
+      stalenessKey: 'k1',
+    });
+  });
+
+  it('produces a different fingerprint when tool-call identity changes', () => {
+    const a = encodeBytecodeXPVaccineFromToolCall({
+      toolName: 'Read',
+      targetPath: 'codex/core/a.js',
+      whyFamily: 'NAV',
+    });
+    const b = encodeBytecodeXPVaccineFromToolCall({
+      toolName: 'Read',
+      targetPath: 'codex/core/b.js',
+      whyFamily: 'NAV',
+    });
+
+    expect(a.checksum).not.toBe(b.checksum);
+    expect(a.fingerprint).not.toBe(b.fingerprint);
+  });
+
+  it('produces an identical bytecode regardless of createdAt (timestamp-independent repeat detection)', () => {
+    const base = {
+      toolName: 'Grep',
+      targetPath: 'codex/core/example.js',
+      targetSymbol: 'exampleFn',
+      whyFamily: 'NAV',
+    };
+
+    const first = encodeBytecodeXPVaccineFromToolCall({ ...base, createdAt: '2026-01-01T00:00:00.000Z' });
+    const second = encodeBytecodeXPVaccineFromToolCall({ ...base, createdAt: '2099-12-31T23:59:59.999Z' });
+
+    expect(first.bytecode).toBe(second.bytecode);
+    expect(first.stableContext).not.toHaveProperty('createdAt');
+    expect(second.stableContext).not.toHaveProperty('createdAt');
+  });
+
+  it('parses TOOLCALL bytecode headers', () => {
+    const vaccine = encodeBytecodeXPVaccineFromToolCall({
+      toolName: 'Read',
+      targetPath: 'codex/core/example.js',
+      whyFamily: 'NAV',
+    });
+    const parsed = parseBytecodeXPVaccineBytecode(vaccine.bytecode);
+
+    expect(parsed).toMatchObject({
+      valid: true,
+      sourceKind: 'toolcall',
+      semanticSlug: vaccine.semanticSlug,
+      fingerprint: vaccine.fingerprint,
+      checksum: vaccine.checksum,
+      vaccineId: vaccine.vaccineId,
+    });
+  });
+
+  it('adding TOOLCALL does not move any existing bytecode', () => {
+    const v = encodeBytecodeXPVaccineFromHealth(
+      { cellId: 'c1', checkId: 'k1', code: 'X', moduleId: 'm', context: {} });
+    expect(v.bytecode).toMatch(/^PB-XP-v1-HLTH-/);
+    expect(parseBytecodeXPVaccineBytecode(v.bytecode).valid).toBe(true);
+    // Golden value pinned pre-TOOLCALL: catches drift the prefix regex alone
+    // would miss (e.g. a stray key rename inside BYTECODE_SOURCE_SEGMENTS).
+    expect(v.bytecode).toBe('PB-XP-v1-HLTH-C1K1XM-9f935081eb5b-ae57da87f5cf');
   });
 
   it('supports direct construction with explicit fingerprint', () => {

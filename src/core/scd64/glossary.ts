@@ -1,8 +1,8 @@
 import crypto from 'node:crypto';
 import type { SCD64RemediationHint } from './types';
-import { SCD64_SLOT_NAMES, ART_SLOT_ALIASES, MEMORY_SLOT_ALIASES } from './constants';
+import { SCD64_SLOT_NAMES, ART_SLOT_ALIASES, MEMORY_SLOT_ALIASES, NAV_SLOT_ALIASES } from './constants';
 
-export { SCD64_SLOT_NAMES, ART_SLOT_ALIASES, MEMORY_SLOT_ALIASES };
+export { SCD64_SLOT_NAMES, ART_SLOT_ALIASES, MEMORY_SLOT_ALIASES, NAV_SLOT_ALIASES };
 
 export const BUG_FAMILIES = Object.freeze({
   COLOR_DRAGON: Object.freeze({
@@ -348,6 +348,114 @@ export const MEMORY_FAMILIES = Object.freeze({
   }),
 });
 
+/**
+ * NAV families — one SCD64 encodes one act of looking.
+ *
+ * A family names WHY a navigation tool was called. The set is deliberately
+ * small and hand-authored, exactly like BUG/ART/MEMORY: SCD64 hexes are
+ * precomputed from canonical strings and frozen, so an intent that is not
+ * authored here has no address and cannot be encoded. That is the constraint,
+ * not a limitation — an unbounded intent space would make decodeSCD64Hover
+ * unable to explain its own output.
+ */
+export const NAV_FAMILIES = Object.freeze({
+  NAV_ORIENT: Object.freeze({
+    versionByte: 'D1',
+    predictedVersionByte: '71',
+    domain: 'NAV',
+    description: 'Cold orientation: build a map of an area the agent has no position in yet.',
+    canonicals: Object.freeze([
+      { slot: 'BUGCLASS',  canonical: 'NAV_INTENT:ORIENT' },
+      { slot: 'COORDSYS',  canonical: 'NAV_SCOPE:subtree' },
+      { slot: 'INVARIANT', canonical: 'NAV_FRESHNESS:git-subtree-clean' },
+      { slot: 'MAGNITUDE', canonical: 'NAV_BREADTH:many-files' },
+      { slot: 'MASKING',   canonical: 'NAV_BLINDSPOT:depth-and-symbol-caps' },
+      { slot: 'GATE',      canonical: 'NAV_ADMISSION:recallable' },
+      { slot: 'PROPAGATE', canonical: 'NAV_FEEDS:source-episodes' },
+      { slot: 'VERDICT',   canonical: 'NAV_INVALIDATES_IF:subtree-dirty-or-head-moved' },
+    ]),
+  }),
+  NAV_LOCATE_DEFINITION: Object.freeze({
+    versionByte: 'D2',
+    predictedVersionByte: '72',
+    domain: 'NAV',
+    description: 'Locate one definition by name or line inside one known file.',
+    canonicals: Object.freeze([
+      { slot: 'BUGCLASS',  canonical: 'NAV_INTENT:LOCATE_DEFINITION' },
+      { slot: 'COORDSYS',  canonical: 'NAV_SCOPE:single-file' },
+      { slot: 'INVARIANT', canonical: 'NAV_FRESHNESS:file-sha256-match' },
+      { slot: 'MAGNITUDE', canonical: 'NAV_BREADTH:one-symbol' },
+      { slot: 'MASKING',   canonical: 'NAV_BLINDSPOT:body-line-cap' },
+      { slot: 'GATE',      canonical: 'NAV_ADMISSION:recallable' },
+      { slot: 'PROPAGATE', canonical: 'NAV_FEEDS:source-episodes' },
+      { slot: 'VERDICT',   canonical: 'NAV_INVALIDATES_IF:file-bytes-changed' },
+    ]),
+  }),
+  NAV_VERIFY_USAGE: Object.freeze({
+    versionByte: 'D3',
+    predictedVersionByte: '73',
+    domain: 'NAV',
+    description: 'Usage check: confirm how, or whether, a symbol is referenced anywhere else in the repo.',
+    canonicals: Object.freeze([
+      { slot: 'BUGCLASS',  canonical: 'NAV_INTENT:VERIFY_USAGE' },
+      { slot: 'COORDSYS',  canonical: 'NAV_SCOPE:repo-wide' },
+      // Must name the same invariant episode_staleness.KIND_REPO_CLEAN enforces
+      // (repo-clean-head) — refs cross-references the WHOLE repo, so a subtree
+      // or single-file key would be unsound (PDR §3.3 "WHY REFS NEEDS ITS OWN
+      // KIND"). Task 7's classifier routes microscope(refs=true) and
+      // atlas(refs|prefix) here; if this string drifted from the code's
+      // staleness_kind the two would silently disagree.
+      { slot: 'INVARIANT', canonical: 'NAV_FRESHNESS:repo-clean-head' },
+      { slot: 'MAGNITUDE', canonical: 'NAV_BREADTH:all-reference-sites' },
+      { slot: 'MASKING',   canonical: 'NAV_BLINDSPOT:reference-count-cap' },
+      { slot: 'GATE',      canonical: 'NAV_ADMISSION:recallable' },
+      { slot: 'PROPAGATE', canonical: 'NAV_FEEDS:source-episodes' },
+      { slot: 'VERDICT',   canonical: 'NAV_INVALIDATES_IF:any-tracked-file-in-repo-dirty' },
+    ]),
+  }),
+  NAV_RUNTIME_PROOF: Object.freeze({
+    versionByte: 'D4',
+    predictedVersionByte: '74',
+    domain: 'NAV',
+    description: 'Runtime proof: execute code to observe behaviour rather than infer it from source.',
+    canonicals: Object.freeze([
+      { slot: 'BUGCLASS',  canonical: 'NAV_INTENT:RUNTIME_PROOF' },
+      { slot: 'COORDSYS',  canonical: 'NAV_SCOPE:execution-context' },
+      // "none" names the same staleness kind episode_staleness.KIND_NONE does —
+      // there is no key to compare because there is nothing sound to recall.
+      { slot: 'INVARIANT', canonical: 'NAV_FRESHNESS:none' },
+      { slot: 'MAGNITUDE', canonical: 'NAV_BREADTH:one-execution' },
+      { slot: 'MASKING',   canonical: 'NAV_BLINDSPOT:side-effects-not-captured' },
+      // Must read never-recallable, not recallable: evaluate and
+      // microscope(eval=true) run non-deterministic code (PDR F9) and are
+      // logged but never served from cache — the glossary entry must say so,
+      // not contradict episode_staleness.is_recallable.
+      { slot: 'GATE',      canonical: 'NAV_ADMISSION:never-recallable' },
+      { slot: 'PROPAGATE', canonical: 'NAV_FEEDS:source-episodes' },
+      { slot: 'VERDICT',   canonical: 'NAV_INVALIDATES_IF:every-call-non-deterministic' },
+    ]),
+  }),
+  NAV_EDIT_VERIFY: Object.freeze({
+    versionByte: 'D5',
+    predictedVersionByte: '75',
+    domain: 'NAV',
+    description: 'Edit verification: look at a file this session itself just wrote, to confirm the edit landed.',
+    canonicals: Object.freeze([
+      { slot: 'BUGCLASS',  canonical: 'NAV_INTENT:EDIT_VERIFY' },
+      // Same scope as NAV_LOCATE_DEFINITION — checking one file, single-file.
+      { slot: 'COORDSYS',  canonical: 'NAV_SCOPE:single-file' },
+      // Same staleness kind as NAV_LOCATE_DEFINITION (file-sha256): both are
+      // sound off one file's bytes, so both name it the same way.
+      { slot: 'INVARIANT', canonical: 'NAV_FRESHNESS:file-sha256-match' },
+      { slot: 'MAGNITUDE', canonical: 'NAV_BREADTH:one-file' },
+      { slot: 'MASKING',   canonical: 'NAV_BLINDSPOT:pre-edit-state-not-diffed' },
+      { slot: 'GATE',      canonical: 'NAV_ADMISSION:recallable' },
+      { slot: 'PROPAGATE', canonical: 'NAV_FEEDS:source-episodes' },
+      { slot: 'VERDICT',   canonical: 'NAV_INVALIDATES_IF:file-bytes-changed-since-edit' },
+    ]),
+  }),
+});
+
 export function buildSCD64Glossary() {
   const out = [];
 
@@ -478,6 +586,55 @@ export function buildSCD64Glossary() {
         canonicalDerivationString: entry.canonical,
         humanMeaning: _humanMeaningForSlot(familyName, entry.slot),
         jsonFormulaTemplate: { name: memAlias.toLowerCase() },
+        fixedForever: true,
+        categoryChecksum: ""
+      };
+      glossaryEntry.categoryChecksum = crypto.createHash('sha256')
+        .update(JSON.stringify({
+          family: familyName,
+          slotName: entry.slot,
+          hexCode: hex,
+          canonical: entry.canonical,
+        }))
+        .digest('hex')
+        .slice(0, 16)
+        .toUpperCase();
+      out.push(Object.freeze(glossaryEntry));
+    }
+  }
+
+  // NAV families — same wire contract, navigation-domain interpretation
+  for (const [familyName, family] of Object.entries(NAV_FAMILIES)) {
+    const deriveHex = (canonical: string, isNavIntent: boolean) => {
+      const hash = crypto.createHash('sha256').update(canonical).digest('hex').toUpperCase();
+      if (isNavIntent) {
+        return family.versionByte + hash.slice(0, 6);
+      }
+      return hash.slice(0, 8);
+    };
+
+    for (let i = 0; i < family.canonicals.length; i += 1) {
+      const entry = family.canonicals[i];
+      const isNavIntent = entry.slot === 'BUGCLASS'; // NAV_INTENT maps to BUGCLASS slot
+      const hex = deriveHex(entry.canonical, isNavIntent);
+      const navAlias = NAV_SLOT_ALIASES[entry.slot as keyof typeof NAV_SLOT_ALIASES] ?? entry.slot;
+
+      const glossaryEntry = {
+        schema: 'SCD64_GLOSSARY_ENTRY',
+        schemaVersion: 1,
+        family: familyName,
+        domain: 'NAV' as const,
+        slotIndex: isNavIntent ? 0 : i,
+        slotName: entry.slot,
+        navSlotAlias: navAlias,
+        hexCode: hex,
+        versionByte: isNavIntent ? family.versionByte : undefined,
+        predictedVersionByte: isNavIntent ? family.predictedVersionByte : undefined,
+        category: familyName,
+        canonicalMeaning: entry.canonical.split(':').slice(1).join(':'),
+        canonicalDerivationString: entry.canonical,
+        humanMeaning: _humanMeaningForSlot(familyName, entry.slot),
+        jsonFormulaTemplate: { name: navAlias.toLowerCase() },
         fixedForever: true,
         categoryChecksum: ""
       };
