@@ -42,6 +42,9 @@ import os
 import subprocess
 from pathlib import Path
 
+_HERE = Path(__file__).resolve()
+REPO_ROOT = _HERE.parents[3]
+
 AUTHORED_FIELDS = ("canonical", "evidence", "forbidden", "need")
 _TIMEOUT = 20
 
@@ -180,6 +183,65 @@ def freshness(packet: dict, repo_root: str, *, packet_path: str | None = None) -
     return verdict
 
 
+def _symbol_check(packet: dict, repo_root: str) -> dict:
+    """Dead symbols via scripts/verify_capabilities.check_symbols.
+
+    That module resolves files against its own REPO_ROOT constant, so it can
+    only speak about the real checkout. Rather than silently returning "no dead
+    symbols" for any other root -- which would read as a clean bill of health --
+    this reports `ran: False` with the reason.
+    """
+    out = {"ran": False, "reason": "", "dead": []}
+    root = os.path.abspath(repo_root)
+    if root != os.path.abspath(str(REPO_ROOT)):
+        out["reason"] = (
+            f"symbol search resolves against {REPO_ROOT}, not {root}; "
+            "not run for this root"
+        )
+        return out
+
+    try:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location(
+            "_verify_capabilities", os.path.join(root, "scripts", "verify_capabilities.py"))
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+    except Exception as exc:
+        out["reason"] = f"verify_capabilities unavailable: {exc!r}"
+        return out
+
+    try:
+        for cap in packet.get("capabilities", []) or []:
+            symbols = mod._candidate_symbols(cap.get("canonical", ""))
+            if not symbols:
+                continue
+            files = mod._search_files(cap)
+            if not files:
+                continue
+            blobs = []
+            for f in files:
+                try:
+                    blobs.append(f.read_text(encoding="utf-8", errors="replace"))
+                except OSError:
+                    continue
+            if not blobs:
+                continue
+            where = ", ".join(str(f.relative_to(REPO_ROOT)) for f in files)
+            for sym in sorted(symbols):
+                if not any(sym in b for b in blobs):
+                    out["dead"].append({
+                        "symbol": sym, "need": cap.get("need"),
+                        "path": cap.get("path"), "where": where,
+                    })
+    except Exception as exc:
+        out["reason"] = f"symbol check errored: {exc!r}"
+        return out
+
+    out["ran"] = True
+    out["reason"] = f"{len(out['dead'])} dead symbol(s)"
+    return out
+
+
 def reconciliation_plan(packet: dict, repo_root: str, *,
                         packet_path: str | None = None) -> dict:
     """What must happen for this packet to be true again.
@@ -192,6 +254,28 @@ def reconciliation_plan(packet: dict, repo_root: str, *,
     """
     v = freshness(packet, repo_root, packet_path=packet_path)
     actions: list[dict] = []
+    symbol_check = _symbol_check(packet, repo_root)
+
+    # A named symbol that no longer exists is drift regardless of the commit
+    # log: the file may be untouched for a year and the claim still dead. So
+    # these fire independently of changedSurfaces.
+    for dead in symbol_check["dead"]:
+        actions.append({
+            "kind": "CLARIFY",
+            "derived": False,
+            "field": "canonical",
+            "capability": dead["need"],
+            "path": dead["path"],
+            "deadSymbol": dead["symbol"],
+            # No proposed replacement, deliberately. Finding the name that
+            # replaced it requires reading the code and understanding intent;
+            # guessing it here would be a fabricated Do.
+            "question": (
+                f"the packet tells the reader to use {dead['symbol']!r}, which no "
+                f"longer appears in {dead['where']} — read it and state what "
+                f"replaced it"
+            ),
+        })
 
     for missing in v["missingPaths"]:
         actions.append({
@@ -247,6 +331,7 @@ def reconciliation_plan(packet: dict, repo_root: str, *,
     return {
         "domain": packet.get("domain"),
         "freshness": v,
+        "symbolCheck": symbol_check,
         "actions": actions,
         "bounded": True,
     }

@@ -126,16 +126,50 @@ def check_surfaces(packets: list[dict]) -> list[str]:
 # than a miss. Only four unambiguously code-shaped forms qualify:
 #   _span_weight   leading-underscore snake_case
 #   MMS_FA         ALL_CAPS containing an underscore
-#   runG2PJury     an internal capital (camelCase / PascalCase)
-#   Syllabifier    a single Capitalised word of 3+ letters
+#   runG2PJury     an internal capital AFTER a lowercase run
+#   Syllabifier    a single Capitalised word of 3+ letters, not a known noun
 # Plain lowercase words ("reads", "demucs", "grid") never qualify, so ordinary
 # prose contributes no candidates at all.
+#
+# The camelCase run is `[a-z0-9]+`, NOT `*`. With `*` the lowercase run could
+# match empty, so every all-caps acronym satisfied the pattern -- "ONCE" parsed
+# as O + "" + N + "CE". Measured against the shipped packets that admitted
+# ONCE, JSON, HMM, IDF, OOV, BT, ET and PB as symbol candidates, and the gate
+# duly reported "ONCE" as a dead symbol in turboquant_service.py. A gate that
+# cries wolf is a gate nobody reads, so the run is mandatory. The cost is that
+# a genuinely all-caps identifier without an underscore is no longer a
+# candidate; ALL_CAPS_WITH_UNDERSCORE still is, and that is the shape the real
+# constants in this repo use (ART_FAMILIES, MMS_FA, IMAGE_ONLY_PDF).
 _SYMBOL_PATTERNS = [
     re.compile(r"\b_[a-z][A-Za-z0-9_]*\b"),
     re.compile(r"\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b"),
-    re.compile(r"\b[A-Za-z][a-z0-9]*[A-Z][A-Za-z0-9]*\b"),
+    re.compile(r"\b[A-Za-z][a-z0-9]+[A-Z][A-Za-z0-9]*\b"),
     re.compile(r"\b[A-Z][a-z]{2,}\b"),
 ]
+
+# A single Capitalised word is the weakest of the four shapes: a class name and
+# a technology proper noun are identical in form, and architectural prose is
+# full of the latter. Measured on the shipped packets, this pattern yielded
+# Node, Python and Rayleigh (prose) alongside Sigil and Syllabifier (symbols) --
+# under 50% precision, which does not meet "only a confident miss is an error".
+#
+# The exclusion is a DECLARED list rather than a silent heuristic, for the same
+# reason code_atlas declares its blind spots: excluding content is a governance
+# decision, and hiding the decision is not. Adding a name here is a deliberate
+# act, and the list is exported so a test can audit it.
+PROSE_NOUNS = frozenset({
+    # languages / runtimes / formats
+    "Node", "Python", "Java", "Rust", "Bash", "Shell", "Regex", "Unicode",
+    # libraries and products named in prose
+    "React", "Redis", "Fastify", "Vite", "Playwright", "Vitest", "Pytest",
+    "Textual", "Phaser", "Blender", "Godot", "Chrome", "Firefox",
+    # maths / stats named after people or concepts
+    "Rayleigh", "Gaussian", "Markov", "Viterbi", "Bayes", "Fourier",
+    # ordinary capitalised prose that is not a symbol
+    "The", "This", "That", "These", "Those", "When", "Where", "While",
+    "Every", "Only", "Never", "Always", "Both", "Each", "None", "Note",
+    "Uses", "Used", "Reads", "Writes", "Keeps", "Talks", "Spawns",
+})
 # Path-ish tokens named in the prose: `CmuPhonemeEngine` lives in the .js file
 # the prose points at, NOT in the packet's `path` (which is a cmudict data
 # file). Searching only `path` would fire on every capability of that shape.
@@ -148,7 +182,7 @@ def _candidate_symbols(canonical: str) -> set[str]:
     found: set[str] = set()
     for pattern in _SYMBOL_PATTERNS:
         found.update(pattern.findall(prose))
-    return found
+    return {s for s in found if s not in PROSE_NOUNS}
 
 
 def _search_files(cap: dict) -> list[Path]:

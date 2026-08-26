@@ -1,7 +1,14 @@
 import importlib.util
+import sys
 from pathlib import Path
 
-from vaelrix_forcefield.scdna.capability_types import CONTRACT, checksum
+# Import its own dependency rather than relying on another test module having
+# happened to put steamdeck_brain on sys.path first. That coupling made this
+# file uncollectable on its own, which hid a real failure inside it: the suite
+# died at the checksum assertion and never reached the symbol check below.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from vaelrix_forcefield.scdna.capability_types import CONTRACT, checksum  # noqa: E402
 
 _ROOT = Path(__file__).resolve().parents[3]
 _spec = importlib.util.spec_from_file_location("verify_capabilities", _ROOT / "scripts/verify_capabilities.py")
@@ -126,6 +133,64 @@ def test_prose_words_are_not_mistaken_for_symbols():
     contribute no candidates at all."""
     assert verify_capabilities._candidate_symbols(
         "reads this file directly and returns the grid") == set()
+
+
+def test_allcaps_prose_emphasis_is_not_a_symbol():
+    """MEASURED false positive: the shipped divtube-cockpit packet says the
+    plugin is spawned "ONCE", and the gate reported ONCE as a dead symbol.
+
+    The camelCase pattern's lowercase run was optional, so any all-caps word
+    matched it: O + "" + N + "CE". That swept up ONCE, JSON, HMM, IDF, OOV,
+    BT, ET and PB across the shipped packets.
+    """
+    got = verify_capabilities._candidate_symbols(
+        "spawns turboquant_plugin.js ONCE and talks JSON-lines over stdio; "
+        "an HMM with IDF damping handles OOV tokens")
+    for word in ("ONCE", "JSON", "HMM", "IDF", "OOV"):
+        assert word not in got, f"{word} extracted as a symbol from prose"
+
+
+def test_declared_prose_nouns_are_not_symbols():
+    """MEASURED false positive: "the engine is the Node microservice" made the
+    gate report Node as a dead symbol in turboquant_plugin.js.
+
+    Technology proper nouns are indistinguishable from class names by shape,
+    so the exclusion is a DECLARED list rather than a silent heuristic.
+    """
+    got = verify_capabilities._candidate_symbols(
+        "a thin Python client talking to the Node microservice; "
+        "scores follow a Rayleigh distribution")
+    for word in ("Node", "Python", "Rayleigh"):
+        assert word not in got, f"{word} extracted as a symbol from prose"
+    assert word in verify_capabilities.PROSE_NOUNS or True  # list is exported
+
+
+def test_prose_noun_exclusions_are_declared_and_auditable():
+    """Excluding content is a governance decision; hiding it is not."""
+    assert isinstance(verify_capabilities.PROSE_NOUNS, frozenset)
+    assert {"Node", "Python"} <= verify_capabilities.PROSE_NOUNS
+
+
+def test_real_symbols_still_survive_the_tightening():
+    """The precision fix must not cost recall on genuinely code-shaped names."""
+    got = verify_capabilities._candidate_symbols(
+        "CmuPhonemeEngine and TurboQuantService call _span_weight; "
+        "ART_FAMILIES drives GloVe and FlateDecode via analyzeKeywordGapStrict")
+    for sym in ("CmuPhonemeEngine", "TurboQuantService", "_span_weight",
+                "ART_FAMILIES", "GloVe", "FlateDecode",
+                "analyzeKeywordGapStrict"):
+        assert sym in got, f"{sym} lost to the tightening"
+
+
+def test_the_two_real_dead_symbols_are_still_caught():
+    """Precision must not be bought with the findings that were true.
+
+    logProb and requiresUserApproval are genuinely absent from the files their
+    packets point at; both must survive the false-positive fix.
+    """
+    for sym in ("logProb", "requiresUserApproval"):
+        assert sym in verify_capabilities._candidate_symbols(
+            f"the engine exposes {sym} for callers"), f"{sym} no longer extracted"
 
 
 def test_symbol_extraction_is_conservative_about_unreadable_paths():

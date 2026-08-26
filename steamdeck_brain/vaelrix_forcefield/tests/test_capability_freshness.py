@@ -226,6 +226,57 @@ class TestReconciliationIsBounded(unittest.TestCase):
                           "uncommitted drift raised no question")
             self.assertNotIn("src/other.py", paths)
 
+    def test_dead_symbol_is_named_in_the_clarify(self):
+        """"Read it and confirm" is weaker than "logProb is gone".
+
+        verify_capabilities.check_symbols already finds claims whose SUBJECT
+        vanished while the file survived. A CLARIFY that names the dead symbol
+        is actionable without opening anything.
+        """
+        import json as _json
+        caps = REPO_ROOT / "steamdeck_brain/vaelrix_forcefield/scdna/capabilities"
+        f = caps / "career-ats.capability.json"
+        if not f.exists():
+            self.skipTest("career-ats packet absent")
+        pkt = _json.loads(f.read_text())
+        plan = fresh.reconciliation_plan(pkt, str(REPO_ROOT), packet_path=str(f))
+        dead = [a for a in plan["actions"] if a.get("deadSymbol")]
+        self.assertTrue(dead, f"no dead symbol surfaced; symbolCheck="
+                              f"{plan.get('symbolCheck')}")
+        names = {a["deadSymbol"] for a in dead}
+        self.assertIn("logProb", names)
+        for a in dead:
+            self.assertEqual(a["kind"], "CLARIFY")
+            self.assertNotIn("newValue", a,
+                             "a dead-symbol CLARIFY must not propose a replacement")
+            self.assertIn(a["deadSymbol"], a["question"])
+
+    def test_symbol_check_reports_when_it_cannot_run(self):
+        """Off the real repo root the symbol search cannot resolve files.
+        Not-run must be stated, never mistaken for nothing-found."""
+        with TempRepo() as r:
+            pkt, f = r.packet(["src/**"], ["src/engine.py"])
+            r.commit("add packet")
+            plan = fresh.reconciliation_plan(pkt, str(r.root), packet_path=str(f))
+            self.assertIn("symbolCheck", plan)
+            self.assertFalse(plan["symbolCheck"]["ran"], plan["symbolCheck"])
+            self.assertTrue(plan["symbolCheck"]["reason"])
+
+    def test_symbol_check_reason_states_the_count_when_it_did_run(self):
+        """"ran: true" with an empty or vague reason is a silent verdict.
+        The reason must carry the finding, not just assert success."""
+        import json as _json
+        f = REPO_ROOT / "steamdeck_brain/vaelrix_forcefield/scdna/capabilities/career-ats.capability.json"
+        if not f.exists():
+            self.skipTest("career-ats packet absent")
+        plan = fresh.reconciliation_plan(_json.loads(f.read_text()),
+                                         str(REPO_ROOT), packet_path=str(f))
+        sc = plan["symbolCheck"]
+        self.assertTrue(sc["ran"], sc)
+        self.assertIn(str(len(sc["dead"])), sc["reason"],
+                      f"reason does not state the count: {sc['reason']!r}")
+        self.assertIn("symbol", sc["reason"].lower())
+
     def test_fresh_packet_yields_no_actions(self):
         with TempRepo() as r:
             pkt, f = r.packet(["src/**"], ["src/engine.py"])
