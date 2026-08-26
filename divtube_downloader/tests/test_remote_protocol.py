@@ -108,6 +108,7 @@ def test_server_event_payloads_are_exactly_sanitized_before_serialization():
         "status.snapshot": {
             "cockpit": {"state": "idle"},
             "activeJobs": [{"jobId": "job-1", "mediaType": "audio", "percent": 50, "state": "downloading"}],
+            "lastSeq": 0,
         },
         "chat.activity": {"state": "thinking"},
         "chat.message": {"messageId": "message-1", "role": "assistant", "text": "Safe reply", "terminal": True},
@@ -129,7 +130,7 @@ def test_server_event_payloads_are_exactly_sanitized_before_serialization():
 
 @pytest.mark.parametrize("event_type,payload", [
     ("status.snapshot", {"cockpit": {"state": "idle"}}),
-    ("status.snapshot", {"cockpit": {"state": "idle", "config": "secret"}, "activeJobs": []}),
+    ("status.snapshot", {"cockpit": {"state": "idle", "config": "secret"}, "activeJobs": [], "lastSeq": 1}),
     ("chat.activity", {"state": "thinking", "arguments": {"cmd": "id"}}),
     ("chat.message", {"messageId": "message-1", "role": "assistant", "text": "reply", "terminal": True, "shellOutput": "secret"}),
     ("download.accepted", {"jobId": "job-1", "mediaType": "video", "sourceHost": "youtube.com", "url": "https://youtube.com/watch?v=abc"}),
@@ -163,13 +164,13 @@ def test_server_envelope_revalidates_payload_if_a_caller_mutates_it_after_constr
 
 
 @pytest.mark.parametrize("event_type,payload,field", [
-    ("status.snapshot", {"cockpit": {"state": []}, "activeJobs": []}, ("cockpit", "state")),
+    ("status.snapshot", {"cockpit": {"state": []}, "activeJobs": [], "lastSeq": 1}, ("cockpit", "state")),
     ("status.snapshot", {"cockpit": {"state": "idle"}, "activeJobs": [{
         "jobId": "job-1", "mediaType": {}, "percent": 0, "state": "queued",
-    }]}, ("activeJobs", 0, "mediaType")),
+    }], "lastSeq": 1}, ("activeJobs", 0, "mediaType")),
     ("status.snapshot", {"cockpit": {"state": "idle"}, "activeJobs": [{
         "jobId": "job-1", "mediaType": "video", "percent": 0, "state": [],
-    }]}, ("activeJobs", 0, "state")),
+    }], "lastSeq": 1}, ("activeJobs", 0, "state")),
     ("chat.activity", {"state": {}}, ("state",)),
     ("download.accepted", {"jobId": "job-1", "mediaType": [], "sourceHost": "youtube.com"}, ("mediaType",)),
     ("download.accepted", {"jobId": "job-1", "mediaType": "video", "sourceHost": {}}, ("sourceHost",)),
@@ -184,13 +185,13 @@ def test_server_enum_fields_reject_unhashable_values_during_construction(event_t
 
 
 @pytest.mark.parametrize("event_type,payload,mutate", [
-    ("status.snapshot", {"cockpit": {"state": "idle"}, "activeJobs": []}, lambda p: p["cockpit"].update(state=[])),
+    ("status.snapshot", {"cockpit": {"state": "idle"}, "activeJobs": [], "lastSeq": 1}, lambda p: p["cockpit"].update(state=[])),
     ("status.snapshot", {"cockpit": {"state": "idle"}, "activeJobs": [{
         "jobId": "job-1", "mediaType": "video", "percent": 0, "state": "queued",
-    }]}, lambda p: p["activeJobs"][0].update(mediaType={})),
+    }], "lastSeq": 1}, lambda p: p["activeJobs"][0].update(mediaType={})),
     ("status.snapshot", {"cockpit": {"state": "idle"}, "activeJobs": [{
         "jobId": "job-1", "mediaType": "video", "percent": 0, "state": "queued",
-    }]}, lambda p: p["activeJobs"][0].update(state=[])),
+    }], "lastSeq": 1}, lambda p: p["activeJobs"][0].update(state=[])),
     ("chat.activity", {"state": "thinking"}, lambda p: p.update(state={})),
     ("download.accepted", {"jobId": "job-1", "mediaType": "video", "sourceHost": "youtube.com"}, lambda p: p.update(mediaType=[])),
     ("download.accepted", {"jobId": "job-1", "mediaType": "video", "sourceHost": "youtube.com"}, lambda p: p.update(sourceHost={})),
@@ -212,16 +213,28 @@ def test_server_envelope_uses_stable_sorted_json_and_validates_sequence():
         instance_id="pc-1",
         seq=7,
         request_id=None,
-        payload={"cockpit": {"state": "idle"}, "activeJobs": []},
+        payload={"cockpit": {"state": "idle"}, "activeJobs": [], "lastSeq": 7},
     )
     assert envelope.to_json() == (
-        '{"instanceId":"pc-1","payload":{"activeJobs":[],"cockpit":{"state":"idle"}},'
+        '{"instanceId":"pc-1","payload":{"activeJobs":[],"cockpit":{"state":"idle"},"lastSeq":7},'
         '"protocolVersion":"divtube-remote-v1","requestId":null,"seq":7,'
         '"type":"status.snapshot"}'
     )
     for bad in (-1, True, 1.0):
         with pytest.raises(ProtocolError):
             ServerEnvelope(type="status.snapshot", instance_id="pc-1", seq=bad, request_id=None, payload={})
+
+
+@pytest.mark.parametrize("last_seq", [True, -1, 1.0, 8])
+def test_status_snapshot_last_seq_is_an_integer_matching_its_envelope(last_seq):
+    with pytest.raises(ProtocolError):
+        ServerEnvelope(
+            type="status.snapshot",
+            instance_id="pc-1",
+            seq=7,
+            request_id=None,
+            payload={"cockpit": {"state": "idle"}, "activeJobs": [], "lastSeq": last_seq},
+        )
 
 
 def test_server_sequence_is_monotonic_per_instance():

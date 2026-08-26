@@ -7,8 +7,10 @@ from dataclasses import dataclass
 import hashlib
 import hmac
 import json
+import math
 import os
 from pathlib import Path
+import re
 import secrets
 import tempfile
 import threading
@@ -23,6 +25,10 @@ AUTH_FAILURE_LIMIT = 5
 _SCRYPT_N = 2**14
 _SCRYPT_R = 8
 _SCRYPT_P = 1
+_TOKEN_HASH_KEYS = {"algorithm", "salt", "digest"}
+_OFFER_KEYS = {"host", "port", "certificateFingerprint", "expiresAt", "used", "tokenHash"}
+_DEVICE_KEYS = {"deviceId", "label", "revoked", "failureTimes", "tokenHash"}
+_HEX_FINGERPRINT = re.compile(r"^[0-9A-Fa-f]+$")
 
 
 @dataclass(frozen=True)
@@ -75,12 +81,9 @@ class PairingStore:
         return self._state_path
 
     def create_offer(self, host: str, port: int, certificate_fingerprint: str) -> PairingOffer:
-        if not isinstance(host, str) or not host or len(host) > 255:
-            raise PairingError("invalid pairing host")
-        if type(port) is not int or not 1 <= port <= 65535:
-            raise PairingError("invalid pairing port")
-        if not isinstance(certificate_fingerprint, str) or not certificate_fingerprint:
-            raise PairingError("invalid certificate fingerprint")
+        host = _pairing_host(host)
+        port = _pairing_port(port)
+        certificate_fingerprint = _certificate_fingerprint(certificate_fingerprint)
 
         token = self._new_token()
         created_at = self._timestamp()
@@ -170,13 +173,21 @@ class PairingStore:
             return {"offers": [], "devices": []}
         try:
             raw = json.loads(self._state_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError) as exc:
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
             raise PairingError("pairing state is unreadable") from exc
         if not isinstance(raw, dict) or set(raw) != {"offers", "devices"}:
             raise PairingError("pairing state is invalid")
         if not isinstance(raw["offers"], list) or not isinstance(raw["devices"], list):
             raise PairingError("pairing state is invalid")
-        return raw
+        try:
+            return {
+                "offers": [_offer_record(record) for record in raw["offers"]],
+                "devices": [_device_record(record) for record in raw["devices"]],
+            }
+        except PairingError:
+            raise
+        except (AttributeError, KeyError, TypeError, ValueError, UnicodeError) as exc:
+            raise PairingError("pairing state is invalid") from exc
 
     def _write(self, state: dict[str, list[dict[str, Any]]]) -> None:
         descriptor, temporary = tempfile.mkstemp(prefix=".pairings-", dir=self._state_dir)
@@ -250,11 +261,85 @@ def _device_label(value: str) -> str:
     return label
 
 
+def _pairing_host(value: Any) -> str:
+    if not isinstance(value, str) or not value or len(value) > 255 or any(ord(character) < 0x20 for character in value):
+        raise PairingError("invalid pairing host")
+    return value
+
+
+def _pairing_port(value: Any) -> int:
+    if type(value) is not int or not 1 <= value <= 65535:
+        raise PairingError("invalid pairing port")
+    return value
+
+
+def _certificate_fingerprint(value: Any) -> str:
+    if not isinstance(value, str) or not value:
+        raise PairingError("invalid certificate fingerprint")
+    parts = value.split(":")
+    if any(len(part) != 2 or not _HEX_FINGERPRINT.fullmatch(part) for part in parts):
+        raise PairingError("invalid certificate fingerprint")
+    return value
+
+
+def _token_hash_record(value: Any) -> dict[str, str]:
+    if not isinstance(value, dict) or set(value) != _TOKEN_HASH_KEYS or value.get("algorithm") != "scrypt":
+        raise PairingError("pairing state is invalid")
+    try:
+        salt = _unb64(value["salt"])
+        digest = _unb64(value["digest"])
+    except (TypeError, ValueError) as exc:
+        raise PairingError("pairing state is invalid") from exc
+    if len(salt) != 16 or len(digest) != 32:
+        raise PairingError("pairing state is invalid")
+    return {"algorithm": "scrypt", "salt": value["salt"], "digest": value["digest"]}
+
+
+def _timestamp_record(value: Any) -> float:
+    if not isinstance(value, (int, float)) or isinstance(value, bool) or not math.isfinite(value):
+        raise PairingError("pairing state is invalid")
+    return float(value)
+
+
+def _offer_record(value: Any) -> dict[str, Any]:
+    if not isinstance(value, dict) or set(value) != _OFFER_KEYS or type(value.get("used")) is not bool:
+        raise PairingError("pairing state is invalid")
+    return {
+        "host": _pairing_host(value["host"]),
+        "port": _pairing_port(value["port"]),
+        "certificateFingerprint": _certificate_fingerprint(value["certificateFingerprint"]),
+        "expiresAt": _timestamp_record(value["expiresAt"]),
+        "used": value["used"],
+        "tokenHash": _token_hash_record(value["tokenHash"]),
+    }
+
+
+def _device_record(value: Any) -> dict[str, Any]:
+    if not isinstance(value, dict) or set(value) != _DEVICE_KEYS or type(value.get("revoked")) is not bool:
+        raise PairingError("pairing state is invalid")
+    device_id = value["deviceId"]
+    if not isinstance(device_id, str) or not device_id or len(device_id) > 128 or any(ord(character) < 0x20 for character in device_id):
+        raise PairingError("pairing state is invalid")
+    failure_times = value["failureTimes"]
+    if not isinstance(failure_times, list):
+        raise PairingError("pairing state is invalid")
+    return {
+        "deviceId": device_id,
+        "label": _device_label(value["label"]),
+        "revoked": value["revoked"],
+        "failureTimes": [_timestamp_record(item) for item in failure_times],
+        "tokenHash": _token_hash_record(value["tokenHash"]),
+    }
+
+
 def _b64(value: bytes) -> str:
     return base64.urlsafe_b64encode(value).decode("ascii").rstrip("=")
 
 
 def _unb64(value: Any) -> bytes:
-    if not isinstance(value, str):
+    if not isinstance(value, str) or not value or "=" in value:
         raise ValueError("not base64")
-    return base64.urlsafe_b64decode(value + "=" * (-len(value) % 4))
+    try:
+        return base64.b64decode(value + "=" * (-len(value) % 4), altchars=b"-_", validate=True)
+    except (ValueError, UnicodeError) as exc:
+        raise ValueError("not base64") from exc

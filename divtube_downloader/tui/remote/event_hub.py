@@ -27,7 +27,7 @@ class RemoteEventHub:
             instance_id=instance_id,
             seq=0,
             request_id=None,
-            payload={"cockpit": {"state": "idle"}, "activeJobs": []},
+            payload={"cockpit": {"state": "idle"}, "activeJobs": [], "lastSeq": 0},
         )
         self._instance_id = instance_id
         self._last_seq = 0
@@ -43,7 +43,7 @@ class RemoteEventHub:
                 payload = self._ordered_snapshot_payload(payload.get("cockpit"), payload.get("activeJobs"))
             event = self._emit_locked(event_type, payload, request_id, self._connections)
             if event_type == "status.snapshot":
-                self._snapshot_payload = json.loads(event)["payload"]
+                self._snapshot_payload = self._snapshot_cache(json.loads(event)["payload"])
             return event
 
     def snapshot(
@@ -57,7 +57,7 @@ class RemoteEventHub:
         payload = self._ordered_snapshot_payload(cockpit, active_jobs)
         with self._lock:
             event = self._emit_locked("status.snapshot", payload, request_id, self._connections)
-            self._snapshot_payload = json.loads(event)["payload"]
+            self._snapshot_payload = self._snapshot_cache(json.loads(event)["payload"])
             return event
 
     def attach(self, device_id: str) -> asyncio.Queue[str]:
@@ -90,14 +90,17 @@ class RemoteEventHub:
         request_id: str | None,
         device_ids: Iterable[str],
     ) -> str:
-        self._last_seq += 1
+        next_seq = self._last_seq + 1
+        if event_type == "status.snapshot":
+            payload = self._snapshot_payload_for_sequence(payload, next_seq)
         event = ServerEnvelope(
             type=event_type,
             instance_id=self._instance_id,
-            seq=self._last_seq,
+            seq=next_seq,
             request_id=request_id,
             payload=payload,
         ).to_json()
+        self._last_seq = next_seq
         self._backlog.append(event)
 
         stale_devices: list[str] = []
@@ -121,6 +124,18 @@ class RemoteEventHub:
         jobs = [dict(job) if isinstance(job, dict) else job for job in active_jobs]
         jobs.sort(key=lambda job: job.get("jobId") if isinstance(job, dict) and isinstance(job.get("jobId"), str) else "")
         return {"cockpit": dict(cockpit), "activeJobs": jobs}
+
+    @staticmethod
+    def _snapshot_payload_for_sequence(payload: Any, seq: int) -> Any:
+        if not isinstance(payload, dict):
+            return payload
+        result = dict(payload)
+        result["lastSeq"] = seq
+        return result
+
+    @staticmethod
+    def _snapshot_cache(payload: dict[str, Any]) -> dict[str, Any]:
+        return {"cockpit": payload["cockpit"], "activeJobs": payload["activeJobs"]}
 
 
 def _device_id(value: str) -> None:

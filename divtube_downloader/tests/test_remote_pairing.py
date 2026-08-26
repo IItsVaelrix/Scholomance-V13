@@ -125,3 +125,32 @@ def test_five_failed_authentications_rate_limit_the_paired_device(tmp_path):
 
     clock.value += 61
     assert store.authenticate(credentials.device_id, credentials.token) is True
+
+
+@pytest.mark.parametrize("corrupt", [
+    lambda state: state.update(offers=["not-a-record"]),
+    lambda state: state["offers"][0].pop("host"),
+    lambda state: state["offers"][0].update(unexpected=True),
+    lambda state: state["offers"][0].update(port="8443"),
+    lambda state: state["offers"][0].update(certificateFingerprint="not-hex"),
+    lambda state: state["offers"][0].update(certificateFingerprint="AB::CD"),
+    lambda state: state["offers"][0].update(expiresAt="soon"),
+    lambda state: state["offers"][0].update(used=1),
+    lambda state: state["offers"][0].update(tokenHash={"algorithm": "scrypt", "salt": "!!!", "digest": "x"}),
+    lambda state: state.update(devices=["not-a-record"]),
+    lambda state: state["devices"][0].pop("deviceId"),
+    lambda state: state["devices"][0].update(unexpected=True),
+    lambda state: state["devices"][0].update(label=[]),
+    lambda state: state["devices"][0].update(revoked=0),
+    lambda state: state["devices"][0].update(failureTimes=["never"]),
+    lambda state: state["devices"][0].update(tokenHash={"algorithm": "pbkdf2", "salt": "x", "digest": "x"}),
+])
+def test_corrupt_persisted_pairing_records_always_raise_pairing_error(tmp_path, corrupt):
+    store = PairingStore(tmp_path, token_factory=token_source("offer", "credential"))
+    credentials = store.redeem(store.create_offer("127.0.0.1", 8443, "AB:CD").token, "Pixel")
+    state = json.loads(store.state_path.read_text(encoding="utf-8"))
+    corrupt(state)
+    store.state_path.write_text(json.dumps(state), encoding="utf-8")
+
+    with pytest.raises(PairingError):
+        store.authenticate(credentials.device_id, credentials.token)

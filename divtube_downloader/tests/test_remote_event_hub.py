@@ -101,8 +101,9 @@ def test_reconnect_receives_a_snapshot_before_later_live_events():
     assert reconnect_snapshot["payload"] == {
         "cockpit": {"state": "downloading"},
         "activeJobs": [active_job("job-2")],
+        "lastSeq": reconnect_snapshot["seq"],
     }
-    assert reconnect_snapshot["seq"] < live_event["seq"]
+    assert reconnect_snapshot["payload"]["lastSeq"] == reconnect_snapshot["seq"] < live_event["seq"]
     assert decoded(queue.get_nowait()) == live_event
 
 

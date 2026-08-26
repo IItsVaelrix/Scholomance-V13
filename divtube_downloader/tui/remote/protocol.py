@@ -173,13 +173,19 @@ def _server_payload(data: Any, message_type: str) -> dict[str, Any]:
     _reject_forbidden_server_fields(data)
 
     if message_type == "status.snapshot":
-        payload = _exact_object(data, {"cockpit", "activeJobs"}, "status snapshot payload")
+        payload = _exact_object(data, {"cockpit", "activeJobs", "lastSeq"}, "status snapshot payload")
         cockpit = _exact_object(payload["cockpit"], {"state"}, "cockpit")
         if not isinstance(cockpit["state"], str) or cockpit["state"] not in _COCKPIT_STATES:
             _fail("Invalid cockpit state.", "invalid_state")
         if not isinstance(payload["activeJobs"], list) or len(payload["activeJobs"]) > 100:
             _fail("activeJobs must contain at most 100 summaries.", "invalid_activeJobs")
-        return {"cockpit": {"state": cockpit["state"]}, "activeJobs": [_job_summary(job) for job in payload["activeJobs"]]}
+        if type(payload["lastSeq"]) is not int or payload["lastSeq"] < 0:
+            _fail("lastSeq must be a nonnegative integer.", "invalid_lastSeq")
+        return {
+            "cockpit": {"state": cockpit["state"]},
+            "activeJobs": [_job_summary(job) for job in payload["activeJobs"]],
+            "lastSeq": payload["lastSeq"],
+        }
 
     if message_type == "chat.activity":
         payload = _exact_object(data, {"state"}, "chat activity payload")
@@ -289,7 +295,7 @@ class ServerEnvelope:
             _fail("Server sequence must be a nonnegative integer.", "invalid_seq")
         if self.request_id is not None:
             _identifier(self.request_id, "requestId")
-        object.__setattr__(self, "payload", _server_payload(self.payload, self.type))
+        object.__setattr__(self, "payload", _validated_server_payload(self.payload, self.type, self.seq))
 
     @classmethod
     def next_sequence(cls, instance_id: str) -> int:
@@ -305,5 +311,12 @@ class ServerEnvelope:
             "seq": self.seq,
             "type": self.type,
             "requestId": self.request_id,
-            "payload": _server_payload(self.payload, self.type),
+            "payload": _validated_server_payload(self.payload, self.type, self.seq),
         })
+
+
+def _validated_server_payload(payload: Any, message_type: str, seq: int) -> dict[str, Any]:
+    validated = _server_payload(payload, message_type)
+    if message_type == "status.snapshot" and validated["lastSeq"] != seq:
+        _fail("status snapshot lastSeq must match its envelope sequence.", "invalid_lastSeq")
+    return validated
