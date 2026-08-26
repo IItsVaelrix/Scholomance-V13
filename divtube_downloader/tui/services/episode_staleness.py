@@ -71,26 +71,78 @@ def _sha256_file(abs_path):
     return h.hexdigest()
 
 
+def _resolve_git_dirs(project_root):
+    """Return (worktree_git_dir, common_git_dir).
+
+    A plain repo: <root>/.git is a directory; both are that directory.
+
+    A linked worktree (created via `git worktree add`, which is how this
+    repo commonly develops features): <root>/.git is a FILE containing
+    `gitdir: <worktree_git_dir>`. HEAD inside worktree_git_dir is the
+    worktree's OWN current ref pointer (per-worktree, read from here).
+    refs/heads/* (loose refs) and packed-refs live in the COMMON git dir,
+    found via a `commondir` file inside worktree_git_dir (usually a
+    relative path, e.g. "../.."); if commondir is absent, the worktree git
+    dir IS the common dir.
+
+    On any OSError or unrecognized shape, return (None, None) — fail closed,
+    same philosophy as _read_head_sha's own docstring below.
+    """
+    try:
+        dot_git = os.path.join(project_root, ".git")
+        if os.path.isdir(dot_git):
+            return dot_git, dot_git
+        if not os.path.isfile(dot_git):
+            return None, None
+        with open(dot_git, "r", encoding="utf-8") as fh:
+            first_line = fh.readline().strip()
+        if not first_line.startswith("gitdir:"):
+            return None, None
+        raw = first_line.split(":", 1)[1].strip()
+        worktree_git_dir = raw if os.path.isabs(raw) else os.path.normpath(os.path.join(project_root, raw))
+        commondir_path = os.path.join(worktree_git_dir, "commondir")
+        if os.path.isfile(commondir_path):
+            with open(commondir_path, "r", encoding="utf-8") as fh:
+                raw_common = fh.read().strip()
+            common_git_dir = (
+                raw_common if os.path.isabs(raw_common)
+                else os.path.normpath(os.path.join(worktree_git_dir, raw_common))
+            )
+        else:
+            common_git_dir = worktree_git_dir
+        return worktree_git_dir, common_git_dir
+    except OSError:
+        return None, None
+
+
 def _read_head_sha(project_root):
     """Current HEAD sha via direct .git file reads — no subprocess.
 
-    Handles the common ref case (refs/heads/<branch>, packed or loose) and a
-    detached HEAD (a bare sha in .git/HEAD). Any shape this doesn't recognize
-    (worktrees, gitdir redirection, submodule quirks) returns None, and the
-    caller MUST treat that as 'do not recall' rather than guessing.
+    Handles the common ref case (refs/heads/<branch>, packed or loose), a
+    detached HEAD (a bare sha in HEAD), and a linked git worktree (where
+    .git is a file, not a directory — see _resolve_git_dirs). HEAD itself is
+    read from the worktree-specific git dir (it is per-worktree); a `ref:`
+    pointer is resolved against the COMMON git dir, where refs/heads/* and
+    packed-refs actually live (this is also the conceptually correct
+    resolution for a plain repo, where the two dirs happen to coincide).
+    Any shape this doesn't recognize (submodule quirks, etc.) returns None,
+    and the caller MUST treat that as 'do not recall' rather than guessing.
     """
     try:
-        head_path = os.path.join(project_root, ".git", "HEAD")
+        worktree_git_dir, common_git_dir = _resolve_git_dirs(project_root)
+        if worktree_git_dir is None or common_git_dir is None:
+            return None
+        head_path = os.path.join(worktree_git_dir, "HEAD")
         with open(head_path, "r", encoding="utf-8") as fh:
             head = fh.read().strip()
         if not head.startswith("ref:"):
             return head or None  # detached HEAD: a bare sha
         ref = head.split(":", 1)[1].strip()
-        loose = os.path.join(project_root, ".git", ref)
+        loose = os.path.join(common_git_dir, ref)
         if os.path.isfile(loose):
             with open(loose, "r", encoding="utf-8") as fh:
                 return fh.read().strip() or None
-        packed = os.path.join(project_root, ".git", "packed-refs")
+        packed = os.path.join(common_git_dir, "packed-refs")
         if os.path.isfile(packed):
             with open(packed, "r", encoding="utf-8") as fh:
                 for line in fh:

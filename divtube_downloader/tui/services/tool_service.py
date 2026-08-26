@@ -33,9 +33,16 @@ def _toolcall_bytecode(tool_name, target_path, args_hash, why_family, staleness_
     """A PB-XP-v1-TCL-... identity string, format-compatible with (not
     byte-identical to) BytecodeXPVaccine.js's TOOLCALL kind — see PDR §11 Q7
     and this plan's ruling on JS/Python bytecode parity."""
-    title = f"toolcall {tool_name} {why_family} {target_path or ''}"
-    slug_src = "".join(ch for ch in title.upper() if ch.isalnum())
-    slug = slug_src[:8] if len(slug_src) >= 4 else hashlib.sha256(title.encode("utf-8")).hexdigest()[:8].upper()
+    # slug_src is built from tool_name+why_family directly (not from a
+    # "toolcall ..." title string) so the slug actually varies per call — a
+    # constant literal prefix like "toolcall " would dominate title.upper()
+    # and make every slug identical regardless of the real inputs (final
+    # whole-branch review, Important finding #4/bytecode slug).
+    slug_src = "".join(ch for ch in f"{tool_name}{why_family}".upper() if ch.isalnum())
+    slug = (
+        slug_src[:8] if len(slug_src) >= 4
+        else hashlib.sha256(f"{tool_name}{why_family}{target_path or ''}".encode("utf-8")).hexdigest()[:8].upper()
+    )
     stable = json.dumps(
         {"argsHash": args_hash, "stalenessKey": staleness_key, "stalenessKind": staleness_kind,
          "targetPath": target_path, "toolName": tool_name, "whyFamily": why_family},
@@ -44,6 +51,54 @@ def _toolcall_bytecode(tool_name, target_path, args_hash, why_family, staleness_
     fingerprint = hashlib.sha256(stable.encode("utf-8")).hexdigest()[:12]
     checksum = hashlib.sha256((stable + fingerprint).encode("utf-8")).hexdigest()[:12]
     return f"PB-XP-v1-TCL-{slug}-{fingerprint}-{checksum}"
+
+
+# Top-level keys, per tool, that carry repo-wide telemetry the staleness key
+# does not cover — see the module ruling on shadow-mode comparison below.
+# microscope/telescope embed a "telemetry" block (code_lens.py, built from
+# atlas.is_stale()); atlas(action=rollup) embeds a "stale" key the same way.
+# Two calls with an identical staleness key can have genuinely different,
+# both-correct values here if the .atlas/ index was rebuilt or the working
+# tree got dirtier/cleaner elsewhere in between — comparing them raw would
+# make shadow mode's mismatch signal unusable once a real atlas index exists
+# (final whole-branch review, Important findings #3/#4).
+_SHADOW_VOLATILE_KEYS = {
+    "microscope": ("telemetry",),
+    "telescope": ("telemetry",),
+    "atlas": ("stale",),
+}
+
+
+def _normalize_for_shadow_comparison(tool_name, result_text):
+    """Strip tool-specific volatile top-level keys before shadow-mode
+    compares fresh vs. stored result text.
+
+    This ONLY affects the shadow-mode "would this have been a sound hit"
+    comparison-and-report step. It never touches what gets stored via
+    record() or what is returned to the real caller in any mode — both of
+    those keep the full, unstripped text, exactly as before this fix.
+
+    Defensive: never raises. If result_text isn't valid JSON (e.g. an error
+    string, or a tool this function doesn't recognize), the raw text is
+    returned unchanged rather than crashing the comparison.
+    """
+    keys = _SHADOW_VOLATILE_KEYS.get(tool_name)
+    if not keys:
+        return result_text
+    try:
+        parsed = json.loads(result_text)
+        if not isinstance(parsed, dict):
+            return result_text
+        changed = False
+        for key in keys:
+            if key in parsed:
+                del parsed[key]
+                changed = True
+        if not changed:
+            return result_text
+        return json.dumps(parsed, sort_keys=True)
+    except (TypeError, ValueError):
+        return result_text
 
 
 def _fuzzy_find_target(content, target, threshold):
@@ -1858,7 +1913,9 @@ class ToolService:
                         if hit is None:
                             return  # miss during shadow soak is the common
                                     # case and would be noise — no callback.
-                        if str(result) == hit["result_text"]:
+                        fresh_norm = _normalize_for_shadow_comparison(tool_name, str(result))
+                        stored_norm = _normalize_for_shadow_comparison(tool_name, hit["result_text"])
+                        if fresh_norm == stored_norm:
                             if callback:
                                 callback(f"  [#7CFF8B]○[/] {tool_name}: would have recalled (match)")
                         else:

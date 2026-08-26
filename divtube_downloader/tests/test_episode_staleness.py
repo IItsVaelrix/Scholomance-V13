@@ -94,6 +94,69 @@ class TestReadHeadSha(unittest.TestCase):
             ).stdout.strip()
             self.assertEqual(es._read_head_sha(root), expected)
 
+    def test_matches_git_rev_parse_inside_a_linked_worktree(self):
+        """Final whole-branch review, Important finding #2: a linked git
+        worktree's `.git` is a FILE containing `gitdir: <path>`, not a
+        directory — `_read_head_sha` used to try to open that file as if it
+        were `.git/HEAD`'s parent directory and silently return None. This
+        exercises the real mechanism (a real `git worktree add`) rather than
+        a hand-built fake layout, per the fix brief's stated preference."""
+        with tempfile.TemporaryDirectory() as parent:
+            main_repo = os.path.join(parent, "main")
+            os.makedirs(main_repo)
+            _init_repo(main_repo)
+            with open(os.path.join(main_repo, "f.txt"), "w") as f:
+                f.write("x")
+            _git("add", "f.txt", cwd=main_repo)
+            _git("commit", "-q", "-m", "x", cwd=main_repo)
+
+            worktree_dir = os.path.join(parent, "wt")
+            _git("worktree", "add", "-q", "-b", "wt-branch", worktree_dir, cwd=main_repo)
+
+            self.assertTrue(os.path.isfile(os.path.join(worktree_dir, ".git")))
+
+            expected = subprocess.run(
+                ["git", "rev-parse", "HEAD"], cwd=worktree_dir,
+                capture_output=True, text=True, check=True,
+            ).stdout.strip()
+            self.assertEqual(es._read_head_sha(worktree_dir), expected)
+
+    def test_worktree_head_advances_independently_of_main_checkout(self):
+        """A stronger version of the above: after a NEW commit on the
+        worktree's own branch, _read_head_sha must follow the worktree's
+        HEAD (which moved), not the main checkout's HEAD (which didn't) —
+        this is what proves HEAD is read from the worktree-specific git dir
+        while refs/packed-refs are resolved from the common dir, not that
+        both dirs happen to coincide."""
+        with tempfile.TemporaryDirectory() as parent:
+            main_repo = os.path.join(parent, "main")
+            os.makedirs(main_repo)
+            _init_repo(main_repo)
+            with open(os.path.join(main_repo, "f.txt"), "w") as f:
+                f.write("x")
+            _git("add", "f.txt", cwd=main_repo)
+            _git("commit", "-q", "-m", "x", cwd=main_repo)
+
+            worktree_dir = os.path.join(parent, "wt")
+            _git("worktree", "add", "-q", "-b", "wt-branch", worktree_dir, cwd=main_repo)
+
+            with open(os.path.join(worktree_dir, "g.txt"), "w") as f:
+                f.write("y")
+            _git("add", "g.txt", cwd=worktree_dir)
+            _git("commit", "-q", "-m", "y", cwd=worktree_dir)
+
+            main_head = subprocess.run(
+                ["git", "rev-parse", "HEAD"], cwd=main_repo,
+                capture_output=True, text=True, check=True,
+            ).stdout.strip()
+            wt_head = subprocess.run(
+                ["git", "rev-parse", "HEAD"], cwd=worktree_dir,
+                capture_output=True, text=True, check=True,
+            ).stdout.strip()
+            self.assertNotEqual(main_head, wt_head)
+            self.assertEqual(es._read_head_sha(worktree_dir), wt_head)
+            self.assertEqual(es._read_head_sha(main_repo), main_head)
+
 
 class TestRepoCleanGate(unittest.TestCase):
     """microscope(refs=true) staleness — Codex review, finding 4: refs

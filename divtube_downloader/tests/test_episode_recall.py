@@ -13,6 +13,8 @@ F10/F11 THROUGH the ToolService wrapper, not just against staleness_for
 directly, because the property that actually matters for this task is
 that the wrapper honors what staleness_for says.
 """
+import hashlib
+import json
 import os
 import re
 import sqlite3
@@ -22,7 +24,7 @@ import unittest
 from unittest import mock
 
 from tui.services import code_eval, code_lens
-from tui.services.tool_service import ToolService, _toolcall_bytecode
+from tui.services.tool_service import ToolService, _toolcall_bytecode, _normalize_for_shadow_comparison
 from tui.services import tool_service
 
 
@@ -135,6 +137,22 @@ class TestToolcallBytecodeFormat(unittest.TestCase):
         a = _toolcall_bytecode("atlas", "codex/core", "hh", "NAV_ORIENT", "repo-clean-head", "kk")
         b = _toolcall_bytecode("atlas", "codex/core", "hh", "NAV_ORIENT", "repo-clean-head", "kk")
         self.assertEqual(a, b)
+
+    def test_different_tool_and_why_family_produce_different_slugs(self):
+        """The regression this class exists to catch: the slug must vary by
+        (tool_name, why_family), not collapse to a constant like "TOOLCALL"
+        because a literal "toolcall " prefix dominates title.upper()[:8]. A
+        regex-only assertion cannot see this — two different-looking calls
+        can still both satisfy the format and still be degenerate."""
+        bc1 = _toolcall_bytecode("microscope", "a.py", "hash1", "NAV_ORIENT",
+                                  "file-sha256", "deadbeef")
+        bc2 = _toolcall_bytecode("telescope", "b.py", "hash2", "NAV_LOCATE_DEFINITION",
+                                  "file-sha256", "cafebabe")
+        slug1 = bc1.split("-")[4]
+        slug2 = bc2.split("-")[4]
+        self.assertNotEqual(slug1, slug2)
+        self.assertNotEqual(slug1, "TOOLCALL")
+        self.assertNotEqual(slug2, "TOOLCALL")
 
 
 class TestEpisodeWriteF1(unittest.TestCase):
@@ -517,6 +535,133 @@ class TestShadowModeWritesOneRowPerCall(unittest.TestCase):
             for _ in range(3):
                 svc._telescope({"path": "divtube_downloader/tui/services"}, None)
         self.assertEqual(len(_rows(self.db_path)), 3)
+
+
+class TestNormalizeForShadowComparison(unittest.TestCase):
+    """Final whole-branch review, Important findings #3/#4: microscope/
+    telescope's "telemetry" block and atlas(rollup)'s "stale" block are
+    repo-wide facts the staleness key does not cover — two calls with an
+    identical key can have genuinely different, both-correct values there.
+    Unit-level coverage of the normalization helper itself; the integration
+    test below (TestShadowIgnoresVolatileFieldsF3F4) exercises it through
+    the real wrapper."""
+
+    def test_strips_telemetry_for_microscope_and_telescope(self):
+        text = json.dumps({"ok": True, "mode": "index", "telemetry": {"available": False}})
+        for tool in ("microscope", "telescope"):
+            norm = _normalize_for_shadow_comparison(tool, text)
+            self.assertNotIn("telemetry", json.loads(norm))
+
+    def test_strips_stale_for_atlas(self):
+        text = json.dumps({"ok": True, "rollup": {}, "stale": {"stale": True}})
+        norm = _normalize_for_shadow_comparison("atlas", text)
+        self.assertNotIn("stale", json.loads(norm))
+
+    def test_two_texts_differing_only_in_telemetry_normalize_equal(self):
+        a = json.dumps({"ok": True, "mode": "index", "telemetry": {"dirtyFiles": 0}})
+        b = json.dumps({"ok": True, "mode": "index", "telemetry": {"dirtyFiles": 7}})
+        self.assertEqual(
+            _normalize_for_shadow_comparison("microscope", a),
+            _normalize_for_shadow_comparison("microscope", b),
+        )
+
+    def test_two_texts_differing_in_a_non_volatile_field_stay_different(self):
+        """The fix must not become "never compare anything" — a real
+        difference outside the known-volatile keys must still be visible
+        after normalization."""
+        a = json.dumps({"ok": True, "mode": "index", "telemetry": {}})
+        b = json.dumps({"ok": True, "mode": "line", "telemetry": {}})
+        self.assertNotEqual(
+            _normalize_for_shadow_comparison("microscope", a),
+            _normalize_for_shadow_comparison("microscope", b),
+        )
+
+    def test_unrecognized_tool_name_is_unchanged(self):
+        text = '{"ok": true, "telemetry": {"x": 1}}'
+        self.assertEqual(_normalize_for_shadow_comparison("read_file", text), text)
+
+    def test_invalid_json_falls_back_to_raw_text_without_raising(self):
+        raw = "Error: path is required."
+        self.assertEqual(_normalize_for_shadow_comparison("microscope", raw), raw)
+
+    def test_non_dict_json_falls_back_unchanged(self):
+        raw = "[1,2,3]"
+        self.assertEqual(_normalize_for_shadow_comparison("microscope", raw), raw)
+
+
+class TestShadowIgnoresVolatileFieldsF3F4(unittest.TestCase):
+    """This is the test the final whole-branch review explicitly called
+    missing: "Add one test that a telemetry-bearing result changes without
+    the target file changing — that test would have caught #1." Exercised
+    through the real ToolService wrapper (not just the helper in isolation),
+    because the property under test is that shadow-mode's comparison-and-
+    report step — not storage, not the served result — is the only thing
+    this fix may touch."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.db_path = os.path.join(self.tmp.name, "collab.sqlite")
+        _make_db(self.db_path)
+        self.scratch_dir = os.path.join(
+            tool_service.PROJECT_ROOT, "divtube_downloader", "tests", "_scratch_episode_recall_telemetry"
+        )
+        os.makedirs(self.scratch_dir, exist_ok=True)
+        self.abs_path = os.path.join(self.scratch_dir, "target.py")
+        self.rel_path = os.path.relpath(self.abs_path, tool_service.PROJECT_ROOT)
+        with open(self.abs_path, "w") as f:
+            f.write("def foo():\n    return 1\n")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+        import shutil
+        shutil.rmtree(self.scratch_dir, ignore_errors=True)
+
+    def _tamper_stored_row(self, mutate_fn):
+        """Load the sole stored row's result_text as JSON, apply mutate_fn
+        to the parsed dict, and write it back with a matching digest — the
+        same technique TestShadowModeNeverServesAHit's hand-tamper test
+        uses, so lookup()'s digest integrity gate still treats the row as
+        legitimate rather than corrupted."""
+        rows = _rows(self.db_path)
+        self.assertEqual(len(rows), 1)
+        parsed = json.loads(rows[0]["result_text"])
+        mutate_fn(parsed)
+        new_text = json.dumps(parsed)
+        new_digest = hashlib.sha256(new_text.encode("utf-8")).hexdigest()
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute(
+                "UPDATE collab_toolcall_episodes SET result_text = ?, result_digest = ?",
+                (new_text, new_digest),
+            )
+
+    def test_telemetry_only_difference_is_reported_as_a_match(self):
+        with _EnvGuard(TURSO_COLLAB_DB_URL=None, COLLAB_DB_PATH=self.db_path, DIVTUBE_EPISODE_LEDGER="shadow"):
+            svc = _make_service()
+            svc._microscope({"path": self.rel_path, "symbol": "foo"}, None)
+            # This checkout has no .atlas/ index, so real telemetry is frozen
+            # at {available: False, reason: atlas-not-built} — hand-tamper it
+            # to simulate what a rebuilt atlas index would produce, which is
+            # exactly the scenario the review found invisible to this repo's
+            # tests today.
+            self._tamper_stored_row(lambda p: p.__setitem__(
+                "telemetry", {"available": True, "source": "code-atlas",
+                               "stale": False, "dirty": True, "dirtyFiles": 99}
+            ))
+            messages = []
+            svc._microscope({"path": self.rel_path, "symbol": "foo"}, messages.append)
+        joined = "\n".join(messages)
+        self.assertIn("would have recalled (match)", joined)
+        self.assertNotIn("MISMATCH", joined)
+
+    def test_non_telemetry_difference_still_reported_as_mismatch(self):
+        with _EnvGuard(TURSO_COLLAB_DB_URL=None, COLLAB_DB_PATH=self.db_path, DIVTUBE_EPISODE_LEDGER="shadow"):
+            svc = _make_service()
+            svc._microscope({"path": self.rel_path, "symbol": "foo"}, None)
+            self._tamper_stored_row(lambda p: p.__setitem__("mode", "not-the-real-mode"))
+            messages = []
+            svc._microscope({"path": self.rel_path, "symbol": "foo"}, messages.append)
+        joined = "\n".join(messages)
+        self.assertIn("MISMATCH", joined)
 
 
 if __name__ == "__main__":
