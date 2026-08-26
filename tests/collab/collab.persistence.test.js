@@ -520,3 +520,10 @@ describe('memories', () => {
         expect(memory).toBeNull();
     });
 });
+
+describe('migration state', () => {
+    it('applies all migrations through v17 (toolcall episodes)', () => {
+        const status = collabPersistence.getStatus();
+        expect(status.version).toBe(17);
+    });
+});
