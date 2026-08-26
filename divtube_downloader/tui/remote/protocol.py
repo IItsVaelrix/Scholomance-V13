@@ -33,6 +33,16 @@ _YOUTUBE_HOSTS = frozenset({
     "youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com",
     "youtu.be", "www.youtu.be",
 })
+_COCKPIT_STATES = frozenset({"idle", "thinking", "looking", "responding", "downloading", "failed"})
+_CHAT_ACTIVITY_STATES = frozenset({"thinking", "looking", "responding", "idle", "failed"})
+_JOB_STATES = frozenset({"queued", "downloading", "processing", "failed", "cancelled"})
+_COMPLETED_JOB_STATES = frozenset({"completed", "failed", "cancelled"})
+_FORBIDDEN_SERVER_FIELD_NAMES = frozenset({
+    "api_key", "apikey", "arguments", "authorization", "command", "config",
+    "credential", "credentials", "cwd", "directory", "env", "headers", "password",
+    "path", "paths", "secret", "secrets", "shell", "shelloutput", "stdout", "stderr",
+    "token", "tokens", "url",
+})
 
 
 @dataclass(frozen=True)
@@ -82,6 +92,44 @@ def _identifier(value: Any, field: str) -> str:
     return value
 
 
+def _display_text(value: Any, field: str, *, max_length: int = 512) -> str:
+    value = _string(value, field, max_length=max_length)
+    if "\x00" in value or any(ord(character) < 0x20 and character not in "\n\r\t" for character in value):
+        _fail(f"Invalid {field}.", f"invalid_{field}")
+    return value
+
+
+def _bounded_percent(value: Any, field: str = "percent") -> int:
+    if type(value) is not int or not 0 <= value <= 100:
+        _fail(f"Invalid {field}.", f"invalid_{field}")
+    return value
+
+
+def _exact_object(value: Any, expected: set[str], field: str) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        _fail(f"{field} must be an object.", f"invalid_{field}")
+    _exact_keys(value, expected)
+    return value
+
+
+def _reject_forbidden_server_fields(value: Any) -> None:
+    if isinstance(value, dict):
+        for key, nested_value in value.items():
+            if not isinstance(key, str):
+                _fail("Server payload keys must be strings.", "invalid_payload")
+            normalized = re.sub(r"[^a-z0-9]", "", key.lower())
+            if normalized in _FORBIDDEN_SERVER_FIELD_NAMES:
+                _fail("Server payload includes a forbidden field.", "unsafe_payload_field")
+            _reject_forbidden_server_fields(nested_value)
+    elif isinstance(value, list):
+        for nested_value in value:
+            _reject_forbidden_server_fields(nested_value)
+    elif value is None or type(value) in {str, bool, int}:
+        return
+    else:
+        _fail("Server payload contains an unsafe value.", "invalid_payload")
+
+
 def _payload(data: dict[str, Any], message_type: str) -> None:
     expected: dict[str, set[str]] = {
         "session.hello": {"appVersion"},
@@ -106,6 +154,95 @@ def _payload(data: dict[str, Any], message_type: str) -> None:
             _fail("Media type must be video or audio.", "invalid_media_type")
         if type(data["rightsConfirmed"]) is not bool or data["rightsConfirmed"] is not True:
             _fail("Rights confirmation is required.", "rights_not_confirmed")
+
+
+def _job_summary(value: Any) -> dict[str, Any]:
+    data = _exact_object(value, {"jobId", "mediaType", "percent", "state"}, "activeJobs entry")
+    job_id = _identifier(data["jobId"], "jobId")
+    if data["mediaType"] not in {"video", "audio"}:
+        _fail("Media type must be video or audio.", "invalid_media_type")
+    percent = _bounded_percent(data["percent"])
+    if data["state"] not in _JOB_STATES:
+        _fail("Invalid download state.", "invalid_state")
+    return {"jobId": job_id, "mediaType": data["mediaType"], "percent": percent, "state": data["state"]}
+
+
+def _server_payload(data: Any, message_type: str) -> dict[str, Any]:
+    if not isinstance(data, dict):
+        _fail("Payload must be an object.")
+    _reject_forbidden_server_fields(data)
+
+    if message_type == "status.snapshot":
+        payload = _exact_object(data, {"cockpit", "activeJobs"}, "status snapshot payload")
+        cockpit = _exact_object(payload["cockpit"], {"state"}, "cockpit")
+        if cockpit["state"] not in _COCKPIT_STATES:
+            _fail("Invalid cockpit state.", "invalid_state")
+        if not isinstance(payload["activeJobs"], list) or len(payload["activeJobs"]) > 100:
+            _fail("activeJobs must contain at most 100 summaries.", "invalid_activeJobs")
+        return {"cockpit": {"state": cockpit["state"]}, "activeJobs": [_job_summary(job) for job in payload["activeJobs"]]}
+
+    if message_type == "chat.activity":
+        payload = _exact_object(data, {"state"}, "chat activity payload")
+        if payload["state"] not in _CHAT_ACTIVITY_STATES:
+            _fail("Invalid chat activity state.", "invalid_state")
+        return {"state": payload["state"]}
+
+    if message_type == "chat.message":
+        payload = _exact_object(data, {"messageId", "role", "text", "terminal"}, "chat message payload")
+        if payload["role"] != "assistant":
+            _fail("Invalid chat message role.", "invalid_role")
+        if type(payload["terminal"]) is not bool:
+            _fail("terminal must be a boolean.", "invalid_terminal")
+        return {
+            "messageId": _identifier(payload["messageId"], "messageId"),
+            "role": payload["role"],
+            "text": _display_text(payload["text"], "text", max_length=8000),
+            "terminal": payload["terminal"],
+        }
+
+    if message_type == "download.accepted":
+        payload = _exact_object(data, {"jobId", "mediaType", "sourceHost"}, "download accepted payload")
+        if payload["mediaType"] not in {"video", "audio"}:
+            _fail("Media type must be video or audio.", "invalid_media_type")
+        if payload["sourceHost"] not in _YOUTUBE_HOSTS:
+            _fail("Invalid source host.", "invalid_sourceHost")
+        return {"jobId": _identifier(payload["jobId"], "jobId"), "mediaType": payload["mediaType"], "sourceHost": payload["sourceHost"]}
+
+    if message_type == "download.progress":
+        payload = _exact_object(data, {"jobId", "percent", "speed", "eta", "state"}, "download progress payload")
+        if payload["state"] not in _JOB_STATES:
+            _fail("Invalid download state.", "invalid_state")
+        return {
+            "jobId": _identifier(payload["jobId"], "jobId"),
+            "percent": _bounded_percent(payload["percent"]),
+            "speed": _display_text(payload["speed"], "speed", max_length=64),
+            "eta": _display_text(payload["eta"], "eta", max_length=64),
+            "state": payload["state"],
+        }
+
+    if message_type == "download.completed":
+        payload = _exact_object(data, {"jobId", "state", "filename"}, "download completed payload")
+        filename = _display_text(payload["filename"], "filename", max_length=255)
+        if "/" in filename or "\\" in filename or filename in {".", ".."}:
+            _fail("filename must be display-safe and not a path.", "invalid_filename")
+        if payload["state"] not in _COMPLETED_JOB_STATES:
+            _fail("Invalid completed download state.", "invalid_state")
+        return {"jobId": _identifier(payload["jobId"], "jobId"), "state": payload["state"], "filename": filename}
+
+    if message_type == "error":
+        expected = {"code", "message"}
+        if isinstance(data, dict) and "field" in data:
+            expected.add("field")
+        payload = _exact_object(data, expected, "error payload")
+        result = {
+            "code": _identifier(payload["code"], "code"),
+            "message": _display_text(payload["message"], "message", max_length=512),
+        }
+        if "field" in payload:
+            result["field"] = _identifier(payload["field"], "field")
+        return result
+
+    _fail("Unsupported server event type.", "unknown_type")
 
 
 @dataclass(frozen=True)
@@ -152,8 +289,7 @@ class ServerEnvelope:
             _fail("Server sequence must be a nonnegative integer.", "invalid_seq")
         if self.request_id is not None:
             _identifier(self.request_id, "requestId")
-        if not isinstance(self.payload, dict):
-            _fail("Payload must be an object.")
+        object.__setattr__(self, "payload", _server_payload(self.payload, self.type))
 
     @classmethod
     def next_sequence(cls, instance_id: str) -> int:
@@ -169,5 +305,5 @@ class ServerEnvelope:
             "seq": self.seq,
             "type": self.type,
             "requestId": self.request_id,
-            "payload": self.payload,
+            "payload": _server_payload(self.payload, self.type),
         })

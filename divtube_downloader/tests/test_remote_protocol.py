@@ -88,16 +88,90 @@ def test_download_requires_https_youtube_url_and_explicit_rights():
             ClientEnvelope.from_json(raw(**mutation))
 
 
+def test_download_accepts_explicit_audio_rights_confirmation():
+    payload = {
+        "url": "https://youtu.be/abc123",
+        "mediaType": "audio",
+        "rightsConfirmed": True,
+    }
+    envelope = ClientEnvelope.from_json(json.dumps({
+        "protocolVersion": PROTOCOL_VERSION,
+        "type": "download.request",
+        "requestId": "r-audio",
+        "payload": payload,
+    }))
+    assert envelope.payload == payload
+
+
+def test_server_event_payloads_are_exactly_sanitized_before_serialization():
+    events = {
+        "status.snapshot": {
+            "cockpit": {"state": "idle"},
+            "activeJobs": [{"jobId": "job-1", "mediaType": "audio", "percent": 50, "state": "downloading"}],
+        },
+        "chat.activity": {"state": "thinking"},
+        "chat.message": {"messageId": "message-1", "role": "assistant", "text": "Safe reply", "terminal": True},
+        "download.accepted": {"jobId": "job-1", "mediaType": "audio", "sourceHost": "youtu.be"},
+        "download.progress": {"jobId": "job-1", "percent": 50, "speed": "1.2 MiB/s", "eta": "00:10", "state": "downloading"},
+        "download.completed": {"jobId": "job-1", "state": "completed", "filename": "clip.mp3"},
+        "error": {"code": "invalid_url", "message": "The URL is not supported.", "field": "url"},
+    }
+    for index, (event_type, payload) in enumerate(events.items()):
+        envelope = ServerEnvelope(
+            type=event_type,
+            instance_id="pc-1",
+            seq=index,
+            request_id="r-1",
+            payload=payload,
+        )
+        assert json.loads(envelope.to_json())["payload"] == payload
+
+
+@pytest.mark.parametrize("event_type,payload", [
+    ("status.snapshot", {"cockpit": {"state": "idle"}}),
+    ("status.snapshot", {"cockpit": {"state": "idle", "config": "secret"}, "activeJobs": []}),
+    ("chat.activity", {"state": "thinking", "arguments": {"cmd": "id"}}),
+    ("chat.message", {"messageId": "message-1", "role": "assistant", "text": "reply", "terminal": True, "shellOutput": "secret"}),
+    ("download.accepted", {"jobId": "job-1", "mediaType": "video", "sourceHost": "youtube.com", "url": "https://youtube.com/watch?v=abc"}),
+    ("download.progress", {"jobId": "job-1", "percent": True, "speed": "1 MiB/s", "eta": "00:10", "state": "downloading"}),
+    ("download.progress", {"jobId": "job-1", "percent": 50, "speed": "1 MiB/s", "eta": "00:10", "state": "downloading", "path": "/home/deck/secret"}),
+    ("download.completed", {"jobId": "job-1", "state": "completed", "filename": "/home/deck/clip.mp3"}),
+    ("error", {"code": "bad", "message": "bad", "field": "url", "config": {"token": "secret"}}),
+])
+def test_server_event_payloads_reject_unknown_or_unsafe_nested_values(event_type, payload):
+    with pytest.raises(ProtocolError):
+        ServerEnvelope(
+            type=event_type,
+            instance_id="pc-1",
+            seq=1,
+            request_id="r-1",
+            payload=payload,
+        ).to_json()
+
+
+def test_server_envelope_revalidates_payload_if_a_caller_mutates_it_after_construction():
+    envelope = ServerEnvelope(
+        type="chat.activity",
+        instance_id="pc-1",
+        seq=1,
+        request_id="r-1",
+        payload={"state": "thinking"},
+    )
+    envelope.payload["config"] = {"token": "secret"}
+    with pytest.raises(ProtocolError, match="forbidden"):
+        envelope.to_json()
+
+
 def test_server_envelope_uses_stable_sorted_json_and_validates_sequence():
     envelope = ServerEnvelope(
         type="status.snapshot",
         instance_id="pc-1",
         seq=7,
         request_id=None,
-        payload={"z": "é", "a": 1},
+        payload={"cockpit": {"state": "idle"}, "activeJobs": []},
     )
     assert envelope.to_json() == (
-        '{"instanceId":"pc-1","payload":{"a":1,"z":"é"},'
+        '{"instanceId":"pc-1","payload":{"activeJobs":[],"cockpit":{"state":"idle"}},'
         '"protocolVersion":"divtube-remote-v1","requestId":null,"seq":7,'
         '"type":"status.snapshot"}'
     )

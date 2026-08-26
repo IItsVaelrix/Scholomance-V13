@@ -5,22 +5,7 @@ from tui.remote.capability_policy import (
     RemoteCapabilityProfile,
     filter_remote_tools,
 )
-
-CURRENT_TOOL_NAMES = (
-    "read_file", "tui_inspect", "git_diff", "file_create", "test_run",
-    "git_history", "typecheck", "scholo_gate", "browser_inspect",
-    "dependency_graph", "search_code", "list_directory", "find_file",
-    "run_command", "replace_file_content", "search_youtube", "cleri_probe",
-    "health_emit", "health_verify", "archive_search", "archive_neighbors",
-    "scd64_decode", "scd64_scan", "law_get", "law_audit", "law_debug",
-    "phenotypic_ideal", "diagnostic_scan", "diagnostic_summary",
-    "diagnostic_violations", "diagnostic_health", "diagnostic_hints",
-    "immunity_scan", "immunity_status", "raid_query", "codebase_search",
-    "forensic_search", "bug_create", "bug_list", "task_create", "task_list",
-    "agent_list", "memory_get", "memory_set", "heal", "apply_patch",
-    "bash_session", "python_exec", "exec_reset", "substrate_query",
-    "substrate_status", "substrate_store", "substrate_recent",
-)
+from tui.services.tool_service import ToolService
 
 
 def tool(name, *, is_coding_action=False):
@@ -30,11 +15,13 @@ def tool(name, *, is_coding_action=False):
     return item
 
 
-def test_remote_profile_and_exact_positive_allow_list():
+def test_remote_profile_and_exact_positive_allow_list(monkeypatch):
     assert RemoteCapabilityProfile.REMOTE_READ_ONLY.value == "remote_read_only"
     assert RemoteCapabilityProfile.REMOTE_DOWNLOAD_CONFIRM.value == "remote_download_confirm"
-    catalog = [tool(name) for name in CURRENT_TOOL_NAMES]
-    catalog.extend(tool(name) for name in REMOTE_READ_ONLY_TOOLS - {"read_file"})
+    monkeypatch.setattr(ToolService, "_init_persistence", lambda _self: None)
+    catalog = ToolService().tools
+    present_names = {item["function"]["name"] for item in catalog}
+    catalog.extend(tool(name) for name in REMOTE_READ_ONLY_TOOLS - present_names)
     catalog.append(tool("future_unknown"))
     selected = filter_remote_tools(catalog)
     assert [item["function"]["name"] for item in selected] == sorted(REMOTE_READ_ONLY_TOOLS)
