@@ -1,5 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
+    <!--
+      Local Network Protection (Android 16 / API 36+, enforced here because
+      targetSdk is 37): INTERNET alone no longer covers traffic to addresses
+      on the user's own LAN. Without ACCESS_LOCAL_NETWORK the platform drops
+      those connections *silently* — the socket never completes and the app
+      sees a plain connect timeout, indistinguishable from the server being
+      down, which is precisely what made this companion look unreachable
+      even with the gateway listening and reachable from every other client
+      on the same network. The whole point of this app is talking to a PC on
+      the LAN, so this permission is load-bearing, not optional.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
     <application android:allowBackup="false" android:usesCleartextTraffic="false" android:label="DivTube Cockpit" android:theme="@style/AppTheme">
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>

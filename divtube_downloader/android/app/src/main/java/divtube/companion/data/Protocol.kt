@@ -28,7 +28,13 @@ data class ClientEnvelope(
 )
 
 object RemoteProtocol {
-    val json = Json { ignoreUnknownKeys = false; explicitNulls = true }
+    // encodeDefaults MUST stay on: the PC validates client envelopes against
+    // an exact key set, and protocolVersion carries a default value.
+    // kotlinx.serialization omits defaults unless told otherwise, which
+    // silently produced envelopes missing protocolVersion — rejected by the
+    // gateway as "Envelope contains missing or extra keys", so no chat turn
+    // ever reached the agent. Pairing masked it by hand-building its JSON.
+    val json = Json { ignoreUnknownKeys = false; explicitNulls = true; encodeDefaults = true }
     private val serverTypes = setOf("status.snapshot", "chat.activity", "chat.message", "download.accepted", "download.progress", "download.completed", "error")
 
     fun decodeServer(raw: String, previousInstance: String? = null, previousSeq: Long? = null): ServerEnvelope {

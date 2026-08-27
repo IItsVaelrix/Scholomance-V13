@@ -52,7 +52,15 @@ class PinnedCockpitClient(private val record: PairingRecord) {
                 .toRequestBody("application/json".toMediaType())
             val request = Request.Builder().url("https://${offer.host}:${offer.port}/v1/pair").post(body).build()
             client.newCall(request).execute().use { response ->
-                require(response.isSuccessful) { "Pairing rejected" }
+                // The gateway sends a real reason on rejection (invalid/
+                // expired/already-used offer, malformed request) as
+                // {"error": {"code": ..., "message": ...}} — surface it
+                // instead of a flat "rejected" so a real failure and a
+                // network-layer failure aren't indistinguishable upstream.
+                require(response.isSuccessful) {
+                    val bodyText = runCatching { response.peekBody(2048).string() }.getOrDefault("")
+                    "Pairing rejected (HTTP ${response.code}): $bodyText"
+                }
                 val value = RemoteProtocol.json.parseToJsonElement(requireNotNull(response.body).string()).jsonObject
                 return PairingRecord(
                     offer.host, offer.port,
