@@ -27,6 +27,22 @@ class RemoteToolPolicyError(RuntimeError):
     """Raised before execution when a provider calls an unadvertised tool."""
 
 
+def _cacheable_system_message(text):
+    """Wrap the system prompt so DashScope's OpenAI-compatible endpoint can
+    explicitly cache it (see docs/model-studio/context-cache): a plain string
+    `content` only gets the provider's IMPLICIT prefix cache, which is not
+    guaranteed to hit. The content-array + cache_control form asks for a
+    deterministic hit on this message and everything before it.
+
+    Safe on providers that don't support the marker: per Aliyun's docs an
+    unrecognized cache_control degrades to a cache miss, not a request error.
+    """
+    return {
+        "role": "system",
+        "content": [{"type": "text", "text": text, "cache_control": {"type": "ephemeral"}}],
+    }
+
+
 class PromptService:
     # Per-tab conversation memory, persisted so each cockpit tab (DivTube work,
     # Mother commentary, …) keeps its own thread across restarts. Same cwd
@@ -168,14 +184,39 @@ class PromptService:
         return list(self.tools.tools if tools is None else tools)
 
     def _execute_selected_tool(self, name, arguments, callback, selected_tools):
-        allowed = {
-            item.get("function", {}).get("name")
+        advertised = {
+            item["function"]["name"]: item["function"]
             for item in selected_tools
             if isinstance(item, dict) and isinstance(item.get("function"), dict)
+            and isinstance(item["function"].get("name"), str)
         }
-        if name not in allowed:
+        if name not in advertised:
             raise RemoteToolPolicyError(f"Tool {name!r} was not advertised for this request.")
-        return self.tools.execute_tool(name, arguments, callback)
+        return self.tools.execute_tool(
+            name, self._advertised_arguments(advertised[name], arguments), callback
+        )
+
+    @staticmethod
+    def _advertised_arguments(function_schema, arguments):
+        """Drop any argument the advertised schema did not declare.
+
+        A caller may only use the surface it was shown. This matters beyond
+        tidiness: a reduced-capability profile narrows a tool by handing out
+        a reduced schema (the remote companion strips microscope's `eval`,
+        which would otherwise reach code_eval and RUN the target), and that
+        narrowing is only real if undeclared arguments cannot be smuggled
+        past it by a hallucinating model or a forged client payload.
+
+        Dropping rather than raising keeps this fail-closed without turning
+        a harmless surplus argument into a failed turn — handlers already
+        ignore unknown keys, so nothing that worked before changes.
+        """
+        if not isinstance(arguments, dict):
+            return arguments
+        properties = (function_schema.get("parameters") or {}).get("properties")
+        if not isinstance(properties, dict):
+            return arguments
+        return {key: value for key, value in arguments.items() if key in properties}
 
     def _call_api(self, messages, model_name, base_url, api_key, use_tools=True, tools=None):
         kwargs = {"model": model_name, "messages": messages}
@@ -334,7 +375,7 @@ class PromptService:
                     self.history[agent_id] = []
 
                 messages = [
-                    {"role": "system", "content": system_prompt},
+                    _cacheable_system_message(system_prompt),
                     *self.history[agent_id][-(self.max_history * 2):],
                     {"role": "user", "content": text}
                 ]
