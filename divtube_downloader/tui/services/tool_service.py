@@ -353,11 +353,11 @@ except ImportError:
         _gate = None
 
 
-def _gate_check(tool_name, kwargs, callback=None):
+def _gate_check(tool_name, kwargs, callback=None, agent_id=None):
     """Run gate check. Returns True if allowed, False if blocked."""
     if _gate is None:
         return True
-    verdict = _gate.check(tool_name, kwargs)
+    verdict = _gate.check(tool_name, kwargs, agent_id=agent_id) if agent_id else _gate.check(tool_name, kwargs)
     if verdict.is_blocked:
         if callback:
             callback(f"  [#FF5C7A]⛔ GATE BLOCKED[/] [{verdict.reason}] {verdict.message}")
@@ -1731,11 +1731,16 @@ class ToolService:
         return None
 
 
-    def execute_tool(self, tool_name, kwargs, callback=None):
+    def execute_tool(self, tool_name, kwargs, callback=None, agent_id=None):
         # ── CLI Gate: cooldown + redundancy check ────────────
+        # agent_id scopes gate state to the caller: the cockpit can run more
+        # than one agent concurrently in this process (desktop driver, a
+        # paired-phone chat, a mobile coding-partner task) — without this,
+        # an unrelated agent's tool call spuriously blocks another's (see
+        # gate_keeper.py's GateKeeper.check docstring for the live repro).
         # exec tools are the intentionally-powerful path; repeated calls are expected.
         if tool_name not in ("bash_session", "python_exec", "exec_reset"):
-            if not _gate_check(tool_name, kwargs, callback):
+            if not _gate_check(tool_name, kwargs, callback, agent_id=agent_id):
                 return f"⛔ Gate blocked '{tool_name}': check your cadence."
         # ──────────────────────────────────────────────────────
         if tool_name == "read_file":

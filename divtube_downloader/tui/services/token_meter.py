@@ -89,6 +89,20 @@ class TokenMeterService:
             self._save()
         self._notify()
 
+    def is_over_budget(self):
+        """True once accumulated spend has reached the configured budget.
+
+        A budget of 0 (or less — set_budget clamps to >= 0.0, so this only
+        really means exactly 0) means unlimited, matching snapshot()'s
+        existing "budget_usd <= 0 => no ratio" treatment of that value —
+        this is the check prompt_service's agent loop consults before every
+        turn so a runaway conversation can't silently blow past the budget
+        the way the real .aether_meter.json shows one did: $510.53 spent
+        against a configured $20 budget, nothing had ever checked it.
+        """
+        with self._lock:
+            return self.budget_usd > 0 and self.cost_usd >= self.budget_usd
+
     def reset_spend(self):
         with self._lock:
             self.prompt_tokens = self.completion_tokens = self.cached_tokens = self.calls = 0

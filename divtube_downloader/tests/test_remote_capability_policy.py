@@ -121,7 +121,7 @@ def test_remote_microscope_cannot_smuggle_eval_into_execution(monkeypatch):
     received = {}
 
     class FakeTools:
-        def execute_tool(self, name, arguments, callback):
+        def execute_tool(self, name, arguments, callback, agent_id=None):
             received.update(arguments)
             return "ok"
 
@@ -147,7 +147,7 @@ def test_desktop_profile_still_receives_eval(monkeypatch):
     received = {}
 
     class FakeTools:
-        def execute_tool(self, name, arguments, callback):
+        def execute_tool(self, name, arguments, callback, agent_id=None):
             received.update(arguments)
             return "ok"
 

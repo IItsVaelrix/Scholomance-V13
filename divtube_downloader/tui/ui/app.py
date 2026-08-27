@@ -1424,6 +1424,7 @@ class DivTubeAgentApp(App):
         self.setup_daemon_commands()
         self.setup_collab_commands()
         self.setup_lab_commands()
+        self.setup_gate_commands()
 
     def setup_daemon_commands(self):
         """Brain daemon control commands."""
@@ -1696,6 +1697,37 @@ class DivTubeAgentApp(App):
 
         r("/intel", handle_intel, "Full YouTube intel report (telemetry + critique)", "/intel <url>")
         r("/niche", handle_niche, "Niche registry: list/show/import/export", "/niche [list|show <name>|import <f>|export <f>]")
+
+    def setup_gate_commands(self):
+        """/gate-status: visibility into GateKeeper's cooldown/redundancy
+        blocks. Without this, the only way to know whether the redundancy
+        gate is actually doing anything on real usage was to take someone's
+        word for it — this turns that into a number."""
+        r = self.registry.register
+
+        def handle_gate_status(ui, args):
+            from tui.core.gate_keeper import gate
+            if args and args[0].lower() == "reset":
+                gate.reset()
+                ui.log_msg(f"[bold {SUCCESS}]✔ Gate counters reset.[/]")
+                return
+            s = gate.status()
+            by_reason = s["blocks_by_reason"]
+            reason_line = (
+                "  ·  ".join(f"{count} {reason.lower()}" for reason, count in sorted(by_reason.items()))
+                if by_reason else "none yet"
+            )
+            ui.log_msg(
+                f"[bold {PURPLE_LT}]❖ TOOL GATE STATUS ❖[/]\n"
+                f"  Checks: {s['checks']}\n"
+                f"  Blocks: {s['blocks']}  ({reason_line})\n"
+                f"  Tracking: {len(s['recent_files'])} recent file read(s), "
+                f"{len(s['cooldowns'])} tool(s) with an active cooldown timer\n"
+                f"[{MUTED}]Each block is a turn the loop never had to spend "
+                f"re-fetching something it already had. /gate-status reset zeroes the counters.[/]"
+            )
+
+        r("/gate-status", handle_gate_status, "Show tool-gate block counts (cooldown/redundancy)", "/gate-status [reset]")
 
     def setup_turbo_commands(self):
         """TurboQuant SEO plugin commands (spec v1.0, phases 0-3)."""

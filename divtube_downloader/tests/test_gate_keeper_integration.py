@@ -64,6 +64,37 @@ class TestGateWiredIntoExecuteTool(unittest.TestCase):
         blocked = self.service.execute_tool("list_directory", {"path": "tui/core"})
         self.assertTrue(str(blocked).startswith("⛔"))
 
+    def test_different_agent_ids_do_not_collide(self):
+        # Reproduced live: a mobile coding-partner task's tool call got
+        # COOLDOWN-blocked purely because the desktop driver called the same
+        # tool moments earlier — same process, same singleton gate, totally
+        # unrelated conversations. execute_tool must forward agent_id so
+        # concurrent agents (desktop, a paired-phone chat, a mobile coding
+        # task) each get their own cooldown/redundancy state.
+        desktop = self.service.execute_tool("list_directory", {"path": "."}, agent_id="divtube")
+        self.assertNotIn("Gate blocked", str(desktop))
+
+        mobile = self.service.execute_tool(
+            "list_directory", {"path": "."}, agent_id="mobile:phone-1:task-1"
+        )
+        self.assertNotIn("Gate blocked", str(mobile), "a different agent must not inherit this cooldown")
+
+    def test_same_agent_id_still_gets_cooldown_protection(self):
+        # Isolating agents must not accidentally disable protection WITHIN
+        # one agent's own repeated calls.
+        first = self.service.execute_tool("list_directory", {"path": "."}, agent_id="divtube")
+        self.assertNotIn("Gate blocked", str(first))
+        second = self.service.execute_tool("list_directory", {"path": "."}, agent_id="divtube")
+        self.assertIn("Gate blocked", str(second))
+
+    def test_missing_agent_id_defaults_to_the_shared_bucket(self):
+        # Callers that don't pass agent_id (older code, or a caller that
+        # hasn't been updated) must keep today's behavior: one shared bucket.
+        first = self.service.execute_tool("list_directory", {"path": "."})
+        self.assertNotIn("Gate blocked", str(first))
+        second = self.service.execute_tool("list_directory", {"path": "."})
+        self.assertIn("Gate blocked", str(second))
+
 
 if __name__ == "__main__":
     unittest.main()

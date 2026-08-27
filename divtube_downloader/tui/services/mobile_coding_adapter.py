@@ -21,6 +21,40 @@ class MobileCodingError(ValueError):
     """A phone-request failure that has caused no unreported host effect."""
 
 
+# Condensed from docs/scholomance-encyclopedia/Scholomance LAW/
+# DIVTUBE_MOBILE_CODING_AGENT.md — embedded directly rather than left for the
+# agent to read_file() on its own turn budget (the whole point is turn
+# economy). Root cause this exists to fix: a 50-turn task that never
+# finished, spending nearly all its turns calling microscope with symbol=
+# one name at a time against a single ~3,700-line file, having never called
+# that file's own plain microscope/telescope first to get its shape in one
+# call. Full law (patch-protocol edge cases, jurisdiction rationale) lives
+# in that file if a future revision needs to reference it from here.
+_MOBILE_SYSTEM_HINT = (
+    "You are the paired-phone coding agent. You are not a shell and cannot run code — "
+    "run_command/bash_session/python_exec/evaluate are not in your catalog and never will be. "
+    "You are not the desktop agent either: it may be working in this same codebase concurrently.\n\n"
+    "LENS ORDER — use these tools in this order, not interchangeably:\n"
+    "1. telescope on the relevant directory/file FIRST — structural map, one call.\n"
+    "2. microscope with NO symbol= on a specific file — its full symbol index, one call.\n"
+    "3. microscope WITH symbol= — only for the specific symbols step 2 told you matter. "
+    "This is the expensive one-name-at-a-time call; don't reach for it before 1-2.\n"
+    "4. atlas — only after telescope, when you need a symbol's true home or subtree freshness.\n\n"
+    "SCOPE DISCIPLINE — stay in the task's own files plus their real dependencies (an import, "
+    "a caller, something atlas actually named) — not sibling subsystems that merely sound related, "
+    "not .venv/node_modules/build output, not law_get/raid_query/substrate_query/diagnostic_* "
+    "unless the task is specifically about those. If you've opened more than 6 distinct files and "
+    "still can't converge, stop expanding scope: summarize what's missing or answer with what you have.\n\n"
+    "TURN ECONOMY — every tool call is a full round-trip with a real cost; both a turn cap and a "
+    "token budget will end this task if crossed. Once you can state your proposed change in one "
+    "sentence, stop exploring and propose it. 'I don't have enough to safely propose a change' is "
+    "a complete, honest outcome — cheaper than more guessing.\n\n"
+    "PATCH PROTOCOL — to request one carefully reviewed edit, call mobile_propose_patch with a "
+    "logical relative path and exactly one SEARCH\\n---\\nREPLACE patch (search must match exactly "
+    "one location). Never claim a patch was applied: await the host receipt."
+)
+
+
 class MobileCodingAdapter:
     """Narrow mobile effect adapter; never exposes generic Cockpit dispatch."""
 
@@ -89,7 +123,7 @@ class MobileCodingAdapter:
 
     def _start_agent_task(self, device_id: str, task_id: str, text: str, request_id: str) -> None:
         """Run a host agent with a fixed, mobile-safe catalog for this task."""
-        task_tools = self._task_tools()
+        task_tools = self._task_tools(text)
         self._set_task(task_id, state="exploring", summary="Host agent is inspecting the codebase.")
         self._event_hub.publish("task.activity", {"taskId": task_id, "state": "exploring"}, request_id)
 
@@ -98,10 +132,12 @@ class MobileCodingAdapter:
             if message:
                 self._event_hub.publish("task.message", {"taskId": task_id, "text": message}, request_id)
 
+        agent_id = f"mobile:{device_id}:{task_id}"
+
         def execute(name: str, arguments: dict[str, Any], _callback) -> Any:
             if name == "mobile_propose_patch":
                 return self.propose_patch(device_id, task_id, arguments)
-            return self._execute_observe(name, arguments)
+            return self._execute_observe(name, arguments, agent_id=agent_id)
 
         def finished(ok: bool, detail: str) -> None:
             state = "completed" if ok else "failed"
@@ -112,31 +148,60 @@ class MobileCodingAdapter:
         self._prompt_service.prompt(
             text,
             callback,
-            system_hint=(
-                "You are the paired-phone coding agent. Use only the advertised read and inspection tools. "
-                "To request one carefully reviewed edit, call mobile_propose_patch with a logical relative path "
-                "and exactly one SEARCH\\n---\\nREPLACE patch. Never claim a patch was applied: await the host receipt."
-            ),
-            agent_id=f"mobile:{device_id}:{task_id}",
+            system_hint=_MOBILE_SYSTEM_HINT,
+            agent_id=agent_id,
             tools=task_tools,
             tool_executor=execute,
             on_finished=finished,
         )
 
-    def _task_tools(self) -> list[dict[str, Any]]:
-        """A frozen catalog: observe tools plus one proposal-only patch schema."""
+    # Always-available lens/navigation tools regardless of task — mirrors
+    # PromptService.CORE_TOOL_NAMES's reasoning, restricted to what
+    # capability_policy actually classifies OBSERVE for mobile.
+    _CORE_OBSERVE_NAMES = frozenset({
+        "read_file", "telescope", "microscope", "atlas", "list_directory", "find_file", "search_code",
+    })
+    _RECOMMEND_TOP_K = 10
+
+    def _task_tools(self, task_text: str) -> list[dict[str, Any]]:
+        """Core lens/nav tools plus the recommender's top picks for this
+        task's text, out of the OBSERVE-classified catalog only — plus one
+        proposal-only patch schema, always.
+
+        Was a frozen 36-tool catalog on every task regardless of relevance,
+        bypassing the same AdaptiveToolRecommender PromptService already
+        uses for the desktop path — see DIVTUBE_MOBILE_CODING_AGENT.md's
+        "Lens Methodology" section for the failure mode this caused.
+        Capability_policy's OBSERVE/AVAILABLE classification stays
+        authoritative: the recommender only ranks WITHIN that safe set, it
+        never adds a tool policy excluded.
+        """
         catalog = self._prompt_service.tools.tools
         manifest = build_manifest(catalog)
-        safe: list[dict[str, Any]] = []
-        for tool in catalog:
-            name = tool["function"]["name"]
-            entry = manifest[name]
-            if entry.capability_class is CapabilityClass.OBSERVE and entry.availability is Availability.AVAILABLE:
-                safe.append(_strip_mobile_unsafe_parameters(tool))
+        observe_tools = {
+            tool["function"]["name"]: tool
+            for tool in catalog
+            if manifest[tool["function"]["name"]].capability_class is CapabilityClass.OBSERVE
+            and manifest[tool["function"]["name"]].availability is Availability.AVAILABLE
+        }
+
+        wanted = set(self._CORE_OBSERVE_NAMES)
+        try:
+            recommender = self._prompt_service._get_adaptive_recommender()
+            ranked = recommender.recommend(task_text, top_k=self._RECOMMEND_TOP_K)
+            wanted |= {r["tool"] for r in ranked}
+        except Exception:
+            pass  # graceful degrade to core-only, same spirit as _select_tools
+
+        safe = [
+            _strip_mobile_unsafe_parameters(tool)
+            for name, tool in observe_tools.items()
+            if name in wanted
+        ]
         safe.append(_mobile_patch_schema())
         return safe
 
-    def _execute_observe(self, name: str, arguments: dict[str, Any]) -> Any:
+    def _execute_observe(self, name: str, arguments: dict[str, Any], agent_id: str) -> Any:
         manifest = build_manifest(self._prompt_service.tools.tools)
         entry = manifest.get(name)
         if entry is None or entry.capability_class is not CapabilityClass.OBSERVE or entry.availability is not Availability.AVAILABLE:
@@ -144,7 +209,11 @@ class MobileCodingAdapter:
         # This is the real Cockpit ToolService route: GateKeeper and the
         # desktop handler stay authoritative. The phone cannot name a tool;
         # only the frozen task catalog can invoke this function.
-        return self._prompt_service.tools.execute_tool(name, arguments, lambda _value: None)
+        # agent_id scopes GateKeeper state to this task, not the desktop's
+        # shared bucket — without it, a desktop tool call moments earlier
+        # can spuriously COOLDOWN-block this unrelated phone task (live-
+        # reproduced root cause of a task starting and then stalling).
+        return self._prompt_service.tools.execute_tool(name, arguments, lambda _value: None, agent_id=agent_id)
 
     def _set_task(self, task_id: str, *, state: str, summary: str) -> None:
         with self._lock:

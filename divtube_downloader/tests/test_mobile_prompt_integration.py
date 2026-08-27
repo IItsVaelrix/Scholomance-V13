@@ -26,7 +26,7 @@ class ScriptedPrompt:
         self.executed = []
         self.selected = []
 
-    def execute_tool(self, name, arguments, _callback):
+    def execute_tool(self, name, arguments, _callback, agent_id=None):
         self.tool_calls.append((name, arguments))
         return "note body"
 

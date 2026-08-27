@@ -12,7 +12,7 @@ class FakeTools:
         self.tools = [tool("read_file"), tool("run_command")]
         self.calls = []
 
-    def execute_tool(self, name, arguments, callback):
+    def execute_tool(self, name, arguments, callback, agent_id=None):
         self.calls.append((name, arguments))
         return "ok"
 

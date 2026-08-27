@@ -47,6 +47,16 @@ class MainActivity : ComponentActivity() {
         ensureLocalNetworkAccess()
         val store = PairingStore(this)
         store.load()?.let { record -> model.connect(record); codingModel.connect(record) }
+        // The manifest's divtube://pair intent-filter means the OS opens
+        // this app when a QR scanner resolves that scheme — but until now
+        // nothing here ever read the launch Intent's data, so the app just
+        // showed its normal manual-paste screen with the scanned URI
+        // dropped on the floor ("scans and opens the app but fails").
+        // A fresh scan intentionally takes priority over a restored session
+        // below — re-pairing is why the user scanned again.
+        pairingUriOrNull(intent?.data?.toString())?.let { uri ->
+            model.pair(uri, "Android companion") { record -> store.save(record); codingModel.connect(record) }
+        }
         setContent {
             val state by model.state.collectAsState()
             val codingState by codingModel.state.collectAsState()

@@ -139,5 +139,40 @@ class TestBudgetAndPersistence(TokenMeterTestBase):
         m.record("grok-4.3", {"prompt_tokens": 10, "completion_tokens": 10})
 
 
+class TestIsOverBudget(TokenMeterTestBase):
+    """The meter tracked real spend accurately the whole time (real
+    .aether_meter.json showed $510.53 against a configured $20 budget) —
+    nothing ever checked it mid-loop. This is the check prompt_service's
+    agent loop consults before every turn."""
+
+    def test_under_budget_is_false(self):
+        m = tm.TokenMeterService()
+        m.set_budget(20.0)
+        m.record("grok-4.3", {"prompt_tokens": 100_000, "completion_tokens": 0})  # $0.50
+        self.assertFalse(m.is_over_budget())
+
+    def test_at_or_over_budget_is_true(self):
+        m = tm.TokenMeterService()
+        m.set_budget(10.0)
+        m.record("grok-4.3", {"prompt_tokens": 4_000_000, "completion_tokens": 0})  # $20 >= $10
+        self.assertTrue(m.is_over_budget())
+
+    def test_zero_or_negative_budget_means_unlimited(self):
+        # Matches snapshot()'s existing "budget_usd <= 0 => no ratio" semantics
+        # — 0 was already a reachable value via set_budget's max(0.0, ...) clamp.
+        m = tm.TokenMeterService()
+        m.set_budget(0.0)
+        m.record("grok-4.3", {"prompt_tokens": 4_000_000_000, "completion_tokens": 0})
+        self.assertFalse(m.is_over_budget())
+
+    def test_reset_spend_clears_over_budget_state(self):
+        m = tm.TokenMeterService()
+        m.set_budget(1.0)
+        m.record("grok-4.3", {"prompt_tokens": 1_000_000, "completion_tokens": 0})  # $5 >= $1
+        self.assertTrue(m.is_over_budget())
+        m.reset_spend()
+        self.assertFalse(m.is_over_budget())
+
+
 if __name__ == "__main__":
     unittest.main()

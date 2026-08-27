@@ -44,6 +44,34 @@ def _cacheable_system_message(text):
     }
 
 
+def _with_history_cache_breakpoint(messages):
+    """Add the SECOND of Alibaba's documented 3 cache markers — system+tools
+    (handled by _cacheable_system_message), knowledge (not used here), and
+    conversation history, which "grows each turn" (docs/model-studio/
+    explicit-cache-best-practice). Without this, the messages array itself —
+    the part that actually dominates a long tool-call loop's token count —
+    carried zero cache markers and was rebilled at full price every turn.
+    Measured against real accumulated usage on the exact provider this
+    targets (qwen3.8-max): 0.14% cache hit rate against $510 of real spend.
+
+    Returns a NEW list; never mutates `messages` or its dicts. Exactly one
+    "live" breakpoint exists per request — on whatever is currently last —
+    rather than leaving a stale marker behind every turn as new messages
+    get appended; providers cap how many cache_control blocks one request
+    may carry, so accumulating one per turn would eventually break requests
+    on a long-running task instead of just wasting cache opportunity.
+    """
+    if not messages:
+        return messages
+    last = messages[-1]
+    content = last.get("content") if isinstance(last, dict) else None
+    if not isinstance(content, str) or not content:
+        return messages
+    marked = dict(last)
+    marked["content"] = [{"type": "text", "text": content, "cache_control": {"type": "ephemeral"}}]
+    return messages[:-1] + [marked]
+
+
 class PromptService:
     # Per-tab conversation memory, persisted so each cockpit tab (DivTube work,
     # Mother commentary, …) keeps its own thread across restarts. Same cwd
@@ -261,7 +289,7 @@ class PromptService:
         except Exception:
             pass
 
-    def _execute_selected_tool(self, name, arguments, callback, selected_tools):
+    def _execute_selected_tool(self, name, arguments, callback, selected_tools, tool_executor=None, agent_id=None):
         advertised = {
             item["function"]["name"]: item["function"]
             for item in selected_tools
@@ -270,9 +298,13 @@ class PromptService:
         }
         if name not in advertised:
             raise RemoteToolPolicyError(f"Tool {name!r} was not advertised for this request.")
-        return self.tools.execute_tool(
-            name, self._advertised_arguments(advertised[name], arguments), callback
-        )
+        safe_arguments = self._advertised_arguments(advertised[name], arguments)
+        if tool_executor is not None:
+            # The mobile coding path supplies its own executor and already
+            # knows its own agent_id (see mobile_coding_adapter.py) — not
+            # this method's job to inject one onto an unrelated callable.
+            return tool_executor(name, safe_arguments, callback)
+        return self.tools.execute_tool(name, safe_arguments, callback, agent_id=agent_id)
 
     @staticmethod
     def _advertised_arguments(function_schema, arguments):
@@ -297,7 +329,7 @@ class PromptService:
         return {key: value for key, value in arguments.items() if key in properties}
 
     def _call_api(self, messages, model_name, base_url, api_key, use_tools=True, tools=None):
-        kwargs = {"model": model_name, "messages": messages}
+        kwargs = {"model": model_name, "messages": _with_history_cache_breakpoint(messages)}
         selected_tools = self._select_tools(tools)
         if use_tools and selected_tools:
             import copy
@@ -347,7 +379,7 @@ class PromptService:
             pass  # rate accounting must never break the agent turn
         return res_json
 
-    def prompt(self, text, callback, system_hint=None, model=None, state_callback=None, controller=None, agent_id="divtube", tools=None, on_finished=None):
+    def prompt(self, text, callback, system_hint=None, model=None, state_callback=None, controller=None, agent_id="divtube", tools=None, on_finished=None, tool_executor=None):
         def set_state(s):
             if state_callback:
                 state_callback(s)
@@ -472,6 +504,20 @@ class PromptService:
                         callback("[#FF5C7A]Agent execution cancelled by user.[/]")
                         set_state("idle")
                         return
+                    if meter.is_over_budget():
+                        # The meter tracked real spend accurately the whole
+                        # time (real .aether_meter.json: $510.53 against a
+                        # configured $20 budget) — nothing ever stopped a
+                        # turn once it was crossed. Checked here, before the
+                        # next API call, not mid-response: a request already
+                        # in flight always finishes normally.
+                        callback(
+                            f"[{ERROR}]Aether budget exceeded (${meter.budget_usd:.2f}).[/] "
+                            f"Stopping before another API call. Use /budget to raise it "
+                            f"or /budget reset to clear spend."
+                        )
+                        set_state("idle")
+                        return
                     set_state("thinking")
                     llm_throttle.wait()
                     try:
@@ -523,7 +569,7 @@ class PromptService:
                             used_tools.add(func_name)
                             try:
                                 func_args = json.loads(tc["function"]["arguments"])
-                                tool_result = self._execute_selected_tool(func_name, func_args, callback, selected_tools)
+                                tool_result = self._execute_selected_tool(func_name, func_args, callback, selected_tools, tool_executor, agent_id=agent_id)
                             except json.JSONDecodeError as e:
                                 func_args = None
                                 tool_result = f"Error: Invalid JSON arguments provided. {str(e)}"

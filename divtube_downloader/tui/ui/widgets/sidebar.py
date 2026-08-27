@@ -37,7 +37,7 @@ SECTIONS = [
                     "/export-pack", "/import-pack", "/registry"]),
     ("DEV & OPS", ["/lint", "/test", "/typecheck", "/health-status", "/log",
                    "/daemon-start", "/daemon-stop"]),
-    ("SESSION", ["/remote-status", "/remote-pair", "/remote-revoke", "/provider", "/apikey", "/budget", "/release", "/help", "/memory", "/clear", "/exit"]),
+    ("SESSION", ["/remote-status", "/remote-pair", "/remote-revoke", "/provider", "/apikey", "/budget", "/release", "/gate-status", "/help", "/memory", "/clear", "/exit"]),
 ]
 
 # Registered commands that deliberately have NO button: true aliases whose
@@ -131,6 +131,7 @@ COMMAND_HINTS = {
     "/apikey": "Store an API key",
     "/budget": "Set the spend budget — /budget <usd>",
     "/release": "Release held session state",
+    "/gate-status": "Show tool-gate block counts — /gate-status [reset]",
     "/help": "Show command help",
     "/memory": "Inspect persistent memory",
     "/clear": "Clear the chat log",
