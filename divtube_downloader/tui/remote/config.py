@@ -22,6 +22,7 @@ class RemoteCompanionConfig:
     lan_enabled: bool
     mode: str
     max_paired_devices: int = 3
+    port: int = 0
 
     @classmethod
     def from_env(cls, env: Mapping[str, str] | None = None) -> "RemoteCompanionConfig":
@@ -32,11 +33,19 @@ class RemoteCompanionConfig:
         if mode not in REMOTE_MODES:
             mode = "off"
         max_paired_devices = _positive_int(source.get("DIVTUBE_REMOTE_COMPANION_MAX_PAIRED_DEVICES"), 3)
+        # 0 (the default) keeps today's behavior: bind an OS-assigned
+        # ephemeral port. A positive value pins a fixed port instead — some
+        # networks (router/AP firewall rules, client-isolation configs that
+        # only allow specific port ranges) treat the high ephemeral range
+        # differently from an ordinary chosen port, so a fixed port is a
+        # real escape hatch, not just a debugging convenience.
+        port = _positive_int(source.get("DIVTUBE_REMOTE_COMPANION_PORT"), 0)
         return cls(
             enabled=enabled,
             lan_enabled=lan_enabled,
             mode=mode,
             max_paired_devices=max_paired_devices,
+            port=port,
         )
 
     @property

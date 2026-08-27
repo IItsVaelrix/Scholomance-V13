@@ -41,6 +41,7 @@ from tui.services.prompt_service import PromptService
 from tui.remote.config import RemoteCompanionConfig
 from tui.remote.event_hub import RemoteEventHub
 from tui.remote.gateway import RemoteGateway
+from tui.remote.net import lan_ipv4
 from tui.remote.pairing import PairingStore
 from tui.services.remote_cockpit_adapter import RemoteCockpitAdapter
 from tui.services.remote_download_queue import RemoteDownloadQueue
@@ -153,6 +154,49 @@ SCHOLOMANCE_THEME = Theme(
     error=ERROR,
     dark=True,
 )
+
+def _pairing_host(lan_enabled: bool) -> str:
+    """Host to embed in a pairing URI's `host=` parameter.
+
+    Earlier versions of this used `socket.gethostname()` (works on Linux,
+    fails on Android — its resolver only routes a lookup to mDNS when the
+    name ends in `.local`) and then `f"{hostname}.local"` (works for name
+    resolution, but avahi advertises an IPv6 AAAA record alongside the IPv4
+    one, and the gateway only binds IPv4 (`0.0.0.0`) — a client that picks
+    the IPv6 address for `<hostname>.local` gets a connection that times
+    out against nothing, with no indication DNS ever succeeded). A plain
+    IPv4 literal sidesteps both problems at once: no DNS lookup of any kind
+    happens, so there is no hostname resolution to fail and no address
+    family to guess wrong.
+    """
+    if not lan_enabled:
+        return "127.0.0.1"
+    return lan_ipv4() or f"{socket.gethostname()}.local"
+
+
+def _compact_fingerprint(fingerprint: str) -> str:
+    """Strip the colon separators from a `AA:BB:CC:...` cert fingerprint
+    before it goes into the pairing URI.
+
+    Purely a size optimization, not a format the Android client needs
+    changed for: PinnedCockpitClient.kt's `fingerprintBytes()` already does
+    `fingerprint.replace(":", "")` before turning it into bytes, so a
+    colon-less fingerprint decodes identically to a colon-having one — the
+    already-installed app requires no rebuild for this.
+
+    Why it's worth doing: the colons cost real QR size for zero benefit.
+    A 32-byte SHA-256 fingerprint is 95 characters as `AA:BB:...` and, once
+    URL-encoded (each `:` becomes `%3A`), 157 characters — over half the
+    total pairing URI. That was enough extra data to push the rendered QR
+    to 63 characters wide, wider than most terminal panels can show without
+    horizontal scrolling — which crops the code and makes it unscannable,
+    even though the pairing offer, fingerprint, and network path underneath
+    are all otherwise correct. Dropping the colons needs no percent-encoding
+    (hex digits are already URL-safe) and cuts the fingerprint to a flat 64
+    characters.
+    """
+    return fingerprint.replace(":", "")
+
 
 def _flags(args, value_flags):
     """Split args into (positionals, {flag: value}).
@@ -515,7 +559,9 @@ class DivTubeAgentApp(App):
                 self.remote_pairing,
                 self.remote_hub,
                 remote_state,
+                port=self.remote_config.port,
                 dispatcher=self.remote_adapter.dispatch,
+                snapshot_provider=self._remote_snapshot,
             )
         self.cmd_history = []
         self.cmd_index = 0
@@ -1991,11 +2037,23 @@ class DivTubeAgentApp(App):
         state = "Listening" if port else "Offline"
         self.log_msg(f"[{MUTED}]Remote companion: {state} · mode={self.remote_config.mode} · port={port or 'none'}[/]")
 
+    def _remote_snapshot(self):
+        """Live (cockpit, active_jobs) for a companion status snapshot.
+
+        A snapshot is the first thing a reconnecting phone receives, and it
+        was previously a hardcoded "idle, no jobs" — so a device that dropped
+        mid-download was told nothing was running. RemoteDownloadQueue
+        already tracks the real jobs; this just reports them.
+        """
+        jobs = self.remote_downloads.snapshot() if self.remote_downloads else []
+        active = [job for job in jobs if job.get("state") in {"queued", "downloading", "processing"}]
+        return {"state": "downloading" if active else "idle"}, active
+
     def _remote_pair(self):
         if self.remote_gateway is None or self.remote_gateway.bound_port is None:
             self.log_msg(f"[{WARNING}]Remote companion is disabled or offline.[/]")
             return
-        host = socket.gethostname() if self.remote_config.lan_enabled else "127.0.0.1"
+        host = _pairing_host(self.remote_config.lan_enabled)
         offer = self.remote_pairing.create_offer(
             host,
             self.remote_gateway.bound_port,
@@ -2004,7 +2062,7 @@ class DivTubeAgentApp(App):
         uri = "divtube://pair?" + urlencode({
             "host": offer.host,
             "port": offer.port,
-            "fingerprint": offer.certificate_fingerprint,
+            "fingerprint": _compact_fingerprint(offer.certificate_fingerprint),
             "offer": offer.token,
             "protocol": "divtube-remote-v1",
         })

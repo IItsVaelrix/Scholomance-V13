@@ -28,6 +28,23 @@ def test_remote_config_defaults_to_no_listener():
     assert config.mode == "off"
     assert config.listener_enabled is False
     assert config.bind_host is None
+    assert config.port == 0
+
+
+def test_remote_config_port_defaults_to_ephemeral_when_unset():
+    config = RemoteCompanionConfig.from_env({})
+    assert config.port == 0
+
+
+def test_remote_config_port_can_be_pinned():
+    config = RemoteCompanionConfig.from_env({"DIVTUBE_REMOTE_COMPANION_PORT": "8766"})
+    assert config.port == 8766
+
+
+@pytest.mark.parametrize("value", ["not-a-number", "-1", "0", ""])
+def test_remote_config_port_fails_closed_to_ephemeral_on_invalid_input(value):
+    config = RemoteCompanionConfig.from_env({"DIVTUBE_REMOTE_COMPANION_PORT": value})
+    assert config.port == 0
 
 
 def test_lan_flag_is_inert_until_feature_is_explicitly_enabled():

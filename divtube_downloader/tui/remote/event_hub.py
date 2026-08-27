@@ -17,9 +17,11 @@ EVENT_BACKLOG_LIMIT = 256
 class RemoteEventHub:
     """The sole producer of server event sequences for one Cockpit instance."""
 
-    def __init__(self, instance_id: str, *, backlog_limit: int = EVENT_BACKLOG_LIMIT) -> None:
-        if type(backlog_limit) is not int or backlog_limit != EVENT_BACKLOG_LIMIT:
-            raise ValueError("remote event backlog must contain exactly 256 events")
+    def __init__(self, instance_id: str) -> None:
+        # The backlog size is fixed by the protocol, not a per-instance
+        # choice. This used to be a keyword argument that raised unless it
+        # equalled EVENT_BACKLOG_LIMIT exactly — a knob with one legal value,
+        # which reads as configurable and is not.
         # Let the canonical protocol perform the identifier validation once, without
         # emitting an event or exposing a sequence-setting API to callers.
         ServerEnvelope(
@@ -31,7 +33,7 @@ class RemoteEventHub:
         )
         self._instance_id = instance_id
         self._last_seq = 0
-        self._backlog: deque[str] = deque(maxlen=backlog_limit)
+        self._backlog: deque[str] = deque(maxlen=EVENT_BACKLOG_LIMIT)
         self._connections: dict[str, asyncio.Queue[str]] = {}
         self._snapshot_payload: dict[str, Any] = {"cockpit": {"state": "idle"}, "activeJobs": []}
         self._lock = threading.RLock()

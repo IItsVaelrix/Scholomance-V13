@@ -33,6 +33,7 @@ class RemoteGateway:
         *,
         port: int = 0,
         dispatcher: Dispatcher | None = None,
+        snapshot_provider: Callable[[], tuple[dict[str, Any], list[dict[str, Any]]]] | None = None,
         clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self.config = config
@@ -41,6 +42,7 @@ class RemoteGateway:
         self.state_dir = Path(state_dir)
         self.port = port
         self.dispatcher = dispatcher
+        self.snapshot_provider = snapshot_provider
         self.clock = clock
         self.runner: web.AppRunner | None = None
         self.site: web.TCPSite | None = None
@@ -48,6 +50,31 @@ class RemoteGateway:
         self.tls_identity: TLSIdentity | None = None
         self._websockets: set[web.WebSocketResponse] = set()
         self._request_times: dict[tuple[str, str], deque[float]] = defaultdict(deque)
+
+    def _current_snapshot(self) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+        """Live cockpit state and active jobs for a status snapshot.
+
+        Both snapshot paths previously hardcoded an idle cockpit and an empty
+        job list, so a device reconnecting mid-download was told nothing was
+        running until the next progress event happened to fire — the one
+        moment a snapshot exists to cover.
+
+        Degrades to the old constants on any provider failure: a snapshot is
+        what a reconnecting client receives first, and it must never be the
+        thing that breaks the reconnect.
+        """
+        if self.snapshot_provider is None:
+            return {"state": "idle"}, []
+        try:
+            cockpit, active_jobs = self.snapshot_provider()
+            return cockpit, list(active_jobs)
+        except Exception:
+            return {"state": "idle"}, []
+
+    def _publish_snapshot(self, *, request_id: str | None = None) -> str:
+        """Emit a status snapshot built from live state."""
+        cockpit, active_jobs = self._current_snapshot()
+        return self.event_hub.snapshot(cockpit=cockpit, active_jobs=active_jobs, request_id=request_id)
 
     @property
     def base_url(self) -> str:
@@ -63,7 +90,13 @@ class RemoteGateway:
         bind_host = self.config.bind_host
         if bind_host is None:
             return None
-        self.tls_identity = ensure_local_certificate(self.state_dir, "127.0.0.1" if bind_host == "0.0.0.0" else bind_host)
+        # Pass the real bind host, wildcard included. Collapsing "0.0.0.0"
+        # to "127.0.0.1" here issued a certificate covering only loopback
+        # even though the gateway was reachable (and advertised in the
+        # pairing URI) on the LAN address — clients that dial that address
+        # verify it against the SAN and reject the connection. tls.py knows
+        # how to expand a wildcard into "loopback + this host's LAN IP".
+        self.tls_identity = ensure_local_certificate(self.state_dir, bind_host)
         app = web.Application(client_max_size=MAX_MESSAGE_BYTES, middlewares=[self._errors])
         app.add_routes([
             web.post("/v1/pair", self._pair),
@@ -115,7 +148,7 @@ class RemoteGateway:
         device_id = self._authenticate(request)
         del device_id
         return web.Response(
-            text=self.event_hub.snapshot(cockpit={"state": "idle"}, active_jobs=[]),
+            text=self._publish_snapshot(),
             content_type="application/json",
         )
 
@@ -153,7 +186,7 @@ class RemoteGateway:
                 raise ProtocolError("mode_forbidden", "Request is disabled by the companion mode.")
             self._enforce_rate_limit(device_id, envelope.type)
             if envelope.type == "status.snapshot.request":
-                self.event_hub.snapshot(cockpit={"state": "idle"}, active_jobs=[], request_id=envelope.requestId)
+                self._publish_snapshot(request_id=envelope.requestId)
                 return
             if self.dispatcher is None:
                 raise ProtocolError("unavailable", "Cockpit adapter is unavailable.")

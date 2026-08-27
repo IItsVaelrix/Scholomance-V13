@@ -249,3 +249,36 @@ def test_client_types_are_explicit():
     assert CLIENT_TYPES == frozenset({
         "session.hello", "chat.turn.request", "download.request", "status.snapshot.request",
     })
+
+
+def test_client_envelope_requires_protocol_version_exactly():
+    """Cross-language wire contract, pinned on the PC side.
+
+    The Android client serialises this envelope with kotlinx.serialization,
+    which omits properties equal to their default unless encodeDefaults is
+    enabled — and protocolVersion has a default. That produced envelopes the
+    gateway rejected as "missing or extra keys", so no chat turn ever
+    reached the agent while pairing (which hand-builds its JSON) kept
+    working and made the link look healthy.
+
+    The counterpart assertion lives in the Android suite
+    (ProtocolTest.clientEnvelopeSerialisesProtocolVersionExplicitly); this
+    one states the requirement the phone has to satisfy. Hand-written test
+    payloads on this side always included the key, which is exactly why the
+    mismatch survived a green suite on both sides.
+    """
+    import json as _json
+
+    from tui.remote.protocol import ClientEnvelope, ProtocolError
+
+    complete = {
+        "protocolVersion": "divtube-remote-v1",
+        "type": "chat.turn.request",
+        "requestId": "req-1",
+        "payload": {"text": "hello", "conversation": "main"},
+    }
+    assert ClientEnvelope.from_json(_json.dumps(complete)).type == "chat.turn.request"
+
+    without_version = {k: v for k, v in complete.items() if k != "protocolVersion"}
+    with pytest.raises(ProtocolError, match="missing or extra keys"):
+        ClientEnvelope.from_json(_json.dumps(without_version))

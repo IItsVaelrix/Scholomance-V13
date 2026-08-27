@@ -29,7 +29,14 @@ class RemoteCompanionStatus(Static):
 
 
 def pairing_qr_text(uri: str, expiry: str) -> str:
-    qr = qrcode.QRCode(border=1)
+    # ERROR_CORRECT_L (~7% redundancy) instead of the library default M
+    # (~15%): this code is read directly off a screen, not a printed
+    # sticker exposed to smudging or damage, so the extra error-correction
+    # capacity buys nothing — while costing real module count (and
+    # therefore rendered character width) that a narrow terminal/TUI panel
+    # doesn't have to spare before horizontal cropping makes the code
+    # unscannable.
+    qr = qrcode.QRCode(border=1, error_correction=qrcode.constants.ERROR_CORRECT_L)
     qr.add_data(uri)
     qr.make(fit=True)
     matrix = qr.get_matrix()

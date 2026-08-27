@@ -16,6 +16,8 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.x509.oid import NameOID
 
+from tui.remote.net import lan_ipv4
+
 
 @dataclass(frozen=True)
 class TLSIdentity:
@@ -58,7 +60,21 @@ def _create_identity(bind_host: str):
     hostname = socket.gethostname() or "divtube-cockpit"
     names: list[x509.GeneralName] = [x509.DNSName(hostname), x509.DNSName("localhost")]
     try:
-        if bind_host not in {"0.0.0.0", "::"}:
+        if bind_host in {"0.0.0.0", "::"}:
+            # Binding a wildcard means the gateway is reachable on this
+            # machine's LAN address, and that is the address the pairing URI
+            # hands the phone. The certificate has to actually cover it:
+            # clients verify the hostname/IP they dialled against the SAN
+            # (the Android companion pins the fingerprint AND leaves normal
+            # hostname verification in force), so a certificate listing only
+            # 127.0.0.1 is rejected the moment the connection is made over
+            # the LAN — pairing fails at TLS even though the address, port,
+            # and fingerprint are all correct.
+            lan_address = lan_ipv4()
+            if lan_address:
+                names.append(x509.IPAddress(ipaddress.ip_address(lan_address)))
+            names.append(x509.IPAddress(ipaddress.ip_address("127.0.0.1")))
+        else:
             names.append(x509.IPAddress(ipaddress.ip_address(bind_host)))
     except ValueError:
         names.append(x509.DNSName(bind_host))
