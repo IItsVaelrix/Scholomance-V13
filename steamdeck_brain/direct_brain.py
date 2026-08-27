@@ -21,7 +21,7 @@ import dataclasses
 import json
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal, TypedDict
 
 # Ensure we can import the forcefield even when run from various cwds
 HERE = Path(__file__).resolve().parent
@@ -62,6 +62,35 @@ def _json_default(obj: Any) -> Any:
 def _direct_noop_llm(prompt: str) -> str:
     """Purely deterministic placeholder so no Ollama / external model is ever called."""
     return f"[DIRECT-NO-LLM] synthesis would be: {prompt[:280]}..."
+
+
+class _CapturingLLMClient:
+    """Stand-in llm_client that records the synthesis prompt instead of
+    discarding it into a placeholder string.
+
+    forcefield_ask has no local model to run synthesis with, but
+    BrainBridge._build_synthesis_prompt already assembles the real
+    query + accepted findings + contradictions + next action into exactly
+    the material an external reasoner needs. Capturing it (rather than
+    faking an "answer" from it) is what makes the calling agent — not this
+    process — the actual amplifier.
+    """
+
+    def __init__(self) -> None:
+        self.prompt: str | None = None
+
+    def __call__(self, prompt: str) -> str:
+        self.prompt = prompt
+        return prompt
+
+
+class CallerSynthesisRequired(TypedDict):
+    """The model-free response contract; this envelope is never an answer."""
+
+    synthesized: Literal[False]
+    state: Literal["CALLER_SYNTHESIS_REQUIRED"]
+    consumerAction: Literal["synthesize_from_evidence"]
+    material: str
 
 
 def list_brains() -> dict[str, Any]:
@@ -140,7 +169,9 @@ def forcefield_ask(query: str, deterministic: bool = True, max_workers: int = 4)
     WITHOUT any Ollama/LLM call.
     """
     try:
-        bridge = BrainBridge(llm_client=_direct_noop_llm)
+        capture = _CapturingLLMClient()
+        llm_client = capture if deterministic else _direct_noop_llm
+        bridge = BrainBridge(llm_client=llm_client)
         result = bridge.ask(
             query,
             classification="diagnostic",
@@ -148,18 +179,21 @@ def forcefield_ask(query: str, deterministic: bool = True, max_workers: int = 4)
             max_workers=max_workers,
         )
 
-        # Replace LLM-synthesized answer with direct structured findings
         if deterministic:
-            findings = result.get("findings") or []
-            if isinstance(findings, list):
-                key_findings = findings[:8]
-            else:
-                key_findings = findings
-            result["answer"] = {
-                "direct": True,
-                "summary": "Direct ForceField (no LLM). See findings, health_signals, scdna_genes.",
-                "key_findings": key_findings,
-            }
+            # No local model exists to synthesize with. Hand the calling
+            # agent the real assembled evidence (query, accepted findings,
+            # contradictions, next action) instead of a fabricated "answer"
+            # dict — that agent is the actual amplifier here. Structured
+            # (not a bare string) so a consumer can't mistake this for a
+            # finished answer without reading synthesized/state first.
+            result["answer"] = None
+            result["for_agent_synthesis"] = CallerSynthesisRequired(
+                synthesized=False,
+                state="CALLER_SYNTHESIS_REQUIRED",
+                consumerAction="synthesize_from_evidence",
+                material=capture.prompt or "",
+            )
+            result["synthesized"] = False
 
         result["mode"] = "direct-forcefield"
         result["ollama_used"] = False

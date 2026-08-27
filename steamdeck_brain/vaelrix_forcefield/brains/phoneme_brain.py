@@ -10,7 +10,9 @@ from __future__ import annotations
 
 import re
 from collections import Counter
+from pathlib import Path
 
+from . import _scholomance_dict as sdict
 from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCortexForceField
 
 
@@ -37,6 +39,39 @@ _PERCUSSIVE_WORDS = {"bang", "clap", "snap", "pop", "click", "tap", "knock", "st
 
 def _extract_words(text: str) -> list[str]:
     return re.findall(r"[a-zA-Z]+", text.lower())
+
+
+def _project_root() -> Path:
+    here = Path(__file__).resolve()
+    for _ in range(8):
+        if here == here.parent:
+            break
+        if any((here / marker).exists() for marker in (".git", "package.json", "pyproject.toml")):
+            return here
+        here = here.parent
+    return Path.cwd()
+
+
+def _real_arpabet_data(root: Path, words: list[str]) -> tuple[dict[str, str], int, int, list[str]]:
+    """Real ARPAbet transcriptions + phone counts for words found in the dictionary.
+
+    Returns (transcriptions_by_word, vowel_phone_total, consonant_phone_total,
+    out_of_vocabulary_words).
+    """
+    transcriptions: dict[str, str] = {}
+    vowel_total = 0
+    consonant_total = 0
+    oov: list[str] = []
+    for word in dict.fromkeys(words):  # de-duplicate, preserve first-seen order
+        ipa = sdict.ipa_for_word(root, word)
+        if ipa:
+            transcriptions[word] = ipa
+            v, c = sdict.count_arpabet_phones(ipa)
+            vowel_total += v
+            consonant_total += c
+        else:
+            oov.append(word)
+    return transcriptions, vowel_total, consonant_total, oov
 
 
 def _phoneme_profile(words: list[str]) -> dict:
@@ -91,26 +126,54 @@ def run_phoneme_brain(
             ),
         )
 
+    root = _project_root()
+    transcriptions, real_vowels, real_consonants, oov = _real_arpabet_data(root, words)
+
+    if transcriptions:
+        real_total = real_vowels + real_consonants
+        vr = real_vowels / real_total if real_total else 0.0
+        cr = real_consonants / real_total if real_total else 0.0
+        findings.append(
+            f"Real ARPAbet vowel/consonant phone ratio: {vr:.0%}/{cr:.0%} "
+            f"({len(transcriptions)}/{len(set(words))} unique word(s) found in the dictionary)"
+        )
+        sample = list(transcriptions.items())[:3]
+        findings.append(
+            "Real transcriptions: " + "; ".join(f'"{w}" = {ipa}' for w, ipa in sample)
+        )
+        if vr > 0.45:
+            findings.append("High vowel density — text may sound open and melodic.")
+        elif vr < 0.32:
+            findings.append("Low vowel density — text may feel clipped or consonant-heavy.")
+        if oov:
+            findings.append(
+                f"{len(oov)} word(s) not in the dictionary (e.g. {', '.join(oov[:3])}) — "
+                "excluded from the real ratio above."
+            )
+    else:
+        profile = _phoneme_profile(words)
+        vr = profile["vowelRatio"]
+        cr = profile["consonantRatio"]
+        findings.append(
+            f"Approximate (letter-based) vowel/consonant ratio: {vr:.0%}/{cr:.0%} — "
+            "no words found in the dictionary; real ARPAbet data unavailable for this text."
+        )
+        if vr > 0.45:
+            findings.append("High vowel density — text may sound open and melodic.")
+        elif vr < 0.32:
+            findings.append("Low vowel density — text may feel clipped or consonant-heavy.")
+
     profile = _phoneme_profile(words)
-    vr = profile["vowelRatio"]
-    cr = profile["consonantRatio"]
-    findings.append(f"Vowel/consonant ratio: {vr:.0%}/{cr:.0%} (English typical: ~38%/62%)")
-
-    if vr > 0.45:
-        findings.append("High vowel density — text may sound open and melodic.")
-    elif vr < 0.32:
-        findings.append("Low vowel density — text may feel clipped or consonant-heavy.")
-
     son = profile["sonorantRatio"]
     plo = profile["plosiveRatio"]
     if son > 0.35:
-        findings.append(f"Rich in sonorants ({son:.0%} of consonants) — flowing, lyrical quality.")
+        findings.append(f"Approximate: rich in sonorants ({son:.0%} of consonants) — flowing, lyrical quality.")
     if plo > 0.30:
-        findings.append(f"High plosive count ({plo:.0%} of consonants) — percussive, punchy delivery.")
+        findings.append(f"Approximate: high plosive count ({plo:.0%} of consonants) — percussive, punchy delivery.")
 
     sib = profile["sibilantRatio"]
     if sib > 0.15:
-        findings.append(f"Elevated sibilance ({sib:.0%}) — may cause recording harshness; consider de-essing.")
+        findings.append(f"Approximate: elevated sibilance ({sib:.0%}) — may cause recording harshness; consider de-essing.")
 
     palette = _detect_sound_palette(words)
     active_palettes = [k for k, v in palette.items() if v > 0]

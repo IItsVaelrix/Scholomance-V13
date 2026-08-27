@@ -16,7 +16,10 @@ from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCort
 ARCHITECTURE_BRAIN = AmplifierBrain(
     id="ARCHITECTURE_BRAIN",
     domain=["architecture", "design", "structure", "pattern"],
-    activationSignals=["architecture", "design", "structure", "pattern", "system", "organize"],
+    activationSignals=[
+        "architecture", "design", "structure", "pattern", "system", "organize",
+        "refactor", "layer", "contract", "boundary",
+    ],
     allowedTools=["search_code", "read_file", "diagnostic_scan"],
     defaultSearchBudget=3,
 )
@@ -68,14 +71,54 @@ def _project_root() -> Path:
     return Path.cwd()
 
 
+#: Known architectural roots whose direct children are the real layers, per
+#: this project's own documented architecture (Scholomance LAW CLAUDE.md:
+#: "CODEx has four strict layers"). Checking only the repo root missed every
+#: one of them — codex/core, codex/services, codex/runtime, codex/server all
+#: live one level down.
+_LAYER_ROOTS = (Path("."), Path("codex"))
+_LAYER_SOURCE_EXTS = (".py", ".js", ".ts", ".jsx", ".tsx")
+
+
+_LAW_DIR = "docs/scholomance-encyclopedia/Scholomance LAW"
+
+
+def _quote_law(root: Path, phrase: str) -> str | None:
+    """Find the first real line in this project's own LAW docs mentioning
+    `phrase`, so a citation like "per CODEx contract" is a real quote
+    instead of a name with nothing behind it."""
+    law_dir = root / _LAW_DIR
+    if not law_dir.is_dir():
+        return None
+    for path in law_dir.rglob("*.md"):
+        if not path.is_file():
+            continue
+        try:
+            for line in path.read_text(encoding="utf-8", errors="ignore").splitlines():
+                if phrase in line.lower():
+                    return line.strip()
+        except Exception:
+            continue
+    return None
+
+
 def _scan_layer_dirs(root: Path) -> dict[str, list[str]]:
-    """Identify directories that match architectural layer names."""
+    """Identify real project directories that match architectural layer names,
+    at the repo root and under known architectural roots (codex/)."""
     layers: dict[str, list[str]] = {}
-    for item in root.iterdir():
-        if item.is_dir() and item.name.lower() in _LAYER_NAMES:
-            layers[item.name] = sorted(
-                str(p.relative_to(root)) for p in item.rglob("*.py") if p.is_file()
-            )[:5]
+    for layer_root in _LAYER_ROOTS:
+        base = root / layer_root
+        if not base.is_dir():
+            continue
+        for item in base.iterdir():
+            if item.is_dir() and item.name.lower() in _LAYER_NAMES:
+                key = str(item.relative_to(root))
+                files = [
+                    str(p.relative_to(root))
+                    for p in item.rglob("*")
+                    if p.is_file() and p.suffix.lower() in _LAYER_SOURCE_EXTS
+                ]
+                layers[key] = sorted(files)[:5]
     return layers
 
 
@@ -114,7 +157,11 @@ def run_architecture_brain(
 
     # Cross-layer analysis
     if "refactor" in text and len(layers) >= 3:
-        findings.append("Multi-layer project — refactors should preserve layer boundaries per CODEx contract.")
+        law_quote = _quote_law(root, "four strict layers")
+        if law_quote:
+            findings.append(f'Multi-layer project — this project\'s own law states: "{law_quote}"')
+        else:
+            findings.append("Multi-layer project — refactors should preserve layer boundaries per CODEx contract.")
     if "import" in text and len(layers) >= 2:
         findings.append("Check import direction — inner layers should not import from outer layers.")
 

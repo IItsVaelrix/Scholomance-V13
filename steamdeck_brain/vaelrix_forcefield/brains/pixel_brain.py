@@ -1,13 +1,16 @@
 """
 Vaelrix Cortex ForceField — Pixel Brain.
 
-Visual/art domain specialist. Analyzes the task for pixel-art, sprite,
-palette, silhouette, and thumbnail concerns. Checks the project for
-CSS colour definitions, sprite metadata, and UI theme tokens.
+Visual/art domain specialist. Its expertise is the project's real pixel-asset
+infrastructure: SCDNA gene packets under codex/core/pixelbrain/imports/, each
+with a diagnostic_manifest.json carrying real facts (geneType, checksum,
+byte length) about that asset. Falls back to a generic CSS/theme-token scan
+only for palette/thumbnail concerns that aren't about a specific packet.
 """
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCortexForceField
@@ -47,6 +50,46 @@ def _project_root() -> Path:
     return Path.cwd()
 
 
+def _pixelbrain_imports_dir(root: Path) -> Path:
+    return root / "codex" / "core" / "pixelbrain" / "imports"
+
+
+def _list_pixelbrain_assets(root: Path) -> list[str]:
+    imports_dir = _pixelbrain_imports_dir(root)
+    if not imports_dir.is_dir():
+        return []
+    return sorted(p.name for p in imports_dir.iterdir() if p.is_dir())
+
+
+def _read_manifest(root: Path, asset_id: str) -> dict | None:
+    manifest_path = _pixelbrain_imports_dir(root) / asset_id / "diagnostic_manifest.json"
+    if not manifest_path.exists():
+        return None
+    try:
+        return json.loads(manifest_path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def _match_assets_in_text(text_lower: str, assets: list[str]) -> list[str]:
+    """Match asset ids the query actually names.
+
+    An asset id is a real identifier (e.g. "barrel_hand"), so a substring
+    match against the lowercased query is precise enough — false positives
+    would require the query to contain that exact token sequence.
+    """
+    return [a for a in assets if a.replace("_", " ") in text_lower or a in text_lower]
+
+
+def _describe_manifest(asset_id: str, manifest: dict | None) -> str:
+    if manifest is None:
+        return f"{asset_id}: matched but no diagnostic manifest found under codex/core/pixelbrain/imports/."
+    gene_type = manifest.get("geneType", "UNKNOWN")
+    checksum = manifest.get("checksum", "MISSING")
+    byte_length = manifest.get("byteLength", "?")
+    return f"{asset_id}: {gene_type} gene, {byte_length} bytes, checksum {checksum}"
+
+
 def _scan_for_visual_assets(root: Path) -> dict[str, list[str]]:
     result: dict[str, list[str]] = {"colourFiles": [], "spriteFiles": [], "assetDirs": []}
     for candidate in list(root.rglob("*"))[:1000]:
@@ -70,6 +113,20 @@ def run_pixel_brain(
     q = (query or field.task.rawUserRequest).lower()
     findings: list[str] = []
     root = _project_root()
+
+    pixelbrain_assets = _list_pixelbrain_assets(root)
+    named_assets = _match_assets_in_text(q, pixelbrain_assets)
+    if named_assets:
+        for asset_id in named_assets[:4]:
+            findings.append(_describe_manifest(asset_id, _read_manifest(root, asset_id)))
+    elif pixelbrain_assets and any(
+        w in q for w in {"pixel", "sprite", "asset", "palette", "gene", "packet"}
+    ):
+        findings.append(
+            f"No specific pixel asset named in the task. {len(pixelbrain_assets)} real "
+            f"pixel asset(s) available: {', '.join(pixelbrain_assets[:8])}"
+        )
+
     assets = _scan_for_visual_assets(root)
 
     if any(w in q for w in {"palette", "colour", "color", "theme", "chroma"}):

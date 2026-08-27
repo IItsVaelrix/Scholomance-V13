@@ -30,9 +30,25 @@ class TestDeterminismAuditor(unittest.TestCase):
     def test_warns_when_seed_missing(self):
         field = create_force_field("Run regression test")
         field.determinism.deterministicMode = True
+        field.determinism.seed = None  # simulate genuine absence, not the default path
         result = audit_determinism(field, [])
         self.assertTrue(any("seed" in f for f in result.findings))
         self.assertTrue(result.bytecodes)
+
+    def test_create_force_field_assigns_a_real_seed(self):
+        field = create_force_field("Run regression test")
+        self.assertIsNotNone(field.determinism.seed)
+
+    def test_seed_is_stable_for_the_same_task_id(self):
+        first = create_force_field("Run regression test", task_id="task-abc")
+        second = create_force_field("A completely different query", task_id="task-abc")
+        self.assertEqual(first.determinism.seed, second.determinism.seed)
+
+    def test_no_seed_warning_on_a_freshly_created_field(self):
+        field = create_force_field("check the pixel art color palette")
+        result = audit_determinism(field, [])
+        self.assertFalse(any("seed" in f for f in result.findings))
+        self.assertFalse(result.bytecodes)
 
     def test_flags_banned_tool_in_brain_allowed_tools(self):
         field = create_force_field("Run deterministic test")

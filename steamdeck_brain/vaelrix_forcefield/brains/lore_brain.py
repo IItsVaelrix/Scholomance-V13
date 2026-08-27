@@ -62,6 +62,32 @@ def _project_root() -> Path:
     return Path.cwd()
 
 
+_ENCYCLOPEDIA_DIR = "docs/scholomance-encyclopedia"
+_MAX_FILES_SCANNED_PER_TERM = 400
+
+
+def _quote_term_definition(root: Path, term: str) -> tuple[str, str] | None:
+    """Find the first real line in the encyclopedia that actually mentions
+    `term`, and return (relative_path, line_text) — evidence, not a guess."""
+    encyclopedia = root / _ENCYCLOPEDIA_DIR
+    if not encyclopedia.is_dir():
+        return None
+    scanned = 0
+    for path in encyclopedia.rglob("*.md"):
+        if not path.is_file():
+            continue
+        scanned += 1
+        if scanned > _MAX_FILES_SCANNED_PER_TERM:
+            break
+        try:
+            for line in path.read_text(encoding="utf-8", errors="ignore").splitlines():
+                if term in line.lower():
+                    return str(path.relative_to(root)), line.strip()
+        except Exception:
+            continue
+    return None
+
+
 def _scan_lore_files(root: Path) -> list[str]:
     lore_dirs = {"knowledge", "encyclopedia", "lore", "canon", "myth", "symbolism", "mirrorborne"}
     lore_exts = {".md", ".pdr.md", ".txt", ".json"}
@@ -93,6 +119,11 @@ def run_lore_brain(
     if matched_terms:
         term_list = ", ".join(matched_terms.keys())
         findings.append(f"Canonical terms detected: {term_list}")
+        for term in matched_terms:
+            quote = _quote_term_definition(root, term)
+            if quote:
+                path, line = quote
+                findings.append(f'"{term}" per {path}: "{line}"')
         if "mirrorborne" in matched_terms and "resonance" not in matched_terms:
             findings.append(
                 "Mirrorborne referenced without Resonance — "

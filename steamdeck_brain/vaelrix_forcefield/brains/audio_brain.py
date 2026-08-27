@@ -4,6 +4,10 @@ Vaelrix Cortex ForceField — Audio Brain.
 Music/sound/beat domain specialist. Analyzes the task for audio-related
 concerns: BPM, beat structure, sound design, audio file references,
 and music theory heuristics.
+
+Its genre, instrument, and production-term lists are unvalidated heuristics,
+not measurements from audio files, BPM analysis, or listener data. Treat
+findings as review prompts, never as measured audio facts.
 """
 
 from __future__ import annotations

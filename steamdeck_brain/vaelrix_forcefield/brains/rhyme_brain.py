@@ -10,7 +10,9 @@ from __future__ import annotations
 
 import re
 from collections import Counter
+from pathlib import Path
 
+from . import _scholomance_dict as sdict
 from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCortexForceField
 
 
@@ -64,6 +66,26 @@ def _last_syllable_group(word: str) -> str:
     return word_lower[-2:] if len(word_lower) >= 2 else word_lower
 
 
+def _project_root() -> Path:
+    here = Path(__file__).resolve()
+    for _ in range(8):
+        if here == here.parent:
+            break
+        if any((here / marker).exists() for marker in (".git", "package.json", "pyproject.toml")):
+            return here
+        here = here.parent
+    return Path.cwd()
+
+
+def _rhyme_group(root: Path, word: str) -> tuple[str, bool]:
+    """(group_label, is_real) — real rhyme_family from the dictionary when
+    the word is known, else the suffix-heuristic fallback."""
+    rhyme = sdict.rhyme_for_word(root, word)
+    if rhyme and rhyme.get("rhyme_family"):
+        return rhyme["rhyme_family"], True
+    return _last_syllable_group(word), False
+
+
 def _count_syllables(word: str) -> int:
     word = word.lower().strip(",.!?;:()[]{}'\"")
     if not word:
@@ -81,10 +103,10 @@ def _count_syllables(word: str) -> int:
     return max(1, count)
 
 
-def _detect_rhyme_scheme(lines: list[str]) -> tuple[str, float]:
+def _detect_rhyme_scheme(root: Path, lines: list[str]) -> tuple[str, float]:
     if len(lines) < 2:
         return "N/A", 0.0
-    endings = [_last_syllable_group(_last_word(line)) for line in lines]
+    endings = [_rhyme_group(root, _last_word(line))[0] for line in lines]
     letter_map: dict[str, str] = {}
     next_letter = ord("A")
     scheme: list[str] = []
@@ -133,8 +155,20 @@ def run_rhyme_brain(
             ),
         )
 
-    scheme, consistency = _detect_rhyme_scheme(lines)
+    root = _project_root()
+    scheme, consistency = _detect_rhyme_scheme(root, lines)
     findings.append(f"Rhyme scheme: {scheme} (consistency: {consistency:.0%})")
+
+    real_hits = [
+        (word, group, is_real)
+        for word, (group, is_real) in (
+            (_last_word(line), _rhyme_group(root, _last_word(line))) for line in lines
+        )
+        if is_real
+    ]
+    if real_hits:
+        sample = ", ".join(f'"{w}"={g}' for w, g, _ in real_hits[:4])
+        findings.append(f"Real dictionary rhyme_family for {len(real_hits)}/{len(lines)} line ending(s): {sample}")
 
     syllable_counts = [_count_syllables(_last_word(line)) for line in lines]
     avg_syl = sum(syllable_counts) / len(syllable_counts) if syllable_counts else 0
@@ -152,7 +186,7 @@ def run_rhyme_brain(
     else:
         findings.append("No strong cadence markers detected; consider adding rhythmic anchor words.")
 
-    rhyme_groups = Counter(_last_syllable_group(_last_word(line)) for line in lines)
+    rhyme_groups = Counter(_rhyme_group(root, _last_word(line))[0] for line in lines)
     unique_rhymes = len(rhyme_groups)
     rhyme_density = (len(lines) - unique_rhymes) / max(len(lines), 1)
     if rhyme_density > 0.6:

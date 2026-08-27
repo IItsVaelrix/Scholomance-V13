@@ -97,13 +97,25 @@ class NoLLMBridge:
             return str(result)
         if result.get("error"):
             return f"[brain error] {result['error']}"
-        ans = result.get("answer") or {}
+        ans = result.get("answer")
+        synthesis_material = result.get("for_agent_synthesis")
         findings = result.get("findings") or []
         signals = result.get("scdna_health_signals") or result.get("health_signals") or []
         genes = result.get("scdna_genes") or []
         next_action = result.get("next_action")
         lines = []
-        if isinstance(ans, dict):
+        if isinstance(synthesis_material, dict):
+            # Structured form: loud enough that a reader can't mistake this
+            # for a finished answer without noticing synthesized=False.
+            lines.append("## UNSYNTHESIZED EVIDENCE — CALLER MUST SYNTHESIZE")
+            lines.append(f"(state: {synthesis_material.get('state')})")
+            lines.append(synthesis_material.get("material", ""))
+        elif synthesis_material:
+            # deterministic mode: no local model synthesized anything, so
+            # this IS the payload — the assembled evidence for whoever reads
+            # this response to reason over.
+            lines.append(synthesis_material)
+        elif isinstance(ans, dict):
             summary = ans.get("summary") or ans.get("direct") and "Direct ForceField."
             if summary:
                 lines.append(f"# {summary}")
@@ -112,7 +124,7 @@ class NoLLMBridge:
                 lines.append("\n## Key findings")
                 for f in kf[:8]:
                     lines.append(f"- {f}")
-        else:
+        elif ans:
             lines.append(str(ans))
         if findings and show_context:
             lines.append("\n## Findings (raw)")

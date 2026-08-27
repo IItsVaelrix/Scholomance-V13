@@ -101,7 +101,10 @@ DEFAULT_AMPLIFIER_REGISTRY: list[AmplifierBrain] = [
     AmplifierBrain(
         id="UI_BRAIN",
         domain=["ui", "interface", "widget", "screen", "layout"],
-        activationSignals=["ui", "interface", "widget", "screen", "layout", "component", "theme"],
+        activationSignals=[
+            "ui", "interface", "widget", "screen", "layout", "component", "theme",
+            "typography", "font", "georgia", "serif", "truesight",
+        ],
         allowedTools=["read_file", "replace_file_content"],
         defaultSearchBudget=3,
         weight=1.0,
@@ -117,7 +120,10 @@ DEFAULT_AMPLIFIER_REGISTRY: list[AmplifierBrain] = [
     AmplifierBrain(
         id="ARCHITECTURE_BRAIN",
         domain=["architecture", "design", "structure", "pattern"],
-        activationSignals=["architecture", "design", "structure", "pattern", "system", "organize"],
+        activationSignals=[
+            "architecture", "design", "structure", "pattern", "system", "organize",
+            "refactor", "layer", "contract", "boundary",
+        ],
         allowedTools=["search_code", "read_file", "codebase_search"],
         defaultSearchBudget=4,
         weight=1.0,

@@ -17,7 +17,10 @@ from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCort
 UI_BRAIN = AmplifierBrain(
     id="UI_BRAIN",
     domain=["ui", "interface", "widget", "screen", "layout"],
-    activationSignals=["ui", "interface", "widget", "screen", "layout", "component", "theme"],
+    activationSignals=[
+        "ui", "interface", "widget", "screen", "layout", "component", "theme",
+        "typography", "font", "georgia", "serif", "truesight",
+    ],
     allowedTools=["read_file", "search_code"],
     defaultSearchBudget=3,
 )
@@ -70,6 +73,33 @@ _THEME_TERMS: dict[str, str] = {
     "radius": "Border radius — corner roundness.",
     "animation": "Animation — motion/transition effects.",
 }
+
+
+#: Terms belonging to this project's OWN documented design system
+#: (Scholomance LAW/CLAUDE.md's Design System table) — checked before the
+#: generic web-UI vocabulary below, since a query about this project's real
+#: typography/theming deserves the real rule, not a Bootstrap glossary hit.
+_SCHOLOMANCE_UI_TERMS = {
+    "typography", "font", "georgia", "jetbrains", "serif", "monospace",
+    "scroll", "aurora", "vignette", "scanline", "truesight", "school theming",
+    "school theme", "phoneme chip", "combat result", "score trace",
+}
+
+_LAW_CLAUDE_MD = "docs/scholomance-encyclopedia/Scholomance LAW/CLAUDE.md"
+
+
+def _quote_design_system(root: Path, phrase: str) -> str | None:
+    """Real line from this project's own Design System doc mentioning `phrase`."""
+    path = root / _LAW_CLAUDE_MD
+    if not path.exists():
+        return None
+    try:
+        for line in path.read_text(encoding="utf-8", errors="ignore").splitlines():
+            if phrase in line.lower():
+                return line.strip()
+    except Exception:
+        return None
+    return None
 
 
 def _project_root() -> Path:
@@ -135,6 +165,12 @@ def run_ui_brain(
     text = (query or field.task.rawUserRequest).lower()
     findings: list[str] = []
     root = _project_root()
+
+    scholomance_hits = [term for term in _SCHOLOMANCE_UI_TERMS if term in text]
+    for term in scholomance_hits[:3]:
+        quote = _quote_design_system(root, term)
+        if quote:
+            findings.append(f'Project design system ({term}): "{quote}"')
 
     layout_hits = {term: desc for term, desc in _LAYOUT_TERMS.items() if term in text}
     if layout_hits:

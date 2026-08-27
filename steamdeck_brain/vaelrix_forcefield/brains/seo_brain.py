@@ -4,6 +4,10 @@ Vaelrix Cortex ForceField — SEO Brain.
 Title, tag, description, and keyword domain specialist. Scores titles
 against YouTube best-practice heuristics: length, power words, keyword
 placement, emotional curve, and golden-curve compliance.
+
+Its power-word and emotional-language lists are unvalidated heuristics, not
+measured SEO-performance signals. Treat findings as prompts for review, never
+as evidence of discoverability or conversion.
 """
 
 from __future__ import annotations
