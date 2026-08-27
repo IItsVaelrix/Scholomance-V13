@@ -12,6 +12,7 @@ All Product Design Requirements (PDRs) for Scholomance are archived here. Each P
 
 | PDR | Status | Classification | Priority |
 |-----|--------|----------------|----------|
+| [`2026-08-27-divtube-mobile-coding-partner-pdr.md`](./2026-08-27-divtube-mobile-coding-partner-pdr.md) | In Progress | Architectural \| Mobile \| Remote Control \| Coding Agent \| Security \| QA | Critical |
 | [`ByteCode%20Diagnostic%20Synthesis%20PDR (1).md`](./ByteCode%2520Diagnostic%2520Synthesis%2520PDR%20%281%29.md) | Unclassified | Bytecode + Diagnostic Synthesis | Unclassified |
 | [`bytecode_contextual_compression_checksums_pdr.md`](./bytecode_contextual_compression_checksums_pdr.md) | Draft | Architectural \| AI Observability \| MCP Memory \| TurboQuant Infrastructure | High |
 | [`ByteCode_Error_System_V3_pdr.md`](./ByteCode_Error_System_V3_pdr.md) | Archived placeholder | Bytecode + QA + Error Transport | High |

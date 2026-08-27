@@ -38,8 +38,18 @@ python3 -m tui.ui.app
 For a phone on the same trusted LAN, also set
 `DIVTUBE_REMOTE_COMPANION_LAN_ENABLED=true`. This binds HTTPS to the LAN; keep
 the firewall scoped to the private subnet and do not port-forward the listener.
-Available modes are `status_only`, `chat_read_only`, and
-`downloads_confirmed`. There is no plaintext HTTP fallback.
+Available modes are `status_only`, `chat_read_only`, `downloads_confirmed`, and
+`coding_partner`. There is no plaintext HTTP fallback.
+
+`coding_partner` is a separate, V2 protocol selected by the phone after the
+same TLS-pinned pairing. It is intentionally not a remote terminal: the host
+alone owns files, processes, credentials, and provider keys. The phone can
+create and inspect bounded tasks, review logical targets and digest-bound
+patch proposals, approve a proposal once before its expiry, read the host
+receipt, run only named verification presets, and revoke itself. Never expose
+this listener beyond a trusted LAN or port-forward it. A tool that has no
+explicit mobile policy and adapter remains unavailable; check the generated
+capability matrix before describing a build as full desktop parity.
 
 Inside the Cockpit:
 

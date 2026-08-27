@@ -30,8 +30,15 @@ class PinnedCockpitClient(private val record: PairingRecord) {
 
     fun events(listener: WebSocketListener): WebSocket = client.newWebSocket(request("/v1/events"), listener)
 
+    /** V2 is selected explicitly; a V1 companion can never be parsed as V2. */
+    fun codingEvents(listener: WebSocketListener): WebSocket =
+        client.newWebSocket(request("/v1/events?protocol=$CODING_PROTOCOL_VERSION"), listener)
+
     fun send(socket: WebSocket, envelope: ClientEnvelope): Boolean =
         socket.send(RemoteProtocol.json.encodeToString(ClientEnvelope.serializer(), envelope))
+
+    fun sendCoding(socket: WebSocket, envelope: CodingClientEnvelope): Boolean =
+        socket.send(CodingProtocol.json.encodeToString(CodingClientEnvelope.serializer(), envelope))
 
     private fun request(path: String) = Request.Builder()
         .url("https://${record.host}:${record.port}$path")

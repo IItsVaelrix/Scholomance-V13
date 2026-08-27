@@ -26,6 +26,13 @@ fun CockpitScreen(
     onDownload: (String, String) -> Unit,
     onRights: (Boolean) -> Unit,
     onRevoke: () -> Unit,
+    codingState: CodingPartnerUiState? = null,
+    onCodingCreateTask: (String) -> Unit = {},
+    onCodingSelectTask: (String) -> Unit = {},
+    onCodingApprove: (String, String) -> Unit = { _, _ -> },
+    onCodingReject: (String) -> Unit = {},
+    onCodingCancel: (String) -> Unit = {},
+    onCodingVerify: (String) -> Unit = {},
 ) {
     if (state.connection == ConnectionState.UNPAIRED || state.connection == ConnectionState.CONNECTING) {
         PairingPane(state, onPair)
@@ -41,9 +48,13 @@ fun CockpitScreen(
         TabRow(selectedTabIndex = tab) {
             Tab(tab == 0, { tab = 0 }, text = { Text("Chat") })
             Tab(tab == 1, { tab = 1 }, text = { Text("Device") })
+            if (codingState != null) Tab(tab == 2, { tab = 2 }, text = { Text("Code") })
         }
         when (tab) {
             0 -> ChatPane(state, onChat, Modifier.weight(1f))
+            2 -> codingState?.let {
+                CodingPartnerScreen(it, onCodingCreateTask, onCodingSelectTask, onCodingApprove, onCodingReject, onCodingCancel, onCodingVerify, onRevoke)
+            }
             else -> DevicePane(state, onDownload, onRights, onRevoke, Modifier.weight(1f))
         }
     }

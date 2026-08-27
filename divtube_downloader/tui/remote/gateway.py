@@ -13,6 +13,7 @@ from typing import Any, Awaitable, Callable
 from aiohttp import WSMsgType, web
 
 from .config import RemoteCompanionConfig
+from .coding_protocol import PROTOCOL_VERSION as CODING_PROTOCOL_VERSION, CodingProtocolError, V2ClientEnvelope
 from .event_hub import RemoteEventHub
 from .pairing import PairingError, PairingStore
 from .protocol import ClientEnvelope, ProtocolError
@@ -33,6 +34,8 @@ class RemoteGateway:
         *,
         port: int = 0,
         dispatcher: Dispatcher | None = None,
+        coding_dispatcher: Dispatcher | None = None,
+        coding_event_hub=None,
         snapshot_provider: Callable[[], tuple[dict[str, Any], list[dict[str, Any]]]] | None = None,
         clock: Callable[[], float] = time.monotonic,
     ) -> None:
@@ -42,6 +45,8 @@ class RemoteGateway:
         self.state_dir = Path(state_dir)
         self.port = port
         self.dispatcher = dispatcher
+        self.coding_dispatcher = coding_dispatcher
+        self.coding_event_hub = coding_event_hub
         self.snapshot_provider = snapshot_provider
         self.clock = clock
         self.runner: web.AppRunner | None = None
@@ -154,10 +159,19 @@ class RemoteGateway:
 
     async def _events(self, request: web.Request) -> web.WebSocketResponse:
         device_id = self._authenticate(request)
+        protocol_version = request.query.get("protocol", "divtube-remote-v1")
+        if protocol_version == CODING_PROTOCOL_VERSION:
+            if self.config.mode != "coding_partner" or self.coding_event_hub is None:
+                raise web.HTTPForbidden(text="coding partner mode is unavailable")
+            event_hub = self.coding_event_hub
+        elif protocol_version == "divtube-remote-v1":
+            event_hub = self.event_hub
+        else:
+            raise web.HTTPBadRequest(text="unsupported protocol version")
         socket = web.WebSocketResponse(max_msg_size=MAX_MESSAGE_BYTES, heartbeat=30)
         await socket.prepare(request)
         self._websockets.add(socket)
-        queue = self.event_hub.attach(device_id)
+        queue = event_hub.attach(device_id)
         sender = asyncio.create_task(self._send_events(socket, queue))
         try:
             async for message in socket:
@@ -165,13 +179,13 @@ class RemoteGateway:
                     if len(message.data.encode("utf-8")) > MAX_MESSAGE_BYTES:
                         await socket.close(code=1009, message=b"message too large")
                         break
-                    await self._handle_client_message(device_id, message.data)
+                    await self._handle_client_message(device_id, message.data, protocol_version, event_hub)
                 elif message.type in {WSMsgType.ERROR, WSMsgType.CLOSE, WSMsgType.CLOSED}:
                     break
         finally:
             sender.cancel()
             await asyncio.gather(sender, return_exceptions=True)
-            self.event_hub.detach(device_id)
+            event_hub.detach(device_id)
             self._websockets.discard(socket)
         return socket
 
@@ -179,21 +193,34 @@ class RemoteGateway:
         while not socket.closed:
             await socket.send_str(await queue.get())
 
-    async def _handle_client_message(self, device_id: str, raw: str) -> None:
+    async def _handle_client_message(self, device_id: str, raw: str, protocol_version: str, event_hub) -> None:
         try:
-            envelope = ClientEnvelope.from_json(raw)
-            if not self._type_allowed(envelope.type):
+            if protocol_version == CODING_PROTOCOL_VERSION:
+                envelope = V2ClientEnvelope.from_json(raw)
+                dispatcher = self.coding_dispatcher
+                message_type = envelope.message_type
+                request_id = envelope.request_id
+            else:
+                envelope = ClientEnvelope.from_json(raw)
+                dispatcher = self.dispatcher
+                message_type = envelope.type
+                request_id = envelope.requestId
+            if not self._type_allowed(message_type, protocol_version):
                 raise ProtocolError("mode_forbidden", "Request is disabled by the companion mode.")
-            self._enforce_rate_limit(device_id, envelope.type)
-            if envelope.type == "status.snapshot.request":
-                self._publish_snapshot(request_id=envelope.requestId)
+            self._enforce_rate_limit(device_id, message_type)
+            if message_type == "status.snapshot.request":
+                self._publish_snapshot(request_id=request_id)
                 return
-            if self.dispatcher is None:
+            if message_type == "device.revoke" and protocol_version == CODING_PROTOCOL_VERSION:
+                self.pairing.revoke(device_id)
+                event_hub.detach(device_id)
+                return
+            if dispatcher is None:
                 raise ProtocolError("unavailable", "Cockpit adapter is unavailable.")
-            result = self.dispatcher(device_id, envelope)
+            result = dispatcher(device_id, envelope)
             if inspect.isawaitable(result):
                 await result
-        except ProtocolError as exc:
+        except (ProtocolError, CodingProtocolError, ValueError) as exc:
             request_id = None
             try:
                 value = json.loads(raw)
@@ -201,9 +228,12 @@ class RemoteGateway:
                     request_id = value["requestId"]
             except json.JSONDecodeError:
                 pass
-            self.event_hub.publish("error", {"code": exc.code, "message": exc.message}, request_id=request_id)
+            code = exc.code if isinstance(exc, ProtocolError) else "invalid_coding_frame"
+            event_hub.publish("error", {"code": code, "message": str(exc)}, request_id=request_id)
 
-    def _type_allowed(self, message_type: str) -> bool:
+    def _type_allowed(self, message_type: str, protocol_version: str = "divtube-remote-v1") -> bool:
+        if protocol_version == CODING_PROTOCOL_VERSION:
+            return self.config.mode == "coding_partner"
         if message_type in {"session.hello", "status.snapshot.request"}:
             return True
         if message_type == "chat.turn.request":
@@ -213,7 +243,14 @@ class RemoteGateway:
         return False
 
     def _enforce_rate_limit(self, device_id: str, message_type: str) -> None:
-        limit = 30 if message_type == "chat.turn.request" else 6 if message_type == "download.request" else None
+        limit = (
+            30 if message_type == "chat.turn.request" else
+            6 if message_type == "download.request" else
+            20 if message_type in {"task.snapshot.request", "capability.manifest.request", "session.hello"} else
+            10 if message_type in {"task.create", "artifact.open.request"} else
+            6 if message_type in {"action.approve", "action.reject", "action.cancel", "verification.start.request", "device.revoke"} else
+            None
+        )
         if limit is None:
             return
         now = self.clock()

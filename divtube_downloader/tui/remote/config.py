@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import Mapping
 
 
-REMOTE_MODES = frozenset({"off", "status_only", "chat_read_only", "downloads_confirmed"})
+REMOTE_MODES = frozenset({"off", "status_only", "chat_read_only", "downloads_confirmed", "coding_partner"})
 
 
 def _enabled(value: str | None) -> bool:

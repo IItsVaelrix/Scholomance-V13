@@ -7,11 +7,57 @@
 
 ## Living Document - Owned by Codex, Read by All Agents
 
-**Version: 1.46** | Last updated: 2026-08-26
+**Version: 1.47** | Last updated: 2026-08-27
 
 > Bump the version on every schema change.
 > Notify Claude for UI-consumed field changes.
 > Notify Gemini for fixture, regression-test, and backend implementation changes.
+
+---
+
+## SCHEMA CHANGE NOTICE
+
+- Schema: DivTube Mobile Coding Partner Protocol
+- Version: 1.46 -> 1.47
+- Date: 2026-08-27
+- Changed fields: registered the separate `DivTubeRemoteProtocolV2` task,
+  proposal, receipt, verification, and device-control envelopes
+- Breaking: no; V1 remains byte-for-byte separate
+- Owner: Codex
+- Claude impact: Android renders only logical targets, proposal digests, and
+  host receipts; it must not imply direct shell or filesystem access
+- Gemini impact: gateway, journal, adapter, and Android fixtures validate exact
+  fields before dispatch
+
+### DivTubeRemoteProtocolV2
+
+V2 is selected only with `GET /v1/events?protocol=divtube-remote-v2` while
+`DIVTUBE_REMOTE_COMPANION_MODE=coding_partner` is enabled. It reuses paired
+device credentials and certificate pinning, but does not share V1 parsers or
+event sequencing. Its client envelope is exactly `protocolVersion`, `type`,
+`requestId`, and `payload`; its server envelope additionally includes
+`instanceId` and strictly increasing `seq`.
+
+V2 client types are `session.hello`, `capability.manifest.request`,
+`task.create`, `task.cancel`, `task.snapshot.request`, `action.approve`,
+`action.reject`, `action.cancel`, `artifact.open.request`,
+`verification.start.request`, and `device.revoke`. Generic shell, Python,
+command, evaluation, credential, and arbitrary path messages do not exist.
+
+An `action.proposed` event contains the exact task/action identifiers,
+capability, human summary, proposal digest, expiry, risk class, logical
+targets, and state. `action.approve` must echo the same digest. A terminal
+`action.receipt` contains the exact task/action identifiers, state, host
+summary, proposal digest, and authoritative post-image digest. Unknown fields,
+versions, event names, malformed identifiers, absolute paths, and stale
+sequences fail before adapter dispatch. Server payloads reject secret-bearing
+field names recursively.
+
+The host-local journal atomically persists only proposal state, logical
+targets, and precondition digests. Every proposal is expiring and single-use;
+the host revalidates target pre-images before applying an approved effect. The
+phone is a review/control surface, never the authority for file state or a
+verification outcome.
 
 ---
 
