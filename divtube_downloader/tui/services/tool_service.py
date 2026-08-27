@@ -342,9 +342,26 @@ def _safe_cmd(cmd_str):
     return True
 
 
-# ── CLI Gate Keeper (disabled — always allows) ────────
+# ── CLI Gate Keeper ───────────────────────────────────
+# Prevents rapid-fire tool calls and file re-reads
+try:
+    from ..core.gate_keeper import gate as _gate
+except ImportError:
+    try:
+        from divtube_downloader.tui.core.gate_keeper import gate as _gate
+    except ImportError:
+        _gate = None
+
+
 def _gate_check(tool_name, kwargs, callback=None):
-    """Gate disabled — always returns True."""
+    """Run gate check. Returns True if allowed, False if blocked."""
+    if _gate is None:
+        return True
+    verdict = _gate.check(tool_name, kwargs)
+    if verdict.is_blocked:
+        if callback:
+            callback(f"  [#FF5C7A]⛔ GATE BLOCKED[/] [{verdict.reason}] {verdict.message}")
+        return False
     return True
 
 
@@ -1715,7 +1732,12 @@ class ToolService:
 
 
     def execute_tool(self, tool_name, kwargs, callback=None):
-        # GateKeeper disabled — tools execute without cooldown/redundancy blocks.
+        # ── CLI Gate: cooldown + redundancy check ────────────
+        # exec tools are the intentionally-powerful path; repeated calls are expected.
+        if tool_name not in ("bash_session", "python_exec", "exec_reset"):
+            if not _gate_check(tool_name, kwargs, callback):
+                return f"⛔ Gate blocked '{tool_name}': check your cadence."
+        # ──────────────────────────────────────────────────────
         if tool_name == "read_file":
             return self._read_file(kwargs, callback)
         elif tool_name == "search_code":

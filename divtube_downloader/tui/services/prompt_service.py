@@ -9,6 +9,7 @@ from openai import APIStatusError
 
 from tui.services.env_config import get_config, get_model, get_openai_client
 from tui.services.tool_service import ToolService, get_pending_diff, _side_by_side_pairs
+from tui.services.adaptive_tool_recommender import AdaptiveToolRecommender
 from tui.utils.throttle import llm_throttle
 from tui.services.token_meter import meter
 # Compiled once: pulls the write_id out of a replace_file_content result so we
@@ -55,6 +56,13 @@ class PromptService:
         self.tools = ToolService()
         self._history_lock = threading.Lock()
         self.history = self._load_history()
+        # Real usage ledger for AdaptiveToolRecommender — see
+        # _get_adaptive_recommender. Own small db file (not
+        # scholomance_collab.sqlite; see tool_usage_history.py's docstring),
+        # constructed here (not lazily) so every real cockpit instance
+        # learns from the same file across the whole process lifetime.
+        from tui.services.tool_usage_history import ToolUsageHistory
+        self._tool_usage_history = ToolUsageHistory()
 
     # ── Per-tab history persistence ─────────────────────────────────
     def _load_history(self):
@@ -180,8 +188,78 @@ class PromptService:
             return base + "\n\n" + law_ctx
         return base
 
-    def _select_tools(self, tools):
-        return list(self.tools.tools if tools is None else tools)
+    # Tools nearly every task needs regardless of what the recommender ranks:
+    # file/code navigation and editing, running things, and the code-lens
+    # trio (telescope/microscope/atlas/evaluate) that predates and isn't
+    # covered by ToolRecommender's metadata (see tool_recommender.py's
+    # module docstring). Always advertised, never gated behind a guess.
+    CORE_TOOL_NAMES = frozenset({
+        "read_file", "search_code", "list_directory", "find_file",
+        "run_command", "replace_file_content", "git_diff", "test_run",
+        "telescope", "microscope", "atlas", "evaluate",
+    })
+
+    # How many additional (non-core) tools the recommender may pull in per
+    # message. Generous on purpose: this is a token-tax cut, not a hard
+    # capability fence — recommend() is a ranked guess, and a task whose
+    # real tool lands just outside top-K still has 3x this many candidates
+    # scored above it before falling off the list entirely.
+    RECOMMEND_TOP_K = 15
+
+    def _get_adaptive_recommender(self):
+        """Lazily build the one AdaptiveToolRecommender this instance uses,
+        shared between _select_tools (reads recommendations) and
+        _record_tool_usage (writes real usage) — they must be the same
+        object, or usage recorded through one would never be visible to the
+        other's recommend() calls.
+
+        getattr(..., None) rather than a hard attribute access: instances
+        built by bypassing __init__ (the __new__-based pattern used
+        throughout this test suite) have no self._tool_usage_history, and
+        must degrade to history=None — a pure static-ranking fallback with
+        no real file I/O — rather than raise.
+        """
+        if not hasattr(self, "_tool_recommender"):
+            self._tool_recommender = AdaptiveToolRecommender(
+                history=getattr(self, "_tool_usage_history", None)
+            )
+        return self._tool_recommender
+
+    def _select_tools(self, tools, task_text=None):
+        """Choose which tool schemas to advertise for one API call.
+
+        An explicit `tools` list (remote/filtered callers) always wins
+        unchanged. Otherwise, with no task text to route on, the full
+        catalog is returned — same as before this existed. With task text,
+        returns CORE_TOOL_NAMES plus the recommender's top-K guesses for
+        that text, computed once by the caller and held fixed for the
+        whole tool-call loop (stable schema == smaller payload AND a
+        byte-identical prefix, which provider prompt caching requires).
+        """
+        if tools is not None:
+            return list(tools)
+        catalog = self.tools.tools
+        if not task_text:
+            return list(catalog)
+        try:
+            ranked = self._get_adaptive_recommender().recommend(task_text, top_k=self.RECOMMEND_TOP_K)
+            wanted = self.CORE_TOOL_NAMES | {r["tool"] for r in ranked}
+        except Exception:
+            return list(catalog)
+        selected = [t for t in catalog if t.get("function", {}).get("name") in wanted]
+        return selected if selected else list(catalog)
+
+    def _record_tool_usage(self, task_text, tools_used):
+        """Log which tools actually got used for this task, once the turn
+        that used them has completed — real ground truth for the next
+        recommend() call to learn from. Never raises: a broken history
+        backend must not break the turn that finished successfully."""
+        if not task_text or not tools_used:
+            return
+        try:
+            self._get_adaptive_recommender().record_usage(task_text, list(tools_used))
+        except Exception:
+            pass
 
     def _execute_selected_tool(self, name, arguments, callback, selected_tools):
         advertised = {
@@ -382,7 +460,11 @@ class PromptService:
 
                 MAX_TURNS = 150
                 use_tools = True
-                selected_tools = self._select_tools(tools)
+                selected_tools = self._select_tools(tools, task_text=text)
+                # Real ground truth for AdaptiveToolRecommender: which tools
+                # actually got called this turn, not just which were
+                # offered. Recorded once at successful completion, below.
+                used_tools = set()
 
                 # We are already in the try block
                 for turn in range(MAX_TURNS):
@@ -438,6 +520,7 @@ class PromptService:
                                 set_state("idle")
                                 return
                             func_name = tc["function"]["name"]
+                            used_tools.add(func_name)
                             try:
                                 func_args = json.loads(tc["function"]["arguments"])
                                 tool_result = self._execute_selected_tool(func_name, func_args, callback, selected_tools)
@@ -544,6 +627,7 @@ class PromptService:
                             callback("\n")
                     else:
                         callback("(empty response)\n")
+                    self._record_tool_usage(text, used_tools)
                     set_state("idle")
                     terminal_ok = True
                     terminal_detail = "complete"

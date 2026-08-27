@@ -16,6 +16,7 @@ gradle.zip
 # Generated data / models / logs
 embeddings/
 divtube_memory.db
+tool_usage_history.db
 niche_database.sqlite
 *.log
 
