@@ -26,7 +26,24 @@ import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 
 enum class ConnectionState { UNPAIRED, CONNECTING, CONNECTED, OFFLINE }
-data class ChatLine(val id: String, val text: String, val terminal: Boolean)
+
+/**
+ * Who produced a chat line.
+ *
+ * The server already labels every `chat.message` with a role; the UI simply
+ * had nowhere to put it, so a sent message vanished until the assistant
+ * replied and there was no way to tell a question from an answer in the
+ * scrollback. USER lines are added locally on send — the server echoes only
+ * assistant output.
+ */
+enum class ChatRole { USER, ASSISTANT }
+
+data class ChatLine(
+    val id: String,
+    val text: String,
+    val terminal: Boolean,
+    val role: ChatRole = ChatRole.ASSISTANT,
+)
 data class JobLine(val id: String, val mediaType: String, val percent: Int, val state: String)
 data class CockpitUiState(
     val connection: ConnectionState = ConnectionState.UNPAIRED,
@@ -58,6 +75,8 @@ class CockpitViewModel : ViewModel() {
                 envelope.payload["messageId"]!!.jsonPrimitive.content,
                 envelope.payload["text"]!!.jsonPrimitive.content,
                 envelope.payload["terminal"]!!.jsonPrimitive.content.toBoolean(),
+                role = if (envelope.payload["role"]?.jsonPrimitive?.content == "user") ChatRole.USER
+                       else ChatRole.ASSISTANT,
             ))
             "download.accepted" -> Unit // server progress/snapshot is authoritative
             "download.progress" -> {
@@ -79,7 +98,16 @@ class CockpitViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching { PinnedCockpitClient.pair(PairingOffer.parse(uri), label) }
                 .onSuccess { record -> onPaired(record); connect(record) }
-                .onFailure { mutableState.value = mutableState.value.copy(connection = ConnectionState.UNPAIRED, error = "Pairing failed") }
+                .onFailure {
+                    // A flat "Pairing failed" here was indistinguishable
+                    // between a malformed URI, an HTTP rejection with a
+                    // real server-side reason, a TLS pin mismatch, and a
+                    // plain network/DNS failure — surface the actual
+                    // exception so a real failure mode is visible instead
+                    // of forcing a guess from the PC side with no evidence.
+                    val detail = it.message ?: it::class.simpleName ?: "unknown error"
+                    mutableState.value = mutableState.value.copy(connection = ConnectionState.UNPAIRED, error = "Pairing failed: $detail")
+                }
         }
     }
 
@@ -91,7 +119,20 @@ class CockpitViewModel : ViewModel() {
             override fun onOpen(webSocket: WebSocket, response: Response) { reconnectAttempt = 0; mutableState.value = mutableState.value.copy(connection = ConnectionState.CONNECTED) }
             override fun onMessage(webSocket: WebSocket, text: String) {
                 if (text.toByteArray().size > 32 * 1024) { webSocket.close(1009, "message too large"); return }
-                runCatching { RemoteProtocol.decodeServer(text, mutableState.value.instanceId, mutableState.value.lastSeq) }.onSuccess(::reduce)
+                runCatching { RemoteProtocol.decodeServer(text, mutableState.value.instanceId, mutableState.value.lastSeq) }
+                    .onSuccess(::reduce)
+                    .onFailure { failure ->
+                        // Decoding is strict (ignoreUnknownKeys = false), so a
+                        // protocol drift between PC and phone rejects the
+                        // event. Dropping it silently made the app look frozen
+                        // while the cockpit believed it had replied; a stale
+                        // sequence is normal and stays quiet, anything else is
+                        // a real mismatch the user should see.
+                        val reason = failure.message ?: failure::class.simpleName ?: "unknown"
+                        if (!reason.contains("Stale event sequence")) {
+                            mutableState.value = mutableState.value.copy(error = "Dropped an event from the PC: $reason")
+                        }
+                    }
             }
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                 mutableState.value = mutableState.value.copy(connection = ConnectionState.OFFLINE, error = "Connection lost")
@@ -102,7 +143,28 @@ class CockpitViewModel : ViewModel() {
         })
     }
 
-    fun sendChat(text: String) = send("chat.turn.request", buildJsonObject { put("text", text); put("conversation", "main") })
+    /**
+     * Send a turn and show it immediately.
+     *
+     * The server echoes only assistant output, so without a local append the
+     * user's own message disappeared the moment it was sent — the single
+     * biggest reason the surface felt unresponsive. Appended before the
+     * request so the transcript reads in the order it happened even if the
+     * socket is slow or the send fails.
+     */
+    fun sendChat(text: String) {
+        val trimmed = text.trim()
+        if (trimmed.isEmpty()) return
+        mutableState.value = mutableState.value.copy(
+            messages = mutableState.value.messages + ChatLine(
+                id = "local-" + UUID.randomUUID().toString(),
+                text = trimmed,
+                terminal = true,
+                role = ChatRole.USER,
+            ),
+        )
+        send("chat.turn.request", buildJsonObject { put("text", trimmed); put("conversation", "main") })
+    }
 
     fun submitDownload(url: String, mediaType: String) {
         if (!mutableState.value.rightsConfirmed) return
@@ -113,10 +175,36 @@ class CockpitViewModel : ViewModel() {
     fun setRightsConfirmed(value: Boolean) { mutableState.value = mutableState.value.copy(rightsConfirmed = value) }
     fun revokeLocal() { pairedRecord = null; socket?.close(1000, "revoked"); socket = null; client = null; mutableState.value = CockpitUiState() }
 
-    private fun send(type: String, payload: JsonObject) {
-        val activeClient = client ?: return
-        val activeSocket = socket ?: return
-        activeClient.send(activeSocket, ClientEnvelope(type = type, requestId = UUID.randomUUID().toString(), payload = payload))
+    /**
+     * Send one client envelope, reporting failure instead of hiding it.
+     *
+     * This used to `return` silently when the socket or client was absent,
+     * and discarded OkHttp's enqueue result. The effect was that a message
+     * sent while disconnected simply vanished: no reply, no activity
+     * indicator, and no error to explain why — indistinguishable from the
+     * agent ignoring you. A transport that cannot deliver has to say so.
+     */
+    private fun send(type: String, payload: JsonObject): Boolean {
+        val activeClient = client
+        val activeSocket = socket
+        if (activeClient == null || activeSocket == null) {
+            mutableState.value = mutableState.value.copy(
+                connection = if (pairedRecord == null) ConnectionState.UNPAIRED else ConnectionState.OFFLINE,
+                error = "Not connected to the cockpit. Is DivTube running on your PC?",
+            )
+            return false
+        }
+        val queued = activeClient.send(
+            activeSocket,
+            ClientEnvelope(type = type, requestId = UUID.randomUUID().toString(), payload = payload),
+        )
+        if (!queued) {
+            mutableState.value = mutableState.value.copy(
+                connection = ConnectionState.OFFLINE,
+                error = "Message could not be sent — the connection dropped.",
+            )
+        }
+        return queued
     }
 
     private fun job(value: kotlinx.serialization.json.JsonElement): JobLine = job(value.jsonObject)
