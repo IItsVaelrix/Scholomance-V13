@@ -12,10 +12,12 @@ import androidx.compose.runtime.getValue
 import divtube.companion.data.PairingStore
 import divtube.companion.ui.CockpitScreen
 import divtube.companion.ui.CockpitViewModel
+import divtube.companion.ui.CodingPartnerViewModel
 import divtube.companion.ui.theme.DivTubeTheme
 
 class MainActivity : ComponentActivity() {
     private val model: CockpitViewModel by viewModels()
+    private val codingModel: CodingPartnerViewModel by viewModels()
 
     private val requestLocalNetwork =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* result surfaces as a connection error if denied */ }
@@ -44,17 +46,25 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         ensureLocalNetworkAccess()
         val store = PairingStore(this)
-        store.load()?.let(model::connect)
+        store.load()?.let { record -> model.connect(record); codingModel.connect(record) }
         setContent {
             val state by model.state.collectAsState()
+            val codingState by codingModel.state.collectAsState()
             DivTubeTheme {
                 CockpitScreen(
                     state,
-                    onPair = { uri, label -> model.pair(uri, label, store::save) },
+                    onPair = { uri, label -> model.pair(uri, label) { record -> store.save(record); codingModel.connect(record) } },
                     onChat = model::sendChat,
                     onDownload = model::submitDownload,
                     onRights = model::setRightsConfirmed,
-                    onRevoke = { store.clear(); model.revokeLocal() },
+                    onRevoke = { store.clear(); model.revokeLocal(); codingModel.revokeLocal() },
+                    codingState = codingState,
+                    onCodingCreateTask = codingModel::createTask,
+                    onCodingSelectTask = codingModel::selectTask,
+                    onCodingApprove = codingModel::approveAction,
+                    onCodingReject = codingModel::rejectAction,
+                    onCodingCancel = codingModel::cancelAction,
+                    onCodingVerify = codingModel::verify,
                 )
             }
         }
