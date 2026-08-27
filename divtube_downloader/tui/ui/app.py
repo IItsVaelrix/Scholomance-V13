@@ -40,10 +40,13 @@ from tui.services.archive_bridge import ArchiveBridge
 from tui.services.prompt_service import PromptService
 from tui.remote.config import RemoteCompanionConfig
 from tui.remote.event_hub import RemoteEventHub
+from tui.remote.coding_event_hub import CodingEventHub
+from tui.remote.action_journal import ActionJournal
 from tui.remote.gateway import RemoteGateway
 from tui.remote.net import lan_ipv4
 from tui.remote.pairing import PairingStore
 from tui.services.remote_cockpit_adapter import RemoteCockpitAdapter
+from tui.services.mobile_coding_adapter import MobileCodingAdapter
 from tui.services.remote_download_queue import RemoteDownloadQueue
 from tui.ui.widgets.remote_companion_status import pairing_qr_text
 from tui.services.scd64_service import scd64_service
@@ -548,12 +551,20 @@ class DivTubeAgentApp(App):
         self.remote_hub = None
         self.remote_adapter = None
         self.remote_downloads = None
+        self.mobile_coding_hub = None
+        self.mobile_coding_adapter = None
         if self.remote_config.listener_enabled:
             remote_state = Path(".divtube-remote")
             self.remote_pairing = PairingStore(remote_state)
             self.remote_hub = RemoteEventHub("pc-" + uuid.uuid4().hex)
             self.remote_downloads = RemoteDownloadQueue(self.agent, self.remote_hub)
             self.remote_adapter = RemoteCockpitAdapter(self.prompt, self.remote_hub, self.remote_downloads)
+            if self.remote_config.mode == "coding_partner":
+                self.mobile_coding_hub = CodingEventHub("pc-coding-" + uuid.uuid4().hex)
+                self.mobile_coding_adapter = MobileCodingAdapter(
+                    Path.cwd(), ActionJournal(remote_state / "mobile-coding"), self.mobile_coding_hub,
+                    prompt_service=self.prompt,
+                )
             self.remote_gateway = RemoteGateway(
                 self.remote_config,
                 self.remote_pairing,
@@ -561,6 +572,8 @@ class DivTubeAgentApp(App):
                 remote_state,
                 port=self.remote_config.port,
                 dispatcher=self.remote_adapter.dispatch,
+                coding_dispatcher=self.mobile_coding_adapter.dispatch if self.mobile_coding_adapter else None,
+                coding_event_hub=self.mobile_coding_hub,
                 snapshot_provider=self._remote_snapshot,
             )
         self.cmd_history = []
@@ -2076,6 +2089,8 @@ class DivTubeAgentApp(App):
         if self.remote_pairing.revoke(args[0]):
             if self.remote_hub:
                 self.remote_hub.detach(args[0])
+            if self.mobile_coding_hub:
+                self.mobile_coding_hub.detach(args[0])
             self.log_msg(f"[{SUCCESS}]Remote device revoked.[/]")
         else:
             self.log_msg(f"[{WARNING}]Device not found or already revoked.[/]")
