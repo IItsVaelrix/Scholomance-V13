@@ -80,11 +80,13 @@ class AetherMeter(Static):
             model = model[:19] + "…"
         burn = (f"[{muted}]≈${s['avg_cost']:.3f}/call[/]"
                 if s["calls"] else f"[{muted}]idle[/]")
+        cache = (f"[{muted}]·[/] [{text}]{s['cache_hit_rate'] * 100:.0f}%[/] [{muted}]cached[/]"
+                 if s["cached_tokens"] else "")
 
         self.update(
             f"{head}\n"
             f"{bar} [bold {color}]{pct}[/]\n"
             f"[{gold}]◆[/] [{text}]{_fmt_tokens(s['tokens'])}[/] [{muted}]tok[/] "
-            f"[{muted}]·[/] [{text}]{s['calls']}[/] [{muted}]calls[/]\n"
+            f"[{muted}]·[/] [{text}]{s['calls']}[/] [{muted}]calls[/] {cache}\n"
             f"[{dim}]{model}[/] [{muted}]·[/] {burn}"
         )

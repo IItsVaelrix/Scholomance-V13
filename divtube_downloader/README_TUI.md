@@ -21,6 +21,12 @@ It transforms the CLI tool into a modern AI agent dashboard!
 
 ## Android companion (private LAN, default-off)
 
+For the ready-to-use phone configuration, double-click
+`run-phone-companion.sh`. It starts the Cockpit on the private LAN with
+read-only agent chat and confirmed downloads enabled. Keep the PC and phone on
+the same trusted Wi-Fi network, then enter `/remote-pair` in the Cockpit and
+scan the one-use QR code from the Android app.
+
 The companion is disabled unless all required flags are set. Loopback status mode:
 
 ```bash

@@ -49,6 +49,49 @@ class TestRecording(TokenMeterTestBase):
         self.assertEqual(tm._price_for("grok-4.3"), (5.0, 15.0))
 
 
+class TestCachedTokens(TokenMeterTestBase):
+    def test_cached_tokens_discounted_at_explicit_cache_rate(self):
+        m = tm.TokenMeterService()
+        # 1M prompt tokens, 400K of them cache hits. grok-4.3 in-rate is $5/Mtok.
+        # 600K uncached * $5 + 400K cached * $5 * 0.1 (explicit-cache multiplier) = $3.20
+        m.record("grok-4.3", {
+            "prompt_tokens": 1_000_000,
+            "completion_tokens": 0,
+            "prompt_tokens_details": {"cached_tokens": 400_000},
+        })
+        s = m.snapshot()
+        self.assertEqual(s["cached_tokens"], 400_000)
+        self.assertAlmostEqual(s["cache_hit_rate"], 0.4, places=6)
+        self.assertAlmostEqual(s["cost"], 3.20, places=4)
+
+    def test_missing_prompt_tokens_details_matches_pre_cache_behavior(self):
+        # No prompt_tokens_details at all — same shape every call has sent until now.
+        # Must cost exactly what the old (pre-cache-aware) formula produced.
+        m = tm.TokenMeterService()
+        m.record("grok-4.3", {"prompt_tokens": 1_000_000, "completion_tokens": 1_000_000})
+        s = m.snapshot()
+        self.assertEqual(s["cached_tokens"], 0)
+        self.assertEqual(s["cache_hit_rate"], 0.0)
+        self.assertAlmostEqual(s["cost"], 20.0, places=4)
+
+    def test_non_dict_prompt_tokens_details_does_not_raise(self):
+        m = tm.TokenMeterService()
+        m.record("grok-4.3", {
+            "prompt_tokens": 10, "completion_tokens": 0,
+            "prompt_tokens_details": "not-a-dict",
+        })
+        self.assertEqual(m.snapshot()["cached_tokens"], 0)
+
+    def test_cached_tokens_persist_across_instances(self):
+        m1 = tm.TokenMeterService()
+        m1.record("grok-4.3", {
+            "prompt_tokens": 100, "completion_tokens": 0,
+            "prompt_tokens_details": {"cached_tokens": 30},
+        })
+        m2 = tm.TokenMeterService()
+        self.assertEqual(m2.snapshot()["cached_tokens"], 30)
+
+
 class TestBudgetAndPersistence(TokenMeterTestBase):
     def test_ratio_clamped_and_avg_cost(self):
         m = tm.TokenMeterService()

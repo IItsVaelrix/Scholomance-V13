@@ -29,6 +29,13 @@ PRICE_TABLE = {
 _DEFAULT_PRICE = (1.0, 3.0)
 _DEFAULT_BUDGET = 20.0
 
+# DashScope's OpenAI-compatible endpoint bills an explicit-cache hit at 10% of
+# the input rate (90% off) once a request carries a cache_control marker —
+# see prompt_service._cacheable_system_message. usage.prompt_tokens already
+# counts cached tokens once; this multiplier only affects the cached slice
+# of the cost estimate, not the token count itself.
+CACHE_HIT_PRICE_MULTIPLIER = 0.1
+
 
 def _state_path():
     base = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
@@ -58,6 +65,7 @@ class TokenMeterService:
         self._lock = threading.Lock()
         self.prompt_tokens = 0
         self.completion_tokens = 0
+        self.cached_tokens = 0
         self.calls = 0
         self.cost_usd = 0.0
         self.last_model = None
@@ -83,7 +91,7 @@ class TokenMeterService:
 
     def reset_spend(self):
         with self._lock:
-            self.prompt_tokens = self.completion_tokens = self.calls = 0
+            self.prompt_tokens = self.completion_tokens = self.cached_tokens = self.calls = 0
             self.cost_usd = self.last_call_cost = 0.0
             self._save()
         self._notify()
@@ -103,11 +111,23 @@ class TokenMeterService:
             c = _as_int(usage.get("completion_tokens"))
             if p == 0 and c == 0:
                 return
+            # Cached tokens are a SUBSET of prompt_tokens (the provider bills
+            # the cache hit at a discount, it doesn't add extra tokens), so
+            # only the uncached remainder pays the full input rate.
+            details = usage.get("prompt_tokens_details")
+            cached = _as_int(details.get("cached_tokens")) if isinstance(details, dict) else 0
+            cached = min(cached, p)
+            uncached = p - cached
             in_rate, out_rate = _price_for(model)
-            cost = (p / 1_000_000) * in_rate + (c / 1_000_000) * out_rate
+            cost = (
+                (uncached / 1_000_000) * in_rate
+                + (cached / 1_000_000) * in_rate * CACHE_HIT_PRICE_MULTIPLIER
+                + (c / 1_000_000) * out_rate
+            )
             with self._lock:
                 self.prompt_tokens += p
                 self.completion_tokens += c
+                self.cached_tokens += cached
                 self.calls += 1
                 self.cost_usd += cost
                 self.last_model = model
@@ -124,6 +144,7 @@ class TokenMeterService:
             remaining = max(0.0, self.budget_usd - self.cost_usd)
             ratio = remaining / self.budget_usd if self.budget_usd > 0 else 0.0
             avg = self.cost_usd / self.calls if self.calls else 0.0
+            hit_rate = self.cached_tokens / self.prompt_tokens if self.prompt_tokens else 0.0
             return {
                 "tokens": total,
                 "calls": self.calls,
@@ -133,6 +154,8 @@ class TokenMeterService:
                 "ratio": max(0.0, min(1.0, ratio)),
                 "avg_cost": avg,
                 "model": self.last_model,
+                "cached_tokens": self.cached_tokens,
+                "cache_hit_rate": hit_rate,
             }
 
     # ── plumbing ────────────────────────────────────────────────────
@@ -150,6 +173,7 @@ class TokenMeterService:
                 d = json.load(f)
             self.prompt_tokens = int(d.get("prompt_tokens", 0))
             self.completion_tokens = int(d.get("completion_tokens", 0))
+            self.cached_tokens = int(d.get("cached_tokens", 0))
             self.calls = int(d.get("calls", 0))
             self.cost_usd = float(d.get("cost_usd", 0.0))
             self.last_model = d.get("last_model")
@@ -164,6 +188,7 @@ class TokenMeterService:
                 json.dump({
                     "prompt_tokens": self.prompt_tokens,
                     "completion_tokens": self.completion_tokens,
+                    "cached_tokens": self.cached_tokens,
                     "calls": self.calls,
                     "cost_usd": round(self.cost_usd, 6),
                     "budget_usd": self.budget_usd,
