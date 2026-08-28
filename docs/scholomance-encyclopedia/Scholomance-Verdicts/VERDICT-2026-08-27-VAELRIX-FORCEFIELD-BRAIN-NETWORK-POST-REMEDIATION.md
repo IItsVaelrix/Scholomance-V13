@@ -1,4 +1,6 @@
-# VERDICT-2026-08-27-VAELRIX-FORCEFIELD-BRAIN-NETWORK-POST-REMEDIATION
+# VERDICT-2026-08-27-VAELRIX-FORCEFIELD-BRAIN-NETWORK-POST-REMEDIATION [SUPERSEDED]
+
+> **Superseded 2026-08-28.** Both remaining WARN-tier concerns (§3.2's 2-of-13 routing audit, §3.3's zero non-Claude consumers) have since been closed — a full 13-brain routing sweep found and fixed a real structural bug (a second, silently-diverging brain registry), and `ask_brain` is now wired into DivTube's desktop and mobile Qwen tool catalogs, verified with a real end-to-end call. Superseded by [`VERDICT-2026-08-28-VAELRIX-FORCEFIELD-BRAIN-NETWORK-FULL-CLOSURE.md`](./VERDICT-2026-08-28-VAELRIX-FORCEFIELD-BRAIN-NETWORK-FULL-CLOSURE.md). Preserved unmodified below.
 
 > **In-place update, same day.** The Immediate-tier mirror-deletion item (§7.1) has been executed, with one correction to this verdict's own §2.4/§3.1: the prior audit's claim of "zero executable readers" for the mirror was **not fully accurate**. `steamdeck_brain/paradigms/lore-explain.json` declares the parent `steamdeck_brain/knowledge/` directory as a live retrieval path (harmless to this deletion, since only the `scholomance-encyclopedia/` subdirectory was removed and the parent remains populated with other real content). More materially, three live documents (`README.md`, and two `docs/superpowers/` specs) cited two mirror-only files — `SCDNA.pdr.md` and `vaelrix-upgrade.pdr.md` — as authoritative sources, and those files existed **nowhere else in the repository**. Deleting the mirror as originally proposed would have silently destroyed content two other documents treat as canonical law. All 4 genuinely unique mirror-only files (`SCDNA.pdr.md`, `vaelrix-upgrade.pdr.md`, `2026-06-22-vael-upgrade-pdr.md`, `tomorrow.txt`) were migrated into the live `docs/scholomance-encyclopedia/PDR-archive/` and indexed; the 2 remaining mirror-only files were verified byte-/content-identical to files already live and were not migrated. Citing documents were repointed to the live path. The mirror is now deleted (324 tracked files) and the reader/citation scan re-run clean. See §3.1 and §4.2 below for the corrected finding.
 
@@ -17,7 +19,7 @@
 | Re-Render Due | **2027-08-27** (12 months — Standard architectural canon window; the system now has a filed PDR and has cleared the Experimental/pre-Phase-2 band) |
 | Audit Frame | VAELRIX_LAW (Global Law section) + ByteCode Error System + direct empirical measurement — the same frame as the superseded verdict, extended to verify the new remediation via the actual commit (`399822ba`) and a live full-pipeline routing test, not just a re-read of the diff |
 | Verdict Class | SINGLE-AUDITOR |
-| Status | RE-RENDERED |
+| Status | **SUPERSEDED-BY-VAELRIX-FORCEFIELD-BRAIN-NETWORK-FULL-CLOSURE** |
 
 ---
 
