@@ -3,7 +3,7 @@
 **Date:** 2026-07-17
 **Status:** approved (design); not implemented
 **Author:** Claude + Damien
-**Supersedes:** nothing. **Extends:** SCDNA (`steamdeck_brain/knowledge/scholomance-encyclopedia/PDR-archive/SCDNA.pdr.md`)
+**Supersedes:** nothing. **Extends:** SCDNA (`docs/scholomance-encyclopedia/PDR-archive/SCDNA.pdr.md`)
 
 ## 1. Problem
 

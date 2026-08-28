@@ -1,4 +1,6 @@
-# VERDICT-2026-08-27-VAELRIX-FORCEFIELD-BRAIN-NETWORK
+# VERDICT-2026-08-27-VAELRIX-FORCEFIELD-BRAIN-NETWORK [SUPERSEDED]
+
+> **Superseded same-day.** All three Immediate-tier remediation items (§7.1) shipped within hours of this verdict's render — retroactive PDR filed, routing `activationSignals` gap closed and regression-tested, and a typed evidence envelope replacing the bare-string handoff. Per the Temporal Re-Render Rule's Premature Re-Render Triggers ("a material remediation from the prior verdict ships"), this verdict is superseded by [`VERDICT-2026-08-27-VAELRIX-FORCEFIELD-BRAIN-NETWORK-POST-REMEDIATION.md`](./VERDICT-2026-08-27-VAELRIX-FORCEFIELD-BRAIN-NETWORK-POST-REMEDIATION.md). This document is preserved unmodified below as the temporal record of how the architecture was judged before that remediation.
 
 ## Bytecode Search Code
 `SCHOL-ENC-BYKE-SEARCH-VERDICT-VAELRIX-FORCEFIELD-BRAIN-NETWORK`
@@ -14,7 +16,7 @@
 | Re-Render Due | **2026-11-27** (3 months — Experimental / pre-Phase-2 window: no canon or PDR exists yet, and this verdict documents the system's first real remediation pass) |
 | Audit Frame | VAELRIX_LAW (Global Law section) + ByteCode Error System + **direct empirical measurement** — live `ask_brain` calls, real token/character counts, real dictionary and asset-store verification, a full 267/267-real-test regression run. This verdict is grounded in what the system actually returned when called, not only in static code reading. |
 | Verdict Class | SINGLE-AUDITOR (the target is a single Python codebase; it does not span the MUD's Claude/Codex/Gemini jurisdiction split, so the Multi-Auditor Protocol does not trigger) |
-| Status | RENDERED |
+| Status | **SUPERSEDED-BY-VAELRIX-FORCEFIELD-BRAIN-NETWORK-POST-REMEDIATION** |
 
 ---
 
@@ -218,7 +220,7 @@ Until then, the infrastructure is sound, the gap between name and capability is 
 
 *— `claude`, 2026-08-27*
 
-*Verdict Status: RENDERED | Re-Render Due: 2026-11-27 (experimental / pre-Phase-2 window)*
+*Verdict Status: SUPERSEDED-BY-VAELRIX-FORCEFIELD-BRAIN-NETWORK-POST-REMEDIATION | Superseded: 2026-08-27 (same day, premature re-render — material remediation shipped)*
 
 *Premature Re-Render Triggers: PDR filing · Routing signal audit closing · First non-Claude consumer call · Ollama synthesis decision*
 

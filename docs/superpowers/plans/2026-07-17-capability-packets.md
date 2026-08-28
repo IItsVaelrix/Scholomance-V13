@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - **No new dependencies.** Everything is Python stdlib. The hook runs on every `Write|Edit`; it must not import torch, numpy, or anything heavy.
-- **The PDR's curation law is untouched.** `steamdeck_brain/knowledge/scholomance-encyclopedia/PDR-archive/SCDNA.pdr.md` §7.1: genes/packets are manually curated, never auto-generated; the compiler may reject/warn/emit but **may not commit without human approval**. Nothing in this plan generates a packet from observed behaviour.
+- **The PDR's curation law is untouched.** `docs/scholomance-encyclopedia/PDR-archive/SCDNA.pdr.md` §7.1: genes/packets are manually curated, never auto-generated; the compiler may reject/warn/emit but **may not commit without human approval**. Nothing in this plan generates a packet from observed behaviour.
 - **`distill_query` and `detector.py` scoring are OUT OF SCOPE** (spec §4.1). Do not "fix" them. They serve five agents and are being replaced in role, not repaired.
 - **The hook may never cost work.** It never denies, never blocks, always exits 0, and is bounded. A failure degrades to serving nothing.
 - **The hook may never fail silently.** A crash must be distinguishable from "no packet applies". This is the direct inversion of the bug in `inject.py`.

@@ -308,7 +308,7 @@ The ForceField is a Python subsystem for deterministic agent execution. Key modu
 - `codex/README.md` — CODEx module details.
 - `docs/operations/DEPLOY_RENDER.md` — Render deployment guide.
 - `docs/operations/DICT_BUILD.md` — Offline dictionary build workflow.
-- `steamdeck_brain/knowledge/scholomance-encyclopedia/PDR-archive/vaelrix-upgrade.pdr.md` — ForceField implementation PDR.
+- `docs/scholomance-encyclopedia/PDR-archive/vaelrix-upgrade.pdr.md` — ForceField implementation PDR.
 - `docs/architecture/` — Unlockable schools, dictionary proxy, PLS integration.
 
 ## License
