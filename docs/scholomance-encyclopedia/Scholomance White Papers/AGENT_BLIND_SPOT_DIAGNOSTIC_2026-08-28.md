@@ -1,5 +1,7 @@
 # Agent Blind-Spot Diagnostic — 2026-08-28
 
+> **Update, same day.** All twelve sites in §7's remediation table are fixed, TDD'd, and committed (`785c417f` for the 7 `steamdeck_brain` sites, `f523e00c` for the 6 `divtube_downloader` sites — 13 counted there because the wire-protocol fix for `gateway.py`'s snapshot rippled into `protocol.py` and `event_hub.py` as one unit). Every fix preserves the original fail-open/fail-safe behavior (a broken history backend still doesn't crash a turn; a broken snapshot provider still doesn't break a reconnect) and adds only the missing distinction: a caller can now tell "confirmed absent" from "could not confirm," either via a distinct exception (`DictionaryUnavailable`, `EvidenceLookupError`) or a logged warning, or — for the highest-severity site, the phone-facing snapshot — an explicit `degraded: bool` on the wire. §7 below is preserved as originally written, describing the state at diagnosis time; treat it as history, not a live TODO list.
+
 ## Bytecode Search Code
 `SCHOL-ENC-BYKE-SEARCH-DIAG-AGENT-BLIND-SPOT-2026-08-28`
 
@@ -124,7 +126,7 @@ The likely mechanism: this session was pattern-matching on the *specific shape* 
 
 ---
 
-## 7. Recommendations (Not Yet Implemented)
+## 7. Recommendations (as originally written — all now implemented, see update note at top)
 
 This report describes what was found. It does not fix it — that is a separate decision, not bundled into a diagnostic.
 
@@ -136,7 +138,7 @@ This report describes what was found. It does not fix it — that is a separate 
 | `mobile_coding_adapter.py` `_task_tools` (1 site) | Same as above | ~30 min |
 | Mobile companion `snapshot_provider()` fallback (1 site) | Distinguish "host reports idle" from "host status unreachable" at the wire-protocol level, not just the Python fallback — this is user-facing and the highest-severity of the twelve | ~2-4 hours, needs the Android side too |
 
-None of this has been implemented. It is reported, not silently repaired — the same standard this report is applying to everything else.
+This was the state at the time of diagnosis, when nothing above had been implemented — it was reported first, not silently repaired, the same standard this report applied to everything else. All of it was implemented same-day once explicitly requested; see the update note at the top of this document for the commits.
 
 ---
 
