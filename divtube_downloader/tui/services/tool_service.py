@@ -2,6 +2,7 @@ import difflib
 import json
 import os
 import subprocess
+import sys
 import time
 
 from tui.services.exec_session_service import get_exec_session
@@ -1721,9 +1722,26 @@ class ToolService:
                         "required": []
                     }
                 }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "ask_brain",
+                    "description": "Query the Vaelrix ForceField brain network: 13 domain specialists (code, pixel-asset packets, ARPAbet phoneme/rhyme dictionary, project lore, architecture layers, UI design system, risk, memory, etc.) that gather real, query-specific evidence and route by content, not a fixed list. This tool does NOT produce a finished answer — it returns evidence for YOU to synthesize (state: CALLER_SYNTHESIS_REQUIRED). Read the returned material and reason over it yourself.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "query": {
+                                "type": "string",
+                                "description": "Natural-language question or task (e.g. 'check the pixel art color palette', 'is it safe to force push', 'what does the encyclopedia say about resonance')"
+                            }
+                        },
+                        "required": ["query"]
+                    }
+                }
             }
         ]
- 
+
     def _init_persistence(self):
         result = _run_bridge("init-persistence", timeout=10)
         if isinstance(result, dict) and result.get("available"):
@@ -1859,6 +1877,8 @@ class ToolService:
             return self._substrate_store(kwargs, callback)
         elif tool_name == "substrate_recent":
             return self._substrate_recent(kwargs, callback)
+        elif tool_name == "ask_brain":
+            return self._ask_brain(kwargs, callback)
         return "Tool not found."
 
     def _episode_recall(self, tool_name, kwargs, callback):
@@ -3520,4 +3540,44 @@ class ToolService:
             + (f", tag={stats['tag_filter']}" if stats.get("tag_filter") else "")
             + (f", last {stats['since_minutes']}min" if stats.get("since_minutes") else "")
         )
+        return "\n".join(lines)
+
+    def _ask_brain(self, kwargs, callback):
+        """Query the Vaelrix ForceField brain network (steamdeck_brain/vaelrix_forcefield/).
+
+        In-process import rather than subprocess: direct_brain.py already
+        inserts its own directory onto sys.path for its own imports, so once
+        steamdeck_brain/ is reachable, `import direct_brain` works the same
+        way it does when steamdeck_brain/mcp_brain_bridge.py calls it — just
+        without paying subprocess startup cost on every call.
+        """
+        query = kwargs.get("query", "")
+        if not query:
+            return "Error: query is required."
+
+        try:
+            steamdeck_brain_dir = os.path.join(PROJECT_ROOT, "steamdeck_brain")
+            if steamdeck_brain_dir not in sys.path:
+                sys.path.insert(0, steamdeck_brain_dir)
+            import direct_brain
+            result = direct_brain.forcefield_ask(query, deterministic=True)
+        except Exception as e:
+            return f"Error: brain network failed to load: {e}"
+
+        if result.get("error"):
+            return f"Brain network error: {result['error']}"
+
+        findings = result.get("findings") or []
+        if callback:
+            active = result.get("field").routing.activeBrains if result.get("field") else []
+            callback(f"  [#B388FF]◈[/] ask_brain: {len(findings)} finding(s) from {', '.join(active) or 'no'} brain(s)")
+
+        synthesis = result.get("for_agent_synthesis")
+        material = synthesis.get("material", "") if isinstance(synthesis, dict) else (synthesis or "")
+
+        lines = [
+            "UNSYNTHESIZED EVIDENCE — YOU must synthesize this, it is not a finished answer:",
+            "",
+            material,
+        ]
         return "\n".join(lines)

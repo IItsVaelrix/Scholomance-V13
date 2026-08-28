@@ -57,7 +57,7 @@ TOOL_NAMES = [
     "forensic_search", "bug_create", "bug_list", "task_create", "task_list",
     "agent_list", "memory_get", "memory_set", "heal", "apply_patch",
     "bash_session", "python_exec", "exec_reset", "substrate_query",
-    "substrate_status", "substrate_store", "substrate_recent",
+    "substrate_status", "substrate_store", "substrate_recent", "ask_brain",
 ]
 
 # ---------------------------------------------------------------------------
@@ -65,12 +65,12 @@ TOOL_NAMES = [
 # ---------------------------------------------------------------------------
 
 class TestHypothesisValidation:
-    """Phase 1: The Cockpit has 53 tools and zero recommendation logic."""
+    """Phase 1: The Cockpit has 54 tools and zero recommendation logic."""
 
     def test_tool_catalog_is_complete(self):
-        """All 53 tools are accounted for in our metadata."""
-        assert len(TOOL_NAMES) == 53
-        assert len(TOOL_METADATA) == 53
+        """All 54 tools are accounted for in our metadata."""
+        assert len(TOOL_NAMES) == 54
+        assert len(TOOL_METADATA) == 54
         for name in TOOL_NAMES:
             assert name in TOOL_METADATA, f"missing metadata for {name}"
 
@@ -151,8 +151,8 @@ class TestToolRecommendation:
         self.recommender = ToolRecommender()
 
     def test_recommender_initializes(self):
-        """All 53 tools are indexed."""
-        assert len(self.recommender._tool_embeddings) == 53
+        """All 54 tools are indexed."""
+        assert len(self.recommender._tool_embeddings) == 54
 
     @pytest.mark.parametrize("task,expected_tool", TASK_GROUND_TRUTH)
     def test_top1_accuracy(self, task: str, expected_tool: str):

@@ -283,6 +283,11 @@ TOOL_METADATA: dict[str, dict[str, Any]] = {
         "domain": ["substrate", "search", "semantic"],
         "params": ["query", "top_k", "tag_filter", "multi_hop"],
     },
+    "ask_brain": {
+        "description": "Query the Vaelrix ForceField brain network: 13 domain specialists (code, pixel-asset packets, ARPAbet phoneme/rhyme dictionary, project lore, architecture layers, UI design system, risk, memory) that gather real, query-specific evidence. Returns evidence for the caller to synthesize, not a finished answer.",
+        "domain": ["brain", "forcefield", "evidence", "reasoning"],
+        "params": ["query"],
+    },
     "substrate_status": {
         "description": "Get the health and status of the Scholomance substrate memory bank.",
         "domain": ["substrate", "status", "health"],

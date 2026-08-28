@@ -48,6 +48,7 @@ _OBSERVE = frozenset({
     "diagnostic_health", "diagnostic_hints", "immunity_status", "codebase_search",
     "forensic_search", "bug_list", "task_list", "agent_list", "memory_get",
     "substrate_query", "substrate_status", "substrate_recent", "raid_query",
+    "ask_brain",
 })
 _APPLY = frozenset({"file_create", "replace_file_content", "bug_create", "task_create", "memory_set", "apply_patch", "substrate_store"})
 _EXECUTE = frozenset({"test_run", "typecheck", "scholo_gate", "health_emit", "diagnostic_scan", "immunity_scan"})
