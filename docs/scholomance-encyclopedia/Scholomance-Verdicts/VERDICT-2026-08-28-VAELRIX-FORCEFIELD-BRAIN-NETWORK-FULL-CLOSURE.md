@@ -1,4 +1,6 @@
-# VERDICT-2026-08-28-VAELRIX-FORCEFIELD-BRAIN-NETWORK-FULL-CLOSURE
+# VERDICT-2026-08-28-VAELRIX-FORCEFIELD-BRAIN-NETWORK-FULL-CLOSURE [SUPERSEDED]
+
+> **Superseded same day.** A directed self-diagnostic (`AGENT_BLIND_SPOT_DIAGNOSTIC_2026-08-28.md`) used the just-closed brain network to hunt for flawed logic in this session's own work, found a real 12-site pattern (silent collapse of "confirmed absent" and "could not confirm"), and fixed all of it across both codebases (`785c417f`, `f523e00c`). That is a material remediation under the Temporal Re-Render Rule. Superseded by [`VERDICT-2026-08-28-VAELRIX-FORCEFIELD-BRAIN-NETWORK-HARDENING-CLOSURE.md`](./VERDICT-2026-08-28-VAELRIX-FORCEFIELD-BRAIN-NETWORK-HARDENING-CLOSURE.md). Preserved unmodified below.
 
 ## Bytecode Search Code
 `SCHOL-ENC-BYKE-SEARCH-VERDICT-VAELRIX-FORCEFIELD-BRAIN-NETWORK-FULL-CLOSURE`
@@ -15,7 +17,7 @@
 | Re-Render Due | **2027-08-28** (12 months — Standard architectural canon window) |
 | Audit Frame | VAELRIX_LAW (Global Law section) + ByteCode Error System + direct empirical measurement, extended in this render to cover a second codebase (`divtube_downloader/`) and 805 of its tests, plus a live end-to-end call proving cross-codebase reachability |
 | Verdict Class | SINGLE-AUDITOR |
-| Status | RE-RENDERED |
+| Status | **SUPERSEDED-BY-VAELRIX-FORCEFIELD-BRAIN-NETWORK-HARDENING-CLOSURE** |
 
 ---
 
@@ -176,7 +178,7 @@ Until then: zero law violations, Architecture Risk at 3, every closeable concern
 
 *— `claude`, 2026-08-28*
 
-*Verdict Status: RE-RENDERED | Supersedes: VERDICT-2026-08-27-VAELRIX-FORCEFIELD-BRAIN-NETWORK-POST-REMEDIATION.md | Re-Render Due: 2027-08-28*
+*Verdict Status: SUPERSEDED-BY-VAELRIX-FORCEFIELD-BRAIN-NETWORK-HARDENING-CLOSURE | Supersedes: VERDICT-2026-08-27-VAELRIX-FORCEFIELD-BRAIN-NETWORK-POST-REMEDIATION.md | Superseded: 2026-08-28 (same day, premature re-render — material remediation shipped)*
 
 *Premature Re-Render Triggers: Real ask_brain usage data collected · Ollama synthesis decision · Any new concern surfacing*
 
