@@ -366,3 +366,26 @@ async def _snapshot_provider_failure_degrades(tmp_path):
             assert snapshot["payload"]["activeJobs"] == []
     finally:
         await gateway.stop()
+
+
+def test_snapshot_provider_failure_is_marked_degraded_not_indistinguishable_from_real_idle():
+    """A phone receiving {"state": "idle"} must be able to tell 'the host
+    really is idle' apart from 'the host's status is unreachable' — a real
+    host-side error masked as normal idle state is exactly the failure mode
+    a reconnecting client has no other way to detect."""
+    import unittest as _unittest
+
+    def broken():
+        raise RuntimeError("queue exploded")
+
+    gateway = RemoteGateway(
+        config(), None, RemoteEventHub("pc-1"), "/tmp/unused-tls-dir",
+        snapshot_provider=broken,
+    )
+    case = _unittest.TestCase()
+    with case.assertLogs("tui.remote.gateway", level="WARNING") as cm:
+        cockpit, active_jobs = gateway._current_snapshot()
+    assert cockpit["state"] == "idle"
+    assert cockpit.get("degraded") is True
+    assert active_jobs == []
+    assert any("snapshot" in msg.lower() for msg in cm.output)

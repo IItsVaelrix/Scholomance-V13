@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import inspect
 import json
+import logging
 import time
 from collections import defaultdict, deque
 from pathlib import Path
@@ -18,6 +19,8 @@ from .event_hub import RemoteEventHub
 from .pairing import PairingError, PairingStore
 from .protocol import ClientEnvelope, ProtocolError
 from .tls import TLSIdentity, ensure_local_certificate
+
+logger = logging.getLogger(__name__)
 
 
 MAX_MESSAGE_BYTES = 32 * 1024
@@ -66,15 +69,19 @@ class RemoteGateway:
 
         Degrades to the old constants on any provider failure: a snapshot is
         what a reconnecting client receives first, and it must never be the
-        thing that breaks the reconnect.
+        thing that breaks the reconnect. The degraded response is marked
+        `degraded: True` alongside the same `state: "idle"` a genuinely idle
+        host reports — a real provider failure must not be indistinguishable
+        from actual idleness to a client with no other way to tell.
         """
         if self.snapshot_provider is None:
-            return {"state": "idle"}, []
+            return {"state": "idle", "degraded": False}, []
         try:
             cockpit, active_jobs = self.snapshot_provider()
-            return cockpit, list(active_jobs)
+            return {**cockpit, "degraded": False}, list(active_jobs)
         except Exception:
-            return {"state": "idle"}, []
+            logger.warning("snapshot_provider failed, reporting degraded idle state", exc_info=True)
+            return {"state": "idle", "degraded": True}, []
 
     def _publish_snapshot(self, *, request_id: str | None = None) -> str:
         """Emit a status snapshot built from live state."""

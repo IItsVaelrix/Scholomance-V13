@@ -108,6 +108,21 @@ class TestMobileTaskToolsSelection(unittest.TestCase):
         adapter._task_tools("audit this against the law")
         self.assertEqual(recommender.calls[0][0], "audit this against the law")
 
+    def test_recommender_failure_is_logged_not_silent(self):
+        class _ExplodingRecommender:
+            def recommend(self, *a, **k):
+                raise RuntimeError("simulated: recommender exploded")
+
+        adapter = self._adapter(_ExplodingRecommender())
+        with self.assertLogs("tui.services.mobile_coding_adapter", level="WARNING") as cm:
+            result = adapter._task_tools("fix a typo in the README")
+        # Still degrades to core-only — that fail-open behavior is
+        # unchanged — but the degradation must be visible somewhere.
+        names = {t["function"]["name"] for t in result}
+        for core in ("read_file", "telescope", "microscope", "atlas", "list_directory", "find_file", "search_code"):
+            self.assertIn(core, names)
+        self.assertTrue(any("recommend" in msg.lower() for msg in cm.output))
+
 
 if __name__ == "__main__":
     unittest.main()

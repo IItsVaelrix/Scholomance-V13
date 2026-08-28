@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 from pathlib import Path
 import subprocess
 import threading
@@ -15,6 +16,8 @@ import copy
 
 from tui.remote.action_journal import ActionJournal, ActionStateError
 from tui.remote.coding_policy import Availability, CapabilityClass, build_manifest
+
+logger = logging.getLogger(__name__)
 
 
 class MobileCodingError(ValueError):
@@ -191,7 +194,9 @@ class MobileCodingAdapter:
             ranked = recommender.recommend(task_text, top_k=self._RECOMMEND_TOP_K)
             wanted |= {r["tool"] for r in ranked}
         except Exception:
-            pass  # graceful degrade to core-only, same spirit as _select_tools
+            logger.warning(
+                "mobile tool recommendation failed, falling back to core-only tools", exc_info=True
+            )
 
         safe = [
             _strip_mobile_unsafe_parameters(tool)

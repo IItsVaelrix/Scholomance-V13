@@ -11,7 +11,11 @@ byte-for-byte the same tool SET as the plain ToolRecommender — the boost is
 additive and zero when there's nothing to boost with, so day-one behavior
 (before any usage accumulates) doesn't change from what's already shipped.
 """
+import logging
+
 from tui.services.tool_recommender import ToolRecommender
+
+logger = logging.getLogger(__name__)
 
 
 class AdaptiveToolRecommender:
@@ -53,13 +57,16 @@ class AdaptiveToolRecommender:
     def record_usage(self, task_text, tools_used):
         """Log which tools actually got used for this task, for future
         recommend() calls to learn from. Never raises — a broken history
-        backend must not break the turn that's recording it."""
+        backend must not break the turn that's recording it — but the
+        failure is logged, not silently dropped: a caller with no signal
+        that recording is broken has no way to notice usage data has
+        stopped accumulating."""
         if self._history is None:
             return
         try:
             self._history.record(task_text, tools_used)
         except Exception:
-            pass
+            logger.warning("tool usage history record() failed, usage not recorded", exc_info=True)
 
     def _safe_history_counts(self, task_text):
         if self._history is None:
@@ -67,4 +74,5 @@ class AdaptiveToolRecommender:
         try:
             return dict(self._history.similar_task_tool_counts(task_text))
         except Exception:
+            logger.warning("tool usage history lookup failed, falling back to static ranking", exc_info=True)
             return {}

@@ -106,6 +106,25 @@ class TestGracefulDegradation(unittest.TestCase):
         adaptive = AdaptiveToolRecommender(static_recommender=_FakeStaticRecommender({}), history=None)
         adaptive.record_usage("do something", ["a"])  # must not raise
 
+    def test_history_read_failure_is_logged_not_silent(self):
+        """A broken history backend must not crash recommend() (already
+        covered above), but it also must not vanish without a trace — a
+        caller with no idea the fallback is degraded can't investigate it."""
+        adaptive = AdaptiveToolRecommender(
+            static_recommender=_FakeStaticRecommender({"a": 0.9}), history=_FakeHistory(raises=True)
+        )
+        with self.assertLogs("tui.services.adaptive_tool_recommender", level="WARNING") as cm:
+            adaptive.recommend("do something", top_k=1)
+        self.assertTrue(any("history" in msg.lower() for msg in cm.output))
+
+    def test_record_usage_failure_is_logged_not_silent(self):
+        adaptive = AdaptiveToolRecommender(
+            static_recommender=_FakeStaticRecommender({}), history=_FakeHistory(raises=True)
+        )
+        with self.assertLogs("tui.services.adaptive_tool_recommender", level="WARNING") as cm:
+            adaptive.record_usage("do something", ["a"])
+        self.assertTrue(any("history" in msg.lower() for msg in cm.output))
+
 
 class TestDeterminism(unittest.TestCase):
     def test_same_task_and_history_state_gives_same_ranking(self):

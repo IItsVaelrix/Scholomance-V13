@@ -174,15 +174,17 @@ def _server_payload(data: Any, message_type: str) -> dict[str, Any]:
 
     if message_type == "status.snapshot":
         payload = _exact_object(data, {"cockpit", "activeJobs", "lastSeq"}, "status snapshot payload")
-        cockpit = _exact_object(payload["cockpit"], {"state"}, "cockpit")
+        cockpit = _exact_object(payload["cockpit"], {"state", "degraded"}, "cockpit")
         if not isinstance(cockpit["state"], str) or cockpit["state"] not in _COCKPIT_STATES:
             _fail("Invalid cockpit state.", "invalid_state")
+        if not isinstance(cockpit["degraded"], bool):
+            _fail("cockpit.degraded must be a boolean.", "invalid_degraded")
         if not isinstance(payload["activeJobs"], list) or len(payload["activeJobs"]) > 100:
             _fail("activeJobs must contain at most 100 summaries.", "invalid_activeJobs")
         if type(payload["lastSeq"]) is not int or payload["lastSeq"] < 0:
             _fail("lastSeq must be a nonnegative integer.", "invalid_lastSeq")
         return {
-            "cockpit": {"state": cockpit["state"]},
+            "cockpit": {"state": cockpit["state"], "degraded": cockpit["degraded"]},
             "activeJobs": [_job_summary(job) for job in payload["activeJobs"]],
             "lastSeq": payload["lastSeq"],
         }

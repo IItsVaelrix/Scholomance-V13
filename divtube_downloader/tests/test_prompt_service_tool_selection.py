@@ -151,6 +151,36 @@ class TestAdaptiveRecommenderWiring(unittest.TestCase):
         svc._record_tool_usage("fix the bug", ["replace_file_content", "read_file"])
         self.assertEqual(svc._tool_usage_history.calls, [("fix the bug", ["read_file", "replace_file_content"])])
 
+    def test_select_tools_recommender_failure_is_logged_not_silent(self):
+        svc = _make_service()
+
+        class _ExplodingRecommender:
+            def recommend(self, *a, **k):
+                raise RuntimeError("simulated: recommender exploded")
+
+        svc._tool_recommender = _ExplodingRecommender()
+        with self.assertLogs("tui.services.prompt_service", level="WARNING") as cm:
+            result = svc._select_tools(None, task_text="fix the bug")
+        # Still degrades to the full catalog — that fail-open behavior is
+        # unchanged — but the degradation must be visible somewhere.
+        self.assertEqual(len(result), len(REAL_CATALOG_NAMES))
+        self.assertTrue(any("recommend" in msg.lower() for msg in cm.output))
+
+    def test_record_tool_usage_failure_is_logged_not_silent(self):
+        svc = _make_service()
+
+        class _ExplodingHistory:
+            def record(self, *a, **k):
+                raise RuntimeError("simulated: history write failed")
+
+            def similar_task_tool_counts(self, *a, **k):
+                return {}
+
+        svc._tool_usage_history = _ExplodingHistory()
+        with self.assertLogs("tui.services.adaptive_tool_recommender", level="WARNING") as cm:
+            svc._record_tool_usage("fix the bug", ["read_file"])
+        self.assertTrue(any("history" in msg.lower() for msg in cm.output))
+
     def test_record_tool_usage_ignores_empty_inputs(self):
         svc = _make_service()
 

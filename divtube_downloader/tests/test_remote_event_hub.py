@@ -56,7 +56,7 @@ def test_snapshot_sorts_active_jobs_by_identifier_deterministically():
     hub = RemoteEventHub("pc-1")
 
     event = decoded(hub.snapshot(
-        cockpit={"state": "idle"},
+        cockpit={"state": "idle", "degraded": False},
         active_jobs=[active_job("job-z"), active_job("job-a", 30)],
     ))
 
@@ -91,7 +91,7 @@ def test_devices_receive_distinct_queues_with_the_same_live_event():
 
 def test_reconnect_receives_a_snapshot_before_later_live_events():
     hub = RemoteEventHub("pc-1")
-    hub.snapshot(cockpit={"state": "downloading"}, active_jobs=[active_job("job-2")])
+    hub.snapshot(cockpit={"state": "downloading", "degraded": False}, active_jobs=[active_job("job-2")])
 
     queue = hub.attach("phone-a")
     reconnect_snapshot = decoded(queue.get_nowait())
@@ -99,7 +99,7 @@ def test_reconnect_receives_a_snapshot_before_later_live_events():
 
     assert reconnect_snapshot["type"] == "status.snapshot"
     assert reconnect_snapshot["payload"] == {
-        "cockpit": {"state": "downloading"},
+        "cockpit": {"state": "downloading", "degraded": False},
         "activeJobs": [active_job("job-2")],
         "lastSeq": reconnect_snapshot["seq"],
     }

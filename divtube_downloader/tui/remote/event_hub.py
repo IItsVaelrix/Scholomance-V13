@@ -29,13 +29,13 @@ class RemoteEventHub:
             instance_id=instance_id,
             seq=0,
             request_id=None,
-            payload={"cockpit": {"state": "idle"}, "activeJobs": [], "lastSeq": 0},
+            payload={"cockpit": {"state": "idle", "degraded": False}, "activeJobs": [], "lastSeq": 0},
         )
         self._instance_id = instance_id
         self._last_seq = 0
         self._backlog: deque[str] = deque(maxlen=EVENT_BACKLOG_LIMIT)
         self._connections: dict[str, asyncio.Queue[str]] = {}
-        self._snapshot_payload: dict[str, Any] = {"cockpit": {"state": "idle"}, "activeJobs": []}
+        self._snapshot_payload: dict[str, Any] = {"cockpit": {"state": "idle", "degraded": False}, "activeJobs": []}
         self._lock = threading.RLock()
 
     def publish(self, event_type: str, payload: dict[str, Any], request_id: str | None = None) -> str:

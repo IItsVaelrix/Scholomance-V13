@@ -1,5 +1,6 @@
 import io
 import json
+import logging
 import os
 import re
 import threading
@@ -70,6 +71,9 @@ def _with_history_cache_breakpoint(messages):
     marked = dict(last)
     marked["content"] = [{"type": "text", "text": content, "cache_control": {"type": "ephemeral"}}]
     return messages[:-1] + [marked]
+
+
+logger = logging.getLogger(__name__)
 
 
 class PromptService:
@@ -273,6 +277,7 @@ class PromptService:
             ranked = self._get_adaptive_recommender().recommend(task_text, top_k=self.RECOMMEND_TOP_K)
             wanted = self.CORE_TOOL_NAMES | {r["tool"] for r in ranked}
         except Exception:
+            logger.warning("tool recommendation failed, falling back to the full catalog", exc_info=True)
             return list(catalog)
         selected = [t for t in catalog if t.get("function", {}).get("name") in wanted]
         return selected if selected else list(catalog)
@@ -287,7 +292,10 @@ class PromptService:
         try:
             self._get_adaptive_recommender().record_usage(task_text, list(tools_used))
         except Exception:
-            pass
+            # record_usage() itself already logs failures inside the
+            # recommender; this guards the (rarer) case of
+            # _get_adaptive_recommender() construction itself failing.
+            logger.warning("could not record tool usage for this turn", exc_info=True)
 
     def _execute_selected_tool(self, name, arguments, callback, selected_tools, tool_executor=None, agent_id=None):
         advertised = {
