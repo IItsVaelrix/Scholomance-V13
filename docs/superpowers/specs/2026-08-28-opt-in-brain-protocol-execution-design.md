@@ -31,15 +31,18 @@ equivalent named skill/command), the calling agent must:
 
 1. create an evidence-backed execution roadmap before it edits or runs
    task-changing commands;
-2. execute that roadmap automatically under the authority already granted by
-   the user's task request;
-3. stop only for a new authority boundary: destructive or externally visible
-   work not requested, a material scope conflict, or an unresolved ambiguity
-   that changes the requested outcome;
+2. execute roadmap phases automatically only to the extent that the original
+   task already authorizes them under the agent's normal authority policy;
+3. preserve—not relax—the normal confirmation threshold for hard-to-reverse,
+   destructive, externally visible, or otherwise risky actions. It also stops
+   for a material scope conflict or an unresolved ambiguity that changes the
+   requested outcome;
 4. produce a final receipt that distinguishes completed and independently
    verified work from proposed, blocked, or unverified work.
 
-The protocol does not grant authority. It compiles the user's original task
+Explicit invocation authorizes use of the protocol and its planning work. It
+is not durable advance authorization to perform a later risky action that the
+agent would otherwise confirm. The protocol compiles the user's original task
 into a governed plan; it cannot broaden that task, manufacture acceptance
 criteria, or silently execute a tool that the calling agent itself is not
 allowed to use.
@@ -84,14 +87,21 @@ string:
 }
 ```
 
-`auto` is resolved by a deterministic task-framing pass. It may select only
-the existing `TaskClassification` and `TaskPriority` vocabulary. It returns
-its classification evidence and every inferred criterion marked as
-`provisional`; user-supplied criteria are authoritative. A missing material
-criterion becomes a blocking question, not an invented promise.
+`auto` is deliberately **not** a keyword classifier. It means
+`unclassified`: the compiler produces a class-neutral reconnaissance and
+scope-confirmation phase, with conditional downstream branches, rather than
+guessing a `TaskClassification` or `TaskPriority` from word overlap. The
+calling agent may declare a class/priority when the user explicitly supplies
+one; otherwise a later evidence-backed framing receipt may mark a class as
+`provisional`. Provisional framing cannot by itself authorize a risky phase or
+suppress a necessary verification phase.
 
-The bridge creates the ForceField using these resolved values. It no longer
-hard-codes `diagnostic` / `safety` for an execution-contract request.
+The framing record distinguishes `declared`, `evidence_confirmed`, and
+`unclassified` state. It includes the evidence or user statement behind every
+non-unclassified value. Existing keyword routing may still triage specialist
+brains, but it is never a proof of task class, phase necessity, or authority.
+The bridge therefore no longer hard-codes `diagnostic` / `safety` for an
+execution-contract request, nor silently substitutes another guessed class.
 
 ### Council and roadmap compiler
 
@@ -110,7 +120,9 @@ phases[], blockedQuestions[], stopConditions[], verificationReceiptTemplate
 
 Each phase has a stable ID, goal, relevant evidence references, allowed tool
 classes, intended changes, completion checks, and a `requiresReplan` rule.
-The compiler selects only necessary phases:
+For an unclassified task, the roadmap starts class-neutral and makes its
+branches explicit. For a declared or evidence-confirmed task, the compiler
+selects only necessary phases:
 
 - reconnaissance when the plan lacks confirmed targets;
 - design only for architectural or interface-changing work;
@@ -123,7 +135,8 @@ LLM. Specialist findings that lack evidence may be labeled as hypotheses but
 cannot become confirmed implementation targets. The calling agent is still
 the synthesizer and executor: the contract tells it what to do, why, and how
 to verify it; it does not pretend that the Python process can operate the
-agent's tools.
+agent's tools. It also cannot use a keyword-routed brain as evidence that a
+semantic task class was correctly inferred.
 
 ### Agent execution discipline
 
@@ -157,7 +170,29 @@ rules. Initial implementation may use the existing ForceField persistence
 shape only if it can meet those guarantees; otherwise it needs a separate
 small ledger rather than an implicit mutable cache.
 
-## Integration Surfaces
+## Delivery Sequence
+
+The full integration is deliberately gated behind a cheap efficacy probe.
+
+1. Build a pure, in-process roadmap-compiler prototype with no persistence,
+   agent skill, MCP registration, or new daemon lifecycle. Its input is a
+   hand-constructed ForceField/evidence fixture and its output is an immutable
+   contract; it has no side effects.
+2. Run the sealed efficacy corpus against that prototype before building any
+   execution infrastructure. The corpus must include (a) a meaning-agnostic
+   interval-classifier-shaped task with no domain evidence and (b) a realistic
+   PIXEL, LORE, or ARCHITECTURE task where an independently inspectable source
+   provides real evidence.
+3. Compare both against matched no-protocol planning baselines. If the
+   meaning-agnostic case is null, report the null and constrain the claim to
+   evidence-grounded roadmap/receipt discipline; do not call it general
+   cognition amplification. If the evidence-grounded case also has no
+   discriminating benefit, stop: do not build persistence, skills, or MCP
+   surfaces around it.
+4. Only after a positive, discriminating evidence-grounded result and an
+   explicit review decision, add persistence, MCP tools, and the opt-in skill.
+
+## Deferred Integration Surfaces
 
 | Surface | Change |
 | --- | --- |
@@ -185,23 +220,27 @@ small ledger rather than an implicit mutable cache.
 
 ## Verification Strategy
 
-The proof target is agent amplification, not mere protocol coverage.
+The first proof target is whether the pure compiler improves an agent plan;
+the full-system proof target remains agent amplification, not mere protocol
+coverage.
 
-1. Unit tests: deterministic task classification; stable roadmap compilation;
-   refusal to infer confirmation from unknown evidence; phase-transition and
-   replan guards; persistence atomicity and retention.
-2. MCP/schema tests: protocol is unavailable without an explicit tool call;
-   input validation rejects undeclared task classes and phase IDs; compatibility
-   `brain_forcefield_ask` behavior remains unchanged.
-3. Skill contract tests: explicit invocation causes prepare → phases → finalize;
-   ordinary tasks do not call any protocol tool; destructive/scope boundaries
-   stop instead of proceeding.
-4. Efficacy corpus: create sealed, realistic task fixtures with ground-truth
+1. Prototype unit tests: stable roadmap compilation; `auto` stays
+   unclassified rather than using keyword-derived task class; refusal to infer
+   confirmation from unknown evidence; and conditional phase guards.
+2. Efficacy corpus: create sealed, realistic task fixtures with ground-truth
    required discoveries and verification steps. Compare a normal agent plan
    against the protocol contract. Admit a fixture only when its matched
    baseline demonstrably misses a requirement the protocol correctly surfaces.
-   Report false positives, extra tool cost, latency, and null results.
-5. End-to-end mutation trials: introduce controlled repository defects with
+   Report false positives, extra tool cost, latency, and null results. Include
+   the required meaning-agnostic and evidence-grounded controls from the
+   delivery sequence.
+3. After the efficacy gate, MCP/schema tests: protocol is unavailable without
+   an explicit tool call; input validation rejects undeclared task classes and
+   phase IDs; compatibility `brain_forcefield_ask` behavior remains unchanged.
+4. After the efficacy gate, skill contract tests: explicit invocation causes
+   prepare → phases → finalize; ordinary tasks do not call any protocol tool;
+   normal destructive/scope boundaries still stop instead of being waived.
+5. After the efficacy gate, end-to-end mutation trials: introduce controlled repository defects with
    predeclared oracles. The protocol must lead the executor to discriminate a
    broken baseline and produce a valid receipt; a green self-authored test
    alone is insufficient.
@@ -219,12 +258,16 @@ The proof target is agent amplification, not mere protocol coverage.
 ## Acceptance Criteria
 
 - A user can explicitly invoke the Brain Protocol and receive a structured,
-  evidence-backed roadmap tailored to the task's real class and priority.
-- The designated agent can execute and receipt every roadmap phase without a
-  second approval gate, except at stated stop conditions.
+  evidence-backed roadmap with either declared/evidence-confirmed framing or
+  an explicit class-neutral `unclassified` branch—never a guessed class.
+- Invocation of the protocol does not waive any normal confirmation boundary;
+  the designated agent executes only actions already authorized by the user's
+  task under that ordinary policy.
 - An ordinary agent request produces no Brain Protocol call or persisted
   protocol state.
 - The final receipt lets a reviewer distinguish verified completion from a
   proposal, a blocked step, or an unverified claim.
-- Sealed efficacy scenarios establish at least one discriminating improvement
-  over a matched no-protocol baseline before “amplifies cognition” is claimed.
+- The pure compiler first establishes a discriminating improvement over a
+  matched no-protocol baseline in an evidence-grounded scenario before any
+  full infrastructure is built. A null meaning-agnostic control narrows the
+  claim to evidence-grounded planning rather than general cognition.
