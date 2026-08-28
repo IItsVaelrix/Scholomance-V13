@@ -16,6 +16,7 @@ DETERMINISM_BRAIN = AmplifierBrain(
     activationSignals=["deterministic", "stable", "reproducible", "stasis", "regression test"],
     allowedTools=["diagnostic_scan", "run_tests"],
     defaultSearchBudget=2,
+    weight=0.9,
 )
 
 

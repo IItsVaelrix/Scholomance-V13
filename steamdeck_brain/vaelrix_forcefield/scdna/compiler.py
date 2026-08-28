@@ -15,7 +15,6 @@ import time
 from pathlib import Path
 from typing import Sequence
 
-from ..amplifier_registry import get_registry
 from .decoder import (
     DecodedGene,
     _flags_from_record,
@@ -134,6 +133,12 @@ def compile_gene(
         raise CompilationError(
             f"Cannot supersede unknown gene: {supersede_id}."
         )
+
+    # Lazy import: amplifier_registry now re-exports brains/*.py's own
+    # constants (single source of truth, see amplifier_registry.py's
+    # docstring), and brains/determinism_brain.py transitively imports this
+    # scdna package — a module-level import here would be circular.
+    from ..amplifier_registry import get_registry
 
     known_brain_ids = {brain.id for brain in get_registry()}
     unknown_brains = [b for b in activation_brains if b not in known_brain_ids]

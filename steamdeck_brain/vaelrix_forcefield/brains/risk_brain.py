@@ -56,9 +56,13 @@ from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCort
 RISK_BRAIN = AmplifierBrain(
     id="RISK_BRAIN",
     domain=["risk", "safety", "regression", "dependencies"],
-    activationSignals=["risk", "safe", "regression", "dependency", "blast radius", "dangerous"],
+    activationSignals=[
+        "risk", "safe", "regression", "dependency", "blast radius", "dangerous",
+        "break something", "break anything", "will this break", "downstream", "side effect",
+    ],
     allowedTools=["search_code", "read_file", "diagnostic_scan"],
     defaultSearchBudget=3,
+    weight=1.1,
 )
 
 # (pattern, severity 0..1, finding). Severity drives conflictRisk, which the

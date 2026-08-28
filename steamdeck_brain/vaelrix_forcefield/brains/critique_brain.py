@@ -13,7 +13,10 @@ from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCort
 CRITIQUE_BRAIN = AmplifierBrain(
     id="CRITIQUE_BRAIN",
     domain=["critique", "review", "weakness", "improvement"],
-    activationSignals=["critique", "review", "weakness", "improve", "grade", "score"],
+    activationSignals=[
+        "critique", "review", "weakness", "improve", "grade", "score",
+        "what's wrong with", "wrong with this", "flaws", "shortcomings", "how could this be better",
+    ],
     allowedTools=["read_file", "critique"],
     defaultSearchBudget=2,
 )

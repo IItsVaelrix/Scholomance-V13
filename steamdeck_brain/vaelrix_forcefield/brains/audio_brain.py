@@ -20,7 +20,10 @@ from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCort
 AUDIO_BRAIN = AmplifierBrain(
     id="AUDIO_BRAIN",
     domain=["audio", "music", "sound", "beat"],
-    activationSignals=["audio", "music", "sound", "beat", "song", "track"],
+    activationSignals=[
+        "audio", "music", "sound", "beat", "song", "track",
+        "bpm", "tempo", "time signature", "key signature", "genre", "mixing", "mastering",
+    ],
     allowedTools=["read_file"],
     defaultSearchBudget=1,
 )

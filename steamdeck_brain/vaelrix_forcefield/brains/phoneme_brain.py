@@ -19,7 +19,10 @@ from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCort
 PHONEME_BRAIN = AmplifierBrain(
     id="PHONEME_BRAIN",
     domain=["phoneme", "pronunciation", "syllable", "sound"],
-    activationSignals=["phoneme", "pronunciation", "syllable", "sound", "vowel", "consonant"],
+    activationSignals=[
+        "phoneme", "pronunciation", "syllable", "sound", "vowel", "consonant",
+        "arpabet", "cmu dict", "ipa transcription", "how does this word sound", "phonetic",
+    ],
     allowedTools=["codebase_search"],
     defaultSearchBudget=2,
 )

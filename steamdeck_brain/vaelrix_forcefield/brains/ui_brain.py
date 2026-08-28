@@ -21,7 +21,7 @@ UI_BRAIN = AmplifierBrain(
         "ui", "interface", "widget", "screen", "layout", "component", "theme",
         "typography", "font", "georgia", "serif", "truesight",
     ],
-    allowedTools=["read_file", "search_code"],
+    allowedTools=["read_file", "replace_file_content"],
     defaultSearchBudget=3,
 )
 

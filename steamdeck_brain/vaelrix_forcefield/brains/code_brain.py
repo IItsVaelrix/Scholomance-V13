@@ -32,7 +32,10 @@ from ..types import (
 CODE_BRAIN = AmplifierBrain(
     id="CODE_BRAIN",
     domain=["code", "engineering", "refactor", "debug"],
-    activationSignals=["code", "bug", "fix", "refactor", "test", "error", "function", "class", "import"],
+    activationSignals=[
+        "code", "bug", "fix", "refactor", "test", "error", "function", "class", "import",
+        "crash", "crashing", "exception", "traceback", "stack trace", "broken", "not working",
+    ],
     allowedTools=["search_code", "read_file", "replace_file_content", "run_tests"],
     defaultSearchBudget=5,
 )

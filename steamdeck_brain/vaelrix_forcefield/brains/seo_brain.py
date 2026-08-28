@@ -20,7 +20,10 @@ from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCort
 SEO_BRAIN = AmplifierBrain(
     id="SEO_BRAIN",
     domain=["seo", "title", "tags", "description", "keywords"],
-    activationSignals=["seo", "title", "tag", "description", "keyword", "curve", "golden"],
+    activationSignals=[
+        "seo", "title", "tag", "description", "keyword", "curve", "golden",
+        "thumbnail text", "get clicks", "click-through", "ctr", "clickbait",
+    ],
     allowedTools=["score_title", "search_similar"],
     defaultSearchBudget=2,
 )

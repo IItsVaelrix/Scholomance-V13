@@ -19,7 +19,10 @@ from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCort
 PIXEL_BRAIN = AmplifierBrain(
     id="PIXEL_BRAIN",
     domain=["visual", "pixel", "art", "sprite", "palette"],
-    activationSignals=["pixel", "sprite", "art", "visual", "palette", "silhouette", "thumbnail"],
+    activationSignals=[
+        "pixel", "sprite", "art", "visual", "palette", "silhouette", "thumbnail",
+        "asset", "checksum", "gene packet", "pbrain", "skeleton", "coordinates",
+    ],
     allowedTools=["read_file", "thumbnail"],
     defaultSearchBudget=1,
 )

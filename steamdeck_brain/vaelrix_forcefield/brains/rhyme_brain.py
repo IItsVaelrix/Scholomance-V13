@@ -19,7 +19,10 @@ from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCort
 RHYME_BRAIN = AmplifierBrain(
     id="RHYME_BRAIN",
     domain=["lyrics", "rhyme", "cadence", "verse"],
-    activationSignals=["lyric", "verse", "rhyme", "cadence", "poem", "song"],
+    activationSignals=[
+        "lyric", "verse", "rhyme", "cadence", "poem", "song",
+        "couplet", "scans well", "scansion", "meter", "stanza", "bars",
+    ],
     allowedTools=["codebase_search"],
     defaultSearchBudget=2,
 )

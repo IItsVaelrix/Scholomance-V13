@@ -13,9 +13,13 @@ from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCort
 MEMORY_BRAIN = AmplifierBrain(
     id="MEMORY_BRAIN",
     domain=["memory", "history", "patterns", "prior"],
-    activationSignals=["memory", "history", "pattern", "prior", "remember", "known", "before"],
+    activationSignals=[
+        "memory", "history", "pattern", "prior", "remember", "known", "before",
+        "already tried", "already try", "we tried", "what did we try", "previously", "last time", "context ledger",
+    ],
     allowedTools=["memory_get", "memory_set", "codebase_search"],
     defaultSearchBudget=2,
+    weight=0.9,
 )
 
 

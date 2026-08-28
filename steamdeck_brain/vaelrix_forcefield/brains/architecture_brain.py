@@ -13,17 +13,6 @@ from pathlib import Path
 from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCortexForceField
 
 
-ARCHITECTURE_BRAIN = AmplifierBrain(
-    id="ARCHITECTURE_BRAIN",
-    domain=["architecture", "design", "structure", "pattern"],
-    activationSignals=[
-        "architecture", "design", "structure", "pattern", "system", "organize",
-        "refactor", "layer", "contract", "boundary",
-    ],
-    allowedTools=["search_code", "read_file", "diagnostic_scan"],
-    defaultSearchBudget=3,
-)
-
 _ARCHITECTURAL_PATTERNS: dict[str, str] = {
     "mvc": "Model-View-Controller — separates data, UI, and logic.",
     "mvvm": "Model-View-ViewModel — data-binding oriented variant of MVC.",
@@ -39,6 +28,22 @@ _ARCHITECTURAL_PATTERNS: dict[str, str] = {
     "pipeline": "Pipeline/Chain — sequential processing stages.",
     "plugin": "Plugin Architecture — extensible via add-on modules.",
 }
+
+ARCHITECTURE_BRAIN = AmplifierBrain(
+    id="ARCHITECTURE_BRAIN",
+    domain=["architecture", "design", "structure", "pattern"],
+    # Includes every pattern name this brain can actually recognize
+    # (_ARCHITECTURAL_PATTERNS) so the routing gate's vocabulary never lags
+    # behind the brain's own — the same gap found and fixed for
+    # "typography"/"refactor" earlier applies to every pattern name here too.
+    activationSignals=[
+        "architecture", "design", "structure", "pattern", "system", "organize",
+        "refactor", "layer", "contract", "boundary",
+        *_ARCHITECTURAL_PATTERNS.keys(),
+    ],
+    allowedTools=["search_code", "read_file", "codebase_search"],
+    defaultSearchBudget=4,
+)
 
 _COUPLING_RISK_TERMS = {
     "circular": "Circular dependency — modules mutually importing each other.",

@@ -14,14 +14,6 @@ from pathlib import Path
 from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCortexForceField
 
 
-LORE_BRAIN = AmplifierBrain(
-    id="LORE_BRAIN",
-    domain=["lore", "canon", "mirrorborne", "symbolism", "myth"],
-    activationSignals=["lore", "canon", "mirrorborne", "symbol", "myth", "vaelrix"],
-    allowedTools=["codebase_search", "archive_search"],
-    defaultSearchBudget=2,
-)
-
 _CANON_TERMS: dict[str, str] = {
     "mirrorborne": "The central mythic concept: beings/places reflected across mirror-planes.",
     "vaelrix": "The Vaelrix — a primordial force or entity; namesake of laws and cortex subsystems.",
@@ -39,6 +31,19 @@ _CANON_TERMS: dict[str, str] = {
     "nexus": "Nexus — interactive debug narratives (Cursor agent domain).",
     "stasis": "Stasis — deterministic stability state.",
 }
+
+LORE_BRAIN = AmplifierBrain(
+    id="LORE_BRAIN",
+    domain=["lore", "canon", "mirrorborne", "symbolism", "myth"],
+    # Includes every canon term this brain can actually look up (_CANON_TERMS)
+    # so the routing gate's vocabulary never lags behind the brain's own.
+    activationSignals=[
+        "lore", "canon", "symbol", "myth", "encyclopedia",
+        *_CANON_TERMS.keys(),
+    ],
+    allowedTools=["codebase_search", "archive_search"],
+    defaultSearchBudget=2,
+)
 
 _SYMBOL_MOTIFS: dict[str, set[str]] = {
     "mirror": {"mirror", "reflection", "looking-glass", "echo", "double", "twin", "shadow"},

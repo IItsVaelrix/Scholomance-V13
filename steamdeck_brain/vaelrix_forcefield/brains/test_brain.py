@@ -12,7 +12,10 @@ from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCort
 TEST_BRAIN = AmplifierBrain(
     id="TEST_BRAIN",
     domain=["testing", "validation", "regression"],
-    activationSignals=["test", "regression", "validate", "verify", "coverage", "qa"],
+    activationSignals=[
+        "test", "regression", "validate", "verify", "coverage", "qa",
+        "doesn't break", "don't break", "won't break", "make sure this works", "sanity check",
+    ],
     allowedTools=["run_tests", "search_code", "read_file"],
     defaultSearchBudget=3,
 )
