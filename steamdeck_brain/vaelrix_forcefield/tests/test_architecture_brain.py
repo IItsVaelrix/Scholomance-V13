@@ -10,11 +10,15 @@ the brain could only ever see a coincidental repo-root dir named "data".
 
 import os
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
+from vaelrix_forcefield.brains import architecture_brain
+from vaelrix_forcefield.brains._evidence_errors import EvidenceLookupError
 from vaelrix_forcefield.brains.architecture_brain import run_architecture_brain
 from vaelrix_forcefield.forcefield import create_force_field
 
@@ -50,6 +54,17 @@ class TestArchitectureBrainRealLayers(unittest.TestCase):
         # actual quoted rule text behind it. Assert real law-doc content
         # appears — the phrase this project's own CLAUDE.md uses.
         self.assertIn("four strict layers", joined.lower())
+
+    def test_all_law_files_unreadable_raises_evidence_lookup_error_not_none(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            law_dir = root / "docs" / "scholomance-encyclopedia" / "Scholomance LAW"
+            law_dir.mkdir(parents=True)
+            (law_dir / "CLAUDE.md").write_text("four strict layers")
+
+            with patch.object(Path, "read_text", side_effect=OSError("simulated: permission denied")):
+                with self.assertRaises(EvidenceLookupError):
+                    architecture_brain._quote_law(root, "four strict layers")
 
 
 if __name__ == "__main__":

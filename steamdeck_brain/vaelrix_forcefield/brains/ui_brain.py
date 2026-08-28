@@ -11,6 +11,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+from ._evidence_errors import EvidenceLookupError
 from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCortexForceField
 
 
@@ -89,7 +90,11 @@ _LAW_CLAUDE_MD = "docs/scholomance-encyclopedia/Scholomance LAW/CLAUDE.md"
 
 
 def _quote_design_system(root: Path, phrase: str) -> str | None:
-    """Real line from this project's own Design System doc mentioning `phrase`."""
+    """Real line from this project's own Design System doc mentioning `phrase`.
+
+    Raises EvidenceLookupError if the file exists but couldn't be read —
+    distinct from the file genuinely not mentioning the phrase.
+    """
     path = root / _LAW_CLAUDE_MD
     if not path.exists():
         return None
@@ -97,8 +102,8 @@ def _quote_design_system(root: Path, phrase: str) -> str | None:
         for line in path.read_text(encoding="utf-8", errors="ignore").splitlines():
             if phrase in line.lower():
                 return line.strip()
-    except Exception:
-        return None
+    except Exception as exc:
+        raise EvidenceLookupError(f"failed to read {path}: {exc}") from exc
     return None
 
 
@@ -168,7 +173,11 @@ def run_ui_brain(
 
     scholomance_hits = [term for term in _SCHOLOMANCE_UI_TERMS if term in text]
     for term in scholomance_hits[:3]:
-        quote = _quote_design_system(root, term)
+        try:
+            quote = _quote_design_system(root, term)
+        except EvidenceLookupError as exc:
+            findings.append(f"Design-system doc lookup for \"{term}\" failed ({exc}) — not a claim it's undocumented.")
+            continue
         if quote:
             findings.append(f'Project design system ({term}): "{quote}"')
 

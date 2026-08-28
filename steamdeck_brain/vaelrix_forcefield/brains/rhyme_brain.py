@@ -80,12 +80,17 @@ def _project_root() -> Path:
     return Path.cwd()
 
 
-def _rhyme_group(root: Path, word: str) -> tuple[str, bool]:
+def _rhyme_group(root: Path, word: str, dict_available: bool = True) -> tuple[str, bool]:
     """(group_label, is_real) — real rhyme_family from the dictionary when
-    the word is known, else the suffix-heuristic fallback."""
-    rhyme = sdict.rhyme_for_word(root, word)
-    if rhyme and rhyme.get("rhyme_family"):
-        return rhyme["rhyme_family"], True
+    the word is known, else the suffix-heuristic fallback.
+
+    dict_available=False (set once by the caller after ensure_available()
+    raises) skips the dictionary entirely rather than raising once per line.
+    """
+    if dict_available:
+        rhyme = sdict.rhyme_for_word(root, word)
+        if rhyme and rhyme.get("rhyme_family"):
+            return rhyme["rhyme_family"], True
     return _last_syllable_group(word), False
 
 
@@ -106,10 +111,10 @@ def _count_syllables(word: str) -> int:
     return max(1, count)
 
 
-def _detect_rhyme_scheme(root: Path, lines: list[str]) -> tuple[str, float]:
+def _detect_rhyme_scheme(root: Path, lines: list[str], dict_available: bool = True) -> tuple[str, float]:
     if len(lines) < 2:
         return "N/A", 0.0
-    endings = [_rhyme_group(root, _last_word(line))[0] for line in lines]
+    endings = [_rhyme_group(root, _last_word(line), dict_available)[0] for line in lines]
     letter_map: dict[str, str] = {}
     next_letter = ord("A")
     scheme: list[str] = []
@@ -159,13 +164,24 @@ def run_rhyme_brain(
         )
 
     root = _project_root()
-    scheme, consistency = _detect_rhyme_scheme(root, lines)
+    dict_available = True
+    try:
+        sdict.ensure_available(root)
+    except sdict.DictionaryUnavailable as exc:
+        dict_available = False
+        findings.append(
+            f"Real rhyme dictionary unavailable ({exc}) — falling back to "
+            "suffix-heuristic rhyme grouping. This is an infrastructure "
+            "failure, not a statement about the input verse."
+        )
+
+    scheme, consistency = _detect_rhyme_scheme(root, lines, dict_available)
     findings.append(f"Rhyme scheme: {scheme} (consistency: {consistency:.0%})")
 
     real_hits = [
         (word, group, is_real)
         for word, (group, is_real) in (
-            (_last_word(line), _rhyme_group(root, _last_word(line))) for line in lines
+            (_last_word(line), _rhyme_group(root, _last_word(line), dict_available)) for line in lines
         )
         if is_real
     ]
@@ -189,7 +205,7 @@ def run_rhyme_brain(
     else:
         findings.append("No strong cadence markers detected; consider adding rhythmic anchor words.")
 
-    rhyme_groups = Counter(_rhyme_group(root, _last_word(line))[0] for line in lines)
+    rhyme_groups = Counter(_rhyme_group(root, _last_word(line), dict_available)[0] for line in lines)
     unique_rhymes = len(rhyme_groups)
     rhyme_density = (len(lines) - unique_rhymes) / max(len(lines), 1)
     if rhyme_density > 0.6:

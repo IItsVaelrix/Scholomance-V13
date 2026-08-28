@@ -17,6 +17,18 @@ ARPABET_VOWELS = {
     "IH", "IY", "OW", "OY", "UH", "UW",
 }
 
+
+class DictionaryUnavailable(Exception):
+    """The dictionary file exists but a connection or query against it failed.
+
+    Distinct from a query succeeding and finding no matching row (a genuine
+    out-of-vocabulary word) and distinct from the dictionary file not
+    existing at all — both of those are real "nothing to report" cases and
+    still return None. This is "something broke while looking," which a
+    caller must not silently treat the same way.
+    """
+
+
 _connection_cache: dict[Path, sqlite3.Connection | None] = {}
 
 
@@ -25,6 +37,8 @@ def _dict_path(root: Path) -> Path:
 
 
 def _connection(root: Path) -> sqlite3.Connection | None:
+    """None means the dictionary file genuinely does not exist. Raises
+    DictionaryUnavailable if the file exists but the connection fails."""
     path = _dict_path(root)
     if path in _connection_cache:
         return _connection_cache[path]
@@ -35,13 +49,17 @@ def _connection(root: Path) -> sqlite3.Connection | None:
         con = sqlite3.connect(f"file:{path}?mode=ro", uri=True, check_same_thread=False)
         _connection_cache[path] = con
         return con
-    except Exception:
-        _connection_cache[path] = None
-        return None
+    except Exception as exc:
+        raise DictionaryUnavailable(f"failed to open dictionary at {path}: {exc}") from exc
 
 
 def ipa_for_word(root: Path, word: str) -> str | None:
-    """Real CMU-dictionary ARPAbet transcription, e.g. "crack" -> "K R AE1 K"."""
+    """Real CMU-dictionary ARPAbet transcription, e.g. "crack" -> "K R AE1 K".
+
+    None means the word genuinely is not in the dictionary (or the
+    dictionary file does not exist at all). Raises DictionaryUnavailable if
+    the dictionary exists but a query against it fails.
+    """
     con = _connection(root)
     if con is None:
         return None
@@ -51,12 +69,17 @@ def ipa_for_word(root: Path, word: str) -> str | None:
             (word.lower(),),
         ).fetchone()
         return row[0] if row else None
-    except Exception:
-        return None
+    except DictionaryUnavailable:
+        raise
+    except Exception as exc:
+        raise DictionaryUnavailable(f"query failed for word={word!r}: {exc}") from exc
 
 
 def rhyme_for_word(root: Path, word: str) -> dict | None:
-    """Real phonetic rhyme data: rhyme_family, coda, rhyme_key, corpus_freq."""
+    """Real phonetic rhyme data: rhyme_family, coda, rhyme_key, corpus_freq.
+
+    Same None-vs-raise contract as ipa_for_word.
+    """
     con = _connection(root)
     if con is None:
         return None
@@ -69,8 +92,27 @@ def rhyme_for_word(root: Path, word: str) -> dict | None:
         if not row:
             return None
         return {"rhyme_family": row[0], "coda": row[1], "rhyme_key": row[2], "corpus_freq": row[3]}
-    except Exception:
-        return None
+    except DictionaryUnavailable:
+        raise
+    except Exception as exc:
+        raise DictionaryUnavailable(f"query failed for word={word!r}: {exc}") from exc
+
+
+def ensure_available(root: Path) -> None:
+    """Raises DictionaryUnavailable if the dictionary exists but cannot be
+    queried. A caller that needs to report unavailability once, up front,
+    rather than per-word, should call this before doing per-word lookups.
+    Succeeds silently (including when the file simply doesn't exist —
+    that's a real "nothing to report" case, not a failure)."""
+    con = _connection(root)
+    if con is None:
+        return
+    try:
+        con.execute("SELECT 1").fetchone()
+    except DictionaryUnavailable:
+        raise
+    except Exception as exc:
+        raise DictionaryUnavailable(f"probe query failed: {exc}") from exc
 
 
 def count_arpabet_phones(ipa: str) -> tuple[int, int]:

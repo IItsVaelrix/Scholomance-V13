@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from ._evidence_errors import EvidenceLookupError
 from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCortexForceField
 
 
@@ -73,11 +74,18 @@ _MAX_FILES_SCANNED_PER_TERM = 400
 
 def _quote_term_definition(root: Path, term: str) -> tuple[str, str] | None:
     """Find the first real line in the encyclopedia that actually mentions
-    `term`, and return (relative_path, line_text) — evidence, not a guess."""
+    `term`, and return (relative_path, line_text) — evidence, not a guess.
+
+    Raises EvidenceLookupError if every candidate file failed to read (a
+    permission error, a corrupt file) — that is not the same claim as
+    "searched and the term genuinely isn't mentioned anywhere," and a
+    caller must not be told the two are the same thing.
+    """
     encyclopedia = root / _ENCYCLOPEDIA_DIR
     if not encyclopedia.is_dir():
         return None
     scanned = 0
+    read_failures = 0
     for path in encyclopedia.rglob("*.md"):
         if not path.is_file():
             continue
@@ -89,7 +97,12 @@ def _quote_term_definition(root: Path, term: str) -> tuple[str, str] | None:
                 if term in line.lower():
                     return str(path.relative_to(root)), line.strip()
         except Exception:
+            read_failures += 1
             continue
+    if scanned > 0 and read_failures == scanned:
+        raise EvidenceLookupError(
+            f"all {scanned} candidate file(s) for {term!r} failed to read"
+        )
     return None
 
 
@@ -125,7 +138,11 @@ def run_lore_brain(
         term_list = ", ".join(matched_terms.keys())
         findings.append(f"Canonical terms detected: {term_list}")
         for term in matched_terms:
-            quote = _quote_term_definition(root, term)
+            try:
+                quote = _quote_term_definition(root, term)
+            except EvidenceLookupError as exc:
+                findings.append(f'Encyclopedia lookup for "{term}" failed ({exc}) — not a claim the term is undocumented.')
+                continue
             if quote:
                 path, line = quote
                 findings.append(f'"{term}" per {path}: "{line}"')

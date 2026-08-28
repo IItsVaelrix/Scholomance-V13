@@ -130,9 +130,30 @@ def run_phoneme_brain(
         )
 
     root = _project_root()
-    transcriptions, real_vowels, real_consonants, oov = _real_arpabet_data(root, words)
+    dictionary_unavailable_reason: str | None = None
+    try:
+        transcriptions, real_vowels, real_consonants, oov = _real_arpabet_data(root, words)
+    except sdict.DictionaryUnavailable as exc:
+        transcriptions, real_vowels, real_consonants, oov = {}, 0, 0, []
+        dictionary_unavailable_reason = str(exc)
 
-    if transcriptions:
+    if dictionary_unavailable_reason:
+        findings.append(
+            f"Real dictionary unavailable ({dictionary_unavailable_reason}) — "
+            "falling back to approximate letter-based analysis. This is an "
+            "infrastructure failure, not a statement about the input text."
+        )
+        profile = _phoneme_profile(words)
+        vr = profile["vowelRatio"]
+        cr = profile["consonantRatio"]
+        findings.append(
+            f"Approximate (letter-based) vowel/consonant ratio: {vr:.0%}/{cr:.0%}"
+        )
+        if vr > 0.45:
+            findings.append("High vowel density — text may sound open and melodic.")
+        elif vr < 0.32:
+            findings.append("Low vowel density — text may feel clipped or consonant-heavy.")
+    elif transcriptions:
         real_total = real_vowels + real_consonants
         vr = real_vowels / real_total if real_total else 0.0
         cr = real_consonants / real_total if real_total else 0.0

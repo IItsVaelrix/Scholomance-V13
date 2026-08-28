@@ -14,6 +14,7 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
+from vaelrix_forcefield.brains import _scholomance_dict as sd
 from vaelrix_forcefield.brains.rhyme_brain import run_rhyme_brain
 from vaelrix_forcefield.forcefield import create_force_field
 
@@ -40,6 +41,31 @@ class TestRhymeBrainRealDictionary(unittest.TestCase):
         # pair, so assert on the real rhyme_family label appearing, which
         # only a dictionary-backed implementation would surface.
         self.assertIn("AE", joined)
+
+    def test_broken_dictionary_is_reported_distinctly_not_silently_downgraded(self):
+        if not _dict_present():
+            self.skipTest("scholomance_dict.sqlite not present in this checkout")
+
+        class _BrokenConnection:
+            def execute(self, *a, **kw):
+                raise sd.sqlite3.DatabaseError("simulated: database disk image is malformed")
+
+        here = Path(__file__).resolve()
+        for _ in range(10):
+            if (here / "scholomance_dict.sqlite").exists():
+                break
+            here = here.parent
+        path = sd._dict_path(here)
+        sd._connection_cache[path] = _BrokenConnection()
+        try:
+            text = "the sword began to crack\nechoes rolled across the black"
+            field = create_force_field(text)
+            result = run_rhyme_brain(field, query=text)
+            joined = " ".join(result.findings)
+            self.assertIn("dictionary", joined.lower())
+            self.assertIn("unavailable", joined.lower())
+        finally:
+            del sd._connection_cache[path]
 
 
 if __name__ == "__main__":

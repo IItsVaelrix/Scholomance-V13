@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from ._evidence_errors import EvidenceLookupError
 from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCortexForceField
 
 
@@ -91,19 +92,29 @@ _LAW_DIR = "docs/scholomance-encyclopedia/Scholomance LAW"
 def _quote_law(root: Path, phrase: str) -> str | None:
     """Find the first real line in this project's own LAW docs mentioning
     `phrase`, so a citation like "per CODEx contract" is a real quote
-    instead of a name with nothing behind it."""
+    instead of a name with nothing behind it.
+
+    Raises EvidenceLookupError if every candidate file failed to read —
+    distinct from genuinely searching and finding no mention.
+    """
     law_dir = root / _LAW_DIR
     if not law_dir.is_dir():
         return None
+    scanned = 0
+    read_failures = 0
     for path in law_dir.rglob("*.md"):
         if not path.is_file():
             continue
+        scanned += 1
         try:
             for line in path.read_text(encoding="utf-8", errors="ignore").splitlines():
                 if phrase in line.lower():
                     return line.strip()
         except Exception:
+            read_failures += 1
             continue
+    if scanned > 0 and read_failures == scanned:
+        raise EvidenceLookupError(f"all {scanned} law file(s) failed to read while searching for {phrase!r}")
     return None
 
 
@@ -162,7 +173,11 @@ def run_architecture_brain(
 
     # Cross-layer analysis
     if "refactor" in text and len(layers) >= 3:
-        law_quote = _quote_law(root, "four strict layers")
+        try:
+            law_quote = _quote_law(root, "four strict layers")
+        except EvidenceLookupError as exc:
+            findings.append(f"Law-doc lookup failed ({exc}) — not a claim the layer law doesn't exist.")
+            law_quote = None
         if law_quote:
             findings.append(f'Multi-layer project — this project\'s own law states: "{law_quote}"')
         else:

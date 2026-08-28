@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from ._evidence_errors import EvidenceLookupError
 from ..types import AmplifierBrain, AmplifierResult, ResonanceScore, VaelrixCortexForceField
 
 
@@ -65,13 +66,16 @@ def _list_pixelbrain_assets(root: Path) -> list[str]:
 
 
 def _read_manifest(root: Path, asset_id: str) -> dict | None:
+    """None means no manifest file exists for this asset. Raises
+    EvidenceLookupError if the file exists but is unreadable or corrupt —
+    distinct from the asset genuinely having no manifest."""
     manifest_path = _pixelbrain_imports_dir(root) / asset_id / "diagnostic_manifest.json"
     if not manifest_path.exists():
         return None
     try:
         return json.loads(manifest_path.read_text(encoding="utf-8"))
-    except Exception:
-        return None
+    except Exception as exc:
+        raise EvidenceLookupError(f"failed to read manifest for {asset_id!r}: {exc}") from exc
 
 
 def _match_assets_in_text(text_lower: str, assets: list[str]) -> list[str]:
@@ -121,7 +125,12 @@ def run_pixel_brain(
     named_assets = _match_assets_in_text(q, pixelbrain_assets)
     if named_assets:
         for asset_id in named_assets[:4]:
-            findings.append(_describe_manifest(asset_id, _read_manifest(root, asset_id)))
+            try:
+                manifest = _read_manifest(root, asset_id)
+            except EvidenceLookupError as exc:
+                findings.append(f"{asset_id}: manifest read failed ({exc}) — not a claim it has no manifest.")
+                continue
+            findings.append(_describe_manifest(asset_id, manifest))
     elif pixelbrain_assets and any(
         w in q for w in {"pixel", "sprite", "asset", "palette", "gene", "packet"}
     ):

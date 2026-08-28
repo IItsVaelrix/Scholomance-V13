@@ -11,11 +11,15 @@ file(s)" regardless of which asset was named.
 import json
 import os
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
+from vaelrix_forcefield.brains import pixel_brain
+from vaelrix_forcefield.brains._evidence_errors import EvidenceLookupError
 from vaelrix_forcefield.brains.pixel_brain import run_pixel_brain
 from vaelrix_forcefield.forcefield import create_force_field
 
@@ -54,6 +58,30 @@ class TestPixelBrainRealInfra(unittest.TestCase):
         result = run_pixel_brain(field, query="check the pixel art color palette")
         joined = " ".join(result.findings)
         self.assertTrue(any(a in joined for a in assets))
+
+    def test_corrupt_manifest_raises_evidence_lookup_error_not_none(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            asset_dir = root / "codex" / "core" / "pixelbrain" / "imports" / "some_asset"
+            asset_dir.mkdir(parents=True)
+            (asset_dir / "diagnostic_manifest.json").write_text("{not valid json")
+
+            with self.assertRaises(EvidenceLookupError):
+                pixel_brain._read_manifest(root, "some_asset")
+
+    def test_corrupt_manifest_is_reported_distinctly_from_manifest_missing(self):
+        assets = _real_pixelbrain_assets()
+        if not assets:
+            self.skipTest("no real pixelbrain asset fixtures present in this checkout")
+        asset_id = assets[0]
+
+        with patch.object(pixel_brain, "_read_manifest", side_effect=EvidenceLookupError("simulated: corrupt JSON")):
+            text = f"inspect the {asset_id} pixel asset"
+            field = create_force_field(text)
+            result = run_pixel_brain(field, query=text)
+            joined = " ".join(result.findings)
+        self.assertNotIn("no diagnostic manifest found", joined)
+        self.assertIn("failed", joined.lower())
 
 
 if __name__ == "__main__":
