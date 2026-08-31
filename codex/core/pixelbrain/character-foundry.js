@@ -77,7 +77,7 @@ function getMaterialRamp(materialName, defaultColor = '#808080') {
   };
 }
 
-function applyCharacterFills({ silhouette, spec, direction } = {}) {
+export function applyCharacterFills({ silhouette, spec, direction } = {}) {
   const canvas = spec?.canvas || CHARACTER_DEFAULTS.canvas;
   const cells = [];
   const colors = new Set();

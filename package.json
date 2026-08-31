@@ -26,6 +26,7 @@
     "battle:editor": "npm --prefix \"Scholomance OS\" run battle:editor --",
     "combat:all": "node scripts/combat-all.js",
     "assets:armrig": "node scripts/build-arm-rig-assets.mjs",
+    "assets:charmodel": "node scripts/build-character-model.mjs",
     "transmute": "node scripts/pb-transmute.mjs",
     "dev:dict": "python scripts/serve_scholomance_dict.py --db scholomance_dict.sqlite --port 8787",
     "lexical-graph": "node scripts/lexical-graph.mjs",

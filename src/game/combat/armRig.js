@@ -15,11 +15,21 @@ function advance(jointX, jointY, dx, dy, angleRad, mirror) {
   return { x: jointX + mx * cos - dy * sin, y: jointY + mx * sin + dy * cos };
 }
 
+/**
+ * Root joint of a limb chain. Arms name it `shoulder`; legs name it `hip`.
+ * `root` is the generic spelling — `shoulder` stays supported so the Void1
+ * arm rig keeps working untouched.
+ */
+function rootJoint(limb) {
+  return limb.root || limb.shoulder;
+}
+
 /** @returns {Array<{key,jointX,jointY,angleRad}>} */
 export function solveArm(arm, anglesDeg = []) {
   const results = [];
-  let jointX = arm.shoulder.x;
-  let jointY = arm.shoulder.y;
+  const root = rootJoint(arm);
+  let jointX = root.x;
+  let jointY = root.y;
   let accDeg = 0;
   arm.segments.forEach((seg, i) => {
     const delta = Number.isFinite(anglesDeg[i]) ? anglesDeg[i] : 0;
