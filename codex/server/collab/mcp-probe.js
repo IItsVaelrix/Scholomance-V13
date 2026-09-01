@@ -339,14 +339,6 @@ function createShellPipePayload({ readStatusResource, statusUri, probeToolExecut
     return `${messages.map((message) => JSON.stringify(message)).join('\n')}\n`;
 }
 
-function parseJsonRpcLines(text) {
-    return String(text || '')
-        .split(/\r?\n/)
-        .map((line) => line.trim())
-        .filter(Boolean)
-        .map((line) => JSON.parse(line));
-}
-
 async function runShellPipeCollabMcpProbe(options) {
     const timeoutMs = Number(options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
     const readStatusResource = options.readStatusResource ?? true;
@@ -379,7 +371,8 @@ async function runShellPipeCollabMcpProbe(options) {
     report.transport.args = ['-lc', command];
     report.transport.pid = child.pid ?? null;
 
-    let stdout = '';
+    let stdoutBuffer = '';
+    const parsedResponses = new Map();
     const expectedResponseIds = new Set([1, 2, 3, 4]);
     if (readStatusResource) expectedResponseIds.add(5);
     if (options.probeToolExecution) expectedResponseIds.add(6);
@@ -389,21 +382,35 @@ async function runShellPipeCollabMcpProbe(options) {
     try {
         const responses = await withTimeout(new Promise((resolve, reject) => {
             const maybeResolve = () => {
-                try {
-                    const parsedResponses = new Map(parseJsonRpcLines(stdout).map((message) => [message.id, message]));
-                    const complete = Array.from(expectedResponseIds).every((id) => parsedResponses.has(id));
-                    if (complete) resolve(parsedResponses);
-                } catch (error) {
-                    reject(error);
-                }
+                const complete = Array.from(expectedResponseIds).every((id) => parsedResponses.has(id));
+                if (complete) resolve(parsedResponses);
             };
 
             child.stdout.on('data', (chunk) => {
-                stdout += Buffer.isBuffer(chunk) ? chunk.toString('utf8') : String(chunk);
-                maybeResolve();
+                stdoutBuffer += Buffer.isBuffer(chunk) ? chunk.toString('utf8') : String(chunk);
+                let newlineIndex = stdoutBuffer.indexOf('\n');
+                while (newlineIndex !== -1) {
+                    const line = stdoutBuffer.slice(0, newlineIndex).trim();
+                    stdoutBuffer = stdoutBuffer.slice(newlineIndex + 1);
+                    if (line) {
+                        try {
+                            const message = JSON.parse(line);
+                            if (message.id !== undefined) parsedResponses.set(message.id, message);
+                            maybeResolve();
+                        } catch (error) {
+                            reject(error);
+                            return;
+                        }
+                    }
+                    newlineIndex = stdoutBuffer.indexOf('\n');
+                }
             });
             child.on('error', reject);
             child.on('close', (code, signal) => {
+                if (stdoutBuffer.trim()) {
+                    reject(new SyntaxError('Shell-pipe MCP response ended with an incomplete JSON line'));
+                    return;
+                }
                 maybeResolve();
                 reject(new Error(`Shell-pipe MCP process exited before all responses code=${code} signal=${signal ?? 'none'}`));
             });

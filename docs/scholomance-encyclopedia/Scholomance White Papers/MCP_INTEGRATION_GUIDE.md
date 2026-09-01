@@ -20,12 +20,12 @@ To connect VS Code AI extensions such as Roo Code, Cline, or Claude Desktop to t
 {
   "mcpServers": {
     "scholomance-collab": {
-      "command": "/home/deck/.nvm/versions/node/v24.14.1/bin/node",
+      "command": "/home/deck/.nvm/versions/node/v20.20.2/bin/node",
       "args": [
-        "--env-file=/home/deck/Desktop/Scholomance-V12-main/.env",
-        "/home/deck/Desktop/Scholomance-V12-main/codex/server/collab/mcp-bridge.js"
+        "--env-file=/home/deck/Downloads/Scholomance-V12-main/.env",
+        "/home/deck/Downloads/Scholomance-V12-main/codex/server/collab/mcp-bridge-entry.js"
       ],
-      "cwd": "/home/deck/Desktop/Scholomance-V12-main",
+      "cwd": "/home/deck/Downloads/Scholomance-V12-main",
       "env": {
         "NODE_ENV": "development"
       }
@@ -71,7 +71,7 @@ For Render or any production deployment, the server must boot with `ENABLE_COLLA
 If an editor MCP client still fails to connect:
 
 1. Use the pinned absolute Node path shown above.
-2. Set `cwd` to `/home/deck/Desktop/Scholomance-V12-main`.
+2. Set `cwd` to `/home/deck/Downloads/Scholomance-V12-main`.
 3. Run `npm run mcp:probe -- --json --probe-tool` or the `Scholomance: Probe Collab MCP Bridge` task first. Auto mode verifies the canonical bridge command when child stdio works and falls back to in-memory contract verification when the host blocks nested child stdio.
 4. Start the bridge from VS Code with the workspace task and inspect the task terminal for stderr output.
 5. If the probe passes but an editor MCP client still hangs during initialize, treat that as a host/client stdio transport problem until proven otherwise.

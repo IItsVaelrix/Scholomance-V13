@@ -110,7 +110,9 @@ function torsoShape() {
 function footShape(side) {
   const ax = joints[side === 'L' ? 'ankleL' : 'ankleR'].x;
   const len = width.foot;
-  const toeX = ax - len + 2; // toes lead, character faces screen-left
+  // Toes lead outward from the ankle, mirrored per side, so the two soles
+  // splay apart instead of both pointing screen-left into each other.
+  const toeX = side === 'L' ? ax - len + 2 : ax - 1;
   const cells = [];
   for (let yy = y.ankle - OV; yy <= y.sole - 2; yy += 1) {
     for (let i = -1; i <= 1; i += 1) cells.push({ x: ax + i, y: yy });

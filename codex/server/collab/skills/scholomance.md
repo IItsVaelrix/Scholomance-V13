@@ -371,7 +371,7 @@ npm run mcp:collab        # 2. Start MCP bridge (stdio)
 
 ### MCP Bridge
 
-**File:** `codex/server/collab/mcp-bridge.js`
+**Entrypoint:** `codex/server/collab/mcp-bridge-entry.js`
 
 **Client config:**
 ```json
@@ -379,7 +379,7 @@ npm run mcp:collab        # 2. Start MCP bridge (stdio)
   "mcpServers": {
     "scholomance-collab": {
       "command": "node",
-      "args": ["--env-file=.env", "codex/server/collab/mcp-bridge.js"]
+      "args": ["--env-file=.env", "codex/server/collab/mcp-bridge-entry.js"]
     }
   }
 }

@@ -59,137 +59,21 @@ const TOKEN_TYPES = Object.freeze({
 
 /**
  * Tokenize SCDL source text.
+ *
+ * Thin public wrapper around `_tokenizeFull` — the exact lexer `parseSCDL`
+ * uses to compile. This used to be a second, hand-maintained implementation
+ * kept in sync by comment convention only; tests calling `tokenize()`
+ * directly were therefore exercising a lexer the compiler never ran, so a
+ * fix landed in one could silently regress the other. There is now exactly
+ * one tokenizer.
+ *
  * @param {string} source
  * @param {Array} [issues] - optional sink; illegal characters are appended here
  *   rather than being dropped without trace.
  * @returns {Array<{type:string, value:string, line:number, col:number}>}
  */
 export function tokenize(source, issues = null) {
-  const tokens = [];
-  let pos = 0;
-  let line = 1;
-  let col = 1;
-  const src = String(source || '');
-
-  function peek()  { return src[pos] || ''; }
-  function advance() {
-    const ch = src[pos++];
-    if (ch === '\n') { line++; col = 1; } else { col++; }
-    return ch;
-  }
-  function loc() { return { line, col }; }
-
-  while (pos < src.length) {
-    const ch = peek();
-
-    // Whitespace
-    if (/\s/.test(ch)) { advance(); continue; }
-
-    // '#' — could be comment, hex colour, or malformed hex literal
-    if (ch === '#') {
-      const startLoc = loc();
-      // Look ahead to see if the next 6 characters are hex digits
-      let isHex = true;
-      for (let i = 1; i <= 6; i++) {
-        const nextCh = src[pos + i] || '';
-        if (!/[0-9a-fA-F]/.test(nextCh)) {
-          isHex = false;
-          break;
-        }
-      }
-      // Ensure the 7th char is not a hex digit
-      if (isHex) {
-        const seventhCh = src[pos + 7] || '';
-        if (/[0-9a-fA-F]/.test(seventhCh)) {
-          isHex = false;
-        }
-      }
-
-      if (isHex) {
-        advance(); // consume '#'
-        let hex = '';
-        for (let i = 0; i < 6; i++) {
-          hex += advance();
-        }
-        tokens.push({ type: TOKEN_TYPES.HEX, value: `#${hex}`, line: startLoc.line, col: startLoc.col });
-      } else if (!/\s/.test(src[pos + 1] || '')) {
-        advance(); // consume '#'
-        let raw = '#';
-        while (pos < src.length && !/\s/.test(peek()) && !['{', '}', '(', ')'].includes(peek())) {
-          raw += advance();
-        }
-        tokens.push({ type: TOKEN_TYPES.BAD_HEX, value: raw, line: startLoc.line, col: startLoc.col });
-      } else {
-        // It's a comment — consume to end of line
-        while (pos < src.length && peek() !== '\n') advance();
-      }
-      continue;
-    }
-
-    // String literal
-    if (ch === '"') {
-      const startLoc = loc();
-      advance();
-      let str = '';
-      while (pos < src.length && peek() !== '"') str += advance();
-      advance(); // closing "
-      tokens.push({ type: TOKEN_TYPES.STRING, value: str, line: startLoc.line, col: startLoc.col });
-      continue;
-    }
-
-    // Braces / parens / punctuation
-    if (ch === '{') { tokens.push({ type: TOKEN_TYPES.LBRACE, value: '{', line, col }); advance(); continue; }
-    if (ch === '}') { tokens.push({ type: TOKEN_TYPES.RBRACE, value: '}', line, col }); advance(); continue; }
-    if (ch === '(') { tokens.push({ type: TOKEN_TYPES.LPAREN, value: '(', line, col }); advance(); continue; }
-    if (ch === ')') { tokens.push({ type: TOKEN_TYPES.RPAREN, value: ')', line, col }); advance(); continue; }
-    if (ch === '=') { tokens.push({ type: TOKEN_TYPES.EQUALS, value: '=', line, col }); advance(); continue; }
-    if (ch === '.') { tokens.push({ type: TOKEN_TYPES.DOT,    value: '.', line, col }); advance(); continue; }
-
-    // Numeric literal
-    if (/[0-9-]/.test(ch)) {
-      const startLoc = loc();
-      let num = '';
-      if (peek() === '-') {
-        // See _tokenizeFull: a bare '-' is an illegal character, not a sign.
-        if (!/[0-9]/.test(src[pos + 1] || '')) {
-          _recordIllegalChar(issues, ch, { line, col });
-          advance();
-          continue;
-        }
-        num += advance();
-      }
-      while (/[0-9]/.test(peek())) num += advance();
-      if (peek() === '.' && /[0-9]/.test(src[pos + 1] || '')) {
-        num += advance();
-        while (/[0-9]/.test(peek())) num += advance();
-      }
-      // Check if followed by 'x' (dimension syntax: 64x64)
-      if (!num.includes('.') && !num.startsWith('-') && peek() === 'x' && /[0-9]/.test(src[pos + 1])) {
-        tokens.push({ type: TOKEN_TYPES.INT, value: num, line: startLoc.line, col: startLoc.col });
-        advance(); // consume 'x'
-        tokens.push({ type: TOKEN_TYPES.X, value: 'x', line, col });
-        continue;
-      }
-      tokens.push({ type: TOKEN_TYPES.INT, value: num, line: startLoc.line, col: startLoc.col });
-      continue;
-    }
-
-    // Identifier / keyword
-    if (/[a-zA-Z_]/.test(ch)) {
-      const startLoc = loc();
-      let ident = '';
-      while (/[a-zA-Z0-9_]/.test(peek())) ident += advance();
-      tokens.push({ type: TOKEN_TYPES.IDENT, value: ident, line: startLoc.line, col: startLoc.col });
-      continue;
-    }
-
-    // Unknown char: report it, then skip. See _recordIllegalChar.
-    _recordIllegalChar(issues, ch, { line, col });
-    advance();
-  }
-
-  tokens.push({ type: TOKEN_TYPES.EOF, value: '', line, col });
-  return tokens;
+  return _tokenizeFull(source, issues);
 }
 
 // ─── Parser ──────────────────────────────────────────────────────────────────

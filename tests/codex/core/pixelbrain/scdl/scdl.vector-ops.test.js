@@ -217,3 +217,28 @@ export json
     expect(result.errors.some(e => e.label === 'SCDL-011')).toBe(true);
   });
 });
+
+describe('SCDL boolean ops — arity errors never throw', () => {
+  // compileSCDL's docstring promises it "always returns a CompileResult —
+  // never throws". A union/subtract/intersect with fewer than 2 targets used
+  // to push a plain {code,message} object into the shared errors array;
+  // compileSCDL's final hasErrors check calls e.isError() unconditionally,
+  // so compiling this crashed with a raw TypeError instead of failing clean.
+  it.each(['union', 'subtract', 'intersect'])(
+    "compiles a malformed '%s' with 1 target to a clean ok:false, not a throw",
+    (verb) => {
+      const src = sourceFor(`  circle 2 2 radius 2 core\n  ${verb} a`);
+      expect(() => compileSCDL(src)).not.toThrow();
+      const result = compileSCDL(src);
+      expect(result.ok).toBe(false);
+      expect(result.errors.some(e => e.label === 'SCDL-023')).toBe(true);
+      expect(result.errors.every(e => typeof e.isError === 'function')).toBe(true);
+    }
+  );
+
+  it("compiling a malformed 'union' with 0 targets also fails clean", () => {
+    const src = sourceFor('  circle 2 2 radius 2 core\n  union');
+    expect(() => compileSCDL(src)).not.toThrow();
+    expect(compileSCDL(src).ok).toBe(false);
+  });
+});

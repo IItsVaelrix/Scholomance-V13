@@ -70,6 +70,12 @@ export function resolveColorsPass(ast, errors) {
       return resolved;
     }
 
+    errors.push(scdlError(
+      `Unrecognized color reference kind '${colorRef.kind}' — expected hex or alias`,
+      SCDL_ERROR_CODES.UNKNOWN_COLOR_REF_KIND,
+      loc,
+      { colorRef }
+    ));
     return '#000000';
   }
 

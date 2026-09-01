@@ -238,6 +238,7 @@ const TOOL_ALIASES = new Map(Object.entries({
     mcp_scholomance_collab_skill_vaelrix_law_audit: ['law_audit'],
     mcp_scholomance_collab_skill_scholomance_feedback: ['scholomance_feedback'],
     mcp_scholomance_collab_skill_scholomance_knowledge: ['skill_scholomance'],
+    mcp_scholomance_collab_skill_scholomance_compile_knowledge: ['skill_scholomance_compile'],
     mcp_scholomance_collab_agent_list: ['agent_list'],
     mcp_scholomance_collab_brain_list: ['brain_list', 'list_brains'],
     mcp_scholomance_collab_brain_forcefield_ask: ['brain_ask', 'forcefield', 'ask_brain'],
@@ -262,17 +263,27 @@ const TOOL_ALIASES = new Map(Object.entries({
     mcp_scholomance_collab_evaluate: ['evaluate'],
 }));
 
-function registerTool(server, name, inputSchema, handler) {
+function registerTool(server, name, inputSchema, handler, description) {
     const names = [name, ...(TOOL_ALIASES.get(name) || [])];
 
     for (const toolName of names) {
-        server.tool(toolName, inputSchema, async (params) => {
+        const wrapped = async (params) => {
             try {
                 return createToolSuccess(toolName, await handler(params));
             } catch (error) {
                 return createToolError(error);
             }
-        });
+        };
+        // The SDK's tool(name, description, schema, cb) overload is what
+        // makes a tool findable by keyword search rather than only by exact
+        // name match. `description` is optional and additive here — every
+        // existing call site keeps registering with no description, exactly
+        // as before, unless it passes one.
+        if (description) {
+            server.tool(toolName, description, inputSchema, wrapped);
+        } else {
+            server.tool(toolName, inputSchema, wrapped);
+        }
     }
 }
 
@@ -423,6 +434,14 @@ export function registerCollabMcpBridge(server, service = collabService) {
             uri: 'collab://skills/scholomance',
             mimeType: 'text/markdown',
             text: fs.readFileSync(path.join(ROOT, 'codex/server/collab/skills/scholomance.md'), 'utf8'),
+        }],
+    }));
+
+    server.resource('skill-scholomance-compile', 'collab://skills/scholomance-compile', async () => ({
+        contents: [{
+            uri: 'collab://skills/scholomance-compile',
+            mimeType: 'text/markdown',
+            text: fs.readFileSync(path.join(ROOT, 'codex/server/collab/skills/scholomance-compile.md'), 'utf8'),
         }],
     }));
 
@@ -1367,7 +1386,16 @@ export function registerCollabMcpBridge(server, service = collabService) {
             source: 'codex/server/collab/skills/scholomance.md',
             bytecode: 'SCHOL-SKILL-V1-KNOWLEDGE',
         };
-    });
+    }, 'Master Scholomance knowledge base: world law, CODEx architecture, schools, ScholoTime, PixelBrain, G2P, music video, MCP, and all agent laws. Invoke once per session before Scholomance work.');
+
+    registerTool(server, 'mcp_scholomance_collab_skill_scholomance_compile_knowledge', {}, async () => {
+        const skillPath = path.join(ROOT, 'codex/server/collab/skills/scholomance-compile.md');
+        return {
+            content: fs.readFileSync(skillPath, 'utf8'),
+            source: 'codex/server/collab/skills/scholomance-compile.md',
+            bytecode: 'SCHOL-SKILL-COMPILE-V1-KNOWLEDGE',
+        };
+    }, 'SCDL (PixelBrain vector/cell asset DSL) and generalized asset-compiler/rasterizer engineering knowledge: grammar, compiler pass pipeline, error codes, boolean-op semantics, rasterizer SDF math, and reusable compiler-design patterns. Invoke when writing, debugging, or extending SCDL, or designing any parser->AST->passes->packet compiler.');
 
     // ── Agent / Task / Pipeline Discovery (explicit tools for ergonomics) ─────
     registerTool(server, 'mcp_scholomance_collab_agent_list', {

@@ -1,0 +1,19 @@
+# photo_1_lit-legR-boot.scdl — rigged leg segment, 32x32.
+# Joints: hip y22, knee y26, ankle y29, sole y31. legL x15-17, legR x19-21.
+
+asset Photo1LegRBoot canvas 32x32
+
+palette {
+  robe_base    = #2D0638
+  robe_shadow  = #0F0214
+  robe_hi      = #842176
+  boot_base    = #161616
+  boot_shadow  = #070707
+  joint        = #0A0712
+}
+
+part legR_boot material void_cloth {
+  rect 19 29 3 1 boot_base
+  rect 17 30 5 1 boot_shadow
+}
+export json png

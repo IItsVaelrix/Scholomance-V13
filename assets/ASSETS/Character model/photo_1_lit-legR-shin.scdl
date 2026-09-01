@@ -1,0 +1,21 @@
+# photo_1_lit-legR-shin.scdl — rigged leg segment, 32x32.
+# Joints: hip y22, knee y26, ankle y29, sole y31. legL x15-17, legR x19-21.
+
+asset Photo1LegRShin canvas 32x32
+
+palette {
+  robe_base    = #2D0638
+  robe_shadow  = #0F0214
+  robe_hi      = #842176
+  boot_base    = #161616
+  boot_shadow  = #070707
+  joint        = #0A0712
+}
+
+part legR_shin material void_cloth {
+  rect 19 26 3 3 robe_base
+  line 19 26 19 28 robe_hi
+  line 21 26 21 28 robe_shadow
+  cell 20 26 joint
+}
+export json png

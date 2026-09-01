@@ -1,0 +1,1279 @@
+# photo_1_lit.scdl
+# Source of truth for the character. Rebuilt from Vaelrix's 30-minute hand pass
+# (2026-08-30 16:59), so that work lives HERE, not only in a generated output.
+# Every pixel below is Vaelrix's; this file only re-expresses it as SCDL.
+#
+# ── WARNING ───────────────────────────────────────────────────────────────
+# `photo_1_lit-aseprite.aseprite` is an OUTPUT. Compiling this file with
+# `--export aseprite` overwrites it without asking. If you hand-edit that
+# .aseprite, back the change into this .scdl before recompiling, or the edit
+# is gone. A dated copy of the 2026-08-30 face fix is kept in
+# assets/ASSETS/_handedits/.
+#
+# ── Palette aliases are NAMESPACED PER PART, on purpose ───────────────────
+# SCDL palette aliases are global. An earlier generator wrote per-part values
+# into shared aliases (`skin`, `skinshade`), so `arm` silently overwrote
+# `face` and the face rendered with the arm's colours. Every alias below is
+# prefixed with its part id, which makes that class of bug impossible.
+# Tone suffixes run dark -> light: shadow, deep, base, light, hi.
+#
+#   linework   20 cells  1 tone(s)  material source
+#   cloak      64 cells  3 tone(s)  material void_cloth
+#   hair       88 cells  3 tone(s)  material hair_black
+#   robe       31 cells  3 tone(s)  material void_cloth
+#   staff       7 cells  2 tone(s)  material gold
+#   face       16 cells  4 tone(s)  material skin_medium
+#   arm         6 cells  3 tone(s)  material skin_medium
+#   eyes       10 cells  5 tone(s)  material eye_void_glow
+#   feet        8 cells  1 tone(s)  material void_cloth
+#   TOTAL     250 cells
+#
+# Walk cycle: loop `walk`, 200ms/frame, 4 frames + implicit rest (frame 0).
+# EVERY part bobs 1px with the footfall (body dips on stride-L/stride-R
+# contact, rises on pass-mid/pass-mid2) — a feet-only stride didn't read as
+# the character walking, it read as noise at the hem (Vaelrix, correctly,
+# on the first two attempts). It's a pure translation of existing pixels,
+# nothing reshaped or redrawn. Boots also carry 2 tones now (base/shadow)
+# instead of one flat block.
+
+asset photo_1_lit canvas 32x32
+
+palette {
+  linework_base = #000000
+  cloak_shadow  = #070707
+  cloak_base    = #161616
+  cloak_light   = #B4B4B4
+  hair_shadow   = #161616
+  hair_base     = #2B2B2B
+  hair_hi       = #8D8B8A
+  robe_shadow   = #0F0214
+  robe_base     = #2D0638
+  robe_hi       = #842176
+  staff_base    = #F3DD2E
+  staff_hi      = #FAFDDF
+  face_shadow   = #7E390B
+  face_base     = #BC5D1E
+  face_light    = #B1632F
+  face_hi       = #C97135
+  arm_shadow    = #7E390B
+  arm_base      = #BC5D1E
+  arm_hi        = #FFFFFF
+  eyes_shadow   = #0F0214
+  eyes_deep     = #2B2B2B
+  eyes_base     = #842176
+  eyes_light    = #BC5D1E
+  eyes_hi       = #FAFDDF
+}
+
+# Interior ink detail — eye sockets, mouth, fold lines. NOT a perimeter outline: this sprite has none. Material `source` so transmutation never tints it.
+part linework material source {
+  cell 12 10 linework_base
+  cell 13 10 linework_base
+  cell 13 11 linework_base
+  cell 17 11 linework_base
+  cell 13 12 linework_base
+  rect 18 12 4 1 linework_base
+  cell 14 13 linework_base
+  cell 18 13 linework_base
+  cell 22 13 linework_base
+  cell 15 14 linework_base
+  cell 17 14 linework_base
+  cell 19 21 linework_base
+  cell 21 21 linework_base
+  cell 19 22 linework_base
+  cell 22 22 linework_base
+  cell 20 23 linework_base
+  cell 21 23 linework_base
+}
+
+# Dark cloak mass. 3 tones on the void_cloth ramp: a shadow tone on the right-hand hem/hip cells, a rim-light tone on the true silhouette edge of the left-hand hem (cells whose left neighbour is empty canvas), base unchanged everywhere else. Same light direction Vaelrix's own hand pass already put on the face (face_hi at x=14) and arm (arm_hi at x=12). An earlier pass lit a third of the part by raw x-rank instead of true edges and washed out a pale patch across interior cells hidden behind the hair — reverted after a zoomed render caught it; only 10 of 64 cells are lit, all on the actual silhouette boundary.
+part cloak material void_cloth {
+  cell 13 7 cloak_base
+  cell 13 8 cloak_base
+  cell 15 8 cloak_base
+  cell 13 9 cloak_base
+  cell 16 9 cloak_base
+  cell 18 9 cloak_base
+  cell 23 14 cloak_shadow
+  cell 18 15 cloak_base
+  cell 19 15 cloak_base
+  cell 23 15 cloak_shadow
+  cell 12 16 cloak_light
+  cell 13 16 cloak_base
+  cell 17 16 cloak_base
+  cell 18 16 cloak_base
+  cell 23 16 cloak_shadow
+  cell 11 17 cloak_light
+  cell 14 17 cloak_base
+  cell 17 17 cloak_base
+  cell 23 17 cloak_shadow
+  cell 11 18 cloak_light
+  cell 14 18 cloak_base
+  cell 17 18 cloak_base
+  cell 22 18 cloak_shadow
+  cell 12 19 cloak_light
+  cell 13 19 cloak_base
+  cell 14 19 cloak_base
+  rect 18 19 3 1 cloak_base
+  cell 21 19 cloak_shadow
+  cell 22 19 cloak_shadow
+  cell 24 19 cloak_shadow
+  cell 15 20 cloak_light
+  rect 17 20 3 1 cloak_base
+  cell 21 20 cloak_shadow
+  cell 24 20 cloak_shadow
+  cell 15 21 cloak_light
+  cell 17 21 cloak_base
+  cell 23 21 cloak_shadow
+  cell 24 21 cloak_shadow
+  cell 15 22 cloak_light
+  cell 17 22 cloak_base
+  cell 24 22 cloak_shadow
+  cell 15 23 cloak_light
+  cell 17 23 cloak_base
+  cell 22 23 cloak_shadow
+  cell 23 23 cloak_shadow
+  cell 14 24 cloak_light
+  cell 17 24 cloak_base
+  cell 22 24 cloak_shadow
+  cell 14 25 cloak_light
+  cell 15 25 cloak_base
+  cell 16 25 cloak_base
+  cell 20 25 cloak_shadow
+  cell 22 25 cloak_shadow
+  rect 16 26 4 1 cloak_base
+  rect 20 26 3 1 cloak_shadow
+}
+
+# Crown, left sweep, and right-side fall.
+part hair material hair_black {
+  cell 13 4 hair_base
+  rect 15 4 5 1 hair_base
+  cell 12 5 hair_base
+  rect 13 5 3 1 hair_hi
+  cell 16 5 hair_base
+  cell 17 5 hair_hi
+  cell 18 5 hair_hi
+  cell 19 5 hair_base
+  cell 20 5 hair_base
+  cell 11 6 hair_base
+  cell 12 6 hair_hi
+  cell 13 6 hair_hi
+  cell 14 6 hair_shadow
+  cell 15 6 hair_shadow
+  cell 16 6 hair_hi
+  cell 17 6 hair_shadow
+  cell 18 6 hair_shadow
+  cell 19 6 hair_hi
+  cell 20 6 hair_hi
+  cell 21 6 hair_base
+  cell 11 7 hair_base
+  cell 12 7 hair_hi
+  cell 14 7 hair_hi
+  cell 15 7 hair_hi
+  cell 16 7 hair_base
+  cell 17 7 hair_hi
+  cell 18 7 hair_hi
+  cell 19 7 hair_base
+  cell 20 7 hair_hi
+  cell 21 7 hair_base
+  cell 11 8 hair_base
+  cell 12 8 hair_hi
+  cell 14 8 hair_hi
+  cell 16 8 hair_base
+  cell 17 8 hair_hi
+  cell 18 8 hair_base
+  cell 19 8 hair_base
+  cell 20 8 hair_hi
+  cell 21 8 hair_hi
+  cell 22 8 hair_base
+  cell 12 9 hair_base
+  cell 14 9 hair_base
+  cell 17 9 hair_base
+  cell 19 9 hair_base
+  cell 20 9 hair_base
+  cell 21 9 hair_hi
+  cell 22 9 hair_base
+  cell 17 10 hair_base
+  cell 19 10 hair_base
+  cell 20 10 hair_base
+  cell 21 10 hair_hi
+  cell 22 10 hair_hi
+  cell 19 11 hair_base
+  cell 20 11 hair_hi
+  cell 21 11 hair_base
+  cell 22 11 hair_hi
+  cell 23 11 hair_base
+  cell 22 12 hair_hi
+  cell 23 12 hair_hi
+  cell 20 13 hair_base
+  cell 21 13 hair_base
+  cell 23 13 hair_hi
+  cell 24 13 hair_base
+  cell 19 14 hair_base
+  cell 20 14 hair_hi
+  cell 21 14 hair_hi
+  cell 22 14 hair_base
+  cell 24 14 hair_hi
+  cell 24 15 hair_hi
+  cell 24 16 hair_hi
+  cell 24 17 hair_hi
+  cell 15 18 hair_base
+  cell 16 18 hair_base
+  cell 23 18 hair_hi
+  cell 24 18 hair_base
+  cell 15 19 hair_hi
+  cell 16 19 hair_hi
+  cell 23 19 hair_hi
+  cell 23 20 hair_base
+  cell 20 21 hair_hi
+  cell 20 22 hair_base
+  cell 21 22 hair_hi
+}
+
+# Purple robe body.
+part robe material void_cloth {
+  cell 20 15 robe_hi
+  cell 21 15 robe_hi
+  cell 22 15 robe_base
+  cell 15 16 robe_base
+  cell 19 16 robe_hi
+  rect 20 16 3 1 robe_base
+  cell 18 17 robe_hi
+  rect 19 17 4 1 robe_base
+  cell 18 18 robe_hi
+  rect 19 18 3 1 robe_base
+  cell 18 22 robe_shadow
+  cell 16 23 robe_hi
+  cell 18 23 robe_hi
+  cell 19 23 robe_base
+  cell 15 24 robe_hi
+  cell 16 24 robe_base
+  cell 18 24 robe_hi
+  rect 19 24 3 1 robe_base
+  cell 17 25 robe_hi
+  cell 18 25 robe_base
+  cell 19 25 robe_base
+  cell 21 25 robe_base
+}
+
+# Gold vertical staff.
+part staff material gold {
+  cell 14 16 staff_base
+  cell 16 16 staff_base
+  cell 16 17 staff_hi
+  cell 17 19 staff_base
+  cell 16 21 staff_base
+  cell 18 21 staff_base
+  cell 16 22 staff_hi
+}
+
+# Head skin. Hand-authored by Vaelrix 2026-08-30 (30-minute pass) — kept verbatim.
+part face material skin_medium {
+  cell 14 10 face_hi
+  cell 18 10 face_base
+  cell 14 11 face_hi
+  cell 18 11 face_shadow
+  rect 14 12 3 1 face_light
+  cell 17 12 face_base
+  cell 15 13 face_light
+  cell 16 13 face_base
+  cell 17 13 face_base
+  cell 19 13 face_base
+  cell 18 14 face_base
+  rect 15 15 3 1 face_shadow
+}
+
+# Extended arm and gripping hand, y>=16. Includes the white specular accent.
+part arm material skin_medium {
+  cell 12 17 arm_hi
+  cell 13 17 arm_shadow
+  cell 15 17 arm_base
+  cell 12 18 arm_shadow
+  cell 13 18 arm_base
+  cell 16 20 arm_base
+}
+
+# Eye and brow region, hand-authored by Vaelrix 2026-08-30. The part that made the head finally read.
+part eyes material eye_void_glow {
+  cell 14 4 eyes_deep
+  cell 15 9 eyes_base
+  cell 15 10 eyes_base
+  cell 16 10 eyes_hi
+  cell 23 10 eyes_deep
+  cell 15 11 eyes_base
+  cell 16 11 eyes_hi
+  cell 24 12 eyes_deep
+  cell 16 14 eyes_light
+  cell 14 15 eyes_shadow
+}
+
+
+# Boots peeking below the cloak hem. Each is a fixed 2x2 block that
+# TRANSLATES to a new position every frame (forward+down when planted,
+# back+up into the hem shadow when lifted) — v2 kept a corner anchored and
+# only grew the block downward, which read as the leg stretching in place
+# rather than a foot moving (caught by Vaelrix on the second version too).
+part feet material void_cloth {
+    cell 16 27 cloak_base
+    cell 17 27 cloak_base
+    cell 20 27 cloak_base
+    cell 21 27 cloak_base
+    cell 16 28 cloak_shadow
+    cell 17 28 cloak_shadow
+    cell 20 28 cloak_shadow
+    cell 21 28 cloak_shadow
+}
+
+
+loop walk duration 200
+
+frame 1 "stride-L" {
+  part linework material source {
+    cell 12 11 linework_base
+    cell 13 11 linework_base
+    cell 13 12 linework_base
+    cell 17 12 linework_base
+    cell 13 13 linework_base
+    rect 18 13 4 1 linework_base
+    cell 14 14 linework_base
+    cell 18 14 linework_base
+    cell 22 14 linework_base
+    cell 15 15 linework_base
+    cell 17 15 linework_base
+    cell 19 22 linework_base
+    cell 21 22 linework_base
+    cell 19 23 linework_base
+    cell 22 23 linework_base
+    cell 20 24 linework_base
+    cell 21 24 linework_base
+  }
+  part cloak material void_cloth {
+    cell 13 8 cloak_base
+    cell 13 9 cloak_base
+    cell 15 9 cloak_base
+    cell 13 10 cloak_base
+    cell 16 10 cloak_base
+    cell 18 10 cloak_base
+    cell 23 15 cloak_shadow
+    cell 18 16 cloak_base
+    cell 19 16 cloak_base
+    cell 23 16 cloak_shadow
+    cell 12 17 cloak_light
+    cell 13 17 cloak_base
+    cell 17 17 cloak_base
+    cell 18 17 cloak_base
+    cell 23 17 cloak_shadow
+    cell 11 18 cloak_light
+    cell 14 18 cloak_base
+    cell 17 18 cloak_base
+    cell 23 18 cloak_shadow
+    cell 11 19 cloak_light
+    cell 14 19 cloak_base
+    cell 17 19 cloak_base
+    cell 22 19 cloak_shadow
+    cell 12 20 cloak_light
+    cell 13 20 cloak_base
+    cell 14 20 cloak_base
+    rect 18 20 3 1 cloak_base
+    cell 21 20 cloak_shadow
+    cell 22 20 cloak_shadow
+    cell 24 20 cloak_shadow
+    cell 15 21 cloak_light
+    rect 17 21 3 1 cloak_base
+    cell 21 21 cloak_shadow
+    cell 24 21 cloak_shadow
+    cell 15 22 cloak_light
+    cell 17 22 cloak_base
+    cell 23 22 cloak_shadow
+    cell 24 22 cloak_shadow
+    cell 15 23 cloak_light
+    cell 17 23 cloak_base
+    cell 24 23 cloak_shadow
+    cell 15 24 cloak_light
+    cell 17 24 cloak_base
+    cell 22 24 cloak_shadow
+    cell 23 24 cloak_shadow
+    cell 14 25 cloak_light
+    cell 17 25 cloak_base
+    cell 22 25 cloak_shadow
+    cell 14 26 cloak_light
+    cell 15 26 cloak_base
+    cell 16 26 cloak_base
+    cell 20 26 cloak_shadow
+    cell 22 26 cloak_shadow
+    rect 16 27 4 1 cloak_base
+    rect 20 27 3 1 cloak_shadow
+  }
+  part hair material hair_black {
+    cell 13 5 hair_base
+    rect 15 5 5 1 hair_base
+    cell 12 6 hair_base
+    rect 13 6 3 1 hair_hi
+    cell 16 6 hair_base
+    cell 17 6 hair_hi
+    cell 18 6 hair_hi
+    cell 19 6 hair_base
+    cell 20 6 hair_base
+    cell 11 7 hair_base
+    cell 12 7 hair_hi
+    cell 13 7 hair_hi
+    cell 14 7 hair_shadow
+    cell 15 7 hair_shadow
+    cell 16 7 hair_hi
+    cell 17 7 hair_shadow
+    cell 18 7 hair_shadow
+    cell 19 7 hair_hi
+    cell 20 7 hair_hi
+    cell 21 7 hair_base
+    cell 11 8 hair_base
+    cell 12 8 hair_hi
+    cell 14 8 hair_hi
+    cell 15 8 hair_hi
+    cell 16 8 hair_base
+    cell 17 8 hair_hi
+    cell 18 8 hair_hi
+    cell 19 8 hair_base
+    cell 20 8 hair_hi
+    cell 21 8 hair_base
+    cell 11 9 hair_base
+    cell 12 9 hair_hi
+    cell 14 9 hair_hi
+    cell 16 9 hair_base
+    cell 17 9 hair_hi
+    cell 18 9 hair_base
+    cell 19 9 hair_base
+    cell 20 9 hair_hi
+    cell 21 9 hair_hi
+    cell 22 9 hair_base
+    cell 12 10 hair_base
+    cell 14 10 hair_base
+    cell 17 10 hair_base
+    cell 19 10 hair_base
+    cell 20 10 hair_base
+    cell 21 10 hair_hi
+    cell 22 10 hair_base
+    cell 17 11 hair_base
+    cell 19 11 hair_base
+    cell 20 11 hair_base
+    cell 21 11 hair_hi
+    cell 22 11 hair_hi
+    cell 19 12 hair_base
+    cell 20 12 hair_hi
+    cell 21 12 hair_base
+    cell 22 12 hair_hi
+    cell 23 12 hair_base
+    cell 22 13 hair_hi
+    cell 23 13 hair_hi
+    cell 20 14 hair_base
+    cell 21 14 hair_base
+    cell 23 14 hair_hi
+    cell 24 14 hair_base
+    cell 19 15 hair_base
+    cell 20 15 hair_hi
+    cell 21 15 hair_hi
+    cell 22 15 hair_base
+    cell 24 15 hair_hi
+    cell 24 16 hair_hi
+    cell 24 17 hair_hi
+    cell 24 18 hair_hi
+    cell 15 19 hair_base
+    cell 16 19 hair_base
+    cell 23 19 hair_hi
+    cell 24 19 hair_base
+    cell 15 20 hair_hi
+    cell 16 20 hair_hi
+    cell 23 20 hair_hi
+    cell 23 21 hair_base
+    cell 20 22 hair_hi
+    cell 20 23 hair_base
+    cell 21 23 hair_hi
+  }
+  part robe material void_cloth {
+    cell 20 16 robe_hi
+    cell 21 16 robe_hi
+    cell 22 16 robe_base
+    cell 15 17 robe_base
+    cell 19 17 robe_hi
+    rect 20 17 3 1 robe_base
+    cell 18 18 robe_hi
+    rect 19 18 4 1 robe_base
+    cell 18 19 robe_hi
+    rect 19 19 3 1 robe_base
+    cell 18 23 robe_shadow
+    cell 16 24 robe_hi
+    cell 18 24 robe_hi
+    cell 19 24 robe_base
+    cell 15 25 robe_hi
+    cell 16 25 robe_base
+    cell 18 25 robe_hi
+    rect 19 25 3 1 robe_base
+    cell 17 26 robe_hi
+    cell 18 26 robe_base
+    cell 19 26 robe_base
+    cell 21 26 robe_base
+  }
+  part staff material gold {
+    cell 14 17 staff_base
+    cell 16 17 staff_base
+    cell 16 18 staff_hi
+    cell 17 20 staff_base
+    cell 16 22 staff_base
+    cell 18 22 staff_base
+    cell 16 23 staff_hi
+  }
+  part face material skin_medium {
+    cell 14 11 face_hi
+    cell 18 11 face_base
+    cell 14 12 face_hi
+    cell 18 12 face_shadow
+    rect 14 13 3 1 face_light
+    cell 17 13 face_base
+    cell 15 14 face_light
+    cell 16 14 face_base
+    cell 17 14 face_base
+    cell 19 14 face_base
+    cell 18 15 face_base
+    rect 15 16 3 1 face_shadow
+  }
+  part arm material skin_medium {
+    cell 12 18 arm_hi
+    cell 13 18 arm_shadow
+    cell 15 18 arm_base
+    cell 12 19 arm_shadow
+    cell 13 19 arm_base
+    cell 16 21 arm_base
+  }
+  part eyes material eye_void_glow {
+    cell 14 5 eyes_deep
+    cell 15 10 eyes_base
+    cell 15 11 eyes_base
+    cell 16 11 eyes_hi
+    cell 23 11 eyes_deep
+    cell 15 12 eyes_base
+    cell 16 12 eyes_hi
+    cell 24 13 eyes_deep
+    cell 16 15 eyes_light
+    cell 14 16 eyes_shadow
+  }
+  part feet material void_cloth {
+    cell 21 27 cloak_base
+    cell 22 27 cloak_base
+    cell 21 28 cloak_shadow
+    cell 22 28 cloak_shadow
+    cell 14 29 cloak_shadow
+    cell 15 29 cloak_shadow
+    cell 14 30 cloak_shadow
+    cell 15 30 cloak_shadow
+  }
+}
+
+frame 2 "pass-mid" {
+  part linework material source {
+    cell 12 9 linework_base
+    cell 13 9 linework_base
+    cell 13 10 linework_base
+    cell 17 10 linework_base
+    cell 13 11 linework_base
+    rect 18 11 4 1 linework_base
+    cell 14 12 linework_base
+    cell 18 12 linework_base
+    cell 22 12 linework_base
+    cell 15 13 linework_base
+    cell 17 13 linework_base
+    cell 19 20 linework_base
+    cell 21 20 linework_base
+    cell 19 21 linework_base
+    cell 22 21 linework_base
+    cell 20 22 linework_base
+    cell 21 22 linework_base
+  }
+  part cloak material void_cloth {
+    cell 13 6 cloak_base
+    cell 13 7 cloak_base
+    cell 15 7 cloak_base
+    cell 13 8 cloak_base
+    cell 16 8 cloak_base
+    cell 18 8 cloak_base
+    cell 23 13 cloak_shadow
+    cell 18 14 cloak_base
+    cell 19 14 cloak_base
+    cell 23 14 cloak_shadow
+    cell 12 15 cloak_light
+    cell 13 15 cloak_base
+    cell 17 15 cloak_base
+    cell 18 15 cloak_base
+    cell 23 15 cloak_shadow
+    cell 11 16 cloak_light
+    cell 14 16 cloak_base
+    cell 17 16 cloak_base
+    cell 23 16 cloak_shadow
+    cell 11 17 cloak_light
+    cell 14 17 cloak_base
+    cell 17 17 cloak_base
+    cell 22 17 cloak_shadow
+    cell 12 18 cloak_light
+    cell 13 18 cloak_base
+    cell 14 18 cloak_base
+    rect 18 18 3 1 cloak_base
+    cell 21 18 cloak_shadow
+    cell 22 18 cloak_shadow
+    cell 24 18 cloak_shadow
+    cell 15 19 cloak_light
+    rect 17 19 3 1 cloak_base
+    cell 21 19 cloak_shadow
+    cell 24 19 cloak_shadow
+    cell 15 20 cloak_light
+    cell 17 20 cloak_base
+    cell 23 20 cloak_shadow
+    cell 24 20 cloak_shadow
+    cell 15 21 cloak_light
+    cell 17 21 cloak_base
+    cell 24 21 cloak_shadow
+    cell 15 22 cloak_light
+    cell 17 22 cloak_base
+    cell 22 22 cloak_shadow
+    cell 23 22 cloak_shadow
+    cell 14 23 cloak_light
+    cell 17 23 cloak_base
+    cell 22 23 cloak_shadow
+    cell 14 24 cloak_light
+    cell 15 24 cloak_base
+    cell 16 24 cloak_base
+    cell 20 24 cloak_shadow
+    cell 22 24 cloak_shadow
+    rect 16 25 4 1 cloak_base
+    rect 20 25 3 1 cloak_shadow
+  }
+  part hair material hair_black {
+    cell 13 3 hair_base
+    rect 15 3 5 1 hair_base
+    cell 12 4 hair_base
+    rect 13 4 3 1 hair_hi
+    cell 16 4 hair_base
+    cell 17 4 hair_hi
+    cell 18 4 hair_hi
+    cell 19 4 hair_base
+    cell 20 4 hair_base
+    cell 11 5 hair_base
+    cell 12 5 hair_hi
+    cell 13 5 hair_hi
+    cell 14 5 hair_shadow
+    cell 15 5 hair_shadow
+    cell 16 5 hair_hi
+    cell 17 5 hair_shadow
+    cell 18 5 hair_shadow
+    cell 19 5 hair_hi
+    cell 20 5 hair_hi
+    cell 21 5 hair_base
+    cell 11 6 hair_base
+    cell 12 6 hair_hi
+    cell 14 6 hair_hi
+    cell 15 6 hair_hi
+    cell 16 6 hair_base
+    cell 17 6 hair_hi
+    cell 18 6 hair_hi
+    cell 19 6 hair_base
+    cell 20 6 hair_hi
+    cell 21 6 hair_base
+    cell 11 7 hair_base
+    cell 12 7 hair_hi
+    cell 14 7 hair_hi
+    cell 16 7 hair_base
+    cell 17 7 hair_hi
+    cell 18 7 hair_base
+    cell 19 7 hair_base
+    cell 20 7 hair_hi
+    cell 21 7 hair_hi
+    cell 22 7 hair_base
+    cell 12 8 hair_base
+    cell 14 8 hair_base
+    cell 17 8 hair_base
+    cell 19 8 hair_base
+    cell 20 8 hair_base
+    cell 21 8 hair_hi
+    cell 22 8 hair_base
+    cell 17 9 hair_base
+    cell 19 9 hair_base
+    cell 20 9 hair_base
+    cell 21 9 hair_hi
+    cell 22 9 hair_hi
+    cell 19 10 hair_base
+    cell 20 10 hair_hi
+    cell 21 10 hair_base
+    cell 22 10 hair_hi
+    cell 23 10 hair_base
+    cell 22 11 hair_hi
+    cell 23 11 hair_hi
+    cell 20 12 hair_base
+    cell 21 12 hair_base
+    cell 23 12 hair_hi
+    cell 24 12 hair_base
+    cell 19 13 hair_base
+    cell 20 13 hair_hi
+    cell 21 13 hair_hi
+    cell 22 13 hair_base
+    cell 24 13 hair_hi
+    cell 24 14 hair_hi
+    cell 24 15 hair_hi
+    cell 24 16 hair_hi
+    cell 15 17 hair_base
+    cell 16 17 hair_base
+    cell 23 17 hair_hi
+    cell 24 17 hair_base
+    cell 15 18 hair_hi
+    cell 16 18 hair_hi
+    cell 23 18 hair_hi
+    cell 23 19 hair_base
+    cell 20 20 hair_hi
+    cell 20 21 hair_base
+    cell 21 21 hair_hi
+  }
+  part robe material void_cloth {
+    cell 20 14 robe_hi
+    cell 21 14 robe_hi
+    cell 22 14 robe_base
+    cell 15 15 robe_base
+    cell 19 15 robe_hi
+    rect 20 15 3 1 robe_base
+    cell 18 16 robe_hi
+    rect 19 16 4 1 robe_base
+    cell 18 17 robe_hi
+    rect 19 17 3 1 robe_base
+    cell 18 21 robe_shadow
+    cell 16 22 robe_hi
+    cell 18 22 robe_hi
+    cell 19 22 robe_base
+    cell 15 23 robe_hi
+    cell 16 23 robe_base
+    cell 18 23 robe_hi
+    rect 19 23 3 1 robe_base
+    cell 17 24 robe_hi
+    cell 18 24 robe_base
+    cell 19 24 robe_base
+    cell 21 24 robe_base
+  }
+  part staff material gold {
+    cell 14 15 staff_base
+    cell 16 15 staff_base
+    cell 16 16 staff_hi
+    cell 17 18 staff_base
+    cell 16 20 staff_base
+    cell 18 20 staff_base
+    cell 16 21 staff_hi
+  }
+  part face material skin_medium {
+    cell 14 9 face_hi
+    cell 18 9 face_base
+    cell 14 10 face_hi
+    cell 18 10 face_shadow
+    rect 14 11 3 1 face_light
+    cell 17 11 face_base
+    cell 15 12 face_light
+    cell 16 12 face_base
+    cell 17 12 face_base
+    cell 19 12 face_base
+    cell 18 13 face_base
+    rect 15 14 3 1 face_shadow
+  }
+  part arm material skin_medium {
+    cell 12 16 arm_hi
+    cell 13 16 arm_shadow
+    cell 15 16 arm_base
+    cell 12 17 arm_shadow
+    cell 13 17 arm_base
+    cell 16 19 arm_base
+  }
+  part eyes material eye_void_glow {
+    cell 14 3 eyes_deep
+    cell 15 8 eyes_base
+    cell 15 9 eyes_base
+    cell 16 9 eyes_hi
+    cell 23 9 eyes_deep
+    cell 15 10 eyes_base
+    cell 16 10 eyes_hi
+    cell 24 11 eyes_deep
+    cell 16 13 eyes_light
+    cell 14 14 eyes_shadow
+  }
+  part feet material void_cloth {
+    rect 17 26 4 1 cloak_base
+    rect 17 27 4 1 cloak_shadow
+  }
+}
+
+frame 3 "stride-R" {
+  part linework material source {
+    cell 12 11 linework_base
+    cell 13 11 linework_base
+    cell 13 12 linework_base
+    cell 17 12 linework_base
+    cell 13 13 linework_base
+    rect 18 13 4 1 linework_base
+    cell 14 14 linework_base
+    cell 18 14 linework_base
+    cell 22 14 linework_base
+    cell 15 15 linework_base
+    cell 17 15 linework_base
+    cell 19 22 linework_base
+    cell 21 22 linework_base
+    cell 19 23 linework_base
+    cell 22 23 linework_base
+    cell 20 24 linework_base
+    cell 21 24 linework_base
+  }
+  part cloak material void_cloth {
+    cell 13 8 cloak_base
+    cell 13 9 cloak_base
+    cell 15 9 cloak_base
+    cell 13 10 cloak_base
+    cell 16 10 cloak_base
+    cell 18 10 cloak_base
+    cell 23 15 cloak_shadow
+    cell 18 16 cloak_base
+    cell 19 16 cloak_base
+    cell 23 16 cloak_shadow
+    cell 12 17 cloak_light
+    cell 13 17 cloak_base
+    cell 17 17 cloak_base
+    cell 18 17 cloak_base
+    cell 23 17 cloak_shadow
+    cell 11 18 cloak_light
+    cell 14 18 cloak_base
+    cell 17 18 cloak_base
+    cell 23 18 cloak_shadow
+    cell 11 19 cloak_light
+    cell 14 19 cloak_base
+    cell 17 19 cloak_base
+    cell 22 19 cloak_shadow
+    cell 12 20 cloak_light
+    cell 13 20 cloak_base
+    cell 14 20 cloak_base
+    rect 18 20 3 1 cloak_base
+    cell 21 20 cloak_shadow
+    cell 22 20 cloak_shadow
+    cell 24 20 cloak_shadow
+    cell 15 21 cloak_light
+    rect 17 21 3 1 cloak_base
+    cell 21 21 cloak_shadow
+    cell 24 21 cloak_shadow
+    cell 15 22 cloak_light
+    cell 17 22 cloak_base
+    cell 23 22 cloak_shadow
+    cell 24 22 cloak_shadow
+    cell 15 23 cloak_light
+    cell 17 23 cloak_base
+    cell 24 23 cloak_shadow
+    cell 15 24 cloak_light
+    cell 17 24 cloak_base
+    cell 22 24 cloak_shadow
+    cell 23 24 cloak_shadow
+    cell 14 25 cloak_light
+    cell 17 25 cloak_base
+    cell 22 25 cloak_shadow
+    cell 14 26 cloak_light
+    cell 15 26 cloak_base
+    cell 16 26 cloak_base
+    cell 20 26 cloak_shadow
+    cell 22 26 cloak_shadow
+    rect 16 27 4 1 cloak_base
+    rect 20 27 3 1 cloak_shadow
+  }
+  part hair material hair_black {
+    cell 13 5 hair_base
+    rect 15 5 5 1 hair_base
+    cell 12 6 hair_base
+    rect 13 6 3 1 hair_hi
+    cell 16 6 hair_base
+    cell 17 6 hair_hi
+    cell 18 6 hair_hi
+    cell 19 6 hair_base
+    cell 20 6 hair_base
+    cell 11 7 hair_base
+    cell 12 7 hair_hi
+    cell 13 7 hair_hi
+    cell 14 7 hair_shadow
+    cell 15 7 hair_shadow
+    cell 16 7 hair_hi
+    cell 17 7 hair_shadow
+    cell 18 7 hair_shadow
+    cell 19 7 hair_hi
+    cell 20 7 hair_hi
+    cell 21 7 hair_base
+    cell 11 8 hair_base
+    cell 12 8 hair_hi
+    cell 14 8 hair_hi
+    cell 15 8 hair_hi
+    cell 16 8 hair_base
+    cell 17 8 hair_hi
+    cell 18 8 hair_hi
+    cell 19 8 hair_base
+    cell 20 8 hair_hi
+    cell 21 8 hair_base
+    cell 11 9 hair_base
+    cell 12 9 hair_hi
+    cell 14 9 hair_hi
+    cell 16 9 hair_base
+    cell 17 9 hair_hi
+    cell 18 9 hair_base
+    cell 19 9 hair_base
+    cell 20 9 hair_hi
+    cell 21 9 hair_hi
+    cell 22 9 hair_base
+    cell 12 10 hair_base
+    cell 14 10 hair_base
+    cell 17 10 hair_base
+    cell 19 10 hair_base
+    cell 20 10 hair_base
+    cell 21 10 hair_hi
+    cell 22 10 hair_base
+    cell 17 11 hair_base
+    cell 19 11 hair_base
+    cell 20 11 hair_base
+    cell 21 11 hair_hi
+    cell 22 11 hair_hi
+    cell 19 12 hair_base
+    cell 20 12 hair_hi
+    cell 21 12 hair_base
+    cell 22 12 hair_hi
+    cell 23 12 hair_base
+    cell 22 13 hair_hi
+    cell 23 13 hair_hi
+    cell 20 14 hair_base
+    cell 21 14 hair_base
+    cell 23 14 hair_hi
+    cell 24 14 hair_base
+    cell 19 15 hair_base
+    cell 20 15 hair_hi
+    cell 21 15 hair_hi
+    cell 22 15 hair_base
+    cell 24 15 hair_hi
+    cell 24 16 hair_hi
+    cell 24 17 hair_hi
+    cell 24 18 hair_hi
+    cell 15 19 hair_base
+    cell 16 19 hair_base
+    cell 23 19 hair_hi
+    cell 24 19 hair_base
+    cell 15 20 hair_hi
+    cell 16 20 hair_hi
+    cell 23 20 hair_hi
+    cell 23 21 hair_base
+    cell 20 22 hair_hi
+    cell 20 23 hair_base
+    cell 21 23 hair_hi
+  }
+  part robe material void_cloth {
+    cell 20 16 robe_hi
+    cell 21 16 robe_hi
+    cell 22 16 robe_base
+    cell 15 17 robe_base
+    cell 19 17 robe_hi
+    rect 20 17 3 1 robe_base
+    cell 18 18 robe_hi
+    rect 19 18 4 1 robe_base
+    cell 18 19 robe_hi
+    rect 19 19 3 1 robe_base
+    cell 18 23 robe_shadow
+    cell 16 24 robe_hi
+    cell 18 24 robe_hi
+    cell 19 24 robe_base
+    cell 15 25 robe_hi
+    cell 16 25 robe_base
+    cell 18 25 robe_hi
+    rect 19 25 3 1 robe_base
+    cell 17 26 robe_hi
+    cell 18 26 robe_base
+    cell 19 26 robe_base
+    cell 21 26 robe_base
+  }
+  part staff material gold {
+    cell 14 17 staff_base
+    cell 16 17 staff_base
+    cell 16 18 staff_hi
+    cell 17 20 staff_base
+    cell 16 22 staff_base
+    cell 18 22 staff_base
+    cell 16 23 staff_hi
+  }
+  part face material skin_medium {
+    cell 14 11 face_hi
+    cell 18 11 face_base
+    cell 14 12 face_hi
+    cell 18 12 face_shadow
+    rect 14 13 3 1 face_light
+    cell 17 13 face_base
+    cell 15 14 face_light
+    cell 16 14 face_base
+    cell 17 14 face_base
+    cell 19 14 face_base
+    cell 18 15 face_base
+    rect 15 16 3 1 face_shadow
+  }
+  part arm material skin_medium {
+    cell 12 18 arm_hi
+    cell 13 18 arm_shadow
+    cell 15 18 arm_base
+    cell 12 19 arm_shadow
+    cell 13 19 arm_base
+    cell 16 21 arm_base
+  }
+  part eyes material eye_void_glow {
+    cell 14 5 eyes_deep
+    cell 15 10 eyes_base
+    cell 15 11 eyes_base
+    cell 16 11 eyes_hi
+    cell 23 11 eyes_deep
+    cell 15 12 eyes_base
+    cell 16 12 eyes_hi
+    cell 24 13 eyes_deep
+    cell 16 15 eyes_light
+    cell 14 16 eyes_shadow
+  }
+  part feet material void_cloth {
+    cell 15 27 cloak_base
+    cell 16 27 cloak_base
+    cell 15 28 cloak_shadow
+    cell 16 28 cloak_shadow
+    cell 21 29 cloak_shadow
+    cell 22 29 cloak_shadow
+    cell 21 30 cloak_shadow
+    cell 22 30 cloak_shadow
+  }
+}
+
+frame 4 "pass-mid2" {
+  part linework material source {
+    cell 12 9 linework_base
+    cell 13 9 linework_base
+    cell 13 10 linework_base
+    cell 17 10 linework_base
+    cell 13 11 linework_base
+    rect 18 11 4 1 linework_base
+    cell 14 12 linework_base
+    cell 18 12 linework_base
+    cell 22 12 linework_base
+    cell 15 13 linework_base
+    cell 17 13 linework_base
+    cell 19 20 linework_base
+    cell 21 20 linework_base
+    cell 19 21 linework_base
+    cell 22 21 linework_base
+    cell 20 22 linework_base
+    cell 21 22 linework_base
+  }
+  part cloak material void_cloth {
+    cell 13 6 cloak_base
+    cell 13 7 cloak_base
+    cell 15 7 cloak_base
+    cell 13 8 cloak_base
+    cell 16 8 cloak_base
+    cell 18 8 cloak_base
+    cell 23 13 cloak_shadow
+    cell 18 14 cloak_base
+    cell 19 14 cloak_base
+    cell 23 14 cloak_shadow
+    cell 12 15 cloak_light
+    cell 13 15 cloak_base
+    cell 17 15 cloak_base
+    cell 18 15 cloak_base
+    cell 23 15 cloak_shadow
+    cell 11 16 cloak_light
+    cell 14 16 cloak_base
+    cell 17 16 cloak_base
+    cell 23 16 cloak_shadow
+    cell 11 17 cloak_light
+    cell 14 17 cloak_base
+    cell 17 17 cloak_base
+    cell 22 17 cloak_shadow
+    cell 12 18 cloak_light
+    cell 13 18 cloak_base
+    cell 14 18 cloak_base
+    rect 18 18 3 1 cloak_base
+    cell 21 18 cloak_shadow
+    cell 22 18 cloak_shadow
+    cell 24 18 cloak_shadow
+    cell 15 19 cloak_light
+    rect 17 19 3 1 cloak_base
+    cell 21 19 cloak_shadow
+    cell 24 19 cloak_shadow
+    cell 15 20 cloak_light
+    cell 17 20 cloak_base
+    cell 23 20 cloak_shadow
+    cell 24 20 cloak_shadow
+    cell 15 21 cloak_light
+    cell 17 21 cloak_base
+    cell 24 21 cloak_shadow
+    cell 15 22 cloak_light
+    cell 17 22 cloak_base
+    cell 22 22 cloak_shadow
+    cell 23 22 cloak_shadow
+    cell 14 23 cloak_light
+    cell 17 23 cloak_base
+    cell 22 23 cloak_shadow
+    cell 14 24 cloak_light
+    cell 15 24 cloak_base
+    cell 16 24 cloak_base
+    cell 20 24 cloak_shadow
+    cell 22 24 cloak_shadow
+    rect 16 25 4 1 cloak_base
+    rect 20 25 3 1 cloak_shadow
+  }
+  part hair material hair_black {
+    cell 13 3 hair_base
+    rect 15 3 5 1 hair_base
+    cell 12 4 hair_base
+    rect 13 4 3 1 hair_hi
+    cell 16 4 hair_base
+    cell 17 4 hair_hi
+    cell 18 4 hair_hi
+    cell 19 4 hair_base
+    cell 20 4 hair_base
+    cell 11 5 hair_base
+    cell 12 5 hair_hi
+    cell 13 5 hair_hi
+    cell 14 5 hair_shadow
+    cell 15 5 hair_shadow
+    cell 16 5 hair_hi
+    cell 17 5 hair_shadow
+    cell 18 5 hair_shadow
+    cell 19 5 hair_hi
+    cell 20 5 hair_hi
+    cell 21 5 hair_base
+    cell 11 6 hair_base
+    cell 12 6 hair_hi
+    cell 14 6 hair_hi
+    cell 15 6 hair_hi
+    cell 16 6 hair_base
+    cell 17 6 hair_hi
+    cell 18 6 hair_hi
+    cell 19 6 hair_base
+    cell 20 6 hair_hi
+    cell 21 6 hair_base
+    cell 11 7 hair_base
+    cell 12 7 hair_hi
+    cell 14 7 hair_hi
+    cell 16 7 hair_base
+    cell 17 7 hair_hi
+    cell 18 7 hair_base
+    cell 19 7 hair_base
+    cell 20 7 hair_hi
+    cell 21 7 hair_hi
+    cell 22 7 hair_base
+    cell 12 8 hair_base
+    cell 14 8 hair_base
+    cell 17 8 hair_base
+    cell 19 8 hair_base
+    cell 20 8 hair_base
+    cell 21 8 hair_hi
+    cell 22 8 hair_base
+    cell 17 9 hair_base
+    cell 19 9 hair_base
+    cell 20 9 hair_base
+    cell 21 9 hair_hi
+    cell 22 9 hair_hi
+    cell 19 10 hair_base
+    cell 20 10 hair_hi
+    cell 21 10 hair_base
+    cell 22 10 hair_hi
+    cell 23 10 hair_base
+    cell 22 11 hair_hi
+    cell 23 11 hair_hi
+    cell 20 12 hair_base
+    cell 21 12 hair_base
+    cell 23 12 hair_hi
+    cell 24 12 hair_base
+    cell 19 13 hair_base
+    cell 20 13 hair_hi
+    cell 21 13 hair_hi
+    cell 22 13 hair_base
+    cell 24 13 hair_hi
+    cell 24 14 hair_hi
+    cell 24 15 hair_hi
+    cell 24 16 hair_hi
+    cell 15 17 hair_base
+    cell 16 17 hair_base
+    cell 23 17 hair_hi
+    cell 24 17 hair_base
+    cell 15 18 hair_hi
+    cell 16 18 hair_hi
+    cell 23 18 hair_hi
+    cell 23 19 hair_base
+    cell 20 20 hair_hi
+    cell 20 21 hair_base
+    cell 21 21 hair_hi
+  }
+  part robe material void_cloth {
+    cell 20 14 robe_hi
+    cell 21 14 robe_hi
+    cell 22 14 robe_base
+    cell 15 15 robe_base
+    cell 19 15 robe_hi
+    rect 20 15 3 1 robe_base
+    cell 18 16 robe_hi
+    rect 19 16 4 1 robe_base
+    cell 18 17 robe_hi
+    rect 19 17 3 1 robe_base
+    cell 18 21 robe_shadow
+    cell 16 22 robe_hi
+    cell 18 22 robe_hi
+    cell 19 22 robe_base
+    cell 15 23 robe_hi
+    cell 16 23 robe_base
+    cell 18 23 robe_hi
+    rect 19 23 3 1 robe_base
+    cell 17 24 robe_hi
+    cell 18 24 robe_base
+    cell 19 24 robe_base
+    cell 21 24 robe_base
+  }
+  part staff material gold {
+    cell 14 15 staff_base
+    cell 16 15 staff_base
+    cell 16 16 staff_hi
+    cell 17 18 staff_base
+    cell 16 20 staff_base
+    cell 18 20 staff_base
+    cell 16 21 staff_hi
+  }
+  part face material skin_medium {
+    cell 14 9 face_hi
+    cell 18 9 face_base
+    cell 14 10 face_hi
+    cell 18 10 face_shadow
+    rect 14 11 3 1 face_light
+    cell 17 11 face_base
+    cell 15 12 face_light
+    cell 16 12 face_base
+    cell 17 12 face_base
+    cell 19 12 face_base
+    cell 18 13 face_base
+    rect 15 14 3 1 face_shadow
+  }
+  part arm material skin_medium {
+    cell 12 16 arm_hi
+    cell 13 16 arm_shadow
+    cell 15 16 arm_base
+    cell 12 17 arm_shadow
+    cell 13 17 arm_base
+    cell 16 19 arm_base
+  }
+  part eyes material eye_void_glow {
+    cell 14 3 eyes_deep
+    cell 15 8 eyes_base
+    cell 15 9 eyes_base
+    cell 16 9 eyes_hi
+    cell 23 9 eyes_deep
+    cell 15 10 eyes_base
+    cell 16 10 eyes_hi
+    cell 24 11 eyes_deep
+    cell 16 13 eyes_light
+    cell 14 14 eyes_shadow
+  }
+  part feet material void_cloth {
+    rect 17 26 4 1 cloak_base
+    rect 17 27 4 1 cloak_shadow
+  }
+}
+
+export json png svg aseprite phaser

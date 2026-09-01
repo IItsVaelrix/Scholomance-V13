@@ -599,7 +599,7 @@ No agent may invent an alternate transport, bypass authentication on the HTTP su
 There are two distinct access paths:
 
 - **HTTP / CLI control plane**: authenticated routes under `/collab`, used by `scripts/connect-collab.js` and `scripts/collab-client.js`
-- **MCP bridge**: local stdio server at `codex/server/collab/mcp-bridge.js`, used by MCP-capable clients and agents
+- **MCP bridge**: local stdio server at `codex/server/collab/mcp-bridge-entry.js`, used by MCP-capable clients and agents
 
 These paths serve different purposes:
 
@@ -673,7 +673,7 @@ npm run mcp:collab
 Equivalent direct invocation:
 
 ```bash
-node --env-file=.env codex/server/collab/mcp-bridge.js
+node --env-file=.env codex/server/collab/mcp-bridge-entry.js
 ```
 
 **Canonical MCP client configuration**
@@ -683,7 +683,7 @@ node --env-file=.env codex/server/collab/mcp-bridge.js
   "mcpServers": {
     "scholomance-collab": {
       "command": "node",
-      "args": ["--env-file=.env", "codex/server/collab/mcp-bridge.js"]
+      "args": ["--env-file=.env", "codex/server/collab/mcp-bridge-entry.js"]
     }
   }
 }

@@ -1,0 +1,243 @@
+asset lightning_scimitar_handdrawn canvas 32x32
+
+palette {
+  c0 = #000000
+  c1 = #3E4B58
+  c2 = #BFE8FF
+  c3 = #6B7686
+  c4 = #6EE7F4
+  c5 = #A07A24
+  c6 = #D8B84C
+  c7 = #5A3D0F
+  c8 = #6B1E1E
+  c9 = #A8453D
+  c10 = #3D1010
+  c11 = #FFD9DC
+  c12 = #C9203A
+}
+
+part outline material source {
+  cell 21 4 c0
+  cell 22 4 c0
+  cell 23 4 c0
+  cell 24 4 c0
+  cell 21 5 c0
+  cell 25 5 c0
+  cell 22 6 c0
+  cell 23 6 c0
+  cell 26 6 c0
+  cell 23 7 c0
+  cell 27 7 c0
+  cell 23 8 c0
+  cell 27 8 c0
+  cell 23 9 c0
+  cell 27 9 c0
+  cell 22 10 c0
+  cell 27 10 c0
+  cell 21 11 c0
+  cell 26 11 c0
+  cell 20 12 c0
+  cell 26 12 c0
+  cell 19 13 c0
+  cell 25 13 c0
+  cell 18 14 c0
+  cell 25 14 c0
+  cell 16 15 c0
+  cell 17 15 c0
+  cell 24 15 c0
+  cell 14 16 c0
+  cell 15 16 c0
+  cell 23 16 c0
+  cell 9 17 c0
+  cell 13 17 c0
+  cell 22 17 c0
+  cell 8 18 c0
+  cell 10 18 c0
+  cell 12 18 c0
+  cell 20 18 c0
+  cell 21 18 c0
+  cell 7 19 c0
+  cell 9 19 c0
+  cell 11 19 c0
+  cell 18 19 c0
+  cell 19 19 c0
+  cell 7 20 c0
+  cell 9 20 c0
+  cell 10 20 c0
+  cell 16 20 c0
+  cell 17 20 c0
+  cell 7 21 c0
+  cell 14 21 c0
+  cell 15 21 c0
+  cell 7 22 c0
+  cell 8 22 c0
+  cell 12 22 c0
+  cell 13 22 c0
+  cell 6 23 c0
+  cell 11 23 c0
+  cell 4 24 c0
+  cell 5 24 c0
+  cell 12 24 c0
+  cell 3 25 c0
+  cell 9 25 c0
+  cell 10 25 c0
+  cell 12 25 c0
+  cell 3 26 c0
+  cell 7 26 c0
+  cell 8 26 c0
+  cell 10 26 c0
+  cell 12 26 c0
+  cell 4 27 c0
+  cell 7 27 c0
+  cell 9 27 c0
+  cell 11 27 c0
+  cell 5 28 c0
+  cell 6 28 c0
+  cell 10 28 c0
+}
+
+part blade material darksteel {
+  cell 22 5 c1
+  cell 23 5 c1
+  cell 24 5 c2
+  cell 24 6 c1
+  cell 25 6 c2
+  cell 24 7 c1
+  cell 26 7 c2
+  cell 24 8 c1
+  cell 26 8 c2
+  cell 24 9 c1
+  cell 26 9 c2
+  cell 23 10 c1
+  cell 24 10 c1
+  cell 26 10 c2
+  cell 22 11 c1
+  cell 23 11 c3
+  cell 25 11 c2
+  cell 21 12 c1
+  cell 22 12 c3
+  cell 23 12 c3
+  cell 25 12 c2
+  cell 20 13 c1
+  cell 21 13 c3
+  cell 22 13 c3
+  cell 23 13 c3
+  cell 24 13 c2
+  cell 19 14 c1
+  cell 20 14 c3
+  cell 21 14 c3
+  cell 22 14 c3
+  cell 23 14 c3
+  cell 24 14 c2
+  cell 18 15 c1
+  cell 19 15 c3
+  cell 20 15 c3
+  cell 21 15 c3
+  cell 22 15 c3
+  cell 23 15 c2
+  cell 16 16 c1
+  cell 17 16 c1
+  cell 20 16 c3
+  cell 21 16 c3
+  cell 22 16 c2
+  cell 14 17 c1
+  cell 15 17 c1
+  cell 18 17 c3
+  cell 19 17 c3
+  cell 20 17 c2
+  cell 21 17 c2
+  cell 13 18 c1
+  cell 14 18 c3
+  cell 15 18 c3
+  cell 16 18 c3
+  cell 17 18 c3
+  cell 18 18 c2
+  cell 19 18 c2
+  cell 12 19 c1
+  cell 13 19 c1
+  cell 14 19 c3
+  cell 15 19 c3
+  cell 16 19 c2
+  cell 17 19 c2
+  cell 11 20 c1
+  cell 12 20 c3
+  cell 13 20 c3
+  cell 14 20 c2
+  cell 15 20 c2
+  cell 11 21 c3
+  cell 12 21 c2
+  cell 13 21 c2
+  cell 11 22 c2
+}
+
+part blade_core material cyan_lightning {
+  glow radius 2
+  # Wand mathematical_stroke, propagated per WAND_CHEMICAL_STROKE_PROPAGATION:
+  # piecewise stroke along the blade's own centroid spine (tip->hilt
+  # via-points derived from the blade part's real geometry), quantized to
+  # the pixel grid and clipped to the blade footprint. See
+  # wand-stroke-vein2.mjs for the derivation.
+  cell 23 5 c4
+  cell 24 6 c4
+  cell 24 7 c4
+  cell 24 8 c4
+  cell 24 9 c4
+  cell 24 10 c4
+  cell 23 11 c4
+  cell 22 12 c4
+  cell 22 13 c4
+  cell 21 14 c4
+  cell 20 15 c4
+  cell 20 16 c4
+  cell 18 17 c4
+  cell 15 18 c4
+  cell 14 19 c4
+  cell 13 20 c4
+  cell 12 21 c4
+  cell 11 22 c4
+  # recursive sub-unfolding: short branch spark off the mid-vein, same
+  # stroke formula at smaller scale, reaching the blade's outer edge
+  cell 26 9 c4
+}
+
+part guard material gold {
+  cell 9 18 c5
+  cell 8 19 c6
+  cell 8 20 c6
+  cell 8 21 c5
+  cell 9 21 c6
+  cell 10 21 c6
+  cell 9 22 c5
+  cell 10 22 c6
+  cell 9 23 c7
+  cell 10 23 c5
+  cell 10 24 c7
+  cell 11 24 c6
+  cell 4 25 c5
+  cell 11 25 c6
+  cell 4 26 c5
+  cell 5 26 c5
+  cell 11 26 c6
+  cell 5 27 c5
+  cell 6 27 c5
+  cell 10 27 c5
+}
+
+part grip material leather_brown {
+  cell 7 23 c8
+  cell 8 23 c8
+  cell 8 24 c9
+  cell 9 24 c8
+  cell 5 25 c10
+  cell 8 25 c9
+  cell 6 26 c10
+}
+
+part ruby_gem material ruby {
+  cell 6 24 c11
+  cell 7 24 c12
+  cell 6 25 c12
+  cell 7 25 c12
+}
+
+export json svg phaser png aseprite

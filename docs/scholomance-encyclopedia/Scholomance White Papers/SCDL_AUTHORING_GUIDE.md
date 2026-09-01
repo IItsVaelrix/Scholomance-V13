@@ -1,7 +1,12 @@
 # SCDL Authoring Guide
 
 **Audience:** anyone writing `.scdl` files by hand — artists, agents, engineers.
-**Scope:** SCDL v1.1 (`SCDL-AST-v1` version `1.1.0`).
+**Scope:** SCDL v1.1 ops and frames, plus the v1.2 boolean-op rework
+(`SCDL-AST-v1` version `1.2.0`). The v1.2 scene-graph features (`def`,
+`group`, `instance`, transform clauses) exist in the compiler and grammar
+but are not yet covered by this guide — see the
+[Compiler White Paper](SCDL_COMPILER_WHITE_PAPER.md) §3.1 for their formal
+grammar until a rendered-example section lands here.
 **Search anchor:** `SCHOL-ENC-BYKE-SEARCH-SCDL-AUTHORING`
 
 This is the practical companion to the
@@ -9,6 +14,10 @@ This is the practical companion to the
 pass pipeline) and the PDRs
 ([v1](../PDR-archive/scdl-v1-pdr.md),
 [v1.1 frames](../PDR-archive/2026-07-03-scdl-frames-and-cli-out-dir-pdr.md)).
+For generalized compiler/rasterizer engineering patterns that extend past
+SCDL itself, see the `ScholomanceCompile` Claude Code skill
+(`.claude/skills/ScholomanceCompile/`), which treats this guide and the
+white paper as its canonical reference documentation.
 Every image in this guide was rendered by compiling the shown source through the
 real compiler (`compileSCDL` → packet coordinates → PNG, nearest-neighbour
 upscaled). Nothing is a mock-up.
@@ -326,7 +335,55 @@ resolution would need I/O or is a material property, breaking determinism):
 - **`glow radius N`** — an *effect hint*, not pixels. It attaches a
   `PB-NOISE-v1` descriptor to the part for the render pass (see §7).
 
-### 4.13 Reserved verbs — parse but do not rasterize yet
+### 4.13 `union` / `subtract` / `intersect` — combine sibling parts
+
+Targets are **part ids**, not op ids — you write the id of another `part`
+declared in the same asset, the same way you'd write it anywhere else. There
+is no way to target one shape drawn *inside* the same part; if you want to
+combine or cut specific shapes, give each its own part.
+
+```scdl
+part a material source { circle 6 8 radius 5 a_col }
+part b material source { circle 10 8 radius 5 b_col }
+part c material source { subtract a b }
+```
+
+`a` and `b` above, rendered together (painter order: `a` then `b` on top) —
+this is the "before" picture every boolean op reads from:
+
+![boolean venn input](assets/scdl-authoring-guide/op-boolean-venn.png)
+
+Real compiled coordinate counts for that exact geometry (two radius-5
+circles, centers 4 apart, `a`=81 cells, `b`=81 cells):
+
+| Op | Part `c` gets | Why |
+|---|---|---|
+| `union a b` | 119 cells | every cell in `a` or `b`, overlap counted once |
+| `subtract a b` | 38 cells | `a`'s cells with `b`'s footprint (43 cells) removed |
+| `intersect a b` | 43 cells | only the cells both `a` and `b` occupy |
+
+**There is no "after" picture** — and that's not a documentation gap, it's
+how the feature is designed. `a` and `b` keep rendering standalone at their
+own original coordinates no matter what boolean ops reference them (don't
+give a part drawing ops beyond what it needs as a cutting shape if you don't
+want it independently visible). `c`'s own cells occupy those exact same
+coordinates too — there's no relocation — so a flattened raster of `a`+`b`+`c`
+together looks identical to `a`+`b` alone; painter order just repaints the
+same pixels. **Verify a boolean op against the compiled packet's per-part
+coordinate counts (as above), not against a picture.** If you need the
+*visual* effect of "b cuts a hole in a," give `b` the color you want exposed
+underneath, or route only `c`'s coordinates to the consumer that should see
+the cut shape.
+
+Errors:
+
+- Fewer than 2 targets → `SCDL-023`.
+- A target that doesn't name an existing sibling part, or names the part the
+  op is written inside of (self-reference) → `SCDL-026`.
+- `intersect` combining cells with conflicting semantic roles → `SCDL-024`
+  (WARN; compile still succeeds).
+
+### 4.14 Reserved verbs — parse but do not rasterize yet
 
 The grammar accepts these, but their lowering is a placeholder today.
 **Do not rely on them for geometry:**
@@ -334,7 +391,6 @@ The grammar accepts these, but their lowering is a placeholder today.
 | Verb | Status |
 |---|---|
 | `rotate cx cy degrees N` / `scale cx cy s [sy s]` / `translate cx cy dx dy` | parsed, currently emit nothing |
-| `union a b` / `subtract a b` / `intersect a b` | boolean lowering placeholder (`lower-booleans.js`) |
 | `reference` / `instance "id"` | emits a single white marker cell at (0,0) |
 
 ---
@@ -607,6 +663,17 @@ in the white paper §6.
 | SCDL-013 | ERROR | Frame Index Law violation |
 | SCDL-014 | ERROR | `after` anchor missing on add / present on replacement |
 | SCDL-015 | WARN | frame identical to base (dead frame) |
+| SCDL-016 | ERROR | v1.2 scene-graph: `instance` references undeclared `def` |
+| SCDL-017 | ERROR | v1.2 scene-graph: def reference cycle |
+| SCDL-018 | ERROR | v1.2 scene-graph: expansion depth exceeds cap (8) |
+| SCDL-019 | ERROR | v1.2 scene-graph: non-finite transform or scale 0 |
+| SCDL-020 | WARN | v1.2 scene-graph: instance fully outside canvas |
+| SCDL-021 | WARN | v1.2 scene-graph: def declared but never instanced |
+| SCDL-022 | ERROR | illegal character (legal in no token — e.g. a hyphen in a name) |
+| SCDL-023 | ERROR | `union`/`subtract`/`intersect` given fewer than 2 targets |
+| SCDL-024 | WARN | `intersect` combines cells with conflicting semantic roles |
+| SCDL-025 | ERROR | unrecognized color-reference kind (internal AST producers only) |
+| SCDL-026 | ERROR | boolean-op target is not another existing sibling part |
 
 ---
 
@@ -631,6 +698,10 @@ Distilled from the fixtures that shipped:
    output paths predictable for scripts.
 8. **Fractional centers for even canvases** — `15.5` centers on a 32-wide
    canvas; integer centers on odd-width ones.
+9. **Give a boolean op's targets their own parts, not shared ones.** `union`/
+   `subtract`/`intersect` target whole sibling parts (§4.13); if a part you
+   reference also needs to be independently invisible, don't give it any
+   other purpose — it will render standalone regardless of what consumes it.
 
 ---
 

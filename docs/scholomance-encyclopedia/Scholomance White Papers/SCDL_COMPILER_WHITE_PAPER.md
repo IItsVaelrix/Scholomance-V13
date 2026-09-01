@@ -1,9 +1,17 @@
 # SCDL Compiler and Language White Paper and Instruction Manual
 
-**Date:** 2026-07-03 (Updated with SCDL v1.1 frames + CLI output directory)  
-**Applies To:** Scholomance Coordinate Description Language (SCDL v1.1), SCDL-AST-v1 JSON contract (version 1.1.0), SCDL-FRAME-LOOP-v1 manifest, PB-Semantics / SemQuant unification layer, compile pass pipeline, SymmetryAMP integration, Phaser/SVG/JSON/PNG/Aseprite exporters, SCD64 + PB-SEM diagnostics, CLI utilities  
+**Date:** 2026-08-30 (Updated: v1.2 scene-graph grammar documented, real cross-part
+boolean ops, SCDL-016..026 error codes, pipeline map corrected to include the
+scene-graph branch and art-gene projection)  
+**Applies To:** Scholomance Coordinate Description Language (SCDL v1.2), SCDL-AST-v1 JSON contract (version 1.2.0), PB-SCENE-GRAPH-v1 canonical program form, SCDL-FRAME-LOOP-v1 manifest, PB-Semantics / SemQuant unification layer, compile pass pipeline, SymmetryAMP integration, Phaser/SVG/JSON/PNG/Aseprite exporters, SCD64 + PB-SEM diagnostics, CLI utilities  
 **Implementation PDR:** [`scdl-v1-pdr.md`](../PDR-archive/scdl-v1-pdr.md), [`2026-07-03-scdl-frames-and-cli-out-dir-pdr.md`](../PDR-archive/2026-07-03-scdl-frames-and-cli-out-dir-pdr.md)  
-**Implementation PIR:** [`PIR-20260702-SCDL-COMPILER.md`](../post-implementation-reports/PIR-20260702-SCDL-COMPILER.md), [`PIR-20260702-PB-SEMANTICS-SEMQUANT.md`](../post-implementation-reports/PIR-20260702-PB-SEMANTICS-SEMQUANT.md)
+**Implementation PIR:** [`PIR-20260702-SCDL-COMPILER.md`](../post-implementation-reports/PIR-20260702-SCDL-COMPILER.md), [`PIR-20260702-PB-SEMANTICS-SEMQUANT.md`](../post-implementation-reports/PIR-20260702-PB-SEMANTICS-SEMQUANT.md)  
+**Companion skill:** `.claude/skills/ScholomanceCompile/` — a Claude Code skill
+distilled from a 2026-08-30 audit-and-fix pass on this pipeline (one
+never-throws-contract crash found and fixed, the boolean-op rework below).
+Load it for generalized parser/pass/rasterizer engineering patterns that
+extend past SCDL; this white paper remains the source of truth for SCDL
+itself.
 
 ---
 
@@ -38,14 +46,18 @@ SCDL Source Text (.scdl)
 Tokens Array
         │
         ▼ (Recursive-Descent Parser / parseSCDL)
-SCDL-AST-v1 JSON AST
+SCDL-AST-v1 JSON AST  (graphMode = true iff any def/group/instance is used)
         │
         ▼ (Pass 1: validatePass)
 Syntax-Checked AST
         │
-        ▼ (Pass 2: semanticUnifierPass)
+        ▼ (Pass 1.5: expandFramesPass — v1.1, skipped for graphMode assets)
+One virtual part list per frame (frame 0 = base, byte-identical to no-frames)
+        │
+        ▼ (per frame, from here down) (Pass 2: semanticUnifierPass / SemQuant)
 Semantically Annotated AST
-(with roles, parts, effects, provenance via semantic-bridge + semantic-registry)
+(with roles, parts, effects, provenance via semantic-bridge + semantic-registry;
+ failures here never abort compilation — downgraded to PB-SEM-000 info)
         │
         ▼ (Pass 3: resolveColorsPass)
 Hex-Resolved Palette AST
@@ -53,30 +65,39 @@ Hex-Resolved Palette AST
         ▼ (Pass 4: resolveMaterialsPass)
 Material-Registry Validated AST
         │
-        ▼ (Pass 5: expandVectorPass)
-Vector Ops Lowered to Cells
-(circle/ring/rect/polygon/path/sphere → cell ops, preserving semantic metadata)
-        │
-        ▼ (Pass 6: expandSymmetryPass ──► SymmetryAMP)
-Mirrored Coordinates AST
-        │
-        ▼ (Pass 7: expandCellsPass)
-Flat Coordinates AST
-        │
-        ▼ (Pass 8: emitPacketPass)
-PixelBrainAssetPacket (immutable core packet)
+        ├─── graphMode? ───────────────────────────────────────────────┐
+        ▼ (no)                                                        ▼ (yes)
+Pass 5: expandVectorPass                                  Pass 5g: buildSceneGraphPass
+  phase 1 — rasterize each part's own vector ops in isolation   (SCDL-016..021; emits
+    (circle/ring/rect/polygon/path/sphere/ellipse/line)          ast.sceneGraph, the
+  phase 2 — resolveBooleanOpsPass: union/subtract/intersect      PB-SCENE-GRAPH-v1
+    resolved CROSS-PART by part id, once every part's shape      canonical program —
+    is known (§5.7)                                              no frames yet, PR-3)
+        │                                                              │
+        ▼ (Pass 6: expandSymmetryPass ──► SymmetryAMP)                 │
+Mirrored Coordinates AST                                               │
+        │                                                              │
+        ▼ (Pass 7: expandCellsPass)                                    │
+Flat Coordinates AST                                                   │
+        │                                                              │
+        ▼ (Pass 7.5: projectGenesPass — optional, only if               │
+           options.artGenes given; strict no-op otherwise)             │
+        │                                                              │
+        ▼ (Pass 8: emitPacketPass) ◄──────────────────────────────────┘
+PixelBrainAssetPacket (immutable core packet — flat-coordinates mode,
+  or scene-graph mode whose id hashes the canonical program, never pixels)
         │
         ▼ (Pass 9: emitDiagnosticsPass ──► PB-ERR-v1 + PB-SEM Bytecode)
-CompileResult { ok, ast, packet, errors, diagnostics }
+CompileResult { ok, ast, packet, framePackets, frameLoop, errors, diagnostics }
         │
-        ├──────────────────────┼──────────────────────┐
-        ▼                      ▼                      ▼
-   JSON Exporter          SVG Exporter         Phaser Exporter
+        ├──────────────────────┼──────────────────────┬──────────────┐
+        ▼                      ▼                      ▼              ▼
+   JSON Exporter          SVG Exporter         Phaser Exporter   PNG / Aseprite
 ```
 
-This strict layout guarantees that raw source code is parsed in a pure, side-effect-free environment, compiling into standard intermediate structures before reaching the runtime engines.
+This strict layout guarantees that raw source code is parsed in a pure, side-effect-free environment, compiling into standard intermediate structures before reaching the runtime engines. Every pass runs inside a try/catch in `scdl.compiler.js`; a pass that throws becomes an SCDL error instead of propagating, which is why `compileSCDL()` is documented to **never throw** — see §5.7 and §10 for what happens when one error-producing code path doesn't hold up its end of that contract.
 
-The semantic unifier (Pass 2) is the only non-geometry pass; it is responsible solely for meaning resolution and never mutates coordinate values.
+The semantic unifier (Pass 2) is the only non-geometry pass; it is responsible solely for meaning resolution and never mutates coordinate values. `graphMode` assets (any `def`, `group`, or `instance` in the source) skip vector/symmetry/cell expansion entirely in favor of `buildSceneGraphPass`, and currently reject frame blocks outright (planned PR-3).
 
 ---
 
@@ -89,7 +110,21 @@ Parser output nodes now include stable `id` and `sourceSpan` metadata. Parts and
 ### 3.1 Formal Grammar Definition
 
 ```ebnf
-program       ::= asset_decl palette_block? part_block* loop_decl? frame_block* export_decl?
+program       ::= asset_decl palette_block? def_block*
+                   (part_block | group_block | instance_stmt)*
+                   loop_decl? frame_block* export_decl?
+
+(* v1.2 scene-graph: presence of any def_block, group_block, or instance_stmt
+   anywhere in roots sets ast.graphMode = true. Graph-mode assets currently
+   reject loop_decl/frame_block (SCDL error, "planned: PR-3"). *)
+def_block     ::= 'def' IDENT '{' (part_block | group_block | instance_stmt)* '}'
+group_block   ::= 'group' IDENT transform_clause '{' scene_node* '}'
+scene_node    ::= part_block | group_block | instance_stmt
+instance_stmt ::= 'instance' IDENT ['as' IDENT] transform_clause ['material' IDENT]
+transform_clause ::= ['at' NUMBER NUMBER] ['rotate' NUMBER]
+                     ['scale' NUMBER [NUMBER]] ['mirror' ('x'|'y'|'xy')]
+(* 'at' is mandatory on instance_stmt (missing → SCDL-019); optional on
+   group_block, defaulting to the identity transform. *)
 
 loop_decl     ::= 'loop' NAME ['duration' INTEGER]
 frame_block   ::= 'frame' INTEGER [STRING] ['duration' INTEGER] '{' frame_item* '}'
@@ -158,7 +193,13 @@ radial_symmetry_op ::= 'symmetry' 'radial' INTEGER
 
 (* sphere: the light vector is optional; colors are one-or-more shading
    tiers, five (shine/core/core/rim/shadow) being the standard set.
-   instance is parsed as an alias of reference and emits a reference op. *)
+   instance_op here is the LEGACY part_op alias of reference_op (emits a
+   single marker cell) — distinct from the v1.2 scene-graph instance_stmt
+   above, which is a root/group-level node, not a part_op.
+   union_op/subtract_op/intersect_op: the two IDENTs are SIBLING PART ids —
+   not op ids, not the current part's own id. See §5.7 for full semantics,
+   error codes, and why op-id-based targeting (the pre-2026-08-30 design)
+   never worked for any hand-authored source. *)
 
 NUMBER        ::= SIGN? DIGIT+ ('.' DIGIT+)?
 SIGN          ::= '+' | '-'
@@ -297,7 +338,7 @@ These are propagated downstream into packet coordinates.
 ```json
 {
   "contract": "SCDL-AST-v1",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "checksum": "000000000514b500",
   "asset": "void_chestplate",
   "type": "void_chestplate",
@@ -339,10 +380,12 @@ The compiler (`scdl.compiler.js`) transforms the AST into a `PixelBrainAssetPack
 | **Pass 2: `semanticUnifierPass`** (SemQuant) | Performs semantic annotation and type unification via `semantic-bridge.js` and `semantic-registry.js`. Resolves roles, parts, effects, materials, and construction guides into canonical form. Attaches `annotations`, `sourceOpId`, provenance, and lowering history. Emits PB-SEM diagnostics. |
 | **Pass 3: `resolveColorsPass`** | Evaluates all palette aliases (`void0`) against the palette block, translating them into literal `#RRGGBB` hex strings. Asserts hex color pattern matching. |
 | **Pass 4: `resolveMaterialsPass`** | Validates part materials against the system's `material-registry.js`. Emits warnings for unrecognized materials and normalizes them. |
-| **Pass 5: `expandVectorPass`** | Lowers vector ops (circle, ring, rect, polygon, path, sphere) into deterministic cell ops while preserving partId, role, semanticRole, sourceOpId, and material context. Runs before symmetry so mirrored geometry operates on canonical cells. |
+| **Pass 5: `expandVectorPass`** | Runs in two phases. **Phase 1** lowers each part's own vector ops (circle, ring, rect, polygon, path, sphere, ellipse, line) into deterministic cell ops in isolation, preserving partId, role, semanticRole, sourceOpId, and material context; `union`/`subtract`/`intersect` ops are carried through unresolved. **Phase 2** (`resolveBooleanOpsPass`, `passes/lower-booleans.js`) resolves every boolean op now that every part's own shape exists — see §5.7. Runs before symmetry so mirrored geometry operates on canonical cells. Skipped entirely for `graphMode` assets (see Pass 5g). |
+| **Pass 5g: `buildSceneGraphPass`** (v1.2, `graphMode` only) | Runs *instead of* Pass 5/6/7 for scene-graph assets. Validates every `instance` resolves to a declared `def` (SCDL-016), that the def-reference digraph is acyclic (SCDL-017), and that expansion depth stays within the cap of 8 (SCDL-018, memoized). Warns on a def never instanced (SCDL-021) or an instance whose world-space AABB misses the canvas entirely (SCDL-020). Emits `ast.sceneGraph` — a canonical, identity-bearing `PB-SCENE-GRAPH-v1` structure stripped of source locations and annotations, so the packet id hashes the *program*, not authoring metadata. |
 | **Pass 6: `expandSymmetryPass`** | Translates symmetry axis tags (`x`, `y`, `xy`) to `SymmetryAMP` types (`vertical`, `horizontal`, `radial`). Generates mirror coordinate pairs and drops the symmetry op. |
 | **Pass 7: `expandCellsPass`** | Expands geometric operations (rim bounds, cell coordinate offsets, fill intents) to flat coordinate lists. Captures glows and traces as descriptor intents. Propagates semantic metadata (`role`, `partId`, `sourceOpId`) to coordinates. |
-| **Pass 8: `emitPacketPass`** | Invokes `createPixelBrainAssetPacket` from `pixelbrain-asset-packet.js` to build the final immutable resource. Semantic fields are preserved on coordinates. |
+| **Pass 7.5: `projectGenesPass`** (optional) | Only runs when `options.artGenes` is a non-empty array; strict no-op otherwise (§6.5 of the Ontological Art-Direction PDR guarantees byte-identical output when unused). Projects approved art-direction genes onto the canvas deterministically, with full causal provenance per cell. |
+| **Pass 8: `emitPacketPass`** | Invokes `createPixelBrainAssetPacket` from `pixelbrain-asset-packet.js` to build the final immutable resource — flat-coordinates mode for ordinary assets, or scene-graph mode (id = hash of the canonical program) for `graphMode` assets. Semantic fields are preserved on coordinates. |
 | **Pass 9: `emitDiagnosticsPass`** | Evaluates all compiled warnings/errors (including PB-SEM), translating them to `DiagnosticReport` schemas. |
 
 ---
@@ -396,15 +439,62 @@ This policy ensures that pure semantic-only changes (e.g. richer provenance or r
 
 ## 5.7 Boolean Operations and Semantic Ownership Rules
 
-Boolean ops (union, subtract, intersect) operate on geometry and must preserve or explicitly declare semantic meaning.
+Boolean ops (`union`, `subtract`, `intersect`) combine geometry across **sibling
+parts**, addressed by part id. This is a deliberate design point, not an
+implementation detail: op ids (`op:partId:index:verb`) are internal and
+auto-generated, so no SCDL author can ever type one — an earlier design that
+matched targets against op ids was live in the grammar and validator for some
+time but **silently combined nothing** for any hand-written source (confirmed
+by compiling `subtract a b` on two overlapping circles and observing
+byte-identical output to no `subtract` at all). Reworked 2026-08-30 to target
+part ids instead — the one identifier an author already has reason to name.
 
-Intended ownership contract:
+**Resolution** (`resolveBooleanOpsPass`, `passes/lower-booleans.js`, run as
+Pass 5's phase 2 — see §2/§5 — once every part's own vector ops are
+rasterized):
 
-- `union A B`: Result inherits the dominant/outer part's role and material. Overlaps may emit ambiguity if roles conflict.
-- `subtract A B`: Result keeps the role, material, and annotations of A (the base). B is "cut out".
-- `intersect A B`: Requires compatible roles or explicit override; otherwise emits PB-SEM-002 AMBIGUOUS_ROLE.
-
-**Implementation status:** `passes/lower-booleans.js` is currently a placeholder. It parses the three verbs and tags the result cell with ownership metadata (`role`, `material`, `booleanOp`, `targets`), but it does not yet compute real set operations on the target parts' geometry, and PB-SEM-002 is not yet emitted on role conflicts. Treat the rules above as the contract the full implementation must satisfy, not as current behavior.
+1. **Arity.** Fewer than 2 targets → `SCDL-023`.
+2. **Target validity.** Any target equal to the current part's own id
+   (self-reference), or not the id of an existing sibling part → `SCDL-026`.
+3. **Shape/overlap resolution.** Which cells belong to a given part is
+   resolved via `geometry-amp.js`'s `buildPartMask()` — the same primitive the
+   item-foundry shading pipeline uses to turn a silhouette occupancy map into
+   a part's cell mask. Critically, the `{x,y}→partId` map fed into it is built
+   **fresh per part**, from only that part's own cells, never shared across
+   parts: `buildPartMask` resolves an overlapping cell to a single owner
+   (last writer wins), which is correct for item-foundry's exclusive-territory
+   construction specs but wrong here — two independently authored SCDL parts
+   are free to draw the same coordinate, and `subtract`/`intersect` exist
+   specifically to combine that legitimate overlap. A shared map was tried
+   and caught by a regression test: two concentric circles (`a` radius 3,
+   `b` radius 1, fully inside `a`) fed to `intersect a b` produced **zero**
+   cells instead of the expected 5, because the shared map had already
+   reassigned every one of `a`'s overlapped cells to the later-declared `b`.
+4. **Combination.**
+   - `union a b`: every cell in `a` or `b`; on an overlapping coordinate the
+     later-declared target wins (the codebase's existing painter-order
+     convention). Result inherits `a`'s role, or `union-result` if `a` has
+     none.
+   - `subtract a b`: `a`'s cells with every target's footprint removed.
+     Result inherits `a`'s role, then `part.material`, then `body`.
+   - `intersect a b`: only cells present in both `a` and every other target.
+     Result inherits `a`'s role, or `intersect-ambiguous` if none. Conflicting
+     roles between base and modifier cells emit `SCDL-024` (WARN — the
+     compile still succeeds; this is the code this document previously called
+     "PB-SEM-002", renumbered into the SCDL-0xx catalogue for consistency
+     with every other SCDL diagnostic).
+5. **Provenance.** Every cell pulled into the consuming part is retagged
+   `partId: <consuming part>` (so `emitPacketPass`, which trusts
+   `coord.partId` over its containing part, attributes it correctly) and
+   `sourceOpId: <the boolean op's id>`.
+6. **Target parts are not hidden.** `a` and `b` keep rendering standalone in
+   the final packet exactly as authored — a boolean op only ever writes into
+   the *consuming* part's own op list. Because a boolean op's result cells
+   share the exact same coordinates as their inputs (there is no relocation),
+   a flattened raster of inputs + result looks pixel-identical to the inputs
+   alone; verify a boolean op against the compiled packet's per-part
+   coordinate counts, not against a rendered image (see the Authoring Guide
+   §4.13 for a worked example and real numbers).
 
 ---
 
@@ -431,6 +521,22 @@ In alignment with Vaelrix Law 8, compile errors must emit `PB-ERR-v1` bytecode p
 | `0x100D` | `SCDL-013` | ERROR | `VALUE` | Frame Index Law violation: duplicate, sparse, or out-of-declaration-order frame index, or explicit `frame 0`. |
 | `0x100E` | `SCDL-014` | ERROR | `STATE` | Added part missing/unknown `after` anchor, or `after` given on a replacement (Replacement Ordering Law). |
 | `0x100F` | `SCDL-015` | WARN | `STATE` | Frame identical to base after expansion (dead frame). |
+| `0x1010` | `SCDL-016` | ERROR | `STATE` | v1.2 scene-graph: `instance` references an undeclared `def`. |
+| `0x1011` | `SCDL-017` | ERROR | `STATE` | v1.2 scene-graph: def-reference cycle. |
+| `0x1012` | `SCDL-018` | ERROR | `STATE` | v1.2 scene-graph: expansion depth exceeds the cap (8). |
+| `0x1013` | `SCDL-019` | ERROR | `STATE` | v1.2 scene-graph: non-finite transform parameter, or scale of 0. |
+| `0x1014` | `SCDL-020` | WARN | `VALUE` | v1.2 scene-graph: instance's world-space AABB misses the canvas entirely. |
+| `0x1015` | `SCDL-021` | WARN | `VALUE` | v1.2 scene-graph: def declared but never instanced. |
+| `0x1016` | `SCDL-022` | ERROR | `STATE` | Character legal in no SCDL token (previously silently dropped, surfacing a mis-tokenized error several tokens later). |
+| `0x1017` | `SCDL-023` | ERROR | `STATE` | Boolean op (`union`/`subtract`/`intersect`) given fewer than 2 targets. |
+| `0x1018` | `SCDL-024` | WARN | `VALUE` | `intersect` combines cells with conflicting semantic roles (see §5.7). |
+| `0x1019` | `SCDL-025` | ERROR | `STATE` | Unrecognized `colorRef.kind` — reachable only from internal AST producers, not the current grammar. |
+| `0x101A` | `SCDL-026` | ERROR | `STATE` | Boolean-op target is not another existing sibling part (unknown id or self-reference). |
+
+*Category* is derived purely from severity (`_sevToCategory` in `scdl.errors.js`:
+`ERROR` and `INFO` → `STATE`, `WARN` → `VALUE`), not a per-error semantic
+label — the `COLOR`/`COORD` categories on a few rows above predate that
+simplification and are illustrative, not literal bytecode output.
 
 In addition, the SemQuant layer (integrated after validatePass) emits `PB-SEM-*` diagnostics for semantic issues:
 
@@ -635,3 +741,13 @@ npx vitest run tests/codex/core/pixelbrain/scdl/
 * **Problem:** Symmetric coordinates are emitted out of bounds or translated incorrectly.
 * **Cause:** Using standard index arithmetic without grid limits, causing coordinates to map past the canvas width/height.
 * **Solution:** Verify `expandSymmetryPass`. Ensure coordinate mirror math clamps column/row translations within `[0, cols - 1]` and `[0, rows - 1]`.
+
+### 10.5 `compileSCDL()` Throws Despite Its "Never Throws" Contract
+* **Problem:** A `.scdl` file with a malformed `union`/`subtract`/`intersect` op (fewer than 2 targets) crashed the CLI with `TypeError: e.isError is not a function` instead of a clean `[SCDL] Compile FAILED` — found 2026-08-30.
+* **Cause:** `compileSCDL`'s final gate (§2) calls `e.isError()`/`e.isWarn()` on every entry in the shared `errors` array with no ternary guard. `passes/lower-booleans.js` was the one pass in the whole pipeline that pushed a plain `{code, message}` literal instead of going through `scdlError()`/`scdlWarn()`, so it had neither method. The CLI has no try/catch around `compileSCDL` anywhere — it depends entirely on this contract holding.
+* **Solution:** Every code path that pushes into a shared errors/diagnostics array must produce the exact same shape every other producer does (`scdlError`/`scdlWarn`, or the duck-typed equivalent `createSemanticDiagnostic` in `semantic-registry.js` uses for the same reason). Fixed via `SCDL_ERROR_CODES.BOOLEAN_OP_ARITY`/`SEMANTIC_ROLE_CONFLICT`. Before trusting a "never throws" doc comment on any compiler, grep every push-site into its shared error collection — a fully green test suite proves nothing about an op with zero dedicated tests, which is exactly how this one shipped.
+
+### 10.6 `union`/`subtract`/`intersect` Compiles Clean But Changes Nothing
+* **Problem:** `subtract a b` on two overlapping circles produces byte-identical packet coordinates to omitting the `subtract` line entirely — no error, no warning.
+* **Cause (historical, pre-2026-08-30):** Targets were matched against auto-generated op ids (`op:partId:index:verb`), which no SCDL author can type — so `a`/`b` never matched any real cell's `sourceOpId`, and the op silently combined nothing.
+* **Solution:** Targets now address sibling **part ids** (§5.7). If this symptom reappears, first check whether the targets actually resolve to `SCDL-026` (unknown/self-referencing target) rather than silently no-op'ing — and if a *new* silent no-op shows up, suspect the same class of bug: an identifier nothing in the pipeline can actually produce.

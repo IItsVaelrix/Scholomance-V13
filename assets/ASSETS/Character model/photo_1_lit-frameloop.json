@@ -1,0 +1,43 @@
+{
+  "contract": "SCDL-FRAME-LOOP-v1",
+  "asset": "photo_1_lit",
+  "loop": "walk",
+  "canvas": {
+    "width": 32,
+    "height": 32
+  },
+  "defaultDurationMs": 200,
+  "sourceChecksum": "00000000e561b679",
+  "frames": [
+    {
+      "index": 0,
+      "label": "rest",
+      "durationMs": 200,
+      "packet": "pbasset_08aa3846"
+    },
+    {
+      "index": 1,
+      "label": "stride-L",
+      "durationMs": 200,
+      "packet": "pbasset_74e642c1"
+    },
+    {
+      "index": 2,
+      "label": "pass-mid",
+      "durationMs": 200,
+      "packet": "pbasset_f81f5977"
+    },
+    {
+      "index": 3,
+      "label": "stride-R",
+      "durationMs": 200,
+      "packet": "pbasset_518b1335"
+    },
+    {
+      "index": 4,
+      "label": "pass-mid2",
+      "durationMs": 200,
+      "packet": "pbasset_f81f5977"
+    }
+  ]
+}

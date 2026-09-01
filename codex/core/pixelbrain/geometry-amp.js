@@ -9,7 +9,7 @@
 import { hashString } from './shared.js';
 import { extractQBITGraph } from './qbit-node-extractor.js';
 
-function boundsForPart(partOf, partId) {
+export function boundsForPart(partOf, partId) {
   let minX = Infinity;
   let maxX = -Infinity;
   let minY = Infinity;
@@ -36,6 +36,24 @@ function boundsForPart(partOf, partId) {
     centerY: Number(((minY + maxY) / 2).toFixed(4)),
     count,
   });
+}
+
+/**
+ * The set of cells belonging to one part — its "shape" — as a sorted,
+ * frozen {x,y} list. Extracted so other consumers that need "which cells
+ * does part X occupy" (e.g. the SCDL cross-part boolean-op resolver) reuse
+ * the same silhouette-indexed lookup this AMP already builds per part,
+ * instead of re-deriving it.
+ */
+export function buildPartMask(partOf, partId) {
+  const cells = [];
+  partOf.forEach((pid, key) => {
+    if (pid !== partId) return;
+    const [x, y] = key.split(',').map(Number);
+    cells.push(Object.freeze({ x, y }));
+  });
+  cells.sort((a, b) => (a.y - b.y) || (a.x - b.x));
+  return Object.freeze(cells);
 }
 
 function classifyRole(part) {
@@ -85,14 +103,7 @@ export function buildGeometryAmpPayload({ spec, silhouette, construction = null 
   for (const part of spec.parts) {
     const bounds = boundsForPart(silhouette.partOf, part.id);
     if (!bounds) continue;
-    const maskCells = [];
-    silhouette.partOf.forEach((pid, key) => {
-      if (pid !== part.id) return;
-      const [x, y] = key.split(',').map(Number);
-      maskCells.push(Object.freeze({ x, y }));
-    });
-    maskCells.sort((a, b) => (a.y - b.y) || (a.x - b.x));
-    masks[part.id] = Object.freeze(maskCells);
+    masks[part.id] = buildPartMask(silhouette.partOf, part.id);
     const role = classifyRole(part);
     roleCounts[role] = (roleCounts[role] || 0) + bounds.count;
     parts.push(Object.freeze({

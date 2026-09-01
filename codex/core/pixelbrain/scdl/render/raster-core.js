@@ -257,10 +257,54 @@ export function computeVectorIdentity(op, px, py) {
   return null;
 }
 
+/**
+ * SVG lets an arc command's two single-digit flags (large-arc-flag,
+ * sweep-flag) touch each other or the following coordinate with no
+ * separator — "A2 2 0 011 0" means large-arc=0, sweep=1, x=1, y=0. The
+ * generic number regex in samplePath reads a run of digits greedily, so it
+ * would swallow both flags (or a flag plus part of the next coordinate)
+ * into one multi-digit number, desyncing every token for the rest of that
+ * path. Rewrite each 'A'/'a' command's flag pair as two explicitly
+ * space-separated single-digit tokens first; everything else in the string
+ * (including an already space-separated arc) passes through unchanged.
+ */
+function _normalizeArcFlags(d) {
+  let out = '';
+  let i = 0;
+  const n = d.length;
+  const isDigit = c => c >= '0' && c <= '9';
+  const skipSep = () => { while (i < n && /[\s,]/.test(d[i])) out += d[i++]; };
+  const readNumber = () => {
+    skipSep();
+    const start = i;
+    if (d[i] === '-' || d[i] === '+') i++;
+    while (i < n && isDigit(d[i])) i++;
+    if (d[i] === '.') { i++; while (i < n && isDigit(d[i])) i++; }
+    out += d.slice(start, i);
+  };
+
+  while (i < n) {
+    const ch = d[i];
+    if (ch !== 'A' && ch !== 'a') { out += ch; i++; continue; }
+
+    out += ch; i++;
+    readNumber(); // rx
+    readNumber(); // ry
+    readNumber(); // x-axis-rotation
+    skipSep();
+    if (i < n && (d[i] === '0' || d[i] === '1')) { out += d[i]; i++; out += ' '; }
+    skipSep();
+    if (i < n && (d[i] === '0' || d[i] === '1')) { out += d[i]; i++; out += ' '; }
+    readNumber(); // x
+    readNumber(); // y
+  }
+  return out;
+}
+
 // SVG-like path sampler. Handles M, L, H, V, Q, T, C, S, A, Z.
 // Curves are flattened into deterministic 10-step polylines.
 function samplePath(d) {
-  const tokens = d.match(/[a-zA-Z]|-?\d*\.?\d+/g) || [];
+  const tokens = _normalizeArcFlags(String(d || '')).match(/[a-zA-Z]|-?\d*\.?\d+/g) || [];
   let i = 0;
   let cx = 0, cy = 0;
   let startX = 0, startY = 0;

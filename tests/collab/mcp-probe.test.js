@@ -134,4 +134,15 @@ describe('collab MCP probe', () => {
 
         expect(launchSpec.args.at(-1)).toMatch(/codex[/\\]server[/\\]collab[/\\]mcp-bridge-entry\.js$/);
     });
+
+    it('handles a large newline-delimited tools/list response in shell-pipe mode', async () => {
+        const report = await runCollabMcpProbe({
+            transportMode: 'raw',
+            timeoutMs: 5000,
+        });
+
+        expect(report.ok).toBe(true);
+        expect(report.stage).toBe('complete');
+        expect(report.counts.tools).toBeGreaterThan(100);
+    });
 });

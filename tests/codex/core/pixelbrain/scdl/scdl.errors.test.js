@@ -67,14 +67,32 @@ describe('SCDL Error — SCDLError constructor', () => {
 });
 
 describe('SCDL_ERROR_CODES catalogue', () => {
-  it('has all 22 codes (v1 + frame codes + SCDL-016..021 graph codes v1.2 + SCDL-022 lexer)', () => {
-    expect(Object.keys(SCDL_ERROR_CODES)).toHaveLength(22);
+  it('has all 26 codes (v1 + frame codes + SCDL-016..021 graph codes v1.2 + SCDL-022 lexer + SCDL-023..026 boolean-op/color-ref)', () => {
+    expect(Object.keys(SCDL_ERROR_CODES)).toHaveLength(26);
   });
 
   it('carries a code for a character that is legal in no token', () => {
     // The lexer used to skip such characters silently, so a hyphen in an asset
     // name reappeared as an unrelated canvas error at the wrong line.
     expect(SCDL_ERROR_CODES.ILLEGAL_CHARACTER).toBe(0x1016);
+  });
+
+  it('carries codes for the boolean-op arity and role-conflict diagnostics', () => {
+    // These used to be raw {code,message} literals pushed straight into the
+    // errors array, bypassing SCDLError entirely — compileSCDL's final
+    // hasErrors check calls e.isError()/e.isWarn() unconditionally, so a
+    // malformed union/subtract/intersect crashed the compiler instead of
+    // failing cleanly.
+    expect(SCDL_ERROR_CODES.BOOLEAN_OP_ARITY).toBe(0x1017);
+    expect(SCDL_ERROR_CODES.SEMANTIC_ROLE_CONFLICT).toBe(0x1018);
+  });
+
+  it('carries a code for an unrecognized colorRef.kind', () => {
+    expect(SCDL_ERROR_CODES.UNKNOWN_COLOR_REF_KIND).toBe(0x1019);
+  });
+
+  it('carries a code for a boolean-op target that is not another existing part', () => {
+    expect(SCDL_ERROR_CODES.INVALID_BOOLEAN_TARGET).toBe(0x101A);
   });
 
   it('codes are unique numeric values', () => {

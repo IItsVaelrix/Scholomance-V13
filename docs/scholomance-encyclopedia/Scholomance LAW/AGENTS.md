@@ -268,12 +268,12 @@ Merge into the existing JSON under the top-level `mcpServers` key:
 {
   "mcpServers": {
     "scholomance-collab": {
-      "command": "/home/deck/.nvm/versions/node/v24.14.1/bin/node",
+      "command": "/home/deck/.nvm/versions/node/v20.20.2/bin/node",
       "args": [
-        "--env-file=/home/deck/Desktop/Scholomance-V12-main/.env",
-        "/home/deck/Desktop/Scholomance-V12-main/codex/server/collab/mcp-bridge.js"
+        "--env-file=/home/deck/Downloads/Scholomance-V12-main/.env",
+        "/home/deck/Downloads/Scholomance-V12-main/codex/server/collab/mcp-bridge-entry.js"
       ],
-      "cwd": "/home/deck/Desktop/Scholomance-V12-main"
+      "cwd": "/home/deck/Downloads/Scholomance-V12-main"
     }
   }
 }
@@ -291,12 +291,12 @@ Create or replace the file entirely:
 {
   "mcpServers": {
     "scholomance-collab": {
-      "command": "/home/deck/.nvm/versions/node/v24.14.1/bin/node",
+      "command": "/home/deck/.nvm/versions/node/v20.20.2/bin/node",
       "args": [
-        "--env-file=/home/deck/Desktop/Scholomance-V12-main/.env",
-        "/home/deck/Desktop/Scholomance-V12-main/codex/server/collab/mcp-bridge.js"
+        "--env-file=/home/deck/Downloads/Scholomance-V12-main/.env",
+        "/home/deck/Downloads/Scholomance-V12-main/codex/server/collab/mcp-bridge-entry.js"
       ],
-      "cwd": "/home/deck/Desktop/Scholomance-V12-main"
+      "cwd": "/home/deck/Downloads/Scholomance-V12-main"
     }
   }
 }
@@ -312,12 +312,12 @@ Merge into the existing JSON:
 {
   "mcpServers": {
     "scholomance-collab": {
-      "command": "/home/deck/.nvm/versions/node/v24.14.1/bin/node",
+      "command": "/home/deck/.nvm/versions/node/v20.20.2/bin/node",
       "args": [
-        "--env-file=/home/deck/Desktop/Scholomance-V12-main/.env",
-        "/home/deck/Desktop/Scholomance-V12-main/codex/server/collab/mcp-bridge.js"
+        "--env-file=/home/deck/Downloads/Scholomance-V12-main/.env",
+        "/home/deck/Downloads/Scholomance-V12-main/codex/server/collab/mcp-bridge-entry.js"
       ],
-      "cwd": "/home/deck/Desktop/Scholomance-V12-main"
+      "cwd": "/home/deck/Downloads/Scholomance-V12-main"
     }
   }
 }
@@ -332,8 +332,8 @@ Merge into the existing JSON:
 ```toml
 [mcp_servers.scholomance-collab]
 command = "node"
-args = ["--env-file=/home/deck/Desktop/Scholomance-V12-main/.env", "/home/deck/Desktop/Scholomance-V12-main/codex/server/collab/mcp-bridge.js"]
-cwd = "/home/deck/Desktop/Scholomance-V12-main"
+args = ["--env-file=/home/deck/Downloads/Scholomance-V12-main/.env", "/home/deck/Downloads/Scholomance-V12-main/codex/server/collab/mcp-bridge-entry.js"]
+cwd = "/home/deck/Downloads/Scholomance-V12-main"
 ```
 
 ---

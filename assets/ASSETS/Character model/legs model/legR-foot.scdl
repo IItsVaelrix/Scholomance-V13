@@ -22,17 +22,17 @@ part legR_foot material void_cloth {
   cell 18 44 t4
   cell 19 44 t3
   cell 20 44 t2
-  cell 15 45 t1
-  cell 16 45 t4
-  cell 17 45 t3
-  cell 18 45 t3
-  cell 19 45 t2
-  cell 20 45 t1
-  cell 15 46 t1
-  cell 16 46 t4
-  cell 17 46 t3
-  cell 18 46 t3
-  cell 19 46 t2
-  cell 20 46 t1
+  cell 18 45 t1
+  cell 19 45 t4
+  cell 20 45 t3
+  cell 21 45 t3
+  cell 22 45 t2
+  cell 23 45 t1
+  cell 18 46 t1
+  cell 19 46 t4
+  cell 20 46 t3
+  cell 21 46 t3
+  cell 22 46 t2
+  cell 23 46 t1
 }
 export json png

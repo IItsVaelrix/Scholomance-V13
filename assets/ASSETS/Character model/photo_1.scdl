@@ -1,0 +1,220 @@
+# photo_1.scdl
+# 1:1 SCDL conversion of the supplied Photo 1.jpg pixel sprite.
+# The source is a 32x32 grid enlarged to 1280x1280; transparent cells remain
+# empty. Two parts preserve the original head-over-torso painter order.
+
+asset photo_1 canvas 32x32
+
+palette {
+  ink        = #000000
+  cloak      = #161616
+  robedeep   = #2E0631
+  robe       = #320636
+  hair       = #3F3E3E
+  robehi     = #4B1451
+  skindeep   = #59390A
+  hairhi     = #797676
+  skinshade  = #9D630E
+  skin       = #BC7206
+  sash       = #C9C10C
+  sashhi     = #E4DA0E
+  shine      = #F6F4F1
+  white      = #FFFFFF
+}
+
+# Head, hair, face, and right-side fall.
+part head material hair_black {
+  rect 15 4 2 1 hair
+  cell 17 4 cloak
+  rect 18 4 2 1 hair
+  rect 13 5 2 1 hair
+  cell 15 5 hairhi
+  cell 16 5 hair
+  rect 17 5 2 1 hairhi
+  rect 19 5 2 1 hair
+  cell 12 6 hair
+  cell 13 6 hairhi
+  cell 14 6 cloak
+  cell 15 6 hair
+  cell 16 6 hairhi
+  rect 17 6 2 1 hair
+  rect 19 6 2 1 hairhi
+  cell 21 6 hair
+  cell 12 7 hairhi
+  cell 13 7 cloak
+  rect 14 7 2 1 hairhi
+  cell 16 7 hair
+  rect 17 7 2 1 hairhi
+  cell 19 7 hair
+  cell 20 7 hairhi
+  cell 21 7 hair
+  cell 12 8 hairhi
+  cell 13 8 cloak
+  cell 14 8 hairhi
+  cell 15 8 cloak
+  cell 16 8 hair
+  cell 17 8 hairhi
+  rect 18 8 2 1 hair
+  rect 20 8 2 1 hairhi
+  cell 22 8 hair
+  cell 12 9 hair
+  cell 13 9 cloak
+  cell 14 9 hair
+  cell 15 9 skindeep
+  cell 16 9 cloak
+  cell 17 9 hairhi
+  cell 18 9 cloak
+  rect 19 9 2 1 hair
+  cell 21 9 hairhi
+  cell 22 9 hair
+  cell 12 10 ink
+  cell 13 10 hair
+  cell 14 10 skinshade
+  cell 15 10 skindeep
+  cell 16 10 shine
+  cell 17 10 hair
+  cell 18 10 skin
+  rect 19 10 2 1 hair
+  rect 21 10 2 1 hairhi
+  cell 13 11 ink
+  cell 14 11 skinshade
+  cell 15 11 skindeep
+  cell 16 11 shine
+  cell 17 11 ink
+  cell 18 11 skinshade
+  cell 19 11 hair
+  cell 20 11 hairhi
+  cell 21 11 hair
+  cell 22 11 hairhi
+  cell 23 11 hair
+  cell 13 12 ink
+  rect 14 12 3 1 skinshade
+  cell 17 12 skin
+  cell 18 12 hair
+  rect 19 12 3 1 ink
+  rect 22 12 2 1 hairhi
+  cell 14 13 ink
+  cell 15 13 skinshade
+  cell 16 13 skin
+  cell 17 13 hair
+  cell 18 13 ink
+  cell 19 13 skin
+  cell 22 13 ink
+  cell 23 13 hairhi
+  cell 24 13 hair
+  cell 15 14 ink
+  cell 16 14 skin
+  cell 17 14 ink
+  cell 18 14 skin
+  cell 23 14 cloak
+  cell 24 14 hairhi
+  cell 17 15 skin
+  cell 23 15 cloak
+  cell 24 15 hairhi
+  cell 23 16 cloak
+  cell 24 16 hairhi
+  cell 23 17 cloak
+  cell 24 17 hairhi
+  cell 23 18 hairhi
+  cell 24 18 hair
+  cell 23 19 hairhi
+  cell 23 20 hair
+}
+
+# Torso, robe, sash, cloak, and arm; paints after head like the source.
+part torso material void_cloth {
+  rect 20 13 2 1 hair
+  cell 19 14 hair
+  rect 20 14 2 1 hairhi
+  cell 22 14 hair
+  cell 14 15 hair
+  cell 15 15 skin
+  cell 16 15 skinshade
+  cell 18 15 hair
+  cell 19 15 cloak
+  cell 20 15 robe
+  cell 21 15 robehi
+  cell 22 15 robe
+  rect 12 16 2 1 cloak
+  cell 14 16 sash
+  cell 15 16 robe
+  cell 16 16 sash
+  cell 17 16 hair
+  rect 18 16 2 1 cloak
+  cell 20 16 robe
+  rect 21 16 2 1 robehi
+  cell 11 17 cloak
+  cell 12 17 white
+  cell 13 17 skinshade
+  cell 14 17 cloak
+  cell 15 17 skin
+  cell 16 17 sashhi
+  cell 17 17 cloak
+  cell 18 17 robehi
+  cell 19 17 robe
+  rect 20 17 2 1 robehi
+  cell 22 17 robe
+  cell 11 18 cloak
+  cell 12 18 skinshade
+  cell 13 18 skin
+  cell 14 18 cloak
+  rect 15 18 2 1 hair
+  cell 17 18 cloak
+  rect 18 18 4 1 robe
+  cell 22 18 cloak
+  rect 12 19 3 1 cloak
+  rect 15 19 2 1 hairhi
+  cell 17 19 sash
+  rect 18 19 5 1 cloak
+  cell 24 19 cloak
+  cell 15 20 cloak
+  cell 16 20 skin
+  rect 17 20 2 1 cloak
+  cell 19 20 hair
+  cell 21 20 cloak
+  cell 24 20 cloak
+  cell 15 21 cloak
+  cell 16 21 sash
+  cell 17 21 cloak
+  cell 18 21 sash
+  cell 19 21 ink
+  cell 20 21 hairhi
+  cell 21 21 ink
+  rect 23 21 2 1 cloak
+  cell 15 22 cloak
+  cell 16 22 sashhi
+  cell 17 22 cloak
+  cell 18 22 robedeep
+  cell 19 22 ink
+  cell 20 22 hair
+  cell 21 22 hairhi
+  cell 22 22 ink
+  cell 24 22 cloak
+  cell 15 23 cloak
+  cell 16 23 robehi
+  cell 17 23 cloak
+  cell 18 23 robe
+  cell 19 23 robehi
+  rect 20 23 2 1 ink
+  cell 22 23 hair
+  cell 23 23 cloak
+  cell 14 24 cloak
+  cell 15 24 robe
+  cell 16 24 robehi
+  cell 17 24 cloak
+  cell 18 24 hair
+  cell 19 24 hairhi
+  cell 20 24 robe
+  cell 21 24 robehi
+  cell 22 24 cloak
+  rect 14 25 3 1 cloak
+  cell 17 25 robe
+  cell 18 25 robehi
+  cell 19 25 robe
+  cell 20 25 cloak
+  cell 21 25 robe
+  cell 22 25 cloak
+  rect 16 26 7 1 cloak
+}
+
+export json png svg aseprite

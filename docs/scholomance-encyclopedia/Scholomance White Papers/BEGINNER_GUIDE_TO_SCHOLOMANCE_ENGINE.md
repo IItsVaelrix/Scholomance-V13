@@ -857,7 +857,7 @@ No agent may invent an alternate transport, bypass authentication on the HTTP su
 There are two distinct access paths:
 
 - **HTTP / CLI control plane**: authenticated routes under `/collab`, used by `scripts/connect-collab.js` and `scripts/collab-client.js`
-- **MCP bridge**: local stdio server at `codex/server/collab/mcp-bridge.js`, used by MCP-capable clients and agents
+- **MCP bridge**: local stdio server at `codex/server/collab/mcp-bridge-entry.js`, used by MCP-capable clients and agents
 
 These paths serve different purposes:
 
@@ -931,7 +931,7 @@ npm run mcp:collab
 Equivalent direct invocation:
 
 ```bash
-node --env-file=.env codex/server/collab/mcp-bridge.js
+node --env-file=.env codex/server/collab/mcp-bridge-entry.js
 ```
 
 **Canonical MCP client configuration**
@@ -941,7 +941,7 @@ node --env-file=.env codex/server/collab/mcp-bridge.js
   "mcpServers": {
     "scholomance-collab": {
       "command": "node",
-      "args": ["--env-file=.env", "codex/server/collab/mcp-bridge.js"]
+      "args": ["--env-file=.env", "codex/server/collab/mcp-bridge-entry.js"]
     }
   }
 }
@@ -11893,12 +11893,12 @@ Merge into the existing JSON under the top-level `mcpServers` key:
 {
   "mcpServers": {
     "scholomance-collab": {
-      "command": "/home/deck/.nvm/versions/node/v24.14.1/bin/node",
+      "command": "/home/deck/.nvm/versions/node/v20.20.2/bin/node",
       "args": [
-        "--env-file=/home/deck/Desktop/Scholomance-V12-main/.env",
-        "/home/deck/Desktop/Scholomance-V12-main/codex/server/collab/mcp-bridge.js"
+        "--env-file=/home/deck/Downloads/Scholomance-V12-main/.env",
+        "/home/deck/Downloads/Scholomance-V12-main/codex/server/collab/mcp-bridge-entry.js"
       ],
-      "cwd": "/home/deck/Desktop/Scholomance-V12-main"
+      "cwd": "/home/deck/Downloads/Scholomance-V12-main"
     }
   }
 }
@@ -11916,12 +11916,12 @@ Create or replace the file entirely:
 {
   "mcpServers": {
     "scholomance-collab": {
-      "command": "/home/deck/.nvm/versions/node/v24.14.1/bin/node",
+      "command": "/home/deck/.nvm/versions/node/v20.20.2/bin/node",
       "args": [
-        "--env-file=/home/deck/Desktop/Scholomance-V12-main/.env",
-        "/home/deck/Desktop/Scholomance-V12-main/codex/server/collab/mcp-bridge.js"
+        "--env-file=/home/deck/Downloads/Scholomance-V12-main/.env",
+        "/home/deck/Downloads/Scholomance-V12-main/codex/server/collab/mcp-bridge-entry.js"
       ],
-      "cwd": "/home/deck/Desktop/Scholomance-V12-main"
+      "cwd": "/home/deck/Downloads/Scholomance-V12-main"
     }
   }
 }
@@ -11937,12 +11937,12 @@ Merge into the existing JSON:
 {
   "mcpServers": {
     "scholomance-collab": {
-      "command": "/home/deck/.nvm/versions/node/v24.14.1/bin/node",
+      "command": "/home/deck/.nvm/versions/node/v20.20.2/bin/node",
       "args": [
-        "--env-file=/home/deck/Desktop/Scholomance-V12-main/.env",
-        "/home/deck/Desktop/Scholomance-V12-main/codex/server/collab/mcp-bridge.js"
+        "--env-file=/home/deck/Downloads/Scholomance-V12-main/.env",
+        "/home/deck/Downloads/Scholomance-V12-main/codex/server/collab/mcp-bridge-entry.js"
       ],
-      "cwd": "/home/deck/Desktop/Scholomance-V12-main"
+      "cwd": "/home/deck/Downloads/Scholomance-V12-main"
     }
   }
 }
@@ -11957,8 +11957,8 @@ Merge into the existing JSON:
 ```toml
 [mcp_servers.scholomance-collab]
 command = "node"
-args = ["--env-file=/home/deck/Desktop/Scholomance-V12-main/.env", "/home/deck/Desktop/Scholomance-V12-main/codex/server/collab/mcp-bridge.js"]
-cwd = "/home/deck/Desktop/Scholomance-V12-main"
+args = ["--env-file=/home/deck/Downloads/Scholomance-V12-main/.env", "/home/deck/Downloads/Scholomance-V12-main/codex/server/collab/mcp-bridge-entry.js"]
+cwd = "/home/deck/Downloads/Scholomance-V12-main"
 ```
 
 ---
@@ -12556,5 +12556,3 @@ To ensure that beginners and incoming developers have a single, unified referenc
 - **Vowel Family**: A classification of vowel sounds (e.g., front, back, diphthong) that maps phonemes to specific magic schools.
 - **Weave**: The runtime system of execution threads, event paths, and state bindings.
 - **Zombie Bug**: A regression or legacy issue that is re-introduced into the codebase by an AI agent due to a lack of shared memory.
-
-

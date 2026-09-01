@@ -10,6 +10,7 @@
     "scholomance-collab": {
       "type": "local",
       "command": ["node", "--env-file=.env", "codex/server/collab/mcp-bridge-entry.js"],
+      "cwd": "/home/deck/Downloads/Scholomance-V12-main",
       "enabled": true
     },
     "scholomance-brain": {

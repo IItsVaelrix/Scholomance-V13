@@ -1,0 +1,81 @@
+asset lightning_scimitar canvas 64x64
+
+# v2 — rebuilt against a real reference (assets/ASSETS/reference/Sci.jpg).
+# v1 had no outline, a too-thin blade, no real cross-sectional shading, a
+# fussy 6-part hilt, and a lightning zigzag that overpowered the weapon
+# instead of reading as part of it. Fixed here: black outline pass, a wide
+# wedge blade with an outline -> mid-steel -> shadow-band -> highlight-band
+# layering (the highlight band carries the electric color itself, so the
+# "lightning" IS the blade's lit facet, not a scribble on top of it), and a
+# 4-shape hilt instead of 6 small fussy ones.
+
+palette {
+  outline_black = #0A0A0C
+  steel_mid     = #6B7686
+  steel_shadow  = #232A33
+  bolt_hi       = #BFE8FF
+  bolt_hot      = #FFFFFF
+  bolt_cyan     = #6EE7F4
+  hilt_maroon   = #6E1F22
+  hilt_gold     = #D8B84C
+  hilt_light    = #E8C77A
+}
+
+# Full silhouette, laid down first so a rim of it survives at every edge —
+# this single part is what makes the weapon read against any background.
+part blade_outline material darksteel {
+  path "M 16 48 Q 11 20 47 6 L 53 14 Q 31 43 14 52 Z" outline_black
+}
+
+# The true blade shape, inset ~2px inside the outline on every edge.
+part blade_fill material darksteel {
+  path "M 18 46 Q 14 22 46 9 L 50 13 Q 30 40 16 50 Z" steel_mid
+}
+
+# Shadow facet hugging the cutting edge (lower/outer side of the curve).
+part blade_shadow material darksteel {
+  path "M 50 13 Q 30 40 16 50 L 19 48 Q 28 34 46 15 Z" steel_shadow
+}
+
+# Highlight facet hugging the spine — carries the electric color, so the
+# blade's own lit edge doubles as the "lightning" instead of a separate
+# effect fighting the shading for attention.
+part blade_highlight material cyan_lightning {
+  path "M 18 46 Q 14 22 46 9 L 48 11 Q 18 26 21 48 Z" bolt_hi
+  glow radius 2
+}
+
+# Crisp specular glint right at the spine edge itself.
+part blade_hot_edge material silver {
+  line 18 46 24 33 bolt_hot
+  line 24 33 32 20 bolt_hot
+  line 32 20 46 9 bolt_hot
+}
+
+# One restrained crackle + spark cluster at the tip — an accent, not the
+# whole point.
+part blade_spark material cyan_lightning {
+  line 46 15 51 10 bolt_cyan
+  cell 51 10 bolt_hot
+  cell 52 11 bolt_cyan
+}
+
+part hilt_outline material ruby {
+  circle 17 51 radius 7 outline_black
+}
+
+part hilt_body material ruby {
+  circle 17 51 radius 6 hilt_maroon
+}
+
+# Gold wrap, a simple cross-band rather than many small separate rivets.
+part hilt_wrap material gold {
+  rect 12 49 10 2 hilt_gold
+  rect 16 46 2 10 hilt_gold
+}
+
+part hilt_highlight material gold {
+  circle 15 49 radius 2 hilt_light
+}
+
+export json svg phaser png aseprite

@@ -1,0 +1,252 @@
+# photo_1_lit-body.scdl — body only, 32x32.
+# Rows y>=23 of the original art (the dark hem mass that read as the
+# character's boots) are REMOVED here: they are replaced by the rigged leg
+# segments, not covered by them. Hanging legs below that mass made the figure
+# read boots -> legs -> boots (Vaelrix, correctly).
+
+asset photo_1_lit_body canvas 32x32
+
+palette {
+  linework_base = #000000
+  cloak_shadow  = #070707
+  cloak_base    = #161616
+  cloak_light   = #B4B4B4
+  hair_shadow   = #161616
+  hair_base     = #2B2B2B
+  hair_hi       = #8D8B8A
+  robe_shadow   = #0F0214
+  robe_base     = #2D0638
+  robe_hi       = #842176
+  staff_base    = #F3DD2E
+  staff_hi      = #FAFDDF
+  face_shadow   = #7E390B
+  face_base     = #BC5D1E
+  face_light    = #B1632F
+  face_hi       = #C97135
+  arm_shadow    = #7E390B
+  arm_base      = #BC5D1E
+  arm_hi        = #FFFFFF
+  eyes_shadow   = #0F0214
+  eyes_deep     = #2B2B2B
+  eyes_base     = #842176
+  eyes_light    = #BC5D1E
+  eyes_hi       = #FAFDDF
+}
+
+# Interior ink detail — eye sockets, mouth, fold lines. NOT a perimeter outline: this sprite has none. Material `source` so transmutation never tints it.
+part linework material source {
+  cell 12 10 linework_base
+  cell 13 10 linework_base
+  cell 13 11 linework_base
+  cell 17 11 linework_base
+  cell 13 12 linework_base
+  rect 18 12 4 1 linework_base
+  cell 14 13 linework_base
+  cell 18 13 linework_base
+  cell 22 13 linework_base
+  cell 15 14 linework_base
+  cell 17 14 linework_base
+  cell 19 21 linework_base
+  cell 21 21 linework_base
+  cell 19 22 linework_base
+  cell 22 22 linework_base
+}
+
+# Dark cloak mass. 3 tones on the void_cloth ramp: a shadow tone on the right-hand hem/hip cells, a rim-light tone on the true silhouette edge of the left-hand hem (cells whose left neighbour is empty canvas), base unchanged everywhere else. Same light direction Vaelrix's own hand pass already put on the face (face_hi at x=14) and arm (arm_hi at x=12). An earlier pass lit a third of the part by raw x-rank instead of true edges and washed out a pale patch across interior cells hidden behind the hair — reverted after a zoomed render caught it; only 10 of 64 cells are lit, all on the actual silhouette boundary.
+part cloak material void_cloth {
+  cell 13 7 cloak_base
+  cell 13 8 cloak_base
+  cell 15 8 cloak_base
+  cell 13 9 cloak_base
+  cell 16 9 cloak_base
+  cell 18 9 cloak_base
+  cell 23 14 cloak_shadow
+  cell 18 15 cloak_base
+  cell 19 15 cloak_base
+  cell 23 15 cloak_shadow
+  cell 12 16 cloak_light
+  cell 13 16 cloak_base
+  cell 17 16 cloak_base
+  cell 18 16 cloak_base
+  cell 23 16 cloak_shadow
+  cell 11 17 cloak_light
+  cell 14 17 cloak_base
+  cell 17 17 cloak_base
+  cell 23 17 cloak_shadow
+  cell 11 18 cloak_light
+  cell 14 18 cloak_base
+  cell 17 18 cloak_base
+  cell 22 18 cloak_shadow
+  cell 12 19 cloak_light
+  cell 13 19 cloak_base
+  cell 14 19 cloak_base
+  rect 18 19 3 1 cloak_base
+  cell 21 19 cloak_shadow
+  cell 22 19 cloak_shadow
+  cell 24 19 cloak_shadow
+  cell 15 20 cloak_light
+  rect 17 20 3 1 cloak_base
+  cell 21 20 cloak_shadow
+  cell 24 20 cloak_shadow
+  cell 15 21 cloak_light
+  cell 17 21 cloak_base
+  cell 23 21 cloak_shadow
+  cell 24 21 cloak_shadow
+  cell 15 22 cloak_light
+  cell 17 22 cloak_base
+  cell 24 22 cloak_shadow
+}
+
+# Crown, left sweep, and right-side fall.
+part hair material hair_black {
+  cell 13 4 hair_base
+  rect 15 4 5 1 hair_base
+  cell 12 5 hair_base
+  rect 13 5 3 1 hair_hi
+  cell 16 5 hair_base
+  cell 17 5 hair_hi
+  cell 18 5 hair_hi
+  cell 19 5 hair_base
+  cell 20 5 hair_base
+  cell 11 6 hair_base
+  cell 12 6 hair_hi
+  cell 13 6 hair_hi
+  cell 14 6 hair_shadow
+  cell 15 6 hair_shadow
+  cell 16 6 hair_hi
+  cell 17 6 hair_shadow
+  cell 18 6 hair_shadow
+  cell 19 6 hair_hi
+  cell 20 6 hair_hi
+  cell 21 6 hair_base
+  cell 11 7 hair_base
+  cell 12 7 hair_hi
+  cell 14 7 hair_hi
+  cell 15 7 hair_hi
+  cell 16 7 hair_base
+  cell 17 7 hair_hi
+  cell 18 7 hair_hi
+  cell 19 7 hair_base
+  cell 20 7 hair_hi
+  cell 21 7 hair_base
+  cell 11 8 hair_base
+  cell 12 8 hair_hi
+  cell 14 8 hair_hi
+  cell 16 8 hair_base
+  cell 17 8 hair_hi
+  cell 18 8 hair_base
+  cell 19 8 hair_base
+  cell 20 8 hair_hi
+  cell 21 8 hair_hi
+  cell 22 8 hair_base
+  cell 12 9 hair_base
+  cell 14 9 hair_base
+  cell 17 9 hair_base
+  cell 19 9 hair_base
+  cell 20 9 hair_base
+  cell 21 9 hair_hi
+  cell 22 9 hair_base
+  cell 17 10 hair_base
+  cell 19 10 hair_base
+  cell 20 10 hair_base
+  cell 21 10 hair_hi
+  cell 22 10 hair_hi
+  cell 19 11 hair_base
+  cell 20 11 hair_hi
+  cell 21 11 hair_base
+  cell 22 11 hair_hi
+  cell 23 11 hair_base
+  cell 22 12 hair_hi
+  cell 23 12 hair_hi
+  cell 20 13 hair_base
+  cell 21 13 hair_base
+  cell 23 13 hair_hi
+  cell 24 13 hair_base
+  cell 19 14 hair_base
+  cell 20 14 hair_hi
+  cell 21 14 hair_hi
+  cell 22 14 hair_base
+  cell 24 14 hair_hi
+  cell 24 15 hair_hi
+  cell 24 16 hair_hi
+  cell 24 17 hair_hi
+  cell 15 18 hair_base
+  cell 16 18 hair_base
+  cell 23 18 hair_hi
+  cell 24 18 hair_base
+  cell 15 19 hair_hi
+  cell 16 19 hair_hi
+  cell 23 19 hair_hi
+  cell 23 20 hair_base
+  cell 20 21 hair_hi
+  cell 20 22 hair_base
+  cell 21 22 hair_hi
+}
+
+# Purple robe body.
+part robe material void_cloth {
+  cell 20 15 robe_hi
+  cell 21 15 robe_hi
+  cell 22 15 robe_base
+  cell 15 16 robe_base
+  cell 19 16 robe_hi
+  rect 20 16 3 1 robe_base
+  cell 18 17 robe_hi
+  rect 19 17 4 1 robe_base
+  cell 18 18 robe_hi
+  rect 19 18 3 1 robe_base
+  cell 18 22 robe_shadow
+}
+
+# Gold vertical staff.
+part staff material gold {
+  cell 14 16 staff_base
+  cell 16 16 staff_base
+  cell 16 17 staff_hi
+  cell 17 19 staff_base
+  cell 16 21 staff_base
+  cell 18 21 staff_base
+  cell 16 22 staff_hi
+}
+
+# Head skin. Hand-authored by Vaelrix 2026-08-30 (30-minute pass) — kept verbatim.
+part face material skin_medium {
+  cell 14 10 face_hi
+  cell 18 10 face_base
+  cell 14 11 face_hi
+  cell 18 11 face_shadow
+  rect 14 12 3 1 face_light
+  cell 17 12 face_base
+  cell 15 13 face_light
+  cell 16 13 face_base
+  cell 17 13 face_base
+  cell 19 13 face_base
+  cell 18 14 face_base
+  rect 15 15 3 1 face_shadow
+}
+
+# Extended arm and gripping hand, y>=16. Includes the white specular accent.
+part arm material skin_medium {
+  cell 12 17 arm_hi
+  cell 13 17 arm_shadow
+  cell 15 17 arm_base
+  cell 12 18 arm_shadow
+  cell 13 18 arm_base
+  cell 16 20 arm_base
+}
+
+# Eye and brow region, hand-authored by Vaelrix 2026-08-30. The part that made the head finally read.
+part eyes material eye_void_glow {
+  cell 14 4 eyes_deep
+  cell 15 9 eyes_base
+  cell 15 10 eyes_base
+  cell 16 10 eyes_hi
+  cell 23 10 eyes_deep
+  cell 15 11 eyes_base
+  cell 16 11 eyes_hi
+  cell 24 12 eyes_deep
+  cell 16 14 eyes_light
+  cell 14 15 eyes_shadow
+}
+
+export json png

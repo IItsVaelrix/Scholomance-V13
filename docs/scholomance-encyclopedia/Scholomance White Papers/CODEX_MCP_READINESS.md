@@ -10,13 +10,13 @@ This checklist verifies that Codex can use the Scholomance Collab MCP as an acti
 ## Canonical Workspace
 
 ```text
-/home/deck/Desktop/Scholomance-V12-main
+/home/deck/Downloads/Scholomance-V12-main
 ```
 
 All Codex/OpenCode MCP configuration for this checkout should use that path as `cwd` and should point the bridge at:
 
 ```text
-/home/deck/Desktop/Scholomance-V12-main/codex/server/collab/mcp-bridge.js
+/home/deck/Downloads/Scholomance-V12-main/codex/server/collab/mcp-bridge-entry.js
 ```
 
 ## Codex Config
@@ -26,14 +26,14 @@ Reference entry for `~/.codex/config.toml`:
 ```toml
 [mcp_servers.scholomance-collab]
 command = "node"
-args = ["--env-file=/home/deck/Desktop/Scholomance-V12-main/.env", "/home/deck/Desktop/Scholomance-V12-main/codex/server/collab/mcp-bridge.js"]
-cwd = "/home/deck/Desktop/Scholomance-V12-main"
+args = ["--env-file=/home/deck/Downloads/Scholomance-V12-main/.env", "/home/deck/Downloads/Scholomance-V12-main/codex/server/collab/mcp-bridge-entry.js"]
+cwd = "/home/deck/Downloads/Scholomance-V12-main"
 ```
 
 If the host does not inherit the correct shell `PATH`, replace `command = "node"` with the pinned runtime:
 
 ```toml
-command = "/home/deck/.nvm/versions/node/v24.14.1/bin/node"
+command = "/home/deck/.nvm/versions/node/v20.20.2/bin/node"
 ```
 
 ## Probe

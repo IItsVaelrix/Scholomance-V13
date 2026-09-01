@@ -46,8 +46,16 @@ function createFakeServer() {
         resource(name, uri, handler) {
             resources.set(name, { uri, handler });
         },
-        tool(name, schema, handler) {
-            tools.set(name, { schema, handler });
+        tool(name, ...rest) {
+            // Real SDK overloads: tool(name, schema, cb) or tool(name, description, schema, cb).
+            // A string second argument means the description form was used.
+            if (typeof rest[0] === 'string') {
+                const [description, schema, handler] = rest;
+                tools.set(name, { description, schema, handler });
+            } else {
+                const [schema, handler] = rest;
+                tools.set(name, { schema, handler });
+            }
         },
     };
 }
@@ -85,6 +93,21 @@ describe('collab MCP bridge parity', () => {
         fakeServer = createFakeServer();
         service = createMockService();
         registerCollabMcpBridge(fakeServer, service);
+    });
+
+    it('gives the skill tools a real description, so they are findable by keyword search, not just exact name', () => {
+        // A tool with no description is registered via the 3-arg SDK overload
+        // and can only be found by matching its exact name — the gap that let
+        // "scholomancecompile" search miss this tool even once it existed.
+        for (const name of [
+            'mcp_scholomance_collab_skill_scholomance_knowledge',
+            'mcp_scholomance_collab_skill_scholomance_compile_knowledge',
+        ]) {
+            const registered = fakeServer.tools.get(name);
+            expect(registered).toBeDefined();
+            expect(typeof registered.description).toBe('string');
+            expect(registered.description.length).toBeGreaterThan(20);
+        }
     });
 
     it('registers the required PDR resources and tools', () => {

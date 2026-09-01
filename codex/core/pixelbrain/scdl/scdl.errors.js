@@ -45,6 +45,11 @@ export const SCDL_ERROR_CODES = Object.freeze({
   DEAD_DEF:              0x1015, // def declared but never instanced (warn)
 
   ILLEGAL_CHARACTER:     0x1016, // character legal in no token — was silently dropped
+
+  BOOLEAN_OP_ARITY:        0x1017, // union/subtract/intersect given fewer than 2 targets
+  SEMANTIC_ROLE_CONFLICT:  0x1018, // intersect combines cells with conflicting semantic roles (warn)
+  UNKNOWN_COLOR_REF_KIND:  0x1019, // colorRef.kind is not hex/alias/palette
+  INVALID_BOOLEAN_TARGET:  0x101A, // union/subtract/intersect target is not another existing part id
 });
 
 const SCDL_CODE_LABELS = Object.freeze({
@@ -72,6 +77,11 @@ const SCDL_CODE_LABELS = Object.freeze({
   [SCDL_ERROR_CODES.DEAD_INSTANCE]:         'SCDL-020',
   [SCDL_ERROR_CODES.DEAD_DEF]:              'SCDL-021',
   [SCDL_ERROR_CODES.ILLEGAL_CHARACTER]:     'SCDL-022',
+
+  [SCDL_ERROR_CODES.BOOLEAN_OP_ARITY]:      'SCDL-023',
+  [SCDL_ERROR_CODES.SEMANTIC_ROLE_CONFLICT]: 'SCDL-024',
+  [SCDL_ERROR_CODES.UNKNOWN_COLOR_REF_KIND]: 'SCDL-025',
+  [SCDL_ERROR_CODES.INVALID_BOOLEAN_TARGET]: 'SCDL-026',
 });
 
 // ─── SCDLError Class ─────────────────────────────────────────────────────────
