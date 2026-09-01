@@ -1,8 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Python Chatbot
-Comment=Launch the Python chatbot desktop app
-Exec=bash -c "cd /home/deck/Downloads/Scholomance-V12-main/nlp_chatbot && source venv/bin/activate && export PYTHONPATH=. && python -m client.launcher"
-Icon=utilities-terminal
-Terminal=false
-Categories=Utility;Chat;

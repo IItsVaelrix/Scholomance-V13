@@ -120,8 +120,6 @@
     "polish:ci": "node scripts/production-polish.js full --ci",
     "scd64:intellisense": "npx tsx scripts/scd64-intellisense.ts",
     "scd64:nav-export": "npx tsx scripts/scd64-nav-export.mjs",
-    "chatbot": "cd nlp_chatbot && ./venv/bin/uvicorn server.api:app --reload --port 8000",
-    "chatbot:app": "cd nlp_chatbot && ./venv/bin/python client/terminal.py",
     "vaelrix": "bash scripts/launch-vaelrix.sh",
     "vaelrix:web": "bash scripts/launch-vaelrix.sh -- --web --port 8080",
     "vaelrix:daemon": "node --env-file=.env scripts/dev-with-collab-reuse.js --brain-only",
