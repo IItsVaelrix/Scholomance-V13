@@ -12,6 +12,11 @@ from tui.services.memory_service import MemoryService
 from tui.services.tool_service import ToolService
 from tui.utils.throttle import llm_throttle
 from tui.services.token_meter import meter
+from tui.services.prompt_service import (
+    PromptService,
+    _cacheable_system_message,
+    _with_history_cache_breakpoint,
+)
 
 
 # ── model price classification ──────────────────────────────────────
@@ -158,15 +163,25 @@ class ContentCriticService:
             system_prompt = base_prompt + f"\n\n{memory_context}\n\nCRITIQUE INSTRUCTIONS:\nCritique the provided video JSON against the above framework and output your analysis following the exact 'Report Template' format. Use tools if necessary."
 
             messages = [
-                {"role": "system", "content": system_prompt},
+                _cacheable_system_message(system_prompt),
                 {"role": "user", "content": f"Critique this video JSON:\n\n{content_json}"}
             ]
 
             def do_api_call(msgs, use_tools=True):
-                kwargs = {"model": model_name, "messages": msgs}
+                kwargs = {"model": model_name, "messages": _with_history_cache_breakpoint(msgs)}
                 if use_tools and hasattr(self, "tools") and self.tools.tools:
                     import copy
-                    safe_tools = copy.deepcopy(self.tools.tools)
+                    # Scoped to the same CORE_TOOL_NAMES the main agent loop
+                    # advertises (see PromptService._select_tools) instead of
+                    # the full ~58-tool catalog — the critic doesn't need
+                    # bug/task tracking, law/immunity, or raw exec tools, and
+                    # resending the full schema every turn (up to MAX_TURNS)
+                    # was a real chunk of the per-turn token tax.
+                    core_only = [
+                        t for t in self.tools.tools
+                        if t.get("function", {}).get("name") in PromptService.CORE_TOOL_NAMES
+                    ]
+                    safe_tools = copy.deepcopy(core_only or self.tools.tools)
                     def _strip_custom(d):
                         if isinstance(d, dict):
                             d.pop("default", None)
@@ -205,6 +220,19 @@ class ContentCriticService:
                 MAX_TURNS = 50
                 use_tools = True
                 for turn in range(MAX_TURNS):
+                    if meter.is_over_budget():
+                        # Same shared meter/budget the main agent loop guards
+                        # (see PromptService's turn loop) — this critique
+                        # loop fed the same .aether_meter.json but nothing
+                        # here ever checked it, so a runaway critique could
+                        # keep spending past the configured budget.
+                        callback(
+                            f"[red]Aether budget exceeded (${meter.budget_usd:.2f}).[/] "
+                            f"Stopping before another API call. Use /budget to raise it "
+                            f"or /budget reset to clear spend.",
+                            success=False, is_final=True,
+                        )
+                        return
                     try:
                         llm_throttle.wait()
                         res_json = do_api_call(messages, use_tools)
