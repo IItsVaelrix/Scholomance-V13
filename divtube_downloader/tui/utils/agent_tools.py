@@ -60,7 +60,7 @@ class PatchResult:
 
 
 @dataclass
-class TestResult:
+class AgentToolResult:
     """Result of run_targeted_tests()."""
 
     success: bool
@@ -407,7 +407,7 @@ def run_targeted_tests(
     *,
     pattern: str = "test*.py",
     timeout: int = 120,
-) -> TestResult:
+) -> AgentToolResult:
     """
     Run targeted Python tests using unittest discovery.
 
@@ -437,14 +437,14 @@ def run_targeted_tests(
             timeout=timeout,
             cwd=divtube_root,
         )
-        return TestResult(
+        return AgentToolResult(
             success=proc.returncode == 0,
             stdout=proc.stdout,
             stderr=proc.stderr,
             returncode=proc.returncode,
         )
     except subprocess.TimeoutExpired as e:
-        return TestResult(
+        return AgentToolResult(
             success=False,
             stdout=e.stdout or "",
             stderr=e.stderr or "",

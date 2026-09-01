@@ -53,8 +53,8 @@ from tui.services.scd64_service import scd64_service
 from tui.services.substrate_osmosis_service import SubstrateOsmosisService
 from tui.services.env_config import write_key, set_active_key, set_provider, get_active_provider
 from tui.screens.video_forge_screen import VideoForgeScreen
-from tui.widgets.log_tail_widget import LogTailWidget
-from tui.widgets.registry_inspector_widget import RegistryInspectorWidget
+from tui.ui.widgets.log_tail_widget import LogTailWidget
+from tui.ui.widgets.registry_inspector_widget import RegistryInspectorWidget
 
 # ── Scholomance palette ──────────────────────────────────────────────
 # Obsidian · Purple · Crimson — derived from the ONE source of truth

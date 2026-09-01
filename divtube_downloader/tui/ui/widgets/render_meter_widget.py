@@ -1,15 +1,15 @@
+"""Render progress meter for VideoForge.
+
+All colours resolve through theme.palette() — no raw hex in this file, so the
+widget follows a theme switch instead of staying pinned to one palette.
+"""
+
 from textual.widgets import Static
 from textual.app import RenderResult
 from rich.text import Text
 from rich.style import Style
 
-GOLD = "#FFD700"
-PURPLE = "#B388FF"
-MUTED = "#6A5A6A"
-SUCCESS = "#7CFF8B"
-WARNING = "#FFD166"
-CRIMSON = "#DC143C"
-OBSIDIAN = "#0D0D0D"
+from tui.ui.theme import palette
 
 
 class RenderMeterWidget(Static):
@@ -20,6 +20,10 @@ class RenderMeterWidget(Static):
         self._render_id = ""
         self._progress = 0.0
         self._message = ""
+
+    @property
+    def _p(self):
+        return palette(getattr(self.app, "THEME_NAME", None))
 
     def set_render_state(self, status: str, preset: str = "", render_id: str = "",
                          progress: float = 0.0, message: str = ""):
@@ -39,14 +43,17 @@ class RenderMeterWidget(Static):
         self.refresh()
 
     def render(self) -> RenderResult:
+        p = self._p
+        muted = p["muted"]
+
         if self._status == "idle":
-            return Text(" ⏸  Render idle. Use /forge export <preset> to start.", style=Style(color=MUTED))
+            return Text(" ⏸  Render idle. Use /forge export <preset> to start.", style=Style(color=muted))
 
         status_color = {
-            "rendering": WARNING,
-            "completed": SUCCESS,
-            "failed": CRIMSON,
-        }.get(self._status, MUTED)
+            "rendering": p["warning"],
+            "completed": p["success"],
+            "failed": p["accent_primary"],
+        }.get(self._status, muted)
 
         bar_width = 30
         filled = int(self._progress * bar_width)
@@ -54,13 +61,15 @@ class RenderMeterWidget(Static):
         pct = f"{int(self._progress * 100)}%"
 
         lines = Text.assemble(
-            (f" {bar}", Style(color=status_color, bgcolor=OBSIDIAN)),
-            (f" {pct:>4} ", Style(color=GOLD)),
+            (f" {bar}", Style(color=status_color, bgcolor=p["background"])),
+            (f" {pct:>4} ", Style(color=p["highlight"])),
             "\n",
-            (f" {status_color}{self._status.upper()}[/] ", Style(color=status_color)),
-            (f"{self._preset}", Style(color=PURPLE)),
-            (f" [{self._render_id[:8]}]", Style(color=MUTED)) if self._render_id else Text(""),
+            # The Style already carries the colour; the status text must not
+            # also interpolate it, or the palette value prints as literal text.
+            (f" {self._status.upper()} ", Style(color=status_color)),
+            (f"{self._preset}", Style(color=p["accent_tertiary"])),
+            (f" [{self._render_id[:8]}]", Style(color=muted)) if self._render_id else Text(""),
             "\n" if self._message else Text(""),
-            (f" {self._message}", Style(color=MUTED)) if self._message else Text(""),
+            (f" {self._message}", Style(color=muted)) if self._message else Text(""),
         )
         return lines

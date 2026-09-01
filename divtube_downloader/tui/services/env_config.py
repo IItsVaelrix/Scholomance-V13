@@ -106,6 +106,16 @@ def get_config():
 _OPENAI_CLIENTS = {}
 
 
+# The SDK default (no timeout=) is 600s per request attempt — a wedged
+# provider freezes the whole Textual cockpit (prompt_service.py calls
+# .create() synchronously off the UI thread's turn loop) for up to 10
+# minutes. 120s comfortably covers a slow completion with a large tool
+# schema without leaving the app hung for that long. max_retries matches
+# the SDK's own default (2); set explicitly so it isn't silently implicit.
+_OPENAI_CLIENT_TIMEOUT_S = 120.0
+_OPENAI_CLIENT_MAX_RETRIES = 2
+
+
 def get_openai_client(base_url, api_key):
     """Cached OpenAI SDK client per (base_url, api_key) so switching providers
     mid-session never reuses stale credentials. base_url already ends in /v1 (or a
@@ -120,6 +130,8 @@ def get_openai_client(base_url, api_key):
         client = OpenAI(
             api_key=api_key,
             base_url=base_url,
+            timeout=_OPENAI_CLIENT_TIMEOUT_S,
+            max_retries=_OPENAI_CLIENT_MAX_RETRIES,
             # OpenRouter reads these for app attribution/ranking; harmless elsewhere.
             default_headers={
                 "HTTP-Referer": "https://github.com/DivTube",

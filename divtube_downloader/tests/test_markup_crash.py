@@ -47,7 +47,7 @@ class TestLogTailMarkupSafety(unittest.TestCase):
 
     def test_render_line_escapes_crashers(self):
         from rich.text import Text
-        from tui.widgets.log_tail_widget import LogTailWidget
+        from tui.ui.widgets.log_tail_widget import LogTailWidget
 
         for msg in CRASHERS:
             rendered = LogTailWidget._format_line("app.log", msg)
@@ -58,7 +58,7 @@ class TestLogTailMarkupSafety(unittest.TestCase):
 
     def test_safe_write_survives_crashers(self):
         async def run():
-            from tui.widgets.log_tail_widget import LogTailWidget
+            from tui.ui.widgets.log_tail_widget import LogTailWidget
 
             # Instantiate DivTubeAgentApp directly, never a local subclass:
             # Textual resolves CSS_PATH relative to the module that DEFINES the

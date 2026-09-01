@@ -213,9 +213,17 @@ HEX_EXEMPT: set = set()
 
 
 def test_no_raw_hex_in_ui_outside_theme():
-    ui_dir = _DT / "tui" / "ui"
+    # Scope covers every UI-RENDERING tree, not just tui/ui. tui/screens holds
+    # VideoForgeScreen, a live surface (mounted from tui/ui/app.py) that sat
+    # outside the original tui/ui-only scan and was pinned to obsidian_crimson
+    # literals, so it did not follow a theme switch. The widgets it mounts used
+    # to live in a second tree at tui/widgets; they now sit in tui/ui/widgets,
+    # inside this scan. The service layer is deliberately NOT in scope: its
+    # Rich-markup constants are separate debt, and pulling it in here would only
+    # buy a large HEX_EXEMPT list, which this guard exists to shrink.
+    ui_dirs = [_DT / "tui" / "ui", _DT / "tui" / "screens"]
     offenders = {}
-    for py in ui_dir.rglob("*.py"):
+    for py in (p for d in ui_dirs for p in d.rglob("*.py")):
         if py.name in HEX_EXEMPT or py.name == "theme.py":
             continue
         hits = []

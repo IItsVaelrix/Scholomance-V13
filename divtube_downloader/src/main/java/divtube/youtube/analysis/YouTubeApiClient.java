@@ -28,7 +28,14 @@ public class YouTubeApiClient {
     public JsonNode get(String endpoint, String params, int quotaCost) throws Exception {
         if (!hasApiKey()) throw new RuntimeException("Missing YOUTUBE_API_KEY in environment variables.");
         
-        try { Thread.sleep(1500); } catch (InterruptedException ignored) {}
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            // Restore the flag: swallowing it here would let cancel()/shutdown
+            // hang forever, since nothing downstream would ever see the interrupt.
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while throttling YouTube API request", e);
+        }
         
         String url = YouTubeAnalysisConfig.API_BASE_URL + endpoint + "?key=" + apiKey + "&" + params;
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();

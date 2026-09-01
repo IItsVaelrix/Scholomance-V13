@@ -240,26 +240,49 @@ class TestCrossReference(unittest.TestCase):
         )
 
 
+def _without_worktree_dirt(payload):
+    """telemetry.dirty/dirtyFiles come from an intentionally uncached live
+    `git status` probe against PROJECT_ROOT (atlas_sqlite.is_stale's
+    docstring: "freshness is not a thing to memoize") — real environmental
+    state, not something telescope() computes deterministically from the
+    target directory. Comparing it across a 100-iteration loop makes the
+    test flake whenever anything touches the live working tree mid-run
+    (e.g. a concurrent edit), which asserts nothing about telescope()'s own
+    determinism. Strip it so the test only compares what telescope()
+    actually controls.
+    """
+    payload = json.loads(json.dumps(payload))  # deep copy
+    telemetry = payload.get("telemetry")
+    if isinstance(telemetry, dict):
+        telemetry.pop("dirty", None)
+        telemetry.pop("dirtyFiles", None)
+    return payload
+
+
 class TestDeterminismStress(unittest.TestCase):
     def test_telescope_100_iterations_identical(self):
         target = "divtube_downloader/tui/services"
         first = json.dumps(
-            code_lens.telescope(PROJECT_ROOT, target, max_depth=1), sort_keys=True
+            _without_worktree_dirt(code_lens.telescope(PROJECT_ROOT, target, max_depth=1)),
+            sort_keys=True,
         )
         for _ in range(99):
             again = json.dumps(
-                code_lens.telescope(PROJECT_ROOT, target, max_depth=1), sort_keys=True
+                _without_worktree_dirt(code_lens.telescope(PROJECT_ROOT, target, max_depth=1)),
+                sort_keys=True,
             )
             self.assertEqual(first, again)
 
     def test_microscope_100_iterations_identical(self):
         target = "divtube_downloader/tui/services/harness_tools.py"
         first = json.dumps(
-            code_lens.microscope(PROJECT_ROOT, target), sort_keys=True
+            _without_worktree_dirt(code_lens.microscope(PROJECT_ROOT, target)),
+            sort_keys=True,
         )
         for _ in range(99):
             again = json.dumps(
-                code_lens.microscope(PROJECT_ROOT, target), sort_keys=True
+                _without_worktree_dirt(code_lens.microscope(PROJECT_ROOT, target)),
+                sort_keys=True,
             )
             self.assertEqual(first, again)
 

@@ -20,9 +20,4 @@ public class DownloadRequest {
     public String getFormat() { return format; }
     public String getSaveLocation() { return saveLocation; }
     public boolean userConfirmedRights() { return userConfirmedRights; }
-    
-    public boolean urlRequiresLoginKnown() {
-        // Implement deterministic static checks for login-required URLs (e.g. member links)
-        return false;
-    }
 }

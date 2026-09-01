@@ -4,11 +4,14 @@ import divtube.process.ProcessRunner;
 import divtube.process.ProcessResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.file.Path;
 
 public class YtDlpProvider implements DownloadProvider {
     private final ProcessRunner processRunner;
     private final ObjectMapper mapper;
-    private Process currentProcess;
+    // Written on the download thread, read by cancel() from the UI thread —
+    // volatile for safe cross-thread publication under the JMM.
+    private volatile Process currentProcess;
 
     public YtDlpProvider() {
         this.processRunner = new ProcessRunner();
@@ -45,6 +48,11 @@ public class YtDlpProvider implements DownloadProvider {
 
             return new VideoMetadata(title, channel, duration, thumbnail);
 
+        } catch (DownloadException e) {
+            // Already the right type with the right message (e.g. "This video
+            // requires login or is private.") — don't re-wrap and blur it
+            // into a generic "Analyze process failed: ..." string.
+            throw e;
         } catch (Exception e) {
             throw new DownloadException("Analyze process failed: " + e.getMessage(), e);
         }
@@ -70,7 +78,7 @@ public class YtDlpProvider implements DownloadProvider {
         command.add("--no-cookies");
         command.add("--no-cookies-from-browser");
         command.add("-o");
-        command.add(request.getSaveLocation() + "/%(title)s.%(ext)s");
+        command.add(Path.of(request.getSaveLocation(), "%(title)s.%(ext)s").toString());
         command.add(request.getUrl());
 
         try {
@@ -82,6 +90,11 @@ public class YtDlpProvider implements DownloadProvider {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new DownloadException("Download was interrupted.");
+        } catch (DownloadException e) {
+            // Same symmetry fix as analyze(): don't blur an already-correct
+            // message (e.g. "Download process exited with code 5") into a
+            // generic "Download execution failed: ..." wrapper.
+            throw e;
         } catch (Exception e) {
             throw new DownloadException("Download execution failed: " + e.getMessage(), e);
         } finally {

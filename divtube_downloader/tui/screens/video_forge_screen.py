@@ -1,3 +1,10 @@
+"""VideoForge screen.
+
+All colours resolve through theme.py — markup via theme.palette(), CSS via
+the app's $tokens (get_css_variables) — so this surface follows a theme
+switch instead of staying pinned to one palette.
+"""
+
 from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.containers import Horizontal, Vertical
@@ -6,52 +13,57 @@ from rich.text import Text
 from rich.style import Style
 import shlex
 
-from tui.widgets.timeline_widget import TimelineWidget
-from tui.widgets.media_bin_widget import MediaBinWidget
-from tui.widgets.render_meter_widget import RenderMeterWidget
+from tui.ui.theme import palette
+from tui.ui.widgets.timeline_widget import TimelineWidget
+from tui.ui.widgets.media_bin_widget import MediaBinWidget
+from tui.ui.widgets.render_meter_widget import RenderMeterWidget
 
-GOLD = "#FFD700"
-PURPLE = "#B388FF"
-MUTED = "#6A5A6A"
-SUCCESS = "#7CFF8B"
-WARNING = "#FFD166"
-CRIMSON = "#DC143C"
-OBSIDIAN = "#0D0D0D"
-PANEL_BG = "#161616"
+_FORGE_COMMANDS = [
+    ("new", "Create new project"),
+    ("import", "Import media into bin"),
+    ("timeline", "Show timeline"),
+    ("trim", "Trim clip in/out"),
+    ("split", "Split clip at time"),
+    ("delete", "Remove clip from timeline"),
+    ("transition", "Add transition between clips"),
+    ("effect", "Apply effect to clip"),
+    ("export", "Render project to file"),
+    ("presets", "List export presets"),
+    ("effects", "List available effects"),
+    ("transitions", "List available transitions"),
+    ("recipe", "Dump full project JSON"),
+    ("apply", "Load modified recipe file"),
+    ("ledger", "Show render history"),
+    ("add-title", "Add title card"),
+    ("add-caption", "Add caption overlay"),
+    ("add-credit", "Add credit card"),
+    ("snapshot", "Save project snapshot"),
+    ("freeze", "Freeze frame"),
+    ("music", "Add background music"),
+    ("narration", "Add narration track"),
+    ("mute", "Mute track"),
+    ("detach-audio", "Detach audio from clip"),
+    ("duplicate", "Duplicate clip"),
+    ("move", "Move clip on timeline"),
+    ("list", "List saved projects"),
+    ("open", "Open saved project"),
+    ("project", "Show current project info"),
+]
 
-FORGE_HELP_TEXT = """[#B388FF]FORGE COMMANDS[/]
-  [#FFD700]new[/]             Create new project
-  [#FFD700]import[/]          Import media into bin
-  [#FFD700]timeline[/]        Show timeline
-  [#FFD700]trim[/]            Trim clip in/out
-  [#FFD700]split[/]           Split clip at time
-  [#FFD700]delete[/]          Remove clip from timeline
-  [#FFD700]transition[/]      Add transition between clips
-  [#FFD700]effect[/]          Apply effect to clip
-  [#FFD700]export[/]          Render project to file
-  [#FFD700]presets[/]         List export presets
-  [#FFD700]effects[/]         List available effects
-  [#FFD700]transitions[/]     List available transitions
-  [#FFD700]recipe[/]          Dump full project JSON
-  [#FFD700]apply[/]           Load modified recipe file
-  [#FFD700]ledger[/]          Show render history
-  [#FFD700]add-title[/]       Add title card
-  [#FFD700]add-caption[/]     Add caption overlay
-  [#FFD700]add-credit[/]      Add credit card
-  [#FFD700]snapshot[/]        Save project snapshot
-  [#FFD700]freeze[/]          Freeze frame
-  [#FFD700]music[/]           Add background music
-  [#FFD700]narration[/]       Add narration track
-  [#FFD700]mute[/]            Mute track
-  [#FFD700]detach-audio[/]    Detach audio from clip
-  [#FFD700]duplicate[/]       Duplicate clip
-  [#FFD700]move[/]            Move clip on timeline
-  [#FFD700]list[/]            List saved projects
-  [#FFD700]open[/]            Open saved project
-  [#FFD700]project[/]         Show current project info"""
+
+def _forge_help_markup(p) -> str:
+    """Command help, coloured from the active palette rather than baked in."""
+    head = f"[{p['accent_tertiary']}]FORGE COMMANDS[/]"
+    rows = [
+        f"  [{p['highlight']}]{name}[/]{' ' * max(1, 16 - len(name))}{desc}"
+        for name, desc in _FORGE_COMMANDS
+    ]
+    return "\n".join([head, *rows])
 
 
 class VideoForgeScreen(Screen):
+    # $tokens resolve from the app's active theme via get_css_variables —
+    # theme.py stays the single source of truth for this screen's chrome too.
     CSS = '''
     #forge-left {
         width: 2fr;
@@ -61,20 +73,20 @@ class VideoForgeScreen(Screen):
     }
     #forge-terminal-input {
         dock: bottom;
-        border: round #DC143C;
-        background: #000000;
-        color: #FFD700;
+        border: round $accent-primary;
+        background: $background;
+        color: $highlight;
         text-style: bold;
         margin-top: 1;
         height: 3;
     }
     #forge-terminal-input:focus {
-        border: round #FFD700;
+        border: round $highlight;
     }
     #forge-command-list {
         height: 10;
-        border: round #8B5CF6;
-        background: #161616;
+        border: round $accent-secondary;
+        background: $surface;
         padding: 0 1;
         margin-top: 1;
         overflow-y: auto;
@@ -90,6 +102,10 @@ class VideoForgeScreen(Screen):
         super().__init__()
         self._service = service
         self._log_fn = log_fn
+
+    @property
+    def _p(self):
+        return palette(getattr(self.app, "THEME_NAME", None))
 
     def action_go_back(self):
         self.dismiss()
@@ -117,20 +133,22 @@ class VideoForgeScreen(Screen):
         yield Footer()
 
     def on_mount(self):
+        p = self._p
+        section = Style(color=p["accent_tertiary"], bold=True)
         self.query_one("#forge-title", Static).update(
-            Text("✦  V I D E O   F O R G E  ✦", style=Style(color=GOLD, bold=True))
+            Text("✦  V I D E O   F O R G E  ✦", style=Style(color=p["highlight"], bold=True))
         )
         self.query_one("#forge-media-label", Static).update(
-            Text("\n📦 MEDIA BIN", style=Style(color=PURPLE, bold=True))
+            Text("\n📦 MEDIA BIN", style=section)
         )
         self.query_one("#forge-timeline-label", Static).update(
-            Text("\n⏱ TIMELINE", style=Style(color=PURPLE, bold=True))
+            Text("\n⏱ TIMELINE", style=section)
         )
         self.query_one("#forge-render-label", Static).update(
-            Text("\n⚡ RENDER", style=Style(color=PURPLE, bold=True))
+            Text("\n⚡ RENDER", style=section)
         )
         self.query_one("#forge-command-list", Static).update(
-            Text.from_markup(FORGE_HELP_TEXT)
+            Text.from_markup(_forge_help_markup(p))
         )
         self.refresh_display()
 
@@ -139,22 +157,23 @@ class VideoForgeScreen(Screen):
         event.input.value = ""
         if not val:
             return
-            
+
         self._output_buffer = []
-        
+
         try:
             args = shlex.split(val)
         except ValueError as e:
-            self._log_fn(f"[#FF5C7A]Parse error: {e}[/]")
-            self._show_output(f"[#FF5C7A]Parse error: {e}[/]")
+            error = self._p["error"]
+            self._log_fn(f"[{error}]Parse error: {e}[/]")
+            self._show_output(f"[{error}]Parse error: {e}[/]")
             return
-            
+
         self._service.cmd_forge(args, self._show_output)
-        
+
         if self._output_buffer:
             cmd_list = self.query_one("#forge-command-list", Static)
             cmd_list.update(Text.from_markup("\n".join(self._output_buffer)))
-            
+
         self.refresh_display()
 
     def _show_output(self, msg):
@@ -163,10 +182,12 @@ class VideoForgeScreen(Screen):
         self._output_buffer.append(str(msg))
 
     def refresh_display(self):
+        p = self._p
         proj = self._service.current_project
         if proj is None:
             self.query_one("#forge-project-info", Static).update(
-                Text("No project loaded. Use /forge new or /forge open", style=Style(color=WARNING))
+                Text("No project loaded. Use /forge new or /forge open",
+                     style=Style(color=p["warning"]))
             )
             self.query_one("#forge-media-bin", MediaBinWidget).update_media([])
             self.query_one("#forge-timeline", TimelineWidget).update_clips([], [])
@@ -177,7 +198,7 @@ class VideoForgeScreen(Screen):
                  f"{len(proj.timeline)} clips  |  "
                  f"{len(proj.media_bin)} media files  |  "
                  f"{len(proj.audio_tracks)} audio tracks",
-                 style=Style(color=MUTED))
+                 style=Style(color=p["muted"]))
         )
 
         media_list = []

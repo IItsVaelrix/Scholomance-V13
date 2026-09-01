@@ -7,7 +7,7 @@ from tui.utils.agent_tools import (
     PatchResult,
     RefactorResult,
     SymbolMatch,
-    TestResult,
+    AgentToolResult,
     WriteFileResult,
     apply_patch,
     find_symbol,
@@ -215,7 +215,7 @@ class TestWriteFile(unittest.TestCase):
 class TestRunTargetedTests(unittest.TestCase):
     def test_runs_existing_search_governor_tests(self):
         result = run_targeted_tests("divtube_downloader.tests.test_search_governor", timeout=60)
-        self.assertIsInstance(result, TestResult)
+        self.assertIsInstance(result, AgentToolResult)
         self.assertTrue(result.success, result.stderr)
         self.assertIn("OK", result.stderr or result.stdout)
 
