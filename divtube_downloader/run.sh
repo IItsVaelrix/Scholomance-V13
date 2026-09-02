@@ -34,10 +34,26 @@ fi
 # Activate the virtual environment
 source .venv/bin/activate
 
-# Ensure Python UI and backend dependencies are installed inside the venv
-if ! python3 -c "import textual, yt_dlp, PIL, anthropic, openai" &> /dev/null; then
-    echo "Installing dependencies (textual, rich, yt-dlp, Pillow, anthropic, openai)..."
-    python3 -m pip install textual rich yt-dlp Pillow anthropic openai
+# Ensure Python UI and backend dependencies are installed inside the venv.
+#
+# Install from requirements-remote.txt rather than a floating package list: the
+# old `pip install textual rich yt-dlp Pillow anthropic openai` resolved to
+# whatever was latest, so a local run could drift from the exact pins that CI
+# audits with pip-audit — which makes that audit meaningless for anyone using
+# run.sh. The probe below also gated on anthropic, so a missing optional extra
+# reinstalled the entire stack.
+if ! python3 -c "import textual, rich, yt_dlp, PIL, openai, aiohttp, numpy, cryptography" &> /dev/null; then
+    echo "Installing pinned dependencies from requirements-remote.txt..."
+    python3 -m pip install -r requirements-remote.txt
+fi
+
+# anthropic is intentionally NOT in requirements-remote.txt. It backs
+# intel/report/prose.py's LLM-written critique prose, which imports it inside a
+# try and degrades to templated prose when it is absent. Kept as a best-effort
+# extra at a known-good pin so even the optional path is reproducible.
+if ! python3 -c "import anthropic" &> /dev/null; then
+    python3 -m pip install "anthropic==0.111.0" &> /dev/null \
+        || echo "Note: anthropic unavailable — SEO critique prose will use templates."
 fi
 
 # Desktop / konsole launches often skip ~/.bashrc, so nvm's npm/node are missing.

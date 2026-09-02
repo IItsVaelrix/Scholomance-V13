@@ -610,15 +610,11 @@ class DivTubeAgentApp(App):
             # UI update.  The thread will exit on its own (daemon=True).
             pass
 
-    async def on_mount(self):
-        try:
-            from tui.services.exec_session_service import get_exec_session
-            get_exec_session().bind_app(self)
-        except Exception:
-            pass
-        await scd64_service.start()
-        # QBIT Field Radar was replaced by TestRunPanel (#test-run).
-        # Keep the SCD64 service alive for other consumers; no radar UI loop.
+    # (removed) An earlier `async def on_mount` lived here, binding the exec
+    # session and starting scd64_service. The real one is at the bottom of this
+    # class and already does both, plus theme, banner and gateway startup. Two
+    # methods with the same name in one class means the later silently wins, so
+    # this body never ran and deleting it changes no behaviour.
 
     # ── Agent run controller ─────────────────────────────────────────
     def begin_agent(self):
@@ -782,18 +778,12 @@ class DivTubeAgentApp(App):
         r("/remote-revoke", lambda ui, args: ui._remote_revoke(args),           "Revoke paired device",    "/remote-revoke <device-id>")
         self.registry.register("/analyze", lambda ui, args: ui.agent.run_command("1", args[0] if args else "", ui.log_msg, ui), "Analyze URL", "/analyze <url>")
         self.registry.register("/download", handle_download, "Download URL (--audio = MP3)", "/download <url> [--audio]")
-        def handle_memory(ui, args):
-            sub = args[0].lower() if args else ""
-
-        r = self.registry.register
-        r("/help",    lambda ui, args: ui.show_help(),                         "Show commands",          "/help")
-        r("/exit",    lambda ui, args: ui.exit(),                              "Exit app",               "/exit")
-        r("/clear",   handle_clear,                                            "Clear chat",             "/clear")
-        r("/code",    handle_code,                                             "View code in editor",    "/code <path>")
-        r("/undo-replace", handle_undo_replace,                                 "Roll back last write",   "/undo-replace [write_id|--list]")
-        r("/undo-list",    handle_undo_list,                                    "List pending undos",     "/undo-list")
-        self.registry.register("/analyze", lambda ui, args: ui.agent.run_command("1", args[0] if args else "", ui.log_msg, ui), "Analyze URL", "/analyze <url>")
-        self.registry.register("/download", handle_download, "Download URL (--audio = MP3)", "/download <url> [--audio]")
+        # (removed) A merge had left a truncated stub of handle_memory and a
+        # second copy of the /help…/download registrations above this point.
+        # CommandRegistry.register is a plain dict write, so the duplicate was
+        # silently overwriting the block above with identical arguments — inert
+        # today, but any edit to the surviving registrations would have been
+        # undone without warning.
         def handle_memory(ui, args):
             sub = args[0].lower() if args else ""
 
@@ -1469,7 +1459,9 @@ class DivTubeAgentApp(App):
             bar.progress = 0
 
             def run():
-                import urllib.request, urllib.error, json as _json
+                import urllib.request
+                import urllib.error
+                import json as _json
                 try:
                     data = _json.dumps({"query": text}).encode()
                     req = urllib.request.Request(
@@ -1488,10 +1480,24 @@ class DivTubeAgentApp(App):
                         ui.log_msg(f"[{GOLD}]{response}[/]")
                     ui.call_from_thread(_write)
                 except Exception as e:
+                    # Copy the message into a real local instead of closing
+                    # over `e`. This is defensive, not a live-bug fix: Python
+                    # implicitly deletes the `as e` binding when the except
+                    # block exits, so a closure that reads `e` later raises
+                    # NameError. It happens to work today only because
+                    # call_from_thread BLOCKS the worker until the UI thread
+                    # has run _write, which keeps this block alive across the
+                    # call. Make the post genuinely deferred (a queued message
+                    # instead of a blocking call) and this error path starts
+                    # raising NameError instead of reporting "daemon
+                    # unreachable". Verified both ways in a scratch harness.
+                    reason = str(e) or e.__class__.__name__
+
                     def _write():
                         bar.progress = 100
                         ui.set_timer(2.0, lambda: setattr(bar.styles, "display", "none"))
-                        ui.log_msg(f"[{ERROR}]Vaelrix unreachable: {e}\n[{MUTED}]Is the daemon running on :9090?[/]")
+                        ui.log_msg(f"[{ERROR}]Vaelrix unreachable: {reason}[/]")
+                        ui.log_msg(f"[{MUTED}]Is the daemon running on :9090?[/]")
                     ui.call_from_thread(_write)
 
             threading.Thread(target=run, daemon=True).start()
@@ -2065,6 +2071,8 @@ class DivTubeAgentApp(App):
             get_exec_session().bind_app(self)
         except Exception:
             pass
+        # QBIT Field Radar was replaced by TestRunPanel (#test-run). Keep the
+        # SCD64 service alive for other consumers; there is no radar UI loop.
         await scd64_service.start()
         if self.remote_gateway is not None:
             try:

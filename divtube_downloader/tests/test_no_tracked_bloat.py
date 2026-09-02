@@ -32,6 +32,25 @@ BLOAT_PATTERNS = (
     ".healer.bak",
 )
 
+# Exact paths exempt from BLOAT_PATTERNS, each with a hard size ceiling.
+#
+# The Gradle wrapper JAR is the one `.jar` that MUST be tracked. `gradlew`,
+# `gradlew.bat` and `gradle-wrapper.properties` were already tracked, so the
+# build had committed to the wrapper and then withheld the only file it can
+# execute — every fresh clone died with
+# "could not find or load main class org.gradle.wrapper.GradleWrapperMain".
+#
+# Matched on the full repo-relative path, never a substring, and re-checked
+# against its own ceiling below, so this cannot be used to smuggle a vendored
+# jar in by renaming it.
+ALLOWED_BLOAT = {
+    "android/gradle/wrapper/gradle-wrapper.jar": 256 * 1024,
+}
+
+
+def _is_allowed(path: str) -> bool:
+    return path in ALLOWED_BLOAT
+
 
 def _git_ls_files() -> list[str]:
     proc = subprocess.run(
@@ -51,9 +70,29 @@ def test_no_bloat_patterns_tracked():
     offenders = [
         path
         for path in tracked
-        if any(pat in path or path.endswith(pat.lstrip("/")) for pat in BLOAT_PATTERNS)
+        if not _is_allowed(path)
+        and any(pat in path or path.endswith(pat.lstrip("/")) for pat in BLOAT_PATTERNS)
     ]
     assert offenders == [], f"bloat is tracked in git: {offenders}"
+
+
+def test_allowed_bloat_stays_small_and_wrapper_coherent():
+    """An exemption is only safe if it cannot grow or orphan its companions."""
+    tracked = set(_git_ls_files())
+    for path, ceiling in ALLOWED_BLOAT.items():
+        assert path in tracked, f"{path} is allowlisted but not tracked — the wrapper is broken"
+        full = os.path.join(DIVTUBE_ROOT, path)
+        if not os.path.exists(full):
+            continue
+        size = os.path.getsize(full)
+        assert size <= ceiling, (
+            f"{path} is {size} bytes, over the {ceiling}-byte exemption ceiling. "
+            f"The wrapper jar is ~49 KB; a larger one is not the wrapper jar."
+        )
+    # gradlew needs all three of these; a partial set is the original bug.
+    wrapper_dir = "android/gradle/wrapper/"
+    assert f"{wrapper_dir}gradle-wrapper.properties" in tracked
+    assert "android/gradlew" in tracked
 
 
 def test_no_oversized_tracked_file():

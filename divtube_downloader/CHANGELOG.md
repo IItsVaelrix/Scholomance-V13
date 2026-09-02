@@ -1,7 +1,88 @@
 # Changelog — DivTube_downloader
 
 All notable changes to this app are recorded here.
-Format follows [Keep a Changelog](https://keepachangelog.com/); this app is at **v1.0-SNAPSHOT**.
+Format follows [Keep a Changelog](https://keepachangelog.com/); this app follows
+semantic versioning at **v1.0.0** (matching `version` in `build.gradle`).
+The old `v1.0-SNAPSHOT` label was stale: P3C forbids SNAPSHOT on release
+artifacts, and the build file had already moved to `1.0.0`.
+
+## [Unreleased] — 2026-09-02
+
+### Fixed
+- **Fresh clones could not build the Android companion.** `android/gradlew` was
+  tracked but `gradle/wrapper/gradle-wrapper.jar` was gitignored, so `gradlew`
+  died with "could not find or load main class
+  org.gradle.wrapper.GradleWrapperMain". The wrapper jar is now tracked, with
+  the reasoning recorded at the point in `.gitignore` where it used to live.
+- **`intel/report/prose.py` swallowed every Claude failure.** A bare
+  `except Exception` fell back to templated prose with no record, so an auth
+  error, a retired model id, or unparseable JSON all looked identical to
+  "LLM prose disabled". Now logs at `exception` level with the stack before
+  degrading. Verified end-to-end: a bogus API key produced a full trace where
+  previously there was silence.
+- Removed two dead expressions in `prose.py` (a discarded list comprehension
+  and a dict literal built then thrown away).
+- **`tui/ui/app.py` had two `on_mount` methods in one class.** The later
+  definition silently won, so the first never ran. Verified the survivor is a
+  superset (it already binds the exec session and starts `scd64_service`), so
+  no behaviour was lost by deleting the dead copy.
+- **`tui/ui/app.py` had a duplicated command-registration block** left by a
+  merge, plus a truncated stub of `handle_memory` that the real definition
+  shadowed. `CommandRegistry.register` is a plain dict write, so the duplicate
+  was overwriting the live registrations with identical arguments — inert
+  today, but any edit to them would have been silently undone.
+- `app.py`'s `/vaelrix` error handler closed over the `except ... as e` binding
+  inside a callback posted to the UI thread. Python deletes that binding when
+  the `except` block exits. Not a live defect — `call_from_thread` blocks, so
+  the block is still open — but it becomes a `NameError` the moment the post is
+  deferred. Made robust by copying the message into a real local.
+- `run.sh` installed dependencies from a floating package list, so a local run
+  could drift from the exact pins CI audits with `pip-audit`. It now installs
+  from `requirements-remote.txt`; `anthropic` stays a genuinely optional
+  best-effort extra at a known-good pin.
+
+### Added
+- `LICENSE` (MIT) and `NOTICE` — the latter lists every bundled dependency's
+  licence read from installed distribution metadata, not asserted from memory.
+- `.github/workflows/divtube.yml`: `ruff check`, the previously-uncovered
+  Android module (24 Kotlin files compiled by no CI job before), and an
+  assertion that the wrapper trio survives in a checkout.
+- `divtube_downloader/ruff.toml` enforcing `E401,E741,E9,F541,F811,F821` —
+  verified zero violations across `tui/`, `intel/`, `src/` and `tests/`, so a
+  CI failure is always a regression. Unenforced rules are listed with their
+  real counts and the reason each needs judgement rather than a sweep.
+- `divtube_downloader/settings.gradle` pinning `rootProject.name`.
+- `SECURITY.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md` at the repo root
+  (GitHub's vuln-reporting UI reads the root or `.github/`, not a module
+  directory), plus issue and PR templates.
+- `tests/test_osmosis_concentration_coupling.py` — locks the
+  clamp/threshold coupling in `SubstrateOsmosisService` against both source
+  text and exact decimal arithmetic.
+- `test_allowed_bloat_stays_small_and_wrapper_coherent` — bounds the wrapper
+  jar exemption by exact path **and** size, so the `.jar` bloat guard still
+  catches vendored blobs.
+
+### Verified
+- 761 Python tests pass (was 754; +7 new). 30 JUnit validator tests pass.
+  `gradle clean build` green with the new `settings.gradle`.
+- Control tests: planting an inline `0.99` turns the coupling guard red while
+  all five behavioural tests stay green — the exact blind spot that justified
+  the source assertion. Inflating the wrapper jar past its ceiling, and
+  smuggling a 3 MB vendored jar, are each caught by the bloat guard.
+- `openai==3.3.1` confirmed to expose `APIStatusError` (a suspected break was
+  disproved). `Gradle 9.4.1` in the wrapper properties confirmed correct for
+  AGP 9.2.0 — the desktop/Android modules need different Gradle versions.
+
+### Notes — audit claims I could not sustain
+- **No precision bug in `substrate_osmosis_service.py`.** The `REAL`
+  similarity/drift/concentration columns were flagged as a determinism risk;
+  tested against `decimal.Decimal` across 20,001 value lengths, the float
+  clamp and the `>=` threshold agree with exact intent on every input. The
+  defect was the undocumented coupling, not the arithmetic.
+- SQLite table-name and `key`/`value` reserved-word findings from P3C MySQL
+  were **not** acted on: those rules protect Alibaba's managed-MySQL estate,
+  and renaming 10 tables to buy a hypothetical migration is churn, not
+  correctness.
 
 ## [Unreleased] — 2026-06-22
 

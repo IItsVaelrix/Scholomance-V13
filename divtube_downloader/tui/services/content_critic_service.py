@@ -261,7 +261,8 @@ class ContentCriticService:
                                 func_name = tool_call["function"]["name"]
                                 try:
                                     func_args = json.loads(tool_call["function"]["arguments"])
-                                    import rich.panel, rich.syntax
+                                    import rich.panel
+                                    import rich.syntax
                                     args_str = json.dumps(func_args, indent=2)
                                     syntax = rich.syntax.Syntax(args_str, "json", theme="monokai", word_wrap=True)
                                     panel = rich.panel.Panel(syntax, title=f"[bold #FFD700]⚡ {func_name}[/]", border_style="#B48EAD", expand=False)
@@ -318,9 +319,9 @@ class ContentCriticService:
             except urllib.error.HTTPError as e:
                 err_msg = e.read().decode('utf-8').replace('[', '\\[')
                 if e.code == 429:
-                    callback(f"[red]API Error (429): Too Many Requests.[/]\n[italic]This means you have hit a rate limit or are out of credits with the provider.\nWait a moment, or ensure your account is funded.[/]", success=False, is_final=True)
+                    callback("[red]API Error (429): Too Many Requests.[/]\n[italic]This means you have hit a rate limit or are out of credits with the provider.\nWait a moment, or ensure your account is funded.[/]", success=False, is_final=True)
                 elif e.code == 503:
-                    callback(f"[red]API Error (503): Service Unavailable.[/]\n[italic]The AI provider is currently overloaded or down. Please try again later, or switch to a different provider.[/]", success=False, is_final=True)
+                    callback("[red]API Error (503): Service Unavailable.[/]\n[italic]The AI provider is currently overloaded or down. Please try again later, or switch to a different provider.[/]", success=False, is_final=True)
                 else:
                     callback(f"[red]API Error ({e.code}):[/] {err_msg}", success=False, is_final=True)
             except Exception as e:

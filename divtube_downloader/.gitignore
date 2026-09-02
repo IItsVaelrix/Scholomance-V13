@@ -31,7 +31,14 @@ niche_database.sqlite
 android/local.properties
 android/.gradle/
 android/app/build/
-android/gradle/wrapper/gradle-wrapper.jar
+# NOTE: gradle-wrapper.jar is deliberately TRACKED, not ignored. `gradlew`
+# cannot bootstrap without it (no `Main-Class` to load => "could not find or
+# load main class org.gradle.wrapper.GradleWrapperMain"), so ignoring it made
+# every fresh clone unable to build. Committing the wrapper is Gradle's own
+# documented guidance and matches the gradlew/gradlew.bat/
+# gradle-wrapper.properties files that were already tracked next to it.
+# It is a 49 KB Apache-2.0 artifact; its runtime behaviour is pinned by the
+# distributionUrl SHA in gradle-wrapper.properties, not by this file.
 
 # Backups
 *.bak

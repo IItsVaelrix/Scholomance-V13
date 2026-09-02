@@ -1,0 +1,78 @@
+name: Bug report
+description: A reproducible defect in any Scholomance module
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: >
+        If this is a **security** issue — pairing/TLS, the read-only remote
+        capability boundary, URL validation, an action that bypasses the
+        journal, or any committed credential — do not use this form.
+        See SECURITY.md and report it privately.
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened
+      description: Observed behaviour, with the exact error text or log line.
+    validations: { required: true }
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      placeholder: |
+        1. cd divtube_downloader && ./run.sh
+        2. Run /memory status
+        3. Observe ...
+      description: >
+        A working reproduction is triaged above a report that only describes a
+        class of problem. Include the command you ran.
+    validations: { required: true }
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected instead
+    validations: { required: true }
+
+  - type: dropdown
+    id: module
+    attributes:
+      label: Module
+      options:
+        - divtube_downloader (TUI / cockpit)
+        - divtube_downloader (Java desktop)
+        - divtube_downloader (Android companion)
+        - divtube_downloader (remote companion / gateway)
+        - steamdeck_brain (Vaelrix ForceField)
+        - codex (linguistic engines / PixelBrain)
+        - game client (React / Vite)
+        - backend (Fastify)
+        - Godot runtime
+        - other / unclear
+    validations: { required: true }
+
+  - type: input
+    id: head
+    attributes:
+      label: Commit under test
+      description: Output of `git rev-parse --short HEAD`.
+      placeholder: f860c649
+    validations: { required: true }
+
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      description: OS, `python3 --version`, `java -version` if relevant.
+      placeholder: SteamOS / Linux, Python 3.13.x, Java 21
+
+  - type: textarea
+    id: tests
+    attributes:
+      label: Does the existing suite cover this?
+      description: >
+        e.g. "no — `python -m pytest` is green on this input". If a test should
+        have caught it and did not, say so; that is usually the more valuable
+        half of the fix.

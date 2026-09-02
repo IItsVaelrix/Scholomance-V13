@@ -3411,7 +3411,7 @@ class ToolService:
             f"--- {stats['result_count']} results, "
             f"{stats['query_time_ms']}ms, {engine_line}"
             + (f", tag={stats['tag_filter']}" if stats.get("tag_filter") else "")
-            + (f", multi_hop" if stats.get("multi_hop") else "")
+            + (", multi_hop" if stats.get("multi_hop") else "")
         )
         return "\n".join(lines)
 
@@ -3474,7 +3474,7 @@ class ToolService:
             callback(f"  [#69F0AE]◈[/] substrate stored: id={mid} chk={chk} [{tag}]")
 
         lines = [
-            f"✓ Memory stored in substrate",
+            "✓ Memory stored in substrate",
             f"  memory_id: {result['memory_id']}",
             f"  checksum:  {result['checksum']}",
             f"  tag:       {result['tag']}",

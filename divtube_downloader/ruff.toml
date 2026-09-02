@@ -1,0 +1,54 @@
+# Ruff configuration for the DivTube module.
+#
+# Existed in name only before this: `.ruff_cache/` proved ruff had been run, but
+# with no config and no CI step, so nothing was enforced and nothing could not
+# regress. This file selects the ruleset that is CLEAN today and is therefore
+# safe to fail CI on. Do not add a rule here until the tree passes it — an
+# unenforced warning list is worse than none, because it reads like coverage.
+
+line-length = 120
+target-version = "py313"
+
+# Vendored/generated/3rd-party trees are not ours to lint.
+extend-exclude = [
+    ".venv",
+    "build",
+    "gradle-8.5",
+    "embeddings",
+    "subtlety-spool",
+    "JSONS",
+    "Songs",
+    "references",
+    "crash logs",
+]
+
+[lint]
+# Enforced — all verified zero-violation across tui/, intel/, src/ and tests/.
+#
+#   F821  undefined name            — found the closure-over-deleted-`e` in app.py
+#   F811  redefinition-while-unused — found two `on_mount` methods in one class
+#                                     (the first never ran) and a duplicated
+#                                     command-registration block
+#   E9    syntax/eval errors        — baseline: it must at least parse
+#   E401  multiple imports on a line
+#   E741  ambiguous variable name   — `l` vs 1, `O` vs 0
+#   F541  f-string without placeholders — an f-prefix that does nothing usually
+#                                     means interpolation was forgotten
+select = ["E401", "E741", "E9", "F541", "F811", "F821"]
+
+# Deliberately NOT enforced yet. Each has real violations and needs judgement,
+# not a sweep — listed so the gap is visible rather than silently ignored.
+#
+#   F401  unused-import (11) — at least one is a load-bearing availability
+#         probe inside a try/except in substrate_bridge_service.py; the
+#         `substrate` package is not installed here, so removing a name from
+#         that import cannot be proven safe on a machine that has it.
+#   F841  unused-variable (4)  — includes `except ... as e` with unused `e`.
+#   E702  semicolon statements (14) — style only; churns 14 live files.
+#   E501  line-too-long (1097) — not a defect. Adopting it needs a formatter
+#         pass with its own review, not a lint rule bolted onto CI.
+ignore = ["E501", "E702", "F401", "F841"]
+
+[lint.per-file-ignores]
+# __init__.py re-exports names on purpose.
+"__init__.py" = ["F401"]

@@ -1,0 +1,9 @@
+// Declares the desktop Java module as a self-contained build.
+//
+// Without this file Gradle infers a single-project build from the directory
+// name. That inference still works on Gradle 8.5 (the version CI uses) but is
+// removed in Gradle 9, which the sibling :android companion module already
+// builds against (AGP 9.2.0 requires Gradle 9.x). Pinning the name here keeps
+// `gradle build` reproducible if the desktop module's toolchain moves forward,
+// and stops the artifact name drifting with whoever's checkout directory.
+rootProject.name = 'divtube-downloader'

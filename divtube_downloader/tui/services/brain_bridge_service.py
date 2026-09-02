@@ -117,7 +117,11 @@ class BrainBridgeService:
                     output = proc.stdout
                     # Strip the header lines
                     lines = output.split("\n")
-                    start = next((i for i, l in enumerate(lines) if "🧠" in l or "Response:" in l or lines[i-1] == "==============="), 0)
+                    start = next(
+                        (i for i, row in enumerate(lines)
+                         if "🧠" in row or "Response:" in row or lines[i - 1] == "==============="),
+                        0,
+                    )
                     response = "\n".join(lines[start+1:]) if start else output
                     callback(response.strip())
                 except Exception as e:

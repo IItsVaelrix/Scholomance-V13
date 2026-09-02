@@ -1,5 +1,8 @@
 import os
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def write_sections(scores, flags, references):
@@ -11,7 +14,6 @@ def write_sections(scores, flags, references):
 
 def _write_with_template(scores, flags, references):
     sections = {}
-    [f.code for f in flags]
 
     ref_map = {}
     for block in references:
@@ -127,12 +129,6 @@ def _write_with_claude(scores, flags, references, api_key):
                         "critique_language": block.critique_language[code],
                     })
 
-        {
-            "scores": scores,
-            "flags": [{"severity": f.severity, "code": f.code, "message": f.message} for f in flags],
-            "references": ref_context,
-        }
-
         client = anthropic.Anthropic(api_key=api_key)
         message = client.messages.create(
             model="claude-sonnet-4-20250514",
@@ -149,4 +145,13 @@ def _write_with_claude(scores, flags, references, api_key):
         return sections
 
     except Exception:
+        # Falling back to templated prose is the intended degradation, but the
+        # bare `except Exception` also hides auth failures, a retired model
+        # name, and JSON that will not parse — so the report silently stops
+        # being LLM-written and nothing records why. Log at exception level
+        # with the stack, then degrade.
+        logger.exception(
+            "Claude prose failed; falling back to template. scores=%s flags=%d",
+            sorted(scores or {}), len(flags or []),
+        )
         return _write_with_template(scores, flags, references)

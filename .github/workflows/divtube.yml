@@ -23,6 +23,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r divtube_downloader/requirements-remote.txt
+          pip install ruff
+
+      - name: Lint (ruleset is clean today — a failure here is a regression)
+        working-directory: divtube_downloader
+        run: python -m ruff check .
 
       - name: Run divtube_downloader tests
         working-directory: divtube_downloader
@@ -56,3 +61,43 @@ jobs:
       - name: Build the desktop Java module
         working-directory: divtube_downloader
         run: gradle build
+
+      # The whole point of this step is the failure it prevents: gradlew is
+      # tracked but gradle-wrapper.jar was gitignored, so a fresh clone could
+      # not bootstrap and nothing here noticed. Assert the trio is present in
+      # the checkout rather than trusting .gitignore.
+      - name: Verify the Android wrapper is complete in a fresh checkout
+        run: |
+          set -euo pipefail
+          for f in android/gradlew android/gradle/wrapper/gradle-wrapper.jar \
+                   android/gradle/wrapper/gradle-wrapper.properties; do
+            if [ ! -f "divtube_downloader/$f" ]; then
+              echo "::error::$f is missing from the checkout — gradlew cannot bootstrap"
+              exit 1
+            fi
+          done
+          echo "wrapper trio present"
+
+  android-companion:
+    # 24 Kotlin files in divtube_downloader/android had no CI coverage at all:
+    # this module could stop compiling and every workflow would stay green.
+    # assembleDebug compiles main; assembleDebugAndroidTest typechecks the
+    # instrumented tests without needing an emulator to run them.
+    name: Android companion
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Prove the wrapper bootstraps from a clean clone
+        working-directory: divtube_downloader/android
+        run: ./gradlew --version
+
+      - name: Assemble debug + typecheck instrumented sources
+        working-directory: divtube_downloader/android
+        run: ./gradlew --no-daemon assembleDebug assembleDebugAndroidTest

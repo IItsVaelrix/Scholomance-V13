@@ -44,6 +44,18 @@ ANOMALY_GLYPHS = {
     "concentration":     "◉",
 }
 
+# Ceiling for the derived concentration metric, and therefore the only value on
+# which the `concentration` anomaly can ever fire — _derive_concentration clamps
+# to it and the scan tests `>=` against it. Changing one side without the other
+# silently disables the anomaly: raise the clamp and nothing fires, lower the
+# test and everything fires. Held as one constant for exactly that reason.
+#
+# Verified against exact decimal arithmetic (decimal.Decimal) over value lengths
+# 0..20020: the float clamp and the float `>=` agree with the decimal intent on
+# every input, so no drift is currently observable. Keep that property if the
+# divisor or the temporal pressure is ever tuned.
+CONCENTRATION_CEILING = 0.99
+
 
 def _node_bin():
     n = "/home/deck/.nvm/versions/node/v20.20.2/bin/node"
@@ -161,7 +173,10 @@ class SubstrateOsmosisService:
         size_pressure = min(1.0, len(val_str) / 10000.0)
         # Timestamp-like values have higher concentration (they change)
         temporal_pressure = 0.3 if any(c in val_str for c in ["T", "Z", ":", "-"]) else 0.0
-        return min(0.99, size_pressure + temporal_pressure)
+        # The clamp and the `>= CONCENTRATION_CEILING` test in _scan_cell are the
+        # same number and are only correct together: the anomaly can fire on no
+        # other value. Both sides read the constant, so neither can drift alone.
+        return min(CONCENTRATION_CEILING, size_pressure + temporal_pressure)
 
     # ── Bridge Calls ─────────────────────────────────────────────────
 
@@ -291,9 +306,16 @@ class SubstrateOsmosisService:
                     drift = 0.0
                     status = "silent"
 
-                # Check concentration
+                # Check concentration.
+                # NOTE: this deliberately wins over baseline_drift — a cell is
+                # reported as ONE anomaly_kind, and an oversized/temporal cell
+                # is the more actionable finding. That also means a cell which
+                # has genuinely drifted AND is oversized reports "concentration"
+                # and its similarity=0.85/drift=0.15 are stored but not surfaced
+                # in anomaly_kind. Pre-existing precedence; documented, not
+                # changed, because the TUI grid keys off this single value.
                 concentration = cell.get("concentration", 0)
-                if concentration >= 0.99:
+                if concentration >= CONCENTRATION_CEILING:
                     anomaly_kind = "concentration"
                     status = "anomaly"
 

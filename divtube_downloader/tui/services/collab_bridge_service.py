@@ -489,10 +489,10 @@ def _render_lock_list(data: dict) -> str:
     if not locks:
         return f"[{MUTED}]No active locks.[/]"
     lines = [f"[bold {PURPLE}]Locks ({len(locks)})[/]"]
-    for l in locks:
-        path = l.get("filePath") or l.get("path") or "?"
-        agent = l.get("agentId") or l.get("agent_id") or "?"
-        when = l.get("acquiredAt") or l.get("acquired_at") or ""
+    for entry in locks:
+        path = entry.get("filePath") or entry.get("path") or "?"
+        agent = entry.get("agentId") or entry.get("agent_id") or "?"
+        when = entry.get("acquiredAt") or entry.get("acquired_at") or ""
         lines.append(f"  [{GOLD}]{path}[/]  [{MUTED}]{agent}  {when}[/]")
     return "\n".join(lines)
 
