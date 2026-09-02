@@ -31,6 +31,10 @@ from tui.services.agent_service import (
 from tui.services.memory_service import MemoryService
 from tui.services.export_service import ExportService
 from tui.services.config_service import ConfigService
+# The cockpit input box decides "is this a URL or a prompt" against the same
+# host allowlist the remote protocol and the Java companion are tested against,
+# rather than keeping a fourth independent copy of that rule inline.
+from tui.remote.url_policy import is_url_like
 from tui.services.content_critic_service import ContentCriticService
 from tui.services.turboquant_service import TurboQuantService
 from tui.services.video_forge_service import VideoForgeService
@@ -2378,7 +2382,11 @@ class DivTubeAgentApp(App):
         if val.startswith("/"):
             self.registry.parse_and_execute(val, self)
         else:
-            if "youtube.com" in val or "youtu.be" in val:
+            if is_url_like(val):
+                # Was `"youtube.com" in val or "youtu.be" in val` — a substring
+                # scan that also matched prose, so "explain youtube.com's quota
+                # model" was intercepted and sent to the downloader instead of
+                # reaching the prompt path.
                 self.log_msg(f"[{MUTED}]Auto-detecting URL… running analysis.[/]")
                 self.agent.run_command("1", val, self.log_msg, self)
             else:

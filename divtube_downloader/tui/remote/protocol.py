@@ -7,7 +7,15 @@ import json
 import re
 from threading import Lock
 from typing import Any, ClassVar
-from urllib.parse import urlparse
+
+# Imported directly rather than as `from . import url_policy`: tui/remote/__init__
+# imports this module, so attribute access on the partially-initialised package
+# would be a cycle. url_policy itself depends on nothing in tui.
+#
+# ALLOWED_HOSTS is aliased to the historical name because `sourceHost` below is a
+# bare host string, not a URL, and is validated against the same allowlist. The
+# point of the alias is that there is now exactly one host list in Python.
+from .url_policy import ALLOWED_HOSTS as _YOUTUBE_HOSTS, evaluate as _evaluate_url
 
 PROTOCOL_VERSION = "divtube-remote-v1"
 CLIENT_TYPES = frozenset({
@@ -29,10 +37,9 @@ SERVER_TYPES = frozenset({
 _ENVELOPE_KEYS = frozenset({"protocolVersion", "type", "requestId", "payload"})
 _SERVER_KEYS = frozenset({"protocolVersion", "instanceId", "seq", "type", "requestId", "payload"})
 _IDENTIFIER = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$")
-_YOUTUBE_HOSTS = frozenset({
-    "youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com",
-    "youtu.be", "www.youtu.be",
-})
+# The YouTube allowlist lives in url_policy.py alone now; see the import above.
+# It used to be duplicated here and in services/remote_download_queue.py, and the
+# copies had started to disagree.
 _COCKPIT_STATES = frozenset({"idle", "thinking", "looking", "responding", "downloading", "failed"})
 _CHAT_ACTIVITY_STATES = frozenset({"thinking", "looking", "responding", "idle", "failed"})
 _JOB_STATES = frozenset({"queued", "downloading", "processing", "failed", "cancelled"})
@@ -147,9 +154,14 @@ def _payload(data: dict[str, Any], message_type: str) -> None:
         _identifier(data["conversation"], "conversation")
     elif message_type == "download.request":
         url = _string(data["url"], "url", max_length=2048)
-        parsed = urlparse(url)
-        if parsed.scheme != "https" or parsed.username or parsed.password or parsed.hostname not in _YOUTUBE_HOSTS or not parsed.path:
-            _fail("Download URL must be an HTTPS YouTube URL.", "invalid_url")
+        # Delegated to the shared policy instead of re-deriving it here. This is
+        # a tightening: the inline check only required an https scheme, an
+        # allowlisted hostname and a non-empty path, so
+        # https://www.youtube.com/feed/subscriptions and
+        # https://youtube.com:22/watch?v=x were both accepted as "a YouTube URL".
+        decision = _evaluate_url(url, require_https=True)
+        if not decision.ok:
+            _fail(f"Download URL must be an HTTPS YouTube URL: {decision}", "invalid_url")
         if data["mediaType"] not in {"video", "audio"}:
             _fail("Media type must be video or audio.", "invalid_media_type")
         if type(data["rightsConfirmed"]) is not bool or data["rightsConfirmed"] is not True:

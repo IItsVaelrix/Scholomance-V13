@@ -109,7 +109,7 @@ def build_sqlite(payload: dict, db_path: str) -> dict:
             "INSERT INTO postings (token, idx) VALUES (?, ?)",
             ((tok, i) for tok, idxs in postings.items() for i in idxs),
         )
-        con.execute("CREATE INDEX postings_token ON postings (token, idx)")
+        con.execute("CREATE INDEX idx_postings_token ON postings (token, idx)")
 
         meta_rows = [
             ("schema", payload["schema"]),

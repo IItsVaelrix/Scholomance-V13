@@ -11,9 +11,11 @@ import uuid
 from urllib.parse import urlparse
 
 from .agent_service import CMD_DOWNLOAD_AUDIO, CMD_DOWNLOAD_VIDEO
-
-
-_HOSTS = {"youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com", "youtu.be", "www.youtu.be"}
+# Admission control here and protocol validation in tui/remote/protocol.py are
+# deliberately the same predicate. They used to be two hand-maintained host sets
+# that had started to drift, which meant a URL could be accepted by the envelope
+# parser and then rejected (or, worse, accepted) again at a different layer.
+from ..remote.url_policy import evaluate as _evaluate_url
 
 
 @dataclass(frozen=True)
@@ -24,8 +26,9 @@ class RemoteDownloadRequest:
     rights_confirmed: bool
 
     def __post_init__(self):
-        parsed = urlparse(self.url) if isinstance(self.url, str) else None
-        if not self.request_id or not parsed or parsed.scheme != "https" or parsed.hostname not in _HOSTS or not parsed.path:
+        # Message kept byte-identical to the previous behaviour on purpose; only
+        # the predicate is now shared with tui/remote/protocol.py.
+        if not self.request_id or not _evaluate_url(self.url, require_https=True).ok:
             raise ValueError("invalid remote download request")
         if self.media_type not in {"audio", "video"} or self.rights_confirmed is not True:
             raise ValueError("invalid remote download request")

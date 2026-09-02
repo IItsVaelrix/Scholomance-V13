@@ -1,7 +1,51 @@
-import os
+"""RETIRED SCAFFOLD -- DO NOT RUN. Kept for historical reference only.
 
-base_dir = "/home/deck/Downloads/Scholomance-V12-main/divtube_downloader"
-src_dir = os.path.join(base_dir, "src/main/java/divtube")
+This one-shot generator produced the original DivTube Java skeleton on
+2026-06-22 (single commit e6022e0a) and was never maintained afterwards. The
+real module has since diverged far past it, so this script is not a source of
+truth -- it is a fossil, and a dangerous one, because its embedded templates
+still contain code that was deliberately removed from the live tree:
+
+  * build.gradle             -> version '1.0-SNAPSHOT'  (P3C Library [Mandatory]
+                                forbids SNAPSHOT on release artifacts; the module
+                                now ships 1.0.0)
+  * YouTubeUrlValidator.java -> url.contains("youtube.com/watch?v=")  (a
+                                substring test that accepts
+                                https://evil.example/?x=/youtube.com/watch?v=a and
+                                http://youtube.com.attacker.tld/watch?v=x; the live
+                                validator decides on the parsed URI authority)
+  * YtDlpProvider.java       -> non-volatile currentProcess, an over-broad
+                                catch that re-wrapped DownloadException, no
+                                save-location validation
+  * LegalPolicyGuard.java    -> the access-control claim that rested on the
+                                hardcoded urlRequiresLoginKnown() == false stub
+
+Because the target path is absolute and the write loop was unconditional,
+running the old version silently reverted all of the above. It also emitted
+neither settings.gradle nor the Gradle wrapper, so a regeneration would have
+broken the build as well as the security posture -- the committed
+src/test/java/divtube/validation/YouTubeUrlValidatorTest.java would fail
+against the regressed validator.
+
+Nothing in the repository referenced this file (verified with an exhaustive
+content search), and the live tree is now the only source of truth. Editing
+Java by hand is safe; this script will no longer clobber it.
+
+The writer is now guarded on three independent levels: it defaults to dry-run,
+it refuses to overwrite any existing file, and it aborts if the destination
+looks like a checkout under version control. Reconstructing the original
+skeleton into a scratch directory still works:
+
+    python generate_divtube.py --target /tmp/skeleton --force
+"""
+
+import argparse
+import os
+import sys
+
+# Was a hardcoded absolute path into the live working tree. It must be supplied
+# explicitly now; there is no default destination.
+base_dir = None
 
 files = {
     "build.gradle": """
@@ -302,10 +346,51 @@ public class YouTubeUrlValidator {
 """
 }
 
-for filepath, content in files.items():
-    full_path = os.path.join(base_dir, filepath)
-    os.makedirs(os.path.dirname(full_path), exist_ok=True)
-    with open(full_path, "w") as f:
-        f.write(content)
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Retired one-shot Java skeleton generator (dry-run by default).")
+    parser.add_argument("--target", required=True,
+                        help="Directory to write the skeleton into. There is no default.")
+    parser.add_argument("--force", action="store_true",
+                        help="Actually write files. Without this, only report what would happen.")
+    args = parser.parse_args()
 
-print(f"Generated {len(files)} files successfully in {base_dir}")
+    global base_dir
+    base_dir = os.path.abspath(args.target)
+
+    # Refuse to write into anything that is version-controlled. The original
+    # failure mode was clobbering a live checkout, and "did you mean to" is not
+    # a safety property worth betting on.
+    probe = base_dir
+    while True:
+        if os.path.isdir(os.path.join(probe, ".git")):
+            print(f"refusing to write: {base_dir} is inside the git checkout at {probe}",
+                  file=sys.stderr)
+            return 2
+        parent = os.path.dirname(probe)
+        if parent == probe:
+            break
+        probe = parent
+
+    written = skipped = 0
+    for filepath, content in files.items():
+        full_path = os.path.join(base_dir, filepath)
+        if os.path.exists(full_path):
+            print(f"skip (exists): {filepath}")
+            skipped += 1
+            continue
+        if args.force:
+            os.makedirs(os.path.dirname(full_path), exist_ok=True)
+            with open(full_path, "w") as f:
+                f.write(content)
+        written += 1
+
+    verb = "wrote" if args.force else "would write"
+    print(f"{verb} {written} files, skipped {skipped} pre-existing under {base_dir}")
+    if not args.force:
+        print("dry-run: pass --force to write")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

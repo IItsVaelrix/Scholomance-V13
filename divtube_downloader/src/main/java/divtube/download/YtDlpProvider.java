@@ -1,9 +1,11 @@
 package divtube.download;
 
-import divtube.process.ProcessRunner;
-import divtube.process.ProcessResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import divtube.process.ProcessResult;
+import divtube.process.ProcessRunner;
+import divtube.validation.SavePathValidator;
+import divtube.validation.YouTubeUrlValidator;
 import java.nio.file.Path;
 
 public class YtDlpProvider implements DownloadProvider {
@@ -20,6 +22,11 @@ public class YtDlpProvider implements DownloadProvider {
 
     @Override
     public VideoMetadata analyze(String url) throws DownloadException {
+        // Enforced here as well as in the UI: MainViewController validates on the
+        // analyze path only, so download() would otherwise hand an arbitrary
+        // string to yt-dlp. The sink is the last place every caller must pass.
+        requireYouTubeUrl(url);
+
         // Enforce strict no-circumvention policy by explicitly disabling cookies and login
         String[] command = {
             "yt-dlp",
@@ -60,6 +67,17 @@ public class YtDlpProvider implements DownloadProvider {
 
     @Override
     public void download(DownloadRequest request, DownloadProgressListener listener) throws DownloadException {
+        requireYouTubeUrl(request.getUrl());
+
+        // Validate before anything is spawned: an unusable save location used to
+        // reach Path.of and come back as "Download execution failed: null".
+        final Path outputDir;
+        try {
+            outputDir = SavePathValidator.resolve(request.getSaveLocation());
+        } catch (IllegalArgumentException e) {
+            throw new DownloadException(e.getMessage());
+        }
+
         String formatArg = getFormatArgument(request.getQuality(), request.getFormat());
         boolean audioOnly = "MP3 audio".equalsIgnoreCase(request.getFormat());
 
@@ -78,7 +96,7 @@ public class YtDlpProvider implements DownloadProvider {
         command.add("--no-cookies");
         command.add("--no-cookies-from-browser");
         command.add("-o");
-        command.add(Path.of(request.getSaveLocation(), "%(title)s.%(ext)s").toString());
+        command.add(Path.of(outputDir.toString(), "%(title)s.%(ext)s").toString());
         command.add(request.getUrl());
 
         try {
@@ -106,6 +124,18 @@ public class YtDlpProvider implements DownloadProvider {
     public void cancel() {
         if (currentProcess != null && currentProcess.isAlive()) {
             currentProcess.destroy();
+        }
+    }
+
+    /**
+     * Single choke point for the URL that becomes a process argument. Uses the
+     * parsed-authority validator, so a lookalike host is refused here even if a
+     * caller forgot to (or was never shown a text box to) validate first.
+     */
+    private static void requireYouTubeUrl(String url) throws DownloadException {
+        if (!YouTubeUrlValidator.isValid(url)) {
+            throw new DownloadException("Not a supported YouTube link: "
+                + YouTubeUrlValidator.describe(url));
         }
     }
 

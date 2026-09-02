@@ -33,9 +33,13 @@ jobs:
         working-directory: divtube_downloader
         run: python -m pytest -q
 
-      - name: Run cockpit UI guard rails (tests/tui)
-        run: python -m pytest tests/tui -q
-
+      # Removed: a "python -m pytest tests/tui -q" step. tests/tui does not
+      # exist in either the repo root or divtube_downloader, so pytest exited 4
+      # ("file or directory not found") and failed the job; the step also
+      # lacked the working-directory its neighbours set, so it resolved against
+      # the wrong tree regardless. Nothing was lost -- "python -m pytest -q"
+      # above uses testpaths = tests from divtube_downloader/pytest.ini and
+      # already collects every cockpit test there.
       - name: Audit Python dependencies
         working-directory: divtube_downloader
         run: |
