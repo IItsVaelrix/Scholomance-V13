@@ -334,12 +334,23 @@ export function encodeAsepriteBinary(payload) {
   writeUInt32LE(header, 1, 14);
   writeUInt16LE(header, 100, 18);
   writeUInt16LE(header, 0, 30);
-  writeUInt8(header, 1, 32);
-  writeUInt8(header, 1, 33);
-  writeInt16LE(header, 0, 34);
-  writeInt16LE(header, 0, 36);
-  writeUInt16LE(header, width, 38);
-  writeUInt16LE(header, height, 40);
+  // Field order here is the upstream Aseprite header (docs/ase-file-specs.md):
+  //   0x1C transparent index · 0x20 number of colors · 0x22/0x23 pixel ratio
+  //   0x24/0x26 grid x/y · 0x28/0x2A grid width/height · 0x2B+ reserved, zero
+  //
+  // The palette count used to be written as two separate 1-bytes (0x20=1,
+  // 0x21=1), i.e. the WORD read back as 257, and was only corrected in the
+  // indexed branch below — so an RGBA export claimed a 257-entry palette while
+  // carrying no palette chunk at all. Per the spec, 0 is the "no palette" value.
+  writeUInt16LE(header, 0, 32);
+  writeUInt16LE(header, 0, 34);          // pixel ratio 0/0 => 1:1
+  // Grid x/y/width/height. Writing the canvas size here (0x26 = width,
+  // 0x28 = height) told Aseprite the grid was offset by the canvas width and
+  // `grid width` pixels wide; the canvas size already lives at 0x08/0x0A above.
+  // Zero means "no grid", which is what a 1x foundry export is.
+  writeUInt16LE(header, 0, 36);
+  writeUInt16LE(header, 0, 38);
+  writeUInt16LE(header, 0, 40);
   if (isIndexed) {
     writeUInt8(header, 0, 28);           // transparent color index
     writeUInt16LE(header, paletteColors.length, 32);

@@ -16,7 +16,11 @@ import {
 import {
   widenPauldrons,
   moveCore,
+  postForgeMetadata,
+  POSTFORGE_PROVENANCE_KEY,
 } from '../codex/core/pixelbrain/edit-compiler.js';
+
+import { formatSpecIntent } from '../codex/core/pixelbrain/spec-intent-report.js';
 
 import {
   buildSquareSharpnessContrastPayload,
@@ -83,6 +87,11 @@ export function buildVoidChestplateSpec() {
       rimContrast: 1.0,            // crisp gold edges
       centralGlowContainment: 0.95,
       noiseFloor: 'none',          // clean for pro polished appearance
+      // The hand-authored palette this asset is designed against. Declaring it
+      // on the spec (not just as post-forge editor metadata) lets the palette
+      // quantizer report whether a budget cut destroyed an authored color or
+      // merely collapsed amp-generated shading.
+      exactPalette: VOID_CHESTPLATE_EXACT_PALETTE,
     },
     construction: {
       version: 'construction-v1',
@@ -285,6 +294,7 @@ export function forgeVoidChestplate() {
 
   // Deterministic post-polish using the new Edit Compiler pure verbs
   // to replicate the dramatic wide wings and prominent crystal from the reference image.
+  let postForgeFailure = null;
   try {
     let polished = widenPauldrons(editorAssetPacket, 5);
     polished = moveCore(polished, -1);
@@ -294,6 +304,11 @@ export function forgeVoidChestplate() {
     polished = createPixelBrainAssetPacket({
       ...polished,
       coordinates: sharpened,
+      metadata: postForgeMetadata(polished, {
+        kind: 'square-sharpness-contrast',
+        intensity: 0.95,
+        cells: sharpened.length,
+      }),
     });
 
     editorAssetPacket = createPixelBrainAssetPacket({
@@ -308,6 +323,15 @@ export function forgeVoidChestplate() {
 
     // Add the small purple cross details on the side void panels exactly as in the reference image
     // (deterministic positions relative to anchors for perfect replication)
+    //
+    // HONESTY NOTE (audit 2026-09-03, MAJOR #2): these five-pixel crosses are the
+    // part of the flagship asset that ITEM-SPEC-v1 does not describe. They are
+    // literal coordinates tuned by eye against a reference image, so this asset is
+    // "declarative spec + 2 hand-placed motifs", not "declarative spec". Rather
+    // than delete them (the shipped art regresses) or pretend (the old behaviour,
+    // where `metadata.compatibility.spec.hash` implied a pure spec derivation), the
+    // placement is now recorded on the packet itself via `postForgeMetadata`, so a
+    // consumer can tell provenance from the asset instead of from this file.
     const crossColor = '#6B35B8'; // vibrant purple from exact palette
     const crossOffsets = [
       {x: 0, y: 0}, {x: -1, y: 0}, {x: 1, y: 0}, {x: 0, y: -1}, {x: 0, y: 1}
@@ -315,6 +339,7 @@ export function forgeVoidChestplate() {
     const leftCrossCenter = { x: 20, y: 30 }; // left void panel, tuned to image
     const rightCrossCenter = { x: 44, y: 30 }; // mirrored
     let finalCoords = [...editorAssetPacket.geometry.coordinates];
+    const placedCrossCells = [];
     [leftCrossCenter, rightCrossCenter].forEach(center => {
       crossOffsets.forEach(off => {
         const cx = center.x + off.x;
@@ -322,15 +347,47 @@ export function forgeVoidChestplate() {
         // avoid overwriting important cells
         if (!finalCoords.some(c => c.x === cx && c.y === cy)) {
           finalCoords.push({ x: cx, y: cy, color: crossColor, partId: 'small_cross', emphasis: 1 });
+          placedCrossCells.push({ x: cx, y: cy, color: crossColor, partId: 'small_cross' });
         }
       });
     });
     editorAssetPacket = createPixelBrainAssetPacket({
       ...editorAssetPacket,
       coordinates: finalCoords,
+      metadata: postForgeMetadata(editorAssetPacket, {
+        kind: 'hand-placed-cross-motifs',
+        centers: [leftCrossCenter, rightCrossCenter],
+        cellsPlaced: placedCrossCells.length,
+        cells: placedCrossCells,
+      }),
     });
   } catch (e) {
-    console.warn('Edit Compiler polish step skipped (non-fatal):', e.message);
+    // The whole post-forge block used to be reported as "skipped (non-fatal)" on
+    // stderr and then forgotten, so a rejected edit left no trace on the asset.
+    // With the geometry precedence fixed (pixelbrain-asset-packet.js:172) these
+    // verbs really apply, and a real one now fails: widenPauldrons(5) pushes the
+    // pauldrons to x=-1 and x=64 on a 64-wide canvas, which its own
+    // preventOutOfBounds constraint rejects. That is a genuine authoring defect
+    // that the dropped-edit bug had been masking since the verbs were written.
+    // It is recorded here rather than silently swallowed; widening the intent
+    // (smaller amount, or a wider canvas) is an art decision, not a drive-by.
+    postForgeFailure = { stage: 'post-forge-polish', error: String(e?.message || e) };
+    console.warn('Edit Compiler polish step REJECTED (asset ships without it):', e.message);
+  }
+  if (editorAssetPacket) {
+    editorAssetPacket = createPixelBrainAssetPacket({
+      ...editorAssetPacket,
+      metadata: {
+        ...editorAssetPacket.metadata,
+        compatibility: {
+          ...(editorAssetPacket.metadata?.compatibility || {}),
+          postForgeFailures: Object.freeze([
+            ...(editorAssetPacket.metadata?.compatibility?.postForgeFailures || []),
+            ...(postForgeFailure ? [Object.freeze(postForgeFailure)] : []),
+          ]),
+        },
+      },
+    });
   }
   const materialSlotManifest = buildMaterialSlotManifest(bundle.spec.parts);
   return {
@@ -342,8 +399,17 @@ export function forgeVoidChestplate() {
       spec: {
         id: bundle.spec.id,
         hash: hashItemSpec(bundle.spec),
+        // `hash` identifies the declarative INPUT only. This asset then gets
+        // imperative post-forge edits, so the hash does not identify the shipped
+        // pixels — `contentDigest` and `postForgeEdits` do. (Audit 2026-09-03,
+        // MAJOR #2.)
+        identifiesShippedPixels: false,
       },
-      cells: bundle.assetPacket.geometry.coordinates.length,
+      postForgeEdits: editorAssetPacket.metadata?.compatibility?.[POSTFORGE_PROVENANCE_KEY] || [],
+      postForgeFailures: editorAssetPacket.metadata?.compatibility?.postForgeFailures || [],
+      contentDigest: editorAssetPacket.contentDigest || null,
+      cells: editorAssetPacket.geometry.coordinates.length,
+      cellsFromSpecAlone: bundle.assetPacket.geometry.coordinates.length,
       materialSlotManifest,
       editorPalette: {
         id: 'void-chestplate-exact',
@@ -406,5 +472,23 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     JSON.stringify(diagnostics, null, 2),
     'utf8',
   );
-  console.log(`forged void-chestplate ${hashItemSpec(bundle.spec)} ${bundle.assetPacket.geometry.coordinates.length} cells`);
+  // Report what actually shipped, not what the spec alone produced: the two
+  // differ by the post-forge edits above. (Audit 2026-09-03, MAJOR #2.)
+  const edits = diagnostics.postForgeEdits.length;
+  const failed = diagnostics.postForgeFailures.length;
+  console.log(
+    `forged void-chestplate ${diagnostics.contentDigest} ` +
+    `${diagnostics.cells} cells (spec alone: ${diagnostics.cellsFromSpecAlone}; ` +
+    `${edits} post-forge edit${edits === 1 ? '' : 's'}` +
+    `${failed ? `, ${failed} REJECTED` : ''}; ` +
+    `spec hash ${hashItemSpec(bundle.spec)} identifies input only)`,
+  );
+
+  // Authored-intent divergence (audit 2026-09-03, MAJOR #6): knobs the foundry
+  // silently coerced, and declared outlines that could not reach the silhouette.
+  const intent = bundle.fidelity?.intent;
+  if (intent && !intent.clean) {
+    console.log(`\nintent vs output — ${intent.attentionCount} to look at:`);
+    console.log(formatSpecIntent(intent));
+  }
 }

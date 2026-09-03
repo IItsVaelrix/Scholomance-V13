@@ -175,22 +175,65 @@ export function compileSCDL(source, options = {}) {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /**
- * Run the per-frame portion of the pipeline on one frame's AST.
- * @returns {{ ast: object, packet: object|null, fatal: boolean }}
+ * Run one pass, reporting a crash instead of recording it.
+ *
+ * Used only by the post-fatal recovery sweep in _runFramePipeline, where a
+ * throwing pass means "stop, we are past useful information" rather than
+ * "here is another error for the author to read".
+ */
+function _tryPass(name, ast, errors, passFn) {
+  try {
+    return { ast: passFn(ast, errors) || ast, threw: false };
+  } catch (e) {
+    return { ast, threw: true, error: e };
+  }
+}
+
+/**
+ * Frame pipeline.
+ *
+ * Recovery sweep (audit 2026-09-03, MINOR #9): the first fatal used to abort
+ * here, so an asset carrying three independent mistakes reported exactly one
+ * and made the author fix → recompile → fix → recompile. That guard was also
+ * stricter than it needed to be — `_hasFatal` scans the whole *accumulating*
+ * error list, so a single early error suppressed every later diagnostic in
+ * every frame of a loop. The passes after it are frequently still meaningful:
+ * resolve-colors already degrades an unresolvable alias to `#000000` and
+ * continues, resolve-materials reports SCDL-005 per part, and lower-booleans
+ * reports SCDL-026 per bad target — none of which depend on the failure that
+ * came first.
+ *
+ * So we now keep going, but only as far as the passes keep working. Once one
+ * throws, we stop rather than reporting crashes that are symptoms of the real
+ * error. Either way `fatal` stays true and no packet is emitted: this buys a
+ * complete *report*, never a partial asset.
  */
 function _runFramePipeline(frameAst, errors, options) {
   _applySemQuant(frameAst, errors, options);
 
   let ast = frameAst;
-  ast = _runPass('resolveColors', ast, errors, resolveColorsPass);
-  if (_hasFatal(errors)) return { ast, packet: null, fatal: true };
+  let recovering = false;
 
-  ast = _runPass('resolveMaterials', ast, errors, resolveMaterialsPass);
+  /** Advance one pass, honouring the sweep. Returns false to stop the sweep. */
+  const step = (name, passFn) => {
+    if (!recovering) {
+      ast = _runPass(name, ast, errors, passFn);
+      if (_hasFatal(errors)) recovering = true;
+      return true;
+    }
+    const r = _tryPass(name, ast, errors, passFn);
+    if (r.threw) return false;   // symptom, not cause — stop sweeping
+    ast = r.ast;
+    return true;
+  };
+
+  if (!step('resolveColors', resolveColorsPass)) return _sweepResult(ast, errors);
   // Material warnings are non-fatal
+  if (!step('resolveMaterials', resolveMaterialsPass)) return _sweepResult(ast, errors);
 
   if (ast.graphMode) {
-    ast = _runPass('buildSceneGraph', ast, errors, buildSceneGraphPass);
-    if (_hasFatal(errors)) return { ast, packet: null, fatal: true };
+    if (!step('buildSceneGraph', buildSceneGraphPass)) return _sweepResult(ast, errors);
+    if (recovering) return _sweepResult(ast, errors);
     let packet = null;
     try {
       packet = emitPacketPass(ast, errors);
@@ -204,13 +247,11 @@ function _runFramePipeline(frameAst, errors, options) {
     return { ast, packet, fatal: false };
   }
 
-  ast = _runPass('expandVector', ast, errors, expandVectorPass);
+  if (!step('expandVector', expandVectorPass)) return _sweepResult(ast, errors);
+  if (!step('expandSymmetry', expandSymmetryPass)) return _sweepResult(ast, errors);
+  if (!step('expandCells', expandCellsPass)) return _sweepResult(ast, errors);
 
-  ast = _runPass('expandSymmetry', ast, errors, expandSymmetryPass);
-  if (_hasFatal(errors)) return { ast, packet: null, fatal: true };
-
-  ast = _runPass('expandCells', ast, errors, expandCellsPass);
-  if (_hasFatal(errors)) return { ast, packet: null, fatal: true };
+  if (recovering) return _sweepResult(ast, errors);
 
   // ── Art Gene Projection (PDR: Ontological Art-Direction Pipeline) ────────
   // Strict no-op when options.artGenes is empty/absent or feature flag is off.
@@ -236,6 +277,11 @@ function _runFramePipeline(frameAst, errors, options) {
   }
 
   return { ast, packet, fatal: false };
+}
+
+/** A fatal was recorded; never emit a packet, but the diagnostics are complete. */
+function _sweepResult(ast, errors) {
+  return { ast, packet: null, fatal: true, swept: _hasFatal(errors) };
 }
 
 /**

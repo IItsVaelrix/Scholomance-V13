@@ -170,15 +170,36 @@ function normalizeSource(input = {}) {
 }
 
 function normalizeGeometry(input = {}) {
-  const coordinates = Array.isArray(input.geometry?.coordinates)
-    ? input.geometry.coordinates
-    : Array.isArray(input.coordinates)
-      ? input.coordinates
+  // An explicitly supplied top-level `coordinates` is the caller saying "these
+  // are the pixels" and MUST win over `geometry.coordinates`.
+  //
+  // The precedence used to be the other way round, which silently deleted every
+  // edit in the codebase. The universal rebuild idiom is
+  // `createPixelBrainAssetPacket({ ...packet, coordinates: edited })`, and a
+  // constructed packet always carries a `geometry` object, so the spread handed
+  // the normalizer the PRE-edit `geometry.coordinates` alongside the caller's new
+  // top-level `coordinates` — and the old ones won. Proven directly 2026-09-03:
+  // asking for one cell at (3,3) blue from a packet holding one cell at (1,1)
+  // red returned (1,1) red. `widenPauldrons`, `moveCore`, `remapTrimMaterial`,
+  // `transformRelativeToAnchor`, `applyPolishDelta`, `cleanupOrphanPixels`,
+  // `enforceInnerStructuralRigidity` and `applyDropShadow` all built their result
+  // that way and were therefore all no-ops against a real packet — including in
+  // the flagship generator, whose "imperative post-forge patches" (audit
+  // DR-2026-09-03-PIXELBRAIN-UX MAJOR #2) have never moved a single pixel.
+  //
+  // Flipping the precedence rather than rewriting 21 call sites fixes them all at
+  // once, and is unambiguous: a normalized packet has `geometry.coordinates` and
+  // no top-level `coordinates`, so re-hydration never has both keys and cannot
+  // change behaviour. Only an explicit edit supplies both, and only an edit.
+  const coordinates = Array.isArray(input.coordinates)
+    ? input.coordinates
+    : Array.isArray(input.geometry?.coordinates)
+      ? input.geometry.coordinates
       : [];
-  const cells = Array.isArray(input.geometry?.cells)
-    ? input.geometry.cells
-    : Array.isArray(input.cells)
-      ? input.cells
+  const cells = Array.isArray(input.cells)
+    ? input.cells
+    : Array.isArray(input.geometry?.cells)
+      ? input.geometry.cells
       : [];
 
   const normalizedCoordinates = Object.freeze(coordinates.map(normalizePixelBrainCoordinate));
@@ -212,9 +233,20 @@ export function normalizePixelBrainAssetPacket(input = {}) {
     material: materialId,
   };
 
+  // Recomputed from this packet's own normalized pixels on every construction
+  // and never carried forward from `input`, so it is always a trustworthy
+  // statement about what is actually painted here. `id` is not: it is honoured
+  // verbatim from `input.id`, which is correct for a caller-chosen asset name
+  // and for re-hydration, but means an edit that spreads an existing packet
+  // (`createPixelBrainAssetPacket({ ...packet, coordinates })` in edit-compiler)
+  // keeps the pre-edit id. Compare `contentDigest` to detect that; see
+  // POSTFORGE-PROVENANCE in edit-compiler.js.
+  const contentDigest = `pd_${packetSeed.coordinateDigest}`;
+
   return Object.freeze({
     kind: PIXELBRAIN_ASSET_KIND,
     id: input.id || stableId('pbasset', packetSeed),
+    contentDigest,
     schemaVersion: 1,
     source: normalizeSource(input),
     canvas,

@@ -639,12 +639,25 @@ frame packets; raster previews are never a source of truth.
 
 The Node.js CLI utility is located at `codex/core/pixelbrain/scdl/scdl.cli.js`.
 
+Every command is also reachable as `npm run scdl -- <command> …`, or through the
+per-command shortcuts `npm run scdl:compile|scdl:preview|scdl:check`. Bare
+`npm run scdl` (or running the file with no arguments) prints current usage.
+
+| Command | Purpose | Writes files? |
+|---|---|---|
+| `compile` | run the pass pipeline and emit exports | yes |
+| `preview` | magnified PNG(s) to actually look at | yes |
+| `check` | run the pipeline and report diagnostics | no |
+| `parse` | raw AST, no semantic passes | no |
+
 ### 8.1 Compilation
-Compile an SCDL file and generate target files (defaults to `.json`):
+Compile an SCDL file and generate target files (defaults to `json`):
 ```bash
 node codex/core/pixelbrain/scdl/scdl.cli.js compile fixtures/void_chestplate.scdl --export json,svg,phaser
 node codex/core/pixelbrain/scdl/scdl.cli.js compile fixtures/void_acolyte/void_acolyte.scdl --export json,png,svg,phaser,aseprite
 ```
+
+Valid `--export` targets: `json`, `svg`, `png`, `phaser`, `aseprite` (comma-separated).
 
 **Export Naming Law (SCDL v1.1):** outputs default to the **source file's
 directory** (never the process CWD; override with `--out-dir <dir>`), and all
@@ -658,17 +671,74 @@ Multi-frame:   <asset>-f<N>-<target>.<ext>  per frame
                <asset>-aseprite.aseprite    (one combined file)
 ```
 
-### 8.2 Parsing to AST
+`--out-dir` is **created if it does not exist**, including intermediate
+directories. (It used to be trusted to pre-exist, which made the Quick Start in
+the Authoring Guide fail with a bare `ENOENT` on every first run — audit
+2026-09-03.)
+
+| Flag | Effect |
+|---|---|
+| `--export <csv>` | targets to emit; default `json` |
+| `--out-dir <dir>` | write here instead of beside the source; created on demand |
+| `--out <file>` | exact single-target destination (gets a target infix when `--export` lists more than one target) |
+| `--scale <N>` | magnify raster exports; **default 1**, so a canonical PNG still matches the declared canvas |
+| `--shade material` | shade per material instead of the default Lambert banding |
+| `--semantic` | embed SemQuant annotations in the JSON export |
+| `--strict` | promote warnings to errors (see §8.4) |
+| `--bytecode` | append the `PB-ERR-v1` payload to each diagnostic (see §8.4) |
+
+### 8.2 Preview — the iterate-and-look command
+```bash
+node codex/core/pixelbrain/scdl/scdl.cli.js preview fixtures/void_chestplate.scdl --scale 8
+```
+
+This is the command an artist runs most, and it was missing from this manual
+entirely. A canonical export is the exact declared canvas (16×24, 24×24 …),
+which is unreadable on screen and must stay that way for downstream consumers —
+so looking at your work is a separate operation with its own namespace:
+
+```
+<asset>-preview-<N>x.png          single frame
+<asset>-preview-<N>x-strip.png    one filmstrip per animated loop
+```
+
+Default scale is 8 (`--scale` accepted up to 32; an absurd value is clamped
+with a warning rather than allocating a gigabyte or refusing). Preview files sit
+**outside** the Export Naming Law and are never valid compiler inputs.
+`--out-dir`, `--shade`, `--strict` and `--bytecode` all apply here too.
+
+### 8.3 Parsing to AST
 Generate the raw parsed AST for diagnostic inspection:
 ```bash
 node codex/core/pixelbrain/scdl/scdl.cli.js parse fixtures/void_chestplate.scdl --out ast.json
 ```
+Without `--out` the AST goes to stdout, so it pipes: `… parse x.scdl | jq .parts`.
+Parse-level `INFO` diagnostics are printed after the JSON — earlier versions
+printed only a count (`Parse warnings: 3`) and discarded the list.
 
-### 8.3 Checking Diagnostics
+### 8.4 Checking Diagnostics
 Runs the compilation pass pipeline, validating syntax, colors, and bounds without generating output files:
 ```bash
 node codex/core/pixelbrain/scdl/scdl.cli.js check fixtures/void_chestplate.scdl
 ```
+Exits `0` when the asset compiles clean, `1` otherwise. Diagnostics render
+identically across all four commands:
+
+```
+  WARN: [SCDL-005] Unknown material 'crimson_ooze_material' in part 'body' — falling back to 'source' (line 18:1)
+```
+
+Two deliberate choices, both from audit 2026-09-03:
+
+- **`--strict`** promotes warnings to errors. `SCDL-005` earns a gate: an
+  unknown material does not fail a compile, it silently falls back to `source`,
+  so a typo'd material name produces a *wrong-looking asset that reports
+  success*. Use `--strict` in CI.
+- **the `PB-ERR-v1` bytecode payload is off by default** and opt-in with
+  `--bytecode` (or `SCDL_BYTECODE=1`). It is a ~250-character base64 correlation
+  handle for tooling. It used to be inlined unconditionally on `preview` and
+  `check` but not `compile`, so the same warning looked different depending on
+  which command you happened to run.
 
 ---
 

@@ -189,6 +189,10 @@ function normalizeFidelity(raw) {
   if (!NOISE_FLOORS.includes(noiseFloor)) {
     throw err(`fidelity.noiseFloor must be one of: ${NOISE_FLOORS.join(', ')}`, { noiseFloor });
   }
+  // Optional hand-authored palette the asset is designed against. Emitted only
+  // when declared, so specs that omit it keep their existing spec hash.
+  const exactPalette = normalizeExactPalette(raw.exactPalette);
+
   return Object.freeze({
     qualityTarget,
     paletteBudget: Math.max(8, Math.min(128, Math.round(toFiniteNumber(raw.paletteBudget, 64)))),
@@ -196,7 +200,23 @@ function normalizeFidelity(raw) {
     rimContrast: clampNumber(raw.rimContrast, 0, 1, 0.82),
     centralGlowContainment: clampNumber(raw.centralGlowContainment, 0, 1, 0.88),
     noiseFloor,
+    ...(exactPalette ? { exactPalette } : {}),
   });
+}
+
+function normalizeExactPalette(raw) {
+  if (raw == null) return null;
+  if (!Array.isArray(raw)) throw err('fidelity.exactPalette must be an array of hex colors', { raw });
+  const colors = [];
+  for (const entry of raw) {
+    const hex = String(entry || '').replace('#', '').toUpperCase();
+    if (!/^[0-9A-F]{6}$/.test(hex)) {
+      throw err('fidelity.exactPalette entries must be #RRGGBB hex colors', { entry });
+    }
+    const normalized = `#${hex}`;
+    if (!colors.includes(normalized)) colors.push(normalized);
+  }
+  return colors.length ? Object.freeze(colors) : null;
 }
 
 function clampNumber(value, min, max, fallback) {

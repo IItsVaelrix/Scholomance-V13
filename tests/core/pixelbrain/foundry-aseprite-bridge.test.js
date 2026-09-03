@@ -174,7 +174,27 @@ describe('Foundry Aseprite bridge', () => {
     expect(binary.readUInt16LE(4)).toBe(0xA5E0);
     expect(binary.readUInt16LE(8)).toBe(MINI_SPEC.canvas.width);
     expect(binary.readUInt16LE(10)).toBe(MINI_SPEC.canvas.height);
-    expect(binary.readUInt16LE(12)).toBe(32);
+
+    // Header layout, asserted against upstream docs/ase-file-specs.md rather than
+    // against this codec's own decoder — a round-trip test can pass while the
+    // file is unreadable by the program named in its own format. Field order is
+    // DWORD size · WORD magic · WORD frames · WORD width · WORD height ·
+    // WORD depth · DWORD flags..., with grid fields at 0x24..0x2A and
+    // "number of colors" at 0x20.
+    //
+    // Depth used to be asserted as 32 (RGBA) here, which was red on arrival: the
+    // bridge declares `colorMode: 'indexed'` unconditionally (the sibling test at
+    // the top of this file asserts the same), so the codec writes 8. 8 is the
+    // correct value for an indexed file; the assertion was the stale side.
+    expect(binary.readUInt16LE(6)).toBe(1);                  // frames
+    expect(binary.readUInt16LE(12)).toBe(8);                 // 8 bpp = indexed
+    expect(binary.readUInt16LE(32)).toBeGreaterThan(1);      // palette entries
+    expect(binary.readUInt16LE(36)).toBe(0);                 // grid x
+    expect(binary.readUInt16LE(38)).toBe(0);                 // grid y
+    expect(binary.readUInt16LE(40)).toBe(0);                 // grid width (0 = no grid)
+    // The canvas size must not be duplicated into the grid fields.
+    expect(binary.readUInt16LE(38)).not.toBe(MINI_SPEC.canvas.width);
+    expect(binary.readUInt16LE(40)).not.toBe(MINI_SPEC.canvas.height);
 
     const decoded = decodeFoundryAsepriteBinary(binary);
     expect(decoded.width).toBe(MINI_SPEC.canvas.width);

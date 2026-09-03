@@ -72,6 +72,7 @@ import { forgePacket } from './semantic-bridge.js';
 import { MATERIAL_PALETTES, resolveMaterialId, SOURCE_MATERIAL } from './material-registry.js';
 import { exportToPhaserPipeline } from './phaser-shader-export.js';
 import { normalizeItemSpec, hashItemSpec, validateItemSpec } from './item-spec.js';
+import { collectSpecIntent } from './spec-intent-report.js';
 import { SDFShapeAMP } from './sdf-shape-amp.js';
 import { NoiseFillAMP } from './noise-fill-amp.js';
 
@@ -632,6 +633,15 @@ export function forgeItemAsset(rawSpec, opts = {}) {
     fidelity: Object.freeze({
       proportions: chestplateProportions,
       palette: quantization.diagnostics,
+      // Read-only authored-vs-effective delta (audit 2026-09-03, MAJOR #6).
+      // Computed last and never fed to a hash, a resolver or a pass, so it can
+      // only ever report — it cannot change what ships.
+      intent: opts.intentReport === false ? null : collectSpecIntent({
+        rawSpec,
+        spec,
+        fills,
+        silhouette,
+      }),
     }),
     routeDiagnostics: Object.freeze(routeDiagnostics),
     expansion: expansion ? Object.freeze(expansion) : null,

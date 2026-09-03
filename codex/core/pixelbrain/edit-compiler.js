@@ -138,10 +138,21 @@ export function applyPolishDelta(packet, delta) {
   return createPixelBrainAssetPacket({
     ...packet,
     coordinates: coords,
-    metadata: {
-      ...packet.metadata,
-      lastDelta: normalizedDelta.targetAssetId || 'polish-delta',
-    },
+    metadata: postForgeMetadata(
+      packet,
+      {
+        kind: 'apply-polish-delta',
+        delta: normalizedDelta.targetAssetId || 'polish-delta',
+        operations: normalizedDelta.operations.length,
+        // The cells touched, as data. This is the channel a hand edit should go
+        // through: it lands in the provenance chain, so "authored by spec" and
+        // "authored by spec plus N hand edits" stay distinguishable on the asset.
+        touched: Object.freeze(normalizedDelta.operations.map(
+          (op) => Object.freeze({ kind: op.kind, x: op.x, y: op.y }),
+        )),
+      },
+      { ...packet.metadata, lastDelta: normalizedDelta.targetAssetId || 'polish-delta' },
+    ),
   });
 }
 
@@ -179,6 +190,99 @@ export function validatePixelBrainEdit(packet, { previousPacket = null, operatio
 
 // 5. Constraint-Preserving Edit Operations (verbs, not brushes)
 
+/**
+ * Post-forge provenance chain.
+ *
+ * WHY THIS EXISTS (audit 2026-09-03, DR-2026-09-03-PIXELBRAIN-UX, MAJOR #2).
+ * The flagship asset is not the declarative spec alone: `forgeItemAsset` output
+ * is then widened, moved and hand-dotted with literal coordinates. That is a
+ * legitimate authoring choice, but the packet carried no trace of it, so every
+ * consumer reading `metadata.compatibility.spec.hash` believed it was looking at
+ * a pure ITEM-SPEC-v1 derivation. It was not, and nothing said so.
+ *
+ * The identity problem is worse than an unlisted provenance. `createPixelBrainAssetPacket`
+ * honours `input.id` verbatim, and every edit here rebuilds with
+ * `createPixelBrainAssetPacket({ ...packet, coordinates })`, so the pre-edit id is
+ * carried across a pixel change. Measured directly, 2026-09-03: two packets with
+ * different positions and different colours both returned `pbasset_e122cff3`.
+ *
+ * Recomputing the id on mismatch is NOT the fix, and was tried and rejected:
+ * `stableId` seeds on partly unnormalized input (`source` is a string at first
+ * build and an object after `normalizeSource`), so an id does not generally equal
+ * the digest of its own packet. Re-hydrating a stored packet would rename it.
+ *
+ * So instead: `contentDigest` is recomputed from normalized pixels on every build
+ * and never inherited, and every geometry-changing edit appends a link here. An
+ * inherited id is then detectable as `entry.digestBefore !== packet.contentDigest`,
+ * and "spec-declared" vs "spec + hand edits" is a fact on the asset rather than a
+ * rumour about the script that made it.
+ */
+export const POSTFORGE_PROVENANCE_KEY = 'postForgeEdits';
+
+/**
+ * Build the `metadata` object for an edit's output packet, appending this edit to
+ * the chain the input packet already carries.
+ * @param {object} packet   the packet BEFORE this edit
+ * @param {object} operation { kind, ...params }
+ * @param {object} [extra]   other metadata fields this edit's output should carry
+ */
+export function postForgeMetadata(packet, operation, extra = {}) {
+  const metadata = packet?.metadata || {};
+  const compatibility = metadata?.compatibility || {};
+  const prior = Array.isArray(compatibility[POSTFORGE_PROVENANCE_KEY])
+    ? compatibility[POSTFORGE_PROVENANCE_KEY]
+    : [];
+  const { kind, ...params } = operation || { kind: 'unknown' };
+  const entry = Object.freeze({
+    kind,
+    params: Object.freeze(params),
+    idBefore: packet?.id ?? null,
+    digestBefore: packet?.contentDigest ?? null,
+    cellCountBefore: packet?.geometry?.coordinates?.length ?? packet?.coordinates?.length ?? 0,
+  });
+  return {
+    ...metadata,
+    ...extra,
+    compatibility: {
+      ...compatibility,
+      [POSTFORGE_PROVENANCE_KEY]: Object.freeze([...prior, entry]),
+    },
+  };
+}
+
+/** True when this packet's pixels are not what its id was minted for. */
+export function hasInheritedEditId(packet) {
+  const edits = packet?.metadata?.compatibility?.[POSTFORGE_PROVENANCE_KEY];
+  if (!Array.isArray(edits) || edits.length === 0) return false;
+  const first = edits[0];
+  return !!first?.digestBefore && first.digestBefore !== packet.contentDigest;
+}
+
+/**
+ * One line per rejected edit, naming the cell rather than dumping it.
+ *
+ * `throw new Error(... + JSON.stringify(diag.failures))` printed four complete
+ * cell records — 3.5 KB for a 4-pixel overflow — which is the same failure mode
+ * the 2026-09-03 audit logged against the SCDL CLI's inline `PB-ERR-v1` blobs:
+ * the payload buries the one fact the author needs. A rejected edit now reads
+ * `OUT_OF_BOUNDS at (-1,10 left_pauldron), (64,10 right_pauldron) +2 more`.
+ */
+export function describeEditFailures(failures = [], limit = 4) {
+  const parts = [];
+  let rest = 0;
+  for (const f of failures) {
+    if (!f) continue;
+    if (parts.length >= limit) { rest++; continue; }
+    const c = f.cell;
+    const where = c && Number.isFinite(c.x) && Number.isFinite(c.y)
+      ? ` at (${c.x},${c.y}${c.partId ? ` ${c.partId}` : ''})`
+      : '';
+    parts.push(`${f.code || 'EDIT_REJECTED'}${where}`);
+  }
+  if (failures.length === 0) return 'unknown failure';
+  return rest > 0 ? `${parts.join(', ')} +${rest} more` : parts.join(', ');
+}
+
 export function widenPauldrons(packet, amount = 2) {
   const parts = ['left_pauldron_shell', 'left_pauldron_trim', 'right_pauldron_shell', 'right_pauldron_trim', 'left_pauldron', 'right_pauldron'];
   let coords = [...(packet.geometry?.coordinates || packet.coordinates || [])];
@@ -190,9 +294,13 @@ export function widenPauldrons(packet, amount = 2) {
     return { ...cell, x: newX, snappedX: (cell.snappedX ?? cell.x) + dir * amount };
   });
 
-  const next = createPixelBrainAssetPacket({ ...packet, coordinates: coords });
+  const next = createPixelBrainAssetPacket({
+    ...packet,
+    coordinates: coords,
+    metadata: postForgeMetadata(packet, { kind: 'widen-part', amount, parts }),
+  });
   const diag = validatePixelBrainEdit(next, { previousPacket: packet, operation: { kind: 'widen-part', amount }, constraints: { preventOutOfBounds: true } });
-  if (!diag.ok) throw new Error('widenPauldrons validation failed: ' + JSON.stringify(diag.failures));
+  if (!diag.ok) throw new Error(`widenPauldrons validation failed: ${describeEditFailures(diag.failures)}`);
 
   return next;
 }
@@ -207,9 +315,13 @@ export function moveCore(packet, dy = 1) {
     return { ...cell, y: newY, snappedY: (cell.snappedY ?? cell.y) + dy };
   });
 
-  const next = createPixelBrainAssetPacket({ ...packet, coordinates: coords });
+  const next = createPixelBrainAssetPacket({
+    ...packet,
+    coordinates: coords,
+    metadata: postForgeMetadata(packet, { kind: 'move-part', dy, parts }),
+  });
   const diag = validatePixelBrainEdit(next, { previousPacket: packet, operation: { kind: 'move-part', dy }, constraints: { preventOutOfBounds: true } });
-  if (!diag.ok) throw new Error('moveCore validation failed');
+  if (!diag.ok) throw new Error(`moveCore validation failed: ${describeEditFailures(diag.failures)}`);
 
   return next;
 }
@@ -223,7 +335,11 @@ export function remapTrimMaterial(packet, nextMaterial, resolveColor = (m) => '#
     return { ...cell, material: nextMaterial, color: resolveColor(nextMaterial) };
   });
 
-  return createPixelBrainAssetPacket({ ...packet, coordinates: coords });
+  return createPixelBrainAssetPacket({
+    ...packet,
+    coordinates: coords,
+    metadata: postForgeMetadata(packet, { kind: 'remap-trim-material', material: nextMaterial, parts }),
+  });
 }
 
 // 6. Region Selection Masks (attach to packet)
@@ -241,7 +357,11 @@ export function transformRelativeToAnchor(packet, anchor, dx = 0, dy = 0, parts 
     if (parts.length && !parts.includes(cell.partId)) return cell;
     return { ...cell, x: cell.x + dx, y: cell.y + dy };
   });
-  return createPixelBrainAssetPacket({ ...packet, coordinates: coords });
+  return createPixelBrainAssetPacket({
+    ...packet,
+    coordinates: coords,
+    metadata: postForgeMetadata(packet, { kind: 'transform-relative-to-anchor', anchor, dx, dy, parts }),
+  });
 }
 
 // 8. Minimal PB-EDIT-SESSION implementation
@@ -380,10 +500,14 @@ export function cleanupOrphanPixels(packet, options = {}) {
   const baseMeta = { ...(packet.metadata || {}) };
   const metaUpdate = { lastPolishPass: 'cleanupOrphanPixels', orphansMerged: modified, orphanCandidatesConsidered: coords.length };
 
+  // Only a pass that actually moved pixels gets a provenance link: a no-op must
+  // not leave the chain implying an edit that never happened.
   return createPixelBrainAssetPacket({
     ...packet,
     coordinates: updated,
-    metadata: { ...baseMeta, ...metaUpdate },
+    metadata: modified > 0
+      ? postForgeMetadata(packet, { kind: 'cleanup-orphan-pixels', minSameNeighbors }, { ...baseMeta, ...metaUpdate })
+      : { ...baseMeta, ...metaUpdate },
   });
 }
 
@@ -486,7 +610,9 @@ export function enforceInnerStructuralRigidity(packet, options = {}) {
   return createPixelBrainAssetPacket({
     ...packet,
     coordinates: coords,
-    metadata: { ...baseMeta2, lastPolishPass: 'enforceInnerStructuralRigidity', innerJogsFixed: modified },
+    metadata: modified > 0
+      ? postForgeMetadata(packet, { kind: 'enforce-inner-structural-rigidity', innerJogsFixed: modified }, { ...baseMeta2, lastPolishPass: 'enforceInnerStructuralRigidity', innerJogsFixed: modified })
+      : { ...baseMeta2, lastPolishPass: 'enforceInnerStructuralRigidity', innerJogsFixed: modified },
   });
 }
 
@@ -579,10 +705,10 @@ export function applyDropShadow(packet, options = {}) {
   return createPixelBrainAssetPacket({
     ...packet,
     coordinates: nextCoords,
-    metadata: {
+    metadata: postForgeMetadata(packet, { kind: 'apply-drop-shadow', shadowsCast: additions.length }, {
       ...baseMeta3,
       lastPolishPass: 'applyDropShadow',
       shadowsCast: additions.length,
-    },
+    }),
   });
 }
