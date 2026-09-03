@@ -16,17 +16,25 @@
  *   node scdl.cli.js check   fixtures/void_chestplate.scdl
  */
 
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, basename, dirname, extname, join } from 'node:path';
 import { compileSCDL, parseSCDL, exportSCDL } from './index.js';
 import { buildAsepritePayload, exportFilmstripPNG, MAX_PNG_SCALE } from './scdl.exporters.js';
 import { encodeAsepriteBinary } from '../aseprite-binary-codec.js';
-import { buildSCDLDiagnosticReport, formatSCDLDiagnostic } from './scdl.diagnostics.js';
+import { buildSCDLDiagnosticReport } from './scdl.diagnostics.js';
 
 const [,, command, ...argv] = process.argv;
 
 /** Big enough to read a 16–32px asset on a normal display without squinting. */
 const DEFAULT_PREVIEW_SCALE = 8;
+
+/**
+ * Flags that are pure switches and must never swallow the token after them.
+ * Without this list a boolean could only be detected by peeking at the *next*
+ * token for a `--` prefix, so `compile --bytecode foo.scdl` read foo.scdl as
+ * bytecode's value and lost the input file.
+ */
+const BOOLEAN_FLAGS = new Set(['bytecode', 'strict', 'semantic']);
 
 function parseArgs(args) {
   const opts = { flags: {}, positional: [] };
@@ -38,12 +46,13 @@ function parseArgs(args) {
       // `--strict --out-dir /tmp` set strict='--out-dir', left `--out-dir` unset,
       // and pushed the path into positionals — so the flag silently did nothing
       // and the output landed somewhere else.
+      const key = args[i].slice(2);
       const next = args[i + 1];
-      if (next !== undefined && !next.startsWith('--')) {
-        opts.flags[args[i].slice(2)] = next;
+      if (!BOOLEAN_FLAGS.has(key) && next !== undefined && !next.startsWith('--')) {
+        opts.flags[key] = next;
         i += 2;
       } else {
-        opts.flags[args[i].slice(2)] = true;
+        opts.flags[key] = true;
         i += 1;
       }
     } else {
@@ -63,17 +72,80 @@ function readSource(filePath) {
   }
 }
 
+/**
+ * Write one export artifact, creating its parent directory if needed.
+ *
+ * `--out-dir` used to be trusted to exist. It doesn't: every first run against
+ * a fresh directory died with a raw `ENOENT: no such file or directory, open
+ * '<path>'` — the exact invocation the Authoring Guide's Quick Start shows
+ * (audit 2026-09-03 MAJOR). A bare Node errno also never says the actual fix,
+ * which is "that directory does not exist", so we create it and, if creation
+ * itself is refused, say so instead of leaking the open() error.
+ */
 function writeOut(outPath, content) {
+  const abs = resolve(outPath);
+  try {
+    mkdirSync(dirname(abs), { recursive: true });
+  } catch (e) {
+    console.error(`[SCDL] Cannot create output directory: ${dirname(abs)}\n${e.message}`);
+    process.exit(1);
+  }
   try {
     if (typeof content === 'string') {
-      writeFileSync(resolve(outPath), content, 'utf8');
+      writeFileSync(abs, content, 'utf8');
     } else {
-      writeFileSync(resolve(outPath), content);
+      writeFileSync(abs, content);
     }
     console.log(`[SCDL] Written: ${outPath}`);
   } catch (e) {
-    console.error(`[SCDL] Cannot write: ${outPath}\n${e.message}`);
+    const hint = e.code === 'EISDIR' ? '\n  (a directory already exists at this path)' : '';
+    console.error(`[SCDL] Cannot write: ${outPath}\n${e.message}${hint}`);
     process.exit(1);
+  }
+}
+
+// ─── Diagnostic presentation ──────────────────────────────────────────────────
+
+/**
+ * One diagnostic printer for every subcommand.
+ *
+ * Audit 2026-09-03 (MINOR) caught the same warning rendering two ways: `compile`
+ * printed a clean one-liner, while `preview` and `check` inlined the raw
+ * ~250-character `PB-ERR-v1-…` payload — and `preview` is the command an artist
+ * runs most, because it's the one that shows them their art. The bytecode
+ * string is a machine correlation handle, not prose; it is now opt-in via
+ * `--bytecode` (or `SCDL_BYTECODE=1`) everywhere instead of varying per command.
+ * The human-readable prefix is unchanged and still complete on its own, which
+ * is the property the audit graded as a genuine strength.
+ */
+const SHOW_BYTECODE = process.argv.includes('--bytecode') || process.env.SCDL_BYTECODE === '1';
+
+function diagnosticLevel(err) {
+  if (err.isError?.()) return 'ERROR';
+  if (err.isWarn?.()) return 'WARN';
+  return 'INFO';
+}
+
+function diagnosticLine(err) {
+  const label = err.label ? `[${err.label}] ` : '';
+  const loc = err.loc ? ` (line ${err.loc.line}:${err.loc.col})` : '';
+  const bytecode = SHOW_BYTECODE && err.bytecodeString ? ` | ${err.bytecodeString}` : '';
+  return `${label}${err.message}${loc}${bytecode}`;
+}
+
+function printDiagnostic(err) {
+  const level = diagnosticLevel(err);
+  const line = `  ${level}: ${diagnosticLine(err)}`;
+  if (level === 'ERROR') console.error(line);
+  else if (level === 'WARN') console.warn(line);
+  else console.log(line);
+}
+
+/** Print the diagnostics whose severity should reach the terminal for a command. */
+function printDiagnostics(errors, { only } = {}) {
+  for (const err of errors || []) {
+    if (only && !only.includes(diagnosticLevel(err))) continue;
+    printDiagnostic(err);
   }
 }
 
@@ -109,17 +181,11 @@ function cmdCompile(args) {
     // and then explain nothing.
     const blocking = result.errors.filter(e => e.isError?.() || (opts.flags.strict === true && e.isWarn?.()));
     console.error(`[SCDL] Compile FAILED (${blocking.length} blocking diagnostic(s)):`);
-    for (const err of blocking) {
-      console.error('  ' + formatSCDLDiagnostic(err));
-    }
+    for (const err of blocking) printDiagnostic(err);
     process.exit(1);
   }
 
-  if (result.errors.length > 0) {
-    for (const err of result.errors) {
-      if (err.isWarn && err.isWarn()) console.warn('  WARN: ' + err.message);
-    }
-  }
+  printDiagnostics(result.errors, { only: ['WARN'] });
 
   const multiFrame = Boolean(result.frameLoop) && result.framePackets.length > 1;
 
@@ -197,15 +263,12 @@ function cmdPreview(args) {
   const result = compileSCDL(source, { strict: opts.flags.strict === true });
 
   if (!result.ok) {
-    console.error(`[SCDL] preview: compile FAILED (${result.errors.length} error(s)):`);
-    for (const err of result.errors) {
-      if (err.isError && err.isError()) console.error('  ' + formatSCDLDiagnostic(err));
-    }
+    const blocking = result.errors.filter(e => e.isError?.() || (opts.flags.strict === true && e.isWarn?.()));
+    console.error(`[SCDL] preview: compile FAILED (${blocking.length} blocking diagnostic(s)):`);
+    for (const err of blocking) printDiagnostic(err);
     process.exit(1);
   }
-  for (const err of result.errors) {
-    if (err.isWarn && err.isWarn()) console.warn('  WARN: ' + formatSCDLDiagnostic(err));
-  }
+  printDiagnostics(result.errors, { only: ['WARN'] });
 
   const packets = (result.frameLoop && result.framePackets.length > 1)
     ? result.framePackets
@@ -263,8 +326,11 @@ function cmdParse(args) {
     console.log(out);
   }
 
-  if (result.errors.length) {
-    console.warn(`[SCDL] Parse warnings: ${result.errors.length}`);
+  if (result.errors?.length) {
+    // Previously this printed only a count and swallowed the list — an author
+    // got "Parse warnings: 3" and no way to see which three lines.
+    console.warn(`[SCDL] Parse diagnostics: ${result.errors.length}`);
+    printDiagnostics(result.errors);
   }
 }
 
@@ -284,15 +350,7 @@ function cmdCheck(args) {
   console.log(`  Warns:  ${report.summary.warns}`);
   console.log(`  Infos:  ${report.summary.infos}`);
 
-  for (const err of result.errors) {
-    if (err.isError && err.isError()) {
-      console.error('  ERROR: ' + formatSCDLDiagnostic(err));
-    } else if (err.isWarn && err.isWarn()) {
-      console.warn('  WARN:  ' + formatSCDLDiagnostic(err));
-    } else {
-      console.log('  INFO:  ' + formatSCDLDiagnostic(err));
-    }
-  }
+  printDiagnostics(result.errors);
 
   if (result.ok) {
     console.log(`  Packet: ${result.packet?.id}`);
@@ -349,5 +407,9 @@ These sit outside the Export Naming Law namespace and are never compiler inputs.
 
 --strict promotes warnings (notably SCDL-005 unknown material, which silently
 falls back to 'source') to errors.
+
+--bytecode appends the machine-readable PB-ERR-v1 correlation payload to each
+diagnostic. Off by default: it is a ~250-char base64 blob meant for tooling,
+not for reading. SCDL_BYTECODE=1 sets it for every command in a shell.
 `);
 }

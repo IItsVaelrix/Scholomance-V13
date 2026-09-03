@@ -324,3 +324,121 @@ export json
     expect(existsSync(join(dir, 'blob-preview-2x.png'))).toBe(true);
   });
 });
+
+/**
+ * Audit 2026-09-03 — MAJOR `writeOut` ENOENT + MINOR diagnostic-verbosity drift.
+ * These use spawnSync because the behaviours under test are split across
+ * stdout (JSON, INFO) and stderr (WARN/ERROR), which execFileSync cannot both
+ * capture.
+ */
+import { spawnSync } from 'node:child_process';
+
+function runBoth(args, cwd) {
+  const r = spawnSync('node', [CLI, ...args], { cwd, encoding: 'utf8' });
+  return { status: r.status, stdout: r.stdout ?? '', stderr: r.stderr ?? '', all: (r.stdout ?? '') + (r.stderr ?? '') };
+}
+
+const UNKNOWN_MATERIAL = `
+asset badmat canvas 8x8
+palette { a = #112233 }
+part body material totally_not_a_material { rect 2 2 4 4 a }
+export json
+`.trim();
+
+describe('SCDL CLI — --out-dir creates its target (audit MAJOR)', () => {
+  it('compiles into a fresh, non-existent, nested --out-dir instead of ENOENT', () => {
+    const src = join(dir, 'blob.scdl');
+    writeFileSync(src, SINGLE);
+    const out = join(dir, 'fresh', 'deeper', 'deepest');
+    const r = runBoth(['compile', src, '--export', 'png', '--out-dir', out], cwdDir);
+    expect(r.stderr).not.toMatch(/ENOENT/);
+    expect(r.status).toBe(0);
+    expect(existsSync(join(out, 'blob-png.png'))).toBe(true);
+  });
+
+  it('preview into a fresh --out-dir creates it too (the artist-facing path)', () => {
+    const src = join(dir, 'blob.scdl');
+    writeFileSync(src, SINGLE);
+    const out = join(dir, 'never-existed');
+    const r = runBoth(['preview', src, '--scale', '4', '--out-dir', out], cwdDir);
+    expect(r.status).toBe(0);
+    expect(existsSync(join(out, 'blob-preview-4x.png'))).toBe(true);
+  });
+
+  it('a path that is a directory reports the real problem, not a bare errno', () => {
+    const src = join(dir, 'blob.scdl');
+    writeFileSync(src, SINGLE);
+    mkdirSync(join(dir, 'blob-json.json'));
+    const r = runBoth(['compile', src, '--export', 'json', '--out', join(dir, 'blob-json.json')], cwdDir);
+    expect(r.status).toBe(1);
+    expect(r.stderr).toMatch(/Cannot write/);
+  });
+});
+
+describe('SCDL CLI — one diagnostic rendering across commands (audit MINOR)', () => {
+  function warnLines(cmd, extra = []) {
+    const src = join(dir, `badmat-${cmd}.scdl`);
+    writeFileSync(src, UNKNOWN_MATERIAL);
+    const r = runBoth([cmd, src, ...extra], cwdDir);
+    return r.all.split('\n').filter((l) => /SCDL-005/.test(l)).map((l) => l.trim());
+  }
+
+  it('compile, check and preview print the identical WARN text', () => {
+    const compile = warnLines('compile');
+    const check = warnLines('check');
+    const preview = warnLines('preview');
+    expect(compile.length).toBeGreaterThan(0);
+    expect(check).toEqual(compile);
+    expect(preview).toEqual(compile);
+  });
+
+  it('the PB-ERR-v1 payload is suppressed by default on every command', () => {
+    for (const cmd of ['compile', 'check', 'preview']) {
+      expect(warnLines(cmd).join('\n')).not.toMatch(/PB-ERR-v1/);
+    }
+  });
+
+  it('--bytecode opts the payload back in', () => {
+    const lines = warnLines('check', ['--bytecode']);
+    expect(lines.length).toBeGreaterThan(0);
+    expect(lines.join('\n')).toMatch(/PB-ERR-v1/);
+  });
+
+  it('SCDL_BYTECODE=1 is honoured without a flag', () => {
+    const src = join(dir, 'badmat-env.scdl');
+    writeFileSync(src, UNKNOWN_MATERIAL);
+    const r = spawnSync('node', [CLI, 'check', src], {
+      cwd: cwdDir, encoding: 'utf8', env: { ...process.env, SCDL_BYTECODE: '1' },
+    });
+    expect((r.stdout ?? '') + (r.stderr ?? '')).toMatch(/PB-ERR-v1/);
+  });
+
+  it('the human line keeps severity + code + message + line:col with no payload', () => {
+    const line = warnLines('check')[0];
+    expect(line).toMatch(/^WARN:\s+\[SCDL-005\] Unknown material 'totally_not_a_material'/);
+    expect(line).toMatch(/\(line \d+:\d+\)$/);
+    expect(line).not.toMatch(/PB-ERR-v1/);
+  });
+
+  it('a boolean flag before the input file does not swallow it', () => {
+    const src = join(dir, 'blob.scdl');
+    writeFileSync(src, SINGLE);
+    const r = runBoth(['compile', '--bytecode', src, '--export', 'json'], cwdDir);
+    expect(r.status).toBe(0);
+    expect(existsSync(join(dir, 'blob-json.json'))).toBe(true);
+  });
+
+  it('parse reports the diagnostics behind its count instead of a bare number', () => {
+    const src = join(dir, 'opaque.scdl');
+    writeFileSync(src, `
+asset blob canvas 8x8
+palette { a = #112233 }
+part body material voidsteel { rect 2 2 4 4 a wobble=yes }
+export json
+`.trim());
+    const r = runBoth(['parse', src], cwdDir);
+    expect(r.all).toMatch(/Parse diagnostics: \d+/);
+    expect(r.all).toMatch(/Unknown part op 'wobble'/);
+  });
+});
+

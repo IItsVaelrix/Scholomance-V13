@@ -36,6 +36,13 @@ jobs:
     - name: Lint
       run: npm run lint
 
+    # EFFECT_CATALOG.md is generated from source (summaries, live import-graph
+    # status, registry coverage). Audit 2026-09-03 found the one hand-kept
+    # registry contradicting the tree with no gate to notice; this makes that
+    # class of drift a build failure instead of a reader's discovery.
+    - name: Verify generated asset docs are current
+      run: npm run effects:check
+
     - name: Verify backend contract
       run: npm run verify:backend-contract
 

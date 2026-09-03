@@ -9,7 +9,7 @@ import crypto from 'node:crypto';
 import path from 'path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { execFileSync, execSync } from 'node:child_process';
+import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
@@ -1396,6 +1396,121 @@ export function registerCollabMcpBridge(server, service = collabService) {
             bytecode: 'SCHOL-SKILL-COMPILE-V1-KNOWLEDGE',
         };
     }, 'SCDL (PixelBrain vector/cell asset DSL) and generalized asset-compiler/rasterizer engineering knowledge: grammar, compiler pass pipeline, error codes, boolean-op semantics, rasterizer SDF math, and reusable compiler-design patterns. Invoke when writing, debugging, or extending SCDL, or designing any parser->AST->passes->packet compiler.');
+
+    // ── PixelBrain / SCDL asset generation ───────────────────────────────────
+    // Audit 2026-09-03 (MAJOR): this server registered 83 tools and exposed
+    // ZERO asset-generation capability, so an assistant asked to "make a
+    // bespoke sword" had nothing callable and had to already know a raw file
+    // path. These tools deliberately spawn the SAME scdl.cli.js a human runs
+    // rather than importing the compiler directly: one entrypoint, so MCP
+    // output and CLI output can never silently disagree about flags, naming,
+    // or diagnostics.
+    const SCDL_CLI = path.join(ROOT, 'codex/core/pixelbrain/scdl/scdl.cli.js');
+    const EFFECT_CATALOG = path.join(ROOT, 'scripts/pixelbrain-effect-catalog.mjs');
+
+    function runScdl(args, timeoutMs = 120_000) {
+        // spawnSync, not execFileSync: the CLI writes exports to stdout and
+        // diagnostics to stderr, and execFileSync only hands back stdout when
+        // the process exits 0. A successful `check` would then report
+        // "OK: true" with its two SCDL-005 warnings invisible — the exit code
+        // is not the payload here, the diagnostics are.
+        const r = spawnSync('node', [SCDL_CLI, ...args], {
+            encoding: 'utf8', cwd: ROOT, maxBuffer: 32 * 1024 * 1024, timeout: timeoutMs,
+        });
+        const stdout = r.stdout ? String(r.stdout) : '';
+        const stderr = r.stderr ? String(r.stderr) : '';
+        if (r.error) {
+            return { ok: false, error: r.error.message, stdout: stdout.slice(0, 20000), stderr: stderr.slice(0, 20000) };
+        }
+        return {
+            // Non-zero means the compile failed, and that IS the answer an
+            // author wants — surface the diagnostics, don't mask them as an
+            // execution error.
+            ok: r.status === 0,
+            exitCode: r.status,
+            stdout: stdout.slice(0, 20000),
+            stderr: stderr.slice(0, 20000),
+        };
+    }
+
+    registerTool(server, 'mcp_scholomance_collab_asset_scdl', {
+        command: z.enum(['compile', 'preview', 'check', 'parse'])
+            .describe('compile=emit exports, preview=magnified PNG to look at, check=diagnostics only, parse=AST'),
+        file: z.string().describe('Repo-relative or absolute .scdl path'),
+        export: z.string().optional().describe('compile only: csv of json,svg,png,phaser,aseprite (default json)'),
+        outDir: z.string().optional().describe('Target directory; created if missing (default: beside the source)'),
+        scale: z.number().int().min(1).max(32).optional().describe('preview magnification (default 8)'),
+        strict: z.boolean().optional().describe('promote warnings (e.g. unknown material) to errors'),
+    }, ({ command, file, export: exp, outDir, scale, strict }) => {
+        const abs = path.isAbsolute(file) ? file : path.join(ROOT, file);
+        if (!fs.existsSync(abs)) {
+            return { ok: false, error: `No such .scdl file: ${file}`, hint: 'Search assets/ASSETS/ and codex/core/pixelbrain/scdl/fixtures/ for *.scdl' };
+        }
+        const args = [command, abs];
+        if (command === 'compile' && exp) args.push('--export', exp);
+        if (outDir) args.push('--out-dir', outDir);
+        if (command === 'preview' && scale) args.push('--scale', String(scale));
+        if (strict) args.push('--strict');
+        const res = runScdl(args);
+        return {
+            ...res,
+            command,
+            // The CLI prints "[SCDL] Written: <path>" per artifact — hand the
+            // caller the resolved list instead of making it parse prose.
+            written: res.ok ? res.stdout.split('\n').filter(l => l.includes('[SCDL] Written:'))
+                .map(l => l.split('[SCDL] Written:')[1].trim()) : [],
+            generatedBy: 'codex/core/pixelbrain/scdl/scdl.cli.js',
+            note: 'Generated PNG/SVG/JSON are gitignored on purpose — commit the .scdl. See codex/core/pixelbrain/OUTPUTS.md.',
+        };
+    }, 'Compile, preview, or lint an SCDL pixel-art asset (vector/cell DSL). Use for any "make me a sword/shield/chestplate/character sprite" request. Returns the artifacts written; pass command=preview to get a magnified PNG you can actually judge.');
+
+    registerTool(server, 'mcp_scholomance_collab_asset_effects_list', {
+        query: z.string().optional().describe('Optional filter over module name + description (e.g. "bevel", "glow", "symmetry")'),
+        status: z.enum(['WIRED', 'GEN', 'TEST-ONLY', 'ORPHAN']).optional()
+            .describe('Filter by real reachability: WIRED=reachable, GEN=generator-only, ORPHAN=nothing imports it'),
+        limit: z.number().int().min(1).max(200).optional().default(60),
+    }, ({ query, status, limit }) => {
+        let parsed = null;
+        try {
+            parsed = JSON.parse(execFileSync('node', [EFFECT_CATALOG, '--json'], {
+                encoding: 'utf8', cwd: ROOT, maxBuffer: 16 * 1024 * 1024, timeout: 120_000,
+            }));
+        } catch (err) {
+            return { ok: false, error: err.message || 'catalog generation failed', hint: 'npm run effects' };
+        }
+        let amps = parsed.amps;
+        if (status) amps = amps.filter(a => a.status === status);
+        if (query) {
+            const q = query.toLowerCase();
+            amps = amps.filter(a => `${a.name} ${a.summary || ''} ${a.exports.join(' ')}`.toLowerCase().includes(q));
+        }
+        return {
+            ok: true,
+            total: parsed.amps.length,
+            matched: amps.length,
+            summary: parsed.summary,
+            effects: amps.slice(0, limit ?? 60).map(a => ({
+                module: a.path, what: a.summary || `(no header comment; exports ${a.exports.join(', ')})`,
+                status: a.status, reachability: a.detail,
+            })),
+            truncated: amps.length > (limit ?? 60),
+            humanVersion: 'codex/core/pixelbrain/EFFECT_CATALOG.md (npm run effects)',
+        };
+    }, 'List PixelBrain effect/AMP passes (bevel, facet, glow, symmetry, heraldry, selout, tonation, ...) with what each does and whether it is actually wired into a live code path. This is the answer to "what can I use to make this asset look good?" — previously the only registry listed 2 of 53 modules and warned readers not to trust it.');
+
+    registerTool(server, 'mcp_scholomance_collab_asset_output_conventions', {}, () => ({
+        ok: true,
+        doc: 'codex/core/pixelbrain/OUTPUTS.md',
+        content: (() => {
+            const p = path.join(ROOT, 'codex/core/pixelbrain/OUTPUTS.md');
+            return fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : null;
+        })(),
+        rules: {
+            scdlDoorA: 'Exports land beside the source .scdl as <asset>-<target>.<ext>; --out-dir overrides and is created for you.',
+            foundryDoorB: 'ITEM-SPEC-v1 generators write output/foundry/<name>/ (gitignored).',
+            committed: 'Only .scdl and -frameloop.json are tracked. Generated png/svg/json are intentionally NOT in git.',
+        },
+    }), 'Where generated pixel assets are written and which files are actually tracked by git. Read before telling a user an asset was "saved" — most generated art is gitignored by design.');
 
     // ── Agent / Task / Pipeline Discovery (explicit tools for ergonomics) ─────
     registerTool(server, 'mcp_scholomance_collab_agent_list', {
