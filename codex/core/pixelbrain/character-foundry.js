@@ -9,6 +9,7 @@ import { applyXBR2x } from './pixel-scale-amp.js';
 import { evaluateFormula } from './formula-to-coordinates.js';
 import { pointsToSVGPath } from './svg-path-builder.js';
 import { applyChaikin, applyAffine, applyOffsetCurve } from './shared.js';
+import { createPixelBrainAssetPacket, PIXELBRAIN_ASSET_KIND } from './pixelbrain-asset-packet.js';
 
 import './character-body-profiles.js';
 import './character-face-profiles.js';
@@ -523,10 +524,22 @@ export function forgeCharacter(rawSpec, opts = {}) {
     });
   }
 
+  const assetPacket = createPixelBrainAssetPacket({
+    kind: PIXELBRAIN_ASSET_KIND,
+    id: `character_${spec.id}_${specHash}`,
+    source: { kind: 'character-foundry', id: spec.id },
+    coordinates: allCells,
+    canvas: { width: canvas.width, height: canvas.height, transparent: true },
+    palette: {
+      sourcePalette: [{ key: 'character', colors: [...new Set(allCells.map((c) => c.color))] }],
+    },
+  });
+
   const character = Object.freeze({
     spec,
     specHash,
     canvas,
+    assetPacket,
     silhouette: silhouettes,
     fills: filledResults,
     sprites: Object.fromEntries(

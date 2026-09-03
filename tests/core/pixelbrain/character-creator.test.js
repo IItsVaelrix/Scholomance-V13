@@ -201,6 +201,13 @@ describe('character-creator', () => {
     }
   });
 
+  it('includes a valid PixelBrainAssetPacket (PDR §3 assetPacket)', () => {
+    const character = forgeCharacter(buildScholarSpec());
+    expect(character.assetPacket).toBeDefined();
+    expect(character.assetPacket.kind).toBe('pixelbrain.asset.v1');
+    expect(character.assetPacket.geometry.coordinates.length).toBe(character.diagnostics.totalCells);
+  });
+
   it('produces a valid spritesheet (128×48 logical, 512×192 at 4x)', () => {
     const character = forgeCharacter(buildScholarSpec());
     const png = character.spritesheet;
