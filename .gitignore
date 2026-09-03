@@ -88,6 +88,10 @@ dict_data/*
 # Backups of gitignored databases are still databases. A 16MB binary in git
 # history cannot be taken back out; the raw sources rebuild them instead.
 *.sqlite.*
+# Same reasoning, different extension: divtube_memory.db was tracked and
+# mutated on every TUI launch (memory_service.py:_init_db/seed_default_cells
+# run on construction) — a runtime artifact, not a source file.
+*.db
 *.sqlite-wal
 *.sqlite-shm
 *.sqlite-shm

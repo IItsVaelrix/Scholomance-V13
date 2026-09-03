@@ -1,6 +1,16 @@
+import os
 import sqlite3
 import hashlib
 from datetime import datetime
+
+
+def _default_db_path():
+    # Anchored to the module root (divtube_downloader/), same convention as
+    # token_meter.py's _state_path(). A bare relative default meant the TUI
+    # wrote to a different file depending on the launch cwd (repo root vs.
+    # divtube_downloader/), and the resulting runtime DB was tracked in git.
+    base = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    return os.path.join(base, "divtube_memory.db")
 
 
 class MemoryService:
@@ -11,8 +21,8 @@ class MemoryService:
        (reads, status, timestamps). Visualised as a grid in the TUI.
     """
 
-    def __init__(self, db_path="divtube_memory.db"):
-        self.db_path = db_path
+    def __init__(self, db_path=None):
+        self.db_path = db_path if db_path is not None else _default_db_path()
         self._init_db()
         self.seed_default_cells()
 

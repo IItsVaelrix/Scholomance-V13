@@ -5,7 +5,7 @@ inside an unrelated feature commit (82a579d0, "land today's phenotypic
 idealism...") — no incident or design doc explains the disabling, it just
 never got reverted. The DivTube cockpit's agent loop resends its full tool
 catalog and ever-growing message history on every tool round-trip (up to
-MAX_TURNS=150), so every redundant/spammy tool call the gate used to block
+MAX_TURNS=500), so every redundant/spammy tool call the gate used to block
 is now a full-price extra turn. These tests restore the original behavior:
 cooldown-gate a hot tool, and redundancy-gate a re-read of a file we already
 have fresh content for.

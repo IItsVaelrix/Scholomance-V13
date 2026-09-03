@@ -2,7 +2,7 @@
 
 Context: the cockpit agent loop (PromptService.prompt) resends the FULL tool
 catalog (57 schemas, ~8k tokens measured via json.dumps) on every one of up
-to MAX_TURNS=150 tool round-trips for a single user message, because
+to MAX_TURNS=500 tool round-trips for a single user message, because
 _select_tools(tools=None) always returned self.tools.tools unfiltered. This
 is the dominant term in the "token burning" / "reloading every tool
 exponentially" complaint: the schema tax is paid again on every turn, on

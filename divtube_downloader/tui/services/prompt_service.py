@@ -498,7 +498,7 @@ class PromptService:
                     {"role": "user", "content": text}
                 ]
 
-                MAX_TURNS = 150
+                MAX_TURNS = 500
                 use_tools = True
                 selected_tools = self._select_tools(tools, task_text=text)
                 # Real ground truth for AdaptiveToolRecommender: which tools
