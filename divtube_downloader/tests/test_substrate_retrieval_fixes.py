@@ -84,15 +84,40 @@ def test_tui_inspect_still_works_with_real_bound_method():
 class _StubCortex:
     def __init__(self, results):
         self._results = results
+        self.calls = []
+        self.substrate = None
 
     def retrieve(self, text, top_k=5, multi_hop=False):
-        return list(self._results), "ctx"
+        self.calls.append({"text": text, "top_k": top_k, "multi_hop": multi_hop})
+        # Mirror the real Cortex: it can only return the top_k it was asked for,
+        # so a rare tag living outside that slice is simply not in the pool.
+        return list(self._results[:top_k]), "ctx"
 
 
-def _bridge_with_stubbed_cortex(results):
+class _StubSubstrate:
+    """Stands in for Substrate.retrieve's exact SQL metadata pre-filter."""
+
+    def __init__(self, bank):
+        self._bank = bank
+        self.calls = []
+
+    def retrieve(self, query, top_k=5, metadata_filter=None):
+        self.calls.append({"query": query, "top_k": top_k, "metadata_filter": metadata_filter})
+        rows = self._bank
+        if metadata_filter:
+            rows = [
+                r for r in rows
+                if all(r.get("metadata", {}).get(k) == v for k, v in metadata_filter.items())
+            ]
+        return [dict(r) for r in rows[:top_k]]
+
+
+def _bridge_with_stubbed_cortex(results, substrate_bank=None):
     svc = SubstrateBridgeService(db_path="/nonexistent/does-not-matter.sqlite")
     svc._cortex = _StubCortex(results)
     svc._engine = "cortex"
+    if substrate_bank is not None:
+        svc._cortex.substrate = _StubSubstrate(substrate_bank)
     # Skip lazy init entirely — we stubbed the engine directly.
     svc._ensure_engine = lambda: True
     return svc
@@ -192,3 +217,77 @@ def test_cortex_single_hop_dedups_and_gates():
     texts = [r["text"] for r in results]
     assert texts == ["memory A", "memory C"], texts
     assert "SUBSTRATE MEMORIES" in ctx or "CORTEX MEMORIES" in ctx
+
+
+# ── Fix 3: tag_filter must be an exact pre-filter, not a lossy post-filter ──
+# Regression for: substrate_query(tag_filter='insight') returning 0 results on
+# the Cortex path even though the memory existed. Cortex has no tag predicate,
+# so the old code filtered a top_k-sized draw afterwards -- a rare tag could
+# never appear in that draw, producing FALSE ABSENCE from a memory system.
+#
+# KNOWN COVERAGE LIMIT: these stubs use a 61-row bank, so a naive "over-fetch
+# top_k*20 then post-filter" implementation would ALSO pass them. Against the
+# real ~200k bank over-fetch was measured returning 0 (the hash embedder's
+# ranking does not keep a rare tag within the widened window), which is exactly
+# why this routes through Substrate's SQL pre-filter instead. If you ever move
+# the filter back onto the Cortex path, re-verify against ~/.substrate with a
+# rare tag -- green here does not mean correct there.
+
+
+def _rare_tag_bank():
+    """A 'rare' tag sitting far down a large pool of other-tagged rows."""
+    filler = [
+        {"id": i, "text": f"pdr row {i}", "similarity": 0.40 - i * 0.001,
+         "metadata": {"tag": "pdr"}}
+        for i in range(60)
+    ]
+    needle = {"id": 999, "text": "NEEDLE: testpaths is discarded when pytest "
+              "receives an explicit path argument.", "similarity": 0.05,
+              "metadata": {"tag": "insight"}}
+    return filler + [needle], needle
+
+
+def test_tag_filtered_query_finds_row_outside_top_k_pool():
+    bank, needle = _rare_tag_bank()
+    svc = _bridge_with_stubbed_cortex(bank, substrate_bank=bank)
+
+    res = svc.query("pytest collection hazard", top_k=3, tag_filter="insight")
+
+    assert res["ok"] is True
+    texts = [r["text"] for r in res["results"]]
+    assert texts == [needle["text"]], texts
+    # The whole point: the needle ranked 61st, so a top-3 draw plus a post-hoc
+    # filter would have returned nothing and looked like an empty substrate.
+    assert bank[:3][2]["metadata"]["tag"] == "pdr"
+
+
+def test_tag_filter_uses_substrate_pre_filter_and_skips_cortex():
+    bank, _ = _rare_tag_bank()
+    svc = _bridge_with_stubbed_cortex(bank, substrate_bank=bank)
+
+    svc.query("anything", top_k=5, tag_filter="insight")
+
+    assert svc._cortex.substrate.calls[0]["metadata_filter"] == {"tag": "insight"}
+    assert svc._cortex.calls == [], "Cortex must not be used when tag_filter is set"
+
+
+def test_tag_filter_negative_control_still_returns_nothing():
+    """The guard must be able to go red, or 'found it' proves nothing."""
+    bank, _ = _rare_tag_bank()
+    svc = _bridge_with_stubbed_cortex(bank, substrate_bank=bank)
+
+    res = svc.query("anything", top_k=3, tag_filter="no_such_tag")
+
+    assert res["ok"] is True
+    assert res["results"] == []
+
+
+def test_unfiltered_query_still_routes_to_cortex():
+    bank, _ = _rare_tag_bank()
+    svc = _bridge_with_stubbed_cortex(bank, substrate_bank=bank)
+
+    res = svc.query("anything", top_k=3)
+
+    assert len(svc._cortex.calls) == 1
+    assert svc._cortex.substrate.calls == [], "unused substrate on unfiltered path"
+    assert len(res["results"]) > 0

@@ -55,6 +55,7 @@ _PROJECT_ROOT = os.path.dirname(
 )
 _BRAIN_DIR = os.path.join(_PROJECT_ROOT, "steamdeck_brain")
 
+
 # ── Singleton ───────────────────────────────────────────────────────────
 _instance: Optional["SubstrateBridgeService"] = None
 
@@ -177,23 +178,33 @@ class SubstrateBridgeService:
 
         t0 = time.monotonic()
         try:
-            if self._cortex is not None:
+            if tag_filter:
+                # Route tag-scoped queries to Substrate, NOT Cortex.
+                #
+                # Cortex has no tag predicate, so the only option there was to
+                # filter a top_k-sized draw post-hoc. That makes a rare tag
+                # UNREACHABLE (e.g. 'insight' = 2 rows out of ~200k can never
+                # land in a top-2 draw), so the caller receives "0 results" and
+                # wrongly concludes the knowledge is ABSENT -- a false negative
+                # from a memory system is the worst possible failure mode.
+                # Over-fetching does not fix it either: the hash embedder's
+                # ranking is unreliable (see l2_threshold note in _ensure_engine),
+                # so rank is not a usable proxy for "in the right tag".
+                # Substrate exposes an EXACT SQL pre-filter
+                # (json_extract(metadata,'$.tag') = ?, substrate_engine.py:476),
+                # which is both correct and ~17x faster (0.2s vs 3.4s measured).
+                results_raw = self._get_substrate().retrieve(
+                    text, top_k=top_k, metadata_filter={"tag": tag_filter}
+                )
+            elif self._cortex is not None:
                 # Cortex path: multi-hop or single-hop with L1 warming
                 results_raw, _ctx = self._cortex.retrieve(
                     text, top_k=top_k, multi_hop=multi_hop
                 )
-                # Apply tag filter post-hoc (Cortex doesn't support it natively)
-                if tag_filter:
-                    results_raw = [
-                        r for r in results_raw
-                        if r.get("metadata", {}).get("tag") == tag_filter
-                    ][:top_k]
             else:
-                # Substrate fallback: flat retrieval
-                metadata_filter = {"tag": tag_filter} if tag_filter else None
-                results_raw = self._substrate.retrieve(
-                    text, top_k=top_k, metadata_filter=metadata_filter
-                )
+                # Substrate fallback: flat retrieval (tag_filter is handled
+                # above, so there is no metadata filter to apply here).
+                results_raw = self._substrate.retrieve(text, top_k=top_k)
 
             # Dedup by text (the substrate can return the same memory several
             # times from duplicate rows). Keep the first/highest-ranked hit.
