@@ -10,7 +10,7 @@ import { applyXBR2x } from './pixel-scale-amp.js';
 import { evaluateFormula } from './formula-to-coordinates.js';
 import { pointsToSVGPath } from './svg-path-builder.js';
 import { applyChaikin, applyAffine, applyOffsetCurve } from './shared.js';
-import { createPixelBrainAssetPacket, PIXELBRAIN_ASSET_KIND } from './pixelbrain-asset-packet.js';
+import { createPixelBrainAssetPacket } from './pixelbrain-asset-packet.js';
 
 import './character-body-profiles.js';
 import './character-face-profiles.js';
@@ -567,7 +567,6 @@ export function forgeCharacter(rawSpec, opts = {}) {
   }
 
   const assetPacket = createPixelBrainAssetPacket({
-    kind: PIXELBRAIN_ASSET_KIND,
     id: `character_${spec.id}_${specHash}`,
     source: { kind: 'character-foundry', id: spec.id },
     coordinates: allCells,
@@ -878,7 +877,6 @@ export function forgeCharacterFromWandVector(wandProposal, baseSpec = {}, opts =
   const pbrainBlueprint = exportCharacterToPbrainBlueprint({ spec: mergedSpec, canvas, vectorPaths, vectorSource: 'wand', fills, construction: {} });
 
   const assetPacket = createPixelBrainAssetPacket({
-    kind: PIXELBRAIN_ASSET_KIND,
     id: `character_${mergedSpec.id || 'wand'}_${hashCharacterSpec(mergedSpec)}`,
     source: { kind: 'character-foundry-wand', id: mergedSpec.id || null },
     coordinates: allCells,

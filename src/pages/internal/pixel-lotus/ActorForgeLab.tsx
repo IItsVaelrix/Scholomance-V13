@@ -308,7 +308,13 @@ export default function ActorForgeLab() {
   };
 
   const handleLoadFromCatalog = (entry: SavedCharacter) => {
-    const controls = JSON.parse(entry.controls_json);
+    let controls: any;
+    try {
+      controls = JSON.parse(entry.controls_json);
+    } catch {
+      setCatalogError('Failed to load character: invalid saved data');
+      return;
+    }
     if (controls.stylePreset) setStylePreset(controls.stylePreset);
     if (controls.bodyProfile) setBodyProfile(controls.bodyProfile);
     if (controls.skin) setSkin(controls.skin);

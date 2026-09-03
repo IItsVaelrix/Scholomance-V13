@@ -1,5 +1,5 @@
 import { hashString } from './shared.js';
-import { MATERIAL_PALETTES, resolveMaterialId } from './material-registry.js';
+import { MATERIAL_PALETTES } from './material-registry.js';
 
 export const CHARACTER_SPEC_VERSION = 'CHARACTER-SPEC-v1';
 const VALID_DIRECTIONS = Object.freeze(['south', 'east', 'north', 'west']);
