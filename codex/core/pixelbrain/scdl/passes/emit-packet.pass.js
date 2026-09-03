@@ -25,8 +25,18 @@ export function emitPacketPass(ast, _errors) {
   // Flatten all coordinates from all parts
   const allCoordinates = [];
   const allNoise = [];
+  const sdfDescriptors = [];
 
   for (const part of ast.parts) {
+    if (Array.isArray(part.sdfPrimitives) && part.sdfPrimitives.length > 0) {
+      sdfDescriptors.push({
+        contract: 'PB-SDF-v1',
+        version: '1.0.0',
+        id: `sdf-${part.id}`,
+        primitives: part.sdfPrimitives,
+        operations: [],
+      });
+    }
     for (const coord of (part.coordinates || [])) {
       const entry = {
         x:        coord.x,
@@ -87,6 +97,7 @@ export function emitPacketPass(ast, _errors) {
       id: _primaryMaterial(ast.parts),
     },
     noiseDescriptors: allNoise,
+    sdfDescriptors,
     provenance: {
       createdBy:  'scdl-compiler.v1',
       operations: [
