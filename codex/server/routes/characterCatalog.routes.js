@@ -5,7 +5,7 @@ import { getCharacters, saveCharacter, deleteCharacter } from '../characterCatal
 const characterCatalogSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1).max(100),
-  controls: z.any().optional().default({}),
+  controls: z.record(z.string(), z.any()).optional().default({}),
   specJson: z.string().min(1),
   specHash: z.string().min(1),
 });

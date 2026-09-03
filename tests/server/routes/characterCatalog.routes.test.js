@@ -72,6 +72,36 @@ describe('[Server] character catalog routes', () => {
     expect(res.statusCode).toBe(400);
   });
 
+  it('POST rejects controls as a string', async () => {
+    const res = await app.inject({
+      method: 'POST',
+      url: '/api/character/catalog',
+      payload: {
+        id: 'char_route_2',
+        name: 'Test Character',
+        controls: 'not an object',
+        specJson: '{"contract":"CHARACTER-SPEC-v1"}',
+        specHash: 'hash1',
+      },
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('POST rejects controls as an array', async () => {
+    const res = await app.inject({
+      method: 'POST',
+      url: '/api/character/catalog',
+      payload: {
+        id: 'char_route_3',
+        name: 'Test Character',
+        controls: [1, 2, 3],
+        specJson: '{"contract":"CHARACTER-SPEC-v1"}',
+        specHash: 'hash1',
+      },
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
   it('DELETE removes the character', async () => {
     const res = await app.inject({ method: 'DELETE', url: '/api/character/catalog/char_route_1' });
     expect(res.statusCode).toBe(200);
