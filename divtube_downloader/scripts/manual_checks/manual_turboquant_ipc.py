@@ -1,12 +1,18 @@
-import subprocess
 import json
+import pathlib
+import subprocess
+
+# Was ["node", "turboquant_plugin.js"], which resolved against the *current
+# working directory* -- so the harness only ever worked from the module root
+# and reported "Process died" with an empty stderr from anywhere else.
+PLUGIN = pathlib.Path(__file__).resolve().parents[2] / "turboquant_plugin.js"
 
 def run_test():
     print("Starting TurboQuant IPC Test Harness...")
     
     # Start the Node.js plugin
     process = subprocess.Popen(
-        ["node", "turboquant_plugin.js"],
+        ["node", str(PLUGIN)],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,

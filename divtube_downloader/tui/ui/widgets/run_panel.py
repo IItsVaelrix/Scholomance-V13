@@ -41,7 +41,20 @@ def format_progress_bar(fraction: float, width: int = 16, p: dict | None = None)
 
 
 class TestRunPanel(Static):
-    """Animated test board: running progress, then staggered result cascade."""
+    """Animated test board: running progress, then staggered result cascade.
+
+    `__test__ = False` is load-bearing, not decoration. pytest's default
+    `python_classes = Test*` collects by name prefix and inspects *imported*
+    names too, so the first test module that does `from
+    tui.ui.widgets.run_panel import TestRunPanel` would make pytest try to
+    instantiate a Textual widget as a test class. It used to also be reached via
+    the filename (`widgets/test_run_panel.py` matched `python_files`), which is
+    why the module is now `run_panel.py`. Both guards are kept: the rename stops
+    accidental import at collection, this line stops deliberate import in a real
+    test.
+    """
+
+    __test__ = False
 
     def __init__(self, **kwargs):
         super().__init__(_idle_markup(palette(None)), **kwargs)

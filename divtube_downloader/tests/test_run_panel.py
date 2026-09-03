@@ -1,6 +1,6 @@
 import unittest
 
-from tui.ui.widgets.test_run_panel import format_progress_bar, format_test_row
+from tui.ui.widgets.run_panel import format_progress_bar, format_test_row
 
 
 class TestTestRunFormatting(unittest.TestCase):

@@ -4,7 +4,7 @@ from textual.widgets import Header, Footer, RichLog, Input, Static, ProgressBar,
 from tui.ui.widgets.sidebar import Sidebar
 from tui.ui.widgets.inspector import Inspector
 from tui.ui.widgets.code_box import CodeBox
-from tui.ui.widgets.test_run_panel import TestRunPanel
+from tui.ui.widgets.run_panel import TestRunPanel
 from tui.ui.widgets.command_area import CommandArea
 from tui.ui.widgets.resize_handle import CommandResizeHandle
 from tui.ui.widgets.token_meter import AetherMeter

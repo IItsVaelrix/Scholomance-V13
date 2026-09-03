@@ -1,3 +1,0 @@
-So, Vaelrix, there is an issue with the syllable gutter in TrueSight. The visual does not stay in the positioning that it does when it is without         ▎ ▊               ╰───────╯               ▎ 
- ▊         /cleri-scan          ▎ ▊ multiple lines in the text area. At this point, when more than one line is typed, the gutter makes the line indicator magnify. Try to find the reason why   ▎ ▊                                       ▎ 
- ▊       /cleri-diagnose        ▎ ▊ that bug is happening   
