@@ -163,6 +163,15 @@ describe('character-creator', () => {
     expect(arraysEqual(a.sprites.west, b.sprites.west)).toBe(true);
   });
 
+  it('spritesheet PNG is actually compressed, not just stored', () => {
+    const character = forgeCharacter(buildScholarSpec());
+    // A stored (uncompressed) zlib stream is close to raw pixel size; real
+    // DEFLATE on pixel-art (large runs of identical/near-identical bytes)
+    // should compress well below that.
+    const rawPixelBytes = character.canvas.width * 4 * character.canvas.height * 4 * 4; // 4 dirs wide, 4x scale, RGBA
+    expect(character.spritesheet.length).toBeLessThan(rawPixelBytes * 0.5);
+  });
+
   it('generates all 4 directions', () => {
     const character = forgeCharacter(buildScholarSpec());
     expect(character.diagnostics.directions).toEqual(['south', 'east', 'north', 'west']);

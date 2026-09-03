@@ -1,3 +1,4 @@
+import { zlibSync } from 'fflate';
 import { composeCharacterSilhouette } from './character-silhouette-composer.js';
 import { buildCharacterRouteDefinition, validateCharacterDirection } from './character-factory.js';
 import { createCharacterSkeleton, hashCharacterSkeleton, validateCharacterSkeleton } from './character-construction-skeleton.js';
@@ -232,39 +233,6 @@ function u32be(v) {
   return [(v >>> 24) & 0xff, (v >>> 16) & 0xff, (v >>> 8) & 0xff, v & 0xff];
 }
 
-function adler32(data) {
-  let a = 1;
-  let b = 0;
-  for (let i = 0; i < data.length; i += 1) {
-    a = (a + data[i]) % 65521;
-    b = (b + a) % 65521;
-  }
-  return (((b << 16) >>> 0) | a) >>> 0;
-}
-
-function storedDeflate(data) {
-  // PNG IDAT must be a zlib stream, not bare deflate blocks: CMF/FLG
-  // header, stored blocks capped at 0xffff bytes each (BFINAL only on
-  // the last), then an Adler-32 of the uncompressed data.
-  const MAX_BLOCK = 0xffff;
-  const blockCount = Math.max(1, Math.ceil(data.length / MAX_BLOCK));
-  const parts = [new Uint8Array([0x78, 0x01])];
-  for (let i = 0; i < blockCount; i += 1) {
-    const start = i * MAX_BLOCK;
-    const block = data.subarray(start, Math.min(start + MAX_BLOCK, data.length));
-    const len = block.length;
-    const header = new Uint8Array(5);
-    header[0] = i === blockCount - 1 ? 1 : 0;
-    header[1] = len & 0xff;
-    header[2] = (len >>> 8) & 0xff;
-    header[3] = (~len) & 0xff;
-    header[4] = ((~len) >>> 8) & 0xff;
-    parts.push(header, block);
-  }
-  parts.push(new Uint8Array(u32be(adler32(data))));
-  return concatBytes(parts);
-}
-
 export function rasterizeCells(coordinates, width, height, scale = 4) {
   const outW = width * scale;
   const outH = height * scale;
@@ -305,7 +273,7 @@ function encodePng(outW, outH, rgba) {
     filtered[y * (stride + 1)] = 0;
     filtered.set(rgba.subarray(y * stride, y * stride + stride), y * (stride + 1) + 1);
   }
-  const idat = storedDeflate(filtered);
+  const idat = zlibSync(filtered, { level: 6 });
   return concatBytes([SIG, chunk('IHDR', IHDR), chunk('IDAT', idat), chunk('IEND', new Uint8Array(0))]);
 }
 
