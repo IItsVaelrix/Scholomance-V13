@@ -41,6 +41,7 @@ import { semanticShadowRoutes } from './routes/semanticShadow.routes.js';
 import { grimdesignRoutes } from './routes/grimdesign.routes.js';
 import { combatRoutes } from './routes/combat.routes.js';
 import { characterEnhanceRoutes } from './routes/character-enhance.routes.js';
+import { characterCatalogRoutes } from './routes/characterCatalog.routes.js';
 import { lexiconRoutes } from './routes/lexicon.routes.js';
 import { authRoutes } from './routes/auth.routes.js';
 import { oauthRoutes } from './routes/oauth.routes.js';
@@ -1193,6 +1194,7 @@ await fastify.register(panelAnalysisRoutes, {
 });
 await fastify.register(combatRoutes);
 await fastify.register(characterEnhanceRoutes);
+await fastify.register(characterCatalogRoutes);
 fastify.register(lexiconRoutes, { prefix: '/api/lexicon', adapter: lexiconAdapter });
 fastify.register(worldRoutes, { prefix: '/api/world', adapter: lexiconAdapter, persistence: userPersistence });
 fastify.register(corpusRoutes, { prefix: '/api/corpus', adapter: corpusAdapter, lexiconAdapter });
