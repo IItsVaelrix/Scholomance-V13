@@ -451,7 +451,7 @@ export function forgeCharacter(rawSpec, opts = {}) {
 
   // Route to vectorized Wand path if vectorWand present (high priority for vectorized art)
   if (spec.vectorWand) {
-    return forgeCharacterFromWandVector(spec.vectorWand, spec, { ...opts, direction: 'south' });
+    return forgeCharacterFromWandVector(spec.vectorWand, spec, opts);
   }
 
   const pngScale = Math.max(1, Math.round(opts.pngScale || 4));
@@ -634,13 +634,13 @@ export function exportCharacterToPbrainBlueprint(character) {
  *       ]
  *     }
  *   };
- *   const character = forgeCharacterFromWandVector(wandProposal, baseSpec, { direction: 'south' });
+ *   const character = forgeCharacterFromWandVector(wandProposal, baseSpec, { directions: ['south', 'east'] });
  */
 export function forgeCharacterFromWandVector(wandProposal, baseSpec = {}, opts = {}) {
   if (!wandProposal) throw new Error('forgeCharacterFromWandVector: wandProposal required');
 
   const canvas = baseSpec.canvas || CHARACTER_DEFAULTS.canvas;
-  const direction = opts.direction || 'south';
+  const directions = opts.directions || baseSpec.directions || ['south', 'east', 'north', 'west'];
 
   // 1. Evaluate Wand to vector coordinates
   // Support composite by recursing children and attaching roles
@@ -791,23 +791,27 @@ export function forgeCharacterFromWandVector(wandProposal, baseSpec = {}, opts =
   };
 
   // Merge with base spec for materials / other parts
-  const mergedSpec = {
-    ...baseSpec,
-    canvas,
-    // If the Wand proposal carried materials or presentation, they win
-  };
+  const mergedSpec = { ...baseSpec, canvas };
 
-  // 4. Run the normal fill + raster pipeline on top of our vector silhouette
-  const fills = applyCharacterFills({ silhouette, spec: mergedSpec, direction });
+  const dirRgbas = {};
+  const dirPngs = {};
+  let primaryFills = null;
+  let allCells = [];
+  for (const dir of directions) {
+    const dirFills = applyCharacterFills({ silhouette, spec: mergedSpec, direction: dir });
+    if (!primaryFills) primaryFills = dirFills;
+    for (const c of dirFills.coordinates) allCells.push({ ...c, direction: dir });
 
-  // 5. Rasterize using public rasterizeCells (XBR upscale for crisp output)
-  const baseScale = 1;
-  let rgba = rasterizeCells(fills.coordinates, canvas.width, canvas.height, baseScale);
-  rgba = applyXBR2x(rgba, canvas.width, canvas.height);
-  rgba = applyXBR2x(rgba, canvas.width * 2, canvas.height * 2);
+    let rgba = rasterizeCells(dirFills.coordinates, canvas.width, canvas.height, 1);
+    rgba = applyXBR2x(rgba, canvas.width, canvas.height);
+    rgba = applyXBR2x(rgba, canvas.width * 2, canvas.height * 2);
+    dirRgbas[dir] = rgba;
+    dirPngs[dir] = encodePng(canvas.width * 4, canvas.height * 4, rgba);
+  }
+  const fills = primaryFills;
+  const spritesheet = assembleSpritesheet(dirRgbas, canvas.width, canvas.height, 4);
 
   // Vectorized art export (the important part for Wand-driven models)
-  // Enhanced with direct SVG serializer + pure immutable modifiers (Chaikin, offset)
   const vectorPaths = Object.entries(byRole).map(([role, pts]) => {
     let processed = pts.map(p => ({ ...p }));
     if (processed.length > 3) {
@@ -829,19 +833,37 @@ export function forgeCharacterFromWandVector(wandProposal, baseSpec = {}, opts =
 
   const pbrainBlueprint = exportCharacterToPbrainBlueprint({ spec: mergedSpec, canvas, vectorPaths, vectorSource: 'wand', fills, construction: {} });
 
+  const assetPacket = createPixelBrainAssetPacket({
+    kind: PIXELBRAIN_ASSET_KIND,
+    id: `character_${mergedSpec.id || 'wand'}_${hashCharacterSpec(mergedSpec)}`,
+    source: { kind: 'character-foundry-wand', id: mergedSpec.id || null },
+    coordinates: allCells,
+    canvas: { width: canvas.width, height: canvas.height, transparent: true },
+    palette: {
+      sourcePalette: [{ key: 'character', colors: [...new Set(allCells.map((c) => c.color))] }],
+    },
+  });
+
   return Object.freeze({
     spec: mergedSpec,
     vectorSource: 'wand',
-    vectorPaths,           // THE vectorized art — clean paths from Wand formulas
+    vectorPaths,
     silhouette: { cells: fills.coordinates },
     fills,
     canvas,
-    blueprint: pbrainBlueprint,  // full round-trip .pbrain.json ready
+    sprites: dirPngs,
+    spritesheet,
+    phaserPipeline: exportCharacterToPhaserPipeline({ spritesheet, canvas, spec: mergedSpec }),
+    godotScene: exportCharacterToGodotScene({ spritesheet, canvas, spec: mergedSpec }),
+    pixelLotusActor: exportCharacterToPixelLotusActor({ spritesheet, canvas, spec: mergedSpec }),
+    assetPacket,
+    blueprint: pbrainBlueprint,
     diagnostics: {
       source: 'wand-vector',
       pointCount: vectorCoords.length,
       cellCount: fills.coordinates.length,
       roles: Object.keys(byRole),
+      directions,
     },
   });
 }
