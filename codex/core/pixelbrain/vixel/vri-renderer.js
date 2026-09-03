@@ -17,6 +17,8 @@
  */
 
 import { LAYER_TYPES, BLEND_MODES, LIGHT_KINDS, QUANTIZATION_MODES } from './vri-schema.js';
+import { extractContours } from './stroke-extractor.js';
+import { stylizeStrokes } from './stroke-stylizer.js';
 
 // ─── Capability manifest ─────────────────────────────────────────────────────
 //
@@ -392,7 +394,7 @@ function applyBlend(base, layer, mode, opacity) {
  * @param {number} scale - Output scale (1 = native, 4 = 4×, 8 = 8×)
  * @returns {{ width: number, height: number, data: Uint8Array }}
  */
-export function renderVRI(scene, scale = 4) {
+export function renderVRI(scene, scale = 4, options = {}) {
   const W = scene.width * scale;
   const H = scene.height * scale;
   const buf = new Uint8Array(W * H * 4); // RGBA, starts transparent black
@@ -811,6 +813,35 @@ export function renderVRI(scene, scale = 4) {
             buf[idx + 1] = clamp255(buf[idx + 1] * (1 - alpha) + pg * alpha);
             buf[idx + 2] = clamp255(buf[idx + 2] * (1 - alpha) + pb * alpha);
             buf[idx + 3] = Math.max(buf[idx + 3], clamp255(255 * alpha));
+          }
+        }
+      }
+    }
+  }
+
+  // ── Final overlay: strokes ────────────────────────────────────────────────
+  // Runs strictly after Pass 1-4, which are completely unmodified by this
+  // block. Hard opaque fill, no smoothstep, no sub-pixel math -- this is what
+  // actually fixes the tearing bug (a fragile continuous per-cell coverage
+  // estimate disagreeing with itself at curves): discrete integer-grid
+  // adjacency (stroke-extractor.js) cannot disagree with itself the way two
+  // independent floating-point extrapolations can.
+  if (options.strokes) {
+    const strokeIR = extractContours(geoLayer?.payload.coordinates || []);
+    const paint = stylizeStrokes(strokeIR);
+    for (const { cells, color } of paint) {
+      const inkRgb = hexToRGB(color);
+      for (const cellCoord of cells) {
+        for (let sy = 0; sy < scale; sy++) {
+          for (let sx = 0; sx < scale; sx++) {
+            const px = cellCoord.x * scale + sx;
+            const py = cellCoord.y * scale + sy;
+            if (px < 0 || px >= W || py < 0 || py >= H) continue;
+            const idx = (py * W + px) * 4;
+            buf[idx] = inkRgb[0];
+            buf[idx + 1] = inkRgb[1];
+            buf[idx + 2] = inkRgb[2];
+            buf[idx + 3] = 255;
           }
         }
       }
