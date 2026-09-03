@@ -83,4 +83,24 @@ describe('[Server] character catalog persistence (migration v23)', () => {
     const ok = await characterCatalogPersistence.deleteCharacter('char_002', 999999);
     expect(ok).toBe(false);
   });
+
+  it('two different users can save under the same id without overwriting each other', async () => {
+    const userA = await userPersistence.users.createUser('user_a', 'a@example.com', 'hash', 'tok-a');
+    const userB = await userPersistence.users.createUser('user_b', 'b@example.com', 'hash', 'tok-b');
+
+    await characterCatalogPersistence.saveCharacter(userA.id, {
+      id: 'shared_id', name: 'Alice Character', controls: {}, specJson: '{}', specHash: 'ha',
+    });
+    await characterCatalogPersistence.saveCharacter(userB.id, {
+      id: 'shared_id', name: 'Bob Character', controls: {}, specJson: '{}', specHash: 'hb',
+    });
+
+    const aliceRow = await characterCatalogPersistence.getCharacter('shared_id', userA.id);
+    const bobRow = await characterCatalogPersistence.getCharacter('shared_id', userB.id);
+
+    expect(aliceRow.name).toBe('Alice Character');
+    expect(aliceRow.spec_hash).toBe('ha');
+    expect(bobRow.name).toBe('Bob Character');
+    expect(bobRow.spec_hash).toBe('hb');
+  });
 });

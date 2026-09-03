@@ -28,7 +28,7 @@ export async function saveCharacter(userId, entry) {
       id, user_id, name, controls_json, spec_json, spec_hash, created_at, updated_at
     ) VALUES (
       ?, ?, ?, ?, ?, ?, ?, ?
-    ) ON CONFLICT(id) DO UPDATE SET
+    ) ON CONFLICT(user_id, id) DO UPDATE SET
       name = excluded.name,
       controls_json = excluded.controls_json,
       spec_json = excluded.spec_json,

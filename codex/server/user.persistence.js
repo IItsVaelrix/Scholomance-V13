@@ -483,7 +483,7 @@ const USER_MIGRATIONS = [
     up(database) {
       database.exec(`
         CREATE TABLE IF NOT EXISTS character_catalog (
-          id TEXT PRIMARY KEY,
+          id TEXT NOT NULL,
           user_id INTEGER NOT NULL,
           name TEXT NOT NULL,
           controls_json TEXT NOT NULL,
@@ -491,7 +491,8 @@ const USER_MIGRATIONS = [
           spec_hash TEXT NOT NULL,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+          FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+          PRIMARY KEY (user_id, id)
         );
         CREATE INDEX IF NOT EXISTS idx_character_catalog_user ON character_catalog(user_id);
       `);
