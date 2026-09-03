@@ -103,10 +103,15 @@ export function computeVectorIdentity(op, px, py) {
   const type = op.op || op.type;
 
   if (type === 'circle' || type === 'ellipse') {
-    const cx = op.cx;
-    const cy = op.cy;
-    const rx = op.rx ?? op.radius ?? 1;
-    const ry = op.ry ?? op.radius ?? 1;
+    // opToSDFPrimitive is the single source of truth for the true-circle case
+    // (rx === ry). It returns null for eccentric ellipses, which have no
+    // evaluateSDF descriptor but still need rendering here, so those fall back
+    // to reading op.rx/op.ry directly rather than sharing the extraction.
+    const primitive = opToSDFPrimitive(op);
+    const cx = primitive ? primitive.params.center.x : op.cx;
+    const cy = primitive ? primitive.params.center.y : op.cy;
+    const rx = primitive ? primitive.params.radius : (op.rx ?? op.radius ?? 1);
+    const ry = primitive ? primitive.params.radius : (op.ry ?? op.radius ?? 1);
 
     const dx = (px - cx) / rx;
     const dy = (py - cy) / ry;
@@ -147,8 +152,9 @@ export function computeVectorIdentity(op, px, py) {
 
   if (type === 'rect') {
     const { x, y, w, h } = op;
-    const rcx = x + w / 2;
-    const rcy = y + h / 2;
+    const primitive = opToSDFPrimitive(op); // always non-null for rect — same values, one source
+    const rcx = primitive.params.center.x;
+    const rcy = primitive.params.center.y;
 
     // SDF for axis-aligned rect
     const ddx = Math.abs(px - rcx) - w / 2;
