@@ -24,6 +24,15 @@ const CHARACTER_DEFAULTS = {
   canvas: { width: 32, height: 48 },
 };
 
+export const MAX_PALETTE_COLORS = 32; // PDR 4.5: 32 unique colors max per direction
+
+export function enforcePaletteBudget(fills, direction, max = MAX_PALETTE_COLORS) {
+  const uniqueColors = fills.diagnostics.uniqueColors;
+  if (uniqueColors > max) {
+    throw err('PB_PALETTE_BUDGET_EXCEEDED', { direction, uniqueColors, max });
+  }
+}
+
 function err(reason, context) {
   const e = new Error(`character-foundry: ${reason}`);
   e.cause = context;
@@ -485,6 +494,7 @@ export function forgeCharacter(rawSpec, opts = {}) {
 
     const fills = applyCharacterFills({ silhouette, spec, direction: dir });
     filledResults[dir] = fills;
+    enforcePaletteBudget(fills, dir);
 
     const routeDefinition = buildCharacterRouteDefinition(spec, dir, silhouette);
     const dirRoute = validateCharacterDirection(routeDefinition, spec, fills.coordinates);
