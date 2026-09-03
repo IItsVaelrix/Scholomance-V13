@@ -477,6 +477,26 @@ const USER_MIGRATIONS = [
       applyCatalogV22(database);
     },
   },
+  {
+    version: 23,
+    name: 'create_character_catalog',
+    up(database) {
+      database.exec(`
+        CREATE TABLE IF NOT EXISTS character_catalog (
+          id TEXT PRIMARY KEY,
+          user_id INTEGER NOT NULL,
+          name TEXT NOT NULL,
+          controls_json TEXT NOT NULL,
+          spec_json TEXT NOT NULL,
+          spec_hash TEXT NOT NULL,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+        CREATE INDEX IF NOT EXISTS idx_character_catalog_user ON character_catalog(user_id);
+      `);
+    },
+  },
 ];
 
 let db;
