@@ -25,6 +25,18 @@ const CHARACTER_DEFAULTS = {
   canvas: { width: 32, height: 48 },
 };
 
+// Form-shading thresholds: fraction of a part's y-range treated as the lit top
+// zone vs. the shadowed bottom zone (applyCharacterFills volume gradient).
+const FORM_SHADE_TOP_ZONE = 0.28;
+const FORM_SHADE_BOTTOM_ZONE = 0.75;
+const FORM_SHADE_MIN_HEIGHT = 6; // parts shorter than this skip the gradient entirely
+
+// Wand vector rasterization: stroke emphasis and closed-trace fill pressure.
+const WAND_CLOSED_TRACE_EMPHASIS = 0.82;
+const WAND_STROKE_HALF_WIDTH_HAIRLIMB = 1.4;
+const WAND_STROKE_HALF_WIDTH_EDGE = 1.9;
+const WAND_STROKE_HALF_WIDTH_DEFAULT = 1.1;
+
 export const MAX_PALETTE_COLORS = 32; // PDR 4.5: 32 unique colors max per direction
 
 export function enforcePaletteBudget(fills, direction, max = MAX_PALETTE_COLORS) {
@@ -176,12 +188,12 @@ export function applyCharacterFills({ silhouette, spec, direction } = {}) {
       // producing the classic "pillow or muddy small detail" amateur look.
       const isEnergyHair = partId === 'hair';
 
-      if (yRange >= 6 && !isEnergyHair) {
+      if (yRange >= FORM_SHADE_MIN_HEIGHT && !isEnergyHair) {
         // Only apply gradient to parts tall enough to show form
         const yT = (c.y - bounds.minY) / yRange;
-        if (yT < 0.28) {
+        if (yT < FORM_SHADE_TOP_ZONE) {
           color = ramp.frost;                              // Top zone: lit from above
-        } else if (yT > 0.75 && !isTopLeft) {
+        } else if (yT > FORM_SHADE_BOTTOM_ZONE && !isTopLeft) {
           color = ramp.deep;                               // Bottom zone: form shadow
         } else if (isTopLeft) {
           color = ramp.frost;                              // Top-left adjacency highlight
@@ -698,7 +710,7 @@ export function forgeCharacterFromWandVector(wandProposal, baseSpec = {}, opts =
   // Rasterize each role as vector art (thick stroke simulation)
   // #5: Real bezier/offset-curve math for hair/limbs (dense sampling + parallel offset curves)
   for (const [role, points] of Object.entries(byRole)) {
-    const shouldFillClosedTrace = /head|body|robe|boot|eye|mouth/.test(role);
+    const shouldFillClosedTrace = /head|body|robe|boot|eye|mouth/i.test(role);
     if (shouldFillClosedTrace && points.length >= 3) {
       const polygon = points.map(p => ({ x: Number(p.x) || 0, y: Number(p.y) || 0 }));
       const minX = Math.floor(Math.min(...polygon.map(p => p.x)));
@@ -708,7 +720,7 @@ export function forgeCharacterFromWandVector(wandProposal, baseSpec = {}, opts =
       for (let y = minY; y <= maxY; y += 1) {
         for (let x = minX; x <= maxX; x += 1) {
           if (pointInPolygon(x + 0.5, y + 0.5, polygon)) {
-            addCell(x, y, role, 0.82);
+            addCell(x, y, role, WAND_CLOSED_TRACE_EMPHASIS);
           }
         }
       }
@@ -720,7 +732,7 @@ export function forgeCharacterFromWandVector(wandProposal, baseSpec = {}, opts =
     }
 
     const isStroke = points.some(p => p.role && String(p.role).includes('stroke'));
-    const isHairOrLimb = /hair|arm|leg|limb/.test(role);
+    const isHairOrLimb = /hair|arm|leg|limb/i.test(role);
 
     for (let i = 0; i < points.length - 1; i++) {
       const a = points[i];
@@ -743,7 +755,7 @@ export function forgeCharacterFromWandVector(wandProposal, baseSpec = {}, opts =
 
         if (isStroke || isHairOrLimb) {
           // offset curve (parallel curves)
-          const baseW = isHairOrLimb ? 1.4 : (a.role === 'stroke.edge' ? 1.9 : 1.1);
+          const baseW = isHairOrLimb ? WAND_STROKE_HALF_WIDTH_HAIRLIMB : (a.role === 'stroke.edge' ? WAND_STROKE_HALF_WIDTH_EDGE : WAND_STROKE_HALF_WIDTH_DEFAULT);
           const half = baseW * 0.5 * press;
 
           addCell(px + pxp * half, py + pyp * half, role, press * 0.75);

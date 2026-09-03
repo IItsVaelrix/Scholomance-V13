@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { forgeCharacter, normalizeCharacterSpec, hashCharacterSpec, enforcePaletteBudget } from '../../../codex/core/pixelbrain/character-foundry.js';
+import { forgeCharacter, normalizeCharacterSpec, hashCharacterSpec, enforcePaletteBudget, forgeCharacterFromWandVector } from '../../../codex/core/pixelbrain/character-foundry.js';
 
 function arraysEqual(a, b) {
   if (a.length !== b.length) return false;
@@ -279,5 +279,26 @@ describe('character-creator', () => {
     const spec = buildScholarSpec();
     const badSpec = { ...spec, materials: { ...spec.materials, skin: 'skin_does_not_exist' } };
     expect(() => forgeCharacter(badSpec)).toThrow(/material.*not found in registry/i);
+  });
+
+  it('Wand role classification matches camelCase ids like leftEye, not just lowercase', () => {
+    // shouldFillClosedTrace's regex must match 'leftEye' the same way it matches 'eye',
+    // since real part ids from composite Wand proposals are camelCase (leftEye/rightEye).
+    // forgeCharacterFromWandVector must be added to the top-of-file import (see Step 3 note).
+    const wandProposal = {
+      coordinateFormula: {
+        type: 'composite',
+        children: [{
+          role: 'leftEye',
+          anchor: { x: 0.5, y: 0.5 },
+          size: { w: 1.0, h: 1.0 },
+          formula: { type: 'edge_trace', tracePath: [{ x: 0, y: 0 }, { x: 32, y: 0 }, { x: 32, y: 48 }, { x: 0, y: 48 }] },
+        }],
+      },
+    };
+    const character = forgeCharacterFromWandVector(wandProposal, { canvas: { width: 32, height: 48 }, directions: ['south'] }, {});
+    // A filled closed trace produces many more cells than an unfilled outline trace of the same 4-point square.
+    // With the case-insensitive regex fix, 'leftEye' matches the fill rule and produces a filled square.
+    expect(character.diagnostics.cellCount).toBeGreaterThan(4);
   });
 });
