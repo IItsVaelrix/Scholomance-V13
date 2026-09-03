@@ -151,6 +151,24 @@ export default function ActorForgeLab() {
   const [enhancementState, setEnhancementState] = useState<EnhancementState>('idle');
   const [enhancementError, setEnhancementError] = useState<string | null>(null);
 
+  type SavedCharacter = { id: string; name: string; controls_json: string; spec_hash: string; updated_at: string };
+  const [savedCharacters, setSavedCharacters] = useState<SavedCharacter[]>([]);
+  const [catalogError, setCatalogError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const refreshCatalog = async () => {
+    try {
+      const res = await fetch('/api/character/catalog');
+      if (!res.ok) throw new Error(`catalog fetch failed: ${res.status}`);
+      const data = await res.json();
+      setSavedCharacters(data.characters ?? []);
+    } catch (e) {
+      setCatalogError(e instanceof Error ? e.message : String(e));
+    }
+  };
+
+  useEffect(() => { refreshCatalog(); }, []);
+
   useEffect(() => {
     if (showCinematic) {
       const t1 = setTimeout(() => setPhase('impact'), 3000);
@@ -256,6 +274,62 @@ export default function ActorForgeLab() {
       const msg = err instanceof Error ? err.message : String(err);
       setEnhancementError(msg);
       setEnhancementState('error');
+    }
+  };
+
+  const currentControls = () => ({
+    stylePreset, bodyProfile, skin, hairProfile, hairColor,
+    eyeProfile, eyeColor, top, bottom, shoes, seed, characterName,
+  });
+
+  const handleSaveToCatalog = async () => {
+    if (!forge.character) return;
+    setIsSaving(true);
+    setCatalogError(null);
+    try {
+      const res = await fetch('/api/character/catalog', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: forge.character.spec.id,
+          name: characterName,
+          controls: currentControls(),
+          specJson: JSON.stringify(forge.character.spec),
+          specHash: (forge.character as any).specHash,
+        }),
+      });
+      if (!res.ok) throw new Error(`save failed: ${res.status}`);
+      await refreshCatalog();
+    } catch (e) {
+      setCatalogError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleLoadFromCatalog = (entry: SavedCharacter) => {
+    const controls = JSON.parse(entry.controls_json);
+    if (controls.stylePreset) setStylePreset(controls.stylePreset);
+    if (controls.bodyProfile) setBodyProfile(controls.bodyProfile);
+    if (controls.skin) setSkin(controls.skin);
+    if (controls.hairProfile) setHairProfile(controls.hairProfile);
+    if (controls.hairColor) setHairColor(controls.hairColor);
+    if (controls.eyeProfile) setEyeProfile(controls.eyeProfile);
+    if (controls.eyeColor) setEyeColor(controls.eyeColor);
+    if (controls.top) setTop(controls.top);
+    if (controls.bottom) setBottom(controls.bottom);
+    if (controls.shoes) setShoes(controls.shoes);
+    if (typeof controls.seed === 'number') setSeed(controls.seed);
+    if (controls.characterName) setCharacterName(controls.characterName);
+  };
+
+  const handleDeleteFromCatalog = async (id: string) => {
+    try {
+      const res = await fetch(`/api/character/catalog/${encodeURIComponent(id)}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(`delete failed: ${res.status}`);
+      await refreshCatalog();
+    } catch (e) {
+      setCatalogError(e instanceof Error ? e.message : String(e));
     }
   };
 
@@ -516,6 +590,22 @@ export default function ActorForgeLab() {
              : enhancementState === 'enhanced'  ? '✦ Re-Enhance'
              : '✦ Forge & Enhance'}
           </button>
+
+          <div className="actor-forge-catalog">
+            <button onClick={handleSaveToCatalog} disabled={isSaving || !forge.character}>
+              {isSaving ? 'Saving…' : 'Save to Catalog'}
+            </button>
+            {catalogError && <div className="actor-forge-catalog-error">{catalogError}</div>}
+            <ul className="actor-forge-catalog-list">
+              {savedCharacters.map((entry) => (
+                <li key={entry.id}>
+                  <span>{entry.name}</span>
+                  <button onClick={() => handleLoadFromCatalog(entry)}>Load</button>
+                  <button onClick={() => handleDeleteFromCatalog(entry.id)}>Delete</button>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           <button
             type="button"
