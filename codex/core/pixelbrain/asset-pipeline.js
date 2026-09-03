@@ -99,6 +99,7 @@ export function compileAsset(source, options = {}) {
     vri = {},
     scale = null,
     digest = defaultDigest,
+    strict = true,
   } = options;
 
   const errors = [];
@@ -192,9 +193,10 @@ export function compileAsset(source, options = {}) {
   }
 
   // ── Stage 3: SCDL ───────────────────────────────────────────────────────
-  const scdl = compileSCDL(source, genePackets
-    ? { artGenes: genePackets, artProjectionContext: projectionContext }
-    : {});
+  const scdl = compileSCDL(source, {
+    ...(genePackets ? { artGenes: genePackets, artProjectionContext: projectionContext } : {}),
+    strict,
+  });
 
   diagnostics.scdl = {
     fatal: scdl.fatal === true,
