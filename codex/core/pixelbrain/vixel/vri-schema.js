@@ -23,6 +23,25 @@
 
 export const VRI_VERSION = 'PB-VRI-v1';
 
+// ─── Stroke Contract (PB-STROKE-v1) ───────────────────────────────────────────
+//
+// Discrete contour extraction, frozen for v1. See docs/scholomance-encyclopedia/
+// PDR-archive/2026-09-03-vixel-stroke-ir-v1-pdr.md. path/role/baseWeight/
+// schemaVersion are frozen; depthClass/lightExposure/materialBoundary are
+// reserved slots for future stylizers and are not interpreted by v1.
+
+export const STROKE_CONTRACT = 'PB-STROKE-v1';
+
+/**
+ * @typedef {'silhouette'|'material-boundary'} StrokeRole
+ * @typedef {{ cells: Array<{x:number,y:number,partId:string|null,sourceOpId:string|null}> }} StrokePath
+ * @typedef {{
+ *   path: StrokePath, role: StrokeRole, baseWeight: number,
+ *   depthClass?: string, lightExposure?: number, materialBoundary?: boolean,
+ *   schemaVersion: 'PB-STROKE-v1',
+ * }} StrokeIR
+ */
+
 // ─── Layer Types ─────────────────────────────────────────────────────────────
 
 export const LAYER_TYPES = Object.freeze({
