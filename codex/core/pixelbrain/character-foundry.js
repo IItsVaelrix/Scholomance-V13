@@ -218,18 +218,70 @@ export function applyCharacterFills({ silhouette, spec, direction } = {}) {
     cells.push({ x: c.x, y: c.y, color, partId, isRim });
   }
 
-  const palette = [...colors].sort();
+  const quantizedCells = quantizeCellColors(cells, MAX_PALETTE_COLORS);
+  const quantizedColors = new Set(quantizedCells.map((c) => c.color));
+  const palette = [...quantizedColors].sort();
 
   return {
-    coordinates: Object.freeze(cells),
+    coordinates: Object.freeze(quantizedCells),
     palette: Object.freeze(palette),
     partColors: Object.fromEntries(Object.entries(partRamps).map(([k, v]) => [k, v.body])),
     diagnostics: {
-      totalCells: cells.length,
+      totalCells: quantizedCells.length,
       uniqueColors: palette.length,
-      rimCells: cells.filter(c => c.isRim).length,
+      rimCells: quantizedCells.filter(c => c.isRim).length,
     },
   };
+}
+
+function hexToRgbTuple(hex) {
+  const m = String(hex).replace('#', '');
+  return [parseInt(m.slice(0, 2), 16), parseInt(m.slice(2, 4), 16), parseInt(m.slice(4, 6), 16)];
+}
+
+function colorDistanceSq(a, b) {
+  const [ar, ag, ab] = hexToRgbTuple(a);
+  const [br, bg, bb] = hexToRgbTuple(b);
+  return (ar - br) ** 2 + (ag - bg) ** 2 + (ab - bb) ** 2;
+}
+
+// Real quantization: iteratively merges the two closest colors (by RGB distance),
+// folding the less-frequently-used one into the more-frequent one, until the
+// palette fits within maxColors. NOT a sort-and-truncate — every original color
+// survives as either itself or merged into its nearest neighbor, chosen by actual
+// perceptual distance, not alphabetical order.
+export function quantizeCellColors(cells, maxColors) {
+  const counts = new Map();
+  for (const c of cells) counts.set(c.color, (counts.get(c.color) || 0) + 1);
+  let palette = [...counts.keys()];
+  if (palette.length <= maxColors) return cells;
+
+  const remap = new Map();
+  for (const c of palette) remap.set(c, c);
+
+  while (palette.length > maxColors) {
+    let best = null;
+    for (let i = 0; i < palette.length; i += 1) {
+      for (let j = i + 1; j < palette.length; j += 1) {
+        const d = colorDistanceSq(palette[i], palette[j]);
+        if (!best || d < best.d) best = { d, i, j };
+      }
+    }
+    const colorA = palette[best.i];
+    const colorB = palette[best.j];
+    const countA = counts.get(colorA);
+    const countB = counts.get(colorB);
+    const keep = countA >= countB ? colorA : colorB;
+    const drop = countA >= countB ? colorB : colorA;
+    counts.set(keep, countA + countB);
+    counts.delete(drop);
+    for (const [orig, mapped] of remap.entries()) {
+      if (mapped === drop) remap.set(orig, keep);
+    }
+    palette = palette.filter((c) => c !== drop);
+  }
+
+  return cells.map((c) => (remap.get(c.color) !== c.color ? { ...c, color: remap.get(c.color) } : c));
 }
 
 function concatBytes(arrays) {

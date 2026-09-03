@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { forgeCharacter, normalizeCharacterSpec, hashCharacterSpec, enforcePaletteBudget, forgeCharacterFromWandVector } from '../../../codex/core/pixelbrain/character-foundry.js';
+import { forgeCharacter, normalizeCharacterSpec, hashCharacterSpec, enforcePaletteBudget, forgeCharacterFromWandVector, quantizeCellColors } from '../../../codex/core/pixelbrain/character-foundry.js';
 
 function arraysEqual(a, b) {
   if (a.length !== b.length) return false;
@@ -300,5 +300,117 @@ describe('character-creator', () => {
     // A filled closed trace produces many more cells than an unfilled outline trace of the same 4-point square.
     // With the case-insensitive regex fix, 'leftEye' matches the fill rule and produces a filled square.
     expect(character.diagnostics.cellCount).toBeGreaterThan(4);
+  });
+
+  describe('quantizeCellColors — real closest-pair merge quantization, not truncation', () => {
+    // 30 mutually-distant filler colors (R channel steps of 8, min pairwise distance 64 squared units apart)
+    const fillers = [];
+    for (let i = 0; i < 30; i += 1) {
+      const r = (i * 8).toString(16).padStart(2, '0');
+      fillers.push(`#${r}0000`);
+    }
+    // A close pair: RGB-adjacent (distance-squared = 1), the smallest possible non-zero distance.
+    const closePairA = '#f00000';
+    const closePairB = '#f00100';
+    // Maximally distant from everything, and alphabetically LAST — a sort-and-truncate quantizer
+    // (keep the first 32 by alphabetical order, drop the rest) would drop this one, since it sorts
+    // after all 32 other colors. A real closest-pair quantizer must keep it (nothing is close to it)
+    // and instead merge the close pair above.
+    const farOutlier = '#ffffff';
+
+    function buildCells() {
+      // 30 fillers + close pair (2) + outlier (1) = 33 unique colors, 1 cell each.
+      const colors = [...fillers, closePairA, closePairB, farOutlier];
+      return colors.map((color, i) => ({ x: i, y: 0, color, partId: 'body', isRim: false }));
+    }
+
+    it('quantizes an over-budget palette to <= maxColors without dropping any cell', () => {
+      const cells = buildCells();
+      expect(cells.length).toBe(33);
+      const result = quantizeCellColors(cells, 32);
+      expect(result.length).toBe(cells.length);
+      const uniqueColors = new Set(result.map((c) => c.color));
+      expect(uniqueColors.size).toBeLessThanOrEqual(32);
+      expect(uniqueColors.size).toBe(32); // exactly one merge needed to go from 33 -> 32
+    });
+
+    it('leaves an already-in-budget palette untouched', () => {
+      const cells = buildCells().slice(0, 20);
+      const result = quantizeCellColors(cells, 32);
+      expect(result).toBe(cells); // same reference: no-op when already within budget
+    });
+
+    it('merges the closest RGB pair, not the alphabetically-last color (proves real quantization, not truncation)', () => {
+      const cells = buildCells();
+      const result = quantizeCellColors(cells, 32);
+      const colorByOriginal = new Map(cells.map((c, i) => [c.color, result[i].color]));
+
+      // The alphabetical-truncation approach would drop farOutlier ('#ffffff', alphabetically last).
+      // Real closest-pair quantization must keep it, since nothing is close to white.
+      const outlierResult = colorByOriginal.get(farOutlier);
+      expect(outlierResult).toBe(farOutlier);
+
+      // The RGB-adjacent close pair must have been merged into a single shared color —
+      // that is the actual closest pair in the set, so it's what a real quantizer merges.
+      const mergedA = colorByOriginal.get(closePairA);
+      const mergedB = colorByOriginal.get(closePairB);
+      expect(mergedA).toBe(mergedB);
+      expect([closePairA, closePairB]).toContain(mergedA);
+
+      // Every filler color survives unmerged — they're all mutually far apart and none is
+      // the closest pair, so a correct quantizer leaves them alone.
+      for (const filler of fillers) {
+        expect(colorByOriginal.get(filler)).toBe(filler);
+      }
+    });
+  });
+
+  describe('palette quantization integration — over-budget spec renders instead of throwing', () => {
+    function buildOverBudgetSpec() {
+      // Real repro: a Starbound-Esper-style spec with many distinct gem/metal materials on
+      // clothing, trim, and accessories. Verified against the pre-quantization code to genuinely
+      // throw PB_PALETTE_BUDGET_EXCEEDED with 37 unique colors on the south direction.
+      return {
+        contract: 'CHARACTER-SPEC-v1',
+        id: 'overbudget.starbound.esper.v1',
+        class: 'character',
+        archetype: 'human',
+        canvas: { width: 32, height: 48, gridSize: 1 },
+        seed: 4242,
+        bytecode: 'VW-STARBOUND-ESPER-CHIBI',
+        presentation: { gender: 'androgynous', heightClass: 'short', buildClass: 'average' },
+        directions: ['south', 'east', 'north', 'west'],
+        materials: { skin: 'skin_apricot_signal', hair: 'hair_midnight_teal', eyes: 'eye_psychic_cobalt' },
+        body: { profile: 'character.body.chibi.starboundEsper', params: { compact: 0.72 } },
+        face: [
+          { id: 'leftEye', profile: 'character.face.eye.humanSoft', params: { iris: 'eye_psychic_cobalt' }, attach: { parent: 'body', at: 'face.eyeLeft' } },
+          { id: 'rightEye', profile: 'character.face.eye.humanSoft', params: { iris: 'eye_psychic_cobalt' }, attach: { parent: 'body', at: 'face.eyeRight' } },
+          { id: 'nose', profile: 'character.face.nose.humanSoft', attach: { parent: 'body', at: 'face.nose' } },
+          { id: 'mouth', profile: 'character.face.mouth.humanSoft', attach: { parent: 'body', at: 'face.mouth' } },
+        ],
+        hair: { profile: 'character.hair.cometSweep', params: { color: 'hair_midnight_teal', streak: 'neon_mint_signal' }, attach: { parent: 'body', at: 'headTop' } },
+        clothing: [
+          { id: 'bottom', profile: 'character.clothing.bottom.psychicStreetShorts', params: { color: 'ruby', trim: 'gold' } },
+          { id: 'top', profile: 'character.clothing.top.starboundJacket', params: { color: 'sapphire', trim: 'silver', signal: 'cyan_glow' } },
+          { id: 'shoes', profile: 'character.clothing.shoes.cometBoots', params: { color: 'emerald', trim: 'bronze' } },
+        ],
+        accessories: [
+          { id: 'antenna', profile: 'character.accessory.signalAntenna', params: { stem: 'amethyst', signal: 'holy_fire' } },
+        ],
+        details: [
+          { id: 'constellation', profile: 'character.detail.jacketConstellation', params: { color: '#56F0C8', gold: '#D99A2B' } },
+          { id: 'cheekBlush', profile: 'character.detail.cheekPixelBlush', params: { color: '#F08A78' } },
+          { id: 'shadow', profile: 'character.detail.castShadow', params: { color: '#1c1c2e' } },
+        ],
+      };
+    }
+
+    it('forgeCharacter no longer throws PB_PALETTE_BUDGET_EXCEEDED, and quantizes every direction to <= 32', () => {
+      let character;
+      expect(() => { character = forgeCharacter(buildOverBudgetSpec()); }).not.toThrow();
+      for (const dir of ['south', 'east', 'north', 'west']) {
+        expect(character.diagnostics.paletteSizes[dir]).toBeLessThanOrEqual(32);
+      }
+    });
   });
 });
