@@ -245,4 +245,10 @@ describe('character-creator', () => {
     expect(arraysEqual(a.spritesheet, b.spritesheet)).toBe(true);
     expect(arraysEqual(a.sprites.south, b.sprites.south)).toBe(true);
   });
+
+  it('throws on an unknown material instead of silently dropping it', () => {
+    const spec = buildScholarSpec();
+    const badSpec = { ...spec, materials: { ...spec.materials, skin: 'skin_does_not_exist' } };
+    expect(() => forgeCharacter(badSpec)).toThrow(/material.*not found in registry/i);
+  });
 });

@@ -41,9 +41,9 @@ function sortKeysDeep(value) {
   return value;
 }
 
-function normalizeCanvas(canvas) {
-  const width = toPositiveInt(canvas?.width, 32);
-  const height = toPositiveInt(canvas?.height, 48);
+function normalizeCanvas(canvas, defaults = { width: 32, height: 48 }) {
+  const width = toPositiveInt(canvas?.width, defaults.width);
+  const height = toPositiveInt(canvas?.height, defaults.height);
   if (width <= 0 || height <= 0) {
     throw err('canvas.width and canvas.height must be positive integers', { canvas });
   }
@@ -76,9 +76,11 @@ function normalizeMaterials(raw) {
   if (!raw || typeof raw !== 'object') return null;
   const out = {};
   for (const [key, value] of Object.entries(raw)) {
-    if (MATERIAL_PALETTES[resolveMaterialId(value)]) {
-      out[key] = String(value).trim();
+    const material = String(value).trim();
+    if (!MATERIAL_PALETTES[material]) {
+      throw err(`material "${material}" not found in registry`, { key, material });
     }
+    out[key] = material;
   }
   return Object.keys(out).length > 0 ? deepFreeze(out) : null;
 }
@@ -172,7 +174,12 @@ export function normalizeCharacterSpec(input = {}) {
   if (!id) throw err('id is required');
 
   const archetype = String(input.archetype || 'human').trim();
-  const canvas = normalizeCanvas(input.canvas);
+  const canvas = normalizeCanvas(
+    input.canvas,
+    input.body?.profile === 'character.body.human.jrpg'
+      ? { width: 48, height: 80 }
+      : undefined,
+  );
   const seed = toFiniteNumber(input.seed, 0) >>> 0;
   const bytecode = String(input.bytecode || '').trim();
   if (!bytecode) throw err('bytecode is required');
@@ -237,15 +244,6 @@ export function validateCharacterSpec(spec) {
   // With vectorWand, body profile is optional (Wand provides the vector construction)
   if (!spec.vectorWand && !spec.body?.profile) {
     throw err('body.profile is required unless vectorWand is provided');
-  }
-
-  // Validate materials exist in registry
-  if (spec.materials) {
-    for (const [key, material] of Object.entries(spec.materials)) {
-      if (!MATERIAL_PALETTES[resolveMaterialId(material)]) {
-        throw err(`material "${material}" not found in registry`, { key, material });
-      }
-    }
   }
 
   return true;
