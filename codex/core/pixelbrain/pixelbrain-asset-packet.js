@@ -351,7 +351,7 @@ export function derivePixelBrainExportPacket(packet, target = 'json', options = 
 export const PB_SDF_KIND = 'PB-SDF-v1';
 export const PB_NOISE_KIND = 'PB-NOISE-v1';
 
-function normalizeSDFPrimitive(prim = {}) {
+export function normalizeSDFPrimitive(prim = {}) {
   const type = String(prim.type || 'circle');
   const params = {};
   if (prim.params) {

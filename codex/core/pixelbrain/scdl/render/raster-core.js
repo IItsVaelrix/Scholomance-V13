@@ -60,6 +60,35 @@ export function pushCell(ops, x, y, color, loc, sourceOp = null) {
 }
 
 /**
+ * Map one SCDL op to an evaluateSDF-compatible primitive, or null if this op
+ * type has no lossless mapping today. See docs/scholomance-encyclopedia/
+ * PDR-archive/2026-09-03-scdl-sdf-descriptors-v1-pdr.md §2 for why each
+ * excluded type is excluded (not merely "not yet done").
+ */
+export function opToSDFPrimitive(op) {
+  const type = op.op || op.type;
+
+  if (type === 'circle' || type === 'ellipse') {
+    const rx = op.rx ?? op.radius ?? 1;
+    const ry = op.ry ?? op.radius ?? 1;
+    if (rx !== ry) return null; // eccentric ellipse — no lossless evaluateSDF mapping
+    return { type: 'circle', params: { center: { x: op.cx, y: op.cy }, radius: rx } };
+  }
+
+  if (type === 'rect') {
+    return {
+      type: 'box',
+      params: {
+        center: { x: op.x + op.w / 2, y: op.y + op.h / 2 },
+        size: { x: op.w, y: op.h },
+      },
+    };
+  }
+
+  return null; // ring, polygon, sphere, path, line — all deferred, PDR §2
+}
+
+/**
  * Compute analytic vector identity for a cell at (px, py) relative to its source op.
  * Returns { signedDistance, t, tangent, normal, curvature } or null if the op type
  * is not analytically tractable.
