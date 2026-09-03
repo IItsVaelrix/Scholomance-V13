@@ -19,6 +19,7 @@ import {
   pushCell, acceptAll, makeCanvasAccept,
   rasterizeCircle, rasterizeRing, rasterizeRect, rasterizePolygon,
   rasterizePath, rasterizeSphere, rasterizeEllipse, rasterizeLine,
+  opToSDFPrimitive,
 } from '../render/raster-core.js';
 import { resolveBooleanOpsPass } from './lower-booleans.js';
 
@@ -34,8 +35,11 @@ export function expandVectorPass(ast, _errors) {
   // Phase 1: rasterize each part's own vector ops in isolation.
   const rasterizedParts = ast.parts.map(part => {
     const newOps = [];
+    const sdfPrimitives = [];
     for (const op of part.ops) {
       const opWithContext = { ...op, partId: op.partId || part.id };
+      const primitive = opToSDFPrimitive(opWithContext);
+      if (primitive) sdfPrimitives.push(primitive);
       switch (op.op) {
         case 'circle':   rasterizeCircle(opWithContext, accept, newOps);   break;
         case 'ring':     rasterizeRing(opWithContext, accept, newOps);     break;
@@ -56,7 +60,7 @@ export function expandVectorPass(ast, _errors) {
         default: newOps.push(op); break;
       }
     }
-    return { ...part, ops: newOps, _vectorExpanded: true };
+    return { ...part, ops: newOps, sdfPrimitives, _vectorExpanded: true };
   });
 
   // Phase 2: resolve boolean ops now that every part's own shape is known.
