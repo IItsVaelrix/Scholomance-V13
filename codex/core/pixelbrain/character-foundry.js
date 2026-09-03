@@ -640,7 +640,9 @@ export function forgeCharacterFromWandVector(wandProposal, baseSpec = {}, opts =
   if (!wandProposal) throw new Error('forgeCharacterFromWandVector: wandProposal required');
 
   const canvas = baseSpec.canvas || CHARACTER_DEFAULTS.canvas;
-  const directions = opts.directions || baseSpec.directions || ['south', 'east', 'north', 'west'];
+  const directions = (opts.directions?.length ? opts.directions : null)
+    || (baseSpec.directions?.length ? baseSpec.directions : null)
+    || ['south', 'east', 'north', 'west'];
 
   // 1. Evaluate Wand to vector coordinates
   // Support composite by recursing children and attaching roles

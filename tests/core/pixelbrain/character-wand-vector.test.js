@@ -54,4 +54,12 @@ describe('[PixelBrain] Wand vector character route', () => {
     expect(character.pixelLotusActor).toBeDefined();
     expect(character.assetPacket).toBeDefined();
   });
+
+  it('falls back to the 4-direction default when directions is an empty array', () => {
+    const spec = buildWandSpec([]);
+    expect(() => forgeCharacterFromWandVector(spec.vectorWand, spec, {})).not.toThrow();
+    const character = forgeCharacterFromWandVector(spec.vectorWand, spec, {});
+    expect(Object.keys(character.sprites)).toEqual(['south', 'east', 'north', 'west']);
+    expect(character.diagnostics.directions).toEqual(['south', 'east', 'north', 'west']);
+  });
 });
