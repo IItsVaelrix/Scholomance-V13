@@ -16,6 +16,9 @@ import {
   ERROR_SEVERITY,
   MODULE_IDS,
 } from '../pixelbrain/bytecode-error.js';
+// Layer-1 consumes the SAME lineage verifier the asset pipeline uses — one
+// source of truth, dependency-free, light enough for the innate layer.
+import { verifyLineageChain, LINEAGE_CONTRACT } from '../pixelbrain/lineage-verify.js';
 
 /**
  * Canonical-path table for LING-0F04 (duplicate-path detector).
@@ -559,6 +562,47 @@ export const INNATE_RULES = [
       if (isTestPath(filePath) || isDocumentationPath(filePath)) return false;
       if (content.includes('IMMUNE_ALLOW: ui-shadow-computation')) return false;
       return detectUiShadowComputation(content, filePath);
+    },
+  },
+  {
+    id: 'LINEAGE-0F0D',
+    name: 'Broken asset lineage chain (PB-ASSET-LINEAGE-v1)',
+    category: ERROR_CATEGORIES.STATE,
+    errorCode: ERROR_CODES.IMMUNE_LINEAGE_BROKEN,
+    severity: ERROR_SEVERITY.ERROR,
+    moduleId: MODULE_IDS.IMMUNITY,
+    repairKey: 'repair.asset-lineage.recompile',
+    // The asset pipeline records a lineage chain (construction -> packet ->
+    // VRI scene -> raster digest) for every compile, and `--shade vri --lineage`
+    // exports it as a `-lineage.json` sidecar. Until this rule existed the chain
+    // had zero innate consumers: verifyLineage()/verifyLineageChain() were only
+    // exercised by tests. Layer 1 now defends the chain AT REST — a sidecar that
+    // fails its own internal consistency (missing digest, broken frame row,
+    // unknown construction link, mismatched frame-0 shorthand) is flagged
+    // deterministically, without needing the pixels it once described.
+    detector: (content, filePath) => {
+      const normalized = String(filePath || '').replace(/\\/g, '/');
+      if (!normalized.endsWith('-lineage.json')) return false;
+      if (isTestPath(normalized)) return false;
+      if (content.includes('IMMUNE_ALLOW: asset-lineage')) return false;
+
+      let doc;
+      try {
+        doc = JSON.parse(content);
+      } catch {
+        // A lineage artifact that is not even JSON cannot describe any asset.
+        return { matched: true, context: { reason: 'unparseable lineage artifact' } };
+      }
+      if (!doc || typeof doc !== 'object' || !doc.lineage) return false; // not a sidecar
+      if (doc.lineage.contract !== LINEAGE_CONTRACT) {
+        return {
+          matched: true,
+          context: { reason: `foreign contract: ${String(doc.lineage.contract)}` },
+        };
+      }
+      const result = verifyLineageChain(doc.lineage);
+      if (result.ok) return false;
+      return { matched: true, context: { mismatches: result.mismatches.slice(0, 5) } };
     },
   },
 ];

@@ -11,7 +11,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { IsoFacing } from '../../../pixel-lotus/actor-forge/pixelLotusActor.schema';
-import { forgeCharacter } from '../../../lib/pixelbrain.adapter';
+import { forgeCharacter, renderCharacterDirectionVri } from '../../../lib/pixelbrain.adapter';
 import { enhanceCharacter, EnhancementError } from '../../../lib/character-enhancement';
 import './ActorForgeLab.css';
 
@@ -24,6 +24,7 @@ const FACING_TO_DIRECTION: Record<IsoFacing, CardinalDirection> = {
 
 const BODY_PROFILES = [
   { id: 'character.body.chibi.starboundEsper', label: 'Starbound Esper Chibi' },
+  { id: 'character.body.human.jrpg', label: 'Astral Knight (tall JRPG)' },
   { id: 'character.body.human.feminine', label: 'Feminine' },
   { id: 'character.body.human.masculine', label: 'Masculine' },
   { id: 'character.body.human.androgynous', label: 'Androgynous' },
@@ -74,6 +75,20 @@ const SHOES_PROFILES = [
 ];
 
 const STYLE_PRESETS = {
+  astralKnight: {
+    label: 'Astral Knight',
+    body: 'character.body.human.jrpg',
+    skin: 'skin_medium',
+    hair: 'character.hair.cometSweep',
+    hairColor: 'hair_brown',
+    eyes: 'character.face.eye.humanSoft',
+    eyeColor: 'eye_psychic_cobalt',
+    top: 'character.clothing.top.starboundJacket',
+    bottom: 'character.clothing.bottom.beginnerPants',
+    shoes: 'character.clothing.shoes.cometBoots',
+    presentation: { gender: 'androgynous', heightClass: 'tall', buildClass: 'average' },
+    bytecode: 'VW-ASTRAL-KNIGHT-JRPG-V1',
+  },
   starboundEsper: {
     label: 'Starbound Esper',
     body: 'character.body.chibi.starboundEsper',
@@ -129,19 +144,25 @@ const nextSeed = (seed: number) => (seed * 1664525 + 1013904223) % 0x7fffffff;
 export default function ActorForgeLab() {
   const [facing, setFacing] = useState<IsoFacing>('S');
   const [showProvenance, setShowProvenance] = useState(false);
+  // VRI preview lens (opt-in, additive) — routes the current direction's
+  // sprite through the Vixel Render IR engine instead of the standard
+  // xBR-upscaled renderer. See renderCharacterDirectionVri's doc comment:
+  // character art carries no material/vector data, so this is closer to "the
+  // same art through a different rasterizer" than a lighting upgrade.
+  const [shadeVri, setShadeVri] = useState(false);
 
   const [showCinematic, setShowCinematic] = useState(true);
   const [phase, setPhase] = useState<'falling' | 'impact' | 'whiteout'>('falling');
 
   const [characterName, setCharacterName] = useState('Apprentice Scholar');
-  const [stylePreset, setStylePreset] = useState<StylePresetId>('starboundEsper');
+  const [stylePreset, setStylePreset] = useState<StylePresetId>('astralKnight');
 
-  const [bodyProfile, setBodyProfile] = useState<string>(STYLE_PRESETS.starboundEsper.body);
-  const [skin, setSkin] = useState<string>(STYLE_PRESETS.starboundEsper.skin);
-  const [hairProfile, setHairProfile] = useState<string>(STYLE_PRESETS.starboundEsper.hair);
-  const [hairColor, setHairColor] = useState<string>(STYLE_PRESETS.starboundEsper.hairColor);
-  const [eyeProfile, setEyeProfile] = useState<string>(STYLE_PRESETS.starboundEsper.eyes);
-  const [eyeColor, setEyeColor] = useState<string>(STYLE_PRESETS.starboundEsper.eyeColor);
+  const [bodyProfile, setBodyProfile] = useState<string>(STYLE_PRESETS.astralKnight.body);
+  const [skin, setSkin] = useState<string>(STYLE_PRESETS.astralKnight.skin);
+  const [hairProfile, setHairProfile] = useState<string>(STYLE_PRESETS.astralKnight.hair);
+  const [hairColor, setHairColor] = useState<string>(STYLE_PRESETS.astralKnight.hairColor);
+  const [eyeProfile, setEyeProfile] = useState<string>(STYLE_PRESETS.astralKnight.eyes);
+  const [eyeColor, setEyeColor] = useState<string>(STYLE_PRESETS.astralKnight.eyeColor);
   const [top, setTop] = useState(TOP_PROFILES[0]);
   const [bottom, setBottom] = useState(BOTTOM_PROFILES[0]);
   const [shoes, setShoes] = useState(SHOES_PROFILES[0]);
@@ -195,12 +216,15 @@ export default function ActorForgeLab() {
   const forge = useMemo(() => {
     const preset = STYLE_PRESETS[stylePreset];
     const isStarboundEsper = stylePreset === 'starboundEsper';
+    const isJrpgHumanoid = bodyProfile === 'character.body.human.jrpg';
     const spec = {
       contract: 'CHARACTER-SPEC-v1',
       id: `forge.custom.${stylePreset}.${bodyProfile.split('.').pop()}.v1`,
       class: 'character',
       archetype: 'human',
-      canvas: { width: 32, height: 48, gridSize: 1 },
+      canvas: isJrpgHumanoid
+        ? { width: 48, height: 80, gridSize: 1 }
+        : { width: 32, height: 48, gridSize: 1 },
       seed,
       bytecode: preset.bytecode,
       presentation: preset.presentation,
@@ -238,10 +262,21 @@ export default function ActorForgeLab() {
 
   const direction = FACING_TO_DIRECTION[facing];
 
+  const vriPreview = useMemo(() => {
+    if (!shadeVri || !forge.character) return { png: null as Uint8Array | null, error: null as string | null };
+    try {
+      const bundle = renderCharacterDirectionVri(forge.character, direction, { scale: 4 });
+      return { png: bundle.png as Uint8Array, error: null as string | null };
+    } catch (e) {
+      return { png: null as Uint8Array | null, error: e instanceof Error ? e.message : String(e) };
+    }
+  }, [shadeVri, forge.character, direction]);
+
   const spriteUrl = useMemo(() => {
+    if (shadeVri && vriPreview.png) return pngToDataUrl(vriPreview.png);
     const png = (forge.character as any)?.sprites?.[direction];
     return png ? pngToDataUrl(png) : null;
-  }, [forge, direction]);
+  }, [forge, direction, shadeVri, vriPreview]);
 
   const sheetUrl = useMemo(() => {
     const sheet = (forge.character as any)?.spritesheet;
@@ -400,10 +435,18 @@ export default function ActorForgeLab() {
                 <img
                   className="forged-sprite"
                   src={spriteUrl}
-                  alt={`${characterName} facing ${direction}`}
+                  alt={`${characterName} facing ${direction}${shadeVri && vriPreview.png ? ' (VRI preview)' : ''}`}
                 />
               ) : null}
-              <div className="actor-animation-label">idle · {direction}</div>
+              {shadeVri && vriPreview.error && (
+                <div className="forge-error" role="alert">
+                  <strong>VRI preview failed — showing standard sprite instead:</strong>
+                  <pre className="mono">{vriPreview.error}</pre>
+                </div>
+              )}
+              <div className="actor-animation-label">
+                idle · {direction}{shadeVri && vriPreview.png ? ' · VRI preview (experimental)' : ''}
+              </div>
             </div>
           </div>
           {sheetUrl && (
@@ -561,6 +604,19 @@ export default function ActorForgeLab() {
               onClick={() => setShowProvenance(s => !s)}
             >
               Provenance: {showProvenance ? 'visible' : 'hidden'}
+            </button>
+          </div>
+
+          <div className="control-group">
+            <button
+              type="button"
+              className="provenance-toggle"
+              aria-pressed={shadeVri}
+              aria-label="Toggle VRI preview lens (experimental, opt-in engine preview)"
+              onClick={() => setShadeVri(s => !s)}
+              title="Routes the current sprite through the Vixel Render IR engine instead of the standard renderer. Experimental preview — not a lighting upgrade, see the label under the sprite when active."
+            >
+              VRI Preview: {shadeVri ? 'on' : 'off'}
             </button>
           </div>
 

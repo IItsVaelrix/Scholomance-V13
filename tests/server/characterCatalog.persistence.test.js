@@ -2,8 +2,11 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { spawnSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
+import Database from 'better-sqlite3';
 
-describe('[Server] character catalog persistence (migration v23)', () => {
+describe('[Server] character catalog persistence (migrations v23-v24)', () => {
   let userPersistence;
   let characterCatalogPersistence;
   let dbPath;
@@ -102,5 +105,106 @@ describe('[Server] character catalog persistence (migration v23)', () => {
     expect(aliceRow.spec_hash).toBe('ha');
     expect(bobRow.name).toBe('Bob Character');
     expect(bobRow.spec_hash).toBe('hb');
+  });
+
+  it('upgrades a database that already recorded v23 to the per-user primary key', () => {
+    const legacyDbPath = path.join(os.tmpdir(), `character_catalog_v23_${Date.now()}.sqlite`);
+    const legacyDb = new Database(legacyDbPath);
+    legacyDb.exec(`
+      CREATE TABLE schema_migrations (
+        namespace TEXT NOT NULL,
+        version INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        applied_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (namespace, version)
+      );
+      INSERT INTO schema_migrations (namespace, version, name)
+      VALUES ('user', 23, 'create_character_catalog');
+
+      CREATE TABLE users (id INTEGER PRIMARY KEY);
+      INSERT INTO users (id) VALUES (1), (2);
+
+      CREATE TABLE character_catalog (
+        id TEXT PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        controls_json TEXT NOT NULL,
+        spec_json TEXT NOT NULL,
+        spec_hash TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      );
+      CREATE INDEX idx_character_catalog_user ON character_catalog(user_id);
+      INSERT INTO character_catalog (
+        id, user_id, name, controls_json, spec_json, spec_hash
+      ) VALUES ('shared_id', 1, 'Preserved Character', '{}', '{}', 'original-hash');
+
+      CREATE TABLE _world_meta (key TEXT PRIMARY KEY, value TEXT);
+      INSERT INTO _world_meta (key, value) VALUES ('seed_version', '1.0.0');
+    `);
+    legacyDb.close();
+
+    const persistenceUrl = pathToFileURL(
+      path.resolve('codex/server/user.persistence.js'),
+    ).href;
+    const child = spawnSync(
+      process.execPath,
+      ['--input-type=module', '--eval', `
+        const { userPersistence } = await import(${JSON.stringify(persistenceUrl)});
+        await userPersistence.close();
+      `],
+      {
+        cwd: process.cwd(),
+        env: {
+          ...process.env,
+          USER_DB_PATH: legacyDbPath,
+          TURSO_USER_DB_URL: '',
+          TURSO_USER_DB_TOKEN: '',
+        },
+        encoding: 'utf8',
+      },
+    );
+
+    try {
+      expect(child.status, child.stderr).toBe(0);
+
+      const upgradedDb = new Database(legacyDbPath);
+      const primaryKey = upgradedDb.prepare(`PRAGMA table_info('character_catalog')`)
+        .all()
+        .filter((column) => column.pk > 0)
+        .sort((left, right) => left.pk - right.pk)
+        .map((column) => column.name);
+      expect(primaryKey).toEqual(['user_id', 'id']);
+
+      const preserved = upgradedDb.prepare(
+        'SELECT user_id, id, name, spec_hash FROM character_catalog WHERE user_id = 1 AND id = ?',
+      ).get('shared_id');
+      expect(preserved).toEqual({
+        user_id: 1,
+        id: 'shared_id',
+        name: 'Preserved Character',
+        spec_hash: 'original-hash',
+      });
+
+      upgradedDb.prepare(`
+        INSERT INTO character_catalog (
+          id, user_id, name, controls_json, spec_json, spec_hash
+        ) VALUES (?, ?, ?, '{}', '{}', ?)
+      `).run('shared_id', 2, 'Second User Character', 'second-hash');
+      expect(upgradedDb.prepare(
+        'SELECT COUNT(*) AS count FROM character_catalog WHERE id = ?',
+      ).get('shared_id').count).toBe(2);
+
+      const migration = upgradedDb.prepare(
+        "SELECT name FROM schema_migrations WHERE namespace = 'user' AND version = 24",
+      ).get();
+      expect(migration?.name).toBe('scope_character_catalog_primary_key_per_user');
+      upgradedDb.close();
+    } finally {
+      for (const suffix of ['', '-wal', '-shm']) {
+        try { fs.unlinkSync(`${legacyDbPath}${suffix}`); } catch { /* not present */ }
+      }
+    }
   });
 });

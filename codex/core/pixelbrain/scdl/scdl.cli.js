@@ -35,7 +35,7 @@ const DEFAULT_PREVIEW_SCALE = 8;
  * token for a `--` prefix, so `compile --bytecode foo.scdl` read foo.scdl as
  * bytecode's value and lost the input file.
  */
-const BOOLEAN_FLAGS = new Set(['bytecode', 'strict', 'semantic']);
+const BOOLEAN_FLAGS = new Set(['bytecode', 'strict', 'semantic', 'strokes', 'lineage']);
 
 function parseArgs(args) {
   const opts = { flags: {}, positional: [] };
@@ -163,6 +163,58 @@ function printVriFailure(asset, commandLabel) {
   for (const err of blocking) printDiagnostic(err);
 }
 
+/**
+ * Render-stage options (--shade vri only). `--strokes` turns on the PB-STROKE-v1
+ * contour overlay — discrete silhouette/material-boundary ink that fixes the
+ * tearing bug at part boundaries. Default off keeps output byte-identical to
+ * every pre-stroke golden comparison.
+ */
+function vriRenderOptions(opts) {
+  const render = {};
+  if (opts.flags.strokes === true) render.strokes = true;
+  return render;
+}
+
+/**
+ * VRI compile-stage options (--shade vri only). `--relief synthetic` gives flat
+ * hand-painted cells a rank-projected in-plane normal (PB-VRI-RELIEF-v1) so the
+ * lighting pass has real relief to act on.
+ */
+function vriCompileOptions(opts) {
+  const vri = {};
+  if (typeof opts.flags.relief === 'string' && opts.flags.relief.length > 0) {
+    vri.relief = opts.flags.relief;
+  }
+  return vri;
+}
+
+/**
+ * Print both palette-coverage surfaces side by side: the authored value sketch
+ * (compile-time, what the artist painted) vs. the rendered buffer (post-light,
+ * post-quantization, what actually reached pixels). These CAN legitimately
+ * differ — the fix that made `renderedPaletteCoverage` exist was exactly a case
+ * where 'authored: flat' (6 colours) hid 'rendered: 19 colours' after
+ * quantization. Printing only one surface is how that bug went unnoticed;
+ * printing both is the two-line fix.
+ */
+function printPaletteCoverage(vriDiag) {
+  const authored = vriDiag?.paletteCoverage || [];
+  const rendered = vriDiag?.renderedPaletteCoverage || [];
+  if (authored.length === 0 && rendered.length === 0) return;
+
+  console.log('[SCDL] Palette coverage (authored vs rendered):');
+  const renderedByMaterial = new Map(rendered.map(r => [r.material, r]));
+  for (const a of authored) {
+    const r = renderedByMaterial.get(a.material);
+    const authoredStr = `authored ${a.anchorsUsed}/${a.anchorCount}${a.flat ? ' (flat)' : ''}`;
+    const renderedStr = r
+      ? `rendered ${r.distinctColors} colour(s), span ${r.span}${r.flat ? ' (flat)' : ''}`
+      : 'rendered: no raster';
+    const mismatch = r && a.flat !== r.flat ? '  <- authored/rendered surfaces disagree' : '';
+    console.log(`  ${a.material}: ${authoredStr} | ${renderedStr}${mismatch}`);
+  }
+}
+
 function encodeVriFilmstrip(frames) {
   const rasters = frames.map(frame => frame.raster);
   if (rasters.length === 0 || rasters.some(raster => !raster)) {
@@ -221,7 +273,11 @@ function cmdCompile(args) {
       console.error('[SCDL] compile: --shade vri only supports PNG export; use --export png or omit --export.');
       process.exit(1);
     }
-    const asset = compileAsset(source, { scale });
+    const asset = compileAsset(source, {
+      scale,
+      render: vriRenderOptions(opts),
+      vri: vriCompileOptions(opts),
+    });
     if (!asset.ok) {
       printVriFailure(asset, '--shade vri');
       process.exit(1);
@@ -245,6 +301,22 @@ function cmdCompile(args) {
       writeOut(join(outDir, `${name}-frameloop.json`), JSON.stringify(asset.frameLoop, null, 2));
       console.log(`[SCDL] Frames: ${asset.frames.length} (loop '${asset.frameLoop.loop}')`);
     }
+    // Lineage sidecar (opt-in): the PB-ASSET-LINEAGE-v1 chain without its
+    // pixels, so it can travel to where the pixels cannot — Layer-1 immunity
+    // scans these artifacts (innate rule LINEAGE-0F0D) via verifyLineageChain.
+    if (opts.flags.lineage === true) {
+      const sidecar = {
+        artifact: 'PB-ASSET-LINEAGE-SIDECAR-v1',
+        asset: name,
+        sourceFile: basename(filePath),
+        shading: 'vri',
+        scale,
+        frames: asset.frames.length,
+        lineage: asset.lineage,
+      };
+      writeOut(join(outDir, `${name}-lineage.json`), JSON.stringify(sidecar, null, 2));
+    }
+    printPaletteCoverage(asset.diagnostics.vri);
     console.log(`[SCDL] Done. Packet ID: ${asset.frames[0].packet.id}`);
     return;
   }
@@ -340,7 +412,11 @@ function cmdPreview(args) {
   const source = readSource(filePath);
 
   if (shade === 'vri') {
-    const asset = compileAsset(source, { scale });
+    const asset = compileAsset(source, {
+      scale,
+      render: vriRenderOptions(opts),
+      vri: vriCompileOptions(opts),
+    });
     if (!asset.ok) {
       printVriFailure(asset, 'preview --shade vri');
       process.exit(1);
@@ -358,6 +434,7 @@ function cmdPreview(args) {
       writeOut(join(outDir, `${name}-preview-${scale}x-strip.png`), encodeVriFilmstrip(asset.frames));
       console.log(`[SCDL] Frames: ${asset.frames.length} (loop '${asset.frameLoop?.loop ?? 'unknown'}')`);
     }
+    printPaletteCoverage(asset.diagnostics.vri);
     return;
   }
 
@@ -512,5 +589,31 @@ falls back to 'source') to errors.
 --bytecode appends the machine-readable PB-ERR-v1 correlation payload to each
 diagnostic. Off by default: it is a ~250-char base64 blob meant for tooling,
 not for reading. SCDL_BYTECODE=1 sets it for every command in a shell.
+
+Vixel Render IR (VRI) shading — opt-in, PNG export only:
+  --shade vri            route the asset through the VRI engine (compileAsset)
+                         instead of the default material shader. Deterministic,
+                         lineage-recorded, physically-motivated lighting.
+  --shade vri --strokes  add the PB-STROKE-v1 contour overlay (discrete
+                         silhouette + material-boundary ink) that repairs tearing
+                         at part boundaries. Byte-identical to plain --shade vri
+                         when omitted.
+  --shade vri --relief synthetic
+                         PB-VRI-RELIEF-v1: give flat hand-painted cells a
+                         rank-projected in-plane normal so the lighting pass has
+                         real relief to act on. Bright values lean into the key
+                         light, dark values recede.
+  --shade vri --lineage  also write <asset>-lineage.json, the PB-ASSET-LINEAGE-v1
+                         chain (construction -> packet -> VRI scene -> raster
+                         digest). This is the artifact Layer-1 immunity
+                         (rule LINEAGE-0F0D) scans to defend asset integrity.
+
+--shade vri always prints palette coverage per material, authored (the value
+sketch as painted) alongside rendered (what actually reached pixels after
+lighting/quantization) — the two surfaces can legitimately disagree, and a
+'<- authored/rendered surfaces disagree' marker flags it when they do.
+
+Example:
+  node scdl.cli.js compile assets/foo.scdl --shade vri --strokes --lineage
 `);
 }

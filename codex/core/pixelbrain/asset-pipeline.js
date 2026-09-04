@@ -35,20 +35,29 @@ import {
 import { compileVRI, fnv1aHex } from './vixel/vri-compiler.js';
 import { renderVRI } from './vixel/vri-renderer.js';
 import { createConstruction, trySolve } from './construction/index.js';
+import { constructionToSCDLParts } from './construction-to-scdl.js';
+import {
+  LINEAGE_CONTRACT,
+  verifyLineageChain,
+} from './lineage-verify.js';
 
 export const ASSET_PIPELINE_CONTRACT = 'PB-ASSET-PIPELINE-v1';
-export const LINEAGE_CONTRACT = 'PB-ASSET-LINEAGE-v1';
+// Re-exported so existing consumers keep importing the lineage vocabulary from
+// the pipeline boundary; the definitions themselves live in lineage-verify.js,
+// dependency-free, so Layer-1 immunity can consume the same source.
+export { LINEAGE_CONTRACT, verifyLineageChain };
 
 /**
  * How a construction relates to the packet compiled alongside it.
  *
  * `gate`    — the construction was solved and had to succeed for this compile to
- *             proceed, but its solved geometry does not yet flow into the SCDL
- *             AST. The link is causal (a refusal stops the asset) but not
- *             generative.
- * `derived` — the packet's coordinates were produced from the solved geometry.
- *             Not reachable until a constructionToSCDLParts pass exists; the
- *             field exists so the distinction is recorded rather than assumed.
+ *             proceed, but its solved geometry does not flow into the SCDL AST.
+ *             The link is causal (a refusal stops the asset) but not generative.
+ * `derived` — the packet's coordinates were produced from the solved geometry
+ *             via `constructionToSCDLParts()` (passed through
+ *             `options.deriveConstructionParts`). The solved contours became
+ *             real `part` blocks in the compiled source, so the geometry is
+ *             generative, not merely causal.
  */
 export const CONSTRUCTION_LINK = Object.freeze({
   GATE: 'gate',
@@ -56,7 +65,7 @@ export const CONSTRUCTION_LINK = Object.freeze({
 });
 
 /** Default digest: content-sensitive change detector, not a content address. */
-function defaultDigest(bytes) {
+export function defaultDigest(bytes) {
   let h = 0x811c9dc5;
   for (let i = 0; i < bytes.length; i++) {
     h ^= bytes[i];
@@ -66,20 +75,51 @@ function defaultDigest(bytes) {
 }
 
 /**
+ * Splice generated SCDL into a source WITHOUT disturbing the export directive.
+ *
+ * `export` is a terminal directive: any `part` token appearing after it is read
+ * as an export target ("Unknown export target 'part'"), so naive appending
+ * breaks every production asset — they all end in `export png`. Insert before
+ * the first export line instead; when there is none, append. The whole result
+ * still goes through the ordinary grammar, so a bad splice refuses loudly
+ * through SCDL diagnostics rather than compiling half a scene.
+ */
+function insertBeforeExport(source, fragment) {
+  const lines = source.split('\n');
+  const exportIdx = lines.findIndex(l => /^export(\s|$)/.test(l.trim()));
+  if (exportIdx === -1) return `${source}\n${fragment}`;
+  const before = lines.slice(0, exportIdx).join('\n');
+  const after = lines.slice(exportIdx).join('\n');
+  return `${before}\n${fragment}\n${after}`;
+}
+
+/**
  * Compile an asset from SCDL source through to pixels.
  *
  * @param {string} source - SCDL source text
  * @param {object} [options]
  * @param {object}   [options.construction] - GeometryConstructionSpec. Solved and
- *   required to pass before compilation proceeds. Its geometry does not yet feed
- *   the packet — see CONSTRUCTION_LINK.
+ *   required to pass before compilation proceeds. Without
+ *   `options.deriveConstructionParts` its geometry gates the asset without
+ *   supplying it — see CONSTRUCTION_LINK.
+ * @param {object}   [options.deriveConstructionParts] - When set alongside
+ *   `options.construction`, the solved geometry is turned into SCDL `part`
+ *   blocks by `constructionToSCDLParts()` and appended to the source, and the
+ *   construction lineage link becomes `derived`. Shape:
+ *   `{ colorByPart: { [partId]: colorRefOrHex }, materialByPart?: { [partId]: materialId } }`.
+ *   Refuses (never silently compiles nothing) when every solved part is skipped.
  * @param {object[]} [options.genes] - raw gene definitions, or pre-built packets
  * @param {object}   [options.canvas] - canvas for gene projection; defaults to the
  *   compiled packet's canvas when genes are absent
  * @param {string}   [options.assetId] - asset id for gene packet construction
  * @param {object}   [options.projection] - overrides for the gene projection context
  * @param {object}   [options.vri] - options forwarded to compileVRI (lighting,
- *   atmosphere, rasterPatches, quantize, ...). Pass `false` to skip VRI entirely.
+ *   atmosphere, rasterPatches, quantize, relief, ...). Pass `false` to skip VRI entirely.
+ * @param {object}   [options.render] - options forwarded to renderVRI (e.g.
+ *   `{ strokes: true }` for the PB-STROKE-v1 contour overlay). Compile options
+ *   live in `options.vri`; render options live here — the two stages are
+ *   separately refusable and separately optional, and this boundary must not
+ *   collapse them.
  * @param {number}   [options.scale] - when set, renders the VRI scene at this
  *   integer scale. Omit to stop at the scene.
  * @param {Function} [options.digest] - (Uint8Array) => string, for the raster
@@ -92,11 +132,13 @@ function defaultDigest(bytes) {
 export function compileAsset(source, options = {}) {
   const {
     construction = null,
+    deriveConstructionParts = null,
     genes = null,
     canvas = null,
     assetId = null,
     projection = {},
     vri = {},
+    render = {},
     scale = null,
     digest = defaultDigest,
     strict = true,
@@ -105,7 +147,12 @@ export function compileAsset(source, options = {}) {
   const errors = [];
   const diagnostics = {};
 
-  // ── Stage 1: construction (gate) ────────────────────────────────────────
+  // The construction-derivation path appends generated `part` blocks to the
+  // authored source. Keeping them separate until SCDL compile time means a
+  // refusal in either layer names the layer that actually refused.
+  let effectiveSource = source;
+
+  // ── Stage 1: construction (gate, or gate + derivation) ──────────────────
   // A false constraint must stop the asset before anything is drawn. This is
   // the pipeline's existing law -- refusal is not a visual warning -- applied
   // at the composition boundary rather than left to each caller.
@@ -141,6 +188,41 @@ export function compileAsset(source, options = {}) {
       resultChecksum: solved.result.resultChecksum,
       link: CONSTRUCTION_LINK.GATE,
     };
+
+    // ── Stage 1b: construction → SCDL part derivation (opt-in) ────────────
+    // The solved contours become real `part` blocks appended to the authored
+    // source. Refusal here is mandatory when nothing survives derivation:
+    // silently compiling an asset whose supplied geometry produced zero parts
+    // would be the SCDL-005 class of defect this pipeline exists to prevent.
+    if (deriveConstructionParts) {
+      const derived = constructionToSCDLParts(solved.result, deriveConstructionParts);
+      if (derived.parts.length === 0) {
+        return _fail(
+          [new Error(
+            'PB-ASSET-PIPELINE: deriveConstructionParts produced zero parts. '
+            + 'Every solved part was skipped: '
+            + derived.skipped.map(s => `${s.partId} (${s.reason})`).join('; '),
+          )],
+          diagnostics,
+        );
+      }
+      effectiveSource = insertBeforeExport(source, derived.source);
+      constructionLineage = {
+        ...constructionLineage,
+        link: CONSTRUCTION_LINK.DERIVED,
+        partsChecksum: derived.partsChecksum,
+      };
+      diagnostics.construction.derivedParts = {
+        count: derived.parts.length,
+        partIds: derived.parts.map(p => p.partId),
+        skipped: derived.skipped,
+      };
+    }
+  } else if (deriveConstructionParts) {
+    return _fail(
+      [new Error('PB-ASSET-PIPELINE: deriveConstructionParts requires options.construction.')],
+      diagnostics,
+    );
   }
 
   // ── Stage 2: gene projection ────────────────────────────────────────────
@@ -193,7 +275,7 @@ export function compileAsset(source, options = {}) {
   }
 
   // ── Stage 3: SCDL ───────────────────────────────────────────────────────
-  const scdl = compileSCDL(source, {
+  const scdl = compileSCDL(effectiveSource, {
     ...(genePackets ? { artGenes: genePackets, artProjectionContext: projectionContext } : {}),
     strict,
   });
@@ -240,7 +322,7 @@ export function compileAsset(source, options = {}) {
     }
     if (frameScene && scale != null) {
       try {
-        frameRaster = renderVRI(frameScene, scale);
+        frameRaster = renderVRI(frameScene, scale, render);
       } catch (e) {
         return _fail([e], {
           ...diagnostics,
@@ -266,7 +348,12 @@ export function compileAsset(source, options = {}) {
       lights: vriScene.lights.length,
       quantizationMode: vriScene.provenance.quantizationMode,
       unrenderedDeclarations: vriScene.provenance.unrenderedDeclarations,
+      // Authored-surface coverage (the value sketch as painted). The tag is
+      // load-bearing: see paletteCoverage's surface-honesty note in vri-compiler.
       paletteCoverage: vriScene.provenance.paletteCoverage,
+      // Rendered-surface coverage — what actually reached pixels after lighting,
+      // atmosphere, and quantization. Null when no raster was requested.
+      renderedPaletteCoverage: raster?.provenance?.renderedPaletteCoverage ?? null,
     };
   }
 

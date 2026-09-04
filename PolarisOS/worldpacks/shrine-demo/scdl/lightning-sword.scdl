@@ -31,5 +31,5 @@ part grip material oak_bark {
 }
 
 part pommel material moonstone {
-  ellipse 8 30 radius 2 ry 1 pommel_cyan
+  circle 8 30 radius 2 pommel_cyan
 }

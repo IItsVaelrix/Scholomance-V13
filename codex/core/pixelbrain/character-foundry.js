@@ -11,6 +11,10 @@ import { evaluateFormula } from './formula-to-coordinates.js';
 import { pointsToSVGPath } from './svg-path-builder.js';
 import { applyChaikin, applyAffine, applyOffsetCurve } from './shared.js';
 import { createPixelBrainAssetPacket } from './pixelbrain-asset-packet.js';
+// VRI preview bridge (opt-in, additive) — see renderCharacterDirectionVri below.
+import { renderCoordinatesVri } from './vixel/index.js';
+import { LINEAGE_CONTRACT } from './lineage-verify.js';
+import { defaultDigest } from './asset-pipeline.js';
 
 import './character-body-profiles.js';
 import './character-face-profiles.js';
@@ -602,6 +606,76 @@ export function forgeCharacter(rawSpec, opts = {}) {
   });
 
   return character;
+}
+
+/**
+ * Render one direction of a forged character through the VRI engine — an
+ * opt-in preview lens, not a replacement renderer.
+ *
+ * Honest limits, measured (not assumed) by rendering a real character through
+ * both paths and comparing pixels: character-foundry cells carry `{ x, y,
+ * color, partId, isRim }` — no `material` and no vector/SDF identity, because
+ * form-shading (rim/sub-rim/top-lit gradient) is baked into `color` directly by
+ * `applyCharacterFills`. VRI's lighting is reference-normalized so a flat cell
+ * with no material ramp and no normal renders at its own authored colour —
+ * this preview is therefore closer to "the same art through a different
+ * rasterizer" than "the same art, better lit." Synthetic relief and the
+ * PB-STROKE-v1 contour overlay both need a resolvable material ramp or vector
+ * identity to act on, neither of which exists here, so they are visibly
+ * inert on character output today. This function exists so that gap is
+ * something a human can SEE by flipping a toggle, not something buried in a
+ * memory file — see ARCH-2026-09-04-VIXEL-RENDER-IR.md.
+ *
+ * @param {object} character - a forgeCharacter() result
+ * @param {string} direction - one of character.spec.directions (e.g. 'south')
+ * @param {object} [opts]
+ * @param {number} [opts.scale=4]
+ * @returns {{ contract: string, scene: object, raster: object, png: Uint8Array, lineage: object }}
+ */
+export function renderCharacterDirectionVri(character, direction, opts = {}) {
+  const fills = character?.fills?.[direction];
+  if (!fills) {
+    throw new Error(`character-foundry: renderCharacterDirectionVri: no fills for direction '${direction}'`);
+  }
+  const { scale = 4 } = opts;
+  const canvas = character.canvas;
+
+  const coordinates = fills.coordinates.map(c => ({
+    x: c.x,
+    y: c.y,
+    color: c.color,
+    partId: c.partId ?? null,
+  }));
+
+  const packetId = `${character.assetPacket?.id || character.spec?.id || 'character'}-${direction}`;
+  const { scene, raster } = renderCoordinatesVri(coordinates, canvas, { id: packetId, scale });
+  const digest = defaultDigest(raster.data);
+
+  const frame = Object.freeze({
+    index: 0,
+    packet: Object.freeze({ id: packetId }),
+    vriScene: Object.freeze({ id: scene.id, checksum: scene.checksum }),
+    raster: Object.freeze({ width: raster.width, height: raster.height, scale, digest }),
+  });
+  const lineage = Object.freeze({
+    contract: LINEAGE_CONTRACT,
+    construction: null,
+    genes: null,
+    packet: frame.packet,
+    vriScene: frame.vriScene,
+    raster: frame.raster,
+    frames: Object.freeze([frame]),
+  });
+
+  return Object.freeze({
+    contract: 'PB-CHARACTER-VRI-PREVIEW-v1',
+    scene,
+    raster,
+    // This module's encodePng is browser-safe (fflate, no Node Buffer) — raster.data
+    // is already a Uint8Array, which is all it needs.
+    png: encodePng(raster.width, raster.height, raster.data),
+    lineage,
+  });
 }
 
 export { composeCharacterSilhouette } from './character-silhouette-composer.js';

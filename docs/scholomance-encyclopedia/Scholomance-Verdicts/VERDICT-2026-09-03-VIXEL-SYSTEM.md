@@ -1,4 +1,6 @@
-# VERDICT-2026-09-03-VIXEL-SYSTEM
+# VERDICT-2026-09-03-VIXEL-SYSTEM [SUPERSEDED]
+
+> **Superseded 2026-09-04.** Commit `f2d05092` wired VRI into the SCDL CLI (`--shade vri`, opt-in) and commit `2c92a5d5` ruled and shipped `compileAsset`'s `strict: true` default, resolving one of this verdict's two named open decisions and one of its three named re-render triggers. Per the Temporal Re-Render Rule's Premature Re-Render Triggers ("a material remediation from the prior verdict ships"), this verdict is superseded by [`VERDICT-2026-09-04-VIXEL-SYSTEM-POST-REMEDIATION.md`](./VERDICT-2026-09-04-VIXEL-SYSTEM-POST-REMEDIATION.md), which also corrects this verdict's Innovation praise for the synthetic-relief technique — a fresh grep found no implementation of it anywhere in the tracked tree. Grade is unchanged at B. This document is preserved unmodified below as the temporal record of how the architecture was judged before that remediation.
 
 ## Bytecode Search Code
 `SCHOL-ENC-BYKE-SEARCH-VERDICT-VIXEL-SYSTEM`
@@ -14,7 +16,7 @@
 | Re-Render Due | **2026-12-03** (3 months — Experimental / pre-Phase-2 window: no canon or PDR exists, the system has zero production consumers, and two explicit design decisions have sat unanswered since the session that built the work) |
 | Audit Frame | VAELRIX_LAW (Global Law + Law 3, Law 13) + ByteCode Error System + **direct empirical measurement this session**: git-tracked-file check, full dependency-graph grep across both production asset-generation doors (`item-foundry.js` and every file under `codex/core/pixelbrain/scdl/`), and a live test run (`npx vitest run tests/codex/core/pixelbrain/vixel/ tests/codex/core/pixelbrain/asset-pipeline.test.js tests/codex/core/pixelbrain/compile-asset.test.js tests/codex/core/pixelbrain/material-validator.test.js`, 194/194 passing, measured 2026-09-03). Historical claims about specific bugs found and fixed (the additive-lighting overshoot, the negated to-light vector, the synthetic-relief technique) are carried from this project's own session record of 2026-07-29 and 2026-08-30 and are corroborated, not just repeated, by this session's fresh 194/194 test-pass measurement — the fixes described are still in the code and still green today. |
 | Verdict Class | SINGLE-AUDITOR (the target is engine code inside `codex/core/pixelbrain/`; it does not cross into `src/pages/`, `*.css`, or a UI surface, so the Multi-Auditor Protocol does not trigger) |
-| Status | RENDERED |
+| Status | **SUPERSEDED-BY-VIXEL-SYSTEM-POST-REMEDIATION** |
 
 ---
 

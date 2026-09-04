@@ -288,6 +288,26 @@ export const REPAIR_RECOMMENDATIONS = Object.freeze({
     references: ['ARCH-2026-04-26-IMMUNE-SYSTEM.md'],
     canonical: null,
   },
+
+  'repair.asset-lineage.recompile': {
+    key: 'repair.asset-lineage.recompile',
+    title: 'Recompile the asset to regenerate a self-consistent PB-ASSET-LINEAGE-v1 chain',
+    suggestions: [
+      'A `-lineage.json` sidecar is internally inconsistent (missing digest, broken frame row, unknown construction link).',
+      'Recompile from source with `npm run scdl:compile -- <asset>.scdl --shade vri --lineage` to regenerate the chain.',
+      'Never hand-edit a lineage artifact: the chain is a record of what the pipeline produced, not an authored document.',
+      'If the source itself changed, the old lineage describes pixels that no longer exist — regenerate, do not patch.',
+    ],
+    constraints: [
+      'A lineage is only valid as a whole: contract, packet, per-frame rows, and digests must all agree.',
+      'A derived construction link must carry its partsChecksum.',
+    ],
+    invariants: [
+      'verifyLineageChain(lineage).ok === true',
+    ],
+    references: ['ARCH-2026-04-26-IMMUNE-SYSTEM.md'],
+    canonical: null,
+  },
 });
 
 /**

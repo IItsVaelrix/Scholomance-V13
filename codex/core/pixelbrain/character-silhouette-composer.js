@@ -145,11 +145,14 @@ export function composeCharacterSilhouette(spec, { direction = 'south' } = {}) {
   // Layer 3-5: Clothing
   if (Array.isArray(spec.clothing)) {
     const bodyAnchorsMap = bodyAnchors || {};
+    const centerX = Math.round(canvas.width / 2);
     const shoulderY = bodyAnchorsMap.shoulderL?.y || 12;
     const waistY = bodyAnchorsMap.waist?.y || 24;
     const legBot = bodyAnchorsMap.ankleL?.y || 40;
     const footBot = bodyAnchorsMap.ankleL ? bodyAnchorsMap.ankleL.y + 3 : 44;
-    const shoulderHalfW = bodyAnchorsMap.shoulderL ? (bodyAnchors.bodyRight?.x - bodyAnchors.bodyLeft?.x) / 2 || 7 : 7;
+    const shoulderHalfW = bodyAnchorsMap.shoulderL && bodyAnchorsMap.shoulderR
+      ? Math.max(1, Math.round((bodyAnchorsMap.shoulderR.x - bodyAnchorsMap.shoulderL.x) / 2))
+      : 7;
     const legGap = 2;
     const legHalfW = 2;
 
@@ -159,7 +162,7 @@ export function composeCharacterSilhouette(spec, { direction = 'south' } = {}) {
       try {
         const profileFn = getPartProfile(clothingPart.profile);
         const result = profileFn({
-          cx: 16,
+          cx: centerX,
           shoulderY,
           waistY,
           legBot,
@@ -199,7 +202,7 @@ export function composeCharacterSilhouette(spec, { direction = 'south' } = {}) {
       try {
         const profileFn = getPartProfile(part.profile);
         const result = profileFn({
-          cx: 16,
+          cx: Math.round(canvas.width / 2),
           cy: 16,
           shoulderY: bodyAnchors.shoulderL?.y || 12,
           waistY: bodyAnchors.waist?.y || 24,

@@ -223,6 +223,7 @@ export const ERROR_CODES = Object.freeze({
   IMMUNE_APOPTOSIS_SIGNAL: 0x0F0A,       // Domain self-destruct / self-signal
   IMMUNE_OVERRIDE_VELOCITY: 0x0F0B,      // Threshold of IMMUNE_ALLOW annotations exceeded in single file
   IMMUNE_SYNTAX_PRION: 0x0F0C,           // Stray character / structural syntax deformity (SYNTAX-0F0C)
+  IMMUNE_LINEAGE_BROKEN: 0x0F0D,         // PB-ASSET-LINEAGE-v1 artifact fails verifyLineageChain (LINEAGE-0F0D)
   TEST_MISSING: 0x0F10,                  // Module has no corresponding test file
   TEST_FIXTURE_ANTIPATTERN: 0x0F11,       // Test fixture antipattern detected
 

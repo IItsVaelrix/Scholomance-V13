@@ -1,4 +1,5 @@
 import { registerPartProfile } from './part-profile-library.js';
+import { resolveCanon } from './humanoid-proportion-canon.js';
 
 const CW = 32;
 const CH = 48;
@@ -544,6 +545,184 @@ function makeBodyProfile(type) {
   };
 }
 
+function drawDisc(cells, cx, cy, radius) {
+  const r = Math.max(0, roundInt(radius));
+  for (let y = cy - r; y <= cy + r; y += 1) {
+    for (let x = cx - r; x <= cx + r; x += 1) {
+      if ((x - cx) ** 2 + (y - cy) ** 2 <= r ** 2) cells.push({ x, y });
+    }
+  }
+}
+
+function drawLine(cells, x0, y0, x1, y1) {
+  let x = x0;
+  let y = y0;
+  const dx = Math.abs(x1 - x0);
+  const dy = -Math.abs(y1 - y0);
+  const sx = x0 < x1 ? 1 : -1;
+  const sy = y0 < y1 ? 1 : -1;
+  let error = dx + dy;
+  for (;;) {
+    cells.push({ x, y });
+    if (x === x1 && y === y1) break;
+    const twice = 2 * error;
+    if (twice >= dy) { error += dy; x += sx; }
+    if (twice <= dx) { error += dx; y += sy; }
+  }
+}
+
+function drawCapsule(cells, start, end, radius) {
+  const centerline = [];
+  drawLine(centerline, start.x, start.y, end.x, end.y);
+  for (const point of centerline) drawDisc(cells, point.x, point.y, radius);
+}
+
+/**
+ * Tall 16-bit JRPG humanoid base. This profile deliberately owns only the
+ * body construction: hair, clothing, armor, and weapons remain composable
+ * layers. The canon is resolved against the caller's canvas so 48x80 is the
+ * production target while smaller legacy canvases remain deterministic.
+ */
+function makeJrpgHumanoidBodyProfile() {
+  return (params = {}, options = {}) => {
+    const canvas = options.canvas || { width: 48, height: 80 };
+    const width = Math.max(1, roundInt(canvas.width));
+    const height = Math.max(1, roundInt(canvas.height));
+    const direction = String(options.direction || 'south');
+    const isProfile = direction === 'east' || direction === 'west';
+    const facing = direction === 'west' ? -1 : 1;
+    const cx = roundInt(params.cx ?? width / 2);
+    const requestedTop = params.top === undefined
+      ? null
+      : clamp(roundInt(params.top), 0, Math.max(0, height - 2));
+    const defaultTop = Math.max(1, Math.round(height * 0.025));
+    const maxFigureHeight = height - (requestedTop ?? defaultTop) - 1;
+    const heightScale = params.heightClass === 'short' ? 0.88 : params.heightClass === 'tall' ? 1 : 0.95;
+    const figureHeight = Math.max(2, Math.min(
+      maxFigureHeight,
+      roundInt(params.figureHeight ?? maxFigureHeight * heightScale),
+    ));
+    const top = requestedTop ?? height - figureHeight - 1;
+    const canon = resolveCanon({ top, height: figureHeight, centerX: cx });
+    const buildScale = params.buildClass === 'slender' ? 0.9 : params.buildClass === 'stocky' ? 1.08 : 1;
+    const cells = [];
+
+    const headCx = cx + (isProfile ? facing : 0);
+    const headHalf = Math.max(2, roundInt((canon.width.head * 0.5) * (isProfile ? 0.9 : 1)));
+    for (let y = canon.y.crown; y <= canon.y.chin; y += 1) {
+      const t = (y - canon.y.crown) / Math.max(1, canon.y.chin - canon.y.crown);
+      const taper = Math.sin(Math.PI * Math.min(1, t * 0.96 + 0.04));
+      const half = Math.max(1, roundInt(headHalf * taper));
+      for (let x = headCx - half; x <= headCx + half; x += 1) cells.push({ x, y });
+    }
+
+    // Neck and the tapered chest create the clean, elegant torso break typical
+    // of a hero sprite instead of the old rectangular chibi mass.
+    const neckHalf = Math.max(1, roundInt(canon.width.head * 0.18));
+    for (let y = canon.y.chin; y <= canon.y.shoulder; y += 1) {
+      for (let x = cx - neckHalf; x <= cx + neckHalf; x += 1) cells.push({ x, y });
+    }
+
+    if (isProfile) {
+      const profileBack = Math.max(2, roundInt(canon.width.waist * 0.24 * buildScale));
+      const profileFront = Math.max(3, roundInt(canon.width.shoulders * 0.34 * buildScale));
+      for (let y = canon.y.shoulder; y <= canon.y.crotch; y += 1) {
+        const t = (y - canon.y.shoulder) / Math.max(1, canon.y.crotch - canon.y.shoulder);
+        const half = roundInt(profileFront + (profileBack - profileFront) * t);
+        const left = facing === 1 ? cx - half + 1 : cx - half;
+        const right = facing === 1 ? cx + half : cx + half - 1;
+        for (let x = left; x <= right; x += 1) cells.push({ x, y });
+      }
+    } else {
+      const shoulderHalf = Math.max(2, roundInt(canon.width.shoulders * 0.5 * buildScale));
+      const waistHalf = Math.max(2, roundInt(canon.width.waist * 0.5 * buildScale));
+      const hipHalf = Math.max(2, roundInt(canon.width.hips * 0.5 * buildScale));
+      for (let y = canon.y.shoulder; y <= canon.y.crotch; y += 1) {
+        const t = (y - canon.y.shoulder) / Math.max(1, canon.y.crotch - canon.y.shoulder);
+        const half = y <= canon.y.waist
+          ? roundInt(shoulderHalf + (waistHalf - shoulderHalf) * (t / 0.5))
+          : roundInt(waistHalf + (hipHalf - waistHalf) * ((t - 0.5) / 0.5));
+        for (let x = cx - half; x <= cx + half; x += 1) cells.push({ x, y });
+      }
+    }
+
+    const joints = {
+      ...canon.joints,
+      elbowL: { x: canon.joints.elbowL.x - 1, y: canon.joints.elbowL.y },
+      elbowR: { x: canon.joints.elbowR.x + 1, y: canon.joints.elbowR.y },
+      wristL: { x: canon.joints.wristL.x - 2, y: canon.joints.wristL.y },
+      wristR: { x: canon.joints.wristR.x + 2, y: canon.joints.wristR.y },
+      fingertipL: { x: canon.joints.wristL.x - 2, y: canon.y.fingertip },
+      fingertipR: { x: canon.joints.wristR.x + 2, y: canon.y.fingertip },
+    };
+
+    const armRadius = Math.max(1, roundInt(canon.width.upperArm * 0.5));
+    const forearmRadius = Math.max(1, roundInt(canon.width.foreArm * 0.5));
+    const handRadius = Math.max(1, roundInt(canon.width.hand * 0.5));
+    const armSides = isProfile ? [facing] : [-1, 1];
+    for (const side of armSides) {
+      const suffix = side < 0 ? 'L' : 'R';
+      drawCapsule(cells, joints[`shoulder${suffix}`], joints[`elbow${suffix}`], armRadius);
+      drawCapsule(cells, joints[`elbow${suffix}`], joints[`wrist${suffix}`], forearmRadius);
+      drawCapsule(cells, joints[`wrist${suffix}`], joints[`fingertip${suffix}`], handRadius);
+    }
+
+    const legRadius = Math.max(1, roundInt(canon.width.thigh * 0.5));
+    const shinRadius = Math.max(1, roundInt(canon.width.shin * 0.5));
+    const legSides = isProfile ? [facing] : [-1, 1];
+    for (const side of legSides) {
+      const suffix = side < 0 ? 'L' : 'R';
+      const knee = { ...joints[`knee${suffix}`], x: joints[`knee${suffix}`].x + side };
+      const ankle = { ...joints[`ankle${suffix}`], x: joints[`ankle${suffix}`].x + side };
+      drawCapsule(cells, joints[`hip${suffix}`], knee, legRadius);
+      drawCapsule(cells, knee, ankle, shinRadius);
+      drawCapsule(cells, ankle, { x: ankle.x + side * 3, y: canon.y.sole }, Math.max(1, roundInt(canon.width.foot * 0.4)));
+    }
+
+    const skeleton = buildSkeleton(
+      { x: headCx, y: canon.y.crown },
+      { x: headCx, y: roundInt((canon.y.crown + canon.y.chin) / 2) },
+      { x: headCx, y: canon.y.chin },
+      direction === 'north' ? null : { x: headCx - (isProfile ? 0 : 3), y: roundInt((canon.y.crown + canon.y.chin) * 0.5) },
+      direction === 'north' || isProfile ? null : { x: headCx + 3, y: roundInt((canon.y.crown + canon.y.chin) * 0.5) },
+      direction === 'north' ? null : { x: headCx + facing, y: roundInt((canon.y.crown + canon.y.chin) * 0.62) },
+      direction === 'north' ? null : { x: headCx + facing, y: roundInt((canon.y.crown + canon.y.chin) * 0.78) },
+      direction === 'north' ? null : { x: headCx - 5, y: roundInt((canon.y.crown + canon.y.chin) * 0.58) },
+      direction === 'north' || isProfile ? null : { x: headCx + 5, y: roundInt((canon.y.crown + canon.y.chin) * 0.58) },
+      joints.shoulderL,
+      joints.shoulderR,
+      joints.hipL,
+      joints.hipR,
+      joints.kneeL,
+      joints.kneeR,
+      joints.ankleL,
+      joints.ankleR,
+    );
+
+    return {
+      cells,
+      anchors: {
+        base: { x: cx, y: canon.y.sole },
+        tip: { x: headCx, y: canon.y.crown },
+        center: { x: cx, y: roundInt((canon.y.shoulder + canon.y.crotch) / 2) },
+        headTop: skeleton.head.top,
+        headCenter: skeleton.head.center,
+        headChin: skeleton.head.chin,
+        ...Object.fromEntries(Object.entries(skeleton.face).filter(([, value]) => value !== null)),
+        ...skeleton.torso,
+        ...skeleton.legs,
+        elbowL: joints.elbowL,
+        elbowR: joints.elbowR,
+        wristL: joints.wristL,
+        wristR: joints.wristR,
+        fingertipL: joints.fingertipL,
+        fingertipR: joints.fingertipR,
+      },
+      skeleton,
+    };
+  };
+}
+
 function makeStarboundEsperChibiBody() {
   return (params = {}, options = {}) => {
     const direction = String(options.direction || 'south');
@@ -742,4 +921,5 @@ function makeStarboundEsperChibiBody() {
 registerPartProfile('character.body.human.feminine', makeBodyProfile('feminine'));
 registerPartProfile('character.body.human.masculine', makeBodyProfile('masculine'));
 registerPartProfile('character.body.human.androgynous', makeBodyProfile('androgynous'));
+registerPartProfile('character.body.human.jrpg', makeJrpgHumanoidBodyProfile());
 registerPartProfile('character.body.chibi.starboundEsper', makeStarboundEsperChibiBody());

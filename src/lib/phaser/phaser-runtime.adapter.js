@@ -1,5 +1,14 @@
 let runtimePromise;
 
+// PixelBrain render adapters consume a Phaser Scene but do not import Phaser
+// themselves. Re-export them from this boundary so UI callers have one lawful
+// entry point for Phaser-backed behavior.
+export {
+  createPixelBrainAnimation,
+  createPixelBrainTexture,
+  validatePixelBrainPhaserAsset,
+} from './pixelbrain-phaser.adapter.js';
+
 /**
  * Ensures Phaser is only loaded once per session and only when requested.
  * Returns the Phaser runtime object.

@@ -106,6 +106,7 @@ export function expandCellsPass(ast, errors) {
             if (op.curvature !== undefined) coord.curvature = op.curvature;
             if (op.arcLength !== undefined) coord.arcLength = op.arcLength;
             if (op.strokeHalfWidth !== undefined) coord.strokeHalfWidth = op.strokeHalfWidth;
+            if (op.interiorFill === true) coord.interiorFill = true;
             coordinates.push(coord);
           }
           break;

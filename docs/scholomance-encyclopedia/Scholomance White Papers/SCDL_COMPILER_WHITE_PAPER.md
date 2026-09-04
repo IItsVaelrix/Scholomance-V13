@@ -683,6 +683,10 @@ the Authoring Guide fail with a bare `ENOENT` on every first run — audit
 | `--out <file>` | exact single-target destination (gets a target infix when `--export` lists more than one target) |
 | `--scale <N>` | magnify raster exports; **default 1**, so a canonical PNG still matches the declared canvas |
 | `--shade material` | shade per material instead of the default Lambert banding |
+| `--shade vri` | route through the Vixel Render IR engine instead (see §8.5); PNG export only |
+| `--strokes` | with `--shade vri`: add the `PB-STROKE-v1` contour overlay (see §8.5) |
+| `--relief <mode>` | with `--shade vri`: relief model for flat cells; `synthetic` is the only mode (see §8.5) |
+| `--lineage` | with `--shade vri`: also write the `PB-ASSET-LINEAGE-v1` sidecar (see §8.5) |
 | `--semantic` | embed SemQuant annotations in the JSON export |
 | `--strict` | promote warnings to errors (see §8.4) |
 | `--bytecode` | append the `PB-ERR-v1` payload to each diagnostic (see §8.4) |
@@ -739,6 +743,30 @@ Two deliberate choices, both from audit 2026-09-03:
   handle for tooling. It used to be inlined unconditionally on `preview` and
   `check` but not `compile`, so the same warning looked different depending on
   which command you happened to run.
+
+### 8.5 VRI Shading — the physically-motivated path
+`--shade vri` routes the asset through the Vixel Render IR engine
+(`compileAsset()` → `compileVRI()` → `renderVRI()`) instead of the default
+material shader. It is opt-in, deterministic, lineage-recorded, and PNG-export
+only (any other `--export` target is refused rather than silently mislabeled):
+
+```bash
+node codex/core/pixelbrain/scdl/scdl.cli.js compile fixtures/void_acolyte/void_acolyte.scdl --shade vri --out-dir out
+```
+
+Three modifiers, each independently opt-in and each byte-neutral when omitted:
+
+| Flag | Effect |
+|---|---|
+| `--strokes` | Overlay the `PB-STROKE-v1` contour pass: discrete silhouette and material-boundary ink extracted by integer-grid adjacency. This repairs the tearing that continuous per-cell coverage estimates can leave at part boundaries. |
+| `--relief synthetic` | `PB-VRI-RELIEF-v1`: flat hand-painted cells carry no vector relief, so this ranks each cell's colour in its own material value ramp and projects that rank onto the key light's in-plane direction. Bright values lean into the key light; dark values recede. |
+| `--lineage` | Also write `<asset>-lineage.json`: the `PB-ASSET-LINEAGE-v1` chain (construction → packet → VRI scene checksum → raster digest, per frame). This sidecar travels without its pixels so Layer-1 immunity (rule `LINEAGE-0F0D`) can defend asset integrity at rest. |
+
+Example with everything on:
+
+```bash
+node codex/core/pixelbrain/scdl/scdl.cli.js compile fixtures/void_acolyte/void_acolyte.scdl --shade vri --strokes --relief synthetic --lineage --out-dir out
+```
 
 ---
 

@@ -15,9 +15,15 @@
  * tables agree about it — never **correctness**. It reports; it does not
  * adjudicate taste.
  *
- * Every exception must be a declared property of the species (`emissive: true`),
- * never an allowance inside a law. A checker that accumulates special cases is
- * a checker that eventually gets disabled.
+ * Every exception must be a declared property of the species, never an
+ * allowance inside a law. A checker that accumulates special cases is a checker
+ * that eventually gets disabled. Two declarations are recognised:
+ *   `emissive: true`   — the species deliberately emits off the thermal ordering
+ *                        (a white-hot core, a glowing rim). Exempt from Law 2.
+ *   `absorptive: true` — the species is anti-light: its dark-end inversion is
+ *                        deliberate absorption (a body darker than its deep step),
+ *                        not emission. Exempt from Law 2 for the same reason —
+ *                        the inversion is declared intent, not a ramp defect.
  *
  * @bytecode PB-MATERIAL-VALIDATE-v1
  */
@@ -110,11 +116,15 @@ export function validateMaterialRegistry(options = {}) {
   // ── Law 2: ramp order — anchors are an energy ramp, dark to bright ────────
   // qbit-phosphorylation indexes Object.values(anchors) by SDF depth, rim to
   // core, so insertion order IS the energy axis. A species that genuinely emits
-  // off the thermal ordering must declare `emissive: true`.
+  // off the thermal ordering must declare `emissive: true`; a species that
+  // deliberately absorbs (dark-end inversion, anti-light) declares
+  // `absorptive: true`. Both are declared intent, so both are exempt — the
+  // accusation only stands when an inversion is undeclared.
   for (const [species, definition] of Object.entries(palettes)) {
     if (exemptSet.has(species)) continue;
     if (definition?.rules?.passthrough) continue;
     if (definition?.emissive === true) continue;
+    if (definition?.absorptive === true) continue;
 
     const anchors = anchorsOf(definition);
     if (anchors.length < 2) continue;
@@ -151,6 +161,19 @@ export function validateMaterialRegistry(options = {}) {
   for (const [, group] of byRamp) {
     if (group.length < 2) continue;
     const sorted = [...group].sort();
+    // Declared aliases answer Law 3's own question ("distinct species, or a
+    // spelling that acquired its own identity?") in the registry instead of
+    // leaving the validator to re-ask it forever: when exactly one member is
+    // canonical and every other member declares `aliasOf` pointing at it, the
+    // relationship is documented, not an unexplained duplicate. Any other shape
+    // (no alias declared, aliases pointing outside the group, two canonicals)
+    // still reports.
+    const canonical = sorted.filter(s => !palettes[s]?.aliasOf);
+    const aliased = sorted.filter(s => palettes[s]?.aliasOf);
+    const fullyDeclared = canonical.length === 1
+      && aliased.length === sorted.length - 1
+      && aliased.every(s => palettes[s].aliasOf === canonical[0]);
+    if (fullyDeclared) continue;
     add(LAWS.DUPLICATE_SPECIES, SEVERITY.WARN, sorted[0],
       `identical ramp to ${sorted.slice(1).join(', ')} — distinct species or a spelling that acquired its own identity?`,
       { group: sorted });

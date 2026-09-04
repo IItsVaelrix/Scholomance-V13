@@ -388,11 +388,77 @@ function applyBlend(base, layer, mode, opacity) {
 // ─── Main Renderer ───────────────────────────────────────────────────────────
 
 /**
+ * Per-material coverage of the RENDERED buffer.
+ *
+ * The compile-time sibling (vri-compiler.js collectPaletteCoverage) reads
+ * authored colours; lighting, atmosphere, and quantization then rewrite those
+ * pixels, so it cannot say what the raster actually contains. This measures the
+ * final values by walking the raster itself and attributing each opaque pixel
+ * to its cell's material through the same cellMap (last-cell-wins) that Pass 1
+ * paints with — so overlapping cells attribute to the cell that actually shows.
+ *
+ * Scope honesty: pixels outside every geometry cell (raster patches, marks)
+ * are nobody's material and are not counted, and stroke ink — painted after
+ * this measurement — is contour overlay, not material colour.
+ *
+ * @returns {Array<{ material: string, surface: 'rendered', pixels: number,
+ *   distinctColors: number, span: number, flat: boolean, reason: string|null }>}
+ *   sorted fewest distinct colours first.
+ */
+function collectRenderedPaletteCoverage(geoLayer, buf, W, H, scale) {
+  if (!geoLayer) return [];
+
+  // Same index, same last-wins order as the paint passes.
+  const cellMap = new Map();
+  for (const c of geoLayer.payload.coordinates) {
+    cellMap.set(`${c.snappedX ?? c.x},${c.snappedY ?? c.y}`, c);
+  }
+  if (cellMap.size === 0) return [];
+
+  const perMaterial = new Map();
+  for (let py = 0; py < H; py += 1) {
+    const cellY = Math.floor(py / scale);
+    for (let px = 0; px < W; px += 1) {
+      const idx = (py * W + px) * 4;
+      if (buf[idx + 3] === 0) continue;
+      const cell = cellMap.get(`${Math.floor(px / scale)},${cellY}`);
+      if (!cell) continue; // opaque pixel outside all geometry: unattributed
+
+      if (!perMaterial.has(cell.material)) {
+        perMaterial.set(cell.material, { pixels: 0, colors: new Set(), min: 1, max: 0 });
+      }
+      const entry = perMaterial.get(cell.material);
+      const r = buf[idx], g = buf[idx + 1], b = buf[idx + 2];
+      entry.pixels += 1;
+      entry.colors.add((r << 16) | (g << 8) | b);
+      const L = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+      if (L < entry.min) entry.min = L;
+      if (L > entry.max) entry.max = L;
+    }
+  }
+
+  return [...perMaterial.entries()]
+    .map(([material, e]) => ({
+      material,
+      surface: 'rendered',
+      pixels: e.pixels,
+      distinctColors: e.colors.size,
+      span: Number((e.max - e.min).toFixed(3)),
+      flat: e.colors.size <= 1,
+      reason: e.colors.size <= 1
+        ? 'rendered as a single colour: lighting and quantization produced no value range'
+        : null,
+    }))
+    .sort((a, b) => a.distinctColors - b.distinctColors || a.material.localeCompare(b.material));
+}
+
+/**
  * Render a VRI scene to RGBA at the given scale.
  *
  * @param {object} scene - VRI scene from compileVRI()
  * @param {number} scale - Output scale (1 = native, 4 = 4×, 8 = 8×)
- * @returns {{ width: number, height: number, data: Uint8Array }}
+ * @returns {{ width: number, height: number, data: Uint8Array,
+ *   provenance: { renderedPaletteCoverage: Array } }}
  */
 export function renderVRI(scene, scale = 4, options = {}) {
   const W = scene.width * scale;
@@ -435,9 +501,15 @@ export function renderVRI(scene, scale = 4, options = {}) {
               (v - 0.5) * (normal ? normal[1] : 0)
             );
             const edge = 0.5 / scale;
-            if (hw != null) {
+            if (hw != null && !cell.interiorFill) {
               coverage = smoothstep(edge, -edge, Math.abs(localSD) - hw);
             } else {
+              // Half-space fill coverage. This is the default (no stroke width),
+              // and it is ALSO the correct model for a filled circle's interior
+              // cells: they carry a strokeHalfWidth from the shared circle/ellipse
+              // identity math, but they sit strictly inside the stroke band, so
+              // band coverage would hollow the disc into a ring. interiorFill
+              // selects the fill model and the disc renders solid.
               coverage = smoothstep(-edge, edge, -localSD);
             }
           }
@@ -819,6 +891,14 @@ export function renderVRI(scene, scale = 4, options = {}) {
     }
   }
 
+  // ── Rendered palette coverage ─────────────────────────────────────────────
+  // Measures what each material ACTUALLY became after lighting, atmosphere,
+  // quantization, and raster patches — the post-lighting buffer that the
+  // compile-time provenance.paletteCoverage diagnostic was mistakenly standing
+  // in for (it reads authored colours, which lighting then rewrites). Runs
+  // before the stroke overlay on purpose: contour ink is not material colour.
+  const renderedPaletteCoverage = collectRenderedPaletteCoverage(geoLayer, buf, W, H, scale);
+
   // ── Final overlay: strokes ────────────────────────────────────────────────
   // Runs strictly after Pass 1-4, which are completely unmodified by this
   // block. Hard opaque fill, no smoothstep, no sub-pixel math -- this is what
@@ -848,5 +928,14 @@ export function renderVRI(scene, scale = 4, options = {}) {
     }
   }
 
-  return { width: W, height: H, data: buf };
+  return {
+    width: W,
+    height: H,
+    data: buf,
+    // Diagnostics about what actually reached pixels. Additive — callers that
+    // read only { width, height, data } are unaffected.
+    provenance: Object.freeze({
+      renderedPaletteCoverage: Object.freeze(renderedPaletteCoverage),
+    }),
+  };
 }

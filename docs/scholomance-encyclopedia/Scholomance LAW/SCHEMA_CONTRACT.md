@@ -7,7 +7,7 @@
 
 ## Living Document - Owned by Codex, Read by All Agents
 
-**Version: 1.47** | Last updated: 2026-08-27
+**Version: 1.48** | Last updated: 2026-09-04
 
 > Bump the version on every schema change.
 > Notify Claude for UI-consumed field changes.
@@ -3893,6 +3893,216 @@ interface ConstellationEvaluationEvidenceV1 {
 
 ---
 
+## SCHEMA CHANGE NOTICE
+
+- Schema: Vixel Render IR family (PB-VRI-v1) and Asset Pipeline lineage
+- Version: 1.47 -> 1.48
+- Date: 2026-09-04
+- Changed fields: registered the Vixel Render IR (VRI) engine's frozen contracts — `PB-VRI-v1` scene schema, `PB-STROKE-v1` contour IR, `PB-VRI-RELIEF-v1` synthetic-relief provenance, `PB-ASSET-PIPELINE-v1` composition result, `PB-ASSET-LINEAGE-v1` integrity chain, and `PB-CONSTRUCTION-SCDL-v1` geometry derivation — as first-class canon. This resolves the 2026-09-04 VIXEL verdict's WARN that `vri-schema.js` declared a real production data shape with zero `SCHEMA_CONTRACT.md` entry.
+- Breaking: no; additive registration of an already-shipped, version-frozen schema family. No existing contract changed type or meaning.
+- Owner: Codex
+- Claude impact: none; no UI or client-authoritative surface
+- Gemini impact: regression fixtures in `tests/codex/core/pixelbrain/vixel/`, `.../asset-pipeline.test.js`, `.../construction-to-scdl.test.js`, and `tests/qa/immunity/lineage-integrity-rule.test.js` pin these shapes
+- Error codes: lineage corruption emits `PB-ERR-v1-VALUE-CRIT-IMMUNE-0F0D` via innate rule `LINEAGE-0F0D`
+
+```ts
+// ── PB-VRI-v1 — Vixel Render IR scene ───────────────────────────────────────
+// The layered, lit, textured, mark-bearing description a deterministic renderer
+// collapses into pixels at any scale. SCDL says WHAT exists; VRI says HOW it
+// looks. Frozen by codex/core/pixelbrain/vixel/vri-schema.js.
+
+interface VRIScene {
+  contract: "PB-VRI-v1";
+  id: `vri-${string}-${string}`;      // packet fingerprint + scene checksum
+  width: number;                      // logical canvas cells (pre-scale)
+  height: number;
+  layers: VRILayer[];                 // geometry, texture, mark, raster patch
+  lights: VRILight[];
+  atmosphere: VRIAtmosphere | null;
+  quantization: VRIQuantization;
+  provenance: VRIProvenance;
+  checksum: string;                   // FNV-1a over canonical scene content
+}
+
+type VRILayerType = "geometry" | "texture" | "mark" | "raster";
+type VRIBlendMode = "normal" | "overlay" | "multiply" | "screen" | "add";
+
+interface VRILayer {
+  id: string;
+  type: VRILayerType;
+  blendMode: VRIBlendMode;
+  opacity: number;                    // 0..1
+  depthBand: number;                  // ordering tier
+  maskRef: string | null;
+  payload: object;                    // layer-kind-specific, frozen
+}
+
+type VRILightKind = "point" | "directional" | "ambient" | "rim" | "fog" | "bloom";
+interface VRILight {
+  id: string;
+  kind: VRILightKind;
+  position: [number, number];
+  direction: [number, number];        // TO-LIGHT vector for directional/rim
+  color: string;                      // #RRGGBB
+  intensity: number;
+  radius: number;
+  angle: number;
+  affects: string[];                  // material filter; empty = all
+}
+
+interface VRIAtmosphere { fog?: object; grading?: object; bloom?: object; }
+
+type VRIQuantizationMode = "off" | "luminance-band" | "nearest-anchor";
+interface VRIQuantization {
+  mode: VRIQuantizationMode;
+  dither?: boolean;                   // luminance-band only
+  ramps: Record<string, string[]>;    // material -> ordered #RRGGBB anchors
+}
+
+interface VRIProvenance {
+  compiler: string;                   // "PB-VRI-COMPILE-v2"
+  packetId: string | null;
+  geometryMode: "coordinates" | "scene-graph";
+  materialCount: number;
+  quantizationMode: VRIQuantizationMode;
+  quantizedMaterialCount: number;
+  // Coverage of the AUTHORED value sketch (pre-lighting). `surface: "authored"`
+  // is load-bearing: it must not be conflated with the rendered-surface
+  // measurement the renderer reports (raster.provenance.renderedPaletteCoverage).
+  paletteCoverage: Array<{
+    material: string;
+    surface: "authored";
+    anchorCount: number;
+    anchorsUsed: number;
+    coverage: number;
+    span: number;
+    flat: boolean;
+    reason: string | null;
+  }>;
+  syntheticRelief: VRISyntheticReliefReport | null;
+  unrenderedDeclarations: Array<{ feature: string; reason: string }>;
+}
+
+// ── PB-STROKE-v1 — discrete contour IR ──────────────────────────────────────
+// Frozen by codex/core/pixelbrain/vixel/vri-schema.js + stroke-extractor.js.
+// Discrete integer-grid adjacency replaces fragile per-cell sub-pixel coverage
+// at part boundaries (the tearing bug). path/role/baseWeight/schemaVersion are
+// frozen; depthClass/lightExposure/materialBoundary are reserved, uninterpreted.
+
+type StrokeRole = "silhouette" | "material-boundary";
+interface StrokePath {
+  cells: Array<{ x: number; y: number; partId: string | null; sourceOpId: string | null }>;
+}
+interface StrokeIR {
+  path: StrokePath;
+  role: StrokeRole;
+  baseWeight: number;                 // run length in cells (geometry only)
+  schemaVersion: "PB-STROKE-v1";
+  depthClass?: string;                // reserved, not interpreted in v1
+  lightExposure?: number;             // reserved, not interpreted in v1
+  materialBoundary?: boolean;         // reserved, not interpreted in v1
+}
+
+// ── PB-VRI-RELIEF-v1 — synthetic relief provenance ─────────────────────────
+// Reports the opt-in relief pass (compileVRI option `relief: "synthetic"`).
+// Flat hand-painted cells gain a rank-projected in-plane normal so the lighting
+// pass has real relief to act on. Deterministic; no RNG.
+
+interface VRISyntheticReliefReport {
+  contract: "PB-VRI-RELIEF-v1";
+  cellsAffected: number;
+  cellsSkippedNoRamp: number;
+  keyDirection: [number, number];
+}
+
+// ── PB-ASSET-PIPELINE-v1 — composition result ──────────────────────────────
+// The single composition boundary (codex/core/pixelbrain/asset-pipeline.js):
+// construction -> gene projection -> SCDL -> VRI -> raster, with lineage.
+
+interface AssetPipelineResult {
+  ok: boolean;
+  contract: "PB-ASSET-PIPELINE-v1";
+  errors: ReadonlyArray<object>;
+  packet: object | null;              // SCDL packet (frame 0 shorthand)
+  vriScene: VRIScene | null;
+  raster: { width: number; height: number; data: Uint8Array; provenance?: object } | null;
+  frames: ReadonlyArray<{ index: number; packet: object; vriScene: VRIScene | null; raster: object | null }>;
+  frameLoop: object | null;
+  lineage: AssetLineage | null;
+  diagnostics: object;
+}
+
+// ── PB-ASSET-LINEAGE-v1 — integrity chain ──────────────────────────────────
+// Records construction -> packet -> VRI scene -> raster digest per frame.
+// verifyLineage() re-derives identity from live artifacts; verifyLineageChain()
+// checks a chain's INTERNAL consistency so it can be defended at rest by Layer-1
+// immunity (rule LINEAGE-0F0D).
+
+interface AssetLineage {
+  contract: "PB-ASSET-LINEAGE-v1";
+  construction: {
+    id: string;
+    checksum: string;
+    resultChecksum: string;
+    link: "gate" | "derived";
+    partsChecksum?: string;           // REQUIRED when link === "derived"
+  } | null;
+  genes: { count: number; projectionChecksum: string } | null;
+  packet: { id: string | null };
+  vriScene: { id: string; checksum: string } | null;
+  raster: { width: number; height: number; scale: number; digest: string } | null;
+  frames: ReadonlyArray<{
+    index: number;
+    packet: { id: string | null };
+    vriScene: { id: string; checksum: string } | null;
+    raster: { width: number; height: number; scale: number; digest: string } | null;
+  }>;
+}
+
+// Optional exported sidecar (--shade vri --lineage). Travels without its pixels.
+interface AssetLineageSidecar {
+  artifact: "PB-ASSET-LINEAGE-SIDECAR-v1";
+  asset: string;
+  sourceFile: string;
+  shading: "vri";
+  scale: number;
+  frames: number;
+  lineage: AssetLineage;
+}
+
+// ── PB-CONSTRUCTION-SCDL-v1 — geometry derivation ──────────────────────────
+// Turns a solved PB-GEOMETRY-CONSTRUCTION-v1 result into SCDL `part` blocks,
+// making CONSTRUCTION_LINK.DERIVED reachable (construction supplies geometry,
+// not merely gates it). codex/core/pixelbrain/construction-to-scdl.js.
+
+interface ConstructionToSCDLResult {
+  contract: "PB-CONSTRUCTION-SCDL-v1";
+  source: string;                     // generated `part` blocks (parseable SCDL)
+  parts: ReadonlyArray<{
+    partId: string;
+    scdlPartId: `cg_${string}`;       // collision-free prefix
+    material: string;
+    color: string;                    // #RRGGBB or palette alias
+    op: "polygon";
+    points: Array<[number, number]>;
+  }>;
+  skipped: ReadonlyArray<{ partId: string; reason: string }>;
+  partsChecksum: string;              // FNV-1a over the canonical generated text
+}
+```
+
+### Invariants
+
+1. `PB-VRI-v1` scenes are frozen; the checksum is content-addressed over layers, lights, atmosphere, quantization, and intents — provenance is inspection metadata, not checksum input.
+2. A directional/rim light's `direction` is a TO-LIGHT vector. Negating it lights surfaces facing away from the key (the historical `shrine-bell` bug).
+3. `paletteCoverage` entries carry `surface: "authored"`; the renderer's post-lighting measurement carries `surface: "rendered"`. Consumers MUST NOT conflate the two surfaces.
+4. `PB-STROKE-v1` is frozen: `path`, `role`, `baseWeight`, `schemaVersion` may not change meaning; reserved slots stay uninterpreted until a v2.
+5. A `PB-ASSET-LINEAGE-v1` chain with `link: "derived"` MUST carry `partsChecksum`; its absence is a broken promise that `verifyLineageChain` and innate rule `LINEAGE-0F0D` both refuse.
+6. `constructionToSCDLParts` never defaults a colour: a part with no entry in `colorByPart` is skipped and recorded, because colour is art direction.
+7. `renderVRI` output is deterministic for a given (scene, scale, options); raster `provenance` is additive diagnostic metadata and does not affect bytes.
+
+---
+
 ## Version Log
 
 | Version | Date | Change | Breaking |
@@ -3943,6 +4153,7 @@ interface ConstellationEvaluationEvidenceV1 {
 | 1.45 | 2026-08-19 | Published the live ConstellationOS Phase-2 page packet (`scholomance/constellation-os-page-phase2`) as SCHOL-COS-PAGE-v2; sealed the emitted shape and declared the stale Phase-1 typedef the drift | no |
 | 1.46 | 2026-08-20 | SCHOL-COS-PAGE-v3: additive — `semanticInquiry` gains `ballistics` (semantic-ballistics evidence axis) and `receiptDigests` (sealed replay envelopes); contractVersion `cos-page-v3`; pageBytecode golden pin re-sealed `4922C817` → `E8DC9244` | no |
 | 1.47 | 2026-08-22 | Registered `SCHOL-CONSTELLATION-EVALUATION-EVIDENCE-v1`: deterministic, text-free, recursively frozen offline parser evidence with fixture identity, exhaustive accounting, row outcomes, sorted failure signatures, and canonical SHA-256 checksum | no |
+| 1.48 | 2026-09-04 | Registered the Vixel Render IR family: `PB-VRI-v1` scene schema, `PB-STROKE-v1` contour IR, `PB-VRI-RELIEF-v1` synthetic-relief provenance, `PB-ASSET-PIPELINE-v1` composition result, `PB-ASSET-LINEAGE-v1` integrity chain (defended at rest by innate rule `LINEAGE-0F0D`), and `PB-CONSTRUCTION-SCDL-v1` geometry derivation | no |
 
 ---
 

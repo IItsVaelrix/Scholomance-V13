@@ -75,6 +75,14 @@ import { normalizeItemSpec, hashItemSpec, validateItemSpec } from './item-spec.j
 import { collectSpecIntent } from './spec-intent-report.js';
 import { SDFShapeAMP } from './sdf-shape-amp.js';
 import { NoiseFillAMP } from './noise-fill-amp.js';
+// VRI reach (Door B): the Foundry's items become shadeable through the Vixel
+// Render IR engine — opt-in, additive, lineage-recorded. The engine is canon:
+// ARCH-2026-09-04-VIXEL-RENDER-IR.md, SCHEMA_CONTRACT.md 1.48.
+import { renderCoordinatesVri } from './vixel/index.js';
+import { LINEAGE_CONTRACT } from './lineage-verify.js';
+import { defaultDigest } from './asset-pipeline.js';
+// NOTE: PNG encoding uses this module's own zero-dep `encodePng` (below), not
+// the scdl exporter's — importing that name here would collide.
 
 function err(reason, context) {
   const e = new Error(`item-foundry: ${reason}`);
@@ -589,6 +597,22 @@ export function forgeItemAsset(rawSpec, opts = {}) {
     }
   }
 
+  // 9b. VRI shading (optional, Door B) — additive; never changes the png above.
+  let vri = null;
+  if (opts.includeVri === true) {
+    try {
+      const partial = { spec, assetPacket };
+      vri = renderBundleVri(partial, {
+        scale: pngScale,
+        relief: opts.vriRelief ?? null,
+        strokes: opts.vriStrokes === true,
+        quantize: opts.vriQuantize ?? false,
+      });
+    } catch (e) {
+      vri = null;
+    }
+  }
+
   return Object.freeze({
     spec,
     silhouette: Object.freeze({
@@ -649,6 +673,9 @@ export function forgeItemAsset(rawSpec, opts = {}) {
     godotShader: null,
     phaserPipeline,
     png,
+    // VRI shading (Door B): null unless `includeVri: true`. Additive — the
+    // standard `png` above is never affected by this field.
+    vri,
     volume,
     voxelPacket,
   });
@@ -706,4 +733,86 @@ function renderPngWithZlib(coordinates, width, height, scale) {
     chunk('IDAT', idat),
     chunk('IEND', Buffer.alloc(0)),
   ]);
+}
+
+/**
+ * Render a Foundry bundle through the Vixel Render IR engine — production
+ * Door B for VRI, opt-in and additive (the standard `png` output is untouched).
+ *
+ * The Foundry speaks partId + baked fill colour; VRI speaks material ramps and
+ * lighting. The bridge is deliberately thin and honest:
+ *
+ *   - each coordinate keeps its authored colour and gains the MATERIAL its part
+ *     was filled with (spec.parts is the authority; unknown parts become
+ *     'source', which is passthrough — never an invented ramp)
+ *   - no vector identity is fabricated: foundry cells carry no SDF normals, so
+ *     they render as flat cells under VRI's reference-normalized lighting, and
+ *     opt-in synthetic relief (PB-VRI-RELIEF-v1) may give their baked values
+ *     physical grounding — it is the exact technique built for hand-shaded cells
+ *   - the result carries a PB-ASSET-LINEAGE-v1 chain so the same integrity
+ *     machinery (verifyLineageChain, innate rule LINEAGE-0F0D) defends it
+ *
+ * @param {object} bundle - a forgeItemAsset() result
+ * @param {object} [opts]
+ * @param {number}   [opts.scale=4]
+ * @param {string|null} [opts.relief=null]      'synthetic' enables PB-VRI-RELIEF-v1
+ * @param {boolean}  [opts.strokes=false]        PB-STROKE-v1 contour overlay
+ * @param {boolean|object} [opts.quantize=false] VRI quantization onto ramps
+ * @param {object|null} [opts.lighting=null]     custom lights (null = engine default key+ambient)
+ * @returns {{ contract: string, scene: object, raster: object, png: Uint8Array, lineage: object }}
+ */
+export function renderBundleVri(bundle, opts = {}) {
+  if (!bundle || !bundle.assetPacket) throw err('bundle is required');
+  const { scale = 4, relief = null, strokes = false, quantize = false, lighting = null } = opts;
+
+  const packet = bundle.assetPacket;
+  const canvas = packet.canvas;
+
+  // partId -> material, from the spec's own fill declarations.
+  const materialByPart = new Map();
+  for (const part of (bundle.spec?.parts || [])) {
+    if (part?.id && part?.fill?.material) materialByPart.set(part.id, part.fill.material);
+  }
+
+  const coordinates = (packet.geometry?.coordinates || []).map(c => ({
+    x: Math.round(c.snappedX ?? c.x),
+    y: Math.round(c.snappedY ?? c.y),
+    color: c.color,
+    partId: c.partId ?? null,
+    material: materialByPart.get(c.partId) || SOURCE_MATERIAL,
+  }));
+
+  const vriPacketId = packet.id || `foundry-${bundle.spec?.id || 'item'}`;
+  const { scene, raster } = renderCoordinatesVri(coordinates, canvas, {
+    id: vriPacketId,
+    scale,
+    compile: { relief, quantize, ...(lighting ? { lighting } : {}) },
+    render: { strokes },
+  });
+  const digest = defaultDigest(raster.data);
+
+  const frame = Object.freeze({
+    index: 0,
+    packet: Object.freeze({ id: vriPacketId }),
+    vriScene: Object.freeze({ id: scene.id, checksum: scene.checksum }),
+    raster: Object.freeze({ width: raster.width, height: raster.height, scale, digest }),
+  });
+  const lineage = Object.freeze({
+    contract: LINEAGE_CONTRACT,
+    construction: null,
+    genes: null,
+    packet: frame.packet,
+    vriScene: frame.vriScene,
+    raster: frame.raster,
+    frames: Object.freeze([frame]),
+  });
+
+  return Object.freeze({
+    contract: 'PB-FOUNDRY-VRI-v1',
+    scene,
+    raster,
+    // The module-local zero-dep encoder wants a Buffer, not a Uint8Array.
+    png: encodePng(raster.width, raster.height, Buffer.from(raster.data)),
+    lineage,
+  });
 }

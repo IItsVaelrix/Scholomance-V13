@@ -498,6 +498,69 @@ const USER_MIGRATIONS = [
       `);
     },
   },
+  {
+    version: 24,
+    name: 'repair_character_catalog_pk',
+    up(database) {
+      // v23 originally shipped with `id TEXT PRIMARY KEY` (globally unique),
+      // which let one user's saveCharacter upsert silently overwrite another
+      // user's row on an id collision. v23 was later amended in place to a
+      // composite `PRIMARY KEY (user_id, id)`, but any database where v23 had
+      // already run under the old DDL recorded version 23 as applied and will
+      // never re-run it — that database is stuck with the broken single-column
+      // PK forever unless repaired here.
+      const columns = database.prepare('PRAGMA table_info("character_catalog")').all();
+      if (columns.length === 0) {
+        // Table doesn't exist yet (shouldn't happen — v23 always runs first
+        // in the same migration batch — but nothing to repair either way).
+        return;
+      }
+
+      const pkColumns = columns
+        .filter((c) => c.pk > 0)
+        .sort((a, b) => a.pk - b.pk)
+        .map((c) => c.name);
+      const hasCorrectCompositePk =
+        pkColumns.length === 2 && pkColumns[0] === 'user_id' && pkColumns[1] === 'id';
+
+      if (hasCorrectCompositePk) {
+        // Already on the correct composite key — either a fresh install that
+        // got v23's already-fixed DDL, or a database this migration already
+        // repaired. No-op.
+        return;
+      }
+
+      // Old single-column `id`-only PK (or any other unexpected shape).
+      // Rebuild the table with the correct schema, preserving all rows.
+      database.exec(`
+        ALTER TABLE character_catalog RENAME TO character_catalog_old;
+
+        CREATE TABLE character_catalog (
+          id TEXT NOT NULL,
+          user_id INTEGER NOT NULL,
+          name TEXT NOT NULL,
+          controls_json TEXT NOT NULL,
+          spec_json TEXT NOT NULL,
+          spec_hash TEXT NOT NULL,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (user_id, id),
+          FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+
+        INSERT INTO character_catalog (
+          id, user_id, name, controls_json, spec_json, spec_hash, created_at, updated_at
+        )
+        SELECT
+          id, user_id, name, controls_json, spec_json, spec_hash, created_at, updated_at
+        FROM character_catalog_old;
+
+        DROP TABLE character_catalog_old;
+
+        CREATE INDEX IF NOT EXISTS idx_character_catalog_user ON character_catalog(user_id);
+      `);
+    },
+  },
 ];
 
 let db;

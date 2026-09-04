@@ -59,6 +59,9 @@ export function emitPacketPass(ast, _errors) {
       // can apply band coverage. Without this the field is stripped and the renderer
       // falls back to half-space coverage, fogging the outer half of every rim.
       if (coord.strokeHalfWidth !== undefined) entry.strokeHalfWidth = coord.strokeHalfWidth;
+      // Filled-circle interior cells: strip this and the renderer's band coverage
+      // hollows every disc into a ring (lightning-sword pommel, hollow at all scales).
+      if (coord.interiorFill === true) entry.interiorFill = true;
       // Art-gene causal provenance (PDR §6.4)
       if (coord._gene) entry._gene = coord._gene;
       allCoordinates.push(entry);

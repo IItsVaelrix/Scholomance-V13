@@ -1,6 +1,14 @@
 /**
  * VIXEL FUSION — The Composition Boundary
  *
+ * NOT the same "Vixel" as `codex/core/pixelbrain/vixel/` (the Vixel Render IR
+ * shading engine — materials, lighting, checksummed scenes; canon:
+ * ARCH-2026-09-04-VIXEL-RENDER-IR.md). This module fuses a pixel grid with
+ * Wand vector paths into a `VixelField` for Photonic Feel evaluation — a
+ * different concept that happens to share the name. Neither imports the
+ * other. If you came here looking for shading/lighting, you want
+ * `codex/core/pixelbrain/vixel/index.js` instead.
+ *
  * This is where two mediums become one representation. The Wand produces
  * clean vectorized coordinate paths (the ART). The PixelBrain/SCDL compiler
  * produces a material-rich pixel grid (the CRAFT). Neither knows the other

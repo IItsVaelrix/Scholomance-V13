@@ -400,6 +400,14 @@ function buildQuantization(quantize, materialsInScene) {
 // the ramp is doing no work.
 const FLAT_ANCHOR_COUNT = 1;
 
+/**
+ * The house default key-light direction: upper-left, matching the default
+ * lighting branch below. Exported so synthetic relief — which projects value
+ * rank onto the key light's own in-plane direction — can read the exact same
+ * default the renderer will use, never a copy of it.
+ */
+export const DEFAULT_KEY_DIRECTION = Object.freeze([-0.447, -0.537]);
+
 function hexTriplet(hex) {
   if (typeof hex !== 'string' || !/^#[0-9A-Fa-f]{6}$/.test(hex)) return null;
   const n = parseInt(hex.slice(1), 16);
@@ -412,6 +420,12 @@ function relativeLuminance([r, g, b]) {
 
 /**
  * Per-material ramp coverage of the authored colours.
+ *
+ * SURFACE HONESTY: this measures the value sketch as PAINTED — the coordinate
+ * colours before lighting, atmosphere, or quantization touch them. It answers
+ * "can this part express a material swap at all", not "what does the raster
+ * contain". The post-lighting answer lives in the renderer's
+ * collectRenderedPaletteCoverage (raster.provenance.renderedPaletteCoverage).
  *
  * Returns an entry for every material with a resolvable ramp, sorted
  * least-covered first, each carrying `flat: true` when the value sketch reaches
@@ -441,6 +455,10 @@ function collectPaletteCoverage(coords) {
   return [...perMaterial.entries()]
     .map(([material, e]) => ({
       material,
+      // Which surface this number describes. The rendered-buffer sibling
+      // carries 'rendered'; conflating the two is exactly the bug this tag
+      // exists to prevent.
+      surface: 'authored',
       anchorCount: e.anchorCount,
       anchorsUsed: e.indices.size,
       coverage: Number((e.indices.size / e.anchorCount).toFixed(3)),
@@ -451,6 +469,93 @@ function collectPaletteCoverage(coords) {
         : null,
     }))
     .sort((a, b) => a.anchorsUsed - b.anchorsUsed || a.material.localeCompare(b.material));
+}
+
+// ─── Synthetic relief (PB-VRI-RELIEF-v1) ─────────────────────────────────────
+//
+// Hand-drawn flat-cell art carries no vector relief: a painted cell has a colour
+// and nothing else, so the lighting pass sees a viewer-facing plane and renders
+// it exactly as painted — physically honest, but flat. The value sketch is NOT
+// flat, though: the author already chose where the darks and lights go. Synthetic
+// relief converts that authored value information into something the lighting
+// pass can act on, without inventing geometry the author never drew:
+//
+//   1. Rank each cell's colour by its position in its own material's value ramp
+//      (the same axis quantization snaps on — nearest anchor by luminance).
+//   2. Center the rank so mid-tones stay flat: tilt = (rank - 0.5) * 2 ∈ [-1, 1].
+//   3. Project that tilt onto the key light's own in-plane direction, giving the
+//      cell an in-plane normal exactly like SCDL's vector ops produce — which the
+//      renderer's existing relief model (NORMAL_RELIEF in vri-renderer.js) then
+//      treats as a perturbation of a viewer-facing surface.
+//
+// Bright values tilt toward the key, dark values tilt away. Deterministic: a pure
+// function of (colour, material ramp, key direction) — no RNG, no tuning knobs.
+// Cells that already carry a real normal are never touched, so vector-relief and
+// synthetic-relief coexist in one asset without interference.
+
+export const SYNTHETIC_RELIEF_CONTRACT = 'PB-VRI-RELIEF-v1';
+
+/**
+ * Attach rank-projected in-plane normals to flat cells.
+ *
+ * Mutates and returns a NEW coordinate array (cells are shallow-copied first —
+ * the caller's packet geometry is never edited in place).
+ *
+ * @returns {{ coords: Array, cellsAffected: number, cellsSkippedNoRamp: number,
+ *   keyDirection: number[] }}
+ */
+function applySyntheticRelief(coords, keyDirection) {
+  const [kx, ky] = keyDirection || [0, 0];
+  const kLen = Math.hypot(kx, ky);
+  const ux = kLen === 0 ? 0 : kx / kLen;
+  const uy = kLen === 0 ? 0 : ky / kLen;
+
+  let cellsAffected = 0;
+  let cellsSkippedNoRamp = 0;
+  const out = new Array(coords.length);
+
+  for (let i = 0; i < coords.length; i += 1) {
+    const cell = coords[i];
+    const n = cell.normal;
+    // Real vector relief (circle/sphere ops) is authoritative — untouched.
+    if (n && (n[0] || n[1])) { out[i] = cell; continue; }
+
+    const ramp = resolveRamp(cell.material);
+    const rgb = hexTriplet(cell.color);
+    if (!ramp || ramp.length < 2 || !rgb || kLen === 0) {
+      cellsSkippedNoRamp += 1;
+      out[i] = cell;
+      continue;
+    }
+
+    // Rank = the nearest ramp anchor by luminance, normalized across the ramp.
+    const L = relativeLuminance(rgb);
+    let best = 0;
+    let bestDistance = Infinity;
+    for (let a = 0; a < ramp.length; a += 1) {
+      const anchorRgb = hexTriplet(ramp[a]);
+      if (!anchorRgb) continue;
+      const d = Math.abs(relativeLuminance(anchorRgb) - L);
+      if (d < bestDistance) { bestDistance = d; best = a; }
+    }
+    const rank = best / (ramp.length - 1);
+    const tilt = (rank - 0.5) * 2;
+    if (tilt === 0) { out[i] = cell; continue; }
+
+    out[i] = {
+      ...cell,
+      normal: [Number((ux * tilt).toFixed(6)), Number((uy * tilt).toFixed(6))],
+      reliefOrigin: 'synthetic',
+    };
+    cellsAffected += 1;
+  }
+
+  return {
+    coords: out,
+    cellsAffected,
+    cellsSkippedNoRamp,
+    keyDirection: [kx, ky],
+  };
 }
 
 // ─── Unrendered-declaration diagnostics ──────────────────────────────────────
@@ -615,6 +720,10 @@ export function compileVRI(packet, options = {}) {
     // Below 1.0 the grain textures a band; at or above it, the grain
     // reassigns bands and reads as specular gloss rather than material.
     textureGrainSteps = 0.5,
+    // 'synthetic' | null — PB-VRI-RELIEF-v1. Give flat hand-painted cells a
+    // rank-projected in-plane normal so the lighting pass has real relief to
+    // act on. Null (default) leaves flat cells flat and output byte-identical.
+    relief = null,
   } = options;
 
   const canvas = packet.canvas || { width: 16, height: 24 };
@@ -657,6 +766,28 @@ export function compileVRI(packet, options = {}) {
     }
   } else {
     coords = packet.geometry?.coordinates || [];
+  }
+
+  // ── Synthetic relief (opt-in, PB-VRI-RELIEF-v1) ─────────────────────────
+  // Runs before the geometry layer exists so the normals it adds ride the same
+  // layer, checksum, and lighting path as vector-relief normals. The key
+  // direction it projects onto is the very one the lighting below will use.
+  let syntheticReliefReport = null;
+  if (relief != null) {
+    if (relief !== 'synthetic') {
+      throw new Error(
+        `VRI-COMPILE: unknown relief mode "${relief}". Supported: 'synthetic'.`,
+      );
+    }
+    const keyDirection = lighting?.key?.direction || DEFAULT_KEY_DIRECTION;
+    const applied = applySyntheticRelief(coords, keyDirection);
+    coords = applied.coords;
+    syntheticReliefReport = {
+      contract: SYNTHETIC_RELIEF_CONTRACT,
+      cellsAffected: applied.cellsAffected,
+      cellsSkippedNoRamp: applied.cellsSkippedNoRamp,
+      keyDirection: applied.keyDirection,
+    };
   }
 
   const layers = [];
@@ -775,7 +906,7 @@ export function compileVRI(packet, options = {}) {
         id: 'key-light',
         kind: LIGHT_KINDS.DIRECTIONAL,
         position: lighting.key.position || [W * 0.25, H * 0.15],
-        direction: lighting.key.direction || [-0.447, -0.537],
+        direction: lighting.key.direction || [...DEFAULT_KEY_DIRECTION],
         color: lighting.key.color || '#FFFFFF',
         intensity: lighting.key.intensity ?? 0.8,
         radius: lighting.key.radius ?? W * 2,
@@ -838,7 +969,7 @@ export function compileVRI(packet, options = {}) {
       id: 'default-key',
       kind: LIGHT_KINDS.DIRECTIONAL,
       position: [W * 0.25, H * 0.1],
-      direction: [-0.447, -0.537],
+      direction: [...DEFAULT_KEY_DIRECTION],
       color: '#FFFFFF',
       intensity: 0.7,
       radius: W * 2,
@@ -914,6 +1045,10 @@ export function compileVRI(packet, options = {}) {
     // reaches. Entries flagged `flat` cannot express a material swap.
     // See collectPaletteCoverage().
     paletteCoverage: collectPaletteCoverage(coords),
+    // Synthetic relief (PB-VRI-RELIEF-v1), or null when relief was not applied.
+    // Recorded for inspection; the normals it adds are scene content and already
+    // ride the checksum through the geometry payload.
+    syntheticRelief: syntheticReliefReport,
     unrenderedDeclarations: collectUnrenderedDeclarations(
       finalLayers, finalLights, finalAtmo, artGenes, quantization,
       [...materialsInScene].filter(m => !quantization.ramps[m]).sort(),

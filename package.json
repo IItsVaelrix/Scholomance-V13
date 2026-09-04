@@ -31,6 +31,8 @@
     "scdl:compile": "node codex/core/pixelbrain/scdl/scdl.cli.js compile",
     "scdl:preview": "node codex/core/pixelbrain/scdl/scdl.cli.js preview",
     "scdl:check": "node codex/core/pixelbrain/scdl/scdl.cli.js check",
+    "vixel:pipeline": "node scripts/wand-vixel-pipeline.mjs",
+    "vixel:pipeline:all": "node scripts/wand-vixel-pipeline.mjs --all",
     "effects": "node scripts/pixelbrain-effect-catalog.mjs --stdout",
     "effects:gen": "node scripts/pixelbrain-effect-catalog.mjs",
     "effects:check": "node scripts/pixelbrain-effect-catalog.mjs --check",

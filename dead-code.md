@@ -1,6 +1,6 @@
 # Dead Code Report
 
-Generated at: 2026-08-15T19:03:41.375Z
+Generated at: 2026-09-03T20:26:09.519Z
 
 ## Unreachable Files
 Files in `src/` or `codex/` that are not imported by any entry point or reachable file.
@@ -54,6 +54,7 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] src/core/scd64/generateSCD64RegressionTest.ts
 - [ ] src/core/scd64/glossary.ts
 - [ ] src/core/scd64/index.ts
+- [ ] src/core/scd64/memoryTransport.ts
 - [ ] src/core/scd64/parseSCD64.ts
 - [ ] src/core/tokenization/index.ts
 - [ ] src/core/tokenization/tokenWeightError.ts
@@ -61,6 +62,7 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] src/core/tokenization/tokenWeightToSCD64.ts
 - [ ] src/data/armRigConfig.js
 - [ ] src/data/combatElementDatabase.js
+- [ ] src/data/photo1RigConfig.js
 - [ ] src/data/schoolPresentation.js
 - [ ] src/data/void1Animations.js
 - [ ] src/data/void1RigConfig.js
@@ -395,7 +397,9 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/core/combat/tactical-board.tiles.js
 - [ ] codex/core/combat.exegesis.js
 - [ ] codex/core/combat.session.js
+- [ ] codex/core/constellation/atom-matter.js
 - [ ] codex/core/constellation/atom-nucleus.js
+- [ ] codex/core/constellation/atom-valence.js
 - [ ] codex/core/constellation/audition/audition.adapter.js
 - [ ] codex/core/constellation/audition/candidates/from-compose.candidate.generator.js
 - [ ] codex/core/constellation/audition/candidates/index.js
@@ -415,6 +419,8 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/core/constellation/compose.js
 - [ ] codex/core/constellation/electromagnetism.js
 - [ ] codex/core/constellation/element-phase.js
+- [ ] codex/core/constellation/epitope-silicone.js
+- [ ] codex/core/constellation/evaluation-evidence.js
 - [ ] codex/core/constellation/failure-diagnosis.js
 - [ ] codex/core/constellation/grimoire/bond-synthesizer.js
 - [ ] codex/core/constellation/grimoire/construction-families.js
@@ -428,6 +434,7 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/core/constellation/grimoire/families/copular.js
 - [ ] codex/core/constellation/grimoire/families/determination.js
 - [ ] codex/core/constellation/grimoire/families/inversion.js
+- [ ] codex/core/constellation/grimoire/families/list.js
 - [ ] codex/core/constellation/grimoire/families/modifier.js
 - [ ] codex/core/constellation/grimoire/families/nonfinite.js
 - [ ] codex/core/constellation/grimoire/families/participial.js
@@ -442,13 +449,48 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/core/constellation/grimoire/projection-laws.js
 - [ ] codex/core/constellation/grimoire/reactor.js
 - [ ] codex/core/constellation/grimoire/schemas.js
+- [ ] codex/core/constellation/inquiry-coverage.js
+- [ ] codex/core/constellation/lawful-unknown-seed.js
+- [ ] codex/core/constellation/molecule-topology.js
+- [ ] codex/core/constellation/np-anchor.js
 - [ ] codex/core/constellation/perturbation-beam.js
 - [ ] codex/core/constellation/perturbation-telemetry.js
 - [ ] codex/core/constellation/precedent.js
 - [ ] codex/core/constellation/resonance-beacon.js
+- [ ] codex/core/constellation/semantic-particles/annotate.js
+- [ ] codex/core/constellation/semantic-particles/capability-transfer.js
+- [ ] codex/core/constellation/semantic-particles/compat-waterfall.js
+- [ ] codex/core/constellation/semantic-particles/complement-compat.js
+- [ ] codex/core/constellation/semantic-particles/complement-ontology.js
+- [ ] codex/core/constellation/semantic-particles/compositional-semantics.js
+- [ ] codex/core/constellation/semantic-particles/contrastive-probes.js
+- [ ] codex/core/constellation/semantic-particles/coverage-census.js
+- [ ] codex/core/constellation/semantic-particles/decision-bearing.js
+- [ ] codex/core/constellation/semantic-particles/derivation-factors.js
+- [ ] codex/core/constellation/semantic-particles/diverse-shortlist.js
+- [ ] codex/core/constellation/semantic-particles/evidence-ledger.js
+- [ ] codex/core/constellation/semantic-particles/experimental-design.js
+- [ ] codex/core/constellation/semantic-particles/experimental-inventory.js
+- [ ] codex/core/constellation/semantic-particles/exposure-gate.js
+- [ ] codex/core/constellation/semantic-particles/feature-provider.js
+- [ ] codex/core/constellation/semantic-particles/feature-score.js
+- [ ] codex/core/constellation/semantic-particles/forest-inference.js
+- [ ] codex/core/constellation/semantic-particles/index.js
+- [ ] codex/core/constellation/semantic-particles/lexical-semantics.js
+- [ ] codex/core/constellation/semantic-particles/observe-coverage.js
+- [ ] codex/core/constellation/semantic-particles/root-reachability.js
+- [ ] codex/core/constellation/semantic-particles/schema.js
+- [ ] codex/core/constellation/semantic-particles/selectional-index.js
+- [ ] codex/core/constellation/semantic-particles/stats.js
+- [ ] codex/core/constellation/semantic-particles/unknown-remainder.js
+- [ ] codex/core/constellation/silicone-superposition.js
+- [ ] codex/core/constellation/spectral-rejections.js
+- [ ] codex/core/constellation/text-ppsp.js
 - [ ] codex/core/constellation/treebank-metrics.js
 - [ ] codex/core/constellation/treebank-run.js
 - [ ] codex/core/constellation/treebank.js
+- [ ] codex/core/constellation/unknown-capability-marker.js
+- [ ] codex/core/constellation/viterbi-answer.js
 - [ ] codex/core/diagnostic/QbitProbeEnrichment.js
 - [ ] codex/core/diagnostic/SpatialImmunePrototype.js
 - [ ] codex/core/diagnostic/chromaticImmuneProbe.js
@@ -578,6 +620,7 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/core/pixelbrain/palette-role-quantizer.js
 - [ ] codex/core/pixelbrain/pbrain-checksum.js
 - [ ] codex/core/pixelbrain/pipeline-golden-corpus.js
+- [ ] codex/core/pixelbrain/pixel-art-shaders.js
 - [ ] codex/core/pixelbrain/pixelit-adapter.js
 - [ ] codex/core/pixelbrain/placebo-a-serialize-packet.js
 - [ ] codex/core/pixelbrain/placebo-b-serialize-verify.js
@@ -636,6 +679,8 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/core/pixelbrain/tile-forge/tile-forge.snap-validator.js
 - [ ] codex/core/pixelbrain/tile-forge/tile-forge.validator.js
 - [ ] codex/core/pixelbrain/vixel/index.js
+- [ ] codex/core/pixelbrain/vixel/stroke-extractor.js
+- [ ] codex/core/pixelbrain/vixel/stroke-stylizer.js
 - [ ] codex/core/pixelbrain/vixel/vri-compiler.js
 - [ ] codex/core/pixelbrain/vixel/vri-renderer.js
 - [ ] codex/core/pixelbrain/vixel/vri-schema.js
@@ -671,8 +716,36 @@ Files in `src/` or `codex/` that are not imported by any entry point or reachabl
 - [ ] codex/core/shared/workers/microprocessor.worker.js
 - [ ] codex/core/spellweave-compendium/compendium.registry.js
 - [ ] codex/core/tactical.engine.js
+- [ ] codex/research/parser-failure-atlas/atlas-schema.js
+- [ ] codex/research/parser-failure-atlas/build-atlas.js
+- [ ] codex/research/parser-failure-atlas/cluster-punctuation.js
+- [ ] codex/research/parser-failure-atlas/collect-failures.js
+- [ ] codex/research/parser-failure-atlas/cyclotron-feed.js
+- [ ] codex/research/parser-failure-atlas/freeze-case.js
+- [ ] codex/research/parser-failure-atlas/index.js
+- [ ] codex/research/parser-failure-atlas/overgeneration-gate.js
+- [ ] codex/research/parser-failure-atlas/plate.js
+- [ ] codex/research/parser-failure-atlas/rank-constructions.js
+- [ ] codex/research/parser-failure-atlas/replicate-interiors.js
+- [ ] codex/research/semantic-adjudication/adjudicate.js
+- [ ] codex/research/semantic-adjudication/adjudication-schema.js
+- [ ] codex/research/semantic-adjudication/blind-case.js
+- [ ] codex/research/semantic-adjudication/build-hole-ledger.js
+- [ ] codex/research/semantic-adjudication/classify-hole.js
+- [ ] codex/research/semantic-adjudication/cluster-predicates.js
+- [ ] codex/research/semantic-adjudication/collect-opportunities.js
+- [ ] codex/research/semantic-adjudication/cue-lexicon.js
+- [ ] codex/research/semantic-adjudication/evaluate-ballistics.js
+- [ ] codex/research/semantic-adjudication/freeze-case.js
+- [ ] codex/research/semantic-adjudication/hypothesis-card.js
+- [ ] codex/research/semantic-adjudication/index.js
+- [ ] codex/research/semantic-adjudication/rubric-adjudicator.js
+- [ ] codex/research/semantic-adjudication/seed-queries.js
+- [ ] codex/research/semantic-adjudication/stratify.js
+- [ ] codex/research/semantic-adjudication/util.js
 - [ ] codex/runtime/cleri-probe/investigation.runtime.js
 - [ ] codex/server/collab/mcp-bridge-entry.js
+- [ ] codex/server/services/cognitivePacketBytecodeXP.service.js
 - [ ] codex/server/services/constellation/precedent.adapter.js
 - [ ] codex/services/adapters/index.js
 - [ ] codex/services/cleri-probe/babel-facts.adapter.js
@@ -822,9 +895,16 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `SCD64DiagnosticMatch` in `src/core/scd64/RuleRegistry.ts`
 - [ ] `SCD64Rule` in `src/core/scd64/RuleRegistry.ts`
 - [ ] `ArtSlotAlias` in `src/core/scd64/constants.ts`
+- [ ] `MemorySlotAlias` in `src/core/scd64/constants.ts`
+- [ ] `NavSlotAlias` in `src/core/scd64/constants.ts`
 - [ ] `lookupSCD64BlocksInMCP` in `src/core/scd64/decodeSCD64.ts`
 - [ ] `writeSCD64RegressionTest` in `src/core/scd64/generateSCD64RegressionTest.ts`
 - [ ] `buildSCD64Glossary` in `src/core/scd64/glossary.ts`
+- [ ] `MemoryRecord` in `src/core/scd64/memoryTransport.ts`
+- [ ] `TransportResult` in `src/core/scd64/memoryTransport.ts`
+- [ ] `memoryRecordToSCD64` in `src/core/scd64/memoryTransport.ts`
+- [ ] `familyRecord` in `src/core/scd64/memoryTransport.ts`
+- [ ] `scoreTransport` in `src/core/scd64/memoryTransport.ts`
 - [ ] `SCD64GlossaryEntry` in `src/core/scd64/types.ts`
 - [ ] `SCD64FullRecord` in `src/core/scd64/types.ts`
 - [ ] `WeightErrorKind` in `src/core/tokenization/tokenWeightError.ts`
@@ -837,6 +917,11 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `tokenWeightDiagnosticToSCD64` in `src/core/tokenization/tokenWeightToSCD64.ts`
 - [ ] `ARM_POSES` in `src/data/armRigConfig.js`
 - [ ] `COMBAT_ELEMENT_DATABASE` in `src/data/combatElementDatabase.js`
+- [ ] `PHOTO1_JOINTS` in `src/data/photo1RigConfig.js`
+- [ ] `PHOTO1_LEG_RIG` in `src/data/photo1RigConfig.js`
+- [ ] `PHOTO1_LEG_POSES` in `src/data/photo1RigConfig.js`
+- [ ] `PHOTO1_WALK` in `src/data/photo1RigConfig.js`
+- [ ] `getPhoto1LegPose` in `src/data/photo1RigConfig.js`
 - [ ] `XP_SOURCES` in `src/data/progression_constants.js`
 - [ ] `IDE_LIGHT_MANUSCRIPT` in `src/data/schoolPalettes.js`
 - [ ] `getUniversalVowelColors` in `src/data/schoolPalettes.js`
@@ -858,7 +943,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `Z_ABOVE` in `src/data/stacking_tiers.js`
 - [ ] `Z_OVERLAY` in `src/data/stacking_tiers.js`
 - [ ] `VOID1_BOSS_ID` in `src/data/void1Animations.js`
-- [ ] `VOID1_JOINTS` in `src/data/void1RigConfig.js`
 - [ ] `VOID1_ARM_POSES` in `src/data/void1RigConfig.js`
 - [ ] `VOID1_ANIMATIONS` in `src/data/void1RigConfig.js`
 - [ ] `getVoid1Animation` in `src/data/void1RigConfig.js`
@@ -1573,6 +1657,7 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `projectRepairedTokens` in `codex/core/canonical-tokenizer.js`
 - [ ] `projectBoundUnits` in `codex/core/canonical-tokenizer.js`
 - [ ] `runAtsHmmPass` in `codex/core/career/ats-hmm/index.js`
+- [ ] `CODEBASE_IGNORED_DIRECTORY_NAMES` in `codex/core/codebase-path-policy.js`
 - [ ] `scoreTileForAI` in `codex/core/combat/tactical-board.ai.js`
 - [ ] `selectBestTile` in `codex/core/combat/tactical-board.ai.js`
 - [ ] `shouldContestTile` in `codex/core/combat/tactical-board.ai.js`
@@ -1609,7 +1694,13 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `MODEL_CORPUS` in `codex/core/commentary/phrase-bank.js`
 - [ ] `getSonicStationTrackPool` in `codex/core/constants/data/sonicStationBuckets.js`
 - [ ] `getDefaultSonicStationTrackUrl` in `codex/core/constants/data/sonicStationBuckets.js`
-- [ ] `sealNucleus` in `codex/core/constellation/atom-nucleus.js`
+- [ ] `ATOM_MATTER_CONTRACT` in `codex/core/constellation/atom-matter.js`
+- [ ] `MATTER_TIERS` in `codex/core/constellation/atom-matter.js`
+- [ ] `classifyAtomMatter` in `codex/core/constellation/atom-matter.js`
+- [ ] `ATOM_VALENCE_CONTRACT` in `codex/core/constellation/atom-valence.js`
+- [ ] `openVacancies` in `codex/core/constellation/atom-valence.js`
+- [ ] `fillValence` in `codex/core/constellation/atom-valence.js`
+- [ ] `seekingByType` in `codex/core/constellation/atom-valence.js`
 - [ ] `receptorReject` in `codex/core/constellation/bond-admission.js`
 - [ ] `isClauseAdjunctBond` in `codex/core/constellation/bond-admission.js`
 - [ ] `SCAFFOLD_TYPES` in `codex/core/constellation/bond-anatomy.js`
@@ -1634,9 +1725,7 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `sunkCurrent` in `codex/core/constellation/electromagnetism.js`
 - [ ] `pathImpedance` in `codex/core/constellation/electromagnetism.js`
 - [ ] `coulomb` in `codex/core/constellation/electromagnetism.js`
-- [ ] `ELEMENT_PHASE` in `codex/core/constellation/element-phase.js`
 - [ ] `PHRASE_TYPES` in `codex/core/constellation/element-phase.js`
-- [ ] `classifyConstruction` in `codex/core/constellation/element-phase.js`
 - [ ] `axiomAssay` in `codex/core/constellation/element-phase.js`
 - [ ] `transmutationVerdict` in `codex/core/constellation/element-phase.js`
 - [ ] `constructionToAtom` in `codex/core/constellation/element-phase.js`
@@ -1644,9 +1733,15 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `becomesCarbonAxiom` in `codex/core/constellation/element-phase.js`
 - [ ] `graduationQueue` in `codex/core/constellation/element-phase.js`
 - [ ] `feedBondTables` in `codex/core/constellation/element-phase.js`
+- [ ] `CALL_COMPLEMENT` in `codex/core/constellation/epitope-silicone.js`
+- [ ] `hypothesizeComplement` in `codex/core/constellation/epitope-silicone.js`
+- [ ] `proposeFromCall` in `codex/core/constellation/epitope-silicone.js`
+- [ ] `phaseOfProposal` in `codex/core/constellation/epitope-silicone.js`
+- [ ] `isSiliconeShaped` in `codex/core/constellation/epitope-silicone.js`
+- [ ] `matchedPlaceboSilicone` in `codex/core/constellation/epitope-silicone.js`
+- [ ] `CONSTELLATION_EVALUATION_EVIDENCE_CONTRACT` in `codex/core/constellation/evaluation-evidence.js`
+- [ ] `buildConstellationEvaluationEvidence` in `codex/core/constellation/evaluation-evidence.js`
 - [ ] `resolveGovernor` in `codex/core/constellation/governor.js`
-- [ ] `FUNCTION_TYPES` in `codex/core/constellation/grimoire/bond-synthesizer.js`
-- [ ] `CONTENT_TYPES` in `codex/core/constellation/grimoire/bond-synthesizer.js`
 - [ ] `predictHead` in `codex/core/constellation/grimoire/bond-synthesizer.js`
 - [ ] `predictResults` in `codex/core/constellation/grimoire/bond-synthesizer.js`
 - [ ] `synthesizeBonds` in `codex/core/constellation/grimoire/bond-synthesizer.js`
@@ -1673,10 +1768,17 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `constructionByBondTuple` in `codex/core/constellation/grimoire/index.js`
 - [ ] `familyInventory` in `codex/core/constellation/grimoire/index.js`
 - [ ] `isLicensedProjection` in `codex/core/constellation/grimoire/projection-laws.js`
-- [ ] `deriveBond` in `codex/core/constellation/grimoire/projection-laws.js`
 - [ ] `protectOk` in `codex/core/constellation/grimoire/reactor.js`
 - [ ] `deadEndBonds` in `codex/core/constellation/grimoire/reactor.js`
 - [ ] `shuffledControls` in `codex/core/constellation/grimoire/reactor.js`
+- [ ] `classifyInstrumentationCoverage` in `codex/core/constellation/inquiry-coverage.js`
+- [ ] `classifySemanticInquiryCoverage` in `codex/core/constellation/inquiry-coverage.js`
+- [ ] `LAWFUL_UNKNOWN_SEED_CONTRACT` in `codex/core/constellation/lawful-unknown-seed.js`
+- [ ] `LAWFUL_LEAF_SEED` in `codex/core/constellation/lawful-unknown-seed.js`
+- [ ] `lawfulComplementTypes` in `codex/core/constellation/lawful-unknown-seed.js`
+- [ ] `MOLECULE_TOPOLOGY_CONTRACT` in `codex/core/constellation/molecule-topology.js`
+- [ ] `classifyMoleculeTopology` in `codex/core/constellation/molecule-topology.js`
+- [ ] `npAnchor` in `codex/core/constellation/np-anchor.js`
 - [ ] `CONSTELLATION_CONTRACT_VERSION` in `codex/core/constellation/pageBytecode.js`
 - [ ] `BEAM_EFFECTS` in `codex/core/constellation/perturbation-beam.js`
 - [ ] `BEAM_WAVELENGTHS` in `codex/core/constellation/perturbation-beam.js`
@@ -1686,6 +1788,7 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `spanningSignature` in `codex/core/constellation/perturbation-beam.js`
 - [ ] `classifyEffect` in `codex/core/constellation/perturbation-beam.js`
 - [ ] `litHeadMatchesGold` in `codex/core/constellation/perturbation-beam.js`
+- [ ] `litSubjectMatchesGold` in `codex/core/constellation/perturbation-beam.js`
 - [ ] `pickProbeWords` in `codex/core/constellation/perturbation-beam.js`
 - [ ] `backProjectDescendingLight` in `codex/core/constellation/perturbation-beam.js`
 - [ ] `counterfactualExcess` in `codex/core/constellation/perturbation-beam.js`
@@ -1708,14 +1811,11 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `assignTokenRoles` in `codex/core/constellation/phraseAnalysis.js`
 - [ ] `precedentCue` in `codex/core/constellation/precedent.js`
 - [ ] `RARITY_EDGES` in `codex/core/constellation/rarity.js`
-- [ ] `emitLight` in `codex/core/constellation/resonance-beacon.js`
-- [ ] `chloroplastIngest` in `codex/core/constellation/resonance-beacon.js`
 - [ ] `auraRegulate` in `codex/core/constellation/resonance-beacon.js`
 - [ ] `chlorophyllAbsorb` in `codex/core/constellation/resonance-beacon.js`
 - [ ] `panelVoltage` in `codex/core/constellation/resonance-beacon.js`
 - [ ] `photosynthesize` in `codex/core/constellation/resonance-beacon.js`
 - [ ] `illuminateField` in `codex/core/constellation/resonance-beacon.js`
-- [ ] `descendFromRoots` in `codex/core/constellation/resonance-beacon.js`
 - [ ] `decrypt` in `codex/core/constellation/resonance-beacon.js`
 - [ ] `encodeBeacon` in `codex/core/constellation/resonance-beacon.js`
 - [ ] `buildBeaconField` in `codex/core/constellation/resonance-beacon.js`
@@ -1724,15 +1824,57 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `readingScores` in `codex/core/constellation/resonance-beacon.js`
 - [ ] `leafTypesInOrder` in `codex/core/constellation/resonance-beacon.js`
 - [ ] `scoreAnswer` in `codex/core/constellation/resonance-beacon.js`
+- [ ] `pickResonantAnswerDetailed` in `codex/core/constellation/resonance-beacon.js`
 - [ ] `pickResonantAnswer` in `codex/core/constellation/resonance-beacon.js`
-- [ ] `headedAtoms` in `codex/core/constellation/resonance-beacon.js`
-- [ ] `derivationCandidates` in `codex/core/constellation/resonance-beacon.js`
+- [ ] `RANKABLE_TYPES` in `codex/core/constellation/resonance-beacon.js`
+- [ ] `canRankDerivations` in `codex/core/constellation/resonance-beacon.js`
 - [ ] `scoreDerivationCandidate` in `codex/core/constellation/resonance-beacon.js`
+- [ ] `scoreDerivationPosition` in `codex/core/constellation/resonance-beacon.js`
+- [ ] `emptyCapabilities` in `codex/core/constellation/semantic-particles/capability-transfer.js`
+- [ ] `WATERFALL_STAGES` in `codex/core/constellation/semantic-particles/compat-waterfall.js`
+- [ ] `SILENCE_CLASSES` in `codex/core/constellation/semantic-particles/compat-waterfall.js`
+- [ ] `waterfallStages` in `codex/core/constellation/semantic-particles/compat-waterfall.js`
+- [ ] `classifySilence` in `codex/core/constellation/semantic-particles/compat-waterfall.js`
+- [ ] `diagnoseCompetitionEdge` in `codex/core/constellation/semantic-particles/compat-waterfall.js`
+- [ ] `summarizeWaterfall` in `codex/core/constellation/semantic-particles/compat-waterfall.js`
+- [ ] `GOVERNOR_CLASSES` in `codex/core/constellation/semantic-particles/complement-compat.js`
+- [ ] `EVENT_KIND_TO_GOVERNOR_CLASS` in `codex/core/constellation/semantic-particles/complement-compat.js`
+- [ ] `COMPLEMENT_KIND_BY_CLASS` in `codex/core/constellation/semantic-particles/complement-compat.js`
+- [ ] `EFFICACY_ALPHA` in `codex/core/constellation/semantic-particles/exposure-gate.js`
+- [ ] `dimensionKeys` in `codex/core/constellation/semantic-particles/feature-provider.js`
+- [ ] `SEMANTIC_ROLES` in `codex/core/constellation/semantic-particles/lexical-semantics.js`
+- [ ] `resetParticleInterner` in `codex/core/constellation/semantic-particles/schema.js`
 - [ ] `CONSTELLATION_INQUIRY_BIND` in `codex/core/constellation/semanticInquiry.js`
 - [ ] `CONSTELLATION_SENSE_OBSERVATION_IDS` in `codex/core/constellation/semanticInquiry.js`
-- [ ] `runTreebank` in `codex/core/constellation/treebank-run.js`
+- [ ] `SILICONE_SUPERPOSITION_CONTRACT` in `codex/core/constellation/silicone-superposition.js`
+- [ ] `COLLAPSE_MARGIN` in `codex/core/constellation/silicone-superposition.js`
+- [ ] `locusKey` in `codex/core/constellation/silicone-superposition.js`
+- [ ] `stemLocus` in `codex/core/constellation/silicone-superposition.js`
+- [ ] `weightSiliconeDerivation` in `codex/core/constellation/silicone-superposition.js`
+- [ ] `collapseSuperposition` in `codex/core/constellation/silicone-superposition.js`
+- [ ] `purifySilicone` in `codex/core/constellation/silicone-superposition.js`
+- [ ] `SPECTRAL_REJECTION_CONTRACT` in `codex/core/constellation/spectral-rejections.js`
+- [ ] `SPECTRAL_PROMOTIONS` in `codex/core/constellation/spectral-rejections.js`
+- [ ] `SPECTRAL_REJECTION_REASON` in `codex/core/constellation/spectral-rejections.js`
+- [ ] `SPECTRAL_REJECTIONS` in `codex/core/constellation/spectral-rejections.js`
+- [ ] `spectralRejection` in `codex/core/constellation/spectral-rejections.js`
+- [ ] `spectralRejectionById` in `codex/core/constellation/spectral-rejections.js`
+- [ ] `isRejectedSpectralPromotion` in `codex/core/constellation/spectral-rejections.js`
+- [ ] `refuseSpectralPromotion` in `codex/core/constellation/spectral-rejections.js`
+- [ ] `TEXT_PPSP_CONTRACT` in `codex/core/constellation/text-ppsp.js`
+- [ ] `moleculeKey` in `codex/core/constellation/text-ppsp.js`
+- [ ] `chartInventory` in `codex/core/constellation/text-ppsp.js`
+- [ ] `measurePpsp` in `codex/core/constellation/text-ppsp.js`
 - [ ] `UPOS_TO_TAG` in `codex/core/constellation/treebank.js`
+- [ ] `UNKNOWN_CAPABILITY_CONTRACT` in `codex/core/constellation/unknown-capability-marker.js`
+- [ ] `seedUnknownReceiver` in `codex/core/constellation/unknown-capability-marker.js`
+- [ ] `markUnknownReceiver` in `codex/core/constellation/unknown-capability-marker.js`
+- [ ] `annotateUnknownCapabilities` in `codex/core/constellation/unknown-capability-marker.js`
+- [ ] `VITERBI_ANSWER_CONTRACT` in `codex/core/constellation/viterbi-answer.js`
+- [ ] `projectViterbiAnswer` in `codex/core/constellation/viterbi-answer.js`
+- [ ] `viterbiAnswer` in `codex/core/constellation/viterbi-answer.js`
 - [ ] `deepFreezeClone` in `codex/core/diagnostic/BytecodeHealth.js`
+- [ ] `encodeBytecodeXPVaccineFromToolCall` in `codex/core/diagnostic/BytecodeXPVaccine.js`
 - [ ] `SPECTRAL_Z` in `codex/core/diagnostic/chromaticImmuneProbe.js`
 - [ ] `validateColor` in `codex/core/diagnostic/chromaticImmuneProbe.js`
 - [ ] `traceChromaProvenance` in `codex/core/diagnostic/chromaticImmuneProbe.js`
@@ -1866,7 +2008,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `canonicalContextBytes` in `codex/core/lexical-analysis/context.js`
 - [ ] `IRREGULAR_VERB_FORMS` in `codex/core/lexical-analysis/irregular-forms.js`
 - [ ] `IRREGULAR_PLURALS` in `codex/core/lexical-analysis/irregular-forms.js`
-- [ ] `BALLISTIC_EMBEDDING` in `codex/core/lexical-analysis/semanticBallistics.js`
 - [ ] `compareBallisticSignatures` in `codex/core/lexical-analysis/semanticBallistics.js`
 - [ ] `embedDevices` in `codex/core/lexical-graph/embedDevices.js`
 - [ ] `deleteLexicalEntry` in `codex/core/lexical-graph/ftsSync.js`
@@ -1927,6 +2068,7 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `AnatomySchemas` in `codex/core/pixelbrain/anatomy-registry.js`
 - [ ] `getAnatomySchema` in `codex/core/pixelbrain/anatomy-registry.js`
 - [ ] `ASEPRITE_BINARY_CODEC_VERSION` in `codex/core/pixelbrain/aseprite-binary-codec.js`
+- [ ] `remapAsepriteColors` in `codex/core/pixelbrain/aseprite-binary-codec.js`
 - [ ] `ASSET_PIPELINE_CONTRACT` in `codex/core/pixelbrain/asset-pipeline.js`
 - [ ] `LINEAGE_CONTRACT` in `codex/core/pixelbrain/asset-pipeline.js`
 - [ ] `CONSTRUCTION_LINK` in `codex/core/pixelbrain/asset-pipeline.js`
@@ -2011,7 +2153,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `utilityScore` in `codex/core/pixelbrain/codebase-nuclei-bank.js`
 - [ ] `collapseByTopology` in `codex/core/pixelbrain/codebase-nuclei-bank.js`
 - [ ] `rankProposals` in `codex/core/pixelbrain/codebase-nuclei-bank.js`
-- [ ] `seededShuffle` in `codex/core/pixelbrain/codebase-nuclei-bank.js`
 - [ ] `shuffleEvidencePaths` in `codex/core/pixelbrain/codebase-nuclei-bank.js`
 - [ ] `randomTopologyMatchedControls` in `codex/core/pixelbrain/codebase-nuclei-bank.js`
 - [ ] `generateSemanticPalette` in `codex/core/pixelbrain/color-byte-mapping.js`
@@ -2064,9 +2205,10 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `BytecodeInstruction` in `codex/core/pixelbrain/dimension-formula-compiler.ts`
 - [ ] `REGISTERS` in `codex/core/pixelbrain/dimension-formula-compiler.ts`
 - [ ] `UNIT_MULTIPLIERS` in `codex/core/pixelbrain/dimension-formula-compiler.ts`
-- [ ] `cleanupOrphanPixels` in `codex/core/pixelbrain/edit-compiler.js`
-- [ ] `enforceInnerStructuralRigidity` in `codex/core/pixelbrain/edit-compiler.js`
-- [ ] `applyDropShadow` in `codex/core/pixelbrain/edit-compiler.js`
+- [ ] `POSTFORGE_PROVENANCE_KEY` in `codex/core/pixelbrain/edit-compiler.js`
+- [ ] `postForgeMetadata` in `codex/core/pixelbrain/edit-compiler.js`
+- [ ] `hasInheritedEditId` in `codex/core/pixelbrain/edit-compiler.js`
+- [ ] `describeEditFailures` in `codex/core/pixelbrain/edit-compiler.js`
 - [ ] `OCCUPANCY_ENTROPY_CONTRACT` in `codex/core/pixelbrain/entropic-decay-dampener.js`
 - [ ] `applyOccupancyEntropy` in `codex/core/pixelbrain/entropic-decay-dampener.js`
 - [ ] `verifyOccupancyEntropyResult` in `codex/core/pixelbrain/entropic-decay-dampener.js`
@@ -2126,7 +2268,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `GRAMMAR_VALENCE_CYCLOTRON_MODE` in `codex/core/pixelbrain/grammar-valence-cyclotron.js`
 - [ ] `createGrammarGapAntigenCell` in `codex/core/pixelbrain/grammar-valence-cyclotron.js`
 - [ ] `buildGrammarValenceGapReport` in `codex/core/pixelbrain/grammar-valence-cyclotron.js`
-- [ ] `runGrammarValenceCyclotron` in `codex/core/pixelbrain/grammar-valence-cyclotron.js`
 - [ ] `verifyGrammarValenceGapReport` in `codex/core/pixelbrain/grammar-valence-cyclotron.js`
 - [ ] `createSinisterVoidGraphicForge` in `codex/core/pixelbrain/graphic-forge/graphic-forge.presets.js`
 - [ ] `createImageReceiverGraphicForge` in `codex/core/pixelbrain/graphic-forge/graphic-forge.presets.js`
@@ -2142,6 +2283,9 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `buildSurfaceLockSet` in `codex/core/pixelbrain/hollowness-amp.js`
 - [ ] `HOLYFIRE_MOTIF_AMP_ID` in `codex/core/pixelbrain/holyfire-motif-amp.js`
 - [ ] `HOLYFIRE_MOTIF_AMP_VERSION` in `codex/core/pixelbrain/holyfire-motif-amp.js`
+- [ ] `HUMANOID_CANON` in `codex/core/pixelbrain/humanoid-proportion-canon.js`
+- [ ] `HUMANOID_WIDTHS` in `codex/core/pixelbrain/humanoid-proportion-canon.js`
+- [ ] `JOINT_OVERLAP` in `codex/core/pixelbrain/humanoid-proportion-canon.js`
 - [ ] `ImageLatticeCompiler` in `codex/core/pixelbrain/image-lattice-compiler.js`
 - [ ] `extractEdgePoints` in `codex/core/pixelbrain/image-to-bytecode-formula.js`
 - [ ] `fitParametricCurve` in `codex/core/pixelbrain/image-to-bytecode-formula.js`
@@ -2206,6 +2350,8 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `PIPELINE_CORPUS_CASE_IDS` in `codex/core/pixelbrain/pipeline-golden-corpus.js`
 - [ ] `runPipelineCorpusCase` in `codex/core/pixelbrain/pipeline-golden-corpus.js`
 - [ ] `runPixelBrainPipelineCorpus` in `codex/core/pixelbrain/pipeline-golden-corpus.js`
+- [ ] `shadeCylinder` in `codex/core/pixelbrain/pixel-art-shaders.js`
+- [ ] `shadeMass` in `codex/core/pixelbrain/pixel-art-shaders.js`
 - [ ] `colorDist` in `codex/core/pixelbrain/pixel-scale-amp.js`
 - [ ] `PIXELBRAIN_RENDER_KIND` in `codex/core/pixelbrain/pixelbrain-asset-packet.js`
 - [ ] `PIXELBRAIN_EXPORT_KIND` in `codex/core/pixelbrain/pixelbrain-asset-packet.js`
@@ -2213,6 +2359,7 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `assertPixelBrainAssetPacket` in `codex/core/pixelbrain/pixelbrain-asset-packet.js`
 - [ ] `PB_SDF_KIND` in `codex/core/pixelbrain/pixelbrain-asset-packet.js`
 - [ ] `PB_NOISE_KIND` in `codex/core/pixelbrain/pixelbrain-asset-packet.js`
+- [ ] `normalizeSDFPrimitive` in `codex/core/pixelbrain/pixelbrain-asset-packet.js`
 - [ ] `assertPB_SDF_v1` in `codex/core/pixelbrain/pixelbrain-asset-packet.js`
 - [ ] `hashPB_SDF_v1` in `codex/core/pixelbrain/pixelbrain-asset-packet.js`
 - [ ] `assertPB_NOISE_v1` in `codex/core/pixelbrain/pixelbrain-asset-packet.js`
@@ -2346,7 +2493,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `runTopologicalCausalAblation` in `codex/core/pixelbrain/semantic-silicone-reactor.js`
 - [ ] `openRingCounterfactual` in `codex/core/pixelbrain/semantic-silicone-reactor.js`
 - [ ] `isolateRingClosureEffect` in `codex/core/pixelbrain/semantic-silicone-reactor.js`
-- [ ] `exactTwoSidedSignP` in `codex/core/pixelbrain/semantic-silicone-reactor.js`
 - [ ] `verifySemanticSiliconeReport` in `codex/core/pixelbrain/semantic-silicone-reactor.js`
 - [ ] `SEMANTIC_ATOM_CONTRACT` in `codex/core/pixelbrain/semantic-valence-cyclotron.js`
 - [ ] `SEMANTIC_MOLECULE_CONTRACT` in `codex/core/pixelbrain/semantic-valence-cyclotron.js`
@@ -2377,6 +2523,12 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `simulateRaidTriage` in `codex/core/pixelbrain/simulate-raid-triage.js`
 - [ ] `specFromReaction` in `codex/core/pixelbrain/simulate-reaction.js`
 - [ ] `simulateReaction` in `codex/core/pixelbrain/simulate-reaction.js`
+- [ ] `SPEC_INTENT_REPORT_VERSION` in `codex/core/pixelbrain/spec-intent-report.js`
+- [ ] `collectFidelityClamps` in `codex/core/pixelbrain/spec-intent-report.js`
+- [ ] `collectAnchorSubstitutions` in `codex/core/pixelbrain/spec-intent-report.js`
+- [ ] `collectOutlineIntent` in `codex/core/pixelbrain/spec-intent-report.js`
+- [ ] `collectUnrenderedParts` in `codex/core/pixelbrain/spec-intent-report.js`
+- [ ] `formatSpecIntent` in `codex/core/pixelbrain/spec-intent-report.js`
 - [ ] `SQUARE_SHARPNESS_CONTRAST_AMP_ID` in `codex/core/pixelbrain/square-sharpness-contrast-amp.js`
 - [ ] `SQUARE_SHARPNESS_CONTRAST_VERSION` in `codex/core/pixelbrain/square-sharpness-contrast-amp.js`
 - [ ] `STRUCTURAL_ENERGY_VERSION` in `codex/core/pixelbrain/structural-energy.js`
@@ -2617,7 +2769,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `LEXICON_ROLE_ERRORS` in `codex/core/semantic-calculus/lexicons.ts`
 - [ ] `assertLexiconInvariants` in `codex/core/semantic-calculus/lexicons.ts`
 - [ ] `lexiconsVersion` in `codex/core/semantic-calculus/lexicons.ts`
-- [ ] `hashResult` in `codex/core/semantic-calculus/observationReceipt.ts`
 - [ ] `KIND_RANK` in `codex/core/semantic-calculus/permission.ts`
 - [ ] `PermissionVector` in `codex/core/semantic-calculus/permission.ts`
 - [ ] `ModulatableState` in `codex/core/semantic-calculus/permission.ts`
@@ -2628,6 +2779,8 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `CandidateProposer` in `codex/core/semantic-calculus/proposer.ts`
 - [ ] `PROPOSAL_ERRORS` in `codex/core/semantic-calculus/proposer.ts`
 - [ ] `MarginVerdict` in `codex/core/semantic-calculus/proposer.ts`
+- [ ] `RECEIPT_SEAL_ALGORITHM` in `codex/core/semantic-calculus/receiptSeal.js`
+- [ ] `canonicalizeJson` in `codex/core/semantic-calculus/receiptSeal.js`
 - [ ] `SEAL_ALGORITHM` in `codex/core/semantic-calculus/seal.ts`
 - [ ] `assertSealedIntact` in `codex/core/semantic-calculus/seal.ts`
 - [ ] `isSealIntact` in `codex/core/semantic-calculus/seal.ts`
@@ -2661,7 +2814,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `TrustClass` in `codex/core/semantic-calculus/types.ts`
 - [ ] `TRUSTED_PARTITIONS` in `codex/core/semantic-calculus/types.ts`
 - [ ] `ProbeReportPayload` in `codex/core/semantic-calculus/types.ts`
-- [ ] `Ballistics` in `codex/core/semantic-calculus/types.ts`
 - [ ] `FormulaIds` in `codex/core/semantic-calculus/types.ts`
 - [ ] `UNATTRIBUTED_TAINT` in `codex/core/semantic-calculus/utterance.ts`
 - [ ] `isTainted` in `codex/core/semantic-calculus/utterance.ts`
@@ -2717,6 +2869,17 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `inferMudEntityType` in `codex/core/world.entity.js`
 - [ ] `inferMudRarity` in `codex/core/world.entity.js`
 - [ ] `buildWorldEntitySummary` in `codex/core/world.entity.js`
+- [ ] `CYCLOTRON_FEED_CONTRACT` in `codex/research/parser-failure-atlas/cyclotron-feed.js`
+- [ ] `feedCyclotron` in `codex/research/parser-failure-atlas/cyclotron-feed.js`
+- [ ] `OVERGENERATION_GATE_CONTRACT` in `codex/research/parser-failure-atlas/overgeneration-gate.js`
+- [ ] `judgeCandidate` in `codex/research/parser-failure-atlas/overgeneration-gate.js`
+- [ ] `admitCumulative` in `codex/research/parser-failure-atlas/overgeneration-gate.js`
+- [ ] `plateRows` in `codex/research/parser-failure-atlas/overgeneration-gate.js`
+- [ ] `gateCandidateBonds` in `codex/research/parser-failure-atlas/overgeneration-gate.js`
+- [ ] `calibrateAgainstLicensed` in `codex/research/parser-failure-atlas/overgeneration-gate.js`
+- [ ] `cueHits` in `codex/research/semantic-adjudication/cue-lexicon.js`
+- [ ] `isLegalRubricGold` in `codex/research/semantic-adjudication/rubric-adjudicator.js`
+- [ ] `SEED_QUERIES` in `codex/research/semantic-adjudication/seed-queries.js`
 - [ ] `setupAmpPipeline` in `codex/runtime/amp.pipeline.js`
 - [ ] `initializeAmpPipeline` in `codex/runtime/amp.pipeline.js`
 - [ ] `cleanupAmpPipeline` in `codex/runtime/amp.pipeline.js`
@@ -2779,6 +2942,7 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `SUBTLETY_TOKEN_HEADER` in `codex/server/routes/subtlety.routes.js`
 - [ ] `authorizeSubtletyRequest` in `codex/server/routes/subtlety.routes.js`
 - [ ] `CaptchaService` in `codex/server/services/captcha.service.js`
+- [ ] `normalizeAdmissionEvidenceSummary` in `codex/server/services/cognitivePacketBytecodeXP.service.js`
 - [ ] `glossTokensFor` in `codex/server/services/constellation/discovery.adapter.js`
 - [ ] `expandSemantic` in `codex/server/services/constellation/discovery.adapter.js`
 - [ ] `syllablesFromPhonemes` in `codex/server/services/constellation/genome.adapter.js`
@@ -2790,7 +2954,6 @@ Symbols that are exported but not referenced in any other file. (Note: May inclu
 - [ ] `recordRuling` in `codex/server/services/constellation/precedent.adapter.js`
 - [ ] `cadenceFamilyFromStress` in `codex/server/services/constellation/rhymeAstrology.adapter.js`
 - [ ] `cmuPhonologySource` in `codex/server/services/constellation/senseProbe.harness.js`
-- [ ] `getConstellationRuntimeStats` in `codex/server/services/constellationPage.service.js`
 - [ ] `ConsoleMailerAdapter` in `codex/server/services/mailer.service.js`
 - [ ] `SendGridMailerAdapter` in `codex/server/services/mailer.service.js`
 - [ ] `ResendMailerAdapter` in `codex/server/services/mailer.service.js`

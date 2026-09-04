@@ -28,6 +28,11 @@ export const MATERIAL_PALETTES = Object.freeze({
     emissionFactor: DEFAULT_EMISSION_FACTOR,
     label: 'Icy Fire',
     category: MATERIAL_CATEGORIES.FLAME,
+    // Emissive, ruled 2026-09-04: a white-hot core (whiteCore 0.986) cooling out
+    // through spectral and glacial-lavender halos is a light source's energy
+    // profile, not a thermal dark-to-bright ramp. material-validator Law 2
+    // exempts declared emitters; this is the declaration.
+    emissive: true,
     anchors: Object.freeze({
       void: '#02070A',
       shadow: '#06131C',
@@ -392,7 +397,11 @@ export const MATERIAL_PALETTES = Object.freeze({
     id: 'void_cloth',
     emissionFactor: DEFAULT_EMISSION_FACTOR,
     label: 'Void Cloth',
-    category: MATERIAL_CATEGORIES.METAL,
+    // Recategorised metal → organic, ruled 2026-09-04: `void` is a cross-cutting
+    // trait (the validator's own Law 4 names it as spanning all categories), while
+    // `cloth` is the family — and cloth_linen, cloth_wool, cloth_star_jacket, and
+    // cloth_psychic_denim are all organic. The family testifies; the trait does not.
+    category: MATERIAL_CATEGORIES.ORGANIC,
     anchors: Object.freeze({
       void: '#010105',
       shadow: '#050611',
@@ -457,6 +466,14 @@ export const MATERIAL_PALETTES = Object.freeze({
     emissionFactor: DEFAULT_EMISSION_FACTOR,
     label: 'Black Steel',
     category: MATERIAL_CATEGORIES.METAL,
+    // Alias ruling 2026-09-04: `black_steel` and `blacksteel` carried byte-
+    // identical ramps under two shader indices — a spelling that acquired its
+    // own identity, not two species. `blacksteel` is the canonical form (the
+    // spelling both scene-graph-renderer.js and mirrored-trim-validator.js
+    // reach for first); this entry stays resolvable for the 8 authored assets
+    // that used the underscored spelling, and declares the relationship rather
+    // than letting the validator re-discover it as an unexplained duplicate.
+    aliasOf: 'blacksteel',
     anchors: Object.freeze({
       void: '#030308',
       shadow: '#0B0B14',
@@ -615,6 +632,9 @@ export const MATERIAL_PALETTES = Object.freeze({
     emissionFactor: DEFAULT_EMISSION_FACTOR,
     label: 'Astral Moss',
     category: MATERIAL_CATEGORIES.ORGANIC,
+    // Emissive, ruled 2026-09-04: bioluminescent growth — the frost→spectral dip
+    // is the glow band, an emission feature, not a thermal-ordering error.
+    emissive: true,
     anchors: Object.freeze({
       void: '#03040A', shadow: '#070B1A', deep: '#10163A', body: '#2B6CFF', frost: '#20D8FF', spectral: '#0C7896', whiteCore: '#48F2FF'
     }),
@@ -625,6 +645,9 @@ export const MATERIAL_PALETTES = Object.freeze({
     emissionFactor: DEFAULT_EMISSION_FACTOR,
     label: 'Corrupted Snow',
     category: MATERIAL_CATEGORIES.ORGANIC,
+    // Emissive, ruled 2026-09-04: snow lit from inside by corruption — the
+    // frost→spectral dip is the energy showing through, not a ramp defect.
+    emissive: true,
     anchors: Object.freeze({
       void: '#03040A', shadow: '#070B1A', deep: '#10163A', body: '#566083', frost: '#BBC7E8', spectral: '#20D8FF', whiteCore: '#48F2FF'
     }),
@@ -635,6 +658,10 @@ export const MATERIAL_PALETTES = Object.freeze({
     emissionFactor: DEFAULT_EMISSION_FACTOR,
     label: 'Rune Glow',
     category: MATERIAL_CATEGORIES.FLAME,
+    // Emissive, ruled 2026-09-04: the name says it — a rune's glow is a light
+    // source. whiteCore is deliberately darker than the glowing rim (energy
+    // concentrated in the glyph's edge), which no thermal ramp would do.
+    emissive: true,
     anchors: Object.freeze({
       void: '#03040A', shadow: '#070B1A', deep: '#10163A', body: '#2B6CFF', frost: '#48F2FF', spectral: '#20D8FF', whiteCore: '#0C7896'
     }),
@@ -645,6 +672,11 @@ export const MATERIAL_PALETTES = Object.freeze({
     emissionFactor: DEFAULT_EMISSION_FACTOR,
     label: 'Abyss',
     category: MATERIAL_CATEGORIES.ORGANIC,
+    // Absorptive, ruled 2026-09-04: the abyss is anti-light, not a source. Its
+    // body (#090711) is deliberately the single darkest point, darker than the
+    // deep step beside it — the dark-end inversion is intentional absorption,
+    // declared here rather than mis-labelled emissive.
+    absorptive: true,
     anchors: Object.freeze({
       void: '#000000', shadow: '#03040A', deep: '#070B1A', body: '#090711', frost: '#10163A', spectral: '#17245C', whiteCore: '#282060'
     }),
@@ -655,6 +687,10 @@ export const MATERIAL_PALETTES = Object.freeze({
     emissionFactor: DEFAULT_EMISSION_FACTOR,
     label: 'Void Crystal',
     category: MATERIAL_CATEGORIES.GEMSTONE,
+    // Absorptive, ruled 2026-09-04: same class as abyss — the crystal's purple
+    // body absorbs more than the navy deep step around it. Deliberate dark-end
+    // inversion, declared rather than re-ordered.
+    absorptive: true,
     anchors: Object.freeze({
       void: '#03040A', shadow: '#070B1A', deep: '#10163A', body: '#190B2E', frost: '#32227A', spectral: '#5146C8', whiteCore: '#2B6CFF'
     }),

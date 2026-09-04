@@ -53,7 +53,12 @@ export function pushCell(ops, x, y, color, loc, sourceOp = null) {
       if (vi.arcLength !== undefined) cell.arcLength = vi.arcLength;
       // Stroke ops carry their half-width so the renderer can apply band coverage
       // (edge at |sd| = halfWidth) instead of half-space coverage (edge at sd = 0).
+      // Exception: a filled circle's interior cells are FILL, not band — marking
+      // them interiorFill tells the renderer to use half-space coverage so a disc
+      // renders solid instead of hollow. The half-width is still recorded; the
+      // renderer decides which coverage model the mark selects.
       if (vi.halfWidth !== undefined) cell.strokeHalfWidth = vi.halfWidth;
+      if (vi.interiorFill === true) cell.interiorFill = true;
     }
   }
   ops.push(cell);
@@ -89,15 +94,108 @@ export function opToSDFPrimitive(op) {
 }
 
 /**
+ * Closed-form area centroid and principal (long) axis of a simple polygon.
+ *
+ * Why this exists: a per-pixel "which edge is nearest" query (as used for
+ * signedDistance/normal below) is a nearest-point-on-boundary map, and that
+ * map is mathematically discontinuous on the shape's medial axis — wherever
+ * two non-adjacent edges are equidistant, the attributed edge (and anything
+ * derived from it: arc-length position, tangent) jumps. That is not an
+ * implementation bug to patch case-by-case; it is a property of nearest-point
+ * maps on any shape wider than a thin stroke. Measured on lightning-sword's
+ * blade polygon: `t` jumped from 0.883 to 0.143 (a ~31-unit swing in
+ * `t * arcLength`) between two adjacent pixel columns, at the same column on
+ * every row — a hard seam the texture pass reads as a tear.
+ *
+ * The fix is to stop deriving the texture's flow direction from a per-pixel
+ * nearest-feature search at all. A polygon's area-weighted second moments
+ * (the same closed-form formulas used for rigid-body mass properties — see
+ * Eberly, "Polygon Mass Properties", or Box2D's `ComputeMass`) give a single
+ * principal axis for the *whole* shape: the direction of greatest spatial
+ * extent, computed once from the vertex list, not sampled per pixel. A
+ * constant vector cannot be discontinuous. `t` becomes a linear projection
+ * onto that axis, so it varies smoothly — provably, not just observedly —
+ * across the entire interior, independent of which pixel is being asked.
+ *
+ * signedDistance and normal (the shape's boundary/outward-facing-direction
+ * quantities used by geometry coverage and lighting) are untouched by this:
+ * they still come from the nearest-edge search below, which is exact for
+ * signedDistance (it is genuinely a distance-to-nearest-feature value, and
+ * that value — unlike the identity of the feature — is continuous) and is
+ * the intentional source of each polygon's faux-bevel lighting response.
+ */
+function polygonPrincipalAxis(pts) {
+  const n = pts.length;
+  let cross2 = 0, cx = 0, cy = 0, sxx = 0, syy = 0, sxy = 0;
+  for (let i = 0; i < n; i++) {
+    const [x0, y0] = pts[i];
+    const [x1, y1] = pts[(i + 1) % n];
+    const cross = x0 * y1 - x1 * y0;
+    cross2 += cross;
+    cx += (x0 + x1) * cross;
+    cy += (y0 + y1) * cross;
+    sxx += (x0 * x0 + x0 * x1 + x1 * x1) * cross;
+    syy += (y0 * y0 + y0 * y1 + y1 * y1) * cross;
+    sxy += (x0 * y1 + 2 * x0 * y0 + 2 * x1 * y1 + x1 * y0) * cross;
+  }
+  const area = cross2 / 2;
+  if (Math.abs(area) < 1e-9) {
+    // Degenerate (zero-area / collinear) polygon: no well-defined interior,
+    // so fall back to the direction between its first two vertices rather
+    // than divide by zero.
+    const [x0, y0] = pts[0];
+    const [x1, y1] = pts[1] || pts[0];
+    const dx = x1 - x0, dy = y1 - y0;
+    const len = Math.hypot(dx, dy) || 1;
+    return { centroid: [x0, y0], axis: [dx / len, dy / len] };
+  }
+
+  const centroidX = cx / (6 * area);
+  const centroidY = cy / (6 * area);
+
+  // Statistical covariance of the filled region (area-weighted variance in
+  // x and y, and their covariance), from the second moments above.
+  const covXX = sxx / (12 * area) - centroidX * centroidX;
+  const covYY = syy / (12 * area) - centroidY * centroidY;
+  const covXY = sxy / (24 * area) - centroidX * centroidY;
+
+  // Principal axis = eigenvector of [[covXX, covXY], [covXY, covYY]] for the
+  // larger eigenvalue: the direction of greatest extent (ordinary 2D PCA).
+  const trace = covXX + covYY;
+  const diff = covXX - covYY;
+  const disc = Math.sqrt(diff * diff + 4 * covXY * covXY);
+  const lambdaMax = (trace + disc) / 2;
+
+  let ax, ay;
+  if (Math.abs(covXY) > 1e-9) {
+    ax = lambdaMax - covYY;
+    ay = covXY;
+  } else if (covXX >= covYY) {
+    ax = 1; ay = 0;
+  } else {
+    ax = 0; ay = 1;
+  }
+  const len = Math.hypot(ax, ay) || 1;
+  return { centroid: [centroidX, centroidY], axis: [ax / len, ay / len] };
+}
+
+/**
  * Compute analytic vector identity for a cell at (px, py) relative to its source op.
  * Returns { signedDistance, t, tangent, normal, curvature } or null if the op type
  * is not analytically tractable.
  *
  * signedDistance: negative inside, positive outside, zero on boundary
- * t: true arc-length parameter (0..1) along the op's perimeter
- * tangent: unit tangent vector [tx, ty] at the nearest boundary point
- * normal: unit outward normal [nx, ny]
- * curvature: 1/R at the nearest boundary point (0 for flat edges)
+ * t: for circle/ellipse, true arc-length parameter (0..1) along the perimeter.
+ *    For rect/polygon, signed distance (canvas units) along the shape's own
+ *    principal axis (see polygonPrincipalAxis) — continuous across the whole
+ *    interior, not a per-pixel nearest-edge arc-length position.
+ * tangent: unit tangent vector [tx, ty]. For circle/ellipse, at the nearest
+ *    boundary point. For rect/polygon, the shape's principal axis — constant
+ *    across the whole shape, so texture flow direction cannot tear.
+ * normal: unit outward normal [nx, ny], from the nearest boundary point
+ * curvature: 1/R at the nearest boundary point for circle/ellipse; 0 for
+ *    rect/polygon (a straight edge has no curvature — the old near-edge
+ *    threshold heuristic was itself a discontinuity source, not a feature)
  */
 export function computeVectorIdentity(op, px, py) {
   const type = op.op || op.type;
@@ -147,7 +245,20 @@ export function computeVectorIdentity(op, px, py) {
     // An authored op.width overrides this for deliberately thicker strokes.
     const halfWidth = op.width != null ? op.width / 2 : 0.5;
 
-    return { signedDistance, t, tangent, normal, curvature, arcLength, halfWidth };
+    // A true circle is the exception: rasterizeCircle FILLS (every cell inside
+    // the radius is emitted), so cells strictly inside the stroke band are
+    // interior fill, not part of any band. Without this mark the renderer's
+    // band coverage hollows a filled disc into a ring — measured on
+    // lightning-sword's pommel, hollow at every scale including 1x. The mark
+    // is a fact about the op's rasterization; the coverage decision it informs
+    // still belongs to the renderer. Absent (not false) when not interior, so
+    // the return shape stays exactly what it was for every non-interior cell.
+    const interiorFill = type === 'circle' && signedDistance < -halfWidth;
+
+    return {
+      signedDistance, t, tangent, normal, curvature, arcLength, halfWidth,
+      ...(interiorFill ? { interiorFill: true } : {}),
+    };
   }
 
   if (type === 'rect') {
@@ -170,22 +281,18 @@ export function computeVectorIdentity(op, px, py) {
     const len = Math.sqrt(nx * nx + ny * ny) || 1;
     nx /= len; ny /= len;
     const normal = [nx, ny];
-    const tangent = [-ny, nx];
 
-    // Curvature: 0 on flat edges, high at corners
-    const atCorner = ddx > -0.5 && ddy > -0.5;
-    const curvature = atCorner ? 2.0 : 0.0;
+    // Texture flow direction: the shape's own principal axis (see
+    // polygonPrincipalAxis above), not a per-pixel nearest-edge parametric
+    // position — that formulation jumps at the diagonals from each corner,
+    // wherever "nearest edge" flips between two adjacent sides.
+    const corners = [[x, y], [x + w, y], [x + w, y + h], [x, y + h]];
+    const { centroid: [flowCx, flowCy], axis: [fax, fay] } = polygonPrincipalAxis(corners);
+    const flowTangent = [fax, fay];
+    const t = (px - flowCx) * fax + (py - flowCy) * fay;
+    const curvature = 0; // a straight edge has no curvature; see header note
 
-    // t: parametric position along perimeter (clockwise from top-left)
-    const perim = 2 * (w + h);
-    let t;
-    if (py <= y) t = (px - x) / perim;
-    else if (px >= x + w) t = (w + (py - y)) / perim;
-    else if (py >= y + h) t = (w + h + (x + w - px)) / perim;
-    else t = (w + h + w + (y + h - py)) / perim;
-    t = Math.max(0, Math.min(1, t));
-
-    return { signedDistance, t, tangent, normal, curvature, arcLength: perim };
+    return { signedDistance, t, tangent: flowTangent, normal, curvature, arcLength: 1 };
   }
 
   if (type === 'polygon') {
@@ -202,29 +309,23 @@ export function computeVectorIdentity(op, px, py) {
       }
     }
 
-    // Find nearest edge
+    // Find nearest edge — this stays a per-pixel search because
+    // signedDistance genuinely is "distance to nearest boundary point," and
+    // that value (unlike the identity of which edge owns it) is continuous.
+    // normal inherits the nearest edge's orientation deliberately: this is
+    // the source of each polygon's faux-bevel lighting response and is left
+    // untouched. See the header note above polygonPrincipalAxis for why `t`
+    // and `tangent` — the texture-flow quantities — do NOT come from here.
     let minDist = Infinity;
-    let bestTangent = [1, 0];
     let bestNormal = [0, 1];
-    let bestT = 0;
 
-    let totalLen = 0;
-    const edgeLengths = [];
-    for (let i = 0; i < pts.length; i++) {
-      const j = (i + 1) % pts.length;
-      const len = Math.sqrt((pts[j][0] - pts[i][0]) ** 2 + (pts[j][1] - pts[i][1]) ** 2);
-      edgeLengths.push(len);
-      totalLen += len;
-    }
-
-    let accLen = 0;
     for (let i = 0; i < pts.length; i++) {
       const j = (i + 1) % pts.length;
       const [xi, yi] = pts[i];
       const [xj, yj] = pts[j];
       const ex = xj - xi, ey = yj - yi;
-      const len = edgeLengths[i];
-      if (len === 0) { accLen += len; continue; }
+      const len = Math.sqrt(ex * ex + ey * ey);
+      if (len === 0) continue;
 
       const tEdge = Math.max(0, Math.min(1, ((px - xi) * ex + (py - yi) * ey) / (len * len)));
       const closestX = xi + tEdge * ex;
@@ -233,10 +334,9 @@ export function computeVectorIdentity(op, px, py) {
 
       if (dist < minDist) {
         minDist = dist;
-        bestTangent = [ex / len, ey / len];
         let nx = -ey / len;
         let ny = ex / len;
-        
+
         // Polygon centroid for outward normal orientation
         let polyCx = 0, polyCy = 0;
         for (let k = 0; k < pts.length; k++) { polyCx += pts[k][0]; polyCy += pts[k][1]; }
@@ -248,15 +348,20 @@ export function computeVectorIdentity(op, px, py) {
           ny = -ny;
         }
         bestNormal = [nx, ny];
-        bestT = (accLen + tEdge * len) / (totalLen || 1);
       }
-      accLen += len;
     }
 
     const signedDistance = inside ? -minDist : minDist;
-    const curvature = minDist < 0.5 ? 1.5 : 0.0;
 
-    return { signedDistance, t: bestT, tangent: bestTangent, normal: bestNormal, curvature, arcLength: totalLen };
+    // Texture flow direction: the polygon's own principal axis, not the
+    // per-pixel nearest-edge search above. See polygonPrincipalAxis's header
+    // note — this is what removes the tearing seam.
+    const { centroid: [flowCx, flowCy], axis: [fax, fay] } = polygonPrincipalAxis(pts);
+    const flowTangent = [fax, fay];
+    const t = (px - flowCx) * fax + (py - flowCy) * fay;
+    const curvature = 0; // a straight edge has no curvature; see header note
+
+    return { signedDistance, t, tangent: flowTangent, normal: bestNormal, curvature, arcLength: 1 };
   }
 
   if (type === 'ring') {

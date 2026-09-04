@@ -82,6 +82,7 @@ import {
 import {
   forgeCharacter as codexForgeCharacter,
   forgeCharacterFromWandVector as codexForgeCharacterFromWandVector,
+  renderCharacterDirectionVri as codexRenderCharacterDirectionVri,
   exportCharacterToPbrainBlueprint as codexExportCharacterToPbrainBlueprint,
   normalizeCharacterSpec as codexNormalizeCharacterSpec,
   validateCharacterSpec as codexValidateCharacterSpec,
@@ -888,6 +889,13 @@ export function forgeCharacter(spec, opts) {
 
 export function forgeCharacterFromWandVector(wandProposal, baseSpec = {}, opts = {}) {
   return codexForgeCharacterFromWandVector(wandProposal, baseSpec, opts);
+}
+
+// VRI preview bridge (opt-in, additive) — see character-foundry.js's
+// renderCharacterDirectionVri doc comment for the measured, honest limits of
+// running character output through the VRI engine.
+export function renderCharacterDirectionVri(character, direction, opts = {}) {
+  return codexRenderCharacterDirectionVri(character, direction, opts);
 }
 
 export function exportCharacterToPbrainBlueprint(character) {
