@@ -412,7 +412,7 @@ function _pngScale(scale) {
   return Math.min(n, MAX_PNG_SCALE);
 }
 
-function encodePng(width, height, rgba) {
+export function encodePng(width, height, rgba) {
   const ihdr = new Uint8Array(13);
   writeU32BE(ihdr, 0, width);
   writeU32BE(ihdr, 4, height);

@@ -19,9 +19,10 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, basename, dirname, extname, join } from 'node:path';
 import { compileSCDL, parseSCDL, exportSCDL } from './index.js';
-import { buildAsepritePayload, exportFilmstripPNG, MAX_PNG_SCALE } from './scdl.exporters.js';
+import { buildAsepritePayload, exportFilmstripPNG, MAX_PNG_SCALE, encodePng } from './scdl.exporters.js';
 import { encodeAsepriteBinary } from '../aseprite-binary-codec.js';
 import { buildSCDLDiagnosticReport } from './scdl.diagnostics.js';
+import { compileAsset } from '../asset-pipeline.js';
 
 const [,, command, ...argv] = process.argv;
 
@@ -149,6 +150,45 @@ function printDiagnostics(errors, { only } = {}) {
   }
 }
 
+function printVriFailure(asset, commandLabel) {
+  const vriFailure = asset?.diagnostics?.vri;
+  if (vriFailure) {
+    const frame = Number.isInteger(vriFailure.frame) ? ` at frame ${vriFailure.frame}` : '';
+    console.error(`[SCDL] ${commandLabel}: ${vriFailure.stage} FAILED${frame} — ${vriFailure.error ?? 'unknown error'}`);
+    return;
+  }
+
+  const blocking = (asset?.errors || []).filter(err => err.isError?.() || err.isWarn?.());
+  console.error(`[SCDL] ${commandLabel}: compile FAILED (${blocking.length} blocking diagnostic(s)):`);
+  for (const err of blocking) printDiagnostic(err);
+}
+
+function encodeVriFilmstrip(frames) {
+  const rasters = frames.map(frame => frame.raster);
+  if (rasters.length === 0 || rasters.some(raster => !raster)) {
+    throw new Error('encodeVriFilmstrip: every frame must have a raster');
+  }
+
+  const height = rasters[0].height;
+  if (rasters.some(raster => raster.height !== height)) {
+    throw new Error('encodeVriFilmstrip: frame heights must match');
+  }
+
+  const width = rasters.reduce((sum, raster) => sum + raster.width, 0);
+  const rgba = new Uint8Array(width * height * 4);
+  let xOffset = 0;
+  for (const raster of rasters) {
+    const rowBytes = raster.width * 4;
+    for (let y = 0; y < height; y += 1) {
+      const sourceStart = y * rowBytes;
+      const destinationStart = (y * width + xOffset) * 4;
+      rgba.set(raster.data.subarray(sourceStart, sourceStart + rowBytes), destinationStart);
+    }
+    xOffset += raster.width;
+  }
+  return encodePng(width, height, rgba);
+}
+
 // ─── Commands ─────────────────────────────────────────────────────────────────
 
 function cmdCompile(args) {
@@ -166,13 +206,49 @@ function cmdCompile(args) {
     : dirname(resolve(filePath));
   const name = basename(filePath, '.scdl');
   const includeSemantic = opts.flags.semantic || false;
-  const shade = opts.flags.shade === 'material' ? 'material' : undefined;
+  const shade = opts.flags.shade === 'vri' ? 'vri'
+    : opts.flags.shade === 'material' ? 'material'
+    : undefined;
   // Canonical exports are 1x by default: the raster must match the declared
   // canvas unless the author explicitly asks otherwise. Use `preview` to look
   // at an asset without changing what the compiler emits.
   const scale = opts.flags.scale === undefined ? 1 : _previewScale(opts.flags.scale);
 
   console.log(`[SCDL] Compiling: ${filePath}`);
+
+  if (shade === 'vri') {
+    if (opts.flags.export !== undefined && (targets.length !== 1 || targets[0] !== 'png')) {
+      console.error('[SCDL] compile: --shade vri only supports PNG export; use --export png or omit --export.');
+      process.exit(1);
+    }
+    const asset = compileAsset(source, { scale });
+    if (!asset.ok) {
+      printVriFailure(asset, '--shade vri');
+      process.exit(1);
+    }
+    const multi = asset.frames.length > 1;
+    asset.frames.forEach((frame, i) => {
+      if (!frame.raster) {
+        console.warn(`  [WARN] --shade vri (frame ${i}) produced no raster`);
+        return;
+      }
+      const infix = multi ? `-f${i}` : '';
+      // A single --out path cannot represent an animation. Match the existing
+      // multi-frame export law and keep every frame under its deterministic
+      // <asset>-f<N>-png.png name instead of overwriting one file N times.
+      const dest = outPath && !multi
+        ? _targetPath({ outPath, sourceName: name, target: 'png', multi: false })
+        : join(outDir, `${name}${infix}-png.png`);
+      writeOut(dest, encodePng(frame.raster.width, frame.raster.height, frame.raster.data));
+    });
+    if (multi && asset.frameLoop) {
+      writeOut(join(outDir, `${name}-frameloop.json`), JSON.stringify(asset.frameLoop, null, 2));
+      console.log(`[SCDL] Frames: ${asset.frames.length} (loop '${asset.frameLoop.loop}')`);
+    }
+    console.log(`[SCDL] Done. Packet ID: ${asset.frames[0].packet.id}`);
+    return;
+  }
+
   const result = compileSCDL(source, { strict: opts.flags.strict === true });
 
   if (!result.ok) {
@@ -257,9 +333,34 @@ function cmdPreview(args) {
     ? resolve(opts.flags['out-dir'])
     : dirname(resolve(filePath));
   const name = basename(filePath, '.scdl');
-  const shade = opts.flags.shade === 'material' ? 'material' : undefined;
+  const shade = opts.flags.shade === 'vri' ? 'vri'
+    : opts.flags.shade === 'material' ? 'material'
+    : undefined;
 
   const source = readSource(filePath);
+
+  if (shade === 'vri') {
+    const asset = compileAsset(source, { scale });
+    if (!asset.ok) {
+      printVriFailure(asset, 'preview --shade vri');
+      process.exit(1);
+    }
+    const multi = asset.frames.length > 1;
+    console.log(`[SCDL] Preview: ${filePath} @ ${scale}x (vri)`);
+    asset.frames.forEach((frame, i) => {
+      if (!frame.raster) return;
+      const infix = multi ? `-f${i}` : '';
+      writeOut(join(outDir, `${name}${infix}-preview-${scale}x.png`), encodePng(
+        frame.raster.width, frame.raster.height, frame.raster.data,
+      ));
+    });
+    if (multi) {
+      writeOut(join(outDir, `${name}-preview-${scale}x-strip.png`), encodeVriFilmstrip(asset.frames));
+      console.log(`[SCDL] Frames: ${asset.frames.length} (loop '${asset.frameLoop?.loop ?? 'unknown'}')`);
+    }
+    return;
+  }
+
   const result = compileSCDL(source, { strict: opts.flags.strict === true });
 
   if (!result.ok) {
@@ -393,8 +494,8 @@ switch (command) {
   default:
     console.log(`SCDL Compiler CLI
 Usage:
-  node scdl.cli.js compile <file.scdl> [--export json,svg,phaser,png,aseprite] [--out-dir <dir>] [--out <file>] [--shade material] [--scale N] [--strict]
-  node scdl.cli.js preview <file.scdl> [--scale N] [--out-dir <dir>] [--shade material] [--strict]
+  node scdl.cli.js compile <file.scdl> [--export json,svg,phaser,png,aseprite] [--out-dir <dir>] [--out <file>] [--shade material|vri] [--scale N] [--strict]
+  node scdl.cli.js preview <file.scdl> [--scale N] [--out-dir <dir>] [--shade material|vri] [--strict]
   node scdl.cli.js parse   <file.scdl> [--out <file>]
   node scdl.cli.js check   <file.scdl> [--strict]
 

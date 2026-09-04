@@ -22,4 +22,12 @@ describe('compileAsset strict default', () => {
     const result = compileAsset(source, { scale: 1, strict: false });
     expect(result.ok).toBe(true);
   });
+
+  it('turns a VRI render exception into a frame-scoped failure result', () => {
+    expect(() => compileAsset(source, { scale: Number.POSITIVE_INFINITY, strict: false })).not.toThrow();
+
+    const result = compileAsset(source, { scale: Number.POSITIVE_INFINITY, strict: false });
+    expect(result.ok).toBe(false);
+    expect(result.diagnostics.vri).toMatchObject({ stage: 'render', frame: 0 });
+  });
 });

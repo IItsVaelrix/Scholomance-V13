@@ -227,6 +227,7 @@ export function compileAsset(source, options = {}) {
   for (let i = 0; i < framePackets.length; i += 1) {
     const framePacket = framePackets[i];
     let frameScene = null;
+    let frameRaster = null;
     if (vri !== false) {
       try {
         frameScene = compileVRI(framePacket, vri || {});
@@ -237,11 +238,21 @@ export function compileAsset(source, options = {}) {
         });
       }
     }
+    if (frameScene && scale != null) {
+      try {
+        frameRaster = renderVRI(frameScene, scale);
+      } catch (e) {
+        return _fail([e], {
+          ...diagnostics,
+          vri: { stage: 'render', frame: i, error: String(e.message || e) },
+        });
+      }
+    }
     frames.push({
       index: i,
       packet: framePacket,
       vriScene: frameScene,
-      raster: (frameScene && scale != null) ? renderVRI(frameScene, scale) : null,
+      raster: frameRaster,
     });
   }
 
