@@ -1,0 +1,24 @@
+{
+  "contract": "PB-AMP-RELEVANCE-v2",
+  "pipeline": "terrain",
+  "ampId": "grass-amp",
+  "order": 1,
+  "description": "Procedural grass blade geometry (root-to-tip shading, deterministic volume distribution, crisscrossing depth layers) for top-down ground tiles; see codex/core/pixelbrain/grass-amp.js. Gated on class:terrain + archetype:void_grove_grass (the terrain spec shape this pipeline's first real caller, generate-grass-blades.mjs, actually passes).",
+  "concept": "material-fx",
+  "version": "1.0.0",
+  "appliesTo": [
+    {
+      "field": "class",
+      "op": "eq",
+      "value": "terrain"
+    },
+    {
+      "field": "archetype",
+      "op": "eq",
+      "value": "void_grove_grass"
+    }
+  ],
+  "requires": [],
+  "schemaVersion": "PB-AMP-RELEVANCE-v2",
+  "checksum": "7490a23da90f323c455a20af675a50b191795307c3be32bae62273cbbbceee3e"
+}

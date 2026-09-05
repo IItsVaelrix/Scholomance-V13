@@ -5,18 +5,25 @@
  * - Component: ForgeGatePanel - src/pages/PixelBrain/components/ForgeGatePanel.jsx
  * - World-law connection: The Craft Gate is Immunity made visible. A forged item
  *   asset only enters the world once the gate certifies its lattice as pixel-perfect,
- *   readable, deterministic, and materially authoritative. The verdict is bytecode  - 
+ *   readable, deterministic, and materially authoritative. The verdict is bytecode  -
  *   a PB-XP vaccine on PASS, a PB-ERR sigil on a blocking FAIL. This panel renders
- *   that judgement as a glyph pulse, never an alert box.
+ *   that judgement as a glyph pulse, never an alert box. On PASS, the panel now also
+ *   shows the exact asset the gate certified — a verdict that never shows its subject
+ *   was half the point missing. The optional VRI preview toggle routes the SAME
+ *   certified bundle through the Vixel Render IR engine (Door B, real per-part
+ *   materials) — opt-in, additive, never replaces the certified standard sprite.
  * - Silhouette blueprint: a sealed `.silh` is BOTH mould and inspector. Loading one
  *   re-runs the gate against the blueprint's front/side/top shadow masks (and any
  *   animation poses) via runForgeCraftGateWithBlueprint. The verdict surfaces a
  *   per-view PASS/FAIL chip row and, on a blocking FAIL, the offending view/phase.
- * - Data consumed: onRunGate(spec) and onRunBlueprint(spec, silhText) - supplied by
- *   PixelBrainPage, which calls the pixelbrain.adapter. No codex/ or src/lib import here.
- * - State: loaded spec metadata + the last verdict + a "running" pulse, plus the last
- *   parsed spec (held in a ref so a follow-up blueprint run reuses it). Hooks only.
- * - Accessibility: aria-live verdict regions, labelled file controls, status text for SR.
+ * - Data consumed: onRunGate(spec), onRunBlueprint(spec, silhText), and
+ *   onRunVriPreview(bundle, opts) - supplied by PixelBrainPage, which calls the
+ *   pixelbrain.adapter. No codex/ or src/lib import here.
+ * - State: loaded spec metadata + the last verdict (now carrying the certified
+ *   bundle) + a "running" pulse, plus the last parsed spec (held in a ref so a
+ *   follow-up blueprint run reuses it), plus the VRI preview toggle state. Hooks only.
+ * - Accessibility: aria-live verdict regions, labelled file controls, status text for
+ *   SR, aria-pressed on the VRI toggle.
  * - Animation: glyph pulse on verdict; CSS-gated by prefers-reduced-motion.
  */
 
@@ -25,6 +32,16 @@ import { useState, useRef, useCallback } from "react";
 const PHASE = { IDLE: "idle", RUNNING: "running", PASS: "pass", FAIL: "fail" };
 const VIEWS = ["front", "side", "top"];
 
+/** Decode raw PNG bytes (Uint8Array) into a data: URL the <img> tag can use. */
+function pngToDataUrl(bytes) {
+  let bin = "";
+  const CHUNK = 0x8000;
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    bin += String.fromCharCode(...bytes.subarray(i, i + CHUNK));
+  }
+  return `data:image/png;base64,${btoa(bin)}`;
+}
+
 /** Resolve a single view's chip state from the blueprint verdict. */
 function chipState(view, phase, verdict) {
   if (phase === PHASE.PASS) return "pass";
@@ -32,10 +49,16 @@ function chipState(view, phase, verdict) {
   return "idle";
 }
 
-export function ForgeGatePanel({ onRunGate, onRunBlueprint }) {
+export function ForgeGatePanel({ onRunGate, onRunBlueprint, onRunVriPreview }) {
   const [specName, setSpecName] = useState(null);
   const [phase, setPhase] = useState(PHASE.IDLE);
   const [verdict, setVerdict] = useState(null);
+
+  // VRI Door B preview — opt-in, tied to the currently-certified bundle only.
+  // Reset whenever a new spec is loaded so a stale preview never survives onto
+  // a different asset.
+  const [vriOn, setVriOn] = useState(false);
+  const [vriPreview, setVriPreview] = useState(null); // { png, error } | null
 
   const [blueprintName, setBlueprintName] = useState(null);
   const [blueprintPhase, setBlueprintPhase] = useState(PHASE.IDLE);
@@ -56,6 +79,8 @@ export function ForgeGatePanel({ onRunGate, onRunBlueprint }) {
       setPhase(PHASE.RUNNING);
       setSpecName(file.name);
       setVerdict(null);
+      setVriOn(false);
+      setVriPreview(null);
 
       try {
         const text = await file.text();
@@ -64,18 +89,37 @@ export function ForgeGatePanel({ onRunGate, onRunBlueprint }) {
         const result = onRunGate ? onRunGate(spec) : { ok: false, reason: "Gate unavailable" };
         if (result.ok) {
           setPhase(PHASE.PASS);
-          setVerdict({ bytecode: result.vaccine, reason: null });
+          setVerdict({ bytecode: result.vaccine, reason: null, bundle: result.bundle ?? null });
         } else {
           setPhase(PHASE.FAIL);
-          setVerdict({ bytecode: result.bytecode, reason: result.reason });
+          setVerdict({ bytecode: result.bytecode, reason: result.reason, bundle: null });
         }
       } catch (err) {
         setPhase(PHASE.FAIL);
-        setVerdict({ bytecode: null, reason: `Malformed spec - ${err.message}` });
+        setVerdict({ bytecode: null, reason: `Malformed spec - ${err.message}`, bundle: null });
       }
     },
     [onRunGate]
   );
+
+  const handleToggleVriPreview = useCallback(() => {
+    setVriOn((prev) => {
+      const next = !prev;
+      if (next && verdict?.bundle) {
+        if (!onRunVriPreview) {
+          setVriPreview({ png: null, error: "VRI preview unavailable" });
+        } else {
+          const result = onRunVriPreview(verdict.bundle, { scale: 4 });
+          setVriPreview(
+            result.ok
+              ? { png: result.png, error: null }
+              : { png: null, error: result.reason || "VRI preview failed" }
+          );
+        }
+      }
+      return next;
+    });
+  }, [verdict, onRunVriPreview]);
 
   const handleBlueprintFile = useCallback(
     async (e) => {
@@ -186,6 +230,36 @@ export function ForgeGatePanel({ onRunGate, onRunBlueprint }) {
           )}
         </div>
       </div>
+
+      {/* The asset the gate just certified - a PASS/FAIL glyph never showed the
+          pixels it was judging. VRI Door B toggle renders the SAME certified
+          bundle through the Vixel Render IR engine (real per-part materials). */}
+      {phase === PHASE.PASS && verdict?.bundle?.png && (
+        <div className="pb-forge-gate__preview">
+          <img
+            className="pb-forge-gate__sprite"
+            src={pngToDataUrl(
+              vriOn && vriPreview?.png ? vriPreview.png : verdict.bundle.png
+            )}
+            alt={`Certified asset${vriOn && vriPreview?.png ? " (VRI preview)" : ""}`}
+          />
+          <button
+            type="button"
+            className="pb-forge-gate__vri-toggle"
+            aria-pressed={vriOn}
+            aria-label="Toggle VRI preview (experimental engine preview, Door B)"
+            onClick={handleToggleVriPreview}
+            title="Routes this certified item through the Vixel Render IR engine (real per-part materials). Opt-in preview — the certified standard sprite is never replaced."
+          >
+            VRI Preview: {vriOn ? "on" : "off"}
+          </button>
+          {vriOn && vriPreview?.error && (
+            <span className="pb-forge-gate__reason" role="alert">
+              VRI preview failed — showing certified sprite instead: {vriPreview.error}
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Silhouette blueprint - sealed .silh moulds + inspects the three shadows */}
       <label className="pb-action-btn pb-forge-gate__load" htmlFor="pb-forge-gate-silh">

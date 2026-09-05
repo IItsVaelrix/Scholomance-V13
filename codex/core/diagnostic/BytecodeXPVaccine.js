@@ -1,4 +1,10 @@
-import crypto from 'node:crypto';
+// `node:crypto` is externalised under Vite's browser bundle (throws on call,
+// not on import — see codex/core/pixelbrain/sha256.js's own header for why).
+// This module is reached from the browser via pixelbrain.adapter.js ->
+// forge-craft-gate.js -> encodeBytecodeXPVaccineFromHealth() on every gate
+// PASS, so it needs the same isomorphic hash the rest of the codebase already
+// standardised on for exactly this reason.
+import { sha256Hex as isomorphicSha256Hex } from '../pixelbrain/sha256.js';
 import { deriveSemanticSlug, parseCccbId } from './cccbEncoder.js';
 
 export const BYTECODE_XP_VERSION = 'v1';
@@ -290,5 +296,5 @@ function stableJson(value) {
 }
 
 function sha256Hex(value) {
-  return crypto.createHash('sha256').update(value).digest('hex');
+  return isomorphicSha256Hex(value);
 }

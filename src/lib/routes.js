@@ -15,6 +15,8 @@ export const ConstellationPage = lazyWithRetry(
   "constellation-page",
 );
 export const PixelBrainPage = lazyWithRetry(() => import("../pages/PixelBrain/PixelBrainPage.jsx"), "pixelbrain-page");
+export const PixelBrainEntryPage = lazyWithRetry(() => import("../pages/PixelBrain/studio/PixelBrainEntryPage.jsx"), "pixelbrain-entry-page");
+export const PixelBrainStudioPage = lazyWithRetry(() => import("../pages/PixelBrain/studio/PixelBrainStudioPage.jsx"), "pixelbrain-studio-page");
 export const CareerPage = lazyWithRetry(() => import("../pages/Career/CareerPage"), "career-page");
 export const WandPage = lazyWithRetry(() => import("../pages/Wand/WandPage.jsx"), "wand-page");
 export const WandGraphPage = lazyWithRetry(() => import("../pages/Wand/WandGraphPage.jsx"), "wand-graph-page");
@@ -35,7 +37,7 @@ export const VisualizerReleasePage = lazyWithRetry(() => import("../pages/Visual
 export const OraclePage = lazyWithRetry(() => import("../pages/Oracle/OraclePage.jsx"), "oracle-page");
 
 const IS_PROD = typeof import.meta !== "undefined" && import.meta.env.PROD;
-const INTERNAL_MODULES = ["/collab", "/pixelbrain", "/career", "/wand", "/wand/graph", "/div-wand", "/qbit-world", "/manifold", "/internal/photonic-bridge", "/internal/studio", "/internal/pixel-lotus/actor-forge", "/internal/pixel-lotus/iso-map-sandbox", "/internal/pixel-lotus/tile-forge", "/internal/time-lab"];
+const INTERNAL_MODULES = ["/collab", "/pixelbrain", "/pixelbrain/studio", "/career", "/wand", "/wand/graph", "/div-wand", "/qbit-world", "/manifold", "/internal/photonic-bridge", "/internal/studio", "/internal/pixel-lotus/actor-forge", "/internal/pixel-lotus/iso-map-sandbox", "/internal/pixel-lotus/tile-forge", "/internal/time-lab"];
 
 export const ALL_COMPONENTS = {
   "/watch": WatchPage,
@@ -45,7 +47,8 @@ export const ALL_COMPONENTS = {
   "/collab": CollabPage,
   "/profile": ProfilePage,
   "/constellation": ConstellationPage,
-  "/pixelbrain": PixelBrainPage,
+  "/pixelbrain": PixelBrainEntryPage,
+  "/pixelbrain/studio": PixelBrainStudioPage,
   "/career": CareerPage,
   "/wand": WandPage,
   "/wand/graph": WandGraphPage,

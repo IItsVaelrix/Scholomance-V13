@@ -21,7 +21,6 @@
  */
 
 import { sha256Hex } from '../sha256.js';
-import { appendActivationLog } from './amp-substrate.db.js';
 
 export const SELECTOR_VERSION = '1.0.0';
 
@@ -151,20 +150,4 @@ export function selectActiveAmps(pipeline, spec, records) {
     selectorVersion: SELECTOR_VERSION,
     pipeline,
   };
-}
-
-/**
- * `selectActiveAmps` against a live substrate, recording the decision.
- * The pure function above stays independently testable; this is the one that
- * leaves an audit trail.
- */
-export async function selectAndLog(db, pipeline, spec, records) {
-  const result = selectActiveAmps(pipeline, spec, records);
-  await appendActivationLog(db, {
-    specChecksum: result.specChecksum,
-    activated: result.activated,
-    skipped: result.skipped,
-    selectorVersion: result.selectorVersion,
-  });
-  return result;
 }

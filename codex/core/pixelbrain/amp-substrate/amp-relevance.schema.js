@@ -22,7 +22,7 @@ export const AMP_RELEVANCE_CONTRACT = 'PB-AMP-RELEVANCE-v2';
 
 export const VALID_PIPELINES = Object.freeze([
   'item', 'chestplate-fidelity', 'render-fidelity', 'voxel-world',
-  'character', 'image-lattice', 'cross-cutting', 'runtime',
+  'character', 'image-lattice', 'cross-cutting', 'runtime', 'terrain',
 ]);
 
 /**

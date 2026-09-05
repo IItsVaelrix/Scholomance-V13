@@ -271,6 +271,10 @@ const PIXELBRAIN_AMP_LOADERS = Object.freeze({
     const { applyRegionFills } = await import('../pixelbrain/region-fill-amp.js');
     return applyRegionFills(payload);
   },
+  'grass-amp': async (payload) => {
+    const { GrassAMP } = await import('../pixelbrain/grass-amp.js');
+    return GrassAMP(payload);
+  },
   'noise-fill-amp': async ({ cellsOrFills, noiseDesc, options = {} }) => {
     const { NoiseFillAMP } = await import('../pixelbrain/noise-fill-amp.js');
     return NoiseFillAMP(cellsOrFills, noiseDesc, options);

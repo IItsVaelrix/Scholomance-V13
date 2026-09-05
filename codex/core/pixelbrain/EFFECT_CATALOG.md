@@ -27,8 +27,8 @@ registered repo-wide (`semantic-unifier`, `scholomance.character.motif`). That g
 alone could never serve as this catalog; `Status` here is measured from the
 real import graph instead.
 
-**53 modules** — 44 WIRED, 6 GEN, 0 TEST-ONLY,
-3 ORPHAN. 24/53 have a header summary.
+**54 modules** — 54 WIRED, 0 GEN, 0 TEST-ONLY,
+0 ORPHAN. 25/54 have a header summary.
 
 ## PixelBrain passes (`codex/core/pixelbrain/*-amp.js`)
 
@@ -45,6 +45,7 @@ real import graph instead.
 | `codex/core/pixelbrain/flame-tip-amp.js` | _(no header comment — exports `applyFlameTipGeometry`, `buildFlameTipAmpPayload`, `FLAME_TIP_AMP_ID`, `FLAME_TIP_AMP_VERSION`)_ | WIRED | `pixelbrain.flame-tip-amp` |
 | `codex/core/pixelbrain/gear-glide-amp.js` | GEAR-GLIDE AMP — BPM-Synced Clock Rotation System | WIRED | — |
 | `codex/core/pixelbrain/geometry-amp.js` | Geometry AMP converts composed PixelBrain item geometry into deterministic | WIRED | — |
+| `codex/core/pixelbrain/grass-amp.js` | PixelBrain AMP wrapper for the literal SWARD grass engine port. | WIRED | `grass` |
 | `codex/core/pixelbrain/gravity-amp.js` | _(no header comment — exports `applyGravityAMP`)_ | WIRED | — |
 | `codex/core/pixelbrain/hair-flow-amp.js` | HairFlowAMP - Generates deterministic rasterized hair clumps and strands | WIRED | — |
 | `codex/core/pixelbrain/heraldry-amp.js` | HERALDRY MICROPROCESSOR — emblem stamping for shield faces and panels. | WIRED | — |
@@ -83,23 +84,23 @@ in `amp-registry.js`.
 | Module | What it does | Status | Registered |
 |---|---|---|---|
 | `codex/core/microprocessors/arena/arena-tick.processor.js` | Arena Visual Tick Processor | WIRED | — |
-| `codex/core/pixelbrain/amps/biome/biome-material.microprocessor.js` | _(no header comment — exports `BiomeMaterialMicroprocessor`)_ | GEN | — |
-| `codex/core/pixelbrain/amps/noise/deterministic-noise.js` | _(no header comment — exports `createSeededRng`)_ | ORPHAN | — |
-| `codex/core/pixelbrain/amps/fibonacci/fibonacci-field.microprocessor.js` | _(no header comment — exports `FibonacciFieldMicroprocessor`)_ | GEN | — |
+| `codex/core/pixelbrain/amps/biome/biome-material.microprocessor.js` | _(no header comment — exports `BiomeMaterialMicroprocessor`)_ | WIRED | — |
+| `codex/core/pixelbrain/amps/noise/deterministic-noise.js` | _(no header comment — exports `createSeededRng`)_ | WIRED | — |
+| `codex/core/pixelbrain/amps/fibonacci/fibonacci-field.microprocessor.js` | _(no header comment — exports `FibonacciFieldMicroprocessor`)_ | WIRED | — |
 | `codex/core/pixelbrain/amps/fibonacci/fibonacci-seed-field.js` | _(no header comment — exports `generateFibonacciSeedField`)_ | WIRED | — |
 | `codex/core/pixelbrain/amps/volume/processors/heightmap.microprocessor.js` | _(no header comment — exports `generateHeightMap`)_ | WIRED | — |
-| `codex/core/pixelbrain/amps/geometry/processors/iso-tile-geometry.microprocessor.js` | _(no header comment — exports `IsoTileGeometryMicroprocessor`)_ | GEN | — |
+| `codex/core/pixelbrain/amps/geometry/processors/iso-tile-geometry.microprocessor.js` | _(no header comment — exports `IsoTileGeometryMicroprocessor`)_ | WIRED | — |
 | `codex/core/pixelbrain/amps/biome/material-resolver.js` | _(no header comment — exports `MaterialResolver`)_ | WIRED | — |
 | `codex/core/pixelbrain/amps/noise/noise-mask.microprocessor.js` | _(no header comment — exports `generateNoiseMask`)_ | WIRED | — |
-| `codex/core/pixelbrain/amps/noise/perlin-field.microprocessor.js` | _(no header comment — exports `PerlinFieldMicroprocessor`)_ | GEN | — |
-| `codex/core/pixelbrain/amps/qbit/qbit-snap-profile.js` | _(no header comment — exports `areSnapProfilesCompatible`, `canSnapEdges`, `QbitTileCellSchema`, `TileSnapProfileSchema`)_ | ORPHAN | — |
-| `codex/core/pixelbrain/amps/geometry/processors/tile-socket.microprocessor.js` | _(no header comment — exports `TileSocketMicroprocessor`)_ | GEN | — |
-| `codex/core/pixelbrain/amps/turboquant/turboquant-layer-snapshot.js` | _(no header comment — exports `TurboQuantCandidateMemorySchema`)_ | ORPHAN | — |
-| `codex/core/pixelbrain/amps/volume/processors/volume.microprocessor.js` | _(no header comment — exports `VolumeMicroprocessor`)_ | GEN | — |
+| `codex/core/pixelbrain/amps/noise/perlin-field.microprocessor.js` | _(no header comment — exports `PerlinFieldMicroprocessor`)_ | WIRED | — |
+| `codex/core/pixelbrain/amps/qbit/qbit-snap-profile.js` | _(no header comment — exports `areSnapProfilesCompatible`, `canSnapEdges`, `QbitTileCellSchema`, `TileSnapProfileSchema`)_ | WIRED | — |
+| `codex/core/pixelbrain/amps/geometry/processors/tile-socket.microprocessor.js` | _(no header comment — exports `TileSocketMicroprocessor`)_ | WIRED | — |
+| `codex/core/pixelbrain/amps/turboquant/turboquant-layer-snapshot.js` | _(no header comment — exports `TurboQuantCandidateMemorySchema`)_ | WIRED | — |
+| `codex/core/pixelbrain/amps/volume/processors/volume.microprocessor.js` | _(no header comment — exports `VolumeMicroprocessor`)_ | WIRED | — |
 
 ## Asset generators (`scripts/generate-*.mjs`)
 
-**39 generators, 1 reachable via an `npm run` entry.**
+**40 generators, 2 reachable via an `npm run` entry.**
 The rest are invoked directly: `node scripts/generate-<name>.mjs`. Listed here so
 the set is enumerable without a directory listing, and so each one's output root
 is visible before you run it.
@@ -130,6 +131,7 @@ is visible before you run it.
 | `scripts/generate-pixelbrain-combat-props.mjs` | — | neither (direct) | no |
 | `scripts/generate-pixelbrain-kiteshield.mjs` — Generate a high-definition Kiteshield asset through the PixelBrain pipeline. | `output/pixelbrain/kiteshield` | neither (direct) | no |
 | `scripts/generate-pixelbrain-scimitar.mjs` — Generate a high-definition scimitar asset through the PixelBrain pipeline. | `output/pixelbrain/scimitar` | neither (direct) | no |
+| `scripts/generate-pixelbrain-studio-manifest.mjs` | — | neither (direct) | yes |
 | `scripts/generate-pixelbrain-sword.mjs` | `output/pixelbrain/sword` | neither (direct) | no |
 | `scripts/generate-redwood-tree.mjs` — REDWOOD TREE — tall, majestic conifer using PixelBrain harmonic construction. | — | B foundry | no |
 | `scripts/generate-slime-scdl.mjs` | — | neither (direct) | no |
@@ -149,7 +151,7 @@ is visible before you run it.
 `Door` is measured from each script's own imports, not its filename. It is
 **three-way because the tree really holds three populations**: 16
 scripts drive the ITEM-SPEC-v1 foundry (B), 0 drive the SCDL
-compiler (A), and 19 import effect passes and the rasterizer
+compiler (A), and 20 import effect passes and the rasterizer
 directly and compose them by hand. "writes to —" means the script resolves its
 output path from a variable rather than a literal: open it to see.
 

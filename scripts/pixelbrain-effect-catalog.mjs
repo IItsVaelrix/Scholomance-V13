@@ -107,7 +107,7 @@ function extractSummary(src) {
     .filter((l) => l.length > 0);
   // Drop the filename echo line ("selout-amp.js") and any STATUS/banner noise.
   const body = lines.filter((l) =>
-    !/^[\w.\-]+\.(js|mjs)$/.test(l) && !/^[═─-]{3,}$/.test(l) && !/^={3,}$/.test(l));
+    !/^[\w.-]+\.(js|mjs)$/.test(l) && !/^[═─-]{3,}$/.test(l) && !/^={3,}$/.test(l));
   if (!body.length) return null;
   // First sentence, else first line.
   const first = body[0];
@@ -160,7 +160,7 @@ function usableSummary(text) {
   const t = text.trim();
   if (t.length < 16) return null;
   if (/^[a-z0-9_.-]+\.$/i.test(t)) return null;   // "chunks-seam-amp."
-  if (/^[A-Z0-9 \-]+AMP\b/i.test(t) && t.length < 24) return null;
+  if (/^[A-Z0-9 -]+AMP\b/i.test(t) && t.length < 24) return null;
   return t;
 }
 
@@ -262,7 +262,7 @@ function collectGenerators() {
   }).sort((a, b) => a.name.localeCompare(b.name));
 }
 
-async function build() {
+export async function buildEffectCatalog() {
   const registered = await registeredIds();
   const amps = collectAmps().map(({ file, rel, system }) => {
     const src = readFileSync(file, 'utf8');
@@ -305,7 +305,7 @@ async function build() {
   return { amps, generators, summary };
 }
 
-function renderMd(amps, generators, s) {
+export function renderEffectCatalogMarkdown(amps, generators, s) {
   const rows = (list) => list.map((a) => {
     const desc = a.summary
       ? a.summary.replace(/\|/g, '\\|')
@@ -410,39 +410,48 @@ difference is written down.
 `;
 }
 
-const args = new Set(process.argv.slice(2));
-const { amps, generators, summary } = await build();
+export async function runEffectCatalogCli(argv = process.argv.slice(2)) {
+  const args = new Set(argv);
+  const { amps, generators, summary } = await buildEffectCatalog();
 
-if (args.has('--json')) {
-  console.log(JSON.stringify({ generatedFrom: 'source', summary, amps, generators }, null, 2));
-  process.exit(0);
-}
-
-const md = renderMd(amps, generators, summary);
-
-if (args.has('--stdout')) { process.stdout.write(md); process.exit(0); }
-
-if (args.has('--check')) {
-  if (!existsSync(OUT_MD)) {
-    console.error(`[catalog] ${relative(ROOT, OUT_MD)} is missing. Run: node scripts/pixelbrain-effect-catalog.mjs`);
-    process.exit(1);
+  if (args.has('--json')) {
+    console.log(JSON.stringify({ generatedFrom: 'source', summary, amps, generators }, null, 2));
+    return 0;
   }
-  const cur = readFileSync(OUT_MD, 'utf8');
-  if (cur !== md) {
-    console.error('[catalog] EFFECT_CATALOG.md is STALE vs the source tree.');
-    const names = new Set(amps.map((a) => a.path));
-    for (const m of cur.matchAll(/\|\s*`(codex\/[^`]+\.js)`\s*\|/g)) {
-      if (!names.has(m[1])) console.error(`  - listed but no longer a catalogued amp: ${m[1]}`);
+
+  const md = renderEffectCatalogMarkdown(amps, generators, summary);
+
+  if (args.has('--stdout')) {
+    process.stdout.write(md);
+    return 0;
+  }
+
+  if (args.has('--check')) {
+    if (!existsSync(OUT_MD)) {
+      console.error(`[catalog] ${relative(ROOT, OUT_MD)} is missing. Run: node scripts/pixelbrain-effect-catalog.mjs`);
+      return 1;
     }
-    for (const a of amps) if (!cur.includes(`\`${a.path}\``)) console.error(`  + present in tree, missing from catalog: ${a.path}`);
-    console.error('[catalog] Fix: node scripts/pixelbrain-effect-catalog.mjs');
-    process.exit(1);
+    const cur = readFileSync(OUT_MD, 'utf8');
+    if (cur !== md) {
+      console.error('[catalog] EFFECT_CATALOG.md is STALE vs the source tree.');
+      const names = new Set(amps.map((a) => a.path));
+      for (const m of cur.matchAll(/\|\s*`(codex\/[^`]+\.js)`\s*\|/g)) {
+        if (!names.has(m[1])) console.error(`  - listed but no longer a catalogued amp: ${m[1]}`);
+      }
+      for (const a of amps) if (!cur.includes(`\`${a.path}\``)) console.error(`  + present in tree, missing from catalog: ${a.path}`);
+      console.error('[catalog] Fix: node scripts/pixelbrain-effect-catalog.mjs');
+      return 1;
+    }
+    console.log(`[catalog] EFFECT_CATALOG.md is current (${summary.total} modules).`);
+    return 0;
   }
-  console.log(`[catalog] EFFECT_CATALOG.md is current (${summary.total} modules).`);
-  process.exit(0);
+
+  writeFileSync(OUT_MD, md, 'utf8');
+  console.log(`[catalog] wrote ${relative(ROOT, OUT_MD)} — ${summary.total} modules ` +
+    `(${summary.wired} WIRED, ${summary.gen} GEN, ${summary.testOnly} TEST-ONLY, ${summary.orphan} ORPHAN; ` +
+    `${summary.documented} documented, ${summary.registered} registered)`);
+  return 0;
 }
 
-writeFileSync(OUT_MD, md, 'utf8');
-console.log(`[catalog] wrote ${relative(ROOT, OUT_MD)} — ${summary.total} modules ` +
-  `(${summary.wired} WIRED, ${summary.gen} GEN, ${summary.testOnly} TEST-ONLY, ${summary.orphan} ORPHAN; ` +
-  `${summary.documented} documented, ${summary.registered} registered)`);
+const isMain = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isMain) process.exitCode = await runEffectCatalogCli();

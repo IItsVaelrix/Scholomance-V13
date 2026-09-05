@@ -41,6 +41,7 @@ export function IndexedPalettePanel({
           <input
             type="color"
             value={fgColor}
+            aria-label="Foreground color"
             onChange={(e) => onColorPick && onColorPick(e.target.value, true)}
             style={{ width: 28, height: 18, padding: 0, border: 'none' }}
           />
@@ -50,6 +51,7 @@ export function IndexedPalettePanel({
           <input
             type="color"
             value={bgColor}
+            aria-label="Background color"
             onChange={(e) => onColorPick && onColorPick(e.target.value, false)}
             style={{ width: 28, height: 18, padding: 0, border: 'none' }}
           />

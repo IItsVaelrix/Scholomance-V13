@@ -210,6 +210,11 @@ describe('PB-AMP-RELEVANCE-v2 envelope', () => {
     expect(validateAmpRelevance(record).ok).toBe(false);
   });
 
+  it('accepts the terrain pipeline (added for grass-amp)', () => {
+    const record = createAmpRelevanceRecord({ ...ITEM_RECORD, pipeline: 'terrain' });
+    expect(validateAmpRelevance(record).ok).toBe(true);
+  });
+
   it('rejects a non-integer order', () => {
     const record = createAmpRelevanceRecord({ ...ITEM_RECORD, order: 1.5 });
     expect(validateAmpRelevance(record).ok).toBe(false);

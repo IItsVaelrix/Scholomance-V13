@@ -60,6 +60,21 @@ describe('PaintCommand', () => {
   });
 });
 
+describe('command history retention', () => {
+  it('retains at most 20 undo snapshots by default', () => {
+    const grid = makeGrid();
+    const stack = createCommandStack();
+
+    for (let index = 0; index < 25; index += 1) {
+      stack.execute(createPaintCommand(grid, 0, index % 16, Math.floor(index / 16), '#FF0000'));
+    }
+
+    expect(stack.getHistory()).toHaveLength(20);
+    for (let index = 0; index < 20; index += 1) stack.undo();
+    expect(stack.canUndo()).toBe(false);
+  });
+});
+
 describe('createFillCommand', () => {
   it('fills the empty region and undo restores the exact prior state', () => {
     const grid = makeGrid();

@@ -55,8 +55,18 @@ export class Command {
 }
 
 export function createCommandStack(initialCommands = [], options = {}) {
-  const history = [...initialCommands];
+  const maxHistory = Number.isInteger(options.maxHistory) && options.maxHistory > 0
+    ? options.maxHistory
+    : 20;
+  const history = [...initialCommands].slice(-maxHistory);
   let pointer = history.length - 1;
+
+  function enforceHistoryLimit() {
+    if (history.length <= maxHistory) return;
+    const overflow = history.length - maxHistory;
+    history.splice(0, overflow);
+    pointer = Math.max(-1, pointer - overflow);
+  }
 
   // Active build plane (A2): the depth slice authoring targets. This is editor
   // session state, not document state — slice navigation stays out of the undo
@@ -83,6 +93,8 @@ export function createCommandStack(initialCommands = [], options = {}) {
         return { result, description: cmd.description, meta: cmd.meta, rejected: true };
       }
       history.push(cmd);
+      pointer = history.length - 1;
+      enforceHistoryLimit();
       pointer = history.length - 1;
       return { result, description: cmd.description, meta: cmd.meta };
     },
@@ -149,6 +161,7 @@ export function createCommandStack(initialCommands = [], options = {}) {
         const cmd = rehydrateFn(s); // caller provides rehydration logic (e.g. recreate PaintCommand)
         if (cmd) history.push(cmd);
       }
+      enforceHistoryLimit();
       pointer = history.length - 1;
     }
   };

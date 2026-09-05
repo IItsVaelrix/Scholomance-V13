@@ -16,7 +16,7 @@
  *   grid and mutates it through editorRef commands. There is no shadow document.
  */
 
-import { useState, useRef, useEffect, useCallback, lazy, Suspense } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import {
@@ -27,6 +27,8 @@ import {
   analyzeImageToFormula,
   runForgeCraftGate,
   runForgeCraftGateWithBlueprint,
+  renderItemVriPreview,
+  createStudioAssetSnapshot,
 } from "../../lib/pixelbrain.adapter.js";
 
 import { LayerStackPanel } from "./components/LayerStackPanel.jsx";
@@ -35,13 +37,32 @@ import MentorCritiquePanel from "./components/MentorCritiquePanel.jsx";
 import { AMPApplyPanel } from "./components/AMPApplyPanel.jsx";
 import { ReferencePanel } from "./components/ReferencePanel.jsx";
 import { ForgeGatePanel } from "./components/ForgeGatePanel.jsx";
+import { StudioTabBar } from './studio/StudioTabBar.jsx';
+import { normalizeStudioTab } from './studio/studio-tabs.js';
+import { StudioTabSurface } from './studio/StudioTabSurface.jsx';
 
 const TemplateEditor = lazy(() => import('./components/TemplateEditor.jsx'));
 const PixelBrainTerminal = lazy(() => import('./PixelBrainTerminal.jsx'));
+const STUDIO_RECEIPT_KEY = 'pixelbrain.studio.receipts.v1';
+
+function loadStudioReceipts() {
+  if (typeof localStorage === 'undefined') return [];
+  try {
+    const parsed = JSON.parse(localStorage.getItem(STUDIO_RECEIPT_KEY) || '[]');
+    return Array.isArray(parsed) ? parsed.slice(-20) : [];
+  } catch {
+    return [];
+  }
+}
 
 import "./PixelBrainPage.css";
 
-export default function PixelBrainPage() {
+export default function PixelBrainPage({
+  studioEnabled = false,
+  studioTab = 'canvas',
+  onStudioTabChange = () => {},
+}) {
+  const activeStudioTab = normalizeStudioTab(studioTab);
   const [activeTool, setActiveTool] = useState('paint');
   const [showPixelBrainPanel, setShowPixelBrainPanel] = useState(true);
   const [showLayersPanel, setShowLayersPanel] = useState(true);
@@ -77,9 +98,27 @@ export default function PixelBrainPage() {
     setCanvasDoc({ grid, rev });
   }, []);
   const canvasGrid = canvasDoc?.grid || null;
+  const studioSnapshot = useMemo(
+    () => createStudioAssetSnapshot(canvasDoc?.grid || currentDocument, activeAssetPacket?.id || null),
+    [canvasDoc, currentDocument, activeAssetPacket?.id],
+  );
 
   // In-world status line (faults, drill results). The LAW forbids alert boxes.
   const [pageNotice, setPageNotice] = useState(null);
+  const [studioReceipts, setStudioReceipts] = useState(loadStudioReceipts);
+  const recordStudioReceipt = useCallback((receipt) => {
+    if (!receipt) return;
+    setStudioReceipts((current) => [...current, receipt].slice(-20));
+  }, []);
+
+  useEffect(() => {
+    if (!studioEnabled || typeof localStorage === 'undefined') return;
+    try {
+      localStorage.setItem(STUDIO_RECEIPT_KEY, JSON.stringify(studioReceipts));
+    } catch {
+      // A full/disabled browser store must not block authoring or export.
+    }
+  }, [studioEnabled, studioReceipts]);
 
   // External trigger for the mentor panel's critique run.
   const [critiqueToken, setCritiqueToken] = useState(0);
@@ -439,6 +478,7 @@ export default function PixelBrainPage() {
         layerIndex: h.layerIndex,
         timestamp: h.timestamp,
       })),
+      ...(studioEnabled ? { studioReceipts } : {}),
       note: 'Replay the commands in order on a fresh grid with the same palette + construction to reproduce exactly.',
     };
 
@@ -630,28 +670,41 @@ export default function PixelBrainPage() {
 
   const loadDrill = () => startVoidShieldDrill();
 
+  const handleStudioOutput = useCallback((output, label = 'Studio AMP') => {
+    const result = editorRef.current?.applyStudioResult?.(output, { name: label });
+    if (result?.applied) {
+      setPageNotice(`${label} committed as a new layer · ${result.cells} cells.`);
+    } else {
+      setPageNotice(`${label} completed with a non-visual result; inspect its receipt in the active tab.`);
+    }
+  }, []);
+
   return (
-    <div className="pb-editor">
+    <div className={`pb-editor${studioEnabled ? ' pb-studio' : ''}`}>
       {/* Top bar - every important function is a visible button */}
       <div className="pb-topbar">
-        <div className="title">PIXELBRAIN</div>
+        <div className="title">{studioEnabled ? 'SWARD / PIXELBRAIN' : 'PIXELBRAIN'}</div>
 
         <button className="pb-action-btn" onClick={handleNew}>New</button>
         <button className="pb-action-btn" onClick={handleImport}>Import Image / ASE</button>
 
-        {/* The special PixelBrain capabilities, each as its own button */}
-        <button className="pb-action-btn primary" onClick={triggerCritique} title="Run the 30-year pro critique (silhouette & readability first, then geometry, always with a clear next action)">
-          CRITIQUE
-        </button>
-        <button className="pb-action-btn pb-pixelbrain-btn" onClick={applyConstructionGuides} title="Emit / work with 00_Reference construction guides (the highest-leverage tool for shields, orbs, radials)">
-          CONSTRUCTION GUIDES
-        </button>
-        <button className="pb-action-btn pb-pixelbrain-btn" onClick={loadDrill} title="Load the exact Void Shield construction drill">
-          VOID SHIELD DRILL
-        </button>
-        <button className="pb-action-btn pb-pixelbrain-btn primary" onClick={createEclipseWardPauldronViaPixelBrain} title="Create the Eclipse Ward Pauldron (user recipe) fully via PixelBrain lattice + SDFShapeAMP + NoiseFillAMP + history. The authoritative way.">
-          CREATE VIA PIXELBRAIN (PAULDRON)
-        </button>
+        {!studioEnabled && (
+          <>
+            {/* The special PixelBrain capabilities, each as its own button */}
+            <button className="pb-action-btn primary" onClick={triggerCritique} title="Run the 30-year pro critique (silhouette & readability first, then geometry, always with a clear next action)">
+              CRITIQUE
+            </button>
+            <button className="pb-action-btn pb-pixelbrain-btn" onClick={applyConstructionGuides} title="Emit / work with 00_Reference construction guides (the highest-leverage tool for shields, orbs, radials)">
+              CONSTRUCTION GUIDES
+            </button>
+            <button className="pb-action-btn pb-pixelbrain-btn" onClick={loadDrill} title="Load the exact Void Shield construction drill">
+              VOID SHIELD DRILL
+            </button>
+            <button className="pb-action-btn pb-pixelbrain-btn primary" onClick={createEclipseWardPauldronViaPixelBrain} title="Create the Eclipse Ward Pauldron (user recipe) fully via PixelBrain lattice + SDFShapeAMP + NoiseFillAMP + history. The authoritative way.">
+              CREATE VIA PIXELBRAIN (PAULDRON)
+            </button>
+          </>
+        )}
 
         <button className="pb-action-btn" onClick={() => handleRealExport('ase')}>
           EXPORT .ase
@@ -662,19 +715,31 @@ export default function PixelBrainPage() {
         <button className="pb-action-btn" onClick={exportDeterministicRecipe} title="Machine-readable full recipe + command log + AMP params for exact reproduction in foundry or another session">
           EXPORT RECIPE (Forge Spec)
         </button>
-        <button className="pb-action-btn pb-pixelbrain-btn" onClick={() => setShowForgeGatePanel(true)} title="Run an ITEM-SPEC-v1 through the PixelBrain Forge Craft Gate (Immunity): lattice, readability, determinism, material authority. Emits bytecode-grade PASS/FAIL.">
-          FORGE GATE
-        </button>
+        {!studioEnabled && (
+          <button className="pb-action-btn pb-pixelbrain-btn" onClick={() => setShowForgeGatePanel(true)} title="Run an ITEM-SPEC-v1 through the PixelBrain Forge Craft Gate (Immunity): lattice, readability, determinism, material authority. Emits bytecode-grade PASS/FAIL.">
+            FORGE GATE
+          </button>
+        )}
 
         <button className="pb-action-btn" onClick={() => setShowTerminal(!showTerminal)}>
           {showTerminal ? 'HIDE TERMINAL' : 'TERMINAL'}
         </button>
 
         <div style={{ flex: 1 }} />
-        <span style={{ fontSize: 11, color: '#666' }}>PIXEL PERFECT • ONE LATTICE</span>
+        <span className="pb-topbar-motto">PIXEL PERFECT • ONE LATTICE</span>
       </div>
 
-      <div className="pb-main">
+      {studioEnabled && (
+        <StudioTabBar activeTab={activeStudioTab} onSelect={onStudioTabChange} />
+      )}
+
+      <div
+        className="pb-main"
+        role={studioEnabled ? 'tabpanel' : undefined}
+        id={studioEnabled ? `pb-studio-panel-${activeStudioTab}` : undefined}
+        aria-labelledby={studioEnabled ? `pb-studio-tab-${activeStudioTab}` : undefined}
+        data-studio-tab={studioEnabled ? activeStudioTab : undefined}
+      >
         {/* Classic left toolbar - tools + the PixelBrain functions as buttons */}
         <div className="pb-toolbar" role="toolbar" aria-label="Tools">
           <button className={`pb-tool-btn ${activeTool === 'paint' ? 'active' : ''}`} onClick={() => selectTool('paint')}>PENCIL</button>
@@ -714,7 +779,7 @@ export default function PixelBrainPage() {
           <div className="pb-statusbar">
             <span>TOOL: {activeTool.toUpperCase()}</span>
             <span>Direct pixel canvas • Construction before ink • Critique before polish</span>
-            <span style={{ marginLeft: 'auto', color: pageNotice ? '#fc4' : '#555' }} aria-live="polite">
+            <span className={pageNotice ? 'has-notice' : ''} aria-live="polite">
               {pageNotice || 'All PixelBrain tools are the buttons above and on the left'}
             </span>
           </div>
@@ -723,7 +788,7 @@ export default function PixelBrainPage() {
           <div className="custom-palette-box">
             <div className="header">
               <span>CUSTOM PALETTE</span>
-              <span style={{color: '#666'}}>{customPalette.length}/12</span>
+              <span className="custom-palette-count">{customPalette.length}/12</span>
             </div>
 
             {customPalette.map((color, index) => (
@@ -764,9 +829,38 @@ export default function PixelBrainPage() {
           </div>
         </div>
 
+        {studioEnabled && (
+          <div className="pb-studio-tab-surface">
+            <StudioTabSurface
+              activeTab={activeStudioTab}
+              snapshot={studioSnapshot}
+              canvasGrid={canvasGrid}
+              critiqueToken={critiqueToken}
+              isDrillActive={isDrillActive}
+              drillSecondsLeft={drillSecondsLeft}
+              pageNotice={pageNotice}
+              onUploadImage={handleUploadForReference}
+              onCreateReferenceLayer={handleCreateReferenceLayer}
+              onGenerateEditableLayers={handleGenerateEditableFromRef}
+              onRunGate={handleRunForgeGate}
+              onRunBlueprint={handleRunForgeGateWithBlueprint}
+              onRunVriPreview={renderItemVriPreview}
+              onConstructionGuides={applyConstructionGuides}
+              onCritique={triggerCritique}
+              onLoadDrill={loadDrill}
+              onApplyStudioOutput={handleStudioOutput}
+              onStudioReceipt={recordStudioReceipt}
+              studioReceipts={studioReceipts}
+              onExport={handleRealExport}
+              onExportRecipe={exportDeterministicRecipe}
+              onOpenTerminal={() => setShowTerminal(true)}
+            />
+          </div>
+        )}
+
         {/* Right side - supporting panels, all reading the live canvas grid */}
         <div className="pb-right-panels">
-          {showPixelBrainPanel && (
+          {!studioEnabled && showPixelBrainPanel && (
             <div className="pb-panel">
               <div className="pb-panel-header">
                 PIXELBRAIN <button onClick={() => setShowPixelBrainPanel(false)} style={{ background: 'transparent', border: 'none', color: '#666', cursor: 'pointer' }}>×</button>
@@ -855,7 +949,7 @@ export default function PixelBrainPage() {
           )}
 
           {/* AMP post-processing panel - applies adapter AMPs to the live canvas grid */}
-          {showAmpPanel && (
+          {!studioEnabled && showAmpPanel && (
             <div className="pb-panel" style={{ flex: '0 0 auto' }}>
               <div className="pb-panel-header">
                 AMP FILTERS <button onClick={() => setShowAmpPanel(false)} style={{ background: 'transparent', border: 'none', color: '#666', cursor: 'pointer' }}>×</button>
@@ -907,7 +1001,7 @@ export default function PixelBrainPage() {
           )}
 
           {/* Reference / semantic image import panel - adds reference layers to the live canvas */}
-          {showRefPanel && (
+          {!studioEnabled && showRefPanel && (
             <div className="pb-panel" style={{ flex: '0 0 auto' }}>
               <div className="pb-panel-header">
                 REFERENCE LAYERS <button onClick={() => setShowRefPanel(false)} style={{ background: 'transparent', border: 'none', color: '#666', cursor: 'pointer' }}>×</button>
@@ -923,18 +1017,22 @@ export default function PixelBrainPage() {
           )}
 
           {/* Forge Craft Gate - Immunity verdict surface for ITEM-SPEC-v1 assets */}
-          {showForgeGatePanel && (
+          {!studioEnabled && showForgeGatePanel && (
             <div className="pb-panel" style={{ flex: '0 0 auto' }}>
               <div className="pb-panel-header">
                 FORGE GATE <button onClick={() => setShowForgeGatePanel(false)} style={{ background: 'transparent', border: 'none', color: '#666', cursor: 'pointer' }}>×</button>
               </div>
               <div className="pb-panel-body">
-                <ForgeGatePanel onRunGate={handleRunForgeGate} onRunBlueprint={handleRunForgeGateWithBlueprint} />
+                <ForgeGatePanel
+                  onRunGate={handleRunForgeGate}
+                  onRunBlueprint={handleRunForgeGateWithBlueprint}
+                  onRunVriPreview={renderItemVriPreview}
+                />
               </div>
             </div>
           )}
 
-          <div style={{ padding: 6 }}>
+          {!studioEnabled && <div style={{ padding: 6 }}>
             {!showPixelBrainPanel && (
               <button className="pb-action-btn" style={{ width: '100%' }} onClick={() => setShowPixelBrainPanel(true)}>
                 Show PixelBrain Tools
@@ -955,7 +1053,7 @@ export default function PixelBrainPage() {
                 SHOW REFERENCE (semantic import)
               </button>
             )}
-          </div>
+          </div>}
         </div>
       </div>
 

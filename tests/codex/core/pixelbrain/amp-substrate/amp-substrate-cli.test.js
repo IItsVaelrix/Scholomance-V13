@@ -72,19 +72,21 @@ describe('amp-substrate CLI', () => {
   // `codex/core/pixelbrain/amp-substrate/pilot-relevance/*.json` files. As of
   // Task 7 that directory holds all 16 item-pipeline AMPs (the original 5
   // pilots plus the 12 measured in this task, including `volume-lift-amp`
-  // which is discovery-only) plus `symmetry-amp` in `cross-cutting` — 17
-  // records total.
+  // which is discovery-only) plus `symmetry-amp` in `cross-cutting`, plus
+  // (added later, same session) `grass-amp` in the new `terrain` pipeline —
+  // 18 records total.
   //
-  // Note: `symmetry-amp` lives in the `cross-cutting` pipeline, so it never
-  // activates within the `item` pipeline `select` calls below.
+  // Note: `symmetry-amp` and `grass-amp` live outside the `item` pipeline,
+  // so neither activates within the `item` pipeline `select` calls below.
 
-  it('register-pilots registers all seventeen pilot records', () => {
+  it('register-pilots registers all eighteen pilot records', () => {
     const out = amps(['register-pilots']);
-    expect(out).toMatch(/17\/17 pilot records registered/);
+    expect(out).toMatch(/18\/18 pilot records registered/);
     for (const ampId of [
       'chestplate-amp', 'shield-rim-amp', 'shield-volume-amp', 'holyfire-motif-amp', 'symmetry-amp',
       'sketch-amp', 'sdf-shape-amp', 'heraldry-amp', 'jewelry-amp', 'geometry-amp', 'region-fill-amp',
       'noise-fill-amp', 'selout-amp', 'pixel-aa-amp', 'facet-amp', 'square-sharpness-contrast-amp', 'volume-lift-amp',
+      'grass-amp',
     ]) {
       expect(out).toContain(ampId);
     }
@@ -93,7 +95,7 @@ describe('amp-substrate CLI', () => {
   it('list prints each record with its gate rendered in plain English', () => {
     amps(['register-pilots']);
     const out = amps(['list']);
-    expect(out).toMatch(/17 registered record\(s\)/);
+    expect(out).toMatch(/18 registered record\(s\)/);
     expect(out).toMatch(/chestplate-amp\s+order 8\s+v2\.0\.0/);
     expect(out).toMatch(/chestplate-amp[\s\S]*when: class eq armor AND archetype includes chestplate/);
     expect(out).toMatch(/symmetry-amp[\s\S]*when: always relevant/);
@@ -151,7 +153,7 @@ describe('amp-substrate CLI', () => {
     amps(['select', specFile, '--pipeline', 'item']);
 
     const stats = amps(['stats']);
-    expect(stats).toMatch(/registered records : 17/);
+    expect(stats).toMatch(/registered records : 18/);
     expect(stats).toMatch(/activation entries : 2/);
     // symmetry-amp now lives in the cross-cutting pipeline, so it never enters
     // an `item`-scoped select at all. A kite-shield spec now activates 8
@@ -167,13 +169,14 @@ describe('amp-substrate CLI', () => {
   });
 
   // Not from the brief — a live sentinel, inverted now that Task 6 has
-  // migrated pilot-relevance/ to v2 and Task 7 has grown it to all 16
-  // item-pipeline AMPs plus symmetry-amp: pins down that register-pilots
-  // succeeds against the real files, so this file screams if a future change
-  // regresses one of them back out of v2 shape.
-  it('documents post-Task-7 state: register-pilots accepts the real v2-shape files', () => {
+  // migrated pilot-relevance/ to v2, Task 7 grew it to all 16 item-pipeline
+  // AMPs plus symmetry-amp, and grass-amp (terrain pipeline) was added later
+  // the same session: pins down that register-pilots succeeds against the
+  // real files, so this file screams if a future change regresses one of
+  // them back out of v2 shape.
+  it('documents current state: register-pilots accepts the real v2-shape files', () => {
     const out = amps(['register-pilots']);
-    expect(out).toMatch(/17\/17 pilot records registered/);
+    expect(out).toMatch(/18\/18 pilot records registered/);
   });
 
   it("list --pipeline filters to only that pipeline's records", () => {

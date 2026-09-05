@@ -29,7 +29,7 @@ import {
   readActivationLog,
   substrateStats,
 } from '../codex/core/pixelbrain/amp-substrate/amp-substrate.db.js';
-import { selectAndLog } from '../codex/core/pixelbrain/amp-substrate/amp-selector.js';
+import { selectAndLog } from '../codex/core/pixelbrain/amp-substrate/amp-selector.db.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SUBSTRATE_DIR = resolve(HERE, '../codex/core/pixelbrain/amp-substrate');

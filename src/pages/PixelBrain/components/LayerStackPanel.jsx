@@ -103,10 +103,6 @@ export function LayerStackPanel({
         return (
           <div
             key={idx}
-            role="button"
-            tabIndex={0}
-            onClick={() => onActiveLayerChange && onActiveLayerChange(idx)}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onActiveLayerChange && onActiveLayerChange(idx); }}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -115,7 +111,6 @@ export function LayerStackPanel({
               background: isActive ? '#2a3a5e' : 'transparent',
               border: isRef ? '1px dashed #4a9' : '1px solid transparent',
               marginBottom: 2,
-              cursor: 'pointer',
               opacity: layer.visible ? 1 : 0.6,
             }}
           >
@@ -141,11 +136,17 @@ export function LayerStackPanel({
               onChange={(e) => { e.stopPropagation(); handleOpacity(idx, e.target.value); }}
               style={{ width: 50 }}
               title={`Opacity ${Math.round(layer.opacity * 100)}%`}
+              aria-label={`${layer.name} opacity ${Math.round(layer.opacity * 100)} percent`}
             />
 
-            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <button
+              type="button"
+              aria-pressed={isActive}
+              onClick={(e) => { e.stopPropagation(); onActiveLayerChange && onActiveLayerChange(idx); }}
+              style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left' }}
+            >
               {layer.name} {isRef && '(REF)'}
-            </span>
+            </button>
 
             {idx > 0 && (
               <button onClick={(e) => { e.stopPropagation(); moveLayer(idx, idx - 1); }} title="Move up">↑</button>

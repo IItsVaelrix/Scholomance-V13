@@ -152,6 +152,24 @@ const RECORDS = [
     appliesTo: [],
     requires: [],
   },
+  {
+    // NOTE on this record's honesty status, unlike the item-pipeline records
+    // above: those predicates were MEASURED from a real, pre-existing gate
+    // inside item-foundry.js. This one is DESIGNED — grass-amp.js and its
+    // caller (generate-grass-blades.mjs) were both built in this same
+    // session, so there was no prior scattered `if` to transcribe. The gate
+    // below (class:terrain + archetype:void_grove_grass) is the real
+    // condition the caller now checks before invoking GrassAMP, not a
+    // retrofit — but it is a first-caller design, not a measurement.
+    pipeline: 'terrain', ampId: 'grass-amp', order: 1, version: '1.0.0',
+    description: 'Procedural grass blade geometry (root-to-tip shading, deterministic volume distribution, crisscrossing depth layers) for top-down ground tiles; see codex/core/pixelbrain/grass-amp.js. Gated on class:terrain + archetype:void_grove_grass (the terrain spec shape this pipeline\'s first real caller, generate-grass-blades.mjs, actually passes).',
+    concept: 'material-fx',
+    appliesTo: [
+      { field: 'class', op: 'eq', value: 'terrain' },
+      { field: 'archetype', op: 'eq', value: 'void_grove_grass' },
+    ],
+    requires: [],
+  },
 ];
 
 const generatedRows = [];

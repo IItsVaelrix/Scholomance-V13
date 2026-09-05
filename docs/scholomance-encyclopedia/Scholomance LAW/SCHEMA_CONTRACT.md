@@ -7,11 +7,134 @@
 
 ## Living Document - Owned by Codex, Read by All Agents
 
-**Version: 1.49** | Last updated: 2026-09-04
+**Version: 1.50** | Last updated: 2026-09-05
 
 > Bump the version on every schema change.
 > Notify Claude for UI-consumed field changes.
 > Notify Gemini for fixture, regression-test, and backend implementation changes.
+
+---
+
+## SCHEMA CHANGE NOTICE
+
+- Schema: PixelBrain SWARD Studio execution contracts
+- Version: 1.49 -> 1.50
+- Date: 2026-09-05
+- Changed fields: registered the additive, frozen
+  `PB-STUDIO-AMP-MANIFEST-v1`, `PB-STUDIO-AMP-PLAN-v1`,
+  `PB-STUDIO-AMP-RECEIPT-v1`, `PB-STUDIO-MUTATION-v1`, and
+  `PB-STUDIO-DIFF-v1` client-local execution envelopes.
+- Breaking: no; the legacy PixelBrain route and direct AMP calls remain intact.
+- Owner: Codex, with Angel's implementation authorization.
+- Claude impact: Studio UI renders these records only through
+  `src/lib/pixelbrain.adapter.js`; no UI may import the core contracts directly.
+- Gemini impact: manifest generation, deterministic plan replay, static adapter
+  coverage, mutation isolation, and receipt checksums are fixture/test surfaces.
+
+### PB-STUDIO-AMP-MANIFEST-v1
+
+```ts
+type PixelBrainStudioAmpKind =
+  | "runnable"
+  | "mutation"
+  | "runtime-gated"
+  | "support"
+  | "blocked-with-reason";
+
+interface PixelBrainStudioAmpManifestRecord {
+  contract: "PB-STUDIO-AMP-MANIFEST-v1";
+  ampId: string;
+  modulePath: string;
+  system: string;
+  status: string;
+  kind: PixelBrainStudioAmpKind;
+  tab: "canvas" | "blueprint" | "foundry" | "amps" | "mutations" |
+    "finish" | "mentor" | "library" | "diagnostics";
+  pipeline: string;
+  order: number;
+  adapterId: string;
+  mutates: boolean;
+  reads: readonly string[];
+  writes: readonly string[];
+  exports: readonly string[];
+  summary: string;
+  consumerIds: readonly string[];
+  checksum: string; // SHA-256 of the ordered record body
+}
+```
+
+The generated manifest contains exactly one record for every effect-catalog
+module. `ampId`, `modulePath`, and `adapterId` are unique. A support record has
+at least one named tested consumer and is not directly executable. A mutation
+record is routed only to `mutations`; final-release manifests contain no
+`blocked-with-reason` record. Manifest data never supplies an import path or an
+export name to runtime dispatch: `studio-amp-adapter-registry.js` is the static
+allow-list.
+
+### PB-STUDIO-AMP-PLAN-v1
+
+```ts
+interface PixelBrainStudioAmpPlan {
+  contract: "PB-STUDIO-AMP-PLAN-v1";
+  snapshotChecksum: string;
+  steps: readonly {
+    ampId: string;
+    adapterId: string;
+    kind: PixelBrainStudioAmpKind;
+    order: number;
+    tab: string;
+    reads: readonly string[];
+    writes: readonly string[];
+  }[];
+  skipped: readonly { ampId: string; reason: string }[];
+  planChecksum: `studio-plan1:${string}`;
+}
+```
+
+Plans sort steps by `order`, then `ampId`; skipped records sort by `ampId`.
+Unknown ids and competing write claims fail closed. The checksum covers the
+contract, base snapshot, ordered steps, and skipped reasons.
+
+### Studio receipts and mutation transactions
+
+```ts
+interface PixelBrainStudioAmpReceipt {
+  contract: "PB-STUDIO-AMP-RECEIPT-v1";
+  ampId: string;
+  adapterId: string;
+  kind: PixelBrainStudioAmpKind;
+  mode: "preview" | "commit" | "mutation-preview";
+  order: number;
+  baseChecksum: string;
+  planChecksum: string | null;
+  manifestChecksum: string;
+  outputChecksum: `studio-output1:${string}`;
+}
+
+interface PixelBrainStudioMutation {
+  contract: "PB-STUDIO-MUTATION-v1";
+  baseChecksum: string;
+  ampId: string;
+  candidate: { checksum: `studio-output1:${string}`; data: unknown };
+  accepted: false;
+}
+
+interface PixelBrainStudioDiff {
+  contract: "PB-STUDIO-DIFF-v1";
+  beforeChecksum: `studio-output1:${string}`;
+  afterChecksum: `studio-output1:${string}`;
+  beforeBytes: number | null;
+  afterBytes: number | null;
+  changedBytes: number | null;
+  changed: boolean;
+}
+```
+
+Preview and mutation invocation clone caller inputs before calling the static
+adapter. Mutation acceptance refuses a stale baseline and creates a new object
+with `parentChecksum` and `mutationAmpId`; rejection returns the exact current
+baseline object. Receipts and diffs contain no wall-clock field, so identical
+inputs produce byte-identical evidence.
 
 ---
 
@@ -4188,6 +4311,8 @@ interface ConstructionToSCDLResult {
 | 1.46 | 2026-08-20 | SCHOL-COS-PAGE-v3: additive — `semanticInquiry` gains `ballistics` (semantic-ballistics evidence axis) and `receiptDigests` (sealed replay envelopes); contractVersion `cos-page-v3`; pageBytecode golden pin re-sealed `4922C817` → `E8DC9244` | no |
 | 1.47 | 2026-08-22 | Registered `SCHOL-CONSTELLATION-EVALUATION-EVIDENCE-v1`: deterministic, text-free, recursively frozen offline parser evidence with fixture identity, exhaustive accounting, row outcomes, sorted failure signatures, and canonical SHA-256 checksum | no |
 | 1.48 | 2026-09-04 | Registered the Vixel Render IR family: `PB-VRI-v1` scene schema, `PB-STROKE-v1` contour IR, `PB-VRI-RELIEF-v1` synthetic-relief provenance, `PB-ASSET-PIPELINE-v1` composition result, `PB-ASSET-LINEAGE-v1` integrity chain (defended at rest by innate rule `LINEAGE-0F0D`), and `PB-CONSTRUCTION-SCDL-v1` geometry derivation | no |
+| 1.49 | 2026-09-04 | Registered additive `PB-AMP-RELEVANCE-v1` deterministic relevance records and checksums | no |
+| 1.50 | 2026-09-05 | Registered PixelBrain SWARD Studio manifest, plan, receipt, mutation, and diff contracts | no |
 
 ---
 

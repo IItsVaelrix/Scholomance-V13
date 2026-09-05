@@ -37,6 +37,8 @@
     "effects": "node scripts/pixelbrain-effect-catalog.mjs --stdout",
     "effects:gen": "node scripts/pixelbrain-effect-catalog.mjs",
     "effects:check": "node scripts/pixelbrain-effect-catalog.mjs --check",
+    "studio:manifest:gen": "node scripts/generate-pixelbrain-studio-manifest.mjs",
+    "studio:manifest:check": "node scripts/generate-pixelbrain-studio-manifest.mjs --check",
     "transmute": "node scripts/pb-transmute.mjs",
     "dev:dict": "python scripts/serve_scholomance_dict.py --db scholomance_dict.sqlite --port 8787",
     "lexical-graph": "node scripts/lexical-graph.mjs",

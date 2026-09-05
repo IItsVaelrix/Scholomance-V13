@@ -23,14 +23,15 @@
  * and runs.
  */
 
-// PNG IDAT compression needs zlib, which only exists under Node. Loaded lazily
-// behind a runtime guard so this module stays importable in the browser (Vite
-// externalises node:zlib, so a static import throws on load). PNG *file* export
-// is a Node-only path — the browser previews via canvas and never deflates here.
-let deflateSync = null;
-if (typeof process !== 'undefined' && process.versions != null && process.versions.node) {
-  ({ deflateSync } = await import('node:zlib'));
-}
+// PNG encoding is isomorphic (fflate's zlibSync, not node:zlib — Vite
+// externalises node:zlib so a static import throws on CALL in the browser,
+// same class of bug this file's own history had with node:crypto elsewhere
+// in the pipeline). Every consumer of renderPng/renderBundlePng — Node
+// scripts, the Craft Gate's browser caller, Door B's VRI preview — gets a
+// real PNG now, not a browser-side null. See the RUNNING_UNDER_NODE guard
+// below: Node callers still get a real Buffer back (existing contract,
+// existing tests assert Buffer.isBuffer), browser callers get a Uint8Array.
+import { zlibSync } from 'fflate';
 
 import { sketchToSilhouette, runSketchAMP, applyConstructionLines } from './sketch-amp.js';
 import { forgeArmor } from './factory/armor-factory.js';
@@ -85,6 +86,8 @@ import { LINEAGE_CONTRACT } from './lineage-verify.js';
 import { defaultDigest } from './asset-pipeline.js';
 // NOTE: PNG encoding uses this module's own zero-dep `encodePng` (below), not
 // the scdl exporter's — importing that name here would collide.
+
+const RUNNING_UNDER_NODE = typeof process !== 'undefined' && process.versions != null && process.versions.node;
 
 function err(reason, context) {
   const e = new Error(`item-foundry: ${reason}`);
@@ -157,12 +160,15 @@ function applyPartRules(fills, spec) {
 }
 
 /**
- * Render PNG (zero-dep, 8-bit RGBA, scale ≥ 1).
+ * Render PNG (zero-dep, 8-bit RGBA, scale ≥ 1). Isomorphic: real Buffer under
+ * Node (existing contract — scripts pass this straight to fs.writeFileSync,
+ * tests assert Buffer.isBuffer), plain Uint8Array in the browser (all a
+ * data: URL or a canvas needs).
  */
 function renderPng(coordinates, width, height, scale = 4) {
   const outW = width * scale;
   const outH = height * scale;
-  const pixels = Buffer.alloc(outW * outH * 4);
+  const pixels = new Uint8Array(outW * outH * 4);
   const bg = { r: 10, g: 10, b: 18 };
   for (let i = 0; i < pixels.length; i += 4) {
     pixels[i] = bg.r; pixels[i + 1] = bg.g; pixels[i + 2] = bg.b; pixels[i + 3] = 255;
@@ -189,33 +195,46 @@ function renderPng(coordinates, width, height, scale = 4) {
 
 export { renderPng };
 
+function concatBytes(arrays) {
+  let total = 0;
+  for (const a of arrays) total += a.length;
+  const out = new Uint8Array(total);
+  let off = 0;
+  for (const a of arrays) { out.set(a, off); off += a.length; }
+  return out;
+}
+
+function u32be(v) {
+  return new Uint8Array([(v >>> 24) & 0xff, (v >>> 16) & 0xff, (v >>> 8) & 0xff, v & 0xff]);
+}
+
 function encodePng(outW, outH, rgba) {
-  // Minimal zero-dep PNG encoder (signature + IHDR + IDAT + IEND).
-  const SIG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
-  const IHDR = Buffer.alloc(13);
-  IHDR.writeUInt32BE(outW, 0);
-  IHDR.writeUInt32BE(outH, 4);
+  // Minimal zero-dep PNG encoder (signature + IHDR + IDAT + IEND), pure
+  // Uint8Array math — no Buffer, no node:zlib. fflate's zlibSync is a
+  // synchronous, dependency-free deflate that runs identically in Node and
+  // the browser.
+  const SIG = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  const IHDR = new Uint8Array(13);
+  IHDR.set(u32be(outW), 0);
+  IHDR.set(u32be(outH), 4);
   IHDR[8] = 8; IHDR[9] = 6; IHDR[10] = 0; IHDR[11] = 0; IHDR[12] = 0;
   const stride = outW * 4;
-  const filtered = Buffer.alloc((stride + 1) * outH);
+  const filtered = new Uint8Array((stride + 1) * outH);
   for (let y = 0; y < outH; y += 1) {
     filtered[y * (stride + 1)] = 0;
-    rgba.copy(filtered, y * (stride + 1) + 1, y * stride, y * stride + stride);
+    filtered.set(rgba.subarray(y * stride, y * stride + stride), y * (stride + 1) + 1);
   }
-  // `require` does not exist in ESM scope — only the leaked CJS-eval global
-  // made this appear to work. Use the module-level zlib import.
-  const idat = deflateSync(filtered);
-  return Buffer.concat([SIG, chunk('IHDR', IHDR), chunk('IDAT', idat), chunk('IEND', Buffer.alloc(0))]);
+  const idat = zlibSync(filtered, { level: 6 });
+  const bytes = concatBytes([SIG, chunk('IHDR', IHDR), chunk('IDAT', idat), chunk('IEND', new Uint8Array(0))]);
+  // Existing contract: Node callers (scripts, tests) get a real Buffer back.
+  return RUNNING_UNDER_NODE ? Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength) : bytes;
 }
 
 function chunk(type, data) {
-  const typeBuf = Buffer.from(type, 'ascii');
-  const lengthBuf = Buffer.alloc(4);
-  lengthBuf.writeUInt32BE(data.length, 0);
-  const crcInput = Buffer.concat([typeBuf, data]);
-  const crcBuf = Buffer.alloc(4);
-  crcBuf.writeUInt32BE(crc32(crcInput), 0);
-  return Buffer.concat([lengthBuf, typeBuf, data, crcBuf]);
+  const typeBuf = new TextEncoder().encode(type);
+  const lengthBuf = u32be(data.length);
+  const crcBuf = u32be(crc32(concatBytes([typeBuf, data])));
+  return concatBytes([lengthBuf, typeBuf, data, crcBuf]);
 }
 
 function crc32(buf) {
@@ -727,55 +746,16 @@ export function forgeItemAsset(rawSpec, opts = {}) {
 /**
  * Render PNG bytes from a Foundry bundle. Exposed as a separate function
  * so callers can render on demand without paying the cost during forge.
+ *
+ * Used to duplicate renderPng's whole pixel-fill + PNG-encode logic under a
+ * second, Node-only (Buffer + node:zlib) implementation (`renderPngWithZlib`).
+ * Now that renderPng/encodePng are isomorphic, there is no reason for two —
+ * this just calls the one real implementation.
  */
 export function renderBundlePng(bundle, scale = 4) {
   if (!bundle || !bundle.assetPacket) throw err('bundle is required');
   const canvas = bundle.assetPacket.canvas;
-  return renderPngWithZlib(bundle.assetPacket.geometry.coordinates, canvas.width, canvas.height, scale);
-}
-
-function renderPngWithZlib(coordinates, width, height, scale) {
-  const outW = width * scale;
-  const outH = height * scale;
-  const pixels = Buffer.alloc(outW * outH * 4);
-  const bg = { r: 10, g: 10, b: 18 };
-  for (let i = 0; i < pixels.length; i += 4) {
-    pixels[i] = bg.r; pixels[i + 1] = bg.g; pixels[i + 2] = bg.b; pixels[i + 3] = 255;
-  }
-  for (const c of coordinates) {
-    const x = Math.round(c.snappedX ?? c.x);
-    const y = Math.round(c.snappedY ?? c.y);
-    if (x < 0 || x >= width || y < 0 || y >= height) continue;
-    const hex = String(c.color || '').trim();
-    const m = hex.replace('#', '');
-    if (m.length !== 6) continue;
-    const r = parseInt(m.slice(0, 2), 16);
-    const g = parseInt(m.slice(2, 4), 16);
-    const b = parseInt(m.slice(4, 6), 16);
-    for (let dy = 0; dy < scale; dy += 1) {
-      for (let dx = 0; dx < scale; dx += 1) {
-        const off = ((y * scale + dy) * outW + (x * scale + dx)) * 4;
-        pixels[off] = r; pixels[off + 1] = g; pixels[off + 2] = b; pixels[off + 3] = 255;
-      }
-    }
-  }
-  const ihdr = Buffer.alloc(13);
-  ihdr.writeUInt32BE(outW, 0);
-  ihdr.writeUInt32BE(outH, 4);
-  ihdr[8] = 8; ihdr[9] = 6; ihdr[10] = 0; ihdr[11] = 0; ihdr[12] = 0;
-  const stride = outW * 4;
-  const filtered = Buffer.alloc((stride + 1) * outH);
-  for (let y = 0; y < outH; y += 1) {
-    filtered[y * (stride + 1)] = 0;
-    pixels.copy(filtered, y * (stride + 1) + 1, y * stride, y * stride + stride);
-  }
-  const idat = deflateSync(filtered);
-  return Buffer.concat([
-    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
-    chunk('IHDR', ihdr),
-    chunk('IDAT', idat),
-    chunk('IEND', Buffer.alloc(0)),
-  ]);
+  return renderPng(bundle.assetPacket.geometry.coordinates, canvas.width, canvas.height, scale);
 }
 
 /**
@@ -854,8 +834,9 @@ export function renderBundleVri(bundle, opts = {}) {
     contract: 'PB-FOUNDRY-VRI-v1',
     scene,
     raster,
-    // The module-local zero-dep encoder wants a Buffer, not a Uint8Array.
-    png: encodePng(raster.width, raster.height, Buffer.from(raster.data)),
+    // encodePng is isomorphic now — raster.data (Uint8Array) is all it needs;
+    // it wraps in a real Buffer itself when running under Node.
+    png: encodePng(raster.width, raster.height, raster.data),
     lineage,
   });
 }

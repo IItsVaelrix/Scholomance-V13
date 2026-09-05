@@ -140,4 +140,11 @@ export const GENERATED_RELEVANCE_RECORDS = Object.freeze([
     appliesToJson: "[]",
     requiresJson: "[]",
   },
+  {
+    pipeline: "terrain",
+    ampId: "grass-amp",
+    order: 1,
+    appliesToJson: "[{\"field\":\"class\",\"op\":\"eq\",\"value\":\"terrain\"},{\"field\":\"archetype\",\"op\":\"eq\",\"value\":\"void_grove_grass\"}]",
+    requiresJson: "[]",
+  },
 ]);

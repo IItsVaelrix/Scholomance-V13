@@ -956,6 +956,64 @@ function TemplateEditorComponent({ onCommitAsset, onGridChange, initialAssetPack
       setRevision((r) => r + 1);
     },
 
+    // Studio adapter landing seam. Analysis/runtime outputs remain visible in
+    // their receipt panels; outputs that contain raster/cell geometry can be
+    // committed as a new, undoable layer without replacing the baseline.
+    applyStudioResult: (rawResult, { name = 'Studio AMP', replace = false } = {}) => {
+      const g = gridRef.current;
+      const stack = commandStackRef.current;
+      if (!g || !Array.isArray(g.layers)) return { applied: false, reason: 'no grid' };
+
+      const result = rawResult?.accepted?.data ?? rawResult?.data ?? rawResult?.output ?? rawResult;
+      let coordinates = result?.coordinates
+        ?? result?.fills?.coordinates
+        ?? result?.output?.coordinates
+        ?? result?.output?.materialCells
+        ?? result?.partCells
+        ?? null;
+
+      if (!coordinates && ArrayBuffer.isView(result?.field) && Array.isArray(result?.palette)) {
+        coordinates = [];
+        const width = result.width || g.width;
+        const height = result.height || g.height;
+        for (let y = 0; y < height; y += 1) {
+          for (let x = 0; x < width; x += 1) {
+            const rank = result.field[y * width + x];
+            if (rank >= 0 && result.palette[rank]) coordinates.push({ x, y, color: result.palette[rank] });
+          }
+        }
+      }
+
+      if (!Array.isArray(coordinates)) return { applied: false, reason: 'non-visual output' };
+
+      const before = g.layers.map((layer) => ({
+        ...layer,
+        cells: layer?.cells instanceof Map ? new Map(layer.cells) : layer?.cells,
+      }));
+      const nextLayer = createLayer(name);
+      for (const cell of coordinates) {
+        if (!Number.isFinite(Number(cell?.x)) || !Number.isFinite(Number(cell?.y))) continue;
+        setCell(nextLayer, Number(cell.x), Number(cell.y), cell.color || '#D4D4D4', cell.emphasis || 1);
+      }
+      const next = replace ? [nextLayer] : [...g.layers, nextLayer];
+      const install = (layers) => {
+        g.layers = layers.map((layer) => ({
+          ...layer,
+          cells: layer?.cells instanceof Map ? new Map(layer.cells) : layer?.cells,
+        }));
+        setRevision((revision) => revision + 1);
+      };
+      stack?.execute(new Command({
+        doFn: () => install(next),
+        undoFn: () => install(before),
+        description: `Studio commit ${name}`,
+        meta: { type: 'studio-amp', layerName: name },
+      }));
+      if (!stack) install(next);
+      setActiveLayerIndex(next.length - 1);
+      return { applied: true, cells: nextLayer.cells.size, layerIndex: next.length - 1 };
+    },
+
     applyAMP: (ampId, options = {}) => {
       const g = gridRef.current;
       const stack = commandStackRef.current;
@@ -1358,7 +1416,7 @@ function TemplateEditorComponent({ onCommitAsset, onGridChange, initialAssetPack
                     textAlign: 'left',
                     fontSize: '9px',
                     padding: '1px 4px',
-                    background: idx === activeLayerIndex ? '#0a4' : '#222',
+                    background: idx === activeLayerIndex ? '#006b32' : '#222',
                     border: '1px solid #444',
                     color: idx === activeLayerIndex ? '#fff' : '#ccc'
                   }}
@@ -1368,7 +1426,7 @@ function TemplateEditorComponent({ onCommitAsset, onGridChange, initialAssetPack
                 </button>
               ))}
             </div>
-            <div style={{ fontSize: '8px', color: '#666', marginTop: '2px' }}>
+            <div style={{ fontSize: '8px', color: '#aaa', marginTop: '2px' }}>
               Paint only affects the active (highlighted) layer.
             </div>
           </div>

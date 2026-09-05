@@ -7,6 +7,26 @@
 
 import { processorBridge } from './engine.adapter.js';
 import { routeRetinaPacketToPhotonicBridge } from './photonic-retina/index.js';
+import { STUDIO_AMP_RECORDS as codexStudioAmpRecords } from '../../codex/core/pixelbrain/studio/studio-amp-manifest.generated.js';
+import { createStudioAmpPlan as codexCreateStudioAmpPlan } from '../../codex/core/pixelbrain/studio/studio-amp-planner.js';
+import {
+  acceptMutation as codexAcceptStudioMutation,
+  createMutationCandidate as codexCreateStudioMutationCandidate,
+  rejectMutation as codexRejectStudioMutation,
+} from '../../codex/core/pixelbrain/studio/studio-mutation-transaction.js';
+import {
+  commitStudioAmp as codexCommitStudioAmp,
+  getStudioAdapterCoverage as codexGetStudioAdapterCoverage,
+  inspectStudioSupport as codexInspectStudioSupport,
+  previewStudioAmp as codexPreviewStudioAmp,
+  proposeStudioMutation as codexProposeStudioMutation,
+  studioOutputChecksum as codexStudioOutputChecksum,
+} from '../../codex/core/pixelbrain/studio/studio-amp-execution.js';
+import {
+  defaultParams as codexDefaultGrassParams,
+  generateGrass as codexGenerateGrass,
+} from '../../codex/core/pixelbrain/grass-engine.js';
+import { PALETTES as codexGrassPalettes } from '../../codex/core/pixelbrain/grass-palettes.js';
 
 // --- Coordinate & Formula Logic ---
 import { 
@@ -98,6 +118,15 @@ import {
 import {
   runForgeCraftGate as codexRunForgeCraftGate,
 } from '../../codex/core/pixelbrain/forge-craft-gate.js';
+
+// VRI Door B (opt-in, additive) — items forged through the Craft Gate render
+// through the same Vixel Render IR engine as Door A/C, with real per-part
+// materials (unlike character output, item specs carry real `fill.material`
+// declarations, so this door is a genuine material/lighting preview, not a
+// rasterizer swap). See ARCH-2026-09-04-VIXEL-RENDER-IR.md.
+import {
+  renderBundleVri as codexRenderBundleVri,
+} from '../../codex/core/pixelbrain/item-foundry.js';
 
 import {
   parseSilhouetteBlueprint as codexParseSilhouetteBlueprint,
@@ -311,6 +340,23 @@ export function runForgeCraftGate(spec) {
       reason: detail?.context?.reason || err?.message || 'Forge craft gate failure',
       detail,
     };
+  }
+}
+
+/**
+ * Render a gate-passed item bundle through the VRI engine (Door B) — opt-in,
+ * additive, never called unless the gate already certified the bundle. The UI
+ * must never see raw codex error instances, so failures flatten to a plain
+ * result the panel can render (mirrors runForgeCraftGate's own contract).
+ *
+ * @returns {{ ok: boolean, png?: Uint8Array, reason?: string }}
+ */
+export function renderItemVriPreview(bundle, opts = {}) {
+  try {
+    const result = codexRenderBundleVri(bundle, opts);
+    return { ok: true, png: result.png };
+  } catch (err) {
+    return { ok: false, reason: err?.message || 'VRI preview failed' };
   }
 }
 
@@ -795,6 +841,83 @@ export const PIXELBRAIN_REGISTERED_AMPS = Object.freeze([
 
 export function getRegisteredAMPs() {
   return PIXELBRAIN_REGISTERED_AMPS;
+}
+
+// PixelBrain SWARD Studio: exhaustive discovery and pure planning stay behind
+// the established UI adapter boundary. The old six-entry editor list remains
+// available for legacy TemplateEditor commands during the parity rollout.
+export function getStudioAmpManifest() {
+  return codexStudioAmpRecords;
+}
+
+export function planStudioAmps(input) {
+  return codexCreateStudioAmpPlan({ ...input, records: codexStudioAmpRecords });
+}
+
+export function getStudioAdapterCoverage() {
+  return codexGetStudioAdapterCoverage(codexStudioAmpRecords);
+}
+
+export function inspectStudioSupportExecution(ampId) {
+  return codexInspectStudioSupport(ampId);
+}
+
+export function previewStudioAmpExecution(input) {
+  return codexPreviewStudioAmp(input);
+}
+
+export function commitStudioAmpExecution(input) {
+  return codexCommitStudioAmp(input);
+}
+
+export function proposeStudioMutationExecution(input) {
+  return codexProposeStudioMutation(input);
+}
+
+export function createStudioAssetSnapshot(grid, source = null) {
+  const layers = (grid?.layers || []).map((layer) => ({
+    name: layer?.name || 'Layer',
+    visible: layer?.visible !== false,
+    locked: layer?.locked === true,
+    opacity: typeof layer?.opacity === 'number' ? layer.opacity : 1,
+    cells: layer?.cells instanceof Map
+      ? [...layer.cells.values()].map((cell) => ({ ...cell }))
+      : Array.isArray(layer?.cells) ? layer.cells.map((cell) => ({ ...cell })) : [],
+  }));
+  const body = {
+    width: grid?.width || 64,
+    height: grid?.height || 80,
+    gridType: grid?.gridType || 'rectangular',
+    cellSize: grid?.cellSize || 1,
+    palette: [...(grid?.palette || [])],
+    layers,
+    source,
+  };
+  return Object.freeze({ ...body, checksum: codexStudioOutputChecksum(body) });
+}
+
+export function getStudioGrassDefaults() {
+  return codexDefaultGrassParams();
+}
+
+export function getStudioGrassPalettes() {
+  return codexGrassPalettes;
+}
+
+export function generateStudioGrass(params) {
+  return codexGenerateGrass(params);
+}
+
+export function beginStudioMutation({ base, result, ampId }) {
+  return codexCreateStudioMutationCandidate(base, result, ampId);
+}
+
+export function acceptStudioMutation({ current, transaction }) {
+  return codexAcceptStudioMutation(current, transaction);
+}
+
+export function rejectStudioMutation({ current, transaction }) {
+  return codexRejectStudioMutation(current, transaction);
 }
 
 // Editor-friendly wrappers so SDF/Noise fit the (cells, options) => processedCells contract used by applyAMPTo* + command stack.

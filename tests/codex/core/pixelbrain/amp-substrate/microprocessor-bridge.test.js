@@ -15,6 +15,7 @@ import { buildGeometryAmpPayload } from '../../../../../codex/core/pixelbrain/ge
 import { applyHeraldryTemplate } from '../../../../../codex/core/pixelbrain/heraldry-amp.js';
 import { applySelout } from '../../../../../codex/core/pixelbrain/selout-amp.js';
 import { applyFacets } from '../../../../../codex/core/pixelbrain/facet-amp.js';
+import { GrassAMP } from '../../../../../codex/core/pixelbrain/grass-amp.js';
 
 const PRE_EXISTING_AMP_IDS = [
   'amp.symmetry',
@@ -24,9 +25,9 @@ const PRE_EXISTING_AMP_IDS = [
 ];
 
 describe('PixelBrain AMP substrate bridge', () => {
-  it('registers one pixelbrain.amp.* id per item-pipeline AMP', () => {
+  it('registers one pixelbrain.amp.* id per bridged AMP (item pipeline, plus grass-amp in terrain)', () => {
     expect(PIXELBRAIN_AMP_IDS).toEqual([
-      'chestplate-amp', 'facet-amp', 'geometry-amp', 'heraldry-amp', 'holyfire-motif-amp',
+      'chestplate-amp', 'facet-amp', 'geometry-amp', 'grass-amp', 'heraldry-amp', 'holyfire-motif-amp',
       'jewelry-amp', 'noise-fill-amp', 'pixel-aa-amp', 'region-fill-amp', 'sdf-shape-amp',
       'selout-amp', 'shield-rim-amp', 'shield-volume-amp', 'sketch-amp',
       'square-sharpness-contrast-amp', 'symmetry-amp', 'volume-lift-amp',
@@ -119,6 +120,7 @@ describe('PixelBrain AMP substrate bridge', () => {
       'facet-amp': { fills: { coordinates: [] }, spec: { parts: [] }, materialResolver: () => ({}), lightOptions: {} },
       'square-sharpness-contrast-amp': { coordinates: [], material: {}, canvas: {}, options: {}, intent: '' },
       'volume-lift-amp': { energized: [], dims: { w: 10, h: 10, d: 10 }, partParams: {} },
+      'grass-amp': { width: 8, height: 8, seed: 1 },
     };
 
     for (const ampId of PIXELBRAIN_AMP_IDS) {
@@ -176,6 +178,13 @@ describe('PixelBrain AMP substrate bridge', () => {
       materialResolver,
       lightOptions,
     });
+    expect(viaRegistry).toEqual(direct);
+  });
+
+  it('adapts a grass-amp execution packet to GrassAMP', async () => {
+    const payload = { width: 16, height: 16, seed: 42 };
+    const direct = GrassAMP(payload);
+    const viaRegistry = await verseIRMicroprocessors.execute('pixelbrain.amp.grass-amp', payload);
     expect(viaRegistry).toEqual(direct);
   });
 });

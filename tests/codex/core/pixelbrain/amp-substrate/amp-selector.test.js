@@ -7,7 +7,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { selectActiveAmps, selectAndLog, SELECTOR_VERSION } from '../../../../../codex/core/pixelbrain/amp-substrate/amp-selector.js';
+import { selectActiveAmps, SELECTOR_VERSION } from '../../../../../codex/core/pixelbrain/amp-substrate/amp-selector.js';
+import { selectAndLog } from '../../../../../codex/core/pixelbrain/amp-substrate/amp-selector.db.js';
 import { createAmpRelevanceRecord } from '../../../../../codex/core/pixelbrain/amp-substrate/amp-relevance.schema.js';
 import {
   openAmpSubstrate,
