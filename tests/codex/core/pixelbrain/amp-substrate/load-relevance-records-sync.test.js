@@ -1,19 +1,27 @@
 /**
- * `load-relevance-records-sync.js` — the synchronous JSON reader Task 4 built
- * for `item-foundry.js`'s hot, synchronous forge path.
+ * `load-relevance-records-sync.js` — the synchronous, browser-safe record
+ * source for `item-foundry.js`'s hot, synchronous forge path — and
+ * `load-relevance-records-from-dir.js`, the Node-only directory reader it
+ * was split from (see `load-relevance-records-sync.js`'s header for why:
+ * item-foundry.js is reachable from the browser bundle, and a top-level
+ * `node:*` import anywhere in that graph breaks `npx vite build`).
  *
  * Two families of test live here:
  *
- * 1. The brief's own Step-1 tests, run against the REAL
- *    `pilot-relevance/` directory. Task 6 has migrated the 5 files under
- *    `codex/core/pixelbrain/amp-substrate/pilot-relevance/` from
- *    PB-AMP-RELEVANCE-v1 shape to v2, so these now pass for real.
+ * 1. The brief's own Step-1 tests, run against `loadRelevanceRecordsSync()`
+ *    — now backed by the generated, isomorphic `pilot-relevance.generated.js`
+ *    data module instead of a live directory read, but still validating real
+ *    content: `scripts/seed-amp-item-pipeline-records.mjs` writes both the
+ *    tracked JSON files under `pilot-relevance/` AND the generated module
+ *    from the same in-memory records in the same run, so they never drift.
  *
- * 2. This loader's own correctness proof: hand-authored, checksummed,
- *    VALID v2-shape records written to a temp directory per test, exercising
- *    reading, row-shaping, `selectActiveAmps` interop, error reporting and the
- *    default-directory-only caching guard — all independent of whether the
- *    real `pilot-relevance/` directory happens to be migrated yet.
+ * 2. `loadRelevanceRecordsFromDir(dir)`'s own correctness proof: hand-authored,
+ *    checksummed, VALID v2-shape records written to a temp directory per
+ *    test, exercising reading, row-shaping, `selectActiveAmps` interop and
+ *    error reporting — all independent of whether the real `pilot-relevance/`
+ *    directory happens to be migrated yet. This function is Node-only by
+ *    design (`readdirSync`/`readFileSync`) and is never on the browser's
+ *    import graph.
  */
 
 import { afterEach, describe, expect, it } from 'vitest';
@@ -24,6 +32,7 @@ import {
   loadRelevanceRecordsSync,
   clearRelevanceRecordsCache,
 } from '../../../../../codex/core/pixelbrain/amp-substrate/load-relevance-records-sync.js';
+import { loadRelevanceRecordsFromDir } from '../../../../../codex/core/pixelbrain/amp-substrate/load-relevance-records-from-dir.js';
 import { selectActiveAmps } from '../../../../../codex/core/pixelbrain/amp-substrate/amp-selector.js';
 import { createAmpRelevanceRecord } from '../../../../../codex/core/pixelbrain/amp-substrate/amp-relevance.schema.js';
 import { BytecodeError } from '../../../../../codex/core/pixelbrain/bytecode-error.js';
@@ -31,7 +40,7 @@ import { BytecodeError } from '../../../../../codex/core/pixelbrain/bytecode-err
 afterEach(() => clearRelevanceRecordsCache());
 
 describe('loadRelevanceRecordsSync — against the real pilot-relevance/ directory', () => {
-  it('reads every JSON record from pilot-relevance/ synchronously', () => {
+  it('reads every generated record synchronously', () => {
     const records = loadRelevanceRecordsSync();
     expect(records.length).toBeGreaterThan(0);
     expect(records.every((r) => typeof r.pipeline === 'string')).toBe(true);
@@ -39,7 +48,7 @@ describe('loadRelevanceRecordsSync — against the real pilot-relevance/ directo
 
   it('throws with the offending filename when a record in the directory fails validation', () => {
     const badDir = join(process.cwd(), 'tests/codex/core/pixelbrain/amp-substrate/fixtures/invalid-relevance');
-    expect(() => loadRelevanceRecordsSync(badDir)).toThrow(/description/);
+    expect(() => loadRelevanceRecordsFromDir(badDir)).toThrow(/description/);
   });
 
   it('the loaded records work directly with selectActiveAmps', () => {
@@ -48,24 +57,24 @@ describe('loadRelevanceRecordsSync — against the real pilot-relevance/ directo
     expect(result.activated).toContain('chestplate-amp');
   });
 
-  it('caches on repeated calls with the default directory', () => {
+  it('returns the same reference on repeated calls (no cache logic left — it is a statically-imported, frozen array)', () => {
     const first = loadRelevanceRecordsSync();
     const second = loadRelevanceRecordsSync();
     expect(second).toBe(first);
   });
 
   // Not from the brief — a live sentinel, inverted now that Task 6 has
-  // migrated pilot-relevance/ to v2: pins down that the real default
-  // directory loads cleanly, so this file screams if a future change
-  // regresses one of the real files back out of v2 shape.
-  it('documents post-Task-6 state: the real default directory loads and validates as v2', () => {
+  // migrated pilot-relevance/ to v2: pins down that the generated default
+  // data loads cleanly, so this file screams if a future change regresses
+  // one of the real records back out of v2 shape.
+  it('documents post-Task-6 state: the generated default records load and validate as v2', () => {
     const records = loadRelevanceRecordsSync();
     expect(records.length).toBeGreaterThanOrEqual(5);
     expect(records.every((r) => typeof r.pipeline === 'string')).toBe(true);
   });
 });
 
-describe('loadRelevanceRecordsSync — v2 fixture verification (independent of Task 6)', () => {
+describe('loadRelevanceRecordsFromDir — v2 fixture verification (independent of Task 6)', () => {
   /** Write hand-authored, checksummed, valid v2 records to a fresh temp dir. */
   function writeValidV2Dir(records) {
     const dir = mkdtempSync(join(tmpdir(), 'amp-relevance-v2-'));
@@ -93,7 +102,7 @@ describe('loadRelevanceRecordsSync — v2 fixture verification (independent of T
     const chestplate = createAmpRelevanceRecord(CHESTPLATE_INPUT);
     const dir = writeValidV2Dir([chestplate]);
     try {
-      const records = loadRelevanceRecordsSync(dir);
+      const records = loadRelevanceRecordsFromDir(dir);
       expect(records).toHaveLength(1);
       expect(records[0]).toEqual({
         pipeline: 'item',
@@ -121,7 +130,7 @@ describe('loadRelevanceRecordsSync — v2 fixture verification (independent of T
     });
     const dir = writeValidV2Dir([chestplate, symmetry]);
     try {
-      const records = loadRelevanceRecordsSync(dir);
+      const records = loadRelevanceRecordsFromDir(dir);
       const result = selectActiveAmps(
         'item',
         { class: 'armor', archetype: 'chestplate', parts: [] },
@@ -157,7 +166,7 @@ describe('loadRelevanceRecordsSync — v2 fixture verification (independent of T
     try {
       let caught;
       try {
-        loadRelevanceRecordsSync(dir);
+        loadRelevanceRecordsFromDir(dir);
       } catch (e) {
         caught = e;
       }
@@ -171,14 +180,15 @@ describe('loadRelevanceRecordsSync — v2 fixture verification (independent of T
     }
   });
 
-  it('does not cache explicit (non-default) directories: repeated loads re-read from disk', () => {
+  it('never caches: repeated loads of the same directory always re-read from disk', () => {
     const chestplate = createAmpRelevanceRecord(CHESTPLATE_INPUT);
     const dir = writeValidV2Dir([chestplate]);
     try {
-      const first = loadRelevanceRecordsSync(dir);
-      const second = loadRelevanceRecordsSync(dir);
-      // Same content, but the cache branch only fires for the module's own
-      // DEFAULT_DIR sentinel — an explicit dir must always re-read.
+      const first = loadRelevanceRecordsFromDir(dir);
+      const second = loadRelevanceRecordsFromDir(dir);
+      // Same content, but a fresh array each call — this function has no
+      // caching at all; that behavior now lives only in the generated,
+      // statically-imported default records `loadRelevanceRecordsSync()` returns.
       expect(second).not.toBe(first);
       expect(second).toEqual(first);
     } finally {

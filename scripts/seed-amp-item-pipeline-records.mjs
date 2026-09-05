@@ -19,6 +19,7 @@ import { createAmpRelevanceRecord } from '../codex/core/pixelbrain/amp-substrate
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PILOT_DIR = join(HERE, '../codex/core/pixelbrain/amp-substrate/pilot-relevance');
+const GENERATED_FILE = join(HERE, '../codex/core/pixelbrain/amp-substrate/pilot-relevance.generated.js');
 
 const RECORDS = [
   {
@@ -153,8 +154,63 @@ const RECORDS = [
   },
 ];
 
+const generatedRows = [];
+
 for (const fields of RECORDS) {
   const record = createAmpRelevanceRecord(fields);
   writeFileSync(join(PILOT_DIR, `${record.ampId}.json`), `${JSON.stringify(record, null, 2)}\n`);
   console.log(`[seed] wrote ${record.pipeline}/${record.ampId}.json  ${record.checksum.slice(0, 12)}…`);
+
+  // Same row shape `loadRelevanceRecordsSync()` has always returned — generated
+  // straight from this script's in-memory `RECORDS`/`createAmpRelevanceRecord()`
+  // output, not re-read off the JSON files we just wrote.
+  generatedRows.push({
+    pipeline: record.pipeline,
+    ampId: record.ampId,
+    order: record.order,
+    appliesToJson: JSON.stringify(record.appliesTo ?? []),
+    requiresJson: JSON.stringify(record.requires ?? []),
+  });
 }
+
+function formatRow(row) {
+  return [
+    '  {',
+    `    pipeline: ${JSON.stringify(row.pipeline)},`,
+    `    ampId: ${JSON.stringify(row.ampId)},`,
+    `    order: ${row.order},`,
+    `    appliesToJson: ${JSON.stringify(row.appliesToJson)},`,
+    `    requiresJson: ${JSON.stringify(row.requiresJson)},`,
+    '  },',
+  ].join('\n');
+}
+
+const generatedSource = `/**
+ * GENERATED FILE — do not hand-edit. Regenerate with:
+ *
+ *   node scripts/seed-amp-item-pipeline-records.mjs
+ *
+ * Isomorphic, browser-safe data module: the exact rows
+ * \`loadRelevanceRecordsSync()\` (in load-relevance-records-sync.js) returns,
+ * frozen and statically imported — zero \`node:*\` imports, at any syntax
+ * level, so this module is safe for code the browser bundle reaches
+ * (item-foundry.js -> src/lib/pixelbrain.adapter.js). The Node-only
+ * directory reader this replaced for that path still exists, for tests and
+ * regeneration validation only, as \`loadRelevanceRecordsFromDir()\` in
+ * ./load-relevance-records-from-dir.js.
+ *
+ * Source of truth: this script's \`RECORDS\` array, run through
+ * \`createAmpRelevanceRecord()\` — the tracked JSON files under
+ * pilot-relevance/ are the human-readable/checksummed form of the same data,
+ * written by this same script in the same run.
+ *
+ * @bytecode PB-AMP-RELEVANCE-v2
+ */
+
+export const GENERATED_RELEVANCE_RECORDS = Object.freeze([
+${generatedRows.map(formatRow).join('\n')}
+]);
+`;
+
+writeFileSync(GENERATED_FILE, generatedSource);
+console.log(`[seed] wrote ${generatedRows.length} rows to codex/core/pixelbrain/amp-substrate/pilot-relevance.generated.js`);
