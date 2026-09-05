@@ -13,7 +13,7 @@
  * separate contracts answering separate questions.
  *
  * PDR: docs/scholomance-encyclopedia/PDR-archive/2026-09-04-pixelbrain-amp-activation-substrate-v1-pdr.md
- * @bytecode PB-AMP-RELEVANCE-v1
+ * @bytecode PB-AMP-RELEVANCE-v2
  */
 
 import { sha256Hex } from '../sha256.js';

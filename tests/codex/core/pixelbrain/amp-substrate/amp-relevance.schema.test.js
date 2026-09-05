@@ -222,10 +222,14 @@ describe('PB-AMP-RELEVANCE-v2 envelope', () => {
 
   it('checksum changes when pipeline, order, description, or concept changes', () => {
     const base = createAmpRelevanceRecord(ITEM_RECORD);
+    const repipelined = createAmpRelevanceRecord({ ...ITEM_RECORD, pipeline: 'render-fidelity' });
     const reordered = createAmpRelevanceRecord({ ...ITEM_RECORD, order: 9 });
     const redescribed = createAmpRelevanceRecord({ ...ITEM_RECORD, description: 'different text entirely here' });
+    const reconcepted = createAmpRelevanceRecord({ ...ITEM_RECORD, concept: 'material' });
+    expect(repipelined.checksum).not.toBe(base.checksum);
     expect(reordered.checksum).not.toBe(base.checksum);
     expect(redescribed.checksum).not.toBe(base.checksum);
+    expect(reconcepted.checksum).not.toBe(base.checksum);
   });
 
   it('parts.shading is now a valid appliesTo field (facet-amp needs it)', () => {
