@@ -1,0 +1,12 @@
+{
+  "contract": "PB-AMP-RELEVANCE-v2",
+  "schemaVersion": "PB-AMP-RELEVANCE-v2",
+  "pipeline": "item",
+  "ampId": "broken-amp",
+  "order": 1,
+  "concept": "structural",
+  "version": "1.0.0",
+  "appliesTo": [],
+  "requires": [],
+  "checksum": "0000000000000000000000000000000000000000000000000000000000000000"
+}
