@@ -202,8 +202,28 @@ describe('AMP substrate — SQLite store', () => {
   });
 
   it('listAmpRelevance with no filter returns every pipeline, ordered by (pipeline, order)', async () => {
+    await registerAmpRelevance(db, createAmpRelevanceRecord({
+      pipeline: 'item', ampId: 'item-high-order', order: 10,
+      description: 'runs late in the item pipeline', concept: 'structural',
+      version: '1.0.0', appliesTo: [], requires: [],
+    }));
+    await registerAmpRelevance(db, createAmpRelevanceRecord({
+      pipeline: 'cross-cutting', ampId: 'cross-cutting-only', order: 1,
+      description: 'the sole cross-cutting pass in this test', concept: 'lighting',
+      version: '1.0.0', appliesTo: [], requires: [],
+    }));
+    await registerAmpRelevance(db, createAmpRelevanceRecord({
+      pipeline: 'item', ampId: 'item-low-order', order: 2,
+      description: 'runs early in the item pipeline', concept: 'structural',
+      version: '1.0.0', appliesTo: [], requires: [],
+    }));
+
     const rows = await listAmpRelevance(db);
-    expect(rows.map((r) => r.pipeline)).toEqual([...rows.map((r) => r.pipeline)].sort());
+    expect(rows.map((r) => [r.pipeline, r.order])).toEqual([
+      ['cross-cutting', 1],
+      ['item', 2],
+      ['item', 10],
+    ]);
   });
 
   it('unregisterAmpRelevance is scoped to (pipeline, ampId)', async () => {
@@ -216,5 +236,52 @@ describe('AMP substrate — SQLite store', () => {
     const deleted = await unregisterAmpRelevance(db, 'item', 'facet-amp');
     expect(deleted).toBe(true);
     expect(await getAmpRelevance(db, 'item', 'facet-amp')).toBeNull();
+  });
+
+  it('refuses a second ampId in the same pipeline claiming an already-used order', async () => {
+    await registerAmpRelevance(db, createAmpRelevanceRecord({
+      pipeline: 'item', ampId: 'first-amp', order: 5,
+      description: 'holds order 5 in the item pipeline', concept: 'structural',
+      version: '1.0.0', appliesTo: [], requires: [],
+    }));
+    const collider = createAmpRelevanceRecord({
+      pipeline: 'item', ampId: 'second-amp', order: 5,
+      description: 'also wants order 5 in the item pipeline', concept: 'structural',
+      version: '1.0.0', appliesTo: [], requires: [],
+    });
+    await expect(registerAmpRelevance(db, collider)).rejects.toThrow();
+    expect(await getAmpRelevance(db, 'item', 'second-amp')).toBeNull();
+  });
+
+  it('allows the same order value in two different pipelines (order is scoped per-pipeline)', async () => {
+    await registerAmpRelevance(db, createAmpRelevanceRecord({
+      pipeline: 'item', ampId: 'item-order-5', order: 5,
+      description: 'holds order 5 in the item pipeline', concept: 'structural',
+      version: '1.0.0', appliesTo: [], requires: [],
+    }));
+    const otherPipeline = createAmpRelevanceRecord({
+      pipeline: 'render-fidelity', ampId: 'render-order-5', order: 5,
+      description: 'holds order 5 in the render-fidelity pipeline', concept: 'lighting',
+      version: '1.0.0', appliesTo: [], requires: [],
+    });
+    await expect(registerAmpRelevance(db, otherPipeline)).resolves.not.toThrow();
+    expect(await getAmpRelevance(db, 'render-fidelity', 'render-order-5')).not.toBeNull();
+  });
+
+  it('re-registering the same ampId with the same order updates in place, not a collision', async () => {
+    const v1 = createAmpRelevanceRecord({
+      pipeline: 'item', ampId: 'stable-amp', order: 7,
+      description: 'first version of a stable-order pass', concept: 'structural',
+      version: '1.0.0', appliesTo: [], requires: [],
+    });
+    await registerAmpRelevance(db, v1);
+    const v2 = createAmpRelevanceRecord({
+      pipeline: 'item', ampId: 'stable-amp', order: 7,
+      description: 'second version of a stable-order pass', concept: 'structural',
+      version: '2.0.0', appliesTo: [], requires: [],
+    });
+    await expect(registerAmpRelevance(db, v2)).resolves.not.toThrow();
+    const row = await getAmpRelevance(db, 'item', 'stable-amp');
+    expect(row.version).toBe('2.0.0');
   });
 });

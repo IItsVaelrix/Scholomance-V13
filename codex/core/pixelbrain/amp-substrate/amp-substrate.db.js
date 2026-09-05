@@ -111,6 +111,11 @@ export async function openAmpSubstrate(dbPath) {
  *
  * Refuses a record whose declared checksum disagrees with its own content —
  * silently recomputing it would defeat the only guarantee this table offers.
+ * Refuses a record whose `order` collides with a *different* ampId already
+ * registered in the same pipeline, for the same reason: `order` is the
+ * conveyor-belt position within a pipeline, and two passes silently sharing a
+ * position is exactly the kind of ambiguity a hard error should catch instead
+ * of an arbitrary `ORDER BY` tiebreak papering over it.
  */
 export async function registerAmpRelevance(db, record) {
   const { ok, errors } = validateAmpRelevance(record);
@@ -118,6 +123,24 @@ export async function registerAmpRelevance(db, record) {
     throw new BytecodeError(
       ERROR_CATEGORIES.VALUE, ERROR_SEVERITY.CRIT, MOD, ERROR_CODES.INVALID_VALUE,
       { pipeline: record?.pipeline ?? null, ampId: record?.ampId ?? null, errors },
+    );
+  }
+
+  const { rows: collisionRows } = await db.execute(
+    'SELECT amp_id AS ampId FROM amp_relevance WHERE pipeline = ? AND order_index = ? AND amp_id != ?',
+    [record.pipeline, record.order, record.ampId],
+  );
+  const collision = collisionRows?.[0] ?? null;
+  if (collision) {
+    throw new BytecodeError(
+      ERROR_CATEGORIES.VALUE, ERROR_SEVERITY.CRIT, MOD, ERROR_CODES.INVALID_VALUE,
+      {
+        pipeline: record.pipeline,
+        ampId: record.ampId,
+        order: record.order,
+        collidesWith: collision.ampId,
+        reason: `order ${record.order} is already used by '${collision.ampId}' in pipeline '${record.pipeline}'`,
+      },
     );
   }
 
