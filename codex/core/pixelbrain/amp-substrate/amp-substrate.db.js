@@ -32,7 +32,7 @@ import { validateAmpRelevance } from './amp-relevance.schema.js';
 
 const MOD = MODULE_IDS.AMP_SUBSTRATE;
 export const SUBSTRATE_NAMESPACE = 'amp_substrate';
-export const SUBSTRATE_SCHEMA_VERSION = 1;
+export const SUBSTRATE_SCHEMA_VERSION = 2;
 
 export const AMP_SUBSTRATE_MIGRATIONS = Object.freeze([
   {
@@ -59,6 +59,28 @@ export const AMP_SUBSTRATE_MIGRATIONS = Object.freeze([
      created_at       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
    );
    CREATE INDEX idx_activation_log_spec ON amp_activation_log (spec_checksum);`);
+    },
+  },
+  {
+    version: 2,
+    name: 'amp_relevance_v2_pipeline_order_description_concept',
+    up(db) {
+      // Same sanctioned exception as v1 above: raw DDL on the pre-wrapper handle.
+      // eslint-disable-next-line no-restricted-syntax
+      db.exec(`DROP TABLE IF EXISTS amp_relevance;
+   CREATE TABLE amp_relevance (
+     pipeline        TEXT NOT NULL,
+     amp_id          TEXT NOT NULL,
+     order_index     INTEGER NOT NULL,
+     description     TEXT NOT NULL,
+     concept         TEXT NOT NULL,
+     version         TEXT NOT NULL,
+     applies_to_json TEXT NOT NULL,
+     requires_json   TEXT NOT NULL,
+     checksum        TEXT NOT NULL,
+     registered_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+     PRIMARY KEY (pipeline, amp_id)
+   );`);
     },
   },
 ]);
@@ -95,21 +117,29 @@ export async function registerAmpRelevance(db, record) {
   if (!ok) {
     throw new BytecodeError(
       ERROR_CATEGORIES.VALUE, ERROR_SEVERITY.CRIT, MOD, ERROR_CODES.INVALID_VALUE,
-      { ampId: record?.ampId ?? null, errors },
+      { pipeline: record?.pipeline ?? null, ampId: record?.ampId ?? null, errors },
     );
   }
 
   await db.execute(
-    `INSERT INTO amp_relevance (amp_id, version, applies_to_json, requires_json, checksum)
-     VALUES (?, ?, ?, ?, ?)
-     ON CONFLICT(amp_id) DO UPDATE SET
+    `INSERT INTO amp_relevance
+       (pipeline, amp_id, order_index, description, concept, version, applies_to_json, requires_json, checksum)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT(pipeline, amp_id) DO UPDATE SET
+       order_index     = excluded.order_index,
+       description     = excluded.description,
+       concept         = excluded.concept,
        version         = excluded.version,
        applies_to_json = excluded.applies_to_json,
        requires_json   = excluded.requires_json,
        checksum        = excluded.checksum,
        registered_at   = CURRENT_TIMESTAMP`,
     [
+      record.pipeline,
       record.ampId,
+      record.order,
+      record.description,
+      record.concept,
       record.version,
       JSON.stringify(record.appliesTo ?? []),
       JSON.stringify(record.requires ?? []),
@@ -117,37 +147,48 @@ export async function registerAmpRelevance(db, record) {
     ],
   );
 
-  return { ampId: record.ampId, checksum: record.checksum };
+  return { pipeline: record.pipeline, ampId: record.ampId, checksum: record.checksum };
 }
 
 /**
- * Every registered record, in a stable order (ampId ascending).
+ * Records for one pipeline (ordered by conveyor-belt position), or — with no
+ * filter — every record across every pipeline, ordered by (pipeline, order).
  * Ordering is part of the selector's determinism guarantee, so it belongs here
  * rather than being left to SQLite's default row order.
  */
-export async function listAmpRelevance(db) {
-  const { rows } = await db.execute(
-    `SELECT amp_id AS ampId, version, applies_to_json AS appliesToJson,
-            requires_json AS requiresJson, checksum, registered_at AS registeredAt
-     FROM amp_relevance ORDER BY amp_id ASC`,
-  );
+export async function listAmpRelevance(db, { pipeline } = {}) {
+  const selectCols = `pipeline, amp_id AS ampId, order_index AS "order", description, concept,
+            version, applies_to_json AS appliesToJson, requires_json AS requiresJson,
+            checksum, registered_at AS registeredAt`;
+  const { rows } = pipeline
+    ? await db.execute(
+        `SELECT ${selectCols} FROM amp_relevance WHERE pipeline = ? ORDER BY order_index ASC`,
+        [pipeline],
+      )
+    : await db.execute(
+        `SELECT ${selectCols} FROM amp_relevance ORDER BY pipeline ASC, order_index ASC`,
+      );
   return rows ?? [];
 }
 
-/** One record by id, or null. */
-export async function getAmpRelevance(db, ampId) {
+/** One record by (pipeline, ampId), or null. */
+export async function getAmpRelevance(db, pipeline, ampId) {
   const { rows } = await db.execute(
-    `SELECT amp_id AS ampId, version, applies_to_json AS appliesToJson,
-            requires_json AS requiresJson, checksum, registered_at AS registeredAt
-     FROM amp_relevance WHERE amp_id = ?`,
-    [ampId],
+    `SELECT pipeline, amp_id AS ampId, order_index AS "order", description, concept,
+            version, applies_to_json AS appliesToJson, requires_json AS requiresJson,
+            checksum, registered_at AS registeredAt
+     FROM amp_relevance WHERE pipeline = ? AND amp_id = ?`,
+    [pipeline, ampId],
   );
   return rows?.[0] ?? null;
 }
 
-/** Remove one record. Returns true if a row was actually deleted. */
-export async function unregisterAmpRelevance(db, ampId) {
-  const result = await db.execute('DELETE FROM amp_relevance WHERE amp_id = ?', [ampId]);
+/** Remove one record, scoped to (pipeline, ampId). Returns true if a row was actually deleted. */
+export async function unregisterAmpRelevance(db, pipeline, ampId) {
+  const result = await db.execute(
+    'DELETE FROM amp_relevance WHERE pipeline = ? AND amp_id = ?',
+    [pipeline, ampId],
+  );
   return (result.rowsAffected ?? 0) > 0;
 }
 

@@ -22,7 +22,11 @@ import {
 import { createAmpRelevanceRecord } from '../../../../../codex/core/pixelbrain/amp-substrate/amp-relevance.schema.js';
 
 const CHESTPLATE = createAmpRelevanceRecord({
+  pipeline: 'item',
   ampId: 'chestplate-amp',
+  order: 10,
+  description: 'gates chestplate-specific geometry to armor chestplates',
+  concept: 'structural',
   version: '1.0.0',
   appliesTo: [
     { field: 'class', op: 'eq', value: 'armor' },
@@ -30,7 +34,14 @@ const CHESTPLATE = createAmpRelevanceRecord({
   ],
 });
 
-const SYMMETRY = createAmpRelevanceRecord({ ampId: 'symmetry-amp', version: '1.0.0' });
+const SYMMETRY = createAmpRelevanceRecord({
+  pipeline: 'item',
+  ampId: 'symmetry-amp',
+  order: 20,
+  description: 'enforces left/right symmetry on applicable parts',
+  concept: 'structural',
+  version: '1.0.0',
+});
 
 describe('AMP substrate — SQLite store', () => {
   let db;
@@ -42,8 +53,8 @@ describe('AMP substrate — SQLite store', () => {
     expect(tables).toContain('amp_relevance');
     expect(tables).toContain('amp_activation_log');
 
-    const applied = (await db.execute('SELECT version FROM schema_migrations WHERE namespace = ?', [SUBSTRATE_NAMESPACE])).rows;
-    expect(applied).toEqual([{ version: 1 }]);
+    const applied = (await db.execute('SELECT version FROM schema_migrations WHERE namespace = ? ORDER BY version', [SUBSTRATE_NAMESPACE])).rows;
+    expect(applied).toEqual([{ version: 1 }, { version: 2 }]);
     expect(db.client.pragma('foreign_keys', { simple: true })).toBe(1);
   });
 
@@ -59,7 +70,10 @@ describe('AMP substrate — SQLite store', () => {
         'SELECT version, name FROM schema_migrations WHERE namespace = ? ORDER BY version',
         [SUBSTRATE_NAMESPACE],
       )).rows;
-      expect(rows).toEqual([{ version: 1, name: 'create_amp_relevance_and_activation_log' }]);
+      expect(rows).toEqual([
+        { version: 1, name: 'create_amp_relevance_and_activation_log' },
+        { version: 2, name: 'amp_relevance_v2_pipeline_order_description_concept' },
+      ]);
     } finally {
       await second?.close();
       rmSync(dir, { recursive: true, force: true });
@@ -68,7 +82,7 @@ describe('AMP substrate — SQLite store', () => {
 
   it('registers a record and reads it back with its checksum intact', async () => {
     await registerAmpRelevance(db, CHESTPLATE);
-    const row = await getAmpRelevance(db, 'chestplate-amp');
+    const row = await getAmpRelevance(db, 'item', 'chestplate-amp');
     expect(row.ampId).toBe('chestplate-amp');
     expect(row.checksum).toBe(CHESTPLATE.checksum);
     expect(JSON.parse(row.appliesToJson)).toHaveLength(2);
@@ -83,13 +97,17 @@ describe('AMP substrate — SQLite store', () => {
       expect(err.bytecode).toBeTruthy();
       expect(JSON.stringify(err.context ?? err.toJSON?.() ?? {})).toMatch(/checksum/);
     }
-    expect(await getAmpRelevance(db, 'chestplate-amp')).toBeNull();
+    expect(await getAmpRelevance(db, 'item', 'chestplate-amp')).toBeNull();
   });
 
   it('re-registering the same ampId updates in place rather than duplicating', async () => {
     await registerAmpRelevance(db, CHESTPLATE);
     const v2 = createAmpRelevanceRecord({
+      pipeline: 'item',
       ampId: 'chestplate-amp',
+      order: 10,
+      description: 'gates chestplate-specific geometry to armor chestplates',
+      concept: 'structural',
       version: '2.0.0',
       appliesTo: [{ field: 'class', op: 'eq', value: 'armor' }],
     });
@@ -101,7 +119,7 @@ describe('AMP substrate — SQLite store', () => {
     expect(all[0].checksum).toBe(v2.checksum);
   });
 
-  it('lists records in a stable alphabetical order regardless of insertion order', async () => {
+  it('lists records in a stable order regardless of insertion order', async () => {
     await registerAmpRelevance(db, SYMMETRY);
     await registerAmpRelevance(db, CHESTPLATE);
     expect((await listAmpRelevance(db)).map((r) => r.ampId)).toEqual(['chestplate-amp', 'symmetry-amp']);
@@ -109,8 +127,8 @@ describe('AMP substrate — SQLite store', () => {
 
   it('unregisters a record and reports whether anything was actually removed', async () => {
     await registerAmpRelevance(db, CHESTPLATE);
-    expect(await unregisterAmpRelevance(db, 'chestplate-amp')).toBe(true);
-    expect(await unregisterAmpRelevance(db, 'chestplate-amp')).toBe(false);
+    expect(await unregisterAmpRelevance(db, 'item', 'chestplate-amp')).toBe(true);
+    expect(await unregisterAmpRelevance(db, 'item', 'chestplate-amp')).toBe(false);
     expect(await listAmpRelevance(db)).toHaveLength(0);
   });
 
@@ -150,5 +168,53 @@ describe('AMP substrate — SQLite store', () => {
 
   it('refuses to open without a path instead of silently choosing one', async () => {
     await expect(openAmpSubstrate('')).rejects.toThrow();
+  });
+
+  it('migrates to schema v2 with a (pipeline, ampId) composite key', async () => {
+    const record = createAmpRelevanceRecord({
+      pipeline: 'item', ampId: 'geometry-amp', order: 9,
+      description: 'always-relevant base geometry pass', concept: 'structural',
+      version: '2.0.0', appliesTo: [], requires: [],
+    });
+    await registerAmpRelevance(db, record);
+    const rows = await listAmpRelevance(db, { pipeline: 'item' });
+    expect(rows).toHaveLength(1);
+    expect(rows[0].pipeline).toBe('item');
+    expect(rows[0].order).toBe(9);
+    expect(rows[0].description).toBe(record.description);
+  });
+
+  it('the same ampId may exist under two different pipelines', async () => {
+    const itemRecord = createAmpRelevanceRecord({
+      pipeline: 'item', ampId: 'shadow-amp', order: 1,
+      description: 'item-pipeline shadow pass (hypothetical)', concept: 'lighting',
+      version: '1.0.0', appliesTo: [], requires: [],
+    });
+    const renderRecord = createAmpRelevanceRecord({
+      pipeline: 'render-fidelity', ampId: 'shadow-amp', order: 1,
+      description: 'render-fidelity shadow pass', concept: 'lighting',
+      version: '1.0.0', appliesTo: [], requires: [],
+    });
+    await registerAmpRelevance(db, itemRecord);
+    await registerAmpRelevance(db, renderRecord);
+    expect(await getAmpRelevance(db, 'item', 'shadow-amp')).not.toBeNull();
+    expect(await getAmpRelevance(db, 'render-fidelity', 'shadow-amp')).not.toBeNull();
+  });
+
+  it('listAmpRelevance with no filter returns every pipeline, ordered by (pipeline, order)', async () => {
+    const rows = await listAmpRelevance(db);
+    expect(rows.map((r) => r.pipeline)).toEqual([...rows.map((r) => r.pipeline)].sort());
+  });
+
+  it('unregisterAmpRelevance is scoped to (pipeline, ampId)', async () => {
+    const record = createAmpRelevanceRecord({
+      pipeline: 'item', ampId: 'facet-amp', order: 14,
+      description: 'faceting pass for gem-class parts', concept: 'lighting',
+      version: '2.0.0', appliesTo: [], requires: [],
+    });
+    await registerAmpRelevance(db, record);
+    const deleted = await unregisterAmpRelevance(db, 'item', 'facet-amp');
+    expect(deleted).toBe(true);
+    expect(await getAmpRelevance(db, 'item', 'facet-amp')).toBeNull();
   });
 });
