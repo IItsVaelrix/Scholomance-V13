@@ -18,7 +18,12 @@
 
 import { sha256Hex } from '../sha256.js';
 
-export const AMP_RELEVANCE_CONTRACT = 'PB-AMP-RELEVANCE-v1';
+export const AMP_RELEVANCE_CONTRACT = 'PB-AMP-RELEVANCE-v2';
+
+export const VALID_PIPELINES = Object.freeze([
+  'item', 'chestplate-fidelity', 'render-fidelity', 'voxel-world',
+  'character', 'image-lattice', 'cross-cutting', 'runtime',
+]);
 
 /**
  * Fields a predicate may read off a spec. Dotted paths whose first segment is an
@@ -28,7 +33,7 @@ export const AMP_RELEVANCE_CONTRACT = 'PB-AMP-RELEVANCE-v1';
  */
 export const VALID_FIELDS = Object.freeze([
   'class', 'archetype', 'materials', 'parts',
-  'parts.id', 'parts.profile', 'parts.fill.material',
+  'parts.id', 'parts.profile', 'parts.fill.material', 'parts.shading',
 ]);
 
 // `matches` is a literal whole-value comparison, never an executable regex.
@@ -48,7 +53,11 @@ function isPlainObject(value) {
 export function canonicalAmpRelevanceJSON(record) {
   return JSON.stringify({
     contract: AMP_RELEVANCE_CONTRACT,
+    pipeline: record?.pipeline,
     ampId: record?.ampId,
+    order: record?.order,
+    description: record?.description,
+    concept: record?.concept,
     version: record?.version,
     appliesTo: record?.appliesTo ?? [],
     requires: record?.requires ?? [],
@@ -132,6 +141,19 @@ export function validateAmpRelevance(record) {
     errors.push('version: required non-empty string');
   }
 
+  if (typeof record.pipeline !== 'string' || !VALID_PIPELINES.includes(record.pipeline)) {
+    errors.push(`pipeline: must be one of ${VALID_PIPELINES.join(', ')}, got '${record.pipeline}'`);
+  }
+  if (!Number.isInteger(record.order)) {
+    errors.push('order: required integer (conveyor-belt position within its pipeline)');
+  }
+  if (typeof record.description !== 'string' || record.description.trim() === '') {
+    errors.push('description: required non-empty string');
+  }
+  if (typeof record.concept !== 'string' || record.concept.trim() === '') {
+    errors.push('concept: required non-empty string');
+  }
+
   const appliesTo = record.appliesTo ?? [];
   if (!Array.isArray(appliesTo)) {
     errors.push('appliesTo: must be an array (empty array means "always relevant")');
@@ -156,10 +178,16 @@ export function validateAmpRelevance(record) {
  * Build a complete, checksummed record from its parts. The only sanctioned way
  * to produce a valid checksum — authors never hand-write one.
  */
-export function createAmpRelevanceRecord({ ampId, version, appliesTo = [], requires = [] }) {
+export function createAmpRelevanceRecord({
+  pipeline, ampId, order, description, concept, version, appliesTo = [], requires = [],
+}) {
   const base = {
     contract: AMP_RELEVANCE_CONTRACT,
+    pipeline,
     ampId,
+    order,
+    description,
+    concept,
     version,
     appliesTo,
     requires,
