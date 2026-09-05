@@ -294,6 +294,16 @@ export function forgeItemAsset(rawSpec, opts = {}) {
   const { activated: activeAmps } = selectActiveAmps('item', spec, loadRelevanceRecordsSync());
   const ampActive = (ampId) => activeAmps.includes(ampId);
 
+  // LATENT RISK — do not change these four AMPs' relevance record
+  // (`appliesTo`/`requires` in pilot-relevance/*.json) away from
+  // "always relevant" (empty appliesTo/requires) without also adding a
+  // fallback/guard at their downstream use site below: `sketch-amp` (sets
+  // `template`), `geometry-amp` (sets `geometry`), `region-fill-amp` (sets
+  // `fills`), and `square-sharpness-contrast-amp` (sets `sharpness`). Each of
+  // those variables is consumed unconditionally further down with no guard —
+  // if any of these four ever gains a real predicate and skips, forging
+  // crashes with an opaque TypeError instead of failing clearly.
+
   const materialResolver = opts.materialResolver || defaultMaterialResolver();
   const includeShader = opts.includeShader !== false;
   const includePng = opts.includePng !== false;
