@@ -75,6 +75,8 @@ import { normalizeItemSpec, hashItemSpec, validateItemSpec } from './item-spec.j
 import { collectSpecIntent } from './spec-intent-report.js';
 import { SDFShapeAMP } from './sdf-shape-amp.js';
 import { NoiseFillAMP } from './noise-fill-amp.js';
+import { loadRelevanceRecordsSync } from './amp-substrate/load-relevance-records-sync.js';
+import { selectActiveAmps } from './amp-substrate/amp-selector.js';
 // VRI reach (Door B): the Foundry's items become shadeable through the Vixel
 // Render IR engine — opt-in, additive, lineage-recorded. The engine is canon:
 // ARCH-2026-09-04-VIXEL-RENDER-IR.md, SCHEMA_CONTRACT.md 1.48.
@@ -283,6 +285,15 @@ export function forgeItemAsset(rawSpec, opts = {}) {
   const spec = normalizeItemSpec(rawSpec);
   validateItemSpec(spec);
 
+  // Data-driven AMP activation: the relevance registry (Task 1-8's substrate)
+  // decides which of this pipeline's AMPs a spec activates, instead of each
+  // AMP's condition being buried inline below. `volume-lift-amp` is the one
+  // deliberate exception — see its call site (~opts.includeVolume below) — its
+  // real trigger is call-time opts and a route-computed volume, neither of
+  // which is spec content the selector can see.
+  const { activated: activeAmps } = selectActiveAmps('item', spec, loadRelevanceRecordsSync());
+  const ampActive = (ampId) => activeAmps.includes(ampId);
+
   const materialResolver = opts.materialResolver || defaultMaterialResolver();
   const includeShader = opts.includeShader !== false;
   const includePng = opts.includePng !== false;
@@ -303,10 +314,8 @@ export function forgeItemAsset(rawSpec, opts = {}) {
   // 1a. Holy Fire Motif AMP — deterministic flame emission for holy-paladin
   //     weapons. Must run BEFORE template construction so motif cells become
   //     part of the silhouette and get the regular fill pass.
-  if (spec.class === 'weapon'
-      && spec.archetype === 'sword'
-      && spec.parts.some((p) => p.profile === 'weapon.sword.holyfire_motif'
-        || p.id === 'holyFire' || p.id === 'holy_fire')) {
+  //     Activation is data-driven — see pilot-relevance/holyfire-motif-amp.json.
+  if (ampActive('holyfire-motif-amp')) {
     const holyFireResult = applyHolyFireMotif(silhouette, spec);
     silhouette = Object.freeze({
       ...silhouette,
@@ -332,8 +341,9 @@ export function forgeItemAsset(rawSpec, opts = {}) {
 
   // SDF and Coherent Noise integration (full per 2026-06-12-pixelbrain-sdf-and-coherent-noise-integration-pdr.md)
   // SDFShapeAMP for parts declaring 'sdf' (uses construction for bounds, emits integer cells)
-  const sdfSpecParts = spec.parts.filter(p => p.sdf);
-  if (sdfSpecParts.length > 0) {
+  // Activation is data-driven — see pilot-relevance/sdf-shape-amp.json.
+  if (ampActive('sdf-shape-amp')) {
+    const sdfSpecParts = spec.parts.filter(p => p.sdf);
     for (const part of sdfSpecParts) {
       const sdfResult = SDFShapeAMP({ construction: constructionResult, silhouette, spec }, { sdf: part.sdf, partId: part.id, minCells: part.minCells || 1 });
       if (sdfResult.partCells && sdfResult.partCells.length > 0) {
@@ -352,20 +362,32 @@ export function forgeItemAsset(rawSpec, opts = {}) {
 
 
   // 2. Distance transform shading slots
-  let template = sketchToSilhouette(
-    silhouette.cells,
-    { width: spec.canvas.width, height: spec.canvas.height },
-    { bands: spec.bands, symmetry: 'none', light: spec.light },
-  );
+  // Activation is data-driven — see pilot-relevance/sketch-amp.json.
+  let template;
+  if (ampActive('sketch-amp')) {
+    template = sketchToSilhouette(
+      silhouette.cells,
+      { width: spec.canvas.width, height: spec.canvas.height },
+      { bands: spec.bands, symmetry: 'none', light: spec.light },
+    );
+  }
 
   // PRE-PROCESSORS (mutate template slots / normals before region fill)
-  template = applyShieldRimTemplate(template, silhouette, spec);
-  template = applyShieldVolumeTemplate(template, silhouette, spec);
-  template = applyHeraldryTemplate(template, silhouette, spec);
-  template = applyJewelryTemplate(template, silhouette, spec);
-  template = applyChestplateTemplate(template, silhouette, spec, constructionHintsForComposer || (constructionResult ? constructionResult.constructionHints : null));
+  // Activation is data-driven — see pilot-relevance/{shield-rim,shield-volume,
+  // heraldry,jewelry,chestplate}-amp.json.
+  if (ampActive('shield-rim-amp')) template = applyShieldRimTemplate(template, silhouette, spec);
+  if (ampActive('shield-volume-amp')) template = applyShieldVolumeTemplate(template, silhouette, spec);
+  if (ampActive('heraldry-amp')) template = applyHeraldryTemplate(template, silhouette, spec);
+  if (ampActive('jewelry-amp')) template = applyJewelryTemplate(template, silhouette, spec);
+  if (ampActive('chestplate-amp')) {
+    template = applyChestplateTemplate(template, silhouette, spec, constructionHintsForComposer || (constructionResult ? constructionResult.constructionHints : null));
+  }
 
-  const geometry = buildGeometryAmpPayload({ spec, silhouette, construction: constructionResult });
+  // Activation is data-driven — see pilot-relevance/geometry-amp.json.
+  let geometry;
+  if (ampActive('geometry-amp')) {
+    geometry = buildGeometryAmpPayload({ spec, silhouette, construction: constructionResult });
+  }
 
   const outline = computeOutline(silhouette);
 
@@ -385,14 +407,19 @@ export function forgeItemAsset(rawSpec, opts = {}) {
   const motifHash = hashMotifs(motifRaw);
 
   // 4. Region fills (colors are registry-anchored)
-  let fills = applyRegionFills({ silhouette, template, spec, motifCells });
+  // Activation is data-driven — see pilot-relevance/region-fill-amp.json.
+  let fills;
+  if (ampActive('region-fill-amp')) {
+    fills = applyRegionFills({ silhouette, template, spec, motifCells });
+  }
   // Per-part rules (e.g. grip wrap rows). Adds wrap colors to grip rows.
   fills = applyPartRules(fills, spec);
   fills = applyChestplateFidelityFills({ fills, spec, silhouette });
 
   // NoiseFillAMP (after fills, for parts with 'noise' per PDR)
-  const noiseSpecParts = spec.parts.filter(p => p.noise);
-  if (noiseSpecParts.length > 0) {
+  // Activation is data-driven — see pilot-relevance/noise-fill-amp.json.
+  if (ampActive('noise-fill-amp')) {
+    const noiseSpecParts = spec.parts.filter(p => p.noise);
     for (const part of noiseSpecParts) {
       const noiseResult = NoiseFillAMP(fills, part.noise, { partId: part.id });
       if (noiseResult.fills && noiseResult.fills.length > 0) {
@@ -400,25 +427,31 @@ export function forgeItemAsset(rawSpec, opts = {}) {
       }
     }
   }
-  
+
   // Finish passes
-  fills = applySelout(fills, spec, materialResolver, spec.light);
-  fills = applyPixelAA(fills, spec);
-  fills = applyFacets(fills, spec, materialResolver, spec.light);
+  // Activation is data-driven — see pilot-relevance/{selout,pixel-aa,facet}-amp.json.
+  if (ampActive('selout-amp')) fills = applySelout(fills, spec, materialResolver, spec.light);
+  if (ampActive('pixel-aa-amp')) fills = applyPixelAA(fills, spec);
+  if (ampActive('facet-amp')) fills = applyFacets(fills, spec, materialResolver, spec.light);
   // Heraldry fill stage runs last so emblem inlay/emit/outline colors and
   // the contrast guarantee survive the other finish passes.
-  fills = applyHeraldryFills(fills, spec, silhouette);
+  // Activation is data-driven — see pilot-relevance/heraldry-amp.json.
+  if (ampActive('heraldry-amp')) fills = applyHeraldryFills(fills, spec, silhouette);
 
   const fillHash = hashRegionFills(fills);
 
   // 5. Square Sharpness Contrast (HD edge pass)
-  const sharpness = buildSquareSharpnessContrastPayload({
-    coordinates: fills.coordinates,
-    material: hdMaterial,
-    canvas: spec.canvas,
-    options: { enabled: true },
-    intent: 'enhance_square_render_readability',
-  });
+  // Activation is data-driven — see pilot-relevance/square-sharpness-contrast-amp.json.
+  let sharpness;
+  if (ampActive('square-sharpness-contrast-amp')) {
+    sharpness = buildSquareSharpnessContrastPayload({
+      coordinates: fills.coordinates,
+      material: hdMaterial,
+      canvas: spec.canvas,
+      options: { enabled: true },
+      intent: 'enhance_square_render_readability',
+    });
+  }
   const quantization = finalizeChestplateFidelityCoordinates({
     coordinates: sharpness.outputCoordinates,
     spec,
