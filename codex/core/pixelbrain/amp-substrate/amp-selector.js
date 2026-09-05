@@ -110,18 +110,20 @@ function satisfiesRequires(spec, requires) {
  *
  * Pure: same spec + same records in, byte-identical result out. Records are
  * evaluated in ampId order so the returned arrays never depend on row order,
- * Map iteration, or insertion history.
+ * Map iteration, or insertion history. Activated results are sorted by `order`.
  *
+ * @param {string} pipeline - the pipeline to scope to (e.g. 'item', 'cross-cutting')
  * @param {object} spec - an ITEM-SPEC-v1 / CHARACTER-SPEC-v1 shaped object
- * @param {Array<{ampId:string, appliesToJson:string, requiresJson:string}>} records
+ * @param {Array<{pipeline:string, ampId:string, order:number, appliesToJson:string, requiresJson:string}>} records
  * @returns {{ activated: string[], skipped: Array<{ampId:string, reason:string}>,
- *   specChecksum: string, selectorVersion: string }}
+ *   specChecksum: string, selectorVersion: string, pipeline: string }}
  */
-export function selectActiveAmps(spec, records) {
-  const activated = [];
+export function selectActiveAmps(pipeline, spec, records) {
+  const scoped = (records ?? []).filter((r) => r.pipeline === pipeline);
+  const activatedRecords = [];
   const skipped = [];
 
-  const ordered = [...(records ?? [])].sort((a, b) => a.ampId.localeCompare(b.ampId));
+  const ordered = [...scoped].sort((a, b) => a.ampId.localeCompare(b.ampId));
 
   for (const record of ordered) {
     const appliesTo = JSON.parse(record.appliesToJson || '[]');
@@ -136,15 +138,18 @@ export function selectActiveAmps(spec, records) {
     // Empty appliesTo means universally relevant — the correct shape for a pass
     // like symmetry-amp, not a missing predicate.
     const matched = appliesTo.length === 0 || appliesTo.every((clause) => matchesClause(spec, clause));
-    if (matched) activated.push(record.ampId);
+    if (matched) activatedRecords.push(record);
     else skipped.push({ ampId: record.ampId, reason: 'appliesTo did not match spec' });
   }
 
+  activatedRecords.sort((a, b) => a.order - b.order);
+
   return {
-    activated,
+    activated: activatedRecords.map((r) => r.ampId),
     skipped,
     specChecksum: sha256Hex(JSON.stringify(spec ?? null)),
     selectorVersion: SELECTOR_VERSION,
+    pipeline,
   };
 }
 
@@ -153,8 +158,8 @@ export function selectActiveAmps(spec, records) {
  * The pure function above stays independently testable; this is the one that
  * leaves an audit trail.
  */
-export async function selectAndLog(db, spec, records) {
-  const result = selectActiveAmps(spec, records);
+export async function selectAndLog(db, pipeline, spec, records) {
+  const result = selectActiveAmps(pipeline, spec, records);
   await appendActivationLog(db, {
     specChecksum: result.specChecksum,
     activated: result.activated,

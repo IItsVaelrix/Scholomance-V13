@@ -140,13 +140,14 @@ function describeClause(clause) {
 async function cmdSelect(db, file) {
   if (!file) { console.error('[AMP] select: missing <spec.json>'); process.exit(1); }
   const spec = readJson(file);
+  const pipeline = spec.pipeline ?? 'item';
   const records = await listAmpRelevance(db);
   if (records.length === 0) {
     console.log('[AMP] no relevance records registered — nothing can activate. Run `register-pilots` first.');
     return;
   }
 
-  const result = await selectAndLog(db, spec, records);
+  const result = await selectAndLog(db, pipeline, spec, records);
   console.log(`[AMP] spec ${basename(file)}  (${result.specChecksum.slice(0, 12)}…)`);
   console.log(`\n  ACTIVATED (${result.activated.length}):`);
   if (result.activated.length === 0) console.log('    (none)');
