@@ -7,11 +7,45 @@
 
 ## Living Document - Owned by Codex, Read by All Agents
 
-**Version: 1.48** | Last updated: 2026-09-04
+**Version: 1.49** | Last updated: 2026-09-04
 
 > Bump the version on every schema change.
 > Notify Claude for UI-consumed field changes.
 > Notify Gemini for fixture, regression-test, and backend implementation changes.
+
+---
+
+## SCHEMA CHANGE NOTICE
+
+- Schema: PixelBrain AMP Relevance Registry
+- Version: 1.48 -> 1.49
+- Date: 2026-09-04
+- Changed fields: registered the additive `PB-AMP-RELEVANCE-v1` record used to
+  declare deterministic, checksummed AMP relevance predicates and required spec
+  paths; no forge consumes the registry in v1.
+- Breaking: no; additive, dormant-by-default infrastructure.
+- Owner: Codex
+- Claude impact: none; no UI surface exists in v1.
+- Gemini impact: relevance fixtures, SQLite migration, selector, CLI, and
+  microprocessor bridge validate this exact envelope before registration.
+
+### PB-AMP-RELEVANCE-v1
+
+Each record has exactly the canonical checksum fields `contract`, `ampId`,
+`version`, `appliesTo`, `requires`, and `schemaVersion`; `checksum` is the
+SHA-256 hex digest of that canonical ordered object. `contract` and
+`schemaVersion` are both `PB-AMP-RELEVANCE-v1`. `appliesTo` is an AND-list of
+`{ field, op, value }` clauses; a one-level `{ anyOf: [...] }` clause is allowed
+where the live AMP's real gate has alternatives. Fields are `class`, `archetype`,
+`materials`, `parts`, `parts.id`, `parts.profile`, and `parts.fill.material`.
+`requires` is an AND-list of non-empty dotted paths that must resolve on the
+spec. Supported operations are `eq`, `includes`, and literal whole-value
+`matches`; no record value is compiled as a regular expression.
+
+Records with an empty `appliesTo` are universally relevant once their `requires`
+are satisfied. A stale or fabricated checksum is a value error and is never
+corrected automatically. Selection sorts by `ampId`, has no RNG or floating-point
+comparison, and emits an audit record only through the SQLite selector boundary.
 
 ---
 

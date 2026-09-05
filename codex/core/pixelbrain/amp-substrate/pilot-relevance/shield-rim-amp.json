@@ -1,0 +1,20 @@
+{
+  "contract": "PB-AMP-RELEVANCE-v1",
+  "ampId": "shield-rim-amp",
+  "version": "1.0.0",
+  "appliesTo": [
+    {
+      "field": "class",
+      "op": "eq",
+      "value": "armor"
+    },
+    {
+      "field": "archetype",
+      "op": "eq",
+      "value": "kite_shield"
+    }
+  ],
+  "requires": [],
+  "schemaVersion": "PB-AMP-RELEVANCE-v1",
+  "checksum": "4d86a8820464252e1a2f7c69a1bf21aece1d64b47f9558fa81b745dd0708ce89"
+}

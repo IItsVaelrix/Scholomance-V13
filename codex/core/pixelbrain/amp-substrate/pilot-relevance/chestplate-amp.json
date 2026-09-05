@@ -1,0 +1,20 @@
+{
+  "contract": "PB-AMP-RELEVANCE-v1",
+  "ampId": "chestplate-amp",
+  "version": "1.0.0",
+  "appliesTo": [
+    {
+      "field": "class",
+      "op": "eq",
+      "value": "armor"
+    },
+    {
+      "field": "archetype",
+      "op": "includes",
+      "value": "chestplate"
+    }
+  ],
+  "requires": [],
+  "schemaVersion": "PB-AMP-RELEVANCE-v1",
+  "checksum": "a430ef268484c732fca2675acbdb82d7a64759c2c4185cb4bfa05aae80b4fa0d"
+}

@@ -210,4 +210,59 @@ verseIRMicroprocessors.register('amp.turboquant.similarity', async (payload, _co
   return runTurboQuantAmp(payload);
 });
 
+// ─── PixelBrain AMP Substrate bridge (PB-AMP-RELEVANCE-v1) ───────────────────
+//
+// Executable half of the AMP activation substrate: the selector decides WHICH
+// amps a spec activates (codex/core/pixelbrain/amp-substrate/amp-selector.js);
+// these ids are how a decision actually gets run.
+//
+// The `pixelbrain.amp.` prefix is deliberate. The `amp.*` ids above are two
+// different systems already sharing one namespace — `amp.symmetry`/
+// `amp.coord-symmetry` are PixelBrain passes, while `amp.run`/`amp.status`/
+// `amp.getActive` are Animation AMP running-state. A third meaning under the
+// same prefix would make the collision worse, so this family gets its own.
+//
+// This map is static ON PURPOSE. Reading the substrate's SQLite table here would
+// pull better-sqlite3 into every consumer's module graph — including the browser
+// ones (src/hooks/useVerseSynthesis.js, src/lib/engine.adapter.js both import
+// this file). Relevance lives in the database; id→implementation is just a map.
+const PIXELBRAIN_AMP_LOADERS = Object.freeze({
+  'chestplate-amp': async ({ template, silhouette, spec, constructionHints = null }) => {
+    const { applyChestplateTemplate } = await import('../pixelbrain/chestplate-amp.js');
+    return applyChestplateTemplate(template, silhouette, spec, constructionHints);
+  },
+  'shield-rim-amp': async ({ template, silhouette, spec }) => {
+    const { applyShieldRimTemplate } = await import('../pixelbrain/shield-rim-amp.js');
+    return applyShieldRimTemplate(template, silhouette, spec);
+  },
+  'shield-volume-amp': async ({ template, silhouette, spec }) => {
+    const { applyShieldVolumeTemplate } = await import('../pixelbrain/shield-volume-amp.js');
+    return applyShieldVolumeTemplate(template, silhouette, spec);
+  },
+  'holyfire-motif-amp': async ({ silhouette, spec, options = {} }) => {
+    const { applyHolyFireMotif } = await import('../pixelbrain/holyfire-motif-amp.js');
+    return applyHolyFireMotif(silhouette, spec, options);
+  },
+  'symmetry-amp': async (payload, context) => {
+    const { runSymmetryAmpProcessor } = await import('../pixelbrain/symmetry-amp.js');
+    return runSymmetryAmpProcessor(payload, context);
+  },
+});
+
+export const PIXELBRAIN_AMP_IDS = Object.freeze(Object.keys(PIXELBRAIN_AMP_LOADERS).sort());
+
+for (const ampId of PIXELBRAIN_AMP_IDS) {
+  verseIRMicroprocessors.register(`pixelbrain.amp.${ampId}`, async (payload, context) => {
+    const fn = PIXELBRAIN_AMP_LOADERS[ampId];
+    if (typeof fn !== 'function') {
+      throw new BytecodeError(
+        ERROR_CATEGORIES.STATE, ERROR_SEVERITY.CRIT, MODULE_IDS.AMP_SUBSTRATE,
+        ERROR_CODES.INVALID_STATE,
+        { ampId, reason: 'amp module did not export the expected entry function' },
+      );
+    }
+    return fn(payload, context);
+  });
+}
+
 export { verseIRMicroprocessors };

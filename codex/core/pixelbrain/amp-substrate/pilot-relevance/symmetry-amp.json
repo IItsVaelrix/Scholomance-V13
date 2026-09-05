@@ -1,0 +1,9 @@
+{
+  "contract": "PB-AMP-RELEVANCE-v1",
+  "ampId": "symmetry-amp",
+  "version": "1.0.1",
+  "appliesTo": [],
+  "requires": [],
+  "schemaVersion": "PB-AMP-RELEVANCE-v1",
+  "checksum": "c8bbb673a36092195f086372357ef0deec5c68df1e278fc84f8faed9c5276893"
+}

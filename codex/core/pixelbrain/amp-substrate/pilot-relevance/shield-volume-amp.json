@@ -1,0 +1,20 @@
+{
+  "contract": "PB-AMP-RELEVANCE-v1",
+  "ampId": "shield-volume-amp",
+  "version": "1.0.0",
+  "appliesTo": [
+    {
+      "field": "class",
+      "op": "eq",
+      "value": "armor"
+    },
+    {
+      "field": "archetype",
+      "op": "eq",
+      "value": "kite_shield"
+    }
+  ],
+  "requires": [],
+  "schemaVersion": "PB-AMP-RELEVANCE-v1",
+  "checksum": "5cbc9641febeeac1bc50d17595130e1799227aa554f2f1cf16d4788317e42afc"
+}

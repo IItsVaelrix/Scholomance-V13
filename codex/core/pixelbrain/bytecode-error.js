@@ -115,6 +115,7 @@ export const MODULE_IDS = Object.freeze({
   VECTOR: 'VECTOR',
   SHADER: 'SHADER',
   AUDIO_FORGE: 'AUDFOR',
+  AMP_SUBSTRATE: 'AMPSUB',
 });
 
 // ─── Error Codes (per category) ──────────────────────────────────────────────

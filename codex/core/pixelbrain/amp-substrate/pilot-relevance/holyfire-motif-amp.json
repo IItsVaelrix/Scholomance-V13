@@ -1,0 +1,37 @@
+{
+  "contract": "PB-AMP-RELEVANCE-v1",
+  "ampId": "holyfire-motif-amp",
+  "version": "1.0.0",
+  "appliesTo": [
+    {
+      "field": "class",
+      "op": "eq",
+      "value": "weapon"
+    },
+    {
+      "field": "archetype",
+      "op": "eq",
+      "value": "sword"
+    },
+    {
+      "anyOf": [
+        {
+          "field": "parts.profile",
+          "op": "eq",
+          "value": "weapon.sword.holyfire_motif"
+        },
+        {
+          "field": "parts.id",
+          "op": "eq",
+          "value": [
+            "holyFire",
+            "holy_fire"
+          ]
+        }
+      ]
+    }
+  ],
+  "requires": [],
+  "schemaVersion": "PB-AMP-RELEVANCE-v1",
+  "checksum": "a5f541fba4f92f4157d110a82815f1cc76206af876e6e58626688bd361425116"
+}
