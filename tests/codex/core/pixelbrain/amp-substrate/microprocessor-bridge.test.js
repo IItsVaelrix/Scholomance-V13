@@ -11,6 +11,10 @@ import { verseIRMicroprocessors, PIXELBRAIN_AMP_IDS } from '../../../../../codex
 import { applyChestplateTemplate } from '../../../../../codex/core/pixelbrain/chestplate-amp.js';
 import { applyShieldRimTemplate } from '../../../../../codex/core/pixelbrain/shield-rim-amp.js';
 import { applyHolyFireMotif } from '../../../../../codex/core/pixelbrain/holyfire-motif-amp.js';
+import { buildGeometryAmpPayload } from '../../../../../codex/core/pixelbrain/geometry-amp.js';
+import { applyHeraldryTemplate } from '../../../../../codex/core/pixelbrain/heraldry-amp.js';
+import { applySelout } from '../../../../../codex/core/pixelbrain/selout-amp.js';
+import { applyFacets } from '../../../../../codex/core/pixelbrain/facet-amp.js';
 
 const PRE_EXISTING_AMP_IDS = [
   'amp.symmetry',
@@ -92,5 +96,86 @@ describe('PixelBrain AMP substrate bridge', () => {
       expect(new Set(prefixed).size).toBe(prefixed.length);
       expect(prefixed).toHaveLength(PIXELBRAIN_AMP_IDS.length);
     }
+  });
+
+  it('every pixelbrain.amp.* id actually invokes its loader and returns a real result, not a function', async () => {
+    // This guards against the bug where loaders were `async () => functionRef`
+    // instead of `async (...) => functionRef(...)`
+    const payloads = {
+      'chestplate-amp': { template: {}, silhouette: { cells: [], partOf: new Map() }, spec: { parts: [] }, constructionHints: null },
+      'shield-rim-amp': { template: {}, silhouette: { cells: [], partOf: new Map() }, spec: { parts: [] } },
+      'shield-volume-amp': { template: {}, silhouette: { cells: [], partOf: new Map() }, spec: { parts: [] } },
+      'holyfire-motif-amp': { silhouette: { cells: [], partOf: new Map() }, spec: { parts: [{ id: 'blade' }] } },
+      'symmetry-amp': { silhouette: { cells: [], partOf: new Map() }, spec: { parts: [] } },
+      'sketch-amp': { occupied: [], dimensions: { w: 10, h: 10 }, options: {} },
+      'sdf-shape-amp': { context: {}, options: {} },
+      'heraldry-amp': { template: {}, silhouette: { cells: [], partOf: new Map() }, spec: { parts: [] } },
+      'jewelry-amp': { template: {}, silhouette: { cells: [], partOf: new Map() }, spec: { parts: [] } },
+      'geometry-amp': { spec: { parts: [], canvas: { w: 10, h: 10 } }, silhouette: { cells: [], partOf: new Map() }, construction: {} },
+      'region-fill-amp': { silhouette: { cells: [], partOf: new Map() }, template: { coordinates: [] }, spec: { parts: [] }, motifCells: [] },
+      'noise-fill-amp': { cellsOrFills: [], noiseDesc: {}, options: {} },
+      'selout-amp': { fills: { coordinates: [] }, spec: { parts: [] }, materialResolver: () => ({}), lightOptions: {} },
+      'pixel-aa-amp': { fills: { coordinates: [] }, spec: { parts: [] } },
+      'facet-amp': { fills: { coordinates: [] }, spec: { parts: [] }, materialResolver: () => ({}), lightOptions: {} },
+      'square-sharpness-contrast-amp': { coordinates: [], material: {}, canvas: {}, options: {}, intent: '' },
+      'volume-lift-amp': { energized: [], dims: { w: 10, h: 10, d: 10 }, partParams: {} },
+    };
+
+    for (const ampId of PIXELBRAIN_AMP_IDS) {
+      const payload = payloads[ampId];
+      expect(payload).toBeDefined(`Missing test payload for ${ampId}`);
+      const result = await verseIRMicroprocessors.execute(`pixelbrain.amp.${ampId}`, payload);
+      expect(typeof result).not.toBe('function', `pixelbrain.amp.${ampId} returned a function instead of calling it`);
+    }
+  });
+
+  it('adapts a geometry-amp execution packet to buildGeometryAmpPayload', async () => {
+    const payload = { spec: { parts: [], canvas: { w: 10, h: 10 } }, silhouette: { cells: [], partOf: new Map() }, construction: {} };
+    const direct = buildGeometryAmpPayload(payload);
+    const viaRegistry = await verseIRMicroprocessors.execute('pixelbrain.amp.geometry-amp', payload);
+    expect(viaRegistry).toEqual(direct);
+  });
+
+  it('adapts a heraldry-amp execution packet to applyHeraldryTemplate', async () => {
+    const template = { slots: [] };
+    const silhouette = { cells: [], partOf: new Map() };
+    const spec = { class: 'armor', archetype: 'shield', parts: [] };
+    const direct = applyHeraldryTemplate(template, silhouette, spec);
+    const viaRegistry = await verseIRMicroprocessors.execute('pixelbrain.amp.heraldry-amp', {
+      template,
+      silhouette,
+      spec,
+    });
+    expect(viaRegistry).toEqual(direct);
+  });
+
+  it('adapts a selout-amp execution packet to applySelout', async () => {
+    const fills = { coordinates: [] };
+    const spec = { class: 'weapon', parts: [] };
+    const materialResolver = () => ({});
+    const lightOptions = {};
+    const direct = applySelout(fills, spec, materialResolver, lightOptions);
+    const viaRegistry = await verseIRMicroprocessors.execute('pixelbrain.amp.selout-amp', {
+      fills,
+      spec,
+      materialResolver,
+      lightOptions,
+    });
+    expect(viaRegistry).toEqual(direct);
+  });
+
+  it('adapts a facet-amp execution packet to applyFacets', async () => {
+    const fills = { coordinates: [] };
+    const spec = { class: 'weapon', parts: [] };
+    const materialResolver = () => ({});
+    const lightOptions = {};
+    const direct = applyFacets(fills, spec, materialResolver, lightOptions);
+    const viaRegistry = await verseIRMicroprocessors.execute('pixelbrain.amp.facet-amp', {
+      fills,
+      spec,
+      materialResolver,
+      lightOptions,
+    });
+    expect(viaRegistry).toEqual(direct);
   });
 });

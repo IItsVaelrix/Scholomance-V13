@@ -247,18 +247,54 @@ const PIXELBRAIN_AMP_LOADERS = Object.freeze({
     const { runSymmetryAmpProcessor } = await import('../pixelbrain/symmetry-amp.js');
     return runSymmetryAmpProcessor(payload, context);
   },
-  'sketch-amp': async () => (await import('../pixelbrain/sketch-amp.js')).sketchToSilhouette,
-  'sdf-shape-amp': async () => (await import('../pixelbrain/sdf-shape-amp.js')).SDFShapeAMP,
-  'heraldry-amp': async () => (await import('../pixelbrain/heraldry-amp.js')).applyHeraldryTemplate,
-  'jewelry-amp': async () => (await import('../pixelbrain/jewelry-amp.js')).applyJewelryTemplate,
-  'geometry-amp': async () => (await import('../pixelbrain/geometry-amp.js')).buildGeometryAmpPayload,
-  'region-fill-amp': async () => (await import('../pixelbrain/region-fill-amp.js')).applyRegionFills,
-  'noise-fill-amp': async () => (await import('../pixelbrain/noise-fill-amp.js')).NoiseFillAMP,
-  'selout-amp': async () => (await import('../pixelbrain/selout-amp.js')).applySelout,
-  'pixel-aa-amp': async () => (await import('../pixelbrain/pixel-aa-amp.js')).applyPixelAA,
-  'facet-amp': async () => (await import('../pixelbrain/facet-amp.js')).applyFacets,
-  'square-sharpness-contrast-amp': async () => (await import('../pixelbrain/square-sharpness-contrast-amp.js')).buildSquareSharpnessContrastPayload,
-  'volume-lift-amp': async () => (await import('../pixelbrain/volume-lift-amp.js')).liftToVolume,
+  'sketch-amp': async ({ occupied, dimensions, options = {} }) => {
+    const { sketchToSilhouette } = await import('../pixelbrain/sketch-amp.js');
+    return sketchToSilhouette(occupied, dimensions, options);
+  },
+  'sdf-shape-amp': async ({ context = {}, options = {} }) => {
+    const { SDFShapeAMP } = await import('../pixelbrain/sdf-shape-amp.js');
+    return SDFShapeAMP(context, options);
+  },
+  'heraldry-amp': async ({ template, silhouette, spec }) => {
+    const { applyHeraldryTemplate } = await import('../pixelbrain/heraldry-amp.js');
+    return applyHeraldryTemplate(template, silhouette, spec);
+  },
+  'jewelry-amp': async ({ template, silhouette, spec }) => {
+    const { applyJewelryTemplate } = await import('../pixelbrain/jewelry-amp.js');
+    return applyJewelryTemplate(template, silhouette, spec);
+  },
+  'geometry-amp': async (payload) => {
+    const { buildGeometryAmpPayload } = await import('../pixelbrain/geometry-amp.js');
+    return buildGeometryAmpPayload(payload);
+  },
+  'region-fill-amp': async (payload) => {
+    const { applyRegionFills } = await import('../pixelbrain/region-fill-amp.js');
+    return applyRegionFills(payload);
+  },
+  'noise-fill-amp': async ({ cellsOrFills, noiseDesc, options = {} }) => {
+    const { NoiseFillAMP } = await import('../pixelbrain/noise-fill-amp.js');
+    return NoiseFillAMP(cellsOrFills, noiseDesc, options);
+  },
+  'selout-amp': async ({ fills, spec, materialResolver, lightOptions }) => {
+    const { applySelout } = await import('../pixelbrain/selout-amp.js');
+    return applySelout(fills, spec, materialResolver, lightOptions);
+  },
+  'pixel-aa-amp': async ({ fills, spec }) => {
+    const { applyPixelAA } = await import('../pixelbrain/pixel-aa-amp.js');
+    return applyPixelAA(fills, spec);
+  },
+  'facet-amp': async ({ fills, spec, materialResolver, lightOptions }) => {
+    const { applyFacets } = await import('../pixelbrain/facet-amp.js');
+    return applyFacets(fills, spec, materialResolver, lightOptions);
+  },
+  'square-sharpness-contrast-amp': async (payload) => {
+    const { buildSquareSharpnessContrastPayload } = await import('../pixelbrain/square-sharpness-contrast-amp.js');
+    return buildSquareSharpnessContrastPayload(payload);
+  },
+  'volume-lift-amp': async ({ energized, dims, partParams }) => {
+    const { liftToVolume } = await import('../pixelbrain/volume-lift-amp.js');
+    return liftToVolume(energized, { dims, partParams });
+  },
 });
 
 export const PIXELBRAIN_AMP_IDS = Object.freeze(Object.keys(PIXELBRAIN_AMP_LOADERS).sort());
