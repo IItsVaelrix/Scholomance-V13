@@ -47,8 +47,9 @@ AMP Activation Substrate CLI
 Usage:
   npm run amps -- register <record.json>   Register one PB-AMP-RELEVANCE-v1 record
   npm run amps -- register-pilots          Register every record in pilot-relevance/
-  npm run amps -- list                     List registered relevance records
-  npm run amps -- select <spec.json>       Show which AMPs a spec activates
+  npm run amps -- list [--pipeline <name>] List registered relevance records (optionally scoped to one pipeline)
+  npm run amps -- select --pipeline <name> <spec.json>
+                                            Show which AMPs a spec activates in that pipeline
   npm run amps -- stats                    Registered/activation counts
   npm run amps -- log [--limit N]          Recent activation decisions
   npm run amps -- help
@@ -117,15 +118,18 @@ async function cmdRegisterPilots(db) {
   if (failed > 0) process.exit(1);
 }
 
-async function cmdList(db) {
-  const rows = await listAmpRelevance(db);
+async function cmdList(db, args) {
+  const flagIndex = args.indexOf('--pipeline');
+  const pipeline = flagIndex !== -1 ? args[flagIndex + 1] : undefined;
+  const rows = await listAmpRelevance(db, pipeline ? { pipeline } : {});
   if (rows.length === 0) { console.log('[AMP] no relevance records registered'); return; }
-  console.log(`[AMP] ${rows.length} registered record(s):\n`);
+  console.log(`[AMP] ${rows.length} registered record(s)${pipeline ? ` in pipeline '${pipeline}'` : ''}:\n`);
   for (const row of rows) {
     const clauses = JSON.parse(row.appliesToJson);
     const requires = JSON.parse(row.requiresJson);
     const gate = clauses.length === 0 ? 'always relevant' : clauses.map(describeClause).join(' AND ');
-    console.log(`  ${row.ampId.padEnd(26)} v${row.version.padEnd(8)} ${row.checksum.slice(0, 8)}…`);
+    console.log(`  [${row.pipeline}] ${row.ampId.padEnd(26)} order ${String(row.order).padEnd(3)} v${row.version}`);
+    console.log(`    ${row.description}`);
     console.log(`    when: ${gate}`);
     if (requires.length > 0) console.log(`    requires: ${requires.join(', ')}`);
   }
@@ -137,10 +141,13 @@ function describeClause(clause) {
   return `${clause.field} ${clause.op} ${value}`;
 }
 
-async function cmdSelect(db, file) {
+async function cmdSelect(db, args) {
+  const pipelineIndex = args.indexOf('--pipeline');
+  const pipeline = pipelineIndex !== -1 ? args[pipelineIndex + 1] : null;
+  const file = args.find((a, i) => !a.startsWith('--') && args[i - 1] !== '--pipeline');
+  if (!pipeline) { console.error('[AMP] select: missing --pipeline <name>'); process.exit(1); }
   if (!file) { console.error('[AMP] select: missing <spec.json>'); process.exit(1); }
   const spec = readJson(file);
-  const pipeline = spec.pipeline ?? 'item';
   const records = await listAmpRelevance(db);
   if (records.length === 0) {
     console.log('[AMP] no relevance records registered — nothing can activate. Run `register-pilots` first.');
@@ -148,8 +155,8 @@ async function cmdSelect(db, file) {
   }
 
   const result = await selectAndLog(db, pipeline, spec, records);
-  console.log(`[AMP] spec ${basename(file)}  (${result.specChecksum.slice(0, 12)}…)`);
-  console.log(`\n  ACTIVATED (${result.activated.length}):`);
+  console.log(`[AMP] spec ${basename(file)}  pipeline '${pipeline}'  (${result.specChecksum.slice(0, 12)}…)`);
+  console.log(`\n  ACTIVATED (${result.activated.length}, in order):`);
   if (result.activated.length === 0) console.log('    (none)');
   for (const ampId of result.activated) console.log(`    ✦ ${ampId}`);
   console.log(`\n  DORMANT (${result.skipped.length}):`);
@@ -193,8 +200,8 @@ async function main() {
   try {
     if (cmd === 'register') await cmdRegister(db, args[1]);
     else if (cmd === 'register-pilots') await cmdRegisterPilots(db);
-    else if (cmd === 'list') await cmdList(db);
-    else if (cmd === 'select') await cmdSelect(db, args[1]);
+    else if (cmd === 'list') await cmdList(db, args);
+    else if (cmd === 'select') await cmdSelect(db, args.slice(1));
     else if (cmd === 'stats') await cmdStats(db);
     else if (cmd === 'log') await cmdLog(db, args);
   } finally {
