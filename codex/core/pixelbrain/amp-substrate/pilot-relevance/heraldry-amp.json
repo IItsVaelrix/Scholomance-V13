@@ -1,0 +1,15 @@
+{
+  "contract": "PB-AMP-RELEVANCE-v2",
+  "pipeline": "item",
+  "ampId": "heraldry-amp",
+  "order": 6,
+  "description": "Emblem stamping for shield faces/panels; both template and fill stages self-gate on spec.heraldry being a non-empty array (heraldry-amp.js:131,211).",
+  "concept": "material-fx",
+  "version": "1.0.0",
+  "appliesTo": [],
+  "requires": [
+    "heraldry"
+  ],
+  "schemaVersion": "PB-AMP-RELEVANCE-v2",
+  "checksum": "7604090760dd9c6e34f9ee244c30ad214b401818a66caf02a6d7352142672556"
+}

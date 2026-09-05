@@ -1,0 +1,42 @@
+{
+  "contract": "PB-AMP-RELEVANCE-v2",
+  "pipeline": "item",
+  "ampId": "jewelry-amp",
+  "order": 7,
+  "description": "Chains, gem settings, volume manipulation for jewelry; self-gates on spec.class in [amulet,ring,jewelry] OR any part with a gem.* profile / id containing crystal or core (jewelry-amp.js:8-9).",
+  "concept": "material-fx",
+  "version": "1.0.0",
+  "appliesTo": [
+    {
+      "anyOf": [
+        {
+          "field": "class",
+          "op": "eq",
+          "value": [
+            "amulet",
+            "ring",
+            "jewelry"
+          ]
+        },
+        {
+          "field": "parts.profile",
+          "op": "includes",
+          "value": "gem."
+        },
+        {
+          "field": "parts.id",
+          "op": "includes",
+          "value": "crystal"
+        },
+        {
+          "field": "parts.id",
+          "op": "includes",
+          "value": "core"
+        }
+      ]
+    }
+  ],
+  "requires": [],
+  "schemaVersion": "PB-AMP-RELEVANCE-v2",
+  "checksum": "ccf87d3bf872e3d14f8afbf53353a398aeb88f7957831a51211b1458b11fa560"
+}

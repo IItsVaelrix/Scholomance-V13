@@ -1,0 +1,13 @@
+{
+  "contract": "PB-AMP-RELEVANCE-v2",
+  "pipeline": "item",
+  "ampId": "region-fill-amp",
+  "order": 10,
+  "description": "Color authority for the Item Foundry — every cell gets its part fill or outline color; item-foundry.js:407 calls it unconditionally.",
+  "concept": "material-fx",
+  "version": "1.0.0",
+  "appliesTo": [],
+  "requires": [],
+  "schemaVersion": "PB-AMP-RELEVANCE-v2",
+  "checksum": "d5eba3001a611ee6d3d6b2629ba253907d14a9f232b4e75259a37fc8aee4e7a7"
+}

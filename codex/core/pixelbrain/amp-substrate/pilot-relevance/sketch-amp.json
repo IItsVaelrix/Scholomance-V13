@@ -1,0 +1,13 @@
+{
+  "contract": "PB-AMP-RELEVANCE-v2",
+  "pipeline": "item",
+  "ampId": "sketch-amp",
+  "order": 2,
+  "description": "Distance-transform shading template (sketchToSilhouette) — the base template pass every item goes through; item-foundry.js:374 calls it unconditionally.",
+  "concept": "structural",
+  "version": "1.0.0",
+  "appliesTo": [],
+  "requires": [],
+  "schemaVersion": "PB-AMP-RELEVANCE-v2",
+  "checksum": "0a0427a3a648bc63dbe032bccfdc287eb3d072c5eaa071e23514fadfef9134f2"
+}

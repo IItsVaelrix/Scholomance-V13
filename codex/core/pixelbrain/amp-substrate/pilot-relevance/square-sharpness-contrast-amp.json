@@ -1,0 +1,13 @@
+{
+  "contract": "PB-AMP-RELEVANCE-v2",
+  "pipeline": "item",
+  "ampId": "square-sharpness-contrast-amp",
+  "order": 15,
+  "description": "HD edge-sharpness/contrast pass over the final fill coordinates; item-foundry.js:434 calls it unconditionally for every item.",
+  "concept": "outline",
+  "version": "1.0.0",
+  "appliesTo": [],
+  "requires": [],
+  "schemaVersion": "PB-AMP-RELEVANCE-v2",
+  "checksum": "53968f1cac17baa6f1cab5e9487450f7745dd573021a9a5b6707dd9aa3b3bafb"
+}

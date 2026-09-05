@@ -1,0 +1,15 @@
+{
+  "contract": "PB-AMP-RELEVANCE-v2",
+  "pipeline": "item",
+  "ampId": "selout-amp",
+  "order": 12,
+  "description": "Modulates outline color by light orientation; self-gates on spec.light being present (selout-amp.js:10).",
+  "concept": "outline",
+  "version": "1.0.0",
+  "appliesTo": [],
+  "requires": [
+    "light"
+  ],
+  "schemaVersion": "PB-AMP-RELEVANCE-v2",
+  "checksum": "e5f05ccf56d465a512f461ed6eb65ebbb94e1df020501280e3bf7305bcc73914"
+}

@@ -1,0 +1,21 @@
+{
+  "contract": "PB-AMP-RELEVANCE-v2",
+  "pipeline": "item",
+  "ampId": "facet-amp",
+  "order": 14,
+  "description": "Partitions gem-class parts into planar regions with flat shading; self-gates on spec.light present AND at least one part with shading:\"faceted\" (facet-amp.js:19,26).",
+  "concept": "lighting",
+  "version": "1.0.0",
+  "appliesTo": [
+    {
+      "field": "parts.shading",
+      "op": "eq",
+      "value": "faceted"
+    }
+  ],
+  "requires": [
+    "light"
+  ],
+  "schemaVersion": "PB-AMP-RELEVANCE-v2",
+  "checksum": "c9ae3e0e0fc4e3b4d8236aa510667d95721b86f5cd814eea5d8e43a7fbb1469b"
+}

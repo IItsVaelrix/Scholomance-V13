@@ -1,0 +1,15 @@
+{
+  "contract": "PB-AMP-RELEVANCE-v2",
+  "pipeline": "item",
+  "ampId": "noise-fill-amp",
+  "order": 11,
+  "description": "Modulates material intensity/variation on existing cells; gated on parts.noise presence (item-foundry.js:413-414).",
+  "concept": "material-fx",
+  "version": "1.0.0",
+  "appliesTo": [],
+  "requires": [
+    "parts.noise"
+  ],
+  "schemaVersion": "PB-AMP-RELEVANCE-v2",
+  "checksum": "e40291e332ddd13f35c84299857e387537bad827791ab08e017dd80067a0142b"
+}

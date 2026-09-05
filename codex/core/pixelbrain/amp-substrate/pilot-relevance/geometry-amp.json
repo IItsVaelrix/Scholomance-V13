@@ -1,0 +1,13 @@
+{
+  "contract": "PB-AMP-RELEVANCE-v2",
+  "pipeline": "item",
+  "ampId": "geometry-amp",
+  "order": 9,
+  "description": "Converts composed geometry into deterministic shader masks and construction diagnostics; item-foundry.js:387 calls it unconditionally for every item.",
+  "concept": "structural",
+  "version": "1.0.0",
+  "appliesTo": [],
+  "requires": [],
+  "schemaVersion": "PB-AMP-RELEVANCE-v2",
+  "checksum": "91e2c08d92feb2bd58a2b578f154b66308facf67bd5242502121cf2a4b56f9d5"
+}

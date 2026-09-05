@@ -1,0 +1,13 @@
+{
+  "contract": "PB-AMP-RELEVANCE-v2",
+  "pipeline": "item",
+  "ampId": "pixel-aa-amp",
+  "order": 13,
+  "description": "Softens 1-cell silhouette stair-steps by recoloring inner corners; item-foundry.js:425 calls it unconditionally.",
+  "concept": "outline",
+  "version": "1.0.0",
+  "appliesTo": [],
+  "requires": [],
+  "schemaVersion": "PB-AMP-RELEVANCE-v2",
+  "checksum": "d0c3148ddda4c6d5601f3612ba94c9c85e28b34f1af012bedcaf971147385816"
+}

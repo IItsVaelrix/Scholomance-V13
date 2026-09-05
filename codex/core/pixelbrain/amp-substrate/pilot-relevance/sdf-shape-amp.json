@@ -1,0 +1,15 @@
+{
+  "contract": "PB-AMP-RELEVANCE-v2",
+  "pipeline": "item",
+  "ampId": "sdf-shape-amp",
+  "order": 3,
+  "description": "Samples a signed-distance field at cell centers for parts that declare one; gated on parts.sdf presence (item-foundry.js:354-357).",
+  "concept": "structural",
+  "version": "1.0.0",
+  "appliesTo": [],
+  "requires": [
+    "parts.sdf"
+  ],
+  "schemaVersion": "PB-AMP-RELEVANCE-v2",
+  "checksum": "0c4e9f3633e25416c25d2ea313e36955e2cc158b26129b87216664136528005b"
+}

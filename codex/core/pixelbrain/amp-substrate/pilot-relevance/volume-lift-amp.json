@@ -1,0 +1,13 @@
+{
+  "contract": "PB-AMP-RELEVANCE-v2",
+  "pipeline": "item",
+  "ampId": "volume-lift-amp",
+  "order": 16,
+  "description": "Lifts 2D structural energy into a 3D voxel volume. NOT cutover-eligible: item-foundry.js only calls it as a fallback when opts.includeVolume !== false AND the class route did not already emit routeVolume (item-foundry.js:566-577) — both are call-time/computed state, not spec content selectActiveAmps can see. Registered for discovery only; its item-foundry.js call site is unchanged.",
+  "concept": "structural",
+  "version": "1.0.0",
+  "appliesTo": [],
+  "requires": [],
+  "schemaVersion": "PB-AMP-RELEVANCE-v2",
+  "checksum": "9a2394118ec89a9a69a649f8340f51c9b43dc1649f4d5edb127de207532b3bf7"
+}
