@@ -69,15 +69,15 @@ describe('amp-substrate CLI', () => {
   });
 
   // The five tests below call `register-pilots`, which registers the real
-  // `codex/core/pixelbrain/amp-substrate/pilot-relevance/*.json` files. Those
-  // files are still PB-AMP-RELEVANCE-v1 shape (no pipeline/order/description/
-  // concept) — Task 6 migrates them to v2. Until then `registerAmpRelevance`
-  // (schema v2, enforced since Task 1/2) refuses every one of them, so
-  // `register-pilots` itself fails and everything downstream of it here fails
-  // too. This is not something Task 5's CLI changes caused — skip pending
-  // Task 6, matching the pattern used in load-relevance-records-sync.test.js.
+  // `codex/core/pixelbrain/amp-substrate/pilot-relevance/*.json` files. Task 6
+  // migrated those files to PB-AMP-RELEVANCE-v2 shape, so `registerAmpRelevance`
+  // now accepts every one of them and these run for real.
+  //
+  // Note: `symmetry-amp` moved to the `cross-cutting` pipeline as part of that
+  // migration, so it no longer activates within the `item` pipeline `select`
+  // calls below — the item pipeline now has only the 4 item-pipeline pilots.
 
-  it.skip('register-pilots registers all five pilot records [PENDING Task 6: real pilot-relevance/ files are still v1-shape]', () => {
+  it('register-pilots registers all five pilot records', () => {
     const out = amps(['register-pilots']);
     expect(out).toMatch(/5\/5 pilot records registered/);
     for (const ampId of ['chestplate-amp', 'shield-rim-amp', 'shield-volume-amp', 'holyfire-motif-amp', 'symmetry-amp']) {
@@ -85,35 +85,33 @@ describe('amp-substrate CLI', () => {
     }
   });
 
-  it.skip('list prints each record with its gate rendered in plain English [PENDING Task 6: real pilot-relevance/ files are still v1-shape]', () => {
+  it('list prints each record with its gate rendered in plain English', () => {
     amps(['register-pilots']);
     const out = amps(['list']);
     expect(out).toMatch(/5 registered record\(s\)/);
-    expect(out).toMatch(/chestplate-amp\s+v1\.0\.0\s+[0-9a-f]{8}…/);
-    expect(out).not.toMatch(/chestplate-amp\s+v1\.0\.0\s+[0-9a-f]{9,}…/);
+    expect(out).toMatch(/chestplate-amp\s+order 8\s+v2\.0\.0/);
     expect(out).toMatch(/chestplate-amp[\s\S]*when: class eq armor AND archetype includes chestplate/);
     expect(out).toMatch(/symmetry-amp[\s\S]*when: always relevant/);
     expect(out).toMatch(/holyfire-motif-amp[\s\S]*OR/);
   });
 
-  it.skip('select separates activated from dormant, with a reason for every dormant amp [PENDING Task 6: real pilot-relevance/ files are still v1-shape]', () => {
+  it('select separates activated from dormant, with a reason for every dormant amp', () => {
     amps(['register-pilots']);
     const specFile = join(workDir, 'chestplate.json');
     writeFileSync(specFile, JSON.stringify({ class: 'armor', archetype: 'void_chestplate', parts: [{ id: 'body' }] }));
 
     const out = amps(['select', specFile, '--pipeline', 'item']);
-    expect(out).toMatch(/ACTIVATED \(2/);
+    expect(out).toMatch(/ACTIVATED \(1/);
     expect(out).toMatch(/✦ chestplate-amp/);
-    expect(out).toMatch(/✦ symmetry-amp/);
     expect(out).toMatch(/DORMANT \(3\)/);
     expect(out).toMatch(/shield-rim-amp\s+appliesTo did not match spec/);
   });
 
-  it.skip('select against a real repo spec activates only what that spec earns [PENDING Task 6: real pilot-relevance/ files are still v1-shape]', () => {
+  it('select against a real repo spec activates only what that spec earns', () => {
     amps(['register-pilots']);
     // A real production spec that is NOT a chestplate or a kite shield.
     const out = amps(['select', 'specs/slime-staff.v1.json', '--pipeline', 'item']);
-    expect(out).toMatch(/✦ symmetry-amp/);
+    expect(out).toMatch(/ACTIVATED \(0/);
     expect(out).not.toMatch(/✦ chestplate-amp/);
     expect(out).not.toMatch(/✦ shield-rim-amp/);
   });
@@ -131,7 +129,7 @@ describe('amp-substrate CLI', () => {
     expect(amps(['list'])).toMatch(/no relevance records registered/);
   });
 
-  it.skip('stats and log reflect real activity [PENDING Task 6: real pilot-relevance/ files are still v1-shape]', () => {
+  it('stats and log reflect real activity', () => {
     amps(['register-pilots']);
     const specFile = join(workDir, 'shield.json');
     writeFileSync(specFile, JSON.stringify({ class: 'armor', archetype: 'kite_shield', parts: [] }));
@@ -141,21 +139,24 @@ describe('amp-substrate CLI', () => {
     const stats = amps(['stats']);
     expect(stats).toMatch(/registered records : 5/);
     expect(stats).toMatch(/activation entries : 2/);
-    expect(stats).toMatch(/most activated {5}: (shield-rim-amp|shield-volume-amp|symmetry-amp) \(2×\)/);
+    // symmetry-amp now lives in the cross-cutting pipeline, so it never enters
+    // an `item`-scoped select at all; shield-rim-amp and shield-volume-amp tie
+    // at 2 each and the tie breaks alphabetically, making shield-rim-amp the
+    // deterministic winner.
+    expect(stats).toMatch(/most activated {5}: shield-rim-amp \(2×\)/);
 
     const log = amps(['log', '--limit', '5']);
     expect(log.trim().split('\n')).toHaveLength(2);
     expect(log).toMatch(/shield-rim-amp/);
   });
 
-  // Not from the brief — a live sentinel pinning down exactly why the five
-  // register-pilots-dependent tests above are skipped, so this file fails
-  // loudly (telling someone to un-skip them) the moment Task 6 migrates
-  // pilot-relevance/ to v2, instead of the skips going stale silently.
-  it('documents current pre-Task-6 state: register-pilots still refuses the real v1-shape files', () => {
-    const out = amps(['register-pilots'], { expectFailure: true });
-    expect(out).toMatch(/refused/);
-    expect(out).toMatch(/0\/5 pilot records registered/);
+  // Not from the brief — a live sentinel, inverted now that Task 6 has
+  // migrated pilot-relevance/ to v2: pins down that register-pilots succeeds
+  // against the real files, so this file screams if a future change
+  // regresses one of them back out of v2 shape.
+  it('documents post-Task-6 state: register-pilots accepts the real v2-shape files', () => {
+    const out = amps(['register-pilots']);
+    expect(out).toMatch(/5\/5 pilot records registered/);
   });
 
   it("list --pipeline filters to only that pipeline's records", () => {

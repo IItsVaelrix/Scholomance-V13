@@ -1,7 +1,11 @@
 {
-  "contract": "PB-AMP-RELEVANCE-v1",
+  "contract": "PB-AMP-RELEVANCE-v2",
+  "pipeline": "item",
   "ampId": "holyfire-motif-amp",
-  "version": "1.0.0",
+  "order": 1,
+  "description": "Deterministic flame emission for holy-paladin swords; must run before template construction so motif cells join the silhouette (item-foundry.js:322-335).",
+  "concept": "material-fx",
+  "version": "2.0.0",
   "appliesTo": [
     {
       "field": "class",
@@ -32,6 +36,6 @@
     }
   ],
   "requires": [],
-  "schemaVersion": "PB-AMP-RELEVANCE-v1",
-  "checksum": "a5f541fba4f92f4157d110a82815f1cc76206af876e6e58626688bd361425116"
+  "schemaVersion": "PB-AMP-RELEVANCE-v2",
+  "checksum": "646b14f00079ed1a25cfa4d938d0006023925374bb755bd7d0c686b6abbf5261"
 }

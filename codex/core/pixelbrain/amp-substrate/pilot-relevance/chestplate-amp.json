@@ -1,7 +1,11 @@
 {
-  "contract": "PB-AMP-RELEVANCE-v1",
+  "contract": "PB-AMP-RELEVANCE-v2",
+  "pipeline": "item",
   "ampId": "chestplate-amp",
-  "version": "1.0.0",
+  "order": 8,
+  "description": "Chestplate trim/plate templating; gated on class:armor + archetype includes chestplate (item-foundry.js:385).",
+  "concept": "structural",
+  "version": "2.0.0",
   "appliesTo": [
     {
       "field": "class",
@@ -15,6 +19,6 @@
     }
   ],
   "requires": [],
-  "schemaVersion": "PB-AMP-RELEVANCE-v1",
-  "checksum": "a430ef268484c732fca2675acbdb82d7a64759c2c4185cb4bfa05aae80b4fa0d"
+  "schemaVersion": "PB-AMP-RELEVANCE-v2",
+  "checksum": "7e5b476559b8f6364e5e8d63e86b493b615f8f03efd60de049d5d76e09667d44"
 }

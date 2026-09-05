@@ -1,7 +1,11 @@
 {
-  "contract": "PB-AMP-RELEVANCE-v1",
+  "contract": "PB-AMP-RELEVANCE-v2",
+  "pipeline": "item",
   "ampId": "shield-rim-amp",
-  "version": "1.0.0",
+  "order": 4,
+  "description": "Outer border, gold/bronze frame, rim thickness, corner highlights; gated on class:armor + archetype:kite_shield (item-foundry.js:381).",
+  "concept": "structural",
+  "version": "2.0.0",
   "appliesTo": [
     {
       "field": "class",
@@ -15,6 +19,6 @@
     }
   ],
   "requires": [],
-  "schemaVersion": "PB-AMP-RELEVANCE-v1",
-  "checksum": "4d86a8820464252e1a2f7c69a1bf21aece1d64b47f9558fa81b745dd0708ce89"
+  "schemaVersion": "PB-AMP-RELEVANCE-v2",
+  "checksum": "3abf7c4c1959b709f3de585b9322d2b2a2d0c21e08865bf66ef7dd3312ce17dd"
 }

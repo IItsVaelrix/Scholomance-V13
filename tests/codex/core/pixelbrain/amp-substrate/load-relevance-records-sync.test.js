@@ -5,20 +5,9 @@
  * Two families of test live here:
  *
  * 1. The brief's own Step-1 tests, run against the REAL
- *    `pilot-relevance/` directory. Three of them (`it.skip`, below) are
- *    EXPECTED-RED until Task 6 re-migrates the 5 files under
+ *    `pilot-relevance/` directory. Task 6 has migrated the 5 files under
  *    `codex/core/pixelbrain/amp-substrate/pilot-relevance/` from
- *    PB-AMP-RELEVANCE-v1 shape (no `pipeline`/`order`/`description`/`concept`)
- *    to v2. This loader throws on the FIRST record that fails
- *    `validateAmpRelevance` — a bad record must never silently reach the hot
- *    forge path — and every file in that directory is still v1-shaped today
- *    (confirmed by reading `pilot-relevance/chestplate-amp.json`: its
- *    `contract` is `"PB-AMP-RELEVANCE-v1"` and it has no
- *    `description`/`concept`/`order`). This is ruled-on for Task 4, not a bug
- *    in this loader — see `task-4-brief.md` Step 4's note and the Task 4
- *    dispatch instructions. A live sentinel test (not skipped) pins down that
- *    exact current-state claim so this file screams if Task 6 lands and
- *    someone forgets to come back here and un-skip.
+ *    PB-AMP-RELEVANCE-v1 shape to v2, so these now pass for real.
  *
  * 2. This loader's own correctness proof: hand-authored, checksummed,
  *    VALID v2-shape records written to a temp directory per test, exercising
@@ -42,7 +31,7 @@ import { BytecodeError } from '../../../../../codex/core/pixelbrain/bytecode-err
 afterEach(() => clearRelevanceRecordsCache());
 
 describe('loadRelevanceRecordsSync — against the real pilot-relevance/ directory', () => {
-  it.skip('reads every JSON record from pilot-relevance/ synchronously [PENDING Task 6: real pilot-relevance/ files are still v1-shape]', () => {
+  it('reads every JSON record from pilot-relevance/ synchronously', () => {
     const records = loadRelevanceRecordsSync();
     expect(records.length).toBeGreaterThan(0);
     expect(records.every((r) => typeof r.pipeline === 'string')).toBe(true);
@@ -53,24 +42,26 @@ describe('loadRelevanceRecordsSync — against the real pilot-relevance/ directo
     expect(() => loadRelevanceRecordsSync(badDir)).toThrow(/description/);
   });
 
-  it.skip('the loaded records work directly with selectActiveAmps [PENDING Task 6: chestplate-amp.json not yet v2]', () => {
+  it('the loaded records work directly with selectActiveAmps', () => {
     const records = loadRelevanceRecordsSync();
     const result = selectActiveAmps('item', { class: 'armor', archetype: 'chestplate', parts: [] }, records);
     expect(result.activated).toContain('chestplate-amp');
   });
 
-  it.skip('caches on repeated calls with the default directory [PENDING Task 6: default dir currently throws before caching]', () => {
+  it('caches on repeated calls with the default directory', () => {
     const first = loadRelevanceRecordsSync();
     const second = loadRelevanceRecordsSync();
     expect(second).toBe(first);
   });
 
-  // Not from the brief — a live sentinel pinning down exactly why the three
-  // tests above are skipped, so this file fails loudly (telling someone to
-  // un-skip them) the moment Task 6 migrates pilot-relevance/ to v2, instead
-  // of the skips going stale silently.
-  it('documents current pre-Task-6 state: the real default directory still fails v2 validation', () => {
-    expect(() => loadRelevanceRecordsSync()).toThrow(/description/);
+  // Not from the brief — a live sentinel, inverted now that Task 6 has
+  // migrated pilot-relevance/ to v2: pins down that the real default
+  // directory loads cleanly, so this file screams if a future change
+  // regresses one of the real files back out of v2 shape.
+  it('documents post-Task-6 state: the real default directory loads and validates as v2', () => {
+    const records = loadRelevanceRecordsSync();
+    expect(records.length).toBeGreaterThanOrEqual(5);
+    expect(records.every((r) => typeof r.pipeline === 'string')).toBe(true);
   });
 });
 

@@ -1,7 +1,11 @@
 {
-  "contract": "PB-AMP-RELEVANCE-v1",
+  "contract": "PB-AMP-RELEVANCE-v2",
+  "pipeline": "item",
   "ampId": "shield-volume-amp",
-  "version": "1.0.0",
+  "order": 5,
+  "description": "Curved face shading, center plane, side shadows, rim cast shadows; gated on class:armor + archetype:kite_shield (item-foundry.js:382).",
+  "concept": "lighting",
+  "version": "2.0.0",
   "appliesTo": [
     {
       "field": "class",
@@ -15,6 +19,6 @@
     }
   ],
   "requires": [],
-  "schemaVersion": "PB-AMP-RELEVANCE-v1",
-  "checksum": "5cbc9641febeeac1bc50d17595130e1799227aa554f2f1cf16d4788317e42afc"
+  "schemaVersion": "PB-AMP-RELEVANCE-v2",
+  "checksum": "a5b3921ce4e4d1604c9d293370713b47bf769261c02b3f3498e830e7b34f5ea9"
 }

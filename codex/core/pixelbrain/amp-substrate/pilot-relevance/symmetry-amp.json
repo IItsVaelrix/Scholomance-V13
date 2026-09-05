@@ -1,9 +1,13 @@
 {
-  "contract": "PB-AMP-RELEVANCE-v1",
+  "contract": "PB-AMP-RELEVANCE-v2",
+  "pipeline": "cross-cutting",
   "ampId": "symmetry-amp",
+  "order": 1,
+  "description": "Coordinate mirroring; called from nl-compile.js, scdl/passes/expand-symmetry.pass.js, scene-graph-renderer.js and others — genuinely cross-cutting, not item-pipeline specific.",
+  "concept": "structural",
   "version": "1.0.1",
   "appliesTo": [],
   "requires": [],
-  "schemaVersion": "PB-AMP-RELEVANCE-v1",
-  "checksum": "c8bbb673a36092195f086372357ef0deec5c68df1e278fc84f8faed9c5276893"
+  "schemaVersion": "PB-AMP-RELEVANCE-v2",
+  "checksum": "202f0685d7a95b9bace22a52d4fcb2200f63e28cb74e09f4156e1963fb0d6d69"
 }
