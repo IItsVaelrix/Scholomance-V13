@@ -1,6 +1,6 @@
 # PDR: PixelBrain Studio Standalone Port
 
-**Status:** Approved — corrected Phase A design authorized by Angel on 2026-09-05; implementation not yet started.
+**Status:** Implemented — corrected Phase A scope shipped on 2026-09-05; all scoped unit, type, build, dev-browser, and production-browser gates pass. Phase B remains deferred.
 **Classification:** Architectural | Behavioral | PixelBrain | Studio migration | Standalone app
 **Priority:** Critical
 **Bytecode Search Code:** `SCHOL-ENC-BYKE-SEARCH-PDR-PIXELBRAIN-STUDIO-STANDALONE-PORT-2026-09-05`
@@ -246,14 +246,14 @@ No flags needed — this is a new, independent app entry point with no existing 
 
 ## 15. Definition of Done
 
-- [ ] P1–P7 all pass their stated acceptance criteria.
-- [ ] The measured 104-file closure is byte-identical and every one of 54 target adapters loads from the production build.
-- [ ] Differential tests assert full output equality, not shape-only.
-- [ ] `npm test`, `npm run typecheck`, `npm run build` all pass in `Pixel-Art-Studio-Skeleton`.
-- [ ] `startup.sh` serves the ported Studio; a real render check (screenshot or DOM assertion) confirms content, not just HTTP 200.
-- [ ] Main app's `/pixelbrain/studio` route is unmodified (diff review, not just "I didn't mean to touch it").
-- [ ] Phase B remains explicitly deferred under §6; no placeholder or dead Phase-B tab is presented as live functionality.
-- [ ] PIR records the differential-test evidence (checksum matches) as the primary proof of correctness.
+- [x] P1–P7 all pass their stated acceptance criteria.
+- [x] The measured 104-file closure is byte-identical and every one of 54 target adapters loads from the production build.
+- [x] Differential tests assert full output equality, not shape-only.
+- [x] `npm test`, `npm run typecheck`, `npm run build` all pass in `Pixel-Art-Studio-Skeleton`.
+- [x] `startup.sh` serves the ported Studio; a real render check (screenshot or DOM assertion) confirms content, not just HTTP 200.
+- [x] Main app's `/pixelbrain/studio` route is unmodified (diff review, not just "I didn't mean to touch it").
+- [x] Phase B remains explicitly deferred under §6; no placeholder or dead Phase-B tab is presented as live functionality.
+- [x] PIR records the differential-test evidence (checksum matches) as the primary proof of correctness.
 
 ## 16. Final Architectural Verdict
 
