@@ -20,9 +20,12 @@ const PRE_EXISTING_AMP_IDS = [
 ];
 
 describe('PixelBrain AMP substrate bridge', () => {
-  it('registers one pixelbrain.amp.* id per pilot AMP', () => {
+  it('registers one pixelbrain.amp.* id per item-pipeline AMP', () => {
     expect(PIXELBRAIN_AMP_IDS).toEqual([
-      'chestplate-amp', 'holyfire-motif-amp', 'shield-rim-amp', 'shield-volume-amp', 'symmetry-amp',
+      'chestplate-amp', 'facet-amp', 'geometry-amp', 'heraldry-amp', 'holyfire-motif-amp',
+      'jewelry-amp', 'noise-fill-amp', 'pixel-aa-amp', 'region-fill-amp', 'sdf-shape-amp',
+      'selout-amp', 'shield-rim-amp', 'shield-volume-amp', 'sketch-amp',
+      'square-sharpness-contrast-amp', 'symmetry-amp', 'volume-lift-amp',
     ]);
     for (const ampId of PIXELBRAIN_AMP_IDS) {
       expect(verseIRMicroprocessors.has(`pixelbrain.amp.${ampId}`)).toBe(true);

@@ -247,6 +247,18 @@ const PIXELBRAIN_AMP_LOADERS = Object.freeze({
     const { runSymmetryAmpProcessor } = await import('../pixelbrain/symmetry-amp.js');
     return runSymmetryAmpProcessor(payload, context);
   },
+  'sketch-amp': async () => (await import('../pixelbrain/sketch-amp.js')).sketchToSilhouette,
+  'sdf-shape-amp': async () => (await import('../pixelbrain/sdf-shape-amp.js')).SDFShapeAMP,
+  'heraldry-amp': async () => (await import('../pixelbrain/heraldry-amp.js')).applyHeraldryTemplate,
+  'jewelry-amp': async () => (await import('../pixelbrain/jewelry-amp.js')).applyJewelryTemplate,
+  'geometry-amp': async () => (await import('../pixelbrain/geometry-amp.js')).buildGeometryAmpPayload,
+  'region-fill-amp': async () => (await import('../pixelbrain/region-fill-amp.js')).applyRegionFills,
+  'noise-fill-amp': async () => (await import('../pixelbrain/noise-fill-amp.js')).NoiseFillAMP,
+  'selout-amp': async () => (await import('../pixelbrain/selout-amp.js')).applySelout,
+  'pixel-aa-amp': async () => (await import('../pixelbrain/pixel-aa-amp.js')).applyPixelAA,
+  'facet-amp': async () => (await import('../pixelbrain/facet-amp.js')).applyFacets,
+  'square-sharpness-contrast-amp': async () => (await import('../pixelbrain/square-sharpness-contrast-amp.js')).buildSquareSharpnessContrastPayload,
+  'volume-lift-amp': async () => (await import('../pixelbrain/volume-lift-amp.js')).liftToVolume,
 });
 
 export const PIXELBRAIN_AMP_IDS = Object.freeze(Object.keys(PIXELBRAIN_AMP_LOADERS).sort());
