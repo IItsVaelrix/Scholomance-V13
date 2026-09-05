@@ -173,6 +173,28 @@ describe('amp-substrate CLI', () => {
     expect(out).toMatch(/--pipeline/);
   });
 
+  it("list --pipeline=value (equals-joined) filters the same as the space-separated form", () => {
+    registerV2Fixture({ ampId: 'region-fill-amp', pipeline: 'item', order: 10 });
+    registerV2Fixture({ ampId: 'symmetry-amp', pipeline: 'cross-cutting', order: 1 });
+
+    const out = amps(['list', '--pipeline=item']);
+    expect(out).toMatch(/in pipeline 'item'/);
+    expect(out).toContain('region-fill-amp');
+    expect(out).not.toContain('symmetry-amp');
+  });
+
+  it('select --pipeline=value (equals-joined) is honored, not silently ignored', () => {
+    registerV2Fixture({ ampId: 'always-on-amp', pipeline: 'item', order: 1, appliesTo: [] });
+    registerV2Fixture({ ampId: 'other-pipeline-amp', pipeline: 'cross-cutting', order: 1, appliesTo: [] });
+    const specFile = join(workDir, 'spec.json');
+    writeFileSync(specFile, JSON.stringify({ class: 'armor', archetype: 'chestplate', parts: [] }));
+
+    const out = amps(['select', specFile, '--pipeline=item']);
+    expect(out).toMatch(/pipeline 'item'/);
+    expect(out).toMatch(/✦ always-on-amp/);
+    expect(out).not.toContain('other-pipeline-amp');
+  });
+
   it('select runs against a specific pipeline once --pipeline is given', () => {
     registerV2Fixture({ ampId: 'always-on-amp', pipeline: 'item', order: 1, appliesTo: [] });
     registerV2Fixture({ ampId: 'other-pipeline-amp', pipeline: 'cross-cutting', order: 1, appliesTo: [] });

@@ -118,9 +118,22 @@ async function cmdRegisterPilots(db) {
   if (failed > 0) process.exit(1);
 }
 
-async function cmdList(db, args) {
+/**
+ * Read `--pipeline <name>` (space-separated) or `--pipeline=<name>`
+ * (equals-joined) out of an args array. Both forms are ordinary in CLI usage,
+ * and a user who happens to type the `=` form must not be silently ignored —
+ * for `list` that would mean "show everything" instead of "filter", the
+ * opposite of what was asked.
+ */
+function readPipelineFlag(args) {
+  const eqToken = args.find((a) => a.startsWith('--pipeline='));
+  if (eqToken !== undefined) return eqToken.slice('--pipeline='.length);
   const flagIndex = args.indexOf('--pipeline');
-  const pipeline = flagIndex !== -1 ? args[flagIndex + 1] : undefined;
+  return flagIndex !== -1 ? args[flagIndex + 1] : undefined;
+}
+
+async function cmdList(db, args) {
+  const pipeline = readPipelineFlag(args);
   const rows = await listAmpRelevance(db, pipeline ? { pipeline } : {});
   if (rows.length === 0) { console.log('[AMP] no relevance records registered'); return; }
   console.log(`[AMP] ${rows.length} registered record(s)${pipeline ? ` in pipeline '${pipeline}'` : ''}:\n`);
@@ -142,8 +155,7 @@ function describeClause(clause) {
 }
 
 async function cmdSelect(db, args) {
-  const pipelineIndex = args.indexOf('--pipeline');
-  const pipeline = pipelineIndex !== -1 ? args[pipelineIndex + 1] : null;
+  const pipeline = readPipelineFlag(args) ?? null;
   const file = args.find((a, i) => !a.startsWith('--') && args[i - 1] !== '--pipeline');
   if (!pipeline) { console.error('[AMP] select: missing --pipeline <name>'); process.exit(1); }
   if (!file) { console.error('[AMP] select: missing <spec.json>'); process.exit(1); }
