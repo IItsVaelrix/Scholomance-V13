@@ -25,7 +25,7 @@
  */
 
 import { afterEach, describe, expect, it } from 'vitest';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
@@ -36,6 +36,20 @@ import { loadRelevanceRecordsFromDir } from '../../../../../codex/core/pixelbrai
 import { selectActiveAmps } from '../../../../../codex/core/pixelbrain/amp-substrate/amp-selector.js';
 import { createAmpRelevanceRecord } from '../../../../../codex/core/pixelbrain/amp-substrate/amp-relevance.schema.js';
 import { BytecodeError } from '../../../../../codex/core/pixelbrain/bytecode-error.js';
+import { GENERATED_RELEVANCE_RECORDS } from '../../../../../codex/core/pixelbrain/amp-substrate/pilot-relevance.generated.js';
+
+const PILOT_RELEVANCE_DIR = join(
+  process.cwd(),
+  'codex/core/pixelbrain/amp-substrate/pilot-relevance',
+);
+
+function canonicalSelectorRows(records) {
+  return [...records].sort(
+    (left, right) => left.pipeline.localeCompare(right.pipeline)
+      || left.order - right.order
+      || left.ampId.localeCompare(right.ampId),
+  );
+}
 
 afterEach(() => clearRelevanceRecordsCache());
 
@@ -71,6 +85,17 @@ describe('loadRelevanceRecordsSync — against the real pilot-relevance/ directo
     const records = loadRelevanceRecordsSync();
     expect(records.length).toBeGreaterThanOrEqual(5);
     expect(records.every((r) => typeof r.pipeline === 'string')).toBe(true);
+  });
+
+  it('matches the selector rows derived from every checked-in pilot relevance JSON record', () => {
+    const records = readdirSync(PILOT_RELEVANCE_DIR)
+      .filter((file) => file.endsWith('.json'))
+      .sort()
+      .map((file) => JSON.parse(readFileSync(join(PILOT_RELEVANCE_DIR, file), 'utf8')));
+
+    expect(records.map((record) => createAmpRelevanceRecord(record))).toEqual(records);
+    expect(canonicalSelectorRows(loadRelevanceRecordsFromDir(PILOT_RELEVANCE_DIR)))
+      .toEqual(canonicalSelectorRows(GENERATED_RELEVANCE_RECORDS));
   });
 });
 

@@ -43,6 +43,31 @@ const SYMMETRY = createAmpRelevanceRecord({
   version: '1.0.0',
 });
 
+function createTransactionSpyDb() {
+  let inTransaction = false;
+  const executions = [];
+  const db = {
+    transactionCalls: 0,
+    executions,
+    async execute(sql, params = []) {
+      executions.push({ sql, params, inTransaction });
+      if (sql.startsWith('SELECT amp_id AS ampId')) return { rows: [], rowsAffected: 0 };
+      if (sql.includes('INSERT INTO amp_relevance')) return { rows: [], rowsAffected: 1 };
+      throw new Error(`Unexpected SQL in transaction spy: ${sql}`);
+    },
+    async transaction(callback) {
+      db.transactionCalls += 1;
+      inTransaction = true;
+      try {
+        return [await callback({ execute: db.execute })];
+      } finally {
+        inTransaction = false;
+      }
+    },
+  };
+  return db;
+}
+
 describe('AMP substrate — SQLite store', () => {
   let db;
   beforeEach(async () => { db = await openAmpSubstrate(':memory:'); });
@@ -86,6 +111,17 @@ describe('AMP substrate — SQLite store', () => {
     expect(row.ampId).toBe('chestplate-amp');
     expect(row.checksum).toBe(CHESTPLATE.checksum);
     expect(JSON.parse(row.appliesToJson)).toHaveLength(2);
+  });
+
+  it('performs the order collision check and upsert in one transaction', async () => {
+    const transactionSpy = createTransactionSpyDb();
+
+    await expect(registerAmpRelevance(transactionSpy, CHESTPLATE)).resolves.toEqual({
+      pipeline: 'item', ampId: 'chestplate-amp', checksum: CHESTPLATE.checksum,
+    });
+    expect(transactionSpy.transactionCalls).toBe(1);
+    expect(transactionSpy.executions).toHaveLength(2);
+    expect(transactionSpy.executions.every((execution) => execution.inTransaction)).toBe(true);
   });
 
   it('refuses a record whose checksum disagrees with its content, instead of correcting it', async () => {

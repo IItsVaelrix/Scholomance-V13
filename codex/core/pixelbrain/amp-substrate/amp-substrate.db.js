@@ -126,51 +126,55 @@ export async function registerAmpRelevance(db, record) {
     );
   }
 
-  const { rows: collisionRows } = await db.execute(
-    'SELECT amp_id AS ampId FROM amp_relevance WHERE pipeline = ? AND order_index = ? AND amp_id != ?',
-    [record.pipeline, record.order, record.ampId],
-  );
-  const collision = collisionRows?.[0] ?? null;
-  if (collision) {
-    throw new BytecodeError(
-      ERROR_CATEGORIES.VALUE, ERROR_SEVERITY.CRIT, MOD, ERROR_CODES.INVALID_VALUE,
-      {
-        pipeline: record.pipeline,
-        ampId: record.ampId,
-        order: record.order,
-        collidesWith: collision.ampId,
-        reason: `order ${record.order} is already used by '${collision.ampId}' in pipeline '${record.pipeline}'`,
-      },
+  const [registered] = await db.transaction(async (tx) => {
+    const { rows: collisionRows } = await tx.execute(
+      'SELECT amp_id AS ampId FROM amp_relevance WHERE pipeline = ? AND order_index = ? AND amp_id != ?',
+      [record.pipeline, record.order, record.ampId],
     );
-  }
+    const collision = collisionRows?.[0] ?? null;
+    if (collision) {
+      throw new BytecodeError(
+        ERROR_CATEGORIES.VALUE, ERROR_SEVERITY.CRIT, MOD, ERROR_CODES.INVALID_VALUE,
+        {
+          pipeline: record.pipeline,
+          ampId: record.ampId,
+          order: record.order,
+          collidesWith: collision.ampId,
+          reason: `order ${record.order} is already used by '${collision.ampId}' in pipeline '${record.pipeline}'`,
+        },
+      );
+    }
 
-  await db.execute(
-    `INSERT INTO amp_relevance
-       (pipeline, amp_id, order_index, description, concept, version, applies_to_json, requires_json, checksum)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-     ON CONFLICT(pipeline, amp_id) DO UPDATE SET
-       order_index     = excluded.order_index,
-       description     = excluded.description,
-       concept         = excluded.concept,
-       version         = excluded.version,
-       applies_to_json = excluded.applies_to_json,
-       requires_json   = excluded.requires_json,
-       checksum        = excluded.checksum,
-       registered_at   = CURRENT_TIMESTAMP`,
-    [
-      record.pipeline,
-      record.ampId,
-      record.order,
-      record.description,
-      record.concept,
-      record.version,
-      JSON.stringify(record.appliesTo ?? []),
-      JSON.stringify(record.requires ?? []),
-      record.checksum,
-    ],
-  );
+    await tx.execute(
+      `INSERT INTO amp_relevance
+         (pipeline, amp_id, order_index, description, concept, version, applies_to_json, requires_json, checksum)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(pipeline, amp_id) DO UPDATE SET
+         order_index     = excluded.order_index,
+         description     = excluded.description,
+         concept         = excluded.concept,
+         version         = excluded.version,
+         applies_to_json = excluded.applies_to_json,
+         requires_json   = excluded.requires_json,
+         checksum        = excluded.checksum,
+         registered_at   = CURRENT_TIMESTAMP`,
+      [
+        record.pipeline,
+        record.ampId,
+        record.order,
+        record.description,
+        record.concept,
+        record.version,
+        JSON.stringify(record.appliesTo ?? []),
+        JSON.stringify(record.requires ?? []),
+        record.checksum,
+      ],
+    );
 
-  return { pipeline: record.pipeline, ampId: record.ampId, checksum: record.checksum };
+    return { pipeline: record.pipeline, ampId: record.ampId, checksum: record.checksum };
+  });
+
+  return registered;
 }
 
 /**
