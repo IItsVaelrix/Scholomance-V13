@@ -62,6 +62,7 @@ All Product Design Requirements (PDRs) for Scholomance are archived here. Each P
 | [`2026-06-12-pixelbrain-deterministic-pro-chestplate-pdr.md`](./2026-06-12-pixelbrain-deterministic-pro-chestplate-pdr.md) | Implemented | PixelBrain + Item Foundry + Armor Fidelity + Deterministic Asset Pipeline | High |
 | [`2026-06-12-foundry-aseprite-bridge-pdr.md`](./2026-06-12-foundry-aseprite-bridge-pdr.md) | Implemented | PixelBrain + Item Foundry + Aseprite + Manual Editing | High |
 | [`2026-06-12-pixelbrain-editor-aseprite-rival-pdr.md`](./2026-06-12-pixelbrain-editor-aseprite-rival-pdr.md) | Draft | PixelBrain Editor + Aseprite-Rival Canvas + AMP-Aware Editing | High |
+| [`2026-09-06-pixelbrain-canvas-professional-polish-pdr.md`](./2026-09-06-pixelbrain-canvas-professional-polish-pdr.md) | Design approved — awaiting written PDR review | Architectural \| Behavioral \| UI + Rendering \| PixelBrain | High |
 | [`2026-06-12-jewelry-amp-pdr.md`](./2026-06-12-jewelry-amp-pdr.md) | Draft | PixelBrain + Item Foundry + Jewelry + AMP Migration | High |
 | [`2026-06-12-sketchamp-construction-line-microprocessor-pdr.md`](./2026-06-12-sketchamp-construction-line-microprocessor-pdr.md) | Draft | PixelBrain + Sketching + Reference Layer + AMP + Microprocessor + Aseprite Bridge + Item Foundry | High |
 | [`2026-06-12-pixelbrain-deterministic-shape-grammar-router-pdr.md`](./2026-06-12-pixelbrain-deterministic-shape-grammar-router-pdr.md) | Implemented | PixelBrain + Shape Grammar + Construction Skeletons + Microprocessor Router + Deterministic Asset Pipeline | Critical |
