@@ -226,12 +226,30 @@ function boundedArea(bounds) {
   return width * height;
 }
 
+// Task 6's static law charges a circle by the square around its ceil-rounded
+// radius, clipped only by total canvas area. Keep the runtime cell preflight
+// byte-for-byte equivalent to that model: fractional center placement may
+// enlarge the candidate-iteration rectangle, but cannot enlarge the set of
+// emitted integer lattice points beyond this bound.
+function staticCircleCellBound(radius, canvas) {
+  const ceilRadius = ceilRational(radius);
+  const side = 2n * ceilRadius + 1n;
+  const square = side * side;
+  if (!canvas) return square;
+  const canvasArea = BigInt(canvas.width) * BigInt(canvas.height);
+  return square < canvasArea ? square : canvasArea;
+}
+
 // The exact center-inclusion policy: `center` is `{ x, y }` exact rationals
 // (or integral plain numbers, normalized via toRationalValue), `radius` is
 // an exact rational (or integral plain number). A cell's inclusion is
 // decided by comparing squared rational distances with cross multiplication
 // — no floating point ever enters the comparison.
-function rasterizeCircleCenterBounded(center, radius, { canvas = null, cellLimit = DEFAULT_RASTER_CELL_LIMIT } = {}) {
+function rasterizeCircleCenterBounded(center, radius, {
+  canvas = null,
+  cellLimit = DEFAULT_RASTER_CELL_LIMIT,
+  iterationLimit = 4n * BigInt(cellLimit),
+} = {}) {
   const cx = toRationalValue(center.x);
   const cy = toRationalValue(center.y);
   const r = toRationalValue(radius);
@@ -240,7 +258,8 @@ function rasterizeCircleCenterBounded(center, radius, { canvas = null, cellLimit
   const exactBounds = exactCircleBounds(cx, cy, r);
   if (!exactBounds) return { ok: false, cells: [] };
   const bounds = clippedBounds(exactBounds, canvas);
-  if (boundedArea(bounds) > BigInt(cellLimit)) return { ok: false, cells: [], budgetActual: boundedArea(bounds) };
+  const candidateArea = boundedArea(bounds);
+  if (candidateArea > iterationLimit) return { ok: false, cells: [], budgetActual: candidateArea };
 
   const rSquared = mulRational(r, r);
   const rsN = BigInt(rSquared.numerator);
@@ -369,14 +388,21 @@ function rasterizePaintShape(shape, raster, { canvas, remainingCells, rasterCell
           diagnostic: geomDiagnostic('CENTER', 'safe-integer lattice bounds', `center=(${rationalToString(cx)}, ${rationalToString(cy)}), radius=${rationalToString(r)}`),
         };
       }
-      const cellBound = boundedArea(clippedBounds(exactBounds, canvas));
+      const cellBound = staticCircleCellBound(r, canvas);
       if (cellBound > BigInt(remainingCells)) {
         return { ok: false, diagnostic: budgetDiagnostic(rasterCellLimit, BigInt(cellsGenerated) + cellBound) };
       }
+      // Along either axis, a rational-center candidate interval contains at
+      // most 2*ceil(radius)+2 integers, versus Task 6's 2*ceil(radius)+1
+      // emitted-cell side. Therefore the candidate rectangle is < 4x the
+      // static square; canvas clipping preserves the same <=4 relationship.
+      // This distinct operational cap keeps CENTER bounded without charging
+      // candidate probes as emitted raster cells.
+      const iterationLimit = 4n * cellBound;
       const generated = rasterizeCircleCenterBounded(
         { x: cx, y: cy },
         r,
-        { canvas, cellLimit: remainingCells },
+        { canvas, cellLimit: remainingCells, iterationLimit },
       );
       if (!generated.ok) {
         if (generated.budgetActual !== undefined) {

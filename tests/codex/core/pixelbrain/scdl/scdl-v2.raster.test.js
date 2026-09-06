@@ -306,6 +306,37 @@ LAYER ink ORDER 0 { PAINT $p FILL #FF0000 RASTER CENTER }`;
       expect(rasterized.coordinates).toEqual([{ x: 1, y: 2, color: '#ff0000', partId: 'ink', role: 'paint' }]);
     });
 
+    it('accepts a fractional-center CENTER circle at Task 6 exact static raster demand', () => {
+      const source = `SCDL 2
+ASSET fractional_center
+CANVAS WIDTH 10 HEIGHT 10
+BUDGET INSTRUCTIONS 128 GENERATED_SHAPES 1 RASTER_CELLS 9
+CONST $center VEC2 (VEC2 (PX 2.5) (PX 2.5))
+SHAPE $circle (CIRCLE CENTER $center RADIUS (PX 1))
+LAYER ink ORDER 0 { PAINT $circle FILL #55CCFF RASTER CENTER }`;
+
+      const parsed = parseSCDLV2(source);
+      expect(parsed.ok).toBe(true);
+      const analysis = analyzeSCDLV2(parsed.ast);
+      expect(analysis.ok).toBe(true);
+      const budget = verifySCDLV2Budget(analysis.ir);
+      expect(budget.ok).toBe(true);
+      expect(budget.verified.demand.rasterCells).toBe(9);
+      expect(budget.verified.limits.rasterCells).toBe(9);
+      const program = lowerSCDLV2Bytecode(analysis.ir, budget.verified);
+      const evaluated = evaluateSCDLV2(program);
+      expect(evaluated.ok).toBe(true);
+
+      const rasterized = rasterizeSCDLV2(evaluated.construction, program.canvas, program.verifiedBudget);
+      expect(rasterized.ok).toBe(true);
+      expect(rasterized.coordinates).toEqual([
+        { x: 2, y: 2, color: '#55ccff', partId: 'ink', role: 'paint' },
+        { x: 3, y: 2, color: '#55ccff', partId: 'ink', role: 'paint' },
+        { x: 2, y: 3, color: '#55ccff', partId: 'ink', role: 'paint' },
+        { x: 3, y: 3, color: '#55ccff', partId: 'ink', role: 'paint' },
+      ]);
+    });
+
     it('rejects at the raster stage when a real forged verifiedBudget crosses its rasterCells limit', () => {
       const source = `SCDL 2
 ASSET disc

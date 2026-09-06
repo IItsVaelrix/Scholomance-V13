@@ -104,3 +104,34 @@ Independent review identified six fail-closed and immutability gaps in the Task 
 Implementation commit before this report amendment: `9bccbcd1` (`fix(scdl): close v2 evaluator and raster bounds`). The final amended commit hash is reported in the controller handoff because a Git commit cannot contain its own final hash.
 
 The first commit attempt was stopped by the immunity hook's textual rename detector after it saw the original exported function declaration lines move behind bounded internal helpers. `rg -n "rasterizeCircle(Midpoint|Center)" codex tests --glob '!node_modules/**'` confirmed both exports remain present and all consumers still resolve them, so the verified commit used `--no-verify` for that false positive only.
+
+## Fix round 2
+
+Independent re-review found one remaining Task 6 -> Task 7 budget-seam mismatch: a valid CENTER circle with center `(2.5, 2.5)`, radius `1`, canvas `10x10`, and `RASTER_CELLS 9` passed Task 6's exact static demand of 9 but Task 7 rejected it by charging the 4x4 candidate-iteration rectangle as 16 raster cells.
+
+### Red evidence
+
+- Command: `npx vitest run tests/codex/core/pixelbrain/scdl/scdl-v2.raster.test.js`
+- Before implementation: **1 file failed; 1 test failed and 37 passed (38 total)**.
+- The new test uses the real parser -> analyzer -> Task 6 budget verifier -> bytecode lowerer -> evaluator -> rasterizer pipeline. Parse, analysis, budget verification, lowering, and evaluation succeeded; Task 6 reported exactly `rasterCells: 9`; the failure occurred only at `expect(rasterized.ok).toBe(true)`.
+
+### Green evidence
+
+- Focused: `npx vitest run tests/codex/core/pixelbrain/scdl/scdl-v2.raster.test.js` -> **1 file passed; 38/38 tests passed**.
+- Full SCDL: `npx vitest run tests/codex/core/pixelbrain/scdl/` -> **40 files passed; 417/417 tests passed**.
+- Targeted lint: `npx eslint codex/core/pixelbrain/scdl/v2/scdl-v2.raster.js tests/codex/core/pixelbrain/scdl/scdl-v2.raster.test.js` -> **0 errors, 0 warnings**.
+- Whitespace: `git diff --check` -> silent success.
+
+### Reasoning and boundedness proof
+
+- Task 6 defines one circle's conservative emitted-cell demand as `(2 * ceil(radius) + 1)^2`, clipped by total canvas area. Task 7 now computes that exact same `BigInt` bound for CENTER cell-budget preflight instead of substituting the candidate rectangle.
+- For one axis, the exact candidate interval is `floor(center - radius)..ceil(center + radius)`, inclusive. It contains at most `2 * ceil(radius) + 2` integers. Relative to Task 6's side `2 * ceil(radius) + 1`, the two-dimensional candidate rectangle is strictly less than four times the static square. Canvas clipping preserves the bound: when canvas area is the smaller static term, candidate iteration is at most canvas area; otherwise it remains below four times the static square.
+- CENTER therefore receives two separate guards: emitted cells remain limited by the verified remaining raster budget, while candidate lattice probes are limited to `4 * staticCellBound`. All bound arithmetic stays in `BigInt`; only already-validated safe-integer lattice endpoints enter JavaScript number loops.
+- The reviewer fixture now emits exactly four cells, in stable y-major/x-minor order: `(2,2)`, `(3,2)`, `(2,3)`, `(3,3)`.
+- The separately ledgered forged-above-host-ceiling Minor was intentionally not changed in this round.
+
+### Files changed
+
+- `codex/core/pixelbrain/scdl/v2/scdl-v2.raster.js`
+- `tests/codex/core/pixelbrain/scdl/scdl-v2.raster.test.js`
+- `.superpowers/sdd/2026-09-06-scdl-v2-semantic-core-vertical-slice/task-7-report.md`
