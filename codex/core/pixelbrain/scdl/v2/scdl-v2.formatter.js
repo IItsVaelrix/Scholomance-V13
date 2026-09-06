@@ -106,13 +106,31 @@ function printProgram(ast) {
   return `${lines.join('\n')}\n`;
 }
 
+function isPreParsedV2Ast(value) {
+  return typeof value === 'object' && value !== null && !Array.isArray(value) && Array.isArray(value.declarations);
+}
+
 export function formatSCDLV2(input) {
-  const parsed = typeof input === 'string'
-    ? parseSCDLV2(input)
-    : { ok: Boolean(input), ast: input, diagnostics: [] };
+  let parsed;
+  if (typeof input === 'string') {
+    parsed = parseSCDLV2(input);
+  } else if (isPreParsedV2Ast(input)) {
+    parsed = { ok: true, ast: input, diagnostics: [] };
+  } else {
+    parsed = { ok: false, ast: null, diagnostics: [] };
+  }
   if (!parsed.ok || !parsed.ast) {
     return Object.freeze({ ok: false, output: null, ast: null, diagnostics: parsed.diagnostics });
   }
-  const output = printProgram(parsed.ast);
-  return Object.freeze({ ok: true, output, ast: parsed.ast, diagnostics: Object.freeze([]) });
+  // printProgram trusts the AST shape once past isPreParsedV2Ast; a pre-parsed
+  // AST can still carry a malformed declaration/expression (e.g. an unknown
+  // `kind`) that only the recursive printers can detect. The "never throws"
+  // global constraint applies regardless of source, so guard the actual print
+  // work too rather than trusting shallow validation alone.
+  try {
+    const output = printProgram(parsed.ast);
+    return Object.freeze({ ok: true, output, ast: parsed.ast, diagnostics: Object.freeze([]) });
+  } catch {
+    return Object.freeze({ ok: false, output: null, ast: null, diagnostics: Object.freeze([]) });
+  }
 }

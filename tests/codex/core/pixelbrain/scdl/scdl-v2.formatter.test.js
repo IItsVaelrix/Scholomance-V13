@@ -75,4 +75,107 @@ LAYER ink ORDER 1 {
     expect(result.output).toContain('CONST $decPad FIXED 1.25');
     expect(result.output).toContain('CONST $decTrail FIXED 1.0');
   });
+
+  it('inserts exactly one blank line between header and layer when no bindings exist', () => {
+    // No CONST/SHAPE binding declarations at all: the PAINT statement's shape
+    // is an inline expression, not a $-symbol reference, so this parses
+    // cleanly straight from HEADER into LAYER (the direct transition path).
+    const source = [
+      'SCDL 2',
+      'ASSET orb',
+      'CANVAS WIDTH 1 HEIGHT 1',
+      'LAYER a ORDER 0 { PAINT (PIXEL AT (VEC2 (PX 0) (PX 0))) FILL #000000 RASTER CENTER }',
+    ].join('\n');
+    const result = formatSCDLV2(source);
+    expect(result.ok).toBe(true);
+    expect(result.output).toBe([
+      'SCDL 2',
+      'ASSET orb',
+      'CANVAS WIDTH 1 HEIGHT 1',
+      '',
+      'LAYER a ORDER 0 {',
+      '  PAINT (PIXEL AT (VEC2 (PX 0) (PX 0))) FILL #000000 RASTER CENTER',
+      '}',
+      '',
+    ].join('\n'));
+  });
+
+  it('does not insert a blank line between consecutive LAYER declarations', () => {
+    const source = [
+      'SCDL 2',
+      'ASSET orb',
+      'CANVAS WIDTH 1 HEIGHT 1',
+      'SHAPE $p (PIXEL AT (VEC2 (PX 0) (PX 0)))',
+      'LAYER a ORDER 0 { PAINT $p FILL #000000 RASTER CENTER }',
+      'LAYER b ORDER 1 { PAINT $p FILL #111111 RASTER CENTER }',
+    ].join('\n');
+    const result = formatSCDLV2(source);
+    expect(result.ok).toBe(true);
+    expect(result.output).toBe([
+      'SCDL 2',
+      'ASSET orb',
+      'CANVAS WIDTH 1 HEIGHT 1',
+      '',
+      'SHAPE $p (PIXEL AT (VEC2 (PX 0) (PX 0)))',
+      '',
+      'LAYER a ORDER 0 {',
+      '  PAINT $p FILL #000000 RASTER CENTER',
+      '}',
+      'LAYER b ORDER 1 {',
+      '  PAINT $p FILL #111111 RASTER CENTER',
+      '}',
+      '',
+    ].join('\n'));
+  });
+
+  describe('never throws on malformed non-string input', () => {
+    it('returns a failure shape for an empty object (no declarations at all)', () => {
+      expect(() => formatSCDLV2({})).not.toThrow();
+      const result = formatSCDLV2({});
+      expect(result).toEqual({ ok: false, output: null, ast: null, diagnostics: [] });
+    });
+
+    it('returns a failure shape when a declaration has an unrecognized kind', () => {
+      const input = { declarations: [{ kind: 'Bogus' }] };
+      expect(() => formatSCDLV2(input)).not.toThrow();
+      const result = formatSCDLV2(input);
+      expect(result).toEqual({ ok: false, output: null, ast: null, diagnostics: [] });
+    });
+
+    it('returns a failure shape for null', () => {
+      expect(() => formatSCDLV2(null)).not.toThrow();
+      const result = formatSCDLV2(null);
+      expect(result).toEqual({ ok: false, output: null, ast: null, diagnostics: [] });
+    });
+
+    it('returns a failure shape for a bare number', () => {
+      expect(() => formatSCDLV2(42)).not.toThrow();
+      const result = formatSCDLV2(42);
+      expect(result).toEqual({ ok: false, output: null, ast: null, diagnostics: [] });
+    });
+
+    it('returns a failure shape for an array (not a plain AST object)', () => {
+      expect(() => formatSCDLV2([])).not.toThrow();
+      const result = formatSCDLV2([]);
+      expect(result).toEqual({ ok: false, output: null, ast: null, diagnostics: [] });
+    });
+
+    it('returns a failure shape for an object missing declarations entirely', () => {
+      const input = { kind: 'Program', span: { start: {}, end: {} } };
+      expect(() => formatSCDLV2(input)).not.toThrow();
+      const result = formatSCDLV2(input);
+      expect(result).toEqual({ ok: false, output: null, ast: null, diagnostics: [] });
+    });
+
+    it('returns a failure shape when a nested expression has an unrecognized kind', () => {
+      const input = {
+        declarations: [
+          { kind: 'ShapeDeclaration', symbol: '$p', value: { kind: 'Mystery' } },
+        ],
+      };
+      expect(() => formatSCDLV2(input)).not.toThrow();
+      const result = formatSCDLV2(input);
+      expect(result).toEqual({ ok: false, output: null, ast: null, diagnostics: [] });
+    });
+  });
 });
