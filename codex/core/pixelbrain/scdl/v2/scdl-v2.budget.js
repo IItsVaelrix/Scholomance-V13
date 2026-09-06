@@ -127,13 +127,24 @@ function rasterCellsForShape(shape, canvasAreaBig) {
 // "for each paint", and an unpainted shape produces no raster work no matter
 // how it's counted, so it is untouched here.
 //
-// To avoid double-counting a declared SHAPE that a PAINT does reach, shapes
+// To avoid double-counting a declared shape that a PAINT does reach, shapes
 // reached by reference carry through as the exact same (frozen, but not
-// cloned) object Task 5 attached to the SHAPE declaration — so identity
-// (`===`) reliably tells "already counted via the declaration walk" apart
-// from "an anonymous shape expression written inline in the PAINT
-// statement", which has no declaration entry of its own and must still be
-// charged here.
+// cloned) object Task 5 attached to the declaration — so identity (`===`)
+// reliably tells "already counted via the declaration walk" apart from "an
+// anonymous shape expression written inline in the PAINT statement", which
+// has no declaration entry of its own and must still be charged here.
+//
+// A shape value can be declared two different ways in source — `SHAPE $x
+// (CIRCLE ...)` (lands in `ir.shapes`) or `CONST $x SHAPE (CIRCLE ...)`
+// (legal per SCDL_V2_TYPES; lands in `ir.constants` with `type === 'SHAPE'`)
+// — and both are equally real static declared-shape cost. `declaredShapeValues`
+// is built from BOTH origins up front, in one pass, before any counting runs,
+// so there is exactly one definition of "this is a declared shape" shared by
+// the generatedShapes count and the paint-loop's dedup check. Two separate
+// per-origin code paths is exactly how a CONST-typed SHAPE previously evaded
+// both the generatedShapes gate (round 1 only walked ir.shapes) and, when
+// painted, ended up double-charged for instructions (the paint loop didn't
+// know it had already been counted by the constants loop).
 function measureDemand(ir) {
   let instructions = 0n;
   let generatedShapes = 0n;
@@ -146,14 +157,25 @@ function measureDemand(ir) {
 
   const declaredShapeValues = new Set();
   for (const constant of constants) {
+    if (constant && constant.type === 'SHAPE' && constant.value) {
+      declaredShapeValues.add(constant.value);
+    }
+  }
+  for (const shape of shapes) {
+    if (shape && shape.value) declaredShapeValues.add(shape.value);
+  }
+  // One PIXEL/CIRCLE construction per declared shape value, declared
+  // regardless of reach — counted once here from the unified set, whichever
+  // declaration syntax produced it.
+  generatedShapes += BigInt(declaredShapeValues.size);
+
+  for (const constant of constants) {
     instructions += 1n; // the CONST declaration/bind itself
     instructions += BigInt(countValueNodes({ type: constant && constant.type, value: constant && constant.value }));
   }
   for (const shape of shapes) {
     instructions += 1n; // the SHAPE declaration/bind itself
     instructions += BigInt(countShapeNodes(shape && shape.value));
-    generatedShapes += 1n; // one PIXEL/CIRCLE construction, declared regardless of reach
-    if (shape && shape.value) declaredShapeValues.add(shape.value);
   }
 
   for (const layer of layers) {

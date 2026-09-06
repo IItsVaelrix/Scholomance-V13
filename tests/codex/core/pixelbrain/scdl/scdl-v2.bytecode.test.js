@@ -121,4 +121,71 @@ LAYER ink ORDER 10 { PAINT $s FILL #55CCFF RASTER MIDPOINT }`;
     // One CIRCLE, reached by exactly one PAINT: charged once, not twice.
     expect(budget.verified.demand.generatedShapes).toBe(1);
   });
+
+  // Fix round 2: `SHAPE` is also a legal CONST-declared type (`SCDL_V2_TYPES`
+  // includes 'SHAPE'; `CONST $x SHAPE (CIRCLE ...)` is valid syntax). Round 1
+  // only unified `ir.shapes` (the `SHAPE $x (...)` keyword form) into the
+  // generatedShapes count; a CONST-typed SHAPE value landed in `ir.constants`
+  // instead and evaded the gate exactly as the original finding described.
+  // This is the re-reviewer's exact repro at reduced scale: 3 unreferenced
+  // `CONST $u SHAPE (CIRCLE ...)` declarations + 1 painted `SHAPE $s`, against
+  // a tight GENERATED_SHAPES budget.
+  const UNUSED_CONST_SHAPES_SOURCE = `SCDL 2
+ASSET unused_const_shapes
+CANVAS WIDTH 9 HEIGHT 9
+BUDGET INSTRUCTIONS 200000 GENERATED_SHAPES 2 RASTER_CELLS 1048576
+CONST $n I32 (ADD 1 1)
+CONST $c VEC2 (VEC2 (PX 4) (PX 4))
+CONST $u1 SHAPE (CIRCLE CENTER $c RADIUS (PX 1))
+CONST $u2 SHAPE (CIRCLE CENTER $c RADIUS (PX 1))
+CONST $u3 SHAPE (CIRCLE CENTER $c RADIUS (PX 1))
+SHAPE $s (CIRCLE CENTER $c RADIUS (PX $n))
+LAYER ink ORDER 10 { PAINT $s FILL #55CCFF RASTER MIDPOINT }`;
+
+  it('rejects generatedShapes demand inflated by unreferenced CONST-typed SHAPE declarations', () => {
+    const analysis = analyzeSCDLV2(parseSCDLV2(UNUSED_CONST_SHAPES_SOURCE).ast);
+    expect(analysis.ok).toBe(true);
+    const budget = verifySCDLV2Budget(analysis.ir, {});
+    expect(budget.ok).toBe(false);
+    const violation = budget.diagnostics.find((d) => d.code === 'SCDL-BUDGET-002' && d.relatedSymbols.includes('generatedShapes'));
+    expect(violation).toBeDefined();
+    // 1 painted ($s) + 3 unreferenced CONST-typed SHAPE ($u1..$u3) = 4,
+    // over the requested 2. Before the fix this reported 1 and passed.
+    expect(violation.received).toContain('4');
+  });
+
+  it('does not double-count a CONST-typed SHAPE that a PAINT does reach', () => {
+    const source = `SCDL 2
+ASSET const_shape_painted
+CANVAS WIDTH 9 HEIGHT 9
+CONST $n I32 (ADD 1 1)
+CONST $c VEC2 (VEC2 (PX 4) (PX 4))
+CONST $s SHAPE (CIRCLE CENTER $c RADIUS (PX $n))
+LAYER ink ORDER 10 { PAINT $s FILL #55CCFF RASTER MIDPOINT }`;
+    const analysis = analyzeSCDLV2(parseSCDLV2(source).ast);
+    expect(analysis.ok).toBe(true);
+    const budget = verifySCDLV2Budget(analysis.ir, {});
+    expect(budget.ok).toBe(true);
+    // Exactly one CIRCLE declared and painted: one generated-shape unit.
+    expect(budget.verified.demand.generatedShapes).toBe(1);
+    // Instruction cost for the CIRCLE's node tree must be charged exactly
+    // once (via the CONST declaration walk), not a second time by the paint
+    // loop. Rather than hand-deriving the exact expected count, assert the
+    // double-count-free invariant directly: the same declared-and-painted
+    // CIRCLE, declared via the `SHAPE` keyword instead of `CONST ... SHAPE`,
+    // must cost the identical number of instructions — both are the same
+    // shape, once declared and once painted, regardless of which legal
+    // declaration syntax produced it.
+    const shapeKeywordSource = `SCDL 2
+ASSET const_shape_painted
+CANVAS WIDTH 9 HEIGHT 9
+CONST $n I32 (ADD 1 1)
+CONST $c VEC2 (VEC2 (PX 4) (PX 4))
+SHAPE $s (CIRCLE CENTER $c RADIUS (PX $n))
+LAYER ink ORDER 10 { PAINT $s FILL #55CCFF RASTER MIDPOINT }`;
+    const shapeKeywordAnalysis = analyzeSCDLV2(parseSCDLV2(shapeKeywordSource).ast);
+    const shapeKeywordBudget = verifySCDLV2Budget(shapeKeywordAnalysis.ir, {});
+    expect(shapeKeywordBudget.ok).toBe(true);
+    expect(budget.verified.demand.instructions).toBe(shapeKeywordBudget.verified.demand.instructions);
+  });
 });
