@@ -18,6 +18,8 @@ import { tmpdir } from 'node:os';
 import { readFileSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { MAX_PNG_SCALE } from '../../../../../codex/core/pixelbrain/scdl/scdl.exporters.js';
+import { compileSCDL } from '../../../../../codex/core/pixelbrain/scdl/scdl.compiler.js';
+import { hashString } from '../../../../../codex/core/pixelbrain/shared.js';
 
 const ROOT = resolve(process.cwd());
 const CLI = join(ROOT, 'codex/core/pixelbrain/scdl/scdl.cli.js');
@@ -103,5 +105,21 @@ describe('SCDL white paper §8 matches the CLI', () => {
 
   it('documents the --out-dir creation behaviour the audit proved broken', () => {
     expect(section).toMatch(/created if it does not exist/);
+  });
+});
+
+describe('SCDL white paper §11.7 bytecode dump', () => {
+  it('is LF-terminated bytecode.text whose hashString is scdlbc_98042e1f', () => {
+    const md = readFileSync(PAPER, 'utf8');
+    const heading = md.indexOf('### 11.7 Canonical bytecode example');
+    expect(heading, 'white paper lost its §11.7 heading').toBeGreaterThan(-1);
+    const match = md.slice(heading).match(/```\n([\s\S]*?)\n```/);
+    expect(match, '§11.7 lost its bytecode fence').toBeTruthy();
+    const dump = match[1];
+    const live = compileSCDL(readFileSync(join(ROOT, 'codex/core/pixelbrain/scdl/fixtures/v2/exact-orb.scdl'), 'utf8'));
+    expect(dump).toBe(live.bytecode.text);
+    expect(dump.endsWith('\n')).toBe(true);
+    expect(`scdlbc_${hashString(dump).toString(16).padStart(8, '0')}`).toBe('scdlbc_98042e1f');
+    expect(live.bytecode.programId).toBe('scdlbc_98042e1f');
   });
 });

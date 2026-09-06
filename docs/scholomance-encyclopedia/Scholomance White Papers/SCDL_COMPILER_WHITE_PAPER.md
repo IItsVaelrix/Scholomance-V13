@@ -1039,10 +1039,13 @@ during evaluate / raster may still fire `SCDL-BUDGET-003` as a second defense.
 
 The dump below is `compileSCDL` of the checked-in fixture
 `codex/core/pixelbrain/scdl/fixtures/v2/exact-orb.scdl`, field
-`result.bytecode.text`. It is not a hand-written illustration. Identity is
-`scdlbc_98042e1f` (`hashString` of this exact text, eight lowercase hex
-digits). Comments, whitespace, the asset label, and local `$symbol` spelling
-do not change this text or `programId`.
+`result.bytecode.text`, including the terminating LF that
+`lowerSCDLV2Bytecode` always appends (the blank line before the closing
+fence is that terminator, not an extra instruction). It is not a
+hand-written illustration. Identity is `scdlbc_98042e1f` (`hashString` of
+this exact terminated text, eight lowercase hex digits). Comments,
+whitespace, the asset label, and local `$symbol` spelling do not change
+this text or `programId`.
 
 ```
 .module SCDL-BC-v2
@@ -1072,6 +1075,7 @@ BC.PAINT %0 %4 %5 MIDPOINT
 %9 = BC.CONST $k4
 BC.PAINT %0 %8 %9 CENTER
 BC.EMIT.ASSET %0
+
 ```
 
 The fixture paints a cyan radius-2 `MIDPOINT` disc centered at `(4,4)` and a
