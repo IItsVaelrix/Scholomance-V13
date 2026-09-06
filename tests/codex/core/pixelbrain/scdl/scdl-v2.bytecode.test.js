@@ -54,3 +54,71 @@ describe('SCDL-BC-v2 lowering', () => {
     expect(b).not.toBe(a);
   });
 });
+
+describe('verifySCDLV2Budget declaration accounting', () => {
+  // A CONST/SHAPE declaration that no PAINT ever reaches is still real
+  // static cost the source asked the compiler to hold: it is not free just
+  // because it never reaches the raster. These reproduce the reviewer
+  // finding against small, fast fixtures instead of the original
+  // 40,000/20,000-declaration repro.
+  const UNUSED_SHAPES_SOURCE = `SCDL 2
+ASSET unused_shapes
+CANVAS WIDTH 9 HEIGHT 9
+BUDGET INSTRUCTIONS 200000 GENERATED_SHAPES 3 RASTER_CELLS 1048576
+CONST $n I32 (ADD 1 1)
+CONST $c VEC2 (VEC2 (PX 4) (PX 4))
+SHAPE $s (CIRCLE CENTER $c RADIUS (PX $n))
+SHAPE $u1 (CIRCLE CENTER $c RADIUS (PX 1))
+SHAPE $u2 (CIRCLE CENTER $c RADIUS (PX 1))
+SHAPE $u3 (CIRCLE CENTER $c RADIUS (PX 1))
+LAYER ink ORDER 10 { PAINT $s FILL #55CCFF RASTER MIDPOINT }`;
+
+  it('rejects generatedShapes demand inflated by unreferenced SHAPE declarations', () => {
+    const analysis = analyzeSCDLV2(parseSCDLV2(UNUSED_SHAPES_SOURCE).ast);
+    expect(analysis.ok).toBe(true);
+    const budget = verifySCDLV2Budget(analysis.ir, {});
+    expect(budget.ok).toBe(false);
+    const violation = budget.diagnostics.find((d) => d.code === 'SCDL-BUDGET-002' && d.relatedSymbols.includes('generatedShapes'));
+    expect(violation).toBeDefined();
+    // 1 reached ($s) + 3 unreferenced ($u1..$u3) = 4, over the requested 3.
+    expect(violation.received).toContain('4');
+  });
+
+  it('still analyzes the unreferenced-declaration source successfully (dead code, not invalid code)', () => {
+    const analysis = analyzeSCDLV2(parseSCDLV2(UNUSED_SHAPES_SOURCE).ast);
+    expect(analysis.ok).toBe(true);
+    expect(analysis.ir.shapes.length).toBe(4);
+  });
+
+  const UNUSED_CONSTS_SOURCE = `SCDL 2
+ASSET unused_consts
+CANVAS WIDTH 9 HEIGHT 9
+BUDGET INSTRUCTIONS 20 GENERATED_SHAPES 10000 RASTER_CELLS 1048576
+CONST $n I32 (ADD 1 1)
+CONST $c VEC2 (VEC2 (PX 4) (PX 4))
+CONST $u1 I32 5
+CONST $u2 I32 5
+CONST $u3 I32 5
+SHAPE $s (CIRCLE CENTER $c RADIUS (PX $n))
+LAYER ink ORDER 10 { PAINT $s FILL #55CCFF RASTER MIDPOINT }`;
+
+  it('rejects instructions demand inflated by unreferenced CONST declarations', () => {
+    const analysis = analyzeSCDLV2(parseSCDLV2(UNUSED_CONSTS_SOURCE).ast);
+    expect(analysis.ok).toBe(true);
+    const budget = verifySCDLV2Budget(analysis.ir, {});
+    expect(budget.ok).toBe(false);
+    const violation = budget.diagnostics.find((d) => d.code === 'SCDL-BUDGET-002' && d.relatedSymbols.includes('instructions'));
+    expect(violation).toBeDefined();
+    // Baseline reachable-only demand is 16; three unreferenced `CONST $u I32`
+    // declarations add 2 instructions each (bind + literal) = 22.
+    expect(violation.received).toContain('22');
+  });
+
+  it('does not double-count a SHAPE declaration that a PAINT does reach', () => {
+    const analysis = analyzeSCDLV2(parseSCDLV2(SOURCE).ast);
+    const budget = verifySCDLV2Budget(analysis.ir, {});
+    expect(budget.ok).toBe(true);
+    // One CIRCLE, reached by exactly one PAINT: charged once, not twice.
+    expect(budget.verified.demand.generatedShapes).toBe(1);
+  });
+});

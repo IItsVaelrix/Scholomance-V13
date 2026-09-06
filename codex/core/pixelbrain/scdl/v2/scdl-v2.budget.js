@@ -70,6 +70,11 @@ function countValueNodes(resolved) {
       return 1;
     case 'VEC2':
       return 1 + countValueNodes(resolved.value.x) + countValueNodes(resolved.value.y);
+    case 'SHAPE':
+      // A CONST may itself resolve to a SHAPE value (e.g. `CONST $x SHAPE
+      // (CIRCLE ...)`); delegate to the shape node counter instead of
+      // falling through to the defensive default below.
+      return countShapeNodes(resolved.value);
     default:
       // Defensive: an IR shape this module does not know about yet. Charge
       // one instruction rather than crashing the budget pass.
@@ -104,12 +109,31 @@ function rasterCellsForShape(shape, canvasAreaBig) {
   return cost < canvasAreaBig ? cost : canvasAreaBig;
 }
 
-// Measures static demand by walking only what the program actually emits:
-// declared LAYER/PAINT statements. A CONST or SHAPE declaration that no
-// PAINT ever reaches costs nothing and never reaches bytecode either — it is
-// genuinely dead. This keeps the budget estimate and the bytecode lowering
-// answering the same question ("what does this program emit") from two
-// independent angles.
+// Measures static demand by walking BOTH the program's raw CONST/SHAPE
+// declaration lists AND its declared LAYER/PAINT statements.
+//
+// The brief's Step 3 lists "declaration" as its own instruction-cost
+// category, separate from "layer creation" and "paint" — unqualified by
+// reachability. Every CONST/SHAPE declaration Task 5's analyzer produces
+// costs instructions (and, for SHAPE, a generated-shape unit) whether or not
+// any PAINT ever reaches it: a source with thousands of unreferenced heavy
+// declarations is real static cost the host must reject before lowering,
+// even though the *bytecode lowering* pass (scdl-v2.bytecode.js) is
+// separately and correctly free to omit unreached declarations from its
+// canonical program text/identity (a distinct question the brief's Step 4
+// never ties to "declaration").
+//
+// RASTER_CELLS stays reachability-scoped on purpose: the brief charges it
+// "for each paint", and an unpainted shape produces no raster work no matter
+// how it's counted, so it is untouched here.
+//
+// To avoid double-counting a declared SHAPE that a PAINT does reach, shapes
+// reached by reference carry through as the exact same (frozen, but not
+// cloned) object Task 5 attached to the SHAPE declaration — so identity
+// (`===`) reliably tells "already counted via the declaration walk" apart
+// from "an anonymous shape expression written inline in the PAINT
+// statement", which has no declaration entry of its own and must still be
+// charged here.
 function measureDemand(ir) {
   let instructions = 0n;
   let generatedShapes = 0n;
@@ -117,15 +141,35 @@ function measureDemand(ir) {
   const canvas = ir && ir.canvas;
   const canvasAreaBig = canvas ? BigInt(canvas.width) * BigInt(canvas.height) : null;
   const layers = Array.isArray(ir && ir.layers) ? ir.layers : [];
+  const constants = Array.isArray(ir && ir.constants) ? ir.constants : [];
+  const shapes = Array.isArray(ir && ir.shapes) ? ir.shapes : [];
+
+  const declaredShapeValues = new Set();
+  for (const constant of constants) {
+    instructions += 1n; // the CONST declaration/bind itself
+    instructions += BigInt(countValueNodes({ type: constant && constant.type, value: constant && constant.value }));
+  }
+  for (const shape of shapes) {
+    instructions += 1n; // the SHAPE declaration/bind itself
+    instructions += BigInt(countShapeNodes(shape && shape.value));
+    generatedShapes += 1n; // one PIXEL/CIRCLE construction, declared regardless of reach
+    if (shape && shape.value) declaredShapeValues.add(shape.value);
+  }
 
   for (const layer of layers) {
     instructions += 1n; // BC.LAYER.NEW
     const paints = Array.isArray(layer && layer.paints) ? layer.paints : [];
     for (const paint of paints) {
       instructions += 1n; // BC.PAINT
-      instructions += BigInt(countShapeNodes(paint.shape));
       instructions += 1n; // fill literal
-      generatedShapes += 1n;
+      if (!declaredShapeValues.has(paint.shape)) {
+        // An anonymous shape expression written inline in the PAINT
+        // statement — not covered by the SHAPE declaration walk above, so
+        // its literal/expression-call cost and generated-shape unit are
+        // charged here instead of being counted twice.
+        instructions += BigInt(countShapeNodes(paint.shape));
+        generatedShapes += 1n;
+      }
       rasterCells += rasterCellsForShape(paint.shape, canvasAreaBig);
     }
   }
