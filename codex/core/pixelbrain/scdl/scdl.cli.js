@@ -7,6 +7,7 @@
  *   node scdl.cli.js preview <file.scdl> [--scale N]
  *   node scdl.cli.js parse   <file.scdl> [--out <file>]
  *   node scdl.cli.js check   <file.scdl>
+ *   node scdl.cli.js format  <file.scdl> [--write]
  *   (semantic includes annotations from SemQuant + wired engine primitives)
  *
  * Examples:
@@ -14,11 +15,12 @@
  *   node scdl.cli.js preview fixtures/void_chestplate.scdl --scale 8
  *   node scdl.cli.js parse   fixtures/void_chestplate.scdl
  *   node scdl.cli.js check   fixtures/void_chestplate.scdl
+ *   node scdl.cli.js format  fixtures/v2/exact-orb.scdl --write
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, basename, dirname, extname, join } from 'node:path';
-import { compileSCDL, parseSCDL, exportSCDL } from './index.js';
+import { compileSCDL, parseSCDL, exportSCDL, detectSCDLVersion, parseSCDLV2, formatSCDLV2 } from './index.js';
 import { buildAsepritePayload, exportFilmstripPNG, MAX_PNG_SCALE, encodePng } from './scdl.exporters.js';
 import { encodeAsepriteBinary } from '../aseprite-binary-codec.js';
 import { buildSCDLDiagnosticReport } from './scdl.diagnostics.js';
@@ -35,7 +37,7 @@ const DEFAULT_PREVIEW_SCALE = 8;
  * token for a `--` prefix, so `compile --bytecode foo.scdl` read foo.scdl as
  * bytecode's value and lost the input file.
  */
-const BOOLEAN_FLAGS = new Set(['bytecode', 'strict', 'semantic', 'strokes', 'lineage']);
+const BOOLEAN_FLAGS = new Set(['bytecode', 'strict', 'semantic', 'strokes', 'lineage', 'write']);
 
 function parseArgs(args) {
   const opts = { flags: {}, positional: [] };
@@ -495,6 +497,18 @@ function cmdParse(args) {
   if (!filePath) { console.error('[SCDL] parse: missing <file.scdl>'); process.exit(1); }
 
   const source = readSource(filePath);
+  if (detectSCDLVersion(source) === 2) {
+    const result = parseSCDLV2(source);
+    const out = JSON.stringify(result.ast || result.cst || result, null, 2);
+    if (opts.flags.out) {
+      writeOut(opts.flags.out, out);
+    } else {
+      console.log(out);
+    }
+    if (result.ok === false) process.exit(1);
+    return;
+  }
+
   const result = parseSCDL(source);
   const out    = JSON.stringify(result.rawAst || result, null, 2);
 
@@ -533,9 +547,30 @@ function cmdCheck(args) {
   if (result.ok) {
     console.log(`  Packet: ${result.packet?.id}`);
     console.log(`  Coords: ${result.packet?.geometry?.coordinates?.length ?? 0}`);
+    if (result.languageVersion === 2) {
+      console.log(`  Bytecode: ${result.bytecode.programId}`);
+    }
   }
 
   process.exit(result.ok ? 0 : 1);
+}
+
+function cmdFormat(args) {
+  const opts = parseArgs(args);
+  const filePath = opts.positional[0];
+  if (!filePath) { console.error('[SCDL] format: missing <file.scdl>'); process.exit(1); }
+  const source = readSource(filePath);
+  if (detectSCDLVersion(source) !== 2) {
+    console.error('[SCDL] format: canonical formatting is available only for explicit SCDL 2 source');
+    process.exit(1);
+  }
+  const result = formatSCDLV2(source);
+  if (!result.ok) {
+    printDiagnostics(result.diagnostics);
+    process.exit(1);
+  }
+  if (opts.flags.write === true) writeFileSync(resolve(filePath), result.output, 'utf8');
+  else process.stdout.write(result.output);
 }
 
 function _targetExt(target) {
@@ -568,6 +603,7 @@ switch (command) {
   case 'preview': cmdPreview(argv); break;
   case 'parse':   cmdParse(argv);   break;
   case 'check':   cmdCheck(argv);   break;
+  case 'format':  cmdFormat(argv);  break;
   default:
     console.log(`SCDL Compiler CLI
 Usage:
@@ -575,6 +611,7 @@ Usage:
   node scdl.cli.js preview <file.scdl> [--scale N] [--out-dir <dir>] [--shade material|vri] [--strict]
   node scdl.cli.js parse   <file.scdl> [--out <file>]
   node scdl.cli.js check   <file.scdl> [--strict]
+  node scdl.cli.js format  <file.scdl>
 
 Outputs default to the source file's directory, named <asset>-<target>.<ext>
 (multi-frame assets: <asset>-f<N>-<target>.<ext> plus <asset>-frameloop.json).

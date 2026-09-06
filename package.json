@@ -31,6 +31,7 @@
     "scdl:compile": "node codex/core/pixelbrain/scdl/scdl.cli.js compile",
     "scdl:preview": "node codex/core/pixelbrain/scdl/scdl.cli.js preview",
     "scdl:check": "node codex/core/pixelbrain/scdl/scdl.cli.js check",
+    "scdl:format": "node codex/core/pixelbrain/scdl/scdl.cli.js format",
     "amps": "node scripts/amp-substrate-cli.mjs",
     "vixel:pipeline": "node scripts/wand-vixel-pipeline.mjs",
     "vixel:pipeline:all": "node scripts/wand-vixel-pipeline.mjs --all",

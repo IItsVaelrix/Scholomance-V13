@@ -5,7 +5,12 @@
  * Import from here, not from individual sub-modules.
  */
 
-export { compileSCDL }               from './scdl.compiler.js';
+export { compileSCDL, compileLegacySCDL } from './scdl.compiler.js';
+export { detectSCDLVersion } from './v2/scdl-v2.version.js';
+export { compileSCDLV2 } from './v2/scdl-v2.compiler.js';
+export { parseSCDLV2 } from './v2/scdl-v2.parser.js';
+export { formatSCDLV2 } from './v2/scdl-v2.formatter.js';
+export { listSCDLV2Opcodes, getSCDLV2Opcode } from './v2/scdl-v2.opcodes.js';
 export { parseSCDL, tokenize }       from './scdl.grammar.js';
 export { exportSCDL, buildAsepritePayload } from './scdl.exporters.js';
 export { emitLattice }               from './scdl.lattice-emitter.js';

@@ -442,3 +442,29 @@ export json
   });
 });
 
+describe('SCDL CLI — v2 router and format', () => {
+  it('checks and compiles an explicit v2 source through the existing CLI', () => {
+    const src = join(dir, 'exact-orb.scdl');
+    writeFileSync(src, readFileSync(resolve(process.cwd(), 'codex/core/pixelbrain/scdl/fixtures/v2/exact-orb.scdl'), 'utf8'));
+    const check = runBoth(['check', src], cwdDir);
+    const compile = runBoth(['compile', src, '--export', 'json,png'], cwdDir);
+    expect(check.status).toBe(0);
+    expect(check.all).toMatch(/Bytecode:\s+scdlbc_[0-9a-f]{8}/);
+    expect(compile.status).toBe(0);
+    expect(existsSync(join(dir, 'exact-orb-json.json'))).toBe(true);
+    expect(existsSync(join(dir, 'exact-orb-png.png'))).toBe(true);
+  });
+
+  it('formats v2 source to stdout and --write updates only that file', () => {
+    const src = join(dir, 'format-me.scdl');
+    writeFileSync(src, 'SCDL 2\r\nASSET x\r\nCANVAS WIDTH 1 HEIGHT 1\r\nSHAPE $p (PIXEL AT (VEC2 (PX 0) (PX 0)))\r\nLAYER a ORDER 0 { PAINT $p FILL #FFFFFF RASTER CENTER }');
+    const printed = runBoth(['format', src], cwdDir);
+    expect(printed.status).toBe(0);
+    expect(printed.stdout).toContain('PAINT $p FILL #ffffff RASTER CENTER');
+    const written = runBoth(['format', src, '--write'], cwdDir);
+    expect(written.status).toBe(0);
+    expect(readFileSync(src, 'utf8')).toBe(printed.stdout);
+  });
+});
+
+

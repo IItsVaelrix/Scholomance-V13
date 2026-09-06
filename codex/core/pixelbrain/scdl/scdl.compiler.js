@@ -35,6 +35,13 @@ import { projectGenesPass }     from './passes/project-genes.pass.js';
 import { scdlAstToIR } from '../semantic/adapters/scdl-to-ir.adapter.js';
 import { semanticUnifierPass } from '../semantic/semantic-unifier.js';
 import { createSemanticDiagnostic } from '../semantic-registry.js';
+import { detectSCDLVersion } from './v2/scdl-v2.version.js';
+import { compileSCDLV2 } from './v2/scdl-v2.compiler.js';
+
+export function compileSCDL(source, options = {}) {
+  if (detectSCDLVersion(source) === 2) return compileSCDLV2(source, options);
+  return compileLegacySCDL(source, options);
+}
 
 /**
  * Compile SCDL source text into a PixelBrainAssetPacket.
@@ -44,7 +51,7 @@ import { createSemanticDiagnostic } from '../semantic-registry.js';
  * @param {boolean} [options.strict=false] - Treat WARNs as ERRORs
  * @returns {CompileResult}
  */
-export function compileSCDL(source, options = {}) {
+export function compileLegacySCDL(source, options = {}) {
   const { strict = false } = options;
   const errors = [];
 

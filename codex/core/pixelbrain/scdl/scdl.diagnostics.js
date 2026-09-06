@@ -4,7 +4,7 @@
  * Converts CompileResult diagnostics into the format expected by the
  * existing SCD64 diagnostic infrastructure (DiagnosticReport.js).
  *
- * Registers SCDL as a known diagnostic source: 'SCDL-v1'.
+ * Registers SCDL as a known diagnostic source: 'SCDL-v1' or 'SCDL-v2'.
  */
 
 /**
@@ -14,13 +14,15 @@
  * @returns {{ source: string, entries: object[], summary: object }}
  */
 export function buildSCDLDiagnosticReport(result) {
+  const source = result.languageVersion === 2 ? 'SCDL-v2' : 'SCDL-v1';
   const entries = (result.diagnostics || []).map(d => ({
-    source:        d.source || 'SCDL-v1',
+    source:        d.source || source,
     module:        d.module || 'scdl-compiler',
     severity:      d.severity,
     code:          d.code,
     message:       d.message,
     loc:           d.loc,
+    span:          d.span,
     bytecodeString: d.bytecodeString,
     context:       d.context,
     assetId:       d.assetId,
@@ -32,7 +34,7 @@ export function buildSCDLDiagnosticReport(result) {
   const infoCount  = entries.filter(e => e.severity === 'INFO').length;
 
   return {
-    source:  'SCDL-v1',
+    source,
     ok:      result.ok,
     entries,
     summary: {
