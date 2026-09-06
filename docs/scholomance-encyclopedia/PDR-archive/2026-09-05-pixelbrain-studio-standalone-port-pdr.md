@@ -1,6 +1,6 @@
 # PDR: PixelBrain Studio Standalone Port
 
-**Status:** Implemented — corrected Phase A scope shipped on 2026-09-05; all scoped unit, type, build, dev-browser, and production-browser gates pass. Phase B remains deferred.
+**Status:** Implemented — corrected Phase A scope shipped on 2026-09-05; all scoped unit, type, build, dev-browser, and production-browser gates pass. Phase B was separately authorized by `2026-09-06-pixelbrain-studio-standalone-phase-b-pdr.md`.
 **Classification:** Architectural | Behavioral | PixelBrain | Studio migration | Standalone app
 **Priority:** Critical
 **Bytecode Search Code:** `SCHOL-ENC-BYKE-SEARCH-PDR-PIXELBRAIN-STUDIO-STANDALONE-PORT-2026-09-05`
@@ -42,7 +42,7 @@ This is a **port**, not a rebuild: every capability being moved already has a pa
 Two honest phases, because the portability evidence is uneven:
 
 - **Phase A (this PDR's committed scope):** mirror the measured 104-file framework-agnostic execution closure wholesale, extract the Studio facade, and stand up the 3 genuinely new tabs (Foundry/grass, AMP Conveyor, Mutation Lab) plus Diagnostics in the target app. Only those four tabs are rendered or routable in Phase A. This is where the verified core capability lives; the larger-than-first-estimated copy is required so every advertised adapter can actually load and execute in the independent app.
-- **Phase B (named, scoped, explicitly NOT started by this PDR):** port the remaining 6 legacy-component-backed tabs (Canvas/Aseprite, Blueprint, Material & Finish, Mentor & Reference, Library & Export) for full 9-tab parity. Two components need their `PixelBrainPage`/context coupling resolved first; this phase's estimate is a placeholder pending that discovery, not a committed number.
+- **Phase B (historical scope boundary for this PDR):** complete the six legacy-backed surfaces for full nine-tab parity. Diagnostics received its Phase-A evidence shell, so the later work adds five routes (Canvas/Aseprite, Blueprint, Material & Finish, Mentor & Reference, Library & Export) and completes Diagnostics. At the time of this Phase-A decision, two components appeared context-coupled; the follow-up Phase-B PDR records the corrected dependency audit and authorization.
 
 Auth is dropped entirely, not ported: `<AdminRoute>` gates the main app's route because it's a shared, multi-tenant web app; `Pixel-Art-Studio-Skeleton` is a local, single-user tool (matches its own `AGENTS.md`: auth stays OFF unless the ask names accounts/sign-in). No login screen, no `authMiddleware`.
 
@@ -56,14 +56,14 @@ Same determinism (VAELRIX Law 6), adapter-only-access, and frozen-contract rules
 
 ## 1. Executive Summary
 
-Port the already-implemented, already-tested PixelBrain Studio core (manifest, planner, execution, mutation-transaction, adapter registry, the real SWARD-ported grass engine) plus its 3 new Studio-native UI tabs (Foundry, AMP Conveyor, Mutation Lab) from their current home — a route inside the main Scholomance React app — into `Pixel-Art-Studio-Skeleton`, a genuinely standalone app with its own dev server, build, and lifecycle. This is Phase A of a two-phase plan; Phase B (porting the 6 tabs backed by the legacy PixelBrain component library for full 9-tab parity) is named but not committed here pending its own discovery pass on two tightly-coupled components.
+Port the already-implemented, already-tested PixelBrain Studio core (manifest, planner, execution, mutation-transaction, adapter registry, the real SWARD-ported grass engine) plus its 3 new Studio-native UI tabs (Foundry, AMP Conveyor, Mutation Lab) from their current home — a route inside the main Scholomance React app — into `Pixel-Art-Studio-Skeleton`, a genuinely standalone app with its own dev server, build, and lifecycle. This is Phase A of a two-phase plan; this document did not commit the six legacy-backed surfaces. The later Phase-B PDR authorizes five new routes plus completion of the Phase-A Diagnostics surface after a corrected dependency audit.
 
 The main app's `/pixelbrain/studio` route is left exactly as it is — this PDR adds a second, independent home for the same capability, it does not retire or modify the first.
 
 ## 2. Out of Scope / Non-Goals
 
 - Modifying, retiring, or redirecting the main app's existing `/pixelbrain/studio` route, `<AdminRoute>`, or any file under `src/pages/PixelBrain/` — this PDR only reads from those locations.
-- Phase B (the 6 legacy-component-backed tabs) — named above, not committed. A future PDR or plan revision authorizes it once the two coupled components' dependencies are actually resolved, not assumed away.
+- Phase B's six legacy-backed surfaces — historically named above but not committed by this Phase-A PDR. They are authorized only by the approved 2026-09-06 follow-up PDR.
 - Any auth, accounts, or per-user data in the target app — it is a single-user local tool.
 - Redesigning the Studio UI, its CSS, or its interaction model during the port. Visual output should be a plain relocation, not a refresh.
 - Changing the manifest/planner/execution/mutation-transaction contracts themselves — this PDR moves their implementation, not their design.
@@ -110,17 +110,17 @@ No new contracts. Existing contracts (`PB-STUDIO-AMP-MANIFEST-v1`, `PB-STUDIO-AM
 - **Unknown:** whether `PixelBrainPage.css`'s 2,517 rules have any global selectors (bare element selectors, `*`, unscoped `body`/`html` rules) that would leak into Sward's own chrome once co-loaded. Audit before copying, don't assume it's cleanly scoped just because its rules are prefixed `.pb-*` in the parts already read.
 - **Unknown:** the Node engine mismatch noted when installing `Pixel-Art-Studio-Skeleton`'s dependencies (`@tanstack/start-*` wants Node ≥22.12.0; this machine has 20.20.2) ran fine for `npm run dev` in practice, but hasn't been stress-tested under the added load of the ported Studio code. Watch for it, don't assume it's fully inconsequential.
 
-## 6. Open Questions / Escalations
+## 6. Resolved Escalation
 
 ```text
-ESCALATION: PHASE_B_AUTHORIZATION
+RESOLVED_ESCALATION: PHASE_B_AUTHORIZATION
 - Clause: scope of legacy-tab porting
-- Current Text: Phase B (Canvas/Aseprite, Blueprint, Material & Finish, Mentor & Reference, Library & Export) is named but not authorized by this PDR.
-- Proposed Text: A follow-up PDR or plan revision authorizes Phase B only after ForgeGatePanel.jsx and MentorCritiquePanel.jsx's PixelBrainPage/context coupling has been measured (not assumed) and a real estimate exists.
-- Rationale: Committing a full 9-tab estimate now would repeat the exact mistake this PDR exists to correct — scoping work before verifying what's actually portable.
+- Resolution: Angel approved the follow-up `2026-09-06-pixelbrain-studio-standalone-phase-b-pdr.md` on 2026-09-06 after a fresh source and dependency audit.
+- Evidence correction: the current ForgeGatePanel.jsx and MentorCritiquePanel.jsx are props-driven; the older context-coupling observation in this Phase-A record is stale.
+- Authorized scope: five new routes complete the exact nine-tab contract, while Foundry and Diagnostics receive their remaining legacy-backed functions.
 - Critical Nature: MEDIUM
 - Structural Impact: SCOPE, ESTIMATE ACCURACY
-- Needs: Angel approval before Phase B work starts.
+- Needs: governed Phase-B implementation and verification under the follow-up PDR.
 ```
 
 ## 7. Architecture / File Map
@@ -204,7 +204,7 @@ test('studio-facade.js does not import engine.adapter or photonic-retina', () =>
 1. **Does this replace the main app's `/pixelbrain/studio` route?** No. Both exist independently; neither imports the other.
 2. **Why not just import the main app's code directly instead of copying it?** Cross-app relative imports between two independently-built, independently-versioned apps create exactly the kind of drift risk this repo's SCDL/AMP work has repeatedly hit — a copy with a differential test is more honest about the two apps' independence than a fragile relative import across a repo boundary neither app owns.
 3. **Will this app need auth?** No — single-user local tool, matches `Pixel-Art-Studio-Skeleton`'s own `AGENTS.md` default.
-4. **What happens to the 6 legacy-backed tabs?** Named as Phase B, not committed. See §6.
+4. **What happened to the six legacy-backed surfaces?** Diagnostics received a Phase-A shell; the approved follow-up PDR adds the other five routes and completes that shell. See §6.
 5. **Does the CSS need a rewrite for Tailwind?** No — ported as plain CSS alongside the Tailwind-styled chrome, scoped to avoid leakage.
 6. **What if the Node engine mismatch actually breaks something?** Flagged as an open unknown (§5), watched during A5's verification, not assumed away.
 7. **Is this a smaller or bigger effort than the original companion PDR?** Much smaller — that PDR built the capability from scratch; this one relocates already-built, already-tested capability into a second home.
@@ -252,7 +252,7 @@ No flags needed — this is a new, independent app entry point with no existing 
 - [x] `npm test`, `npm run typecheck`, `npm run build` all pass in `Pixel-Art-Studio-Skeleton`.
 - [x] `startup.sh` serves the ported Studio; a real render check (screenshot or DOM assertion) confirms content, not just HTTP 200.
 - [x] Main app's `/pixelbrain/studio` route is unmodified (diff review, not just "I didn't mean to touch it").
-- [x] Phase B remains explicitly deferred under §6; no placeholder or dead Phase-B tab is presented as live functionality.
+- [x] Phase B remained deferred for the Phase-A implementation; no placeholder or dead Phase-B tab was presented as live functionality. The later authorization is governed by the follow-up PDR in §6.
 - [x] PIR records the differential-test evidence (checksum matches) as the primary proof of correctness.
 
 ## 16. Final Architectural Verdict
