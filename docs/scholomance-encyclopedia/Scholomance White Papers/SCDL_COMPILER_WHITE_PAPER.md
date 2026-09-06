@@ -2,8 +2,9 @@
 
 **Date:** 2026-08-30 (Updated: v1.2 scene-graph grammar documented, real cross-part
 boolean ops, SCDL-016..026 error codes, pipeline map corrected to include the
-scene-graph branch and art-gene projection)  
-**Applies To:** Scholomance Coordinate Description Language (SCDL v1.2), SCDL-AST-v1 JSON contract (version 1.2.0), PB-SCENE-GRAPH-v1 canonical program form, SCDL-FRAME-LOOP-v1 manifest, PB-Semantics / SemQuant unification layer, compile pass pipeline, SymmetryAMP integration, Phaser/SVG/JSON/PNG/Aseprite exporters, SCD64 + PB-SEM diagnostics, CLI utilities  
+scene-graph branch and art-gene projection; 2026-09-06 SCDL v2 semantic-core
+milestone documented from compiler-demonstrated behavior, CLI `format` / `--write`)
+**Applies To:** Scholomance Coordinate Description Language (SCDL v1.2), SCDL-AST-v1 JSON contract (version 1.2.0), PB-SCENE-GRAPH-v1 canonical program form, SCDL-FRAME-LOOP-v1 manifest, PB-Semantics / SemQuant unification layer, compile pass pipeline, SymmetryAMP integration, Phaser/SVG/JSON/PNG/Aseprite exporters, SCD64 + PB-SEM diagnostics, CLI utilities, SCDL v2 semantic-core (`SCDL 2` routing, SCDL-BC-v2, PixelBrain packet emission)
 **Implementation PDR:** [`scdl-v1-pdr.md`](../PDR-archive/scdl-v1-pdr.md), [`2026-07-03-scdl-frames-and-cli-out-dir-pdr.md`](../PDR-archive/2026-07-03-scdl-frames-and-cli-out-dir-pdr.md)  
 **Implementation PIR:** [`PIR-20260702-SCDL-COMPILER.md`](../post-implementation-reports/PIR-20260702-SCDL-COMPILER.md), [`PIR-20260702-PB-SEMANTICS-SEMQUANT.md`](../post-implementation-reports/PIR-20260702-PB-SEMANTICS-SEMQUANT.md)  
 **Companion skill:** `.claude/skills/ScholomanceCompile/` — a Claude Code skill
@@ -640,7 +641,7 @@ frame packets; raster previews are never a source of truth.
 The Node.js CLI utility is located at `codex/core/pixelbrain/scdl/scdl.cli.js`.
 
 Every command is also reachable as `npm run scdl -- <command> …`, or through the
-per-command shortcuts `npm run scdl:compile|scdl:preview|scdl:check`. Bare
+per-command shortcuts `npm run scdl:compile|scdl:preview|scdl:check|scdl:format`. Bare
 `npm run scdl` (or running the file with no arguments) prints current usage.
 
 | Command | Purpose | Writes files? |
@@ -649,6 +650,7 @@ per-command shortcuts `npm run scdl:compile|scdl:preview|scdl:check`. Bare
 | `preview` | magnified PNG(s) to actually look at | yes |
 | `check` | run the pipeline and report diagnostics | no |
 | `parse` | raw AST, no semantic passes | no |
+| `format` | canonical SCDL 2 source spelling | only with `--write` |
 
 ### 8.1 Compilation
 Compile an SCDL file and generate target files (defaults to `json`):
@@ -768,6 +770,30 @@ Example with everything on:
 node codex/core/pixelbrain/scdl/scdl.cli.js compile fixtures/void_acolyte/void_acolyte.scdl --shade vri --strokes --relief synthetic --lineage --out-dir out
 ```
 
+### 8.6 Canonical format (SCDL 2 only)
+
+`format` reprints explicit `SCDL 2` source in the compiler's one canonical
+spelling. It does not compile, rasterize, or write packets. Legacy / unversioned
+source is refused (exit 1): canonical formatting is available only for explicit
+SCDL 2.
+
+```bash
+node codex/core/pixelbrain/scdl/scdl.cli.js format fixtures/v2/exact-orb.scdl
+node codex/core/pixelbrain/scdl/scdl.cli.js format fixtures/v2/exact-orb.scdl --write
+npm run scdl:format -- codex/core/pixelbrain/scdl/fixtures/v2/exact-orb.scdl
+```
+
+| Flag | Effect |
+|---|---|
+| `--write` | overwrite the input `.scdl` with the canonical spelling; omitted, formatted text goes to stdout |
+
+Canonical rules demonstrated by `formatSCDLV2`: LF endings, uppercase opcodes /
+types / enums, lowercase hex, two-space layer indentation, one blank line
+between header and bindings and between bindings and layers, a final newline,
+and comments stripped. A second `format` of its own output is a no-op
+(idempotent). `--write` is a boolean switch (`BOOLEAN_FLAGS`); it never
+consumes the following token as a path.
+
 ---
 
 ## 9. Developer Instruction Manual
@@ -849,3 +875,223 @@ npx vitest run tests/codex/core/pixelbrain/scdl/
 * **Problem:** `subtract a b` on two overlapping circles produces byte-identical packet coordinates to omitting the `subtract` line entirely — no error, no warning.
 * **Cause (historical, pre-2026-08-30):** Targets were matched against auto-generated op ids (`op:partId:index:verb`), which no SCDL author can type — so `a`/`b` never matched any real cell's `sourceOpId`, and the op silently combined nothing.
 * **Solution:** Targets now address sibling **part ids** (§5.7). If this symptom reappears, first check whether the targets actually resolve to `SCDL-026` (unknown/self-referencing target) rather than silently no-op'ing — and if a *new* silent no-op shows up, suspect the same class of bug: an identifier nothing in the pipeline can actually produce.
+
+---
+
+## 11. SCDL v2 semantic-core milestone
+
+This section documents **compiler-demonstrated** SCDL v2 behavior as of the
+2026-09-06 semantic-core vertical slice. It is attached documentation, not
+executable compiler authority: if this text and `compileSCDL` disagree, the
+compiler wins and this section is stale. §§1–10 above remain the v1 / v1.2
+manual; they do not describe the v2 pipeline.
+
+### 11.1 Routing law and legacy invariance
+
+Public `compileSCDL(source, options)` is unchanged as the seam. Version
+selection is exact and non-heuristic:
+
+- Strip a leading BOM.
+- Walk lines. Skip blanks and `#` comments.
+- If the first significant declaration is **exactly** `SCDL 2`, call
+  `compileSCDLV2`.
+- Every other source — unversioned v1, `SCDL 3`, `scdl 2`, `SCDL 2 extra`,
+  non-strings — enters the frozen `compileLegacySCDL` body.
+
+`SCDL 2` and only `SCDL 2` selects v2. Unsupported headers are not
+reinterpreted as v2; they fail in the legacy compiler. Frozen v1 / v1.2
+fixture and frame packet IDs remain byte-identical. SCDL v2 is compile-time
+only: no SCDL source evaluator ships into a game or browser runtime.
+
+### 11.2 Supported statement and expression opcodes
+
+The shipped source surface is deliberately small. Statement opcodes:
+
+| ID | Mnemonic | Role |
+|---|---|---|
+| `0x0001` | `SCDL` | version declaration (`SCDL 2`) |
+| `0x0002` | `ASSET` | emitted asset identifier |
+| `0x0003` | `CANVAS` | `WIDTH` / `HEIGHT` as U32 |
+| `0x0004` | `BUDGET` | `INSTRUCTIONS` / `GENERATED_SHAPES` / `RASTER_CELLS` |
+| `0x0010` | `CONST` | typed immutable binding |
+| `0x0020` | `SHAPE` | immutable shape binding |
+| `0x0030` | `LAYER` | ordered paint layer with a brace body |
+| `0x0031` | `PAINT` | paint a shape into the enclosing layer |
+
+Expression opcodes:
+
+| ID | Mnemonic | Role |
+|---|---|---|
+| `0x0100` | `ADD` | compatible numeric addition |
+| `0x0101` | `SUB` | compatible numeric subtraction |
+| `0x0102` | `MUL` | I32×I32, scalar×scalar, or PX×scalar |
+| `0x0103` | `DIV` | numeric ÷ nonzero scalar |
+| `0x0110` | `PX` | pixel-distance from a scalar |
+| `0x0111` | `VEC2` | two `PX` components |
+| `0x0200` | `PIXEL` | one-cell shape at named `AT` |
+| `0x0201` | `CIRCLE` | named `CENTER` (VEC2) and `RADIUS` (PX) |
+
+Bytecode-only mnemonics, illegal in source: `BC.CONST` (`0x8000`),
+`BC.LAYER.NEW` (`0x8001`), `BC.PAINT` (`0x8002`), `BC.EMIT.ASSET` (`0x8003`).
+
+Statements are uppercase opcode-first. Expressions are parenthesized prefix
+forms. Required non-positional operands are named (`CENTER`, `RADIUS`, `AT`,
+`FILL`, `RASTER`, `WIDTH`, `HEIGHT`, …). Literals demonstrated: signed base-10
+integers, exact base-10 decimals, `#RRGGBB` / `#RRGGBBAA` colors, identifiers,
+enum words (`CENTER` / `MIDPOINT`), and `$symbols`. A successful program emits
+declared layers sorted by ascending `ORDER`, with source order breaking ties.
+Values and shapes are immutable; construction does not paint — only `PAINT`
+adds a shape to an ordered layer.
+
+Inspect the frozen registry at runtime with `listSCDLV2Opcodes()` /
+`getSCDLV2Opcode(mnemonic)` from `codex/core/pixelbrain/scdl/index.js`.
+
+### 11.3 Compiler pipeline
+
+```text
+SCDL 2 source
+        │
+        ▼ detectSCDLVersion  (exact header only)
+tokenizeSCDLV2               lossless tokens + trivia + spans
+        │
+        ▼ parseSCDLV2        recoverable CST + strict AST
+analyzeSCDLV2                bind, closed types, exact constant eval
+        │
+        ▼ verifySCDLV2Budget static demand vs protected / requested limits
+                             (failure never lowers or evaluates)
+lowerSCDLV2Bytecode          canonical SCDL-BC-v2 text + instruction objects
+        │
+        ▼ evaluateSCDLV2     bounded interpreter of instruction objects
+                             (never re-parses bytecode.text)
+rasterizeSCDLV2              PIXEL + filled CIRCLE, CENTER / MIDPOINT
+        │
+        ▼ emitSCDLV2Package  PixelBrainAssetPacket + SCDL-PACKAGE-v2
+```
+
+Public calls never throw. Invalid input returns structured diagnostics and
+nulls `analysis`, `bytecode`, `package`, and `packet` (`framePackets` frozen
+empty). No partial packet, bytecode, export, or cache may escape a failed
+compile. Canonical bytecode is emitted **before** evaluation and is the
+authority for v2 program identity.
+
+### 11.4 Public result and package contracts
+
+A v2 `compileSCDL()` result has `contract: 'SCDL-COMPILE-RESULT-v2'`,
+`languageVersion: 2`, `compilerVersion: '2.0.0'`, plus `cst`, `ast`,
+`analysis`, `bytecode`, `package`, `packet`, `framePackets`, `frameLoop: null`,
+`errors`, `diagnostics`, `diagnosticReport` (`contract: 'SCDL-DIAGNOSTICS-v2'`),
+and `regressionSeed`. `errors` keep CLI methods (`isError()`, `isWarn()`,
+`isInfo()`, `toJSON()`). `diagnostics` is the JSON-safe list; if `ok` is
+false, `bytecode` / `package` / `packet` / `analysis` are null.
+
+A successful package has `contract: 'SCDL-PACKAGE-v2'`, `programId`, the
+bytecode object, `verifiedBudget`, immutable `construction`, composited
+`layers`, `framePackets` (one packet this milestone), `animation: null`,
+`ampPlan: []`, and an export manifest listing `json`, `svg`, `phaser`, `png`,
+`aseprite`. The packet is a real `pixelbrain.asset.v1` whose
+`bytecode.authority` is `SCDL-BC-v2`. Packet id is
+`pbasset_` plus the eight hex digits of `bytecode.programId` (`scdlbc_<hex>`).
+JSON / PNG exporters consume that packet; they do not re-author geometry.
+
+### 11.5 Exact rationals, units, CENTER, and MIDPOINT
+
+Closed types: `I32`, `U32`, `FIXED`, `RATIO`, `PX`, `COLOR`, `VEC2`, `SHAPE`,
+`LAYER`. `PX` is a pixel-distance type, not a unitless integer. There is no
+truthiness and no implicit conversion: `RADIUS $n` where `$n` is `I32` is
+`SCDL-TYPE-002` (`expected: ["PX"]`, `received: ["I32"]`). Wrap scalars with
+`PX`.
+
+Fractional values are reduced BigInt rationals stored as base-10 strings
+(`1.250` → `5/4`, `-0.125` → `-1/8`). `ADD` / `SUB` require compatible
+numerics. `MUL` accepts I32×I32, scalar×scalar, or PX×scalar. `DIV` requires a
+numeric numerator and a nonzero scalar divisor (zero → `SCDL-TYPE-004`);
+PX÷scalar stays `PX`, otherwise the quotient is `RATIO`. `I32` is the signed
+32-bit range. Floating-point arithmetic does not decide lattice membership or
+program identity.
+
+Raster policies on `PAINT`:
+
+- `CENTER` (`CIRCLE-FILL-CENTER-v1`): exact inclusion. Center and radius stay
+  rationals; a cell is painted iff its squared distance from the exact center
+  is `<=` the exact squared radius, compared by cross-multiplication. No
+  rounding, no anti-aliasing.
+- `MIDPOINT` (`CIRCLE-FILL-MIDPOINT-v1`): classic integer midpoint / Bresenham
+  filled disc (symmetric horizontal spans). It is a distinct named algorithm,
+  not an alias of `CENTER`. They coincide on the golden radius-2 disc used by
+  `exact-orb.scdl`; they are not required to agree at every radius.
+
+`PIXEL` requires integral `PX` coordinates. Canvas coordinates are integers.
+Out-of-bounds cells clip deterministically. Later paints win; layers sort by
+`ORDER` then source order. No anti-aliased coverage values are produced.
+
+### 11.6 Protected budgets and failure-before-evaluation
+
+Default protected host limits for this milestone are exactly
+`INSTRUCTIONS 200000`, `GENERATED_SHAPES 10000`, and `RASTER_CELLS 1048576`.
+A source `BUDGET` may lower a field; requesting above the host ceiling is
+`SCDL-BUDGET-001` and stops before demand is measured. Measured static demand
+above the effective requested budget is `SCDL-BUDGET-002`. Both gates run
+**before** bytecode lowering and evaluation — a program that would exceed
+them never walks a raster or allocates evaluator registers. Runtime counters
+during evaluate / raster may still fire `SCDL-BUDGET-003` as a second defense.
+
+### 11.7 Canonical bytecode example (`exact-orb.scdl`)
+
+The dump below is `compileSCDL` of the checked-in fixture
+`codex/core/pixelbrain/scdl/fixtures/v2/exact-orb.scdl`, field
+`result.bytecode.text`. It is not a hand-written illustration. Identity is
+`scdlbc_98042e1f` (`hashString` of this exact text, eight lowercase hex
+digits). Comments, whitespace, the asset label, and local `$symbol` spelling
+do not change this text or `programId`.
+
+```
+.module SCDL-BC-v2
+.language 2.0
+.semantics 2.0.0
+.canvas 9 9
+.capability CORE.MATH@2.0
+.capability GEOMETRY.STANDARD@2.0
+.capability PAINT.LAYERS@2.0
+.algorithm rational=RAT-REDUCED-v1
+.algorithm circle.midpoint=CIRCLE-FILL-MIDPOINT-v1
+.const $k0:px 4/1
+.const $k1:px 2/1
+.const $k2:color #55ccff
+.const $k3:px 1/1
+.const $k4:color #ffffff
+%0 = BC.LAYER.NEW ink 10
+%1 = BC.CONST $k0
+%2 = VEC2 %1 %1
+%3 = BC.CONST $k1
+%4 = CIRCLE %2 %3
+%5 = BC.CONST $k2
+BC.PAINT %0 %4 %5 MIDPOINT
+%6 = BC.CONST $k3
+%7 = VEC2 %6 %6
+%8 = PIXEL %7
+%9 = BC.CONST $k4
+BC.PAINT %0 %8 %9 CENTER
+BC.EMIT.ASSET %0
+```
+
+The fixture paints a cyan radius-2 `MIDPOINT` disc centered at `(4,4)` and a
+white `PIXEL` at `(1,1)` under `CENTER`, on a 9×9 canvas. Prefix math
+`(ADD 1 1)` folds to I32 `2` and then `PX`. JSON / PNG export consume the
+resulting `PixelBrainAssetPacket`.
+
+### 11.8 What this slice does not ship
+
+The following remain **separate, later subprojects**. They are named here so
+they are not mistaken for available surface:
+
+- sequences and Fibonacci-style recurrence
+- functions / procedures
+- animation, frames, and loops in v2 source
+- imports and multi-file programs
+- RNG / noise
+- masks, boolean shape ops, and 2D transforms in v2
+- AMP execution and agent-inspection milestones
+
+Do not author those forms against this compiler. The v1 / v1.2 pipeline in
+§§1–10 continues to provide frames, boolean ops, scene-graph, and SymmetryAMP
+for unversioned sources; that is a different language.

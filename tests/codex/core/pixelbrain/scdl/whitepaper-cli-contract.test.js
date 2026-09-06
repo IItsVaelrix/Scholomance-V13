@@ -66,20 +66,22 @@ describe('SCDL white paper §8 matches the CLI', () => {
   });
 
   it('every command in the §8 table dispatches for real', () => {
-    const cmds = [...section.matchAll(/^\|\s*`(compile|preview|check|parse)`\s*\|/gm)].map((m) => m[1]);
-    expect(cmds.sort()).toEqual(['check', 'compile', 'parse', 'preview']);
-    const fixture = join(ROOT, 'codex/core/pixelbrain/scdl/fixtures/crimson_ooze.scdl');
+    const cmds = [...section.matchAll(/^\|\s*`(compile|preview|check|parse|format)`\s*\|/gm)].map((match) => match[1]);
+    expect(cmds.sort()).toEqual(['check', 'compile', 'format', 'parse', 'preview']);
+    const fixtureFor = (command) => command === 'format'
+      ? join(ROOT, 'codex/core/pixelbrain/scdl/fixtures/v2/exact-orb.scdl')
+      : join(ROOT, 'codex/core/pixelbrain/scdl/fixtures/crimson_ooze.scdl');
     // compile/preview WRITE. Redirect them to a temp dir or this "doc test"
     // quietly drops artifacts into the checked-in fixtures folder on every run.
     const outDir = mkdtempSync(join(tmpdir(), 'scdl-doc-contract-'));
     // Each command's own banner: proof it reached its handler rather than
     // falling through to the usage banner, which is what a stale doc looks
     // like from the reader's side.
-    const markers = { compile: '[SCDL] Compiling', preview: '[SCDL] Preview', check: '[SCDL] Check', parse: '"parts"' };
+    const markers = { compile: '[SCDL] Compiling', preview: '[SCDL] Preview', check: '[SCDL] Check', parse: '"parts"', format: 'SCDL 2' };
     try {
       for (const c of cmds) {
         const extra = (c === 'compile' || c === 'preview') ? ['--out-dir', join(outDir, c)] : [];
-        const r = spawnSync('node', [CLI, c, fixture, ...extra], { cwd: ROOT, encoding: 'utf8', timeout: 60_000 });
+        const r = spawnSync('node', [CLI, c, fixtureFor(c), ...extra], { cwd: ROOT, encoding: 'utf8', timeout: 60_000 });
         const combined = `${r.stdout ?? ''}${r.stderr ?? ''}`;
         expect(combined, `${c} fell through to the usage banner`).not.toMatch(/Usage:\n/);
         expect(combined, `${c} printed no ${markers[c]} banner`).toContain(markers[c]);

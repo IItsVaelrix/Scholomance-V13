@@ -2,7 +2,8 @@
 
 **Audience:** anyone writing `.scdl` files by hand — artists, agents, engineers.
 **Scope:** SCDL v1.1 ops and frames, plus the v1.2 boolean-op rework
-(`SCDL-AST-v1` version `1.2.0`). The v1.2 scene-graph features (`def`,
+(`SCDL-AST-v1` version `1.2.0`), plus the SCDL v2 semantic-core slice in §11
+(compiler-demonstrated `SCDL 2` only). The v1.2 scene-graph features (`def`,
 `group`, `instance`, transform clauses) exist in the compiler and grammar
 but are not yet covered by this guide — see the
 [Compiler White Paper](SCDL_COMPILER_WHITE_PAPER.md) §3.1 for their formal
@@ -705,8 +706,215 @@ Distilled from the fixtures that shipped:
 
 ---
 
+## 11. SCDL v2 semantic-core (compiler-demonstrated)
+
+This section documents what the public compiler actually does for sources
+whose first significant declaration is exactly `SCDL 2`. It is **not**
+executable compiler authority. If this guide and `compileSCDL` disagree, trust
+the compiler and file a doc fix. Sequences, Fibonacci, functions, animation,
+imports, RNG/noise, masks, v2 boolean ops, transforms, and AMP execution are
+**not shipped** in this slice — do not author them against `SCDL 2`.
+
+### 11.1 Copy-pasteable commands
+
+From the repo root, against the checked-in fixture:
+
+```bash
+npm run scdl:check -- codex/core/pixelbrain/scdl/fixtures/v2/exact-orb.scdl
+npm run scdl:format -- codex/core/pixelbrain/scdl/fixtures/v2/exact-orb.scdl
+npm run scdl:compile -- codex/core/pixelbrain/scdl/fixtures/v2/exact-orb.scdl --export json,png --out-dir /tmp/scdl-v2-exact-orb
+```
+
+`check` reports `OK: true` plus `Bytecode: scdlbc_<eight lowercase hex>` on
+success and prints structured diagnostics on failure (exit 1). `format` writes
+canonical SCDL 2 to stdout; add `--write` to overwrite the input file.
+`compile` with `--export json,png` writes `<asset>-json.json` and
+`<asset>-png.png` under `--out-dir` (created if missing). Preview is a
+separate command:
+
+```bash
+npm run scdl:preview -- codex/core/pixelbrain/scdl/fixtures/v2/exact-orb.scdl --scale 8 --out-dir /tmp/scdl-v2-exact-orb
+```
+
+`format` refuses unversioned / v1 source. `parse` on `SCDL 2` prints the v2
+AST (or CST on parse failure).
+
+### 11.2 Full fixture source
+
+`codex/core/pixelbrain/scdl/fixtures/v2/exact-orb.scdl` — the only checked-in
+v2 golden. 9×9 canvas, prefix `ADD`, a `PX`-wrapped radius, one `CIRCLE`
+painted `MIDPOINT` and one `PIXEL` painted `CENTER`:
+
+```scdl
+SCDL 2
+ASSET exact_orb
+CANVAS WIDTH 9 HEIGHT 9
+BUDGET INSTRUCTIONS 128 GENERATED_SHAPES 2 RASTER_CELLS 81
+
+CONST $two I32 (ADD 1 1)
+CONST $center VEC2 (VEC2 (PX 4) (PX 4))
+CONST $ink COLOR #55CCFF
+SHAPE $spark (PIXEL AT (VEC2 (PX 1) (PX 1)))
+SHAPE $orb (CIRCLE CENTER $center RADIUS (PX $two))
+
+LAYER ink ORDER 10 {
+  PAINT $orb FILL $ink RASTER MIDPOINT
+  PAINT $spark FILL #FFFFFF RASTER CENTER
+}
+```
+
+That source is the generator of the bytecode dump in the white paper §11.7.
+Do not hand-edit JSON / PNG exports; change this file and recompile.
+
+### 11.3 Agent repair loop
+
+Agents author textual SCDL only. The loop is:
+
+1. **`check`** the `.scdl` (`npm run scdl:check -- path/to/file.scdl`).
+2. **Read diagnostics.** On failure the compile result has `ok: false`,
+   `packet` / `bytecode` / `package` all `null`, and `errors` / `diagnostics`
+   populated. Each JSON entry (from `error.toJSON()` /
+   `diagnosticReport.diagnostics`) carries:
+
+   | Field | Meaning |
+   |---|---|
+   | `code` | stable family id (`SCDL-LEX-001`, `SCDL-PARSE-004`, `SCDL-BIND-001`, `SCDL-TYPE-002`, `SCDL-BUDGET-001`, …) |
+   | `severity` | `ERROR` / `WARN` / `INFO` |
+   | `phase` | `LEX` / `PARSE` / `ANALYSIS` / `BUDGET` / `RASTER` / `emit` |
+   | `message` | human-readable failure |
+   | `span` | `{ start, end }` each `{ line, column, offset }` (1-based line/column) |
+   | `instructionPath` | bytecode path when a later phase has one; often `[]` |
+   | `expected` | strings naming what was required |
+   | `received` | strings naming what arrived |
+   | `relatedSymbols` | `$names` or budget field names |
+   | `fixes` | structured fix hints; often `[]` this slice |
+
+   CLI `check` prints the same `errors` array (it uses `result.errors`, not
+   a reconstructed loc-only list). `buildSCDLDiagnosticReport` labels the
+   source `SCDL-v2` when `languageVersion === 2`.
+3. **Edit the source** at `span.start` — add the missing operand, bind the
+   `$symbol`, wrap a scalar in `PX`, or lower the `BUDGET`.
+4. **`check` again.** Repeat until `OK: true`. Then `format` (optional) and
+   `compile` / `preview`.
+
+Never invent bytecode or JSON as source. Never treat a failed compile's
+partial AST as an asset.
+
+### 11.4 Explicit diagnostic examples
+
+These four were compiled through public `compileSCDL` for this guide. They
+are the repair-loop inputs, not puzzles.
+
+**Missing `RADIUS`** — parse phase, `SCDL-PARSE-004`:
+
+```scdl
+SCDL 2
+ASSET x
+CANVAS WIDTH 1 HEIGHT 1
+SHAPE $p (CIRCLE CENTER (VEC2 (PX 0) (PX 0)))
+```
+
+```json
+{
+  "code": "SCDL-PARSE-004",
+  "severity": "ERROR",
+  "phase": "PARSE",
+  "message": "CIRCLE is missing required RADIUS operand.",
+  "expected": ["RADIUS PX"],
+  "received": [")"]
+}
+```
+
+Fix: name the operand, typed as `PX` — `RADIUS (PX 1)`.
+
+**Unknown `$symbol`** — bind phase, `SCDL-BIND-001`:
+
+```scdl
+SCDL 2
+ASSET x
+CANVAS WIDTH 1 HEIGHT 1
+SHAPE $p $missing
+```
+
+```json
+{
+  "code": "SCDL-BIND-001",
+  "severity": "ERROR",
+  "phase": "ANALYSIS",
+  "message": "Symbol $missing is not bound.",
+  "relatedSymbols": ["$missing"]
+}
+```
+
+Fix: declare `$missing` (or the intended shape) with `CONST` / `SHAPE`
+**before** use. Declaration-before-use is required.
+
+**`I32` where `PX` is required** — type phase, `SCDL-TYPE-002`:
+
+```scdl
+SCDL 2
+ASSET x
+CANVAS WIDTH 1 HEIGHT 1
+CONST $n I32 1
+SHAPE $p (CIRCLE CENTER (VEC2 (PX 0) (PX 0)) RADIUS $n)
+```
+
+```json
+{
+  "code": "SCDL-TYPE-002",
+  "severity": "ERROR",
+  "phase": "ANALYSIS",
+  "message": "CIRCLE RADIUS operand must be PX.",
+  "expected": ["PX"],
+  "received": ["I32"]
+}
+```
+
+Fix: `RADIUS (PX $n)`. There is no implicit I32→PX conversion.
+
+**Budget rejection** — budget phase, `SCDL-BUDGET-001`, **before**
+evaluation:
+
+```scdl
+SCDL 2
+ASSET x
+CANVAS WIDTH 1 HEIGHT 1
+BUDGET INSTRUCTIONS 200001 GENERATED_SHAPES 1 RASTER_CELLS 1
+```
+
+```json
+{
+  "code": "SCDL-BUDGET-001",
+  "severity": "ERROR",
+  "phase": "BUDGET",
+  "message": "instructions requested budget 200001 exceeds protected host limit 200000.",
+  "expected": ["200000"],
+  "received": ["200001"],
+  "relatedSymbols": ["instructions"]
+}
+```
+
+Protected ceilings this milestone: `INSTRUCTIONS 200000`,
+`GENERATED_SHAPES 10000`, `RASTER_CELLS 1048576`. Source may lower them.
+Asking for more than the host allows fails closed with no bytecode.
+
+### 11.5 Authoring rules that actually bite
+
+- First significant line must be exactly `SCDL 2` (not `scdl 2`, not
+  `SCDL 2 extra`). Anything else is the v1 compiler.
+- Wrap distances in `PX`. Prefix math stays exact; `(ADD 1 1)` is I32 `2`.
+- `RASTER CENTER` is exact disc inclusion; `RASTER MIDPOINT` is the integer
+  midpoint disc. Pick one on purpose.
+- `format` is the canonical spelling. Run it before committing v2 sources.
+- Invalid input never throws and never emits a packet. If `ok` is false,
+  there is nothing to export.
+
+---
+
 *Assets in `assets/scdl-authoring-guide/` are regenerable: every image is the
 compiled output of the SCDL shown beside it (op demos) or of the repo fixtures
 (`slime-sphere.scdl`, `void_acolyte.scdl`); material tiles are the registry's
-transmutation of a neutral grayscale sphere. If the compiler or registry
-changes behavior, regenerate rather than hand-edit.*
+transmutation of a neutral grayscale sphere. The v2 fixture
+`codex/core/pixelbrain/scdl/fixtures/v2/exact-orb.scdl` likewise regenerates
+its JSON / PNG / bytecode dump through `compileSCDL`. If the compiler or
+registry changes behavior, regenerate rather than hand-edit.*

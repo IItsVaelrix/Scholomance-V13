@@ -611,7 +611,7 @@ Usage:
   node scdl.cli.js preview <file.scdl> [--scale N] [--out-dir <dir>] [--shade material|vri] [--strict]
   node scdl.cli.js parse   <file.scdl> [--out <file>]
   node scdl.cli.js check   <file.scdl> [--strict]
-  node scdl.cli.js format  <file.scdl>
+  node scdl.cli.js format  <file.scdl> [--write]
 
 Outputs default to the source file's directory, named <asset>-<target>.<ext>
 (multi-frame assets: <asset>-f<N>-<target>.<ext> plus <asset>-frameloop.json).
