@@ -10,6 +10,7 @@ describe('SCDL v2 explicit version law', () => {
     ['legacy source', 'asset x canvas 1x1'],
     ['unsupported version', 'SCDL 3\nASSET x'],
     ['near match', 'SCDL 2 extra\nASSET x'],
+    ['near match with BOM', '\uFEFFSCDL 2 extra\nASSET x'],
     ['wrong case', 'scdl 2\nASSET x'],
     ['non-string', null],
   ])('routes %s to legacy', (_label, source) => {

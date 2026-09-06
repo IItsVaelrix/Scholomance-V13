@@ -67,6 +67,12 @@ export function tokenizeSCDLV2(source) {
     const start = point();
     const char = text[cursor.offset];
 
+    // Leading U+FEFF is trivia so detectSCDLVersion and this scanner agree.
+    if (cursor.offset === 0 && char === '\uFEFF') {
+      advance();
+      emit('WHITESPACE', start, char);
+      continue;
+    }
     if (char === '\r' || char === '\n') {
       const length = char === '\r' && text[cursor.offset + 1] === '\n' ? 2 : 1;
       const raw = text.slice(cursor.offset, cursor.offset + length);

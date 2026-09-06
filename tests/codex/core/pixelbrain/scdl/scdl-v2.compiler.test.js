@@ -40,6 +40,13 @@ describe('SCDL v2 compiler vertical slice', () => {
     expect(result.diagnostics).toEqual(result.diagnosticReport.diagnostics);
   });
 
+  it('compiles a leading-BOM minimal v2 program', () => {
+    const source = '\uFEFFSCDL 2\nASSET x\nCANVAS WIDTH 1 HEIGHT 1\nSHAPE $p (PIXEL AT (VEC2 (PX 0) (PX 0)))\nLAYER ink ORDER 0 { PAINT $p FILL #FFFFFF RASTER CENTER }\n';
+    const result = compileSCDLV2(source);
+    expect(result.ok).toBe(true);
+    expect(result.languageVersion).toBe(2);
+  });
+
   it('publishes resolved IR as analysis and records options.strict without warn-as-error', () => {
     const result = compileSCDLV2(SOURCE, { strict: true });
     expect(result.ok).toBe(true);

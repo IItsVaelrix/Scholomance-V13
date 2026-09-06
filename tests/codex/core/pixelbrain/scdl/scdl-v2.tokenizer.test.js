@@ -12,6 +12,15 @@ describe('SCDL v2 tokenizer', () => {
     expect(result.tokens.find((token) => token.kind === 'COLOR').value).toBe('#AA00FF80');
   });
 
+  it('treats a leading BOM as trivia and remains lossless', () => {
+    const source = '\uFEFFSCDL 2\nASSET x\nCANVAS WIDTH 1 HEIGHT 1\nSHAPE $p (PIXEL AT (VEC2 (PX 0) (PX 0)))\nLAYER ink ORDER 0 { PAINT $p FILL #FFFFFF RASTER CENTER }\n';
+    const result = tokenizeSCDLV2(source);
+    expect(result.ok).toBe(true);
+    expect(result.tokens.map((token) => token.raw).join('')).toBe(source);
+    expect(result.tokens[0]).toMatchObject({ kind: 'WHITESPACE', raw: '\uFEFF' });
+    expect(result.diagnostics).toEqual([]);
+  });
+
   it('reports the exact illegal character and keeps scanning', () => {
     const result = tokenizeSCDLV2('SCDL 2\nCONST $x I32 1 @ CONST $y I32 2\n');
     expect(result.ok).toBe(false);

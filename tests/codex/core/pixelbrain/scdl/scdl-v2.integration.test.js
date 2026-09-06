@@ -18,4 +18,11 @@ describe('SCDL public version router', () => {
     expect(result.languageVersion).not.toBe(2);
     expect(result.ok).toBe(false);
   });
+
+  it('compiles a leading-BOM minimal v2 program', () => {
+    const source = '\uFEFFSCDL 2\nASSET x\nCANVAS WIDTH 1 HEIGHT 1\nSHAPE $p (PIXEL AT (VEC2 (PX 0) (PX 0)))\nLAYER ink ORDER 0 { PAINT $p FILL #FFFFFF RASTER CENTER }\n';
+    const result = compileSCDL(source);
+    expect(result.ok).toBe(true);
+    expect(result.languageVersion).toBe(2);
+  });
 });
