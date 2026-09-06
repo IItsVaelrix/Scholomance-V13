@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { spawnSync } from 'node:child_process';
 import { rasterizeCircleCenter, rasterizeCircleMidpoint, compositeSCDLV2Layers, rasterizeSCDLV2 } from '../../../../../codex/core/pixelbrain/scdl/v2/scdl-v2.raster.js';
 import { evaluateSCDLV2 } from '../../../../../codex/core/pixelbrain/scdl/v2/scdl-v2.evaluator.js';
 import { parseSCDLV2 } from '../../../../../codex/core/pixelbrain/scdl/v2/scdl-v2.parser.js';
@@ -8,6 +9,22 @@ import { lowerSCDLV2Bytecode } from '../../../../../codex/core/pixelbrain/scdl/v
 import { makeRational } from '../../../../../codex/core/pixelbrain/scdl/v2/scdl-v2.rational.js';
 
 describe('SCDL v2 raster kernel', () => {
+  function runRasterSubprocess(constructionSource, budgetSource) {
+    const script = `
+      import { rasterizeSCDLV2 } from './codex/core/pixelbrain/scdl/v2/scdl-v2.raster.js';
+      const construction = ${constructionSource};
+      const budget = ${budgetSource};
+      const result = rasterizeSCDLV2(construction, { width: 1, height: 1 }, budget);
+      process.stdout.write(JSON.stringify({ ok: result.ok, code: result.diagnostics[0]?.code }));
+    `;
+    return spawnSync(process.execPath, ['--input-type=module', '-e', script], {
+      cwd: process.cwd(),
+      encoding: 'utf8',
+      timeout: 750,
+      maxBuffer: 1024 * 1024,
+    });
+  }
+
   it('rasterizes a radius-2 midpoint disc symmetrically', () => {
     const cells = rasterizeCircleMidpoint({ x: 4, y: 4 }, 2);
     const keys = cells.map(({ x, y }) => `${x},${y}`).sort();
@@ -38,8 +55,7 @@ describe('SCDL v2 raster kernel', () => {
     expect(result.coordinates).toEqual([{ x: 0, y: 0, color: '#ffffff', partId: 'top', role: 'paint' }]);
   });
 
-  it('stops when a forged verified program crosses its runtime instruction limit', async () => {
-    const { evaluateSCDLV2 } = await import('../../../../../codex/core/pixelbrain/scdl/v2/scdl-v2.evaluator.js');
+  it('stops when a forged verified program crosses its runtime instruction limit', () => {
     const program = Object.freeze({
       constants: Object.freeze([{ index: 0, type: 'I32', value: '1' }]),
       instructions: Object.freeze([{ index: 0, opcodeId: 0x8000, mnemonic: 'BC.CONST', result: '%0', type: 'I32', operands: [{ kind: 'constant', index: 0 }] }]),
@@ -116,6 +132,19 @@ describe('SCDL v2 raster kernel', () => {
   });
 
   describe('raster policy rejection (SCDL-GEOM-001)', () => {
+    it.each([
+      ['missing', undefined],
+      ['unknown', 'BOGUS'],
+    ])('rejects a PIXEL with a %s raster policy without partial output', (_label, raster) => {
+      const result = compositeSCDLV2Layers({ width: 8, height: 8 }, [
+        { id: 'l', order: 0, paints: [{ shape: { kind: 'PIXEL', at: { x: 1, y: 1 } }, fill: '#fff', raster }] },
+      ]);
+      expect(result.ok).toBe(false);
+      expect(result.coordinates).toBeNull();
+      expect(result.layers).toBeNull();
+      expect(result.diagnostics[0].code).toBe('SCDL-GEOM-001');
+    });
+
     it('rejects a PIXEL with a non-integral coordinate', () => {
       const result = compositeSCDLV2Layers({ width: 8, height: 8 }, [
         { id: 'l', order: 0, paints: [{ shape: { kind: 'PIXEL', at: { x: makeRational(5n, 2n), y: 0 } }, fill: '#fff', raster: 'CENTER' }] },
@@ -158,9 +187,42 @@ describe('SCDL v2 raster kernel', () => {
       expect(result.ok).toBe(false);
       expect(result.diagnostics[0].code).toBe('SCDL-GEOM-001');
     });
+
+    it('rejects an exact integer coordinate outside the safe lattice range', () => {
+      const result = compositeSCDLV2Layers({ width: 8, height: 8 }, [
+        { id: 'l', order: 0, paints: [{
+          shape: { kind: 'PIXEL', at: { x: { numerator: '9007199254740992', denominator: '1' }, y: 0 } },
+          fill: '#fff',
+          raster: 'CENTER',
+        }] },
+      ]);
+      expect(result.ok).toBe(false);
+      expect(result.coordinates).toBeNull();
+      expect(result.diagnostics[0].code).toBe('SCDL-GEOM-001');
+    });
+
+    it('rejects an unsafe exact radius promptly before lattice iteration', () => {
+      const child = runRasterSubprocess(
+        `{ layers: [{ id: 'l', order: 0, sourceIndex: 0, paints: [{ shape: { kind: 'CIRCLE', center: { x: 0, y: 0 }, radius: { numerator: '9007199254740992', denominator: '1' } }, fill: '#fff', raster: 'CENTER' }] }] }`,
+        `{ limits: { instructions: 10, generatedShapes: 1, rasterCells: 1 } }`,
+      );
+      expect(child.error).toBeUndefined();
+      expect(child.status).toBe(0);
+      expect(JSON.parse(child.stdout)).toEqual({ ok: false, code: 'SCDL-GEOM-001' });
+    });
   });
 
   describe('PIXEL-only compositing', () => {
+    it('uses persisted sourceIndex to break equal-order ties even when the layer array is reversed', () => {
+      const result = compositeSCDLV2Layers({ width: 2, height: 2 }, [
+        { id: 'later', order: 10, sourceIndex: 1, paints: [{ shape: { kind: 'PIXEL', at: { x: 0, y: 0 } }, fill: '#ffffff', raster: 'CENTER' }] },
+        { id: 'earlier', order: 10, sourceIndex: 0, paints: [{ shape: { kind: 'PIXEL', at: { x: 0, y: 0 } }, fill: '#000000', raster: 'CENTER' }] },
+      ]);
+      expect(result.ok).toBe(true);
+      expect(result.coordinates).toEqual([{ x: 0, y: 0, color: '#ffffff', partId: 'later', role: 'paint' }]);
+      expect(result.layers.map((layer) => layer.sourceIndex)).toEqual([0, 1]);
+    });
+
     it('composites two non-overlapping pixels from a single layer, both surviving', () => {
       const result = compositeSCDLV2Layers({ width: 4, height: 4 }, [
         { id: 'dots', order: 0, paints: [
@@ -260,9 +322,68 @@ LAYER ink ORDER 10 { PAINT $s FILL #55CCFF RASTER MIDPOINT }`;
       expect(rasterized.ok).toBe(false);
       expect(rasterized.diagnostics[0].code).toBe('SCDL-BUDGET-003');
     });
+
+    it('rejects a forged huge circle promptly before primitive materialization', () => {
+      const child = runRasterSubprocess(
+        `{ layers: [{ id: 'l', order: 0, sourceIndex: 0, paints: [{ shape: { kind: 'CIRCLE', center: { x: 0, y: 0 }, radius: 1000000000 }, fill: '#fff', raster: 'MIDPOINT' }] }] }`,
+        `{ limits: { instructions: 10, generatedShapes: 1, rasterCells: 1 } }`,
+      );
+      expect(child.error).toBeUndefined();
+      expect(child.status).toBe(0);
+      expect(JSON.parse(child.stdout)).toEqual({ ok: false, code: 'SCDL-BUDGET-003' });
+    });
+
+    it.each([
+      ['missing', undefined],
+      ['malformed', { limits: { instructions: 10, generatedShapes: 1, rasterCells: '1' } }],
+    ])('fails closed when the raster verified budget is %s', (_label, verifiedBudget) => {
+      const result = rasterizeSCDLV2({ layers: [] }, { width: 1, height: 1 }, verifiedBudget);
+      expect(result.ok).toBe(false);
+      expect(result.coordinates).toBeNull();
+      expect(result.diagnostics[0].code).toBe('SCDL-BUDGET-003');
+    });
   });
 
   describe('evaluator defensive boundaries', () => {
+    it.each([
+      ['missing', undefined],
+      ['malformed', { limits: { instructions: 10, generatedShapes: '1', rasterCells: 1 } }],
+    ])('fails closed when the evaluator verified budget is %s', (_label, verifiedBudget) => {
+      const result = evaluateSCDLV2({ constants: [], instructions: [], verifiedBudget });
+      expect(result.ok).toBe(false);
+      expect(result.construction).toBeNull();
+      expect(result.diagnostics[0].code).toBe('SCDL-BUDGET-003');
+    });
+
+    it('keeps layer registers and paint arrays immutable with EMIT observing the latest copy', () => {
+      const program = {
+        constants: [
+          { index: 0, type: 'PX', value: '0/1' },
+          { index: 1, type: 'COLOR', value: '#111111' },
+          { index: 2, type: 'COLOR', value: '#222222' },
+        ],
+        instructions: [
+          { index: 0, mnemonic: 'BC.CONST', result: '%0', type: 'PX', operands: [{ kind: 'constant', index: 0 }] },
+          { index: 1, mnemonic: 'BC.CONST', result: '%1', type: 'COLOR', operands: [{ kind: 'constant', index: 1 }] },
+          { index: 2, mnemonic: 'BC.CONST', result: '%2', type: 'COLOR', operands: [{ kind: 'constant', index: 2 }] },
+          { index: 3, mnemonic: 'VEC2', result: '%3', type: 'VEC2', operands: [{ kind: 'register', index: 0 }, { kind: 'register', index: 0 }] },
+          { index: 4, mnemonic: 'PIXEL', result: '%4', type: 'SHAPE', operands: [{ kind: 'register', index: 3 }] },
+          { index: 5, mnemonic: 'BC.LAYER.NEW', result: '%5', type: 'LAYER', operands: [{ kind: 'immediate', value: 'ink' }, { kind: 'immediate', value: 0 }] },
+          { index: 6, mnemonic: 'BC.PAINT', result: null, type: null, operands: [{ kind: 'register', index: 5 }, { kind: 'register', index: 4 }, { kind: 'register', index: 1 }, { kind: 'immediate', value: 'CENTER' }] },
+          { index: 7, mnemonic: 'BC.EMIT.ASSET', result: null, type: null, operands: [{ kind: 'register', index: 5 }] },
+          { index: 8, mnemonic: 'BC.PAINT', result: null, type: null, operands: [{ kind: 'register', index: 5 }, { kind: 'register', index: 4 }, { kind: 'register', index: 2 }, { kind: 'immediate', value: 'CENTER' }] },
+        ],
+        verifiedBudget: { limits: { instructions: 9, generatedShapes: 1, rasterCells: 1 } },
+      };
+      const result = evaluateSCDLV2(program);
+      expect(result.ok).toBe(true);
+      expect(result.construction.layers[0].paints).toHaveLength(1);
+      expect(result.construction.layers[0].paints[0].fill).toBe('#111111');
+      expect(Object.isFrozen(result.construction.layers[0])).toBe(true);
+      expect(Object.isFrozen(result.construction.layers[0].paints)).toBe(true);
+      expect(Object.isFrozen(result.construction.layers[0].paints[0])).toBe(true);
+    });
+
     it('reports SCDL-LOWER-001 for an unknown opcode', () => {
       const program = {
         constants: [],

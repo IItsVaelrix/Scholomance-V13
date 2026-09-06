@@ -43,6 +43,9 @@ import { v2Diagnostic, span } from './scdl-v2.diagnostics.js';
 import { makeRational, addRational, subRational, mulRational, rationalToString, isIntegralRational } from './scdl-v2.rational.js';
 
 const ZERO_SPAN = span({ line: 1, column: 1, offset: 0 });
+const DEFAULT_RASTER_CELL_LIMIT = 1048576;
+const MIN_SAFE_BIGINT = BigInt(Number.MIN_SAFE_INTEGER);
+const MAX_SAFE_BIGINT = BigInt(Number.MAX_SAFE_INTEGER);
 
 export const RASTER_CODES = Object.freeze({
   GEOMETRY: 'SCDL-GEOM-001',
@@ -74,6 +77,18 @@ function budgetDiagnostic(limit, actual) {
   });
 }
 
+function invalidBudgetDiagnostic(field, received) {
+  return v2Diagnostic({
+    code: RASTER_CODES.BUDGET,
+    phase: 'RASTER',
+    message: `Verified budget limit '${field}' must be a finite, non-negative safe integer.`,
+    span: ZERO_SPAN,
+    expected: ['finite non-negative safe integer'],
+    received: [String(received)],
+    relatedSymbols: [field],
+  });
+}
+
 function internalDiagnostic(error) {
   return v2Diagnostic({
     code: RASTER_CODES.INTERNAL,
@@ -94,27 +109,47 @@ function sortYMajorXMinor(cells) {
 // Cells are collected into a keyed map to remove the duplicate writes that
 // naturally occur where octant spans overlap or the eight-way symmetry
 // degenerates (x === y, or radius === 0).
-export function rasterizeCircleMidpoint(center, radius) {
+function rasterizeCircleMidpointBounded(center, radius, {
+  canvas = null,
+  cellLimit = DEFAULT_RASTER_CELL_LIMIT,
+  iterationLimit = DEFAULT_RASTER_CELL_LIMIT,
+} = {}) {
   const cx = center.x;
   const cy = center.y;
   const cells = new Map();
+  let budgetActual = null;
 
   const addSpan = (rowY, xFrom, xTo) => {
-    const lo = Math.min(xFrom, xTo);
-    const hi = Math.max(xFrom, xTo);
-    for (let x = lo; x <= hi; x += 1) {
-      cells.set(`${x},${rowY}`, { x, y: rowY });
+    if (canvas && (rowY < 0 || rowY >= canvas.height)) return true;
+    const lo = Math.max(Math.min(xFrom, xTo), canvas ? 0 : Number.MIN_SAFE_INTEGER);
+    const hi = Math.min(Math.max(xFrom, xTo), canvas ? canvas.width - 1 : Number.MAX_SAFE_INTEGER);
+    for (let cellX = lo; cellX <= hi; cellX += 1) {
+      if (!cells.has(`${cellX},${rowY}`) && cells.size >= cellLimit) {
+        budgetActual = cells.size + 1;
+        return false;
+      }
+      cells.set(`${cellX},${rowY}`, { x: cellX, y: rowY });
     }
+    return true;
   };
 
   let x = radius;
   let y = 0;
   let err = 0;
+  let iterations = 0;
   while (x >= y) {
-    addSpan(cy + y, cx - x, cx + x);
-    addSpan(cy - y, cx - x, cx + x);
-    addSpan(cy + x, cx - y, cx + y);
-    addSpan(cy - x, cx - y, cx + y);
+    iterations += 1;
+    if (iterations > iterationLimit) {
+      return { ok: false, cells: [], budgetActual: Math.max(iterations, budgetActual || 0) };
+    }
+    if (
+      !addSpan(cy + y, cx - x, cx + x)
+      || !addSpan(cy - y, cx - x, cx + x)
+      || !addSpan(cy + x, cx - y, cx + y)
+      || !addSpan(cy - x, cx - y, cx + y)
+    ) {
+      return { ok: false, cells: [], budgetActual };
+    }
 
     y += 1;
     err += 1 + 2 * y;
@@ -124,34 +159,71 @@ export function rasterizeCircleMidpoint(center, radius) {
     }
   }
 
-  return sortYMajorXMinor([...cells.values()]);
+  return { ok: true, cells: sortYMajorXMinor([...cells.values()]) };
+}
+
+export function rasterizeCircleMidpoint(center, radius) {
+  if (!Number.isSafeInteger(center && center.x) || !Number.isSafeInteger(center && center.y) || !Number.isSafeInteger(radius) || radius < 0) return [];
+  const side = 2n * BigInt(radius) + 1n;
+  if (side * side > BigInt(DEFAULT_RASTER_CELL_LIMIT)) return [];
+  const result = rasterizeCircleMidpointBounded(center, radius);
+  return result.ok ? result.cells : [];
 }
 
 function toRationalValue(value) {
   if (value && typeof value === 'object' && typeof value.numerator === 'string' && typeof value.denominator === 'string') {
-    return value;
+    try {
+      return makeRational(BigInt(value.numerator), BigInt(value.denominator));
+    } catch {
+      return null;
+    }
   }
-  if (typeof value === 'number' && Number.isInteger(value)) {
+  if (typeof value === 'number' && Number.isSafeInteger(value)) {
     return makeRational(BigInt(value));
   }
   return null;
 }
 
-// floor()/ceil() of an exact rational (positive-denominator, per
-// makeRational's invariant), returned as a plain JS number. Canvas-scale
-// coordinates stay well within Number.isSafeInteger range.
-function floorRationalToNumber(rational) {
+function floorRational(rational) {
   const n = BigInt(rational.numerator);
   const d = BigInt(rational.denominator);
-  const floored = n >= 0n ? n / d : -(((-n) + d - 1n) / d);
-  return Number(floored);
+  return n >= 0n ? n / d : -(((-n) + d - 1n) / d);
 }
 
-function ceilRationalToNumber(rational) {
+function ceilRational(rational) {
   const n = BigInt(rational.numerator);
   const d = BigInt(rational.denominator);
-  const ceiled = n >= 0n ? (n + d - 1n) / d : -((-n) / d);
-  return Number(ceiled);
+  return n >= 0n ? (n + d - 1n) / d : -((-n) / d);
+}
+
+function safeNumber(integer) {
+  return integer >= MIN_SAFE_BIGINT && integer <= MAX_SAFE_BIGINT ? Number(integer) : null;
+}
+
+function exactCircleBounds(cx, cy, radius) {
+  const minX = safeNumber(floorRational(subRational(cx, radius)));
+  const maxX = safeNumber(ceilRational(addRational(cx, radius)));
+  const minY = safeNumber(floorRational(subRational(cy, radius)));
+  const maxY = safeNumber(ceilRational(addRational(cy, radius)));
+  if (minX === null || maxX === null || minY === null || maxY === null) return null;
+  return { minX, maxX, minY, maxY };
+}
+
+function clippedBounds(bounds, canvas) {
+  if (!canvas) return bounds;
+  return {
+    minX: Math.max(bounds.minX, 0),
+    maxX: Math.min(bounds.maxX, canvas.width - 1),
+    minY: Math.max(bounds.minY, 0),
+    maxY: Math.min(bounds.maxY, canvas.height - 1),
+  };
+}
+
+function boundedArea(bounds) {
+  if (bounds.maxX < bounds.minX || bounds.maxY < bounds.minY) return 0n;
+  const width = BigInt(bounds.maxX) - BigInt(bounds.minX) + 1n;
+  const height = BigInt(bounds.maxY) - BigInt(bounds.minY) + 1n;
+  return width * height;
 }
 
 // The exact center-inclusion policy: `center` is `{ x, y }` exact rationals
@@ -159,54 +231,66 @@ function ceilRationalToNumber(rational) {
 // an exact rational (or integral plain number). A cell's inclusion is
 // decided by comparing squared rational distances with cross multiplication
 // — no floating point ever enters the comparison.
-export function rasterizeCircleCenter(center, radius) {
+function rasterizeCircleCenterBounded(center, radius, { canvas = null, cellLimit = DEFAULT_RASTER_CELL_LIMIT } = {}) {
   const cx = toRationalValue(center.x);
   const cy = toRationalValue(center.y);
   const r = toRationalValue(radius);
-  if (!cx || !cy || !r || BigInt(r.numerator) < 0n) return [];
+  if (!cx || !cy || !r || BigInt(r.numerator) < 0n) return { ok: false, cells: [] };
 
-  const minX = floorRationalToNumber(subRational(cx, r));
-  const maxX = ceilRationalToNumber(addRational(cx, r));
-  const minY = floorRationalToNumber(subRational(cy, r));
-  const maxY = ceilRationalToNumber(addRational(cy, r));
+  const exactBounds = exactCircleBounds(cx, cy, r);
+  if (!exactBounds) return { ok: false, cells: [] };
+  const bounds = clippedBounds(exactBounds, canvas);
+  if (boundedArea(bounds) > BigInt(cellLimit)) return { ok: false, cells: [], budgetActual: boundedArea(bounds) };
 
   const rSquared = mulRational(r, r);
   const rsN = BigInt(rSquared.numerator);
   const rsD = BigInt(rSquared.denominator);
 
   const cells = [];
-  for (let y = minY; y <= maxY; y += 1) {
+  for (let y = bounds.minY; y <= bounds.maxY; y += 1) {
     const dy = subRational(makeRational(BigInt(y)), cy);
     const dySquared = mulRational(dy, dy);
-    for (let x = minX; x <= maxX; x += 1) {
+    for (let x = bounds.minX; x <= bounds.maxX; x += 1) {
       const dx = subRational(makeRational(BigInt(x)), cx);
       const distSquared = addRational(mulRational(dx, dx), dySquared);
       const dN = BigInt(distSquared.numerator);
       const dD = BigInt(distSquared.denominator);
       // distSquared <= rSquared  <=>  dN/dD <= rsN/rsD  <=>  dN*rsD <= rsN*dD
       // (dD and rsD are both strictly positive, per makeRational's invariant).
-      if (dN * rsD <= rsN * dD) cells.push({ x, y });
+      if (dN * rsD <= rsN * dD) {
+        if (cells.length >= cellLimit) return { ok: false, cells: [], budgetActual: cells.length + 1 };
+        cells.push({ x, y });
+      }
     }
   }
-  return sortYMajorXMinor(cells);
+  return { ok: true, cells: sortYMajorXMinor(cells) };
+}
+
+export function rasterizeCircleCenter(center, radius) {
+  const result = rasterizeCircleCenterBounded(center, radius);
+  return result.ok ? result.cells : [];
 }
 
 // --- Shape -> cells dispatch, gated by exact raster policy -------------
 
 function toIntegerValue(value) {
-  if (value && typeof value === 'object' && typeof value.numerator === 'string' && typeof value.denominator === 'string') {
-    if (!isIntegralRational(value)) return { ok: false, text: rationalToString(value) };
-    return { ok: true, value: Number(value.numerator), text: rationalToString(value) };
-  }
-  if (typeof value === 'number' && Number.isInteger(value)) {
-    return { ok: true, value, text: String(value) };
-  }
-  return { ok: false, text: String(value) };
+  const rational = toRationalValue(value);
+  if (!rational) return { ok: false, text: String(value) };
+  const text = rationalToString(rational);
+  if (!isIntegralRational(rational)) return { ok: false, text };
+  const integer = BigInt(rational.numerator);
+  const number = safeNumber(integer);
+  if (number === null) return { ok: false, text };
+  return { ok: true, value: number, text };
 }
 
-function rasterizePaintShape(shape, raster) {
+function rasterizePaintShape(shape, raster, { canvas, remainingCells, rasterCellLimit, cellsGenerated }) {
   if (!shape || typeof shape !== 'object') {
     return { ok: false, diagnostic: geomDiagnostic('SHAPE', 'a PIXEL or CIRCLE shape object', String(shape)) };
+  }
+
+  if (raster !== 'CENTER' && raster !== 'MIDPOINT') {
+    return { ok: false, diagnostic: geomDiagnostic(String(raster), 'a known raster policy (CENTER or MIDPOINT)', String(raster)) };
   }
 
   if (shape.kind === 'PIXEL') {
@@ -214,6 +298,9 @@ function rasterizePaintShape(shape, raster) {
     const yr = toIntegerValue(shape.at && shape.at.y);
     if (!xr.ok || !yr.ok) {
       return { ok: false, diagnostic: geomDiagnostic('PIXEL', 'integral PX x/y', `x=${xr.text}, y=${yr.text}`) };
+    }
+    if (remainingCells < 1) {
+      return { ok: false, diagnostic: budgetDiagnostic(rasterCellLimit, cellsGenerated + 1) };
     }
     return { ok: true, cells: [{ x: xr.value, y: yr.value }] };
   }
@@ -232,7 +319,34 @@ function rasterizePaintShape(shape, raster) {
       if (rr.value < 0) {
         return { ok: false, diagnostic: geomDiagnostic('MIDPOINT', 'a non-negative radius', `radius=${rr.text}`) };
       }
-      return { ok: true, cells: rasterizeCircleMidpoint({ x: cxr.value, y: cyr.value }, rr.value) };
+      const minX = BigInt(cxr.value) - BigInt(rr.value);
+      const maxX = BigInt(cxr.value) + BigInt(rr.value);
+      const minY = BigInt(cyr.value) - BigInt(rr.value);
+      const maxY = BigInt(cyr.value) + BigInt(rr.value);
+      if ([minX, maxX, minY, maxY].some((value) => safeNumber(value) === null)) {
+        return {
+          ok: false,
+          diagnostic: geomDiagnostic('MIDPOINT', 'safe-integer lattice bounds', `center=(${cxr.text}, ${cyr.text}), radius=${rr.text}`),
+        };
+      }
+      const bounds = clippedBounds({
+        minX: Number(minX), maxX: Number(maxX), minY: Number(minY), maxY: Number(maxY),
+      }, canvas);
+      const cellBound = boundedArea(bounds);
+      const iterationBound = BigInt(rr.value) + 1n;
+      const workBound = cellBound > iterationBound ? cellBound : iterationBound;
+      if (workBound > BigInt(remainingCells)) {
+        return { ok: false, diagnostic: budgetDiagnostic(rasterCellLimit, BigInt(cellsGenerated) + workBound) };
+      }
+      const generated = rasterizeCircleMidpointBounded(
+        { x: cxr.value, y: cyr.value },
+        rr.value,
+        { canvas, cellLimit: remainingCells, iterationLimit: remainingCells },
+      );
+      if (!generated.ok) {
+        return { ok: false, diagnostic: budgetDiagnostic(rasterCellLimit, cellsGenerated + generated.budgetActual) };
+      }
+      return { ok: true, cells: generated.cells };
     }
 
     if (raster === 'CENTER') {
@@ -248,10 +362,33 @@ function rasterizePaintShape(shape, raster) {
       if (BigInt(r.numerator) < 0n) {
         return { ok: false, diagnostic: geomDiagnostic('CENTER', 'a non-negative radius', `radius=${rationalToString(r)}`) };
       }
-      return { ok: true, cells: rasterizeCircleCenter({ x: cx, y: cy }, r) };
+      const exactBounds = exactCircleBounds(cx, cy, r);
+      if (!exactBounds) {
+        return {
+          ok: false,
+          diagnostic: geomDiagnostic('CENTER', 'safe-integer lattice bounds', `center=(${rationalToString(cx)}, ${rationalToString(cy)}), radius=${rationalToString(r)}`),
+        };
+      }
+      const cellBound = boundedArea(clippedBounds(exactBounds, canvas));
+      if (cellBound > BigInt(remainingCells)) {
+        return { ok: false, diagnostic: budgetDiagnostic(rasterCellLimit, BigInt(cellsGenerated) + cellBound) };
+      }
+      const generated = rasterizeCircleCenterBounded(
+        { x: cx, y: cy },
+        r,
+        { canvas, cellLimit: remainingCells },
+      );
+      if (!generated.ok) {
+        if (generated.budgetActual !== undefined) {
+          return { ok: false, diagnostic: budgetDiagnostic(rasterCellLimit, cellsGenerated + generated.budgetActual) };
+        }
+        return {
+          ok: false,
+          diagnostic: geomDiagnostic('CENTER', 'safe exact rational lattice inputs', `center=(${rationalToString(cx)}, ${rationalToString(cy)}), radius=${rationalToString(r)}`),
+        };
+      }
+      return { ok: true, cells: generated.cells };
     }
-
-    return { ok: false, diagnostic: geomDiagnostic(String(raster), 'a known raster policy (CENTER or MIDPOINT)', String(raster)) };
   }
 
   return { ok: false, diagnostic: geomDiagnostic('SHAPE', 'shape.kind PIXEL or CIRCLE', String(shape.kind)) };
@@ -270,14 +407,31 @@ function rasterizePaintShape(shape, raster) {
 // output, by design (that provenance lives in bytecode, not the raster).
 export function compositeSCDLV2Layers(canvas, layers, options = {}) {
   try {
-    const width = canvas && Number.isFinite(canvas.width) ? canvas.width : 0;
-    const height = canvas && Number.isFinite(canvas.height) ? canvas.height : 0;
-    const rasterCellLimit = Number.isFinite(options.rasterCellLimit) ? options.rasterCellLimit : Infinity;
+    const width = canvas && canvas.width;
+    const height = canvas && canvas.height;
+    if (!Number.isSafeInteger(width) || width < 0 || !Number.isSafeInteger(height) || height < 0) {
+      const diagnostic = geomDiagnostic('CANVAS', 'finite non-negative safe-integer width and height', `width=${width}, height=${height}`);
+      return Object.freeze({ ok: false, coordinates: null, layers: null, diagnostics: Object.freeze([diagnostic]) });
+    }
+    const suppliedLimit = options && Object.hasOwn(options, 'rasterCellLimit') ? options.rasterCellLimit : DEFAULT_RASTER_CELL_LIMIT;
+    if (!Number.isSafeInteger(suppliedLimit) || suppliedLimit < 0) {
+      return Object.freeze({ ok: false, coordinates: null, layers: null, diagnostics: Object.freeze([invalidBudgetDiagnostic('rasterCells', suppliedLimit)]) });
+    }
+    const rasterCellLimit = suppliedLimit;
     const list = Array.isArray(layers) ? layers : [];
 
-    const orderedLayers = list
-      .map((layer, sourceIndex) => ({ layer, sourceIndex }))
-      .sort((a, b) => (a.layer.order - b.layer.order) || (a.sourceIndex - b.sourceIndex));
+    const indexedLayers = [];
+    for (let fallbackIndex = 0; fallbackIndex < list.length; fallbackIndex += 1) {
+      const layer = list[fallbackIndex];
+      const hasPersistedIndex = layer && layer.sourceIndex !== undefined;
+      const sourceIndex = hasPersistedIndex ? layer.sourceIndex : fallbackIndex;
+      if (!Number.isSafeInteger(sourceIndex) || sourceIndex < 0) {
+        const diagnostic = geomDiagnostic('LAYER', 'a non-negative safe-integer sourceIndex when present', String(sourceIndex));
+        return Object.freeze({ ok: false, coordinates: null, layers: null, diagnostics: Object.freeze([diagnostic]) });
+      }
+      indexedLayers.push({ layer, sourceIndex });
+    }
+    const orderedLayers = indexedLayers.sort((a, b) => (a.layer.order - b.layer.order) || (a.sourceIndex - b.sourceIndex));
 
     const coordinateMap = new Map();
     let cellsGenerated = 0;
@@ -285,7 +439,12 @@ export function compositeSCDLV2Layers(canvas, layers, options = {}) {
     for (const { layer } of orderedLayers) {
       const paints = Array.isArray(layer.paints) ? layer.paints : [];
       for (const paint of paints) {
-        const result = rasterizePaintShape(paint.shape, paint.raster);
+        const result = rasterizePaintShape(paint.shape, paint.raster, {
+          canvas: { width, height },
+          remainingCells: rasterCellLimit - cellsGenerated,
+          rasterCellLimit,
+          cellsGenerated,
+        });
         if (!result.ok) {
           return Object.freeze({ ok: false, coordinates: null, layers: null, diagnostics: Object.freeze([result.diagnostic]) });
         }
@@ -323,8 +482,14 @@ export function compositeSCDLV2Layers(canvas, layers, options = {}) {
 export function rasterizeSCDLV2(construction, canvas, verifiedBudget) {
   try {
     const layers = Array.isArray(construction && construction.layers) ? construction.layers : [];
-    const limits = (verifiedBudget && verifiedBudget.limits) || {};
-    const rasterCellLimit = Number.isFinite(limits.rasterCells) ? limits.rasterCells : Infinity;
+    const limits = verifiedBudget && verifiedBudget.limits;
+    for (const field of ['instructions', 'generatedShapes', 'rasterCells']) {
+      const value = limits && limits[field];
+      if (!Number.isSafeInteger(value) || value < 0) {
+        return Object.freeze({ ok: false, coordinates: null, layers: null, diagnostics: Object.freeze([invalidBudgetDiagnostic(field, value)]) });
+      }
+    }
+    const rasterCellLimit = limits.rasterCells;
     return compositeSCDLV2Layers(canvas, layers, { rasterCellLimit });
   } catch (error) {
     return Object.freeze({ ok: false, coordinates: null, layers: null, diagnostics: Object.freeze([internalDiagnostic(error)]) });

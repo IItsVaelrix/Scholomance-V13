@@ -28,7 +28,7 @@
 //   I32 / FIXED / RATIO / PX  -> value: a Task 5 Rational { numerator, denominator }
 //   COLOR                     -> value: a lowercase hex string
 //   VEC2                      -> value: { x: Rational, y: Rational }
-//   LAYER                     -> value: the mutable-until-EMIT layer record
+//   LAYER                     -> value: an immutable copy-on-write layer record
 //   SHAPE                     -> value: { kind: 'PIXEL', at } | { kind: 'CIRCLE', center, radius }
 //
 // evaluateSCDLV2 never throws: any internal failure — an unknown opcode, a
@@ -71,6 +71,18 @@ function budgetDiagnostic(field, limit, actual) {
     span: ZERO_SPAN,
     expected: [String(limit)],
     received: [String(actual)],
+    relatedSymbols: [field],
+  });
+}
+
+function invalidBudgetDiagnostic(field, received) {
+  return v2Diagnostic({
+    code: EVAL_CODES.BUDGET,
+    phase: 'EVAL',
+    message: `Verified budget limit '${field}' must be a finite, non-negative safe integer.`,
+    span: ZERO_SPAN,
+    expected: ['finite non-negative safe integer'],
+    received: [String(received)],
     relatedSymbols: [field],
   });
 }
@@ -135,15 +147,21 @@ function registerKey(resultField) {
 export function evaluateSCDLV2(program) {
   const counters = { instructions: 0, generatedShapes: 0, rasterCells: 0 };
   try {
-    const limits = (program && program.verifiedBudget && program.verifiedBudget.limits) || {};
-    const instructionLimit = Number.isFinite(limits.instructions) ? limits.instructions : Infinity;
-    const generatedShapesLimit = Number.isFinite(limits.generatedShapes) ? limits.generatedShapes : Infinity;
+    const limits = program && program.verifiedBudget && program.verifiedBudget.limits;
+    for (const field of ['instructions', 'generatedShapes', 'rasterCells']) {
+      const value = limits && limits[field];
+      if (!Number.isSafeInteger(value) || value < 0) {
+        return failure(invalidBudgetDiagnostic(field, value), counters);
+      }
+    }
+    const instructionLimit = limits.instructions;
+    const generatedShapesLimit = limits.generatedShapes;
 
     const constants = Array.isArray(program && program.constants) ? program.constants : [];
     const instructions = Array.isArray(program && program.instructions) ? program.instructions : [];
 
     const registers = new Map();
-    const layerRecords = []; // every BC.LAYER.NEW record, in creation order
+    let layerCount = 0;
     let emittedLayerRegisters = null; // set by BC.EMIT.ASSET, or stays null if absent
 
     const readRegisterOperand = (operand) => {
@@ -274,14 +292,14 @@ export function evaluateSCDLV2(program) {
               counters,
             );
           }
-          const layerRecord = {
+          const layerRecord = Object.freeze({
             id: idOperand.value,
             order: orderOperand.value,
-            sourceIndex: layerRecords.length,
-            paints: [],
-          };
-          layerRecords.push(layerRecord);
-          registers.set(resultKey, { type: 'LAYER', value: layerRecord });
+            sourceIndex: layerCount,
+            paints: Object.freeze([]),
+          });
+          layerCount += 1;
+          registers.set(resultKey, Object.freeze({ type: 'LAYER', value: layerRecord }));
           break;
         }
 
@@ -311,11 +329,16 @@ export function evaluateSCDLV2(program) {
               counters,
             );
           }
-          layerValue.value.paints.push(Object.freeze({
+          const paint = Object.freeze({
             shape: shapeValue.value,
             fill: fillValue.value,
             raster: rasterOperand.value,
-          }));
+          });
+          const updatedLayer = Object.freeze({
+            ...layerValue.value,
+            paints: Object.freeze([...layerValue.value.paints, paint]),
+          });
+          registers.set(operands[0].index, Object.freeze({ type: 'LAYER', value: updatedLayer }));
           break;
         }
 
@@ -331,7 +354,7 @@ export function evaluateSCDLV2(program) {
             }
             collected.push(layerValue.value);
           }
-          emittedLayerRegisters = collected;
+          emittedLayerRegisters = Object.freeze(collected);
           break;
         }
 
@@ -346,16 +369,11 @@ export function evaluateSCDLV2(program) {
       }
     }
 
-    const finalLayers = (emittedLayerRegisters || []).map((layerRecord) => Object.freeze({
-      id: layerRecord.id,
-      order: layerRecord.order,
-      sourceIndex: layerRecord.sourceIndex,
-      paints: Object.freeze([...layerRecord.paints]),
-    }));
+    const finalLayers = Object.freeze([...(emittedLayerRegisters || [])]);
 
     return Object.freeze({
       ok: true,
-      construction: Object.freeze({ layers: Object.freeze(finalLayers) }),
+      construction: Object.freeze({ layers: finalLayers }),
       counters: Object.freeze({ ...counters }),
       diagnostics: Object.freeze([]),
     });
