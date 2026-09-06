@@ -107,6 +107,7 @@ tmp-*.png
 !godot_project/assets/blocks/*.png
 !tests/visual/pixelbrain-studio.spec.js-snapshots/
 !tests/visual/pixelbrain-studio.spec.js-snapshots/*.png
+!codex/core/pixelbrain/scdl/fixtures/v2/*.png
 *.bmp
 
 # SCDL compile dumps — regenerable build artifacts (the .scdl is the source, and
