@@ -905,18 +905,25 @@ only: no SCDL source evaluator ships into a game or browser runtime.
 
 ### 11.2 Supported statement and expression opcodes
 
-The shipped source surface is deliberately small. Statement opcodes:
+Statement opcodes:
 
 | ID | Mnemonic | Role |
 |---|---|---|
 | `0x0001` | `SCDL` | version declaration (`SCDL 2`) |
 | `0x0002` | `ASSET` | emitted asset identifier |
 | `0x0003` | `CANVAS` | `WIDTH` / `HEIGHT` as U32 |
-| `0x0004` | `BUDGET` | `INSTRUCTIONS` / `GENERATED_SHAPES` / `RASTER_CELLS` |
+| `0x0004` | `BUDGET` | `INSTRUCTIONS` / `GENERATED_SHAPES` / `RASTER_CELLS`, optional `RECURSION_DEPTH` |
 | `0x0010` | `CONST` | typed immutable binding |
 | `0x0020` | `SHAPE` | immutable shape binding |
-| `0x0030` | `LAYER` | ordered paint layer with a brace body |
-| `0x0031` | `PAINT` | paint a shape into the enclosing layer |
+| `0x0021` | `MASK` | immutable mask binding |
+| `0x0030` | `LAYER` | ordered paint layer (`ORDER`, optional `BLEND`, `OPACITY`, `VISIBLE`) |
+| `0x0031` | `PAINT` | paint shape into layer (`FILL`, `RASTER`, optional `AT`, `CLIP_TO`, `MATERIAL`) |
+| `0x0040` | `ANCHOR` | named anchor binding on a shape |
+| `0x0041` | `ASSERT` | geometric constraint assertion at compile time |
+| `0x0050` | `FN` | pure function declaration with optional recursion cap |
+| `0x0051` | `SEQUENCE` | finite recurrence declaration |
+| `0x0052` | `RNG` | seeded deterministic RNG declaration |
+| `0x0053`–`0x0059` | `LET` / `RETURN` / `EMIT` / `FOR` / `IF` / `MATCH` / `RADIAL` | finite block and generative control flow |
 
 Expression opcodes:
 
@@ -930,18 +937,62 @@ Expression opcodes:
 | `0x0111` | `VEC2` | two `PX` components |
 | `0x0200` | `PIXEL` | one-cell shape at named `AT` |
 | `0x0201` | `CIRCLE` | named `CENTER` (VEC2) and `RADIUS` (PX) |
+| `0x0202` | `LINE` | segment from `FROM` to `TO` |
+| `0x0203` | `POLYLINE` | sequence of vertices |
+| `0x0204` | `RAY` | bounded ray (`ORIGIN`, `DIR`, `LENGTH`) |
+| `0x0205` | `RECT` | axis-aligned rectangle (`ORIGIN` or `CENTER`, plus `SIZE`) |
+| `0x0206` | `ROUNDED_RECT` | rectangle with `CORNER_RADIUS` |
+| `0x0207` | `RING` | annular ring (`CENTER`, `RADIUS`, `THICKNESS`) |
+| `0x0208` | `ELLIPSE` | ellipse (`CENTER`, `RADIUS_X`, `RADIUS_Y`) |
+| `0x0209` | `ARC` | circular arc (`CENTER`, `RADIUS`, `START`, `END`) |
+| `0x020A` | `SECTOR` | pie sector (`CENTER`, `RADIUS`, `START`, `END`) |
+| `0x020B` | `TRIANGLE` | three vertices `P1`, `P2`, `P3` |
+| `0x020C` | `REGULAR_POLYGON` | polygon (`CENTER`, `RADIUS`, `SIDES`) |
+| `0x020D` | `POLYGON` | arbitrary polygon vertices |
+| `0x020E` | `STAR` | star shape (`CENTER`, `POINTS`, `INNER_RADIUS`, `OUTER_RADIUS`) |
+| `0x020F` | `PATH` | SVG-compatible path command list |
+| `0x0210`–`0x0212` | `DEGREES` / `RADIANS` / `TURNS` | exact angle constructors |
+| `0x0213` | `ROTATE` | 2D rotation transform by `ANGLE` |
+| `0x0214` | `TRANSLATE` | 2D translation transform by `OFFSET` (VEC2) |
+| `0x0215` | `SCALE` | 2D scale transform by `FACTOR` |
+| `0x0216` | `TRANSFORM_COMPOSE` | composition of two 2D transforms |
+| `0x0217` | `TRANSFORM_APPLY` | apply transform to a shape or vector |
+| `0x0220` | `UNION` | CSG union of two shapes |
+| `0x0221` | `SUBTRACT` | CSG subtraction of shape B from shape A |
+| `0x0222` | `INTERSECT` | CSG intersection of two shapes |
+| `0x0223` | `XOR` | CSG symmetric difference of two shapes |
+| `0x0224` | `OUTLINE` | boundary outline of a shape with `WIDTH` |
+| `0x0230` | `TO_MASK` | rasterize shape to an immutable boolean mask |
+| `0x0231` | `MASK_UNION` | union of two masks |
+| `0x0232` | `MASK_INTERSECT` | intersection of two masks |
+| `0x0233` | `MASK_SUBTRACT` | subtraction of mask B from mask A |
+| `0x0234` | `MASK_INVERT` | inversion of mask within canvas bounds |
+| `0x0240` | `ALIGN` | align one shape to another by named anchor |
+| `0x0241` | `ANCHOR_OF` | query named anchor position on shape |
+| `0x0242` | `BOUNDS` | query bounding box of shape |
+| `0x0243` | `INSIDE` | predicate: point inside shape or bounds |
+| `0x0244` | `CONTAINS` | predicate: container contains target |
+| `0x0245` | `TOUCHES` | predicate: two targets touch |
+| `0x0246` | `OVERLAPS` | predicate: two targets overlap |
+
+Generative-math expressions occupy `0x0104`–`0x011B` (arithmetic, rounding,
+trigonometry, interpolation, number theory, and vector math), `0x0120`–`0x0128`
+(comparisons and boolean logic), `0x0130`–`0x013A` (finite collections,
+recurrences, and calls), and `0x0140`–`0x0143` (seeded sampling and noise).
+The frozen runtime registry remains the exhaustive operand-level authority.
 
 Bytecode-only mnemonics, illegal in source: `BC.CONST` (`0x8000`),
-`BC.LAYER.NEW` (`0x8001`), `BC.PAINT` (`0x8002`), `BC.EMIT.ASSET` (`0x8003`).
+`BC.LAYER.NEW` (`0x8001`), `BC.PAINT` (`0x8002`), `BC.EMIT.ASSET` (`0x8003`),
+and the Step 3 lowering operations `0x8010`–`0x8014`.
 
 Statements are uppercase opcode-first. Expressions are parenthesized prefix
 forms. Required non-positional operands are named (`CENTER`, `RADIUS`, `AT`,
 `FILL`, `RASTER`, `WIDTH`, `HEIGHT`, …). Literals demonstrated: signed base-10
 integers, exact base-10 decimals, `#RRGGBB` / `#RRGGBBAA` colors, identifiers,
-enum words (`CENTER` / `MIDPOINT`), and `$symbols`. A successful program emits
-declared layers sorted by ascending `ORDER`, with source order breaking ties.
-Values and shapes are immutable; construction does not paint — only `PAINT`
-adds a shape to an ordered layer.
+enum words (`CENTER` / `MIDPOINT` / `BRESENHAM` / `SUPERCOVER` / `THRESHOLD`),
+and `$symbols`. A successful program emits declared layers sorted by ascending
+`ORDER`, with source order breaking ties. Values, shapes, and masks are immutable;
+construction does not paint — only `PAINT` adds a shape to an ordered layer.
 
 Inspect the frozen registry at runtime with `listSCDLV2Opcodes()` /
 `getSCDLV2Opcode(mnemonic)` from `codex/core/pixelbrain/scdl/index.js`.
@@ -963,7 +1014,7 @@ lowerSCDLV2Bytecode          canonical SCDL-BC-v2 text + instruction objects
         │
         ▼ evaluateSCDLV2     bounded interpreter of instruction objects
                              (never re-parses bytecode.text)
-rasterizeSCDLV2              PIXEL + filled CIRCLE, CENTER / MIDPOINT
+rasterizeSCDLV2              geometry catalog + CSG/masks + raster policies
         │
         ▼ emitSCDLV2Package  PixelBrainAssetPacket + SCDL-PACKAGE-v2
 ```
@@ -993,10 +1044,12 @@ bytecode object, `verifiedBudget`, immutable `construction`, composited
 `pbasset_` plus the eight hex digits of `bytecode.programId` (`scdlbc_<hex>`).
 JSON / PNG exporters consume that packet; they do not re-author geometry.
 
-### 11.5 Exact rationals, units, CENTER, and MIDPOINT
+### 11.5 Exact rationals, units, raster policies, and compositing
 
-Closed types: `I32`, `U32`, `FIXED`, `RATIO`, `PX`, `COLOR`, `VEC2`, `SHAPE`,
-`LAYER`. `PX` is a pixel-distance type, not a unitless integer. There is no
+Closed types: `BOOL`, `I32`, `U32`, `FIXED`, `RATIO`, `PX`, `ANGLE`, `DURATION`,
+`COLOR`, `VEC2`, `RECT`, `RANGE`, `SEQUENCE`, `PALETTE`, `PATH`, `SHAPE`, `MASK`,
+`TRANSFORM`, `MATERIAL`, `LAYER`, `TIMELINE`, and `RNG`. `PX` is a pixel-distance
+type, not a unitless integer. There is no
 truthiness and no implicit conversion: `RADIUS $n` where `$n` is `I32` is
 `SCDL-TYPE-002` (`expected: ["PX"]`, `received: ["I32"]`). Wrap scalars with
 `PX`.
@@ -1012,22 +1065,37 @@ program identity.
 Raster policies on `PAINT`:
 
 - `CENTER` (`CIRCLE-FILL-CENTER-v1`): exact inclusion. Center and radius stay
-  rationals; a cell is painted iff its squared distance from the exact center
-  is `<=` the exact squared radius, compared by cross-multiplication. No
-  rounding, no anti-aliasing.
+  rationals; a cell is painted iff its center is inside the ideal shape.
+  No rounding, no anti-aliasing.
 - `MIDPOINT` (`CIRCLE-FILL-MIDPOINT-v1`): classic integer midpoint / Bresenham
-  filled disc (symmetric horizontal spans). It is a distinct named algorithm,
-  not an alias of `CENTER`. They coincide on the golden radius-2 disc used by
-  `exact-orb.scdl`; they are not required to agree at every radius.
+  filled disc, ellipse, and ring (symmetric horizontal spans). Distinct named
+  algorithm.
+- `BRESENHAM` (`LINE-BRESENHAM-v1`): canonical 8-connected integer line algorithm.
+- `SUPERCOVER` (`POLY-SUPERCOVER-v1`): conservative inclusion; every lattice cell
+  touched or crossed by the shape boundary or interior is included.
+- `THRESHOLD` (`POLY-THRESHOLD-v1`): deterministic subpixel grid coverage sampling
+  (included if coverage >= 0.5).
 
-`PIXEL` requires integral `PX` coordinates. Canvas coordinates are integers.
-Out-of-bounds cells clip deterministically. Later paints win; layers sort by
-`ORDER` then source order. No anti-aliased coverage values are produced.
+Multi-layer compositing and painter order:
+
+- Layers declare ascending `ORDER`, with source order breaking ties.
+- `BLEND` modes: `OVER` (standard alpha over), `REPLACE` (write target directly),
+  `ADD` / `SUBTRACT` (saturating channel arithmetic), `MULTIPLY` (normalized
+  channel product), and alpha-only `MASK_IN` / `MASK_OUT`.
+- Integer channel math (`0..255`) with deterministic rational opacity scaling.
+- `CLIP_TO <mask>`: restricts rasterization strictly to cells enabled in the
+  immutable mask value.
+- `AT <vec2>`: translates shape painting within the layer without mutating
+  underlying shape values.
+
+Canvas coordinates are integers. Out-of-bounds cells clip deterministically.
+No anti-aliased coverage values are produced.
 
 ### 11.6 Protected budgets and failure-before-evaluation
 
-Default protected host limits for this milestone are exactly
-`INSTRUCTIONS 200000`, `GENERATED_SHAPES 10000`, and `RASTER_CELLS 1048576`.
+Default limits for this milestone are exactly `INSTRUCTIONS 200000`,
+`GENERATED_SHAPES 10000`, `RASTER_CELLS 1048576`, and `RECURSION_DEPTH 64`;
+the protected host recursion ceiling is 256.
 A source `BUDGET` may lower a field; requesting above the host ceiling is
 `SCDL-BUDGET-001` and stops before demand is measured. Measured static demand
 above the effective requested budget is `SCDL-BUDGET-002`. Both gates run
@@ -1083,18 +1151,46 @@ white `PIXEL` at `(1,1)` under `CENTER`, on a 9×9 canvas. Prefix math
 `(ADD 1 1)` folds to I32 `2` and then `PX`. JSON / PNG export consume the
 resulting `PixelBrainAssetPacket`.
 
-### 11.8 What this slice does not ship
+### 11.8 Decomposition Step 3: Generative Mathematics
 
-The following remain **separate, later subprojects**. They are named here so
-they are not mistaken for available surface:
+Decomposition Step 3 completes the generative mathematical substrate for SCDL v2:
 
-- sequences and Fibonacci-style recurrence
-- functions / procedures
-- animation, frames, and loops in v2 source
-- imports and multi-file programs
-- RNG / noise
-- masks, boolean shape ops, and 2D transforms in v2
-- AMP execution and agent-inspection milestones
+1. **Pure Functions and Lexical Scoping:**
+   - Declared with `FN <id> PARAM <$p1> <T1> ... RETURNS <TRet> [RECURSION_MAX <N>] { ... }`.
+   - Local variable bindings with `LET <$var> <Type> <Expr>`.
+   - Invocation through `(CALL <fn> <args...>)` and `RETURN <Expr>`.
+   - Enforces return type checking and parameter count/type verification.
+
+2. **Static Recursion Bounds & Termination Analysis:**
+   - **`SCDL-TERM-001` (Uncapped Recursion):** Every recursive function declaration MUST declare explicit `RECURSION_MAX <N>`.
+   - **`SCDL-TERM-002` (Depth Exceeded):** Declarations with `RECURSION_MAX > 256` or runtime call stacks crossing host or declared limits fail closed.
+   - **`SCDL-TERM-004` (Mutual Recursion Forbidden):** Static call-graph cycle detection rejects all mutual recursion (cycles of length >= 2) before lowering or execution.
+
+3. **Recurrences, Sequences, and Collections:**
+   - Recurrences defined via `SEQUENCE <$name> TYPE <T> COUNT <N> { SEED <v0> ... NEXT <expr> }` accessing historical elements with `(PREV 1)`, `(PREV 2)`.
+   - Pure collection primitives: `(RANGE START <s0> END <s1> STEP <step>)`, `(AT <seq> <index>)`, `(LENGTH <seq>)`, `(SUM <seq>)`, `(PRODUCT <seq>)`, `(ZIP <aSeq> <bSeq>)`.
+
+4. **Seeded Variation and Coherent Noise:**
+   - Deterministic PRNG via `RNG <$rng> ALGORITHM PCG32 SEED <int>`.
+   - Seeded sampling expressions: `(RANDOM_I32 <$rng> MIN <lo> MAX <hi>)`, `(RANDOM_SCALAR <$rng> MIN <lo> MAX <hi>)`, `(RANDOM_VEC2 <$rng> MIN <vMin> MAX <vMax>)`.
+   - Deterministic 2D value/gradient noise via `(NOISE_2D AT <vec2> SEED <int> FREQUENCY <scalar> [OCTAVES <int>])`.
+
+5. **Finite Generative Control Flow in Shapes and Layers:**
+   - `SHAPE <$name> COMPOUND { ... }` supporting `FOR <$var> IN <iterable> { ... }`, `RADIAL COUNT <N> [CENTER <vec2>] [RADIUS <px>] { ... }`, `IF / ELSE`, `MATCH`, and `EMIT <shape>`.
+   - Compound shapes are lowered canonically into `UNION` trees in SSA bytecode and rasterized with full layer compositing.
+
+6. **Golden Fixture `fibonacci-bloom.scdl`:**
+   - Located at `codex/core/pixelbrain/scdl/fixtures/v2/fibonacci-bloom.scdl`.
+   - Program identity: `scdlbc_64c9884a`.
+   - Verifies end-to-end integration of recurrences, pure functions, a seeded PCG32 declaration, radial compound shape emission, and pixel rasterization.
+
+### 11.9 What this slice does not ship
+
+With Decomposition Step 3 (Generative Mathematics) complete, the following remain for **later subprojects**:
+
+- animation, timelines, tracks, frames, and loops in v2 source (Step 4)
+- imports and multi-file modules (Step 5)
+- AMP execution substrate and agent-inspection milestones (Steps 5, 6, 7)
 
 Do not author those forms against this compiler. The v1 / v1.2 pipeline in
 §§1–10 continues to provide frames, boolean ops, scene-graph, and SymmetryAMP

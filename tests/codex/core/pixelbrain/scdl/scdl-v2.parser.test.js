@@ -47,6 +47,30 @@ describe('SCDL v2 parser', () => {
     }
   });
 
+  it('registry metadata exposes the shipped layer and paint options', () => {
+    expect(getSCDLV2Opcode('BUDGET').operands.at(-1)).toEqual(
+      { name: 'RECURSION_DEPTH', type: 'U32', required: false },
+    );
+    expect(getSCDLV2Opcode('LAYER').operands).toEqual([
+      { name: 'ID', type: 'IDENT', required: true },
+      { name: 'ORDER', type: 'I32', required: true },
+      { name: 'BLEND', type: 'COMPOSITE_MODE', required: false },
+      { name: 'OPACITY', type: 'SCALAR', required: false },
+      { name: 'VISIBLE', type: 'BOOL', required: false },
+      { name: 'BODY', type: 'BLOCK', required: true },
+    ]);
+    expect(getSCDLV2Opcode('PAINT').operands).toEqual([
+      { name: 'SHAPE', type: 'SHAPE', required: true },
+      { name: 'AT', type: 'VEC2', required: false },
+      { name: 'FILL', type: 'COLOR', required: true },
+      { name: 'RASTER', type: 'RASTER_POLICY', required: true },
+      { name: 'BLEND', type: 'COMPOSITE_MODE', required: false },
+      { name: 'CLIP_TO', type: 'MASK', required: false },
+      { name: 'MATERIAL', type: 'ANY', required: false },
+      { name: 'OPACITY', type: 'SCALAR', required: false },
+    ]);
+  });
+
   it('accepts compact layer blocks and repeated symbol declarations as syntax', () => {
     const source = `${VALID.replace(/LAYER[\s\S]*$/, 'CONST $two I32 2\nLAYER ink ORDER 10 { PAINT $orb FILL $ink RASTER MIDPOINT }')}`;
     const result = parseSCDLV2(source);

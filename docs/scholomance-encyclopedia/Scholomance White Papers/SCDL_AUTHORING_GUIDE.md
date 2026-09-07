@@ -2,8 +2,10 @@
 
 **Audience:** anyone writing `.scdl` files by hand — artists, agents, engineers.
 **Scope:** SCDL v1.1 ops and frames, plus the v1.2 boolean-op rework
-(`SCDL-AST-v1` version `1.2.0`), plus the SCDL v2 semantic-core slice in §11
-(compiler-demonstrated `SCDL 2` only). The v1.2 scene-graph features (`def`,
+(`SCDL-AST-v1` version `1.2.0`), plus the SCDL v2 milestones in §11
+(Decomposition Steps 1–3: Semantic Core, Geometry/Paint Kernel, and
+Generative Mathematics;
+compiler-demonstrated `SCDL 2` only). The v1.2 scene-graph features (`def`,
 `group`, `instance`, transform clauses) exist in the compiler and grammar
 but are not yet covered by this guide — see the
 [Compiler White Paper](SCDL_COMPILER_WHITE_PAPER.md) §3.1 for their formal
@@ -706,23 +708,25 @@ Distilled from the fixtures that shipped:
 
 ---
 
-## 11. SCDL v2 semantic-core (compiler-demonstrated)
+## 11. SCDL v2 (compiler-demonstrated)
 
 This section documents what the public compiler actually does for sources
 whose first significant declaration is exactly `SCDL 2`. It is **not**
 executable compiler authority. If this guide and `compileSCDL` disagree, trust
-the compiler and file a doc fix. Sequences, Fibonacci, functions, animation,
-imports, RNG/noise, masks, v2 boolean ops, transforms, and AMP execution are
-**not shipped** in this slice — do not author them against `SCDL 2`.
+the compiler and file a doc fix. Animation, imports, multi-file modules, and
+AMP execution are **not shipped** in this slice — do not author them against
+`SCDL 2`.
 
 ### 11.1 Copy-pasteable commands
 
-From the repo root, against the checked-in fixture:
+From the repo root, against the checked-in fixtures:
 
 ```bash
 npm run scdl:check -- codex/core/pixelbrain/scdl/fixtures/v2/exact-orb.scdl
-npm run scdl:format -- codex/core/pixelbrain/scdl/fixtures/v2/exact-orb.scdl
-npm run scdl:compile -- codex/core/pixelbrain/scdl/fixtures/v2/exact-orb.scdl --export json,png --out-dir /tmp/scdl-v2-exact-orb
+npm run scdl:check -- codex/core/pixelbrain/scdl/fixtures/v2/void-sigil.scdl
+npm run scdl:check -- codex/core/pixelbrain/scdl/fixtures/v2/fibonacci-bloom.scdl
+npm run scdl:format -- codex/core/pixelbrain/scdl/fixtures/v2/void-sigil.scdl
+npm run scdl:compile -- codex/core/pixelbrain/scdl/fixtures/v2/void-sigil.scdl --export json,png --out-dir /tmp/scdl-v2-sigil
 ```
 
 `check` reports `OK: true` plus `Bytecode: scdlbc_<eight lowercase hex>` on
@@ -733,17 +737,19 @@ canonical SCDL 2 to stdout; add `--write` to overwrite the input file.
 separate command:
 
 ```bash
-npm run scdl:preview -- codex/core/pixelbrain/scdl/fixtures/v2/exact-orb.scdl --scale 8 --out-dir /tmp/scdl-v2-exact-orb
+npm run scdl:preview -- codex/core/pixelbrain/scdl/fixtures/v2/void-sigil.scdl --scale 8 --out-dir /tmp/scdl-v2-sigil
 ```
 
 `format` refuses unversioned / v1 source. `parse` on `SCDL 2` prints the v2
 AST (or CST on parse failure).
 
-### 11.2 Full fixture source
+### 11.2 Fixture sources
 
-`codex/core/pixelbrain/scdl/fixtures/v2/exact-orb.scdl` — the only checked-in
-v2 golden. 9×9 canvas, prefix `ADD`, a `PX`-wrapped radius, one `CIRCLE`
-painted `MIDPOINT` and one `PIXEL` painted `CENTER`:
+#### 11.2.1 Step 1 Semantic-Core Fixture: `exact-orb.scdl`
+
+`codex/core/pixelbrain/scdl/fixtures/v2/exact-orb.scdl` — minimal v2 golden.
+9×9 canvas, prefix `ADD`, a `PX`-wrapped radius, one `CIRCLE` painted `MIDPOINT`
+and one `PIXEL` painted `CENTER`:
 
 ```scdl
 SCDL 2
@@ -764,7 +770,72 @@ LAYER ink ORDER 10 {
 ```
 
 That source is the generator of the bytecode dump in the white paper §11.7.
-Do not hand-edit JSON / PNG exports; change this file and recompile.
+
+#### 11.2.2 Step 2 Geometry & Paint Kernel Fixture: `void-sigil.scdl`
+
+`codex/core/pixelbrain/scdl/fixtures/v2/void-sigil.scdl` — comprehensive Step 2 golden.
+Demonstrates 14-primitive geometry catalog, CSG subtraction, outline extraction,
+immutable mask creation and clipping, named anchors, geometric assertions, and
+multi-layer compositing (`BLEND REPLACE`, `BLEND OVER`, `OPACITY`):
+
+```scdl
+SCDL 2
+ASSET void_sigil
+CANVAS WIDTH 32 HEIGHT 32
+BUDGET INSTRUCTIONS 1000 GENERATED_SHAPES 20 RASTER_CELLS 2048
+
+CONST $center VEC2 (VEC2 (PX 16) (PX 16))
+CONST $ring_radius PX (PX 12)
+CONST $ring_th PX (PX 2)
+
+SHAPE $portal_ring (RING CENTER $center RADIUS $ring_radius THICKNESS $ring_th)
+SHAPE $core_star (STAR CENTER $center POINTS 4 INNER_RADIUS (PX 4) OUTER_RADIUS (PX 9))
+SHAPE $rune_box (RECT CENTER $center SIZE (VEC2 (PX 14) (PX 14)))
+SHAPE $sigil_cut (SUBTRACT $portal_ring $rune_box)
+SHAPE $sigil_edge (OUTLINE $sigil_cut WIDTH (PX 1))
+
+MASK $void_clip (TO_MASK $portal_ring)
+
+ANCHOR $origin_anchor ON $portal_ring AT (ANCHOR_OF $portal_ring CENTER)
+ASSERT (INSIDE $center $portal_ring)
+
+LAYER backdrop ORDER 0 BLEND REPLACE OPACITY 1.0 {
+  PAINT $portal_ring FILL #1A0B2E RASTER MIDPOINT
+}
+
+LAYER glyphs ORDER 10 BLEND OVER OPACITY 0.8 {
+  PAINT $core_star FILL #9B5DE5 RASTER CENTER CLIP_TO $void_clip
+  PAINT $sigil_edge FILL #F15BB5 RASTER BRESENHAM
+}
+```
+
+Key Step 2 conventions:
+- **Primitives:** `LINE`, `POLYLINE`, `RAY`, `RECT`, `ROUNDED_RECT`, `RING`,
+  `ELLIPSE`, `ARC`, `SECTOR`, `TRIANGLE`, `REGULAR_POLYGON`, `POLYGON`, `STAR`, `PATH`.
+- **Transforms:** `(ROTATE ... ANGLE ...)`, `(TRANSLATE ... OFFSET ...)`,
+  `(SCALE ... FACTOR ...)`, `(TRANSFORM_COMPOSE ...)`, `(TRANSFORM_APPLY ...)`.
+- **CSG Booleans:** `UNION`, `SUBTRACT`, `INTERSECT`, `XOR`, `OUTLINE`.
+- **Masks:** `TO_MASK`, `MASK_UNION`, `MASK_INTERSECT`, `MASK_SUBTRACT`, `MASK_INVERT`, `CLIP_TO`.
+- **Anchors & Assertions:** `ANCHOR <name> ON <shape> AT <vec2>`, `ASSERT (<predicate>)`.
+- **5 Raster Policies:** `CENTER`, `MIDPOINT`, `BRESENHAM`, `SUPERCOVER`, `THRESHOLD`.
+- **Multi-layer Compositing:** `BLEND OVER/REPLACE/ADD/SUBTRACT/MULTIPLY/MASK_IN/MASK_OUT`, rational `OPACITY`.
+
+Key Step 3 conventions (Generative Mathematics):
+- **Pure Functions:** `FN <id> PARAM <$p1> <T1> ... RETURNS <TRet> [RECURSION_MAX <N>] { ... }`
+  - Body statements: `LET <$var> <Type> <Expr>`, `RETURN <Expr>`, `IF/ELSE`, `MATCH`.
+  - Calling: `(CALL <id> <args...>)`. Must be pure with zero side effects.
+  - Termination: Any recursive call MUST declare `RECURSION_MAX <= 256` or trigger `SCDL-TERM-001`.
+  - Mutual recursion (cycles of length >= 2) is forbidden and triggers `SCDL-TERM-004`.
+- **Recurrences & Sequences:**
+  - `SEQUENCE <$name> TYPE <T> COUNT <N> { SEED <v0> ... NEXT (ADD (PREV 1) (PREV 2)) }`
+  - Built-in sequence operations: `(RANGE START <s0> END <s1> STEP <step>)`, `(AT <seq> <i>)`, `(LENGTH <seq>)`, `(SUM <seq>)`, `(PRODUCT <seq>)`, `(ZIP <seqA> <seqB>)`.
+- **Seeded Variation & Noise:**
+  - `RNG <$rng> ALGORITHM PCG32 SEED <int>`
+  - Sampling: `(RANDOM_I32 <$rng> MIN <lo> MAX <hi>)`, `(RANDOM_SCALAR <$rng> MIN <lo> MAX <hi>)`, `(RANDOM_VEC2 <$rng> MIN <v0> MAX <v1>)`.
+  - Coherent 2D Noise: `(NOISE_2D AT <vec2> SEED <int> FREQUENCY <scalar> [OCTAVES <int>])`.
+- **Compound Generative Shapes:**
+  - `SHAPE <$name> COMPOUND { ... }` with `FOR <$var> IN <iterable> { EMIT <shape> }` and `RADIAL COUNT <N> [CENTER <vec2>] [RADIUS <px>] { EMIT <shape> }`.
+  - Supports nested `IF/ELSE`, `MATCH`, `LET`, and `EMIT`. Lowers into canonical SSA `UNION` trees.
 
 ### 11.3 Agent repair loop
 

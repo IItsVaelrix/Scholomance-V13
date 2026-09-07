@@ -1,7 +1,7 @@
 import { span, v2Diagnostic } from './scdl-v2.diagnostics.js';
 
 export const TOKEN_KINDS = Object.freeze([
-  'WORD', 'SYMBOL', 'INTEGER', 'DECIMAL', 'COLOR',
+  'WORD', 'SYMBOL', 'INTEGER', 'DECIMAL', 'COLOR', 'STRING',
   'LBRACE', 'RBRACE', 'LPAREN', 'RPAREN', 'LBRACKET', 'RBRACKET', 'COMMA',
   'WHITESPACE', 'NEWLINE', 'COMMENT', 'INVALID', 'EOF',
 ]);
@@ -17,8 +17,6 @@ const PUNCTUATION = Object.freeze({
 });
 
 const isSpace = (char) => char === ' ' || char === '\t' || char === '\f' || char === '\v';
-const isDigit = (char) => char >= '0' && char <= '9';
-const isHex = (char) => Boolean(char && /[0-9a-f]/i.test(char));
 const isWordStart = (char) => Boolean(char && /[A-Za-z_]/.test(char));
 const isWordPart = (char) => Boolean(char && /[A-Za-z0-9_.-]/.test(char));
 const isBoundary = (char) => !char || isSpace(char) || char === '\r' || char === '\n' || PUNCTUATION[char] || char === '$';
@@ -91,26 +89,50 @@ export function tokenizeSCDLV2(source) {
     if (char === '#') {
       const colorMatch = text.slice(cursor.offset).match(/^#[0-9a-f]{6}(?:[0-9a-f]{2})?(?=$|[ \t\f\v\r\n{}()[\],$])/i);
       if (colorMatch) {
-        const raw = colorMatch[0];
-        advance(raw.length);
-        emit('COLOR', start, raw, raw.toUpperCase());
+        const colorRaw = colorMatch[0];
+        advance(colorRaw.length);
+        emit('COLOR', start, colorRaw, colorRaw.toUpperCase());
         continue;
       }
       const next = text[cursor.offset + 1];
       if (!next || isSpace(next) || next === '\r' || next === '\n') {
-        let end = cursor.offset + 1;
-        while (end < text.length && text[end] !== '\r' && text[end] !== '\n') end += 1;
-        const raw = text.slice(cursor.offset, end);
-        advance(raw.length);
-        emit('COMMENT', start, raw, raw.slice(1));
+        let commentEnd = cursor.offset + 1;
+        while (commentEnd < text.length && text[commentEnd] !== '\r' && text[commentEnd] !== '\n') commentEnd += 1;
+        const commentRaw = text.slice(cursor.offset, commentEnd);
+        advance(commentRaw.length);
+        emit('COMMENT', start, commentRaw, commentRaw.slice(1));
         continue;
       }
       let end = cursor.offset + 1;
       while (end < text.length && !isBoundary(text[end])) end += 1;
       const raw = text.slice(cursor.offset, end);
       advance(raw.length);
-      const tokenSpan = emit('INVALID', start, raw, raw);
-      diagnostic('SCDL-LEX-002', 'Malformed color literal; expected #RRGGBB or #RRGGBBAA.', tokenSpan, ['#RRGGBB', '#RRGGBBAA'], [raw]);
+      const colorSpan = emit('INVALID', start, raw, raw);
+      diagnostic('SCDL-LEX-002', 'Malformed color literal; expected #RRGGBB or #RRGGBBAA.', colorSpan, ['#RRGGBB', '#RRGGBBAA'], [raw]);
+      continue;
+    }
+    if (char === '"') {
+      let end = cursor.offset + 1;
+      while (end < text.length && text[end] !== '"' && text[end] !== '\r' && text[end] !== '\n') {
+        if (text[end] === '\\' && end + 1 < text.length) end += 2;
+        else end += 1;
+      }
+      if (end < text.length && text[end] === '"') {
+        end += 1;
+        const stringRaw = text.slice(cursor.offset, end);
+        advance(stringRaw.length);
+        emit('STRING', start, stringRaw, stringRaw.slice(1, -1));
+        continue;
+      }
+      const raw = text.slice(cursor.offset, end);
+      advance(raw.length);
+      const stringSpan = emit('INVALID', start, raw, raw);
+      diagnostic('SCDL-LEX-003', 'Unterminated string literal.', stringSpan, ['"'], [raw]);
+      continue;
+    }
+    if (text.startsWith('=>', cursor.offset)) {
+      advance(2);
+      emit('ARROW', start, '=>');
       continue;
     }
     if (PUNCTUATION[char]) {

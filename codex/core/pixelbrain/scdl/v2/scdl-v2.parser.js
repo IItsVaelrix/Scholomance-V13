@@ -14,9 +14,33 @@ export const PARSE_CODES = Object.freeze({
 
 const STRUCTURAL_DECLARATIONS = Object.freeze(['SCDL', 'ASSET', 'CANVAS', 'BUDGET']);
 const REQUIRED_DECLARATIONS = Object.freeze(['SCDL', 'ASSET', 'CANVAS']);
-const POSITIONAL_EXPRESSIONS = new Set(['ADD', 'SUB', 'MUL', 'DIV', 'PX', 'VEC2']);
-const NAMED_EXPRESSIONS = new Set(['PIXEL', 'CIRCLE']);
+const POSITIONAL_EXPRESSIONS = new Set([
+  'ADD', 'SUB', 'MUL', 'DIV', 'PX', 'VEC2',
+  'DEGREES', 'RADIANS', 'TURNS',
+  'UNION', 'SUBTRACT', 'INTERSECT', 'XOR',
+  'MASK_UNION', 'MASK_INTERSECT', 'MASK_SUBTRACT', 'MASK_INVERT',
+  'INSIDE', 'CONTAINS', 'TOUCHES', 'OVERLAPS',
+  'BOUNDS', 'ANCHOR_OF', 'TRANSFORM_COMPOSE', 'TRANSFORM_APPLY',
+  'MOD', 'POW', 'ABS', 'MIN', 'MAX', 'FLOOR', 'CEIL', 'ROUND', 'SQRT',
+  'SIN', 'COS', 'TAN', 'ATAN2', 'GCD', 'LCM',
+  'DISTANCE', 'DOT', 'CROSS', 'NORMALIZE',
+  'EQ', 'NEQ', 'LT', 'LTE', 'GT', 'GTE', 'AND', 'OR', 'NOT',
+  'PREV', 'AT', 'LENGTH', 'SUM', 'PRODUCT', 'ZIP',
+]);
+const NAMED_EXPRESSIONS = new Set([
+  'PIXEL', 'CIRCLE',
+  'LINE', 'POLYLINE', 'RAY', 'RECT', 'ROUNDED_RECT', 'RING', 'ELLIPSE',
+  'ARC', 'SECTOR', 'TRIANGLE', 'REGULAR_POLYGON', 'POLYGON', 'STAR', 'PATH',
+  'ROTATE', 'TRANSLATE', 'SCALE', 'ALIGN', 'OUTLINE', 'TO_MASK',
+  'CLAMP', 'LERP', 'MAP_RANGE', 'RANGE', 'FOLD', 'MAP', 'FILTER',
+  'RANDOM_I32', 'RANDOM_SCALAR', 'RANDOM_VEC2', 'NOISE_2D',
+]);
+const ALLOWS_LEADING_POSITIONAL = new Set([
+  'OUTLINE', 'TO_MASK', 'RANDOM_I32', 'RANDOM_SCALAR', 'RANDOM_VEC2',
+  'MAP', 'FILTER', 'FOLD', 'CLAMP', 'LERP',
+]);
 const INLINE_TRIVIA = new Set(['WHITESPACE', 'COMMENT']);
+
 
 class ParseAbort extends Error {}
 
@@ -199,12 +223,20 @@ class Parser {
     this.take();
 
     const definition = getSCDLV2Opcode(opcodeToken.raw);
-    if (!definition || !definition.scope.includes(scope) || definition.scope.every((item) => item === 'BYTECODE')) {
+    const inScope = definition && (
+      definition.scope.includes(scope) ||
+      (scope === 'BLOCK' && ['LET', 'RETURN', 'EMIT', 'FOR', 'IF', 'MATCH', 'PAINT', 'RADIAL'].includes(definition.mnemonic)) ||
+      (scope === 'LAYER' && ['PAINT', 'FOR', 'LET', 'IF'].includes(definition.mnemonic)) ||
+      (scope === 'SHAPE' && ['EMIT', 'FOR', 'RADIAL', 'LET', 'IF'].includes(definition.mnemonic)) ||
+      (scope === 'FUNCTION' && ['LET', 'RETURN', 'IF', 'MATCH', 'FOR'].includes(definition.mnemonic))
+    );
+
+    if (!inScope || definition.scope.every((item) => item === 'BYTECODE')) {
       this.abort(
         PARSE_CODES.UNKNOWN_OPCODE,
         `Opcode ${JSON.stringify(opcodeToken.raw)} is not legal in ${scope} source scope.`,
         opcodeToken,
-        scope === 'PROGRAM' ? ['SCDL', 'ASSET', 'CANVAS', 'BUDGET', 'CONST', 'SHAPE', 'LAYER'] : ['PAINT'],
+        scope === 'PROGRAM' ? ['SCDL', 'ASSET', 'CANVAS', 'BUDGET', 'CONST', 'SHAPE', 'LAYER', 'FN', 'SEQUENCE', 'RNG'] : ['PAINT', 'FOR', 'LET'],
         [opcodeToken.raw],
       );
     }
@@ -230,8 +262,21 @@ class Parser {
       case 'BUDGET': return this.parseBudgetDeclaration(opcodeToken);
       case 'CONST': return this.parseConstDeclaration(opcodeToken);
       case 'SHAPE': return this.parseShapeDeclaration(opcodeToken);
+      case 'MASK': return this.parseMaskDeclaration(opcodeToken);
+      case 'ANCHOR': return this.parseAnchorDeclaration(opcodeToken);
+      case 'ASSERT': return this.parseAssertDeclaration(opcodeToken);
       case 'LAYER': return this.parseLayerDeclaration(opcodeToken);
       case 'PAINT': return this.parsePaintStatement(opcodeToken);
+      case 'FN': return this.parseFnDeclaration(opcodeToken);
+      case 'SEQUENCE': return this.parseSequenceDeclaration(opcodeToken);
+      case 'RNG': return this.parseRngDeclaration(opcodeToken);
+      case 'LET': return this.parseLetStatement(opcodeToken);
+      case 'RETURN': return this.parseReturnStatement(opcodeToken);
+      case 'EMIT': return this.parseEmitStatement(opcodeToken);
+      case 'FOR': return this.parseForStatement(opcodeToken, scope);
+      case 'IF': return this.parseIfStatement(opcodeToken, scope);
+      case 'MATCH': return this.parseMatchStatement(opcodeToken, scope);
+      case 'RADIAL': return this.parseRadialStatement(opcodeToken);
       default:
         this.abort(
           PARSE_CODES.UNKNOWN_OPCODE,
@@ -241,6 +286,48 @@ class Parser {
           [definition.mnemonic],
         );
     }
+  }
+
+
+  parseMaskDeclaration(opcodeToken) {
+    const symbolToken = this.expect('SYMBOL', null, ['symbol']);
+    const value = this.parseExpression();
+    return {
+      kind: 'MaskDeclaration',
+      opcode: 'MASK',
+      symbol: symbolToken.value,
+      value,
+      children: [value],
+      span: span(opcodeToken.span.start, value.span.end),
+    };
+  }
+
+  parseAnchorDeclaration(opcodeToken) {
+    const symbolToken = this.expect('SYMBOL', null, ['symbol']);
+    this.expect('WORD', 'ON', ['ON']);
+    const onTarget = this.parseExpression();
+    this.expect('WORD', 'AT', ['AT']);
+    const atSpec = this.parseExpression();
+    return {
+      kind: 'AnchorDeclaration',
+      opcode: 'ANCHOR',
+      symbol: symbolToken.value,
+      on: onTarget,
+      at: atSpec,
+      children: [onTarget, atSpec],
+      span: span(opcodeToken.span.start, atSpec.span.end),
+    };
+  }
+
+  parseAssertDeclaration(opcodeToken) {
+    const condition = this.parseExpression();
+    return {
+      kind: 'AssertDeclaration',
+      opcode: 'ASSERT',
+      condition,
+      children: [condition],
+      span: span(opcodeToken.span.start, condition.span.end),
+    };
   }
 
   parseVersionDeclaration(opcodeToken) {
@@ -269,9 +356,11 @@ class Parser {
 
   parseCanvasDeclaration(opcodeToken) {
     this.expect('WORD', 'WIDTH', ['WIDTH']);
-    const width = this.parseExpression();
+    const widthToken = this.expect('INTEGER', null, ['canvas width']);
     this.expect('WORD', 'HEIGHT', ['HEIGHT']);
-    const height = this.parseExpression();
+    const heightToken = this.expect('INTEGER', null, ['canvas height']);
+    const width = this.literal(widthToken);
+    const height = this.literal(heightToken);
     return {
       kind: 'CanvasDeclaration',
       opcode: 'CANVAS',
@@ -279,42 +368,67 @@ class Parser {
       height,
       named: { WIDTH: width, HEIGHT: height },
       children: [width, height],
-      span: span(opcodeToken.span.start, height.span.end),
+      span: nodeSpan(opcodeToken, heightToken),
     };
   }
 
   parseBudgetDeclaration(opcodeToken) {
     this.expect('WORD', 'INSTRUCTIONS', ['INSTRUCTIONS']);
-    const instructions = this.parseExpression();
+    const instructionsToken = this.expect('INTEGER', null, ['instruction limit']);
     this.expect('WORD', 'GENERATED_SHAPES', ['GENERATED_SHAPES']);
-    const generatedShapes = this.parseExpression();
+    const shapesToken = this.expect('INTEGER', null, ['generated shapes limit']);
     this.expect('WORD', 'RASTER_CELLS', ['RASTER_CELLS']);
-    const rasterCells = this.parseExpression();
+    const cellsToken = this.expect('INTEGER', null, ['raster cells limit']);
+    const instructions = this.literal(instructionsToken);
+    const generatedShapes = this.literal(shapesToken);
+    const rasterCells = this.literal(cellsToken);
+
+    let recursionDepth = null;
+    let lastToken = cellsToken;
+    const peek = this.peekInline();
+    if (peek.kind === 'WORD' && peek.raw === 'RECURSION_DEPTH') {
+      this.take();
+      const depthToken = this.expect('INTEGER', null, ['recursion depth limit']);
+      recursionDepth = this.literal(depthToken);
+      lastToken = depthToken;
+    }
+
     return {
       kind: 'BudgetDeclaration',
       opcode: 'BUDGET',
       instructions,
       generatedShapes,
       rasterCells,
+      recursionDepth,
+      limits: {
+        INSTRUCTIONS: instructions,
+        GENERATED_SHAPES: generatedShapes,
+        RASTER_CELLS: rasterCells,
+        ...(recursionDepth ? { RECURSION_DEPTH: recursionDepth } : {}),
+      },
       named: {
         INSTRUCTIONS: instructions,
         GENERATED_SHAPES: generatedShapes,
         RASTER_CELLS: rasterCells,
+        ...(recursionDepth ? { RECURSION_DEPTH: recursionDepth } : {}),
       },
-      children: [instructions, generatedShapes, rasterCells],
-      span: span(opcodeToken.span.start, rasterCells.span.end),
+      children: recursionDepth ? [instructions, generatedShapes, rasterCells, recursionDepth] : [instructions, generatedShapes, rasterCells],
+      span: span(opcodeToken.span.start, lastToken.span.end),
     };
   }
 
   parseConstDeclaration(opcodeToken) {
     const symbolToken = this.expect('SYMBOL', null, ['symbol']);
-    const typeToken = this.expect('WORD', null, ['type']);
+    let declaredType = null;
+    if (this.peekInline().kind === 'WORD') {
+      declaredType = this.take().raw;
+    }
     const value = this.parseExpression();
     return {
       kind: 'ConstDeclaration',
       opcode: 'CONST',
       symbol: symbolToken.value,
-      declaredType: typeToken.raw,
+      declaredType,
       value,
       children: [value],
       span: span(opcodeToken.span.start, value.span.end),
@@ -323,6 +437,27 @@ class Parser {
 
   parseShapeDeclaration(opcodeToken) {
     const symbolToken = this.expect('SYMBOL', null, ['symbol']);
+    let peek = this.peekInline();
+    let isCompound = false;
+    if (peek.kind === 'WORD' && peek.raw === 'COMPOUND') {
+      this.take();
+      isCompound = true;
+      peek = this.peekInline();
+    }
+    if (peek.kind === 'LBRACE') {
+      this.take();
+      const body = this.parseBlock('SHAPE');
+      const closeToken = this.current();
+      return {
+        kind: 'ShapeBlockDeclaration',
+        opcode: 'SHAPE',
+        symbol: symbolToken.value,
+        isCompound,
+        body,
+        children: [...body],
+        span: span(opcodeToken.span.start, closeToken.span.end),
+      };
+    }
     const value = this.parseExpression();
     return {
       kind: 'ShapeDeclaration',
@@ -334,99 +469,394 @@ class Parser {
     };
   }
 
-  parseLayerDeclaration(opcodeToken) {
-    const idToken = this.expect('WORD', null, ['layer identifier']);
-    const id = this.literal(idToken);
-    this.expect('WORD', 'ORDER', ['ORDER']);
-    const order = this.parseExpression();
-    this.expect('LBRACE', '{', ['{']);
-    const body = [];
-    let closingToken = null;
+  parseFnDeclaration(opcodeToken) {
+    const idToken = this.expect('WORD', null, ['function identifier']);
+    const params = [];
+    for (;;) {
+      const peek = this.peekInline();
+      if (peek.kind === 'WORD' && peek.raw === 'PARAM') {
+        this.take();
+        const paramSym = this.expect('SYMBOL', null, ['parameter name']);
+        const paramType = this.expect('WORD', null, ['parameter type']);
+        params.push({
+          name: paramSym.value,
+          type: paramType.raw,
+          span: nodeSpan(paramSym, paramType),
+        });
+      } else {
+        break;
+      }
+    }
+    this.expect('WORD', 'RETURNS', ['RETURNS']);
+    const returnTypeToken = this.expect('WORD', null, ['return type']);
 
-    while (true) {
+    let recursionMax = null;
+    const peekRec = this.peekInline();
+    if (peekRec.kind === 'WORD' && peekRec.raw === 'RECURSION_MAX') {
+      this.take();
+      const maxToken = this.expect('INTEGER', null, ['recursion max limit']);
+      recursionMax = Number(maxToken.raw);
+    }
+
+    this.expect('LBRACE', '{', ['{']);
+    const body = this.parseBlock('FUNCTION');
+    const closeToken = this.current();
+
+    return {
+      kind: 'FnDeclaration',
+      opcode: 'FN',
+      id: idToken.raw,
+      params,
+      returnType: returnTypeToken.raw,
+      recursionMax,
+      body,
+      children: [...body],
+      span: nodeSpan(opcodeToken, closeToken),
+    };
+  }
+
+  parseSequenceDeclaration(opcodeToken) {
+    const symbolToken = this.expect('SYMBOL', null, ['sequence symbol']);
+    this.expect('WORD', 'TYPE', ['TYPE']);
+    const typeToken = this.expect('WORD', null, ['item type']);
+    this.expect('WORD', 'COUNT', ['COUNT']);
+    const count = this.parseExpression();
+    this.expect('LBRACE', '{', ['{']);
+
+    const seeds = [];
+    let nextExpr = null;
+    for (;;) {
+      this.skipLayout();
+      const token = this.current();
+      if (token.kind === 'RBRACE' || token.kind === 'EOF') break;
+
+      if (token.kind === 'WORD' && token.raw === 'SEED') {
+        this.take();
+        seeds.push(this.parseExpression());
+        this.skipInlineTrivia();
+        if (this.current().kind === 'NEWLINE') this.take();
+      } else if (token.kind === 'WORD' && token.raw === 'NEXT') {
+        this.take();
+        nextExpr = this.parseExpression();
+        this.skipInlineTrivia();
+        if (this.current().kind === 'NEWLINE') this.take();
+      } else {
+        this.abort(
+          PARSE_CODES.EXPECTED_TOKEN,
+          'Expected SEED or NEXT declaration in SEQUENCE block.',
+          token,
+          ['SEED', 'NEXT'],
+        );
+      }
+    }
+    const closeToken = this.expect('RBRACE', '}', ['}']);
+
+    return {
+      kind: 'SequenceDeclaration',
+      opcode: 'SEQUENCE',
+      symbol: symbolToken.value,
+      itemType: typeToken.raw,
+      count,
+      seeds,
+      next: nextExpr,
+      children: [count, ...seeds, ...(nextExpr ? [nextExpr] : [])],
+      span: nodeSpan(opcodeToken, closeToken),
+    };
+  }
+
+  parseRngDeclaration(opcodeToken) {
+    const symbolToken = this.expect('SYMBOL', null, ['rng symbol']);
+    this.expect('WORD', 'ALGORITHM', ['ALGORITHM']);
+    const algToken = this.expect('WORD', null, ['algorithm name']);
+    this.expect('WORD', 'SEED', ['SEED']);
+    const seed = this.parseExpression();
+
+    return {
+      kind: 'RngDeclaration',
+      opcode: 'RNG',
+      symbol: symbolToken.value,
+      algorithm: algToken.raw,
+      seed,
+      children: [seed],
+      span: span(opcodeToken.span.start, seed.span.end),
+    };
+  }
+
+  parseForStatement(opcodeToken, scope) {
+    const varToken = this.expect('SYMBOL', null, ['loop variable']);
+    this.expect('WORD', 'IN', ['IN']);
+    const iterable = this.parseExpression();
+    this.expect('LBRACE', '{', ['{']);
+    const body = this.parseBlock(scope);
+    const closeToken = this.current();
+
+    return {
+      kind: 'ForStatement',
+      opcode: 'FOR',
+      variable: varToken.value,
+      in: iterable,
+      body,
+      children: [iterable, ...body],
+      span: nodeSpan(opcodeToken, closeToken),
+    };
+  }
+
+  parseRadialStatement(opcodeToken) {
+    this.expect('WORD', 'COUNT', ['COUNT']);
+    const count = this.parseExpression();
+    const options = {};
+    for (;;) {
+      const peek = this.peekInline();
+      if (peek.kind === 'WORD' && ['CENTER', 'RADIUS'].includes(peek.raw)) {
+        this.take();
+        options[peek.raw] = this.parseExpression();
+      } else {
+        break;
+      }
+    }
+    this.expect('LBRACE', '{', ['{']);
+    const body = this.parseBlock('SHAPE');
+    const closeToken = this.current();
+
+    return {
+      kind: 'RadialStatement',
+      opcode: 'RADIAL',
+      count,
+      center: options.CENTER || null,
+      radius: options.RADIUS || null,
+      body,
+      children: [count, ...Object.values(options), ...body],
+      span: nodeSpan(opcodeToken, closeToken),
+    };
+  }
+
+  parseLetStatement(opcodeToken) {
+    const symbolToken = this.expect('SYMBOL', null, ['variable symbol']);
+    const typeToken = this.expect('WORD', null, ['variable type']);
+    const value = this.parseExpression();
+
+    return {
+      kind: 'LetStatement',
+      opcode: 'LET',
+      symbol: symbolToken.value,
+      declaredType: typeToken.raw,
+      value,
+      children: [value],
+      span: span(opcodeToken.span.start, value.span.end),
+    };
+  }
+
+  parseReturnStatement(opcodeToken) {
+    const value = this.parseExpression();
+    return {
+      kind: 'ReturnStatement',
+      opcode: 'RETURN',
+      value,
+      children: [value],
+      span: span(opcodeToken.span.start, value.span.end),
+    };
+  }
+
+  parseEmitStatement(opcodeToken) {
+    const value = this.parseExpression();
+    return {
+      kind: 'EmitStatement',
+      opcode: 'EMIT',
+      value,
+      children: [value],
+      span: span(opcodeToken.span.start, value.span.end),
+    };
+  }
+
+  parseIfStatement(opcodeToken, scope) {
+    const condition = this.parseExpression();
+    this.expect('LBRACE', '{', ['{']);
+    const thenBlock = this.parseBlock(scope);
+
+    let elseBlock = null;
+    this.skipInlineTrivia();
+    const peek = this.peekInline();
+    if (peek.kind === 'WORD' && peek.raw === 'ELSE') {
+      this.take();
+      this.expect('LBRACE', '{', ['{']);
+      elseBlock = this.parseBlock(scope);
+    }
+    const closeToken = this.current();
+
+    return {
+      kind: 'IfStatement',
+      opcode: 'IF',
+      condition,
+      then: thenBlock,
+      else: elseBlock,
+      children: [condition, ...thenBlock, ...(elseBlock || [])],
+      span: nodeSpan(opcodeToken, closeToken),
+    };
+  }
+
+  parseMatchStatement(opcodeToken, scope) {
+    const target = this.parseExpression();
+    this.expect('LBRACE', '{', ['{']);
+    const cases = [];
+    let defaultCase = null;
+
+    for (;;) {
+      this.skipLayout();
+      const token = this.current();
+      if (token.kind === 'RBRACE' || token.kind === 'EOF') break;
+
+      if (token.kind === 'WORD' && token.raw === 'CASE') {
+        this.take();
+        const pattern = this.parseExpression();
+        this.skipInlineTrivia();
+        if (this.current().kind === 'ARROW') this.take();
+        this.expect('LBRACE', '{', ['{']);
+        const caseBody = this.parseBlock(scope);
+        cases.push({ pattern, body: caseBody });
+      } else if (token.kind === 'WORD' && token.raw === 'DEFAULT') {
+        this.take();
+        this.skipInlineTrivia();
+        if (this.current().kind === 'ARROW') this.take();
+        this.expect('LBRACE', '{', ['{']);
+        defaultCase = this.parseBlock(scope);
+      } else {
+        const pattern = this.parseExpression();
+        this.skipInlineTrivia();
+        if (this.current().kind === 'ARROW') this.take();
+        this.expect('LBRACE', '{', ['{']);
+        const caseBody = this.parseBlock(scope);
+        cases.push({ pattern, body: caseBody });
+      }
+    }
+    const closeToken = this.expect('RBRACE', '}', ['}']);
+
+    return {
+      kind: 'MatchStatement',
+      opcode: 'MATCH',
+      target,
+      cases,
+      default: defaultCase,
+      children: [target],
+      span: nodeSpan(opcodeToken, closeToken),
+    };
+  }
+
+  parseBlock(scope) {
+    const body = [];
+    for (;;) {
       this.skipLayout();
       const token = this.current();
       if (token.kind === 'RBRACE') {
-        closingToken = this.take();
+        this.take();
         break;
       }
       if (token.kind === 'EOF') {
         this.diagnostic(
           PARSE_CODES.UNBALANCED_BLOCK,
-          'Layer block is missing its closing brace.',
+          'Block is missing its closing brace.',
           token,
           ['}'],
           ['EOF'],
         );
-        closingToken = token;
         break;
       }
 
       const before = this.index;
       try {
-        const statement = this.parseStatement('LAYER');
+        const statement = this.parseStatement(scope);
         if (statement) body.push(statement);
         this.skipInlineTrivia();
         const boundary = this.current();
         if (boundary.kind === 'NEWLINE') this.take();
-        else if (boundary.kind !== 'RBRACE' && !(boundary.kind === 'WORD' && boundary.raw === 'PAINT')) {
-          this.abort(
-            PARSE_CODES.EXPECTED_TOKEN,
-            'Expected a newline, PAINT statement, or closing brace in layer block.',
-            boundary,
-            ['newline', 'PAINT', '}'],
-          );
-        }
       } catch (error) {
         if (!(error instanceof ParseAbort)) throw error;
         this.synchronize(true);
       }
       if (this.index === before) this.take();
     }
+    return body;
+  }
+
+  parseLayerDeclaration(opcodeToken) {
+    const idToken = this.expect('WORD', null, ['layer identifier']);
+    const id = this.literal(idToken);
+    this.expect('WORD', 'ORDER', ['ORDER']);
+    const order = this.parseExpression();
+    const options = {};
+    for (;;) {
+      const peek = this.peekInline();
+      if (peek.kind === 'WORD' && ['BLEND', 'OPACITY', 'VISIBLE'].includes(peek.raw)) {
+        this.take();
+        options[peek.raw] = this.parseExpression();
+      } else {
+        break;
+      }
+    }
+    this.expect('LBRACE', '{', ['{']);
+    const body = this.parseBlock('LAYER');
+    const closingToken = this.tokens[this.index - 1] || opcodeToken;
 
     return {
       kind: 'LayerDeclaration',
       opcode: 'LAYER',
       id,
       order,
+      blend: options.BLEND || null,
+      opacity: options.OPACITY || null,
+      visible: options.VISIBLE || null,
       body,
-      children: [id, order, ...body],
+      children: [id, order, ...Object.values(options), ...body],
       span: nodeSpan(opcodeToken, closingToken),
     };
   }
 
+
+
   parsePaintStatement(opcodeToken) {
     const shapeValue = this.parseExpression();
-    this.expect('WORD', 'FILL', ['FILL']);
-    const fill = this.parseExpression();
-    this.expect('WORD', 'RASTER', ['RASTER']);
-    const rasterToken = this.peekInline();
-    if (rasterToken.kind !== 'WORD' || !['CENTER', 'MIDPOINT'].includes(rasterToken.raw)) {
-      this.abort(
-        PARSE_CODES.EXPECTED_TOKEN,
-        'Expected CENTER or MIDPOINT raster policy.',
-        rasterToken,
-        ['CENTER', 'MIDPOINT'],
-      );
+    const named = {};
+    const children = [shapeValue];
+    let lastToken = shapeValue;
+
+    for (;;) {
+      const token = this.peekInline();
+      if (token.kind === 'NEWLINE' || token.kind === 'RBRACE' || token.kind === 'EOF') break;
+      if (token.kind !== 'WORD') break;
+      const keyToken = this.take();
+      const key = keyToken.raw;
+      const val = this.parseExpression();
+      named[key] = val;
+      children.push(val);
+      lastToken = val;
     }
-    this.take();
-    const raster = this.literal(rasterToken);
+
+    const fill = named.FILL || null;
+    const raster = named.RASTER || { kind: 'Literal', literalKind: 'IDENT', raw: 'CENTER', value: 'CENTER', span: opcodeToken.span };
+    const blend = named.BLEND || null;
+    const clipTo = named.CLIP_TO || null;
+    const material = named.MATERIAL || null;
+    const opacity = named.OPACITY || null;
+
     return {
       kind: 'PaintStatement',
       opcode: 'PAINT',
       shape: shapeValue,
       fill,
       raster,
+      blend,
+      clipTo,
+      material,
+      opacity,
       positional: [shapeValue],
-      named: { FILL: fill, RASTER: raster },
-      children: [shapeValue, fill, raster],
-      span: nodeSpan(opcodeToken, rasterToken),
+      named,
+      children,
+      span: nodeSpan(opcodeToken, lastToken),
     };
   }
 
   parseExpression() {
     const token = this.peekInline();
-    if (['INTEGER', 'DECIMAL', 'COLOR', 'WORD'].includes(token.kind)) {
+    if (['INTEGER', 'DECIMAL', 'COLOR', 'WORD', 'STRING'].includes(token.kind)) {
       this.take();
       return this.literal(token);
     }
@@ -461,12 +891,60 @@ class Parser {
     let positional = [];
     let named = {};
     let children = [];
+
+    if (definition.mnemonic === 'CALL') {
+      const fnToken = this.expect('WORD', null, ['function identifier']);
+      const fnIdent = this.literal(fnToken);
+      const args = [];
+      for (;;) {
+        const peek = this.peekInline();
+        if (peek.kind === 'RPAREN' || peek.kind === 'EOF' || peek.kind === 'NEWLINE') break;
+        args.push(this.parseExpression());
+      }
+      const callCloseToken = this.expect('RPAREN', ')', [')']);
+      return {
+        kind: 'CallExpression',
+        opcode: 'CALL',
+        fn: fnIdent,
+        positional: [fnIdent, ...args],
+        args,
+        named: { FN: fnIdent },
+        children: [fnIdent, ...args],
+        span: nodeSpan(openToken, callCloseToken),
+      };
+    }
+
+    if (definition.mnemonic === 'RANGE') {
+      const peek = this.peekInline();
+      if (peek.kind !== 'WORD' || (peek.raw !== 'START' && peek.raw !== 'FROM')) {
+        const start = this.parseExpression();
+        const end = this.parseExpression();
+        let step = null;
+        if (this.peekInline().kind !== 'RPAREN') {
+          step = this.parseExpression();
+        }
+        const rangeCloseToken = this.expect('RPAREN', ')', [')']);
+        return {
+          kind: 'CallExpression',
+          opcode: 'RANGE',
+          positional: step ? [start, end, step] : [start, end],
+          named: { START: start, END: end, ...(step ? { STEP: step } : {}) },
+          children: step ? [start, end, step] : [start, end],
+          span: nodeSpan(openToken, rangeCloseToken),
+        };
+      }
+    }
+
     if (POSITIONAL_EXPRESSIONS.has(definition.mnemonic)) {
       positional = this.parsePositionalOperands(definition);
       children = [...positional];
     } else if (NAMED_EXPRESSIONS.has(definition.mnemonic)) {
-      ({ named, children } = this.parseNamedOperands(definition));
+      const parsedNamed = this.parseNamedOperands(definition);
+      named = parsedNamed.named;
+      children = parsedNamed.children;
+      positional = parsedNamed.positional || [];
     }
+
 
     const closeToken = this.expect('RPAREN', ')', [')']);
     return {
@@ -501,9 +979,32 @@ class Parser {
     const allowed = new Map(definition.operands.map((operand) => [operand.name, operand]));
     const encountered = new Set();
     const named = {};
+    const positional = [];
     const children = [];
 
-    while (true) {
+    const OPERAND_ALIASES = {
+      NOISE_2D: { COORD: 'AT', SCALE: 'FREQUENCY' },
+    };
+    const aliases = OPERAND_ALIASES[definition.mnemonic] || {};
+
+    const firstOp = definition.operands[0];
+    const initialPeek = this.peekInline();
+    if (
+      firstOp &&
+      ALLOWS_LEADING_POSITIONAL.has(definition.mnemonic) &&
+      initialPeek.kind !== 'RPAREN' &&
+      initialPeek.kind !== 'NEWLINE' &&
+      initialPeek.kind !== 'EOF' &&
+      (initialPeek.kind === 'SYMBOL' || initialPeek.kind === 'LPAREN')
+    ) {
+      const val = this.parseExpression();
+      named[firstOp.name] = val;
+      positional.push(val);
+      children.push(val);
+      encountered.add(firstOp.name);
+    }
+
+    for (;;) {
       const nameToken = this.peekInline();
       if (nameToken.kind === 'RPAREN' || nameToken.kind === 'NEWLINE' || nameToken.kind === 'EOF') break;
       if (nameToken.kind !== 'WORD') {
@@ -515,7 +1016,8 @@ class Parser {
         );
       }
       this.take();
-      const operand = allowed.get(nameToken.raw);
+      const canonName = aliases[nameToken.raw] || nameToken.raw;
+      const operand = allowed.get(canonName);
       if (!operand) {
         this.diagnostic(
           PARSE_CODES.UNKNOWN_OPERAND,
@@ -558,11 +1060,11 @@ class Parser {
           `${definition.mnemonic} is missing required ${operand.name} operand.`,
           this.peekInline(),
           [`${operand.name} ${operand.type}`],
-          [this.current().raw || this.current().kind],
         );
       }
     }
-    return { named, children };
+
+    return { named, positional, children };
   }
 
   literal(token) {

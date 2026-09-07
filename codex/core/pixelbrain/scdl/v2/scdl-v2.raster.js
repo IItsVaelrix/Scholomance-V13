@@ -41,6 +41,18 @@
 
 import { v2Diagnostic, span } from './scdl-v2.diagnostics.js';
 import { makeRational, addRational, subRational, mulRational, rationalToString, isIntegralRational } from './scdl-v2.rational.js';
+import { evaluateCSGToCells } from './scdl-v2.booleans.js';
+import { applyTransformToPoint } from './scdl-v2.transforms.js';
+import { applyOpacity, blendColors, formatColor } from './scdl-v2.compositing.js';
+import { flattenSVGPath, isAngleInSweep } from './scdl-v2.geometry.js';
+
+function getAngleRad(angle) {
+  if (!angle) return 0;
+  if (angle.turns) {
+    return (Number(angle.turns.numerator) / Number(angle.turns.denominator)) * 2 * Math.PI;
+  }
+  return 0;
+}
 
 const ZERO_SPAN = span({ line: 1, column: 1, offset: 0 });
 const DEFAULT_RASTER_CELL_LIMIT = 1048576;
@@ -308,7 +320,8 @@ function rasterizePaintShape(shape, raster, { canvas, remainingCells, rasterCell
     return { ok: false, diagnostic: geomDiagnostic('SHAPE', 'a PIXEL or CIRCLE shape object', String(shape)) };
   }
 
-  if (raster !== 'CENTER' && raster !== 'MIDPOINT') {
+  const VALID_RASTER_POLICIES = new Set(['CENTER', 'MIDPOINT', 'BRESENHAM', 'SUPERCOVER', 'THRESHOLD']);
+  if (!VALID_RASTER_POLICIES.has(raster)) {
     return { ok: false, diagnostic: geomDiagnostic(String(raster), 'a known raster policy (CENTER or MIDPOINT)', String(raster)) };
   }
 
@@ -417,7 +430,510 @@ function rasterizePaintShape(shape, raster, { canvas, remainingCells, rasterCell
     }
   }
 
-  return { ok: false, diagnostic: geomDiagnostic('SHAPE', 'shape.kind PIXEL or CIRCLE', String(shape.kind)) };
+  if (shape.kind === 'LINE') {
+    const x0 = Number(shape.from.x.numerator) / Number(shape.from.x.denominator);
+    const y0 = Number(shape.from.y.numerator) / Number(shape.from.y.denominator);
+    const x1 = Number(shape.to.x.numerator) / Number(shape.to.x.denominator);
+    const y1 = Number(shape.to.y.numerator) / Number(shape.to.y.denominator);
+    const w = shape.width ? Number(shape.width.numerator) / Number(shape.width.denominator) : 1;
+    let cells;
+    if (w > 1) {
+      cells = rasterizeLineWithWidth(x0, y0, x1, y1, w);
+    } else {
+      cells = raster === 'SUPERCOVER'
+        ? rasterizeLineSupercover(x0, y0, x1, y1)
+        : rasterizeLineBresenham(x0, y0, x1, y1);
+    }
+    return { ok: true, cells };
+  }
+
+  if (shape.kind === 'RECT') {
+    const ox = Number(shape.origin.x.numerator) / Number(shape.origin.x.denominator);
+    const oy = Number(shape.origin.y.numerator) / Number(shape.origin.y.denominator);
+    const w = Number(shape.size.width.numerator) / Number(shape.size.width.denominator);
+    const h = Number(shape.size.height.numerator) / Number(shape.size.height.denominator);
+    const cells = rasterizeRectCenter(ox, oy, w, h);
+    return { ok: true, cells };
+  }
+
+  if (shape.kind === 'ROUNDED_RECT') {
+    const ox = Number(shape.origin.x.numerator) / Number(shape.origin.x.denominator);
+    const oy = Number(shape.origin.y.numerator) / Number(shape.origin.y.denominator);
+    const w = Number(shape.size.width.numerator) / Number(shape.size.width.denominator);
+    const h = Number(shape.size.height.numerator) / Number(shape.size.height.denominator);
+    const cr = shape.cornerRadius ? Number(shape.cornerRadius.numerator) / Number(shape.cornerRadius.denominator) : 0;
+    const cells = rasterizeRoundedRectCenter(ox, oy, w, h, cr);
+    return { ok: true, cells };
+  }
+
+  if (shape.kind === 'RING') {
+    const cx = Number(shape.center.x.numerator) / Number(shape.center.x.denominator);
+    const cy = Number(shape.center.y.numerator) / Number(shape.center.y.denominator);
+    const inner = Number(shape.innerRadius.numerator) / Number(shape.innerRadius.denominator);
+    const outer = Number(shape.outerRadius.numerator) / Number(shape.outerRadius.denominator);
+    const cells = rasterizeRingMidpoint(cx, cy, inner, outer);
+    return { ok: true, cells };
+  }
+
+  if (shape.kind === 'ELLIPSE') {
+    const cx = Number(shape.center.x.numerator) / Number(shape.center.x.denominator);
+    const cy = Number(shape.center.y.numerator) / Number(shape.center.y.denominator);
+    const rx = Number(shape.radiusX.numerator) / Number(shape.radiusX.denominator);
+    const ry = Number(shape.radiusY.numerator) / Number(shape.radiusY.denominator);
+    const cells = rasterizeEllipseCenter(cx, cy, rx, ry);
+    return { ok: true, cells };
+  }
+
+  if (shape.kind === 'TRIANGLE') {
+    const v1 = { x: Number(shape.p1.x.numerator) / Number(shape.p1.x.denominator), y: Number(shape.p1.y.numerator) / Number(shape.p1.y.denominator) };
+    const v2 = { x: Number(shape.p2.x.numerator) / Number(shape.p2.x.denominator), y: Number(shape.p2.y.numerator) / Number(shape.p2.y.denominator) };
+    const v3 = { x: Number(shape.p3.x.numerator) / Number(shape.p3.x.denominator), y: Number(shape.p3.y.numerator) / Number(shape.p3.y.denominator) };
+    const cells = rasterizePolygonScanline([v1, v2, v3], 'NON_ZERO');
+    return { ok: true, cells };
+  }
+
+  if (shape.kind === 'POLYGON') {
+    const verts = shape.vertices.map((v) => ({
+      x: Number(v.x.numerator) / Number(v.x.denominator),
+      y: Number(v.y.numerator) / Number(v.y.denominator),
+    }));
+    const cells = rasterizePolygonScanline(verts, 'NON_ZERO');
+    return { ok: true, cells };
+  }
+
+  if (shape.kind === 'STAR') {
+    const cx = Number(shape.center.x.numerator) / Number(shape.center.x.denominator);
+    const cy = Number(shape.center.y.numerator) / Number(shape.center.y.denominator);
+    const inR = Number(shape.innerRadius.numerator) / Number(shape.innerRadius.denominator);
+    const outR = Number(shape.outerRadius.numerator) / Number(shape.outerRadius.denominator);
+    const pts = shape.points;
+    const verts = [];
+    for (let i = 0; i < pts * 2; i++) {
+      const r = i % 2 === 0 ? outR : inR;
+      const angle = (i * Math.PI) / pts - Math.PI / 2;
+      verts.push({ x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) });
+    }
+    const cells = rasterizePolygonScanline(verts, 'NON_ZERO');
+    return { ok: true, cells };
+  }
+
+  if (shape.kind === 'COMPOUND') {
+    const allCells = [];
+    for (const child of (shape.shapes || [])) {
+      const res = rasterizePaintShape(child, raster, { canvas, remainingCells, rasterCellLimit, cellsGenerated });
+      if (!res.ok) return res;
+      allCells.push(...res.cells);
+    }
+    return { ok: true, cells: allCells };
+  }
+
+  if (
+    shape.kind === 'CSG_UNION' ||
+    shape.kind === 'CSG_SUBTRACT' ||
+    shape.kind === 'CSG_INTERSECT' ||
+    shape.kind === 'CSG_XOR' ||
+    shape.kind === 'OUTLINE'
+  ) {
+    const cells = evaluateCSGToCells(shape, raster);
+    return { ok: true, cells };
+  }
+
+  if (shape.kind === 'TRANSFORMED_SHAPE') {
+    const baseRes = rasterizePaintShape(shape.shape, raster, { canvas, remainingCells, rasterCellLimit, cellsGenerated });
+    if (!baseRes.ok) return baseRes;
+    const cells = baseRes.cells.map((c) => {
+      const pt = applyTransformToPoint(shape.transform, { x: makeRational(BigInt(c.x)), y: makeRational(BigInt(c.y)) });
+      return {
+        x: Math.round(Number(pt.x.numerator) / Number(pt.x.denominator)),
+        y: Math.round(Number(pt.y.numerator) / Number(pt.y.denominator)),
+      };
+    });
+    return { ok: true, cells };
+  }
+
+  if (shape.kind === 'PATH') {
+    const cells = rasterizePath(shape, raster);
+    return { ok: true, cells };
+  }
+
+  if (shape.kind === 'REGULAR_POLYGON') {
+    const cx = Number(shape.center.x.numerator) / Number(shape.center.x.denominator);
+    const cy = Number(shape.center.y.numerator) / Number(shape.center.y.denominator);
+    const r = Number(shape.radius.numerator) / Number(shape.radius.denominator);
+    const sides = shape.sides || 6;
+    const verts = [];
+    for (let i = 0; i < sides; i++) {
+      const angle = (i * 2 * Math.PI) / sides - Math.PI / 2;
+      verts.push({ x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) });
+    }
+    const cells = rasterizePolygonScanline(verts, 'NON_ZERO');
+    return { ok: true, cells };
+  }
+
+  if (shape.kind === 'SECTOR') {
+    const cx = Number(shape.center.x.numerator) / Number(shape.center.x.denominator);
+    const cy = Number(shape.center.y.numerator) / Number(shape.center.y.denominator);
+    const r = Number(shape.radius.numerator) / Number(shape.radius.denominator);
+    const startRad = getAngleRad(shape.startAngle);
+    const endRad = getAngleRad(shape.endAngle);
+    const cells = [];
+    const floorR = Math.ceil(r);
+    for (let dy = -floorR; dy <= floorR; dy++) {
+      for (let dx = -floorR; dx <= floorR; dx++) {
+        const dSq = dx * dx + dy * dy;
+        if (dSq <= r * r) {
+          if (dx === 0 && dy === 0) {
+            cells.push({ x: Math.round(cx), y: Math.round(cy) });
+          } else {
+            const angle = Math.atan2(dy, dx);
+            if (isAngleInSweep(angle, startRad, endRad)) {
+              cells.push({ x: Math.round(cx + dx), y: Math.round(cy + dy) });
+            }
+          }
+        }
+      }
+    }
+    return { ok: true, cells };
+  }
+
+  if (shape.kind === 'ARC') {
+    const cx = Number(shape.center.x.numerator) / Number(shape.center.x.denominator);
+    const cy = Number(shape.center.y.numerator) / Number(shape.center.y.denominator);
+    const r = Number(shape.radius.numerator) / Number(shape.radius.denominator);
+    const w = shape.width ? Number(shape.width.numerator) / Number(shape.width.denominator) : 1;
+    const startRad = getAngleRad(shape.startAngle);
+    const endRad = getAngleRad(shape.endAngle);
+    const cells = [];
+    const halfW = w / 2;
+    const innerR = Math.max(0, r - halfW);
+    const outerR = r + halfW;
+    const innerSq = innerR * innerR;
+    const outerSq = outerR * outerR;
+    const floorR = Math.ceil(outerR);
+    for (let dy = -floorR; dy <= floorR; dy++) {
+      for (let dx = -floorR; dx <= floorR; dx++) {
+        const dSq = dx * dx + dy * dy;
+        if (dSq >= innerSq && dSq <= outerSq) {
+          const angle = Math.atan2(dy, dx);
+          if (isAngleInSweep(angle, startRad, endRad)) {
+            cells.push({ x: Math.round(cx + dx), y: Math.round(cy + dy) });
+          }
+        }
+      }
+    }
+    return { ok: true, cells };
+  }
+
+  if (shape.kind === 'POLYLINE') {
+    const cells = [];
+    const pts = shape.points || [];
+    const count = shape.closed ? pts.length : pts.length - 1;
+    const w = shape.width ? Number(shape.width.numerator) / Number(shape.width.denominator) : 1;
+    for (let i = 0; i < count; i++) {
+      const p0 = pts[i];
+      const p1 = pts[(i + 1) % pts.length];
+      const x0 = Number(p0.x.numerator) / Number(p0.x.denominator);
+      const y0 = Number(p0.y.numerator) / Number(p0.y.denominator);
+      const x1 = Number(p1.x.numerator) / Number(p1.x.denominator);
+      const y1 = Number(p1.y.numerator) / Number(p1.y.denominator);
+      if (w > 1) {
+        cells.push(...rasterizeLineWithWidth(x0, y0, x1, y1, w));
+      } else {
+        cells.push(...rasterizeLineBresenham(x0, y0, x1, y1));
+      }
+    }
+    return { ok: true, cells };
+  }
+
+  if (shape.kind === 'RAY') {
+    const x0 = Number(shape.origin.x.numerator) / Number(shape.origin.x.denominator);
+    const y0 = Number(shape.origin.y.numerator) / Number(shape.origin.y.denominator);
+    const dx = Number(shape.dir.x.numerator) / Number(shape.dir.x.denominator);
+    const dy = Number(shape.dir.y.numerator) / Number(shape.dir.y.denominator);
+    const len = Number(shape.length.numerator) / Number(shape.length.denominator);
+    const magnitude = Math.hypot(dx, dy);
+    const x1 = x0 + (dx / magnitude) * len;
+    const y1 = y0 + (dy / magnitude) * len;
+    const w = shape.width ? Number(shape.width.numerator) / Number(shape.width.denominator) : 1;
+    let cells;
+    if (w > 1) {
+      cells = rasterizeLineWithWidth(x0, y0, x1, y1, w);
+    } else {
+      cells = rasterizeLineBresenham(x0, y0, x1, y1);
+    }
+    return { ok: true, cells };
+  }
+
+  return { ok: false, diagnostic: geomDiagnostic('SHAPE', 'supported SCDL v2 shape primitive', String(shape.kind)) };
+}
+
+// Shared primitive entrypoint for masks and CSG operands. Keeping this route
+// aligned with PAINT prevents those subsystems from maintaining a partial,
+// divergent primitive catalog.
+export function rasterizeShapeCells(shape, raster = 'CENTER') {
+  const result = rasterizePaintShape(shape, raster, {
+    canvas: null,
+    remainingCells: DEFAULT_RASTER_CELL_LIMIT,
+    rasterCellLimit: DEFAULT_RASTER_CELL_LIMIT,
+    cellsGenerated: 0,
+  });
+  return result.ok ? result.cells : [];
+}
+
+export function rasterizeLineBresenham(x0, y0, x1, y1) {
+  const cells = [];
+  x0 = Math.round(x0);
+  y0 = Math.round(y0);
+  x1 = Math.round(x1);
+  y1 = Math.round(y1);
+  const dx = Math.abs(x1 - x0);
+  const dy = Math.abs(y1 - y0);
+  const sx = x0 < x1 ? 1 : -1;
+  const sy = y0 < y1 ? 1 : -1;
+  let err = dx - dy;
+  let currX = x0;
+  let currY = y0;
+  for (;;) {
+    cells.push({ x: currX, y: currY });
+    if (currX === x1 && currY === y1) break;
+    const e2 = 2 * err;
+    if (e2 > -dy) {
+      err -= dy;
+      currX += sx;
+    }
+    if (e2 < dx) {
+      err += dx;
+      currY += sy;
+    }
+  }
+  return cells;
+}
+
+export function rasterizeLineWithWidth(x0, y0, x1, y1, width) {
+  const halfWidth = Math.max(0, Number(width) / 2);
+  if (halfWidth <= 0.5) return rasterizeLineBresenham(x0, y0, x1, y1);
+  const minX = Math.floor(Math.min(x0, x1) - halfWidth);
+  const maxX = Math.ceil(Math.max(x0, x1) + halfWidth);
+  const minY = Math.floor(Math.min(y0, y1) - halfWidth);
+  const maxY = Math.ceil(Math.max(y0, y1) + halfWidth);
+  const segmentX = x1 - x0;
+  const segmentY = y1 - y0;
+  const segmentLengthSquared = segmentX * segmentX + segmentY * segmentY;
+  const threshold = halfWidth * halfWidth;
+  const cells = [];
+
+  for (let y = minY; y <= maxY; y++) {
+    for (let x = minX; x <= maxX; x++) {
+      const t = segmentLengthSquared === 0
+        ? 0
+        : Math.max(0, Math.min(1, ((x - x0) * segmentX + (y - y0) * segmentY) / segmentLengthSquared));
+      const nearestX = x0 + t * segmentX;
+      const nearestY = y0 + t * segmentY;
+      const dx = x - nearestX;
+      const dy = y - nearestY;
+      if (dx * dx + dy * dy <= threshold) cells.push({ x, y });
+    }
+  }
+  return cells;
+}
+
+export function rasterizeLineSupercover(x0, y0, x1, y1) {
+  const cells = [];
+  x0 = Math.round(x0);
+  y0 = Math.round(y0);
+  x1 = Math.round(x1);
+  y1 = Math.round(y1);
+  let dx = Math.abs(x1 - x0);
+  let dy = Math.abs(y1 - y0);
+  let x = x0;
+  let y = y0;
+  let n = 1 + dx + dy;
+  const xInc = x1 > x0 ? 1 : -1;
+  const yInc = y1 > y0 ? 1 : -1;
+  let error = dx - dy;
+  dx *= 2;
+  dy *= 2;
+  for (; n > 0; n--) {
+    cells.push({ x, y });
+    if (error > 0) {
+      x += xInc;
+      error -= dy;
+    } else if (error < 0) {
+      y += yInc;
+      error += dx;
+    } else {
+      cells.push({ x: x + xInc, y });
+      cells.push({ x, y: y + yInc });
+      x += xInc;
+      y += yInc;
+      error += dx - dy;
+      n--;
+    }
+  }
+  return cells;
+}
+
+export function rasterizeRectCenter(ox, oy, w, h) {
+  const cells = [];
+  const minX = Math.floor(ox);
+  const maxX = Math.floor(ox + w);
+  const minY = Math.floor(oy);
+  const maxY = Math.floor(oy + h);
+  for (let y = minY; y < maxY; y++) {
+    for (let x = minX; x < maxX; x++) {
+      cells.push({ x, y });
+    }
+  }
+  return cells;
+}
+
+export function rasterizeRoundedRectCenter(ox, oy, w, h, cornerRadius) {
+  const radius = Math.max(0, Math.min(cornerRadius, w / 2, h / 2));
+  if (radius === 0) return rasterizeRectCenter(ox, oy, w, h);
+  const minX = Math.floor(ox);
+  const maxX = Math.floor(ox + w);
+  const minY = Math.floor(oy);
+  const maxY = Math.floor(oy + h);
+  const leftCenter = ox + radius;
+  const rightCenter = ox + w - radius;
+  const topCenter = oy + radius;
+  const bottomCenter = oy + h - radius;
+  const radiusSquared = radius * radius;
+  const cells = [];
+
+  for (let y = minY; y < maxY; y++) {
+    for (let x = minX; x < maxX; x++) {
+      const centerX = x + 0.5;
+      const centerY = y + 0.5;
+      const nearestX = centerX < leftCenter ? leftCenter : centerX > rightCenter ? rightCenter : centerX;
+      const nearestY = centerY < topCenter ? topCenter : centerY > bottomCenter ? bottomCenter : centerY;
+      const dx = centerX - nearestX;
+      const dy = centerY - nearestY;
+      if (dx * dx + dy * dy <= radiusSquared) cells.push({ x, y });
+    }
+  }
+  return cells;
+}
+
+export function rasterizePath(shape, rasterPolicy = 'CENTER') {
+  const cells = [];
+  const subpaths = flattenSVGPath(shape.commands?.length ? shape.commands : (shape.d || shape.data || ''));
+  for (const subpath of subpaths) {
+    const points = subpath.points;
+    if (subpath.closed && points.length >= 3) {
+      const polygon = pointsEqualForRaster(points[0], points[points.length - 1]) ? points.slice(0, -1) : points;
+      cells.push(...rasterizePolygonScanline(polygon, shape.winding || 'NON_ZERO'));
+      continue;
+    }
+    for (let i = 0; i < points.length - 1; i++) {
+      const from = points[i];
+      const to = points[i + 1];
+      cells.push(...(rasterPolicy === 'SUPERCOVER'
+        ? rasterizeLineSupercover(from.x, from.y, to.x, to.y)
+        : rasterizeLineBresenham(from.x, from.y, to.x, to.y)));
+    }
+  }
+  const unique = new Map(cells.map((cell) => [`${cell.x},${cell.y}`, cell]));
+  return [...unique.values()];
+}
+
+function pointsEqualForRaster(a, b) {
+  return a && b && Math.abs(a.x - b.x) < 1e-12 && Math.abs(a.y - b.y) < 1e-12;
+}
+
+export function rasterizeRingMidpoint(cx, cy, innerR, outerR) {
+  const cells = [];
+  cx = Math.round(cx);
+  cy = Math.round(cy);
+  innerR = Math.round(innerR);
+  outerR = Math.round(outerR);
+  const innerSq = innerR * innerR;
+  const outerSq = outerR * outerR;
+  for (let dy = -outerR; dy <= outerR; dy++) {
+    for (let dx = -outerR; dx <= outerR; dx++) {
+      const dSq = dx * dx + dy * dy;
+      if (dSq >= innerSq && dSq <= outerSq) {
+        cells.push({ x: cx + dx, y: cy + dy });
+      }
+    }
+  }
+  return cells;
+}
+
+export function rasterizeEllipseCenter(cx, cy, rx, ry) {
+  const cells = [];
+  const floorRx = Math.ceil(rx);
+  const floorRy = Math.ceil(ry);
+  for (let dy = -floorRy; dy <= floorRy; dy++) {
+    for (let dx = -floorRx; dx <= floorRx; dx++) {
+      const normX = dx / rx;
+      const normY = dy / ry;
+      if (normX * normX + normY * normY <= 1) {
+        cells.push({ x: cx + dx, y: cy + dy });
+      }
+    }
+  }
+  return cells;
+}
+
+export function rasterizePolygonScanline(vertices, windingRule = 'NON_ZERO') {
+  if (!vertices || vertices.length < 3) return [];
+  const cells = [];
+  let minY = Infinity;
+  let maxY = -Infinity;
+  for (const v of vertices) {
+    if (v.y < minY) minY = v.y;
+    if (v.y > maxY) maxY = v.y;
+  }
+  const scanMin = Math.floor(minY);
+  const scanMax = Math.ceil(maxY);
+
+  const n = vertices.length;
+  for (let y = scanMin; y < scanMax; y++) {
+    const scanY = y + 0.5;
+    const intersections = [];
+
+    for (let i = 0; i < n; i++) {
+      const v0 = vertices[i];
+      const v1 = vertices[(i + 1) % n];
+      if ((v0.y <= scanY && v1.y > scanY) || (v1.y <= scanY && v0.y > scanY)) {
+        const t = (scanY - v0.y) / (v1.y - v0.y);
+        const x = v0.x + t * (v1.x - v0.x);
+        intersections.push({ x, dir: v1.y > v0.y ? 1 : -1 });
+      }
+    }
+
+    intersections.sort((a, b) => a.x - b.x);
+
+    if (windingRule === 'NON_ZERO') {
+      let winding = 0;
+      let startX = null;
+      for (const inter of intersections) {
+        const prev = winding;
+        winding += inter.dir;
+        if (prev === 0 && winding !== 0) {
+          startX = inter.x;
+        } else if (prev !== 0 && winding === 0 && startX !== null) {
+          const xStart = Math.ceil(startX - 0.5);
+          const xEnd = Math.floor(inter.x - 0.5);
+          for (let x = xStart; x <= xEnd; x++) {
+            cells.push({ x, y });
+          }
+          startX = null;
+        }
+      }
+    } else {
+      // EVEN_ODD
+      for (let i = 0; i < intersections.length - 1; i += 2) {
+        const xStart = Math.ceil(intersections[i].x - 0.5);
+        const xEnd = Math.floor(intersections[i + 1].x - 0.5);
+        for (let x = xStart; x <= xEnd; x++) {
+          cells.push({ x, y });
+        }
+      }
+    }
+  }
+  return cells;
 }
 
 // --- Layer/paint compositing --------------------------------------------
@@ -463,6 +979,7 @@ export function compositeSCDLV2Layers(canvas, layers, options = {}) {
     let cellsGenerated = 0;
 
     for (const { layer } of orderedLayers) {
+      if (layer.visible === false) continue;
       const paints = Array.isArray(layer.paints) ? layer.paints : [];
       for (const paint of paints) {
         const result = rasterizePaintShape(paint.shape, paint.raster, {
@@ -480,9 +997,47 @@ export function compositeSCDLV2Layers(canvas, layers, options = {}) {
           return Object.freeze({ ok: false, coordinates: null, layers: null, diagnostics: Object.freeze([budgetDiagnostic(rasterCellLimit, cellsGenerated)]) });
         }
 
-        for (const { x, y } of result.cells) {
+        let offX = 0;
+        let offY = 0;
+        if (paint.at) {
+          const atX = paint.at.x?.numerator !== undefined
+            ? Number(paint.at.x.numerator) / Number(paint.at.x.denominator)
+            : (paint.at.x?.value ? Number(paint.at.x.value.numerator) / Number(paint.at.x.value.denominator) : Number(paint.at.x ?? 0));
+          const atY = paint.at.y?.numerator !== undefined
+            ? Number(paint.at.y.numerator) / Number(paint.at.y.denominator)
+            : (paint.at.y?.value ? Number(paint.at.y.value.numerator) / Number(paint.at.y.value.denominator) : Number(paint.at.y ?? 0));
+          offX = Math.round(atX);
+          offY = Math.round(atY);
+        }
+
+        for (const rawCell of result.cells) {
+          const x = rawCell.x + offX;
+          const y = rawCell.y + offY;
           if (x < 0 || y < 0 || x >= width || y >= height) continue;
-          coordinateMap.set(`${x},${y}`, { x, y, color: paint.fill, partId: layer.id, role: 'paint' });
+
+          if (paint.clipTo && typeof paint.clipTo.has === 'function') {
+            if (!paint.clipTo.has(x, y)) continue;
+          }
+
+          const key = `${x},${y}`;
+          const existing = coordinateMap.get(key);
+          const blendMode = paint.blend || layer.blend || 'OVER';
+
+          const effectiveOpacity = Number(layer.opacity ?? 1) * Number(paint.opacity ?? 1);
+          const hasOpacityAdjustment = effectiveOpacity !== 1;
+          const sourceColor = hasOpacityAdjustment ? applyOpacity(paint.fill, effectiveOpacity) : paint.fill;
+          let finalColor = hasOpacityAdjustment ? formatColor(sourceColor) : paint.fill;
+          if (existing && existing.color && blendMode !== 'REPLACE') {
+            try {
+              finalColor = formatColor(blendColors(sourceColor, existing.color, blendMode));
+            } catch {
+              finalColor = formatColor(sourceColor);
+            }
+          }
+
+          const cellRecord = { x, y, color: finalColor, partId: layer.id, role: 'paint' };
+          if (paint.material) cellRecord.material = paint.material;
+          coordinateMap.set(key, cellRecord);
         }
       }
     }

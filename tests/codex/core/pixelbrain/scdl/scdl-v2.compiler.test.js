@@ -61,4 +61,14 @@ describe('SCDL v2 compiler vertical slice', () => {
       ...new Set(result.packet.geometry.coordinates.map((cell) => cell.color)),
     ]);
   });
+
+  it('compiles the Phase 3 golden fixture fibonacci-bloom.scdl end-to-end', () => {
+    const fixtureSource = readFileSync(resolve('codex/core/pixelbrain/scdl/fixtures/v2/fibonacci-bloom.scdl'), 'utf8');
+    const result = compileSCDLV2(fixtureSource);
+    expect(result.ok).toBe(true);
+    expect(result.diagnostics).toHaveLength(0);
+    expect(result.bytecode.programId).toBe('scdlbc_64c9884a');
+    expect(result.packet.geometry.coordinates.length).toBeGreaterThan(0);
+    expect(result.package.verifiedBudget.limits.recursionDepth).toBe(16);
+  });
 });

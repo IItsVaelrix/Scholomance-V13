@@ -49,4 +49,47 @@ describe('SCDL v2 semantic analysis', () => {
     const early = analyze(BASE.replace('CONST $two I32 (ADD 1 1)\n', '').replace('LAYER ink', 'CONST $two I32 2\nLAYER ink'));
     expect(early.diagnostics.some((d) => d.code === 'SCDL-BIND-001')).toBe(true);
   });
+
+  it('binds and evaluates Step 2 geometry, transforms, booleans, masks, and layers', () => {
+    const step2Source = `SCDL 2
+ASSET step2_test
+CANVAS WIDTH 32 HEIGHT 32
+
+CONST $angle ANGLE (DEGREES 90)
+CONST $trans TRANSFORM (TRANSLATE OFFSET (VEC2 (PX 2) (PX 4)))
+SHAPE $box (RECT ORIGIN (VEC2 (PX 0) (PX 0)) SIZE (VEC2 (PX 10) (PX 10)))
+SHAPE $hole (CIRCLE CENTER (VEC2 (PX 5) (PX 5)) RADIUS (PX 3))
+SHAPE $cut (SUBTRACT $box $hole)
+MASK $mask (TO_MASK $cut RASTER CENTER)
+
+ANCHOR $top ON $cut AT TOP
+ASSERT (CONTAINS $box $hole)
+
+LAYER main ORDER 5 BLEND OVER OPACITY 0.9 VISIBLE TRUE {
+  PAINT $cut AT (VEC2 (PX 1) (PX 1)) FILL #FF5500 RASTER CENTER CLIP_TO $mask MATERIAL "crystal" OPACITY 0.8
+}
+`;
+    const result = analyze(step2Source);
+    expect(result.ok).toBe(true);
+    expect(result.ir.shapes.length).toBe(3);
+    expect(result.ir.masks.length).toBe(1);
+    expect(result.ir.anchors.length).toBe(1);
+    expect(result.ir.assertions.length).toBe(1);
+    expect(result.ir.layers[0].blend).toBe('OVER');
+    expect(result.ir.layers[0].opacity).toBeCloseTo(0.9);
+    expect(result.ir.layers[0].paints[0].material).toBe('crystal');
+  });
+
+  it('fails assertion with SCDL-GEOM-002 when geometric condition is false', () => {
+    const failingAssert = `SCDL 2
+ASSET fail_assert
+CANVAS WIDTH 32 HEIGHT 32
+SHAPE $box (RECT ORIGIN (VEC2 (PX 0) (PX 0)) SIZE (VEC2 (PX 5) (PX 5)))
+ASSERT (INSIDE (VEC2 (PX 100) (PX 100)) $box)
+LAYER main ORDER 0 { PAINT $box FILL #FFFFFF RASTER CENTER }
+`;
+    const result = analyze(failingAssert);
+    expect(result.ok).toBe(false);
+    expect(result.diagnostics.some((d) => d.code === 'SCDL-GEOM-002')).toBe(true);
+  });
 });

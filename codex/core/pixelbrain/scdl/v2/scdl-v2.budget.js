@@ -21,6 +21,7 @@
 // v2 compiler boundary.
 
 import { span, v2Diagnostic } from './scdl-v2.diagnostics.js';
+import { computeBounds } from './scdl-v2.geometry.js';
 
 const ZERO_SPAN = span({ line: 1, column: 1, offset: 0 });
 
@@ -36,9 +37,18 @@ export const DEFAULT_SCDL_V2_LIMITS = Object.freeze({
   instructions: 200000,
   generatedShapes: 10000,
   rasterCells: 1048576,
+  recursionDepth: 64,
 });
 
-const LIMIT_FIELDS = Object.freeze(['instructions', 'generatedShapes', 'rasterCells']);
+export const HOST_SCDL_V2_CEILINGS = Object.freeze({
+  instructions: 200000,
+  generatedShapes: 10000,
+  rasterCells: 1048576,
+  recursionDepth: 256,
+});
+
+const LIMIT_FIELDS = Object.freeze(['instructions', 'generatedShapes', 'rasterCells', 'recursionDepth']);
+
 
 function fieldDiagnostic(code, field, expectedValue, receivedValue) {
   const subject = code === BUDGET_CODES.PROTECTED_LIMIT ? 'requested budget' : 'measured demand';
@@ -67,9 +77,16 @@ function countValueNodes(resolved) {
     case 'RATIO':
     case 'PX':
     case 'COLOR':
+    case 'STRING':
+    case 'BOOL':
+    case 'ANGLE':
+    case 'TRANSFORM':
+    case 'MASK':
       return 1;
     case 'VEC2':
-      return 1 + countValueNodes(resolved.value.x) + countValueNodes(resolved.value.y);
+      return 1 + countValueNodes(resolved.value?.x) + countValueNodes(resolved.value?.y);
+    case 'RANGE':
+      return 1 + (resolved.value?.elements?.length || 0);
     case 'SHAPE':
       // A CONST may itself resolve to a SHAPE value (e.g. `CONST $x SHAPE
       // (CIRCLE ...)`); delegate to the shape node counter instead of
@@ -84,12 +101,56 @@ function countValueNodes(resolved) {
 
 function countShapeNodes(shape) {
   if (!shape || typeof shape !== 'object') return 1;
-  if (shape.kind === 'PIXEL') return 1 + countValueNodes(shape.at);
-  if (shape.kind === 'CIRCLE') return 1 + countValueNodes(shape.center) + countValueNodes(shape.radius);
-  return 1;
+  switch (shape.kind) {
+    case 'PIXEL':
+      return 1 + countValueNodes(shape.at);
+    case 'CIRCLE':
+      return 1 + countValueNodes(shape.center) + countValueNodes(shape.radius);
+    case 'RECT':
+    case 'ROUNDED_RECT': {
+      let count = 1;
+      if (shape.origin) count += countValueNodes(shape.origin);
+      if (shape.center) count += countValueNodes(shape.center);
+      if (shape.size) count += countValueNodes(shape.size);
+      if (shape.cornerRadius) count += countValueNodes(shape.cornerRadius);
+      return count;
+    }
+    case 'RING':
+      return 1 + countValueNodes(shape.center) + countValueNodes(shape.radius) + countValueNodes(shape.thickness);
+    case 'ELLIPSE':
+      return 1 + countValueNodes(shape.center) + countValueNodes(shape.radiusX) + countValueNodes(shape.radiusY);
+    case 'LINE':
+      return 1 + countValueNodes(shape.from) + countValueNodes(shape.to);
+    case 'POLYLINE':
+      return 1 + (shape.points ? shape.points.length : 1);
+    case 'RAY':
+      return 1 + countValueNodes(shape.origin) + countValueNodes(shape.dir) + countValueNodes(shape.length);
+    case 'ARC':
+    case 'SECTOR':
+      return 1 + countValueNodes(shape.center) + countValueNodes(shape.radius);
+    case 'TRIANGLE':
+      return 1 + countValueNodes(shape.p1) + countValueNodes(shape.p2) + countValueNodes(shape.p3);
+    case 'REGULAR_POLYGON':
+    case 'STAR':
+      return 1 + countValueNodes(shape.center);
+    case 'PATH':
+      return 1;
+    case 'CSG_UNION':
+    case 'CSG_SUBTRACT':
+    case 'CSG_INTERSECT':
+    case 'CSG_XOR':
+      return 1 + countShapeNodes(shape.a) + countShapeNodes(shape.b);
+    case 'OUTLINE':
+      return 1 + countShapeNodes(shape.shape) + countValueNodes(shape.width);
+    case 'TRANSFORMED_SHAPE':
+      return 1 + countShapeNodes(shape.shape);
+    default:
+      return 1;
+  }
 }
 
 function ceilRational(rational) {
+  if (!rational || typeof rational !== 'object') return 1n;
   const numerator = BigInt(rational.numerator);
   const denominator = BigInt(rational.denominator);
   if (numerator <= 0n) return 0n;
@@ -101,12 +162,29 @@ function ceilRational(rational) {
 // (ceiling-rounded) radius, clipped only by the canvas area — this never
 // walks an actual raster, it is a closed-form upper bound.
 function rasterCellsForShape(shape, canvasAreaBig) {
+  if (!shape) return 0n;
   if (shape.kind === 'PIXEL') return 1n;
-  const ceilRadius = ceilRational(shape.radius.value);
-  const side = 2n * ceilRadius + 1n;
-  const cost = side * side;
-  if (canvasAreaBig === null) return cost;
-  return cost < canvasAreaBig ? cost : canvasAreaBig;
+  if (shape.kind === 'CIRCLE') {
+    const rad = shape.radius?.value ?? shape.radius;
+    const ceilRadius = ceilRational(rad);
+    const side = 2n * ceilRadius + 1n;
+    const cost = side * side;
+    if (canvasAreaBig === null) return cost;
+    return cost < canvasAreaBig ? cost : canvasAreaBig;
+  }
+  try {
+    const bounds = computeBounds(shape);
+    if (bounds && bounds.width && bounds.height) {
+      const w = ceilRational(bounds.width);
+      const h = ceilRational(bounds.height);
+      const cost = w * h;
+      if (canvasAreaBig === null) return cost;
+      return cost < canvasAreaBig ? cost : canvasAreaBig;
+    }
+  } catch {
+    // fallback if bounds fail
+  }
+  return 1n;
 }
 
 // Measures static demand by walking BOTH the program's raw CONST/SHAPE
@@ -164,9 +242,7 @@ function measureDemand(ir) {
   for (const shape of shapes) {
     if (shape && shape.value) declaredShapeValues.add(shape.value);
   }
-  // One PIXEL/CIRCLE construction per declared shape value, declared
-  // regardless of reach — counted once here from the unified set, whichever
-  // declaration syntax produced it.
+
   generatedShapes += BigInt(declaredShapeValues.size);
 
   for (const constant of constants) {
@@ -175,7 +251,32 @@ function measureDemand(ir) {
   }
   for (const shape of shapes) {
     instructions += 1n; // the SHAPE declaration/bind itself
-    instructions += BigInt(countShapeNodes(shape && shape.value));
+    if (shape && shape.value && shape.value.kind === 'COMPOUND') {
+      const inner = shape.value.shapes || [];
+      generatedShapes += BigInt(inner.length);
+      for (const s of inner) {
+        instructions += BigInt(countShapeNodes(s));
+      }
+    } else {
+      instructions += BigInt(countShapeNodes(shape && shape.value));
+    }
+  }
+
+  const sequences = Array.isArray(ir && ir.sequences) ? ir.sequences : [];
+  for (const seq of sequences) {
+    instructions += 1n;
+    const count = BigInt(Math.max(0, seq.count || 0));
+    instructions += count * 2n;
+  }
+
+  let maxRecursionDepth = 0;
+  const functions = Array.isArray(ir && ir.functions) ? ir.functions : [];
+  for (const fn of functions) {
+    instructions += 1n;
+    if (fn.body) instructions += BigInt(fn.body.length);
+    if (fn.recursionMax && fn.recursionMax > maxRecursionDepth) {
+      maxRecursionDepth = fn.recursionMax;
+    }
   }
 
   for (const layer of layers) {
@@ -185,10 +286,6 @@ function measureDemand(ir) {
       instructions += 1n; // BC.PAINT
       instructions += 1n; // fill literal
       if (!declaredShapeValues.has(paint.shape)) {
-        // An anonymous shape expression written inline in the PAINT
-        // statement — not covered by the SHAPE declaration walk above, so
-        // its literal/expression-call cost and generated-shape unit are
-        // charged here instead of being counted twice.
         instructions += BigInt(countShapeNodes(paint.shape));
         generatedShapes += 1n;
       }
@@ -201,6 +298,7 @@ function measureDemand(ir) {
     instructions: Number(instructions),
     generatedShapes: Number(generatedShapes),
     rasterCells: Number(rasterCells),
+    recursionDepth: maxRecursionDepth,
   };
 }
 
@@ -212,8 +310,9 @@ export function verifySCDLV2Budget(ir, options = {}) {
 
     const protectedViolations = [];
     for (const field of LIMIT_FIELDS) {
-      if (requested[field] > host[field]) {
-        protectedViolations.push(fieldDiagnostic(BUDGET_CODES.PROTECTED_LIMIT, field, host[field], requested[field]));
+      const ceiling = HOST_SCDL_V2_CEILINGS[field] || host[field];
+      if (requested[field] > ceiling) {
+        protectedViolations.push(fieldDiagnostic(BUDGET_CODES.PROTECTED_LIMIT, field, ceiling, requested[field]));
       }
     }
     if (protectedViolations.length > 0) {

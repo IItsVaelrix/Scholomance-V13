@@ -38,6 +38,38 @@
 
 import { v2Diagnostic, span } from './scdl-v2.diagnostics.js';
 import { makeRational } from './scdl-v2.rational.js';
+import {
+  createLine,
+  createPolyline,
+  createRay,
+  createRect,
+  createRoundedRect,
+  createRing,
+  createEllipse,
+  createArc,
+  createSector,
+  createTriangle,
+  createRegularPolygon,
+  createPolygon,
+  createStar,
+  createPath,
+} from './scdl-v2.geometry.js';
+import {
+  shapeUnion,
+  shapeSubtract,
+  shapeIntersect,
+  shapeXor,
+  shapeOutline,
+} from './scdl-v2.booleans.js';
+import {
+  createAngle,
+  applyTransformToShape,
+  translateTransform,
+  rotateTransform,
+  scaleTransform,
+  composeTransforms,
+} from './scdl-v2.transforms.js';
+import { toMask } from './scdl-v2.masks.js';
 
 const ZERO_SPAN = span({ line: 1, column: 1, offset: 0 });
 
@@ -131,6 +163,10 @@ function parseConstant(constantEntry) {
     }
     case 'COLOR':
       return { type: 'COLOR', value: String(value) };
+    case 'STRING':
+      return { type: 'STRING', value: String(value) };
+    case 'BOOL':
+      return { type: 'BOOL', value: value === 'true' || value === true };
     default:
       return null;
   }
@@ -283,6 +319,385 @@ export function evaluateSCDLV2(program) {
           break;
         }
 
+        case 'LINE': {
+          counters.generatedShapes += 1;
+          if (counters.generatedShapes > generatedShapesLimit) {
+            return failure(budgetDiagnostic('generatedShapes', generatedShapesLimit, counters.generatedShapes), counters);
+          }
+          const fromValue = readRegisterOperand(operands[0]);
+          const toValue = readRegisterOperand(operands[1]);
+          if (!fromValue || !toValue || resultKey === null) {
+            return failure(lowerDiagnostic('LINE requires valid FROM and TO registers.'), counters);
+          }
+          registers.set(resultKey, Object.freeze({
+            type: 'SHAPE',
+            value: createLine({ from: fromValue.value, to: toValue.value }),
+          }));
+          break;
+        }
+
+        case 'POLYLINE': {
+          counters.generatedShapes += 1;
+          if (counters.generatedShapes > generatedShapesLimit) {
+            return failure(budgetDiagnostic('generatedShapes', generatedShapesLimit, counters.generatedShapes), counters);
+          }
+          const points = operands.map((op) => readRegisterOperand(op)?.value).filter(Boolean);
+          registers.set(resultKey, Object.freeze({
+            type: 'SHAPE',
+            value: createPolyline({ points }),
+          }));
+          break;
+        }
+
+        case 'RAY': {
+          counters.generatedShapes += 1;
+          if (counters.generatedShapes > generatedShapesLimit) {
+            return failure(budgetDiagnostic('generatedShapes', generatedShapesLimit, counters.generatedShapes), counters);
+          }
+          const origin = readRegisterOperand(operands[0]);
+          const dir = readRegisterOperand(operands[1]);
+          const length = readRegisterOperand(operands[2]);
+          registers.set(resultKey, Object.freeze({
+            type: 'SHAPE',
+            value: createRay({ origin: origin?.value, dir: dir?.value, length: length?.value }),
+          }));
+          break;
+        }
+
+        case 'RECT': {
+          counters.generatedShapes += 1;
+          if (counters.generatedShapes > generatedShapesLimit) {
+            return failure(budgetDiagnostic('generatedShapes', generatedShapesLimit, counters.generatedShapes), counters);
+          }
+          const originValue = readRegisterOperand(operands[0]);
+          const sizeValue = readRegisterOperand(operands[1]);
+          if (!originValue || !sizeValue || resultKey === null) {
+            return failure(lowerDiagnostic('RECT requires valid ORIGIN and SIZE registers.'), counters);
+          }
+          registers.set(resultKey, Object.freeze({
+            type: 'SHAPE',
+            value: createRect({ origin: originValue.value, size: sizeValue.value }),
+          }));
+          break;
+        }
+
+        case 'ROUNDED_RECT': {
+          counters.generatedShapes += 1;
+          if (counters.generatedShapes > generatedShapesLimit) {
+            return failure(budgetDiagnostic('generatedShapes', generatedShapesLimit, counters.generatedShapes), counters);
+          }
+          const originValue = readRegisterOperand(operands[0]);
+          const sizeValue = readRegisterOperand(operands[1]);
+          const crValue = readRegisterOperand(operands[2]);
+          registers.set(resultKey, Object.freeze({
+            type: 'SHAPE',
+            value: createRoundedRect({ origin: originValue.value, size: sizeValue.value, cornerRadius: crValue?.value }),
+          }));
+          break;
+        }
+
+        case 'RING': {
+          counters.generatedShapes += 1;
+          if (counters.generatedShapes > generatedShapesLimit) {
+            return failure(budgetDiagnostic('generatedShapes', generatedShapesLimit, counters.generatedShapes), counters);
+          }
+          const centerValue = readRegisterOperand(operands[0]);
+          const radiusValue = readRegisterOperand(operands[1]);
+          const thValue = readRegisterOperand(operands[2]);
+          registers.set(resultKey, Object.freeze({
+            type: 'SHAPE',
+            value: createRing({ center: centerValue.value, radius: radiusValue.value, thickness: thValue?.value }),
+          }));
+          break;
+        }
+
+        case 'ELLIPSE': {
+          counters.generatedShapes += 1;
+          if (counters.generatedShapes > generatedShapesLimit) {
+            return failure(budgetDiagnostic('generatedShapes', generatedShapesLimit, counters.generatedShapes), counters);
+          }
+          const centerValue = readRegisterOperand(operands[0]);
+          const rxValue = readRegisterOperand(operands[1]);
+          const ryValue = readRegisterOperand(operands[2]);
+          registers.set(resultKey, Object.freeze({
+            type: 'SHAPE',
+            value: createEllipse({ center: centerValue.value, radiusX: rxValue.value, radiusY: ryValue.value }),
+          }));
+          break;
+        }
+
+        case 'ARC': {
+          counters.generatedShapes += 1;
+          if (counters.generatedShapes > generatedShapesLimit) {
+            return failure(budgetDiagnostic('generatedShapes', generatedShapesLimit, counters.generatedShapes), counters);
+          }
+          const center = readRegisterOperand(operands[0]);
+          const radius = readRegisterOperand(operands[1]);
+          const start = readRegisterOperand(operands[2]);
+          const end = readRegisterOperand(operands[3]);
+          registers.set(resultKey, Object.freeze({
+            type: 'SHAPE',
+            value: createArc({
+              center: center?.value,
+              radius: radius?.value,
+              startAngle: start?.value,
+              endAngle: end?.value,
+            }),
+          }));
+          break;
+        }
+
+        case 'SECTOR': {
+          counters.generatedShapes += 1;
+          if (counters.generatedShapes > generatedShapesLimit) {
+            return failure(budgetDiagnostic('generatedShapes', generatedShapesLimit, counters.generatedShapes), counters);
+          }
+          const center = readRegisterOperand(operands[0]);
+          const radius = readRegisterOperand(operands[1]);
+          const start = readRegisterOperand(operands[2]);
+          const end = readRegisterOperand(operands[3]);
+          registers.set(resultKey, Object.freeze({
+            type: 'SHAPE',
+            value: createSector({
+              center: center?.value,
+              radius: radius?.value,
+              startAngle: start?.value,
+              endAngle: end?.value,
+            }),
+          }));
+          break;
+        }
+
+        case 'TRIANGLE': {
+          counters.generatedShapes += 1;
+          if (counters.generatedShapes > generatedShapesLimit) {
+            return failure(budgetDiagnostic('generatedShapes', generatedShapesLimit, counters.generatedShapes), counters);
+          }
+          const p1 = readRegisterOperand(operands[0]);
+          const p2 = readRegisterOperand(operands[1]);
+          const p3 = readRegisterOperand(operands[2]);
+          registers.set(resultKey, Object.freeze({
+            type: 'SHAPE',
+            value: createTriangle({ p1: p1.value, p2: p2.value, p3: p3.value }),
+          }));
+          break;
+        }
+
+        case 'REGULAR_POLYGON': {
+          counters.generatedShapes += 1;
+          if (counters.generatedShapes > generatedShapesLimit) {
+            return failure(budgetDiagnostic('generatedShapes', generatedShapesLimit, counters.generatedShapes), counters);
+          }
+          const sides = readRegisterOperand(operands[0]);
+          const radius = readRegisterOperand(operands[1]);
+          const center = readRegisterOperand(operands[2]);
+          const sNum = Number(sides?.value?.numerator ?? sides?.value ?? 6);
+          registers.set(resultKey, Object.freeze({
+            type: 'SHAPE',
+            value: createRegularPolygon({ sides: sNum, radius: radius.value, center: center.value }),
+          }));
+          break;
+        }
+
+        case 'POLYGON': {
+          counters.generatedShapes += 1;
+          if (counters.generatedShapes > generatedShapesLimit) {
+            return failure(budgetDiagnostic('generatedShapes', generatedShapesLimit, counters.generatedShapes), counters);
+          }
+          const vertices = operands.map((op) => readRegisterOperand(op)?.value).filter(Boolean);
+          registers.set(resultKey, Object.freeze({
+            type: 'SHAPE',
+            value: createPolygon({ vertices }),
+          }));
+          break;
+        }
+
+        case 'STAR': {
+          counters.generatedShapes += 1;
+          if (counters.generatedShapes > generatedShapesLimit) {
+            return failure(budgetDiagnostic('generatedShapes', generatedShapesLimit, counters.generatedShapes), counters);
+          }
+          const pts = readRegisterOperand(operands[0]);
+          const inR = readRegisterOperand(operands[1]);
+          const outR = readRegisterOperand(operands[2]);
+          const center = readRegisterOperand(operands[3]);
+          const pNum = Number(pts?.value?.numerator ?? pts?.value ?? 5);
+          registers.set(resultKey, Object.freeze({
+            type: 'SHAPE',
+            value: createStar({ points: pNum, innerRadius: inR.value, outerRadius: outR.value, center: center.value }),
+          }));
+          break;
+        }
+
+        case 'PATH': {
+          counters.generatedShapes += 1;
+          if (counters.generatedShapes > generatedShapesLimit) {
+            return failure(budgetDiagnostic('generatedShapes', generatedShapesLimit, counters.generatedShapes), counters);
+          }
+          const data = readRegisterOperand(operands[0]);
+          registers.set(resultKey, Object.freeze({
+            type: 'SHAPE',
+            value: createPath({ d: String(data?.value ?? '') }),
+          }));
+          break;
+        }
+
+        case 'UNION': {
+          counters.generatedShapes += 1;
+          if (counters.generatedShapes > generatedShapesLimit) {
+            return failure(budgetDiagnostic('generatedShapes', generatedShapesLimit, counters.generatedShapes), counters);
+          }
+          const a = readRegisterOperand(operands[0]);
+          const b = readRegisterOperand(operands[1]);
+          registers.set(resultKey, Object.freeze({
+            type: 'SHAPE',
+            value: shapeUnion(a.value, b.value),
+          }));
+          break;
+        }
+
+        case 'SUBTRACT': {
+          counters.generatedShapes += 1;
+          if (counters.generatedShapes > generatedShapesLimit) {
+            return failure(budgetDiagnostic('generatedShapes', generatedShapesLimit, counters.generatedShapes), counters);
+          }
+          const a = readRegisterOperand(operands[0]);
+          const b = readRegisterOperand(operands[1]);
+          registers.set(resultKey, Object.freeze({
+            type: 'SHAPE',
+            value: shapeSubtract(a.value, b.value),
+          }));
+          break;
+        }
+
+        case 'INTERSECT': {
+          counters.generatedShapes += 1;
+          if (counters.generatedShapes > generatedShapesLimit) {
+            return failure(budgetDiagnostic('generatedShapes', generatedShapesLimit, counters.generatedShapes), counters);
+          }
+          const a = readRegisterOperand(operands[0]);
+          const b = readRegisterOperand(operands[1]);
+          registers.set(resultKey, Object.freeze({
+            type: 'SHAPE',
+            value: shapeIntersect(a.value, b.value),
+          }));
+          break;
+        }
+
+        case 'XOR': {
+          counters.generatedShapes += 1;
+          if (counters.generatedShapes > generatedShapesLimit) {
+            return failure(budgetDiagnostic('generatedShapes', generatedShapesLimit, counters.generatedShapes), counters);
+          }
+          const a = readRegisterOperand(operands[0]);
+          const b = readRegisterOperand(operands[1]);
+          registers.set(resultKey, Object.freeze({
+            type: 'SHAPE',
+            value: shapeXor(a.value, b.value),
+          }));
+          break;
+        }
+
+        case 'OUTLINE': {
+          counters.generatedShapes += 1;
+          if (counters.generatedShapes > generatedShapesLimit) {
+            return failure(budgetDiagnostic('generatedShapes', generatedShapesLimit, counters.generatedShapes), counters);
+          }
+          const shape = readRegisterOperand(operands[0]);
+          const width = readRegisterOperand(operands[1]);
+          registers.set(resultKey, Object.freeze({
+            type: 'SHAPE',
+            value: shapeOutline(shape.value, width.value),
+          }));
+          break;
+        }
+
+        case 'TRANSFORM_APPLY': {
+          const transform = readRegisterOperand(operands[0]);
+          const target = readRegisterOperand(operands[1]);
+          registers.set(resultKey, Object.freeze({
+            type: 'SHAPE',
+            value: applyTransformToShape(transform.value, target.value),
+          }));
+          break;
+        }
+
+        case 'TRANSLATE': {
+          const offset = readRegisterOperand(operands[0]);
+          registers.set(resultKey, Object.freeze({
+            type: 'TRANSFORM',
+            value: translateTransform(offset?.value || { x: makeRational(0), y: makeRational(0) }),
+          }));
+          break;
+        }
+
+        case 'DEGREES': {
+          const val = readRegisterOperand(operands[0]);
+          registers.set(resultKey, Object.freeze({
+            type: 'ANGLE',
+            value: createAngle(val?.value ?? 0, 'DEGREES'),
+          }));
+          break;
+        }
+
+        case 'RADIANS': {
+          const val = readRegisterOperand(operands[0]);
+          registers.set(resultKey, Object.freeze({
+            type: 'ANGLE',
+            value: createAngle(val?.value ?? 0, 'RADIANS'),
+          }));
+          break;
+        }
+
+        case 'TURNS': {
+          const val = readRegisterOperand(operands[0]);
+          registers.set(resultKey, Object.freeze({
+            type: 'ANGLE',
+            value: createAngle(val?.value ?? 0, 'TURNS'),
+          }));
+          break;
+        }
+
+        case 'ROTATE': {
+          const angle = readRegisterOperand(operands[0]);
+          const pivot = operands[1] ? readRegisterOperand(operands[1]) : null;
+          registers.set(resultKey, Object.freeze({
+            type: 'TRANSFORM',
+            value: rotateTransform(angle?.value, pivot?.value || null),
+          }));
+          break;
+        }
+
+        case 'SCALE': {
+          const sx = readRegisterOperand(operands[0]);
+          const sy = operands[1] ? readRegisterOperand(operands[1]) : sx;
+          const pivot = operands[2] ? readRegisterOperand(operands[2]) : null;
+          registers.set(resultKey, Object.freeze({
+            type: 'TRANSFORM',
+            value: scaleTransform(sx?.value, sy?.value, pivot?.value || null),
+          }));
+          break;
+        }
+
+        case 'TRANSFORM_COMPOSE': {
+          const t1 = readRegisterOperand(operands[0]);
+          const t2 = readRegisterOperand(operands[1]);
+          registers.set(resultKey, Object.freeze({
+            type: 'TRANSFORM',
+            value: composeTransforms(t1?.value, t2?.value),
+          }));
+          break;
+        }
+
+        case 'TO_MASK': {
+          const shape = readRegisterOperand(operands[0]);
+          registers.set(resultKey, Object.freeze({
+            type: 'MASK',
+            value: toMask(shape.value),
+          }));
+          break;
+        }
+
         case 'BC.LAYER.NEW': {
           const idOperand = operands[0];
           const orderOperand = operands[1];
@@ -292,9 +707,15 @@ export function evaluateSCDLV2(program) {
               counters,
             );
           }
+          const blendOperand = operands[2];
+          const opacityOperand = operands[3];
+          const visibleOperand = operands[4];
           const layerRecord = Object.freeze({
             id: idOperand.value,
             order: orderOperand.value,
+            blend: blendOperand && blendOperand.kind === 'immediate' ? blendOperand.value : 'OVER',
+            opacity: opacityOperand && opacityOperand.kind === 'immediate' ? opacityOperand.value : 1.0,
+            visible: visibleOperand && visibleOperand.kind === 'immediate' ? visibleOperand.value : true,
             sourceIndex: layerCount,
             paints: Object.freeze([]),
           });
@@ -329,10 +750,23 @@ export function evaluateSCDLV2(program) {
               counters,
             );
           }
+          const atOperand = operands[4] ? readRegisterOperand(operands[4]) : undefined;
+          const clipToOperand = operands[5] ? readRegisterOperand(operands[5]) : undefined;
+          const materialOperand = operands[6] ? (operands[6].kind === 'immediate' ? operands[6] : readRegisterOperand(operands[6])) : undefined;
+          const blendOperand = operands[7];
+          const opacityOperand = operands[8];
+
           const paint = Object.freeze({
             shape: shapeValue.value,
             fill: fillValue.value,
             raster: rasterOperand.value,
+            at: atOperand ? atOperand.value : (shapeValue.value.atOffset || null),
+            clipTo: clipToOperand ? clipToOperand.value : null,
+            material: materialOperand
+              ? (materialOperand.kind === 'immediate' ? materialOperand.value : materialOperand.value)
+              : null,
+            blend: blendOperand && blendOperand.kind === 'immediate' ? blendOperand.value : 'OVER',
+            opacity: opacityOperand && opacityOperand.kind === 'immediate' ? opacityOperand.value : 1.0,
           });
           const updatedLayer = Object.freeze({
             ...layerValue.value,

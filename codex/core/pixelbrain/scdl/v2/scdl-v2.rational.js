@@ -39,3 +39,11 @@ export const mulRational = (a, b) => makeRational(BigInt(a.numerator) * BigInt(b
 export const divRational = (a, b) => makeRational(BigInt(a.numerator) * BigInt(b.denominator), BigInt(a.denominator) * BigInt(b.numerator));
 export const rationalToString = (value) => `${value.numerator}/${value.denominator}`;
 export const isIntegralRational = (value) => value.denominator === '1';
+export function compareRational(a, b) {
+  const diff = BigInt(a.numerator) * BigInt(b.denominator) - BigInt(b.numerator) * BigInt(a.denominator);
+  return diff < 0n ? -1 : diff > 0n ? 1 : 0;
+}
+export const minRational = (a, b) => (compareRational(a, b) <= 0 ? a : b);
+export const maxRational = (a, b) => (compareRational(a, b) >= 0 ? a : b);
+export const absRational = (a) => (BigInt(a.numerator) < 0n ? makeRational(-BigInt(a.numerator), BigInt(a.denominator)) : a);
+export const rationalToNumber = (value) => Number(BigInt(value.numerator)) / Number(BigInt(value.denominator));

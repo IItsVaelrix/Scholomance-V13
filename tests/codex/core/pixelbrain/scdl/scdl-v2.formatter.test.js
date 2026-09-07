@@ -178,4 +178,38 @@ LAYER ink ORDER 1 {
       expect(result).toEqual({ ok: false, output: null, ast: null, diagnostics: [] });
     });
   });
+
+  it('formats FN, SEQUENCE, RNG, and generative shape blocks idempotently', () => {
+    const source = `SCDL 2
+ASSET generative_asset
+CANVAS WIDTH 32 HEIGHT 32
+BUDGET INSTRUCTIONS 1000 GENERATED_SHAPES 50 RASTER_CELLS 1024 RECURSION_DEPTH 16
+
+FN double PARAM $x I32 RETURNS I32 RECURSION_MAX 8 {
+  LET $res I32 (MUL $x 2)
+  RETURN $res
+}
+SEQUENCE $fib TYPE I32 COUNT 10 {
+  SEED 0
+  SEED 1
+  NEXT (ADD (PREV 1) (PREV 2))
+}
+RNG $rng ALGORITHM PCG32 SEED 12345
+SHAPE $flower COMPOUND {
+  RADIAL COUNT 6 CENTER (VEC2 (PX 16) (PX 16)) RADIUS (PX 8) {
+    EMIT (CIRCLE CENTER (VEC2 (PX 0) (PX 0)) RADIUS (PX 2))
+  }
+}
+
+LAYER main ORDER 1 {
+  PAINT $flower FILL #ff00ff RASTER CENTER
+}
+`;
+    const formatted = formatSCDLV2(source);
+    expect(formatted.ok).toBe(true);
+    expect(formatted.output).toBe(source);
+
+    const twice = formatSCDLV2(formatted.output);
+    expect(twice.output).toBe(formatted.output);
+  });
 });

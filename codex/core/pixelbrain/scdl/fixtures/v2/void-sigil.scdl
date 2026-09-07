@@ -1,0 +1,28 @@
+SCDL 2
+ASSET void_sigil
+CANVAS WIDTH 32 HEIGHT 32
+BUDGET INSTRUCTIONS 1000 GENERATED_SHAPES 20 RASTER_CELLS 2048
+
+CONST $center VEC2 (VEC2 (PX 16) (PX 16))
+CONST $ring_radius PX (PX 12)
+CONST $ring_th PX (PX 2)
+
+SHAPE $portal_ring (RING CENTER $center RADIUS $ring_radius THICKNESS $ring_th)
+SHAPE $core_star (STAR CENTER $center POINTS 4 INNER_RADIUS (PX 4) OUTER_RADIUS (PX 9))
+SHAPE $rune_box (RECT CENTER $center SIZE (VEC2 (PX 14) (PX 14)))
+SHAPE $sigil_cut (SUBTRACT $portal_ring $rune_box)
+SHAPE $sigil_edge (OUTLINE $sigil_cut WIDTH (PX 1))
+
+MASK $void_clip (TO_MASK $portal_ring)
+
+ANCHOR $origin_anchor ON $portal_ring AT (ANCHOR_OF $portal_ring CENTER)
+ASSERT (INSIDE $center $portal_ring)
+
+LAYER backdrop ORDER 0 BLEND REPLACE OPACITY 1.0 {
+  PAINT $portal_ring FILL #1A0B2E RASTER MIDPOINT
+}
+
+LAYER glyphs ORDER 10 BLEND OVER OPACITY 0.8 {
+  PAINT $core_star FILL #9B5DE5 RASTER CENTER CLIP_TO $void_clip
+  PAINT $sigil_edge FILL #F15BB5 RASTER BRESENHAM
+}
