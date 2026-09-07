@@ -26,9 +26,90 @@
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, dirname, resolve, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { validateAmpAbiManifest, computeAmpAbiChecksum } from '../codex/core/pixelbrain/scdl/v2/scdl-v2.amp-abi.js';
+import { ANCHOR_MANIFESTS } from '../codex/core/pixelbrain/scdl/v2/amp-manifests/index.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT_MD = join(ROOT, 'codex/core/pixelbrain/EFFECT_CATALOG.md');
+
+function collectAmpAbiManifests() {
+  const dir = join(ROOT, 'codex/core/pixelbrain/scdl/v2/amp-manifests');
+  if (!existsSync(dir)) return new Map();
+  const manifests = new Map();
+  for (const f of readdirSync(dir)) {
+    if (!f.endsWith('.amp.json') && !f.endsWith('.json')) continue;
+    if (f === 'package.json') continue;
+    const filePath = join(dir, f);
+    try {
+      let raw;
+      try {
+        raw = readFileSync(filePath, 'utf8');
+      } catch (readErr) {
+        manifests.set(f, {
+          file: f,
+          ampId: f,
+          valid: false,
+          errors: [`Failed reading manifest file '${f}': ${readErr.message}`],
+        });
+        continue;
+      }
+
+      let parsed;
+      try {
+        parsed = JSON.parse(raw);
+      } catch (parseErr) {
+        manifests.set(f, {
+          file: f,
+          ampId: f,
+          valid: false,
+          errors: [`Malformed JSON in manifest file '${f}': ${parseErr.message}`],
+        });
+        continue;
+      }
+
+      if (!parsed || typeof parsed !== 'object') {
+        manifests.set(f, {
+          file: f,
+          ampId: f,
+          valid: false,
+          errors: [`Manifest in '${f}' must be a non-null object.`],
+        });
+        continue;
+      }
+
+      const key = parsed.ampId || f;
+      if (parsed.contract !== 'PB-AMP-ABI-v1') {
+        manifests.set(key, {
+          ...parsed,
+          file: f,
+          valid: false,
+          errors: [`Invalid contract '${parsed.contract}' in '${f}' (must be 'PB-AMP-ABI-v1').`],
+        });
+        continue;
+      }
+
+      const val = validateAmpAbiManifest(parsed);
+      const errors = [...val.errors];
+      if (!parsed.checksum) {
+        errors.push(`Manifest '${parsed.ampId || f}' is missing required checksum field.`);
+      } else {
+        const expectedChecksum = computeAmpAbiChecksum(parsed);
+        if (parsed.checksum !== expectedChecksum) {
+          errors.push(`Manifest '${parsed.ampId || f}' checksum mismatch: expected ${expectedChecksum}, got ${parsed.checksum}`);
+        }
+      }
+      manifests.set(key, { ...parsed, file: f, valid: val.ok && errors.length === 0, errors });
+    } catch (err) {
+      manifests.set(f, {
+        file: f,
+        ampId: f,
+        valid: false,
+        errors: [`Unexpected error processing manifest '${f}': ${err.message}`],
+      });
+    }
+  }
+  return manifests;
+}
 
 const SKIP_DIRS = new Set([
   'node_modules', '.git', '.venv', 'dist', 'build', '.gradle', '__pycache__',
@@ -264,11 +345,27 @@ function collectGenerators() {
 
 export async function buildEffectCatalog() {
   const registered = await registeredIds();
+  const abiManifests = collectAmpAbiManifests();
   const amps = collectAmps().map(({ file, rel, system }) => {
     const src = readFileSync(file, 'utf8');
     const importers = GRAPH.get(file) || new Set();
     const cls = classify(importers);
     const id = extractAmpId(src);
+
+    const baseName = basename(rel, '.js').replace(/-amp$/, '').replace(/\.(micro)?processor$/, '');
+    let matchedManifest = null;
+    if (id && abiManifests.has(id)) {
+      matchedManifest = abiManifests.get(id);
+    } else {
+      for (const m of abiManifests.values()) {
+        const mBase = (m.ampId || '').replace(/^pixelbrain\./, '');
+        if (m.targetModule === rel || (mBase && mBase === baseName)) {
+          matchedManifest = m;
+          break;
+        }
+      }
+    }
+
     return {
       path: rel,
       name: basename(rel, '.js'),
@@ -277,6 +374,15 @@ export async function buildEffectCatalog() {
       exports: extractExports(src).slice(0, 4),
       ampId: id,
       registered: id ? registered.has(id) : false,
+      abi: matchedManifest ? {
+        contract: matchedManifest.contract,
+        ampId: matchedManifest.ampId,
+        version: matchedManifest.version,
+        execution: matchedManifest.execution,
+        stage: matchedManifest.stage,
+        order: matchedManifest.order,
+        valid: matchedManifest.valid,
+      } : null,
       status: cls.tag,
       detail: cls.detail,
       importers: importers.size,
@@ -295,6 +401,8 @@ export async function buildEffectCatalog() {
     registryList: registered.size
       ? [...registered].map((id) => `\`${id}\``).join(', ')
       : 'none',
+    abiCompatible: amps.filter((a) => a.abi && a.abi.valid).length,
+    abiManifests: abiManifests.size,
   };
   const generators = collectGenerators();
   summary.generators = generators.length;
@@ -314,7 +422,10 @@ export function renderEffectCatalogMarkdown(amps, generators, s) {
         : '_(no header comment, no exports)_';
     const id = [a.ampId ? `\`${a.ampId}\`` : null, a.registered ? '✓ registered' : null]
       .filter(Boolean).join(' ') || '—';
-    return `| \`${a.path}\` | ${desc} | ${a.status} | ${id} |`;
+    const abi = a.abi && a.abi.valid
+      ? `✓ \`${a.abi.contract}\` (${a.abi.execution})`
+      : '—';
+    return `| \`${a.path}\` | ${desc} | ${a.status} | ${id} | ${abi} |`;
   }).join('\n');
 
   const DOOR_LABEL = { foundry: 'B foundry', scdl: 'A SCDL', 'direct-pass': 'neither (direct)', other: 'other' };
@@ -358,11 +469,22 @@ real import graph instead.
 
 **${s.total} modules** — ${s.wired} WIRED, ${s.gen} GEN, ${s.testOnly} TEST-ONLY,
 ${s.orphan} ORPHAN. ${s.documented}/${s.total} have a header summary.
+${s.abiCompatible}/${s.total} have SCDL PB-AMP-ABI-v1 manifests.
+
+## SCDL ABI Substrate (\`PB-AMP-ABI-v1\`)
+
+The **SCDL ABI** column reflects formal compatibility with the SCDL v2 compiler
+substrate (\`codex/core/pixelbrain/scdl/v2/amp-manifests/\`). Unlike legacy registration
+which only applied to experimental item-foundry passes, \`PB-AMP-ABI-v1\` manifests
+certify execution class (\`COMPILE\`, \`ANALYZE\`, \`DESCRIPTOR\`), stage ordering across the
+12-stage conveyor belt, typed shape/layer inputs and parameters, and deterministic
+invariance under \`scdl-v2.amp-certify.js\`. Full catalog coverage (54/54) is enforced
+by the completion gate in Step 6.
 
 ## PixelBrain passes (\`codex/core/pixelbrain/*-amp.js\`)
 
-| Module | What it does | Status | Registered |
-|---|---|---|---|
+| Module | What it does | Status | Registered | SCDL ABI |
+|---|---|---|---|---|
 ${rows(pb)}
 
 ## Microprocessor family (\`amps/**\`, \`codex/core/microprocessors\`)
@@ -371,8 +493,8 @@ A **separate system** from the passes above: microprocessors are wired through
 their own registries (e.g. \`TileForgeMicroprocessor\`) and are deliberately not
 in \`amp-registry.js\`.
 
-| Module | What it does | Status | Registered |
-|---|---|---|---|
+| Module | What it does | Status | Registered | SCDL ABI |
+|---|---|---|---|---|
 ${rows(micro)}
 
 ## Asset generators (\`scripts/generate-*.mjs\`)
@@ -419,6 +541,36 @@ export async function runEffectCatalogCli(argv = process.argv.slice(2)) {
     return 0;
   }
 
+  if (args.has('--check-abi')) {
+    const abiManifests = collectAmpAbiManifests();
+    let invalidCount = 0;
+    for (const [id, m] of abiManifests.entries()) {
+      if (!m.valid) {
+        console.error(`[catalog] ABI Manifest '${id}' is INVALID: ${m.errors.join('; ')}`);
+        invalidCount++;
+      }
+    }
+
+    // Verify synchronization between JSON manifests and static JS ANCHOR_MANIFESTS
+    for (const [id, jsonManifest] of abiManifests.entries()) {
+      const jsManifest = ANCHOR_MANIFESTS.find((m) => m.ampId === id);
+      if (!jsManifest) {
+        console.error(`[catalog] Synchronization error: Manifest '${id}' is in JSON but missing in ANCHOR_MANIFESTS (index.js).`);
+        invalidCount++;
+      } else if (jsonManifest.checksum !== jsManifest.checksum) {
+        console.error(`[catalog] Synchronization error: Checksum mismatch between JSON (${jsonManifest.checksum}) and JS (${jsManifest.checksum}) for '${id}'.`);
+        invalidCount++;
+      }
+    }
+
+    if (invalidCount > 0) {
+      console.error(`[catalog] ${invalidCount} invalid ABI manifest(s) found.`);
+      return 1;
+    }
+    console.log(`[catalog] All ${abiManifests.size} PB-AMP-ABI-v1 manifests are valid. Stored checksums and JS/JSON declarations are synchronized.`);
+    return 0;
+  }
+
   const md = renderEffectCatalogMarkdown(amps, generators, summary);
 
   if (args.has('--stdout')) {
@@ -427,6 +579,18 @@ export async function runEffectCatalogCli(argv = process.argv.slice(2)) {
   }
 
   if (args.has('--check')) {
+    const abiManifests = collectAmpAbiManifests();
+    for (const [id, m] of abiManifests.entries()) {
+      if (!m.valid) {
+        console.error(`[catalog] ABI Manifest '${id}' is INVALID: ${m.errors.join('; ')}`);
+        return 1;
+      }
+      const jsManifest = ANCHOR_MANIFESTS.find((item) => item.ampId === id);
+      if (!jsManifest || m.checksum !== jsManifest.checksum) {
+        console.error(`[catalog] Manifest '${id}' is out of sync with ANCHOR_MANIFESTS (index.js).`);
+        return 1;
+      }
+    }
     if (!existsSync(OUT_MD)) {
       console.error(`[catalog] ${relative(ROOT, OUT_MD)} is missing. Run: node scripts/pixelbrain-effect-catalog.mjs`);
       return 1;
@@ -442,14 +606,14 @@ export async function runEffectCatalogCli(argv = process.argv.slice(2)) {
       console.error('[catalog] Fix: node scripts/pixelbrain-effect-catalog.mjs');
       return 1;
     }
-    console.log(`[catalog] EFFECT_CATALOG.md is current (${summary.total} modules).`);
+    console.log(`[catalog] EFFECT_CATALOG.md is current (${summary.total} modules, ${summary.abiCompatible} ABI compatible).`);
     return 0;
   }
 
   writeFileSync(OUT_MD, md, 'utf8');
   console.log(`[catalog] wrote ${relative(ROOT, OUT_MD)} — ${summary.total} modules ` +
     `(${summary.wired} WIRED, ${summary.gen} GEN, ${summary.testOnly} TEST-ONLY, ${summary.orphan} ORPHAN; ` +
-    `${summary.documented} documented, ${summary.registered} registered)`);
+    `${summary.documented} documented, ${summary.registered} registered, ${summary.abiCompatible} ABI compatible)`);
   return 0;
 }
 

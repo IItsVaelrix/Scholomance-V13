@@ -11,6 +11,8 @@ import { evaluateSCDLV2 } from './scdl-v2.evaluator.js';
 import { rasterizeSCDLV2 } from './scdl-v2.raster.js';
 import { emitSCDLV2Package } from './scdl-v2.emit.js';
 import { diagnosticEnvelope, span, v2Diagnostic } from './scdl-v2.diagnostics.js';
+import { buildConveyorBelt } from './scdl-v2.amp-stages.js';
+import { getAmpAdapter, getAmpManifest } from './scdl-v2.amp-catalog.js';
 
 const ZERO_SPAN = span({ line: 1, column: 1, offset: 0 });
 
@@ -50,18 +52,28 @@ function failV2({ source, options, cst, ast, diagnostics }) {
     bytecode: null,
     package: null,
     packet: null,
+    ampPlan: Object.freeze([]),
+    ampDescriptors: Object.freeze([]),
     framePackets: Object.freeze([]),
   });
 }
 
-function successV2({ source, options, cst, ast, analysis, bytecode, package: packageValue, packet }) {
+function successV2({ source, options, cst, ast, analysis, bytecode, package: packageValue, packet, ampPlan, ampDescriptors }) {
+  const resolvedDescriptors = Object.freeze([...(ampDescriptors || packageValue?.ampDescriptors || [])]);
+  const resolvedPackage = packageValue ? Object.freeze({
+    ...packageValue,
+    ampDescriptors: resolvedDescriptors,
+  }) : null;
+
   return Object.freeze({
     ...baseResult({ source, options, cst, ast, errors: [] }),
     ok: true,
     analysis,
     bytecode,
-    package: packageValue,
+    package: resolvedPackage,
     packet,
+    ampPlan: Object.freeze([...(ampPlan || packageValue?.ampPlan || [])]),
+    ampDescriptors: resolvedDescriptors,
     framePackets: Object.freeze([packet]),
     regressionSeed: Object.freeze({ source, options, checksum: bytecode.programId }),
   });
@@ -89,10 +101,297 @@ export function compileSCDLV2(source, options = {}) {
     }
     const evaluated = evaluateSCDLV2(bytecode);
     if (!evaluated.ok) return failV2({ source: safeSource, options: safeOptions, cst: parsed.cst, ast: parsed.ast, diagnostics: evaluated.diagnostics });
-    const raster = rasterizeSCDLV2(evaluated.construction, analyzed.ir.canvas, budget.verified);
+
+function dispatchConveyorEntry(entry, adapter, manifest, context) {
+  try {
+    const stage = entry.stage;
+    const commonContext = { stage, canvas: context.canvas };
+
+    if (manifest?.execution === 'DESCRIPTOR' || stage === 'RUNTIME_DESCRIPTOR' || stage === 'WORLD_DESCRIPTOR') {
+      const desc = adapter.execute(entry.inputs || {}, entry.params || {}, commonContext);
+      if (desc) context.ampDescriptors.push(desc);
+      return null;
+    }
+
+    switch (stage) {
+      case 'SOURCE_ANALYSIS': {
+        const inputs = { source: context.source, ast: context.ast, analysis: context.analysis, ...(entry.inputs || {}) };
+        const res = adapter.execute(inputs, entry.params || {}, commonContext);
+        if (res?.analysis) {
+          context.analysis = Object.freeze({ ...context.analysis, ...res.analysis });
+        } else if (res && typeof res === 'object') {
+          context.analysis = Object.freeze({ ...context.analysis, ...res });
+        }
+        break;
+      }
+      case 'CONSTRUCTION': {
+        const inputs = { construction: context.activeConstruction, ...(entry.inputs || {}) };
+        const res = adapter.execute(inputs, entry.params || {}, commonContext);
+        if (res?.construction) {
+          context.activeConstruction = Object.freeze({ ...context.activeConstruction, ...res.construction });
+        } else if (res?.layers) {
+          context.activeConstruction = Object.freeze({ ...context.activeConstruction, layers: Object.freeze(res.layers) });
+        }
+        break;
+      }
+      case 'SHAPE_PRE':
+      case 'SHAPE_POST': {
+        const inputs = {
+          shapes: context.activeConstruction?.shapes || context.analysis?.shapes,
+          construction: context.activeConstruction,
+          ...(entry.inputs || {}),
+        };
+        const res = adapter.execute(inputs, entry.params || {}, commonContext);
+        if (res?.layers) {
+          context.activeConstruction = Object.freeze({ ...context.activeConstruction, layers: Object.freeze(res.layers) });
+        } else if (res?.shapes) {
+          context.activeConstruction = Object.freeze({ ...context.activeConstruction, shapes: Object.freeze(res.shapes) });
+        }
+        break;
+      }
+      case 'MASK': {
+        const inputs = {
+          masks: context.activeConstruction?.masks || context.analysis?.masks,
+          construction: context.activeConstruction,
+          ...(entry.inputs || {}),
+        };
+        const res = adapter.execute(inputs, entry.params || {}, commonContext);
+        if (res?.masks) {
+          context.activeConstruction = Object.freeze({ ...context.activeConstruction, masks: Object.freeze(res.masks) });
+        }
+        break;
+      }
+      case 'PAINT': {
+        const inputs = {
+          layers: context.activeConstruction?.layers,
+          construction: context.activeConstruction,
+          ...(entry.inputs || {}),
+        };
+        const res = adapter.execute(inputs, entry.params || {}, commonContext);
+        if (res?.layers) {
+          context.activeConstruction = Object.freeze({ ...context.activeConstruction, layers: Object.freeze(res.layers) });
+        } else if (Array.isArray(res)) {
+          context.activeConstruction = Object.freeze({ ...context.activeConstruction, layers: Object.freeze(res) });
+        }
+        break;
+      }
+      case 'LAYER_POST': {
+        if (context.activeConstruction?.layers) {
+          const updatedLayers = context.activeConstruction.layers.map((layer) => {
+            const res = adapter.execute(entry.inputs?.layer ? entry.inputs : { layer }, entry.params || {}, commonContext);
+            return res?.layer || res || layer;
+          });
+          context.activeConstruction = Object.freeze({ ...context.activeConstruction, layers: Object.freeze(updatedLayers) });
+        }
+        break;
+      }
+      case 'PACKET_POST': {
+        if (context.emitted) {
+          const inputs = { packet: context.emitted.packet, package: context.emitted.package, ...(entry.inputs || {}) };
+          const res = adapter.execute(inputs, entry.params || {}, commonContext);
+          if (res) {
+            const updatedPacket = res.packet || (res.id && res.canvas ? res : null);
+            if (updatedPacket) {
+              const updatedPackage = res.package || Object.freeze({
+                ...context.emitted.package,
+                framePackets: Object.freeze([updatedPacket]),
+              });
+              context.emitted = Object.freeze({
+                packet: Object.freeze(updatedPacket),
+                package: updatedPackage,
+              });
+            }
+          }
+        }
+        break;
+      }
+      case 'RENDER': {
+        if (context.activeRaster) {
+          const inputs = { raster: context.activeRaster, canvas: context.canvas, ...(entry.inputs || {}) };
+          const res = adapter.execute(inputs, entry.params || {}, commonContext);
+          if (res?.coordinates) {
+            context.activeRaster = Object.freeze({ ...context.activeRaster, coordinates: Object.freeze(res.coordinates) });
+          } else if (res?.raster) {
+            context.activeRaster = Object.freeze({ ...context.activeRaster, ...res.raster });
+          }
+          if (context.emitted && context.activeRaster?.coordinates) {
+            const newCoords = context.activeRaster.coordinates;
+            const updatedPacket = Object.freeze({
+              ...context.emitted.packet,
+              coordinates: newCoords,
+              palette: {
+                ...context.emitted.packet.palette,
+                sourcePalette: [{
+                  key: 'scdl-v2-source',
+                  colors: [...new Set(newCoords.map((c) => c.color))],
+                  source: 'scdl-v2',
+                  weights: [],
+                }],
+              },
+            });
+            context.emitted = Object.freeze({
+              packet: updatedPacket,
+              package: Object.freeze({
+                ...context.emitted.package,
+                framePackets: Object.freeze([updatedPacket]),
+              }),
+            });
+          }
+        }
+        break;
+      }
+      case 'TIMELINE': {
+        const inputs = {
+          timeline: context.activeConstruction?.timeline || context.analysis?.timeline,
+          frames: context.emitted?.package?.framePackets,
+          ...(entry.inputs || {}),
+        };
+        const res = adapter.execute(inputs, entry.params || {}, commonContext);
+        if (res?.timeline) {
+          context.activeConstruction = Object.freeze({ ...context.activeConstruction, timeline: Object.freeze(res.timeline) });
+        }
+        if (res?.framePackets || res?.frames) {
+          const frames = Object.freeze(res.framePackets || res.frames);
+          context.emitted = Object.freeze({
+            ...context.emitted,
+            package: Object.freeze({
+              ...context.emitted.package,
+              framePackets: frames,
+              animation: res.animation || context.emitted.package.animation,
+            }),
+          });
+        } else if (res?.animation) {
+          context.emitted = Object.freeze({
+            ...context.emitted,
+            package: Object.freeze({
+              ...context.emitted.package,
+              animation: Object.freeze(res.animation),
+            }),
+          });
+        }
+        break;
+      }
+      default:
+        break;
+    }
+    return null;
+  } catch (err) {
+    return {
+      error: true,
+      message: err instanceof Error ? err.message : String(err),
+      entry,
+    };
+  }
+}
+
+    const activeAmps = analyzed.ir?.selectedAmps || [];
+    const ampDescriptors = [];
+    let activeConstruction = evaluated.construction;
+
+    const conveyorContext = {
+      source: safeSource,
+      ast: parsed.ast,
+      analysis: analyzed.ir,
+      canvas: analyzed.ir.canvas,
+      activeConstruction,
+      activeRaster: null,
+      emitted: null,
+      ampDescriptors,
+    };
+
+    const belt = activeAmps.length > 0 ? buildConveyorBelt(activeAmps) : [];
+
+function ampExecutionDiagnostic(entry, err) {
+  return v2Diagnostic({
+    code: 'SCDL-AMP-007',
+    severity: 'ERROR',
+    phase: 'compiler',
+    message: `AMP '${entry.ampId}' execution failed in stage '${entry.stage}': ${err.message}`,
+    span: ZERO_SPAN,
+    relatedSymbols: [entry.ampId],
+  });
+}
+
+    // Pre-rasterization stages: SOURCE_ANALYSIS (0) through LAYER_POST (6)
+    const STAGES_PRE_RASTER = ['SOURCE_ANALYSIS', 'CONSTRUCTION', 'SHAPE_PRE', 'SHAPE_POST', 'MASK', 'PAINT', 'LAYER_POST'];
+    for (const stage of STAGES_PRE_RASTER) {
+      const stageEntries = belt.filter((e) => e.stage === stage);
+      for (const entry of stageEntries) {
+        if (entry.source === 'EXPLICIT_APPLY' && (entry.stage === 'SHAPE_PRE' || entry.stage === 'SHAPE_POST')) continue;
+        const adapter = getAmpAdapter(entry.ampId);
+        const manifest = entry.manifest || getAmpManifest(entry.ampId);
+        if (adapter && typeof adapter.execute === 'function') {
+          const err = dispatchConveyorEntry(entry, adapter, manifest, conveyorContext);
+          if (err) {
+            return failV2({
+              source: safeSource,
+              options: safeOptions,
+              cst: parsed.cst,
+              ast: parsed.ast,
+              diagnostics: [ampExecutionDiagnostic(entry, err)],
+            });
+          }
+        }
+      }
+    }
+    activeConstruction = conveyorContext.activeConstruction;
+
+    const raster = rasterizeSCDLV2(activeConstruction, analyzed.ir.canvas, budget.verified);
     if (!raster.ok) return failV2({ source: safeSource, options: safeOptions, cst: parsed.cst, ast: parsed.ast, diagnostics: raster.diagnostics });
-    const emitted = emitSCDLV2Package({ analysis: analyzed.ir, bytecode, construction: evaluated.construction, raster });
-    return successV2({ source: safeSource, options: safeOptions, cst: parsed.cst, ast: parsed.ast, analysis: analyzed.ir, bytecode, ...emitted });
+    conveyorContext.activeRaster = raster;
+
+    conveyorContext.emitted = emitSCDLV2Package({
+      analysis: analyzed.ir,
+      bytecode,
+      construction: activeConstruction,
+      raster,
+      ampPlan: analyzed.ir.ampPlan || [],
+      ampDescriptors,
+    });
+
+    // Post-rasterization stages: PACKET_POST (7) through WORLD_DESCRIPTOR (11)
+    const STAGES_POST_RASTER = ['PACKET_POST', 'RENDER', 'TIMELINE', 'RUNTIME_DESCRIPTOR', 'WORLD_DESCRIPTOR'];
+    for (const stage of STAGES_POST_RASTER) {
+      const stageEntries = belt.filter((e) => e.stage === stage);
+      for (const entry of stageEntries) {
+        const adapter = getAmpAdapter(entry.ampId);
+        const manifest = entry.manifest || getAmpManifest(entry.ampId);
+        if (adapter && typeof adapter.execute === 'function') {
+          const err = dispatchConveyorEntry(entry, adapter, manifest, conveyorContext);
+          if (err) {
+            return failV2({
+              source: safeSource,
+              options: safeOptions,
+              cst: parsed.cst,
+              ast: parsed.ast,
+              diagnostics: [ampExecutionDiagnostic(entry, err)],
+            });
+          }
+        }
+      }
+    }
+
+    if (conveyorContext.emitted?.package) {
+      conveyorContext.emitted = Object.freeze({
+        ...conveyorContext.emitted,
+        package: Object.freeze({
+          ...conveyorContext.emitted.package,
+          ampDescriptors: Object.freeze([...conveyorContext.ampDescriptors]),
+        }),
+      });
+    }
+
+    return successV2({
+      source: safeSource,
+      options: safeOptions,
+      cst: parsed.cst,
+      ast: parsed.ast,
+      analysis: conveyorContext.analysis,
+      bytecode,
+      ampPlan: analyzed.ir.ampPlan || [],
+      ampDescriptors: conveyorContext.ampDescriptors,
+      ...conveyorContext.emitted,
+    });
   } catch (error) {
     return failV2({ source: safeSource, options: safeOptions, cst: null, ast: null, diagnostics: [internalDiagnostic(error)] });
   }

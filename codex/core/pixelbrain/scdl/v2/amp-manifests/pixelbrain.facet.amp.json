@@ -1,0 +1,51 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.facet",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "SHAPE_POST",
+  "scope": ["SHAPE", "LAYER"],
+  "inputs": [
+    {
+      "name": "geometry",
+      "type": "SHAPE",
+      "required": true,
+      "description": "Input shape to facet into angular planar regions"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "facetCount",
+      "type": "I32",
+      "min": 3,
+      "max": 32,
+      "default": 8,
+      "description": "Number of radial facet divisions"
+    }
+  ],
+  "output": {
+    "type": "SHAPE",
+    "description": "Faceted shape geometry with faceted region metadata"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 4,
+    "fixed": 0
+  },
+  "order": 40,
+  "relevance": {
+    "pipelines": ["item", "render-fidelity"],
+    "conditions": [
+      {
+        "field": "materials",
+        "op": "includes",
+        "value": "gem"
+      }
+    ]
+  },
+  "checksum": "9b4e952848668f470ab38ba938e8912557e0f4a48e8805819d91e73df94ef28a"
+}

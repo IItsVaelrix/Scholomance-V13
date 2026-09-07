@@ -6,6 +6,7 @@ const BINDING_KINDS = new Set([
   'ConstDeclaration', 'ShapeDeclaration', 'ShapeBlockDeclaration',
   'MaskDeclaration', 'AnchorDeclaration', 'AssertDeclaration',
   'FnDeclaration', 'SequenceDeclaration', 'RngDeclaration',
+  'ApplyAmpStatement', 'SelectAmpsStatement',
 ]);
 
 function declarationCategory(kind) {
@@ -138,6 +139,37 @@ function printStatement(node) {
       lines.push('}');
       return lines.join('\n');
     }
+    case 'ApplyAmpStatement': {
+      let header = 'APPLY_AMP';
+      if (node.targetSymbol) header += ` ${node.targetSymbol} ${node.targetType || 'SHAPE'}`;
+      header += ' {';
+      const lines = [header];
+      if (node.ampId) lines.push(`  AMP ${node.ampId}`);
+      if (node.version) lines.push(`  VERSION ${node.version}`);
+      if (node.stage) lines.push(`  STAGE ${node.stage}`);
+      if (node.inputs) {
+        for (const [k, v] of Object.entries(node.inputs)) {
+          lines.push(`  INPUT ${k} ${printExpression(v)}`);
+        }
+      }
+      if (node.params) {
+        for (const [k, v] of Object.entries(node.params)) {
+          lines.push(`  PARAM ${k} ${printExpression(v)}`);
+        }
+      }
+      lines.push('}');
+      return lines.join('\n');
+    }
+    case 'SelectAmpsStatement': {
+      if (node.pipeline || node.stage) {
+        const lines = ['SELECT_AMPS {'];
+        if (node.pipeline) lines.push(`  PIPELINE ${node.pipeline}`);
+        if (node.stage) lines.push(`  STAGE ${node.stage}`);
+        lines.push('}');
+        return lines.join('\n');
+      }
+      return 'SELECT_AMPS';
+    }
     default:
       throw new Error(`formatSCDLV2: cannot print statement of kind ${node.kind}.`);
   }
@@ -206,6 +238,10 @@ function printDeclarationLine(node) {
     }
     case 'RngDeclaration':
       return `RNG ${node.symbol} ALGORITHM ${node.algorithm} SEED ${printExpression(node.seed)}`;
+    case 'ApplyAmpStatement':
+      return printStatement(node);
+    case 'SelectAmpsStatement':
+      return printStatement(node);
     default:
       throw new Error(`formatSCDLV2: cannot print declaration of kind ${node.kind}.`);
   }

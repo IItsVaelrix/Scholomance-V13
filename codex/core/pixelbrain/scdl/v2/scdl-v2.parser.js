@@ -277,6 +277,8 @@ class Parser {
       case 'IF': return this.parseIfStatement(opcodeToken, scope);
       case 'MATCH': return this.parseMatchStatement(opcodeToken, scope);
       case 'RADIAL': return this.parseRadialStatement(opcodeToken);
+      case 'APPLY_AMP': return this.parseApplyAmpStatement(opcodeToken, scope);
+      case 'SELECT_AMPS': return this.parseSelectAmpsStatement(opcodeToken);
       default:
         this.abort(
           PARSE_CODES.UNKNOWN_OPCODE,
@@ -327,6 +329,150 @@ class Parser {
       condition,
       children: [condition],
       span: span(opcodeToken.span.start, condition.span.end),
+    };
+  }
+
+  parseApplyAmpStatement(opcodeToken, scope) {
+    let targetSymbol = null;
+    let targetType = null;
+    let peek = this.peekInline();
+    if (peek.kind === 'SYMBOL') {
+      targetSymbol = this.take().value;
+      const typeToken = this.expect('WORD', null, ['output type (e.g. SHAPE, LAYER)']);
+      targetType = typeToken.raw;
+    }
+
+    this.expect('LBRACE', '{', ['{']);
+
+    let ampId = null;
+    let version = null;
+    let stage = null;
+    const inputs = {};
+    const params = {};
+
+    for (;;) {
+      this.skipLayout();
+      const token = this.current();
+      if (token.kind === 'RBRACE' || token.kind === 'EOF') break;
+
+      if (token.kind === 'WORD') {
+        const keyword = token.raw;
+        this.take();
+        if (keyword === 'AMP') {
+          const idToken = this.expect('WORD', null, ['qualified amp identifier']);
+          ampId = idToken.raw;
+        } else if (keyword === 'VERSION') {
+          const verToken = this.expect('WORD', null, ['semver version']);
+          version = verToken.raw;
+        } else if (keyword === 'STAGE') {
+          const stageToken = this.expect('WORD', null, ['stage identifier']);
+          stage = stageToken.raw;
+        } else if (keyword === 'INPUT') {
+          const nameToken = this.expect('WORD', null, ['input name']);
+          const valExpr = this.parseExpression();
+          inputs[nameToken.raw] = valExpr;
+        } else if (keyword === 'PARAM') {
+          const nameToken = this.expect('WORD', null, ['parameter name']);
+          const valExpr = this.parseExpression();
+          params[nameToken.raw] = valExpr;
+        } else {
+          this.abort(
+            PARSE_CODES.UNKNOWN_OPERAND,
+            `Unknown operand '${keyword}' in APPLY_AMP block. Expected AMP, VERSION, STAGE, INPUT, or PARAM.`,
+            token,
+            ['AMP', 'VERSION', 'STAGE', 'INPUT', 'PARAM'],
+          );
+        }
+        this.skipInlineTrivia();
+        if (this.current().kind === 'NEWLINE') this.take();
+      } else {
+        this.abort(
+          PARSE_CODES.EXPECTED_TOKEN,
+          `Expected APPLY_AMP field declaration, received ${token.kind}.`,
+          token,
+          ['AMP, VERSION, STAGE, INPUT, or PARAM'],
+        );
+      }
+    }
+
+    const closeToken = this.expect('RBRACE', '}', ['}']);
+
+    return {
+      kind: 'ApplyAmpStatement',
+      opcode: 'APPLY_AMP',
+      targetSymbol,
+      targetType,
+      ampId,
+      version: version || '1.0.0',
+      stage,
+      inputs,
+      params,
+      children: [...Object.values(inputs), ...Object.values(params)],
+      span: nodeSpan(opcodeToken, closeToken),
+    };
+  }
+
+  parseSelectAmpsStatement(opcodeToken) {
+    let pipeline = null;
+    let stage = null;
+    let lastToken = opcodeToken;
+
+    let peek = this.peekInline();
+    if (peek.kind === 'LBRACE') {
+      this.take();
+      for (;;) {
+        this.skipLayout();
+        const token = this.current();
+        if (token.kind === 'RBRACE' || token.kind === 'EOF') break;
+        if (token.kind === 'WORD' && token.raw === 'PIPELINE') {
+          this.take();
+          const pipeToken = this.expect('WORD', null, ['pipeline name']);
+          pipeline = pipeToken.raw;
+        } else if (token.kind === 'WORD' && token.raw === 'STAGE') {
+          this.take();
+          const stageToken = this.expect('WORD', null, ['stage name']);
+          stage = stageToken.raw;
+        } else {
+          this.abort(
+            PARSE_CODES.UNKNOWN_OPERAND,
+            `Unknown operand in SELECT_AMPS block: ${token.raw || token.kind}`,
+            token,
+            ['PIPELINE', 'STAGE'],
+          );
+        }
+        this.skipInlineTrivia();
+        if (this.current().kind === 'NEWLINE') this.take();
+      }
+      lastToken = this.expect('RBRACE', '}', ['}']);
+    } else {
+      while (this.peekInline().kind === 'WORD') {
+        const keyToken = this.take();
+        if (keyToken.raw === 'PIPELINE') {
+          const pipeToken = this.expect('WORD', null, ['pipeline name']);
+          pipeline = pipeToken.raw;
+          lastToken = pipeToken;
+        } else if (keyToken.raw === 'STAGE') {
+          const stageToken = this.expect('WORD', null, ['stage name']);
+          stage = stageToken.raw;
+          lastToken = stageToken;
+        } else {
+          this.abort(
+            PARSE_CODES.UNKNOWN_OPERAND,
+            `Unknown operand in SELECT_AMPS: ${keyToken.raw}`,
+            keyToken,
+            ['PIPELINE', 'STAGE'],
+          );
+        }
+      }
+    }
+
+    return {
+      kind: 'SelectAmpsStatement',
+      opcode: 'SELECT_AMPS',
+      pipeline,
+      stage,
+      children: [],
+      span: nodeSpan(opcodeToken, lastToken),
     };
   }
 

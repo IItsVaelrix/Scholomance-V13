@@ -82,6 +82,7 @@ class Lowerer {
     this.usesCircleMidpoint = false;
     this.usesPath = false;
     this.usesMask = false;
+    this.usesAmp = false;
   }
 
   nextRegister() {
@@ -264,6 +265,53 @@ class Lowerer {
 
   lowerShape(shape) {
     if (!shape) throw new Error('Cannot lower null shape');
+
+    if (shape.isFaceted) {
+      this.usesAmp = true;
+      const baseShape = { ...shape, isFaceted: false };
+      if (baseShape.kind === 'FACETED_SHAPE') baseShape.kind = 'CIRCLE';
+      const baseRegister = this.lowerShape(baseShape);
+      const register = this.nextRegister();
+      this.emit('BC.AMP.APPLY', {
+        resultRegister: register,
+        type: 'SHAPE',
+        operands: [
+          { kind: 'immediate', value: 'pixelbrain.facet' },
+          { kind: 'immediate', value: 'SHAPE_POST' },
+          { kind: 'immediate', value: { geometry: `%${baseRegister}` } },
+          { kind: 'immediate', value: {} },
+        ],
+      });
+      return register;
+    }
+
+    if (shape.kind === 'AMP_RESULT') {
+      this.usesAmp = true;
+      const inputs = {};
+      if (shape.inputs && typeof shape.inputs === 'object') {
+        for (const [k, v] of Object.entries(shape.inputs)) {
+          if (v && typeof v === 'object' && v.kind) {
+            const reg = this.lowerShape(v);
+            inputs[k] = `%${reg}`;
+          } else {
+            inputs[k] = v;
+          }
+        }
+      }
+      const register = this.nextRegister();
+      this.emit('BC.AMP.APPLY', {
+        resultRegister: register,
+        type: shape.outputType || 'SHAPE',
+        operands: [
+          { kind: 'immediate', value: shape.ampId },
+          { kind: 'immediate', value: shape.stage || 'SHAPE_POST' },
+          { kind: 'immediate', value: inputs },
+          { kind: 'immediate', value: shape.params || {} },
+        ],
+      });
+      return register;
+    }
+
     if (shape.kind === 'PIXEL') {
       const atRegister = this.lowerValue(shape.at);
       const pixelRegister = this.nextRegister();
@@ -641,6 +689,35 @@ class Lowerer {
       this.usesMask = true;
     }
 
+    if (ir && (ir.selectAmpsEnabled || (Array.isArray(ir.selectedAmps) && ir.selectedAmps.length > 0))) {
+      this.usesAmp = true;
+      const planIds = (ir.selectedAmps || []).map((a) => a.ampId);
+      this.emit('BC.AMP.SELECT', {
+        resultRegister: null,
+        type: null,
+        operands: [
+          { kind: 'immediate', value: planIds },
+        ],
+      });
+    }
+
+    if (ir && Array.isArray(ir.selectedAmps) && ir.selectedAmps.length > 0) {
+      this.usesAmp = true;
+      for (const amp of ir.selectedAmps) {
+        if (amp.source === 'EXPLICIT_APPLY') continue;
+        this.emit('BC.AMP.APPLY', {
+          resultRegister: null,
+          type: null,
+          operands: [
+            { kind: 'immediate', value: amp.ampId },
+            { kind: 'immediate', value: amp.stage },
+            { kind: 'immediate', value: amp.inputs || {} },
+            { kind: 'immediate', value: amp.params || {} },
+          ],
+        });
+      }
+    }
+
     const layers = Array.isArray(ir && ir.layers) ? ir.layers : [];
     const ordered = layers
       .map((layer, sourceIndex) => ({ layer, sourceIndex }))
@@ -732,6 +809,12 @@ function operandText(operand) {
     case 'register':
       return `%${operand.index}`;
     case 'immediate':
+      if (Array.isArray(operand.value)) {
+        return `[${operand.value.join(', ')}]`;
+      }
+      if (typeof operand.value === 'object' && operand.value !== null) {
+        return JSON.stringify(operand.value);
+      }
       return String(operand.value);
     default:
       return String(operand.value);
@@ -788,6 +871,7 @@ export function lowerSCDLV2Bytecode(ir, verifiedBudget) {
     const capabilities = [...HEADER_CAPABILITIES];
     if (lowerer.usesPath) capabilities.push('GEOMETRY.PATH@2.0');
     if (lowerer.usesMask) capabilities.push('PAINT.MASKS@2.0');
+    if (lowerer.usesAmp) capabilities.push('MATERIAL.PIXELBRAIN@2.0');
     const algorithms = Object.freeze(algorithmLines(lowerer));
     const constants = Object.freeze(lowerer.constants);
     const instructions = Object.freeze(lowerer.instructions);

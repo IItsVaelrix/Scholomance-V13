@@ -70,6 +70,8 @@ import {
   composeTransforms,
 } from './scdl-v2.transforms.js';
 import { toMask } from './scdl-v2.masks.js';
+import { getAmpAdapter } from './scdl-v2.amp-catalog.js';
+import { AMP_CODES } from './scdl-v2.types.js';
 
 const ZERO_SPAN = span({ line: 1, column: 1, offset: 0 });
 
@@ -773,6 +775,73 @@ export function evaluateSCDLV2(program) {
             paints: Object.freeze([...layerValue.value.paints, paint]),
           });
           registers.set(operands[0].index, Object.freeze({ type: 'LAYER', value: updatedLayer }));
+          break;
+        }
+
+        case 'BC.AMP.SELECT': {
+          // Records selected deterministic AMP plan in evaluation
+          break;
+        }
+
+        case 'BC.AMP.APPLY': {
+          if (instruction.type === 'SHAPE') {
+            counters.generatedShapes += 1;
+            if (counters.generatedShapes > generatedShapesLimit) {
+              return failure(budgetDiagnostic('generatedShapes', generatedShapesLimit, counters.generatedShapes), counters);
+            }
+          }
+          const ampId = operands[0]?.value;
+          const stage = operands[1]?.value;
+          const rawInputs = operands[2]?.value || {};
+          const rawParams = operands[3]?.value || {};
+          if (resultKey !== null) {
+            const inputs = {};
+            if (operands[2]?.kind === 'register') {
+              const regVal = readRegisterOperand(operands[2]);
+              if (regVal) {
+                inputs.geometry = regVal.value;
+                inputs.target = regVal.value;
+              }
+            } else if (typeof rawInputs === 'object' && rawInputs !== null) {
+              for (const [k, v] of Object.entries(rawInputs)) {
+                if (typeof v === 'string' && v.startsWith('%')) {
+                  const regIdx = Number(v.slice(1));
+                  if (registers.has(regIdx)) {
+                    inputs[k] = registers.get(regIdx).value;
+                  } else {
+                    inputs[k] = v;
+                  }
+                } else if (v && typeof v === 'object' && v.kind === 'register' && registers.has(v.index)) {
+                  inputs[k] = registers.get(v.index).value;
+                } else {
+                  inputs[k] = v;
+                }
+              }
+            }
+            const params = typeof rawParams === 'object' && rawParams !== null ? rawParams : {};
+            const adapter = getAmpAdapter(ampId);
+            let resultVal = null;
+            if (adapter && typeof adapter.execute === 'function') {
+              try {
+                const out = adapter.execute(inputs, params, { stage });
+                resultVal = { type: instruction.type || 'SHAPE', value: out };
+              } catch (err) {
+                return failure(
+                  v2Diagnostic({
+                    code: AMP_CODES.EXECUTION_FAILED,
+                    phase: 'EVAL',
+                    message: `AMP '${ampId}' execution failed in stage '${stage}': ${err instanceof Error ? err.message : String(err)}`,
+                    span: ZERO_SPAN,
+                    relatedSymbols: [ampId],
+                  }),
+                  counters,
+                );
+              }
+            } else {
+              resultVal = { type: instruction.type || 'SHAPE', value: inputs.geometry || { kind: 'AMP_RESULT', ampId, stage } };
+            }
+            registers.set(resultKey, Object.freeze(resultVal));
+          }
           break;
         }
 

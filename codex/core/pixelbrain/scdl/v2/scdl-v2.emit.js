@@ -4,7 +4,7 @@
 
 import { createPixelBrainAssetPacket } from '../../pixelbrain-asset-packet.js';
 
-export function emitSCDLV2Package({ analysis, bytecode, construction, raster }) {
+export function emitSCDLV2Package({ analysis, bytecode, construction, raster, ampPlan = [], ampDescriptors = [] }) {
   const packet = createPixelBrainAssetPacket({
     id: `pbasset_${bytecode.programId.slice('scdlbc_'.length)}`,
     canvas: analysis.canvas,
@@ -35,7 +35,8 @@ export function emitSCDLV2Package({ analysis, bytecode, construction, raster }) 
     layers: raster.layers,
     framePackets: Object.freeze([packet]),
     animation: null,
-    ampPlan: Object.freeze([]),
+    ampPlan: Object.freeze([...(ampPlan || analysis?.ampPlan || [])]),
+    ampDescriptors: Object.freeze([...(ampDescriptors || [])]),
     exportManifest: Object.freeze({ targets: Object.freeze(['json', 'svg', 'phaser', 'png', 'aseprite']) }),
   });
   return Object.freeze({ packet, package: packageValue });

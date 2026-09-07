@@ -76,6 +76,21 @@ export const TERM_CODES = Object.freeze({
   INVALID_CONTROL_FLOW: 'SCDL-TERM-004',
 });
 
+export const AMP_CODES = Object.freeze({
+  UNKNOWN_AMP: 'SCDL-AMP-001',
+  STAGE_MISMATCH: 'SCDL-AMP-002',
+  MISSING_INPUT: 'SCDL-AMP-003',
+  INVALID_PARAM: 'SCDL-AMP-004',
+  TYPE_MISMATCH: 'SCDL-AMP-005',
+  BUDGET_EXCEEDED: 'SCDL-AMP-006',
+  EXECUTION_FAILED: 'SCDL-AMP-007',
+  RELEVANCE_FAILED: 'SCDL-AMP-008',
+  MANIFEST_INVALID: 'SCDL-AMP-009',
+  VERSION_MISMATCH: 'SCDL-AMP-010',
+  INVALID_INPUT: 'SCDL-AMP-011',
+});
+
+
 export function isKnownType(type) {
   if (typeof type !== 'string') return false;
   const base = type.includes('<') ? type.slice(0, type.indexOf('<')).trim() : type;

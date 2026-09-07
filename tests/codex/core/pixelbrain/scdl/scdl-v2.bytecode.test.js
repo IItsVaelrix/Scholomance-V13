@@ -54,7 +54,6 @@ describe('SCDL-BC-v2 lowering', () => {
     expect(b).not.toBe(a);
   });
 });
-
 describe('verifySCDLV2Budget declaration accounting', () => {
   // A CONST/SHAPE declaration that no PAINT ever reaches is still real
   // static cost the source asked the compiler to hold: it is not free just
@@ -187,5 +186,87 @@ LAYER ink ORDER 10 { PAINT $s FILL #55CCFF RASTER MIDPOINT }`;
     const shapeKeywordBudget = verifySCDLV2Budget(shapeKeywordAnalysis.ir, {});
     expect(shapeKeywordBudget.ok).toBe(true);
     expect(budget.verified.demand.instructions).toBe(shapeKeywordBudget.verified.demand.instructions);
+  });
+
+  it('emits BC.AMP.SELECT and BC.AMP.APPLY conforming to opcode operand contracts', () => {
+    const src = `SCDL 2
+ASSET amp_contract_test
+CANVAS WIDTH 16 HEIGHT 16
+SELECT_AMPS PIPELINE render-fidelity
+SHAPE $base (PIXEL AT (VEC2 (PX 0) (PX 0)))
+APPLY_AMP $out SHAPE {
+  AMP pixelbrain.facet
+  VERSION 1.0.0
+  STAGE SHAPE_POST
+  INPUT geometry $base
+  PARAM facetCount 6
+}
+LAYER l ORDER 1 { PAINT $out FILL #ffffff }
+`;
+    const analysis = analyzeSCDLV2(parseSCDLV2(src).ast);
+    expect(analysis.ok).toBe(true);
+    const budget = verifySCDLV2Budget(analysis.ir, {});
+    const bc = lowerSCDLV2Bytecode(analysis.ir, budget.verified);
+    expect(bc).toBeDefined();
+
+    const selectInst = bc.instructions.find((i) => i.mnemonic === 'BC.AMP.SELECT');
+    expect(selectInst).toBeDefined();
+    expect(selectInst.operands).toHaveLength(1);
+    expect(Array.isArray(selectInst.operands[0].value)).toBe(true);
+
+    const applyInst = bc.instructions.find((i) => i.mnemonic === 'BC.AMP.APPLY' && i.operands[0].value === 'pixelbrain.facet');
+    expect(applyInst).toBeDefined();
+    expect(applyInst.operands).toHaveLength(4);
+    expect(applyInst.operands[0].value).toBe('pixelbrain.facet');
+    expect(applyInst.operands[1].value).toBe('SHAPE_POST');
+    expect(typeof applyInst.operands[2].value).toBe('object');
+    expect(typeof applyInst.operands[3].value).toBe('object');
+  });
+
+  it('emits exactly one BC.AMP.APPLY for explicit APPLY_AMP statement (no duplicate lowering)', () => {
+    const src = `SCDL 2
+ASSET explicit_single_apply
+CANVAS WIDTH 16 HEIGHT 16
+SHAPE $base (PIXEL AT (VEC2 (PX 0) (PX 0)))
+APPLY_AMP $out SHAPE {
+  AMP pixelbrain.facet
+  VERSION 1.0.0
+  STAGE SHAPE_POST
+  INPUT geometry $base
+  PARAM facetCount 6
+}
+LAYER l ORDER 1 { PAINT $out FILL #ffffff }
+`;
+    const analysis = analyzeSCDLV2(parseSCDLV2(src).ast);
+    expect(analysis.ok).toBe(true);
+    const budget = verifySCDLV2Budget(analysis.ir, {});
+    const bc = lowerSCDLV2Bytecode(analysis.ir, budget.verified);
+    expect(bc).toBeDefined();
+
+    const applyInsts = bc.instructions.filter((i) => i.mnemonic === 'BC.AMP.APPLY');
+    expect(applyInsts).toHaveLength(1);
+    expect(applyInsts[0].operands[0].value).toBe('pixelbrain.facet');
+  });
+
+  it('emits BC.AMP.SELECT [] for empty SELECT_AMPS result retaining authored selection operation', () => {
+    const src = `SCDL 2
+ASSET empty_select_amps
+CANVAS WIDTH 16 HEIGHT 16
+SELECT_AMPS PIPELINE non-matching-pipeline
+LAYER l ORDER 1 { PAINT (PIXEL AT (VEC2 (PX 0) (PX 0))) FILL #ffffff }
+`;
+    const analysis = analyzeSCDLV2(parseSCDLV2(src).ast);
+    expect(analysis.ok).toBe(true);
+    expect(analysis.ir.selectAmpsEnabled).toBe(true);
+    expect(analysis.ir.selectedAmps).toHaveLength(0);
+
+    const budget = verifySCDLV2Budget(analysis.ir, {});
+    const bc = lowerSCDLV2Bytecode(analysis.ir, budget.verified);
+    expect(bc).toBeDefined();
+
+    const selectInst = bc.instructions.find((i) => i.mnemonic === 'BC.AMP.SELECT');
+    expect(selectInst).toBeDefined();
+    expect(selectInst.operands).toHaveLength(1);
+    expect(selectInst.operands[0].value).toEqual([]);
   });
 });

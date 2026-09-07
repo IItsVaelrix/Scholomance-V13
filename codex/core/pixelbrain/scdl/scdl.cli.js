@@ -21,6 +21,9 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, basename, dirname, extname, join } from 'node:path';
 import { compileSCDL, parseSCDL, exportSCDL, detectSCDLVersion, parseSCDLV2, formatSCDLV2 } from './index.js';
+import { listAmpManifests, getAmpManifest } from './v2/scdl-v2.amp-catalog.js';
+import { validateAmpAbiManifest } from './v2/scdl-v2.amp-abi.js';
+import { analyzeSCDLV2 } from './v2/scdl-v2.analyzer.js';
 import { buildAsepritePayload, exportFilmstripPNG, MAX_PNG_SCALE, encodePng } from './scdl.exporters.js';
 import { encodeAsepriteBinary } from '../aseprite-binary-codec.js';
 import { buildSCDLDiagnosticReport } from './scdl.diagnostics.js';
@@ -37,7 +40,7 @@ const DEFAULT_PREVIEW_SCALE = 8;
  * token for a `--` prefix, so `compile --bytecode foo.scdl` read foo.scdl as
  * bytecode's value and lost the input file.
  */
-const BOOLEAN_FLAGS = new Set(['bytecode', 'strict', 'semantic', 'strokes', 'lineage', 'write']);
+const BOOLEAN_FLAGS = new Set(['bytecode', 'strict', 'semantic', 'strokes', 'lineage', 'write', 'json']);
 
 function parseArgs(args) {
   const opts = { flags: {}, positional: [] };
@@ -596,6 +599,145 @@ function _targetPath({ outPath, sourceName, target, multi }) {
   return join(dir, `${stem}-${target}.${ext}`);
 }
 
+function cmdAmps(args) {
+  const sub = args[0];
+  const rest = args.slice(1);
+  const opts = parseArgs(rest);
+
+  switch (sub) {
+    case 'list': {
+      const manifests = listAmpManifests();
+      if (opts.flags.json) {
+        console.log(JSON.stringify(manifests, null, 2));
+      } else {
+        console.log(`Registered PB-AMP-ABI-v1 AMPs (${manifests.length}):`);
+        console.log('  ID                            STAGE            CLASS       ORDER');
+        console.log('  ───────────────────────────── ──────────────── ─────────── ─────');
+        for (const m of manifests) {
+          const id = m.ampId.padEnd(29, ' ');
+          const stage = m.stage.padEnd(16, ' ');
+          const cls = m.execution.padEnd(11, ' ');
+          console.log(`  ${id} ${stage} ${cls} ${m.order}`);
+        }
+      }
+      process.exit(0);
+    }
+
+    case 'describe': {
+      const ampId = opts.positional[0];
+      if (!ampId) {
+        console.error('[SCDL] Usage: scdl amps describe <amp-id> [--json]');
+        process.exit(1);
+      }
+      const manifest = getAmpManifest(ampId);
+      if (!manifest) {
+        console.error(`[SCDL] Unknown AMP: '${ampId}'`);
+        process.exit(1);
+      }
+      if (opts.flags.json) {
+        console.log(JSON.stringify(manifest, null, 2));
+      } else {
+        console.log(`AMP: ${manifest.ampId} (v${manifest.version})`);
+        console.log(`  Contract:    ${manifest.contract}`);
+        console.log(`  Execution:   ${manifest.execution}`);
+        console.log(`  Stage:       ${manifest.stage}`);
+        console.log(`  Order:       ${manifest.order}`);
+        console.log(`  Scope:       ${(manifest.scope || []).join(', ')}`);
+        console.log(`  Output:      ${manifest.output?.type || 'UNKNOWN'}`);
+        console.log(`  Determinism: ${manifest.determinism?.class || 'UNKNOWN'}`);
+        console.log(`  Cost:        ${manifest.cost?.model || 'UNKNOWN'}`);
+        if (manifest.inputs?.length) {
+          console.log('  Inputs:');
+          for (const inp of manifest.inputs) {
+            console.log(`    - ${inp.name} (${inp.type})${inp.required ? ' [required]' : ''}: ${inp.description || ''}`);
+          }
+        }
+        if (manifest.parameters?.length) {
+          console.log('  Parameters:');
+          for (const p of manifest.parameters) {
+            console.log(`    - ${p.name} (${p.type}): default=${p.default ?? 'none'} ${p.description || ''}`);
+          }
+        }
+      }
+      process.exit(0);
+    }
+
+    case 'validate': {
+      const manifests = listAmpManifests();
+      let errorCount = 0;
+      console.log(`Validating ${manifests.length} PB-AMP-ABI-v1 manifests...`);
+      for (const m of manifests) {
+        const res = validateAmpAbiManifest(m);
+        if (res.ok) {
+          console.log(`  ✓ ${m.ampId} (v${m.version}, ${m.stage}, ${m.execution})`);
+        } else {
+          console.error(`  ✗ ${m.ampId}: ${res.errors.join('; ')}`);
+          errorCount++;
+        }
+      }
+      if (errorCount > 0) {
+        console.error(`[SCDL] Validation FAILED: ${errorCount} manifest(s) have errors.`);
+        process.exit(1);
+      }
+      console.log(`[SCDL] All ${manifests.length} manifest(s) valid.`);
+      process.exit(0);
+    }
+
+    case 'plan': {
+      const filePath = opts.positional[0];
+      if (!filePath) {
+        console.error('[SCDL] Usage: scdl amps plan <file.scdl> [--json]');
+        process.exit(1);
+      }
+      const src = readSource(filePath);
+      const parsed = parseSCDLV2(src);
+      if (!parsed.ok) {
+        console.error('[SCDL] Parse failure in source file:');
+        for (const d of parsed.diagnostics) {
+          console.error(`  ${d.code}: ${d.message}`);
+        }
+        process.exit(1);
+      }
+      const analyzed = analyzeSCDLV2(parsed.ast);
+      if (!analyzed.ok) {
+        console.error('[SCDL] Analysis failure in source file:');
+        for (const d of analyzed.diagnostics) {
+          console.error(`  ${d.code}: ${d.message}`);
+        }
+        process.exit(1);
+      }
+      const ampPlan = analyzed.ir?.ampPlan || [];
+      const selectedAmps = analyzed.ir?.selectedAmps || [];
+      if (opts.flags.json) {
+        console.log(JSON.stringify({ file: filePath, ampPlan, selectedAmps }, null, 2));
+      } else {
+        console.log(`AMP Plan for ${filePath}:`);
+        console.log(`  Selected / Active AMPs (${selectedAmps.length}):`);
+        for (const s of selectedAmps) {
+          const reason = s.activationReason || s.reason || 'explicit';
+          console.log(`    - [${s.stage}] ${s.ampId} (order ${s.order}): reason='${reason}'`);
+        }
+        console.log(`  Full Evaluated Catalog Plan (${ampPlan.length}):`);
+        for (const p of ampPlan) {
+          const active = p.source !== 'DORMANT';
+          const reason = p.activationReason || p.skipReason || p.reason || 'dormant';
+          console.log(`    - ${p.ampId}: active=${active}, reason='${reason}'`);
+        }
+      }
+      process.exit(0);
+    }
+
+    default:
+      console.log(`SCDL AMP Subcommands:
+  scdl amps list [--json]
+  scdl amps describe <amp-id> [--json]
+  scdl amps validate
+  scdl amps plan <file.scdl> [--json]
+`);
+      process.exit(0);
+  }
+}
+
 // ─── Dispatch ─────────────────────────────────────────────────────────────────
 
 switch (command) {
@@ -604,6 +746,7 @@ switch (command) {
   case 'parse':   cmdParse(argv);   break;
   case 'check':   cmdCheck(argv);   break;
   case 'format':  cmdFormat(argv);  break;
+  case 'amps':    cmdAmps(argv);    break;
   default:
     console.log(`SCDL Compiler CLI
 Usage:
@@ -612,6 +755,7 @@ Usage:
   node scdl.cli.js parse   <file.scdl> [--out <file>]
   node scdl.cli.js check   <file.scdl> [--strict]
   node scdl.cli.js format  <file.scdl> [--write]
+  node scdl.cli.js amps    [list|describe|validate|plan]
 
 Outputs default to the source file's directory, named <asset>-<target>.<ext>
 (multi-frame assets: <asset>-f<N>-<target>.<ext> plus <asset>-frameloop.json).

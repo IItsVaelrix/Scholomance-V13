@@ -114,6 +114,8 @@ const DEFINITIONS = [
   [0x0141, 'RANDOM_SCALAR', ['EXPRESSION'], [['RNG', 'SYMBOL', true], ['MIN', 'SCALAR', true], ['MAX', 'SCALAR', true]], 'SCALAR', 'PURE'],
   [0x0142, 'RANDOM_VEC2', ['EXPRESSION'], [['RNG', 'SYMBOL', true], ['MIN', 'ANY', true], ['MAX', 'ANY', true]], 'VEC2', 'PURE'],
   [0x0143, 'NOISE_2D', ['EXPRESSION'], [['SEED', 'I32', true], ['FREQUENCY', 'SCALAR', false], ['OCTAVES', 'I32', false], ['AT', 'VEC2', true]], 'FIXED', 'PURE'],
+  [0x0060, 'APPLY_AMP', ['PROGRAM', 'LAYER', 'SHAPE', 'BLOCK'], [['SYMBOL', 'SYMBOL', false], ['TYPE', 'TYPE', false], ['BODY', 'BLOCK', true]], 'ANY', 'CONSTRUCTION'],
+  [0x0061, 'SELECT_AMPS', ['PROGRAM'], [['BODY', 'BLOCK', false]], null, 'CONSTRUCTION'],
   [0x8000, 'BC.CONST', ['BYTECODE'], [['CONSTANT', 'CONSTANT_INDEX', true]], 'DECLARED', 'PURE'],
   [0x8001, 'BC.LAYER.NEW', ['BYTECODE'], [['ID', 'IDENT', true], ['ORDER', 'I32', true]], 'LAYER', 'CONSTRUCTION'],
   [0x8002, 'BC.PAINT', ['BYTECODE'], [['LAYER', 'LAYER', true], ['SHAPE', 'SHAPE', true], ['FILL', 'COLOR', true], ['RASTER', 'RASTER_POLICY', true]], null, 'CONSTRUCTION'],
@@ -123,6 +125,8 @@ const DEFINITIONS = [
   [0x8012, 'BC.RNG.INIT', ['BYTECODE'], [['ALGORITHM', 'IDENT', true], ['SEED', 'I32', true]], 'RNG', 'PURE'],
   [0x8013, 'BC.RNG.SAMPLE', ['BYTECODE'], [['RNG', 'REGISTER', true], ['MIN', 'REGISTER', true], ['MAX', 'REGISTER', true]], 'ANY', 'PURE'],
   [0x8014, 'BC.MATH', ['BYTECODE'], [['OP', 'IDENT', true], ['ARGS', 'LIST<REGISTER>', true]], 'ANY', 'PURE'],
+  [0x8020, 'BC.AMP.APPLY', ['BYTECODE'], [['AMP', 'IDENT', true], ['STAGE', 'IDENT', true], ['INPUTS', 'MAP', true], ['PARAMS', 'MAP', true]], 'ANY', 'CONSTRUCTION'],
+  [0x8021, 'BC.AMP.SELECT', ['BYTECODE'], [['PLAN', 'LIST<IDENT>', true]], null, 'CONSTRUCTION'],
 ];
 
 const CAPABILITIES = Object.freeze({
@@ -249,6 +253,10 @@ const CAPABILITIES = Object.freeze({
   'BC.RNG.INIT': 'NOISE.DETERMINISTIC@2.0',
   'BC.RNG.SAMPLE': 'NOISE.DETERMINISTIC@2.0',
   'BC.MATH': 'CORE.MATH@2.0',
+  APPLY_AMP: 'MATERIAL.PIXELBRAIN@2.0',
+  SELECT_AMPS: 'MATERIAL.PIXELBRAIN@2.0',
+  'BC.AMP.APPLY': 'MATERIAL.PIXELBRAIN@2.0',
+  'BC.AMP.SELECT': 'MATERIAL.PIXELBRAIN@2.0',
 });
 
 const DOCS = Object.freeze({
@@ -260,6 +268,8 @@ const DOCS = Object.freeze({
   SHAPE: 'Binds an immutable shape expression or shape generator block.',
   LAYER: 'Constructs an ordered paint layer.',
   PAINT: 'Paints a shape with a color and raster policy.',
+  APPLY_AMP: 'Explicitly applies an AMP effect pass with verified inputs and parameters.',
+  SELECT_AMPS: 'Runs deterministic relevance selection across registered AMPs.',
   ADD: 'Adds two compatible numeric values.',
   SUB: 'Subtracts the right numeric value from the left.',
   MUL: 'Multiplies two compatible numeric values.',
@@ -375,6 +385,8 @@ const DOCS = Object.freeze({
   'BC.RNG.INIT': 'Initializes an RNG stream in canonical bytecode.',
   'BC.RNG.SAMPLE': 'Samples from an RNG stream in canonical bytecode.',
   'BC.MATH': 'Evaluates a mathematical operation in canonical bytecode.',
+  'BC.AMP.APPLY': 'Executes a certified AMP pass or registers a descriptor.',
+  'BC.AMP.SELECT': 'Records the selected deterministic AMP execution plan.',
 });
 
 const OPCODES = Object.freeze(DEFINITIONS.map(([id, mnemonic, scope, operands, result, purity]) => {

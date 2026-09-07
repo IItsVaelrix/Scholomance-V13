@@ -147,6 +147,13 @@ export function tokenizeSCDLV2(source) {
       emit('SYMBOL', start, raw);
       continue;
     }
+    const versionMatch = text.slice(cursor.offset).match(/^\d+\.\d+\.\d+(?:[A-Za-z0-9_.-]*)/);
+    if (versionMatch) {
+      const raw = versionMatch[0];
+      advance(raw.length);
+      emit('WORD', start, raw);
+      continue;
+    }
     const decimalMatch = text.slice(cursor.offset).match(/^-?(?:\d+\.\d+|\.\d+)/);
     if (decimalMatch) {
       const raw = decimalMatch[0];

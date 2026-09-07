@@ -29,51 +29,62 @@ real import graph instead.
 
 **54 modules** — 54 WIRED, 0 GEN, 0 TEST-ONLY,
 0 ORPHAN. 25/54 have a header summary.
+5/54 have SCDL PB-AMP-ABI-v1 manifests.
+
+## SCDL ABI Substrate (`PB-AMP-ABI-v1`)
+
+The **SCDL ABI** column reflects formal compatibility with the SCDL v2 compiler
+substrate (`codex/core/pixelbrain/scdl/v2/amp-manifests/`). Unlike legacy registration
+which only applied to experimental item-foundry passes, `PB-AMP-ABI-v1` manifests
+certify execution class (`COMPILE`, `ANALYZE`, `DESCRIPTOR`), stage ordering across the
+12-stage conveyor belt, typed shape/layer inputs and parameters, and deterministic
+invariance under `scdl-v2.amp-certify.js`. Full catalog coverage (54/54) is enforced
+by the completion gate in Step 6.
 
 ## PixelBrain passes (`codex/core/pixelbrain/*-amp.js`)
 
-| Module | What it does | Status | Registered |
-|---|---|---|---|
-| `codex/core/pixelbrain/biome-coherence-amp.js` | _(no header comment — exports `getNeighbors6`, `runBiomeCoherenceAMP`, `runBiomeCoherenceAMPWorld`, `NEGOTIATION_THRESHOLD`)_ | WIRED | — |
-| `codex/core/pixelbrain/chestplate-amp.js` | _(no header comment — exports `applyChestplateTemplate`)_ | WIRED | — |
-| `codex/core/pixelbrain/chestplate-bevel-amp.js` | Deterministic trim/plate beveling for chestplate-class assets. | WIRED | — |
-| `codex/core/pixelbrain/chestplate-surface-texture-amp.js` | Deterministic material texture for chestplate surfaces. | WIRED | — |
-| `codex/core/pixelbrain/chunks-seam-amp.js` | _(no header comment — exports `injectBorderEnergy`, `injectAllBorderEnergies`, `DEFAULT_OVERLAP_RADIUS`)_ | WIRED | — |
-| `codex/core/pixelbrain/coord-symmetry-amp.js` | COORDINATE SYMMETRY AMP MICROPROCESSOR | WIRED | — |
-| `codex/core/pixelbrain/crystal-core-amp.js` | Structured sternum crystal/core pass for deterministic chestplate assets. | WIRED | — |
-| `codex/core/pixelbrain/facet-amp.js` | Faceting pass for gem-class parts. | WIRED | — |
-| `codex/core/pixelbrain/flame-tip-amp.js` | _(no header comment — exports `applyFlameTipGeometry`, `buildFlameTipAmpPayload`, `FLAME_TIP_AMP_ID`, `FLAME_TIP_AMP_VERSION`)_ | WIRED | `pixelbrain.flame-tip-amp` |
-| `codex/core/pixelbrain/gear-glide-amp.js` | GEAR-GLIDE AMP — BPM-Synced Clock Rotation System | WIRED | — |
-| `codex/core/pixelbrain/geometry-amp.js` | Geometry AMP converts composed PixelBrain item geometry into deterministic | WIRED | — |
-| `codex/core/pixelbrain/grass-amp.js` | PixelBrain AMP wrapper for the literal SWARD grass engine port. | WIRED | `grass` |
-| `codex/core/pixelbrain/gravity-amp.js` | _(no header comment — exports `applyGravityAMP`)_ | WIRED | — |
-| `codex/core/pixelbrain/hair-flow-amp.js` | HairFlowAMP - Generates deterministic rasterized hair clumps and strands | WIRED | — |
-| `codex/core/pixelbrain/heraldry-amp.js` | HERALDRY MICROPROCESSOR — emblem stamping for shield faces and panels. | WIRED | — |
-| `codex/core/pixelbrain/hollowness-amp.js` | _(no header comment — exports `computeHollownessAMP`, `buildSurfaceLockSet`, `collectHollowDeltas`, `applyHollownessAMP`)_ | WIRED | — |
-| `codex/core/pixelbrain/holyfire-motif-amp.js` | HOLY FIRE MOTIF AMP — deterministic flame emission for the Holy Fire | WIRED | `pixelbrain.holyfireMotif` |
-| `codex/core/pixelbrain/image-segmentation-amp.js` | _(no header comment — exports `segmentImage`)_ | WIRED | — |
-| `codex/core/pixelbrain/jewelry-amp.js` | Template pre-processor: Generates chains, gem settings, and manipulates volumes for jewelry. | WIRED | — |
-| `codex/core/pixelbrain/neighbor-extrapolation-amp.js` | _(no header comment — exports `extrapolateNeighbors`)_ | WIRED | — |
-| `codex/core/pixelbrain/noise-fill-amp.js` | Modulates material intensity or adds optional variation using PB-NOISE-v1 on existing lattice cells. | WIRED | `noise-fill` |
-| `codex/core/pixelbrain/palette-quantization-amp.js` | Deterministic final palette budget enforcement. | WIRED | — |
-| `codex/core/pixelbrain/pixel-aa-amp.js` | Anti-Aliasing pass for pixel art. | WIRED | — |
-| `codex/core/pixelbrain/pixel-scale-amp.js` | _(no header comment — exports `colorDist`, `applyXBR2x`)_ | WIRED | — |
-| `codex/core/pixelbrain/region-fill-amp.js` | REGION FILL AMP — color authority for the Item Foundry. | WIRED | — |
-| `codex/core/pixelbrain/scholomance-character-motif-amp.js` | Scholomance Character Motif Amp | WIRED | — |
-| `codex/core/pixelbrain/school-tag-amp.js` | _(no header comment — exports `collectSchoolTagDeltas`, `applySchoolTagAMP`)_ | WIRED | — |
-| `codex/core/pixelbrain/sdf-shape-amp.js` | Consumes PB-SDF-v1 (from part spec or profile) + construction skeleton. | WIRED | `sdf-shape` |
-| `codex/core/pixelbrain/selout-amp.js` | Selective Outline (selout) pass. | WIRED | — |
-| `codex/core/pixelbrain/shadow-amp.js` | _(no header comment — exports `buildShadowAmpPayload`, `SHADOW_AMP_ID`, `SHADOW_AMP_VERSION`)_ | WIRED | `pixelbrain.shadow-amp` |
-| `codex/core/pixelbrain/shadow-perception-amp.js` | _(no header comment — exports `runShadowPerceptionAmp`, `SHADOW_PERCEPTION_AMP_ID`, `SHADOW_SCALARS`)_ | WIRED | `pixelbrain.shadow-perception-amp` |
-| `codex/core/pixelbrain/shield-rim-amp.js` | Template pre-processor: Owns outer border, gold/bronze frame, rim thickness, corner highlights, bottom shadow. | WIRED | — |
-| `codex/core/pixelbrain/shield-volume-amp.js` | Template pre-processor: Owns curved face shading, center plane, side shadows, and rim cast shadows. | WIRED | — |
-| `codex/core/pixelbrain/sketch-amp.js` | SKETCH AMP — Silhouette Authoring → Auto-Shaded Template + Construction Geometry | WIRED | — |
-| `codex/core/pixelbrain/square-sharpness-contrast-amp.js` | _(no header comment — exports `enhanceSquaresForRender`, `buildSquareSharpnessContrastPayload`, `SQUARE_SHARPNESS_CONTRAST_AMP_ID`, `SQUARE_SHARPNESS_CONTRAST_VERSION`)_ | WIRED | `square-sharpness-contrast` |
-| `codex/core/pixelbrain/symmetry-amp.js` | SYMMETRY AMP MICROPROCESSOR | WIRED | — |
-| `codex/core/pixelbrain/tonation-amp.js` | _(no header comment — exports `buildTonationAmpPayload`, `TONATION_AMP_ID`, `TONATION_AMP_VERSION`)_ | WIRED | `pixelbrain.tonation-amp` |
-| `codex/core/pixelbrain/vector-amp.js` | _(no header comment — exports `buildVectorAmpPayload`, `VECTOR_AMP_ID`, `VECTOR_AMP_VERSION`)_ | WIRED | `pixelbrain.vector-amp` |
-| `codex/core/pixelbrain/volume-amp.js` | _(no header comment — exports `buildVolumeAmpPayload`, `VOLUME_AMP_ID`, `VOLUME_AMP_VERSION`)_ | WIRED | `pixelbrain.volume-amp` |
-| `codex/core/pixelbrain/volume-lift-amp.js` | VOLUME-LIFT AMP — Structural-Energy → True 3D Voxel Volume | WIRED | `pixelbrain.volume-lift-amp` |
+| Module | What it does | Status | Registered | SCDL ABI |
+|---|---|---|---|---|
+| `codex/core/pixelbrain/biome-coherence-amp.js` | _(no header comment — exports `getNeighbors6`, `runBiomeCoherenceAMP`, `runBiomeCoherenceAMPWorld`, `NEGOTIATION_THRESHOLD`)_ | WIRED | — | — |
+| `codex/core/pixelbrain/chestplate-amp.js` | _(no header comment — exports `applyChestplateTemplate`)_ | WIRED | — | — |
+| `codex/core/pixelbrain/chestplate-bevel-amp.js` | Deterministic trim/plate beveling for chestplate-class assets. | WIRED | — | — |
+| `codex/core/pixelbrain/chestplate-surface-texture-amp.js` | Deterministic material texture for chestplate surfaces. | WIRED | — | — |
+| `codex/core/pixelbrain/chunks-seam-amp.js` | _(no header comment — exports `injectBorderEnergy`, `injectAllBorderEnergies`, `DEFAULT_OVERLAP_RADIUS`)_ | WIRED | — | — |
+| `codex/core/pixelbrain/coord-symmetry-amp.js` | COORDINATE SYMMETRY AMP MICROPROCESSOR | WIRED | — | — |
+| `codex/core/pixelbrain/crystal-core-amp.js` | Structured sternum crystal/core pass for deterministic chestplate assets. | WIRED | — | — |
+| `codex/core/pixelbrain/facet-amp.js` | Faceting pass for gem-class parts. | WIRED | — | ✓ `PB-AMP-ABI-v1` (COMPILE) |
+| `codex/core/pixelbrain/flame-tip-amp.js` | _(no header comment — exports `applyFlameTipGeometry`, `buildFlameTipAmpPayload`, `FLAME_TIP_AMP_ID`, `FLAME_TIP_AMP_VERSION`)_ | WIRED | `pixelbrain.flame-tip-amp` | — |
+| `codex/core/pixelbrain/gear-glide-amp.js` | GEAR-GLIDE AMP — BPM-Synced Clock Rotation System | WIRED | — | ✓ `PB-AMP-ABI-v1` (DESCRIPTOR) |
+| `codex/core/pixelbrain/geometry-amp.js` | Geometry AMP converts composed PixelBrain item geometry into deterministic | WIRED | — | — |
+| `codex/core/pixelbrain/grass-amp.js` | PixelBrain AMP wrapper for the literal SWARD grass engine port. | WIRED | `grass` | — |
+| `codex/core/pixelbrain/gravity-amp.js` | _(no header comment — exports `applyGravityAMP`)_ | WIRED | — | — |
+| `codex/core/pixelbrain/hair-flow-amp.js` | HairFlowAMP - Generates deterministic rasterized hair clumps and strands | WIRED | — | — |
+| `codex/core/pixelbrain/heraldry-amp.js` | HERALDRY MICROPROCESSOR — emblem stamping for shield faces and panels. | WIRED | — | — |
+| `codex/core/pixelbrain/hollowness-amp.js` | _(no header comment — exports `computeHollownessAMP`, `buildSurfaceLockSet`, `collectHollowDeltas`, `applyHollownessAMP`)_ | WIRED | — | — |
+| `codex/core/pixelbrain/holyfire-motif-amp.js` | HOLY FIRE MOTIF AMP — deterministic flame emission for the Holy Fire | WIRED | `pixelbrain.holyfireMotif` | — |
+| `codex/core/pixelbrain/image-segmentation-amp.js` | _(no header comment — exports `segmentImage`)_ | WIRED | — | ✓ `PB-AMP-ABI-v1` (ANALYZE) |
+| `codex/core/pixelbrain/jewelry-amp.js` | Template pre-processor: Generates chains, gem settings, and manipulates volumes for jewelry. | WIRED | — | — |
+| `codex/core/pixelbrain/neighbor-extrapolation-amp.js` | _(no header comment — exports `extrapolateNeighbors`)_ | WIRED | — | — |
+| `codex/core/pixelbrain/noise-fill-amp.js` | Modulates material intensity or adds optional variation using PB-NOISE-v1 on existing lattice cells. | WIRED | `noise-fill` | ✓ `PB-AMP-ABI-v1` (COMPILE) |
+| `codex/core/pixelbrain/palette-quantization-amp.js` | Deterministic final palette budget enforcement. | WIRED | — | — |
+| `codex/core/pixelbrain/pixel-aa-amp.js` | Anti-Aliasing pass for pixel art. | WIRED | — | ✓ `PB-AMP-ABI-v1` (COMPILE) |
+| `codex/core/pixelbrain/pixel-scale-amp.js` | _(no header comment — exports `colorDist`, `applyXBR2x`)_ | WIRED | — | — |
+| `codex/core/pixelbrain/region-fill-amp.js` | REGION FILL AMP — color authority for the Item Foundry. | WIRED | — | — |
+| `codex/core/pixelbrain/scholomance-character-motif-amp.js` | Scholomance Character Motif Amp | WIRED | — | — |
+| `codex/core/pixelbrain/school-tag-amp.js` | _(no header comment — exports `collectSchoolTagDeltas`, `applySchoolTagAMP`)_ | WIRED | — | — |
+| `codex/core/pixelbrain/sdf-shape-amp.js` | Consumes PB-SDF-v1 (from part spec or profile) + construction skeleton. | WIRED | `sdf-shape` | — |
+| `codex/core/pixelbrain/selout-amp.js` | Selective Outline (selout) pass. | WIRED | — | — |
+| `codex/core/pixelbrain/shadow-amp.js` | _(no header comment — exports `buildShadowAmpPayload`, `SHADOW_AMP_ID`, `SHADOW_AMP_VERSION`)_ | WIRED | `pixelbrain.shadow-amp` | — |
+| `codex/core/pixelbrain/shadow-perception-amp.js` | _(no header comment — exports `runShadowPerceptionAmp`, `SHADOW_PERCEPTION_AMP_ID`, `SHADOW_SCALARS`)_ | WIRED | `pixelbrain.shadow-perception-amp` | — |
+| `codex/core/pixelbrain/shield-rim-amp.js` | Template pre-processor: Owns outer border, gold/bronze frame, rim thickness, corner highlights, bottom shadow. | WIRED | — | — |
+| `codex/core/pixelbrain/shield-volume-amp.js` | Template pre-processor: Owns curved face shading, center plane, side shadows, and rim cast shadows. | WIRED | — | — |
+| `codex/core/pixelbrain/sketch-amp.js` | SKETCH AMP — Silhouette Authoring → Auto-Shaded Template + Construction Geometry | WIRED | — | — |
+| `codex/core/pixelbrain/square-sharpness-contrast-amp.js` | _(no header comment — exports `enhanceSquaresForRender`, `buildSquareSharpnessContrastPayload`, `SQUARE_SHARPNESS_CONTRAST_AMP_ID`, `SQUARE_SHARPNESS_CONTRAST_VERSION`)_ | WIRED | `square-sharpness-contrast` | — |
+| `codex/core/pixelbrain/symmetry-amp.js` | SYMMETRY AMP MICROPROCESSOR | WIRED | — | — |
+| `codex/core/pixelbrain/tonation-amp.js` | _(no header comment — exports `buildTonationAmpPayload`, `TONATION_AMP_ID`, `TONATION_AMP_VERSION`)_ | WIRED | `pixelbrain.tonation-amp` | — |
+| `codex/core/pixelbrain/vector-amp.js` | _(no header comment — exports `buildVectorAmpPayload`, `VECTOR_AMP_ID`, `VECTOR_AMP_VERSION`)_ | WIRED | `pixelbrain.vector-amp` | — |
+| `codex/core/pixelbrain/volume-amp.js` | _(no header comment — exports `buildVolumeAmpPayload`, `VOLUME_AMP_ID`, `VOLUME_AMP_VERSION`)_ | WIRED | `pixelbrain.volume-amp` | — |
+| `codex/core/pixelbrain/volume-lift-amp.js` | VOLUME-LIFT AMP — Structural-Energy → True 3D Voxel Volume | WIRED | `pixelbrain.volume-lift-amp` | — |
 
 ## Microprocessor family (`amps/**`, `codex/core/microprocessors`)
 
@@ -81,22 +92,22 @@ A **separate system** from the passes above: microprocessors are wired through
 their own registries (e.g. `TileForgeMicroprocessor`) and are deliberately not
 in `amp-registry.js`.
 
-| Module | What it does | Status | Registered |
-|---|---|---|---|
-| `codex/core/microprocessors/arena/arena-tick.processor.js` | Arena Visual Tick Processor | WIRED | — |
-| `codex/core/pixelbrain/amps/biome/biome-material.microprocessor.js` | _(no header comment — exports `BiomeMaterialMicroprocessor`)_ | WIRED | — |
-| `codex/core/pixelbrain/amps/noise/deterministic-noise.js` | _(no header comment — exports `createSeededRng`)_ | WIRED | — |
-| `codex/core/pixelbrain/amps/fibonacci/fibonacci-field.microprocessor.js` | _(no header comment — exports `FibonacciFieldMicroprocessor`)_ | WIRED | — |
-| `codex/core/pixelbrain/amps/fibonacci/fibonacci-seed-field.js` | _(no header comment — exports `generateFibonacciSeedField`)_ | WIRED | — |
-| `codex/core/pixelbrain/amps/volume/processors/heightmap.microprocessor.js` | _(no header comment — exports `generateHeightMap`)_ | WIRED | — |
-| `codex/core/pixelbrain/amps/geometry/processors/iso-tile-geometry.microprocessor.js` | _(no header comment — exports `IsoTileGeometryMicroprocessor`)_ | WIRED | — |
-| `codex/core/pixelbrain/amps/biome/material-resolver.js` | _(no header comment — exports `MaterialResolver`)_ | WIRED | — |
-| `codex/core/pixelbrain/amps/noise/noise-mask.microprocessor.js` | _(no header comment — exports `generateNoiseMask`)_ | WIRED | — |
-| `codex/core/pixelbrain/amps/noise/perlin-field.microprocessor.js` | _(no header comment — exports `PerlinFieldMicroprocessor`)_ | WIRED | — |
-| `codex/core/pixelbrain/amps/qbit/qbit-snap-profile.js` | _(no header comment — exports `areSnapProfilesCompatible`, `canSnapEdges`, `QbitTileCellSchema`, `TileSnapProfileSchema`)_ | WIRED | — |
-| `codex/core/pixelbrain/amps/geometry/processors/tile-socket.microprocessor.js` | _(no header comment — exports `TileSocketMicroprocessor`)_ | WIRED | — |
-| `codex/core/pixelbrain/amps/turboquant/turboquant-layer-snapshot.js` | _(no header comment — exports `TurboQuantCandidateMemorySchema`)_ | WIRED | — |
-| `codex/core/pixelbrain/amps/volume/processors/volume.microprocessor.js` | _(no header comment — exports `VolumeMicroprocessor`)_ | WIRED | — |
+| Module | What it does | Status | Registered | SCDL ABI |
+|---|---|---|---|---|
+| `codex/core/microprocessors/arena/arena-tick.processor.js` | Arena Visual Tick Processor | WIRED | — | — |
+| `codex/core/pixelbrain/amps/biome/biome-material.microprocessor.js` | _(no header comment — exports `BiomeMaterialMicroprocessor`)_ | WIRED | — | — |
+| `codex/core/pixelbrain/amps/noise/deterministic-noise.js` | _(no header comment — exports `createSeededRng`)_ | WIRED | — | — |
+| `codex/core/pixelbrain/amps/fibonacci/fibonacci-field.microprocessor.js` | _(no header comment — exports `FibonacciFieldMicroprocessor`)_ | WIRED | — | — |
+| `codex/core/pixelbrain/amps/fibonacci/fibonacci-seed-field.js` | _(no header comment — exports `generateFibonacciSeedField`)_ | WIRED | — | — |
+| `codex/core/pixelbrain/amps/volume/processors/heightmap.microprocessor.js` | _(no header comment — exports `generateHeightMap`)_ | WIRED | — | — |
+| `codex/core/pixelbrain/amps/geometry/processors/iso-tile-geometry.microprocessor.js` | _(no header comment — exports `IsoTileGeometryMicroprocessor`)_ | WIRED | — | — |
+| `codex/core/pixelbrain/amps/biome/material-resolver.js` | _(no header comment — exports `MaterialResolver`)_ | WIRED | — | — |
+| `codex/core/pixelbrain/amps/noise/noise-mask.microprocessor.js` | _(no header comment — exports `generateNoiseMask`)_ | WIRED | — | — |
+| `codex/core/pixelbrain/amps/noise/perlin-field.microprocessor.js` | _(no header comment — exports `PerlinFieldMicroprocessor`)_ | WIRED | — | — |
+| `codex/core/pixelbrain/amps/qbit/qbit-snap-profile.js` | _(no header comment — exports `areSnapProfilesCompatible`, `canSnapEdges`, `QbitTileCellSchema`, `TileSnapProfileSchema`)_ | WIRED | — | — |
+| `codex/core/pixelbrain/amps/geometry/processors/tile-socket.microprocessor.js` | _(no header comment — exports `TileSocketMicroprocessor`)_ | WIRED | — | — |
+| `codex/core/pixelbrain/amps/turboquant/turboquant-layer-snapshot.js` | _(no header comment — exports `TurboQuantCandidateMemorySchema`)_ | WIRED | — | — |
+| `codex/core/pixelbrain/amps/volume/processors/volume.microprocessor.js` | _(no header comment — exports `VolumeMicroprocessor`)_ | WIRED | — | — |
 
 ## Asset generators (`scripts/generate-*.mjs`)
 

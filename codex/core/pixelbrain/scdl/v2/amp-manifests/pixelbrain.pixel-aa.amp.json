@@ -1,0 +1,45 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.pixel-aa",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "LAYER_POST",
+  "scope": ["LAYER"],
+  "inputs": [
+    {
+      "name": "layer",
+      "type": "LAYER",
+      "required": true,
+      "description": "Layer whose raster paint cells receive anti-aliasing"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "strength",
+      "type": "FIXED",
+      "min": 0,
+      "max": 1,
+      "default": 1,
+      "description": "Anti-aliasing corner softening factor"
+    }
+  ],
+  "output": {
+    "type": "LAYER",
+    "description": "Layer with anti-aliased perimeter cells"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 2,
+    "fixed": 0
+  },
+  "order": 70,
+  "relevance": {
+    "pipelines": ["render-fidelity"],
+    "conditions": []
+  },
+  "checksum": "7ae8d3114ba8d547dc1b7b36c08a83f703e0213f1a3f3ad2017ac5acd3789b0e"
+}

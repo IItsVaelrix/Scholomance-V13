@@ -1,8 +1,11 @@
 import { span, v2Diagnostic } from './scdl-v2.diagnostics.js';
 import {
-  SCDL_V2_TYPES, NUMERIC_TYPES, SCALAR_TYPES, TYPE_CODES, BIND_CODES, GEOM_CODES, TERM_CODES,
+  SCDL_V2_TYPES, NUMERIC_TYPES, SCALAR_TYPES, TYPE_CODES, BIND_CODES, GEOM_CODES, TERM_CODES, AMP_CODES,
   I32_MIN, I32_MAX, RASTER_POLICIES, COMPOSITE_MODES, isKnownType,
 } from './scdl-v2.types.js';
+import { getAmpManifest, listAmpManifests } from './scdl-v2.amp-catalog.js';
+import { isValidStage, AMP_STAGES } from './scdl-v2.amp-stages.js';
+import { resolveAmpPlan } from './scdl-v2.amp-relevance.js';
 import {
   makeRational, mulRational, divRational, addRational, subRational, parseRational, rationalToString,
 } from './scdl-v2.rational.js';
@@ -2231,6 +2234,268 @@ function analyzeConstDeclaration(declaration, symbols, diagnostics, constants) {
   constants.push(Object.freeze({ symbol: declaration.symbol, type: resolved.type, value: resolved.value }));
 }
 
+function analyzeApplyAmpDeclaration(declaration, symbols, diagnostics, explicitAmps, shapes) {
+  ensureAnalyzerContext(symbols);
+  const manifest = getAmpManifest(declaration.ampId);
+  if (!manifest) {
+    pushDiagnostic(diagnostics, {
+      code: AMP_CODES.UNKNOWN_AMP,
+      message: `Unknown AMP '${declaration.ampId}'.`,
+      nodeSpan: declaration.span,
+      expected: listAmpManifests().map((m) => m.ampId),
+      received: [declaration.ampId],
+      relatedSymbols: declaration.targetSymbol ? [declaration.targetSymbol] : [],
+    });
+    return;
+  }
+
+  // Version compatibility check (major versions must match)
+  if (declaration.version) {
+    const declMajor = declaration.version.split('.')[0];
+    const manMajor = manifest.version.split('.')[0];
+    if (declMajor !== manMajor) {
+      pushDiagnostic(diagnostics, {
+        code: AMP_CODES.VERSION_MISMATCH,
+        message: `AMP '${declaration.ampId}' version '${declaration.version}' is incompatible with manifest version '${manifest.version}'.`,
+        nodeSpan: declaration.span,
+        expected: [`^${manMajor}.0.0`],
+        received: [declaration.version],
+        relatedSymbols: [declaration.ampId],
+      });
+      return;
+    }
+  }
+
+  // Stage check
+  if (declaration.stage && declaration.stage !== manifest.stage) {
+    pushDiagnostic(diagnostics, {
+      code: AMP_CODES.STAGE_MISMATCH,
+      message: `Declared STAGE '${declaration.stage}' for AMP '${declaration.ampId}' does not match manifest stage '${manifest.stage}'.`,
+      nodeSpan: declaration.span,
+      expected: [manifest.stage],
+      received: [declaration.stage],
+      relatedSymbols: [declaration.ampId],
+    });
+    return;
+  }
+
+  // Check for unknown inputs
+  const declaredInputNames = Object.keys(declaration.inputs || {});
+  const validInputNames = new Set((manifest.inputs || []).map((i) => i.name));
+  for (const inputName of declaredInputNames) {
+    if (!validInputNames.has(inputName)) {
+      const inputExpr = declaration.inputs[inputName];
+      pushDiagnostic(diagnostics, {
+        code: AMP_CODES.INVALID_INPUT,
+        message: `AMP '${declaration.ampId}' received unknown input '${inputName}'. Valid inputs: [${Array.from(validInputNames).join(', ')}].`,
+        nodeSpan: inputExpr?.span || declaration.span,
+        expected: Array.from(validInputNames),
+        received: [inputName],
+        relatedSymbols: [declaration.ampId],
+      });
+    }
+  }
+
+  // Check required inputs
+  const resolvedInputs = {};
+  for (const inputSpec of manifest.inputs || []) {
+    const inputExpr = declaration.inputs ? declaration.inputs[inputSpec.name] : undefined;
+    if (!inputExpr) {
+      if (inputSpec.required !== false) {
+        pushDiagnostic(diagnostics, {
+          code: AMP_CODES.MISSING_INPUT,
+          message: `AMP '${declaration.ampId}' is missing required input '${inputSpec.name}'.`,
+          nodeSpan: declaration.span,
+          expected: [`${inputSpec.name} ${inputSpec.type}`],
+          received: ['<missing>'],
+          relatedSymbols: [declaration.ampId],
+        });
+      }
+      continue;
+    }
+
+    const resolved = evaluateExpression(inputExpr, symbols, diagnostics);
+    if (resolved) {
+      if (inputSpec.type !== 'ANY' && resolved.type !== inputSpec.type) {
+        pushDiagnostic(diagnostics, {
+          code: AMP_CODES.TYPE_MISMATCH,
+          message: `AMP '${declaration.ampId}' input '${inputSpec.name}' expected type ${inputSpec.type}, received ${resolved.type}.`,
+          nodeSpan: inputExpr.span,
+          expected: [inputSpec.type],
+          received: [resolved.type],
+          relatedSymbols: [declaration.ampId],
+        });
+      } else {
+        resolvedInputs[inputSpec.name] = resolved;
+      }
+    }
+  }
+
+  // Check for unknown parameters
+  const declaredParamNames = Object.keys(declaration.params || {});
+  const validParamNames = new Set((manifest.parameters || []).map((p) => p.name));
+  for (const paramName of declaredParamNames) {
+    if (!validParamNames.has(paramName)) {
+      pushDiagnostic(diagnostics, {
+        code: AMP_CODES.INVALID_PARAM,
+        message: `AMP '${declaration.ampId}' received unknown parameter '${paramName}'.`,
+        nodeSpan: declaration.params[paramName]?.span || declaration.span,
+        expected: Array.from(validParamNames),
+        received: [paramName],
+        relatedSymbols: [declaration.ampId, paramName],
+      });
+    }
+  }
+
+  // Check parameters
+  const resolvedParams = {};
+  for (const paramSpec of manifest.parameters || []) {
+    const paramExpr = declaration.params ? declaration.params[paramSpec.name] : undefined;
+    if (!paramExpr) {
+      if (paramSpec.required) {
+        pushDiagnostic(diagnostics, {
+          code: AMP_CODES.INVALID_PARAM,
+          message: `AMP '${declaration.ampId}' is missing required parameter '${paramSpec.name}'.`,
+          nodeSpan: declaration.span,
+          expected: [`${paramSpec.name} ${paramSpec.type}`],
+          received: ['<missing>'],
+          relatedSymbols: [declaration.ampId],
+        });
+      } else if (paramSpec.default !== null && paramSpec.default !== undefined) {
+        resolvedParams[paramSpec.name] = paramSpec.default;
+      }
+      continue;
+    }
+
+    const resolved = evaluateExpression(paramExpr, symbols, diagnostics);
+    if (resolved) {
+      if (paramSpec.type && paramSpec.type !== 'ANY') {
+        const isTypeMatch = (
+          resolved.type === paramSpec.type
+          || (paramSpec.type === 'I32' && (resolved.type === 'I32' || resolved.type === 'U32'))
+          || (paramSpec.type === 'FIXED' && (resolved.type === 'FIXED' || resolved.type === 'RATIO' || resolved.type === 'I32'))
+          || (paramSpec.type === 'RATIO' && (resolved.type === 'RATIO' || resolved.type === 'FIXED'))
+        );
+        if (!isTypeMatch) {
+          pushDiagnostic(diagnostics, {
+            code: AMP_CODES.TYPE_MISMATCH,
+            message: `AMP '${declaration.ampId}' parameter '${paramSpec.name}' expected type ${paramSpec.type}, received ${resolved.type}.`,
+            nodeSpan: paramExpr.span,
+            expected: [paramSpec.type],
+            received: [resolved.type],
+            relatedSymbols: [declaration.ampId, paramSpec.name],
+          });
+        }
+      }
+
+      let val = resolved.value;
+      if (resolved.type === 'I32' || resolved.type === 'U32') {
+        val = Number(resolved.value);
+      } else if (resolved.type === 'RATIO' || resolved.type === 'FIXED') {
+        val = Number(resolved.value.numerator) / Number(resolved.value.denominator);
+      }
+
+      if (typeof val === 'number') {
+        if (paramSpec.min !== null && paramSpec.min !== undefined && val < paramSpec.min) {
+          pushDiagnostic(diagnostics, {
+            code: AMP_CODES.INVALID_PARAM,
+            message: `Parameter '${paramSpec.name}' value ${val} is below minimum ${paramSpec.min}.`,
+            nodeSpan: paramExpr.span,
+            expected: [`>= ${paramSpec.min}`],
+            received: [String(val)],
+            relatedSymbols: [declaration.ampId],
+          });
+        }
+        if (paramSpec.max !== null && paramSpec.max !== undefined && val > paramSpec.max) {
+          pushDiagnostic(diagnostics, {
+            code: AMP_CODES.INVALID_PARAM,
+            message: `Parameter '${paramSpec.name}' value ${val} exceeds maximum ${paramSpec.max}.`,
+            nodeSpan: paramExpr.span,
+            expected: [`<= ${paramSpec.max}`],
+            received: [String(val)],
+            relatedSymbols: [declaration.ampId],
+          });
+        }
+      }
+
+      if (Array.isArray(paramSpec.enum) && !paramSpec.enum.includes(String(val))) {
+        pushDiagnostic(diagnostics, {
+          code: AMP_CODES.INVALID_PARAM,
+          message: `Parameter '${paramSpec.name}' value '${val}' is not in enum [${paramSpec.enum.join(', ')}].`,
+          nodeSpan: paramExpr.span,
+          expected: paramSpec.enum,
+          received: [String(val)],
+          relatedSymbols: [declaration.ampId],
+        });
+      }
+
+      resolvedParams[paramSpec.name] = val;
+    }
+  }
+
+  // Target symbol binding
+  if (declaration.targetSymbol) {
+    if (symbols.has(declaration.targetSymbol)) {
+      pushDiagnostic(diagnostics, {
+        code: BIND_CODES.DUPLICATE_SYMBOL,
+        message: `Symbol ${declaration.targetSymbol} is already bound.`,
+        nodeSpan: declaration.span,
+        relatedSymbols: [declaration.targetSymbol],
+      });
+      return;
+    }
+
+    const outputType = manifest.output?.type || 'SHAPE';
+    if (declaration.targetType && declaration.targetType !== outputType && outputType !== 'ANY') {
+      pushDiagnostic(diagnostics, {
+        code: AMP_CODES.TYPE_MISMATCH,
+        message: `Declared target type '${declaration.targetType}' does not match AMP '${declaration.ampId}' output type '${outputType}'.`,
+        nodeSpan: declaration.span,
+        expected: [outputType],
+        received: [declaration.targetType],
+        relatedSymbols: [declaration.targetSymbol],
+      });
+      return;
+    }
+
+    const rawInputs = {};
+    for (const [k, v] of Object.entries(resolvedInputs)) {
+      rawInputs[k] = v && typeof v === 'object' && 'value' in v ? v.value : v;
+    }
+
+    const boundValue = Object.freeze({
+      type: outputType,
+      value: Object.freeze({
+        kind: 'AMP_RESULT',
+        ampId: declaration.ampId,
+        outputType,
+        stage: declaration.stage || manifest.stage,
+        inputs: Object.freeze(rawInputs),
+        params: Object.freeze({ ...resolvedParams }),
+        symbol: declaration.targetSymbol,
+      }),
+    });
+
+    symbols.set(declaration.targetSymbol, boundValue);
+    if (outputType === 'SHAPE') {
+      shapes.push(Object.freeze({ symbol: declaration.targetSymbol, value: boundValue.value }));
+    }
+  }
+
+  explicitAmps.push(Object.freeze({
+    ampId: declaration.ampId,
+    version: declaration.version || manifest.version,
+    stage: declaration.stage || manifest.stage,
+    order: manifest.order,
+    manifest,
+    inputs: resolvedInputs,
+    params: resolvedParams,
+    targetSymbol: declaration.targetSymbol || null,
+    targetType: declaration.targetType || manifest.output?.type || null,
+    span: declaration.span,
+  }));
+}
+
 function analyzeShapeDeclaration(declaration, symbols, diagnostics, shapes) {
   ensureAnalyzerContext(symbols);
   if (symbols.has(declaration.symbol)) {
@@ -2940,6 +3205,9 @@ export function analyzeSCDLV2(ast) {
     const sequences = [];
     const functionsList = [];
     const rngs = [];
+    const explicitAmps = [];
+    let selectAmpsRequested = false;
+    let selectAmpsConfig = null;
 
     // Pre-analyze functions
     analyzeFnDeclarations(ast.declarations, symbols, diagnostics, functionsList);
@@ -3005,6 +3273,22 @@ export function analyzeSCDLV2(ast) {
         case 'LayerDeclaration':
           analyzeLayerDeclaration(declaration, symbols, diagnostics, layers);
           break;
+        case 'ApplyAmpStatement':
+          analyzeApplyAmpDeclaration(declaration, symbols, diagnostics, explicitAmps, shapes);
+          break;
+        case 'SelectAmpsStatement':
+          if (declaration.stage && !isValidStage(declaration.stage)) {
+            pushDiagnostic(diagnostics, {
+              code: AMP_CODES.STAGE_MISMATCH,
+              message: `SELECT_AMPS declared invalid stage '${declaration.stage}'.`,
+              nodeSpan: declaration.span,
+              expected: AMP_STAGES,
+              received: [declaration.stage],
+            });
+          }
+          selectAmpsRequested = true;
+          selectAmpsConfig = { pipeline: declaration.pipeline, stage: declaration.stage };
+          break;
         default:
           pushDiagnostic(diagnostics, {
             code: TYPE_CODES.INVALID_OPERATION,
@@ -3012,6 +3296,31 @@ export function analyzeSCDLV2(ast) {
             nodeSpan: declaration.span,
           });
       }
+    }
+
+    const usedMaterials = new Set();
+    for (const layer of layers) {
+      for (const paint of layer.paints || []) {
+        if (paint.material) usedMaterials.add(paint.material);
+      }
+    }
+
+    let ampPlan = [];
+    let selectedAmps = [];
+    if (explicitAmps.length > 0 || selectAmpsRequested) {
+      const context = {
+        assetId,
+        canvas,
+        materials: Array.from(usedMaterials),
+        pipeline: selectAmpsConfig?.pipeline || null,
+        stage: selectAmpsConfig?.stage || null,
+        layers,
+        shapes,
+        selectAmpsEnabled: selectAmpsRequested,
+      };
+      const resolved = resolveAmpPlan(listAmpManifests(), context, explicitAmps, { selectAmpsEnabled: selectAmpsRequested });
+      ampPlan = resolved.fullPlan;
+      selectedAmps = resolved.selectedPlan;
     }
 
     const ok = !diagnostics.some((diagnostic) => diagnostic.isError());
@@ -3029,6 +3338,10 @@ export function analyzeSCDLV2(ast) {
           sequences,
           functions: functionsList,
           rngs,
+          ampPlan,
+          selectedAmps,
+          explicitAmps,
+          selectAmpsEnabled: selectAmpsRequested,
         })
       : null;
 

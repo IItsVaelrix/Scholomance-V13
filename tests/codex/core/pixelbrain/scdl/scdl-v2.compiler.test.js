@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { compileSCDLV2 } from '../../../../../codex/core/pixelbrain/scdl/v2/scdl-v2.compiler.js';
+import {
+  registerAmpManifest,
+  registerAmpAdapter,
+} from '../../../../../codex/core/pixelbrain/scdl/v2/scdl-v2.amp-catalog.js';
 
 const SOURCE = readFileSync(resolve('codex/core/pixelbrain/scdl/fixtures/v2/exact-orb.scdl'), 'utf8');
 
@@ -70,5 +74,258 @@ describe('SCDL v2 compiler vertical slice', () => {
     expect(result.bytecode.programId).toBe('scdlbc_64c9884a');
     expect(result.packet.geometry.coordinates.length).toBeGreaterThan(0);
     expect(result.package.verifiedBudget.limits.recursionDepth).toBe(16);
+  });
+
+  it('dispatches across multi-stage conveyor belt without throwing', () => {
+    const src = `SCDL 2
+ASSET conveyor_test
+CANVAS WIDTH 16 HEIGHT 16
+SELECT_AMPS PIPELINE render-fidelity
+LAYER ink ORDER 10 {
+  PAINT (PIXEL AT (VEC2 (PX 8) (PX 8))) FILL #55ccff RASTER CENTER
+}
+`;
+    const res = compileSCDLV2(src);
+    expect(res.ok).toBe(true);
+    expect(res.packet).toBeDefined();
+    expect(res.package.ampPlan.length).toBeGreaterThan(0);
+  });
+
+  it('strictly enforces 12-stage conveyor order: PACKET_POST -> RENDER -> RUNTIME_DESCRIPTOR', () => {
+    const executionOrder = [];
+
+    registerAmpManifest({
+      contract: 'PB-AMP-ABI-v1',
+      ampId: 'test.probe-packet-post',
+      version: '1.0.0',
+      execution: 'COMPILE',
+      stage: 'PACKET_POST',
+      scope: ['PROGRAM'],
+      inputs: [],
+      parameters: [],
+      output: { type: 'PACKET' },
+      determinism: { class: 'PURE', seedRequired: false },
+      cost: { model: 'CONSTANT', multiplier: 1, fixed: 0 },
+      order: 10,
+      relevance: { pipelines: ['test-conveyor-order'], conditions: [] },
+    });
+    registerAmpAdapter('test.probe-packet-post', {
+      execute() {
+        executionOrder.push('PACKET_POST');
+      },
+    });
+
+    registerAmpManifest({
+      contract: 'PB-AMP-ABI-v1',
+      ampId: 'test.probe-render',
+      version: '1.0.0',
+      execution: 'COMPILE',
+      stage: 'RENDER',
+      scope: ['PROGRAM'],
+      inputs: [],
+      parameters: [],
+      output: { type: 'ANY' },
+      determinism: { class: 'PURE', seedRequired: false },
+      cost: { model: 'CONSTANT', multiplier: 1, fixed: 0 },
+      order: 10,
+      relevance: { pipelines: ['test-conveyor-order'], conditions: [] },
+    });
+    registerAmpAdapter('test.probe-render', {
+      execute() {
+        executionOrder.push('RENDER');
+      },
+    });
+
+    registerAmpManifest({
+      contract: 'PB-AMP-ABI-v1',
+      ampId: 'test.probe-runtime-desc',
+      version: '1.0.0',
+      execution: 'DESCRIPTOR',
+      stage: 'RUNTIME_DESCRIPTOR',
+      scope: ['PROGRAM'],
+      inputs: [],
+      parameters: [],
+      output: { type: 'ANY' },
+      determinism: { class: 'PURE', seedRequired: false },
+      cost: { model: 'CONSTANT', multiplier: 1, fixed: 0 },
+      order: 10,
+      relevance: { pipelines: ['test-conveyor-order'], conditions: [] },
+    });
+    registerAmpAdapter('test.probe-runtime-desc', {
+      execute() {
+        executionOrder.push('RUNTIME_DESCRIPTOR');
+        return { probe: 'runtime_desc' };
+      },
+    });
+
+    const src = `SCDL 2
+ASSET order_probe
+CANVAS WIDTH 16 HEIGHT 16
+SELECT_AMPS PIPELINE test-conveyor-order
+LAYER ink ORDER 10 {
+  PAINT (PIXEL AT (VEC2 (PX 8) (PX 8))) FILL #55ccff RASTER CENTER
+}
+`;
+    const res = compileSCDLV2(src);
+    expect(res.ok).toBe(true);
+    expect(executionOrder).toEqual(['PACKET_POST', 'RENDER', 'RUNTIME_DESCRIPTOR']);
+  });
+
+  it('propagates modified packet from PACKET_POST to final compile output', () => {
+    registerAmpManifest({
+      contract: 'PB-AMP-ABI-v1',
+      ampId: 'test.packet-modifier',
+      version: '1.0.0',
+      execution: 'COMPILE',
+      stage: 'PACKET_POST',
+      scope: ['PROGRAM'],
+      inputs: [],
+      parameters: [],
+      output: { type: 'PACKET' },
+      determinism: { class: 'PURE', seedRequired: false },
+      cost: { model: 'CONSTANT', multiplier: 1, fixed: 0 },
+      order: 20,
+      relevance: { pipelines: ['test-packet-mod'], conditions: [] },
+    });
+    registerAmpAdapter('test.packet-modifier', {
+      execute({ packet }) {
+        return {
+          packet: {
+            ...packet,
+            id: 'modified_packet_id',
+            customSeamTag: 'PACKET_POST_ACTIVE',
+          },
+        };
+      },
+    });
+
+    const src = `SCDL 2
+ASSET mod_probe
+CANVAS WIDTH 16 HEIGHT 16
+SELECT_AMPS PIPELINE test-packet-mod
+LAYER ink ORDER 10 {
+  PAINT (PIXEL AT (VEC2 (PX 8) (PX 8))) FILL #55ccff RASTER CENTER
+}
+`;
+    const res = compileSCDLV2(src);
+    expect(res.ok).toBe(true);
+    expect(res.packet.id).toBe('modified_packet_id');
+    expect(res.packet.customSeamTag).toBe('PACKET_POST_ACTIVE');
+  });
+
+  it('halts and returns structured failV2 without packet emission when adapter throws', () => {
+    registerAmpManifest({
+      contract: 'PB-AMP-ABI-v1',
+      ampId: 'test.deliberate-thrower',
+      version: '1.0.0',
+      execution: 'COMPILE',
+      stage: 'RENDER',
+      scope: ['PROGRAM'],
+      inputs: [],
+      parameters: [],
+      output: { type: 'ANY' },
+      determinism: { class: 'PURE', seedRequired: false },
+      cost: { model: 'CONSTANT', multiplier: 1, fixed: 0 },
+      order: 50,
+      relevance: { pipelines: ['test-thrower'], conditions: [] },
+    });
+    registerAmpAdapter('test.deliberate-thrower', {
+      execute() {
+        throw new Error('Deliberate RENDER failure for testing');
+      },
+    });
+
+    const src = `SCDL 2
+ASSET throw_probe
+CANVAS WIDTH 16 HEIGHT 16
+SELECT_AMPS PIPELINE test-thrower
+LAYER ink ORDER 10 {
+  PAINT (PIXEL AT (VEC2 (PX 8) (PX 8))) FILL #55ccff RASTER CENTER
+}
+`;
+    const res = compileSCDLV2(src);
+    expect(res.ok).toBe(false);
+    expect(res.packet).toBeNull();
+    expect(res.package).toBeNull();
+    expect(res.diagnostics.some((d) => d.code === 'SCDL-AMP-007' && d.message.includes('Deliberate RENDER failure'))).toBe(true);
+  });
+
+  it('propagates modified analysis from SOURCE_ANALYSIS stage seam to final compile output', () => {
+    registerAmpManifest({
+      contract: 'PB-AMP-ABI-v1',
+      ampId: 'test.source-analysis-modifier',
+      version: '1.0.0',
+      execution: 'COMPILE',
+      stage: 'SOURCE_ANALYSIS',
+      scope: ['PROGRAM'],
+      inputs: [],
+      parameters: [],
+      output: { type: 'ANY' },
+      determinism: { class: 'PURE', seedRequired: false },
+      cost: { model: 'CONSTANT', multiplier: 1, fixed: 0 },
+      order: 5,
+      relevance: { pipelines: ['test-src-analysis'], conditions: [] },
+    });
+    registerAmpAdapter('test.source-analysis-modifier', {
+      execute({ analysis }) {
+        return {
+          analysis: {
+            ...analysis,
+            customAnalysisMeta: 'SOURCE_ANALYSIS_MODIFIED',
+          },
+        };
+      },
+    });
+
+    const src = `SCDL 2
+ASSET sa_probe
+CANVAS WIDTH 16 HEIGHT 16
+SELECT_AMPS PIPELINE test-src-analysis
+LAYER ink ORDER 10 {
+  PAINT (PIXEL AT (VEC2 (PX 8) (PX 8))) FILL #55ccff RASTER CENTER
+}
+`;
+    const res = compileSCDLV2(src);
+    expect(res.ok).toBe(true);
+    expect(res.analysis.customAnalysisMeta).toBe('SOURCE_ANALYSIS_MODIFIED');
+  });
+
+  it('propagates modified animation and frames from TIMELINE stage seam to final compile output', () => {
+    registerAmpManifest({
+      contract: 'PB-AMP-ABI-v1',
+      ampId: 'test.timeline-modifier',
+      version: '1.0.0',
+      execution: 'COMPILE',
+      stage: 'TIMELINE',
+      scope: ['PROGRAM'],
+      inputs: [],
+      parameters: [],
+      output: { type: 'ANY' },
+      determinism: { class: 'PURE', seedRequired: false },
+      cost: { model: 'CONSTANT', multiplier: 1, fixed: 0 },
+      order: 15,
+      relevance: { pipelines: ['test-timeline-mod'], conditions: [] },
+    });
+    registerAmpAdapter('test.timeline-modifier', {
+      execute() {
+        return {
+          animation: { fps: 60, totalFrames: 12, loop: true },
+          framePackets: [{ frameIndex: 0, customTimelineTag: 'TIMELINE_SEAM_ACTIVE' }],
+        };
+      },
+    });
+
+    const src = `SCDL 2
+ASSET tl_probe
+CANVAS WIDTH 16 HEIGHT 16
+SELECT_AMPS PIPELINE test-timeline-mod
+LAYER ink ORDER 10 {
+  PAINT (PIXEL AT (VEC2 (PX 8) (PX 8))) FILL #55ccff RASTER CENTER
+}
+`;
+    const res = compileSCDLV2(src);
+    expect(res.ok).toBe(true);
+    expect(res.package.animation).toEqual({ fps: 60, totalFrames: 12, loop: true });
+    expect(res.package.framePackets[0].customTimelineTag).toBe('TIMELINE_SEAM_ACTIVE');
   });
 });
