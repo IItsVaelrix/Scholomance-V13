@@ -1,7 +1,7 @@
 # Design: Forge-Authored Tutorial Forest Fidelity
 
 **Date:** 2026-09-07
-**Status:** Design — approved approach, awaiting written-spec review
+**Status:** Design — approved for implementation planning
 **Decision owner:** Angel
 **Selected approach:** Forge-authored scene fabrics
 **Collab task:** `d1e046d5-a42b-4cc8-9419-09139fb40196`
@@ -18,6 +18,32 @@ decorated diamonds. Quiet ground should support a legible route from the player 
 to the lotus pond and sanctuary. Hero trees and landmarks should carry the strongest
 silhouettes and contrast. Void, lotus, and crystalline accents should identify the
 world as Scholomance without overwhelming its pastoral tutorial function.
+
+### 1.1 Conceptual visual oracle
+
+Angel requested a concept-art-first workflow and instructed the implementation to
+emulate the resulting scene as closely as the deterministic Tile Forge permits.
+
+![Approved tutorial forest concept](assets/2026-09-07-tutorial-forest-concept.png)
+
+The generated concept is a composition and art-direction oracle, not a production
+texture, palette source, or pixel-perfect golden image. The implementation must
+reproduce these visible relationships:
+
+- one continuous, quiet meadow rather than individually outlined ground tiles
+- a broad S-curve path that remains legible from player spawn to the sanctuary
+- a single coherent lotus pond with natural shore massing
+- a clearly raised sanctuary plateau connected through real cliff and stair forms
+- dense, dark canopy framing around a bright navigable center
+- grouped farmstead, well, stump, log, and dolmen discoveries rather than even scatter
+- NW daylight, contact shadows, and layered occlusion that establish 2.5D depth
+- cyan lotus/mineral accents and sparse violet resonance as Scholomance identifiers
+
+The concept's high-resolution painterly micro-detail is intentionally not copied.
+Tile Forge translates it into clean clustered pixels, the shared environmental
+palette, bounded detail density, lawful isometric masks, and deterministic source
+records. Fidelity is judged by hierarchy, forms, material reads, and composition—not
+by per-pixel similarity to the generated image.
 
 ## 2. Current Evidence
 
