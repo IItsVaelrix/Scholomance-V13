@@ -7,7 +7,7 @@
 
 ## Living Document - Owned by Codex, Read by All Agents
 
-**Version: 1.51** | Last updated: 2026-09-07
+**Version: 1.52** | Last updated: 2026-09-08
 
 > Bump the version on every schema change.
 > Notify Claude for UI-consumed field changes.
@@ -16,6 +16,70 @@
 ---
 
 ## SCHEMA CHANGE NOTICE
+
+- Schema: Tile Forge map authoring and portable map files
+- Version: 1.51 -> 1.52
+- Date: 2026-09-08
+- Breaking: No. Additive, independent of compiler bytecode and existing candidate schemas.
+- UI consumers: TileForgeMapEditor and TileForgeMapViewport through tileForgeMap.adapter.js.
+- Tests: tests/game/tile-forge/tile-forge-map.test.js.
+- Authorization: Angel requested individual tile placement and explicitly authorized manual implementation without the collab plane.
+
+### PB-TILE-MAP-v1 and PB-TILE-MAP-FILE-v1
+
+Runtime authority: `codex/core/pixelbrain/tile-forge/tile-forge.map.js`.
+
+```ts
+interface TileMapAsset {
+  id: `asset-${string}`; // full SHA-256 of all content fields except id and display name
+  name: string;
+  kind: 'terrain' | 'prop';
+  width: number; height: number; // native integer raster dimensions, 1..512
+  anchor: { x: number; y: number }; // integer native pixels, relative to projected cell center
+  footprint: { gridW: number; gridH: number }; // integer logical cells, 1..32
+  rgba: string; // exact lowercase RGBA8 hex byte stream, width * height * 8 characters
+  scdlSource: string; // original source; empty only if producer has none
+  bytecode: JsonValue; // original compiler bytecode, or null when absent
+  ampDescriptors: JsonValue[]; // existing producer receipts; placement never executes AMPs
+  scd128Record: { scd128Wire: string; [key: string]: JsonValue }; // existing complete witness
+}
+interface TileMapInstance {
+  id: string; assetId: string; layerId: string;
+  x: number; y: number; // integer grid origin; footprint must remain inside map
+  z: number; // integer -16..32; one elevation unit = 40 native pixels
+}
+interface TileMapDocument {
+  contract: 'PB-TILE-MAP-v1';
+  name: string;
+  width: number; height: number; // 1..256 cells
+  tileWidth: 80; tileHeight: 40; // 2:1 dimetric lattice
+  nextId: number; // monotonic local serial, collision checked; no time/random identity
+  assets: TileMapAsset[];
+  layers: { id: string; name: string; visible: boolean; locked: boolean }[]; // back to front
+  instances: TileMapInstance[];
+}
+interface TileMapFile {
+  contract: 'PB-TILE-MAP-FILE-v1';
+  checksum: string; // full SHA-256 of recursively key-sorted compact document JSON
+  document: TileMapDocument;
+}
+```
+
+Invariants:
+
+1. Validated documents and assets are recursively frozen. Placement operations structurally share assets and never compile source, execute AMPs, mutate pixels, or regenerate witnesses.
+2. Asset identity includes source, bytecode, realized pixels, descriptors, witness, anchor, and footprint. SCD128 alone is not used as a collision-free raster key.
+3. Saved maps preserve the compiled realization exactly. Loading validates format, bounds, unique identities, asset hashes, references, and document checksum before replacing the open map. It never recompiles untrusted imported source.
+4. The file is a canonical bytecode/hex-backed authoring envelope, not a Tiled TMX/TMJ file. Checksums detect corruption; they do not authenticate the author or independently certify the producer's SCD128 witness.
+5. Limits: 256 assets, 2,097,152 total asset pixels, 20,000 instances, 32 layers, 32 MiB UTF-8 file. Metadata remains the existing JSON producer payload.
+6. Brush replacement is confined to one origin cell, elevation, and layer. Moving a selected instance preserves its ID and permits overlapping artwork. Footprints are authoring bounds, not authoritative gameplay collision results.
+7. Render and alpha-hit-test order is identical: layer order, south footprint edge, elevation, stable instance ID. Hidden layers cannot be picked; hidden/locked layers cannot be edited.
+8. History retains at most 50 completed edits, with one entry per brush gesture. Open/new/resize operations are undoable. Save/download is explicit and browser-local; no background server persistence.
+9. Existing compiler modules, standalone Studio isolation, and existing candidate schema remain unchanged. Older versions do not read the new map envelope; no legacy data migration is required.
+
+---
+
+## SCHEMA CHANGE NOTICE — 1.51
 
 - Schema: Scholomium Ink SCD128 Dual-Witness Art Intelligence & Seven-Tree Laboratory Contracts
 - Version: 1.50 -> 1.51

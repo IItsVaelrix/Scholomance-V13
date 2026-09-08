@@ -1,0 +1,1657 @@
+diff --git a/codex/core/pixelbrain/tile-forge/tile-forge.map.js b/codex/core/pixelbrain/tile-forge/tile-forge.map.js
+new file mode 100644
+index 0000000..3cf6a4c
+--- /dev/null
++++ b/codex/core/pixelbrain/tile-forge/tile-forge.map.js
+@@ -0,0 +1,256 @@
++import { z as schema } from 'zod';
++import { sha256Hex } from '../sha256.js';
++import { BytecodeError, ERROR_CATEGORIES, ERROR_SEVERITY, MODULE_IDS, ERROR_CODES } from '../bytecode-error.js';
++
++export const TILE_MAP_CONTRACT = 'PB-TILE-MAP-v1';
++export const TILE_MAP_LIMITS = Object.freeze({ fileBytes: 32 * 1024 * 1024, assets: 256, instances: 20000, dimension: 256, pixels: 2097152 });
++const integer = (min, max) => schema.number().int().min(min).max(max);
++const label = schema.string().trim().min(1).max(120);
++const key = schema.string().regex(/^[a-zA-Z0-9_-]{1,100}$/);
++const json = schema.json();
++const footprintSchema = schema.object({ gridW: integer(1, 32), gridH: integer(1, 32) }).strict();
++const assetSchema = schema.object({
++  id: schema.string().regex(/^asset-[a-f0-9]{64}$/), name: label,
++  kind: schema.enum(['terrain', 'prop']), width: integer(1, 512), height: integer(1, 512),
++  anchor: schema.object({ x: integer(0, 512), y: integer(0, 512) }).strict(),
++  footprint: footprintSchema,
++  rgba: schema.string().max(512 * 512 * 8).regex(/^(?:[0-9a-f]{8})+$/),
++  scdlSource: schema.string().max(1024 * 1024), bytecode: json,
++  ampDescriptors: schema.array(json).max(256),
++  scd128Record: schema.object({ scd128Wire: schema.string().regex(/^[0-9A-F]{128}$/) }).catchall(json),
++}).strict();
++const layerSchema = schema.object({ id: key, name: label, visible: schema.boolean(), locked: schema.boolean() }).strict();
++const instanceSchema = schema.object({
++  id: key, assetId: schema.string(), layerId: key,
++  x: integer(0, 255), y: integer(0, 255), z: integer(-16, 32),
++}).strict();
++const mapSchema = schema.object({
++  contract: schema.literal(TILE_MAP_CONTRACT), name: label,
++  width: integer(1, 256), height: integer(1, 256), tileWidth: schema.literal(80), tileHeight: schema.literal(40),
++  nextId: integer(1, Number.MAX_SAFE_INTEGER - 1),
++  assets: schema.array(assetSchema).max(TILE_MAP_LIMITS.assets),
++  layers: schema.array(layerSchema).min(1).max(32),
++  instances: schema.array(instanceSchema).max(TILE_MAP_LIMITS.instances),
++}).strict();
++
++export function mapError(message) {
++  return new BytecodeError(ERROR_CATEGORIES.VALUE, ERROR_SEVERITY.WARN, MODULE_IDS.CORE, ERROR_CODES.INVALID_VALUE, { reason: message, source: TILE_MAP_CONTRACT });
++}
++
++function canonical(value) {
++  if (Array.isArray(value)) return value.map(canonical);
++  if (value && typeof value === 'object') return Object.fromEntries(Object.keys(value).sort().map(k => [k, canonical(value[k])]));
++  return value;
++}
++
++function digest(value) { return sha256Hex(JSON.stringify(canonical(value))).toLowerCase(); }
++function assetId(asset) {
++  const { id: _id, name: _name, ...content } = asset;
++  return `asset-${digest(content)}`;
++}
++
++function freeze(value) {
++  if (value && typeof value === 'object' && !Object.isFrozen(value)) {
++    Object.values(value).forEach(freeze);
++    Object.freeze(value);
++  }
++  return value;
++}
++
++export function createTileMap({ name = 'Untitled map', width = 24, height = 24 } = {}) {
++  return validateTileMap({ contract: TILE_MAP_CONTRACT, name, width, height, tileWidth: 80, tileHeight: 40, nextId: 1, assets: [], instances: [], layers: [
++    { id: 'cliffs', name: 'Cliffs', visible: true, locked: false },
++    { id: 'terrain', name: 'Terrain', visible: true, locked: false },
++    { id: 'details', name: 'Details', visible: true, locked: false },
++    { id: 'props', name: 'Props', visible: true, locked: false },
++  ] });
++}
++
++/** Snapshot source, witness and realized pixels together; no compiler work happens on placement. */
++export function createMapAsset(buffer, { name, kind = 'terrain', anchor, footprint } = {}) {
++  const width = buffer.width;
++  const height = buffer.height;
++  const data = buffer.data ?? buffer.buffer?.data;
++  if (!data || data.length !== width * height * 4) throw mapError('Asset has no complete RGBA raster.');
++  const body = {
++    name: name || buffer.propType || buffer.type || 'Tile', kind, width, height,
++    anchor: anchor || { x: Math.floor(width / 2), y: kind === 'terrain' ? 20 : height - 1 },
++    footprint: footprint || { gridW: 1, gridH: 1 },
++    rgba: Array.from(data, n => n.toString(16).padStart(2, '0')).join(''),
++    scdlSource: buffer.scdlSource || '', bytecode: buffer.bytecode ?? null,
++    ampDescriptors: buffer.ampDescriptors || [], scd128Record: buffer.scd128Record,
++  };
++  const parsed = assetSchema.safeParse({ ...body, id: assetId(body) });
++  if (!parsed.success) throw mapError(`Invalid tile asset: ${parsed.error.issues[0].message}`);
++  return freeze(parsed.data);
++}
++
++export function validateTileMap(input) {
++  const parsed = mapSchema.safeParse(input);
++  if (!parsed.success) throw mapError(`Invalid map: ${parsed.error.issues[0].path.join('.')} ${parsed.error.issues[0].message}`);
++  const map = parsed.data;
++  const assets = new Map(map.assets.map(a => [a.id, a]));
++  const layers = new Set(map.layers.map(l => l.id));
++  const instances = new Set(map.instances.map(i => i.id));
++  if (assets.size !== map.assets.length || layers.size !== map.layers.length || instances.size !== map.instances.length) throw mapError('Duplicate map identities.');
++  if (map.assets.reduce((sum, a) => sum + a.width * a.height, 0) > TILE_MAP_LIMITS.pixels) throw mapError('Map asset pixel budget exceeded.');
++  for (const a of map.assets) {
++    if (a.rgba.length !== a.width * a.height * 8 || a.id !== assetId(a) || a.anchor.x > a.width || a.anchor.y > a.height) throw mapError(`Asset integrity check failed: ${a.name}`);
++  }
++  for (const i of map.instances) {
++    const a = assets.get(i.assetId);
++    if (!a || !layers.has(i.layerId)) throw mapError('Placement references a missing asset or layer.');
++    if (i.x + a.footprint.gridW > map.width || i.y + a.footprint.gridH > map.height) throw mapError('Placement footprint exceeds map bounds.');
++  }
++  return freeze(map);
++}
++
++export function addMapAssets(map, assets) {
++  const catalog = new Map(map.assets.map(a => [a.id, a]));
++  assets.forEach(a => catalog.set(a.id, a));
++  return validateTileMap({ ...map, assets: [...catalog.values()] });
++}
++
++function editableLayer(map, layerId) {
++  const layer = map.layers.find(l => l.id === layerId);
++  if (!layer || layer.locked || !layer.visible) throw mapError('Choose a visible, unlocked layer.');
++  return layer;
++}
++
++function nextIdentity(map, prefix) {
++  let n = map.nextId;
++  const used = new Set([...map.instances, ...map.layers].map(i => i.id));
++  while (used.has(`${prefix}-${n}`)) n += 1;
++  return { id: `${prefix}-${n}`, nextId: n + 1 };
++}
++
++export function stampMapAsset(map, { assetId: id, layerId, x, y, z = 0 }) {
++  editableLayer(map, layerId);
++  const asset = map.assets.find(a => a.id === id);
++  if (!asset) throw mapError('Choose a tile from the palette first.');
++  if (![x, y, z].every(Number.isInteger) || z < -16 || z > 32 || x < 0 || y < 0 || x + asset.footprint.gridW > map.width || y + asset.footprint.gridH > map.height) throw mapError('Tile footprint is outside the map or elevation range.');
++  const existing = map.instances.find(i => i.layerId === layerId && i.x === x && i.y === y && i.z === z);
++  if (existing?.assetId === id) return map;
++  if (!existing && map.instances.length >= TILE_MAP_LIMITS.instances) throw mapError('Placement limit reached.');
++  const identity = existing ? { id: existing.id, nextId: map.nextId } : nextIdentity(map, 'tile');
++  const instance = freeze({ id: identity.id, assetId: id, layerId, x, y, z });
++  return freeze({ ...map, nextId: identity.nextId, instances: [...map.instances.filter(i => i.id !== instance.id), instance] });
++}
++
++export function moveMapInstance(map, id, position) {
++  const instance = map.instances.find(i => i.id === id);
++  if (!instance) return map;
++  editableLayer(map, instance.layerId);
++  const updated = instanceSchema.safeParse({ ...instance, ...position, id, assetId: instance.assetId });
++  if (!updated.success) throw mapError('Invalid placement coordinates.');
++  editableLayer(map, updated.data.layerId);
++  const a = map.assets.find(asset => asset.id === instance.assetId);
++  if (updated.data.x + a.footprint.gridW > map.width || updated.data.y + a.footprint.gridH > map.height) throw mapError('Tile footprint is outside the map.');
++  if (JSON.stringify(updated.data) === JSON.stringify(instance)) return map;
++  return freeze({ ...map, instances: map.instances.map(i => i.id === id ? freeze(updated.data) : i) });
++}
++
++export function eraseMapInstance(map, id) {
++  const instance = map.instances.find(i => i.id === id);
++  if (!instance) return map;
++  editableLayer(map, instance.layerId);
++  return freeze({ ...map, instances: map.instances.filter(i => i.id !== id) });
++}
++
++export function updateMapLayer(map, id, changes) {
++  const layer = map.layers.find(l => l.id === id);
++  if (!layer) throw mapError('Layer does not exist.');
++  const parsed = layerSchema.safeParse({ ...layer, ...changes, id });
++  if (!parsed.success) throw mapError('Invalid layer settings.');
++  return freeze({ ...map, layers: map.layers.map(l => l.id === id ? parsed.data : l) });
++}
++
++export function addMapLayer(map) {
++  if (map.layers.length >= 32) throw mapError('Layer limit reached.');
++  const identity = nextIdentity(map, 'layer');
++  return freeze({ ...map, nextId: identity.nextId, layers: [...map.layers, { id: identity.id, name: `Layer ${map.layers.length + 1}`, visible: true, locked: false }] });
++}
++
++export function reorderMapLayer(map, id, direction) {
++  const from = map.layers.findIndex(l => l.id === id);
++  const to = from + direction;
++  if (from < 0 || to < 0 || to >= map.layers.length || ![-1, 1].includes(direction)) return map;
++  const layers = [...map.layers];
++  [layers[from], layers[to]] = [layers[to], layers[from]];
++  return freeze({ ...map, layers });
++}
++
++export function projectMapPoint(map, { x, y, z = 0 }) {
++  return { x: (x - y) * map.tileWidth / 2, y: (x + y) * map.tileHeight / 2 - z * map.tileHeight };
++}
++
++export function unprojectMapPoint(map, point, z = 0) {
++  const sum = (point.y + z * map.tileHeight) / (map.tileHeight / 2);
++  const difference = point.x / (map.tileWidth / 2);
++  return { x: Math.floor((sum + difference) / 2 + 0.5), y: Math.floor((sum - difference) / 2 + 0.5), z };
++}
++
++export function orderedMapInstances(map) {
++  const layerOrder = new Map(map.layers.map((l, n) => [l.id, { ...l, order: n }]));
++  const assets = new Map(map.assets.map(a => [a.id, a]));
++  return map.instances.filter(i => layerOrder.get(i.layerId)?.visible).map(i => ({ ...i, asset: assets.get(i.assetId) })).sort((a, b) => {
++    const band = layerOrder.get(a.layerId).order - layerOrder.get(b.layerId).order;
++    const south = i => i.x + i.y + i.asset.footprint.gridW + i.asset.footprint.gridH;
++    return band || south(a) - south(b) || a.z - b.z || a.id.localeCompare(b.id, 'en');
++  });
++}
++
++/** Alpha-aware picking follows the same back-to-front ordering as rendering. */
++export function pickMapInstance(map, point, layerId = null) {
++  const ordered = orderedMapInstances(map);
++  for (let n = ordered.length - 1; n >= 0; n -= 1) {
++    const i = ordered[n];
++    if (layerId && i.layerId !== layerId) continue;
++    const p = projectMapPoint(map, i);
++    const x = Math.floor(point.x - p.x + i.asset.anchor.x);
++    const y = Math.floor(point.y - p.y + i.asset.anchor.y);
++    if (x >= 0 && y >= 0 && x < i.asset.width && y < i.asset.height && parseInt(i.asset.rgba.slice((y * i.asset.width + x) * 8 + 6, (y * i.asset.width + x) * 8 + 8), 16) > 0) return i;
++  }
++  return null;
++}
++
++export function mapStrokePoints(start, end) {
++  const points = [];
++  const steps = Math.max(Math.abs(end.x - start.x), Math.abs(end.y - start.y));
++  for (let n = 0; n <= steps; n += 1) {
++    const t = steps ? n / steps : 0;
++    points.push({ x: Math.round(start.x + (end.x - start.x) * t), y: Math.round(start.y + (end.y - start.y) * t), z: end.z });
++  }
++  return points;
++}
++
++export function serializeTileMap(map) {
++  const document = validateTileMap(map);
++  const text = JSON.stringify(canonical({ contract: 'PB-TILE-MAP-FILE-v1', checksum: digest(document), document }));
++  if (new TextEncoder().encode(text).length > TILE_MAP_LIMITS.fileBytes) throw mapError('Map file size limit exceeded.');
++  return text;
++}
++
++export function deserializeTileMap(text) {
++  if (typeof text !== 'string' || new TextEncoder().encode(text).length > TILE_MAP_LIMITS.fileBytes) throw mapError('Map file is too large.');
++  let envelope;
++  try { envelope = JSON.parse(text); } catch { throw mapError('This is not a valid Tile Forge map file.'); }
++  if (envelope?.contract !== 'PB-TILE-MAP-FILE-v1' || typeof envelope.checksum !== 'string') throw mapError('Unsupported map format.');
++  const document = validateTileMap(envelope.document);
++  if (digest(document) !== envelope.checksum) throw mapError('Map checksum mismatch; the current map was kept.');
++  return document;
++}
++
++export function createMapHistory(present) { return { present, past: [], future: [] }; }
++export function commitMapHistory(history, present) {
++  if (present === history.present) return history;
++  return { present, past: [...history.past.slice(-49), history.present], future: [] };
++}
++export function undoMapHistory(history) {
++  if (!history.past.length) return history;
++  return { present: history.past.at(-1), past: history.past.slice(0, -1), future: [history.present, ...history.future] };
++}
++export function redoMapHistory(history) {
++  if (!history.future.length) return history;
++  return { present: history.future[0], past: [...history.past, history.present], future: history.future.slice(1) };
++}
+diff --git a/docs/scholomance-encyclopedia/Scholomance LAW/SCHEMA_CONTRACT.md b/docs/scholomance-encyclopedia/Scholomance LAW/SCHEMA_CONTRACT.md
+index 4ddd7be..0f1a653 100644
+--- a/docs/scholomance-encyclopedia/Scholomance LAW/SCHEMA_CONTRACT.md	
++++ b/docs/scholomance-encyclopedia/Scholomance LAW/SCHEMA_CONTRACT.md	
+@@ -7,7 +7,7 @@
+ 
+ ## Living Document - Owned by Codex, Read by All Agents
+ 
+-**Version: 1.51** | Last updated: 2026-09-07
++**Version: 1.52** | Last updated: 2026-09-08
+ 
+ > Bump the version on every schema change.
+ > Notify Claude for UI-consumed field changes.
+@@ -17,6 +17,70 @@
+ 
+ ## SCHEMA CHANGE NOTICE
+ 
++- Schema: Tile Forge map authoring and portable map files
++- Version: 1.51 -> 1.52
++- Date: 2026-09-08
++- Breaking: No. Additive, independent of compiler bytecode and existing candidate schemas.
++- UI consumers: TileForgeMapEditor and TileForgeMapViewport through tileForgeMap.adapter.js.
++- Tests: tests/game/tile-forge/tile-forge-map.test.js.
++- Authorization: Angel requested individual tile placement and explicitly authorized manual implementation without the collab plane.
++
++### PB-TILE-MAP-v1 and PB-TILE-MAP-FILE-v1
++
++Runtime authority: `codex/core/pixelbrain/tile-forge/tile-forge.map.js`.
++
++```ts
++interface TileMapAsset {
++  id: `asset-${string}`; // full SHA-256 of all content fields except id and display name
++  name: string;
++  kind: 'terrain' | 'prop';
++  width: number; height: number; // native integer raster dimensions, 1..512
++  anchor: { x: number; y: number }; // integer native pixels, relative to projected cell center
++  footprint: { gridW: number; gridH: number }; // integer logical cells, 1..32
++  rgba: string; // exact lowercase RGBA8 hex byte stream, width * height * 8 characters
++  scdlSource: string; // original source; empty only if producer has none
++  bytecode: JsonValue; // original compiler bytecode, or null when absent
++  ampDescriptors: JsonValue[]; // existing producer receipts; placement never executes AMPs
++  scd128Record: { scd128Wire: string; [key: string]: JsonValue }; // existing complete witness
++}
++interface TileMapInstance {
++  id: string; assetId: string; layerId: string;
++  x: number; y: number; // integer grid origin; footprint must remain inside map
++  z: number; // integer -16..32; one elevation unit = 40 native pixels
++}
++interface TileMapDocument {
++  contract: 'PB-TILE-MAP-v1';
++  name: string;
++  width: number; height: number; // 1..256 cells
++  tileWidth: 80; tileHeight: 40; // 2:1 dimetric lattice
++  nextId: number; // monotonic local serial, collision checked; no time/random identity
++  assets: TileMapAsset[];
++  layers: { id: string; name: string; visible: boolean; locked: boolean }[]; // back to front
++  instances: TileMapInstance[];
++}
++interface TileMapFile {
++  contract: 'PB-TILE-MAP-FILE-v1';
++  checksum: string; // full SHA-256 of recursively key-sorted compact document JSON
++  document: TileMapDocument;
++}
++```
++
++Invariants:
++
++1. Validated documents and assets are recursively frozen. Placement operations structurally share assets and never compile source, execute AMPs, mutate pixels, or regenerate witnesses.
++2. Asset identity includes source, bytecode, realized pixels, descriptors, witness, anchor, and footprint. SCD128 alone is not used as a collision-free raster key.
++3. Saved maps preserve the compiled realization exactly. Loading validates format, bounds, unique identities, asset hashes, references, and document checksum before replacing the open map. It never recompiles untrusted imported source.
++4. The file is a canonical bytecode/hex-backed authoring envelope, not a Tiled TMX/TMJ file. Checksums detect corruption; they do not authenticate the author or independently certify the producer's SCD128 witness.
++5. Limits: 256 assets, 2,097,152 total asset pixels, 20,000 instances, 32 layers, 32 MiB UTF-8 file. Metadata remains the existing JSON producer payload.
++6. Brush replacement is confined to one origin cell, elevation, and layer. Moving a selected instance preserves its ID and permits overlapping artwork. Footprints are authoring bounds, not authoritative gameplay collision results.
++7. Render and alpha-hit-test order is identical: layer order, south footprint edge, elevation, stable instance ID. Hidden layers cannot be picked; hidden/locked layers cannot be edited.
++8. History retains at most 50 completed edits, with one entry per brush gesture. Open/new/resize operations are undoable. Save/download is explicit and browser-local; no background server persistence.
++9. Existing compiler modules, standalone Studio isolation, and existing candidate schema remain unchanged. Older versions do not read the new map envelope; no legacy data migration is required.
++
++---
++
++## SCHEMA CHANGE NOTICE — 1.51
++
+ - Schema: Scholomium Ink SCD128 Dual-Witness Art Intelligence & Seven-Tree Laboratory Contracts
+ - Version: 1.50 -> 1.51
+ - Date: 2026-09-07
+diff --git a/docs/scholomance-encyclopedia/post-implementation-reports/PIR-20260908-TILE-FORGE-MAP-STUDIO.md b/docs/scholomance-encyclopedia/post-implementation-reports/PIR-20260908-TILE-FORGE-MAP-STUDIO.md
+new file mode 100644
+index 0000000..a4dda88
+--- /dev/null
++++ b/docs/scholomance-encyclopedia/post-implementation-reports/PIR-20260908-TILE-FORGE-MAP-STUDIO.md
+@@ -0,0 +1,112 @@
++# Tile Forge Map Studio — Post-Implementation Report
++
++## 1. Change identity
++
++- Date: 2026-09-08
++- Author: Codex
++- Classification: Behavioral and additive architectural change
++- Branch: `codex/tile-forge-map-editor`
++- Baseline: `857a5a4bfba103fe30aa8ab89f11ecb1bdff4869` on `codex/pixelbrain-sward-studio-unification`
++- Request: individually place every generated tile in Tile Forge Studio using PixelBrain/SCDL V2/SCD128.
++- Authorization: user explicitly instructed “Forget collab and do it manually.” No collab registration, locks, or messages were performed after that instruction.
++
++## 2. Executive summary
++
++Tile Forge's existing internal route now opens Map Studio, with the previous chunk renderer retained under Chunk Preview. Generated assets become reusable palette entries; placements reference those assets and have independent coordinates, elevation, layer, and identity. Brush strokes, movement, deletion, layer changes, file opening, and map resizing participate in undo history. Portable map files retain exact native RGBA bytes, original available SCDL source and bytecode, AMP descriptors, and the producer's SCD128 witness. The implementation is ready for review; real-browser visual verification remains outstanding because the available Chromium executable crashes during startup in this environment.
++
++## 3. Intent and assumptions
++
++The previous canvas rebuilt a procedural arrangement and used a nearest-distance click inspector. It did not own an editable map document. The new workflow lets the human compose the scene, with generators supplying assets.
++
++Assumptions: the requested Studio is the existing Tile Forge route `/internal/pixel-lotus/tile-forge`; the map uses the established native 80×40 dimetric lattice. The standalone `Pixel-Art-Studio-Skeleton` is a separate application and was not modified. “Like Tiled” is implemented as a tile palette, manual map placement, layers, selection, history, and portable save/load; full Tiled format/tool parity is not claimed.
++
++## 4. Scope
++
++Included: palette search, individual asset generation, all 29 exposed generator choices, automatic collection of a newly generated chunk's assets, optional chunk placement, native-size rendering, ghost brush, grid snapping, layer visibility/locking/order/name, select/move, explicit instance position/elevation editing, duplication, erasing, keyboard editing, pan, zoom, fit, SCDL file/text import, explicit compilation into a new variant, map dimensions/name, and save/load.
++
++Existing source AMPs execute only when the user explicitly compiles or forges an asset. Moving/painting/loading a placed asset does not execute additional AMPs. Shader modes reuse the existing GLSL through a shared module; the map canvas has a functional 2D path when WebGL is unavailable.
++
++## 5. Files and dependency impact
++
++| File | Responsibility |
++|---|---|
++| `codex/core/pixelbrain/tile-forge/tile-forge.map.js` | Immutable map schema, identity, operations, projection, picking, file codec, history |
++| `src/lib/pixelbrain/tileForgeMap.adapter.js` | Generator/compiler bridge, candidate ingestion, browser raster/download adapters |
++| `src/lib/pixelbrain/tileForgeShaders.js` | Existing shared GLSL and program creation, moved without changing shader source |
++| `src/pages/internal/pixel-lotus/TileForgeMapEditor.jsx` | Tool state, palette, layers, inspector, file and source workflows |
++| `src/pages/internal/pixel-lotus/TileForgeMapViewport.jsx` | Native raster composition, camera, pointer/keyboard bridge, optional WebGL preview |
++| `src/pages/internal/pixel-lotus/TileForgeMapEditor.css` | Scoped editor layout and responsive controls |
++| `src/pages/internal/pixel-lotus/TileForgeLab.jsx` | Map/preview navigation and generated-candidate handoff |
++| `src/pages/internal/pixel-lotus/TileForgeCanvas.jsx` | Imports extracted shader code; legacy preview behavior retained |
++| `tests/game/tile-forge/tile-forge-map*.test.*` | Core integrity and UI interaction regression coverage |
++| `docs/scholomance-encyclopedia/Scholomance LAW/SCHEMA_CONTRACT.md` | Additive 1.52 contracts and invariants |
++
++No new application dependencies, backend endpoints, auth changes, event-bus schemas, or compiler module changes. UI accesses core only through the sanctioned adapter. Package lock and generated build artifacts are not part of the change.
++
++## 6. Data and rendering design
++
++`PB-TILE-MAP-v1` separates immutable assets from instances. Asset keys use a full SHA-256 of source, bytecode, pixels, witness, descriptors, dimensions, anchor and footprint; SCD128 alone is not treated as a unique pixel-buffer key. Independent instances therefore share one realization while retaining their own placement IDs. Browser camera state never enters asset identity.
++
++Terrain defaults to the center of its native top diamond; props default to a bottom-center anchor. Declared asset visual bounds and logical footprints are consumed when available, and custom source imports expose explicit anchor/footprint fields. Rendering uses native dimensions and nearest-neighbor view scaling, without stretching every prop into a tile rectangle.
++
++Draw order and alpha-aware picking share layer ordering, south footprint edge, elevation, and deterministic ID tie-breaks. Picking and erasing are scoped to the active layer. The placed-instance list is paginated so covered or fully transparent instances remain individually accessible. Chunk placement expands map dimensions when needed and keeps cliffs on a separate layer from the ground surface.
++
++## 7. User workflow
++
++1. Open Tile Forge at `/internal/pixel-lotus/tile-forge` and use Map Studio.
++2. Choose an asset type and seed; click **Forge tile**. Alternatively, **Forge Chunk** adds its unique assets to the palette without placing them.
++3. Select a palette tile and a visible, unlocked layer. Click to stamp or drag to paint. Use elevation for raised placements.
++4. Use **Select / move** to drag a tile or edit X/Y/Z in the inspector. **Duplicate** arms the selected asset for placement at a new destination.
++5. Edit a selected asset's SCDL as a new variant and explicitly **Compile & add**. Existing placements keep their old realization until the user paints the new variant.
++6. **Save map** downloads a `.tilemap.json` document. **Open map** validates before replacing the document and allows undo back to the prior map.
++
++Keys on the focused canvas: B brush, V select, E erase, H pan; arrows move the cursor or selected instance; Enter/Space applies the current tool; Delete removes selection; Ctrl/Cmd-Z undo; Ctrl/Cmd-Shift-Z or Ctrl/Cmd-Y redo; Escape cancels the active stroke. Middle-drag pans; wheel and the zoom selector change view scale.
++
++## 8. Risk analysis
++
++Primary risks are projection/anchor mismatch, accidental raster re-synthesis, selection through transparency, partial file imports, and history corruption. Shared projection/picking functions, preserved byte streams, strict validation, atomic file replacement, and gesture-level history reduce those risks. Map changes remain confined to the internal Tile Forge surface.
++
++Source-generated witness records are preserved, not retroactively certified. Map and asset checksums detect content corruption; they are not a signature or authentication proof. Logical footprints are editor bounds, not new authoritative gameplay collision rules.
++
++Rollback: revert this change. The previous chunk preview route and underlying synthesis/compiler contracts are retained. New map files require this editor and are not readable by the old release.
++
++## 9. Validation performed
++
++- Tile Forge's existing tests and new core/interaction tests pass. Interaction tests exercise the real React editor and model with mocked canvas drawing methods; they are not evidence of browser pixels or WebGL correctness.
++- All 29 exposed generator choices were exercised with seed 42 and compatible producer palettes.
++- Changed JavaScript/JSX files pass ESLint; `npm run typecheck` passes; CSS token verification passes.
++- Production application bundle builds successfully. The top-level build command initially failed because the tsx CLI's IPC pipe cannot open here. Its prerequisite scripts were successfully run through `node --import tsx`, followed by the unchanged `build:app` command.
++- Full repository lint reports 127 errors in its broader snapshot. Full `test:qa` reports 207 passing / 17 failing files and 2,365 passing / 33 failing tests; these are not a clean repository-wide gate.
++- Security QA is not green on this checkout. Its AI-use heuristic includes the text `vertex`, so ordinary WebGL calls in the viewport are flagged as AI-provider usage. No policy was weakened to suppress the finding.
++- Browser QA was attempted: standard Chromium download timed out; a separately installed QA-only Chromium package launched with a startup SIGSEGV before page load. No desktop/mobile screenshot or WebGL visual pass is claimed.
++
++## 10. Specific regression retests
++
++- In a real browser, place native terrain adjacent to soil/cliffs and tall/multi-cell props. Verify contact anchors, transparency and south-edge depth order.
++- Pan and change zoom at multiple elevations, then select/move/erase through overlapping artwork.
++- Inspect map mode with every shader, including OFF and WebGL unavailable; verify context-loss fallback.
++- Reopen a saved map and compare realized pixels, witnesses, instance coordinates and layer order.
++- Check desktop and narrow-screen controls, labels, keyboard focus and the canvas instructions.
++- Switch between Map Studio and Chunk Preview; ensure map work survives and hidden shader loops stop.
++
++## 11. Performance and stability
++
++Palette rasters are cached by the assets array and reused for placement. Canvas generation/compilation does not run for each brush stamp. Visible-instance rendering culls outside the viewport; the grid uses one line per row/column. History structurally shares assets and retains 50 completed edits. Maximum document limits are 256 assets, 2,097,152 native pixels, 20,000 instances, 32 layers and 32 MiB files.
++
++No Steam Deck frame-rate or maximum-map latency claim is made; real-browser profiling remains outstanding. Synchronous source compilation and worst-case large-map history memory should be evaluated before raising limits.
++
++## 12. Security and data integrity
++
++Inputs pass allow-list schemas, reference checks, dimension bounds and content checksums. Loading never executes imported SCDL or downloads dependencies. Explicit custom compilation is bounded by source length, canvas size and the existing compiler budget. User draft data remains in browser memory; there is no server autosave or telemetry. Leaving the page with unsaved work triggers the standard unload warning.
++
++## 13. Documentation
++
++The canonical schema contract is bumped to 1.52 and documents the portable map format, ownership, constraints and compatibility. This report includes operating instructions and actual gate results.
++
++## 14. Known gaps
++
++Real-browser visual/a11y/performance verification is still required. This version does not provide Tiled TMX/TMJ interchange, rectangle/flood-fill tools, terrain Wang/autotile rules, flip/rotate operations, multi-selection, map PNG export, or a standalone Studio map tab. Producers that have no SCDL source remain placeable as raster/witness assets, but cannot use the source-edit action. The map inspector displays AMP descriptors; a new general per-instance AMP execution panel is not included.
++
++## 15. Verdict
++
++Functionally implemented and covered by core and React interaction tests; prepared for draft review and visual verification. GitHub publication was blocked by an integration write-permission denial (HTTP 403); no remote branch or pull request was created. It is not a claim that the whole repository or every Tiled feature is production-certified.
+diff --git a/src/lib/pixelbrain/tileForgeMap.adapter.js b/src/lib/pixelbrain/tileForgeMap.adapter.js
+new file mode 100644
+index 0000000..4ae48f6
+--- /dev/null
++++ b/src/lib/pixelbrain/tileForgeMap.adapter.js
+@@ -0,0 +1,118 @@
++import { createMapAsset, addMapAssets, stampMapAsset, validateTileMap, mapError } from '../../../codex/core/pixelbrain/tile-forge/tile-forge.map.js';
++import { synthesizeTileForgeTile, synthesizeTileForgeProp, synthesizeTileForgeAsset } from '../../../codex/core/pixelbrain/tile-forge/tile-forge.synthesizer.js';
++import { compileTileForgeScdl } from '../../../codex/core/pixelbrain/tile-forge/tile-forge.scdl-generator.js';
++import { TILE_FORGE_FOREST_ACTOR_TYPES } from '../../../codex/core/pixelbrain/tile-forge/tile-forge.forest-actor-synthesizer.js';
++export * from '../../../codex/core/pixelbrain/tile-forge/tile-forge.map.js';
++
++export const FORGE_ASSET_CHOICES = Object.freeze([
++  { id: 'top', name: 'Surface tile', kind: 'terrain', family: 'tile' },
++  { id: 'ground', name: 'Ground with soil', kind: 'terrain', family: 'tile' },
++  { id: 'rim', name: 'Rim tile', kind: 'terrain', family: 'tile' },
++  { id: 'cliff', name: 'Cliff tile', kind: 'terrain', family: 'tile' },
++  { id: 'crystal_tree', name: 'Crystal tree', kind: 'prop', family: 'prop' },
++  { id: 'void_pine', name: 'Pine', kind: 'prop', family: 'prop' },
++  { id: 'hologram_fern', name: 'Fern', kind: 'prop', family: 'prop' },
++  { id: 'void_flowers', name: 'Flowers', kind: 'prop', family: 'prop' },
++  ...[
++    ['grandfather_oak', 'Grandfather oak'], ['autumn_maple', 'Autumn maple'],
++    ['stone_well', 'Stone well'], ['ancient_dolmen', 'Ancient dolmen'],
++    ['timber_fence', 'Timber fence'], ['sunflower_patch', 'Sunflower patch'],
++    ['ruined_structure', 'Ruined structure'], ['quiet_meadow', 'Meadow fabric'],
++    ['organic_road', 'Flagstone road'], ['lotus_spring', 'Lotus spring'], ['mossy_cliff', 'Mossy cliff'],
++  ].map(([id, name]) => ({ id, name, kind: ['quiet_meadow', 'organic_road', 'lotus_spring', 'mossy_cliff'].includes(id) ? 'terrain' : 'prop', family: 'asset' })),
++  ...TILE_FORGE_FOREST_ACTOR_TYPES.filter(id => !['timber_fence', 'sunflower_patch'].includes(id)).map(id => ({ id, name: id.replaceAll('_', ' '), kind: 'prop', family: 'asset' })),
++]);
++
++function snapshot(buffer, choice, name) {
++  const visual = buffer.visualBounds ?? buffer.assetSpec?.visualBounds;
++  const logical = buffer.logicalFootprint ?? buffer.assetSpec?.logicalFootprint;
++  return createMapAsset(buffer, {
++    name: name || choice.name, kind: choice.kind,
++    anchor: visual ? { x: Math.round(visual.anchorX * buffer.width), y: Math.round(visual.anchorY * buffer.height) } : undefined,
++    footprint: logical ? { gridW: logical.gridW ?? logical.widthTiles ?? 1, gridH: logical.gridH ?? logical.heightTiles ?? 1 } : undefined,
++  });
++}
++
++export function forgeMapAsset({ type, biome, seed, paletteFamily = 'scholomance_sunlit_glade' }) {
++  const choice = FORGE_ASSET_CHOICES.find(c => c.id === type);
++  if (!choice) throw mapError('Unknown Tile Forge asset type.');
++  const buffer = choice.family === 'tile' ? synthesizeTileForgeTile({ type, biome, seed })
++    : choice.family === 'prop' ? synthesizeTileForgeProp({ propType: type, biome, seed })
++      : synthesizeTileForgeAsset({ semanticType: type, biome, paletteFamily, seed });
++  return snapshot(buffer, choice, `${choice.name} · ${seed}`);
++}
++
++export function compileMapAsset({ source, name, kind, anchor, footprint, biome }) {
++  if (!source.trim() || source.length > 65536) throw mapError('SCDL source must contain 1–65,536 characters.');
++  const canvas = source.match(/^\s*CANVAS\s+WIDTH\s+(\d+)\s+HEIGHT\s+(\d+)\s*$/im);
++  if (!canvas || Number(canvas[1]) > 512 || Number(canvas[2]) > 512) throw mapError('Declare a CANVAS no larger than 512 × 512.');
++  const result = compileTileForgeScdl(source, { assetClass: kind, biome });
++  return createMapAsset(result, { name, kind, anchor, footprint });
++}
++
++export function candidateMapAssets(candidate) {
++  const textures = candidate?.layers?.scd128Synthesizer?.synthesizedTextures;
++  if (!textures) throw mapError('Forge a chunk before adding its tiles.');
++  // Alias names share buffers; enumerate the producer rather than imposing a fixed eight-tile ceiling.
++  const seen = new Set();
++  return Object.entries(textures).flatMap(([name, buffer]) => {
++    if (seen.has(buffer)) return [];
++    seen.add(buffer);
++    const choice = FORGE_ASSET_CHOICES.find(c => c.id === name) || { name, kind: buffer.propType ? 'prop' : 'terrain' };
++    return [{ key: name, asset: snapshot(buffer, choice, `${choice.name} · ${candidate.layers.scd128Synthesizer.seed}`) }];
++  });
++}
++
++export function addCandidateToMap(map, candidate, includePlacements = false) {
++  const entries = candidateMapAssets(candidate);
++  let next = addMapAssets(map, entries.map(e => e.asset));
++  if (!includePlacements) return next;
++  const byKey = new Map(entries.map(e => [e.key, e.asset]));
++  const iso = candidate.layers?.isoTile;
++  const groups = [
++    [candidate.intent?.hasGround !== false ? 'ground' : 'top', iso?.topPlane || [], 'terrain'],
++    ['rim', iso?.rimCells || [], 'details'],
++    ['cliff', Object.values(iso?.sidePlanes || {}).flat(), 'cliffs'],
++  ];
++  const vegetation = ['crystal_tree', 'void_pine', 'hologram_fern', 'void_flowers'];
++  (candidate.layers?.fibonacciField?.seeds || []).forEach((point, n) => groups.push([vegetation[n % vegetation.length], [point], 'props']));
++  let width = next.width;
++  let height = next.height;
++  for (const [key, points] of groups) {
++    const asset = byKey.get(key);
++    if (!asset) continue;
++    for (const point of points) {
++      width = Math.max(width, Math.round(point.x) + asset.footprint.gridW);
++      height = Math.max(height, Math.round(point.y) + asset.footprint.gridH);
++    }
++  }
++  const neededLayers = [...new Set(groups.filter(([, points]) => points.length).map(([, , layer]) => layer))];
++  const missing = neededLayers.filter(id => !next.layers.some(l => l.id === id)).map(id => ({ id, name: id[0].toUpperCase() + id.slice(1), visible: true, locked: false }));
++  next = validateTileMap({ ...next, width, height, layers: [...missing, ...next.layers] });
++  for (const [key, points, preferredLayer] of groups) {
++    const asset = byKey.get(key);
++    if (!asset) continue;
++    const layerId = next.layers.find(l => l.id === preferredLayer)?.id ?? next.layers[0].id;
++    for (const point of points) next = stampMapAsset(next, { assetId: asset.id, layerId, x: Math.round(point.x), y: Math.round(point.y), z: Math.round(point.z || 0) });
++  }
++  return next;
++}
++
++export function mapAssetCanvas(asset) {
++  const canvas = document.createElement('canvas');
++  canvas.width = asset.width;
++  canvas.height = asset.height;
++  const bytes = new Uint8ClampedArray(asset.width * asset.height * 4);
++  for (let n = 0; n < bytes.length; n += 1) bytes[n] = parseInt(asset.rgba.slice(n * 2, n * 2 + 2), 16);
++  canvas.getContext('2d').putImageData(new ImageData(bytes, asset.width, asset.height), 0, 0);
++  return canvas;
++}
++
++export function downloadMapFile(text, name) {
++  const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
++  const anchor = document.createElement('a');
++  anchor.href = url;
++  anchor.download = `${name.replace(/[^a-zA-Z0-9_-]/g, '_') || 'tile-forge'}.tilemap.json`;
++  anchor.click();
++  setTimeout(() => URL.revokeObjectURL(url), 1000);
++}
+diff --git a/src/lib/pixelbrain/tileForgeShaders.js b/src/lib/pixelbrain/tileForgeShaders.js
+new file mode 100644
+index 0000000..2b1c014
+--- /dev/null
++++ b/src/lib/pixelbrain/tileForgeShaders.js
+@@ -0,0 +1,111 @@
++export const VS_SOURCE = `
++attribute vec2 a_position;
++varying vec2 v_uv;
++void main() {
++  v_uv = (a_position + 1.0) * 0.5;
++  v_uv.y = 1.0 - v_uv.y; // Flip Y for canvas texture coordinates
++  gl_Position = vec4(a_position, 0.0, 1.0);
++}
++`;
++
++export const FS_SOURCE = `
++precision mediump float;
++varying vec2 v_uv;
++uniform sampler2D u_texture;
++uniform float u_time;
++uniform int u_mode; // 0=off, 1=day, 2=twilight, 3=night, 4=prismatic
++uniform float u_glow;
++uniform float u_warmth;
++uniform vec2 u_resolution;
++
++void main() {
++  vec4 base = texture2D(u_texture, v_uv);
++  if (u_mode == 0) {
++    gl_FragColor = base;
++    return;
++  }
++
++  // Emissive detection: identify glowing crystals, flowers, and rims
++  float isCyan = step(0.65, base.b) * step(0.55, base.g);
++  float isMagenta = step(0.65, base.r) * step(0.65, base.b) * (1.0 - step(0.6, base.g));
++  float isEmerald = step(0.7, base.g) * (1.0 - step(0.8, base.b));
++  float isBright = step(0.82, max(base.r, max(base.g, base.b)));
++  float emissive = max(max(isCyan, isMagenta), max(isEmerald, isBright));
++
++  float pulse = 0.85 + 0.35 * sin(u_time * 3.0 + v_uv.x * 15.0 + v_uv.y * 15.0);
++
++  // Optical bloom 4-tap neighbor sample
++  vec2 px = 2.0 / u_resolution;
++  vec4 s1 = texture2D(u_texture, v_uv + vec2(px.x, 0.0));
++  vec4 s2 = texture2D(u_texture, v_uv - vec2(px.x, 0.0));
++  vec4 s3 = texture2D(u_texture, v_uv + vec2(0.0, px.y));
++  vec4 s4 = texture2D(u_texture, v_uv - vec2(0.0, px.y));
++
++  float neighborEmissive = (
++    step(0.75, max(s1.r, max(s1.g, s1.b))) +
++    step(0.75, max(s2.r, max(s2.g, s2.b))) +
++    step(0.75, max(s3.r, max(s3.g, s3.b))) +
++    step(0.75, max(s4.r, max(s4.g, s4.b)))
++  ) * 0.25;
++
++  vec3 bloom = (base.rgb * emissive * pulse + (s1.rgb + s2.rgb + s3.rgb + s4.rgb) * 0.25 * neighborEmissive) * u_glow;
++  vec3 col = base.rgb;
++
++  // Atmosphere grading passes
++  if (u_mode == 1) {
++    // Day Glade: Warm golden sunlight & crisp contrast
++    col += vec3(0.06, 0.04, -0.02) * u_warmth;
++    col = mix(col, col * 1.05, 0.5);
++    col += bloom * 0.6;
++  } else if (u_mode == 2) {
++    // Twilight Amber: Purple dusk shadows with warm amber rims
++    col = mix(col, vec3(col.r * 1.15, col.g * 0.82, col.b * 1.3), 0.4);
++    if (base.r > 0.45 && base.g > 0.35) {
++      col += vec3(0.12, 0.06, 0.0) * u_warmth;
++    }
++    col += bloom * 1.0;
++  } else if (u_mode == 3) {
++    // Night Bioluminescent: Abyssal darkness with vivid glowing crystal/spore nodes
++    col *= vec3(0.28, 0.38, 0.68);
++    col += bloom * 2.2;
++  } else if (u_mode == 4) {
++    // Prismatic Glacial: Crystalline icy shimmer
++    float shimmer = sin(v_uv.y * 40.0 + u_time * 2.0) * 0.04;
++    col = vec3(col.r * 0.9 + shimmer, col.g * 1.08, col.b * 1.25);
++    col += bloom * 1.4;
++  }
++
++  // Soft dimetric edge vignette
++  float dist = distance(v_uv, vec2(0.5));
++  col *= smoothstep(0.85, 0.35, dist * 0.7);
++
++  gl_FragColor = vec4(col, base.a);
++}
++`;
++
++function createShader(gl, type, source) {
++  const shader = gl.createShader(type);
++  gl.shaderSource(shader, source);
++  gl.compileShader(shader);
++  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
++    const info = gl.getShaderInfoLog(shader);
++    gl.deleteShader(shader);
++    throw new Error(`Shader compile failed: ${info}`);
++  }
++  return shader;
++}
++
++export function createProgram(gl, vsSource, fsSource) {
++  const vs = createShader(gl, gl.VERTEX_SHADER, vsSource);
++  const fs = createShader(gl, gl.FRAGMENT_SHADER, fsSource);
++  const prog = gl.createProgram();
++  gl.attachShader(prog, vs);
++  gl.attachShader(prog, fs);
++  gl.linkProgram(prog);
++  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
++    const info = gl.getProgramInfoLog(prog);
++    gl.deleteProgram(prog);
++    throw new Error(`Program link failed: ${info}`);
++  }
++  return prog;
++}
+diff --git a/src/pages/internal/pixel-lotus/TileForgeCanvas.jsx b/src/pages/internal/pixel-lotus/TileForgeCanvas.jsx
+index 46a1b3c..77e4212 100644
+--- a/src/pages/internal/pixel-lotus/TileForgeCanvas.jsx
++++ b/src/pages/internal/pixel-lotus/TileForgeCanvas.jsx
+@@ -4,117 +4,7 @@ import {
+   synthesizeTileForgeProp,
+ } from '../../../lib/pixelbrain/tileForge.adapter.js';
+ 
+-const VS_SOURCE = `
+-attribute vec2 a_position;
+-varying vec2 v_uv;
+-void main() {
+-  v_uv = (a_position + 1.0) * 0.5;
+-  v_uv.y = 1.0 - v_uv.y; // Flip Y for canvas texture coordinates
+-  gl_Position = vec4(a_position, 0.0, 1.0);
+-}
+-`;
+-
+-const FS_SOURCE = `
+-precision mediump float;
+-varying vec2 v_uv;
+-uniform sampler2D u_texture;
+-uniform float u_time;
+-uniform int u_mode; // 0=off, 1=day, 2=twilight, 3=night, 4=prismatic
+-uniform float u_glow;
+-uniform float u_warmth;
+-uniform vec2 u_resolution;
+-
+-void main() {
+-  vec4 base = texture2D(u_texture, v_uv);
+-  if (u_mode == 0) {
+-    gl_FragColor = base;
+-    return;
+-  }
+-
+-  // Emissive detection: identify glowing crystals, flowers, and rims
+-  float isCyan = step(0.65, base.b) * step(0.55, base.g);
+-  float isMagenta = step(0.65, base.r) * step(0.65, base.b) * (1.0 - step(0.6, base.g));
+-  float isEmerald = step(0.7, base.g) * (1.0 - step(0.8, base.b));
+-  float isBright = step(0.82, max(base.r, max(base.g, base.b)));
+-  float emissive = max(max(isCyan, isMagenta), max(isEmerald, isBright));
+-
+-  float pulse = 0.85 + 0.35 * sin(u_time * 3.0 + v_uv.x * 15.0 + v_uv.y * 15.0);
+-
+-  // Optical bloom 4-tap neighbor sample
+-  vec2 px = 2.0 / u_resolution;
+-  vec4 s1 = texture2D(u_texture, v_uv + vec2(px.x, 0.0));
+-  vec4 s2 = texture2D(u_texture, v_uv - vec2(px.x, 0.0));
+-  vec4 s3 = texture2D(u_texture, v_uv + vec2(0.0, px.y));
+-  vec4 s4 = texture2D(u_texture, v_uv - vec2(0.0, px.y));
+-
+-  float neighborEmissive = (
+-    step(0.75, max(s1.r, max(s1.g, s1.b))) +
+-    step(0.75, max(s2.r, max(s2.g, s2.b))) +
+-    step(0.75, max(s3.r, max(s3.g, s3.b))) +
+-    step(0.75, max(s4.r, max(s4.g, s4.b)))
+-  ) * 0.25;
+-
+-  vec3 bloom = (base.rgb * emissive * pulse + (s1.rgb + s2.rgb + s3.rgb + s4.rgb) * 0.25 * neighborEmissive) * u_glow;
+-  vec3 col = base.rgb;
+-
+-  // Atmosphere grading passes
+-  if (u_mode == 1) {
+-    // Day Glade: Warm golden sunlight & crisp contrast
+-    col += vec3(0.06, 0.04, -0.02) * u_warmth;
+-    col = mix(col, col * 1.05, 0.5);
+-    col += bloom * 0.6;
+-  } else if (u_mode == 2) {
+-    // Twilight Amber: Purple dusk shadows with warm amber rims
+-    col = mix(col, vec3(col.r * 1.15, col.g * 0.82, col.b * 1.3), 0.4);
+-    if (base.r > 0.45 && base.g > 0.35) {
+-      col += vec3(0.12, 0.06, 0.0) * u_warmth;
+-    }
+-    col += bloom * 1.0;
+-  } else if (u_mode == 3) {
+-    // Night Bioluminescent: Abyssal darkness with vivid glowing crystal/spore nodes
+-    col *= vec3(0.28, 0.38, 0.68);
+-    col += bloom * 2.2;
+-  } else if (u_mode == 4) {
+-    // Prismatic Glacial: Crystalline icy shimmer
+-    float shimmer = sin(v_uv.y * 40.0 + u_time * 2.0) * 0.04;
+-    col = vec3(col.r * 0.9 + shimmer, col.g * 1.08, col.b * 1.25);
+-    col += bloom * 1.4;
+-  }
+-
+-  // Soft dimetric edge vignette
+-  float dist = distance(v_uv, vec2(0.5));
+-  col *= smoothstep(0.85, 0.35, dist * 0.7);
+-
+-  gl_FragColor = vec4(col, base.a);
+-}
+-`;
+-
+-function createShader(gl, type, source) {
+-  const shader = gl.createShader(type);
+-  gl.shaderSource(shader, source);
+-  gl.compileShader(shader);
+-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+-    const info = gl.getShaderInfoLog(shader);
+-    gl.deleteShader(shader);
+-    throw new Error(`Shader compile failed: ${info}`);
+-  }
+-  return shader;
+-}
+-
+-function createProgram(gl, vsSource, fsSource) {
+-  const vs = createShader(gl, gl.VERTEX_SHADER, vsSource);
+-  const fs = createShader(gl, gl.FRAGMENT_SHADER, fsSource);
+-  const prog = gl.createProgram();
+-  gl.attachShader(prog, vs);
+-  gl.attachShader(prog, fs);
+-  gl.linkProgram(prog);
+-  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+-    const info = gl.getProgramInfoLog(prog);
+-    gl.deleteProgram(prog);
+-    throw new Error(`Program link failed: ${info}`);
+-  }
+-  return prog;
+-}
++import { VS_SOURCE, FS_SOURCE, createProgram } from '../../../lib/pixelbrain/tileForgeShaders.js';
+ 
+ export default function TileForgeCanvas({
+   candidate,
+diff --git a/src/pages/internal/pixel-lotus/TileForgeLab.jsx b/src/pages/internal/pixel-lotus/TileForgeLab.jsx
+index 50f9e99..e79b7f2 100644
+--- a/src/pages/internal/pixel-lotus/TileForgeLab.jsx
++++ b/src/pages/internal/pixel-lotus/TileForgeLab.jsx
+@@ -1,5 +1,6 @@
+-import { useState } from 'react';
++import { useState, useId } from 'react';
+ import TileForgeCanvas from './TileForgeCanvas.jsx';
++import TileForgeMapEditor from './TileForgeMapEditor.jsx';
+ import {
+   BiomeMaterialMicroprocessor,
+   FibonacciFieldMicroprocessor,
+@@ -10,7 +11,6 @@ import {
+   TileSocketMicroprocessor,
+   VolumeMicroprocessor,
+   TileForgeScd128Microprocessor,
+-  TileShapeMicroprocessor,
+ } from '../../../lib/pixelbrain/tileForge.adapter.js';
+ 
+ // Mocks for auxiliary pipeline steps
+@@ -28,6 +28,8 @@ class MockMemoryStore {
+ }
+ 
+ export default function TileForgeLab() {
++  const groundControlId = useId();
++  const [workspace, setWorkspace] = useState('map');
+   const [result, setResult] = useState(null);
+   const [seed, setSeed] = useState('void_sanctuary_seed');
+   const [preset, setPreset] = useState('voidForest');
+@@ -128,7 +130,7 @@ export default function TileForgeLab() {
+             </span>
+           </div>
+           <h1 style={{ fontSize: '1.6rem', margin: '0.2rem 0 0', color: '#f8fafc' }}>
+-            Tile Forge — Procedural Chunk Synthesizer
++            Tile Forge — Asset & Map Studio
+           </h1>
+         </div>
+ 
+@@ -202,7 +204,7 @@ export default function TileForgeLab() {
+             </>
+           )}
+ 
+-          <label
++          <label htmlFor={groundControlId}
+             style={{
+               display: 'flex',
+               alignItems: 'center',
+@@ -219,6 +221,7 @@ export default function TileForgeLab() {
+             title="Toggle ground / dirt fullness underneath tile surfaces"
+           >
+             <input
++              id={groundControlId}
+               type="checkbox"
+               checked={hasGround}
+               onChange={(e) => setHasGround(e.target.checked)}
+@@ -245,7 +248,16 @@ export default function TileForgeLab() {
+         </div>
+       </header>
+ 
+-      {result ? (
++      <nav className="tf-map-tabs" aria-label="Tile Forge workspace">
++        <button type="button" aria-pressed={workspace === 'map'} onClick={() => setWorkspace('map')}>Map Studio</button>
++        <button type="button" aria-pressed={workspace === 'chunk'} onClick={() => setWorkspace('chunk')}>Chunk Preview</button>
++      </nav>
++      <div hidden={workspace !== 'map'}>
++        <TileForgeMapEditor candidate={result?.candidate} biome={({ voidForest: 'void_forest', organicVoidIsland: 'void_ice', verdantGlade: 'verdant_glade', sunlitGlade: 'scholomance_sunlit_glade', caveChunk: 'cave_chasm' })[preset]} shaderMode={workspace === 'map' ? shaderMode : 'off'} glowIntensity={glowIntensity} atmosphereWarmth={atmosphereWarmth} />
++      </div>
++      <div hidden={workspace !== 'chunk'}>
++
++      {workspace === 'chunk' && (result ? (
+         <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1.2fr', gap: '1.25rem', height: '78vh' }}>
+           {/* WebGL + Discrete Canvas Viewport */}
+           <TileForgeCanvas
+@@ -443,7 +455,8 @@ export default function TileForgeLab() {
+             Forge Chunk Now
+           </button>
+         </div>
+-      )}
++      ))}
++      </div>
+     </div>
+   );
+ }
+diff --git a/src/pages/internal/pixel-lotus/TileForgeMapEditor.css b/src/pages/internal/pixel-lotus/TileForgeMapEditor.css
+new file mode 100644
+index 0000000..4a3bf22
+--- /dev/null
++++ b/src/pages/internal/pixel-lotus/TileForgeMapEditor.css
+@@ -0,0 +1,60 @@
++.tf-map-editor { --tf-ink: #d8e6ed; --tf-muted: #a2b3bf; --tf-edge: #334652; --tf-panel: #101b25; --tf-accent: #65d5bc; color: var(--tf-ink); font: 13px/1.5 'Space Grotesk', system-ui, sans-serif; }
++.tf-map-editor * { box-sizing: border-box; }
++.tf-map-editor button, .tf-map-editor input, .tf-map-editor select, .tf-map-editor textarea { font: inherit; color: inherit; border: 1px solid var(--tf-edge); border-radius: 5px; background: #0a141d; }
++.tf-map-editor button { padding: 6px 10px; cursor: pointer; min-height: 32px; }
++.tf-map-editor button:hover:not(:disabled) { border-color: var(--tf-accent); background: #1a343c; }
++.tf-map-editor button:disabled { opacity: .45; cursor: default; }
++.tf-map-editor button[aria-pressed="true"], .tf-map-editor .tf-map-primary { color: #041813; background: var(--tf-accent); border-color: var(--tf-accent); }
++.tf-map-editor button[aria-pressed="true"]:hover { color: var(--tf-ink); }
++.tf-map-editor :focus-visible { outline: 2px solid #f0cb83; outline-offset: 3px; }
++.tf-map-editor input:not([type="checkbox"]), .tf-map-editor select, .tf-map-editor textarea { width: 100%; min-width: 0; padding: 6px; }
++.tf-map-editor label { display: flex; flex-direction: column; gap: 4px; color: var(--tf-muted); margin: 7px 0; }
++.tf-map-editor p { color: var(--tf-muted); font-size: 12px; margin: 8px 0; }
++.tf-map-editor h2 { margin: 0; font-size: 14px; color: var(--tf-ink); }
++.tf-map-editor details { border-top: 1px solid var(--tf-edge); margin-top: 14px; padding-top: 10px; }
++.tf-map-editor summary { cursor: pointer; color: #e9ce94; margin-bottom: 8px; }
++.tf-map-editor pre, .tf-map-editor code { display: block; overflow: auto; overflow-wrap: anywhere; white-space: pre-wrap; max-height: 220px; font-size: 11px; font-family: 'JetBrains Mono', monospace; }
++.tf-map-editor textarea { resize: vertical; font: 11px/1.6 'JetBrains Mono', monospace; }
++.tf-map-toolbar, .tf-map-viewtools, .tf-map-row, .tf-map-readout, .tf-map-panelheading { display: flex; align-items: center; gap: 8px; }
++.tf-map-toolbar { padding: 10px; margin-bottom: 10px; flex-wrap: wrap; background: var(--tf-panel); border: 1px solid var(--tf-edge); border-radius: 7px; }
++.tf-map-toolbar label, .tf-map-viewtools label { flex-direction: row; align-items: center; margin: 0; }
++.tf-map-toolbar input[type="number"] { width: 58px; }
++.tf-map-toolgroup { display: flex; gap: 4px; }
++.tf-map-toolgroup kbd { font: inherit; opacity: .7; margin-left: 4px; font-size: 10px; }
++.tf-map-spacer { flex: 1; }
++.tf-map-workspace { display: grid; grid-template-columns: 224px minmax(0, 1fr) 274px; gap: 10px; align-items: start; }
++.tf-map-palette, .tf-map-inspector { border: 1px solid var(--tf-edge); border-radius: 7px; padding: 12px; background: var(--tf-panel); max-height: 80vh; overflow: auto; }
++.tf-map-panelheading { justify-content: space-between; margin-bottom: 10px; }
++.tf-map-panelheading span { color: var(--tf-muted); font-size: 11px; }
++.tf-map-row > label { flex: 1; min-width: 0; }
++.tf-map-row > button { flex: 1; }
++.tf-map-assets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; max-height: 430px; overflow: auto; }
++.tf-map-editor .tf-map-asset { display: flex; flex-direction: column; align-items: center; padding: 4px; text-align: center; gap: 4px; font-size: 11px; }
++.tf-map-asset canvas { width: 100%; height: 72px; object-fit: contain; image-rendering: pixelated; }
++.tf-map-asset span { overflow-wrap: anywhere; }
++.tf-map-asset small { opacity: .7; }
++.tf-map-empty { grid-column: 1 / -1; padding: 20px 8px; }
++.tf-map-center { min-width: 0; border: 1px solid var(--tf-edge); border-radius: 7px; overflow: hidden; background: #080d13; }
++.tf-map-viewtools { flex-wrap: wrap; padding: 8px; border-bottom: 1px solid var(--tf-edge); }
++.tf-map-viewtools span { color: var(--tf-muted); font-size: 11px; margin-left: auto; }
++.tf-map-viewtools select { width: 82px; }
++.tf-map-canvas-stack { position: relative; }
++.tf-map-canvas-stack canvas { display: block; width: 100%; height: auto; aspect-ratio: 1100 / 680; image-rendering: pixelated; touch-action: none; }
++.tf-map-canvas-stack canvas[role="application"] { cursor: crosshair; }
++.tf-map-canvas-stack .tf-map-shader { position: absolute; inset: 0; pointer-events: none; z-index: 1; display: none; }
++.tf-map-canvas-stack .tf-map-shader.is-visible { display: block; }
++.tf-map-status { padding: 10px 12px; min-height: 56px; border-top: 1px solid var(--tf-edge); color: var(--tf-accent); overflow-wrap: anywhere; }
++.tf-map-readout { justify-content: space-between; flex-wrap: wrap; color: var(--tf-muted); font-size: 11px; padding: 8px 12px; background: var(--tf-panel); }
++.tf-map-layer { display: flex; align-items: center; gap: 4px; border-left: 2px solid transparent; padding: 5px 0; }
++.tf-map-layer.is-active { border-left-color: var(--tf-accent); }
++.tf-map-layer > button:first-child { flex: 1; text-align: left; overflow-wrap: anywhere; }
++.tf-map-editor .tf-map-layer button { padding: 4px; font-size: 11px; }
++.tf-map-editor .tf-map-layer label { flex-direction: row; align-items: center; font-size: 9px; gap: 0; }
++.tf-map-instance-list { display: flex; flex-direction: column; max-height: 200px; overflow: auto; gap: 4px; }
++.tf-map-instance-list button { text-align: left; font-size: 11px; }
++.tf-map-inspection > button, .tf-map-settings > button { margin-top: 8px; width: 100%; }
++.tf-map-tabs { display: flex; gap: 8px; margin: 0 0 16px; }
++.tf-map-tabs button { border: 1px solid #334652; background: #101b25; color: #d8e6ed; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
++.tf-map-tabs button[aria-pressed="true"] { background: #65d5bc; color: #041813; border-color: #65d5bc; }
++@media (max-width: 1250px) { .tf-map-workspace { grid-template-columns: 190px minmax(0, 1fr); } .tf-map-inspector { grid-column: 1 / -1; max-height: none; } }
++@media (max-width: 700px) { .tf-map-workspace { grid-template-columns: minmax(0, 1fr); } .tf-map-center { grid-row: 1; } .tf-map-palette, .tf-map-inspector { max-height: none; } .tf-map-assets { grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); max-height: 260px; } .tf-map-toolgroup { flex-wrap: wrap; } .tf-map-viewtools span { display: none; } }
+diff --git a/src/pages/internal/pixel-lotus/TileForgeMapEditor.jsx b/src/pages/internal/pixel-lotus/TileForgeMapEditor.jsx
+new file mode 100644
+index 0000000..ca9ff49
+--- /dev/null
++++ b/src/pages/internal/pixel-lotus/TileForgeMapEditor.jsx
+@@ -0,0 +1,263 @@
++import { useEffect, useRef, useState } from 'react';
++import TileForgeMapViewport, { TileThumbnail, MapField } from './TileForgeMapViewport.jsx';
++import {
++  FORGE_ASSET_CHOICES, TILE_MAP_LIMITS, createTileMap, createMapHistory, commitMapHistory, undoMapHistory, redoMapHistory,
++  forgeMapAsset, compileMapAsset, addMapAssets, addCandidateToMap, stampMapAsset, moveMapInstance, eraseMapInstance,
++  updateMapLayer, addMapLayer, reorderMapLayer, validateTileMap, pickMapInstance, projectMapPoint, unprojectMapPoint, mapStrokePoints,
++  serializeTileMap, deserializeTileMap, downloadMapFile,
++} from '../../../lib/pixelbrain/tileForgeMap.adapter.js';
++import './TileForgeMapEditor.css';
++
++const TOOLS = [['paint', 'Brush', 'B'], ['select', 'Select / move', 'V'], ['erase', 'Erase', 'E'], ['pan', 'Pan', 'H']];
++const INITIAL_SOURCE = `SCDL 2
++ASSET custom_tile
++CANVAS WIDTH 80 HEIGHT 40
++SHAPE $left (TRIANGLE P1 (VEC2 (PX 0) (PX 20)) P2 (VEC2 (PX 40) (PX 0)) P3 (VEC2 (PX 40) (PX 40)))
++SHAPE $right (TRIANGLE P1 (VEC2 (PX 40) (PX 0)) P2 (VEC2 (PX 80) (PX 20)) P3 (VEC2 (PX 40) (PX 40)))
++LAYER terrain ORDER 10 BLEND REPLACE {
++  PAINT $left FILL #3C6415 RASTER CENTER
++  PAINT $right FILL #5B8C1D RASTER CENTER
++}
++`;
++
++export default function TileForgeMapEditor({ candidate, biome, shaderMode, glowIntensity, atmosphereWarmth }) {
++  const [history, setHistory] = useState(() => createMapHistory(createTileMap()));
++  const [draft, setDraft] = useState(null);
++  const [saved, setSaved] = useState(history.present);
++  const [tool, setTool] = useState('paint');
++  const [activeAssetId, setActiveAssetId] = useState(null);
++  const [activeLayerId, setActiveLayer] = useState('terrain');
++  const [instancePage, setInstancePage] = useState(0);
++  const [selectedId, setSelectedId] = useState(null);
++  const [hover, setHover] = useState({ x: 0, y: 0, z: 0 });
++  const [elevation, setElevation] = useState(0);
++  const [showGrid, setShowGrid] = useState(true);
++  const [filter, setFilter] = useState('');
++  const [forgeType, setForgeType] = useState('ground');
++  const [forgeSeed, setForgeSeed] = useState(4242);
++  const [message, setMessage] = useState('Forge a tile, or forge a chunk above to fill your palette.');
++  const [source, setSource] = useState(INITIAL_SOURCE);
++  const [sourceName, setSourceName] = useState('Custom tile');
++  const [sourceKind, setSourceKind] = useState('terrain');
++  const [sourceAnchor, setSourceAnchor] = useState({ x: 40, y: 20 });
++  const [sourceFootprint, setSourceFootprint] = useState({ gridW: 1, gridH: 1 });
++  const [size, setSize] = useState({ width: 24, height: 24 });
++  const stroke = useRef(null);
++  const lastCandidate = useRef(null);
++  const mapFile = useRef(null);
++  const sourceFile = useRef(null);
++  const sourcePanel = useRef(null);
++  const map = draft || history.present;
++  const activeLayer = map.layers.some(l => l.id === activeLayerId) ? activeLayerId : map.layers[0].id;
++  const layerInstances = map.instances.filter(i => i.layerId === activeLayer);
++  const page = Math.min(instancePage, Math.max(0, Math.ceil(layerInstances.length / 100) - 1));
++  const brush = map.assets.find(a => a.id === activeAssetId) || null;
++  const selected = map.instances.find(i => i.id === selectedId);
++  const inspected = map.assets.find(a => a.id === selected?.assetId) || brush;
++  const dirty = map !== saved;
++
++  useEffect(() => {
++    if (!candidate || candidate === lastCandidate.current) return;
++    lastCandidate.current = candidate;
++    try {
++      const next = addCandidateToMap(history.present, candidate);
++      setHistory(h => commitMapHistory(h, next));
++      setMessage('Chunk tiles added to the palette. Select any tile and place it on your map.');
++    } catch (error) { setMessage(error.message); }
++  }, [candidate, history.present]);
++
++  useEffect(() => {
++    const warn = e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } };
++    window.addEventListener('beforeunload', warn);
++    return () => window.removeEventListener('beforeunload', warn);
++  }, [dirty]);
++
++  const commit = (operation, success) => {
++    try {
++      const next = operation(history.present);
++      setHistory(h => commitMapHistory(h, next));
++      if (success) setMessage(success);
++      return next;
++    } catch (error) { setMessage(error.message); return null; }
++  };
++  const chooseAsset = asset => { setActiveAssetId(asset.id); setSelectedId(null); setTool('paint'); setMessage(`${asset.name} selected. Click a cell to place; drag to paint.`); };
++  const addAsset = asset => {
++    const next = commit(current => addMapAssets(current, [asset]), 'Asset added. Its pixels and source are preserved with the map.');
++    if (next) chooseAsset(asset);
++  };
++  const forge = () => {
++    try { addAsset(forgeMapAsset({ type: forgeType, biome, seed: forgeSeed })); } catch (error) { setMessage(error.message); }
++  };
++  const compile = () => {
++    try { addAsset(compileMapAsset({ source, name: sourceName, kind: sourceKind, anchor: sourceAnchor, footprint: sourceFootprint, biome })); }
++    catch (error) { setMessage(error.message); }
++  };
++  const editSource = () => {
++    if (!inspected) return;
++    setSource(inspected.scdlSource); setSourceName(`${inspected.name.slice(0, 100)} variant`); setSourceKind(inspected.kind);
++    setSourceAnchor(inspected.anchor); setSourceFootprint(inspected.footprint);
++    sourcePanel.current.open = true;
++    sourcePanel.current.scrollIntoView({ block: 'nearest' });
++    setMessage('Edit the SCDL and compile a new tile when ready. Existing placements keep their current asset.');
++  };
++  const finish = () => {
++    if (!stroke.current) return;
++    const completed = stroke.current;
++    stroke.current = null; setDraft(null);
++    setHistory(h => commitMapHistory(h, completed.current));
++  };
++  const cancel = () => { stroke.current = null; setDraft(null); setMessage('Stroke cancelled.'); };
++  const applyStroke = (world, first = false) => {
++    const gesture = stroke.current;
++    if (!gesture) return;
++    try {
++      if (gesture.tool === 'select') {
++        if (!gesture.selected) return;
++        const cell = unprojectMapPoint(gesture.current, world, gesture.selected.z);
++        const dx = cell.x - gesture.start.x; const dy = cell.y - gesture.start.y;
++        gesture.current = moveMapInstance(gesture.current, gesture.selected.id, { x: gesture.selected.x + dx, y: gesture.selected.y + dy });
++      } else {
++        const cell = unprojectMapPoint(gesture.current, world, elevation);
++        const points = first ? [cell] : mapStrokePoints(gesture.last, cell);
++        for (const point of points) {
++          if (gesture.tool === 'paint') gesture.current = stampMapAsset(gesture.current, { assetId: activeAssetId, layerId: activeLayer, ...point });
++          else {
++            const hit = pickMapInstance(gesture.current, first ? world : projectMapPoint(gesture.current, point), activeLayer);
++            if (hit) gesture.current = eraseMapInstance(gesture.current, hit.id);
++          }
++        }
++        gesture.last = cell;
++      }
++      setDraft(gesture.current);
++    } catch (error) { setMessage(error.message); setDraft(gesture.current); }
++  };
++  const start = world => {
++    const cell = unprojectMapPoint(map, world, elevation);
++    setHover(cell);
++    const hit = tool === 'select' ? pickMapInstance(map, world, activeLayer) : null;
++    if (tool === 'select') setSelectedId(hit?.id || null);
++    stroke.current = { current: map, tool, last: cell, selected: hit, start: hit ? unprojectMapPoint(map, world, hit.z) : cell };
++    applyStroke(world, true);
++  };
++  const move = world => { setHover(unprojectMapPoint(map, world, elevation)); applyStroke(world); };
++  const undo = () => { cancel(); setHistory(undoMapHistory); setMessage('Undo.'); };
++  const redo = () => { cancel(); setHistory(redoMapHistory); setMessage('Redo.'); };
++  const keyDown = e => {
++    if ((e.ctrlKey || e.metaKey) && ['z', 'y'].includes(e.key.toLowerCase())) {
++      e.preventDefault(); if (e.shiftKey || e.key.toLowerCase() === 'y') redo(); else undo(); return;
++    }
++    if (e.key === 'Escape') { e.preventDefault(); cancel(); return; }
++    const shortcut = TOOLS.find(t => t[2].toLowerCase() === e.key.toLowerCase());
++    if (shortcut) { setTool(shortcut[0]); return; }
++    const directions = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
++    if (directions[e.key]) {
++      e.preventDefault(); const [dx, dy] = directions[e.key];
++      if (tool === 'select' && selected) commit(current => moveMapInstance(current, selected.id, { x: selected.x + dx, y: selected.y + dy }));
++      else setHover(h => ({ x: Math.max(0, Math.min(map.width - 1, (h?.x ?? 0) + dx)), y: Math.max(0, Math.min(map.height - 1, (h?.y ?? 0) + dy)), z: elevation }));
++    } else if (e.key === 'Enter' || e.key === ' ') {
++      e.preventDefault(); if (hover) { start(projectMapPoint(map, { ...hover, z: elevation })); finish(); }
++    } else if (e.key === 'Delete' && selected) {
++      e.preventDefault(); commit(current => eraseMapInstance(current, selected.id));
++    }
++  };
++  const save = () => {
++    try { downloadMapFile(serializeTileMap(map), map.name); setSaved(map); setMessage('Map downloaded with all tile pixels, SCDL, bytecode, and SCD128 records.'); }
++    catch (error) { setMessage(error.message); }
++  };
++  const load = async e => {
++    const file = e.target.files?.[0]; e.target.value = '';
++    if (!file) return;
++    try {
++      if (file.size > TILE_MAP_LIMITS.fileBytes) throw new Error('Map exceeds the 32 MB file limit.');
++      const next = deserializeTileMap(await file.text());
++      finish(); setHistory(h => commitMapHistory(h, next)); setSaved(next); setSize({ width: next.width, height: next.height });
++      setSelectedId(null); setActiveAssetId(next.assets[0]?.id || null); setActiveLayer(next.layers[0].id);
++      setMessage('Map loaded. Undo restores your previous map.');
++    } catch (error) { setMessage(error.message); }
++  };
++  const loadSource = async e => {
++    const file = e.target.files?.[0]; e.target.value = '';
++    if (!file) return;
++    try {
++      if (file.size > 65536) throw new Error('SCDL file exceeds 64 KB.');
++      setSource(await file.text()); setSourceName(file.name.replace(/\.scdl$/i, '')); setMessage('Source loaded for review. Compile & add when ready.');
++    } catch (error) { setMessage(error.message); }
++  };
++
++  return <section className="tf-map-editor" aria-label="Tile Forge map studio">
++    <div className="tf-map-toolbar">
++      <div className="tf-map-toolgroup" role="group" aria-label="Map tools">{TOOLS.map(([id, title, key]) => <button type="button" key={id} aria-pressed={tool === id} onClick={() => { finish(); setTool(id); }} title={`${title} (${key})`}>{title} <kbd>{key}</kbd></button>)}</div>
++      <button type="button" disabled={!history.past.length} onClick={undo}>Undo</button>
++      <button type="button" disabled={!history.future.length} onClick={redo}>Redo</button>
++      <MapField>Elevation <input aria-label="Brush elevation" type="number" min={-16} max={32} value={elevation} onChange={e => { const z = Math.max(-16, Math.min(32, Number(e.target.value))); setElevation(z); setHover(h => h && ({ ...h, z })); }} /></MapField>
++      <MapField><input type="checkbox" checked={showGrid} onChange={e => setShowGrid(e.target.checked)} /> Grid</MapField>
++      <span className="tf-map-spacer" />
++      <button type="button" onClick={() => mapFile.current.click()}>Open map</button>
++      <button type="button" className="tf-map-primary" onClick={save}>Save map{dirty ? ' *' : ''}</button>
++      <input ref={mapFile} type="file" accept=".json" hidden onChange={load} aria-label="Open Tile Forge map file" />
++    </div>
++    <div className="tf-map-workspace">
++      <aside className="tf-map-palette" aria-label="Tile palette">
++        <div className="tf-map-panelheading"><h2>Tile palette</h2><span>{map.assets.length} assets</span></div>
++        <MapField>Asset type<select value={forgeType} onChange={e => setForgeType(e.target.value)}>{FORGE_ASSET_CHOICES.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></MapField>
++        <p>{FORGE_ASSET_CHOICES.find(c => c.id === forgeType)?.family === 'asset' ? 'Art palette: Scholomance Sunlit Glade. Water and cliff generators retain their native material palettes.' : `Biome: ${biome.replaceAll('_', ' ')}`}</p>
++        <div className="tf-map-row"><MapField>Seed<input type="number" min={0} max={4294967295} value={forgeSeed} onChange={e => setForgeSeed(Number(e.target.value))} /></MapField><button type="button" onClick={forge}>Forge tile</button></div>
++        <MapField className="tf-map-search">Find tile<input type="search" placeholder="Search your palette" value={filter} onChange={e => setFilter(e.target.value)} /></MapField>
++        <div className="tf-map-assets">
++          {map.assets.filter(a => a.name.toLowerCase().includes(filter.toLowerCase())).map(a => <button type="button" key={a.id} className="tf-map-asset" aria-pressed={a.id === activeAssetId} onClick={() => chooseAsset(a)} title={`${a.name} · ${a.width}×${a.height} pixels · ${a.footprint.gridW}×${a.footprint.gridH} cells`}><TileThumbnail asset={a} /><span>{a.name}</span><small>{a.width} × {a.height}</small></button>)}
++          {!map.assets.length && <p className="tf-map-empty">Your tiles collect here. Forge individual assets or a complete chunk, then paint them anywhere on the grid.</p>}
++        </div>
++        <details ref={sourcePanel} className="tf-map-source"><summary>SCDL V2 · custom tile</summary>
++          <MapField>Tile name<input value={sourceName} maxLength={120} onChange={e => setSourceName(e.target.value)} /></MapField>
++          <MapField>Placement kind<select value={sourceKind} onChange={e => setSourceKind(e.target.value)}><option value="terrain">Terrain</option><option value="prop">Prop / actor</option></select></MapField>
++          <div className="tf-map-row">{['x', 'y'].map(axis => <MapField key={axis}>Anchor {axis.toUpperCase()}<input type="number" min={0} max={512} value={sourceAnchor[axis]} onChange={e => setSourceAnchor(a => ({ ...a, [axis]: Number(e.target.value) }))} /></MapField>)}</div>
++          <div className="tf-map-row">{[['gridW', 'Footprint W'], ['gridH', 'Footprint H']].map(([key, title]) => <MapField key={key}>{title}<input type="number" min={1} max={32} value={sourceFootprint[key]} onChange={e => setSourceFootprint(f => ({ ...f, [key]: Number(e.target.value) }))} /></MapField>)}</div>
++          <MapField>SCDL source<textarea spellCheck={false} value={source} onChange={e => setSource(e.target.value)} rows={12} maxLength={65536} /></MapField>
++          <p>Anchor coordinates are native pixels. Compilation runs the AMPs explicitly declared in your source.</p>
++          <div className="tf-map-row"><button type="button" onClick={() => sourceFile.current.click()}>Open .scdl</button><button type="button" className="tf-map-primary" onClick={compile}>Compile &amp; add</button></div>
++          <input ref={sourceFile} type="file" accept=".scdl,.txt" hidden onChange={loadSource} aria-label="Open SCDL source file" />
++        </details>
++      </aside>
++      <div className="tf-map-center">
++        <TileForgeMapViewport map={map} tool={tool} brush={brush} selectedId={selectedId} hover={hover} elevation={elevation} showGrid={showGrid} shaderMode={shaderMode} glowIntensity={glowIntensity} atmosphereWarmth={atmosphereWarmth} onStart={start} onMove={move} onEnd={finish} onCancel={cancel} onKeyDown={keyDown} />
++        <div className="tf-map-status" role="status" aria-live="polite">{message}</div>
++        <div className="tf-map-readout"><span>{map.width} × {map.height} cells · {map.instances.length} placements</span><span>{hover ? `Cell ${hover.x}, ${hover.y} · Z ${elevation}` : 'Choose a tile'} · 80 × 40 dimetric</span></div>
++      </div>
++      <aside className="tf-map-inspector" aria-label="Map layers and tile inspector">
++        <div className="tf-map-panelheading"><h2>Layers</h2><button type="button" onClick={() => { const next = commit(addMapLayer); if (next) setActiveLayer(next.layers.at(-1).id); }}>+ Layer</button></div>
++        <p className="tf-map-hint">Top row draws last. Selection and erasing use the active layer.</p>
++        <div className="tf-map-layers">{[...map.layers].reverse().map(l => <div key={l.id} className={`tf-map-layer ${activeLayer === l.id ? 'is-active' : ''}`}>
++          <button type="button" aria-pressed={activeLayer === l.id} onClick={() => { setActiveLayer(l.id); setSelectedId(null); }}>{l.name}</button>
++          <MapField title="Visible"><input type="checkbox" aria-label={`Show ${l.name}`} checked={l.visible} onChange={e => commit(m => updateMapLayer(m, l.id, { visible: e.target.checked }))} />Show</MapField>
++          <MapField title="Locked"><input type="checkbox" aria-label={`Lock ${l.name}`} checked={l.locked} onChange={e => commit(m => updateMapLayer(m, l.id, { locked: e.target.checked }))} />Lock</MapField>
++          <button type="button" aria-label={`Raise ${l.name}`} onClick={() => commit(m => reorderMapLayer(m, l.id, 1))}>↑</button>
++          <button type="button" aria-label={`Lower ${l.name}`} onClick={() => commit(m => reorderMapLayer(m, l.id, -1))}>↓</button>
++        </div>)}</div>
++        <MapField>Layer name<input key={activeLayer + map.layers.find(l => l.id === activeLayer)?.name} defaultValue={map.layers.find(l => l.id === activeLayer)?.name || ''} maxLength={120} onBlur={e => { if (e.target.value !== map.layers.find(l => l.id === activeLayer)?.name) commit(m => updateMapLayer(m, activeLayer, { name: e.target.value })); }} /></MapField>
++        <details open className="tf-map-inspection"><summary>{selected ? 'Placed tile' : 'Asset inspector'}</summary>
++          {inspected ? <>
++            <strong>{inspected.name}</strong><p>{inspected.width} × {inspected.height} native pixels · {inspected.footprint.gridW} × {inspected.footprint.gridH} footprint</p>
++            {selected && <>
++              <div className="tf-map-row">{['x', 'y', 'z'].map(axis => <MapField key={axis}>{axis.toUpperCase()}<input type="number" aria-label={`Selected tile ${axis}`} value={selected[axis]} onChange={e => commit(m => moveMapInstance(m, selected.id, { [axis]: Number(e.target.value) }))} /></MapField>)}</div>
++              <div className="tf-map-row"><button type="button" onClick={() => { setActiveAssetId(selected.assetId); setTool('paint'); setMessage('Duplicate armed. Click a destination cell.'); }}>Duplicate</button><button type="button" onClick={() => commit(m => eraseMapInstance(m, selected.id), 'Tile removed. Undo restores it.')}>Delete tile</button></div>
++            </>}
++            <button type="button" disabled={!inspected.scdlSource} onClick={editSource}>Edit SCDL as new variant</button>
++            <details><summary>SCD128 identity</summary><p>FORM64</p><code>{inspected.scd128Record.scd128Wire.slice(0, 64)}</code><p>REALIZATION64</p><code>{inspected.scd128Record.scd128Wire.slice(64)}</code></details>
++            <details><summary>AMP descriptors ({inspected.ampDescriptors.length})</summary><pre>{JSON.stringify(inspected.ampDescriptors, null, 2)}</pre></details>
++          </> : <p>Select a palette asset or a placed tile to inspect its source and identity.</p>}
++        </details>
++        <details><summary>Placed tiles ({layerInstances.length})</summary><div className="tf-map-instance-list">{layerInstances.slice(page * 100, (page + 1) * 100).map(i => <button type="button" key={i.id} aria-pressed={selectedId === i.id} onClick={() => { setSelectedId(i.id); setTool('select'); }}>{map.assets.find(a => a.id === i.assetId)?.name} · {i.x},{i.y},{i.z}</button>)}</div>
++          <div className="tf-map-row"><button type="button" disabled={page === 0} onClick={() => setInstancePage(page - 1)}>Previous</button><span>{page + 1} / {Math.max(1, Math.ceil(layerInstances.length / 100))}</span><button type="button" disabled={(page + 1) * 100 >= layerInstances.length} onClick={() => setInstancePage(page + 1)}>Next</button></div>
++        </details>
++        <details className="tf-map-settings"><summary>Map settings</summary>
++          <MapField>Map name<input key={map.name} defaultValue={map.name} maxLength={120} onBlur={e => { if (e.target.value !== map.name) commit(m => validateTileMap({ ...m, name: e.target.value })); }} /></MapField>
++          <div className="tf-map-row">{['width', 'height'].map(axis => <MapField key={axis}>{axis}<input type="number" min={1} max={256} value={size[axis]} onChange={e => setSize(s => ({ ...s, [axis]: Number(e.target.value) }))} /></MapField>)}</div>
++          <button type="button" onClick={() => commit(m => validateTileMap({ ...m, ...size }), 'Map resized. All placements retained.')}>Resize map</button>
++          <button type="button" disabled={!candidate} onClick={() => { const next = commit(m => addCandidateToMap(m, candidate, true), 'Chunk placed as individually editable tiles. Map expanded to fit; Undo restores the previous arrangement.'); if (next) setSize({ width: next.width, height: next.height }); }}>Place generated chunk</button>
++          <p>Chunk placement expands the map to fit and replaces matching cells on cliffs, terrain, details, and props layers.</p>
++          <button type="button" onClick={() => { const next = commit(m => addMapAssets(createTileMap({ ...size, name: 'Untitled map' }), m.assets), 'New blank map. Palette retained; Undo restores the previous map.'); if (next) { setActiveLayer('terrain'); setSelectedId(null); } }}>New blank map</button>
++        </details>
++      </aside>
++    </div>
++  </section>;
++}
+diff --git a/src/pages/internal/pixel-lotus/TileForgeMapViewport.jsx b/src/pages/internal/pixel-lotus/TileForgeMapViewport.jsx
+new file mode 100644
+index 0000000..c2d165f
+--- /dev/null
++++ b/src/pages/internal/pixel-lotus/TileForgeMapViewport.jsx
+@@ -0,0 +1,184 @@
++import { useEffect, useRef, useState, useMemo, useId, Children, isValidElement, cloneElement } from 'react';
++import { mapAssetCanvas, orderedMapInstances, projectMapPoint } from '../../../lib/pixelbrain/tileForgeMap.adapter.js';
++import { VS_SOURCE, FS_SOURCE, createProgram } from '../../../lib/pixelbrain/tileForgeShaders.js';
++
++const WIDTH = 1100;
++const HEIGHT = 680;
++const ZOOMS = [0.25, 0.5, 1, 2, 3, 4];
++const MODES = { off: 0, day: 1, twilight: 2, night: 3, prismatic: 4 };
++
++export function MapField({ children, ...props }) {
++  const id = useId();
++  return <label {...props} htmlFor={id}>{Children.map(children, child => isValidElement(child) && ['input', 'select', 'textarea'].includes(child.type) ? cloneElement(child, { id }) : child)}</label>;
++}
++
++export function TileThumbnail({ asset }) {
++  const ref = useRef(null);
++  useEffect(() => {
++    if (!ref.current) return;
++    const ctx = ref.current.getContext('2d');
++    ctx.clearRect(0, 0, 88, 72);
++    ctx.imageSmoothingEnabled = false;
++    const scale = Math.min(1, 84 / asset.width, 68 / asset.height);
++    ctx.drawImage(mapAssetCanvas(asset), Math.round((88 - asset.width * scale) / 2), Math.round((72 - asset.height * scale) / 2), Math.round(asset.width * scale), Math.round(asset.height * scale));
++  }, [asset]);
++  return <canvas aria-hidden="true" ref={ref} width={88} height={72} />;
++}
++
++export default function TileForgeMapViewport({ map, tool, brush, selectedId, hover, elevation, showGrid, shaderMode, glowIntensity, atmosphereWarmth, onStart, onMove, onEnd, onCancel, onKeyDown }) {
++  const canvasRef = useRef(null);
++  const glCanvasRef = useRef(null);
++  const glState = useRef(null);
++  const panRef = useRef(null);
++  const [view, setView] = useState({ x: WIDTH / 2, y: 90, zoom: 0.5 });
++  const [webgl, setWebgl] = useState(false);
++  const textures = useMemo(() => new Map(map.assets.map(a => [a.id, mapAssetCanvas(a)])), [map.assets]);
++  const ordered = useMemo(() => orderedMapInstances(map), [map]);
++
++  useEffect(() => {
++    const canvas = glCanvasRef.current;
++    const gl = canvas.getContext('webgl', { alpha: false });
++    if (!gl) return undefined;
++    let program;
++    try { program = createProgram(gl, VS_SOURCE, FS_SOURCE); } catch { return undefined; }
++    const buffer = gl.createBuffer();
++    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
++    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
++    const position = gl.getAttribLocation(program, 'a_position');
++    gl.enableVertexAttribArray(position);
++    gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
++    const texture = gl.createTexture();
++    gl.bindTexture(gl.TEXTURE_2D, texture);
++    for (const name of [gl.TEXTURE_WRAP_S, gl.TEXTURE_WRAP_T]) gl.texParameteri(gl.TEXTURE_2D, name, gl.CLAMP_TO_EDGE);
++    for (const name of [gl.TEXTURE_MIN_FILTER, gl.TEXTURE_MAG_FILTER]) gl.texParameteri(gl.TEXTURE_2D, name, gl.NEAREST);
++    const uniforms = Object.fromEntries(['u_texture', 'u_time', 'u_mode', 'u_glow', 'u_warmth', 'u_resolution'].map(name => [name, gl.getUniformLocation(program, name)]));
++    glState.current = { gl, program, texture, uniforms };
++    setWebgl(true);
++    const lost = e => { e.preventDefault(); glState.current = null; setWebgl(false); };
++    canvas.addEventListener('webglcontextlost', lost);
++    return () => {
++      canvas.removeEventListener('webglcontextlost', lost);
++      glState.current = null;
++      gl.deleteBuffer(buffer); gl.deleteTexture(texture); gl.deleteProgram(program);
++    };
++  }, []);
++
++  useEffect(() => {
++    const canvas = canvasRef.current;
++    const ctx = canvas.getContext('2d');
++    ctx.setTransform(1, 0, 0, 1, 0, 0);
++    ctx.fillStyle = '#080d13'; ctx.fillRect(0, 0, WIDTH, HEIGHT);
++    ctx.imageSmoothingEnabled = false;
++    ctx.setTransform(view.zoom, 0, 0, view.zoom, Math.round(view.x), Math.round(view.y));
++    const diamond = (point, color, fill = false, gridW = 1, gridH = 1) => {
++      const points = [[point.x - 0.5, point.y - 0.5], [point.x + gridW - 0.5, point.y - 0.5], [point.x + gridW - 0.5, point.y + gridH - 0.5], [point.x - 0.5, point.y + gridH - 0.5]];
++      ctx.beginPath();
++      points.forEach(([x, y], n) => { const p = projectMapPoint(map, { x, y, z: point.z }); if (n) ctx.lineTo(p.x, p.y); else ctx.moveTo(p.x, p.y); });
++      ctx.closePath(); ctx.strokeStyle = color; ctx.lineWidth = 1 / view.zoom;
++      if (fill) { ctx.fillStyle = color; ctx.fill(); } else ctx.stroke();
++    };
++    if (showGrid) {
++      // One line per row/column, independent of map area.
++      ctx.beginPath();
++      for (let x = 0; x <= map.width; x += 1) {
++        const a = projectMapPoint(map, { x: x - 0.5, y: -0.5, z: elevation });
++        const b = projectMapPoint(map, { x: x - 0.5, y: map.height - 0.5, z: elevation });
++        ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
++      }
++      for (let y = 0; y <= map.height; y += 1) {
++        const a = projectMapPoint(map, { x: -0.5, y: y - 0.5, z: elevation });
++        const b = projectMapPoint(map, { x: map.width - 0.5, y: y - 0.5, z: elevation });
++        ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
++      }
++      ctx.strokeStyle = '#233341'; ctx.lineWidth = 1 / view.zoom; ctx.stroke();
++    }
++    for (const instance of ordered) {
++      const p = projectMapPoint(map, instance);
++      const a = instance.asset;
++      const left = p.x - a.anchor.x;
++      const top = p.y - a.anchor.y;
++      if ((left + a.width) * view.zoom + view.x < 0 || left * view.zoom + view.x > WIDTH || (top + a.height) * view.zoom + view.y < 0 || top * view.zoom + view.y > HEIGHT) continue;
++      ctx.drawImage(textures.get(a.id), left, top);
++      if (instance.id === selectedId) {
++        ctx.strokeStyle = '#f0cb83'; ctx.lineWidth = 2 / view.zoom;
++        ctx.strokeRect(left, top, a.width, a.height);
++        diamond(instance, '#f0cb83', false, a.footprint.gridW, a.footprint.gridH);
++      }
++    }
++    if (hover) {
++      const valid = hover.x >= 0 && hover.y >= 0 && hover.x + (brush?.footprint.gridW ?? 1) <= map.width && hover.y + (brush?.footprint.gridH ?? 1) <= map.height;
++      if (tool === 'paint' && brush && valid) {
++        const p = projectMapPoint(map, hover);
++        ctx.globalAlpha = 0.55;
++        ctx.drawImage(textures.get(brush.id), p.x - brush.anchor.x, p.y - brush.anchor.y);
++        ctx.globalAlpha = 1;
++      }
++      diamond(hover, valid ? '#65d5bc' : '#f07e83', false, brush?.footprint.gridW ?? 1, brush?.footprint.gridH ?? 1);
++    }
++    ctx.setTransform(1, 0, 0, 1, 0, 0);
++    const state = glState.current;
++    if (state) { state.gl.bindTexture(state.gl.TEXTURE_2D, state.texture); state.gl.texImage2D(state.gl.TEXTURE_2D, 0, state.gl.RGBA, state.gl.RGBA, state.gl.UNSIGNED_BYTE, canvas); }
++  }, [map, ordered, textures, view, brush, selectedId, hover, elevation, showGrid, tool, webgl]);
++
++  useEffect(() => {
++    let frame;
++    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
++    const render = time => {
++      const state = glState.current;
++      if (state && shaderMode !== 'off') {
++        const { gl, program, uniforms: u } = state;
++        gl.viewport(0, 0, WIDTH, HEIGHT); gl.useProgram(program);
++        gl.uniform1i(u.u_texture, 0); gl.uniform1f(u.u_time, reduced.matches ? 0 : time * 0.001);
++        gl.uniform1i(u.u_mode, MODES[shaderMode] ?? 0); gl.uniform1f(u.u_glow, glowIntensity); gl.uniform1f(u.u_warmth, atmosphereWarmth);
++        gl.uniform2f(u.u_resolution, WIDTH, HEIGHT); gl.drawArrays(gl.TRIANGLES, 0, 6);
++      }
++      if (shaderMode !== 'off') frame = requestAnimationFrame(render);
++    };
++    render(0);
++    return () => cancelAnimationFrame(frame);
++  }, [shaderMode, glowIntensity, atmosphereWarmth, webgl]);
++
++  const screenPoint = e => {
++    const rect = canvasRef.current.getBoundingClientRect();
++    return { x: (e.clientX - rect.left) * WIDTH / rect.width, y: (e.clientY - rect.top) * HEIGHT / rect.height };
++  };
++  const worldPoint = e => { const p = screenPoint(e); return { x: (p.x - Math.round(view.x)) / view.zoom, y: (p.y - Math.round(view.y)) / view.zoom }; };
++  const zoomTo = value => setView(v => ({ zoom: value, x: WIDTH / 2 - (WIDTH / 2 - v.x) * value / v.zoom, y: HEIGHT / 2 - (HEIGHT / 2 - v.y) * value / v.zoom }));
++  const fit = () => {
++    const points = [projectMapPoint(map, { x: 0, y: 0 }), projectMapPoint(map, { x: map.width, y: 0 }), projectMapPoint(map, { x: 0, y: map.height }), projectMapPoint(map, { x: map.width, y: map.height })];
++    ordered.forEach(i => { const p = projectMapPoint(map, i); points.push({ x: p.x - i.asset.anchor.x, y: p.y - i.asset.anchor.y }, { x: p.x - i.asset.anchor.x + i.asset.width, y: p.y - i.asset.anchor.y + i.asset.height }); });
++    const minX = Math.min(...points.map(p => p.x)); const maxX = Math.max(...points.map(p => p.x));
++    const minY = Math.min(...points.map(p => p.y)); const maxY = Math.max(...points.map(p => p.y));
++    const zoom = ZOOMS.filter(z => z <= Math.min((WIDTH - 80) / (maxX - minX), (HEIGHT - 80) / (maxY - minY))).at(-1) ?? 0.25;
++    setView({ zoom, x: WIDTH / 2 - (minX + maxX) / 2 * zoom, y: HEIGHT / 2 - (minY + maxY) / 2 * zoom });
++  };
++  return <div className="tf-map-viewport">
++    <div className="tf-map-viewtools">
++      <button type="button" onClick={fit}>Fit map</button>
++      <MapField>Zoom <select value={view.zoom} onChange={e => zoomTo(Number(e.target.value))}>{ZOOMS.map(z => <option key={z} value={z}>{z * 100}%</option>)}</select></MapField>
++      <span>{!webgl && shaderMode !== 'off' ? '2D preview · WebGL unavailable' : 'Middle-drag to pan · Wheel to zoom'}</span>
++    </div>
++    <div className="tf-map-canvas-stack">
++      <canvas ref={glCanvasRef} width={WIDTH} height={HEIGHT} aria-hidden="true" className={`tf-map-shader ${webgl && shaderMode !== 'off' ? 'is-visible' : ''}`} />
++      {/* Canvas has a full keyboard map editor, described by its application label. */}
++      {/* eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role */}
++      <canvas ref={canvasRef} width={WIDTH} height={HEIGHT} tabIndex={0} role="application" aria-label="Tile map canvas. Arrow keys move the cursor; Enter places or erases; B brush, V select, E erase, H pan. Control Z undoes."
++        onKeyDown={onKeyDown}
++        onWheel={e => { const index = ZOOMS.indexOf(view.zoom); zoomTo(ZOOMS[Math.max(0, Math.min(ZOOMS.length - 1, index + (e.deltaY < 0 ? 1 : -1)))]); }}
++        onPointerDown={e => {
++          if (e.button !== 0 && e.button !== 1) return;
++          e.preventDefault(); e.currentTarget.focus(); e.currentTarget.setPointerCapture(e.pointerId);
++          if (tool === 'pan' || e.button === 1) panRef.current = { point: screenPoint(e), view };
++          else onStart(worldPoint(e));
++        }}
++        onPointerMove={e => {
++          if (panRef.current) { const p = screenPoint(e); const start = panRef.current; setView({ ...start.view, x: start.view.x + p.x - start.point.x, y: start.view.y + p.y - start.point.y }); }
++          else onMove(worldPoint(e));
++        }}
++        onPointerUp={e => { if (!panRef.current) onEnd(); panRef.current = null; if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId); }}
++        onPointerCancel={() => { panRef.current = null; onCancel(); }}
++        onLostPointerCapture={() => { panRef.current = null; onEnd(); }}
++      />
++    </div>
++  </div>;
++}
+diff --git a/tests/game/tile-forge/tile-forge-map-editor.test.jsx b/tests/game/tile-forge/tile-forge-map-editor.test.jsx
+new file mode 100644
+index 0000000..c120f07
+--- /dev/null
++++ b/tests/game/tile-forge/tile-forge-map-editor.test.jsx
+@@ -0,0 +1,89 @@
++// @vitest-environment jsdom
++import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
++import { render, screen, fireEvent, cleanup, waitFor } from '@testing-library/react';
++import TileForgeMapEditor from '../../../src/pages/internal/pixel-lotus/TileForgeMapEditor.jsx';
++import { deserializeTileMap } from '../../../codex/core/pixelbrain/tile-forge/tile-forge.map.js';
++
++let savedBlob;
++beforeEach(() => {
++  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(type => type === '2d' ? {
++    setTransform: vi.fn(), clearRect: vi.fn(), fillRect: vi.fn(), drawImage: vi.fn(), putImageData: vi.fn(),
++    beginPath: vi.fn(), moveTo: vi.fn(), lineTo: vi.fn(), closePath: vi.fn(), stroke: vi.fn(), fill: vi.fn(), strokeRect: vi.fn(),
++  } : null);
++  vi.spyOn(HTMLCanvasElement.prototype, 'getBoundingClientRect').mockReturnValue({ x: 0, y: 0, left: 0, top: 0, right: 1100, bottom: 680, width: 1100, height: 680 });
++  HTMLCanvasElement.prototype.setPointerCapture = vi.fn();
++  HTMLCanvasElement.prototype.hasPointerCapture = vi.fn(() => false);
++  HTMLCanvasElement.prototype.releasePointerCapture = vi.fn();
++  vi.stubGlobal('PointerEvent', MouseEvent);
++  vi.stubGlobal('ImageData', class { constructor(data, width, height) { Object.assign(this, { data, width, height }); } });
++  URL.createObjectURL = vi.fn(blob => { savedBlob = blob; return 'blob:test'; });
++  URL.revokeObjectURL = vi.fn();
++  vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
++});
++afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
++const mount = () => render(<TileForgeMapEditor biome="void_forest" shaderMode="off" glowIntensity={1} atmosphereWarmth={1} />);
++const canvas = () => screen.getByRole('application');
++function stampAt(x, y) {
++  // Default camera: 0.5x, origin (550,90), native grid step (40,20).
++  const point = { clientX: 550 + (x - y) * 20, clientY: 90 + (x + y) * 10, button: 0, pointerId: 1 };
++  fireEvent.pointerDown(canvas(), point); fireEvent.pointerUp(canvas(), point);
++}
++const blobText = blob => new Promise(resolve => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.readAsText(blob); });
++
++describe('Tile Forge map Studio interactions', () => {
++  it('forges, places individual tiles, drags a stroke, and undoes the entire stroke', async () => {
++    mount(); fireEvent.click(screen.getByRole('button', { name: 'Forge tile', exact: true }));
++    expect(screen.getByText('1 assets')).toBeInTheDocument();
++    stampAt(2, 2); stampAt(3, 2);
++    expect(screen.getByText(/2 placements/)).toBeInTheDocument();
++    fireEvent.pointerDown(canvas(), { clientX: 550, clientY: 170, button: 0 });
++    fireEvent.pointerMove(canvas(), { clientX: 610, clientY: 200, buttons: 1 });
++    fireEvent.pointerUp(canvas(), { clientX: 610, clientY: 200 });
++    expect(screen.getByText(/6 placements/)).toBeInTheDocument();
++    fireEvent.click(screen.getByRole('button', { name: 'Undo', exact: true }));
++    expect(screen.getByText(/2 placements/)).toBeInTheDocument();
++    fireEvent.click(screen.getByRole('button', { name: 'Redo', exact: true }));
++    expect(screen.getByText(/6 placements/)).toBeInTheDocument();
++    fireEvent.click(screen.getByRole('button', { name: /Save map/ }));
++    const document = deserializeTileMap(await blobText(savedBlob));
++    expect(document.instances).toHaveLength(6);
++    expect(document.assets[0].scd128Record.scd128Wire).toHaveLength(128);
++    expect(document.assets[0].scdlSource).toContain('SCDL 2');
++  });
++  it('honors layer locking, changes elevation, and supports keyboard placement', () => {
++    mount(); fireEvent.click(screen.getByRole('button', { name: 'Forge tile', exact: true }));
++    fireEvent.click(screen.getByLabelText('Lock Terrain')); stampAt(2, 2);
++    expect(screen.getByText(/0 placements/)).toBeInTheDocument();
++    expect(screen.getByRole('status')).toHaveTextContent(/unlocked/);
++    fireEvent.click(screen.getByLabelText('Lock Terrain'));
++    fireEvent.change(screen.getByLabelText('Brush elevation'), { target: { value: '2' } });
++    fireEvent.keyDown(canvas(), { key: 'ArrowRight' }); fireEvent.keyDown(canvas(), { key: 'Enter' });
++    expect(screen.getByText(/1 placements/)).toBeInTheDocument();
++    fireEvent.keyDown(canvas(), { key: 'z', ctrlKey: true });
++    expect(screen.getByText(/0 placements/)).toBeInTheDocument();
++  });
++  it('compiles the starter SCDL, keeps variants separate, and rejects a broken file without losing work', async () => {
++    mount(); fireEvent.click(screen.getByText('SCDL V2 · custom tile'));
++    fireEvent.click(screen.getByRole('button', { name: 'Compile & add' }));
++    expect(screen.getByText('1 assets')).toBeInTheDocument(); stampAt(2, 2);
++    fireEvent.change(screen.getByLabelText('SCDL source'), { target: { value: 'broken' } });
++    fireEvent.click(screen.getByRole('button', { name: 'Compile & add' }));
++    expect(screen.getByText(/1 placements/)).toBeInTheDocument();
++    const file = new File(['{}'], 'broken.json', { type: 'application/json' });
++    file.text = async () => '{}';
++    fireEvent.change(screen.getByLabelText('Open Tile Forge map file'), { target: { files: [file] } });
++    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(/Unsupported map format/));
++    expect(screen.getByText(/1 placements/)).toBeInTheDocument();
++  });
++  it('selects a placed instance, moves its origin, duplicates, and deletes independently', () => {
++    mount(); fireEvent.click(screen.getByRole('button', { name: 'Forge tile', exact: true })); stampAt(2, 2);
++    fireEvent.click(screen.getByText('Placed tiles (1)'));
++    fireEvent.click(screen.getByRole('button', { name: /Ground with soil.*2,2,0/ }));
++    fireEvent.change(screen.getByLabelText('Selected tile x'), { target: { value: '5' } });
++    expect(screen.getByLabelText('Selected tile x')).toHaveValue(5);
++    fireEvent.click(screen.getByRole('button', { name: 'Duplicate', exact: true })); stampAt(6, 2);
++    expect(screen.getByText(/2 placements/)).toBeInTheDocument();
++    fireEvent.click(screen.getByRole('button', { name: 'Delete tile', exact: true }));
++    expect(screen.getByText(/1 placements/)).toBeInTheDocument();
++  });
++});
+diff --git a/tests/game/tile-forge/tile-forge-map.test.js b/tests/game/tile-forge/tile-forge-map.test.js
+new file mode 100644
+index 0000000..b8f6d18
+--- /dev/null
++++ b/tests/game/tile-forge/tile-forge-map.test.js
+@@ -0,0 +1,120 @@
++import { describe, it, expect } from 'vitest';
++import {
++  createTileMap, createMapAsset, addMapAssets, stampMapAsset, moveMapInstance, eraseMapInstance,
++  updateMapLayer, reorderMapLayer, validateTileMap, pickMapInstance, projectMapPoint, unprojectMapPoint,
++  orderedMapInstances, mapStrokePoints, serializeTileMap, deserializeTileMap,
++  createMapHistory, commitMapHistory, undoMapHistory, redoMapHistory,
++} from '../../../codex/core/pixelbrain/tile-forge/tile-forge.map.js';
++import { forgeMapAsset, compileMapAsset, addCandidateToMap, FORGE_ASSET_CHOICES } from '../../../src/lib/pixelbrain/tileForgeMap.adapter.js';
++import { synthesizeTileForgeTile } from '../../../codex/core/pixelbrain/tile-forge/tile-forge.synthesizer.js';
++import { assertEqual, assertTrue } from '../../qa/tools/bytecode-assertions.js';
++
++const testContext = { testFile: 'tile-forge-map.test.js', testSuite: 'Tile Forge map integrity' };
++const asset = (color = 32, name = 'Tile') => createMapAsset({ width: 2, height: 2, data: new Uint8ClampedArray([color, 40, 60, 255, 0, 0, 0, 0, color, 40, 60, 255, color, 40, 60, 255]), scdlSource: 'original source', bytecode: { bytes: [1, 2, 3] }, ampDescriptors: [], scd128Record: { scd128Wire: 'A'.repeat(128) } }, { name, kind: 'prop', anchor: { x: 0, y: 0 } });
++const base = () => addMapAssets(createTileMap({ width: 8, height: 8 }), [asset()]);
++const stamp = (map, overrides = {}) => stampMapAsset(map, { assetId: map.assets[0].id, layerId: 'terrain', x: 2, y: 2, z: 0, ...overrides });
++
++describe('Tile Forge map editor contracts', () => {
++  it('admits every exposed generator family with a compatible palette', () => {
++    for (const choice of FORGE_ASSET_CHOICES) expect(forgeMapAsset({ type: choice.id, biome: 'void_forest', seed: 42 }).id).toMatch(/^asset-/);
++  });
++  it('imports a chunk beyond the initial map bounds and preserves ground and cliff as independent tiles', () => {
++    const tile = synthesizeTileForgeTile({ type: 'ground' });
++    const candidate = { intent: { hasGround: true }, layers: {
++      scd128Synthesizer: { seed: 42, synthesizedTextures: { ground: tile, cliff: { ...tile, type: 'cliff' } } },
++      isoTile: { topPlane: [{ x: 79, y: 39, z: 0 }], sidePlanes: { south: [{ x: 79, y: 39, z: 0 }] } },
++    } };
++    const map = addCandidateToMap(createTileMap(), candidate, true);
++    expect(map.width).toBe(80); expect(map.height).toBe(40);
++    expect(map.instances).toHaveLength(2);
++    expect(new Set(map.instances.map(i => i.layerId))).toEqual(new Set(['cliffs', 'terrain']));
++  });
++  it('places separate instances while keeping source, pixels and SCD128 identity immutable', () => {
++    const original = base(); const first = stamp(original); const second = stamp(first, { x: 3 });
++    assertEqual(original.instances.length, 0, testContext);
++    assertEqual(second.instances.length, 2, testContext);
++    expect(new Set(second.instances.map(i => i.id)).size).toBe(2);
++    expect(second.assets).toBe(original.assets);
++    expect(Object.isFrozen(second.instances[0])).toBe(true);
++    const moved = moveMapInstance(second, second.instances[0].id, { x: 5, y: 5, z: 2 });
++    expect(moved.assets[0]).toBe(second.assets[0]);
++    expect(second.instances[0].x).toBe(2);
++  });
++  it('deduplicates identical assets but distinguishes pixel changes even when the SCD128 wire matches', () => {
++    const map = addMapAssets(base(), [asset(32, 'Renamed'), asset(33)]);
++    expect(map.assets).toHaveLength(2);
++    expect(map.assets[0].scd128Record.scd128Wire).toBe(map.assets[1].scd128Record.scd128Wire);
++    expect(map.assets[0].id).not.toBe(map.assets[1].id);
++  });
++  it('replaces only the same layer/cell/elevation and suppresses redundant brush stamps', () => {
++    const first = stamp(base()); expect(stamp(first)).toBe(first);
++    let map = stamp(first, { layerId: 'props' }); map = stamp(map, { z: 1 });
++    const other = asset(90); map = addMapAssets(map, [other]); map = stamp(map, { assetId: other.id });
++    expect(map.instances).toHaveLength(3);
++    expect(map.instances.find(i => i.id === first.instances[0].id).assetId).toBe(other.id);
++  });
++  it('rejects editing hidden or locked layers and rejects out-of-bounds footprints', () => {
++    const initial = stamp(base()); const id = initial.instances[0].id;
++    const locked = updateMapLayer(initial, 'terrain', { locked: true });
++    for (const operation of [() => stamp(locked), () => eraseMapInstance(locked, id), () => moveMapInstance(locked, id, { x: 3 })]) expect(operation).toThrow(/unlocked/);
++    expect(() => stamp(updateMapLayer(base(), 'terrain', { visible: false }))).toThrow(/visible/);
++    expect(() => stamp(base(), { x: -1 })).toThrow(); expect(() => stamp(base(), { z: 33 })).toThrow();
++    const large = createMapAsset({ ...asset(), data: new Uint8ClampedArray(16) }, { kind: 'prop', anchor: { x: 0, y: 0 }, footprint: { gridW: 2, gridH: 2 } });
++    expect(() => stamp(addMapAssets(base(), [large]), { assetId: large.id, x: 7 })).toThrow(/footprint/);
++    expect(() => validateTileMap({ ...initial, width: 2 })).toThrow(/footprint/);
++  });
++  it('round-trips grid centers and diamond boundaries at every supported elevation', () => {
++    const map = base();
++    for (const z of [-16, 0, 2, 32]) for (const x of [0, 3, 7]) for (const y of [0, 2, 7]) {
++      expect(unprojectMapPoint(map, projectMapPoint(map, { x, y, z }), z)).toEqual({ x, y, z });
++    }
++    expect(unprojectMapPoint(map, { x: 19, y: 9 })).toEqual({ x: 0, y: 0, z: 0 });
++  });
++  it('picks only opaque pixels on visible layers and respects explicit layer order', () => {
++    const ground = stamp(base()); const stacked = stamp(ground, { layerId: 'props' });
++    const p = projectMapPoint(stacked, stacked.instances[0]);
++    expect(pickMapInstance(stacked, p).layerId).toBe('props');
++    expect(pickMapInstance(stacked, p, 'terrain').layerId).toBe('terrain');
++    expect(pickMapInstance(stacked, { x: p.x + 1, y: p.y })).toBeNull();
++    expect(pickMapInstance(updateMapLayer(stacked, 'props', { visible: false }), p).layerId).toBe('terrain');
++    const reordered = reorderMapLayer(reorderMapLayer(stacked, 'terrain', 1), 'terrain', 1);
++    expect(pickMapInstance(reordered, p).layerId).toBe('terrain');
++    expect(orderedMapInstances(stacked).at(-1).layerId).toBe('props');
++  });
++  it('commits an interpolated stroke as one reversible edit and clears redo after a branch', () => {
++    const original = base(); let map = original;
++    for (const p of mapStrokePoints({ x: 0, y: 0 }, { x: 7, y: 2, z: 0 })) map = stamp(map, p);
++    expect(map.instances).toHaveLength(8);
++    const history = commitMapHistory(createMapHistory(original), map);
++    expect(undoMapHistory(history).present).toBe(original);
++    expect(redoMapHistory(undoMapHistory(history)).present).toBe(map);
++    expect(commitMapHistory(undoMapHistory(history), stamp(original)).future).toHaveLength(0);
++  });
++  it('round-trips a generated SCDL V2 asset without rerunning the compiler or altering evidence', () => {
++    const tile = forgeMapAsset({ type: 'ground', biome: 'void_forest', seed: 42 });
++    const map = stamp(addMapAssets(createTileMap(), [tile]));
++    const encoded = serializeTileMap(map); const decoded = deserializeTileMap(encoded);
++    assertEqual(serializeTileMap(decoded), encoded, testContext);
++    assertTrue(decoded.assets[0].scdlSource.startsWith('SCDL 2'), testContext);
++    expect(decoded.assets[0].rgba).toBe(tile.rgba);
++    expect(decoded.assets[0].bytecode).toEqual(tile.bytecode);
++    expect(decoded.assets[0].scd128Record).toEqual(tile.scd128Record);
++    expect(decoded.assets[0].ampDescriptors).toEqual(tile.ampDescriptors);
++  });
++  it('fails closed on corruption, duplicate IDs, unknown fields and missing references', () => {
++    const map = stamp(base()); const envelope = JSON.parse(serializeTileMap(map));
++    envelope.document.name = 'Tampered'; expect(() => deserializeTileMap(JSON.stringify(envelope))).toThrow(/checksum/);
++    expect(() => deserializeTileMap('{')).toThrow(/valid/);
++    expect(() => validateTileMap({ ...map, assets: [map.assets[0], map.assets[0]] })).toThrow(/Duplicate/);
++    expect(() => validateTileMap({ ...map, injected: true })).toThrow();
++    expect(() => validateTileMap({ ...map, assets: [] })).toThrow(/missing/);
++    expect(() => validateTileMap({ ...map, assets: [{ ...map.assets[0], rgba: 'ffffffff'.repeat(4) }] })).toThrow(/integrity/);
++  });
++  it('compiles explicit custom source and enforces source and canvas input limits', () => {
++    const source = 'SCDL 2\nASSET custom\nCANVAS WIDTH 80 HEIGHT 40\nSHAPE $p (PIXEL AT (VEC2 (PX 40) (PX 20)))\nLAYER sprite ORDER 10 BLEND REPLACE { PAINT $p FILL #65d5bc RASTER CENTER }';
++    const a = compileMapAsset({ source, name: 'Custom', kind: 'terrain' });
++    expect(a.width).toBe(80); expect(a.scdlSource).toBe(source);
++    expect(() => compileMapAsset({ source: source.replace('WIDTH 80', 'WIDTH 99999') })).toThrow(/512/);
++    expect(() => compileMapAsset({ source: 'x'.repeat(65537) })).toThrow(/65,536/);
++  });
++});

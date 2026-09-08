@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useId } from 'react';
 import TileForgeCanvas from './TileForgeCanvas.jsx';
+import TileForgeMapEditor from './TileForgeMapEditor.jsx';
 import {
   BiomeMaterialMicroprocessor,
   FibonacciFieldMicroprocessor,
@@ -10,7 +11,6 @@ import {
   TileSocketMicroprocessor,
   VolumeMicroprocessor,
   TileForgeScd128Microprocessor,
-  TileShapeMicroprocessor,
 } from '../../../lib/pixelbrain/tileForge.adapter.js';
 
 // Mocks for auxiliary pipeline steps
@@ -28,6 +28,8 @@ class MockMemoryStore {
 }
 
 export default function TileForgeLab() {
+  const groundControlId = useId();
+  const [workspace, setWorkspace] = useState('map');
   const [result, setResult] = useState(null);
   const [seed, setSeed] = useState('void_sanctuary_seed');
   const [preset, setPreset] = useState('voidForest');
@@ -128,7 +130,7 @@ export default function TileForgeLab() {
             </span>
           </div>
           <h1 style={{ fontSize: '1.6rem', margin: '0.2rem 0 0', color: '#f8fafc' }}>
-            Tile Forge — Procedural Chunk Synthesizer
+            Tile Forge — Asset & Map Studio
           </h1>
         </div>
 
@@ -202,7 +204,7 @@ export default function TileForgeLab() {
             </>
           )}
 
-          <label
+          <label htmlFor={groundControlId}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -219,6 +221,7 @@ export default function TileForgeLab() {
             title="Toggle ground / dirt fullness underneath tile surfaces"
           >
             <input
+              id={groundControlId}
               type="checkbox"
               checked={hasGround}
               onChange={(e) => setHasGround(e.target.checked)}
@@ -245,7 +248,16 @@ export default function TileForgeLab() {
         </div>
       </header>
 
-      {result ? (
+      <nav className="tf-map-tabs" aria-label="Tile Forge workspace">
+        <button type="button" aria-pressed={workspace === 'map'} onClick={() => setWorkspace('map')}>Map Studio</button>
+        <button type="button" aria-pressed={workspace === 'chunk'} onClick={() => setWorkspace('chunk')}>Chunk Preview</button>
+      </nav>
+      <div hidden={workspace !== 'map'}>
+        <TileForgeMapEditor candidate={result?.candidate} biome={({ voidForest: 'void_forest', organicVoidIsland: 'void_ice', verdantGlade: 'verdant_glade', sunlitGlade: 'scholomance_sunlit_glade', caveChunk: 'cave_chasm' })[preset]} shaderMode={workspace === 'map' ? shaderMode : 'off'} glowIntensity={glowIntensity} atmosphereWarmth={atmosphereWarmth} />
+      </div>
+      <div hidden={workspace !== 'chunk'}>
+
+      {workspace === 'chunk' && (result ? (
         <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1.2fr', gap: '1.25rem', height: '78vh' }}>
           {/* WebGL + Discrete Canvas Viewport */}
           <TileForgeCanvas
@@ -443,7 +455,8 @@ export default function TileForgeLab() {
             Forge Chunk Now
           </button>
         </div>
-      )}
+      ))}
+      </div>
     </div>
   );
 }
