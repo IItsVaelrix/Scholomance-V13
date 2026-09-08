@@ -103,6 +103,8 @@ function actorDescriptor(source, semanticType, kind, index, seed) {
     elevation: source.elevation ?? 0,
     name: source.name ?? semanticType,
     sourceType: source.type ?? source.speciesKey,
+    description: source.description,
+    scd128Record: source.scd128Record,
     seed: stableSeed(`${seed}:${id}`),
   });
 }

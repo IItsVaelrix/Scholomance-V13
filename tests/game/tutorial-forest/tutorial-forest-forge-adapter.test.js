@@ -46,6 +46,9 @@ describe('Tutorial Forest Forge adapter', () => {
     expect(plan.actors.every(({ semanticType }) => (
       TILE_FORGE_FOREST_ACTOR_TYPES.includes(semanticType)
     ))).toBe(true);
+    const stump = plan.actors.find(({ sourceType }) => sourceType === 'hollow_fairy_stump');
+    expect(stump.description).toMatch(/bioluminescent fairy mushrooms/i);
+    expect(stump.scd128Record.contract).toBe('SCD128-ASSET-RECORD');
   });
 
   it('catches adapter nondeterminism between gameplay and Forge outputs', () => {
