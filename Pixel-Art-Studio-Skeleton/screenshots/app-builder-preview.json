@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Sward",
+      "hasCanvas": true,
+      "bodyTextLen": 786,
+      "bodyTextHash": "e092213efdb7f13c423551023725aad41ca9885a172690a5fa79c53df1355171",
+      "bodyTextPrefix": "Sward Pixel grass, grown not painted Seed Grow Tile 2×2 Meadow F",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Sward",
+      "hasCanvas": true,
+      "bodyTextLen": 750,
+      "bodyTextHash": "da350114f728bdd8db8ad5cb88558ea365bf1a372876111b4f7e12bd37598da9",
+      "bodyTextPrefix": "Sward Grow Tile 2×2 Meadow Form Seams 32×32 1 PASS 0.9 shadow 62",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}

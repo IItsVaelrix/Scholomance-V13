@@ -98,7 +98,11 @@ function readLibrary(): Array<{ id: string; name: string; width: number }> {
   }
 }
 
-export function Foundry() {
+type FoundryProps = {
+  onUseInCanvas?: (result: GrassResult, mode: "layer" | "document") => void;
+};
+
+export function Foundry({ onUseInCanvas }: FoundryProps = {}) {
   const palettes = useMemo(() => getStudioGrassPalettes(), []);
   const [params, setParams] = useState<GrassParams>(() => getStudioGrassDefaults() as GrassParams);
   const [result, setResult] = useState<GrassResult>(
@@ -109,6 +113,7 @@ export function Foundry() {
   const [layer, setLayer] = useState("final");
   const [library, setLibrary] = useState(readLibrary);
   const [notice, setNotice] = useState("Form first · colour second · deterministic seed");
+  const [analysis, setAnalysis] = useState("No intake loaded. Grow a field or import a PNG to inspect duplicates.");
 
   const update = <K extends keyof GrassParams>(key: K, value: GrassParams[K]) =>
     setParams((current) => ({ ...current, [key]: value }));
@@ -229,6 +234,21 @@ export function Foundry() {
             </select>
           </label>
           <label>
+            <span>Intake PNG</span>
+            <input
+              type="file"
+              accept="image/png"
+              aria-label="Foundry intake PNG"
+              onChange={async (event) => {
+                const file = event.target.files?.[0];
+                event.target.value = "";
+                if (!file) return;
+                const bytes = new Uint8Array(await file.arrayBuffer());
+                setAnalysis(`Intake ${file.name} · ${bytes.length} bytes · formula ${params.paletteId}`);
+              }}
+            />
+          </label>
+          <label>
             <span>Biome palette</span>
             <select
               value={String(params.paletteId)}
@@ -347,9 +367,23 @@ export function Foundry() {
               <Download size={15} />
               Export PNG
             </button>
+            {onUseInCanvas ? (
+              <>
+                <button className="pbs-button is-primary" type="button" onClick={() => onUseInCanvas(result, "layer")}>
+                  Use in Canvas
+                </button>
+                <button className="pbs-button" type="button" onClick={() => onUseInCanvas(result, "document")}>
+                  New Canvas from field
+                </button>
+              </>
+            ) : null}
           </div>
           <p className="pbs-status" role="status" aria-live="polite">
             {notice}
+          </p>
+          <p className="pbs-note">
+            {analysis} Duplicate versus library:{" "}
+            {library.some((item) => item.id.includes(String(params.seed))) ? "MATCH" : "NONE"}
           </p>
           <details>
             <summary>Local library · {library.length}</summary>

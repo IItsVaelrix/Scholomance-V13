@@ -1,0 +1,45 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.image-segmentation",
+  "version": "1.0.0",
+  "execution": "ANALYZE",
+  "stage": "SOURCE_ANALYSIS",
+  "scope": ["PROGRAM", "ASSET"],
+  "inputs": [
+    {
+      "name": "target",
+      "type": "LAYER",
+      "required": true,
+      "description": "Source layer to analyze into connected-component regions"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "minRegionSize",
+      "type": "I32",
+      "min": 1,
+      "max": 100,
+      "default": 5,
+      "description": "Minimum cell count to form an independent slab"
+    }
+  ],
+  "output": {
+    "type": "LAYER",
+    "description": "Analyzed layer with segmented region tags"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 3,
+    "fixed": 0
+  },
+  "order": 10,
+  "relevance": {
+    "pipelines": ["image-lattice"],
+    "conditions": []
+  },
+  "checksum": "aa840a748b9aae2ab6cfecab4f2817626f5bccdcbf4d472cc6e3af289bf49122"
+}

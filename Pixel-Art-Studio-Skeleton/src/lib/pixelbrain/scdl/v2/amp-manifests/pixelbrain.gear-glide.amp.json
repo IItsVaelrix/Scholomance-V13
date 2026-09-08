@@ -1,0 +1,59 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.gear-glide",
+  "version": "1.0.0",
+  "execution": "DESCRIPTOR",
+  "stage": "RUNTIME_DESCRIPTOR",
+  "scope": ["TIMELINE", "ASSET"],
+  "inputs": [
+    {
+      "name": "targetId",
+      "type": "ANY",
+      "required": false,
+      "description": "Optional target layer or shape identifier"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "bpm",
+      "type": "I32",
+      "min": 40,
+      "max": 220,
+      "default": 90,
+      "description": "BPM tempo sync rate"
+    },
+    {
+      "name": "degreesPerBeat",
+      "type": "I32",
+      "min": 15,
+      "max": 360,
+      "default": 90,
+      "description": "Angular rotation degrees advanced per beat"
+    }
+  ],
+  "output": {
+    "type": "ANY",
+    "description": "Immutable runtime motion and rotation descriptor"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "CONSTANT",
+    "multiplier": 1,
+    "fixed": 10
+  },
+  "order": 110,
+  "relevance": {
+    "pipelines": ["runtime"],
+    "conditions": [
+      {
+        "field": "tags",
+        "op": "includes",
+        "value": "gear"
+      }
+    ]
+  },
+  "checksum": "ea7ac201b94a7f48f78b061cc2e197343c8a613259ca9770c5e2adf5d22d6ebe"
+}

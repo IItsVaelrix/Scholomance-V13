@@ -1,0 +1,59 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.heraldry",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "SHAPE_POST",
+  "scope": [
+    "SHAPE"
+  ],
+  "inputs": [
+    {
+      "name": "geometry",
+      "type": "SHAPE",
+      "required": true,
+      "description": "Escutcheon or emblem field geometry"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "charge",
+      "type": "ANY",
+      "default": "lion",
+      "description": "Heraldic charge emblem"
+    },
+    {
+      "name": "division",
+      "type": "ANY",
+      "default": "pale",
+      "description": "Heraldic field partition division"
+    }
+  ],
+  "output": {
+    "type": "SHAPE",
+    "description": "Structured shield face geometry with partitioned heraldic charge"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 2,
+    "fixed": 0
+  },
+  "order": 48,
+  "relevance": {
+    "pipelines": [
+      "item"
+    ],
+    "conditions": [
+      {
+        "field": "tags",
+        "op": "includes",
+        "value": "heraldry"
+      }
+    ]
+  },
+  "checksum": "2ba45bc830c713ca22e77c2e8bc71d50217b28927de9ce5e4744a5242d8bd558"
+}

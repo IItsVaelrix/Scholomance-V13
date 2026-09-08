@@ -1,0 +1,64 @@
+{
+  "adapterFamily": "tree",
+  "evidenceDigest": "EVIDENCE_FORM_SCHOLOMIUM_MASTER_REDWOOD",
+  "slots": {
+    "ASSET_CLASS": {
+      "canonicalCategory": "redwood",
+      "parameters": {
+        "archetype": "redwood",
+        "asset_id": "scholomium_master_redwood"
+      }
+    },
+    "SCALE_FRAME": {
+      "canonicalCategory": "dimetric_2_5d",
+      "parameters": {
+        "canvas_width": 48,
+        "canvas_height": 112
+      }
+    },
+    "SILHOUETTE": {
+      "canonicalCategory": "tapered_spire",
+      "parameters": {
+        "occupied_ratio": {
+          "numerator": "2",
+          "denominator": "3"
+        }
+      }
+    },
+    "STRUCTURAL_SKELETON": {
+      "canonicalCategory": "massive_vertical_stepped",
+      "parameters": {
+        "primary_limbs": 3,
+        "order": 2
+      }
+    },
+    "PROPORTION": {
+      "canonicalCategory": "ultra_tall",
+      "parameters": {
+        "trunk_ratio": {
+          "numerator": "1",
+          "denominator": "2"
+        },
+        "crown_width": 34
+      }
+    },
+    "MASS_DISTRIBUTION": {
+      "canonicalCategory": "mid_canopy",
+      "parameters": {
+        "center_y": 39
+      }
+    },
+    "NEGATIVE_SPACE": {
+      "canonicalCategory": "moderate_gaps",
+      "parameters": {
+        "void_pct": 18
+      }
+    },
+    "WORLD_FOOTPRINT": {
+      "canonicalCategory": "buttressed_roots",
+      "parameters": {
+        "root_spread": 12
+      }
+    }
+  }
+}

@@ -1,7 +1,7 @@
 # PDR: PixelBrain Studio Standalone Phase B
 ## Full nine-tab authoring parity with a professional Canvas & Aseprite workspace
 
-**Status:** Approved — Angel approved the architecture and professional Canvas direction on 2026-09-06; implementation has not started.
+**Status:** Implemented — nine-tab standalone Studio gates green; PIR records exact evidence.
 **Classification:** Architectural | Behavioral | PixelBrain | Standalone authoring | UI + Rendering
 **Priority:** Critical
 **Primary Goal:** Complete the standalone PixelBrain Studio as a coherent nine-tab authoring application whose default Canvas & Aseprite tab supports serious pixel-art work while preserving deterministic, browser-safe PixelBrain behavior.
@@ -389,3 +389,4 @@ Phase B is implemented only when:
 - 2026-09-06: Angel approved Phase B implementation.
 - 2026-09-06: Angel approved Canvas as the default route and directed that the Aseprite tab have a professional feel.
 - 2026-09-06: Angel approved the narrow browser-safe authoring facade, one-document authority, professional three-pane Canvas, explicit local persistence, and full verification/falsifier design.
+- 2026-09-06: Phase B implemented. Evidence: `docs/scholomance-encyclopedia/post-implementation-reports/PIR-20260906-PIXELBRAIN-STUDIO-STANDALONE-PHASE-B.md`.

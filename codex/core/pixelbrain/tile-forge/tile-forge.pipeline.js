@@ -1,3 +1,5 @@
+import { deriveSubStreamSeeds } from './tile-forge.spec.js';
+
 export class TileForgePipeline {
   constructor({
     processors,
@@ -22,6 +24,11 @@ export class TileForgePipeline {
 
     if (!preset) {
       throw new Error(`Unknown Tile Forge preset: ${intent.preset}`);
+    }
+
+    // Attach deterministic sub-stream seeds if not already present
+    if (intent.seed && !intent.subSeeds) {
+      intent.subSeeds = deriveSubStreamSeeds(intent.seed);
     }
 
     const context = {
@@ -97,7 +104,11 @@ export class TileForgePipeline {
   composeCandidate(intent, context) {
     return {
       id: intent.id,
-      type: "isometric_tile_chunk",
+      type: intent.assetClass || "isometric_tile_chunk",
+      assetClass: intent.assetClass,
+      assetSpec: intent.assetSpec,
+      visualBounds: intent.visualBounds,
+      logicalFootprint: intent.logicalFootprint,
       intent,
       layers: context.layers,
       processorVersionMap: context.processorVersionMap,

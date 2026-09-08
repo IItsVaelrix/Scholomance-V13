@@ -1,0 +1,47 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.school-tag",
+  "version": "1.0.0",
+  "execution": "DESCRIPTOR",
+  "stage": "WORLD_DESCRIPTOR",
+  "scope": [
+    "ASSET"
+  ],
+  "inputs": [
+    {
+      "name": "targetId",
+      "type": "ANY",
+      "required": false,
+      "description": "Asset identifier"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "school",
+      "type": "MATERIAL",
+      "default": "void",
+      "description": "Arcane school classification"
+    }
+  ],
+  "output": {
+    "type": "ANY",
+    "description": "Immutable world school affiliation descriptor"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "CONSTANT",
+    "multiplier": 1,
+    "fixed": 5
+  },
+  "order": 104,
+  "relevance": {
+    "pipelines": [
+      "world-voxel"
+    ],
+    "conditions": []
+  },
+  "checksum": "7ac0805fcdf61490c2f788c28d4e544692f8e226debeb317552ad2ae591ee278"
+}

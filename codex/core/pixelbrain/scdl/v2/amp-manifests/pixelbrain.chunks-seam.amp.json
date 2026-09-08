@@ -1,0 +1,49 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.chunks-seam",
+  "version": "1.0.0",
+  "execution": "DESCRIPTOR",
+  "stage": "WORLD_DESCRIPTOR",
+  "scope": [
+    "ASSET"
+  ],
+  "inputs": [
+    {
+      "name": "targetId",
+      "type": "ANY",
+      "required": false,
+      "description": "Chunk boundary identifier"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "seamMargin",
+      "type": "I32",
+      "min": 0,
+      "max": 8,
+      "default": 1,
+      "description": "Inter-chunk overlap seam margin"
+    }
+  ],
+  "output": {
+    "type": "ANY",
+    "description": "Immutable chunk seam stitching descriptor"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "CONSTANT",
+    "multiplier": 1,
+    "fixed": 10
+  },
+  "order": 103,
+  "relevance": {
+    "pipelines": [
+      "world-voxel"
+    ],
+    "conditions": []
+  },
+  "checksum": "8099dddd72e7058b5d5847a33f1c88d3cfa2c00020cd1a3858b40265d81d9a41"
+}

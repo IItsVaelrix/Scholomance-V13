@@ -1,0 +1,49 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.hollowness",
+  "version": "1.0.0",
+  "execution": "DESCRIPTOR",
+  "stage": "WORLD_DESCRIPTOR",
+  "scope": [
+    "ASSET"
+  ],
+  "inputs": [
+    {
+      "name": "targetId",
+      "type": "ANY",
+      "required": false,
+      "description": "Target volume identifier"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "innerRadius",
+      "type": "I32",
+      "min": 1,
+      "max": 16,
+      "default": 3,
+      "description": "Inner cavity hollow radius in voxels"
+    }
+  ],
+  "output": {
+    "type": "ANY",
+    "description": "Immutable hollow cavity descriptor"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "CONSTANT",
+    "multiplier": 1,
+    "fixed": 10
+  },
+  "order": 102,
+  "relevance": {
+    "pipelines": [
+      "world-voxel"
+    ],
+    "conditions": []
+  },
+  "checksum": "cbdc949fcef0a6c0be91d28a8a7a5e9783e999abb6933b7bf959a13de93b400d"
+}

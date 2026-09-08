@@ -1,0 +1,57 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.tonation",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "LAYER_POST",
+  "scope": [
+    "LAYER"
+  ],
+  "inputs": [
+    {
+      "name": "layer",
+      "type": "LAYER",
+      "required": true,
+      "description": "Layer receiving material color tone balancing"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "warmth",
+      "type": "FIXED",
+      "min": 0,
+      "max": 1,
+      "default": 0.5,
+      "description": "Color temperature warmth bias"
+    },
+    {
+      "name": "contrast",
+      "type": "FIXED",
+      "min": 0,
+      "max": 1,
+      "default": 0.5,
+      "description": "Midtone tonal contrast"
+    }
+  ],
+  "output": {
+    "type": "LAYER",
+    "description": "Layer with balanced material-specific color tonation"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 2,
+    "fixed": 0
+  },
+  "order": 76,
+  "relevance": {
+    "pipelines": [
+      "render-fidelity"
+    ],
+    "conditions": []
+  },
+  "checksum": "c63f97240d479e6a60621d02adc16a4a17ff5b2e6a7ad080cc6e57d3073fdc01"
+}

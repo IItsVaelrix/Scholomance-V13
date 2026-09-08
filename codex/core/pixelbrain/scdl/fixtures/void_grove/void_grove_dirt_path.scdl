@@ -1,0 +1,36 @@
+# void_grove_dirt_path — walkable dirt/path ground tile.
+# 32x32, top-down, no isometric projection.
+asset void_grove_dirt_path canvas 32x32
+
+palette {
+  soil_dark = #1a1206
+  soil_base = #2a1f0f
+  soil_mid  = #3a2c18
+  soil_lit  = #4d3c22
+  soil_hi   = #6b5432
+  pebble    = #877254
+}
+
+part ground material voidsoil {
+  rect 0 0 32 32 soil_base
+  polygon 0 0 18 0 12 10 0 14 soil_mid
+  polygon 32 2 32 16 22 20 28 6 soil_lit
+  polygon 0 20 10 16 14 32 0 32 soil_dark
+  polygon 18 24 32 20 32 32 22 32 soil_mid
+  cell 6 6 soil_hi
+  cell 22 4 soil_dark
+  cell 27 13 soil_hi
+  cell 4 25 soil_dark
+  cell 16 28 soil_hi
+  cell 25 23 soil_dark
+}
+
+part pebbles material voidsoil {
+  circle 9 22 radius 1 pebble
+  circle 14 10 radius 1 soil_hi
+  circle 23 27 radius 1 pebble
+  circle 19 17 radius 1 soil_dark
+  circle 6 14 radius 1 soil_hi
+  cell 27 6 pebble
+  cell 11 28 soil_hi
+}

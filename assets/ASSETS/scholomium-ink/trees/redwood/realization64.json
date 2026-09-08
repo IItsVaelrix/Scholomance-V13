@@ -1,0 +1,116 @@
+{
+  "contract": "SCD128-REALIZATION64-v1",
+  "schemaVersion": 1,
+  "adapterFamily": "tree",
+  "checksum64": "91AD321D09A1C3894C97CD420E1C0D9054E959536993FB808994D72DE52B8F31",
+  "digest256": "AC117E461BF8EA439AD9786F03999CA2BF73F65073AA35AFE215B59AE208F321",
+  "slots": [
+    {
+      "slot": "PIXEL_DENSITY",
+      "position": 0,
+      "canonicalCategory": "res_48x112",
+      "parameters": {
+        "cluster_quantum": 1
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:pixel_density",
+      "digest256": "AD321DBD1E27577B558D8364D04843EF17D8155573942F6FCDA7E8D33E08C9D6",
+      "blockHex": "91AD321D"
+    },
+    {
+      "slot": "EDGE_LANGUAGE",
+      "position": 1,
+      "canonicalCategory": "high_frequency_needles",
+      "parameters": {
+        "outline_weight": 1
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:edge_language",
+      "digest256": "09A1C389655F17DD0C140F2F3D38507A6D8418EDC9791CBB2B2AAD13BFC10BBE",
+      "blockHex": "09A1C389"
+    },
+    {
+      "slot": "CLUSTER_RHYTHM",
+      "position": 2,
+      "canonicalCategory": "foliage_masses",
+      "parameters": {
+        "max_isolated_cells": 2
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:cluster_rhythm",
+      "digest256": "4C97CD42B0C29CBD8F8CC95EC797AB9F5AC5CFE6D1D157019D257BA0CFA102B0",
+      "blockHex": "4C97CD42"
+    },
+    {
+      "slot": "VALUE_HIERARCHY",
+      "position": 3,
+      "canonicalCategory": "bands_6",
+      "parameters": {
+        "value_bands": 6
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:value_hierarchy",
+      "digest256": "0E1C0D90FC90DDB18421B5C014D871CD9C4B21480C3A5621BC426F57387A2C29",
+      "blockHex": "0E1C0D90"
+    },
+    {
+      "slot": "MATERIAL_LANGUAGE",
+      "position": 4,
+      "canonicalCategory": "conifer_needles",
+      "parameters": {
+        "bark_material": "redwood_fibrous_cinnamon",
+        "foliage_material": "conifer_needles"
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:material_language",
+      "digest256": "54E9595346FC1D0FE9F0DF2B68C7139111870484E2AAA2AFC9CAF35D686D722A",
+      "blockHex": "54E95953"
+    },
+    {
+      "slot": "PALETTE_LOGIC",
+      "position": 5,
+      "canonicalCategory": "cinnamon_and_emerald",
+      "parameters": {
+        "steps": 6
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:palette_logic",
+      "digest256": "6993FB8019B1ADBD72EBBF91B4EF1F1EEA7F576BFED64A50E83FF141F28FC841",
+      "blockHex": "6993FB80"
+    },
+    {
+      "slot": "LIGHT_RESPONSE",
+      "position": 6,
+      "canonicalCategory": "upper_left",
+      "parameters": {
+        "light_x": -1,
+        "light_y": -1
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:light_response",
+      "digest256": "8994D72D324F10007A4333964B23B58E24D9947DED1D140F1306D96044B57ABF",
+      "blockHex": "8994D72D"
+    },
+    {
+      "slot": "SURFACE_VARIATION",
+      "position": 7,
+      "canonicalCategory": "subtle_weathering",
+      "parameters": {
+        "variation_pct": 5
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:surface_variation",
+      "digest256": "E52B8F3175A0219497A90EFBBE46670DEBCC16818AFFFFA3E7C401358733257C",
+      "blockHex": "E52B8F31"
+    }
+  ],
+  "evidenceDigest": "EVIDENCE_REAL_SCHOLOMIUM_MASTER_REDWOOD"
+}

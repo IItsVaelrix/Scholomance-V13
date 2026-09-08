@@ -1,0 +1,55 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.shield-volume",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "SHAPE_POST",
+  "scope": [
+    "SHAPE"
+  ],
+  "inputs": [
+    {
+      "name": "geometry",
+      "type": "SHAPE",
+      "required": true,
+      "description": "Shield face geometry"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "curvature",
+      "type": "FIXED",
+      "min": 0,
+      "max": 1,
+      "default": 0.5,
+      "description": "Curved face shading gradient factor"
+    }
+  ],
+  "output": {
+    "type": "SHAPE",
+    "description": "Shield geometry with volumetric face shading and rim cast shadows"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 3,
+    "fixed": 0
+  },
+  "order": 43,
+  "relevance": {
+    "pipelines": [
+      "item"
+    ],
+    "conditions": [
+      {
+        "field": "archetype",
+        "op": "includes",
+        "value": "shield"
+      }
+    ]
+  },
+  "checksum": "1bb5a8e36421018fc99c44187a57b7fc753d85bce42bbbba16208b940c57cb0f"
+}

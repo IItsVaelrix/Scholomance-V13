@@ -48,6 +48,7 @@ import {
   OraclePage,
   ScholoTimeLabPage,
   TileForgeLab,
+  TutorialForestSandbox,
   PAGE_COMPONENTS,
 } from "./lib/routes.js";
 import VideoForgePage from "./pages/VideoForge/VideoForgePage.tsx";
@@ -160,6 +161,7 @@ const router = createBrowserRouter([
           { path: "internal/pixel-lotus/actor-forge", element: <AdminRoute><ActorForgeLab /></AdminRoute> },
           { path: "internal/pixel-lotus/iso-map-sandbox", element: <AdminRoute><IsoMapSandbox /></AdminRoute> },
           { path: "internal/pixel-lotus/tile-forge", element: <AdminRoute><TileForgeLab /></AdminRoute> },
+          { path: "internal/pixel-lotus/tutorial-forest", element: <AdminRoute><TutorialForestSandbox /></AdminRoute> },
           { path: "internal/time-lab", element: <AdminRoute><ScholoTimeLabPage /></AdminRoute> },
           { path: "blog", element: <BlogIndexPage /> },
           { path: "blog/:slug", element: <BlogArticlePage /> },

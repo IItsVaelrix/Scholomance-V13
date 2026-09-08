@@ -1,0 +1,46 @@
+{
+  "url": "http://127.0.0.1:8092/studio/canvas",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Sward",
+      "hasCanvas": true,
+      "bodyTextLen": 939,
+      "bodyTextHash": "7d785058552e0c9f18915784a5bf043e8452535624efc0843d3c439bd69da89a",
+      "bodyTextPrefix": "SWARD / PIXELBRAIN Studio REV 0 studio-output1:a03caad726b8ac08a",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/home/deck/Downloads/Scholomance-V12-main/docs/scholomance-encyclopedia/post-implementation-reports/assets/pixelbrain-canvas-professional-polish/smoke-classic-desktop.png",
+      "extra": {
+        "hasViewport": false,
+        "renderer": null,
+        "headingHeight": 40.3125,
+        "statusText": "x/y —/—8×#c9a227160×144rectangularStructure0 cells"
+      }
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Sward",
+      "hasCanvas": true,
+      "bodyTextLen": 726,
+      "bodyTextHash": "7509d875850195d6ae2740c0e1d20298a588128592167debc247afd40804f9c2",
+      "bodyTextPrefix": "SWARD / PIXELBRAIN Studio REV 0 studio-output1:a03caad726b8ac08a",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/home/deck/Downloads/Scholomance-V12-main/docs/scholomance-encyclopedia/post-implementation-reports/assets/pixelbrain-canvas-professional-polish/smoke-classic-mobile.png",
+      "extra": {
+        "hasViewport": false,
+        "renderer": null,
+        "headingHeight": 28.5625,
+        "statusText": "x/y —/—8×#c9a227160×144rectangularStructure0 cells"
+      }
+    }
+  },
+  "exitCode": 0
+}

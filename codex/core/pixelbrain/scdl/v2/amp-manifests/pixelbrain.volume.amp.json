@@ -1,0 +1,57 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.volume",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "SHAPE_POST",
+  "scope": [
+    "SHAPE"
+  ],
+  "inputs": [
+    {
+      "name": "geometry",
+      "type": "SHAPE",
+      "required": true,
+      "description": "Shape geometry receiving volumetric depth"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "depth",
+      "type": "I32",
+      "min": 1,
+      "max": 16,
+      "default": 3,
+      "description": "Extrusion depth in cells"
+    },
+    {
+      "name": "lightZ",
+      "type": "FIXED",
+      "min": 0,
+      "max": 1,
+      "default": 0.7,
+      "description": "Z-axis light height elevation"
+    }
+  ],
+  "output": {
+    "type": "SHAPE",
+    "description": "Shape geometry with synthesized volumetric depth normals and shading"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 3,
+    "fixed": 0
+  },
+  "order": 50,
+  "relevance": {
+    "pipelines": [
+      "render-fidelity"
+    ],
+    "conditions": []
+  },
+  "checksum": "16fba8824485df41c8a0291aa70c256d258da34eb0970557fe938b0e49511312"
+}

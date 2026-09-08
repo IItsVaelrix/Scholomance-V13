@@ -54,10 +54,36 @@ export class IsoTileGeometryMicroprocessor extends TileForgeMicroprocessor {
       }
     }
 
+    // Ground / Soil fullness faces
+    const groundDepth = typeof intent.groundDepth === 'number'
+      ? intent.groundDepth
+      : (intent.hasGround ? 16 : 0);
+
+    const groundFaces = { left: [], right: [], floor: [] };
+    if (groundDepth > 0) {
+      for (let x = 0; x < hw; x += 1) {
+        const yEdge = Math.floor(hh + (x / 2));
+        for (let y = yEdge; y < yEdge + groundDepth; y += 1) {
+          groundFaces.left.push({ x, y, z: 0, face: 'left', depthRatio: (y - yEdge) / groundDepth });
+        }
+        groundFaces.floor.push({ x, y: yEdge + groundDepth - 1, z: 0 });
+      }
+      for (let x = hw; x < width; x += 1) {
+        const yEdge = Math.floor(height - ((x - hw) / 2));
+        for (let y = yEdge; y < yEdge + groundDepth; y += 1) {
+          groundFaces.right.push({ x, y, z: 0, face: 'right', depthRatio: (y - yEdge) / groundDepth });
+        }
+        groundFaces.floor.push({ x, y: yEdge + groundDepth - 1, z: 0 });
+      }
+    }
+
     const output = {
       topPlane,
       sidePlanes,
       rimCells,
+      groundFaces,
+      groundDepth,
+      hasGround: groundDepth > 0,
       cornerMasks: [],
       edgeMasks,
       walkableCandidates: topPlane,
@@ -67,7 +93,14 @@ export class IsoTileGeometryMicroprocessor extends TileForgeMicroprocessor {
 
     return {
       output,
-      diagnostics: { warnings: [], errors: [], metrics: { topPlaneSize: topPlane.length } },
+      diagnostics: {
+        warnings: [],
+        errors: [],
+        metrics: {
+          topPlaneSize: topPlane.length,
+          groundFaceSize: groundFaces.left.length + groundFaces.right.length,
+        },
+      },
       hash: stableLayerHash(output),
       processor: { id: this.id, version: this.version }
     };

@@ -1,0 +1,56 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.selout",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "LAYER_POST",
+  "scope": [
+    "LAYER"
+  ],
+  "inputs": [
+    {
+      "name": "layer",
+      "type": "LAYER",
+      "required": true,
+      "description": "Layer whose perimeter outline is modulated"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "lightAngle",
+      "type": "ANGLE",
+      "default": 225,
+      "description": "Directional light angle in degrees"
+    },
+    {
+      "name": "threshold",
+      "type": "FIXED",
+      "min": 0,
+      "max": 1,
+      "default": 0.3,
+      "description": "Dot-product lighting threshold"
+    }
+  ],
+  "output": {
+    "type": "LAYER",
+    "description": "Layer with selective directional outline modulation"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 2,
+    "fixed": 0
+  },
+  "order": 75,
+  "relevance": {
+    "pipelines": [
+      "item",
+      "render-fidelity"
+    ],
+    "conditions": []
+  },
+  "checksum": "255845876ae139c5c2ad4ef8965d807adc040daeb68cf6f33bee50ee8d64d6f6"
+}

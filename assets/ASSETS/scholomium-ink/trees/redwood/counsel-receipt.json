@@ -1,0 +1,103 @@
+{
+  "contract": "SCD128-COUNSEL-v1",
+  "schemaVersion": 1,
+  "mode": "canonical",
+  "verdict": "approved",
+  "checksum128": "8121CACC9F6992EFD7F48EC6C76840423281323301E1D5F725E447FEB00AF0CC91AD321D09A1C3894C97CD420E1C0D9054E959536993FB808994D72DE52B8F31",
+  "formDigest256": "92E66840CF450AD54010021C4655783741E90D85AE02300B27D739BDEAFB750F",
+  "realizationDigest256": "AC117E461BF8EA439AD9786F03999CA2BF73F65073AA35AFE215B59AE208F321",
+  "policyId": "scholomium_ink_tree_counsel_policy_v1",
+  "policyDigest256": "89040C82CAA713185FF5C7F5C54274A2427D62C49827B3D8DDE1509396AC338F",
+  "satisfiedRules": [
+    "RULE_CANOPY_EDGE_MORPHOLOGY_COMPATIBLE",
+    "RULE_VALUE_HIERARCHY_DEPTH_ADEQUATE",
+    "RULE_WORLD_FOOTPRINT_VALID"
+  ],
+  "conflicts": [],
+  "projectionDirectives": [
+    {
+      "layer": "ground_shadow",
+      "order": 5,
+      "directiveType": "render_contact_shadow",
+      "params": {
+        "footprint": "buttressed_roots",
+        "radius": 12
+      }
+    },
+    {
+      "layer": "roots_and_ground",
+      "order": 10,
+      "directiveType": "render_roots",
+      "params": {
+        "style": "buttressed_roots",
+        "spread": 12
+      }
+    },
+    {
+      "layer": "trunk",
+      "order": 20,
+      "directiveType": "render_trunk_column",
+      "params": {
+        "axis": "massive_vertical_stepped",
+        "taperRatio": {
+          "numerator": "1",
+          "denominator": "2"
+        },
+        "barkMaterial": "redwood_fibrous_cinnamon"
+      }
+    },
+    {
+      "layer": "primary_branches",
+      "order": 30,
+      "directiveType": "render_primary_limbs",
+      "params": {
+        "branchingOrder": "massive_vertical_stepped",
+        "reach": 34
+      }
+    },
+    {
+      "layer": "secondary_branches",
+      "order": 40,
+      "directiveType": "render_secondary_twigs",
+      "params": {
+        "voidFrequency": "moderate_gaps"
+      }
+    },
+    {
+      "layer": "canopy_masses",
+      "order": 50,
+      "directiveType": "render_canopy_volumes",
+      "params": {
+        "envelope": "tapered_spire",
+        "clusterStyle": "foliage_masses",
+        "valueBands": 6
+      }
+    },
+    {
+      "layer": "foliage_edges",
+      "order": 60,
+      "directiveType": "render_silhouette_fringe",
+      "params": {
+        "edgeStyle": "high_frequency_needles",
+        "outlineMode": "high_frequency_needles"
+      }
+    },
+    {
+      "layer": "surface_detail",
+      "order": 70,
+      "directiveType": "render_bark_and_leaf_marks",
+      "params": {
+        "variationMode": "subtle_weathering"
+      }
+    },
+    {
+      "layer": "highlights",
+      "order": 80,
+      "directiveType": "render_glints_and_specular",
+      "params": {
+        "lightLaw": "upper_left"
+      }
+    }
+  ],
+  "receiptDigest256": "20D9EFB0B1249D1B1D548D50E9A2BC31747A3C9EB2B8D1024E0B034AD03B3788"
+}

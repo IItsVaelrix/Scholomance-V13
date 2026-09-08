@@ -1,0 +1,58 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.fibonacci-field",
+  "version": "1.0.0",
+  "execution": "DESCRIPTOR",
+  "stage": "RUNTIME_DESCRIPTOR",
+  "scope": [
+    "ASSET",
+    "TIMELINE"
+  ],
+  "inputs": [
+    {
+      "name": "targetId",
+      "type": "ANY",
+      "required": false,
+      "description": "Field center identifier"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "count",
+      "type": "I32",
+      "min": 1,
+      "max": 144,
+      "default": 21,
+      "description": "Count of procedural field nodes"
+    },
+    {
+      "name": "goldenAngle",
+      "type": "FIXED",
+      "min": 0,
+      "max": 360,
+      "default": 137.5,
+      "description": "Divergence angle in degrees"
+    }
+  ],
+  "output": {
+    "type": "ANY",
+    "description": "Immutable Fibonacci spiral field distribution descriptor"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "CONSTANT",
+    "multiplier": 1,
+    "fixed": 10
+  },
+  "order": 112,
+  "relevance": {
+    "pipelines": [
+      "world-voxel"
+    ],
+    "conditions": []
+  },
+  "checksum": "9f93e00722619a33608f6010ad5935c000dd5f525d4bc66ef3d034a2fa69db18"
+}

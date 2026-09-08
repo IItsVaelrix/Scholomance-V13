@@ -1,0 +1,49 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.tile-socket",
+  "version": "1.0.0",
+  "execution": "DESCRIPTOR",
+  "stage": "WORLD_DESCRIPTOR",
+  "scope": [
+    "ASSET"
+  ],
+  "inputs": [
+    {
+      "name": "targetId",
+      "type": "ANY",
+      "required": false,
+      "description": "Tile socket identifier"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "socketMask",
+      "type": "I32",
+      "min": 0,
+      "max": 255,
+      "default": 15,
+      "description": "Edge connection bitmask"
+    }
+  ],
+  "output": {
+    "type": "ANY",
+    "description": "Immutable Wang tile socket adjacency descriptor"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "CONSTANT",
+    "multiplier": 1,
+    "fixed": 5
+  },
+  "order": 109,
+  "relevance": {
+    "pipelines": [
+      "world-voxel"
+    ],
+    "conditions": []
+  },
+  "checksum": "c9afee74d86b6b0e90455be058fdeb962ced236550c37ef08896885c199ef126"
+}

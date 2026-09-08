@@ -71,7 +71,8 @@ describe('SCDL v2 compiler vertical slice', () => {
     const result = compileSCDLV2(fixtureSource);
     expect(result.ok).toBe(true);
     expect(result.diagnostics).toHaveLength(0);
-    expect(result.bytecode.programId).toBe('scdlbc_64c9884a');
+    // Under CMP-01 and CMP-05, full 6-component TRANSFORM_MATRIX and radial displacement are preserved:
+    expect(result.bytecode.programId).toBe('scdlbc_9a275a77');
     expect(result.packet.geometry.coordinates.length).toBeGreaterThan(0);
     expect(result.package.verifiedBudget.limits.recursionDepth).toBe(16);
   });

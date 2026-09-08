@@ -1,0 +1,56 @@
+{
+  "adapterFamily": "tree",
+  "evidenceDigest": "EVIDENCE_REAL_SCHOLOMIUM_MASTER_CEDAR",
+  "slots": {
+    "PIXEL_DENSITY": {
+      "canonicalCategory": "res_48x64",
+      "parameters": {
+        "cluster_quantum": 1
+      }
+    },
+    "EDGE_LANGUAGE": {
+      "canonicalCategory": "horizontal_scale_frills",
+      "parameters": {
+        "outline_weight": 1
+      }
+    },
+    "CLUSTER_RHYTHM": {
+      "canonicalCategory": "foliage_masses",
+      "parameters": {
+        "max_isolated_cells": 2
+      }
+    },
+    "VALUE_HIERARCHY": {
+      "canonicalCategory": "bands_5",
+      "parameters": {
+        "value_bands": 5
+      }
+    },
+    "MATERIAL_LANGUAGE": {
+      "canonicalCategory": "conifer_needles",
+      "parameters": {
+        "bark_material": "cedar_stringy_gray",
+        "foliage_material": "conifer_needles"
+      }
+    },
+    "PALETTE_LOGIC": {
+      "canonicalCategory": "deep_sage",
+      "parameters": {
+        "steps": 5
+      }
+    },
+    "LIGHT_RESPONSE": {
+      "canonicalCategory": "upper_left",
+      "parameters": {
+        "light_x": -1,
+        "light_y": -1
+      }
+    },
+    "SURFACE_VARIATION": {
+      "canonicalCategory": "subtle_weathering",
+      "parameters": {
+        "variation_pct": 5
+      }
+    }
+  }
+}

@@ -692,6 +692,7 @@ the Authoring Guide fail with a bare `ENOENT` on every first run — audit
 | `--semantic` | embed SemQuant annotations in the JSON export |
 | `--strict` | promote warnings to errors (see §8.4) |
 | `--bytecode` | append the `PB-ERR-v1` payload to each diagnostic (see §8.4) |
+| `--json` | format CLI reports, diagnostics, and inspection envelopes as machine-readable JSON |
 
 ### 8.2 Preview — the iterate-and-look command
 ```bash
@@ -879,6 +880,15 @@ npx vitest run tests/codex/core/pixelbrain/scdl/
 ---
 
 ## 11. SCDL v2 semantic-core milestone
+
+The full-pilot operating manual — version routing, the complete opcode and AMP
+tables, CLI, catalog gates, Studio isolation, and the ordered procedure — lives
+in [`SCDL_V2_FULL_PILOT_WHITE_PAPER.md`](./SCDL_V2_FULL_PILOT_WHITE_PAPER.md)
+(`SCHOL-ENC-BYKE-SEARCH-SCDL-V2-FULL-PILOT`). Prefer that paper for anything
+after the 2026-09-06 semantic-core slice (geometry, generative math, AMP ABI).
+§11.9 below is stale on AMP execution: the Universal AMP ABI is live.
+Catalog gate is 48 certified SCDL AMPs out of 54 EFFECT_CATALOG modules,
+with adapters, certify, and family tests green; see the pilot paper.
 
 This section documents **compiler-demonstrated** SCDL v2 behavior as of the
 2026-09-06 semantic-core vertical slice. It is attached documentation, not

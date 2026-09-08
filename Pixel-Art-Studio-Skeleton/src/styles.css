@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./styles/pixelbrain.css";
 
 @theme {
   --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
@@ -34,6 +35,7 @@
 
   --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --z-overlay: 100;
 }
 
 @layer base {
@@ -115,6 +117,8 @@
   --pbs-line: color-mix(in oklab, var(--color-fg) 14%, transparent);
   --pbs-line-strong: color-mix(in oklab, var(--color-fg) 25%, transparent);
   min-height: 100dvh;
+  max-width: 100%;
+  overflow-x: hidden;
   background: var(--color-bg);
   color: var(--color-fg);
 }
@@ -254,7 +258,11 @@
 .pbs-foundry-grid,
 .pbs-conveyor-grid,
 .pbs-mutation-grid,
-.pbs-diagnostics-grid {
+.pbs-diagnostics-grid,
+.pbs-blueprint-grid,
+.pbs-finish-grid,
+.pbs-mentor-grid,
+.pbs-library-grid {
   display: grid;
   align-items: start;
   gap: 1px;
@@ -737,7 +745,11 @@
   .pbs-foundry-grid,
   .pbs-conveyor-grid,
   .pbs-mutation-grid,
-  .pbs-diagnostics-grid {
+  .pbs-diagnostics-grid,
+  .pbs-blueprint-grid,
+  .pbs-finish-grid,
+  .pbs-mentor-grid,
+  .pbs-library-grid {
     grid-template-columns: minmax(0, 1fr);
   }
   .pbs-evidence {

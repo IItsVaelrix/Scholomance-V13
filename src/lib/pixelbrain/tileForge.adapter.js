@@ -55,3 +55,14 @@ export {
   BENCHMARK_MANIFEST,
   runTileForgeBenchmarks,
 } from '../../../codex/core/pixelbrain/tile-forge/tile-forge.benchmark.js';
+export { TileShapeMicroprocessor } from '../../../codex/core/pixelbrain/amps/geometry/processors/tile-shape.microprocessor.js';
+export { SoilAdapter } from '../../../codex/core/pixelbrain/scdl/v2/adapters/soil.adapter.js';
+export {
+  generateTileDiamondScdl,
+  generateTileGroundScdl,
+  generateCliffSkirtScdl,
+  generateTreeScdl,
+  generatePropScdl,
+  compileTileForgeScdl,
+} from '../../../codex/core/pixelbrain/tile-forge/tile-forge.scdl-generator.js';
+

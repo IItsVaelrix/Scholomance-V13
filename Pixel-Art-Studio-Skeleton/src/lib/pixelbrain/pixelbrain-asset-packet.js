@@ -169,6 +169,36 @@ function normalizeSource(input = {}) {
   });
 }
 
+function normalizeLayerSurfaces(input = {}) {
+  const list = Array.isArray(input.layerSurfaces)
+    ? input.layerSurfaces
+    : Array.isArray(input.geometry?.layerSurfaces)
+      ? input.geometry.layerSurfaces
+      : [];
+  if (!list.length) return Object.freeze([]);
+
+  return Object.freeze(list.map((surface, index) => {
+    const coords = Array.isArray(surface.coordinates)
+      ? surface.coordinates
+      : Array.isArray(surface.cells)
+        ? surface.cells
+        : [];
+    const normalizedCoords = Object.freeze(coords.map(normalizePixelBrainCoordinate));
+    return Object.freeze({
+      id: String(surface.id || `layer_${index}`),
+      order: Number.isFinite(Number(surface.order)) ? Number(surface.order) : index,
+      sourceIndex: Number.isFinite(Number(surface.sourceIndex)) ? Number(surface.sourceIndex) : index,
+      blend: String(surface.blend || 'OVER'),
+      opacity: Number.isFinite(Number(surface.opacity)) ? Number(surface.opacity) : 1,
+      visible: surface.visible !== false,
+      role: String(surface.role || 'layer'),
+      semanticRole: surface.semanticRole ? String(surface.semanticRole) : null,
+      coordinates: normalizedCoords,
+      cells: normalizedCoords,
+    });
+  }));
+}
+
 function normalizeGeometry(input = {}) {
   // An explicitly supplied top-level `coordinates` is the caller saying "these
   // are the pixels" and MUST win over `geometry.coordinates`.
@@ -204,11 +234,13 @@ function normalizeGeometry(input = {}) {
 
   const normalizedCoordinates = Object.freeze(coordinates.map(normalizePixelBrainCoordinate));
   const sceneGraph = input.geometry?.sceneGraph || null;
+  const layerSurfaces = normalizeLayerSurfaces(input);
   return Object.freeze({
     mode: input.geometry?.mode || (cells.length ? 'template-grid' : 'coordinates'),
     bounds: Object.freeze(clonePlain(input.geometry?.bounds || {})),
     coordinates: normalizedCoordinates,
     cells: Object.freeze(clonePlain(cells)),
+    ...(layerSurfaces.length ? { layerSurfaces } : {}),
     ...(sceneGraph ? { sceneGraph: Object.freeze(clonePlain(sceneGraph)) } : {}),
   });
 }
@@ -220,6 +252,7 @@ export function createPixelBrainAssetPacket(input = {}) {
 export function normalizePixelBrainAssetPacket(input = {}) {
   const canvas = normalizePixelBrainCanvas(input.canvas || input.dimensions || {});
   const geometry = normalizeGeometry(input);
+  const layerSurfaces = normalizeLayerSurfaces(input);
   const sourcePalette = normalizePixelBrainPalettes(input.palette?.sourcePalette || input.palettes || input.palette?.palettes || []);
   const materialId = resolveMaterialId(input.material?.id || input.material || input.chromatic?.material || SOURCE_MATERIAL);
   const bytecode = normalizeBytecode({ ...input, material: { id: materialId } });
@@ -251,6 +284,7 @@ export function normalizePixelBrainAssetPacket(input = {}) {
     source: normalizeSource(input),
     canvas,
     geometry,
+    layerSurfaces,
     palette: Object.freeze({
       sourcePalette,
       semanticPalette: normalizePixelBrainPalettes(input.palette?.semanticPalette || []),

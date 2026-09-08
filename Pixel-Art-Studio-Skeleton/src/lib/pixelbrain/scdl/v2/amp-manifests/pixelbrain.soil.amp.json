@@ -1,0 +1,92 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.soil",
+  "version": "1.0.0",
+  "execution": "DESCRIPTOR",
+  "stage": "WORLD_DESCRIPTOR",
+  "scope": [
+    "ASSET"
+  ],
+  "inputs": [
+    {
+      "name": "targetId",
+      "type": "ANY",
+      "required": false,
+      "description": "Subterranean ground base identifier"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "depth",
+      "type": "I32",
+      "min": 0,
+      "max": 64,
+      "default": 16,
+      "description": "Vertical depth of the soil / ground base in pixels"
+    },
+    {
+      "name": "soilType",
+      "type": "ANY",
+      "default": "loam",
+      "description": "Soil material family (loam, peat, clay, obsidian_humus, subterranean_silt)"
+    },
+    {
+      "name": "stratification",
+      "type": "ANY",
+      "default": "organic_loam",
+      "description": "Stratification profile"
+    },
+    {
+      "name": "pebbleDensity",
+      "type": "FIXED",
+      "min": 0,
+      "max": 1,
+      "default": 0.3,
+      "description": "Mineral pebble inclusion density"
+    },
+    {
+      "name": "rootDensity",
+      "type": "FIXED",
+      "min": 0,
+      "max": 1,
+      "default": 0.25,
+      "description": "Organic root filament density"
+    },
+    {
+      "name": "moisture",
+      "type": "FIXED",
+      "min": 0,
+      "max": 1,
+      "default": 0.5,
+      "description": "Moisture level of soil"
+    },
+    {
+      "name": "hasBedrock",
+      "type": "BOOL",
+      "default": true,
+      "description": "Whether bedrock floor is present"
+    }
+  ],
+  "output": {
+    "type": "ANY",
+    "description": "Immutable procedural subterranean soil base descriptor"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "CONSTANT",
+    "multiplier": 1,
+    "fixed": 12
+  },
+  "order": 106,
+  "relevance": {
+    "pipelines": [
+      "world-voxel",
+      "tile-forge"
+    ],
+    "conditions": []
+  },
+  "checksum": "62a621fc95813363c690a57d09276a0e8e3e3ce47b092d3df65188c690c50170"
+}

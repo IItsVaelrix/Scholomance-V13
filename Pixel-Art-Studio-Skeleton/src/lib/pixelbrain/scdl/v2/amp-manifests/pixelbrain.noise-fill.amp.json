@@ -1,0 +1,59 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.noise-fill",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "PAINT",
+  "scope": ["LAYER", "SHAPE"],
+  "inputs": [
+    {
+      "name": "target",
+      "type": "LAYER",
+      "required": true,
+      "description": "Layer or paint cells whose intensities are modulated with deterministic noise"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "seed",
+      "type": "I32",
+      "min": 0,
+      "max": 2147483647,
+      "default": 1337,
+      "description": "Deterministic PRNG seed"
+    },
+    {
+      "name": "frequency",
+      "type": "FIXED",
+      "min": 0,
+      "max": 1,
+      "default": 0.1,
+      "description": "Noise spatial frequency"
+    }
+  ],
+  "output": {
+    "type": "LAYER",
+    "description": "Layer with modulated cell intensity metadata"
+  },
+  "determinism": {
+    "class": "SEEDED",
+    "seedRequired": true
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 3,
+    "fixed": 0
+  },
+  "order": 60,
+  "relevance": {
+    "pipelines": ["item", "render-fidelity"],
+    "conditions": [
+      {
+        "field": "materials",
+        "op": "includes",
+        "value": "noise"
+      }
+    ]
+  },
+  "checksum": "7e638f20f68d68093f1266246edadc27f1d00f9f59a0fb2d32c6400d548d52e0"
+}

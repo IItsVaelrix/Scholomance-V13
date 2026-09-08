@@ -1,0 +1,64 @@
+{
+  "adapterFamily": "tree",
+  "evidenceDigest": "EVIDENCE_FORM_SCHOLOMIUM_MASTER_PINE",
+  "slots": {
+    "ASSET_CLASS": {
+      "canonicalCategory": "pine",
+      "parameters": {
+        "archetype": "pine",
+        "asset_id": "scholomium_master_pine"
+      }
+    },
+    "SCALE_FRAME": {
+      "canonicalCategory": "dimetric_2_5d",
+      "parameters": {
+        "canvas_width": 32,
+        "canvas_height": 64
+      }
+    },
+    "SILHOUETTE": {
+      "canonicalCategory": "radial_tiered",
+      "parameters": {
+        "occupied_ratio": {
+          "numerator": "2",
+          "denominator": "3"
+        }
+      }
+    },
+    "STRUCTURAL_SKELETON": {
+      "canonicalCategory": "radial_whorled",
+      "parameters": {
+        "primary_limbs": 3,
+        "order": 2
+      }
+    },
+    "PROPORTION": {
+      "canonicalCategory": "tall_slender",
+      "parameters": {
+        "trunk_ratio": {
+          "numerator": "1",
+          "denominator": "2"
+        },
+        "crown_width": 22
+      }
+    },
+    "MASS_DISTRIBUTION": {
+      "canonicalCategory": "mid_canopy",
+      "parameters": {
+        "center_y": 22
+      }
+    },
+    "NEGATIVE_SPACE": {
+      "canonicalCategory": "moderate_gaps",
+      "parameters": {
+        "void_pct": 18
+      }
+    },
+    "WORLD_FOOTPRINT": {
+      "canonicalCategory": "buttressed_roots",
+      "parameters": {
+        "root_spread": 12
+      }
+    }
+  }
+}

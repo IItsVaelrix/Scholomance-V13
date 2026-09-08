@@ -1,0 +1,57 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.iso-tile-geometry",
+  "version": "1.0.0",
+  "execution": "DESCRIPTOR",
+  "stage": "WORLD_DESCRIPTOR",
+  "scope": [
+    "ASSET"
+  ],
+  "inputs": [
+    {
+      "name": "targetId",
+      "type": "ANY",
+      "required": false,
+      "description": "Tile mesh identifier"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "tileWidth",
+      "type": "I32",
+      "min": 8,
+      "max": 128,
+      "default": 32,
+      "description": "Isometric tile diamond width"
+    },
+    {
+      "name": "tileHeight",
+      "type": "I32",
+      "min": 4,
+      "max": 64,
+      "default": 16,
+      "description": "Isometric tile diamond height"
+    }
+  ],
+  "output": {
+    "type": "ANY",
+    "description": "Immutable isometric tile geometry descriptor"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "CONSTANT",
+    "multiplier": 1,
+    "fixed": 10
+  },
+  "order": 108,
+  "relevance": {
+    "pipelines": [
+      "world-voxel"
+    ],
+    "conditions": []
+  },
+  "checksum": "713e8acfbc003ffd156a1a87be71de57cbb4c102238dd3d32772149365d9650d"
+}

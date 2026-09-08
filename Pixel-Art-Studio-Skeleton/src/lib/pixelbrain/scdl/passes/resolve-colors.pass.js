@@ -1,0 +1,124 @@
+/**
+ * SCDL Resolve Colors Pass
+ *
+ * Resolves all `colorRef` fields in ops:
+ *   - { kind: 'alias', value: 'gold2' } → { kind: 'hex', value: '#D8B84C' }
+ *   - { kind: 'hex',   value: '#D8B84C' } → validated hex
+ *
+ * Errors on:
+ *   - Invalid hex format
+ *   - Undefined palette alias
+ */
+
+import { SCDL_ERROR_CODES, scdlError } from '../scdl.errors.js';
+import { mapParts } from '../graph-walk.js';
+
+const HEX_RE = /^#[0-9a-fA-F]{6}$/;
+
+/**
+ * @param {object} ast
+ * @param {import('../scdl.errors.js').SCDLError[]} errors
+ * @returns {object} new AST with all colorRefs resolved to hex strings
+ */
+export function resolveColorsPass(ast, errors) {
+  const palette = ast.palette || {};
+  const paletteLocations = ast.paletteLocations || {};
+  const l = ast.sourceLocation || { line: 1, col: 1 };
+
+  /** Where a palette entry was declared, falling back to the asset header. */
+  const paletteLoc = name => paletteLocations[name] || l;
+
+  function resolveRef(colorRef, opLoc) {
+    if (!colorRef) return '#000000';
+    const loc = opLoc || l;
+
+    if (colorRef.kind === 'hex') {
+      if (!HEX_RE.test(colorRef.value)) {
+        errors.push(scdlError(
+          `Invalid hex color '${colorRef.value}' — must be #RRGGBB`,
+          SCDL_ERROR_CODES.INVALID_HEX_COLOR,
+          loc,
+          { color: colorRef.value }
+        ));
+        return '#000000';
+      }
+      return colorRef.value;
+    }
+
+    if (colorRef.kind === 'alias' || colorRef.kind === 'palette') {
+      const name = colorRef.name || colorRef.value;
+      const resolved = palette[name];
+      if (!resolved) {
+        errors.push(scdlError(
+          `Undefined palette alias '${name}'`,
+          SCDL_ERROR_CODES.UNDEFINED_PALETTE_REF,
+          loc,
+          { alias: name }
+        ));
+        return '#000000';
+      }
+      if (!HEX_RE.test(resolved)) {
+        errors.push(scdlError(
+          `Palette entry '${name}' has invalid hex '${resolved}' `
+          + `(declared at line ${paletteLoc(name).line}, used here)`,
+          SCDL_ERROR_CODES.INVALID_HEX_COLOR,
+          loc,
+          { alias: name, color: resolved, declaredAt: paletteLoc(name) }
+        ));
+        return '#000000';
+      }
+      return resolved;
+    }
+
+    errors.push(scdlError(
+      `Unrecognized color reference kind '${colorRef.kind}' — expected hex or alias`,
+      SCDL_ERROR_CODES.UNKNOWN_COLOR_REF_KIND,
+      loc,
+      { colorRef }
+    ));
+    return '#000000';
+  }
+
+  // Also validate all palette entries up front
+  for (const [name, hex] of Object.entries(palette)) {
+    if (!HEX_RE.test(hex)) {
+      errors.push(scdlError(
+        `Palette entry '${name}' has invalid hex '${hex}'`,
+        SCDL_ERROR_CODES.INVALID_HEX_COLOR,
+        paletteLoc(name),
+        { alias: name, color: hex }
+      ));
+    }
+  }
+
+  const resolvePart = part => ({
+    ...part,
+    ops: part.ops.map(op => {
+      const opLoc = op.loc || l;
+      if (op.colorRef) {
+        return { ...op, color: resolveRef(op.colorRef, opLoc), colorRef: undefined };
+      }
+      if (op.tierColorRefs) {
+        return {
+          ...op,
+          tierColors: op.tierColorRefs.map(r => resolveRef(r, opLoc)),
+          tierColorRefs: undefined,
+        };
+      }
+      return op;
+    }),
+  });
+
+  if (!ast.graphMode) {
+    return { ...ast, parts: ast.parts.map(resolvePart) };
+  }
+
+  const roots = mapParts(ast.roots, resolvePart);
+  const defs = (ast.defs || []).map(def => ({ ...def, nodes: mapParts(def.nodes, resolvePart) }));
+  return {
+    ...ast,
+    roots,
+    defs,
+    parts: roots.filter(n => n.kind === 'part').map(n => n.part),
+  };
+}

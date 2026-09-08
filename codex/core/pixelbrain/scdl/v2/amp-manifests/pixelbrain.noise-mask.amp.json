@@ -1,0 +1,49 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.noise-mask",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "MASK",
+  "scope": [
+    "MASK"
+  ],
+  "inputs": [
+    {
+      "name": "mask",
+      "type": "MASK",
+      "required": true,
+      "description": "Input mask to modulate with procedural noise"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "cutoff",
+      "type": "FIXED",
+      "min": 0,
+      "max": 1,
+      "default": 0.5,
+      "description": "Threshold cutoff for mask cell inclusion"
+    }
+  ],
+  "output": {
+    "type": "MASK",
+    "description": "Procedurally noisy raster mask"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 2,
+    "fixed": 0
+  },
+  "order": 48,
+  "relevance": {
+    "pipelines": [
+      "world-voxel"
+    ],
+    "conditions": []
+  },
+  "checksum": "651ac144851612d27c60848ffef50b701e8afdae8ac9920daf23655773c60d00"
+}

@@ -12,7 +12,8 @@ All Product Design Requirements (PDRs) for Scholomance are archived here. Each P
 
 | PDR | Status | Classification | Priority |
 |-----|--------|----------------|----------|
-| [`2026-09-06-pixelbrain-studio-standalone-phase-b-pdr.md`](./2026-09-06-pixelbrain-studio-standalone-phase-b-pdr.md) | Approved — full nine-tab authoring parity; implementation not started | Architectural \| Behavioral \| PixelBrain \| Standalone authoring \| UI + Rendering | Critical |
+| [`2026-09-07-scholomium-ink-scd128-tree-lab-pdr.md`](./2026-09-07-scholomium-ink-scd128-tree-lab-pdr.md) | Draft — architecture approved; written PDR awaiting owner review | Architectural \| PixelBrain \| SCDL v2 \| Art Forensics \| SCD128 \| Corpus | Critical |
+| [`2026-09-06-pixelbrain-studio-standalone-phase-b-pdr.md`](./2026-09-06-pixelbrain-studio-standalone-phase-b-pdr.md) | Implemented — nine-tab authoring parity; PIR records exact evidence | Architectural \| Behavioral \| PixelBrain \| Standalone authoring \| UI + Rendering | Critical |
 | [`2026-09-05-pixelbrain-studio-standalone-port-pdr.md`](./2026-09-05-pixelbrain-studio-standalone-port-pdr.md) | Implemented — scoped Phase A gates green; Phase B authorized separately | Architectural \| PixelBrain \| Studio migration \| Standalone app | Critical |
 | [`2026-09-05-pixelbrain-sward-studio-unification-pdr.md`](./2026-09-05-pixelbrain-sward-studio-unification-pdr.md) | Implemented — scoped gates green; repository baseline exceptions recorded in PIR | Architectural \| PixelBrain \| Studio migration \| AMP activation \| High-fidelity authoring | Critical |
 | [`2026-09-04-pixelbrain-amp-activation-substrate-v1-pdr.md`](./2026-09-04-pixelbrain-amp-activation-substrate-v1-pdr.md) | Implemented — repository-wide baseline follow-up recorded in PIR | Architectural \| PixelBrain \| SQLite \| Frozen contract | High |

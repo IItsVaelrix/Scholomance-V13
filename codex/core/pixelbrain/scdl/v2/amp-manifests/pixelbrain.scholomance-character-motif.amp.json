@@ -1,0 +1,56 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.scholomance-character-motif",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "PAINT",
+  "scope": [
+    "LAYER",
+    "SHAPE"
+  ],
+  "inputs": [
+    {
+      "name": "target",
+      "type": "LAYER",
+      "required": true,
+      "description": "Character layer receiving arcane school motifs"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "school",
+      "type": "MATERIAL",
+      "default": "void",
+      "description": "Arcane school identifier"
+    },
+    {
+      "name": "intensity",
+      "type": "FIXED",
+      "min": 0,
+      "max": 1,
+      "default": 0.7,
+      "description": "Motif rune glow intensity"
+    }
+  ],
+  "output": {
+    "type": "LAYER",
+    "description": "Character layer injected with school-specific rune and sigil accents"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 2,
+    "fixed": 0
+  },
+  "order": 56,
+  "relevance": {
+    "pipelines": [
+      "character"
+    ],
+    "conditions": []
+  },
+  "checksum": "70332984f2261bda08374fa6bfa4f52c82a8f3ab8ab0c20fb9bc4acb03b207c2"
+}

@@ -17,7 +17,21 @@ export function validateTileForgeCandidate(candidate) {
     ok = false;
   }
   
-  if (candidate.type !== "isometric_tile_chunk") {
+  const VALID_TYPES = new Set([
+    "isometric_tile_chunk",
+    "TerrainFabric",
+    "TerrainFeature",
+    "BotanicalActor",
+    "Prop",
+    "Landmark",
+    "Architecture",
+    "WaterRegion",
+    "CliffRegion",
+    "PathRegion",
+    "procedural_asset"
+  ]);
+
+  if (!VALID_TYPES.has(candidate.type)) {
     warnings.push(`Unexpected candidate type: ${candidate.type}`);
   }
 

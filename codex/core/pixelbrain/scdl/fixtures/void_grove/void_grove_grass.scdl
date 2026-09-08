@@ -1,0 +1,39 @@
+# void_grove_grass — top-down walkable ground tile, 2D MMORPG grid convention
+# 32x32, seamless-ish mottled fill, no isometric projection.
+# Light law: upper-left (-1,-1) — kept subtle since this is a flat top-down tile.
+asset void_grove_grass canvas 32x32
+
+palette {
+  moss_dark = #0d2015
+  moss_base = #163a26
+  moss_mid  = #1f5236
+  moss_lit  = #2f7048
+  moss_hi   = #4a9563
+  moss_spec = #7bc496
+}
+
+part ground material astralmoss {
+  rect 0 0 32 32 moss_base
+  polygon 0 0 16 0 9 13 0 18 moss_mid
+  polygon 32 4 32 20 20 24 26 10 moss_lit
+  polygon 0 22 12 18 16 32 0 32 moss_dark
+  polygon 20 26 32 22 32 32 24 32 moss_mid
+  cell 5 5 moss_hi
+  cell 21 3 moss_dark
+  cell 28 12 moss_hi
+  cell 3 26 moss_dark
+  cell 14 29 moss_hi
+  cell 24 21 moss_dark
+  cell 10 9 moss_dark
+}
+
+part blades material astralmoss {
+  line 8 21 7 16 moss_hi
+  line 15 25 14 20 moss_hi
+  line 22 15 21 10 moss_hi
+  line 27 27 26 23 moss_spec
+  line 4 9 3 5 moss_hi
+  cell 10 23 moss_spec
+  cell 19 12 moss_spec
+  cell 24 26 moss_spec
+}

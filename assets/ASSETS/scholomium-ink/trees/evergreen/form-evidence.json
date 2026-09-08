@@ -1,0 +1,64 @@
+{
+  "adapterFamily": "tree",
+  "evidenceDigest": "EVIDENCE_FORM_SCHOLOMIUM_MASTER_EVERGREEN",
+  "slots": {
+    "ASSET_CLASS": {
+      "canonicalCategory": "evergreen",
+      "parameters": {
+        "archetype": "evergreen",
+        "asset_id": "scholomium_master_evergreen"
+      }
+    },
+    "SCALE_FRAME": {
+      "canonicalCategory": "dimetric_2_5d",
+      "parameters": {
+        "canvas_width": 32,
+        "canvas_height": 52
+      }
+    },
+    "SILHOUETTE": {
+      "canonicalCategory": "dense_conical",
+      "parameters": {
+        "occupied_ratio": {
+          "numerator": "2",
+          "denominator": "3"
+        }
+      }
+    },
+    "STRUCTURAL_SKELETON": {
+      "canonicalCategory": "continuous_conical",
+      "parameters": {
+        "primary_limbs": 3,
+        "order": 2
+      }
+    },
+    "PROPORTION": {
+      "canonicalCategory": "balanced",
+      "parameters": {
+        "trunk_ratio": {
+          "numerator": "1",
+          "denominator": "2"
+        },
+        "crown_width": 22
+      }
+    },
+    "MASS_DISTRIBUTION": {
+      "canonicalCategory": "mid_canopy",
+      "parameters": {
+        "center_y": 18
+      }
+    },
+    "NEGATIVE_SPACE": {
+      "canonicalCategory": "moderate_gaps",
+      "parameters": {
+        "void_pct": 18
+      }
+    },
+    "WORLD_FOOTPRINT": {
+      "canonicalCategory": "buttressed_roots",
+      "parameters": {
+        "root_spread": 12
+      }
+    }
+  }
+}

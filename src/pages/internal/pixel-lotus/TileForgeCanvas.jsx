@@ -1,285 +1,517 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import {
+  synthesizeTileForgeTile,
+  synthesizeTileForgeProp,
+} from '../../../lib/pixelbrain/tileForge.adapter.js';
 
-export default function TileForgeCanvas({ candidate }) {
+const VS_SOURCE = `
+attribute vec2 a_position;
+varying vec2 v_uv;
+void main() {
+  v_uv = (a_position + 1.0) * 0.5;
+  v_uv.y = 1.0 - v_uv.y; // Flip Y for canvas texture coordinates
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}
+`;
+
+const FS_SOURCE = `
+precision mediump float;
+varying vec2 v_uv;
+uniform sampler2D u_texture;
+uniform float u_time;
+uniform int u_mode; // 0=off, 1=day, 2=twilight, 3=night, 4=prismatic
+uniform float u_glow;
+uniform float u_warmth;
+uniform vec2 u_resolution;
+
+void main() {
+  vec4 base = texture2D(u_texture, v_uv);
+  if (u_mode == 0) {
+    gl_FragColor = base;
+    return;
+  }
+
+  // Emissive detection: identify glowing crystals, flowers, and rims
+  float isCyan = step(0.65, base.b) * step(0.55, base.g);
+  float isMagenta = step(0.65, base.r) * step(0.65, base.b) * (1.0 - step(0.6, base.g));
+  float isEmerald = step(0.7, base.g) * (1.0 - step(0.8, base.b));
+  float isBright = step(0.82, max(base.r, max(base.g, base.b)));
+  float emissive = max(max(isCyan, isMagenta), max(isEmerald, isBright));
+
+  float pulse = 0.85 + 0.35 * sin(u_time * 3.0 + v_uv.x * 15.0 + v_uv.y * 15.0);
+
+  // Optical bloom 4-tap neighbor sample
+  vec2 px = 2.0 / u_resolution;
+  vec4 s1 = texture2D(u_texture, v_uv + vec2(px.x, 0.0));
+  vec4 s2 = texture2D(u_texture, v_uv - vec2(px.x, 0.0));
+  vec4 s3 = texture2D(u_texture, v_uv + vec2(0.0, px.y));
+  vec4 s4 = texture2D(u_texture, v_uv - vec2(0.0, px.y));
+
+  float neighborEmissive = (
+    step(0.75, max(s1.r, max(s1.g, s1.b))) +
+    step(0.75, max(s2.r, max(s2.g, s2.b))) +
+    step(0.75, max(s3.r, max(s3.g, s3.b))) +
+    step(0.75, max(s4.r, max(s4.g, s4.b)))
+  ) * 0.25;
+
+  vec3 bloom = (base.rgb * emissive * pulse + (s1.rgb + s2.rgb + s3.rgb + s4.rgb) * 0.25 * neighborEmissive) * u_glow;
+  vec3 col = base.rgb;
+
+  // Atmosphere grading passes
+  if (u_mode == 1) {
+    // Day Glade: Warm golden sunlight & crisp contrast
+    col += vec3(0.06, 0.04, -0.02) * u_warmth;
+    col = mix(col, col * 1.05, 0.5);
+    col += bloom * 0.6;
+  } else if (u_mode == 2) {
+    // Twilight Amber: Purple dusk shadows with warm amber rims
+    col = mix(col, vec3(col.r * 1.15, col.g * 0.82, col.b * 1.3), 0.4);
+    if (base.r > 0.45 && base.g > 0.35) {
+      col += vec3(0.12, 0.06, 0.0) * u_warmth;
+    }
+    col += bloom * 1.0;
+  } else if (u_mode == 3) {
+    // Night Bioluminescent: Abyssal darkness with vivid glowing crystal/spore nodes
+    col *= vec3(0.28, 0.38, 0.68);
+    col += bloom * 2.2;
+  } else if (u_mode == 4) {
+    // Prismatic Glacial: Crystalline icy shimmer
+    float shimmer = sin(v_uv.y * 40.0 + u_time * 2.0) * 0.04;
+    col = vec3(col.r * 0.9 + shimmer, col.g * 1.08, col.b * 1.25);
+    col += bloom * 1.4;
+  }
+
+  // Soft dimetric edge vignette
+  float dist = distance(v_uv, vec2(0.5));
+  col *= smoothstep(0.85, 0.35, dist * 0.7);
+
+  gl_FragColor = vec4(col, base.a);
+}
+`;
+
+function createShader(gl, type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    const info = gl.getShaderInfoLog(shader);
+    gl.deleteShader(shader);
+    throw new Error(`Shader compile failed: ${info}`);
+  }
+  return shader;
+}
+
+function createProgram(gl, vsSource, fsSource) {
+  const vs = createShader(gl, gl.VERTEX_SHADER, vsSource);
+  const fs = createShader(gl, gl.FRAGMENT_SHADER, fsSource);
+  const prog = gl.createProgram();
+  gl.attachShader(prog, vs);
+  gl.attachShader(prog, fs);
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+    const info = gl.getProgramInfoLog(prog);
+    gl.deleteProgram(prog);
+    throw new Error(`Program link failed: ${info}`);
+  }
+  return prog;
+}
+
+export default function TileForgeCanvas({
+  candidate,
+  onSelectTile,
+  shaderMode = 'day',
+  glowIntensity = 1.0,
+  atmosphereWarmth = 1.0,
+}) {
   const canvasRef = useRef(null);
-  
-  // Asset Cache
-  const imageCache = useRef({});
+  const hiddenCanvasRef = useRef(null);
+  const glRef = useRef(null);
+  const programRef = useRef(null);
+  const textureRef = useRef(null);
+  const animFrameRef = useRef(null);
+  const [selectedCell, setSelectedCell] = useState(null);
 
+  // Initialize hidden 2D compositing canvas
+  if (!hiddenCanvasRef.current && typeof document !== 'undefined') {
+    const hCanvas = document.createElement('canvas');
+    hCanvas.width = 1100;
+    hCanvas.height = 650;
+    hiddenCanvasRef.current = hCanvas;
+  }
+
+  // 1. Composite authoritative discrete 1x pixel art onto hidden canvas
   useEffect(() => {
-    // Pre-load graphics
-    const assets = {
-      purple_void_grass: '/assets/void_tiles/void_forest_grass-png.png',
-      void_ice_top: '/assets/void_tiles/void_ice_surface-png.png',
-      obsidian_dirt_side: '/assets/void_tiles/obsidian_cliff_edge-png.png',
-      obsidian_side: '/assets/void_tiles/obsidian_cliff_edge-png.png',
-      purple_void_tree: '/assets/void_tiles/void_crystal_tree-png.png',
-      hologram_fern: '/assets/void_tiles/hologram_fern-png.png',
-      void_spores: '/assets/void_tiles/void_spores-png.png',
-      obsidian_cavity: '/assets/void_tiles/void_spores-png.png',
-      ember_pine: '/assets/trees/ember_pine.png',
-      void_pine: '/assets/trees/void_pine.png',
-      base_pine: '/assets/trees/base_pine.png',
-      snow_pine: '/assets/trees/snow_pine.png',
-      void_liquid: '/assets/void_tiles/void_liquid-png.png',
-      void_flowers: '/assets/void_tiles/void_flowers-png.png',
-      void_tall_grass: '/assets/void_tiles/void_tall_grass-png.png',
-      void_short_grass: '/assets/void_tiles/void_short_grass-png.png',
-      void_ice_sunflower: '/assets/void_tiles/void_ice_sunflower-png.png'
-    };
+    if (!candidate || !hiddenCanvasRef.current) return;
 
-    Object.entries(assets).forEach(([key, src]) => {
-      if (!imageCache.current[key]) {
-        const img = new Image();
-        img.src = src;
-        imageCache.current[key] = img;
-      }
-    });
-  }, []);
+    const canvas = hiddenCanvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
 
-  useEffect(() => {
-    if (!candidate || !canvasRef.current) return;
-
-    const ctx = canvasRef.current.getContext('2d');
-    const width = canvasRef.current.width;
-    const height = canvasRef.current.height;
+    // Enforce Anti-Vector Invariant: Crisp nearest-neighbour pixel scaling
+    ctx.imageSmoothingEnabled = false;
 
     // Clear canvas
     ctx.clearRect(0, 0, width, height);
-    
-    // Background
-    ctx.fillStyle = '#050510'; // Deep void color
+
+    // Deep void ambient background
+    ctx.fillStyle = '#030712';
     ctx.fillRect(0, 0, width, height);
 
-    // Iso constants
-    const tileW = 16; // Adjust size so 80x45 fits on screen
-    const tileH = 8;
-    const offsetX = width / 2;
-    const offsetY = 50;
+    // Biome determination
+    const biome = candidate.intent?.biomeId || 'void_forest';
+    const seed = typeof candidate.intent?.seed === 'number' ? candidate.intent.seed : 4242;
 
-    const { isoTile, biomeMaterial, fibonacciField } = candidate.layers;
+    // Retrieve or synthesize authoritative discrete 1x pixel art buffers
+    const synthLayer = candidate.layers?.scd128Synthesizer?.synthesizedTextures;
+    const topTile = synthLayer?.top || synthesizeTileForgeTile({ type: 'top', biome, seed });
+    const groundTile = synthLayer?.ground || synthesizeTileForgeTile({ type: 'ground', biome, seed });
+    const rimTile = synthLayer?.rim || synthesizeTileForgeTile({ type: 'rim', biome, seed });
+    const cliffTile = synthLayer?.cliff || synthesizeTileForgeTile({ type: 'cliff', biome, seed, elevation: candidate.intent?.elevation || 1 });
+    const treeProp = synthLayer?.crystal_tree || synthesizeTileForgeProp({ propType: 'crystal_tree', biome, seed });
+    const pineProp = synthLayer?.void_pine || synthesizeTileForgeProp({ propType: 'void_pine', biome, seed });
+    const fernProp = synthLayer?.hologram_fern || synthesizeTileForgeProp({ propType: 'hologram_fern', biome, seed });
+    const flowerProp = synthLayer?.void_flowers || synthesizeTileForgeProp({ propType: 'void_flowers', biome, seed });
+
+    // Render texture canvases
+    const topCanvas = topTile.toCanvas();
+    const groundCanvas = groundTile.toCanvas();
+    const rimCanvas = rimTile.toCanvas();
+    const cliffCanvas = cliffTile.toCanvas();
+    const treeCanvas = treeProp.toCanvas();
+    const pineCanvas = pineProp.toCanvas();
+    const fernCanvas = fernProp.toCanvas();
+    const flowerCanvas = flowerProp.toCanvas();
+
+    // Isometric projection sizing
+    // Tile size: 40x20 diamond (crisp 0.5x integer scaling of 80x40 pixel art)
+    const tileW = 40;
+    const tileH = 20;
+    const offsetX = width / 2;
+    const offsetY = 70;
+
+    const { isoTile, fibonacciField } = candidate.layers || {};
     if (!isoTile || !isoTile.topPlane) return;
 
-    // Organic Perlin-like noise for grass texturing
-    const getGrassNoise = (x, z) => {
-      // Lower frequencies for larger, smoother patches of terrain types
-      return (Math.sin(x * 0.1 + z * 0.1) + Math.sin(x * 0.15 - z * 0.05) + Math.sin(x * 0.05 + z * 0.2)) / 3; 
-    };
-
-    // Combine all cells to draw (top, side, rim)
+    // Collect all cells with authoritative SCDL V2 and AMP descriptors
     const allCells = [];
+    const hasGround = candidate.intent?.hasGround !== false;
+    const activeTopTile = hasGround ? groundTile : topTile;
 
-    // Colors based on material assignments
-    const { assignments, palette } = biomeMaterial || {};
-    const primaryColor = palette?.primary || '#8b5cf6';
-    const secondaryColor = palette?.secondary || '#0f172a';
-    const rimColor = '#d8b4fe'; // Glowing rim 
-
-    isoTile.topPlane.forEach(cell => {
-      allCells.push({ ...cell, type: 'top', material: assignments?.topPlane || 'void_ice_top', color: primaryColor });
+    isoTile.topPlane.forEach((cell) => {
+      allCells.push({
+        ...cell,
+        type: hasGround ? 'ground' : 'top',
+        assetClass: hasGround ? 'isometric_ground_soil' : 'isometric_top_diamond',
+        biome,
+        elevation: cell.z || 0,
+        scdlSource: activeTopTile.scdlSource,
+        ampDescriptors: activeTopTile.ampDescriptors || [],
+        scd128Record: activeTopTile.scd128Record,
+      });
     });
-    
+
     if (isoTile.rimCells) {
-      isoTile.rimCells.forEach(cell => {
-        allCells.push({ ...cell, type: 'rim', material: assignments?.rim, color: rimColor });
+      isoTile.rimCells.forEach((cell) => {
+        allCells.push({
+          ...cell,
+          type: 'rim',
+          assetClass: 'isometric_rim_diamond',
+          biome,
+          elevation: cell.z || 0,
+          scdlSource: rimTile.scdlSource,
+          ampDescriptors: rimTile.ampDescriptors || [],
+          scd128Record: rimTile.scd128Record,
+        });
       });
     }
 
     if (isoTile.sidePlanes) {
-      Object.values(isoTile.sidePlanes).flat().forEach(cell => {
-        allCells.push({ ...cell, type: 'side', material: assignments?.sidePlane || 'obsidian_side', color: secondaryColor });
+      Object.values(isoTile.sidePlanes).flat().forEach((cell) => {
+        allCells.push({
+          ...cell,
+          type: 'side',
+          assetClass: 'isometric_cliff_skirt',
+          biome,
+          elevation: cell.z || 0,
+          scdlSource: cliffTile.scdlSource,
+          ampDescriptors: cliffTile.ampDescriptors || [],
+          scd128Record: cliffTile.scd128Record,
+        });
       });
     }
 
-    // Mix in fibonacci seeds as "trees" for the Void Forest
+    // Mix in Fibonacci seeds for procedural trees and vegetation
     if (fibonacciField && fibonacciField.seeds) {
-      fibonacciField.seeds.forEach((seed, index) => {
-        const types = ['hologram_fern', 'purple_void_tree', 'void_pine', 'ember_pine', 'base_pine', 'snow_pine'];
-        const propMaterial = types[index % types.length];
-        allCells.push({ ...seed, type: 'tree', material: propMaterial, color: '#a855f7' });
+      fibonacciField.seeds.forEach((seedPt, index) => {
+        const propTypes = ['tree', 'pine', 'fern', 'flowers'];
+        const pType = propTypes[index % propTypes.length];
+        const propObj = pType === 'tree' ? treeProp
+          : pType === 'pine' ? pineProp
+          : pType === 'fern' ? fernProp
+          : flowerProp;
+
+        allCells.push({
+          ...seedPt,
+          type: pType,
+          assetClass: `prop_${pType}`,
+          biome,
+          elevation: seedPt.z || 0,
+          scdlSource: propObj.scdlSource,
+          ampDescriptors: propObj.ampDescriptors || [],
+          scd128Record: propObj.scd128Record,
+        });
       });
     }
 
-    // Painter's algorithm sort (back to front)
-    // Depth in isometric projection is x + y
+    // Depth Sorting (Back to Front)
     allCells.sort((a, b) => {
       const depthA = a.x + a.y;
       const depthB = b.x + b.y;
       if (depthA === depthB) {
-        // Order of drawing on same tile: side -> top -> rim -> tree
-        const order = { side: 0, top: 1, rim: 2, tree: 3 };
-        return order[a.type] - order[b.type];
+        const order = { ground: 0, side: 1, top: 2, rim: 3, flowers: 4, fern: 5, pine: 6, tree: 7 };
+        return (order[a.type] || 0) - (order[b.type] || 0);
       }
       return depthA - depthB;
     });
 
-    // Animation state
-    let i = 0;
-    let animationFrameId;
+    // Draw all cells into discrete 2D buffer
+    for (let idx = 0; idx < allCells.length; idx += 1) {
+      const cell = allCells[idx];
+      const px = offsetX + (cell.x - cell.y) * (tileW / 2);
+      let py = offsetY + (cell.x + cell.y) * (tileH / 2);
 
-    const drawIsoDiamond = (ctx, px, py, color, strokeColor) => {
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.moveTo(px, py); // Top
-      ctx.lineTo(px + tileW / 2, py + tileH / 2); // Right
-      ctx.lineTo(px, py + tileH); // Bottom
-      ctx.lineTo(px - tileW / 2, py + tileH / 2); // Left
-      ctx.closePath();
-      ctx.fill();
-      
-      if (strokeColor) {
-        ctx.strokeStyle = strokeColor;
-        ctx.lineWidth = 0.5;
-        ctx.stroke();
+      const elevationOffset = (cell.z || 0) * tileH;
+      py -= elevationOffset;
+
+      if (cell.type === 'side') {
+        if (cliffCanvas) {
+          ctx.drawImage(cliffCanvas, px - tileW / 2, py, tileW, 28);
+        }
+      } else if (cell.type === 'ground') {
+        if (groundCanvas) {
+          ctx.drawImage(groundCanvas, px - tileW / 2, py, tileW, 28);
+        }
+      } else if (cell.type === 'top') {
+        if (topCanvas) {
+          ctx.drawImage(topCanvas, px - tileW / 2, py, tileW, tileH);
+        }
+      } else if (cell.type === 'rim') {
+        if (rimCanvas) {
+          ctx.drawImage(rimCanvas, px - tileW / 2, py, tileW, tileH);
+        }
+      } else if (cell.type === 'tree') {
+        if (treeCanvas) {
+          ctx.drawImage(treeCanvas, px - 18, py + 10 - 54, 36, 54);
+        }
+      } else if (cell.type === 'pine') {
+        if (pineCanvas) {
+          ctx.drawImage(pineCanvas, px - 20, py + 10 - 64, 40, 64);
+        }
+      } else if (cell.type === 'fern') {
+        if (fernCanvas) {
+          ctx.drawImage(fernCanvas, px - 12, py + 10 - 20, 24, 20);
+        }
+      } else if (cell.type === 'flowers') {
+        if (flowerCanvas) {
+          ctx.drawImage(flowerCanvas, px - 10, py + 10 - 16, 20, 16);
+        }
       }
-    };
+    }
 
-    const drawNextBatch = () => {
-      // Draw 60 tiles per frame for a fast, sweeping crystal-growth effect
-      const batchSize = 60; 
-      
-      for (let b = 0; b < batchSize && i < allCells.length; b++, i++) {
-        const cell = allCells[i];
-        
-        // Iso projection
+    // Save interactive cells list for click picking with full SCDL metadata
+    const visibleCanvas = canvasRef.current;
+    if (visibleCanvas) {
+      visibleCanvas._cells = allCells.map((cell) => {
         const px = offsetX + (cell.x - cell.y) * (tileW / 2);
         let py = offsetY + (cell.x + cell.y) * (tileH / 2);
+        py -= (cell.z || 0) * tileH;
+        return { ...cell, screenX: px, screenY: py };
+      });
+    }
 
-        // Adjust Y based on Z elevation if present
-        const elevationOffset = (cell.z || 0) * tileH;
-        py -= elevationOffset;
+    // Upload texture to WebGL
+    const gl = glRef.current;
+    const texture = textureRef.current;
+    if (gl && texture) {
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
+    }
+  }, [candidate]);
 
-        let imgKey = cell.material;
-        
-        // Add organic variety to the grass using Perlin patches
-        if (imgKey === 'purple_void_grass') {
-          const noise = getGrassNoise(cell.x, cell.z || 0);
-          
-          // Base patches
-          if (noise > 0.3) {
-            imgKey = 'void_tall_grass';
-          } else if (noise < -0.3) {
-            imgKey = 'void_short_grass';
-          }
+  // 2. Initialize WebGL Shader Context on visible canvas
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-          // Sprinkle flowers and sunflowers organically using a high-frequency hash
-          const hash = Math.abs(Math.sin(cell.x * 12.9898 + (cell.z || 0) * 78.233)) * 100;
-          
-          // Sunflowers prefer taller patches
-          if (noise > 0.1 && hash < 4) {
-            imgKey = 'void_ice_sunflower';
-          }
-          // Bioluminescent flowers bloom everywhere but sparsely
-          else if (hash > 90 && hash < 95) {
-            imgKey = 'void_flowers';
-          }
-        }
+    let gl = canvas.getContext('webgl');
+    if (!gl) {
+      gl = canvas.getContext('experimental-webgl');
+    }
+    if (!gl) {
+      console.warn('[TileForgeCanvas] WebGL not supported, falling back to 2D');
+      return;
+    }
+    glRef.current = gl;
 
-        const img = imageCache.current[imgKey];
-        const imgReady = img && img.complete && img.naturalWidth !== 0;
+    let prog;
+    try {
+      prog = createProgram(gl, VS_SOURCE, FS_SOURCE);
+      programRef.current = prog;
+    } catch (e) {
+      console.error('[TileForgeCanvas] WebGL program creation failed:', e);
+      return;
+    }
 
-        if (cell.type === 'top') {
-          if (imgReady) {
-            ctx.drawImage(img, px - tileW, py, tileW * 2, tileH * 2);
-          } else {
-            drawIsoDiamond(ctx, px, py, cell.color, '#00000044');
-          }
-        } 
-        else if (cell.type === 'rim') {
-          if (imgReady) {
-            // Draw rim tile 
-            ctx.drawImage(img, px - tileW, py, tileW * 2, tileH * 2);
-          } else {
-            drawIsoDiamond(ctx, px, py, cell.color, '#ffffff88');
-          }
-        }
-        else if (cell.type === 'side') {
-          if (imgReady) {
-            // Cliff edge textures might be taller, draw anchored to bottom of diamond
-            ctx.drawImage(img, px - tileW, py, tileW * 2, tileH * 4);
-          } else {
-            // Draw a downward extruded block
-            ctx.fillStyle = cell.color;
-            ctx.beginPath();
-            ctx.moveTo(px - tileW / 2, py + tileH / 2);
-            ctx.lineTo(px, py + tileH);
-            ctx.lineTo(px + tileW / 2, py + tileH / 2);
-            ctx.lineTo(px + tileW / 2, py + tileH / 2 + tileH * 2); // Extrude down
-            ctx.lineTo(px, py + tileH + tileH * 2);
-            ctx.lineTo(px - tileW / 2, py + tileH / 2 + tileH * 2);
-            ctx.closePath();
-            ctx.fill();
-            
-            ctx.strokeStyle = '#00000066';
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-            
-            // Draw top of side
-            drawIsoDiamond(ctx, px, py, cell.color, null);
-          }
-        }
-        else if (cell.type === 'tree') {
-          if (imgReady) {
-            // Dynamically scale tree assets based on their native dimensions to keep them planted on the tile
-            const scale = (tileW * 3.5) / img.naturalWidth;
-            const treeW = img.naturalWidth * scale;
-            const treeH = img.naturalHeight * scale;
-            ctx.drawImage(img, px - treeW / 2, py + tileH / 2 - treeH, treeW, treeH);
-          } else {
-            // Draw a tall glowing crystal/tree
-            const treeHeight = tileH * 4;
-            
-            ctx.fillStyle = cell.color;
-            ctx.beginPath();
-            ctx.moveTo(px, py + tileH / 2 - treeHeight); // Top point
-            ctx.lineTo(px + tileW / 4, py + tileH / 2); // Right base
-            ctx.lineTo(px, py + tileH); // Bottom base
-            ctx.lineTo(px - tileW / 4, py + tileH / 2); // Left base
-            ctx.closePath();
-            
-            // Glow effect
-            ctx.shadowColor = cell.color;
-            ctx.shadowBlur = 10;
-            ctx.fill();
-            
-            // Reset shadow
-            ctx.shadowBlur = 0;
-            
-            ctx.strokeStyle = '#ffffff88';
-            ctx.lineWidth = 1;
-            ctx.stroke();
-          }
-        }
-      }
+    // Quad geometry covering full screen
+    const quadBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([
+        -1, -1,
+        1, -1,
+        -1, 1,
+        -1, 1,
+        1, -1,
+        1, 1,
+      ]),
+      gl.STATIC_DRAW
+    );
 
-      if (i < allCells.length) {
-        animationFrameId = requestAnimationFrame(drawNextBatch);
-      }
-    };
+    const posAttr = gl.getAttribLocation(prog, 'a_position');
+    gl.enableVertexAttribArray(posAttr);
+    gl.vertexAttribPointer(posAttr, 2, gl.FLOAT, false, 0, 0);
 
-    drawNextBatch();
+    // Create texture
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    textureRef.current = texture;
+
+    if (hiddenCanvasRef.current) {
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, hiddenCanvasRef.current);
+    }
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      if (quadBuffer) gl.deleteBuffer(quadBuffer);
+      if (texture) gl.deleteTexture(texture);
+      if (prog) gl.deleteProgram(prog);
+    };
+  }, []);
+
+  // 3. WebGL Shader Render Loop
+  useEffect(() => {
+    let startTime = performance.now();
+    let isRunning = true;
+
+    const render = (time) => {
+      if (!isRunning) return;
+
+      const gl = glRef.current;
+      const prog = programRef.current;
+      const canvas = canvasRef.current;
+
+      if (gl && prog && canvas) {
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.useProgram(prog);
+
+        const elapsed = (time - startTime) * 0.001;
+
+        const modeMap = {
+          off: 0,
+          day: 1,
+          twilight: 2,
+          night: 3,
+          prismatic: 4,
+        };
+        const uModeVal = modeMap[shaderMode] ?? 1;
+
+        gl.uniform1i(gl.getUniformLocation(prog, 'u_texture'), 0);
+        gl.uniform1f(gl.getUniformLocation(prog, 'u_time'), elapsed);
+        gl.uniform1i(gl.getUniformLocation(prog, 'u_mode'), uModeVal);
+        gl.uniform1f(gl.getUniformLocation(prog, 'u_glow'), Number(glowIntensity) || 1.0);
+        gl.uniform1f(gl.getUniformLocation(prog, 'u_warmth'), Number(atmosphereWarmth) || 1.0);
+        gl.uniform2f(gl.getUniformLocation(prog, 'u_resolution'), canvas.width, canvas.height);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+      }
+
+      animFrameRef.current = requestAnimationFrame(render);
     };
 
-  }, [candidate]);
+    animFrameRef.current = requestAnimationFrame(render);
+
+    return () => {
+      isRunning = false;
+      if (animFrameRef.current) {
+        cancelAnimationFrame(animFrameRef.current);
+      }
+    };
+  }, [shaderMode, glowIntensity, atmosphereWarmth]);
+
+  const handleCanvasClick = (e) => {
+    const canvas = canvasRef.current;
+    if (!canvas || !canvas._cells) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
+    const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+    // Find nearest cell
+    let closest = null;
+    let minDist = 30;
+
+    for (const cell of canvas._cells) {
+      const dist = Math.hypot(clickX - cell.screenX, clickY - (cell.screenY + 10));
+      if (dist < minDist) {
+        minDist = dist;
+        closest = cell;
+      }
+    }
+
+    if (closest) {
+      setSelectedCell(closest);
+      if (onSelectTile) {
+        onSelectTile(closest);
+      }
+    }
+  };
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '8px', overflow: 'hidden', border: '1px solid #1e293b' }}>
-      <canvas 
-        ref={canvasRef} 
-        width={1000} 
-        height={600} 
-        style={{ width: '100%', height: '100%', display: 'block' }} 
+      <canvas
+        ref={canvasRef}
+        width={1100}
+        height={650}
+        onClick={handleCanvasClick}
+        style={{ width: '100%', height: '100%', display: 'block', cursor: 'crosshair', imageRendering: 'pixelated' }}
       />
-      {/* Hologram overlay styling */}
-      <div style={{ 
-        position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', 
-        pointerEvents: 'none',
-        background: 'linear-gradient(to bottom, transparent 50%, rgba(0, 255, 255, 0.05) 51%, transparent 51%)',
-        backgroundSize: '100% 4px'
-      }} />
+      {selectedCell && (
+        <div style={{
+          position: 'absolute',
+          bottom: 12,
+          left: 12,
+          background: 'rgba(15, 23, 42, 0.9)',
+          padding: '8px 14px',
+          borderRadius: '6px',
+          border: '1px solid #38bdf8',
+          color: '#f8fafc',
+          fontSize: '0.8rem',
+          pointerEvents: 'none',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
+        }}>
+          Selected: <strong>{selectedCell.type.toUpperCase()}</strong> ({selectedCell.x}, {selectedCell.y}) · Z:{selectedCell.z || 0}
+          {selectedCell.ampDescriptors?.length > 0 && (
+            <span style={{ marginLeft: '0.5rem', color: '#a78bfa' }}>
+              ({selectedCell.ampDescriptors.length} active AMPs)
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 }

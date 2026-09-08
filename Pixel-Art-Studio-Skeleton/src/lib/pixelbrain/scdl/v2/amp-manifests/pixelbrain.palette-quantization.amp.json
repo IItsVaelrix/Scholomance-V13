@@ -1,0 +1,55 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.palette-quantization",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "LAYER_POST",
+  "scope": [
+    "LAYER"
+  ],
+  "inputs": [
+    {
+      "name": "layer",
+      "type": "LAYER",
+      "required": true,
+      "description": "Rendered layer whose colors are quantized"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "colors",
+      "type": "I32",
+      "min": 2,
+      "max": 256,
+      "default": 16,
+      "description": "Maximum distinct color budget"
+    },
+    {
+      "name": "dither",
+      "type": "BOOL",
+      "default": false,
+      "description": "Whether to apply error diffusion dithering"
+    }
+  ],
+  "output": {
+    "type": "LAYER",
+    "description": "Layer quantized strictly to palette slot budget"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 4,
+    "fixed": 0
+  },
+  "order": 80,
+  "relevance": {
+    "pipelines": [
+      "render-fidelity"
+    ],
+    "conditions": []
+  },
+  "checksum": "8432982ffab3a2031c1d62f81ce92d43705b71b1fe544d649af35407d8dfab0b"
+}

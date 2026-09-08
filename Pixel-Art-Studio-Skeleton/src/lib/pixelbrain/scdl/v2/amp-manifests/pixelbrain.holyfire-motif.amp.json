@@ -1,0 +1,56 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.holyfire-motif",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "PAINT",
+  "scope": [
+    "LAYER",
+    "SHAPE"
+  ],
+  "inputs": [
+    {
+      "name": "target",
+      "type": "LAYER",
+      "required": true,
+      "description": "Motif layer receiving holyfire illumination"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "radiance",
+      "type": "FIXED",
+      "min": 0,
+      "max": 1,
+      "default": 0.9,
+      "description": "Holyfire radiance aura strength"
+    }
+  ],
+  "output": {
+    "type": "LAYER",
+    "description": "Layer with radiant holyfire halo and chromatic glow coordinates"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 3,
+    "fixed": 0
+  },
+  "order": 54,
+  "relevance": {
+    "pipelines": [
+      "item"
+    ],
+    "conditions": [
+      {
+        "field": "materials",
+        "op": "includes",
+        "value": "holy"
+      }
+    ]
+  },
+  "checksum": "5b4653e72048f8530e93c6484f89d1b694be56b598e394101e1067fea82ccac1"
+}

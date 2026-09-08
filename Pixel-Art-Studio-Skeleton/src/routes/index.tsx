@@ -3,5 +3,5 @@ import { createFileRoute, Navigate } from "@tanstack/react-router";
 export const Route = createFileRoute("/")({ component: Home });
 
 function Home() {
-  return <Navigate to="/studio/$tab" params={{ tab: "foundry" }} replace />;
+  return <Navigate to="/studio/$tab" params={{ tab: "canvas" }} replace />;
 }

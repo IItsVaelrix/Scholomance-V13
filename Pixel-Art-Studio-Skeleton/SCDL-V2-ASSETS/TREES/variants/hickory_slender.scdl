@@ -1,0 +1,108 @@
+SCDL 2
+ASSET hickory_slender
+CANVAS WIDTH 36 HEIGHT 67
+BUDGET INSTRUCTIONS 20000 GENERATED_SHAPES 500 RASTER_CELLS 16384 RECURSION_DEPTH 16
+SELECT_AMPS PIPELINE render-fidelity
+# APPLY_AMP pixelbrain.fibonacci-seed-field
+# SHADER canopy_masses FOLIAGE
+# SHADER surface_detail BARK_DETAIL
+
+CONST $cx I32 18
+CONST $gy I32 59
+
+# Palette declarations for theme olive_green
+CONST $canopy_spec COLOR #BEF264
+CONST $canopy_hi COLOR #84CC16
+CONST $canopy_lit COLOR #65A30D
+CONST $canopy_mid COLOR #4D7C0F
+CONST $canopy_base COLOR #365314
+CONST $canopy_dark COLOR #1A2E05
+CONST $bark_lit COLOR #78716C
+CONST $bark_mid COLOR #57534E
+CONST $bark_base COLOR #44403C
+CONST $bark_dark COLOR #1C1917
+CONST $shadow_abyss COLOR #04060E
+
+# --- Semantic Layer 1: ground_shadow ---
+SHAPE $sh_core (CIRCLE CENTER (VEC2 (PX $cx) (PX $gy)) RADIUS (PX 11))
+SHAPE $sh_ring (ELLIPSE CENTER (VEC2 (PX $cx) (PX $gy)) RADIUS_X (PX 15) RADIUS_Y (PX 4))
+LAYER ground_shadow ORDER 5 {
+  PAINT $sh_ring FILL $shadow_abyss RASTER MIDPOINT
+  PAINT $sh_core FILL $shadow_abyss RASTER MIDPOINT
+}
+
+# --- Semantic Layer 2: roots_and_ground ---
+SHAPE $r_l (LINE FROM (VEC2 (PX (SUB $cx 8)) (PX $gy)) TO (VEC2 (PX (SUB $cx 2)) (PX (SUB $gy 4))))
+SHAPE $r_r (LINE FROM (VEC2 (PX (ADD $cx 8)) (PX $gy)) TO (VEC2 (PX (ADD $cx 2)) (PX (SUB $gy 4))))
+LAYER roots_and_ground ORDER 10 {
+  PAINT $r_l FILL $bark_dark RASTER MIDPOINT
+  PAINT $r_r FILL $bark_dark RASTER MIDPOINT
+}
+
+# --- Semantic Layer 3: trunk ---
+SHAPE $t_col (RECT CENTER (VEC2 (PX $cx) (PX 40)) SIZE (VEC2 (PX 8) (PX 38)))
+SHAPE $t_sh (RECT CENTER (VEC2 (PX (SUB $cx 2)) (PX 40)) SIZE (VEC2 (PX 2) (PX 38)))
+SHAPE $t_hi (RECT CENTER (VEC2 (PX (ADD $cx 2)) (PX 40)) SIZE (VEC2 (PX 2) (PX 38)))
+LAYER trunk ORDER 20 {
+  PAINT $t_col FILL $bark_mid RASTER MIDPOINT
+  PAINT $t_sh FILL $bark_dark RASTER MIDPOINT
+  PAINT $t_hi FILL $bark_lit RASTER MIDPOINT
+}
+
+# --- Semantic Layer 4: primary_branches ---
+SHAPE $b_asc1_l (LINE FROM (VEC2 (PX $cx) (PX 41)) TO (VEC2 (PX (SUB $cx 8)) (PX 30)))
+SHAPE $b_asc1_r (LINE FROM (VEC2 (PX $cx) (PX 41)) TO (VEC2 (PX (ADD $cx 8)) (PX 30)))
+SHAPE $b_asc2_l (LINE FROM (VEC2 (PX $cx) (PX 33)) TO (VEC2 (PX (SUB $cx 6)) (PX 21)))
+SHAPE $b_asc2_r (LINE FROM (VEC2 (PX $cx) (PX 33)) TO (VEC2 (PX (ADD $cx 6)) (PX 21)))
+LAYER primary_branches ORDER 30 {
+  PAINT $b_asc1_l FILL $bark_dark RASTER MIDPOINT
+  PAINT $b_asc1_r FILL $bark_dark RASTER MIDPOINT
+  PAINT $b_asc2_l FILL $bark_mid RASTER MIDPOINT
+  PAINT $b_asc2_r FILL $bark_mid RASTER MIDPOINT
+}
+
+# --- Semantic Layer 5: secondary_branches ---
+SHAPE $b_tw1 (LINE FROM (VEC2 (PX (SUB $cx 8)) (PX 30)) TO (VEC2 (PX (SUB $cx 10)) (PX 25)))
+SHAPE $b_tw2 (LINE FROM (VEC2 (PX (ADD $cx 8)) (PX 30)) TO (VEC2 (PX (ADD $cx 10)) (PX 25)))
+LAYER secondary_branches ORDER 40 {
+  PAINT $b_tw1 FILL $bark_lit RASTER MIDPOINT
+  PAINT $b_tw2 FILL $bark_lit RASTER MIDPOINT
+}
+
+# --- Semantic Layer 6: canopy_masses ---
+SHAPE $c_ov_base (CIRCLE CENTER (VEC2 (PX $cx) (PX 33)) RADIUS (PX 12))
+SHAPE $c_ov_mid (CIRCLE CENTER (VEC2 (PX $cx) (PX 23)) RADIUS (PX 11))
+SHAPE $c_ov_top (CIRCLE CENTER (VEC2 (PX $cx) (PX 14)) RADIUS (PX 9))
+SHAPE $c_tuft_l (CIRCLE CENTER (VEC2 (PX (SUB $cx 7)) (PX 26)) RADIUS (PX 6))
+SHAPE $c_tuft_r (CIRCLE CENTER (VEC2 (PX (ADD $cx 7)) (PX 26)) RADIUS (PX 6))
+LAYER canopy_masses ORDER 50 {
+  PAINT $c_ov_base FILL $canopy_dark RASTER MIDPOINT
+  PAINT $c_ov_mid FILL $canopy_mid RASTER MIDPOINT
+  PAINT $c_ov_top FILL $canopy_lit RASTER MIDPOINT
+  PAINT $c_tuft_l FILL $canopy_mid RASTER MIDPOINT
+  PAINT $c_tuft_r FILL $canopy_lit RASTER MIDPOINT
+}
+
+# --- Semantic Layer 7: foliage_edges ---
+SHAPE $hk_serr1 (PIXEL AT (VEC2 (PX (SUB $cx 11)) (PX 23)))
+SHAPE $hk_serr2 (PIXEL AT (VEC2 (PX (ADD $cx 11)) (PX 23)))
+SHAPE $hk_serr_top (PIXEL AT (VEC2 (PX $cx) (PX 7)))
+LAYER foliage_edges ORDER 60 {
+  PAINT $hk_serr1 FILL $canopy_hi RASTER CENTER
+  PAINT $hk_serr2 FILL $canopy_hi RASTER CENTER
+  PAINT $hk_serr_top FILL $canopy_hi RASTER CENTER
+}
+
+# --- Semantic Layer 8: surface_detail ---
+SHAPE $hk_diamond1 (LINE FROM (VEC2 (PX (SUB $cx 1)) (PX (SUB $gy 18))) TO (VEC2 (PX (ADD $cx 1)) (PX (SUB $gy 24))))
+SHAPE $hk_diamond2 (LINE FROM (VEC2 (PX (ADD $cx 1)) (PX (SUB $gy 24))) TO (VEC2 (PX (SUB $cx 1)) (PX (SUB $gy 30))))
+LAYER surface_detail ORDER 70 {
+  PAINT $hk_diamond1 FILL $bark_dark RASTER MIDPOINT
+  PAINT $hk_diamond2 FILL $bark_lit RASTER MIDPOINT
+}
+
+# --- Semantic Layer 9: highlights ---
+SHAPE $hk_crest (PIXEL AT (VEC2 (PX $cx) (PX 6)))
+LAYER highlights ORDER 80 {
+  PAINT $hk_crest FILL $canopy_spec RASTER CENTER
+}

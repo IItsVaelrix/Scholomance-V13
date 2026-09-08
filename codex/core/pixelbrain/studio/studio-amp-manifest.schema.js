@@ -40,6 +40,7 @@ const RUNTIME_NAMES = new Set([
   'fibonacci-field.microprocessor',
   'heightmap.microprocessor',
   'iso-tile-geometry.microprocessor',
+  'tile-shape.microprocessor',
   'noise-mask.microprocessor',
   'perlin-field.microprocessor',
   'tile-socket.microprocessor',

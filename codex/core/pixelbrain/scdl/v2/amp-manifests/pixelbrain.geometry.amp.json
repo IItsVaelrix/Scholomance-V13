@@ -1,0 +1,49 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.geometry",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "SHAPE_POST",
+  "scope": [
+    "SHAPE",
+    "LAYER"
+  ],
+  "inputs": [
+    {
+      "name": "geometry",
+      "type": "SHAPE",
+      "required": true,
+      "description": "Input shape geometry to classify and structure"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "classifyRoles",
+      "type": "BOOL",
+      "default": true,
+      "description": "Whether to classify semantic roles"
+    }
+  ],
+  "output": {
+    "type": "SHAPE",
+    "description": "Geometry annotated with role classifications and bounding masks"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 2,
+    "fixed": 0
+  },
+  "order": 30,
+  "relevance": {
+    "pipelines": [
+      "item",
+      "render-fidelity"
+    ],
+    "conditions": []
+  },
+  "checksum": "c004b839cca309fe3e775276413964f75d05f0695ff5635386a7ab72034cdce9"
+}

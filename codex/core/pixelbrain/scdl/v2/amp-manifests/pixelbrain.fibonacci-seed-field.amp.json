@@ -1,0 +1,56 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.fibonacci-seed-field",
+  "version": "1.0.0",
+  "execution": "DESCRIPTOR",
+  "stage": "RUNTIME_DESCRIPTOR",
+  "scope": [
+    "ASSET",
+    "TIMELINE"
+  ],
+  "inputs": [
+    {
+      "name": "targetId",
+      "type": "ANY",
+      "required": false,
+      "description": "Seed origin identifier"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "seed",
+      "type": "I32",
+      "default": 42,
+      "description": "PRNG seed"
+    },
+    {
+      "name": "points",
+      "type": "I32",
+      "min": 1,
+      "max": 89,
+      "default": 13,
+      "description": "Number of phyllotaxis seed points"
+    }
+  ],
+  "output": {
+    "type": "ANY",
+    "description": "Immutable phyllotaxis seed point distribution descriptor"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "CONSTANT",
+    "multiplier": 1,
+    "fixed": 10
+  },
+  "order": 113,
+  "relevance": {
+    "pipelines": [
+      "world-voxel"
+    ],
+    "conditions": []
+  },
+  "checksum": "6d5f050c81942d46968b21cb0c3da0042ef3c5581a3ac9f9f21bf3ded47d51ee"
+}

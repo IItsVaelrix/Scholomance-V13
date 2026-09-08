@@ -1,0 +1,49 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.heightmap",
+  "version": "1.0.0",
+  "execution": "DESCRIPTOR",
+  "stage": "WORLD_DESCRIPTOR",
+  "scope": [
+    "ASSET"
+  ],
+  "inputs": [
+    {
+      "name": "targetId",
+      "type": "ANY",
+      "required": false,
+      "description": "Heightmap grid identifier"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "maxElevation",
+      "type": "I32",
+      "min": 1,
+      "max": 64,
+      "default": 16,
+      "description": "Maximum surface height elevation in cells"
+    }
+  ],
+  "output": {
+    "type": "ANY",
+    "description": "Immutable 2D grid heightmap terrain elevation descriptor"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "CONSTANT",
+    "multiplier": 1,
+    "fixed": 10
+  },
+  "order": 111,
+  "relevance": {
+    "pipelines": [
+      "world-voxel"
+    ],
+    "conditions": []
+  },
+  "checksum": "24834ecf94ff2a89f46eaffa817e8af394f5b970accc50c460adeb0b23efbc83"
+}

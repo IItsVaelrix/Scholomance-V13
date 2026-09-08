@@ -1,0 +1,50 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.vector",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "SHAPE_POST",
+  "scope": [
+    "SHAPE"
+  ],
+  "inputs": [
+    {
+      "name": "geometry",
+      "type": "SHAPE",
+      "required": true,
+      "description": "Vector path or polygon geometry"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "subdivide",
+      "type": "I32",
+      "min": 1,
+      "max": 4,
+      "default": 1,
+      "description": "Subdivision refinement passes"
+    }
+  ],
+  "output": {
+    "type": "SHAPE",
+    "description": "Subdivided high-fidelity vector shape geometry"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 3,
+    "fixed": 0
+  },
+  "order": 49,
+  "relevance": {
+    "pipelines": [
+      "render-fidelity",
+      "item"
+    ],
+    "conditions": []
+  },
+  "checksum": "b6954d4bc71332ed9c15a96dfd99f313d87187aa9d055d3543b88601568da5e3"
+}

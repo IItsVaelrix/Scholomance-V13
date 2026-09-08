@@ -1,0 +1,100 @@
+{
+  "url": "http://127.0.0.1:8090/studio/canvas",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Sward",
+      "hasCanvas": true,
+      "bodyTextLen": 1039,
+      "bodyTextHash": "1c3969dd5d27a627b8e9ea5acb3507d0492a2bfda55822953c82e1dcd953a9e6",
+      "bodyTextPrefix": "SWARD / PIXELBRAIN Studio REV 0 studio-output1:a03caad726b8ac08a",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/home/deck/Downloads/Scholomance-V12-main/docs/scholomance-encyclopedia/post-implementation-reports/assets/pixelbrain-canvas-professional-polish/smoke-dev-desktop.png",
+      "extra": {
+        "hasViewport": true,
+        "renderer": "invalidation",
+        "headingHeight": 17.515625,
+        "statusText": "Pencilx/y —/—2×#c9a227160×144rectangularStructure0 cellssymmetry nonepending none"
+      }
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Sward",
+      "hasCanvas": true,
+      "bodyTextLen": 714,
+      "bodyTextHash": "3064f7dea8d4518913e456684665249ab5297939fb1f0a9dbd909db07fe3c850",
+      "bodyTextPrefix": "SWARD / PIXELBRAIN Studio REV 0 studio-output1:a03caad726b8ac08a",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/home/deck/Downloads/Scholomance-V12-main/docs/scholomance-encyclopedia/post-implementation-reports/assets/pixelbrain-canvas-professional-polish/smoke-dev-mobile.png",
+      "extra": {
+        "hasViewport": true,
+        "renderer": "invalidation",
+        "headingHeight": 17.515625,
+        "statusText": "Pencilx/y —/—2×#c9a227160×144rectangularStructure0 cellssymmetry nonepending none"
+      }
+    }
+  },
+  "exitCode": 0,
+  "contracts": {
+    "start": {
+      "panX": 0,
+      "panY": 0,
+      "zoom": 1
+    },
+    "errors": [],
+    "after1": {
+      "panX": 0,
+      "panY": 0,
+      "zoom": 1
+    },
+    "after2": {
+      "panX": 0,
+      "panY": 0,
+      "zoom": 1
+    },
+    "afterPlus": {
+      "panX": 222,
+      "panY": 62.5,
+      "zoom": 4
+    },
+    "afterMinus": {
+      "panX": 382,
+      "panY": 206.62109375,
+      "zoom": 2
+    },
+    "swap": {
+      "before": {
+        "fg": "#c9a227",
+        "bg": "#0c0e0b"
+      },
+      "after": {
+        "fg": "#0c0e0b",
+        "bg": "#c9a227"
+      }
+    },
+    "afterSpacePan": {
+      "panX": 422,
+      "panY": 230.62109375,
+      "zoom": 2
+    },
+    "spacePanMoved": true,
+    "afterMiddlePan": {
+      "panX": 392,
+      "panY": 210.62109375,
+      "zoom": 2
+    },
+    "middlePanMoved": true,
+    "shiftLine": {
+      "afterFirstClick": "Pencil\nx/y 3/3\n4×\n#000000\n160×144\nrectangular\nStructure\n1 cells\nsymmetry none\npending none",
+      "afterShiftClick": "Pencil\nx/y 8/3\n4×\n#000000\n160×144\nrectangular\nStructure\n6 cells\nsymmetry none\npending none"
+    }
+  }
+}

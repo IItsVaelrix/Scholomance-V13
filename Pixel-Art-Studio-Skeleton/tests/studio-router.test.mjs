@@ -2,25 +2,26 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
-  PHASE_A_STUDIO_TABS,
+  STUDIO_TABS,
   isStudioTab,
   normalizeStudioTab,
 } from "../src/components/studio/pixelbrain/studio-tabs.js";
 
-test("Phase A exposes exactly the four approved Studio tabs", () => {
+test("Phase B exposes exactly the nine source Studio tabs", () => {
   assert.deepEqual(
-    PHASE_A_STUDIO_TABS.map(({ id }) => id),
-    ["foundry", "amps", "mutations", "diagnostics"],
+    STUDIO_TABS.map(({ id }) => id),
+    ["canvas", "blueprint", "foundry", "amps", "mutations", "finish", "mentor", "library", "diagnostics"],
   );
-  assert.ok(Object.isFrozen(PHASE_A_STUDIO_TABS));
-  assert.ok(PHASE_A_STUDIO_TABS.every(Object.isFrozen));
+  assert.ok(Object.isFrozen(STUDIO_TABS));
+  assert.ok(STUDIO_TABS.every(Object.isFrozen));
 });
 
-test("missing, invalid, and Phase B tab ids normalize to Foundry", () => {
-  for (const value of [undefined, null, "", "canvas", "blueprint", "finish", "mentor", "library"]) {
-    assert.equal(normalizeStudioTab(value), "foundry");
+test("missing and invalid tab ids normalize to Canvas", () => {
+  for (const value of [undefined, null, "", "editor", "phase-a"]) {
+    assert.equal(normalizeStudioTab(value), "canvas");
     assert.equal(isStudioTab(value), false);
   }
   assert.equal(normalizeStudioTab("mutations"), "mutations");
-  assert.equal(isStudioTab("mutations"), true);
+  assert.equal(isStudioTab("canvas"), true);
+  assert.equal(isStudioTab("library"), true);
 });

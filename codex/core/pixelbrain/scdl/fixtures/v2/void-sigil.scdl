@@ -16,7 +16,7 @@ SHAPE $sigil_edge (OUTLINE $sigil_cut WIDTH (PX 1))
 MASK $void_clip (TO_MASK $portal_ring)
 
 ANCHOR $origin_anchor ON $portal_ring AT (ANCHOR_OF $portal_ring CENTER)
-ASSERT (INSIDE $center $portal_ring)
+ASSERT (INSIDE $center (BOUNDS $portal_ring))
 
 LAYER backdrop ORDER 0 BLEND REPLACE OPACITY 1.0 {
   PAINT $portal_ring FILL #1A0B2E RASTER MIDPOINT

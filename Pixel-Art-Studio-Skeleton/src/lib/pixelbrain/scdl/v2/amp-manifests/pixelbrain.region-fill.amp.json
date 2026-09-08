@@ -1,0 +1,55 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.region-fill",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "PAINT",
+  "scope": [
+    "LAYER",
+    "SHAPE"
+  ],
+  "inputs": [
+    {
+      "name": "target",
+      "type": "LAYER",
+      "required": true,
+      "description": "Target layer whose regions receive material palette fill"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "material",
+      "type": "MATERIAL",
+      "default": "void",
+      "description": "Material palette identifier"
+    },
+    {
+      "name": "anchor",
+      "type": "ANY",
+      "default": "body",
+      "description": "Palette anchor slot"
+    }
+  ],
+  "output": {
+    "type": "LAYER",
+    "description": "Layer with region-filled color coordinates"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 3,
+    "fixed": 0
+  },
+  "order": 50,
+  "relevance": {
+    "pipelines": [
+      "item",
+      "render-fidelity"
+    ],
+    "conditions": []
+  },
+  "checksum": "93dc839c8bb71dab12f331e6218f2b4e0f9a9464c81fb512faa4450c054e40cf"
+}

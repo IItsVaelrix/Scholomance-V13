@@ -8,6 +8,7 @@ import { FibonacciFieldMicroprocessor } from '../../codex/core/pixelbrain/amps/f
 import { VolumeMicroprocessor } from '../../codex/core/pixelbrain/amps/volume/processors/volume.microprocessor.js';
 import { PerlinFieldMicroprocessor } from '../../codex/core/pixelbrain/amps/noise/perlin-field.microprocessor.js';
 import { BiomeMaterialMicroprocessor } from '../../codex/core/pixelbrain/amps/biome/biome-material.microprocessor.js';
+import { TileForgeScd128Microprocessor } from '../../codex/core/pixelbrain/tile-forge/tile-forge-scd128.microprocessor.js';
 
 // Mocks
 const MockGeometry = { run: () => ({ output: {}, diagnostics: [], processor: {id: 'geometry', version: '1.0.0'}, hash: 'geom-hash' }) };
@@ -48,7 +49,8 @@ export function createTestPipeline() {
       symmetrySoft: MockSymmetry,
       maskedNoise: new PerlinFieldMicroprocessor(),
       biomeMaterial: new BiomeMaterialMicroprocessor(),
-      propScatter: MockPropScatter
+      propScatter: MockPropScatter,
+      scd128Synthesizer: new TileForgeScd128Microprocessor()
     },
     presets: TILE_FORGE_PRESETS,
     validator: new MockValidator(),

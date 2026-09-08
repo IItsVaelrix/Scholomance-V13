@@ -1,0 +1,116 @@
+{
+  "contract": "SCD128-REALIZATION64-v1",
+  "schemaVersion": 1,
+  "adapterFamily": "tree",
+  "checksum64": "91782BF757BE26CD4C97CD424C75A0E90A3E2C8C67F49E7A8994D72DE52B8F31",
+  "digest256": "47C5D56B22CECA77095F316EB10F826BAFF95F7DC3114BF0101A793A3E72E915",
+  "slots": [
+    {
+      "slot": "PIXEL_DENSITY",
+      "position": 0,
+      "canonicalCategory": "res_48x64",
+      "parameters": {
+        "cluster_quantum": 1
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:pixel_density",
+      "digest256": "782BF7EEEA6D04B4A710CAF2FD73B282C83A6A20410E67B2D50E49C60ADE491E",
+      "blockHex": "91782BF7"
+    },
+    {
+      "slot": "EDGE_LANGUAGE",
+      "position": 1,
+      "canonicalCategory": "lobed_pointed_frills",
+      "parameters": {
+        "outline_weight": 1
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:edge_language",
+      "digest256": "57BE26CDCA50E5785944D07AD602081D7EF5D5F551069F7E10C17485C52C0E25",
+      "blockHex": "57BE26CD"
+    },
+    {
+      "slot": "CLUSTER_RHYTHM",
+      "position": 2,
+      "canonicalCategory": "foliage_masses",
+      "parameters": {
+        "max_isolated_cells": 2
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:cluster_rhythm",
+      "digest256": "4C97CD42B0C29CBD8F8CC95EC797AB9F5AC5CFE6D1D157019D257BA0CFA102B0",
+      "blockHex": "4C97CD42"
+    },
+    {
+      "slot": "VALUE_HIERARCHY",
+      "position": 3,
+      "canonicalCategory": "bands_5",
+      "parameters": {
+        "value_bands": 5
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:value_hierarchy",
+      "digest256": "4C75A0E90CE60A9E7FF48A4204C83B8ED4AD9AF3A653673E2103B1081E9D900E",
+      "blockHex": "4C75A0E9"
+    },
+    {
+      "slot": "MATERIAL_LANGUAGE",
+      "position": 4,
+      "canonicalCategory": "broadleaf_clumps",
+      "parameters": {
+        "bark_material": "maple_smooth_gray",
+        "foliage_material": "broadleaf_clumps"
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:material_language",
+      "digest256": "0A3E2C8CB6044A9A6F8A7EAFC0F2752C6BDEF9838BE476167D5ABF1611A63093",
+      "blockHex": "0A3E2C8C"
+    },
+    {
+      "slot": "PALETTE_LOGIC",
+      "position": 5,
+      "canonicalCategory": "autumn_scarlet_gold",
+      "parameters": {
+        "steps": 5
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:palette_logic",
+      "digest256": "67F49E7A7D92A46B5035781C82FDD9EF3A42B27498DD0A17CCDBEEE2E0D830B7",
+      "blockHex": "67F49E7A"
+    },
+    {
+      "slot": "LIGHT_RESPONSE",
+      "position": 6,
+      "canonicalCategory": "upper_left",
+      "parameters": {
+        "light_x": -1,
+        "light_y": -1
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:light_response",
+      "digest256": "8994D72D324F10007A4333964B23B58E24D9947DED1D140F1306D96044B57ABF",
+      "blockHex": "8994D72D"
+    },
+    {
+      "slot": "SURFACE_VARIATION",
+      "position": 7,
+      "canonicalCategory": "subtle_weathering",
+      "parameters": {
+        "variation_pct": 5
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:surface_variation",
+      "digest256": "E52B8F3175A0219497A90EFBBE46670DEBCC16818AFFFFA3E7C401358733257C",
+      "blockHex": "E52B8F31"
+    }
+  ],
+  "evidenceDigest": "EVIDENCE_REAL_SCHOLOMIUM_MASTER_MAPLE"
+}

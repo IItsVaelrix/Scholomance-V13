@@ -6,9 +6,11 @@ type DiagnosticsProps = {
   snapshot: Record<string, unknown>;
   receipts: ReadonlyArray<Record<string, unknown>>;
   faults: ReadonlyArray<Record<string, unknown>>;
+  events?: ReadonlyArray<Record<string, unknown>>;
+  gate?: Record<string, unknown> | null;
 };
 
-export function Diagnostics({ snapshot, receipts, faults }: DiagnosticsProps) {
+export function Diagnostics({ snapshot, receipts, faults, events = [], gate = null }: DiagnosticsProps) {
   const manifest = useMemo(() => getStudioAmpManifest(), []);
   const coverage = useMemo(() => getStudioAdapterCoverage(), []);
   const covered = manifest.length - coverage.missing.length;
@@ -69,6 +71,14 @@ export function Diagnostics({ snapshot, receipts, faults }: DiagnosticsProps) {
                 {String(snapshot.width)}×{String(snapshot.height)}
               </dd>
             </div>
+            <div>
+              <dt>Revision</dt>
+              <dd>{String(snapshot.revision ?? 0)}</dd>
+            </div>
+            <div>
+              <dt>Forge Gate</dt>
+              <dd>{gate ? String(gate.verdict) : "NOT RUN"}</dd>
+            </div>
           </dl>
           <p className="pbs-note">
             The working draft and evidence remain inside this browser until an explicit export.
@@ -104,6 +114,22 @@ export function Diagnostics({ snapshot, receipts, faults }: DiagnosticsProps) {
             </ol>
           ) : (
             <p className="pbs-empty">No Studio faults recorded.</p>
+          )}
+        </div>
+        <div className="pbs-plane">
+          <h3>Terminal · {events.length} / 40</h3>
+          {events.length ? (
+            <ol className="pbs-ledger">
+              {events.slice(0, 8).map((event, index) => (
+                <li key={`${String(event.at)}-${index}`}>
+                  <strong>{String(event.kind)}</strong>
+                  <span>rev {String(event.revision)}</span>
+                  <code>{String(event.at)}</code>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="pbs-empty">No editor events yet.</p>
           )}
         </div>
       </div>

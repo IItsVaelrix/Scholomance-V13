@@ -1,0 +1,58 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.perlin-field",
+  "version": "1.0.0",
+  "execution": "DESCRIPTOR",
+  "stage": "RUNTIME_DESCRIPTOR",
+  "scope": [
+    "ASSET",
+    "TIMELINE"
+  ],
+  "inputs": [
+    {
+      "name": "targetId",
+      "type": "ANY",
+      "required": false,
+      "description": "Noise field origin identifier"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "scale",
+      "type": "FIXED",
+      "min": 0.01,
+      "max": 10,
+      "default": 0.1,
+      "description": "Perlin noise coordinate frequency"
+    },
+    {
+      "name": "octaves",
+      "type": "I32",
+      "min": 1,
+      "max": 8,
+      "default": 3,
+      "description": "Perlin octave fractal depth"
+    }
+  ],
+  "output": {
+    "type": "ANY",
+    "description": "Immutable coherent Perlin noise field descriptor"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "CONSTANT",
+    "multiplier": 1,
+    "fixed": 10
+  },
+  "order": 114,
+  "relevance": {
+    "pipelines": [
+      "world-voxel"
+    ],
+    "conditions": []
+  },
+  "checksum": "9b260b09643438d313f6ccccaf0a9d1ecadd4baebf06aea1922531f7f9e840b9"
+}

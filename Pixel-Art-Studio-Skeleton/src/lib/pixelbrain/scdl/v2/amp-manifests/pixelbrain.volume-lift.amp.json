@@ -1,0 +1,49 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.volume-lift",
+  "version": "1.0.0",
+  "execution": "DESCRIPTOR",
+  "stage": "WORLD_DESCRIPTOR",
+  "scope": [
+    "ASSET"
+  ],
+  "inputs": [
+    {
+      "name": "targetId",
+      "type": "ANY",
+      "required": false,
+      "description": "Target asset identifier"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "liftHeight",
+      "type": "I32",
+      "min": 1,
+      "max": 32,
+      "default": 4,
+      "description": "Voxel elevation lift height in units"
+    }
+  ],
+  "output": {
+    "type": "ANY",
+    "description": "Immutable volume lift world descriptor"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "CONSTANT",
+    "multiplier": 1,
+    "fixed": 10
+  },
+  "order": 101,
+  "relevance": {
+    "pipelines": [
+      "world-voxel"
+    ],
+    "conditions": []
+  },
+  "checksum": "a143ca343bb69a53efb817e2200c5acd54e184ff4f391f7b8ac3267ba2f1fb73"
+}

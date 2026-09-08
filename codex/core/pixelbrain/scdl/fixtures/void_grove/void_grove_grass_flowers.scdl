@@ -1,0 +1,54 @@
+# void_grove_grass_flowers — walkable grass variant, tiny wildflower cluster.
+# 32x32, top-down, no isometric projection.
+asset void_grove_grass_flowers canvas 32x32
+
+palette {
+  moss_dark = #0d2015
+  moss_base = #163a26
+  moss_mid  = #1f5236
+  moss_lit  = #2f7048
+  moss_hi   = #4a9563
+  moss_spec = #7bc496
+  flower_pink = #e893c4
+  flower_core = #fff3a0
+  flower_stem = #2f7048
+}
+
+part ground material astralmoss {
+  rect 0 0 32 32 moss_base
+  polygon 0 0 16 0 9 13 0 18 moss_mid
+  polygon 32 4 32 20 20 24 26 10 moss_lit
+  polygon 0 22 12 18 16 32 0 32 moss_dark
+  polygon 20 26 32 22 32 32 24 32 moss_mid
+  cell 5 5 moss_hi
+  cell 21 3 moss_dark
+  cell 3 26 moss_dark
+  cell 24 21 moss_dark
+}
+
+part blades material astralmoss {
+  line 8 21 7 16 moss_hi
+  line 27 27 26 23 moss_spec
+  line 4 9 3 5 moss_hi
+  cell 19 12 moss_spec
+}
+
+part flowers material astralmoss {
+  # small flower cluster, lower-right of tile
+  cell 20 22 flower_stem
+  cell 20 21 flower_stem
+  cell 19 19 flower_pink
+  cell 21 19 flower_pink
+  cell 20 18 flower_pink
+  cell 20 20 flower_core
+  # second, smaller flower
+  cell 25 26 flower_stem
+  cell 24 24 flower_pink
+  cell 26 24 flower_pink
+  cell 25 25 flower_core
+  # third bud, upper area
+  cell 12 8 flower_stem
+  cell 11 6 flower_pink
+  cell 13 6 flower_pink
+  cell 12 7 flower_core
+}

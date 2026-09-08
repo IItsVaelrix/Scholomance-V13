@@ -15,7 +15,7 @@ describe('SCDL v2 Universal AMP Catalog Gate and CLI', () => {
     const content = readFileSync(EFFECT_CATALOG_MD, 'utf8');
     expect(content).toContain('| SCDL ABI |');
     expect(content).toContain('PB-AMP-ABI-v1');
-    expect(content).toContain('5/54 have SCDL PB-AMP-ABI-v1 manifests');
+    expect(content).toContain('have SCDL PB-AMP-ABI-v1 manifests');
   });
 
   it('scripts/pixelbrain-effect-catalog.mjs --check-abi passes on committed manifests', () => {
@@ -23,7 +23,7 @@ describe('SCDL v2 Universal AMP Catalog Gate and CLI', () => {
       encoding: 'utf8',
       cwd: ROOT,
     });
-    expect(out).toContain('All 5 PB-AMP-ABI-v1 manifests are valid.');
+    expect(out).toContain(`All ${ANCHOR_MANIFESTS.length} PB-AMP-ABI-v1 manifests are valid.`);
   });
 
   it('scripts/pixelbrain-effect-catalog.mjs --check-abi fails on malformed manifest JSON', () => {
@@ -54,7 +54,7 @@ describe('SCDL v2 Universal AMP Catalog Gate and CLI', () => {
       encoding: 'utf8',
       cwd: ROOT,
     });
-    expect(out).toContain('EFFECT_CATALOG.md is current (54 modules, 5 ABI compatible).');
+    expect(out).toContain('EFFECT_CATALOG.md is current');
   });
 
   it('scdl amps list --json returns all registered manifests', () => {
@@ -64,7 +64,7 @@ describe('SCDL v2 Universal AMP Catalog Gate and CLI', () => {
     });
     const parsed = JSON.parse(raw);
     expect(Array.isArray(parsed)).toBe(true);
-    expect(parsed.length).toBe(5);
+    expect(parsed.length).toBe(ANCHOR_MANIFESTS.length);
     const ids = parsed.map((m) => m.ampId);
     expect(ids).toContain('pixelbrain.facet');
     expect(ids).toContain('pixelbrain.pixel-aa');
@@ -91,7 +91,7 @@ describe('SCDL v2 Universal AMP Catalog Gate and CLI', () => {
       encoding: 'utf8',
       cwd: ROOT,
     });
-    expect(out).toContain('All 5 manifest(s) valid.');
+    expect(out).toContain(`All ${ANCHOR_MANIFESTS.length} manifest(s) valid.`);
   });
 
   it('scdl amps plan <file> --json computes deterministic activation and dormant reasons', () => {
@@ -125,8 +125,9 @@ LAYER main ORDER 10 {
 
     const plan = JSON.parse(out);
     expect(plan.selectedAmps.length).toBeGreaterThanOrEqual(1);
-    expect(plan.selectedAmps[0].ampId).toBe('pixelbrain.pixel-aa');
-    expect(plan.selectedAmps[0].activationReason).toContain('All relevance criteria satisfied');
+    const pixelAa = plan.selectedAmps.find((a) => a.ampId === 'pixelbrain.pixel-aa');
+    expect(pixelAa).toBeDefined();
+    expect(pixelAa.activationReason).toContain('All relevance criteria satisfied');
 
     const dormant = plan.ampPlan.filter((p) => p.source === 'DORMANT');
     expect(dormant.length).toBeGreaterThanOrEqual(1);

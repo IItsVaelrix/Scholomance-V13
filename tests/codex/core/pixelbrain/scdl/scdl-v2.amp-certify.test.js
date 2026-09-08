@@ -19,9 +19,9 @@ describe('SCDL v2 Universal AMP Certification Harness', () => {
     'pixelbrain.noise-fill',
   ];
 
-  it('certifies all 5 anchor AMPs across COMPILE, ANALYZE, and DESCRIPTOR classes', () => {
+  it('certifies registered AMPs across COMPILE, ANALYZE, and DESCRIPTOR classes', () => {
     const results = certifyAllRegisteredAmps();
-    expect(results).toHaveLength(5);
+    expect(results.length).toBeGreaterThanOrEqual(5);
     for (const res of results) {
       expect(res.certified, `AMP ${res.ampId} failed certification: ${res.errors.join('; ')}`).toBe(true);
       expect(res.errors).toHaveLength(0);

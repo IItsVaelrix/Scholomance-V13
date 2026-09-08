@@ -1,6 +1,10 @@
 export const TileForgeCandidateSchema = {
   id: "string",
-  type: "isometric_tile_chunk",
+  type: "string", // "isometric_tile_chunk" | polymorphic ASSET_CLASSES
+  assetClass: "string?",
+  assetSpec: "AssetSpec?",
+  visualBounds: "{ width: number, height: number, anchorX: number, anchorY: number }?",
+  logicalFootprint: "{ gridW: number, gridH: number, originTx: number, originTy: number, elevation: number, walkable: boolean }?",
   intent: "TileIntent",
   layers: "Record<string, ProcessorOutput>",
   qbit: "QbitCell[]",
@@ -9,6 +13,21 @@ export const TileForgeCandidateSchema = {
   authoring: "TileAuthoringState",
   validation: "TileValidationResult",
   score: "TileScoreResult"
+};
+
+export const AssetSpecSchema = {
+  id: "string",
+  assetClass: "string",
+  semanticType: "string",
+  biome: "string",
+  paletteFamily: "string",
+  materialGrammar: "string",
+  detailDensity: "string",
+  lighting: "object",
+  logicalFootprint: "object",
+  visualBounds: "object",
+  seed: "number|string",
+  subSeeds: "object"
 };
 
 export const TileAuthoringStateSchema = {

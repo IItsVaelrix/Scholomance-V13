@@ -1,0 +1,41 @@
+# void_grove_bush — decorative prop for the top-down grove tileset.
+# 32x32, top-down, small obstacle/decoration. Light law: upper-left (-1,-1).
+#
+# NOTE: `ellipse` renders as an unfilled black-stroke outline only (confirmed
+# by isolated test) — the ground-contact shadow uses a filled polygon instead.
+asset void_grove_bush canvas 32x32
+
+palette {
+  abyss     = #04060e
+  leaf_dark = #0a2818
+  leaf_base = #123a22
+  leaf_mid  = #1f5c32
+  leaf_lit  = #2f7a42
+  leaf_hi   = #4fae5f
+  leaf_spec = #7fd48f
+  cyansoft  = #b7f4fd
+}
+
+part shadow material voidsoil {
+  polygon 6 28 12 26 20 26 26 28 20 30 12 30 abyss
+}
+
+part clump material voidpine {
+  # ONE dominant sphere for the round volume/highlight, small IRREGULAR
+  # (non-round) polygon bumps for leafy edge texture — not paired round
+  # lobes (buttocks) and not several equal spheres (grape cluster).
+  sphere 16 15 radius 11 light -1 -1 leaf_spec leaf_hi leaf_mid leaf_dark abyss
+  polygon 3 14 8 9 11 17 4 20 leaf_mid
+  polygon 2 20 7 18 9 25 3 26 leaf_dark
+  polygon 22 20 27 17 27 25 21 24 leaf_dark
+  polygon 8 3 15 2 13 8 6 7 leaf_hi
+  polygon 20 3 26 6 23 10 17 7 leaf_lit
+  cell 9 7 leaf_spec
+  cell 5 15 leaf_hi
+  cell 22 10 leaf_hi
+}
+
+part berry material cyan_glow {
+  glow radius 2
+  cell 13 14 cyansoft
+}

@@ -16,7 +16,7 @@ export default defineConfig({
   },
   webServer: {
     command: previewMode ? "npm run preview" : "npm run dev",
-    url: `${baseURL}/studio/foundry`,
+    url: `${baseURL}/studio/canvas`,
     reuseExistingServer: true,
     timeout: 120_000,
   },

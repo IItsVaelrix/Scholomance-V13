@@ -1,0 +1,49 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.volume-processor",
+  "version": "1.0.0",
+  "execution": "DESCRIPTOR",
+  "stage": "WORLD_DESCRIPTOR",
+  "scope": [
+    "ASSET"
+  ],
+  "inputs": [
+    {
+      "name": "targetId",
+      "type": "ANY",
+      "required": false,
+      "description": "Volume grid identifier"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "subsample",
+      "type": "I32",
+      "min": 1,
+      "max": 8,
+      "default": 1,
+      "description": "Voxel volume subsampling rate"
+    }
+  ],
+  "output": {
+    "type": "ANY",
+    "description": "Immutable processed voxel volume grid descriptor"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "CONSTANT",
+    "multiplier": 1,
+    "fixed": 10
+  },
+  "order": 110,
+  "relevance": {
+    "pipelines": [
+      "world-voxel"
+    ],
+    "conditions": []
+  },
+  "checksum": "9c089bb8d7bb6c8b434e09e985f97630b600453f777998535b66a2125947ae7c"
+}

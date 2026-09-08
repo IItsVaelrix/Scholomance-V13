@@ -1,0 +1,48 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.symmetry",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "SHAPE_POST",
+  "scope": [
+    "SHAPE",
+    "LAYER"
+  ],
+  "inputs": [
+    {
+      "name": "geometry",
+      "type": "SHAPE",
+      "required": true,
+      "description": "Input shape to mirror across a symmetry plane"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "axis",
+      "type": "ANY",
+      "default": "VERTICAL",
+      "description": "Symmetry axis (VERTICAL or HORIZONTAL)"
+    }
+  ],
+  "output": {
+    "type": "SHAPE",
+    "description": "Symmetrically mirrored shape geometry"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 2,
+    "fixed": 0
+  },
+  "order": 45,
+  "relevance": {
+    "pipelines": [
+      "item"
+    ],
+    "conditions": []
+  },
+  "checksum": "775e87eeaba30273d779eaaf807594bb44126213f3dbd3bcaab905b6d59b2531"
+}

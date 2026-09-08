@@ -1,0 +1,56 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.pixel-scale",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "RENDER",
+  "scope": [
+    "LAYER",
+    "ASSET"
+  ],
+  "inputs": [
+    {
+      "name": "layer",
+      "type": "LAYER",
+      "required": true,
+      "description": "Rendered layer receiving pixel-art upscaling"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "scale",
+      "type": "I32",
+      "min": 1,
+      "max": 8,
+      "default": 2,
+      "description": "Upscaling factor multiplier"
+    },
+    {
+      "name": "mode",
+      "type": "ANY",
+      "default": "xbr",
+      "description": "Upscaling algorithm mode"
+    }
+  ],
+  "output": {
+    "type": "LAYER",
+    "description": "High-resolution upscaled pixel art layer"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 4,
+    "fixed": 0
+  },
+  "order": 85,
+  "relevance": {
+    "pipelines": [
+      "image-lattice"
+    ],
+    "conditions": []
+  },
+  "checksum": "0f1f30c8aaf655825aeb41a2dbf6643e7cbf9e75234d48806797ddaf2bcb0937"
+}

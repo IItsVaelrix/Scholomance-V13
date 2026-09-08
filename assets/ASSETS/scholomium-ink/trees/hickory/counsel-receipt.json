@@ -1,0 +1,103 @@
+{
+  "contract": "SCD128-COUNSEL-v1",
+  "schemaVersion": 1,
+  "mode": "canonical",
+  "verdict": "approved",
+  "checksum128": "8148A1C23B71F137D0381B26DE6F4F41530D88341E16B22525E447FEB00AF0CC91D2B1E6DB74052C4C97CD427239D44C4B3C05396DFAE7C78994D72DE52B8F31",
+  "formDigest256": "836A386B2609F95C38439CC20A281F4FF0CA6796A6F8A4F8BE14C43DCCE0CD96",
+  "realizationDigest256": "9FF5894CB905D92D9E4DCA040815244121FF156B6FCA69D3729CD432988F1B4D",
+  "policyId": "scholomium_ink_tree_counsel_policy_v1",
+  "policyDigest256": "89040C82CAA713185FF5C7F5C54274A2427D62C49827B3D8DDE1509396AC338F",
+  "satisfiedRules": [
+    "RULE_CANOPY_EDGE_MORPHOLOGY_COMPATIBLE",
+    "RULE_VALUE_HIERARCHY_DEPTH_ADEQUATE",
+    "RULE_WORLD_FOOTPRINT_VALID"
+  ],
+  "conflicts": [],
+  "projectionDirectives": [
+    {
+      "layer": "ground_shadow",
+      "order": 5,
+      "directiveType": "render_contact_shadow",
+      "params": {
+        "footprint": "buttressed_roots",
+        "radius": 12
+      }
+    },
+    {
+      "layer": "roots_and_ground",
+      "order": 10,
+      "directiveType": "render_roots",
+      "params": {
+        "style": "buttressed_roots",
+        "spread": 12
+      }
+    },
+    {
+      "layer": "trunk",
+      "order": 20,
+      "directiveType": "render_trunk_column",
+      "params": {
+        "axis": "upward_ascending",
+        "taperRatio": {
+          "numerator": "1",
+          "denominator": "2"
+        },
+        "barkMaterial": "hickory_striated"
+      }
+    },
+    {
+      "layer": "primary_branches",
+      "order": 30,
+      "directiveType": "render_primary_limbs",
+      "params": {
+        "branchingOrder": "upward_ascending",
+        "reach": 22
+      }
+    },
+    {
+      "layer": "secondary_branches",
+      "order": 40,
+      "directiveType": "render_secondary_twigs",
+      "params": {
+        "voidFrequency": "moderate_gaps"
+      }
+    },
+    {
+      "layer": "canopy_masses",
+      "order": 50,
+      "directiveType": "render_canopy_volumes",
+      "params": {
+        "envelope": "oval_columnar",
+        "clusterStyle": "foliage_masses",
+        "valueBands": 4
+      }
+    },
+    {
+      "layer": "foliage_edges",
+      "order": 60,
+      "directiveType": "render_silhouette_fringe",
+      "params": {
+        "edgeStyle": "crisp_accent_serrate",
+        "outlineMode": "crisp_accent_serrate"
+      }
+    },
+    {
+      "layer": "surface_detail",
+      "order": 70,
+      "directiveType": "render_bark_and_leaf_marks",
+      "params": {
+        "variationMode": "subtle_weathering"
+      }
+    },
+    {
+      "layer": "highlights",
+      "order": 80,
+      "directiveType": "render_glints_and_specular",
+      "params": {
+        "lightLaw": "upper_left"
+      }
+    }
+  ],
+  "receiptDigest256": "FF5B3943AD043591A156FA2A04BFBB9DC7E59B5F5EAE850EAA47AE9CE53E3B51"
+}

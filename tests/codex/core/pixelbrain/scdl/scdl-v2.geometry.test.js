@@ -173,6 +173,59 @@ describe('SCDL v2 geometry primitives and bounds', () => {
     expect(bounds.height).toEqual(makeRational(3));
   });
 
+  it('computes exact tight bounds for SVG path arc (A) commands', () => {
+    // Semicircle with sweepFlag = 1 (chord 100, radius 50)
+    const arcPath = createPath({ d: 'M 0,0 A 50,50 0 0,1 100,0' });
+    const arcBounds = computeBounds(arcPath);
+    expect(arcBounds.x).toEqual(makeRational(0));
+    expect(arcBounds.y).toEqual(makeRational(-50));
+    expect(arcBounds.width).toEqual(makeRational(100));
+    expect(arcBounds.height).toEqual(makeRational(50));
+
+    // Semicircle with sweepFlag = 0
+    const invArcPath = createPath({ d: 'M 0,0 A 50,50 0 0,0 100,0' });
+    const invBounds = computeBounds(invArcPath);
+    expect(invBounds.x).toEqual(makeRational(0));
+    expect(invBounds.y).toEqual(makeRational(0));
+    expect(invBounds.width).toEqual(makeRational(100));
+    expect(invBounds.height).toEqual(makeRational(50));
+
+    // Minor arc vs major arc
+    const minorArc = createPath({ d: 'M 0,0 A 50,50 0 0,1 50,0' });
+    const minorBounds = computeBounds(minorArc);
+    const minorY = Number(minorBounds.y.numerator) / Number(minorBounds.y.denominator);
+    expect(minorBounds.x).toEqual(makeRational(0));
+    expect(minorBounds.width).toEqual(makeRational(50));
+    expect(minorY).toBeCloseTo(-6.6987, 3);
+
+    const majorArc = createPath({ d: 'M 0,0 A 50,50 0 1,1 50,0' });
+    const majorBounds = computeBounds(majorArc);
+    const majorX = Number(majorBounds.x.numerator) / Number(majorBounds.x.denominator);
+    const majorY = Number(majorBounds.y.numerator) / Number(majorBounds.y.denominator);
+    expect(majorX).toBeCloseTo(-25, 3);
+    expect(majorY).toBeCloseTo(-93.301, 3);
+
+    // Rotated elliptical arc
+    const rotArc = createPath({ d: 'M 10,20 A 30,50 45 0,1 80,90' });
+    const rotBounds = computeBounds(rotArc);
+    const rotX = Number(rotBounds.x.numerator) / Number(rotBounds.x.denominator);
+    const rotY = Number(rotBounds.y.numerator) / Number(rotBounds.y.denominator);
+    const rotW = Number(rotBounds.width.numerator) / Number(rotBounds.width.denominator);
+    const rotH = Number(rotBounds.height.numerator) / Number(rotBounds.height.denominator);
+    expect(rotX).toBeCloseTo(10, 1);
+    expect(rotY).toBeCloseTo(-13.03, 1);
+    expect(rotW).toBeCloseTo(103.03, 1);
+    expect(rotH).toBeCloseTo(103.03, 1);
+
+    // Degenerate zero-radius arc (falls back to straight segment endpoints)
+    const degenPath = createPath({ d: 'M 10,10 A 0,0 0 0,1 20,20' });
+    const degenBounds = computeBounds(degenPath);
+    expect(degenBounds.x).toEqual(makeRational(10));
+    expect(degenBounds.y).toEqual(makeRational(10));
+    expect(degenBounds.width).toEqual(makeRational(10));
+    expect(degenBounds.height).toEqual(makeRational(10));
+  });
+
   it('rejects degenerate primitive parameters with structured errors', () => {
     expect(() => createRing({
       center: { x: r0, y: r0 },

@@ -1,0 +1,124 @@
+{
+  "contract": "SCD128-FORM64-v1",
+  "schemaVersion": 1,
+  "adapterFamily": "tree",
+  "checksum64": "8148A1C23B71F137D0381B26DE6F4F41530D88341E16B22525E447FEB00AF0CC",
+  "digest256": "836A386B2609F95C38439CC20A281F4FF0CA6796A6F8A4F8BE14C43DCCE0CD96",
+  "slots": [
+    {
+      "slot": "ASSET_CLASS",
+      "position": 0,
+      "canonicalCategory": "hickory",
+      "parameters": {
+        "archetype": "hickory",
+        "asset_id": "scholomium_master_hickory"
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:asset_class",
+      "digest256": "48A1C2680C3CD79604E0E38BC71658F28F2158B306916D448E63911E80407DAC",
+      "blockHex": "8148A1C2"
+    },
+    {
+      "slot": "SCALE_FRAME",
+      "position": 1,
+      "canonicalCategory": "dimetric_2_5d",
+      "parameters": {
+        "canvas_width": 32,
+        "canvas_height": 52
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:scale_frame",
+      "digest256": "3B71F137E6AD5F6BFD036E4BA21236C658628E1F7DEE5BADADE5A6E71C0EF6AD",
+      "blockHex": "3B71F137"
+    },
+    {
+      "slot": "SILHOUETTE",
+      "position": 2,
+      "canonicalCategory": "oval_columnar",
+      "parameters": {
+        "occupied_ratio": {
+          "numerator": "2",
+          "denominator": "3"
+        }
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:silhouette",
+      "digest256": "D0381B2624179C8F537ED8FC5FC655B4C866B0ECE891F38A67645A50D4BC88A0",
+      "blockHex": "D0381B26"
+    },
+    {
+      "slot": "STRUCTURAL_SKELETON",
+      "position": 3,
+      "canonicalCategory": "upward_ascending",
+      "parameters": {
+        "primary_limbs": 3,
+        "order": 2
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:structural_skeleton",
+      "digest256": "DE6F4F41A132F1724AAFCEEDB15AABA21E484209B6CF40913605E6385C356F15",
+      "blockHex": "DE6F4F41"
+    },
+    {
+      "slot": "PROPORTION",
+      "position": 4,
+      "canonicalCategory": "tall_slender",
+      "parameters": {
+        "trunk_ratio": {
+          "numerator": "1",
+          "denominator": "2"
+        },
+        "crown_width": 22
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:proportion",
+      "digest256": "530D8834F12A6FA05A1417B2F36C634F68B963CBD456F811F931A0F2CA7FE13F",
+      "blockHex": "530D8834"
+    },
+    {
+      "slot": "MASS_DISTRIBUTION",
+      "position": 5,
+      "canonicalCategory": "mid_canopy",
+      "parameters": {
+        "center_y": 18
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:mass_distribution",
+      "digest256": "1E16B225CC082CA8F612C0A653925DB89D4C513F73C6E5DB8719CD0D0170890E",
+      "blockHex": "1E16B225"
+    },
+    {
+      "slot": "NEGATIVE_SPACE",
+      "position": 6,
+      "canonicalCategory": "moderate_gaps",
+      "parameters": {
+        "void_pct": 18
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:negative_space",
+      "digest256": "25E447FE31650164C5BA866F75D63B6D1AB0659AB7695A16967AC1F3A0ADF3EE",
+      "blockHex": "25E447FE"
+    },
+    {
+      "slot": "WORLD_FOOTPRINT",
+      "position": 7,
+      "canonicalCategory": "buttressed_roots",
+      "parameters": {
+        "root_spread": 12
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:world_footprint",
+      "digest256": "B00AF0CC9D8932EF52EC01CEC58362CDF8F9DDDF4B052724308D0381C6F684B2",
+      "blockHex": "B00AF0CC"
+    }
+  ],
+  "evidenceDigest": "EVIDENCE_FORM_SCHOLOMIUM_MASTER_HICKORY"
+}

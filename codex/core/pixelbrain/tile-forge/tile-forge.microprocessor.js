@@ -11,7 +11,7 @@ export class TileForgeMicroprocessor {
     this.version = version;
   }
 
-  run({ intent, input, context }) {
+  run({ intent: _intent, input: _input, context: _context }) {
     throw new Error("Microprocessor must implement run().");
   }
 }

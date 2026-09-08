@@ -1,0 +1,64 @@
+{
+  "adapterFamily": "tree",
+  "evidenceDigest": "EVIDENCE_FORM_SCHOLOMIUM_MASTER_CEDAR",
+  "slots": {
+    "ASSET_CLASS": {
+      "canonicalCategory": "cedar",
+      "parameters": {
+        "archetype": "cedar",
+        "asset_id": "scholomium_master_cedar"
+      }
+    },
+    "SCALE_FRAME": {
+      "canonicalCategory": "dimetric_2_5d",
+      "parameters": {
+        "canvas_width": 48,
+        "canvas_height": 64
+      }
+    },
+    "SILHOUETTE": {
+      "canonicalCategory": "horizontal_terraced",
+      "parameters": {
+        "occupied_ratio": {
+          "numerator": "2",
+          "denominator": "3"
+        }
+      }
+    },
+    "STRUCTURAL_SKELETON": {
+      "canonicalCategory": "stepped_horizontal",
+      "parameters": {
+        "primary_limbs": 3,
+        "order": 2
+      }
+    },
+    "PROPORTION": {
+      "canonicalCategory": "balanced",
+      "parameters": {
+        "trunk_ratio": {
+          "numerator": "1",
+          "denominator": "2"
+        },
+        "crown_width": 34
+      }
+    },
+    "MASS_DISTRIBUTION": {
+      "canonicalCategory": "mid_canopy",
+      "parameters": {
+        "center_y": 22
+      }
+    },
+    "NEGATIVE_SPACE": {
+      "canonicalCategory": "moderate_gaps",
+      "parameters": {
+        "void_pct": 18
+      }
+    },
+    "WORLD_FOOTPRINT": {
+      "canonicalCategory": "buttressed_roots",
+      "parameters": {
+        "root_spread": 12
+      }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.material-resolver",
+  "version": "1.0.0",
+  "execution": "DESCRIPTOR",
+  "stage": "WORLD_DESCRIPTOR",
+  "scope": [
+    "ASSET"
+  ],
+  "inputs": [
+    {
+      "name": "targetId",
+      "type": "ANY",
+      "required": false,
+      "description": "Target material identifier"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "fallback",
+      "type": "MATERIAL",
+      "default": "void",
+      "description": "Fallback material palette identifier"
+    }
+  ],
+  "output": {
+    "type": "ANY",
+    "description": "Immutable material resolution table descriptor"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "CONSTANT",
+    "multiplier": 1,
+    "fixed": 5
+  },
+  "order": 107,
+  "relevance": {
+    "pipelines": [
+      "world-voxel"
+    ],
+    "conditions": []
+  },
+  "checksum": "8b861486e8cb38a4a1c5023585f32f79512bdc266ea18577cb62fc4f3e8f2ebd"
+}

@@ -41,6 +41,54 @@ export function lerpColor(c1, c2, t) {
   ];
 }
 
+// ART-02: Face-semantic lighting grammars
+export const ISOMETRIC_FACE_NORMALS = Object.freeze({
+  TOP: Object.freeze([0, -0.7071, 0.7071]),
+  SW_LIT: Object.freeze([-0.7071, 0.5, 0.5]),
+  SE_SHADOW: Object.freeze([0.7071, 0.5, 0.5]),
+});
+
+export function computeFaceLightIntensity(faceName, lightDir = [-0.65, -0.75, 0.5]) {
+  const normal = ISOMETRIC_FACE_NORMALS[faceName] || ISOMETRIC_FACE_NORMALS.TOP;
+  const dot = normal[0] * lightDir[0] + normal[1] * lightDir[1] + normal[2] * lightDir[2];
+  const ambient = 0.28;
+  const key = 0.72;
+  return Math.max(0.1, Math.min(1.0, ambient + key * Math.max(0, dot)));
+}
+
+// ART-03: Semantic color roles & palette transmutation
+export const SEMANTIC_COLOR_ROLES = Object.freeze([
+  'surface',
+  'flank_lit',
+  'flank_shadow',
+  'strata',
+  'mineral',
+  'root',
+  'glint',
+  'bedrock',
+]);
+
+export function transmutePalette(sourcePalette, targetPaletteFamily) {
+  const normKey = String(targetPaletteFamily || '').toLowerCase();
+  const targetFamily = TILE_FORGE_PALETTE_FAMILIES[targetPaletteFamily] ||
+    TILE_FORGE_PALETTE_FAMILIES[`scholomance_${normKey}`] ||
+    Object.values(TILE_FORGE_PALETTE_FAMILIES).find((f) => (f.name || '').toLowerCase().includes(normKey));
+  if (!targetFamily) return sourcePalette;
+  return {
+    ...sourcePalette,
+    family: targetPaletteFamily,
+    colors: getTileForgePaletteColors(targetFamily),
+    roles: targetFamily.roles || {},
+  };
+}
+
+// ART-05: Explicit pixel style profiles
+export const PIXEL_STYLE_PROFILES = Object.freeze({
+  STRICT_PIXEL: 'STRICT_PIXEL',
+  BAYER_DITHER: 'BAYER_DITHER',
+  SMOOTH_AA: 'SMOOTH_AA',
+});
+
 const SUNLIT_GLADE_COLORS = Object.freeze([
   '#17241B', '#223226', '#2C3E30', '#354A38',
   '#3F5940', '#4B6847', '#58794E', '#678B55',

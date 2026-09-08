@@ -1,0 +1,49 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.biome-coherence",
+  "version": "1.0.0",
+  "execution": "DESCRIPTOR",
+  "stage": "WORLD_DESCRIPTOR",
+  "scope": [
+    "ASSET"
+  ],
+  "inputs": [
+    {
+      "name": "targetId",
+      "type": "ANY",
+      "required": false,
+      "description": "Target asset or voxel region identifier"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "coherenceThreshold",
+      "type": "FIXED",
+      "min": 0,
+      "max": 1,
+      "default": 0.5,
+      "description": "Biome boundary coherence threshold"
+    }
+  ],
+  "output": {
+    "type": "ANY",
+    "description": "Immutable world biome coherence descriptor"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "CONSTANT",
+    "multiplier": 1,
+    "fixed": 10
+  },
+  "order": 100,
+  "relevance": {
+    "pipelines": [
+      "world-voxel"
+    ],
+    "conditions": []
+  },
+  "checksum": "5bedaf2afc84e85aa314e8ea2ead9429751853dacad6fa465d064a8836ccff5d"
+}

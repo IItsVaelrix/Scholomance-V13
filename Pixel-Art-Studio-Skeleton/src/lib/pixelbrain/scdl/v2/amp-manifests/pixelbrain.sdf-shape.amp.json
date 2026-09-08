@@ -1,0 +1,49 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.sdf-shape",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "SHAPE_POST",
+  "scope": [
+    "SHAPE"
+  ],
+  "inputs": [
+    {
+      "name": "geometry",
+      "type": "SHAPE",
+      "required": true,
+      "description": "Input shape or SDF primitive descriptor"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "threshold",
+      "type": "FIXED",
+      "min": -1,
+      "max": 1,
+      "default": 0,
+      "description": "SDF boundary isovalue threshold"
+    }
+  ],
+  "output": {
+    "type": "SHAPE",
+    "description": "Quantized shape geometry sampled from signed distance field"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 4,
+    "fixed": 0
+  },
+  "order": 35,
+  "relevance": {
+    "pipelines": [
+      "item"
+    ],
+    "conditions": []
+  },
+  "checksum": "1ab69f52d1f868434814df90bc21e135698d183b1f6c0b4bf0b28a9bbf510ff2"
+}

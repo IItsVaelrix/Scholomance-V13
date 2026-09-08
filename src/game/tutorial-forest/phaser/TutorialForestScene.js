@@ -80,6 +80,7 @@ export default function createTutorialForestScene(phaserRuntime) {
 
         // 4. Render World Elements
         this.renderGroundRegion();
+        this.renderLotusPond();
         this.renderEnvironmentActors();
         this.renderPlayer();
 
@@ -237,14 +238,16 @@ export default function createTutorialForestScene(phaserRuntime) {
         const pt = this.toIso(w.tx, w.ty, 0);
         const depth = pt.y + 1;
 
-        // Base water tile image (deep spring or shore transition)
-        const waterImg = this.add.image(pt.x, pt.y, w.terrain || 'water_deep_spring');
-        waterImg.setOrigin(0.5, 0.5);
-        waterImg.setDepth(depth);
-        this.waterSprites.push(waterImg);
+        // Base water tile image (deep spring or shore transition) when not using continuous ground fabric
+        if (!this.groundRegionSprite) {
+          const waterImg = this.add.image(pt.x, pt.y, w.terrain || 'water_deep_spring');
+          waterImg.setOrigin(0.5, 0.5);
+          waterImg.setDepth(depth);
+          this.waterSprites.push(waterImg);
+        }
 
         // WebGL Real-Time Water Caustic Shader overlay for deep water
-        if (this.shaderCausticsEnabled && w.terrain === 'water_deep_spring') {
+        if (this.shaderCausticsEnabled && (!w.terrain || w.terrain === 'water_deep_spring' || w.terrain.includes('water'))) {
           const causticShader = createWaterCausticShader(this, pt.x, pt.y, 80, 40);
           if (causticShader) {
             causticShader.setDepth(depth + 0.5);

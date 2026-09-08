@@ -1,0 +1,73 @@
+# void_grove_tree — wall/obstacle sprite for the top-down grove tileset.
+# 32x52, footprint is the bottom 32x32 (trunk base); canopy overhangs upward
+# into the tile above, the standard 2D top-down RPG tree convention (Zelda/
+# Stardew-style: mostly top-down world, objects drawn with enough front bias
+# to read as themselves). Light law: upper-left (-1,-1).
+#
+# NOTE: the `ellipse` primitive renders as an unfilled black-stroke outline
+# only (confirmed by isolated test, not this file's fault) — ground-contact
+# shadows here use a filled `polygon` oval approximation instead.
+asset void_grove_tree canvas 32x52
+
+palette {
+  abyss    = #04060e
+  leaf_dark = #0a2818
+  leaf_base = #123a22
+  leaf_mid  = #1f5c32
+  leaf_lit  = #2f7a42
+  leaf_hi   = #4fae5f
+  leaf_spec = #7fd48f
+  bark_dark = #241408
+  bark_base = #3a2410
+  bark_mid  = #4e3018
+  bark_lit  = #6b4526
+  cyansoft  = #b7f4fd
+  cyanhot   = #67e8f9
+}
+
+# ── ground contact shadow ─────────────────────────────────────────────────
+part shadow material voidsoil {
+  polygon 6 49 12 47 20 47 26 49 20 51 12 51 abyss
+}
+
+# ── trunk ─────────────────────────────────────────────────────────────────
+part trunk material oak_bark {
+  polygon 13 36 19 36 20 50 12 50 bark_base
+  polygon 13 36 16 36 16 50 13 50 bark_lit
+  polygon 16 36 19 36 20 50 16 50 bark_dark
+  line 14 41 18 41 bark_mid
+  line 13 45 19 45 bark_mid
+  cell 15 39 bark_lit
+}
+
+# ── canopy — ONE dominant sphere carries the round volume/highlight; small
+#    IRREGULAR (non-round) polygon bumps break up the silhouette edge for
+#    leafy texture. Two lessons learned the hard way, both avoided here:
+#    (1) two mirrored round lobes flanking the trunk reads as buttocks, not
+#    foliage; (2) several same-size independent spheres reads as a bunch of
+#    grapes, not a canopy. A single sphere plus jagged (not round) edge
+#    texture sidesteps both.
+part canopy material voidpine {
+  sphere 16 19 radius 15 light -1 -1 leaf_spec leaf_hi leaf_mid leaf_dark abyss
+  # jagged leaf-cluster bumps around the silhouette — irregular polygons,
+  # not circles, each a different size/shape so none reads as a paired lobe
+  polygon 3 20 8 14 12 22 4 26 leaf_mid
+  polygon 1 26 6 24 8 32 2 33 leaf_dark
+  polygon 27 24 32 20 32 30 26 30 leaf_dark
+  polygon 9 4 16 2 14 9 6 8 leaf_hi
+  polygon 22 3 29 6 26 11 20 8 leaf_lit
+  polygon 30 12 32 16 27 18 26 13 leaf_mid
+  # individual leaf-cluster glints on the lit (upper-left) side
+  cell 10 9 leaf_spec
+  cell 13 15 leaf_hi
+  cell 6 20 leaf_spec
+  cell 22 9 leaf_hi
+}
+
+# ── void bloom — faint bioluminescent berries in the foliage ─────────────
+part berries material cyan_glow {
+  glow radius 2
+  cell 12 24 cyansoft
+  cell 23 19 cyanhot
+  cell 9 14 cyansoft
+}

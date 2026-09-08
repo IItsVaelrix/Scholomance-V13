@@ -1,8 +1,29 @@
 import { useEffect, useRef } from "react";
-import { Activity, FlaskConical, Leaf, Zap } from "lucide-react";
-import { PHASE_A_STUDIO_TABS, normalizeStudioTab } from "./studio-tabs.js";
+import {
+  Activity,
+  Compass,
+  FlaskConical,
+  GraduationCap,
+  Layers,
+  Leaf,
+  Library,
+  PenTool,
+  Sparkles,
+  Zap,
+} from "lucide-react";
+import { STUDIO_TABS, normalizeStudioTab } from "./studio-tabs.js";
 
-const TAB_ICONS = { foundry: Leaf, amps: Zap, mutations: FlaskConical, diagnostics: Activity };
+const TAB_ICONS = {
+  canvas: PenTool,
+  blueprint: Compass,
+  foundry: Leaf,
+  amps: Zap,
+  mutations: FlaskConical,
+  finish: Sparkles,
+  mentor: GraduationCap,
+  library: Library,
+  diagnostics: Activity,
+};
 
 type StudioTabBarProps = {
   activeTab: string;
@@ -14,13 +35,13 @@ export function StudioTabBar({ activeTab, onSelect }: StudioTabBarProps) {
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   useEffect(() => {
-    const index = PHASE_A_STUDIO_TABS.findIndex((tab) => tab.id === selected);
+    const index = STUDIO_TABS.findIndex((tab) => tab.id === selected);
     tabRefs.current[index]?.scrollIntoView({ block: "nearest", inline: "center" });
   }, [selected]);
 
   const selectAt = (index: number) => {
-    const wrapped = (index + PHASE_A_STUDIO_TABS.length) % PHASE_A_STUDIO_TABS.length;
-    const next = PHASE_A_STUDIO_TABS[wrapped]!;
+    const wrapped = (index + STUDIO_TABS.length) % STUDIO_TABS.length;
+    const next = STUDIO_TABS[wrapped]!;
     onSelect(next.id);
     tabRefs.current[wrapped]?.focus();
   };
@@ -37,15 +58,15 @@ export function StudioTabBar({ activeTab, onSelect }: StudioTabBarProps) {
       selectAt(0);
     } else if (event.key === "End") {
       event.preventDefault();
-      selectAt(PHASE_A_STUDIO_TABS.length - 1);
+      selectAt(STUDIO_TABS.length - 1);
     }
   };
 
   return (
     <nav className="pbs-tabs" aria-label="PixelBrain Studio workspaces">
       <div className="pbs-tab-scroll" role="tablist" aria-orientation="horizontal">
-        {PHASE_A_STUDIO_TABS.map((tab, index) => {
-          const Icon = TAB_ICONS[tab.id as keyof typeof TAB_ICONS];
+        {STUDIO_TABS.map((tab, index) => {
+          const Icon = TAB_ICONS[tab.id as keyof typeof TAB_ICONS] ?? Layers;
           const isSelected = tab.id === selected;
           return (
             <button

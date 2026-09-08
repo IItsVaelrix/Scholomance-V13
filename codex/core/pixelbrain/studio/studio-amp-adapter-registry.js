@@ -11,6 +11,7 @@ export const STUDIO_ADAPTER_DEFINITIONS = Object.freeze({
   'fibonacci-field.microprocessor': { load: () => import('../amps/fibonacci/fibonacci-field.microprocessor.js'), entry: 'FibonacciFieldMicroprocessor', mode: 'class' },
   'fibonacci-seed-field': { load: () => import('../amps/fibonacci/fibonacci-seed-field.js'), entry: 'generateFibonacciSeedField', mode: 'support' },
   'iso-tile-geometry.microprocessor': { load: () => import('../amps/geometry/processors/iso-tile-geometry.microprocessor.js'), entry: 'IsoTileGeometryMicroprocessor', mode: 'class' },
+  'tile-shape.microprocessor': { load: () => import('../amps/geometry/processors/tile-shape.microprocessor.js'), entry: 'TileShapeMicroprocessor', mode: 'class' },
   'tile-socket.microprocessor': { load: () => import('../amps/geometry/processors/tile-socket.microprocessor.js'), entry: 'TileSocketMicroprocessor', mode: 'class' },
   'deterministic-noise': { load: () => import('../amps/noise/deterministic-noise.js'), entry: 'createSeededRng', mode: 'support' },
   'noise-mask.microprocessor': { load: () => import('../amps/noise/noise-mask.microprocessor.js'), entry: 'generateNoiseMask' },

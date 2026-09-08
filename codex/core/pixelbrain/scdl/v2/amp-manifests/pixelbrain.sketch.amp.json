@@ -1,0 +1,50 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.sketch",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "CONSTRUCTION",
+  "scope": [
+    "SHAPE",
+    "ASSET"
+  ],
+  "inputs": [
+    {
+      "name": "geometry",
+      "type": "SHAPE",
+      "required": true,
+      "description": "Raw silhouette or construction geometry"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "bands",
+      "type": "I32",
+      "min": 2,
+      "max": 8,
+      "default": 4,
+      "description": "Number of auto-shaded contour bands"
+    }
+  ],
+  "output": {
+    "type": "SHAPE",
+    "description": "Auto-shaded template shape with construction guidelines"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 3,
+    "fixed": 0
+  },
+  "order": 20,
+  "relevance": {
+    "pipelines": [
+      "item"
+    ],
+    "conditions": []
+  },
+  "checksum": "30fd0fcb9bb9324f83a5d0895d6537ceb7edb0bd620f2f3badbb36f53835190b"
+}

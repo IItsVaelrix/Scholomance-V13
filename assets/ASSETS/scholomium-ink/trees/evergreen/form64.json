@@ -1,0 +1,124 @@
+{
+  "contract": "SCD128-FORM64-v1",
+  "schemaVersion": 1,
+  "adapterFamily": "tree",
+  "checksum64": "81B2D1E33B71F137C2D461C85B374EE679229C1F1E16B22525E447FEB00AF0CC",
+  "digest256": "E254CD686F1EC715FBF2AFF452671C2BA30F9F777FE66E15974324B5A1185363",
+  "slots": [
+    {
+      "slot": "ASSET_CLASS",
+      "position": 0,
+      "canonicalCategory": "evergreen",
+      "parameters": {
+        "archetype": "evergreen",
+        "asset_id": "scholomium_master_evergreen"
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:asset_class",
+      "digest256": "B2D1E3FDFB23498A83AF17D32D5624FF11C3A601DBC0C4AC1F3C0887ED1EF0DC",
+      "blockHex": "81B2D1E3"
+    },
+    {
+      "slot": "SCALE_FRAME",
+      "position": 1,
+      "canonicalCategory": "dimetric_2_5d",
+      "parameters": {
+        "canvas_width": 32,
+        "canvas_height": 52
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:scale_frame",
+      "digest256": "3B71F137E6AD5F6BFD036E4BA21236C658628E1F7DEE5BADADE5A6E71C0EF6AD",
+      "blockHex": "3B71F137"
+    },
+    {
+      "slot": "SILHOUETTE",
+      "position": 2,
+      "canonicalCategory": "dense_conical",
+      "parameters": {
+        "occupied_ratio": {
+          "numerator": "2",
+          "denominator": "3"
+        }
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:silhouette",
+      "digest256": "C2D461C89399DBA544805415FE0E5A121B34DEBA6A4AA3C6836AD9561ADAECF0",
+      "blockHex": "C2D461C8"
+    },
+    {
+      "slot": "STRUCTURAL_SKELETON",
+      "position": 3,
+      "canonicalCategory": "continuous_conical",
+      "parameters": {
+        "primary_limbs": 3,
+        "order": 2
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:structural_skeleton",
+      "digest256": "5B374EE6E9736B998455DCD44F98FA76559D9E0338A760D0F68D3D7ADBCAD841",
+      "blockHex": "5B374EE6"
+    },
+    {
+      "slot": "PROPORTION",
+      "position": 4,
+      "canonicalCategory": "balanced",
+      "parameters": {
+        "trunk_ratio": {
+          "numerator": "1",
+          "denominator": "2"
+        },
+        "crown_width": 22
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:proportion",
+      "digest256": "79229C1F54DDD0D13E02113FB32F79F381054B0B153EA3FC763E20D1541E6E78",
+      "blockHex": "79229C1F"
+    },
+    {
+      "slot": "MASS_DISTRIBUTION",
+      "position": 5,
+      "canonicalCategory": "mid_canopy",
+      "parameters": {
+        "center_y": 18
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:mass_distribution",
+      "digest256": "1E16B225CC082CA8F612C0A653925DB89D4C513F73C6E5DB8719CD0D0170890E",
+      "blockHex": "1E16B225"
+    },
+    {
+      "slot": "NEGATIVE_SPACE",
+      "position": 6,
+      "canonicalCategory": "moderate_gaps",
+      "parameters": {
+        "void_pct": 18
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:negative_space",
+      "digest256": "25E447FE31650164C5BA866F75D63B6D1AB0659AB7695A16967AC1F3A0ADF3EE",
+      "blockHex": "25E447FE"
+    },
+    {
+      "slot": "WORLD_FOOTPRINT",
+      "position": 7,
+      "canonicalCategory": "buttressed_roots",
+      "parameters": {
+        "root_spread": 12
+      },
+      "evidenceRefs": [],
+      "confidence": "authored",
+      "canonicalDerivation": "tree:world_footprint",
+      "digest256": "B00AF0CC9D8932EF52EC01CEC58362CDF8F9DDDF4B052724308D0381C6F684B2",
+      "blockHex": "B00AF0CC"
+    }
+  ],
+  "evidenceDigest": "EVIDENCE_FORM_SCHOLOMIUM_MASTER_EVERGREEN"
+}

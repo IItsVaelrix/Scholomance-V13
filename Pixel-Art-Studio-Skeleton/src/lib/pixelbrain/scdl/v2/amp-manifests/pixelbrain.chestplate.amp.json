@@ -1,0 +1,62 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.chestplate",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "SHAPE_POST",
+  "scope": [
+    "SHAPE",
+    "LAYER"
+  ],
+  "inputs": [
+    {
+      "name": "geometry",
+      "type": "SHAPE",
+      "required": true,
+      "description": "Chestplate base torso geometry"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "tier",
+      "type": "I32",
+      "min": 1,
+      "max": 5,
+      "default": 1,
+      "description": "Armor tier level"
+    },
+    {
+      "name": "profile",
+      "type": "ANY",
+      "default": "armor.chestplate",
+      "description": "Armor profile identifier"
+    }
+  ],
+  "output": {
+    "type": "SHAPE",
+    "description": "Structured chestplate geometry with torso volume and rim slots"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 3,
+    "fixed": 0
+  },
+  "order": 41,
+  "relevance": {
+    "pipelines": [
+      "item"
+    ],
+    "conditions": [
+      {
+        "field": "archetype",
+        "op": "includes",
+        "value": "chestplate"
+      }
+    ]
+  },
+  "checksum": "f5aa1f6e71c309280d6c3db0208748cd0c0485b1655d4352a0e654ccc1f6f91c"
+}

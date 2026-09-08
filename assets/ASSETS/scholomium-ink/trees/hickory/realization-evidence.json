@@ -1,0 +1,56 @@
+{
+  "adapterFamily": "tree",
+  "evidenceDigest": "EVIDENCE_REAL_SCHOLOMIUM_MASTER_HICKORY",
+  "slots": {
+    "PIXEL_DENSITY": {
+      "canonicalCategory": "res_32x52",
+      "parameters": {
+        "cluster_quantum": 1
+      }
+    },
+    "EDGE_LANGUAGE": {
+      "canonicalCategory": "crisp_accent_serrate",
+      "parameters": {
+        "outline_weight": 1
+      }
+    },
+    "CLUSTER_RHYTHM": {
+      "canonicalCategory": "foliage_masses",
+      "parameters": {
+        "max_isolated_cells": 2
+      }
+    },
+    "VALUE_HIERARCHY": {
+      "canonicalCategory": "bands_4",
+      "parameters": {
+        "value_bands": 4
+      }
+    },
+    "MATERIAL_LANGUAGE": {
+      "canonicalCategory": "compound_leaves",
+      "parameters": {
+        "bark_material": "hickory_striated",
+        "foliage_material": "compound_leaves"
+      }
+    },
+    "PALETTE_LOGIC": {
+      "canonicalCategory": "olive_green",
+      "parameters": {
+        "steps": 4
+      }
+    },
+    "LIGHT_RESPONSE": {
+      "canonicalCategory": "upper_left",
+      "parameters": {
+        "light_x": -1,
+        "light_y": -1
+      }
+    },
+    "SURFACE_VARIATION": {
+      "canonicalCategory": "subtle_weathering",
+      "parameters": {
+        "variation_pct": 5
+      }
+    }
+  }
+}

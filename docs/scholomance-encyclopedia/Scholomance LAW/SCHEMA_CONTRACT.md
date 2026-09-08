@@ -7,7 +7,7 @@
 
 ## Living Document - Owned by Codex, Read by All Agents
 
-**Version: 1.50** | Last updated: 2026-09-05
+**Version: 1.51** | Last updated: 2026-09-07
 
 > Bump the version on every schema change.
 > Notify Claude for UI-consumed field changes.
@@ -16,6 +16,79 @@
 ---
 
 ## SCHEMA CHANGE NOTICE
+
+- Schema: Scholomium Ink SCD128 Dual-Witness Art Intelligence & Seven-Tree Laboratory Contracts
+- Version: 1.50 -> 1.51
+- Date: 2026-09-07
+- Changed fields: registered additive, frozen `SCD128-FORM64-v1`, `SCD128-REALIZATION64-v1`,
+  `SCD128-ART-v1`, `SCD128-COUNSEL-v1`, `SCD128-CORPUS-LEDGER-v1`, and `SCD128-ADMISSION-v1`.
+- Breaking: no; existing SCD64 wire contracts, diagnostic, ART, MEMORY, and NAV domains remain untouched.
+- Owner: Codex, with Angel's implementation authorization.
+- Claude impact: Any later Studio UI surface interacts through the browser-safe facade; no direct core imports.
+- Gemini impact: Implements deterministic analyzers, pure Lawyer adjudication, Tree AMP derivation, test battery, and CI gates.
+
+### SCD128-FORM64-v1
+
+```ts
+interface SCD128SlotRecordV1 {
+  slot: string;
+  position: number;                 // 0..7 within its own bank
+  canonicalCategory: string;        // allow-listed family vocabulary
+  parameters: Record<string, ExactValue>;
+  evidenceRefs: string[];           // project-local, content-addressed evidence
+  confidence: "measured" | "authored" | "inferred" | "unbound";
+  canonicalDerivation: string;
+  digest256: string;                // full uppercase SHA-256 hex
+  blockHex: string;                 // 8-char wire block (slot 0 starts with version prefix)
+}
+
+interface SCD128BankPacketV1 {
+  contract: "SCD128-FORM64-v1" | "SCD128-REALIZATION64-v1";
+  schemaVersion: 1;
+  adapterFamily: string;            // e.g. "tree"
+  checksum64: string;               // exactly 64 uppercase hex characters (8 blocks)
+  digest256: string;
+  slots: readonly SCD128SlotRecordV1[]; // exactly 8 ordered slots
+  evidenceDigest: string;
+}
+```
+
+### SCD128-ART-v1
+
+```ts
+interface SCD128ArtPacketV1 {       // emitted only by the Lawyer
+  contract: "SCD128-ART-v1";
+  schemaVersion: 1;
+  checksum128: string;              // form.checksum64 + realization.checksum64
+  form: SCD128BankPacketV1;
+  realization: SCD128BankPacketV1;
+  sourceProvenance: ScholomiumInkProvenanceV1;
+}
+```
+
+### SCD128-COUNSEL-v1
+
+```ts
+interface SCD128CounselReceiptV1 {
+  contract: "SCD128-COUNSEL-v1";
+  schemaVersion: 1;
+  mode: "canonical" | "laboratory";
+  verdict: "approved" | "quarantined";
+  checksum128: string;
+  formDigest256: string;
+  realizationDigest256: string;
+  policyId: string;
+  policyDigest256: string;
+  satisfiedRules: readonly string[];
+  conflicts: readonly SCD128CounselConflictV1[];
+  projectionDirectives: readonly SCD128ProjectionDirectiveV1[];
+  receiptDigest256: string;
+}
+```
+
+---
+
+## PREVIOUS SCHEMA CHANGE NOTICE
 
 - Schema: PixelBrain SWARD Studio execution contracts
 - Version: 1.49 -> 1.50

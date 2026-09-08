@@ -58,10 +58,14 @@ function selectRampIndex(length, shade) {
   return Math.max(0, Math.min(length - 1, Math.floor(shade * length)));
 }
 
-function colorForMaterial({ material, roles, x, y, width, height, seeds, edge }) {
-  const macro = unitHash(x >> 5, y >> 4, seeds.structure);
-  const materialNoise = unitHash(x >> 4, y >> 3, seeds.material);
-  const detail = unitHash(x, y, seeds.detail);
+function colorForMaterial({ material, roles, x, y, width, height, seeds, edge, worldX = 0, worldY = 0 }) {
+  // Canonical world coordinate sampling (TIL-08)
+  const sampleX = worldX * 80 + x;
+  const sampleY = worldY * 40 + y;
+
+  const macro = unitHash(sampleX >> 5, sampleY >> 4, seeds.structure);
+  const materialNoise = unitHash(sampleX >> 4, sampleY >> 3, seeds.material);
+  const detail = unitHash(sampleX, sampleY, seeds.detail);
   const northwestLight = ((1 - x / Math.max(1, width - 1)) * 0.08)
     + ((1 - y / Math.max(1, height - 1)) * 0.12);
 
@@ -146,6 +150,9 @@ export function realizeTileForgeRegion(form, regionSpec) {
   const data = new Uint8ClampedArray(form.width * form.height * 4);
   const rgbRoles = toRgbRoles(family.roles);
 
+  const worldX = regionSpec.worldX ?? 0;
+  const worldY = regionSpec.worldY ?? 0;
+
   for (let y = 0; y < form.height; y += 1) {
     const { first, last } = form.rowSpans[y];
     if (first === -1) continue;
@@ -163,6 +170,8 @@ export function realizeTileForgeRegion(form, regionSpec) {
         height: form.height,
         seeds,
         edge: isMaterialEdge(form, x, y, materialIndex),
+        worldX,
+        worldY,
       });
       writeRgb(data, pixelIndex, color);
     }
@@ -179,6 +188,8 @@ export function realizeTileForgeRegion(form, regionSpec) {
     realizationHash,
     paletteFamily: regionSpec.paletteFamily,
     paletteColorCount: palette.length,
+    worldX,
+    worldY,
   });
 
   return Object.freeze({
@@ -187,6 +198,8 @@ export function realizeTileForgeRegion(form, regionSpec) {
     height: form.height,
     originX: form.originX,
     originY: form.originY,
+    worldX,
+    worldY,
     data,
     form,
     formHash: form.formHash,
@@ -204,4 +217,35 @@ export function realizeTileForgeRegion(form, regionSpec) {
  */
 export function synthesizeTileForgeRegion(regionSpec) {
   return realizeTileForgeRegion(buildTileForgeRegionForm(regionSpec), regionSpec);
+}
+
+/**
+ * Computes deterministic world sorting and exposed flank occlusion (TIL-10).
+ * South flanks are hidden when the adjacent south neighbor is at equal or higher elevation.
+ *
+ * @param {Array<Object>} tiles
+ * @returns {Array<Object>}
+ */
+export function computeWorldOcclusionAndSorting(tiles = []) {
+  const elevationMap = new Map();
+  for (const t of tiles) {
+    const wx = t.worldX ?? 0;
+    const wy = t.worldY ?? 0;
+    elevationMap.set(`${wx},${wy}`, t.elevation ?? t.elevationUnits ?? 0);
+  }
+
+  return tiles.map((t) => {
+    const wx = t.worldX ?? 0;
+    const wy = t.worldY ?? 0;
+    const elev = t.elevation ?? t.elevationUnits ?? 0;
+    const southElev = elevationMap.get(`${wx},${wy + 1}`);
+    const southFlankOccluded = southElev !== undefined && southElev >= elev;
+    const sortOrder = (wy * 1000 + wx) * 100 + elev;
+
+    return {
+      ...t,
+      southFlankOccluded,
+      sortOrder,
+    };
+  }).sort((a, b) => a.sortOrder - b.sortOrder);
 }

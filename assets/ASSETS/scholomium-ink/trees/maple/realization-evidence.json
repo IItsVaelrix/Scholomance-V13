@@ -1,0 +1,56 @@
+{
+  "adapterFamily": "tree",
+  "evidenceDigest": "EVIDENCE_REAL_SCHOLOMIUM_MASTER_MAPLE",
+  "slots": {
+    "PIXEL_DENSITY": {
+      "canonicalCategory": "res_48x64",
+      "parameters": {
+        "cluster_quantum": 1
+      }
+    },
+    "EDGE_LANGUAGE": {
+      "canonicalCategory": "lobed_pointed_frills",
+      "parameters": {
+        "outline_weight": 1
+      }
+    },
+    "CLUSTER_RHYTHM": {
+      "canonicalCategory": "foliage_masses",
+      "parameters": {
+        "max_isolated_cells": 2
+      }
+    },
+    "VALUE_HIERARCHY": {
+      "canonicalCategory": "bands_5",
+      "parameters": {
+        "value_bands": 5
+      }
+    },
+    "MATERIAL_LANGUAGE": {
+      "canonicalCategory": "broadleaf_clumps",
+      "parameters": {
+        "bark_material": "maple_smooth_gray",
+        "foliage_material": "broadleaf_clumps"
+      }
+    },
+    "PALETTE_LOGIC": {
+      "canonicalCategory": "autumn_scarlet_gold",
+      "parameters": {
+        "steps": 5
+      }
+    },
+    "LIGHT_RESPONSE": {
+      "canonicalCategory": "upper_left",
+      "parameters": {
+        "light_x": -1,
+        "light_y": -1
+      }
+    },
+    "SURFACE_VARIATION": {
+      "canonicalCategory": "subtle_weathering",
+      "parameters": {
+        "variation_pct": 5
+      }
+    }
+  }
+}

@@ -29,6 +29,7 @@ export const StudioUpload = lazyWithRetry(() => import("../pages/internal/Studio
 export const ActorForgeLab = lazyWithRetry(() => import("../pages/internal/pixel-lotus/ActorForgeLab.tsx"), "actor-forge-lab");
 export const IsoMapSandbox = lazyWithRetry(() => import("../pages/internal/pixel-lotus/IsoMapSandbox.tsx"), "iso-map-sandbox");
 export const TileForgeLab = lazyWithRetry(() => import("../pages/internal/pixel-lotus/TileForgeLab.jsx"), "tile-forge-lab");
+export const TutorialForestSandbox = lazyWithRetry(() => import("../pages/internal/pixel-lotus/TutorialForestSandbox.jsx"), "tutorial-forest-sandbox");
 export const ScholoTimeLabPage = lazyWithRetry(() => import("../pages/internal/ScholoTimeLab/ScholoTimeLab.jsx"), "scholo-time-lab");
 
 export const BlogIndexPage = lazyWithRetry(() => import("../pages/Blog/BlogIndexPage"), "blog-index-page");
@@ -37,7 +38,7 @@ export const VisualizerReleasePage = lazyWithRetry(() => import("../pages/Visual
 export const OraclePage = lazyWithRetry(() => import("../pages/Oracle/OraclePage.jsx"), "oracle-page");
 
 const IS_PROD = typeof import.meta !== "undefined" && import.meta.env.PROD;
-const INTERNAL_MODULES = ["/collab", "/pixelbrain", "/pixelbrain/studio", "/career", "/wand", "/wand/graph", "/div-wand", "/qbit-world", "/manifold", "/internal/photonic-bridge", "/internal/studio", "/internal/pixel-lotus/actor-forge", "/internal/pixel-lotus/iso-map-sandbox", "/internal/pixel-lotus/tile-forge", "/internal/time-lab"];
+const INTERNAL_MODULES = ["/collab", "/pixelbrain", "/pixelbrain/studio", "/career", "/wand", "/wand/graph", "/div-wand", "/qbit-world", "/manifold", "/internal/photonic-bridge", "/internal/studio", "/internal/pixel-lotus/actor-forge", "/internal/pixel-lotus/iso-map-sandbox", "/internal/pixel-lotus/tile-forge", "/internal/pixel-lotus/tutorial-forest", "/internal/time-lab"];
 
 export const ALL_COMPONENTS = {
   "/watch": WatchPage,
@@ -60,6 +61,7 @@ export const ALL_COMPONENTS = {
   "/internal/pixel-lotus/actor-forge": ActorForgeLab,
   "/internal/pixel-lotus/iso-map-sandbox": IsoMapSandbox,
   "/internal/pixel-lotus/tile-forge": TileForgeLab,
+  "/internal/pixel-lotus/tutorial-forest": TutorialForestSandbox,
   "/internal/time-lab": ScholoTimeLabPage,
   "/blog": BlogIndexPage,
   "/blog/:slug": BlogArticlePage,

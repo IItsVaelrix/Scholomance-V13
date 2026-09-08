@@ -8,7 +8,7 @@ function StudioTabRoute() {
   const { tab } = Route.useParams();
   const navigate = Route.useNavigate();
   if (!isStudioTab(tab)) {
-    return <Navigate to="/studio/$tab" params={{ tab: "foundry" }} replace />;
+    return <Navigate to="/studio/$tab" params={{ tab: "canvas" }} replace />;
   }
   return (
     <PixelBrainStudio

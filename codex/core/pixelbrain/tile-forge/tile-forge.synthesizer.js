@@ -14,6 +14,14 @@ import {
   TILE_FORGE_BIOME_PALETTES,
   createTileForgeWitnessRecord,
 } from './tile-forge.scd128.js';
+import {
+  generateTileDiamondScdl,
+  generateTileGroundScdl,
+  generateCliffSkirtScdl,
+  generateTreeScdl,
+  generatePropScdl,
+  compileTileForgeScdl,
+} from './tile-forge.scdl-generator.js';
 
 // 2x2 Bayer ordered dithering matrix
 const BAYER_2X2 = [
@@ -94,6 +102,8 @@ export function synthesizeTileForgeTile({
   seed = 4242,
   elevation = 0,
   hasFlowers = true,
+  hasGround = null,
+  groundDepth: optGroundDepth = 16,
   socketN = 'socket_open',
   socketE = 'socket_open',
   socketS = 'socket_open',
@@ -101,8 +111,10 @@ export function synthesizeTileForgeTile({
 } = {}) {
   const width = 80;
   const hasCliff = type === 'cliff';
+  const isGround = Boolean(type === 'ground' || hasGround === true);
   const cliffDepth = hasCliff ? 16 : 0;
-  const height = 40 + cliffDepth;
+  const groundDepth = isGround ? (typeof optGroundDepth === 'number' ? optGroundDepth : 16) : 0;
+  const height = 40 + cliffDepth + groundDepth;
 
   const buf = createCanvasBuffer(width, height);
   const palette = TILE_FORGE_BIOME_PALETTES[biome] || TILE_FORGE_BIOME_PALETTES.void_forest;
@@ -130,6 +142,16 @@ export function synthesizeTileForgeTile({
   const cliffDark = hexToRgb(palette.cliff_dark);
   const glowRgb = hexToRgb(palette.crystal_glow);
   const flowerRgb = hexToRgb(palette.flower_accent);
+
+  // Biome-calibrated soil colors for subterranean fullness
+  const isIce = biome.includes('ice');
+  const isCave = biome.includes('cave');
+  const isVoid = biome.includes('void') && !isIce && !isCave;
+  const soilDark = hexToRgb(isIce ? '#031726' : (isCave ? '#020617' : (isVoid ? '#0F172A' : '#2A1810')));
+  const soilMid = hexToRgb(isIce ? '#082F49' : (isCave ? '#0F172A' : (isVoid ? '#1E1B4B' : '#4A3020')));
+  const soilLit = hexToRgb(isIce ? '#0C4A6E' : (isCave ? '#1E293B' : (isVoid ? '#2E1065' : '#654231')));
+  const soilHi = hexToRgb(isIce ? '#0369A1' : (isCave ? '#334155' : (isVoid ? '#4C1D95' : '#8F563B')));
+  const soilPebble = hexToRgb(isIce ? '#7DD3FC' : (isCave ? '#64748B' : (isVoid ? '#64748B' : '#9CA3AF')));
 
   let activeCellCount = 0;
 
@@ -253,13 +275,101 @@ export function synthesizeTileForgeTile({
     }
   }
 
-  // 3. Build SCD128 Witness Record
+  // 2b. Render Extruded Subterranean Soil Base (80x56) for Ground Fullness
+  if (isGround && !hasCliff && groundDepth > 0) {
+    for (let x = 0; x < 80; x += 1) {
+      let yEdge;
+      let isLeftFace = false;
+
+      if (x < 40) {
+        yEdge = Math.floor(20 + (x / 2));
+        isLeftFace = true;
+      } else {
+        yEdge = Math.floor(40 - ((x - 40) / 2));
+        isLeftFace = false;
+      }
+
+      for (let y = yEdge; y < yEdge + groundDepth; y += 1) {
+        activeCellCount += 1;
+        const depthRatio = (y - yEdge) / groundDepth;
+        const bayer = (BAYER_2X2[y % 2][x % 2] / 4.0) - 0.375;
+
+        let soilPixel;
+        if (isLeftFace) {
+          // Left face: lit flank with earthy loam strata
+          const strata = Math.sin(y * 0.75 + x * 0.25) * 0.15;
+          const t = Math.max(0, Math.min(1, 0.55 - depthRatio * 0.3 + strata + bayer * 0.15));
+          soilPixel = lerpColor(soilMid, soilHi, t);
+
+          // Mineral pebbles
+          if ((x * 7 + y * 13 + seed) % 29 === 0 && depthRatio > 0.25) {
+            soilPixel = soilPebble;
+          }
+          // Root filaments
+          if ((x + y * 3) % 23 === 0 && depthRatio < 0.6) {
+            soilPixel = soilDark;
+          }
+        } else {
+          // Right face: deep shadow / earth occlusion
+          const strata = Math.sin(y * 0.8 - x * 0.2) * 0.12;
+          const t = Math.max(0, Math.min(1, 0.35 - depthRatio * 0.35 + strata + bayer * 0.1));
+          soilPixel = lerpColor(ramp[0], soilDark, t);
+        }
+
+        // Vertical center prow ridge
+        if (x === 40) {
+          soilPixel = soilLit;
+        }
+
+        // Bedrock floor baseline
+        if (y === yEdge + groundDepth - 1) {
+          soilPixel = ramp[0];
+        }
+
+        buf.setPixel(x, y, soilPixel, 255);
+      }
+    }
+  }
+
+  // 3. Compile authoritative SCDL V2 program
+  try {
+    const scdlProgram = hasCliff
+      ? generateCliffSkirtScdl({ id: `${biome}_${type}`, width, height, cliffDepth, biome, elevation, seed, socketN, socketE, socketS, socketW })
+      : (isGround
+        ? generateTileGroundScdl({ id: `${biome}_${type}`, width, height, groundDepth, biome, elevation, seed, hasFlowers, isRim: type === 'rim', socketN, socketE, socketS, socketW })
+        : generateTileDiamondScdl({ id: `${biome}_${type}`, width, height, biome, elevation, seed, hasFlowers, isRim: type === 'rim', socketN, socketE, socketS, socketW }));
+    const compiled = compileTileForgeScdl(scdlProgram, { assetClass: type, biome, elevation, seed });
+
+    return {
+      type,
+      width: compiled.width,
+      height: compiled.height,
+      hasCliff,
+      hasGround: isGround,
+      groundDepth: isGround ? groundDepth : 0,
+      activeCellCount: compiled.cells.length,
+      data: compiled.buffer.data,
+      scdlSource: compiled.scdlSource,
+      ast: compiled.ast,
+      bytecode: compiled.bytecode,
+      ampDescriptors: compiled.ampDescriptors,
+      scd128Record: compiled.scd128Record,
+      cells: compiled.cells,
+      toCanvas: () => compiled.toCanvas(),
+    };
+  } catch (err) {
+    console.warn('[TileForge] SCDL V2 tile compilation fallback:', err);
+  }
+
+  // 4. Fallback SCD128 Witness Record (if compiler fails)
   const scd128Record = createTileForgeWitnessRecord(
     {
       width,
       height,
       hasCliff,
       cliffDepth,
+      hasGround: isGround,
+      groundDepth: isGround ? groundDepth : 0,
       elevation,
       terrainType: `${biome}_${type}`,
       isRim: type === 'rim',
@@ -267,6 +377,8 @@ export function synthesizeTileForgeTile({
       socketE,
       socketS,
       socketW,
+      scdlSource: '',
+      ampDescriptors: [],
     },
     {
       biome,
@@ -276,11 +388,18 @@ export function synthesizeTileForgeTile({
   );
 
   return {
+    type,
     width,
     height,
     hasCliff,
+    hasGround: isGround,
+    groundDepth: isGround ? groundDepth : 0,
     activeCellCount,
     data: buf.data,
+    scdlSource: '',
+    ast: null,
+    bytecode: null,
+    ampDescriptors: [],
     scd128Record,
     toCanvas: () => buf.toCanvas(),
   };
@@ -434,12 +553,40 @@ export function synthesizeTileForgeProp({
     }
   }
 
+  // 3. Compile authoritative SCDL V2 program
+  try {
+    const isTree = propType === 'crystal_tree' || propType === 'void_pine' || propType.includes('tree') || propType.includes('oak') || propType.includes('pine');
+    const scdlProgram = isTree
+      ? generateTreeScdl({ id: propType, assetClass: propType, width, height, biome, seed })
+      : generatePropScdl({ id: propType, assetClass: propType, width, height, biome, seed });
+    const compiled = compileTileForgeScdl(scdlProgram, { assetClass: propType, biome });
+
+    return {
+      width: compiled.width,
+      height: compiled.height,
+      propType,
+      activeCellCount: compiled.cells.length,
+      data: compiled.buffer.data,
+      scdlSource: compiled.scdlSource,
+      ast: compiled.ast,
+      bytecode: compiled.bytecode,
+      ampDescriptors: compiled.ampDescriptors,
+      scd128Record: compiled.scd128Record,
+      cells: compiled.cells,
+      toCanvas: () => compiled.toCanvas(),
+    };
+  } catch (err) {
+    console.warn('[TileForge] SCDL V2 prop compilation fallback:', err);
+  }
+
   const scd128Record = createTileForgeWitnessRecord(
     {
       width,
       height,
       hasCliff: false,
       terrainType: `prop_${propType}`,
+      scdlSource: '',
+      ampDescriptors: [],
     },
     {
       biome,
@@ -454,6 +601,10 @@ export function synthesizeTileForgeProp({
     propType,
     activeCellCount,
     data: buf.data,
+    scdlSource: '',
+    ast: null,
+    bytecode: null,
+    ampDescriptors: [],
     scd128Record,
     toCanvas: () => buf.toCanvas(),
   };
@@ -527,44 +678,80 @@ export function synthesizeTileForgeAsset(spec = {}) {
     return _forestActor({ semanticType: semantic, seed, paletteFamily });
   }
 
+  let asset;
   switch (semantic) {
     case 'hero_tree_oak':
     case 'grandfather_oak':
-      return _oak({ seed, paletteFamily });
+      asset = _oak({ seed, paletteFamily });
+      break;
     case 'hero_tree_maple':
     case 'autumn_maple':
-      return _maple({ seed, paletteFamily });
+      asset = _maple({ seed, paletteFamily });
+      break;
     case 'hero_prop_well':
     case 'stone_well':
-      return _well({ seed, paletteFamily });
+      asset = _well({ seed, paletteFamily });
+      break;
     case 'landmark_ancient_dolmen':
     case 'ancient_dolmen':
-      return _dolmen({ seed, paletteFamily });
+      asset = _dolmen({ seed, paletteFamily });
+      break;
     case 'prop_timber_fence':
     case 'timber_fence':
-      return _fence({ seed, paletteFamily });
+      asset = _fence({ seed, paletteFamily });
+      break;
     case 'feature_sunflowers':
     case 'sunflower_patch':
-      return _sunflowers({ seed, paletteFamily });
+      asset = _sunflowers({ seed, paletteFamily });
+      break;
     case 'landmark_ruined_arch':
     case 'ruined_structure':
-      return _ruin({ seed, paletteFamily });
+      asset = _ruin({ seed, paletteFamily });
+      break;
     case 'fabric_meadow':
     case 'quiet_meadow':
-      return _fabric({ seed, paletteFamily, detailDensity: 0.06 });
+      asset = _fabric({ seed, paletteFamily, detailDensity: 0.06 });
+      break;
     case 'path_flagstone_road':
     case 'organic_road':
-      return _path({ seed, paletteFamily });
+      asset = _path({ seed, paletteFamily });
+      break;
     case 'water_lotus_spring':
     case 'lotus_spring':
-      return _water({ seed, paletteFamily: 'sacred_water' });
+      asset = _water({ seed, paletteFamily: 'sacred_water' });
+      break;
     case 'cliff_stratified_granite':
     case 'mossy_cliff':
-      return _cliff({ seed, paletteFamily: 'weathered_granite' });
+      asset = _cliff({ seed, paletteFamily: 'weathered_granite' });
+      break;
     default:
       if (spec.assetClass === 'Prop') {
-        return synthesizeTileForgeProp({ propType: spec.semanticType || 'crystal_tree', biome: paletteFamily, seed });
+        asset = synthesizeTileForgeProp({ propType: spec.semanticType || 'crystal_tree', biome: paletteFamily, seed });
+      } else {
+        asset = synthesizeTileForgeTile({ type: spec.semanticType || 'top', biome: paletteFamily, seed });
       }
-      return synthesizeTileForgeTile({ type: spec.semanticType || 'top', biome: paletteFamily, seed });
+      break;
   }
+
+  if (asset && !asset.scdlSource) {
+    try {
+      const isTree = String(semantic).includes('tree') || String(semantic).includes('oak') || String(semantic).includes('maple') || String(semantic).includes('cedar') || String(semantic).includes('pine');
+      const scdlProgram = isTree
+        ? generateTreeScdl({ id: semantic, assetClass: semantic, width: asset.width || 64, height: asset.height || 80, biome: paletteFamily, seed, paletteFamily })
+        : generatePropScdl({ id: semantic, assetClass: semantic, width: asset.width || 48, height: asset.height || 48, biome: paletteFamily, seed, paletteFamily });
+      const compiled = compileTileForgeScdl(scdlProgram, { assetClass: semantic, biome: paletteFamily });
+      asset.scdlSource = compiled.scdlSource;
+      asset.ast = compiled.ast;
+      asset.bytecode = compiled.bytecode;
+      asset.ampDescriptors = compiled.ampDescriptors;
+      asset.data = compiled.buffer.data;
+      asset.cells = compiled.cells;
+      asset.toCanvas = () => compiled.toCanvas();
+      asset.scd128Record = compiled.scd128Record;
+    } catch {
+      // Retain asset
+    }
+  }
+
+  return asset;
 }

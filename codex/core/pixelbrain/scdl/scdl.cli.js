@@ -18,9 +18,9 @@
  *   node scdl.cli.js format  fixtures/v2/exact-orb.scdl --write
  */
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, renameSync, unlinkSync } from 'node:fs';
 import { resolve, basename, dirname, extname, join } from 'node:path';
-import { compileSCDL, parseSCDL, exportSCDL, detectSCDLVersion, parseSCDLV2, formatSCDLV2 } from './index.js';
+import { compileSCDL, parseSCDL, exportSCDL, detectSCDLVersion, parseSCDLV2, formatSCDLV2, listSCDLV2Opcodes, listSCDLV2Capabilities, inspectSCDLV2 } from './index.js';
 import { listAmpManifests, getAmpManifest } from './v2/scdl-v2.amp-catalog.js';
 import { validateAmpAbiManifest } from './v2/scdl-v2.amp-abi.js';
 import { analyzeSCDLV2 } from './v2/scdl-v2.analyzer.js';
@@ -90,20 +90,28 @@ function readSource(filePath) {
  */
 function writeOut(outPath, content) {
   const abs = resolve(outPath);
-  try {
-    mkdirSync(dirname(abs), { recursive: true });
-  } catch (e) {
-    console.error(`[SCDL] Cannot create output directory: ${dirname(abs)}\n${e.message}`);
+  if (outPath.includes('..') && !abs.startsWith(resolve('.'))) {
+    console.error(`[SCDL] Refusing path traversal write outside workspace: ${outPath}`);
     process.exit(1);
   }
+  const dir = dirname(abs);
+  try {
+    mkdirSync(dir, { recursive: true });
+  } catch (e) {
+    console.error(`[SCDL] Cannot create output directory: ${dir}\n${e.message}`);
+    process.exit(1);
+  }
+  const tmpPath = join(dir, `.${basename(abs)}.tmp.${Date.now()}.${Math.random().toString(36).slice(2)}`);
   try {
     if (typeof content === 'string') {
-      writeFileSync(abs, content, 'utf8');
+      writeFileSync(tmpPath, content, 'utf8');
     } else {
-      writeFileSync(abs, content);
+      writeFileSync(tmpPath, content);
     }
+    renameSync(tmpPath, abs);
     console.log(`[SCDL] Written: ${outPath}`);
   } catch (e) {
+    try { unlinkSync(tmpPath); } catch {}
     const hint = e.code === 'EISDIR' ? '\n  (a directory already exists at this path)' : '';
     console.error(`[SCDL] Cannot write: ${outPath}\n${e.message}${hint}`);
     process.exit(1);
@@ -738,15 +746,86 @@ function cmdAmps(args) {
   }
 }
 
+function cmdOpcodes(args) {
+  const opts = parseArgs(args);
+  const opcodes = listSCDLV2Opcodes();
+  if (opts.flags.json) {
+    console.log(JSON.stringify(opcodes, null, 2));
+  } else {
+    console.log(`SCDL V2 Registered Opcodes (${opcodes.length}):`);
+    for (const op of opcodes) {
+      const statusStr = op.status === 'STUBBED' ? ' [STUBBED]' : '';
+      console.log(`  0x${op.id.toString(16).padStart(4, '0').toUpperCase()} ${op.mnemonic.padEnd(18)} (${op.capability})${statusStr}: ${op.docs || ''}`);
+    }
+  }
+  process.exit(0);
+}
+
+function cmdCapabilities(args) {
+  const opts = parseArgs(args);
+  const caps = listSCDLV2Capabilities();
+  if (opts.flags.json) {
+    console.log(JSON.stringify(caps, null, 2));
+  } else {
+    console.log(`SCDL V2 Capabilities (${caps.capabilities.length}):`);
+    for (const c of caps.capabilities) {
+      console.log(`  - ${c.id}: ${c.supportedCount} supported, ${c.stubbedCount} stubbed`);
+    }
+    console.log('\nRaster Policies:');
+    for (const p of caps.rasterPolicies) {
+      console.log(`  - ${p.name}: ${p.status}${p.reason ? ` (${p.reason})` : ''}`);
+    }
+    console.log('\nComposite Modes:');
+    for (const m of caps.compositeModes) {
+      console.log(`  - ${m.name}: ${m.status}`);
+    }
+  }
+  process.exit(0);
+}
+
+function cmdInspect(args) {
+  const opts = parseArgs(args);
+  const filePath = opts.positional[0];
+  if (!filePath) {
+    console.error('[SCDL] Usage: scdl inspect <file.scdl> [--json]');
+    process.exit(1);
+  }
+  const src = readSource(filePath);
+  const inspection = inspectSCDLV2(src);
+  if (opts.flags.json) {
+    console.log(JSON.stringify(inspection, null, 2));
+  } else {
+    console.log(`SCDL Inspection: ${filePath}`);
+    console.log(`  Asset:   ${inspection.assetId} (v${inspection.version})`);
+    console.log(`  Canvas:  ${inspection.canvas.width}x${inspection.canvas.height}`);
+    console.log(`  Layers (${inspection.layers.length}):`);
+    for (const l of inspection.layers) {
+      console.log(`    - [${l.order}] ${l.id}: ${l.cellCount} cells, opacity=${l.opacity}, blend=${l.blend}`);
+    }
+    console.log(`  Budget:  candidate=${inspection.budget.candidateCells}, writes=${inspection.budget.rasterWrites}, unique=${inspection.budget.uniqueCells}`);
+    console.log(`  Digests: source=${inspection.digests.sourceDigest.slice(0, 16)}..., build=${inspection.digests.buildDigest?.slice(0, 16)}...`);
+    if (inspection.diagnostics.length > 0) {
+      console.log(`  Diagnostics (${inspection.diagnostics.length}):`);
+      for (const d of inspection.diagnostics) {
+        printDiagnostic(d);
+      }
+    }
+  }
+  process.exit(inspection.ok ? 0 : 1);
+}
+
 // ─── Dispatch ─────────────────────────────────────────────────────────────────
 
 switch (command) {
-  case 'compile': cmdCompile(argv); break;
-  case 'preview': cmdPreview(argv); break;
-  case 'parse':   cmdParse(argv);   break;
-  case 'check':   cmdCheck(argv);   break;
-  case 'format':  cmdFormat(argv);  break;
-  case 'amps':    cmdAmps(argv);    break;
+  case 'compile':      cmdCompile(argv); break;
+  case 'preview':      cmdPreview(argv); break;
+  case 'parse':        cmdParse(argv);   break;
+  case 'check':        cmdCheck(argv);   break;
+  case 'format':       cmdFormat(argv);  break;
+  case 'amps':         cmdAmps(argv);    break;
+  case 'opcodes':      cmdOpcodes(argv); break;
+  case 'capabilities': cmdCapabilities(argv); break;
+  case 'inspect':      cmdInspect(argv); break;
   default:
     console.log(`SCDL Compiler CLI
 Usage:
@@ -756,6 +835,9 @@ Usage:
   node scdl.cli.js check   <file.scdl> [--strict]
   node scdl.cli.js format  <file.scdl> [--write]
   node scdl.cli.js amps    [list|describe|validate|plan]
+  node scdl.cli.js opcodes [--json]
+  node scdl.cli.js capabilities [--json]
+  node scdl.cli.js inspect <file.scdl> [--json]
 
 Outputs default to the source file's directory, named <asset>-<target>.<ext>
 (multi-frame assets: <asset>-f<N>-<target>.<ext> plus <asset>-frameloop.json).

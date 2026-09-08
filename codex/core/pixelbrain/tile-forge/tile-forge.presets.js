@@ -9,7 +9,8 @@ export const TILE_FORGE_PRESETS = {
       "symmetrySoft",
       "maskedNoise",
       "biomeMaterial",
-      "propScatter"
+      "propScatter",
+      "scd128Synthesizer"
     ]
   },
 
@@ -23,7 +24,8 @@ export const TILE_FORGE_PRESETS = {
       "symmetrySoft",
       "maskedNoise",
       "biomeMaterial",
-      "propScatter"
+      "propScatter",
+      "scd128Synthesizer"
     ]
   },
 
@@ -37,7 +39,8 @@ export const TILE_FORGE_PRESETS = {
       "fibonacciField",
       "maskedNoise",
       "biomeMaterial",
-      "propScatter"
+      "propScatter",
+      "scd128Synthesizer"
     ]
   },
 
@@ -53,7 +56,8 @@ export const TILE_FORGE_PRESETS = {
       "symmetryOptional",
       "biomeMaterial",
       "caveLayerVisibility",
-      "propScatter"
+      "propScatter",
+      "scd128Synthesizer"
     ]
   },
 
@@ -67,7 +71,8 @@ export const TILE_FORGE_PRESETS = {
       "fibonacciField",
       "maskedNoise",
       "biomeMaterial",
-      "propScatter"
+      "propScatter",
+      "scd128Synthesizer"
     ]
   }
 };

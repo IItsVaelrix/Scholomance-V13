@@ -1,0 +1,59 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.jewelry",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "SHAPE_POST",
+  "scope": [
+    "SHAPE"
+  ],
+  "inputs": [
+    {
+      "name": "geometry",
+      "type": "SHAPE",
+      "required": true,
+      "description": "Gemstone or bezel geometry"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "cut",
+      "type": "ANY",
+      "default": "brilliant",
+      "description": "Gemstone cut style"
+    },
+    {
+      "name": "gemType",
+      "type": "MATERIAL",
+      "default": "ruby",
+      "description": "Gem mineral material type"
+    }
+  ],
+  "output": {
+    "type": "SHAPE",
+    "description": "Faceted jewel geometry with pavilion and bezel rim structure"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 3,
+    "fixed": 0
+  },
+  "order": 47,
+  "relevance": {
+    "pipelines": [
+      "item"
+    ],
+    "conditions": [
+      {
+        "field": "tags",
+        "op": "includes",
+        "value": "jewelry"
+      }
+    ]
+  },
+  "checksum": "45cd3b2ded27ae2bc12a67ab8affd29e025569c100ad2a856c4a72d127f32609"
+}

@@ -1,0 +1,47 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.biome-material",
+  "version": "1.0.0",
+  "execution": "DESCRIPTOR",
+  "stage": "WORLD_DESCRIPTOR",
+  "scope": [
+    "ASSET"
+  ],
+  "inputs": [
+    {
+      "name": "targetId",
+      "type": "ANY",
+      "required": false,
+      "description": "Biome region identifier"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "biome",
+      "type": "ANY",
+      "default": "forest",
+      "description": "Biome type identifier"
+    }
+  ],
+  "output": {
+    "type": "ANY",
+    "description": "Immutable biome-to-material binding descriptor"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "CONSTANT",
+    "multiplier": 1,
+    "fixed": 10
+  },
+  "order": 106,
+  "relevance": {
+    "pipelines": [
+      "world-voxel"
+    ],
+    "conditions": []
+  },
+  "checksum": "4adb037c20f9f96ab307845365f20eb628ccf04dc00cfd15c2241a61bfd5cebd"
+}

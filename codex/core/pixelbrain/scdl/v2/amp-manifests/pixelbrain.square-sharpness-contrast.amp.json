@@ -1,0 +1,49 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.square-sharpness-contrast",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "LAYER_POST",
+  "scope": [
+    "LAYER"
+  ],
+  "inputs": [
+    {
+      "name": "layer",
+      "type": "LAYER",
+      "required": true,
+      "description": "Layer receiving pixel contrast sharpening"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "sharpness",
+      "type": "FIXED",
+      "min": 0,
+      "max": 1,
+      "default": 0.5,
+      "description": "Lattice edge sharpening intensity"
+    }
+  ],
+  "output": {
+    "type": "LAYER",
+    "description": "Layer with crisped pixel boundaries and local contrast enhancement"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 2,
+    "fixed": 0
+  },
+  "order": 74,
+  "relevance": {
+    "pipelines": [
+      "render-fidelity"
+    ],
+    "conditions": []
+  },
+  "checksum": "a7c5b4e5ef60161155d3c3045def2d7e29084d51621ef48438aa6917a30680e4"
+}
