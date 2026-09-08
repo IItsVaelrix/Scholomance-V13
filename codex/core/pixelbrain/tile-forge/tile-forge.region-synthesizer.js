@@ -81,8 +81,9 @@ function colorForMaterial({ material, roles, x, y, width, height, seeds, edge })
     if (edge) return roles.path[0];
     const joint = hash32(Math.floor(x / 7), Math.floor(y / 4), seeds.material) % 17 === 0;
     if (joint) return roles.path[1];
+    const pathBody = roles.path.slice(3);
     const shade = 0.2 + macro * 0.46 + materialNoise * 0.18 + northwestLight;
-    return roles.path[selectRampIndex(roles.path.length, shade)];
+    return pathBody[selectRampIndex(pathBody.length, shade)];
   }
 
   if (material === 'water_pond') {
