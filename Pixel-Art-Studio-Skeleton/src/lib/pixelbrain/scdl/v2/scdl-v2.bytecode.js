@@ -85,6 +85,7 @@ class Lowerer {
     this.usesPath = false;
     this.usesMask = false;
     this.usesAmp = false;
+    this.usesAnimation = false;
   }
 
   nextRegister() {
@@ -831,6 +832,110 @@ class Lowerer {
       operands: layerRegisters.map((index) => ({ kind: 'register', index })),
     });
 
+    if (ir && Array.isArray(ir.timelines) && ir.timelines.length > 0) {
+      this.usesAnimation = true;
+      const timelineRegisters = [];
+      const timelineRegisterMap = new Map();
+
+      for (const timeline of ir.timelines) {
+        const timelineRegister = this.nextRegister();
+        timelineRegisters.push(timelineRegister);
+        timelineRegisterMap.set(timeline.id, timelineRegister);
+
+        this.emit('BC.TIMELINE.NEW', {
+          resultRegister: timelineRegister,
+          type: 'TIMELINE',
+          operands: [
+            { kind: 'immediate', value: timeline.id },
+            { kind: 'immediate', value: timeline.durationTicks },
+            { kind: 'immediate', value: timeline.fps },
+            { kind: 'immediate', value: timeline.loop },
+          ],
+        });
+
+        for (const track of timeline.tracks || []) {
+          this.emit('BC.TRACK', {
+            operands: [
+              { kind: 'register', index: timelineRegister },
+              { kind: 'immediate', value: track.target },
+              { kind: 'immediate', value: track.property },
+            ],
+          });
+
+          if (track.formula) {
+            this.emit('BC.FORMULA', {
+              operands: [
+                { kind: 'immediate', value: JSON.stringify(track.formula.node) },
+                { kind: 'immediate', value: track.formula.valueType || 'ANY' },
+              ],
+            });
+          } else if (Array.isArray(track.keyframes)) {
+            for (const keyframe of track.keyframes) {
+              const valReg = this.lowerValue(keyframe.value);
+              this.emit('BC.KEYFRAME', {
+                operands: [
+                  { kind: 'immediate', value: keyframe.tick },
+                  { kind: 'register', index: valReg },
+                  { kind: 'immediate', value: keyframe.easing || 'LINEAR' },
+                ],
+              });
+            }
+          }
+        }
+
+        for (const pose of timeline.poses || []) {
+          this.emit('BC.POSE', {
+            operands: [
+              { kind: 'register', index: timelineRegister },
+              { kind: 'immediate', value: pose },
+            ],
+          });
+        }
+
+        for (const event of timeline.events || []) {
+          this.emit('BC.EVENT', {
+            operands: [
+              { kind: 'register', index: timelineRegister },
+              { kind: 'immediate', value: event.tick },
+              { kind: 'immediate', value: event.name },
+            ],
+          });
+        }
+
+        for (const variant of timeline.variants || []) {
+          this.emit('BC.VARIANT', {
+            operands: [
+              { kind: 'register', index: timelineRegister },
+              { kind: 'immediate', value: variant.name },
+              { kind: 'immediate', value: variant.fromTick },
+              { kind: 'immediate', value: variant.toTick },
+            ],
+          });
+        }
+      }
+
+      for (const clip of ir.clips || []) {
+        const tlReg = timelineRegisterMap.get(clip.timeline);
+        if (tlReg !== undefined) {
+          this.emit('BC.CLIP', {
+            operands: [
+              { kind: 'register', index: tlReg },
+              { kind: 'immediate', value: clip.atTick || 0 },
+              { kind: 'immediate', value: clip.loop || 'REPEAT' },
+            ],
+          });
+        }
+      }
+
+      const totalFrameCount = Math.max(...ir.timelines.map((t) => t.frameCount || 0));
+      this.emit('BC.EMIT.ANIMATION', {
+        operands: [
+          { kind: 'immediate', value: timelineRegisters.map((index) => `%${index}`) },
+          { kind: 'immediate', value: totalFrameCount },
+        ],
+      });
+    }
+
     return layerRegisters;
   }
 }
@@ -913,6 +1018,7 @@ export function lowerSCDLV2Bytecode(ir, verifiedBudget) {
     if (lowerer.usesPath) capabilities.push('GEOMETRY.PATH@2.0');
     if (lowerer.usesMask) capabilities.push('PAINT.MASKS@2.0');
     if (lowerer.usesAmp) capabilities.push('MATERIAL.PIXELBRAIN@2.0');
+    if (lowerer.usesAnimation) capabilities.push('ANIMATION.TIMELINE@1.0');
     const algorithms = Object.freeze(algorithmLines(lowerer));
     const constants = Object.freeze(lowerer.constants);
     const instructions = Object.freeze(lowerer.instructions);

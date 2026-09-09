@@ -210,3 +210,75 @@ export function readWandFill() {
 export function clearWandFill() {
   Storage.removeItem(HANDOFF_KEY);
 }
+
+const SCDL_V2_HANDOFF_KEY = 'pixelbrain.wandScdlV2.v1';
+
+/**
+ * Publishes an SCDL V2 compile result from Wand / DivWand for PixelBrain and Tile Forge.
+ * @param {Object} compileResult - Output of compileWandToSCDLV2
+ */
+export function publishWandSCDLV2(compileResult) {
+  if (!compileResult) return null;
+  const payload = {
+    ok: compileResult.ok,
+    programId: compileResult.bytecode?.programId || null,
+    source: compileResult.transpiledSource || compileResult.source || '',
+    packet: compileResult.packet || null,
+    package: compileResult.package || null,
+    roles: compileResult.roles || [],
+    palette: compileResult.palette || {},
+    timestamp: Date.now(),
+  };
+  Storage.setItem(SCDL_V2_HANDOFF_KEY, JSON.stringify(payload));
+  return payload;
+}
+
+/**
+ * Consumes the latest SCDL V2 handoff payload, clearing it if clearAfter is true.
+ */
+export function consumeWandSCDLV2(clearAfter = true) {
+  const raw = Storage.getItem(SCDL_V2_HANDOFF_KEY);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    if (clearAfter) {
+      Storage.removeItem(SCDL_V2_HANDOFF_KEY);
+    }
+    return parsed;
+  } catch (_e) {
+    return null;
+  }
+}
+
+export function clearWandSCDLV2() {
+  Storage.removeItem(SCDL_V2_HANDOFF_KEY);
+}
+
+/**
+ * Compile an authored character and its joint-bound Wand signature as ONE SCDL V2
+ * program. This in-memory bridge does not publish/consume the user's saved handoff.
+ * The compiler remains the pixel authority; no cells are patched after compilation.
+ */
+export function compileWandCharacterSource(source, wandProposal, { canvas, compile, transpile } = {}) {
+  if (typeof source !== 'string' || !source.startsWith('SCDL 2\n') || typeof compile !== 'function' || typeof transpile !== 'function') {
+    return { ok: false, errors: [{ message: 'A versioned SCDL character source and compiler adapters are required.' }], packet: null };
+  }
+  const wand = transpile(wandProposal, { canvas });
+  if (!wand.ok) return { ok: false, errors: wand.diagnostics || [], packet: null };
+  const declarations = wand.scdlSource.split('\n').filter(line => !/^(SCDL |ASSET |CANVAS )/.test(line)).join('\n').replace(/ORDER (\d+)/g, (_, order) => `ORDER ${1000 + Number(order)}`);
+  const combinedSource = `${source}\n${declarations}`;
+  const result = compile(combinedSource);
+  if (!result.ok) return result;
+  return {
+    ...result,
+    source: combinedSource,
+    handoff: Object.freeze({
+      contract: 'PB-WAND-CHARACTER-v1',
+      programId: result.bytecode.programId,
+      source: combinedSource,
+      roles: Object.freeze([...wand.roles]),
+      packet: result.packet,
+      package: result.package,
+    }),
+  };
+}

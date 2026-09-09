@@ -79,6 +79,9 @@ function paintDiamond({
   elevationMask,
   materialIndexMask,
   materialMasks,
+  ownerIndexMask,
+  owner,
+  offsetY = 0,
   material,
   elevation,
 }) {
@@ -90,7 +93,7 @@ function paintDiamond({
       if (normalizedX + normalizedY > 1) continue;
 
       const x = anchor.x + localX;
-      const y = anchor.y + localY;
+      const y = anchor.y + offsetY + localY;
       const pixelIndex = y * formWidth + x;
       const previousMaterialIndex = materialIndexMask[pixelIndex];
       alphaMask[pixelIndex] = 1;
@@ -100,6 +103,7 @@ function paintDiamond({
       }
       materialIndexMask[pixelIndex] = materialIndex;
       materialMasks[material][pixelIndex] = 1;
+      ownerIndexMask[pixelIndex] = owner;
     }
   }
 }
@@ -112,13 +116,22 @@ export function buildTileForgeRegionForm(spec) {
     throw new TypeError('PB-TFR-FORM-001 expected a validated PB-TILE-FORGE-REGION-v1 spec');
   }
 
-  const provisionalAnchors = spec.cells.map((cell) => ({
+  const provisionalAnchors = spec.cells.map((cell, index) => ({
     key: `${cell.tx},${cell.ty}`,
     cell,
+    index,
     anchor: projectRegionCell(cell.tx, cell.ty, cell.elevation, spec.gridHeight),
   }));
   const minimumY = Math.min(...provisionalAnchors.map(({ anchor }) => anchor.y));
-  const maximumY = Math.max(...provisionalAnchors.map(({ anchor }) => anchor.y + TILE_HEIGHT));
+  // Elevated cells extrude a cliff skirt downward; reserve that band so the
+  // projected fabric never leaves a transparent crack beneath a raised tier.
+  const maximumElevation = provisionalAnchors.reduce(
+    (maximum, entry) => Math.max(maximum, entry.cell.elevation),
+    0,
+  );
+  const maximumY = Math.max(...provisionalAnchors.map(({ anchor }) => (
+    anchor.y + TILE_HEIGHT + anchor.elevation * ELEVATION_STEP
+  )));
   const width = (spec.gridWidth + spec.gridHeight) * HALF_WIDTH;
   const height = maximumY - minimumY;
   const pixelCount = width * height;
@@ -127,29 +140,64 @@ export function buildTileForgeRegionForm(spec) {
   elevationMask.fill(-1);
   const materialIndexMask = new Uint8Array(pixelCount);
   materialIndexMask.fill(EMPTY_MATERIAL_INDEX);
+  const ownerIndexMask = new Int32Array(pixelCount);
+  ownerIndexMask.fill(-1);
   const materialMasks = Object.fromEntries(TILE_FORGE_REGION_MATERIALS.map((material) => (
     [material, new Uint8Array(pixelCount)]
   )));
   const cellAnchors = {};
 
   for (const { key, cell, anchor } of provisionalAnchors) {
-    const normalizedAnchor = Object.freeze({
+    cellAnchors[key] = Object.freeze({
       x: anchor.x,
       y: anchor.y - minimumY,
       elevation: anchor.elevation,
     });
-    cellAnchors[key] = normalizedAnchor;
+  }
+
+  const paintArgs = {
+    formWidth: width,
+    alphaMask,
+    elevationMask,
+    materialIndexMask,
+    materialMasks,
+    ownerIndexMask,
+  };
+
+  // Pass 1 — cliff skirts: extrude every raised cell downward so its exposed
+  // south-east / south-west flanks read as solid stone instead of empty sky.
+  // Lower-elevation neighbours repaint over the hidden portion in pass 2.
+  for (const { cell, index, anchor } of provisionalAnchors) {
+    if (cell.elevation <= 0) continue;
+    const skirtAnchor = Object.freeze({
+      x: anchor.x,
+      y: anchor.y - minimumY,
+      elevation: cell.elevation,
+    });
+    for (let drop = cell.elevation * ELEVATION_STEP; drop >= 1; drop -= 1) {
+      paintDiamond({
+        ...paintArgs,
+        anchor: skirtAnchor,
+        offsetY: drop,
+        owner: index,
+        material: 'cliff_stone',
+        elevation: cell.elevation,
+      });
+    }
+  }
+
+  // Pass 2 — top planes, painter order back-to-front so nearer cells occlude.
+  for (const { key, cell, index, anchor } of provisionalAnchors) {
     paintDiamond({
-      formWidth: width,
-      anchor: normalizedAnchor,
-      alphaMask,
-      elevationMask,
-      materialIndexMask,
-      materialMasks,
+      ...paintArgs,
+      anchor: cellAnchors[key],
+      owner: index,
       material: cell.material,
       elevation: cell.elevation,
     });
   }
+
+  void maximumElevation;
 
   const cellsByCoordinate = new Map(spec.cells.map((cell) => [`${cell.tx},${cell.ty}`, cell]));
   const boundaries = collectBoundaries(spec, cellsByCoordinate);
@@ -182,6 +230,7 @@ export function buildTileForgeRegionForm(spec) {
     alphaMask,
     elevationMask,
     materialIndexMask,
+    ownerIndexMask,
     materialMasks: Object.freeze(materialMasks),
     materialOrder: TILE_FORGE_REGION_MATERIALS,
     rowSpans,

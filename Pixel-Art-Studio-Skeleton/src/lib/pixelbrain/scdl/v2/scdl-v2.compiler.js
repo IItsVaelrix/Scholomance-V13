@@ -14,6 +14,7 @@ import { diagnosticEnvelope, span, v2Diagnostic } from './scdl-v2.diagnostics.js
 import { buildConveyorBelt } from './scdl-v2.amp-stages.js';
 import { getAmpAdapter, getAmpManifest } from './scdl-v2.amp-catalog.js';
 import { parseVersionHeader } from './scdl-v2.version.js';
+import { sampleTimeline, buildAnimationManifest } from './scdl-v2.animation.js';
 import { sha256Hex } from '../../sha256.js';
 
 const ZERO_SPAN = span({ line: 1, column: 1, offset: 0 });
@@ -60,9 +61,11 @@ function failV2({ source, options, cst, ast, diagnostics }) {
   });
 }
 
-function successV2({ source, options, cst, ast, analysis, bytecode, package: packageValue, packet, ampPlan, ampDescriptors, counters }) {
+function successV2({ source, options, cst, ast, analysis, bytecode, package: packageValue, packet, ampPlan, ampDescriptors, counters, framePackets }) {
   const resolvedDescriptors = Object.freeze([...(ampDescriptors || packageValue?.ampDescriptors || [])]);
   const resolvedPlan = Object.freeze([...(ampPlan || packageValue?.ampPlan || [])]);
+  const resolvedFramePackets = framePackets || packageValue?.framePackets || Object.freeze([packet]);
+  const resolvedFrameLoop = packageValue?.frameLoop || null;
 
   const resolvedAmps = resolvedPlan.map((entry) => {
     const manifest = getAmpManifest(entry.ampId);
@@ -106,7 +109,8 @@ function successV2({ source, options, cst, ast, analysis, bytecode, package: pac
     counters: counters || Object.freeze({}),
     stats: counters || Object.freeze({}),
     buildReceipt,
-    framePackets: Object.freeze([packet]),
+    frameLoop: resolvedFrameLoop,
+    framePackets: resolvedFramePackets,
     regressionSeed: Object.freeze({ source, options, checksum: bytecode.programId }),
   });
 }
@@ -379,8 +383,42 @@ function ampExecutionDiagnostic(entry, err) {
     }
     activeConstruction = conveyorContext.activeConstruction;
 
-    const raster = rasterizeSCDLV2(activeConstruction, analyzed.ir.canvas, budget.verified);
-    if (!raster.ok) return failV2({ source: safeSource, options: safeOptions, cst: parsed.cst, ast: parsed.ast, diagnostics: raster.diagnostics });
+    const isAnimated = Array.isArray(analyzed.ir.timelines) && analyzed.ir.timelines.length > 0;
+    let animationManifest = null;
+    let rasterizedFrames = null;
+    let raster = null;
+
+    if (isAnimated) {
+      const primaryTimeline = analyzed.ir.timelines[0];
+      const sampledFrames = sampleTimeline(primaryTimeline, activeConstruction);
+      rasterizedFrames = [];
+      for (const frame of sampledFrames) {
+        const frameRaster = rasterizeSCDLV2(frame.construction, analyzed.ir.canvas, budget.verified);
+        if (!frameRaster.ok) {
+          return failV2({
+            source: safeSource,
+            options: safeOptions,
+            cst: parsed.cst,
+            ast: parsed.ast,
+            diagnostics: frameRaster.diagnostics,
+          });
+        }
+        rasterizedFrames.push(Object.freeze({ ...frame, raster: frameRaster }));
+      }
+      raster = rasterizedFrames[0].raster;
+      animationManifest = buildAnimationManifest(analyzed.ir.timelines, analyzed.ir.clips);
+    } else {
+      raster = rasterizeSCDLV2(activeConstruction, analyzed.ir.canvas, budget.verified);
+      if (!raster.ok) {
+        return failV2({
+          source: safeSource,
+          options: safeOptions,
+          cst: parsed.cst,
+          ast: parsed.ast,
+          diagnostics: raster.diagnostics,
+        });
+      }
+    }
     conveyorContext.activeRaster = raster;
 
     conveyorContext.emitted = emitSCDLV2Package({
@@ -390,6 +428,8 @@ function ampExecutionDiagnostic(entry, err) {
       raster,
       ampPlan: analyzed.ir.ampPlan || [],
       ampDescriptors,
+      animation: animationManifest,
+      frames: rasterizedFrames,
     });
 
     // Post-rasterization stages: PACKET_POST (7) through WORLD_DESCRIPTOR (11)

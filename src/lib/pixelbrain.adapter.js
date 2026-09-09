@@ -257,6 +257,17 @@ import {
 } from '../../codex/core/pixelbrain/wand-fill-bridge.js';
 
 import {
+  compileWandToSCDLV2 as codexCompileWandToSCDLV2,
+  transpileWandToSCDLV2 as codexTranspileWandToSCDLV2,
+  transpileDivWandToSCDLV2 as codexTranspileDivWandToSCDLV2,
+} from '../../codex/core/pixelbrain/scdl/v2/scdl-v2.wand-bridge.js';
+
+import {
+  publishWandSCDLV2 as codexPublishWandSCDLV2,
+  consumeWandSCDLV2 as codexConsumeWandSCDLV2,
+} from './wandPixelbrainBridge.js';
+
+import {
   buildColorIntensityPayload as codexBuildColorIntensityPayload,
 } from '../../codex/core/pixelbrain/color-intensity-rating-microprocessor.js';
 
@@ -644,6 +655,26 @@ export function buildColorIntensityPayload(input) {
 
 export function deriveWandFillBytecode(proposal) {
   return codexDeriveWandFillBytecode(proposal);
+}
+
+export function transpileWandToSCDLV2(proposal, options = {}) {
+  return codexTranspileWandToSCDLV2(proposal, options);
+}
+
+export function transpileDivWandToSCDLV2(divwandNode, options = {}) {
+  return codexTranspileDivWandToSCDLV2(divwandNode, options);
+}
+
+export function compileWandToSCDLV2(proposal, options = {}) {
+  return codexCompileWandToSCDLV2(proposal, options);
+}
+
+export function publishWandSCDLV2(compileResult) {
+  return codexPublishWandSCDLV2(compileResult);
+}
+
+export function consumeWandSCDLV2(clearAfter = true) {
+  return codexConsumeWandSCDLV2(clearAfter);
 }
 
 function normalizePixelBrainCoordinate(coord) {

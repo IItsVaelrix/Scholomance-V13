@@ -883,6 +883,30 @@ export function evaluateSCDLV2(program) {
           break;
         }
 
+        case 'BC.TIMELINE.NEW': {
+          const id = operands[0]?.value;
+          const durationTicks = operands[1]?.value;
+          const fps = operands[2]?.value;
+          const loop = operands[3]?.value;
+          if (resultKey !== null) {
+            registers.set(resultKey, Object.freeze({
+              type: 'TIMELINE',
+              value: Object.freeze({ id, durationTicks, fps, loop, tracks: [] }),
+            }));
+          }
+          break;
+        }
+
+        case 'BC.TRACK':
+        case 'BC.KEYFRAME':
+        case 'BC.FORMULA':
+        case 'BC.POSE':
+        case 'BC.EVENT':
+        case 'BC.VARIANT':
+        case 'BC.CLIP':
+        case 'BC.EMIT.ANIMATION':
+          break;
+
         default:
           return failure(
             lowerDiagnostic(`Unknown or unsupported opcode '${instruction.mnemonic}'.`, {

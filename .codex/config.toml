@@ -4,3 +4,6 @@ args = [
     "--env-file=.env",
     "codex/server/collab/mcp-bridge-entry.js",
 ]
+startup_timeout_sec = 60
+default_tools_approval_mode = "approve"
+

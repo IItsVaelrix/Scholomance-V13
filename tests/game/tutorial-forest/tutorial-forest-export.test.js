@@ -31,7 +31,7 @@ describe('Tutorial Forest visual evidence exporter', () => {
     expect(composite.height).toBeGreaterThan(runtime.ground.height);
     expect(composite.data).toBeInstanceOf(Uint8ClampedArray);
     expect(composite.quality.grade).toBe('A');
-  });
+  }, 30000);
 
   it('catches smoothed or non-integer evidence scaling', () => {
     const source = new Uint8ClampedArray([

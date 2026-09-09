@@ -660,7 +660,9 @@ import {
 
 import {
   TILE_FORGE_FOREST_ACTOR_TYPES,
+  TILE_FORGE_DECOR_TYPES,
   synthesizeTileForgeForestActor as _forestActor,
+  synthesizeTileForgeDecor as _decor,
 } from './tile-forge.forest-actor-synthesizer.js';
 
 /**
@@ -676,6 +678,10 @@ export function synthesizeTileForgeAsset(spec = {}) {
 
   if (TILE_FORGE_FOREST_ACTOR_TYPES.includes(semantic)) {
     return _forestActor({ semanticType: semantic, seed, paletteFamily });
+  }
+
+  if (TILE_FORGE_DECOR_TYPES.includes(semantic)) {
+    return _decor({ decorType: semantic, seed, paletteFamily });
   }
 
   let asset;

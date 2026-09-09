@@ -108,10 +108,13 @@ describe('Tutorial Forest continuous-region Phaser integration', () => {
     expect(manifest.contract).toBe('PB-TUTORIAL-FOREST-ASSET-MANIFEST-v1');
     expect(manifest.actors).toHaveLength(manifest.environment.actors.length);
     expect(groundTexture.context.imageSmoothingEnabled).toBe(false);
-    expect(scene.textures.created).toHaveLength(1 + manifest.actors.length + 6);
+    // ground + actors + 6 player frames + the water-silhouette mask texture
+    expect(scene.textures.created)
+      .toHaveLength(1 + manifest.actors.length + manifest.player.textureKeys.length + (manifest.ground.waterMaskKey ? 1 : 0));
+    expect(scene.textures.get(manifest.ground.waterMaskKey)).toBeTruthy();
     expect(scene.textures.created.some(({ key }) => key.startsWith('grass_'))).toBe(false);
     expect(scene.textures.created.some(({ key }) => key.startsWith('water_'))).toBe(false);
-  });
+  }, 30000);
 
   it('catches generated texture leaks during deterministic reseeding', () => {
     const scene = fakeBridgeScene();
@@ -156,6 +159,63 @@ describe('Tutorial Forest continuous-region Phaser integration', () => {
     expect(scene.environmentSprites).toHaveLength(scene.assetManifest.actors.length);
   });
 
+  it('catches reflection plates missing any pond edge', () => {
+    const RuntimeScene = createTutorialForestScene(fakeRuntime());
+    const scene = new RuntimeScene();
+    scene.init({ seed: 4242 });
+    scene.world = buildTutorialForestWorld(4242);
+    scene.tileW = 80;
+    scene.tileH = 40;
+    scene.computeReflectionPlates();
+
+    // The pond (tx 11..16, ty 5..10) must be ringed on every side: north, west,
+    // east and south shores all carry activation plates.
+    expect(scene.reflectionPlates.has('12,4')).toBe(true); // north shore
+    expect(scene.reflectionPlates.has('10,7')).toBe(true); // west shore
+    expect(scene.reflectionPlates.has('17,7')).toBe(true); // east shore
+    expect(scene.reflectionPlates.has('13,11')).toBe(true); // south shore
+    expect(scene.reflectionPlates.has('13,7')).toBe(false); // open water: no plate
+  });
+
+  it('catches mirror parity ignoring gaze or water side', () => {
+    const RuntimeScene = createTutorialForestScene(fakeRuntime());
+    const scene = new RuntimeScene();
+    scene.init({ seed: 4242 });
+    scene.world = buildTutorialForestWorld(4242);
+    scene.tileW = 80;
+    scene.tileH = 40;
+    scene.assetManifest = buildTutorialForestAssets(fakeBridgeScene(), scene.world, { seed: 4242 });
+    scene.computeReflectionPlates();
+
+    // North shore, gaze toward the pond => front view, water screen-below.
+    scene.playerPos = { tx: 12, ty: 4 };
+    scene.playerFacing = { dx: 0, dy: 1 };
+    scene.player = { width: 32, height: 48, x: 0, y: 0, texture: { key: 'player_idle_0' } };
+    scene.waterShader = { setTextures: () => {} };
+    scene.updateWaterReflection();
+    expect(scene.waterReflection.enabled).toBe(true);
+    expect(scene.waterReflection.back).toBe(false);
+    expect(scene.waterReflection.flip).toBe(true);
+
+    // Same plate, gaze turned away => the pond reflects the Wanderer's back.
+    scene.playerFacing = { dx: 0, dy: -1 };
+    scene.updateWaterReflection();
+    expect(scene.waterReflection.enabled).toBe(true);
+    expect(scene.waterReflection.back).toBe(true);
+
+    // South shore: pond lies screen-above, parity carried upright.
+    scene.playerPos = { tx: 13, ty: 11 };
+    scene.playerFacing = { dx: 0, dy: -1 };
+    scene.updateWaterReflection();
+    expect(scene.waterReflection.enabled).toBe(true);
+    expect(scene.waterReflection.flip).toBe(false);
+
+    // Far from the pond: no plate, no mirror.
+    scene.playerPos = { tx: 6, ty: 17 };
+    scene.updateWaterReflection();
+    expect(scene.waterReflection.enabled).toBe(false);
+  });
+
   it('catches ambient particles depending on Math.random', () => {
     const RuntimeScene = createTutorialForestScene(fakeRuntime());
     const makeParticles = () => {
@@ -171,5 +231,127 @@ describe('Tutorial Forest continuous-region Phaser integration', () => {
     };
 
     expect(makeParticles()).toEqual(makeParticles());
+  });
+
+  it('catches keyboard navigation mapping W/A/S/D to canonical facing and isometric deltas', () => {
+    const RuntimeScene = createTutorialForestScene(fakeRuntime());
+    const scene = new RuntimeScene();
+    scene.init({ seed: 4242 });
+    scene.world = buildTutorialForestWorld(4242);
+    scene.tileW = 80;
+    scene.tileH = 40;
+
+    scene.wasdKeys = {
+      W: { isDown: false },
+      A: { isDown: false },
+      S: { isDown: false },
+      D: { isDown: false },
+    };
+    scene.cursors = {
+      up: { isDown: false },
+      down: { isDown: false },
+      left: { isDown: false },
+      right: { isDown: false },
+    };
+
+    // W -> North, (-1, -1)
+    scene.wasdKeys.W.isDown = true;
+    let req = scene.getKeyboardMovementRequest();
+    expect(req).toEqual({ dtx: -1, dty: -1, dir: 'north', inputX: 0, inputY: -1 });
+    scene.wasdKeys.W.isDown = false;
+
+    // S -> South, (+1, +1)
+    scene.wasdKeys.S.isDown = true;
+    req = scene.getKeyboardMovementRequest();
+    expect(req).toEqual({ dtx: 1, dty: 1, dir: 'south', inputX: 0, inputY: 1 });
+    scene.wasdKeys.S.isDown = false;
+
+    // D -> East, (+1, -1)
+    scene.wasdKeys.D.isDown = true;
+    req = scene.getKeyboardMovementRequest();
+    expect(req).toEqual({ dtx: 1, dty: -1, dir: 'east', inputX: 1, inputY: 0 });
+    scene.wasdKeys.D.isDown = false;
+
+    // A -> West, (-1, +1)
+    scene.wasdKeys.A.isDown = true;
+    req = scene.getKeyboardMovementRequest();
+    expect(req).toEqual({ dtx: -1, dty: 1, dir: 'west', inputX: -1, inputY: 0 });
+    scene.wasdKeys.A.isDown = false;
+
+    // S+D -> East (down-right), (+1, 0)
+    scene.wasdKeys.S.isDown = true;
+    scene.wasdKeys.D.isDown = true;
+    req = scene.getKeyboardMovementRequest();
+    expect(req).toEqual({ dtx: 1, dty: 0, dir: 'east', inputX: 1, inputY: 1 });
+  });
+
+  it('catches continuous WASD walking parity with click-to-walk paths without idle flickering', () => {
+    const RuntimeScene = createTutorialForestScene(fakeRuntime());
+    const scene = new RuntimeScene();
+    scene.init({ seed: 4242 });
+    scene.world = buildTutorialForestWorld(4242);
+    scene.tileW = 80;
+    scene.tileH = 40;
+    scene.playerPos = { tx: 6, ty: 6 };
+
+    // WASD path resolution uses findGridPath, guaranteeing same tile progression as clicking
+    const req = { dtx: -1, dty: -1, dir: 'north', inputX: 0, inputY: -1 };
+    const resolvedPath = scene.resolveKeyboardPath(req);
+    expect(resolvedPath).not.toBeNull();
+    expect(resolvedPath.length).toBeGreaterThan(0);
+
+    // Every step in the resolved path must be an adjacent grid step (delta of 1 tile)
+    let current = { ...scene.playerPos };
+    for (const step of resolvedPath) {
+      const dist = Math.abs(step.tx - current.tx) + Math.abs(step.ty - current.ty);
+      expect(dist).toBe(1);
+      current = { tx: step.tx, ty: step.ty };
+    }
+    expect(current).toEqual({ tx: 5, ty: 5 });
+  });
+
+  it('catches free-roam velocity movement walking straight up and down without grid zig-zagging', () => {
+    const RuntimeScene = createTutorialForestScene(fakeRuntime());
+    const scene = new RuntimeScene();
+    scene.init({ seed: 4242 });
+    scene.world = buildTutorialForestWorld(4242);
+    scene.tileW = 80;
+    scene.tileH = 40;
+    scene.player = { x: 0, y: 400, setDepth() {}, play() {}, anims: null };
+    scene.wasdKeys = {
+      W: { isDown: false },
+      A: { isDown: false },
+      S: { isDown: false },
+      D: { isDown: false },
+    };
+    scene.cursors = {
+      up: { isDown: false },
+      down: { isDown: false },
+      left: { isDown: false },
+      right: { isDown: false },
+    };
+
+    // 1. Walk straight UP (W key): player.y decreases, player.x remains exactly 0 (no zig-zag!)
+    scene.wasdKeys.W.isDown = true;
+    scene.updateLocomotion(100); // 100ms
+    expect(scene.player.x).toBe(0);
+    expect(scene.player.y).toBeLessThan(400);
+    expect(scene.playerDirection).toBe('north');
+    expect(scene.isWalking).toBe(true);
+    scene.wasdKeys.W.isDown = false;
+
+    // 2. Walk straight DOWN (S key): player.y increases, player.x remains exactly 0 (no zig-zag!)
+    const currentY = scene.player.y;
+    scene.wasdKeys.S.isDown = true;
+    scene.updateLocomotion(100);
+    expect(scene.player.x).toBe(0);
+    expect(scene.player.y).toBeGreaterThan(currentY);
+    expect(scene.playerDirection).toBe('south');
+    expect(scene.isWalking).toBe(true);
+    scene.wasdKeys.S.isDown = false;
+
+    // 3. Releasing keys settles into idle pose
+    scene.updateLocomotion(16);
+    expect(scene.isWalking).toBe(false);
   });
 });

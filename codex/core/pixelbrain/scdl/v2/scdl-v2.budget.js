@@ -38,6 +38,8 @@ export const DEFAULT_SCDL_V2_LIMITS = Object.freeze({
   generatedShapes: 10000,
   rasterCells: 1048576,
   recursionDepth: 64,
+  maxFrames: 120,
+  maxSamples: 4096,
 });
 
 export const HOST_SCDL_V2_CEILINGS = Object.freeze({
@@ -45,16 +47,20 @@ export const HOST_SCDL_V2_CEILINGS = Object.freeze({
   generatedShapes: 10000,
   rasterCells: 1048576,
   recursionDepth: 256,
+  maxFrames: 240,
+  maxSamples: 8192,
 });
 
-const LIMIT_FIELDS = Object.freeze(['instructions', 'generatedShapes', 'rasterCells', 'recursionDepth']);
+const LIMIT_FIELDS = Object.freeze(['instructions', 'generatedShapes', 'rasterCells', 'recursionDepth', 'maxFrames', 'maxSamples']);
 
 
 function fieldDiagnostic(code, field, expectedValue, receivedValue) {
+  const isAnimField = field === 'maxFrames' || field === 'maxSamples';
+  const diagnosticCode = isAnimField ? 'SCDL-ANIM-013' : code;
   const subject = code === BUDGET_CODES.PROTECTED_LIMIT ? 'requested budget' : 'measured demand';
   const ceiling = code === BUDGET_CODES.PROTECTED_LIMIT ? 'protected host limit' : 'requested budget';
   return v2Diagnostic({
-    code,
+    code: diagnosticCode,
     phase: 'BUDGET',
     message: `${field} ${subject} ${receivedValue} exceeds ${ceiling} ${expectedValue}.`,
     span: ZERO_SPAN,
@@ -294,11 +300,42 @@ function measureDemand(ir) {
   }
   instructions += 1n; // BC.EMIT.ASSET
 
+  const timelines = Array.isArray(ir && ir.timelines) ? ir.timelines : [];
+  let maxTimelineFrames = 0;
+  let totalTimelineSamples = 0;
+
+  for (const timeline of timelines) {
+    instructions += 1n; // BC.TIMELINE.NEW
+    const fc = timeline.frameCount || 0;
+    if (fc > maxTimelineFrames) maxTimelineFrames = fc;
+    for (const track of timeline.tracks || []) {
+      instructions += 1n; // BC.TRACK
+      if (track.formula) {
+        instructions += 1n; // BC.FORMULA
+      } else if (Array.isArray(track.keyframes)) {
+        instructions += BigInt(track.keyframes.length); // BC.KEYFRAME
+      }
+      totalTimelineSamples += fc;
+    }
+    instructions += BigInt((timeline.poses || []).length);
+    instructions += BigInt((timeline.events || []).length);
+    instructions += BigInt((timeline.variants || []).length);
+  }
+
+  const clips = Array.isArray(ir && ir.clips) ? ir.clips : [];
+  instructions += BigInt(clips.length);
+
+  if (timelines.length > 0) {
+    instructions += 1n; // BC.EMIT.ANIMATION
+  }
+
   return {
     instructions: Number(instructions),
     generatedShapes: Number(generatedShapes),
     rasterCells: Number(rasterCells),
     recursionDepth: maxRecursionDepth,
+    maxFrames: maxTimelineFrames,
+    maxSamples: totalTimelineSamples,
   };
 }
 

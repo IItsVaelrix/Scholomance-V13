@@ -91,6 +91,101 @@ export const AMP_CODES = Object.freeze({
 });
 
 
+// ---------------------------------------------------------------------------
+// Step 4 — mathematical animation (ANIMATION.TIMELINE@1.0)
+//
+// TIMELINE and DURATION already exist in SCDL_V2_TYPES as reserved types, so
+// shipping animation adds no type and therefore needs no language-version bump.
+// What follows are the closed enum sets the animation opcodes draw from, plus
+// their diagnostic namespace. Every set is exhaustive: an unknown member is a
+// compile error, never a silent default.
+// ---------------------------------------------------------------------------
+
+export const ANIMATION_CODES = Object.freeze({
+  UNKNOWN_TARGET: 'SCDL-ANIM-001',
+  UNKNOWN_PROPERTY: 'SCDL-ANIM-002',
+  PROPERTY_TARGET_MISMATCH: 'SCDL-ANIM-003',
+  UNKNOWN_EASING: 'SCDL-ANIM-004',
+  UNKNOWN_LOOP_MODE: 'SCDL-ANIM-005',
+  EMPTY_TRACK: 'SCDL-ANIM-006',
+  UNORDERED_KEYFRAMES: 'SCDL-ANIM-007',
+  KEYFRAME_OUT_OF_RANGE: 'SCDL-ANIM-008',
+  NON_FINITE_DURATION: 'SCDL-ANIM-009',
+  UNKNOWN_TIMELINE: 'SCDL-ANIM-010',
+  DUPLICATE_TRACK: 'SCDL-ANIM-011',
+  FORMULA_NOT_TIME_DEPENDENT: 'SCDL-ANIM-012',
+  FRAME_BUDGET_EXCEEDED: 'SCDL-ANIM-013',
+  UNKNOWN_DURATION_UNIT: 'SCDL-ANIM-014',
+});
+
+// Duration constructor opcodes. Time is integer ticks internally; these are the
+// only legal ways to spell a DURATION literal in source.
+export const DURATION_UNITS = Object.freeze(['MS', 'SECONDS', 'FPS', 'TICKS']);
+
+// Canonical timeline sample rate (PDR VOXEDIT §D2) and the loop modes a
+// TIMELINE or CLIP may declare.
+export const ANIMATION_FPS_DEFAULT = 12;
+export const LOOP_MODES = Object.freeze(['ONCE', 'REPEAT', 'MIRROR', 'HOLD']);
+
+// Closed property vocabulary. A track may only drive a property that actually
+// exists on the kind of target it names; the analyzer enforces the pairing via
+// TRACK_PROPERTY_TARGETS and refuses anything else (SCDL-ANIM-003).
+export const TRACK_PROPERTIES = Object.freeze([
+  'OPACITY',
+  'VISIBLE',
+  'TRANSFORM_X',
+  'TRANSFORM_Y',
+  'ROTATION',
+  'SCALE',
+  'FILL',
+  'ORDER',
+]);
+
+// Which target kinds each property may drive. In v1.0 of this capability a
+// TRACK TARGET must resolve to a declared LAYER id.
+//
+// This is a deliberate restriction, not an oversight: the analyzer resolves a
+// `SHAPE $name` reference straight into each PAINT's shape value, so the symbol
+// name does not survive into the IR and a shape cannot be addressed after
+// analysis. LAYER is also the correct authoring granularity — put each
+// animatable element (a limb, a crown, a blade) in its own LAYER and drive that
+// layer. Advertising SHAPE targeting here would compile and then silently
+// animate nothing, which is the exact failure mode this language forbids.
+export const TRACK_PROPERTY_TARGETS = Object.freeze({
+  OPACITY: ['LAYER'],
+  VISIBLE: ['LAYER'],
+  ORDER: ['LAYER'],
+  TRANSFORM_X: ['LAYER'],
+  TRANSFORM_Y: ['LAYER'],
+  ROTATION: ['LAYER'],
+  SCALE: ['LAYER'],
+  FILL: ['LAYER'],
+});
+
+// Versioned deterministic easing curves. The name is part of program identity:
+// changing a curve's mathematics is a language-version change, not a patch.
+// Each entry maps normalized t in [0,1] to eased progress in [0,1].
+export const EASING_CURVES = Object.freeze([
+  'LINEAR',
+  'STEP',
+  'SINE_IN',
+  'SINE_OUT',
+  'SINE_IN_OUT',
+  'QUAD_IN',
+  'QUAD_OUT',
+  'QUAD_IN_OUT',
+  'CUBIC_IN',
+  'CUBIC_OUT',
+  'CUBIC_IN_OUT',
+  'SMOOTHSTEP',
+]);
+
+export const EASING_VERSION = '1.0.0';
+
+// Implicit symbols bound inside a TRACK FORMULA body at sample time. Authors
+// may read these but never declare or assign them.
+export const TIME_SYMBOLS = Object.freeze(['$time', '$time_normalized', '$frame', '$t']);
+
 export const ABI_DESCRIPTOR_TYPES = Object.freeze(['PACKET', 'ASSET', 'ANY']);
 
 export function isKnownType(type) {

@@ -57,6 +57,7 @@ import HeightmapAdapter from './adapters/heightmap.adapter.js';
 import PerlinFieldAdapter from './adapters/perlin-field.adapter.js';
 import NoiseMaskAdapter from './adapters/noise-mask.adapter.js';
 import SoilAdapter from './adapters/soil.adapter.js';
+import WandStrokeAdapter from './adapters/wand-stroke.adapter.js';
 
 class AmpCatalog {
   constructor() {
@@ -181,6 +182,7 @@ class AmpCatalog {
     this.registerAdapter('pixelbrain.soil', SoilAdapter);
     this.registerAdapter('pixelbrain.dirt', SoilAdapter);
     this.registerAdapter('pixelbrain.tile-ground', SoilAdapter);
+    this.registerAdapter('pixelbrain.wand-stroke', WandStrokeAdapter);
   }
 }
 

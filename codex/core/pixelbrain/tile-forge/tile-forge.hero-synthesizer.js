@@ -23,7 +23,9 @@ import {
 } from './tile-forge.palette-engine.js';
 import {
   renderVolumetricFoliageLobe,
+  renderClusteredFoliageLobe,
   renderGnarledWoodBranch,
+  renderBarkTrunk,
   renderChiseledStoneBlock,
 } from './tile-forge.material-grammar.js';
 import {
@@ -86,6 +88,27 @@ function createHeroBuffer(width, height) {
 }
 
 /**
+ * Grounds an actor with a contact shadow plus a soft cast shadow thrown toward
+ * the south-east (away from the upper-left key light), so it sits in the scene
+ * instead of floating above it.
+ */
+function drawGroundingShadow(buffer, cx, groundY, rx, ry, rgb, cast = 0.45) {
+  for (let dy = -ry; dy <= ry; dy += 1) {
+    for (let dx = -rx; dx <= rx; dx += 1) {
+      const contact = (dx * dx) / (rx * rx) + (dy * dy) / (ry * ry);
+      if (contact <= 1) {
+        buffer.setPixel(cx + dx, groundY + dy, rgb, Math.round(150 * (1 - contact)));
+      }
+      const castX = dx - rx * cast;
+      const castDist = (castX * castX) / (rx * rx * 1.5) + (dy * dy) / (ry * ry * 1.15);
+      if (castDist <= 1 && castX > 0) {
+        buffer.setPixel(cx + dx, groundY + dy, rgb, Math.round(80 * (1 - castDist)));
+      }
+    }
+  }
+}
+
+/**
  * Synthesizes the Grandfather Ancient Oak (160x200).
  */
 export function synthesizeGrandfatherOak({
@@ -103,16 +126,9 @@ export function synthesizeGrandfatherOak({
   const cx = 80;
   const baseGroundY = 178;
 
-  // 1. Ground Drop Shadow (Soft dimetric contact ellipse)
+  // 1. Grounding: contact shadow + south-east cast shadow.
   const shadowColor = hexToRgb(palette.ramp[0]);
-  for (let dy = -12; dy <= 12; dy += 1) {
-    for (let dx = -46; dx <= 46; dx += 1) {
-      const dist = (dx * dx) / (46 * 46) + (dy * dy) / (12 * 12);
-      if (dist <= 1.0) {
-        buf.setPixel(cx + dx, baseGroundY + dy, shadowColor, Math.round(140 * (1 - dist)));
-      }
-    }
-  }
+  drawGroundingShadow(buf, cx, baseGroundY, 46, 12, shadowColor);
 
   // 2. Buttressed Roots
   const rootPrng = createPrng(subSeeds.structure + 1);
@@ -123,11 +139,11 @@ export function synthesizeGrandfatherOak({
     { x0: cx + 3, y0: baseGroundY - 4, x1: cx + 12, y1: baseGroundY + 8, r0: 5, r1: 2 },
   ];
   for (const r of roots) {
-    renderGnarledWoodBranch(buf, r.x0, r.y0, r.x1, r.y1, r.r0, r.r1, palette.wood, rootPrng);
+    renderBarkTrunk(buf, r.x0, r.y0, r.x1, r.y1, r.r0, r.r1, palette.wood, rootPrng);
   }
 
   // 3. Massive Gnarled Trunk
-  renderGnarledWoodBranch(buf, cx, baseGroundY, cx - 4, 118, 14, 10, palette.wood, structPrng);
+  renderBarkTrunk(buf, cx, baseGroundY, cx - 4, 118, 14, 10, palette.wood, structPrng);
 
   // 4. Primary Boughs
   const boughs = [
@@ -138,7 +154,7 @@ export function synthesizeGrandfatherOak({
     { x0: cx + 22, y0: 94, x1: cx + 48, y1: 60, r0: 5, r1: 2 },
   ];
   for (const b of boughs) {
-    renderGnarledWoodBranch(buf, b.x0, b.y0, b.x1, b.y1, b.r0, b.r1, palette.wood, structPrng);
+    renderBarkTrunk(buf, b.x0, b.y0, b.x1, b.y1, b.r0, b.r1, palette.wood, structPrng);
   }
 
   // 5. Deep Background Canopy Lobes (ambient occlusion)
@@ -148,10 +164,10 @@ export function synthesizeGrandfatherOak({
     { cx: cx - 6, cy: 56, rx: 34, ry: 26 },
   ];
   for (const lobe of bgLobes) {
-    renderVolumetricFoliageLobe(buf, lobe.cx, lobe.cy, lobe.rx, lobe.ry, palette.ramp, foliagePrng, { isBackground: true });
+    renderClusteredFoliageLobe(buf, lobe.cx, lobe.cy, lobe.rx, lobe.ry, palette.ramp, foliagePrng, { isBackground: true });
   }
 
-  // 6. Foreground Volumetric Canopy Lobes (multi-layered cloud volumes)
+  // 6. Foreground Canopy Lobes (layered clustered leaf masses)
   const fgLobes = [
     { cx: cx - 46, cy: 82, rx: 28, ry: 22, sunlit: 0.1 },
     { cx: cx + 44, cy: 80, rx: 26, ry: 20, sunlit: -0.05 },
@@ -160,7 +176,7 @@ export function synthesizeGrandfatherOak({
     { cx: cx - 2, cy: 40, rx: 32, ry: 25, sunlit: 0.22 },
   ];
   for (const lobe of fgLobes) {
-    renderVolumetricFoliageLobe(buf, lobe.cx, lobe.cy, lobe.rx, lobe.ry, palette.ramp, foliagePrng, { sunlitBoost: lobe.sunlit });
+    renderClusteredFoliageLobe(buf, lobe.cx, lobe.cy, lobe.rx, lobe.ry, palette.ramp, foliagePrng, { sunlitBoost: lobe.sunlit });
   }
 
   // Count active cells
@@ -222,21 +238,14 @@ export function synthesizeAutumnMaple({
   const cx = 70;
   const baseGroundY = 162;
 
-  // 1. Ground Contact Shadow
+  // 1. Grounding: contact shadow + south-east cast shadow.
   const shadowColor = hexToRgb(palette.ramp[0]);
-  for (let dy = -10; dy <= 10; dy += 1) {
-    for (let dx = -38; dx <= 38; dx += 1) {
-      const dist = (dx * dx) / (38 * 38) + (dy * dy) / (10 * 10);
-      if (dist <= 1.0) {
-        buf.setPixel(cx + dx, baseGroundY + dy, shadowColor, Math.round(130 * (1 - dist)));
-      }
-    }
-  }
+  drawGroundingShadow(buf, cx, baseGroundY, 38, 10, shadowColor);
 
   // 2. Asymmetric Curved Trunk
-  renderGnarledWoodBranch(buf, cx, baseGroundY, cx - 8, 108, 11, 7, palette.wood, structPrng);
-  renderGnarledWoodBranch(buf, cx - 8, 108, cx - 18, 72, 7, 4, palette.wood, structPrng);
-  renderGnarledWoodBranch(buf, cx - 8, 108, cx + 22, 78, 6, 3, palette.wood, structPrng);
+  renderBarkTrunk(buf, cx, baseGroundY, cx - 8, 108, 11, 7, palette.wood, structPrng);
+  renderBarkTrunk(buf, cx - 8, 108, cx - 18, 72, 7, 4, palette.wood, structPrng);
+  renderBarkTrunk(buf, cx - 8, 108, cx + 22, 78, 6, 3, palette.wood, structPrng);
 
   // 3. Golden Foliage Lobes (Asymmetrical, windward slant)
   const lobes = [
@@ -248,7 +257,7 @@ export function synthesizeAutumnMaple({
   ];
 
   for (const lobe of lobes) {
-    renderVolumetricFoliageLobe(buf, lobe.cx, lobe.cy, lobe.rx, lobe.ry, palette.ramp, foliagePrng, { sunlitBoost: lobe.sunlit });
+    renderClusteredFoliageLobe(buf, lobe.cx, lobe.cy, lobe.rx, lobe.ry, palette.ramp, foliagePrng, { sunlitBoost: lobe.sunlit });
   }
 
   // 4. Sparse Falling Leaves Drift

@@ -12,6 +12,7 @@ export { parseSCDLV2 } from './v2/scdl-v2.parser.js';
 export { formatSCDLV2 } from './v2/scdl-v2.formatter.js';
 export { listSCDLV2Opcodes, getSCDLV2Opcode, listSCDLV2Capabilities } from './v2/scdl-v2.opcodes.js';
 export { inspectSCDLV2 } from './v2/scdl-v2.inspector.js';
+export { applyEasing, sampleTimeline, buildAnimationManifest, EASING_CURVES, EASING_VERSION } from './v2/scdl-v2.animation.js';
 export { parseSCDL, tokenize }       from './scdl.grammar.js';
 export { exportSCDL, buildAsepritePayload } from './scdl.exporters.js';
 export { emitLattice }               from './scdl.lattice-emitter.js';

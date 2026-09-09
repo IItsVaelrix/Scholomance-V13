@@ -3,8 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import styles from './CharacterCompendiumOverlay.module.css';
 import { buildCharacterCompendiumSnapshot } from '../../game/character/characterCompendium.js';
 import { getScholomanceXpSnapshot } from '../../game/character/scholomanceXpService.js';
-
-const CHARACTER_IMAGE_URL = '/generated-assets/IdealHuman/IdealHuman-png.png';
+import { getLotusWandererPortraitUrl } from '../../game/tutorial-forest/render/lotusWandererPortrait.js';
 
 function isTypingTarget(target) {
   if (!target) return false;
@@ -19,6 +18,7 @@ export function CharacterCompendiumOverlay() {
   const [isOpen, setIsOpen] = useState(false);
   const [combatStats, setCombatStats] = useState(null);
   const [xpReadout, setXpReadout] = useState(null);
+  const [inventoryVersion, setInventoryVersion] = useState(0);
 
   const snapshot = useMemo(
     () => buildCharacterCompendiumSnapshot({
@@ -26,7 +26,8 @@ export function CharacterCompendiumOverlay() {
       scholomance: combatStats?.scholomance,
       xpReadout,
     }),
-    [combatStats, xpReadout],
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- inventoryVersion forces a re-read of getInventorySnapshot() inside the builder
+    [combatStats, xpReadout, inventoryVersion],
   );
 
   useEffect(() => {
@@ -40,11 +41,14 @@ export function CharacterCompendiumOverlay() {
     const onXp = (event) => {
       if (event?.detail?.readout) setXpReadout(event.detail.readout);
     };
+    const onInventory = () => setInventoryVersion((version) => version + 1);
     window.addEventListener('combat-stats-changed', onStats);
     window.addEventListener('scholomance-xp-changed', onXp);
+    window.addEventListener('inventory-changed', onInventory);
     return () => {
       window.removeEventListener('combat-stats-changed', onStats);
       window.removeEventListener('scholomance-xp-changed', onXp);
+      window.removeEventListener('inventory-changed', onInventory);
     };
   }, []);
 
@@ -90,6 +94,8 @@ export function CharacterCompendiumOverlay() {
   const movementRow = snapshot.tactical.rows.find((row) => row.key === 'movementPoints');
   const attackRow = snapshot.tactical.rows.find((row) => row.key === 'attackPoints');
   const rangeRow = snapshot.tactical.rows.find((row) => row.key === 'attackRange');
+  const weaponRow = snapshot.equipment.rows.find((row) => row.slotId === 'weapon');
+  const portraitUrl = getLotusWandererPortraitUrl({ equipped: weaponRow ? { weapon: weaponRow.item } : undefined });
 
   return (
     <AnimatePresence>
@@ -133,7 +139,7 @@ export function CharacterCompendiumOverlay() {
               <section className={styles.portraitPane}>
                 <div className={styles.portraitFrame}>
                   <img
-                    src={CHARACTER_IMAGE_URL}
+                    src={portraitUrl}
                     alt="Scholomancer portrait"
                     className={styles.portraitImage}
                   />

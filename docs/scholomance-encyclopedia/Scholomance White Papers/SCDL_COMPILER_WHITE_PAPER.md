@@ -1198,10 +1198,9 @@ Decomposition Step 3 completes the generative mathematical substrate for SCDL v2
 
 With Decomposition Step 3 (Generative Mathematics) complete, the following remain for **later subprojects**:
 
-- animation, timelines, tracks, frames, and loops in v2 source (Step 4)
+- animation, timelines, tracks, frames, and loops in v2 source (Step 4 — SHIPPED: `TIMELINE`, finite sampler, deterministic versioned easing, and multi-frame packet emission)
 - imports and multi-file modules (Step 5)
 - AMP execution substrate and agent-inspection milestones (Steps 5, 6, 7)
 
-Do not author those forms against this compiler. The v1 / v1.2 pipeline in
-§§1–10 continues to provide frames, boolean ops, scene-graph, and SymmetryAMP
-for unversioned sources; that is a different language.
+Do not author remaining un-shipped forms against this compiler. The v1 / v1.2 pipeline in
+§§1–10 continues to provide legacy support for unversioned sources.

@@ -26,6 +26,7 @@ const POSITIONAL_EXPRESSIONS = new Set([
   'DISTANCE', 'DOT', 'CROSS', 'NORMALIZE',
   'EQ', 'NEQ', 'LT', 'LTE', 'GT', 'GTE', 'AND', 'OR', 'NOT',
   'PREV', 'AT', 'LENGTH', 'SUM', 'PRODUCT', 'ZIP',
+  'MS', 'SECONDS', 'FPS', 'TICKS', 'RATIO', 'TAU',
 ]);
 const NAMED_EXPRESSIONS = new Set([
   'PIXEL', 'CIRCLE',
@@ -298,6 +299,15 @@ class Parser {
       case 'RADIAL': return this.parseRadialStatement(opcodeToken);
       case 'APPLY_AMP': return this.parseApplyAmpStatement(opcodeToken, scope);
       case 'SELECT_AMPS': return this.parseSelectAmpsStatement(opcodeToken);
+      case 'TIMELINE': return this.parseTimelineDeclaration(opcodeToken);
+      case 'CLIP': return this.parseClipDeclaration(opcodeToken);
+      case 'TRACK': return this.parseTrackStatement(opcodeToken);
+      case 'POSE': return this.parsePoseStatement(opcodeToken);
+      case 'EVENT': return this.parseEventStatement(opcodeToken);
+      case 'VARIANT': return this.parseVariantStatement(opcodeToken);
+      case 'KEYFRAME': return this.parseKeyframeStatement(opcodeToken);
+      case 'FORMULA': return this.parseFormulaStatement(opcodeToken);
+      case 'VISIBILITY': return this.parseVisibilityStatement(opcodeToken);
       default:
         this.abort(
           PARSE_CODES.UNKNOWN_OPCODE,
@@ -988,6 +998,252 @@ class Parser {
       body,
       children: [id, order, ...Object.values(options), ...body],
       span: nodeSpan(opcodeToken, closingToken),
+    };
+  }
+
+  // -------------------------------------------------------------------------
+  // Step 4 — mathematical animation
+  //
+  // TIMELINE <id> DURATION (MS 800) [SAMPLE_RATE (FPS 12)] [LOOP REPEAT] { ... }
+  //   TRACK TARGET <id> PROPERTY <prop> { KEYFRAME... | FORMULA... | VISIBILITY... }
+  //   POSE <id> { TRACK... }
+  //   EVENT AT (MS 400) NAME <id>
+  //   VARIANT NAME <id> FROM (MS 0) TO (MS 400)
+  // CLIP <id> TIMELINE <id> [AT (MS 0)] [LOOP REPEAT]
+  //
+  // Bodies are parsed with dedicated scopes so the opcode registry's own
+  // `scope` arrays enforce legality; nothing here re-implements that table.
+  // -------------------------------------------------------------------------
+
+  parseTimelineDeclaration(opcodeToken) {
+    this.skipLayout();
+    const idToken = this.expect('WORD', null, ['timeline identifier']);
+    const id = this.literal(idToken);
+    this.skipLayout();
+    this.expect('WORD', 'DURATION', ['DURATION']);
+    this.skipLayout();
+    const duration = this.parseExpression();
+    const options = {};
+    for (;;) {
+      this.skipLayout();
+      const peek = this.peekInline();
+      if (peek.kind === 'WORD' && ['SAMPLE_RATE', 'LOOP'].includes(peek.raw)) {
+        this.take();
+        this.skipLayout();
+        if (peek.raw === 'LOOP') {
+          const modeToken = this.expect('WORD', null, ['ONCE', 'REPEAT', 'MIRROR', 'HOLD']);
+          options.LOOP = this.literal(modeToken);
+        } else {
+          options.SAMPLE_RATE = this.parseExpression();
+        }
+      } else {
+        break;
+      }
+    }
+    this.skipLayout();
+    this.expect('LBRACE', '{', ['{']);
+    const body = this.parseBlock('TIMELINE');
+    const closingToken = this.tokens[this.index - 1] || opcodeToken;
+
+    return {
+      kind: 'TimelineDeclaration',
+      opcode: 'TIMELINE',
+      id,
+      duration,
+      sampleRate: options.SAMPLE_RATE || null,
+      loop: options.LOOP || null,
+      body,
+      children: [id, duration, ...Object.values(options), ...body],
+      span: nodeSpan(opcodeToken, closingToken),
+    };
+  }
+
+  parseClipDeclaration(opcodeToken) {
+    this.skipLayout();
+    const idToken = this.expect('WORD', null, ['clip identifier']);
+    const id = this.literal(idToken);
+    this.skipLayout();
+    this.expect('WORD', 'TIMELINE', ['TIMELINE']);
+    this.skipLayout();
+    const timelineToken = this.expect('WORD', null, ['timeline identifier']);
+    const timeline = this.literal(timelineToken);
+    const options = {};
+    for (;;) {
+      this.skipLayout();
+      const peek = this.peekInline();
+      if (peek.kind === 'WORD' && ['AT', 'LOOP'].includes(peek.raw)) {
+        this.take();
+        this.skipLayout();
+        if (peek.raw === 'LOOP') {
+          const modeToken = this.expect('WORD', null, ['ONCE', 'REPEAT', 'MIRROR', 'HOLD']);
+          options.LOOP = this.literal(modeToken);
+        } else {
+          options.AT = this.parseExpression();
+        }
+      } else {
+        break;
+      }
+    }
+    const lastToken = options.AT || options.LOOP || timeline;
+
+    return {
+      kind: 'ClipDeclaration',
+      opcode: 'CLIP',
+      id,
+      timeline,
+      at: options.AT || null,
+      loop: options.LOOP || null,
+      children: [id, timeline, ...Object.values(options)],
+      span: nodeSpan(opcodeToken, lastToken),
+    };
+  }
+
+  parseTrackStatement(opcodeToken) {
+    this.skipLayout();
+    this.expect('WORD', 'TARGET', ['TARGET']);
+    this.skipLayout();
+    const targetToken = this.expect('WORD', null, ['declared layer, shape, or paint identifier']);
+    const target = this.literal(targetToken);
+    this.skipLayout();
+    this.expect('WORD', 'PROPERTY', ['PROPERTY']);
+    this.skipLayout();
+    const propertyToken = this.expect('WORD', null, ['track property']);
+    const property = this.literal(propertyToken);
+    this.skipLayout();
+    this.expect('LBRACE', '{', ['{']);
+    const body = this.parseBlock('TRACK');
+    const closingToken = this.tokens[this.index - 1] || opcodeToken;
+
+    return {
+      kind: 'TrackStatement',
+      opcode: 'TRACK',
+      target,
+      property,
+      body,
+      children: [target, property, ...body],
+      span: nodeSpan(opcodeToken, closingToken),
+    };
+  }
+
+  parsePoseStatement(opcodeToken) {
+    this.skipLayout();
+    const idToken = this.expect('WORD', null, ['pose identifier']);
+    const id = this.literal(idToken);
+    this.skipLayout();
+    this.expect('LBRACE', '{', ['{']);
+    const body = this.parseBlock('POSE');
+    const closingToken = this.tokens[this.index - 1] || opcodeToken;
+
+    return {
+      kind: 'PoseStatement',
+      opcode: 'POSE',
+      id,
+      body,
+      children: [id, ...body],
+      span: nodeSpan(opcodeToken, closingToken),
+    };
+  }
+
+  parseEventStatement(opcodeToken) {
+    this.skipLayout();
+    this.expect('WORD', 'AT', ['AT']);
+    this.skipLayout();
+    const at = this.parseExpression();
+    this.skipLayout();
+    this.expect('WORD', 'NAME', ['NAME']);
+    this.skipLayout();
+    const nameToken = this.expect('WORD', null, ['event name']);
+    const name = this.literal(nameToken);
+
+    return {
+      kind: 'EventStatement',
+      opcode: 'EVENT',
+      at,
+      name,
+      children: [at, name],
+      span: nodeSpan(opcodeToken, name),
+    };
+  }
+
+  parseVariantStatement(opcodeToken) {
+    this.skipLayout();
+    const nameToken = this.expect('WORD', null, ['variant name']);
+    const name = this.literal(nameToken);
+    this.skipLayout();
+    this.expect('WORD', 'FROM', ['FROM']);
+    this.skipLayout();
+    const from = this.parseExpression();
+    this.skipLayout();
+    this.expect('WORD', 'TO', ['TO']);
+    this.skipLayout();
+    const to = this.parseExpression();
+
+    return {
+      kind: 'VariantStatement',
+      opcode: 'VARIANT',
+      name,
+      from,
+      to,
+      children: [name, from, to],
+      span: nodeSpan(opcodeToken, to),
+    };
+  }
+
+  parseKeyframeStatement(opcodeToken) {
+    this.skipLayout();
+    this.expect('WORD', 'AT', ['AT']);
+    this.skipLayout();
+    const at = this.parseExpression();
+    this.skipLayout();
+    this.expect('WORD', 'VALUE', ['VALUE']);
+    this.skipLayout();
+    const value = this.parseExpression();
+    let ease = null;
+    const peek = this.peekInline();
+    if (peek.kind === 'WORD' && peek.raw === 'EASE') {
+      this.take();
+      this.skipLayout();
+      const easeToken = this.expect('WORD', null, ['easing curve name']);
+      ease = this.literal(easeToken);
+    }
+    const lastToken = ease || value;
+
+    return {
+      kind: 'KeyframeStatement',
+      opcode: 'KEYFRAME',
+      at,
+      value,
+      ease,
+      children: [at, value, ...(ease ? [ease] : [])],
+      span: nodeSpan(opcodeToken, lastToken),
+    };
+  }
+
+  parseFormulaStatement(opcodeToken) {
+    const value = this.parseExpression();
+
+    return {
+      kind: 'FormulaStatement',
+      opcode: 'FORMULA',
+      value,
+      children: [value],
+      span: nodeSpan(opcodeToken, value),
+    };
+  }
+
+  parseVisibilityStatement(opcodeToken) {
+    this.expect('WORD', 'AT', ['AT']);
+    const at = this.parseExpression();
+    this.expect('WORD', 'VALUE', ['VALUE']);
+    const value = this.parseExpression();
+
+    return {
+      kind: 'VisibilityStatement',
+      opcode: 'VISIBILITY',
+      at,
+      value,
+      children: [at, value],
+      span: nodeSpan(opcodeToken, value),
     };
   }
 
