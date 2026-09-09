@@ -279,9 +279,20 @@ export function buildTutorialForestWorld(_seed = 4242) {
           elevation: biome.elevation,
           scd128Record: createTreeWitnessRecord(heroicTree.speciesKey),
         });
-        if (heroicTree.speciesKey !== 'sunlit_young_sapling') {
-          tileEntry.walkable = false;
-        }
+        tileEntry.walkable = false;
+      }
+
+      // ── Decor Boulder Collision Blocking ──────────────────────────────────
+      // Decor boulders from forestComposition are visual-only actors, but
+      // their visible rock mass warrants collision so the player slides
+      // around them instead of phasing through.  Water-shore boulders at
+      // (11,5) and (16,5) are already non-walkable via the pond zone.
+      if (tileEntry.walkable && (
+        (tx === 4 && ty === 10) ||
+        (tx === 19 && ty === 14) ||
+        (tx === 13 && ty === 15)
+      )) {
+        tileEntry.walkable = false;
       }
     }
   }

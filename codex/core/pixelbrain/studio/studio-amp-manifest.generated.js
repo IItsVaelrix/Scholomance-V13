@@ -146,6 +146,29 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
+    "ampId": "tile-shape.microprocessor",
+    "modulePath": "codex/core/pixelbrain/amps/geometry/processors/tile-shape.microprocessor.js",
+    "system": "microprocessor",
+    "status": "WIRED",
+    "kind": "runtime-gated",
+    "tab": "diagnostics",
+    "pipeline": "microprocessor",
+    "order": 7,
+    "adapterId": "tile-shape.microprocessor",
+    "mutates": false,
+    "reads": [
+      "asset.snapshot"
+    ],
+    "writes": [],
+    "exports": [
+      "TileShapeMicroprocessor"
+    ],
+    "summary": "Tile Forge — Tile Shape Microprocessor",
+    "consumerIds": [],
+    "checksum": "852e32fb9360e2428e5f4b7b64cc80b7537a707e7951b771b2fdb460b84026a8"
+  },
+  {
+    "contract": "PB-STUDIO-AMP-MANIFEST-v1",
     "ampId": "tile-socket.microprocessor",
     "modulePath": "codex/core/pixelbrain/amps/geometry/processors/tile-socket.microprocessor.js",
     "system": "microprocessor",
@@ -153,7 +176,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runtime-gated",
     "tab": "diagnostics",
     "pipeline": "microprocessor",
-    "order": 7,
+    "order": 8,
     "adapterId": "tile-socket.microprocessor",
     "mutates": false,
     "reads": [
@@ -165,7 +188,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports TileSocketMicroprocessor",
     "consumerIds": [],
-    "checksum": "368c3944c20c6e984663ea8174e195623ee963361c848f284aece3b0ccc79077"
+    "checksum": "d7388870e0b735090290d49256a67a04f3020106c8cfe470cfb38f880496b2b1"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -176,7 +199,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "support",
     "tab": "diagnostics",
     "pipeline": "microprocessor",
-    "order": 8,
+    "order": 9,
     "adapterId": "deterministic-noise",
     "mutates": false,
     "reads": [
@@ -192,7 +215,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
       "perlin-field.microprocessor",
       "studio-support-inspector"
     ],
-    "checksum": "4981c1c341b0227378cc6af50056daf2f9879a0ee31dee8e5cf9daba1d015b58"
+    "checksum": "43ade33558788a2dedf1bd40d3096a1777ae868a3dbf646ea79b21e3df04ad06"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -203,7 +226,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runtime-gated",
     "tab": "diagnostics",
     "pipeline": "microprocessor",
-    "order": 9,
+    "order": 10,
     "adapterId": "noise-mask.microprocessor",
     "mutates": false,
     "reads": [
@@ -215,7 +238,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports generateNoiseMask",
     "consumerIds": [],
-    "checksum": "3f0980a98591b470ac78db7d784105ab6e6d3f8cbb42576a81d8002f7a3b9434"
+    "checksum": "bf8fa606e07c4f7f86f7af3629511c0c954648f26b38279b80869c41b9abb241"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -226,7 +249,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runtime-gated",
     "tab": "diagnostics",
     "pipeline": "microprocessor",
-    "order": 10,
+    "order": 11,
     "adapterId": "perlin-field.microprocessor",
     "mutates": false,
     "reads": [
@@ -238,7 +261,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports PerlinFieldMicroprocessor",
     "consumerIds": [],
-    "checksum": "8d2c3153ac45e57f3f9c4e34258cbe5ef555f053cc51ad4a317910c3cbba522e"
+    "checksum": "e45c90e6b62cc83f7774a23386e7a7d943a6d0df4eb59d15ac89274805af9f21"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -249,7 +272,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "support",
     "tab": "diagnostics",
     "pipeline": "microprocessor",
-    "order": 11,
+    "order": 12,
     "adapterId": "qbit-snap-profile",
     "mutates": false,
     "reads": [
@@ -266,7 +289,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "consumerIds": [
       "studio-support-inspector"
     ],
-    "checksum": "5df639b53d6fba4806af375d79c512d2b2b0eef8833e9f8dcc16fc4f7d9444ac"
+    "checksum": "10010155997fafb307e7a690ad2b2cf66fa5a462f197a85428ea8ff812882395"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -277,7 +300,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "support",
     "tab": "diagnostics",
     "pipeline": "microprocessor",
-    "order": 12,
+    "order": 13,
     "adapterId": "turboquant-layer-snapshot",
     "mutates": false,
     "reads": [
@@ -291,7 +314,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "consumerIds": [
       "studio-support-inspector"
     ],
-    "checksum": "3e17971af7fa52d0ef6b75f769b7295f4ce312943010038fa72a60a11628aad5"
+    "checksum": "2911954c6f69ed0bdd029542df7e3300e33bedae54eba2e02350763567f7090d"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -302,7 +325,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runtime-gated",
     "tab": "diagnostics",
     "pipeline": "microprocessor",
-    "order": 13,
+    "order": 14,
     "adapterId": "heightmap.microprocessor",
     "mutates": false,
     "reads": [
@@ -314,7 +337,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports generateHeightMap",
     "consumerIds": [],
-    "checksum": "d6a1d9986025970921e5c1105659d9877b007b92be2caaa3ff679f43c78384a0"
+    "checksum": "404a0742b77cdb3df1d758735fe7b0f101b06b21c413e713de83deb861ba0df1"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -325,7 +348,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runtime-gated",
     "tab": "diagnostics",
     "pipeline": "microprocessor",
-    "order": 14,
+    "order": 15,
     "adapterId": "volume.microprocessor",
     "mutates": false,
     "reads": [
@@ -337,7 +360,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports VolumeMicroprocessor",
     "consumerIds": [],
-    "checksum": "fc914e1a2a4d04d5175526b63ec9e143841ff888ffc7c8341a22fbd1d8f48d3e"
+    "checksum": "51d6b793f8198ad3cb32b996e961ef6a0e7952df2e2e942472755b0a77261a92"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -348,7 +371,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runtime-gated",
     "tab": "diagnostics",
     "pipeline": "pixelbrain",
-    "order": 15,
+    "order": 16,
     "adapterId": "biome-coherence-amp",
     "mutates": false,
     "reads": [
@@ -363,7 +386,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports NEGOTIATION_THRESHOLD, getNeighbors6, runBiomeCoherenceAMP, runBiomeCoherenceAMPWorld",
     "consumerIds": [],
-    "checksum": "9c0bfe519cc54de0539176b91b29737844d4cc907cd8aac7d5df9186d33e2651"
+    "checksum": "e2329682f3923f2cab50cce0eebeb7c61a1d4846aa304754d1caca7209c2a405"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -374,7 +397,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "amps",
     "pipeline": "pixelbrain",
-    "order": 16,
+    "order": 17,
     "adapterId": "chestplate-amp",
     "mutates": false,
     "reads": [
@@ -386,7 +409,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports applyChestplateTemplate",
     "consumerIds": [],
-    "checksum": "f0956c6724c9a1d511109bbde704dca035560faaf8a78b8fae236690e7aef6bd"
+    "checksum": "014f8394e0e7ecd9d247d6026103f219dab510533f04eaf9957e6592802ed3a1"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -397,7 +420,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "finish",
     "pipeline": "pixelbrain",
-    "order": 17,
+    "order": 18,
     "adapterId": "chestplate-bevel-amp",
     "mutates": false,
     "reads": [
@@ -409,7 +432,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Deterministic trim/plate beveling for chestplate-class assets.",
     "consumerIds": [],
-    "checksum": "70c762bc1504618af3cc100ac5e58958e0e8328c134afbc76296d4e5ae216fe6"
+    "checksum": "68424219a5aab4756ff1416ae64c686508093d1566dd06f283caadcec3658a98"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -420,7 +443,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "finish",
     "pipeline": "pixelbrain",
-    "order": 18,
+    "order": 19,
     "adapterId": "chestplate-surface-texture-amp",
     "mutates": false,
     "reads": [
@@ -432,7 +455,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Deterministic material texture for chestplate surfaces.",
     "consumerIds": [],
-    "checksum": "a0bae951e582a9c4068d179f6273b02c84ef9ac57170b9d0dd8e2c6da9841b2f"
+    "checksum": "ca1572711310870632b081524310a1cd2f339bebe2f04effb4bbefdd987ebfde"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -443,7 +466,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runtime-gated",
     "tab": "diagnostics",
     "pipeline": "pixelbrain",
-    "order": 19,
+    "order": 20,
     "adapterId": "chunks-seam-amp",
     "mutates": false,
     "reads": [
@@ -457,7 +480,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports DEFAULT_OVERLAP_RADIUS, injectAllBorderEnergies, injectBorderEnergy",
     "consumerIds": [],
-    "checksum": "28fd79a9f57b7aace3da26a535bbdbc2e00bb69cb64735509e35426d1966675a"
+    "checksum": "da37c3a02fa7fdba94c850b00bb071aeb1f78047637cec035bc4f8d671619896"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -468,7 +491,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "mutation",
     "tab": "mutations",
     "pipeline": "editor-mutation",
-    "order": 20,
+    "order": 21,
     "adapterId": "coord-symmetry-amp",
     "mutates": true,
     "reads": [
@@ -485,7 +508,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "COORDINATE SYMMETRY AMP MICROPROCESSOR",
     "consumerIds": [],
-    "checksum": "07094a62787234cd304e61b89a0ed594a7e1a83dd46c4479d09095b9c27dce27"
+    "checksum": "bef504f97ef3cb27e68ed0bca36774dc27e2009df455b1b7b8c7d9a0301d3450"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -496,7 +519,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "amps",
     "pipeline": "pixelbrain",
-    "order": 21,
+    "order": 22,
     "adapterId": "crystal-core-amp",
     "mutates": false,
     "reads": [
@@ -508,7 +531,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Structured sternum crystal/core pass for deterministic chestplate assets.",
     "consumerIds": [],
-    "checksum": "eedca3aaba84fb764fd38154e1aa5e7c0d25a68b1f49ec395365f1f8d55f7039"
+    "checksum": "530d1fa4bfe64411e63ddb4dca9ee528e146fa15bb2dda9cd3885138d46732fd"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -519,7 +542,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "finish",
     "pipeline": "pixelbrain",
-    "order": 22,
+    "order": 23,
     "adapterId": "facet-amp",
     "mutates": false,
     "reads": [
@@ -531,7 +554,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Faceting pass for gem-class parts.",
     "consumerIds": [],
-    "checksum": "e6b3847bb633965dbc02f3db72cedc05d6edaceda23dfd07a06ef84aec39a7dd"
+    "checksum": "6fd8caae885e6e4b36ed45f87330f68d05e00d56bd311eae195b45940d8e5d2e"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -542,7 +565,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "amps",
     "pipeline": "pixelbrain",
-    "order": 23,
+    "order": 24,
     "adapterId": "flame-tip-amp",
     "mutates": false,
     "reads": [
@@ -557,7 +580,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports FLAME_TIP_AMP_ID, FLAME_TIP_AMP_VERSION, applyFlameTipGeometry, buildFlameTipAmpPayload",
     "consumerIds": [],
-    "checksum": "af37754bb1d12ed76fe055791ca326e1588e50115e32f05e35e360d8f67db116"
+    "checksum": "5738f6524736c49b4de03fb218ac859a4b880c7c102cefdc25623c3df227fe20"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -568,7 +591,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runtime-gated",
     "tab": "diagnostics",
     "pipeline": "pixelbrain",
-    "order": 24,
+    "order": 25,
     "adapterId": "gear-glide-amp",
     "mutates": false,
     "reads": [
@@ -583,7 +606,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "GEAR-GLIDE AMP — BPM-Synced Clock Rotation System",
     "consumerIds": [],
-    "checksum": "b05b597f1da4d6bf7e219e68a454f007f7853313616446a1caf7c693f4f9b88b"
+    "checksum": "d09bb7e0fb55d9f045abf02721409d857069a2e1b261574bc3ea0f2c71a0f6e6"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -594,7 +617,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "blueprint",
     "pipeline": "pixelbrain",
-    "order": 25,
+    "order": 26,
     "adapterId": "geometry-amp",
     "mutates": false,
     "reads": [
@@ -608,7 +631,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Geometry AMP converts composed PixelBrain item geometry into deterministic",
     "consumerIds": [],
-    "checksum": "8ab223284a06ea37b78a6d73f928b92ea31f95db280897795c17c7a5532dce4e"
+    "checksum": "ac1f1c3502512bcc8b56b4552009bc149782020ec0c91178adbe8f50910768e8"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -619,7 +642,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "foundry",
     "pipeline": "pixelbrain",
-    "order": 26,
+    "order": 27,
     "adapterId": "grass-amp",
     "mutates": false,
     "reads": [
@@ -634,7 +657,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "PixelBrain AMP wrapper for the literal SWARD grass engine port.",
     "consumerIds": [],
-    "checksum": "548324adabc8c6d801a8c47be78fba5e38863354d7234a89d134f9ea721d3149"
+    "checksum": "c5bdd275241768d13d0dc0b9c66d7379d2b4738a6d1a67b52af417491f6757a2"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -645,7 +668,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runtime-gated",
     "tab": "diagnostics",
     "pipeline": "pixelbrain",
-    "order": 27,
+    "order": 28,
     "adapterId": "gravity-amp",
     "mutates": false,
     "reads": [
@@ -657,7 +680,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports applyGravityAMP",
     "consumerIds": [],
-    "checksum": "9a544b09a06474e651df94ca4581fb0c9cb26aa9315e8e6bc5214abebf968d07"
+    "checksum": "75121ef5d97b799b58ea94e7dba3c06335393bdd7a519e787a7ac0bbc1e73574"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -668,7 +691,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "amps",
     "pipeline": "pixelbrain",
-    "order": 28,
+    "order": 29,
     "adapterId": "hair-flow-amp",
     "mutates": false,
     "reads": [
@@ -680,7 +703,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "HairFlowAMP - Generates deterministic rasterized hair clumps and strands",
     "consumerIds": [],
-    "checksum": "bf524dd674dfe08b3917f33a2b2d922583fadcad9d0c742494004c8412c35b74"
+    "checksum": "67b4feaebf43fae0a437641fe7b3b81e0d3885b787e06b543c3a9657c6e18d69"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -691,7 +714,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "amps",
     "pipeline": "pixelbrain",
-    "order": 29,
+    "order": 30,
     "adapterId": "heraldry-amp",
     "mutates": false,
     "reads": [
@@ -706,7 +729,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "HERALDRY MICROPROCESSOR — emblem stamping for shield faces and panels.",
     "consumerIds": [],
-    "checksum": "190150dab63d5b2141b3df7c35bb20b60c120c33896ec3195c8fb10f64b740e1"
+    "checksum": "f0ff001feffd8e0f8b6f98c3ea39e1d2138782d63437c1303dc9e5007fc7ef2d"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -717,7 +740,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runtime-gated",
     "tab": "diagnostics",
     "pipeline": "pixelbrain",
-    "order": 30,
+    "order": 31,
     "adapterId": "hollowness-amp",
     "mutates": false,
     "reads": [
@@ -732,7 +755,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports applyHollownessAMP, buildSurfaceLockSet, collectHollowDeltas, computeHollownessAMP",
     "consumerIds": [],
-    "checksum": "71a15c498e662d94f2c5c2064ac7174b51d285dfd069406a74b8a403103b8488"
+    "checksum": "d94721c7dc8712934c4b73a9342272f1beadb3468375b68cf398dbf9a15e7466"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -743,7 +766,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "amps",
     "pipeline": "pixelbrain",
-    "order": 31,
+    "order": 32,
     "adapterId": "holyfire-motif-amp",
     "mutates": false,
     "reads": [
@@ -758,7 +781,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "HOLY FIRE MOTIF AMP — deterministic flame emission for the Holy Fire",
     "consumerIds": [],
-    "checksum": "54c7ff1a4d4b3df6fbf9993a9bf6a743e1ee451ef98e45236c28d8088f5ec35c"
+    "checksum": "e26855be674f3d01cc829bd5f5defdc700690778e7b5c2def7b538b50b455cb0"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -769,7 +792,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "mutation",
     "tab": "mutations",
     "pipeline": "editor-mutation",
-    "order": 32,
+    "order": 33,
     "adapterId": "image-segmentation-amp",
     "mutates": true,
     "reads": [
@@ -783,7 +806,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports segmentImage",
     "consumerIds": [],
-    "checksum": "ade6c44c96a775882c63cd6c5086b687c9905da4a2c805c2b8deefbca600b45b"
+    "checksum": "a4c81f9eb00c006d06980cba208d3931ffc3942c09e269b17dc0d4adcf095800"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -794,7 +817,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "amps",
     "pipeline": "pixelbrain",
-    "order": 33,
+    "order": 34,
     "adapterId": "jewelry-amp",
     "mutates": false,
     "reads": [
@@ -806,7 +829,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Template pre-processor: Generates chains, gem settings, and manipulates volumes for jewelry.",
     "consumerIds": [],
-    "checksum": "1eca4ffd08c287d0c8eabdc28528fe44d33ddd56fc3e0ccaa1281c5a42a00510"
+    "checksum": "c8f5f977391e52ff2834646d772e0b0d585cfc18b95f3ffd7646f664661fc9a8"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -817,7 +840,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "mutation",
     "tab": "mutations",
     "pipeline": "editor-mutation",
-    "order": 34,
+    "order": 35,
     "adapterId": "neighbor-extrapolation-amp",
     "mutates": true,
     "reads": [
@@ -831,7 +854,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports extrapolateNeighbors",
     "consumerIds": [],
-    "checksum": "78f3a92318cb7ae66bf3bf04f7040794c902479397d68d96e8d59ea950958e69"
+    "checksum": "002ee1fa86e88062f770f8e3c0bab8db6f3bb745ab45c08e7fe4d093e9e16d77"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -842,7 +865,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "mutation",
     "tab": "mutations",
     "pipeline": "editor-mutation",
-    "order": 35,
+    "order": 36,
     "adapterId": "noise-fill-amp",
     "mutates": true,
     "reads": [
@@ -859,7 +882,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Modulates material intensity or adds optional variation using PB-NOISE-v1 on existing lattice cells.",
     "consumerIds": [],
-    "checksum": "afda09ab3e072476287e38426ba44b099de0c51c22e777027c7c8dae1a741869"
+    "checksum": "8ce3abb6807cb022236f1c104dfbb429c15b8086609f3bf2de7e0afb11b6e227"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -870,7 +893,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "mutation",
     "tab": "mutations",
     "pipeline": "editor-mutation",
-    "order": 36,
+    "order": 37,
     "adapterId": "palette-quantization-amp",
     "mutates": true,
     "reads": [
@@ -884,7 +907,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Deterministic final palette budget enforcement.",
     "consumerIds": [],
-    "checksum": "25db6fd7790a8cf0875428b68d14036d19fad19910d3824c456654442719bf0e"
+    "checksum": "ca5dda1c4b0961d1e5b1ddcb360ea2f7826d8d163d7d81bd2773968850eb1e16"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -895,7 +918,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "mutation",
     "tab": "mutations",
     "pipeline": "editor-mutation",
-    "order": 37,
+    "order": 38,
     "adapterId": "pixel-aa-amp",
     "mutates": true,
     "reads": [
@@ -909,7 +932,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Anti-Aliasing pass for pixel art.",
     "consumerIds": [],
-    "checksum": "2139e76b9c7f18a9df63a5506f0e449e821e493c76c6c9a5ae41a8b015347e0c"
+    "checksum": "f46d99835d7a26fece94d43c4eb818c6d73d1e67baf354587fd29e79a2f72c88"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -920,7 +943,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "mutation",
     "tab": "mutations",
     "pipeline": "editor-mutation",
-    "order": 38,
+    "order": 39,
     "adapterId": "pixel-scale-amp",
     "mutates": true,
     "reads": [
@@ -935,7 +958,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports applyXBR2x, colorDist",
     "consumerIds": [],
-    "checksum": "9646b23feae233448fae502f7bc3f1ac0ea1d4593da812da533257f1e5565ae8"
+    "checksum": "eea9fd3ed436b5a32bd13e22d0f44bf32518034f3f655a59c6bbe69680c8ea59"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -946,7 +969,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "amps",
     "pipeline": "pixelbrain",
-    "order": 39,
+    "order": 40,
     "adapterId": "region-fill-amp",
     "mutates": false,
     "reads": [
@@ -960,7 +983,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "REGION FILL AMP — color authority for the Item Foundry.",
     "consumerIds": [],
-    "checksum": "f7bcb3a015b71e892dae7e49c9e7a1a77bb914c9816d3e550f58f80527944272"
+    "checksum": "2a5f93bc924546ddf271dbed23ad3d99f56f6b8f50d4d822c67534f9c70bf467"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -971,7 +994,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "amps",
     "pipeline": "pixelbrain",
-    "order": 40,
+    "order": 41,
     "adapterId": "scholomance-character-motif-amp",
     "mutates": false,
     "reads": [
@@ -983,7 +1006,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Scholomance Character Motif Amp",
     "consumerIds": [],
-    "checksum": "91e548f6e8aba1dbd288dee1d804a40cd10be806552ced54f600a3693b91c0d7"
+    "checksum": "fbae1e7dec6ae29bba6bb479c54b20bb0028e8c38ea75a2b2622cb79bf15f8c4"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -994,7 +1017,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runtime-gated",
     "tab": "diagnostics",
     "pipeline": "pixelbrain",
-    "order": 41,
+    "order": 42,
     "adapterId": "school-tag-amp",
     "mutates": false,
     "reads": [
@@ -1007,7 +1030,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports applySchoolTagAMP, collectSchoolTagDeltas",
     "consumerIds": [],
-    "checksum": "970d8f98668b151e9e3f082bc3ed94cf94c1b3d877bc288b1c86054ff550e44e"
+    "checksum": "d4c3bbcfca899f9ecd0d34fb078af08cb9994d2c57e878b3ee85672a0f2ec190"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -1018,7 +1041,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "blueprint",
     "pipeline": "pixelbrain",
-    "order": 42,
+    "order": 43,
     "adapterId": "sdf-shape-amp",
     "mutates": false,
     "reads": [
@@ -1033,7 +1056,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Consumes PB-SDF-v1 (from part spec or profile) + construction skeleton.",
     "consumerIds": [],
-    "checksum": "a38e66477fe339c1e47327203539ade05ca19efbd177b10183336e3792b12925"
+    "checksum": "5851ab2d8a88a87b3c4c3cde455fd1dd77d9e5ee745a15fdc0d092922a4b14aa"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -1044,7 +1067,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "mutation",
     "tab": "mutations",
     "pipeline": "editor-mutation",
-    "order": 43,
+    "order": 44,
     "adapterId": "selout-amp",
     "mutates": true,
     "reads": [
@@ -1058,7 +1081,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Selective Outline (selout) pass.",
     "consumerIds": [],
-    "checksum": "8dc9fbccf22541fdae4c891ddeb593170e19faed7b93ad79af800a01fdfb51cd"
+    "checksum": "58269e815a0737f02eb2e1c295cd4311143f319e243ad3476b8e5eb26dad66b0"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -1069,7 +1092,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "finish",
     "pipeline": "pixelbrain",
-    "order": 44,
+    "order": 45,
     "adapterId": "shadow-amp",
     "mutates": false,
     "reads": [
@@ -1083,7 +1106,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports SHADOW_AMP_ID, SHADOW_AMP_VERSION, buildShadowAmpPayload",
     "consumerIds": [],
-    "checksum": "a81a52f71cb8533c42bda34e51e3701dd4610b5584555ce59b03cbc2ca20e51d"
+    "checksum": "831ace429d20dc514b4556d0d36c901de5ba3a3c45753792741acfefc80d9cd9"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -1094,7 +1117,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "finish",
     "pipeline": "pixelbrain",
-    "order": 45,
+    "order": 46,
     "adapterId": "shadow-perception-amp",
     "mutates": false,
     "reads": [
@@ -1108,7 +1131,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports SHADOW_PERCEPTION_AMP_ID, SHADOW_SCALARS, runShadowPerceptionAmp",
     "consumerIds": [],
-    "checksum": "f6f2128130053f0d64ca59290846ae247b0fa789eb06e23c4a8012d9741389b0"
+    "checksum": "a8f1734d3e988a60e78e0725497453dc6698def22005ef06c876471d102f98fa"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -1119,7 +1142,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "finish",
     "pipeline": "pixelbrain",
-    "order": 46,
+    "order": 47,
     "adapterId": "shield-rim-amp",
     "mutates": false,
     "reads": [
@@ -1131,7 +1154,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Template pre-processor: Owns outer border, gold/bronze frame, rim thickness, corner highlights, bottom shadow.",
     "consumerIds": [],
-    "checksum": "f4c4bffb8c681f39a3b7229451c2cda16bd9ca16f7717765de169d0a411b97c9"
+    "checksum": "639b68317497c6db3cf10f10464a6a1b148ac8fd888cb8370fb967874c70ad64"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -1142,7 +1165,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "finish",
     "pipeline": "pixelbrain",
-    "order": 47,
+    "order": 48,
     "adapterId": "shield-volume-amp",
     "mutates": false,
     "reads": [
@@ -1154,7 +1177,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Template pre-processor: Owns curved face shading, center plane, side shadows, and rim cast shadows.",
     "consumerIds": [],
-    "checksum": "70c25305541c77f451d8b7bf900f4a06585c894fb965ac07bfd92e264c43866d"
+    "checksum": "4bb16648e446ae539a7037ac364270cd4e2dfe955a7fa0e448f87e80fd368119"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -1165,7 +1188,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "blueprint",
     "pipeline": "pixelbrain",
-    "order": 48,
+    "order": 49,
     "adapterId": "sketch-amp",
     "mutates": false,
     "reads": [
@@ -1180,7 +1203,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "SKETCH AMP — Silhouette Authoring → Auto-Shaded Template + Construction Geometry",
     "consumerIds": [],
-    "checksum": "5032ff6132a40e307796b437270421609d83be1f7b8e2be82776ab2b39541d04"
+    "checksum": "ea36353872e154e200888401ec540683d435a8f50e75db36cdce282c471f2931"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -1191,7 +1214,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "mutation",
     "tab": "mutations",
     "pipeline": "editor-mutation",
-    "order": 49,
+    "order": 50,
     "adapterId": "square-sharpness-contrast-amp",
     "mutates": true,
     "reads": [
@@ -1208,7 +1231,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports SQUARE_SHARPNESS_CONTRAST_AMP_ID, SQUARE_SHARPNESS_CONTRAST_VERSION, buildSquareSharpnessContrastPayload, enhanceSquaresForRender",
     "consumerIds": [],
-    "checksum": "e96eeab147cb12396f5e2ccf2eaeb1b550274f0462e08c2bb90577ccb5508a40"
+    "checksum": "452a6cb94b692ea295e86c5057e87e0f975bb4be8fc4b28def313a8af6eecc16"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -1219,7 +1242,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "mutation",
     "tab": "mutations",
     "pipeline": "editor-mutation",
-    "order": 50,
+    "order": 51,
     "adapterId": "symmetry-amp",
     "mutates": true,
     "reads": [
@@ -1236,7 +1259,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "SYMMETRY AMP MICROPROCESSOR",
     "consumerIds": [],
-    "checksum": "1007594e80bf9d68c20b1d57a399f58a3de7122db38d5e5cdfa7f676e776335f"
+    "checksum": "ddcd7c204a30473469f444150dce1a5df66d0e547b4c74fee490c4f9d9d5c450"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -1247,7 +1270,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "finish",
     "pipeline": "pixelbrain",
-    "order": 51,
+    "order": 52,
     "adapterId": "tonation-amp",
     "mutates": false,
     "reads": [
@@ -1261,7 +1284,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports TONATION_AMP_ID, TONATION_AMP_VERSION, buildTonationAmpPayload",
     "consumerIds": [],
-    "checksum": "7fa14d7f14f792821354cbafc2089a9b42839e7cb818c2869bc56a704c2adfe1"
+    "checksum": "7458d00c231c82a5e989e90fef64f2e0bd17df9906ade3c7e5b09b8ff4c07e1e"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -1272,7 +1295,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "amps",
     "pipeline": "pixelbrain",
-    "order": 52,
+    "order": 53,
     "adapterId": "vector-amp",
     "mutates": false,
     "reads": [
@@ -1286,7 +1309,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports VECTOR_AMP_ID, VECTOR_AMP_VERSION, buildVectorAmpPayload",
     "consumerIds": [],
-    "checksum": "99e0471f09db49f1a57ab73ea696956b84204e374d9f08741132036f408fcaed"
+    "checksum": "a5aeec4fd5381643bf46c466f949048d3ffb7e9b265163dc5703418afe64dc8c"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -1297,7 +1320,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "finish",
     "pipeline": "pixelbrain",
-    "order": 53,
+    "order": 54,
     "adapterId": "volume-amp",
     "mutates": false,
     "reads": [
@@ -1311,7 +1334,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "Exports VOLUME_AMP_ID, VOLUME_AMP_VERSION, buildVolumeAmpPayload",
     "consumerIds": [],
-    "checksum": "ac70dc508b3c203232a1a206187d2fa072800a23d6887e7636be91384f6c9bc5"
+    "checksum": "5726e145e921243b0e3effebf2ca4c1af8d834aa8fdb8e64fd911690f84b7374"
   },
   {
     "contract": "PB-STUDIO-AMP-MANIFEST-v1",
@@ -1322,7 +1345,7 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     "kind": "runnable",
     "tab": "finish",
     "pipeline": "pixelbrain",
-    "order": 54,
+    "order": 55,
     "adapterId": "volume-lift-amp",
     "mutates": false,
     "reads": [
@@ -1337,6 +1360,6 @@ export const STUDIO_AMP_RECORDS = Object.freeze([
     ],
     "summary": "VOLUME-LIFT AMP — Structural-Energy → True 3D Voxel Volume",
     "consumerIds": [],
-    "checksum": "3d2ecaaa278f557b8b779f66ff88651110397d6213160023396f554a8f0ff1fa"
+    "checksum": "2088e0e3af80a3ba37113538a70c1441c1cd1c8478823c7ff5a1576e7fcc8b14"
   }
 ]);

@@ -698,7 +698,11 @@ export function ingestScdlIntoDocument(doc, source, options = {}) {
           locked: false,
           opacity: pLayer.opacity !== undefined ? pLayer.opacity : 1,
           blend: pLayer.blend || 'normal',
-          cells: cells.map((c) => ({ x: c.x, y: c.y, color: c.color, alpha: c.alpha })),
+          cells: cells.map((c) => {
+            const cell = { x: c.x, y: c.y, color: c.color };
+            if (c.alpha !== undefined) cell.alpha = c.alpha;
+            return cell;
+          }),
         });
       }
     } else if (layerSurfaces.length > 0) {

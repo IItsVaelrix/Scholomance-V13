@@ -27,7 +27,13 @@ import {
   findGridPath,
 } from '../world/tutorialForestBuilder.js';
 import { TILE_W, TILE_H } from '../world/forestBiomeModel.js';
+import {
+  createWindField,
+  sampleWindLean,
+  WIND_FIELD_DEFAULTS,
+} from '../world/windField.js';
 import { createWaterCausticShader } from '../shaders/WaterCausticShader.js';
+import { createFoliageWindShader } from '../shaders/FoliageWindShader.js';
 import { applyBioluminescentGlow } from '../shaders/BioluminescentGlow.js';
 import {
   setupCameraAtmosphere,
@@ -35,6 +41,24 @@ import {
 } from '../shaders/AtmospherePostFX.js';
 
 const GROUND_DEPTH = -4096;
+
+// Canopy wind sway, CPU path. Trees pivot about their sprite origin, which both
+// spawn paths already anchor at the trunk base (0.5, 0.94 / 0.5, 0.95), so a
+// small rotation sweeps the crown while the roots stay planted. Translating X
+// instead slid the entire sprite — trunk included — off its planting point.
+//
+// Lean amplitude and direction live in the shared wind field (world/windField.js),
+// not here: one field drives every tree so the forest breathes as a single
+// system. The defaults put ~0.9px of travel at the crown and under 0.05px at the
+// trunk base, so trunks read as sturdy while foliage drifts subtly.
+//
+// Pixel art reads badly under continuous sub-pixel rotation, so the angle snaps
+// to discrete steps. A quarter degree keeps the subtle sweep from strobing.
+const WIND_SWAY_ANGLE_STEP = 0.25;
+
+function quantizeSwayAngle(degrees) {
+  return Math.round(degrees / WIND_SWAY_ANGLE_STEP) * WIND_SWAY_ANGLE_STEP;
+}
 
 function createSeededRandom(seed) {
   let state = seed >>> 0;
@@ -56,8 +80,17 @@ export default function createTutorialForestScene(phaserRuntime) {
       this.forestSeed = data.seed ?? 4242;
       this.onSelectEntity = data.onSelectEntity ?? null;
       this.windEnabled = data.windEnabled ?? true;
+      // One shared field drives every tree and every shader: the forest breathes
+      // as a single system instead of as independent per-tree oscillators.
+      this.windField = createWindField({
+        direction: data.windDirection ?? WIND_FIELD_DEFAULTS.direction,
+        ...(Number.isFinite(data.windMeanLeanDeg) ? { meanLeanDeg: data.windMeanLeanDeg } : {}),
+        ...(Number.isFinite(data.windGustAmplitudeDeg) ? { gustAmplitudeDeg: data.windGustAmplitudeDeg } : {}),
+      });
       this.particlesEnabled = data.particlesEnabled ?? true;
       this.shaderCausticsEnabled = data.shaderCausticsEnabled ?? true;
+      // GPU canopy flutter is opt-in: the CPU sway below is the proven default.
+      this.windShaderEnabled = data.windShaderEnabled ?? false;
       this.glowEnabled = data.glowEnabled ?? true;
       this.lightingMode = data.lightingMode ?? 'day';
     }
@@ -71,6 +104,7 @@ export default function createTutorialForestScene(phaserRuntime) {
         this.tileW = TILE_W;
         this.tileH = TILE_H;
         this.playerPos = { ...this.world.playerSpawn };
+        this.playerFacing = { dx: 1, dy: -1 };
 
         // 2. Build one continuous ground fabric and depth-sortable Forge actors.
         this.assetManifest = buildTutorialForestAssets(this, this.world, { seed: this.forestSeed });
@@ -79,19 +113,23 @@ export default function createTutorialForestScene(phaserRuntime) {
         this.atmosphere = setupCameraAtmosphere(this.cameras.main);
 
         // 4. Render World Elements
-        this.renderGroundRegion();
-        this.renderLotusPond();
-        this.renderEnvironmentActors();
-        this.renderPlayer();
+      this.renderGroundRegion();
+      this.renderLotusPond();
+      this.renderEnvironmentActors();
+      this.renderPlayer();
+      this.computeReflectionPlates();
+      this.updateWaterReflection();
 
-        // 5. Living Atmosphere Effects
-        this.setupWindSway();
-        this.setupAtmosphericParticles();
-        this.setLightingMode(this.lightingMode);
+      // 5. Living Atmosphere Effects
+      this.setupLotusPulse();
+      this.setupWindSway();
+      this.setupAtmosphericParticles();
+      this.setLightingMode(this.lightingMode);
 
         // 6. Camera & Input
         this.setupCameraControls();
         this.setupInteraction();
+        this.setupKeyboardNavigation();
 
         // Screen resize tracking
         this.scale.on('resize', (gameSize) => {
@@ -164,51 +202,106 @@ export default function createTutorialForestScene(phaserRuntime) {
 
       for (const descriptor of this.assetManifest.actors) {
         const point = this.toIso(descriptor.tx, descriptor.ty, descriptor.elevation ?? 0);
-        const sprite = this.add.image(point.x, point.y + 4, descriptor.textureKey);
+        const px = point.x + (descriptor.offsetX ?? 0);
+        const py = point.y + 4 + (descriptor.offsetY ?? 0);
+        const sprite = this.add.image(px, py, descriptor.textureKey);
         sprite.setOrigin(descriptor.asset.anchor.x, descriptor.asset.anchor.y);
-        sprite.setDepth(point.y + descriptor.asset.depthBias);
-        sprite.setInteractive({ useHandCursor: true });
-        sprite.inspectData = {
-          type: descriptor.semanticType.startsWith('canopy_') || descriptor.semanticType === 'young_sapling'
-            ? 'tree'
-            : 'landmark',
-          name: descriptor.name,
-          semanticType: descriptor.semanticType,
-          sourceType: descriptor.sourceType,
-          tx: descriptor.tx,
-          ty: descriptor.ty,
-          scd128Record: descriptor.asset.scd128Record,
+        sprite.setDepth(py + descriptor.asset.depthBias);
+        if (descriptor.interactive !== false) {
+          sprite.setInteractive({ useHandCursor: true });
+          sprite.inspectData = {
+            type: descriptor.semanticType.startsWith('canopy_') || descriptor.semanticType === 'young_sapling'
+              ? 'tree'
+              : 'landmark',
+            name: descriptor.name,
+            semanticType: descriptor.semanticType,
+            sourceType: descriptor.sourceType,
+            tx: descriptor.tx,
+            ty: descriptor.ty,
+            scd128Record: descriptor.asset.scd128Record,
           description: descriptor.description
-            ?? `Tile Forge ${descriptor.semanticType.replace(/_/g, ' ')} in the shared sunlit-glade palette.`,
+              ?? `Tile Forge ${descriptor.semanticType.replace(/_/g, ' ')} in the shared sunlit-glade palette.`,
         };
-        sprite.on('pointerdown', (pointer) => {
-          if (pointer.button !== 0) return;
-          this.interactiveClicked = true;
-          if (this.onSelectEntity) this.onSelectEntity(sprite.inspectData);
-        });
+        if (descriptor.semanticType === 'lotus_cluster') {
+          // The pond centerpiece keeps its own inspect identity and SCD128 witness.
+          sprite.inspectData = {
+            ...sprite.inspectData,
+            type: 'lotus_bloom',
+            name: 'Sacred Lotus Blossom',
+            description: 'A radiant bioluminescent lotus flower growing from the sacred spring. Petals pulse with healing alchemical light enhanced by WebGL glowing emissive filters.',
+          };
+        }
+          sprite.on('pointerdown', (pointer) => {
+            if (pointer.button !== 0) return;
+            this.interactiveClicked = true;
+            if (this.onSelectEntity) this.onSelectEntity(sprite.inspectData);
+          });
+        }
 
         const isTree = descriptor.semanticType.startsWith('canopy_')
           || descriptor.semanticType === 'young_sapling';
+        let actor = sprite;
+
         if (isTree) {
-          this.treeSprites.push({
-            sprite,
-            baseX: point.x,
-            phase: (descriptor.tx * 0.4 + descriptor.ty * 0.7) % (Math.PI * 2),
-          });
+          // Canopy flutter runs on the GPU only when explicitly enabled on a
+          // WebGL renderer; the CPU sway below remains the deterministic default.
+          const windShader = this.windShaderEnabled && this.sys?.renderer?.gl
+            ? createFoliageWindShader(
+              this,
+              descriptor.textureKey,
+              px,
+              py,
+              descriptor.asset.width,
+              descriptor.asset.height,
+              // Tile coords place this tree on the SHARED gust wave. The old
+              // per-tree phase here made neighbours lean in opposite directions.
+              { tx: descriptor.tx, ty: descriptor.ty },
+            )
+            : null;
+          if (windShader) {
+            windShader.setDepth(py + descriptor.asset.depthBias);
+            windShader.setInteractive({ useHandCursor: true });
+            windShader.inspectData = sprite.inspectData;
+            windShader.on('pointerdown', (pointer) => {
+              if (pointer.button !== 0) return;
+              this.interactiveClicked = true;
+              if (this.onSelectEntity) this.onSelectEntity(windShader.inspectData);
+            });
+            sprite.destroy();
+            actor = windShader;
+            this.treeSprites.push({
+              sprite: windShader,
+              originAngle: 0,
+              tx: descriptor.tx,
+              ty: descriptor.ty,
+              shaderDriven: true,
+            });
+          } else {
+            this.treeSprites.push({
+              sprite,
+              // Sprite origin is descriptor.asset.anchor (0.5, 0.94) — the trunk
+              // base — so CPU sway rotates about the roots, not the centroid.
+              originAngle: 0,
+              // Tile coords feed the SHARED gust wave. No private phase: a tree
+              // must not oscillate independently of its neighbours.
+              tx: descriptor.tx,
+              ty: descriptor.ty,
+            });
+          }
         } else {
           this.propSprites.push(sprite);
         }
-        if (descriptor.semanticType === 'lotus_cluster') this.lotusSprites.push(sprite);
+        if (descriptor.semanticType === 'lotus_cluster') this.lotusSprites.push(actor);
 
         if (this.glowEnabled) {
           if (descriptor.semanticType === 'waymarker' || descriptor.semanticType === 'lotus_cluster') {
-            applyBioluminescentGlow(sprite, { color: 0x63D2CD, outerStrength: 4, innerStrength: 0.5 });
+            applyBioluminescentGlow(actor, { color: 0x63D2CD, outerStrength: 4, innerStrength: 0.5 });
           } else if (descriptor.semanticType === 'sanctuary_ruin') {
-            applyBioluminescentGlow(sprite, { color: 0x9B7BC2, outerStrength: 4, innerStrength: 0.5 });
+            applyBioluminescentGlow(actor, { color: 0x9B7BC2, outerStrength: 4, innerStrength: 0.5 });
           }
         }
 
-        this.environmentSprites.push(sprite);
+        this.environmentSprites.push(actor);
       }
     }
 
@@ -234,88 +327,114 @@ export default function createTutorialForestScene(phaserRuntime) {
       this.lilypadSprites = [];
       this.lotusGlows = [];
 
-      for (const w of this.world.waterTiles) {
-        const pt = this.toIso(w.tx, w.ty, 0);
-        const depth = pt.y + 1;
+      // One unified caustic field over the whole region, not per-tile boxes: the
+      // pattern is continuous in ground pixel space (and flows along the iso
+      // plane), while the uploaded water_pond material mask activates it only
+      // inside the actual water silhouette, tile by tile.
+      const ground = this.assetManifest?.ground;
+      if (
+        !this.shaderCausticsEnabled
+        || !this.sys?.renderer?.gl
+        || !ground?.waterMaskKey
+      ) return;
 
-        // Base water tile image (deep spring or shore transition) when not using continuous ground fabric
-        if (!this.groundRegionSprite) {
-          const waterImg = this.add.image(pt.x, pt.y, w.terrain || 'water_deep_spring');
-          waterImg.setOrigin(0.5, 0.5);
-          waterImg.setDepth(depth);
-          this.waterSprites.push(waterImg);
-        }
-
-        // WebGL Real-Time Water Caustic Shader overlay for deep water
-        if (this.shaderCausticsEnabled && (!w.terrain || w.terrain === 'water_deep_spring' || w.terrain.includes('water'))) {
-          const causticShader = createWaterCausticShader(this, pt.x, pt.y, 80, 40);
-          if (causticShader) {
-            causticShader.setDepth(depth + 0.5);
-            this.waterShaders.push(causticShader);
-          }
-        }
-
-        // Floating lilypads
-        if (w.hasLilypad) {
-          const pad = this.add.image(pt.x, pt.y, 'forest_lilypad');
-          pad.setOrigin(0.5, 0.5);
-          pad.setDepth(depth + 1);
-          this.lilypadSprites.push(pad);
-        }
-
-        // Blooming Sacred Lotus Flower
-        if (w.hasLotus) {
-          const pad = this.add.image(pt.x, pt.y, 'forest_lilypad');
-          pad.setOrigin(0.5, 0.5);
-          pad.setDepth(depth + 1);
-          this.lilypadSprites.push(pad);
-
-          const lotus = this.add.image(pt.x, pt.y - 2, 'forest_lotus_bloom_f0');
-          lotus.setOrigin(0.5, 0.6);
-          lotus.setDepth(depth + 3);
-          lotus.setInteractive({ useHandCursor: true });
-
-          lotus.inspectData = {
-            type: 'lotus_bloom',
-            name: 'Sacred Lotus Blossom',
-            tx: w.tx,
-            ty: w.ty,
-            scd128Record: this.world.tileMap.get(`${w.tx},${w.ty}`)?.scd128Record,
-            description: 'A radiant bioluminescent lotus flower growing from the sacred spring. Petals pulse with healing alchemical light enhanced by WebGL glowing emissive filters.',
-          };
-
-          lotus.on('pointerdown', (pointer) => {
-            if (pointer.button === 0) {
-              this.interactiveClicked = true;
-              if (this.onSelectEntity) {
-                this.onSelectEntity(lotus.inspectData);
-              }
-            }
-          });
-
-          // Apply WebGL Bioluminescent Glow filter
-          if (this.glowEnabled) {
-            applyBioluminescentGlow(lotus, { color: 0x10b981, outerStrength: 6, innerStrength: 1 });
-          }
-
-          this.lotusSprites.push(lotus);
-
-          // Atmospheric radial light aura
-          const glow = this.add.circle(pt.x, pt.y - 2, 20, 0x10b981, 0.2);
-          glow.setDepth(depth + 2);
-          this.lotusGlows.push(glow);
-
-          this.tweens.add({
-            targets: glow,
-            alpha: 0.45,
-            scale: 1.25,
-            duration: 1800,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut',
-          });
-        }
+      const causticShader = createWaterCausticShader(
+        this,
+        ground.originX,
+        ground.originY,
+        ground.width,
+        ground.height,
+        ground.waterMaskKey,
+      );
+      if (causticShader) {
+        causticShader.setOrigin(0, 0);
+        causticShader.setDepth(GROUND_DEPTH + 1);
+        this.waterShader = causticShader;
+        this.waterShaders.push(causticShader);
       }
+    }
+
+    /**
+     * Shore "pressure plates": a full perimeter of walkable tiles around the
+     * pond. Every edge can activate the mirror; each plate remembers its
+     * nearest water tile, which becomes the mirror plane.
+     */
+    computeReflectionPlates() {
+      const plates = new Map();
+      const water = new Map();
+      for (const tile of this.world.tiles) {
+        if (tile.terrain.startsWith('water_')) water.set(`${tile.tx},${tile.ty}`, tile);
+      }
+      const neighbors = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]];
+      for (const tile of this.world.tiles) {
+        if (!tile.walkable || tile.terrain.startsWith('water_')) continue;
+        let best = null;
+        let bestDist = Number.POSITIVE_INFINITY;
+        for (const [dx, dy] of neighbors) {
+          const candidate = water.get(`${tile.tx + dx},${tile.ty + dy}`);
+          if (!candidate) continue;
+          const a = this.toIso(candidate.tx, candidate.ty, 0);
+          const b = this.toIso(tile.tx, tile.ty, 0);
+          const dist = Math.hypot(a.x - b.x, a.y - b.y);
+          if (dist < bestDist) {
+            bestDist = dist;
+            best = candidate;
+          }
+        }
+        if (best) plates.set(`${tile.tx},${tile.ty}`, { tx: best.tx, ty: best.ty });
+      }
+      this.reflectionPlates = plates;
+    }
+
+    /**
+     * Refresh the mirror-ghost state read by the water field each render.
+     *
+     * Physics: activation is orientation-agnostic (touching the plate is
+     * enough); orientation only chooses WHICH side of the Wanderer the water
+     * shows. Gaze toward the water reflects the front, gaze away reflects the
+     * back. Water screen-below mirrors top-to-bottom; water screen-above
+     * carries the parity upright into the pond.
+     */
+    updateWaterReflection() {
+      const state = {
+        enabled: false, x: 0, y: 0, w: 0, h: 0, alpha: 0.26, flip: false, back: false,
+      };
+      const ground = this.assetManifest?.ground;
+      const plate = this.reflectionPlates?.get(`${this.playerPos.tx},${this.playerPos.ty}`);
+      if (plate && ground?.waterMaskKey && this.player && this.waterShader) {
+        const waterPt = this.toIso(plate.tx, plate.ty, 0);
+        const playerPt = this.toIso(this.playerPos.tx, this.playerPos.ty, 0);
+        const squash = 0.55;
+        const facing = this.playerFacing || { dx: 0, dy: -1 };
+        const toWaterX = plate.tx - this.playerPos.tx;
+        const toWaterY = plate.ty - this.playerPos.ty;
+        const gaze = facing.dx * toWaterX + facing.dy * toWaterY;
+        const waterline = (playerPt.y + waterPt.y) / 2;
+        const height = this.player.height * squash;
+
+        state.enabled = true;
+        state.back = gaze < 0;
+        state.flip = waterPt.y > playerPt.y;
+        state.x = this.player.x - this.player.width / 2 - ground.originX;
+        // The shader's pixel lattice counts upward (GL convention) while world
+        // coordinates count downward from the map top: convert the rect.
+        const yTop = (state.flip ? waterline : waterline - height) - ground.originY;
+        state.y = ground.height - yTop - height;
+        state.w = this.player.width;
+        state.h = height;
+      }
+      this.waterReflection = state;
+      this.syncWaterReflectionTexture();
+    }
+
+    /** Bind the water field's ghost sampler to the mirrored parity frame. */
+    syncWaterReflectionTexture() {
+      const ground = this.assetManifest?.ground;
+      if (!this.waterShader || !ground?.waterMaskKey) return;
+      const frameKey = this.waterReflection?.back
+        ? 'player_back_0'
+        : (this.player?.texture?.key || 'player_idle_0');
+      this.waterShader.setTextures([ground.waterMaskKey, frameKey]);
     }
 
     renderTrees() {
@@ -350,7 +469,8 @@ export default function createTutorialForestScene(phaserRuntime) {
         this.treeSprites.push({
           sprite: treeImg,
           originAngle: 0,
-          phase: (t.tx * 0.4 + t.ty * 0.7) % (Math.PI * 2),
+          tx: t.tx,
+          ty: t.ty,
         });
       }
     }
@@ -422,7 +542,8 @@ export default function createTutorialForestScene(phaserRuntime) {
       this.player = this.add.sprite(pt.x, pt.y + 4, 'player_idle_0');
       this.player.setOrigin(0.5, 0.95);
       this.player.setDepth(pt.y + 12);
-      this.player.play('player_idle');
+      this.playerDirection = 'south';
+      this.setPlayerFacing('south', false);
       this.player.setInteractive({ useHandCursor: true });
 
       this.player.inspectData = {
@@ -442,60 +563,89 @@ export default function createTutorialForestScene(phaserRuntime) {
           }
         }
       });
-    }
 
-    setupWaterAnimation() {
-      let currentFrame = 0;
-      this.time.addEvent({
-        delay: 240,
-        loop: true,
-        callback: () => {
-          currentFrame = (currentFrame + 1) % 4;
-          const key = `forest_water_f${currentFrame}`;
-          for (const s of this.waterSprites) {
-            if (s?.active && s.texture?.key?.startsWith('forest_water_')) {
-              s.setTexture(key);
-            }
-          }
-        },
+      // Keep the mirror ghost sampling the player's current animation frame
+      // (or the back-view frame when their gaze turns away from the water).
+      this.player.on('animationupdate', (_anim, frame) => {
+        if (!frame?.texture?.key || this.waterReflection?.back) return;
+        this.syncWaterReflectionTexture();
       });
     }
 
+    /**
+     * Controlled lotus pulse: a slow breathing scale/alpha on the pond
+     * centerpiece actors (the caustic shader carries the water motion).
+     */
     setupLotusPulse() {
-      let lotusFrame = 0;
-      this.time.addEvent({
-        delay: 800,
-        loop: true,
-        callback: () => {
-          lotusFrame = (lotusFrame + 1) % 2;
-          const key = `forest_lotus_bloom_f${lotusFrame}`;
-          for (const s of this.lotusSprites) {
-            if (s?.active) s.setTexture(key);
-          }
-        },
+      if (!this.lotusSprites?.length) return;
+      this.tweens.add({
+        targets: this.lotusSprites,
+        scaleX: 1.06,
+        scaleY: 1.06,
+        alpha: 0.92,
+        duration: 1600,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
       });
     }
 
     setupWindSway() {
       this.events.on('update', (time) => {
+        // The mirror tracks the Wanderer's tweened pixel position every frame.
+        if (this.waterReflection?.enabled && this.player) {
+          const ground = this.assetManifest?.ground;
+          if (ground) {
+            this.waterReflection.x = this.player.x - this.player.width / 2 - ground.originX;
+          }
+        }
         if (!this.windEnabled || !this.treeSprites) return;
-        const t = time * 0.002;
+        const field = this.windField;
         for (let i = 0; i < this.treeSprites.length; i += 1) {
           const item = this.treeSprites[i];
+          // Shader-driven canopies flutter on the GPU; skip CPU sway for them.
+          if (item?.shaderDriven) continue;
           if (item?.sprite?.active) {
-            const sway = Math.round(Math.sin(t + item.phase));
-            item.sprite.setX(item.baseX + sway);
+            // Rotate about the trunk-base origin so the roots stay planted and
+            // only the crown sweeps. Never translate: that moved the trunk too.
+            //
+            // Every tree samples the SAME field at the SAME instant, so the whole
+            // forest leans one way together. Tile coords only place the tree on
+            // the traveling gust wave; they are not a private oscillator phase.
+            const base = item.originAngle ?? 0;
+            const lean = sampleWindLean(field, time, item.tx, item.ty);
+            item.sprite.setAngle(base + quantizeSwayAngle(lean));
           }
         }
       });
     }
 
-    setWindEnabled(enabled) {
-      this.windEnabled = Boolean(enabled);
+    /**
+     * Turn the wind. Every tree and shader follows immediately and uniformly:
+     * a west wind leans every crown left, an east wind leans every crown right.
+     */
+    setWindDirection(direction) {
+      this.windField = createWindField({
+        ...(this.windField || {}),
+        direction,
+      });
       if (!this.windEnabled && this.treeSprites) {
         for (const item of this.treeSprites) {
+          if (item?.shaderDriven) continue;
+          if (item?.sprite?.active) item.sprite.setAngle(item.originAngle ?? 0);
+        }
+      }
+      return this.windField;
+    }
+
+    setWindEnabled(enabled) {
+      this.windEnabled = Boolean(enabled);
+      // Shader canopies read windEnabled live in their setupUniforms callback.
+      if (!this.windEnabled && this.treeSprites) {
+        for (const item of this.treeSprites) {
+          if (item?.shaderDriven) continue;
           if (item?.sprite?.active) {
-            item.sprite.setX(item.baseX);
+            item.sprite.setAngle(item.originAngle ?? 0);
           }
         }
       }
@@ -685,11 +835,15 @@ export default function createTutorialForestScene(phaserRuntime) {
 
       this.world = buildTutorialForestWorld(this.forestSeed);
       this.playerPos = { ...this.world.playerSpawn };
+        this.playerFacing = { dx: 1, dy: -1 };
       this.assetManifest = buildTutorialForestAssets(this, this.world, { seed: this.forestSeed });
 
       this.renderGroundRegion();
+      this.renderLotusPond();
       this.renderEnvironmentActors();
       this.renderPlayer();
+      this.computeReflectionPlates();
+      this.updateWaterReflection();
       this.setupAtmosphericParticles();
       this.setLightingMode(this.lightingMode);
 
@@ -780,48 +934,360 @@ export default function createTutorialForestScene(phaserRuntime) {
         });
       }
 
-      if (!tile.walkable || this.isWalking) return;
+      if (!tile.walkable) return;
 
-      const path = findGridPath(this.playerPos, { tx, ty }, this.world.tileMap);
-      if (path.length > 0) {
-        this.walkPath(path);
+      const targetPt = this.toIso(tx, ty, tile.elevation || 0);
+      this.startFreeRoamNavigation(targetPt.x, targetPt.y + 4, { tx, ty });
+    }
+
+    resolveFacingDirection(dScreenX, dScreenY) {
+      if (Math.abs(dScreenY) >= Math.abs(dScreenX) * 0.7) {
+        return dScreenY < 0 ? 'north' : 'south';
+      }
+      return dScreenX > 0 ? 'east' : 'west';
+    }
+
+    setPlayerFacing(direction, isMoving = false) {
+      this.playerDirection = direction;
+      if (!this.playerFacing || (this.playerFacing.dx === 0 && this.playerFacing.dy === 0)) {
+        if (direction === 'south') this.playerFacing = { dx: 0, dy: 1 };
+        else if (direction === 'north') this.playerFacing = { dx: 0, dy: -1 };
+        else if (direction === 'east') this.playerFacing = { dx: 1, dy: -1 };
+        else if (direction === 'west') this.playerFacing = { dx: -1, dy: 1 };
+      }
+      if (!this.player) return;
+
+      const animKey = isMoving ? `player_walk_${direction}` : `player_idle_${direction}`;
+      const fallbackAnim = isMoving ? 'player_walk' : 'player_idle';
+
+      if (this.anims?.exists(animKey)) {
+        if (this.player.anims?.currentAnim?.key !== animKey) {
+          this.player.play(animKey);
+        }
+      } else if (this.anims?.exists(fallbackAnim)) {
+        if (this.player.anims?.currentAnim?.key !== fallbackAnim) {
+          this.player.play(fallbackAnim);
+        }
+      } else {
+        const textureKey = direction === 'north' ? 'player_back_0' : (direction === 'east' ? 'player_east_0' : (direction === 'west' ? 'player_west_0' : 'player_idle_0'));
+        if (this.textures?.exists(textureKey)) {
+          this.player.setTexture(textureKey);
+        }
+      }
+      this.updateWaterReflection();
+    }
+
+    isPositionWalkable(x, y) {
+      if (!this.world?.tileMap) return true;
+      const cell = this.fromIso(x, y - 4) || this.fromIso(x, y);
+      return Boolean(cell?.tile?.walkable);
+    }
+
+    hasLineOfSight(x1, y1, x2, y2) {
+      const dist = Math.hypot(x2 - x1, y2 - y1);
+      if (dist < 6) return true;
+      const steps = Math.max(2, Math.ceil(dist / 12));
+      for (let i = 1; i <= steps; i++) {
+        const t = i / steps;
+        const sx = x1 + (x2 - x1) * t;
+        const sy = y1 + (y2 - y1) * t;
+        if (!this.isPositionWalkable(sx, sy)) return false;
+      }
+      return true;
+    }
+
+    stringPullWaypoints(startX, startY, points) {
+      if (!points || points.length <= 1) return points ? [...points] : [];
+      const waypoints = [];
+      let currentX = startX;
+      let currentY = startY;
+      let i = 0;
+
+      while (i < points.length) {
+        let furthest = i;
+        for (let j = points.length - 1; j >= i; j--) {
+          if (this.hasLineOfSight(currentX, currentY, points[j].x, points[j].y)) {
+            furthest = j;
+            break;
+          }
+        }
+        waypoints.push(points[furthest]);
+        currentX = points[furthest].x;
+        currentY = points[furthest].y;
+        i = furthest + 1;
+      }
+      return waypoints;
+    }
+
+    startFreeRoamNavigation(targetX, targetY, targetTile = null) {
+      if (!this.player) return;
+
+      // 1. If direct line of sight is unobstructed, navigate in a single straight vector
+      if (this.hasLineOfSight(this.player.x, this.player.y, targetX, targetY)) {
+        this.navWaypoints = [{ x: targetX, y: targetY }];
+        this.isWalking = true;
+        return;
+      }
+
+      // 2. Obstacle in direct line: pathfind around obstacle and string-pull waypoints to eliminate zig-zags
+      const startCell = this.fromIso(this.player.x, this.player.y - 4) || { tx: this.playerPos.tx, ty: this.playerPos.ty };
+      const goalCell = targetTile || this.fromIso(targetX, targetY - 4);
+      if (!goalCell) {
+        this.navWaypoints = [{ x: targetX, y: targetY }];
+        this.isWalking = true;
+        return;
+      }
+
+      const gridPath = findGridPath(startCell, goalCell, this.world.tileMap);
+      if (!gridPath || gridPath.length === 0) {
+        // Fallback to direct navigation
+        this.navWaypoints = [{ x: targetX, y: targetY }];
+        this.isWalking = true;
+        return;
+      }
+
+      const rawPoints = gridPath.map((t) => {
+        const tile = this.world.tileMap.get(`${t.tx},${t.ty}`);
+        const pt = this.toIso(t.tx, t.ty, tile?.elevation || 0);
+        return { x: pt.x, y: pt.y + 4 };
+      });
+
+      this.navWaypoints = this.stringPullWaypoints(this.player.x, this.player.y, rawPoints);
+      this.isWalking = true;
+    }
+
+    walkPath(path, explicitFacing = null) {
+      if (!path || !path.length) return;
+      if (explicitFacing) this.playerDirection = explicitFacing;
+
+      // Convert grid path to screen-space waypoints and string-pull
+      const startX = this.player ? this.player.x : 0;
+      const startY = this.player ? this.player.y : 0;
+      const rawPoints = path.map((t) => {
+        const tile = this.world?.tileMap?.get(`${t.tx},${t.ty}`);
+        const pt = this.toIso(t.tx, t.ty, tile?.elevation || 0);
+        return { x: pt.x, y: pt.y + 4 };
+      });
+
+      this.navWaypoints = this.stringPullWaypoints(startX, startY, rawPoints);
+      this.isWalking = true;
+
+      // Headless / stub fallback if tweens exist but update loop isn't ticking
+      if (this.tweens?.add && (!this.events?.on || !this.player)) {
+        let step = 0;
+        const stepNext = () => {
+          if (step >= path.length) {
+            this.isWalking = false;
+            this.setPlayerFacing(this.playerDirection || 'south', false);
+            return;
+          }
+          const next = path[step];
+          const prev = this.playerPos;
+          step += 1;
+          this.playerPos = { tx: next.tx, ty: next.ty };
+          const dtx = next.tx - prev.tx;
+          const dty = next.ty - prev.ty;
+          const dScreenX = (dtx - dty) * (this.tileW / 2);
+          const dScreenY = (dtx + dty) * (this.tileH / 2);
+          const dir = explicitFacing || this.resolveFacingDirection(dScreenX, dScreenY);
+          this.setPlayerFacing(dir, true);
+
+          const targetTile = this.world?.tileMap?.get(`${next.tx},${next.ty}`);
+          const pt = this.toIso(next.tx, next.ty, targetTile?.elevation || 0);
+          if (this.player) {
+            this.tweens.add({
+              targets: this.player,
+              x: pt.x,
+              y: pt.y + 4,
+              duration: 200,
+              ease: 'Linear',
+              onComplete: stepNext,
+            });
+          }
+        };
+        stepNext();
       }
     }
 
-    walkPath(path) {
-      if (!path.length || this.isWalking) return;
-      this.isWalking = true;
-      this.player.play('player_walk');
+    setupKeyboardNavigation() {
+      if (!this.input?.keyboard) return;
 
-      let step = 0;
-      const stepNext = () => {
-        if (step >= path.length) {
-          this.isWalking = false;
-          this.player.play('player_idle');
-          return;
+      this.cursors = this.input.keyboard.createCursorKeys();
+      this.wasdKeys = this.input.keyboard.addKeys({
+        W: phaserRuntime.Input?.Keyboard?.KeyCodes?.W ?? 'W',
+        A: phaserRuntime.Input?.Keyboard?.KeyCodes?.A ?? 'A',
+        S: phaserRuntime.Input?.Keyboard?.KeyCodes?.S ?? 'S',
+        D: phaserRuntime.Input?.Keyboard?.KeyCodes?.D ?? 'D',
+      });
+
+      this.events.on('update', (_time, delta) => {
+        this.updateLocomotion(delta);
+      });
+    }
+
+    updateLocomotion(delta) {
+      if (!this.player) return;
+
+      const dt = (typeof delta === 'number' && delta > 0 ? Math.min(delta, 50) : 16.667) / 1000;
+      const walkSpeed = 180; // pixels per second for grounded 8-frame human gait
+
+      // 1. Real-time Free-Roam Keyboard Movement (WASD / Arrows)
+      let inputX = 0;
+      let inputY = 0;
+
+      if (this.wasdKeys?.W?.isDown || this.cursors?.up?.isDown) inputY -= 1;
+      if (this.wasdKeys?.S?.isDown || this.cursors?.down?.isDown) inputY += 1;
+      if (this.wasdKeys?.A?.isDown || this.cursors?.left?.isDown) inputX -= 1;
+      if (this.wasdKeys?.D?.isDown || this.cursors?.right?.isDown) inputX += 1;
+
+      if (inputX !== 0 || inputY !== 0) {
+        // Keyboard takes immediate direct control: cancel any click navigation
+        this.navWaypoints = null;
+
+        const len = Math.hypot(inputX, inputY);
+        const normX = inputX / len;
+        const normY = inputY / len;
+        const moveDist = walkSpeed * dt;
+        const vx = normX * moveDist;
+        const vy = normY * moveDist;
+
+        // Facing direction directly from input vector:
+        // Pure W -> North; Pure S -> South; Pure D -> East; Pure A -> West
+        const dir = this.resolveFacingDirection(inputX, inputY);
+        this.setPlayerFacing(dir, true);
+
+        // Continuous collision & obstacle sliding
+        const newX = this.player.x + vx;
+        const newY = this.player.y + vy;
+
+        if (this.isPositionWalkable(newX, newY)) {
+          this.player.x = newX;
+          this.player.y = newY;
+        } else if (vx !== 0 && this.isPositionWalkable(newX, this.player.y)) {
+          this.player.x = newX;
+        } else if (vy !== 0 && this.isPositionWalkable(this.player.x, newY)) {
+          this.player.y = newY;
         }
 
-        const next = path[step];
-        step += 1;
-        this.playerPos = { tx: next.tx, ty: next.ty };
+        this.player.setDepth(this.player.y + 8);
+        const currentCell = this.fromIso(this.player.x, this.player.y - 4) || this.fromIso(this.player.x, this.player.y);
+        if (currentCell) {
+          this.playerPos = { tx: currentCell.tx, ty: currentCell.ty };
+        }
+        this.updateWaterReflection();
+        this.isWalking = true;
+        return;
+      }
 
-        const targetTile = this.world.tileMap.get(`${next.tx},${next.ty}`);
-        const pt = this.toIso(next.tx, next.ty, targetTile?.elevation || 0);
+      // 2. Click-to-Move Free-Roam Waypoint Navigation
+      if (this.navWaypoints && this.navWaypoints.length > 0) {
+        const target = this.navWaypoints[0];
+        const dx = target.x - this.player.x;
+        const dy = target.y - this.player.y;
+        const dist = Math.hypot(dx, dy);
+        const stepDist = walkSpeed * dt;
 
-        this.tweens.add({
-          targets: this.player,
-          x: pt.x,
-          y: pt.y + 4,
-          duration: 200,
-          ease: 'Linear',
-          onUpdate: () => {
-            this.player.setDepth(this.player.y + 8);
-          },
-          onComplete: stepNext,
-        });
-      };
+        if (dist <= stepDist + 2.0) {
+          // Reached this waypoint
+          this.player.x = target.x;
+          this.player.y = target.y;
+          this.navWaypoints.shift();
 
-      stepNext();
+          if (this.navWaypoints.length === 0) {
+            this.navWaypoints = null;
+            this.isWalking = false;
+            this.setPlayerFacing(this.playerDirection || 'south', false);
+          }
+        } else {
+          const vx = (dx / dist) * stepDist;
+          const vy = (dy / dist) * stepDist;
+
+          const dir = this.resolveFacingDirection(dx, dy);
+          this.setPlayerFacing(dir, true);
+
+          this.player.x += vx;
+          this.player.y += vy;
+        }
+
+        this.player.setDepth(this.player.y + 8);
+        const currentCell = this.fromIso(this.player.x, this.player.y - 4) || this.fromIso(this.player.x, this.player.y);
+        if (currentCell) {
+          this.playerPos = { tx: currentCell.tx, ty: currentCell.ty };
+        }
+        this.updateWaterReflection();
+        this.isWalking = true;
+        return;
+      }
+
+      // 3. No active movement: smoothly settle into idle
+      if (this.isWalking) {
+        this.isWalking = false;
+        this.setPlayerFacing(this.playerDirection || 'south', false);
+      }
+    }
+
+    getKeyboardMovementRequest() {
+      if (!this.wasdKeys && !this.cursors) return null;
+
+      let inputX = 0;
+      let inputY = 0;
+
+      if (this.wasdKeys?.W?.isDown || this.cursors?.up?.isDown) inputY -= 1;
+      if (this.wasdKeys?.S?.isDown || this.cursors?.down?.isDown) inputY += 1;
+      if (this.wasdKeys?.A?.isDown || this.cursors?.left?.isDown) inputX -= 1;
+      if (this.wasdKeys?.D?.isDown || this.cursors?.right?.isDown) inputX += 1;
+
+      if (inputX === 0 && inputY === 0) return null;
+
+      let dtx = 0;
+      let dty = 0;
+      let dir = this.playerDirection || 'south';
+
+      if (inputX === 0 && inputY < 0) {
+        dtx = -1; dty = -1; dir = 'north';
+      } else if (inputX === 0 && inputY > 0) {
+        dtx = 1; dty = 1; dir = 'south';
+      } else if (inputX < 0 && inputY === 0) {
+        dtx = -1; dty = 1; dir = 'west';
+      } else if (inputX > 0 && inputY === 0) {
+        dtx = 1; dty = -1; dir = 'east';
+      } else if (inputX > 0 && inputY < 0) {
+        dtx = 0; dty = -1; dir = 'east';
+      } else if (inputX < 0 && inputY < 0) {
+        dtx = -1; dty = 0; dir = 'west';
+      } else if (inputX > 0 && inputY > 0) {
+        dtx = 1; dty = 0; dir = 'east';
+      } else if (inputX < 0 && inputY > 0) {
+        dtx = 0; dty = 1; dir = 'west';
+      }
+
+      return { dtx, dty, dir, inputX, inputY };
+    }
+
+    resolveKeyboardPath(req) {
+      if (!req) return null;
+
+      const targetTx = this.playerPos.tx + req.dtx;
+      const targetTy = this.playerPos.ty + req.dty;
+
+      const path = findGridPath(this.playerPos, { tx: targetTx, ty: targetTy }, this.world.tileMap);
+      if (path && path.length > 0) return path;
+
+      if (req.dtx !== 0 && req.dty !== 0) {
+        const tryA = { tx: this.playerPos.tx + req.dtx, ty: this.playerPos.ty };
+        const pathA = findGridPath(this.playerPos, tryA, this.world.tileMap);
+        if (pathA && pathA.length > 0) return pathA;
+
+        const tryB = { tx: this.playerPos.tx, ty: this.playerPos.ty + req.dty };
+        const pathB = findGridPath(this.playerPos, tryB, this.world.tileMap);
+        if (pathB && pathB.length > 0) return pathB;
+      }
+
+      return null;
+    }
+
+    handleKeyboardMovement(time, delta) {
+      this.updateLocomotion(delta);
     }
   };
 }

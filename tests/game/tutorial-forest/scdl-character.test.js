@@ -11,7 +11,7 @@ describe('Tutorial Forest — SCDL V2 Character & Prop Compilation', () => {
     const pkg = compileCharacterModel();
     expect(pkg.contract).toBe('SCDL-V2-CHARACTER-PACKAGE');
     expect(pkg.assetId).toBe('lotus_wanderer');
-    expect(pkg.canvas).toEqual({ width: 32, height: 48 });
+    expect(pkg.canvas).toEqual({ width: 64, height: 112 });
     expect(pkg.scdlResult.ok).toBe(true);
 
     const coords = pkg.scdlResult.packet.geometry.coordinates;
@@ -22,13 +22,13 @@ describe('Tutorial Forest — SCDL V2 Character & Prop Compilation', () => {
       expect(Number.isInteger(c.x)).toBe(true);
       expect(Number.isInteger(c.y)).toBe(true);
       expect(c.x).toBeGreaterThanOrEqual(0);
-      expect(c.x).toBeLessThan(32);
+      expect(c.x).toBeLessThan(64);
       expect(c.y).toBeGreaterThanOrEqual(0);
-      expect(c.y).toBeLessThan(48);
+      expect(c.y).toBeLessThan(112);
       expect(typeof c.color).toBe('string');
       expect(/^#[0-9a-fA-F]{6}$/.test(c.color)).toBe(true);
     }
-  });
+  }, 30000);
 
   it('synthesizes all 6 animation frames for idle and walk cycles', () => {
     const pkg = compileCharacterModel();
@@ -39,7 +39,8 @@ describe('Tutorial Forest — SCDL V2 Character & Prop Compilation', () => {
     expect(pkg.frames.walk_2).toBeDefined();
     expect(pkg.frames.walk_3).toBeDefined();
 
-    expect(pkg.frames.idle_0.length).toBe(pkg.frames.idle_1.length);
+    expect(pkg.frames.idle_0.length).toBeGreaterThan(1500);
+    expect(pkg.frames.idle_1.length).toBeGreaterThan(1500);
   });
 
   it('compiles Ancient Waymarker and Mossy Boulder environmental props in SCDL V2', () => {

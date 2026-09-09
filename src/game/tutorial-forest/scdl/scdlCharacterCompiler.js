@@ -1,84 +1,53 @@
-/**
- * Tutorial Forest — SCDL V2 Character Compiler & Animation Frame Generator
- *
- * Compiles the SCDL V2 character source into canonical PixelBrain packets
- * and synthesizes 4-frame idle & walk loops ready for Phaser 4.
- */
-
+/** One adult skeleton -> SCDL V2 + Wand -> packets, animation, SCD128 and UI. */
 import { compileSCDLV2 } from '../../../../codex/core/pixelbrain/scdl/v2/scdl-v2.compiler.js';
-import { LOTUS_WANDERER_SCDL_V2 } from './characterModel.scdl.js';
+import { transpileWandToSCDLV2 } from '../../../../codex/core/pixelbrain/scdl/v2/scdl-v2.wand-bridge.js';
+import { compileWandCharacterSource } from '../../../lib/wandPixelbrainBridge.js';
+import { buildCharacterSource, CHARACTER_PALETTE } from './characterModel.scdl.js';
+import { CHARACTER_CANVAS, CHARACTER_ANATOMY, CHARACTER_DIRECTIONS } from './characterSkeleton.js';
+import { createCharacterWitnessRecord } from '../scd128/characterWitness.js';
+function compilePose(options) {
+  const authored = buildCharacterSource(options);
+  const result = compileWandCharacterSource(authored.source, authored.wandProposal, { canvas: CHARACTER_CANVAS, compile: compileSCDLV2, transpile: transpileWandToSCDLV2 });
+  if (!result.ok) throw new Error(`Failed to compile Lotus Wanderer SCDL V2: ${result.errors.map(e => e.message).join('; ')}`);
+  return { ...authored, result };
+}
+/** Single frame, on demand — for UI portraits that don't need the full pose set. */
+export function compileCharacterPortrait({ direction = 'south', equipped } = {}) {
+  const compiled = compilePose({ direction, equipped });
+  return { canvas: CHARACTER_CANVAS, cells: compiled.result.packet.geometry.coordinates, joints: compiled.pose.joints };
+}
+
+let _cachedCharacterModel = null;
+
+export function resetCharacterModelCache() {
+  _cachedCharacterModel = null;
+}
 
 export function compileCharacterModel() {
-  const result = compileSCDLV2(LOTUS_WANDERER_SCDL_V2);
-  if (!result.ok) {
-    throw new Error(`Failed to compile Lotus Wanderer SCDL V2: ${result.errors.map(e => e.message).join('; ')}`);
+  if (_cachedCharacterModel) return _cachedCharacterModel;
+  const base = compilePose({ direction: 'south' });
+  const frames = { idle_0: base.result.packet.geometry.coordinates };
+  const poses = {
+    idle_1: { phase: .25 },
+    back_0: { direction: 'north' },
+  };
+  for (let i = 0; i < 8; i++) {
+    poses[`walk_${i}`] = { motion: 'walk', phase: i / 8 };
   }
-
-  const baseCells = result.packet.geometry.coordinates;
-  const width = result.analysis.canvas.width;
-  const height = result.analysis.canvas.height;
-
-  // Synthesize walk and idle animation frames deterministically from the canonical SCDL cells
-  const frames = {
-    idle_0: baseCells,
-    idle_1: generateIdlePulse(baseCells, width, height),
-    walk_0: generateWalkStride(baseCells, width, height, -1),
-    walk_1: baseCells,
-    walk_2: generateWalkStride(baseCells, width, height, 1),
-    walk_3: baseCells,
-  };
-
-  return {
-    contract: 'SCDL-V2-CHARACTER-PACKAGE',
-    assetId: 'lotus_wanderer',
-    canvas: { width, height },
-    scdlResult: result,
-    frames,
-  };
-}
-
-/**
- * Idle breath & gemstone glow pulsation.
- */
-function generateIdlePulse(cells, _width, _height) {
-  return cells.map((cell) => {
-    // Upper body chest & gem breathe up 1px
-    let y = cell.y;
-    let color = cell.color;
-    if (cell.y <= 24 && cell.y >= 6) {
-      y = Math.max(0, cell.y - 1);
+  for (const dir of ['north', 'east', 'west']) {
+    for (let i = 0; i < 8; i++) {
+      poses[`walk_${dir}_${i}`] = { motion: 'walk', direction: dir, phase: i / 8 };
     }
-    // Crystal glow flare
-    if (cell.color.toLowerCase() === '#10b981') {
-      color = '#34D399';
-    } else if (cell.color.toLowerCase() === '#6ee7b7') {
-      color = '#A7F3D0';
-    }
-    return { ...cell, y, color };
-  });
-}
-
-/**
- * Walking stride step shift.
- */
-function generateWalkStride(cells, _width, _height, direction) {
-  return cells.map((cell) => {
-    let x = cell.x;
-    let y = cell.y;
-    // Left leg / boot moves with direction
-    if (cell.y >= 33 && cell.x <= 14) {
-      x += direction;
-      y += direction === -1 ? -1 : 0;
-    }
-    // Right leg / boot moves opposite
-    if (cell.y >= 33 && cell.x >= 15 && cell.x <= 20) {
-      x -= direction;
-      y += direction === 1 ? -1 : 0;
-    }
-    // Staff sways with movement
-    if (cell.x >= 21) {
-      x += direction > 0 ? 1 : -1;
-    }
-    return { ...cell, x, y };
-  });
+  }
+  const sources = { idle_0: base.result.source };
+  for (const [key, options] of Object.entries(poses)) {
+    const compiled = compilePose(options); frames[key] = compiled.result.packet.geometry.coordinates; sources[key] = compiled.result.source;
+  }
+  // Directional idle charts share the same section generator and joint manifold.
+  for (const direction of CHARACTER_DIRECTIONS.filter(d => d !== 'south' && d !== 'north')) {
+    const compiled = compilePose({ direction }); frames[`${direction}_0`] = compiled.result.packet.geometry.coordinates; sources[`${direction}_0`] = compiled.result.source;
+  }
+  const scd128Record = createCharacterWitnessRecord({ canvas: CHARACTER_CANVAS, joints: base.pose.joints, coordinates: frames.idle_0, palette: CHARACTER_PALETTE });
+  _cachedCharacterModel = Object.freeze({ contract: 'SCDL-V2-CHARACTER-PACKAGE', assetId: 'lotus_wanderer', name: 'Lotus Wanderer', canvas: CHARACTER_CANVAS, anatomy: CHARACTER_ANATOMY, joints: base.pose.joints, scdlResult: base.result, handoff: base.result.handoff, scd128Record, frames, sources });
+  return _cachedCharacterModel;
 }

@@ -1,7 +1,12 @@
 import { createMapAsset, addMapAssets, stampMapAsset, validateTileMap, mapError } from '../../../codex/core/pixelbrain/tile-forge/tile-forge.map.js';
 import { synthesizeTileForgeTile, synthesizeTileForgeProp, synthesizeTileForgeAsset } from '../../../codex/core/pixelbrain/tile-forge/tile-forge.synthesizer.js';
 import { compileTileForgeScdl } from '../../../codex/core/pixelbrain/tile-forge/tile-forge.scdl-generator.js';
-import { TILE_FORGE_FOREST_ACTOR_TYPES } from '../../../codex/core/pixelbrain/tile-forge/tile-forge.forest-actor-synthesizer.js';
+import { createTileForgeWitnessRecord } from '../../../codex/core/pixelbrain/tile-forge/tile-forge.scd128.js';
+import { compileWandToSCDLV2 } from '../../../codex/core/pixelbrain/scdl/v2/scdl-v2.wand-bridge.js';
+import {
+  TILE_FORGE_FOREST_ACTOR_TYPES,
+  TILE_FORGE_DECOR_TYPES,
+} from '../../../codex/core/pixelbrain/tile-forge/tile-forge.forest-actor-synthesizer.js';
 export * from '../../../codex/core/pixelbrain/tile-forge/tile-forge.map.js';
 
 export const FORGE_ASSET_CHOICES = Object.freeze([
@@ -9,6 +14,9 @@ export const FORGE_ASSET_CHOICES = Object.freeze([
   { id: 'ground', name: 'Ground with soil', kind: 'terrain', family: 'tile' },
   { id: 'rim', name: 'Rim tile', kind: 'terrain', family: 'tile' },
   { id: 'cliff', name: 'Cliff tile', kind: 'terrain', family: 'tile' },
+  { id: 'wand_sigil_stone', name: 'Wand sigil stone', kind: 'prop', family: 'wand' },
+  { id: 'wand_foliage_tuft', name: 'Wand foliage', kind: 'prop', family: 'wand' },
+  { id: 'wand_spiral_core', name: 'Wand spiral', kind: 'prop', family: 'wand' },
   { id: 'crystal_tree', name: 'Crystal tree', kind: 'prop', family: 'prop' },
   { id: 'void_pine', name: 'Pine', kind: 'prop', family: 'prop' },
   { id: 'hologram_fern', name: 'Fern', kind: 'prop', family: 'prop' },
@@ -21,6 +29,7 @@ export const FORGE_ASSET_CHOICES = Object.freeze([
     ['organic_road', 'Flagstone road'], ['lotus_spring', 'Lotus spring'], ['mossy_cliff', 'Mossy cliff'],
   ].map(([id, name]) => ({ id, name, kind: ['quiet_meadow', 'organic_road', 'lotus_spring', 'mossy_cliff'].includes(id) ? 'terrain' : 'prop', family: 'asset' })),
   ...TILE_FORGE_FOREST_ACTOR_TYPES.filter(id => !['timber_fence', 'sunflower_patch'].includes(id)).map(id => ({ id, name: id.replaceAll('_', ' '), kind: 'prop', family: 'asset' })),
+  ...TILE_FORGE_DECOR_TYPES.map(id => ({ id, name: id.replace('decor_', 'Decor ').replaceAll('_', ' '), kind: 'prop', family: 'asset' })),
 ]);
 
 function snapshot(buffer, choice, name) {
@@ -33,9 +42,108 @@ function snapshot(buffer, choice, name) {
   });
 }
 
+function rasterizeCoordinatesToRgba(coordinates, width, height) {
+  const data = new Uint8Array(width * height * 4);
+  for (const c of coordinates || []) {
+    const x = Math.max(0, Math.min(width - 1, Math.round(c.x)));
+    const y = Math.max(0, Math.min(height - 1, Math.round(c.y)));
+    const idx = (y * width + x) * 4;
+    const hex = c.color || '#ffffff';
+    const r = parseInt(hex.slice(1, 3), 16) || 0;
+    const g = parseInt(hex.slice(3, 5), 16) || 0;
+    const b = parseInt(hex.slice(5, 7), 16) || 0;
+    data[idx] = r;
+    data[idx + 1] = g;
+    data[idx + 2] = b;
+    data[idx + 3] = 255;
+  }
+  return data;
+}
+
 export function forgeMapAsset({ type, biome, seed, paletteFamily = 'scholomance_sunlit_glade' }) {
   const choice = FORGE_ASSET_CHOICES.find(c => c.id === type);
   if (!choice) throw mapError('Unknown Tile Forge asset type.');
+
+  if (choice.family === 'wand') {
+    const w = 48;
+    const h = 48;
+    let proposal;
+    if (type === 'wand_sigil_stone') {
+      proposal = {
+        name: 'wand_sigil_stone',
+        role: 'prop.sigil_stone',
+        material: 'aurora',
+        formula: {
+          type: 'composite',
+          children: [
+            {
+              role: 'base_stone',
+              formula: {
+                type: 'edge_trace',
+                tracePath: [
+                  { x: 12, y: 16 }, { x: 24, y: 10 }, { x: 36, y: 16 },
+                  { x: 38, y: 36 }, { x: 24, y: 42 }, { x: 10, y: 36 },
+                ],
+              },
+            },
+            {
+              role: 'sigil_stroke',
+              material: 'gold',
+              formula: {
+                type: 'mathematical_stroke',
+                parameters: {
+                  cx: 24, cy: 26, length: 12, angle: 45 + (seed % 90),
+                  baseWidth: 2, widthVariation: 0.3, frequency: 0.5, density: 1.2, n: 12,
+                },
+              },
+            },
+          ],
+        },
+      };
+    } else if (type === 'wand_spiral_core') {
+      proposal = {
+        name: 'wand_spiral_core',
+        role: 'prop.spiral',
+        material: 'aether',
+        formula: {
+          type: 'fibonacci',
+          parameters: { iterations: 6, scale: 0.9 },
+        },
+      };
+    } else {
+      proposal = {
+        name: 'wand_foliage_tuft',
+        role: 'prop.foliage',
+        material: 'crystal',
+        formula: {
+          type: 'mathematical_stroke',
+          parameters: {
+            cx: 24, cy: 38, length: 18, angle: 90,
+            baseWidth: 3, widthVariation: 0.5, frequency: 0.8, density: 1.5, n: 16,
+          },
+        },
+      };
+    }
+
+    const compileRes = compileWandToSCDLV2(proposal, { canvas: { width: w, height: h } });
+    const coords = compileRes.packet?.geometry?.coordinates || [];
+    const data = rasterizeCoordinatesToRgba(coords, w, h);
+    const scd128Record = createTileForgeWitnessRecord(
+      { width: w, height: h, hasCliff: false, terrainType: `prop_${type}` },
+      { biome, seed, cellCount: coords.length }
+    );
+    const buffer = {
+      width: w,
+      height: h,
+      data,
+      scdlSource: compileRes.transpiledSource,
+      bytecode: compileRes.bytecode,
+      ampDescriptors: compileRes.package?.ampDescriptors || [],
+      scd128Record,
+    };
+    return snapshot(buffer, choice, `${choice.name} · ${seed}`);
+  }
+
   const buffer = choice.family === 'tile' ? synthesizeTileForgeTile({ type, biome, seed })
     : choice.family === 'prop' ? synthesizeTileForgeProp({ propType: type, biome, seed })
       : synthesizeTileForgeAsset({ semanticType: type, biome, paletteFamily, seed });

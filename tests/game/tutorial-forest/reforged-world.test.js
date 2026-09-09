@@ -25,6 +25,10 @@ import {
   FOLIAGE_WIND_FRAG_SRC,
   createFoliageWindShader,
 } from '../../../src/game/tutorial-forest/shaders/FoliageWindShader.js';
+import {
+  createWindField,
+  sampleWindShear,
+} from '../../../src/game/tutorial-forest/world/windField.js';
 import { applyBioluminescentGlow } from '../../../src/game/tutorial-forest/shaders/BioluminescentGlow.js';
 import {
   setupCameraAtmosphere,
@@ -218,13 +222,135 @@ describe('WebGL Shaders & Atmosphere Pipelines', () => {
   it('contains valid GLSL fragment source for water caustics', () => {
     expect(WATER_CAUSTIC_FRAG_SRC).toContain('uniform float uTime');
     expect(WATER_CAUSTIC_FRAG_SRC).toContain('uniform vec4 uCausticColor');
-    expect(WATER_CAUSTIC_FRAG_SRC).toContain('gl_FragColor = col');
+    expect(WATER_CAUSTIC_FRAG_SRC).toContain('uniform sampler2D uGhostSampler');
+    expect(WATER_CAUSTIC_FRAG_SRC).toContain('vec3 premult');
   });
 
   it('handles water caustic creation gracefully in mock scene', () => {
     const mockScene = { add: {} };
     const res = createWaterCausticShader(mockScene, 0, 0);
     expect(res).toBeNull();
+  });
+
+  it('catches caustics regressing to cached-string configs or misnamed uniforms', () => {
+    // Phaser 4 matches uniforms to GLSL by exact name and only refreshes them
+    // through the per-render setupUniforms callback; a cached raw string or a
+    // `name.value` key silently disables the effect.
+    const captured = [];
+    const mockShader = { setOrigin: () => mockShader };
+    const mockScene = {
+      time: { now: 0 },
+      add: {
+        shader: (config, x, y, w, h, textures) => {
+          captured.push({ config, x, y, w, h, textures });
+          return mockShader;
+        },
+      },
+    };
+
+    const shader = createWaterCausticShader(mockScene, 12, 34, 80, 40);
+    expect(shader).toBe(mockShader);
+    expect(captured).toHaveLength(1);
+    expect(captured[0].config.fragmentSource).toBe(WATER_CAUSTIC_FRAG_SRC);
+    expect(captured[0].config.fragmentKey).toBeUndefined();
+    expect(typeof captured[0].config.setupUniforms).toBe('function');
+
+    const uniforms = {};
+    captured[0].config.setupUniforms((name, value) => {
+      expect(name).not.toContain('.value');
+      uniforms[name] = value;
+    });
+    expect(Object.keys(uniforms)).toEqual(
+      expect.arrayContaining(['uTime', 'uWaterBase', 'uCausticColor', 'uResolution', 'uHasMask']),
+    );
+    expect(uniforms.uWaterBase).toHaveLength(4);
+    expect(uniforms.uResolution).toEqual([80, 40]);
+    // No mask texture => field runs unmasked rather than leaking a bare quad.
+    expect(uniforms.uHasMask).toBe(0.0);
+
+    // With a mask texture the field meshes to the water silhouette pixel-by-pixel.
+    const masked = [];
+    createWaterCausticShader(mockScene, 0, 0, 1920, 960, 'water-mask');
+    // first capture was the unmasked call; the masked one is the second
+    expect(captured).toHaveLength(2);
+    // unit 0 = water silhouette mask, unit 1 = mirror ghost (placeholder until
+    // the scene binds the player's current frame)
+    expect(captured[1].textures).toEqual(['water-mask', '__DEFAULT']);
+    captured[1].config.setupUniforms((name, value) => { masked[name] = value; });
+    expect(masked.uHasMask).toBe(1.0);
+    expect(masked.uResolution).toEqual([1920, 960]);
+
+    // Stepped animation: time advances in discrete states, not per-frame floats.
+    mockScene.time.now = 100;
+    captured[0].config.setupUniforms((name, value) => { uniforms[name] = value; });
+    const firstStep = uniforms.uTime;
+    mockScene.time.now = 1000;
+    captured[0].config.setupUniforms((name, value) => { uniforms[name] = value; });
+    expect(uniforms.uTime).not.toBe(firstStep);
+  });
+
+  it('catches foliage wind regressing to cached-string configs or misnamed uniforms', () => {
+    const captured = [];
+    const mockShader = { setOrigin: () => mockShader };
+    const mockScene = {
+      time: { now: 0 },
+      windEnabled: true,
+      // One shared field drives every canopy; the shader samples it per render.
+      windField: createWindField({ direction: 'WEST' }),
+      add: {
+        shader: (config, x, y, w, h, textures) => {
+          captured.push({ config, textures });
+          return mockShader;
+        },
+      },
+    };
+
+    const shader = createFoliageWindShader(mockScene, 'tree_oak', 4, 5, 160, 200, { tx: 3, ty: 7 });
+    expect(shader).toBe(mockShader);
+    expect(captured[0].config.fragmentSource).toBe(FOLIAGE_WIND_FRAG_SRC);
+    expect(captured[0].textures).toEqual(['tree_oak']);
+
+    const uniforms = {};
+    captured[0].config.setupUniforms((name, value) => {
+      expect(name).not.toContain('.value');
+      uniforms[name] = value;
+    });
+    expect(Object.keys(uniforms)).toEqual(
+      expect.arrayContaining(['uMainSampler', 'uTime', 'uWindStrength', 'uWindLean']),
+    );
+    expect(uniforms.uWindStrength).toBe(1.0);
+    // The lean is sourced from the shared field, not a per-tree oscillator phase.
+    expect(uniforms.uWindLean).toBeCloseTo(
+      sampleWindShear(mockScene.windField, 0, 3, 7, 160),
+      10,
+    );
+    // A west wind pushes every crown left, so the shear is negative.
+    expect(uniforms.uWindLean).toBeLessThan(0);
+    expect(FOLIAGE_WIND_FRAG_SRC).not.toContain('uPhase');
+  });
+
+  it('gives every tree the same wind direction from the shared field', () => {
+    const capturedConfigs = [];
+    const mockScene = {
+      time: { now: 1500 },
+      windEnabled: true,
+      windField: createWindField({ direction: 'EAST' }),
+      add: { shader: (config) => { capturedConfigs.push(config); return { setOrigin: () => null }; } },
+    };
+
+    // Two trees far apart on the map, sampled at the same instant.
+    for (const tile of [{ tx: 0, ty: 0 }, { tx: 20, ty: 16 }]) {
+      createFoliageWindShader(mockScene, 'tree_oak', 0, 0, 160, 200, tile);
+    }
+
+    const leans = capturedConfigs.map((config) => {
+      let lean = null;
+      config.setupUniforms((name, value) => { if (name === 'uWindLean') lean = value; });
+      return lean;
+    });
+
+    // An east wind leans every crown right, regardless of tile position.
+    expect(leans.every((lean) => lean > 0)).toBe(true);
   });
 
   it('contains valid GLSL fragment source for foliage wind flutter', () => {

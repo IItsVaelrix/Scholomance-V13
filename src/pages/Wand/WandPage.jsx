@@ -34,6 +34,8 @@ import {
   Trash2,
   FolderOpen,
   Download,
+  X,
+  Check,
 } from 'lucide-react';
 
 // Core engine imports
@@ -50,7 +52,12 @@ import { roleDispatcher } from '../../ui/features/mysticHolistics/hero/roleDispa
 import { registerBuiltInDrawers } from '../../ui/features/mysticHolistics/hero/roleDrawers';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js';
 import { routeRetinaPacketToPhotonicBridge } from '../../lib/photonic-retina/index.js';
-import { deriveWandFillBytecode, forgeCharacterFromWandVector } from '../../lib/pixelbrain.adapter.js';
+import {
+  deriveWandFillBytecode,
+  forgeCharacterFromWandVector,
+  compileWandToSCDLV2,
+  publishWandSCDLV2,
+} from '../../lib/pixelbrain.adapter.js';
 import { publishWandFill } from '../../lib/wandPixelbrainBridge.js';
 
 import './WandPage.css';
@@ -491,6 +498,8 @@ export default function WandPage({ onSendToVideoForge } = {}) {
   const [quantStats, setQuantStats] = useState(null);
   const [photonicRoute, setPhotonicRoute] = useState(null);
   const [characterPreview, setCharacterPreview] = useState(null); // for Wand vector character models
+  const [scdlCompiledResult, setScdlCompiledResult] = useState(null);
+  const [showScdlModal, setShowScdlModal] = useState(false);
 
   // Animation time
   const [time, setTime] = useState(0);
@@ -1051,6 +1060,29 @@ export default function WandPage({ onSendToVideoForge } = {}) {
     }
   };
 
+  const handleCompileToSCDLV2 = () => {
+    try {
+      const pf = proposal?.proposedFormula || proposal || {};
+      const canvasSize = { width: 48, height: 48 };
+      const compileRes = compileWandToSCDLV2(pf, { canvas: canvasSize, name: pf.role || 'wand_spell' });
+      if (compileRes.ok) {
+        setScdlCompiledResult(compileRes);
+        publishWandSCDLV2(compileRes);
+        addTerminalLog(
+          `Wand compiled to SCDL V2! Program: ${compileRes.bytecode?.programId} (${compileRes.packet?.geometry?.coordinates?.length || 0} discrete pixel cells). Ironclad Pixel Art Enforced.`,
+          'success'
+        );
+      } else {
+        addTerminalLog(
+          `SCDL V2 compilation diagnostics: ${compileRes.diagnostics?.map((d) => d.message).join('; ') || 'Failure'}`,
+          'error'
+        );
+      }
+    } catch (err) {
+      addTerminalLog(`Wand SCDL V2 error: ${err.message}`, 'error');
+    }
+  };
+
   const handleSendToVideoForge = () => {
     if (!onSendToVideoForge) return;
 
@@ -1260,6 +1292,38 @@ export default function WandPage({ onSendToVideoForge } = {}) {
             <Sparkles className="btn-icon" />
             Send → PixelBrain
           </button>
+
+          <button
+            className="action-btn animate-btn scdl-compile-btn"
+            onClick={handleCompileToSCDLV2}
+            type="button"
+            title="Compile this Wand proposal directly into a canonical SCDL V2 pixel art asset package"
+            style={{
+              background: 'linear-gradient(135deg, rgba(0, 229, 255, 0.25), rgba(123, 31, 162, 0.35))',
+              border: '1px solid rgba(0, 229, 255, 0.6)',
+              color: '#00e5ff',
+            }}
+          >
+            <FileCode className="btn-icon" />
+            Compile → SCDL V2
+          </button>
+
+          {scdlCompiledResult && (
+            <button
+              className="action-btn animate-btn"
+              onClick={() => setShowScdlModal(true)}
+              type="button"
+              title="View compiled SCDL V2 source code and bytecode"
+              style={{
+                background: 'rgba(34, 197, 94, 0.2)',
+                border: '1px solid rgba(34, 197, 94, 0.6)',
+                color: '#4ade80',
+              }}
+            >
+              <FileCode className="btn-icon" />
+              View SCDL V2 ({scdlCompiledResult.packet?.geometry?.coordinates?.length || 0}px)
+            </button>
+          )}
           {onSendToVideoForge && (
             <button
               className="action-btn animate-btn"
@@ -2215,6 +2279,136 @@ export default function WandPage({ onSendToVideoForge } = {}) {
         </section>
 
       </div>
+
+      {/* SCDL V2 SOURCE & BYTECODE MODAL */}
+      {showScdlModal && scdlCompiledResult && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="SCDL V2 Compiled Package"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999,
+            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '24px',
+          }}
+          onClick={() => setShowScdlModal(false)}
+        >
+          <div
+            style={{
+              backgroundColor: '#0c101c',
+              border: '1px solid rgba(0, 229, 255, 0.4)',
+              borderRadius: '12px',
+              maxWidth: '800px',
+              width: '100%',
+              maxHeight: '85vh',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(0, 229, 255, 0.2)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                padding: '16px 20px',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <FileCode size={20} color="#00e5ff" />
+                <h3 style={{ margin: 0, color: '#f8fafc', fontSize: '16px', fontWeight: 600 }}>
+                  SCDL V2 Compiled Program & Package
+                </h3>
+                <span
+                  style={{
+                    backgroundColor: 'rgba(34, 197, 94, 0.15)',
+                    color: '#4ade80',
+                    border: '1px solid rgba(34, 197, 94, 0.4)',
+                    padding: '2px 8px',
+                    borderRadius: '999px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                  }}
+                >
+                  PIXEL ART ENFORCED (ℤ²)
+                </span>
+              </div>
+              <button
+                onClick={() => setShowScdlModal(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#94a3b8',
+                  cursor: 'pointer',
+                  padding: '4px',
+                }}
+                aria-label="Close modal"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div style={{ padding: '20px', overflowY: 'auto', flex: 1 }}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: '12px',
+                  marginBottom: '16px',
+                }}
+              >
+                <div style={{ background: '#131929', padding: '10px 14px', borderRadius: '8px' }}>
+                  <div style={{ fontSize: '11px', color: '#64748b' }}>PROGRAM ID</div>
+                  <div style={{ fontSize: '13px', color: '#00e5ff', fontFamily: 'monospace', fontWeight: 600 }}>
+                    {scdlCompiledResult.bytecode?.programId || 'N/A'}
+                  </div>
+                </div>
+                <div style={{ background: '#131929', padding: '10px 14px', borderRadius: '8px' }}>
+                  <div style={{ fontSize: '11px', color: '#64748b' }}>ASSET PACKET ID</div>
+                  <div style={{ fontSize: '13px', color: '#a78bfa', fontFamily: 'monospace', fontWeight: 600 }}>
+                    {scdlCompiledResult.packet?.id || 'N/A'}
+                  </div>
+                </div>
+                <div style={{ background: '#131929', padding: '10px 14px', borderRadius: '8px' }}>
+                  <div style={{ fontSize: '11px', color: '#64748b' }}>DISCRETE CELLS</div>
+                  <div style={{ fontSize: '13px', color: '#4ade80', fontFamily: 'monospace', fontWeight: 600 }}>
+                    {scdlCompiledResult.packet?.geometry?.coordinates?.length || 0} cells
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '8px', fontSize: '12px', color: '#94a3b8', fontWeight: 600 }}>
+                DECLARATIVE SCDL V2 SOURCE:
+              </div>
+              <pre
+                style={{
+                  margin: 0,
+                  padding: '16px',
+                  background: '#070a12',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '8px',
+                  color: '#e2e8f0',
+                  fontFamily: 'monospace',
+                  fontSize: '12px',
+                  lineHeight: '1.5',
+                  overflowX: 'auto',
+                }}
+              >
+                {scdlCompiledResult.transpiledSource}
+              </pre>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

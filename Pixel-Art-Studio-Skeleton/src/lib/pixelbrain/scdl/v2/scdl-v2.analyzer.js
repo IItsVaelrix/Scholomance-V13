@@ -2,6 +2,8 @@ import { span, v2Diagnostic } from './scdl-v2.diagnostics.js';
 import {
   SCDL_V2_TYPES, NUMERIC_TYPES, SCALAR_TYPES, TYPE_CODES, BIND_CODES, GEOM_CODES, TERM_CODES, AMP_CODES,
   I32_MIN, I32_MAX, RASTER_POLICIES, COMPOSITE_MODES, isKnownType,
+  ANIMATION_CODES, DURATION_UNITS, LOOP_MODES, TRACK_PROPERTIES, TRACK_PROPERTY_TARGETS,
+  EASING_CURVES, ANIMATION_FPS_DEFAULT,
 } from './scdl-v2.types.js';
 import { getAmpManifest, listAmpManifests } from './scdl-v2.amp-catalog.js';
 import { isValidStage, AMP_STAGES } from './scdl-v2.amp-stages.js';
@@ -177,6 +179,11 @@ function evaluateLiteral(node, diagnostics, symbols) {
     case 'IDENT': {
       if (node.raw === 'TRUE' || node.raw === 'true') return Object.freeze({ type: 'BOOL', value: true });
       if (node.raw === 'FALSE' || node.raw === 'false') return Object.freeze({ type: 'BOOL', value: false });
+      // TAU is one full turn, so (SIN (MUL TAU $time_normalized)) sweeps exactly
+      // one cycle. Spelled bare in source; typed ANGLE, never a loose float.
+      if (node.raw === 'TAU') {
+        return Object.freeze({ type: 'ANGLE', value: createAngle(makeRational(1), 'TURNS') });
+      }
       if (symbols && typeof symbols.has === 'function' && symbols.has(node.raw)) {
         return symbols.get(node.raw);
       }
@@ -256,6 +263,12 @@ function evaluateCall(node, symbols, diagnostics) {
     case 'MUL': return evaluateMul(node, symbols, diagnostics);
     case 'DIV': return evaluateDiv(node, symbols, diagnostics);
     case 'PX': return evaluatePx(node, symbols, diagnostics);
+    case 'RATIO': return evaluateRatio(node, symbols, diagnostics);
+    case 'MS': return evaluateDuration(node, symbols, diagnostics, 'MS');
+    case 'SECONDS': return evaluateDuration(node, symbols, diagnostics, 'SECONDS');
+    case 'FPS': return evaluateDuration(node, symbols, diagnostics, 'FPS');
+    case 'TICKS': return evaluateDuration(node, symbols, diagnostics, 'TICKS');
+    case 'TAU': return Object.freeze({ type: 'ANGLE', value: createAngle(makeRational(1), 'TURNS') });
     case 'VEC2': return evaluateVec2(node, symbols, diagnostics);
     case 'PIXEL': return evaluatePixel(node, symbols, diagnostics);
     case 'CIRCLE': return evaluateCircle(node, symbols, diagnostics);
@@ -450,11 +463,23 @@ function evaluateMul(node, symbols, diagnostics) {
     return Object.freeze({ type: 'PX', value: mulRational(toRational(pxOperand), toRational(scalarOperand)) });
   }
 
+  // ANGLE x scalar scales the sweep, so (MUL TAU $time_normalized) is legal and
+  // stays an exact ANGLE. Scalar x ANGLE is the same product, order-insensitive.
+  const leftIsAngle = left.type === 'ANGLE';
+  const rightIsAngle = right.type === 'ANGLE';
+  if ((leftIsAngle && rightIsScalar) || (rightIsAngle && leftIsScalar)) {
+    const angleOperand = leftIsAngle ? left : right;
+    const scalarOperand = leftIsAngle ? right : left;
+    const baseTurns = angleOperand.value?.sweepTurns || angleOperand.value?.turns;
+    const turns = mulRational(toRational(baseTurns), toRational(scalarOperand));
+    return Object.freeze({ type: 'ANGLE', value: createAngle(turns, 'TURNS') });
+  }
+
   pushDiagnostic(diagnostics, {
     code: TYPE_CODES.INVALID_OPERATION,
-    message: 'MUL requires I32xI32, scalarxscalar, or PXxscalar operands.',
+    message: 'MUL requires I32xI32, scalarxscalar, PXxscalar, or ANGLExscalar operands.',
     nodeSpan: node.span,
-    expected: ['I32', 'FIXED', 'RATIO', 'PX'],
+    expected: ['I32', 'FIXED', 'RATIO', 'PX', 'ANGLE'],
     received: [left.type, right.type],
   });
   return null;
@@ -519,6 +544,63 @@ function evaluatePx(node, symbols, diagnostics) {
     return null;
   }
   return Object.freeze({ type: 'PX', value: toRational(value) });
+}
+
+// Exact rational constructor: (RATIO 1 4) is one quarter. Keyframe values use
+// this so an authored fraction never degrades through a decimal round-trip.
+function evaluateRatio(node, symbols, diagnostics) {
+  const [numeratorNode, denominatorNode] = node.positional;
+  const numerator = evaluateExpression(numeratorNode, symbols, diagnostics);
+  const denominator = evaluateExpression(denominatorNode, symbols, diagnostics);
+  if (!numerator || !denominator) return null;
+  for (const [operand, label] of [[numerator, 'numerator'], [denominator, 'denominator']]) {
+    if (operand.type !== 'I32') {
+      pushDiagnostic(diagnostics, {
+        code: TYPE_CODES.MISMATCH,
+        message: `RATIO requires an I32 ${label}.`,
+        nodeSpan: node.span,
+        expected: ['I32'],
+        received: [operand.type],
+      });
+      return null;
+    }
+  }
+  if (denominator.value === 0) {
+    pushDiagnostic(diagnostics, {
+      code: TYPE_CODES.DIVISION_BY_ZERO,
+      message: 'RATIO denominator must be nonzero.',
+      nodeSpan: node.span,
+      received: ['0'],
+    });
+    return null;
+  }
+  return Object.freeze({
+    type: 'RATIO',
+    value: makeRational(BigInt(numerator.value), BigInt(denominator.value)),
+  });
+}
+
+// Duration constructors. Everything normalizes to integer timeline ticks at the
+// canonical sample rate, so a timeline's frame count is an exact integer and
+// never a floating-point rounding decision.
+function evaluateDuration(node, symbols, diagnostics, unit) {
+  const [valueNode] = node.positional;
+  const value = evaluateExpression(valueNode, symbols, diagnostics);
+  if (!value) return null;
+  const expectI32 = unit === 'TICKS';
+  const allowed = expectI32 ? ['I32'] : SCALAR_TYPES;
+  if (!allowed.includes(value.type)) {
+    pushDiagnostic(diagnostics, {
+      code: TYPE_CODES.MISMATCH,
+      message: `${unit} requires ${expectI32 ? 'an I32' : 'a scalar'} operand.`,
+      nodeSpan: node.span,
+      expected: [...allowed],
+      received: [value.type],
+    });
+    return null;
+  }
+  const rational = toRational(value);
+  return Object.freeze({ type: 'DURATION', value: Object.freeze({ unit, rational }) });
 }
 
 function evaluateVec2(node, symbols, diagnostics) {
@@ -3258,6 +3340,413 @@ function analyzeLayerDeclaration(declaration, symbols, diagnostics, layers) {
 }
 
 // ---------------------------------------------------------------------------
+// Step 4 — mathematical animation analysis
+//
+// A TIMELINE is time-dependent mathematics, so unlike every other v2 construct
+// it is NOT constant-folded here. The analyzer resolves structure, types, and
+// target/property legality, converts every duration to exact integer ticks, and
+// preserves each FORMULA as an AST node plus a snapshot of the user symbol scope.
+// scdl-v2.animation.js then evaluates those formulas once per frame with the
+// time symbols bound, producing a finite sample table.
+// ---------------------------------------------------------------------------
+
+// Snapshot of user-declared symbols, excluding analyzer internals. Frozen plain
+// object so it survives deepFreeze of the IR and can be replayed per frame.
+function snapshotUserSymbols(symbols) {
+  const out = {};
+  if (!symbols || typeof symbols.forEach !== 'function') return Object.freeze(out);
+  for (const [key, value] of symbols.entries()) {
+    if (typeof key !== 'string') continue;
+    if (key.startsWith('_') || key.startsWith('$__')) continue;
+    out[key] = value;
+  }
+  return Object.freeze(out);
+}
+
+function animationDiagnostic(diagnostics, code, message, nodeSpan, extra = {}) {
+  pushDiagnostic(diagnostics, { code, message, nodeSpan, ...extra });
+}
+
+// SAMPLE_RATE (FPS 12) -> integer frames per second.
+function resolveSampleRateFps(expr, symbols, diagnostics, nodeSpan) {
+  if (!expr) return ANIMATION_FPS_DEFAULT;
+  const resolved = evaluateExpression(expr, symbols, diagnostics);
+  if (!resolved) return ANIMATION_FPS_DEFAULT;
+  if (resolved.type !== 'DURATION' || resolved.value.unit !== 'FPS') {
+    animationDiagnostic(diagnostics, ANIMATION_CODES.UNKNOWN_DURATION_UNIT,
+      'SAMPLE_RATE requires an FPS duration, e.g. SAMPLE_RATE (FPS 12).', nodeSpan,
+      { expected: ['FPS'], received: [resolved.type === 'DURATION' ? resolved.value.unit : resolved.type] });
+    return ANIMATION_FPS_DEFAULT;
+  }
+  const fps = Number(roundRationalToBigInt(resolved.value.rational));
+  if (!Number.isFinite(fps) || fps <= 0) {
+    animationDiagnostic(diagnostics, ANIMATION_CODES.NON_FINITE_DURATION,
+      'SAMPLE_RATE must be a positive integer frames-per-second.', nodeSpan,
+      { received: [String(fps)] });
+    return ANIMATION_FPS_DEFAULT;
+  }
+  return fps;
+}
+
+// Any duration expression -> exact integer timeline ticks at the given rate.
+function resolveDurationTicks(expr, fps, symbols, diagnostics, nodeSpan, label) {
+  const resolved = evaluateExpression(expr, symbols, diagnostics);
+  if (!resolved) return null;
+  if (resolved.type !== 'DURATION') {
+    animationDiagnostic(diagnostics, TYPE_CODES.MISMATCH,
+      `${label} requires a DURATION built from MS, SECONDS, or TICKS.`, nodeSpan,
+      { expected: ['DURATION'], received: [resolved.type] });
+    return null;
+  }
+  const { unit, rational } = resolved.value;
+  if (unit === 'FPS') {
+    animationDiagnostic(diagnostics, ANIMATION_CODES.UNKNOWN_DURATION_UNIT,
+      `${label} cannot use FPS; FPS is a sample rate, not a span of time.`, nodeSpan,
+      { expected: ['MS', 'SECONDS', 'TICKS'], received: ['FPS'] });
+    return null;
+  }
+  if (unit === 'TICKS') return Number(roundRationalToBigInt(rational));
+  const perSecond = unit === 'MS'
+    ? mulRational(rational, makeRational(1, 1000))
+    : rational;
+  return Number(roundRationalToBigInt(mulRational(perSecond, makeRational(BigInt(fps)))));
+}
+
+function resolveTargetKind(name, symbols) {
+  const entry = symbols && typeof symbols.get === 'function' ? symbols.get(name) : null;
+  if (entry && entry.type === 'LAYER') return 'LAYER';
+  if (entry && entry.type === 'SHAPE') return 'SHAPE';
+  if (entry && entry.type === 'MASK') return 'MASK';
+  return null;
+}
+
+// One KEYFRAME / VISIBILITY row: exact tick, typed value, validated easing.
+function analyzeKeyframeStatement(statement, symbols, diagnostics, keyframes, durationTicks) {
+  const tick = resolveDurationTicks(statement.at, keyframes.fps, symbols, diagnostics, statement.span, 'KEYFRAME AT');
+  if (tick === null) return;
+  if (tick < 0 || tick > durationTicks) {
+    animationDiagnostic(diagnostics, ANIMATION_CODES.KEYFRAME_OUT_OF_RANGE,
+      `KEYFRAME AT tick ${tick} falls outside the timeline span 0..${durationTicks}.`,
+      statement.span, { expected: [`0..${durationTicks}`], received: [String(tick)] });
+    return;
+  }
+  const resolvedValue = evaluateExpression(statement.value, symbols, diagnostics);
+  if (!resolvedValue) return;
+
+  let easing = 'LINEAR';
+  if (statement.ease) {
+    const easeExpr = evaluateExpression(statement.ease, symbols, diagnostics);
+    easing = easeExpr && easeExpr.type === 'IDENT' ? String(easeExpr.value).toUpperCase() : 'LINEAR';
+    if (!EASING_CURVES.includes(easing)) {
+      animationDiagnostic(diagnostics, ANIMATION_CODES.UNKNOWN_EASING,
+        `Unknown easing curve '${easing}'.`, statement.span,
+        { expected: [...EASING_CURVES], received: [easing] });
+      return;
+    }
+  }
+
+  const previous = keyframes.rows[keyframes.rows.length - 1];
+  if (previous && tick < previous.tick) {
+    animationDiagnostic(diagnostics, ANIMATION_CODES.UNORDERED_KEYFRAMES,
+      `KEYFRAME AT tick ${tick} precedes the previous keyframe at tick ${previous.tick}; keyframes must be non-decreasing.`,
+      statement.span, { received: [String(tick), String(previous.tick)] });
+    return;
+  }
+
+  keyframes.rows.push(Object.freeze({ tick, value: resolvedValue, easing }));
+}
+
+// A FORMULA is preserved, never folded: it is re-evaluated at every frame with
+// the time symbols bound. It must actually depend on time, otherwise the author
+// meant a constant and should use a KEYFRAME.
+function analyzeFormulaStatement(statement, symbols, diagnostics, track, scopeSnapshot) {
+  if (track.formula) {
+    animationDiagnostic(diagnostics, ANIMATION_CODES.DUPLICATE_TRACK,
+      'A TRACK may carry at most one FORMULA.', statement.span);
+    return;
+  }
+  if (track.keyframes.length > 0) {
+    animationDiagnostic(diagnostics, ANIMATION_CODES.DUPLICATE_TRACK,
+      'A TRACK may not mix KEYFRAME rows with a FORMULA; choose one driver.', statement.span);
+    return;
+  }
+  const source = JSON.stringify(statement.value);
+  const timeDependent = ['$time', '$time_normalized', '$frame', '$t']
+    .some((symbol) => source.includes(`"${symbol}"`));
+  if (!timeDependent) {
+    animationDiagnostic(diagnostics, ANIMATION_CODES.FORMULA_NOT_TIME_DEPENDENT,
+      'FORMULA does not reference $time, $time_normalized, $frame, or $t, so it cannot vary over the timeline. Use KEYFRAME for a constant value.',
+      statement.span, { expected: ['$time', '$time_normalized', '$frame', '$t'] });
+    return;
+  }
+  // Probe-evaluate with time bound to zero so type errors surface at compile
+  // time rather than mid-sampling. The result is discarded.
+  const probe = new Map(Object.entries(scopeSnapshot));
+  probe.set('$time', Object.freeze({ type: 'RATIO', value: makeRational(0) }));
+  probe.set('$t', Object.freeze({ type: 'RATIO', value: makeRational(0) }));
+  probe.set('$time_normalized', Object.freeze({ type: 'RATIO', value: makeRational(0) }));
+  probe.set('$frame', Object.freeze({ type: 'I32', value: 0 }));
+  ensureAnalyzerContext(probe);
+  const probeDiagnostics = [];
+  const probeValue = evaluateExpression(statement.value, probe, probeDiagnostics);
+  for (const diagnostic of probeDiagnostics) diagnostics.push(diagnostic);
+  if (!probeValue) return;
+
+  track.formula = Object.freeze({ node: statement.value, valueType: probeValue.type });
+}
+
+function analyzeTrackStatement(statement, symbols, diagnostics, tracks, context) {
+  const targetName = statement.target?.value;
+  const property = String(statement.property?.value || '').toUpperCase();
+
+  if (!TRACK_PROPERTIES.includes(property)) {
+    animationDiagnostic(diagnostics, ANIMATION_CODES.UNKNOWN_PROPERTY,
+      `Unknown TRACK PROPERTY '${property}'.`, statement.span,
+      { expected: [...TRACK_PROPERTIES], received: [property] });
+    return;
+  }
+
+  const targetKind = resolveTargetKind(targetName, symbols);
+  if (!targetKind) {
+    animationDiagnostic(diagnostics, ANIMATION_CODES.UNKNOWN_TARGET,
+      `TRACK TARGET '${targetName}' does not resolve to a declared LAYER or SHAPE.`, statement.span,
+      { relatedSymbols: [String(targetName)] });
+    return;
+  }
+  if (!TRACK_PROPERTY_TARGETS[property].includes(targetKind)) {
+    animationDiagnostic(diagnostics, ANIMATION_CODES.PROPERTY_TARGET_MISMATCH,
+      `PROPERTY ${property} cannot drive a ${targetKind} target.`, statement.span,
+      { expected: TRACK_PROPERTY_TARGETS[property], received: [targetKind] });
+    return;
+  }
+
+  const duplicate = tracks.find((track) => track.target === targetName && track.property === property);
+  if (duplicate) {
+    animationDiagnostic(diagnostics, ANIMATION_CODES.DUPLICATE_TRACK,
+      `Duplicate TRACK for ${targetName} ${property}; one property may only have one driver.`,
+      statement.span, { relatedSymbols: [targetName, property] });
+    return;
+  }
+
+  const track = { target: targetName, targetKind, property, keyframes: [], formula: null, pose: context.pose || null };
+  const keyframeSink = { rows: track.keyframes, fps: context.fps };
+
+  for (const child of statement.body || []) {
+    if (child.kind === 'CommentStatement') continue;
+    if (child.kind === 'KeyframeStatement') {
+      analyzeKeyframeStatement(child, symbols, diagnostics, keyframeSink, context.durationTicks);
+    } else if (child.kind === 'VisibilityStatement') {
+      if (property !== 'VISIBLE') {
+        animationDiagnostic(diagnostics, ANIMATION_CODES.PROPERTY_TARGET_MISMATCH,
+          'VISIBILITY is only legal in a TRACK with PROPERTY VISIBLE.', child.span,
+          { expected: ['VISIBLE'], received: [property] });
+        continue;
+      }
+      const tick = resolveDurationTicks(child.at, context.fps, symbols, diagnostics, child.span, 'VISIBILITY AT');
+      if (tick === null) continue;
+      const resolvedValue = evaluateExpression(child.value, symbols, diagnostics);
+      if (!resolvedValue || resolvedValue.type !== 'BOOL') {
+        animationDiagnostic(diagnostics, TYPE_CODES.MISMATCH,
+          'VISIBILITY VALUE requires a BOOL operand.', child.span,
+          { expected: ['BOOL'], received: [resolvedValue ? resolvedValue.type : 'null'] });
+        continue;
+      }
+      track.keyframes.push(Object.freeze({ tick, value: resolvedValue, easing: 'STEP' }));
+    } else if (child.kind === 'FormulaStatement') {
+      analyzeFormulaStatement(child, symbols, diagnostics, track, context.scopeSnapshot);
+    } else {
+      animationDiagnostic(diagnostics, TYPE_CODES.INVALID_OPERATION,
+        `Statement ${child.kind} is not legal inside a TRACK body.`, child.span,
+        { expected: ['KEYFRAME', 'FORMULA', 'VISIBILITY'] });
+    }
+  }
+
+  if (track.keyframes.length === 0 && !track.formula) {
+    animationDiagnostic(diagnostics, ANIMATION_CODES.EMPTY_TRACK,
+      `TRACK ${targetName} ${property} has no KEYFRAME, VISIBILITY, or FORMULA driver.`,
+      statement.span, { relatedSymbols: [targetName, property] });
+    return;
+  }
+
+  tracks.push(Object.freeze({
+    target: track.target,
+    targetKind: track.targetKind,
+    property: track.property,
+    pose: track.pose,
+    formula: track.formula,
+    keyframes: Object.freeze([...track.keyframes]),
+  }));
+}
+
+function analyzeTimelineDeclaration(declaration, symbols, diagnostics, timelines) {
+  const id = declaration.id?.value;
+  if (timelines.some((timeline) => timeline.id === id)) {
+    animationDiagnostic(diagnostics, ANIMATION_CODES.DUPLICATE_TRACK,
+      `Duplicate TIMELINE id '${id}'.`, declaration.span, { relatedSymbols: [String(id)] });
+    return;
+  }
+
+  const fps = resolveSampleRateFps(declaration.sampleRate, symbols, diagnostics, declaration.span);
+  const durationTicks = resolveDurationTicks(declaration.duration, fps, symbols, diagnostics, declaration.span, 'TIMELINE DURATION');
+  if (durationTicks === null) return;
+  if (durationTicks <= 0) {
+    animationDiagnostic(diagnostics, ANIMATION_CODES.NON_FINITE_DURATION,
+      `TIMELINE DURATION must span at least one tick at ${fps} fps; resolved to ${durationTicks}.`,
+      declaration.span, { received: [String(durationTicks)] });
+    return;
+  }
+
+  let loop = 'REPEAT';
+  if (declaration.loop) {
+    const loopExpr = evaluateExpression(declaration.loop, symbols, diagnostics);
+    loop = loopExpr && loopExpr.type === 'IDENT' ? String(loopExpr.value).toUpperCase() : 'REPEAT';
+    if (!LOOP_MODES.includes(loop)) {
+      animationDiagnostic(diagnostics, ANIMATION_CODES.UNKNOWN_LOOP_MODE,
+        `Unknown LOOP mode '${loop}'.`, declaration.span,
+        { expected: [...LOOP_MODES], received: [loop] });
+      return;
+    }
+  }
+
+  const scopeSnapshot = snapshotUserSymbols(symbols);
+  const context = { fps, durationTicks, scopeSnapshot, pose: null };
+  const tracks = [];
+  const events = [];
+  const variants = [];
+  const poses = [];
+
+  for (const child of declaration.body || []) {
+    if (child.kind === 'CommentStatement') continue;
+    if (child.kind === 'TrackStatement') {
+      analyzeTrackStatement(child, symbols, diagnostics, tracks, context);
+    } else if (child.kind === 'PoseStatement') {
+      const poseId = child.id?.value;
+      if (poses.includes(poseId)) {
+        animationDiagnostic(diagnostics, ANIMATION_CODES.DUPLICATE_TRACK,
+          `Duplicate POSE id '${poseId}' in TIMELINE ${id}.`, child.span, { relatedSymbols: [String(poseId)] });
+        continue;
+      }
+      poses.push(poseId);
+      const poseContext = { ...context, pose: poseId };
+      for (const poseChild of child.body || []) {
+        if (poseChild.kind === 'CommentStatement') continue;
+        if (poseChild.kind === 'TrackStatement') {
+          analyzeTrackStatement(poseChild, symbols, diagnostics, tracks, poseContext);
+        } else {
+          animationDiagnostic(diagnostics, TYPE_CODES.INVALID_OPERATION,
+            `Statement ${poseChild.kind} is not legal inside a POSE body.`, poseChild.span,
+            { expected: ['TRACK'] });
+        }
+      }
+    } else if (child.kind === 'EventStatement') {
+      const tick = resolveDurationTicks(child.at, fps, symbols, diagnostics, child.span, 'EVENT AT');
+      if (tick === null) continue;
+      events.push(Object.freeze({ tick, name: String(child.name?.value || '') }));
+    } else if (child.kind === 'VariantStatement') {
+      const from = resolveDurationTicks(child.from, fps, symbols, diagnostics, child.span, 'VARIANT FROM');
+      const to = resolveDurationTicks(child.to, fps, symbols, diagnostics, child.span, 'VARIANT TO');
+      if (from === null || to === null) continue;
+      if (to <= from) {
+        animationDiagnostic(diagnostics, ANIMATION_CODES.KEYFRAME_OUT_OF_RANGE,
+          `VARIANT '${child.name?.value}' TO tick ${to} must be greater than FROM tick ${from}.`,
+          child.span, { received: [String(from), String(to)] });
+        continue;
+      }
+      variants.push(Object.freeze({ name: String(child.name?.value || ''), fromTick: from, toTick: to }));
+    } else {
+      animationDiagnostic(diagnostics, TYPE_CODES.INVALID_OPERATION,
+        `Statement ${child.kind} is not legal inside a TIMELINE body.`, child.span,
+        { expected: ['TRACK', 'POSE', 'EVENT', 'VARIANT'] });
+    }
+  }
+
+  if (tracks.length === 0) {
+    animationDiagnostic(diagnostics, ANIMATION_CODES.EMPTY_TRACK,
+      `TIMELINE ${id} declares no TRACK; there is nothing to sample.`, declaration.span,
+      { relatedSymbols: [String(id)] });
+    return;
+  }
+
+  // A seamless loop must not duplicate its endpoint frame; a one-shot must keep
+  // the final pose. This is the only place frame count is decided.
+  const frameCount = (loop === 'ONCE' || loop === 'HOLD') ? durationTicks + 1 : durationTicks;
+
+  if (frameCount > 240) {
+    animationDiagnostic(diagnostics, ANIMATION_CODES.FRAME_BUDGET_EXCEEDED,
+      `TIMELINE ${id} requires ${frameCount} frames, exceeding maximum frame ceiling of 240.`,
+      declaration.span, { received: [String(frameCount)], expected: ['<= 240'] });
+    return;
+  }
+
+  timelines.push(Object.freeze({
+    id,
+    fps,
+    durationTicks,
+    frameCount,
+    loop,
+    tracks: Object.freeze(tracks),
+    events: Object.freeze(events),
+    variants: Object.freeze(variants),
+    poses: Object.freeze([...poses]),
+    scopeSnapshot,
+  }));
+
+  symbols.set(id, Object.freeze({ type: 'TIMELINE', value: id }));
+}
+
+function analyzeClipDeclaration(declaration, symbols, diagnostics, clips, timelines) {
+  const id = declaration.id?.value;
+  const timelineName = declaration.timeline?.value;
+  const timeline = timelines.find((entry) => entry.id === timelineName);
+  if (!timeline) {
+    animationDiagnostic(diagnostics, ANIMATION_CODES.UNKNOWN_TIMELINE,
+      `CLIP '${id}' references undeclared TIMELINE '${timelineName}'.`, declaration.span,
+      { relatedSymbols: [String(timelineName)] });
+    return;
+  }
+  if (clips.some((clip) => clip.id === id)) {
+    animationDiagnostic(diagnostics, ANIMATION_CODES.DUPLICATE_TRACK,
+      `Duplicate CLIP id '${id}'.`, declaration.span, { relatedSymbols: [String(id)] });
+    return;
+  }
+
+  let loop = timeline.loop;
+  if (declaration.loop) {
+    const loopExpr = evaluateExpression(declaration.loop, symbols, diagnostics);
+    loop = loopExpr && loopExpr.type === 'IDENT' ? String(loopExpr.value).toUpperCase() : loop;
+    if (!LOOP_MODES.includes(loop)) {
+      animationDiagnostic(diagnostics, ANIMATION_CODES.UNKNOWN_LOOP_MODE,
+        `Unknown CLIP LOOP mode '${loop}'.`, declaration.span,
+        { expected: [...LOOP_MODES], received: [loop] });
+      return;
+    }
+  }
+
+  let atTick = 0;
+  if (declaration.at) {
+    const resolved = resolveDurationTicks(declaration.at, timeline.fps, symbols, diagnostics, declaration.span, 'CLIP AT');
+    if (resolved === null) return;
+    atTick = resolved;
+  }
+
+  clips.push(Object.freeze({ id, timeline: timelineName, atTick, loop }));
+}
+
+/**
+ * Evaluate one preserved FORMULA node at one sample instant. Exported for
+ * scdl-v2.animation.js: the sampler binds the time symbols and replays the
+ * author's constants, then folds the expression exactly as the analyzer would.
+ */
+export function evaluateTrackFormula(formulaNode, scopeSnapshot, timeBindings) {
+  const diagnostics = [];
+  const symbols = new Map(Object.entries(scopeSnapshot || {}));
+  for (const [key, value] of Object.entries(timeBindings || {})) symbols.set(key, value);
+  ensureAnalyzerContext(symbols);
+  const value = evaluateExpression(formulaNode, symbols, diagnostics);
+  return Object.freeze({ ok: diagnostics.length === 0 && value !== null, value, diagnostics: Object.freeze(diagnostics) });
+}
+
+// ---------------------------------------------------------------------------
 // Public entry point
 // ---------------------------------------------------------------------------
 
@@ -3303,6 +3792,8 @@ export function analyzeSCDLV2(ast, options = {}) {
     const functionsList = [];
     const rngs = [];
     const explicitAmps = [];
+    const timelines = [];
+    const clips = [];
     let selectAmpsRequested = false;
     let selectAmpsConfig = null;
 
@@ -3374,6 +3865,12 @@ export function analyzeSCDLV2(ast, options = {}) {
         case 'LayerDeclaration':
           analyzeLayerDeclaration(declaration, symbols, diagnostics, layers);
           break;
+        case 'TimelineDeclaration':
+          analyzeTimelineDeclaration(declaration, symbols, diagnostics, timelines);
+          break;
+        case 'ClipDeclaration':
+          analyzeClipDeclaration(declaration, symbols, diagnostics, clips, timelines);
+          break;
         case 'ApplyAmpStatement':
           analyzeApplyAmpDeclaration(declaration, symbols, diagnostics, explicitAmps, shapes);
           break;
@@ -3439,6 +3936,8 @@ export function analyzeSCDLV2(ast, options = {}) {
           sequences,
           functions: functionsList,
           rngs,
+          timelines,
+          clips,
           ampPlan,
           selectedAmps,
           explicitAmps,

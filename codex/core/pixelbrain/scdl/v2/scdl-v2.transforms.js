@@ -56,6 +56,7 @@ export function createAngle(value, unit = 'DEGREES') {
     kind: 'ANGLE',
     unit: u,
     raw: rVal,
+    sweepTurns: turns,
     turns: normTurns,
   });
 }

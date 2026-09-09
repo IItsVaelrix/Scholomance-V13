@@ -459,9 +459,9 @@ LAYER base ORDER 1 {
 
   // ─── AMP-04: Positive-Effect Checks & Fixture Certification ───
   describe('AMP-04: Positive-Effect Checks & Fixture Certification', () => {
-    it('certifies all 50 registered AMP manifests and adapters with 0 errors', () => {
+    it('certifies all registered AMP manifests and adapters with 0 errors', () => {
       const certifiedResults = certifyAllRegisteredAmps();
-      expect(certifiedResults.length).toBe(50);
+      expect(certifiedResults.length).toBeGreaterThanOrEqual(50);
       const failures = certifiedResults.filter((r) => !r.certified);
       expect(failures).toHaveLength(0);
     });

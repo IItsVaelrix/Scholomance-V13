@@ -15,6 +15,7 @@ import { createPixelBrainAssetPacket } from './pixelbrain-asset-packet.js';
 import { renderCoordinatesVri } from './vixel/index.js';
 import { LINEAGE_CONTRACT } from './lineage-verify.js';
 import { defaultDigest } from './asset-pipeline.js';
+import { compileWandToSCDLV2, transpileWandToSCDLV2 } from './scdl/v2/scdl-v2.wand-bridge.js';
 
 import './character-body-profiles.js';
 import './character-face-profiles.js';
@@ -950,6 +951,13 @@ export function forgeCharacterFromWandVector(wandProposal, baseSpec = {}, opts =
 
   const pbrainBlueprint = exportCharacterToPbrainBlueprint({ spec: mergedSpec, canvas, vectorPaths, vectorSource: 'wand', fills, construction: {} });
 
+  let scdlResult = null;
+  try {
+    scdlResult = compileWandToSCDLV2(wandProposal, { canvas, name: mergedSpec.id || 'wand_character' });
+  } catch (_e) {
+    // Non-blocking fallback
+  }
+
   const assetPacket = createPixelBrainAssetPacket({
     id: `character_${mergedSpec.id || 'wand'}_${hashCharacterSpec(mergedSpec)}`,
     source: { kind: 'character-foundry-wand', id: mergedSpec.id || null },
@@ -974,12 +982,18 @@ export function forgeCharacterFromWandVector(wandProposal, baseSpec = {}, opts =
     pixelLotusActor: exportCharacterToPixelLotusActor({ spritesheet, canvas, spec: mergedSpec }),
     assetPacket,
     blueprint: pbrainBlueprint,
+    scdlSource: scdlResult?.transpiledSource || null,
+    scdlPackage: scdlResult?.package || null,
+    scdlBytecode: scdlResult?.bytecode || null,
+    scdlPacket: scdlResult?.packet || null,
+    scdlOk: scdlResult?.ok ?? false,
     diagnostics: {
       source: 'wand-vector',
       pointCount: vectorCoords.length,
       cellCount: fills.coordinates.length,
       roles: Object.keys(byRole),
       directions,
+      scdlCompiled: scdlResult?.ok ?? false,
     },
   });
 }

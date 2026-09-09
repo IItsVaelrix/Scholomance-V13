@@ -11,6 +11,7 @@ import {
   synthesizeTileForgeAsset,
   synthesizeTileForgeRegion,
 } from '../../../lib/pixelbrain/tileForge.adapter.js';
+import { composeTutorialForestDecor } from '../world/forestComposition.js';
 
 export const TUTORIAL_FOREST_FORGE_PLAN_CONTRACT = 'PB-TUTORIAL-FOREST-FORGE-PLAN-v1';
 
@@ -124,7 +125,44 @@ function compileActors(world, seed) {
     .forEach((water, index) => {
       actors.push(actorDescriptor(water, 'lotus_cluster', 'pond', index, seed));
     });
+  composeTutorialForestDecor(world, { seed }).forEach((decor, index) => {
+    actors.push(Object.freeze({
+      ...actorDescriptor(decor, decor.semanticType, 'decor', index, seed),
+      offsetX: decor.offsetX,
+      offsetY: decor.offsetY,
+      interactive: decor.interactive,
+    }));
+  });
   return Object.freeze(actors);
+}
+
+const CANOPY_SHADOW_PROFILES = Object.freeze({
+  canopy_oak: Object.freeze({ rx: 70, ry: 30, strength: 0.5 }),
+  canopy_maple: Object.freeze({ rx: 58, ry: 25, strength: 0.46 }),
+  canopy_pine: Object.freeze({ rx: 38, ry: 16, strength: 0.42 }),
+  young_sapling: Object.freeze({ rx: 22, ry: 10, strength: 0.3 }),
+});
+
+/**
+ * Project each tree's cast shadow (offset south-east, away from the upper-left
+ * key light) into the region composition so the ground fabric occludes under it.
+ */
+function compileCanopyShadows(world) {
+  return Object.freeze(world.trees
+    .map((tree) => {
+      const profile = CANOPY_SHADOW_PROFILES[TREE_ACTOR_TYPES[tree.speciesKey]];
+      if (!profile) return null;
+      return Object.freeze({
+        tx: tree.tx,
+        ty: tree.ty,
+        ox: 18,
+        oy: 9,
+        rx: profile.rx,
+        ry: profile.ry,
+        strength: profile.strength,
+      });
+    })
+    .filter(Boolean));
 }
 
 function compileComposition(world, regionCells, actors) {
@@ -179,6 +217,7 @@ function compileComposition(world, regionCells, actors) {
       actorCount: world.trees.length,
       openCenterRatio: (centralCells.length - centralTreeKeys.size) / centralCells.length,
     }),
+    canopyShadows: compileCanopyShadows(world),
   });
 }
 

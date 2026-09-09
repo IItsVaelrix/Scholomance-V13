@@ -3,9 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import styles from './InventoryOverlay.module.css';
 import { getInventorySnapshot, setInventorySnapshot } from '../../game/inventory/inventoryService.js';
 import { inventorySlotOf } from '../../data/itemDatabase.js';
-
-// Using the recently compiled IdealHuman PNG for the character preview
-const CHARACTER_IMAGE_URL = '/generated-assets/IdealHuman/IdealHuman-png.png';
+import { getLotusWandererPortraitUrl } from '../../game/tutorial-forest/render/lotusWandererPortrait.js';
 
 const EQUIPMENT_SLOTS = [
   { id: 'head', label: 'Head', pos: 'head' },
@@ -19,18 +17,6 @@ const EQUIPMENT_SLOTS = [
   { id: 'legs', label: 'Legs', pos: 'legs' },
   { id: 'boots', label: 'Boots', pos: 'boots' },
 ];
-
-const MODEL_ANCHORS = {
-  head: { top: '15%', left: '50%', scale: 0.35 },
-  chest: { top: '38%', left: '50%', scale: 0.45 },
-  legs: { top: '65%', left: '50%', scale: 0.45 },
-  boots: { top: '85%', left: '50%', scale: 0.35 },
-  weapon: { top: '45%', left: '75%', scale: 0.65 },
-  offhand: { top: '45%', left: '25%', scale: 0.5 },
-  amulet: { top: '25%', left: '50%', scale: 0.2 },
-  ring1: { top: '55%', left: '30%', scale: 0.15 },
-  ring2: { top: '55%', left: '70%', scale: 0.15 },
-};
 
 export function InventoryOverlay() {
   const [isOpen, setIsOpen] = useState(false);
@@ -171,23 +157,11 @@ export function InventoryOverlay() {
               <div className={styles.characterPane}>
                 <div className={styles.characterDisplay}>
                   <div className={styles.modelWrapper}>
-                    {/* SVG Filter for Muscle Morphing */}
-                    <svg style={{ position: 'absolute', width: 0, height: 0, pointerEvents: 'none' }}>
-                      <defs>
-                        <filter id="muscleMorph" x="0" y="0" width="100%" height="100%">
-                          <feImage href={CHARACTER_IMAGE_URL} result="muscleMap" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" />
-                          <feDisplacementMap 
-                            in="SourceGraphic" 
-                            in2="muscleMap" 
-                            scale="4" 
-                            xChannelSelector="R" 
-                            yChannelSelector="G" 
-                          />
-                        </filter>
-                      </defs>
-                    </svg>
-
-                    <img src={CHARACTER_IMAGE_URL} alt="Character Model" className={styles.characterModelBase} />
+                    <img
+                      src={getLotusWandererPortraitUrl({ equipped })}
+                      alt="Character Model"
+                      className={styles.characterModelBase}
+                    />
                     {equipped.chest && <img src={equipped.chest.sprite} alt="" className={styles.characterModelLayer} />}
                     {equipped.legs && <img src={equipped.legs.sprite} alt="" className={styles.characterModelLayer} />}
                     {equipped.boots && <img src={equipped.boots.sprite} alt="" className={styles.characterModelLayer} />}

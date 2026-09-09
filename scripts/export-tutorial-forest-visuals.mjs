@@ -84,9 +84,13 @@ export async function composeTutorialForestVisual(options = {}) {
     const cellCenterX = anchor.x + 40;
     const cellCenterY = anchor.y + 20;
     const asset = descriptor.asset;
-    const posX = Math.round(cellCenterX - (asset.anchor?.x ?? 0.5) * asset.width);
-    const posY = Math.round(cellCenterY - (asset.anchor?.y ?? 1.0) * asset.height);
-    const depth = cellCenterY + (asset.depthBias ?? 0);
+    const posX = Math.round(
+      cellCenterX - (asset.anchor?.x ?? 0.5) * asset.width + (descriptor.offsetX ?? 0),
+    );
+    const posY = Math.round(
+      cellCenterY - (asset.anchor?.y ?? 1.0) * asset.height + (descriptor.offsetY ?? 0),
+    );
+    const depth = cellCenterY + (descriptor.offsetY ?? 0) + (asset.depthBias ?? 0);
 
     actorPlacements.push({
       descriptor,

@@ -72,29 +72,66 @@ function registerPlayer(scene) {
     textureKeys.push(textureKey);
   }
 
-  if (scene.anims && !scene.anims.exists('player_idle')) {
-    scene.anims.create({
-      key: 'player_idle',
-      frames: [{ key: 'player_idle_0' }, { key: 'player_idle_1' }],
-      frameRate: 2,
-      repeat: -1,
-    });
-  }
-  if (scene.anims && !scene.anims.exists('player_walk')) {
-    scene.anims.create({
-      key: 'player_walk',
-      frames: [
-        { key: 'player_walk_0' },
-        { key: 'player_walk_1' },
-        { key: 'player_walk_2' },
-        { key: 'player_walk_3' },
-      ],
-      frameRate: 6,
-      repeat: -1,
-    });
+  if (scene.anims) {
+    const defineAnim = (key, frameKeys, frameRate = 6, repeat = -1) => {
+      if (!scene.anims.exists(key)) {
+        scene.anims.create({
+          key,
+          frames: frameKeys.map((k) => ({ key: k })),
+          frameRate,
+          repeat,
+        });
+      }
+    };
+
+    // Idle animations
+    defineAnim('player_idle', ['player_idle_0', 'player_idle_1'], 2);
+    defineAnim('player_idle_south', ['player_idle_0', 'player_idle_1'], 2);
+    defineAnim('player_idle_north', ['player_back_0'], 2);
+    defineAnim('player_idle_east', ['player_east_0'], 2);
+    defineAnim('player_idle_west', ['player_west_0'], 2);
+
+    // Walk animations (8-frame smooth locomotion at 8 FPS)
+    const southWalkFrames = Array.from({ length: 8 }, (_, i) => `player_walk_${i}`);
+    const northWalkFrames = Array.from({ length: 8 }, (_, i) => `player_walk_north_${i}`);
+    const eastWalkFrames = Array.from({ length: 8 }, (_, i) => `player_walk_east_${i}`);
+    const westWalkFrames = Array.from({ length: 8 }, (_, i) => `player_walk_west_${i}`);
+
+    defineAnim('player_walk', southWalkFrames, 8);
+    defineAnim('player_walk_south', southWalkFrames, 8);
+    defineAnim('player_walk_north', northWalkFrames, 8);
+    defineAnim('player_walk_east', eastWalkFrames, 8);
+    defineAnim('player_walk_west', westWalkFrames, 8);
   }
 
   return Object.freeze({ width, height, textureKeys: Object.freeze(textureKeys) });
+}
+
+/**
+ * Rasterize the region's water_pond material mask into a white/black RGBA asset
+ * so runtime shaders can mesh effects to the exact water silhouette instead of
+ * approximating it with per-tile boxes.
+ */
+function buildWaterMaskAsset(ground) {
+  const mask = ground.form?.materialMasks?.water_pond;
+  if (!mask) return null;
+  let any = false;
+  for (let i = 0; i < mask.length; i += 1) {
+    if (mask[i] === 1) {
+      any = true;
+      break;
+    }
+  }
+  if (!any) return null;
+  const data = new Uint8ClampedArray(ground.width * ground.height * 4);
+  for (let i = 0; i < mask.length; i += 1) {
+    const on = mask[i] === 1 ? 255 : 0;
+    data[i * 4] = on;
+    data[i * 4 + 1] = on;
+    data[i * 4 + 2] = on;
+    data[i * 4 + 3] = 255;
+  }
+  return { width: ground.width, height: ground.height, data };
 }
 
 /**
@@ -107,6 +144,14 @@ export function buildTutorialForestAssets(scene, world, { seed = world?.seed ?? 
 
   uploadRgbaToPhaserTexture(scene, environment.ground.textureKey, environment.ground);
   ownedTextureKeys.push(environment.ground.textureKey);
+
+  const waterMask = buildWaterMaskAsset(environment.ground);
+  let waterMaskKey = null;
+  if (waterMask) {
+    waterMaskKey = `tileforge-water-mask-${environment.ground.realizationHash}`;
+    uploadRgbaToPhaserTexture(scene, waterMaskKey, waterMask);
+    ownedTextureKeys.push(waterMaskKey);
+  }
 
   const actors = environment.actors.map((descriptor) => {
     const textureKey = `tileforge-actor-${descriptor.semanticType}-${descriptor.asset.realizationHash}`;
@@ -126,6 +171,7 @@ export function buildTutorialForestAssets(scene, world, { seed = world?.seed ?? 
       originX: environment.ground.originX,
       originY: environment.ground.originY,
       realizationHash: environment.ground.realizationHash,
+      waterMaskKey,
     }),
     actors: Object.freeze(actors),
     player,

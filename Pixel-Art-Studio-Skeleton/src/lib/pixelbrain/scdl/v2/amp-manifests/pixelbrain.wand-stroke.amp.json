@@ -1,0 +1,68 @@
+{
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.wand-stroke",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "SHAPE_POST",
+  "scope": [
+    "SHAPE",
+    "LAYER"
+  ],
+  "inputs": [
+    {
+      "name": "geometry",
+      "type": "SHAPE",
+      "required": false,
+      "description": "Base shape geometry or anchor points"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "formula",
+      "type": "ANY",
+      "default": "mathematical_stroke",
+      "description": "Wand formula dialect name"
+    },
+    {
+      "name": "pixelArtQuantize",
+      "type": "BOOL",
+      "default": true,
+      "description": "Enforce strict discrete integer grid quantization"
+    },
+    {
+      "name": "strokeWidth",
+      "type": "FIXED",
+      "default": 1,
+      "description": "Stroke width in discrete pixels"
+    },
+    {
+      "name": "density",
+      "type": "FIXED",
+      "default": 1,
+      "description": "Sampling density factor"
+    }
+  ],
+  "output": {
+    "type": "SHAPE",
+    "description": "Geometry refined through Wand mathematical stroke and quantized to pixel art"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 2,
+    "fixed": 0
+  },
+  "order": 35,
+  "relevance": {
+    "pipelines": [
+      "character",
+      "item",
+      "render-fidelity"
+    ],
+    "conditions": []
+  },
+  "checksum": "ad8a10682d86776a910bfce40962b64aeeed798dae834d91b0f2bcd4a3e65ce2"
+}

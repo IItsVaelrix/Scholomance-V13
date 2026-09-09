@@ -4,12 +4,13 @@ import { ResizableBox } from 'react-resizable';
 import {
   Sparkles, Terminal, Save, AlertTriangle, CheckCircle,
   Sliders, Copy, AlignLeft, Grid, ZoomIn, ZoomOut, X,
-  Download,
+  Download, FileCode,
 } from 'lucide-react';
 import { validateDivProposal } from '../../lib/engine.adapter.js';
 import { DivLayoutRenderer } from '../../features/divwand/DivLayoutRenderer.jsx';
 import { generateCatalogId } from '../../lib/catalogId.js';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js';
+import { compileWandToSCDLV2, publishWandSCDLV2 } from '../../lib/pixelbrain.adapter.js';
 import obsidianChoirCrystalProposal from './obsidian-choir-crystal.formula.json';
 import './DivWandPage.css';
 
@@ -387,6 +388,36 @@ export default function DivWandPage({ onSendToVideoForge } = {}) {
     }
   }, [lineCount, nodeCount, onSendToVideoForge, proposalText, treeDepth]);
 
+  const handleCompileToSCDLV2 = useCallback(() => {
+    try {
+      const parsed = JSON.parse(proposalText);
+      const layoutNode = parsed.proposedLayout || parsed;
+      const res = compileWandToSCDLV2(layoutNode);
+      if (res.ok) {
+        publishWandSCDLV2(res);
+        setTerminalLogs(prev => [
+          ...prev,
+          {
+            type: 'success',
+            text: `DivWand compiled to SCDL V2! Program: ${res.bytecode?.programId} (${res.packet?.geometry?.coordinates?.length || 0} discrete pixel cells).`,
+            ts: ts(),
+          },
+        ]);
+      } else {
+        setTerminalLogs(prev => [
+          ...prev,
+          {
+            type: 'error',
+            text: `SCDL V2 compilation failed: ${res.diagnostics?.map(d => d.message).join('; ') || 'Diagnostics error'}`,
+            ts: ts(),
+          },
+        ]);
+      }
+    } catch (err) {
+      setTerminalLogs(prev => [...prev, { type: 'error', text: `Compilation error: ${err.message}`, ts: ts() }]);
+    }
+  }, [proposalText]);
+
   // ── RENDER ────────────────────────────────────────────────────────────────
 
   return (
@@ -418,6 +449,21 @@ export default function DivWandPage({ onSendToVideoForge } = {}) {
           >
             <Save size={13} aria-hidden="true" />
             Register
+          </button>
+          <button
+            className="dw-btn"
+            onClick={handleCompileToSCDLV2}
+            disabled={!validationResult.valid}
+            title="Compile layout proposal into canonical SCDL V2 pixel art frame"
+            aria-label="Compile DivWand layout proposal to SCDL V2"
+            type="button"
+            style={{
+              borderColor: 'rgba(0, 229, 255, 0.5)',
+              color: '#00e5ff',
+            }}
+          >
+            <FileCode size={13} aria-hidden="true" />
+            Compile → SCDL V2
           </button>
 
           {onSendToVideoForge && (

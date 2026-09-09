@@ -624,7 +624,7 @@ SCDL-TERM-*     SCDL-BUDGET-*    SCDL-GEOM-*     SCDL-AMP-*
 SCDL-LOWER-*    SCDL-EMIT-*
 ```
 
-`SCDL-ANIM-*` is reserved by the architecture and unused (Step 4 unshipped).
+`SCDL-ANIM-*` is active in Step 4 Mathematical Animation (`SCDL-ANIM-001` through `SCDL-ANIM-013` in `scdl-v2.types.js`, enforcing timeline validation and budget caps).
 
 **Known code collision:** `TERM_CODES.MUTUAL_RECURSION` and `TERM_CODES.INVALID_CONTROL_FLOW` are both `SCDL-TERM-004` in `scdl-v2.types.js`. Treat `SCDL-TERM-004` as “control-flow/termination illegal”; read `message` to distinguish.
 
@@ -1573,7 +1573,7 @@ A sign-off that skips the new-asset phase (8) or the catalog gate (9–10) is no
 
 ### 19.1 Language / compiler
 
-- **Step 4 animation:** `TIMELINE`, tracks, keyframes, formulas, poses, finite sampling, `frameLoop`, Aseprite tags from v2. Packages currently force `animation: null`. `TIMELINE` exists as an **AMP conveyor stage** (post-raster); an adapter may attach frames there, but there is no v2 source statement. v1 `loop`/`frame` still works on **unversioned** sources only — do not mix it into `SCDL 2`.
+- **Step 4 animation (SHIPPED):** `TIMELINE`, tracks, keyframes, formulas, poses, finite sampling, `frameLoop`, and Aseprite tag export are operational and verified. Features versioned deterministic easing curves (`EASING_VERSION = 1.0.0`), harmonic time symbols (`$time`, `$time_normalized`, `$frame`, `$t`, `TAU`), `ANIMATION.TIMELINE@1.0` SSA bytecode lowering, and multi-frame immutable raster packet emission verified against `kinetic-orb.scdl` and `swaying-forest-sentinel.scdl` golden fixtures.
 - **`SKEW`:** named in the Step 2 plan; **absent** from the opcode registry and `scdl-v2.transforms.js`.
 - **Imports / modules / REQUIRES:** content-addressed `IMPORT`, capability blocks. Not parsed.
 - **`MAP` / `FILTER` / `FOLD`:** parse, then `SCDL-TYPE-003`. Do not author them.

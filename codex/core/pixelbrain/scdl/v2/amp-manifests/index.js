@@ -2814,6 +2814,75 @@ export const DIRT_MANIFEST = Object.freeze({
   "checksum": "39ee48025e1e4e28c0d3e90df9cf785fd4501db1ebc29564c5a544b6af7687e8"
 });
 
+export const WAND_STROKE_MANIFEST = Object.freeze({
+  "contract": "PB-AMP-ABI-v1",
+  "ampId": "pixelbrain.wand-stroke",
+  "version": "1.0.0",
+  "execution": "COMPILE",
+  "stage": "SHAPE_POST",
+  "scope": [
+    "SHAPE",
+    "LAYER"
+  ],
+  "inputs": [
+    {
+      "name": "geometry",
+      "type": "SHAPE",
+      "required": false,
+      "description": "Base shape geometry or anchor points"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "formula",
+      "type": "ANY",
+      "default": "mathematical_stroke",
+      "description": "Wand formula dialect name"
+    },
+    {
+      "name": "pixelArtQuantize",
+      "type": "BOOL",
+      "default": true,
+      "description": "Enforce strict discrete integer grid quantization"
+    },
+    {
+      "name": "strokeWidth",
+      "type": "FIXED",
+      "default": 1,
+      "description": "Stroke width in discrete pixels"
+    },
+    {
+      "name": "density",
+      "type": "FIXED",
+      "default": 1,
+      "description": "Sampling density factor"
+    }
+  ],
+  "output": {
+    "type": "SHAPE",
+    "description": "Geometry refined through Wand mathematical stroke and quantized to pixel art"
+  },
+  "determinism": {
+    "class": "PURE",
+    "seedRequired": false
+  },
+  "cost": {
+    "model": "LINEAR_IN_CELLS",
+    "multiplier": 2,
+    "fixed": 0
+  },
+  "order": 35,
+  "relevance": {
+    "pipelines": [
+      "character",
+      "item",
+      "render-fidelity"
+    ],
+    "conditions": []
+  },
+  "checksum": "ad8a10682d86776a910bfce40962b64aeeed798dae834d91b0f2bcd4a3e65ce2"
+});
+
 export const ANCHOR_MANIFESTS = Object.freeze([
   BIOME_COHERENCE_MANIFEST,
   BIOME_MATERIAL_MANIFEST,
@@ -2865,4 +2934,5 @@ export const ANCHOR_MANIFESTS = Object.freeze([
   VOLUME_LIFT_MANIFEST,
   VOLUME_PROCESSOR_MANIFEST,
   VOLUME_MANIFEST,
+  WAND_STROKE_MANIFEST,
 ]);

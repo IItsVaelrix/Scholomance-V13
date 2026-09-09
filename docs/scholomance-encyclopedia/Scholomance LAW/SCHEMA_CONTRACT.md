@@ -4457,3 +4457,19 @@ interface ConstructionToSCDLResult {
 
 This document is maintained by Codex with Angel's awareness.
 All agents read it before acting on shared data contracts.
+
+## SCHOL-GAME-UI-v1 presentation contract — 2026-09-08
+
+User-authorized MMORPG presentation suite. Canonical TypeScript projections are
+`src/lib/mmorpg/contracts.ts`; pure window and subscription transitions are in
+`src/lib/mmorpg/state.ts`. These project existing game state and do not create a
+second gameplay authority. SystemResource explicitly distinguishes unavailable,
+loading, ready and error; optional command capabilities return Receipt and retain
+validation/resolution in the supplying authority. SystemData supports registry,
+quest, ability, graph, unit, region, recipe, item, chat, dialogue and enchantment
+projections. Missing optional facts must remain absent, never fabricated.
+DragPayload identifies kind/id/source/index/revision, and stale revisions must be
+rejected. WindowRecord geometry and UiSettings are local presentation preferences.
+All layering uses the existing semantic stacking tiers in nested contexts.
+Inventory currently persists IDs only: new stack, sale, binding or socket mutations
+require a supplying game capability rather than new persistence inside components.
